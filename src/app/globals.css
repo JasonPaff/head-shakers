@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@plugin "tailwindcss-animate";
+@plugin "tailwindcss-radix" {
+  variantPrefix: rdx;
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

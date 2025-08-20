@@ -1,7 +1,17 @@
+'use client'
+
 import Image from "next/image";
+import {useState} from "react";
+import {AblyProvider, ChannelProvider, useChannel, useConnectionStateListener} from "ably/react";
+import * as Ably from 'ably';
 
 export default function Home() {
+  const client = new Ably.Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' });
+
+
   return (
+      <AblyProvider client={client}>
+        <ChannelProvider channelName="get-started">
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <Image
@@ -50,6 +60,7 @@ export default function Home() {
             Read our docs
           </a>
         </div>
+        <AblyPubSub/>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <a
@@ -99,5 +110,34 @@ export default function Home() {
         </a>
       </footer>
     </div>
+        </ChannelProvider>
+      </AblyProvider>
+  );
+}
+
+function AblyPubSub() {
+  const [messages, setMessages] = useState([]);
+
+  useConnectionStateListener('connected', () => {
+    console.log('Connected to Ably!');
+  });
+
+  // Create a channel called 'get-started' and subscribe to all messages with the name 'first' using the useChannel hook
+  const { channel } = useChannel('get-started', 'first', (message) => {
+    setMessages(previousMessages => [...previousMessages, message]);
+  });
+
+  return (
+      // Publish a message with the name 'first' and the contents 'Here is my first message!' when the 'Publish' button is clicked
+      <div>
+        <button onClick={() => { channel.publish('first', 'Here is my first message!') }}>
+          Publish
+        </button>
+        {
+          messages.map(message => {
+            return <p key={message.id}>{message.data}</p>
+          })
+        }
+      </div>
   );
 }
