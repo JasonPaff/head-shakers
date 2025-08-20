@@ -3,10 +3,10 @@
 import Image from "next/image";
 import {useState} from "react";
 import {AblyProvider, ChannelProvider, useChannel, useConnectionStateListener} from "ably/react";
-import * as Ably from 'ably';
+import {Realtime, Message} from 'ably';
 
 export default function Home() {
-  const client = new Ably.Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' });
+  const client = new Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' });
 
 
   return (
@@ -116,7 +116,7 @@ export default function Home() {
 }
 
 function AblyPubSub() {
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Array<Message>>([]);
 
   useConnectionStateListener('connected', () => {
     console.log('Connected to Ably!');
@@ -130,7 +130,7 @@ function AblyPubSub() {
   return (
       // Publish a message with the name 'first' and the contents 'Here is my first message!' when the 'Publish' button is clicked
       <div>
-        <button onClick={() => { channel.publish('first', 'Here is my first message!') }}>
+        <button onClick={() => { void channel.publish('first', 'Here is my first message!') }}>
           Publish
         </button>
         {
