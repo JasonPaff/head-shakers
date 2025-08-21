@@ -10,7 +10,8 @@ import eslintTypescript from 'typescript-eslint';
 import eslintTypescriptParser from '@typescript-eslint/parser';
 import globals from 'globals';
 
-// TODO: tailwind plugin
+// TODO: tailwind plugins
+// TODO: testing plugins
 
 export default eslintTypescript.config([
   // typescript config
@@ -37,20 +38,25 @@ export default eslintTypescript.config([
       ...eslintNextJs.configs.recommended.rules,
     },
   },
-  eslintReact.configs.flat.recommended,
   {
     plugins: {
       'react-hooks': eslintReactHooks,
     },
     rules: {
       ...eslintReactHooks.configs.recommended.rules,
-      'react/react-in-jsx-scope': 'off',
-      'react/prop-types': 'off',
     },
   },
+  eslintReact.configs.flat.recommended,
   eslintJsxA11y?.flatConfigs.recommended,
   ...eslintTanstackQuery.configs['flat/recommended'],
   eslintTypescript.configs.recommendedTypeChecked,
   eslintPrettier,
   eslintPerfectionist.configs['recommended-natural'],
+  // customize rules
+  {
+    rules: {
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+    },
+  },
 ]);
