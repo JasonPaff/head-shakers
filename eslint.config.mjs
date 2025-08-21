@@ -57,6 +57,9 @@ export default eslintTypescript.config([
     rules: {
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      '@typescript-eslint/consistent-type-exports': ['error', { fixMixedExportsWithInlineTypeSpecifier: true }],
+      '@typescript-eslint/consistent-type-imports': 'error',
+      eqeqeq: 'error',
     },
   },
 ]);

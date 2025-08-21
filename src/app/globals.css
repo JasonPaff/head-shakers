@@ -24,6 +24,14 @@
   }
 }
 
+* {
+  @apply border-border scroll-smooth antialised
+}
+
+html {
+  scrollbar-gutter: auto;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
