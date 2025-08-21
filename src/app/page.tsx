@@ -1,12 +1,23 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AblyProvider, ChannelProvider, useChannel, useConnectionStateListener } from 'ably/react';
 import { Realtime, Message } from 'ably';
 
 export default function Home() {
   const client = new Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' });
+
+  const getAThing = () => {
+    return 'thing';
+  };
+
+  const apple = 'yum';
+
+  useEffect(() => {
+    console.log(apple);
+    getAThing();
+  }, []);
 
   return (
     <AblyProvider client={client}>
