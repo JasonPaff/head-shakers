@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { ClerkProvider, SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import './globals.css';
+import '../globals.css';
 import type { Children } from '@/types/component-types';
 
 const geistSans = Geist({
