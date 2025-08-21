@@ -1,0 +1,56 @@
+import eslintJs from '@eslint/js';
+import eslintJsxA11y from 'eslint-plugin-jsx-a11y';
+import eslintNextJs from '@next/eslint-plugin-next';
+import eslintPerfectionist from 'eslint-plugin-perfectionist';
+import eslintTanstackQuery from '@tanstack/eslint-plugin-query';
+import eslintPrettier from 'eslint-config-prettier';
+import eslintReact from 'eslint-plugin-react';
+import eslintReactHooks from 'eslint-plugin-react-hooks';
+import eslintTypescript from 'typescript-eslint';
+import eslintTypescriptParser from '@typescript-eslint/parser';
+import globals from 'globals';
+
+// TODO: tailwind plugin
+
+export default eslintTypescript.config([
+  // typescript config
+  {
+    files: ['**/*.{ts,tsx,cts,mts}'],
+    languageOptions: {
+      globals: globals.browser,
+      parser: eslintTypescriptParser,
+      parserOptions: { cmaFeatures: { jsx: true }, project: true, sourceType: 'module' },
+    },
+  },
+  // global ignores
+  {
+    ignores: ['*.config.{js,cjs,mjs,ts, cts, mts}'],
+  },
+  // plugins
+  eslintJs.configs.recommended,
+  {
+    plugins: {
+      '@next/next': eslintNextJs,
+    },
+    rules: {
+      ...eslintNextJs.configs['core-web-vitals'].rules,
+      ...eslintNextJs.configs.recommended.rules,
+    },
+  },
+  eslintReact.configs.flat.recommended,
+  {
+    plugins: {
+      'react-hooks': eslintReactHooks,
+    },
+    rules: {
+      ...eslintReactHooks.configs.recommended.rules,
+      'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+    },
+  },
+  eslintJsxA11y?.flatConfigs.recommended,
+  ...eslintTanstackQuery.configs['flat/recommended'],
+  eslintTypescript.configs.recommendedTypeChecked,
+  eslintPrettier,
+  eslintPerfectionist.configs['recommended-natural'],
+]);
