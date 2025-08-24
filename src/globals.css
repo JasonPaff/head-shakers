@@ -1,4 +1,4 @@
-@import "../node_modules/tailwindcss";
+@import "tailwindcss";
 
 @plugin "tailwindcss-animate";
 @plugin "tailwindcss-radix" {

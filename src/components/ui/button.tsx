@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 
-import { cn } from '@/utils';
+import { cn } from '@/utils/tailwind-utils';
 
 const buttonVariants = cva(
   `

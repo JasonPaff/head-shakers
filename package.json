@@ -16,6 +16,7 @@
   "dependencies": {
     "@clerk/nextjs": "^6.31.3",
     "@neondatabase/serverless": "^1.0.1",
+    "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.3",
     "@sentry/nextjs": "10",
     "@tanstack/react-form": "^1.19.2",
@@ -60,7 +61,7 @@
     "eslint-plugin-perfectionist": "^4.15.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-snob": "^0.0.13",
+    "eslint-plugin-react-snob": "^0.0.14",
     "globals": "^16.3.0",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
