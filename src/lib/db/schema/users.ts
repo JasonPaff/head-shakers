@@ -29,7 +29,7 @@ export const dmPermissionEnum = pgEnum('dm_permission', ['anyone', 'followers', 
 export const loginMethodEnum = pgEnum('login_method', ['email', 'facebook', 'github', 'gmail', 'google']);
 export const privacyLevelEnum = pgEnum('privacy_level', ['public', 'followers', 'private']);
 export const themeEnum = pgEnum('theme', ['light', 'dark', 'auto']);
-export const userActivityTargetTypeEnum = pgEnum('target_type', ['bobblehead', 'collection', 'user', 'comment']);
+export const userActivityTargetTypeEnum = pgEnum('user_activity_target_type', ['bobblehead', 'collection', 'user', 'comment']);
 
 export const USER_SETTINGS_DEFAULTS = {
   CURRENCY: 'USD',
@@ -231,7 +231,7 @@ export const userActivity = pgTable(
     ipAddress: varchar('ip_address', { length: 45 }),
     metadata: jsonb('metadata'),
     targetId: uuid('target_id'),
-    targetType: userActivityTargetTypeEnum('target_type'),
+    targetType: userActivityTargetTypeEnum('user_activity_target_type'),
     userAgent: varchar('user_agent', { length: 1000 }),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
@@ -278,7 +278,7 @@ export const updateUserSchema = insertUserSchema.partial();
 
 export const selectUserSessionSchema = createSelectSchema(userSessions);
 export const insertUserSessionSchema = createInsertSchema(userSessions, {
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().ip().optional(),
   sessionToken: z.string().min(1).max(255),
   userAgent: z.string().max(1000).optional(),
 }).omit({
@@ -292,7 +292,7 @@ export const updateUserSessionSchema = insertUserSessionSchema.partial();
 export const selectLoginHistorySchema = createSelectSchema(loginHistory);
 export const insertLoginHistorySchema = createInsertSchema(loginHistory, {
   failureReason: z.string().max(255).optional(),
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().ip().optional(),
   userAgent: z.string().max(1000).optional(),
 }).omit({
   id: true,
@@ -335,7 +335,7 @@ export const insertUserBlockSchema = createInsertSchema(userBlocks, {
 
 export const selectUserActivitySchema = createSelectSchema(userActivity);
 export const insertUserActivitySchema = createInsertSchema(userActivity, {
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().ip().optional(),
 }).omit({
   createdAt: true,
   id: true,

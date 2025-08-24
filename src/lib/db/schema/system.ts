@@ -23,8 +23,8 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'mention',
   'system',
 ]);
-export const relatedTypeEnum = pgEnum('related_type', ['bobblehead', 'collection', 'comment', 'user']);
-export const contentTypeEnum = pgEnum('content_type', ['bobblehead', 'collection', 'user']);
+export const notificationRelatedTypeEnum = pgEnum('notification_related_type', ['bobblehead', 'collection', 'comment', 'user']);
+export const featuredContentTypeEnum = pgEnum('featured_content_type', ['bobblehead', 'collection', 'user']);
 export const featureTypeEnum = pgEnum('feature_type', [
   'homepage_banner',
   'collection_of_week',
@@ -60,7 +60,7 @@ export const notifications = pgTable(
     message: text('message'),
     readAt: timestamp('read_at'),
     relatedId: uuid('related_id'),
-    relatedType: relatedTypeEnum('related_type'),
+    relatedType: notificationRelatedTypeEnum('notification_related_type'),
     relatedUserId: uuid('related_user_id').references(() => users.id, { onDelete: 'cascade' }),
     title: varchar('title', { length: 255 }).notNull(),
     type: notificationTypeEnum('type').notNull(),
@@ -95,7 +95,7 @@ export const featuredContent = pgTable(
   'featured_content',
   {
     contentId: uuid('content_id').notNull(),
-    contentType: contentTypeEnum('content_type').notNull(),
+    contentType: featuredContentTypeEnum('featured_content_type').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     curatorId: uuid('curator_id').references(() => users.id, { onDelete: 'set null' }),
     description: text('description'),
@@ -234,7 +234,7 @@ export const publicPlatformSettingSchema = selectPlatformSettingSchema
     isPublic: z.literal(true),
   });
 
-export type ContentType = (typeof contentTypeEnum.enumValues)[number];
+export type ContentType = (typeof featuredContentTypeEnum.enumValues)[number];
 export type FeatureType = (typeof featureTypeEnum.enumValues)[number];
 export type InsertFeaturedContent = z.infer<typeof insertFeaturedContentSchema>;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
@@ -245,7 +245,7 @@ export type PublicFeaturedContent = z.infer<typeof publicFeaturedContentSchema>;
 export type PublicNotification = z.infer<typeof publicNotificationSchema>;
 
 export type PublicPlatformSetting = z.infer<typeof publicPlatformSettingSchema>;
-export type RelatedType = (typeof relatedTypeEnum.enumValues)[number];
+export type RelatedType = (typeof notificationRelatedTypeEnum.enumValues)[number];
 export type SelectFeaturedContent = z.infer<typeof selectFeaturedContentSchema>;
 export type SelectNotification = z.infer<typeof selectNotificationSchema>;
 

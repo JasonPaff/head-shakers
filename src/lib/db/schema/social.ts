@@ -20,9 +20,9 @@ const commentType = ['bobblehead', 'collection'] as const;
 const followType = ['user', 'collection'] as const;
 const likeType = ['bobblehead', 'collection', 'comment'] as const;
 
-export const commentTypeEnum = pgEnum('target_type', commentType);
+export const commentTargetTypeEnum = pgEnum('comment_target_type', commentType);
 export const followTypeEnum = pgEnum('follow_type', followType);
-export const likeTypeEnum = pgEnum('target_type', likeType);
+export const likeTargetTypeEnum = pgEnum('like_target_type', likeType);
 
 export const follows = pgTable(
   'follows',
@@ -52,6 +52,9 @@ export const follows = pgTable(
 
     // unique constraints
     uniqueIndex('follows_unique').on(table.followerId, table.followingId, table.followType, table.targetId),
+
+    // check constraints
+    check('follows_no_self_follow', sql`${table.followerId} != ${table.followingId}`),
   ],
 );
 
@@ -61,7 +64,7 @@ export const likes = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
     targetId: uuid('target_id').notNull(),
-    targetType: likeTypeEnum('target_type').notNull(),
+    targetType: likeTargetTypeEnum('like_target_type').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
@@ -95,7 +98,7 @@ export const comments = pgTable(
     likeCount: integer('like_count').default(0).notNull(),
     parentCommentId: uuid('parent_comment_id'),
     targetId: uuid('target_id').notNull(),
-    targetType: commentTypeEnum('target_type').notNull(),
+    targetType: commentTargetTypeEnum('comment_target_type').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })

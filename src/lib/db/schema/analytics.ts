@@ -19,7 +19,7 @@ export const searchFiltersSchema = z.object({
 
 export type SearchFilters = z.infer<typeof searchFiltersSchema>;
 
-export const contentViewsTargetTypeEnum = pgEnum('target_type', ['bobblehead', 'collection', 'profile']);
+export const contentViewsTargetTypeEnum = pgEnum('content_views_target_type', ['bobblehead', 'collection', 'profile']);
 export const resultTypeEnum = pgEnum('result_type', ['bobblehead', 'collection', 'user']);
 
 export const contentViews = pgTable(
@@ -29,7 +29,7 @@ export const contentViews = pgTable(
     ipAddress: varchar('ip_address', { length: 45 }),
     referrerUrl: text('referrer_url'),
     targetId: uuid('target_id').notNull(),
-    targetType: contentViewsTargetTypeEnum('target_type').notNull(),
+    targetType: contentViewsTargetTypeEnum('content_views_target_type').notNull(),
     userAgent: varchar('user_agent', { length: 1000 }),
     viewDuration: integer('view_duration'), // in seconds
     viewedAt: timestamp('viewed_at').defaultNow().notNull(),
@@ -76,7 +76,7 @@ export const searchQueries = pgTable(
 
 export const selectContentViewSchema = createSelectSchema(contentViews);
 export const insertContentViewSchema = createInsertSchema(contentViews, {
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().ip().optional(),
   referrerUrl: z.url().optional(),
   userAgent: z.string().min(1).max(1000).optional(),
   viewDuration: z.number().min(0).optional(),
@@ -90,7 +90,7 @@ export const updateContentViewSchema = insertContentViewSchema.partial();
 export const selectSearchQuerySchema = createSelectSchema(searchQueries);
 export const insertSearchQuerySchema = createInsertSchema(searchQueries, {
   filters: searchFiltersSchema.optional(),
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().ip().optional(),
   query: z.string().min(1).max(500),
   resultCount: z.number().min(0).optional(),
 }).omit({
