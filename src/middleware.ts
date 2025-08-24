@@ -14,17 +14,17 @@ const isPublicRoute = createRouteMatcher([
   '/browse(.*)',
 
   // public collection views (read-only)
-  '/collections/[^/]+$', // /collections/123 (view only)
-  '/collections/[^/]+/share(.*)', // Share links
+  '/collections/:id', // /collections/123 (view only)
+  '/collections/:id/share(.*)', // Share links
 
   // public item views (read-only)
-  '/items/[^/]+$', // /items/456 (view only)
-  '/items/[^/]+/share(.*)', // Share links
+  '/items/:id', // /items/456 (view only)
+  '/items/:id/share(.*)', // Share links
 
   // public user profiles (read-only)
-  '/users/[^/]+$', // /users/john-doe
-  '/users/[^/]+/collections(.*)', // /users/john-doe/collections
-  '/users/[^/]+/following(.*)', // /users/john-doe/following
+  '/users/:username', // /users/john-doe
+  '/users/:username/collections(.*)', // /users/john-doe/collections
+  '/users/:username/following(.*)', // /users/john-doe/following
 
   // homepage (can be viewed by anyone)
   '/',
@@ -42,9 +42,9 @@ const isProtectedRoute = createRouteMatcher([
   '/items/add(.*)',
 
   // edit routes - require auth + ownership check
-  '/collections/[^/]+/edit(.*)',
-  '/collections/[^/]+/settings(.*)',
-  '/items/[^/]+/edit(.*)',
+  '/collections/:id/edit(.*)',
+  '/collections/:id/settings(.*)',
+  '/items/:id/edit(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
