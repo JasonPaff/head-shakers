@@ -12,7 +12,7 @@ class SentryExampleFrontendError extends Error {
 }
 
 export default function Page() {
-  const [hasSentError, setHasSentError] = useState(false);
+  const [isSentError, setIsSentError] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function Page() {
         async () => {
           const res = await fetch('/api/sentry-example-api');
           if (!res.ok) {
-            setHasSentError(true);
+            setIsSentError(true);
           }
         },
       ))();
@@ -69,7 +69,11 @@ export default function Page() {
             Issues Page
           </a>
           . For more details about setting up Sentry,{' '}
-          <a href={'https://docs.sentry.io/platforms/javascript/guides/nextjs/'} rel={'noreferrer'} target={'_blank'}>
+          <a
+            href={'https://docs.sentry.io/platforms/javascript/guides/nextjs/'}
+            rel={'noreferrer'}
+            target={'_blank'}
+          >
             read our docs
           </a>
           .
@@ -79,13 +83,13 @@ export default function Page() {
           <span>Throw Sample Error</span>
         </button>
 
-        {hasSentError ?
+        {isSentError ?
           <p className={'success'}>Error sent to Sentry.</p>
         : !isConnected ?
           <div className={'connectivity-error'}>
             <p>
-              It looks like network requests to Sentry are being blocked, which will prevent errors from being captured.
-              Try disabling your ad-blocker to complete the test.
+              It looks like network requests to Sentry are being blocked, which will prevent errors from being
+              captured. Try disabling your ad-blocker to complete the test.
             </p>
           </div>
         : <div className={'success_placeholder'} />}
