@@ -25,7 +25,7 @@
 }
 
 * {
-  @apply border-border scroll-smooth antialised
+  @apply scroll-smooth antialiased
 }
 
 html {

@@ -4,7 +4,7 @@ import { ClerkProvider, SignedIn, SignedOut, SignInButton, SignUpButton, UserBut
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import '../globals.css';
-import type { Children } from '@/types/component-types';
+import { cn } from '@/utils/utils';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -33,9 +33,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
               <SignInButton mode={'redirect'} />
               <SignUpButton mode={'redirect'}>
                 <button
-                  className={
-                    'bg-[#6c47ff] text-ceramic-white rounded-full font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer'
-                  }
+                  className={cn(
+                    'bg-[#6c47ff] text-ceramic-white rounded-full font-medium',
+                    'text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer',
+                  )}
                 >
                   Sign Up
                 </button>

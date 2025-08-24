@@ -1,3 +1,6 @@
 import type { ReactNode } from 'react';
 
-export declare type Children<TProps = NonNullable<unknown>> = Readonly<{ children?: ReactNode | undefined }> & TProps;
+declare global {
+  type Children<TProps = NonNullable<unknown>> = Readonly<{ children?: ReactNode | undefined }> & TProps;
+  type Classname<TProps = NonNullable<unknown>> = Readonly<{ classname?: string | undefined }> & TProps;
+}
