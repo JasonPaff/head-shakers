@@ -1,11 +1,10 @@
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
 
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { ClerkProvider } from '@/components/clerk/clerk-provider';
-import { Header } from '@/components/layout/header';
 import '@/app/globals.css';
+import { Header } from '@/components/layout/header/header';
 import { ThemeProvider } from '@/components/next-theme/theme-provider';
 
 const geistSans = Geist({
@@ -26,9 +25,7 @@ export const metadata: Metadata = {
   title: { default: 'Dashboard', template: '%s | Head Shakers' },
 };
 
-type RootLayoutProps = Readonly<{
-  children: ReactNode;
-}>;
+type RootLayoutProps = LayoutProps;
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
@@ -37,7 +34,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body className={`${geistSans.variable} ${geistMono.variable} flex min-h-full flex-col antialiased`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
             <Header />
-            {children}
+            <div className={'min-h-screen bg-background'}>{children}</div>
           </ThemeProvider>
         </body>
       </html>
