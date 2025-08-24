@@ -70,7 +70,7 @@ export default eslintTypescript.config([
     },
     settings: {
       'better-tailwindcss': {
-        entryPoint: 'src/globals.css',
+        entryPoint: 'src/app/globals.css',
       },
     },
   },

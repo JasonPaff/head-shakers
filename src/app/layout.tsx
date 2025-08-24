@@ -5,7 +5,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import { ClerkProvider } from '@/components/clerk/clerk-provider';
 import { Header } from '@/components/layout/header';
-import '@/globals.css';
+import '@/app/globals.css';
 import { ThemeProvider } from '@/components/next-theme/theme-provider';
 
 const geistSans = Geist({
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
                 The site prioritizes collection display and management over social features, with robust 
                 tracking capabilities, real-time interactions, and community engagement through collection 
                 showcases and commenting.`,
-  title: 'Head Shakers',
+  title: { default: 'Dashboard', template: '%s | Head Shakers' },
 };
 
 type RootLayoutProps = Readonly<{

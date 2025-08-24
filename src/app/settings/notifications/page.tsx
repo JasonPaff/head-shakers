@@ -3,10 +3,10 @@ import type { Metadata } from 'next';
 export function generateMetadata(): Metadata {
   return {
     description: '',
-    title: 'Home - Head Shakers',
+    title: 'Notification',
   };
 }
 
-export default function HomePage() {
-  return <div>Home Page</div>;
+export default function NotificationSettingsPage() {
+  return <div>Notification Settings Page</div>;
 }

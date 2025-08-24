@@ -1,9 +1,66 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
+const isPublicRoute = createRouteMatcher([
+  // authentication pages (route group)
+  '/login(.*)',
+  '/signup(.*)',
+
+  // static pages (route group)
+  '/about(.*)',
+  '/privacy(.*)',
+  '/terms(.*)',
+
+  // public browsing - anyone can view
+  '/browse(.*)',
+
+  // public collection views (read-only)
+  '/collections/[^/]+$', // /collections/123 (view only)
+  '/collections/[^/]+/share(.*)', // Share links
+
+  // public item views (read-only)
+  '/items/[^/]+$', // /items/456 (view only)
+  '/items/[^/]+/share(.*)', // Share links
+
+  // public user profiles (read-only)
+  '/users/[^/]+$', // /users/john-doe
+  '/users/[^/]+/collections(.*)', // /users/john-doe/collections
+  '/users/[^/]+/following(.*)', // /users/john-doe/following
+
+  // homepage (can be viewed by anyone)
+  '/',
+]);
+
+const isProtectedRoute = createRouteMatcher([
+  // dashboard - always protected
+  '/dashboard(.*)',
+
+  // settings - always protected
+  '/settings(.*)',
+
+  // creation routes - require auth
+  '/collections/create(.*)',
+  '/items/add(.*)',
+
+  // edit routes - require auth + ownership check
+  '/collections/[^/]+/edit(.*)',
+  '/collections/[^/]+/settings(.*)',
+  '/items/[^/]+/edit(.*)',
+]);
 
 export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) await auth.protect();
+  // handle protected routes first
+  if (isProtectedRoute(req)) {
+    await auth.protect();
+    return;
+  }
+
+  // for public routes, no auth required
+  if (isPublicRoute(req)) {
+    return;
+  }
+
+  // for any other routes, protect by default (fail-safe)
+  await auth.protect();
 });
 
 export const config = {

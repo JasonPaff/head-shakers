@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "../../node_modules/tailwindcss/dist/lib.d.mts";
 
 @plugin "tailwindcss-animate";
 @plugin "tailwindcss-radix" {
@@ -140,4 +140,4 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-@import "@clerk/themes/shadcn.css"
+@import "shadcn.css"

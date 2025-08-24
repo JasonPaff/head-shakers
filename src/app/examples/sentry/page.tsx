@@ -11,7 +11,7 @@ class SentryExampleFrontendError extends Error {
   }
 }
 
-export default function Page() {
+export default function SentryExamplePage() {
   const [isSentError, setIsSentError] = useState(false);
   const [isConnected, setIsConnected] = useState(true);
 
