@@ -21,7 +21,9 @@ export const metadata: Metadata = {
   title: 'Head Shakers',
 };
 
-export default function RootLayout({ children }: Children) {
+type RootLayoutProps = Children;
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <ClerkProvider>
       <html lang={'en'}>

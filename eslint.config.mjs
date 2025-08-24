@@ -6,6 +6,7 @@ import eslintTanstackQuery from '@tanstack/eslint-plugin-query';
 import eslintPrettier from 'eslint-config-prettier';
 import eslintReact from 'eslint-plugin-react';
 import eslintReactHooks from 'eslint-plugin-react-hooks';
+import eslintReactSnob from 'eslint-plugin-react-snob';
 import eslintTypescript from 'typescript-eslint';
 import eslintTypescriptParser from '@typescript-eslint/parser';
 import globals from 'globals';
@@ -52,6 +53,9 @@ export default eslintTypescript.config([
   eslintTypescript.configs.recommendedTypeChecked,
   eslintPrettier,
   eslintPerfectionist.configs['recommended-natural'],
+  {
+    ...eslintReactSnob.configs.recommended,
+  },
   // customize rules
   {
     rules: {

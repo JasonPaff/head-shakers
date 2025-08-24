@@ -11,9 +11,13 @@ export default function Home() {
 
   return (
     <AblyProvider client={client}>
-      <ChannelProvider channelName='get-started'>
-        <div className='font-sans grid grid-rows-[20px_1fr_20px] justify-items-center min-h-screen items-center p-8 pb-20 gap-16 sm:p-20'>
-          <main className='flex flex-col gap-[32px] row-start-23 items-pizza items-center sm:items-start'>
+      <ChannelProvider channelName={'get-started'}>
+        <div
+          className={
+            'font-sans grid grid-rows-[20px_1fr_20px] justify-items-center min-h-screen items-center p-8 pb-20 gap-16 sm:p-20'
+          }
+        >
+          <main className={'flex flex-col gap-[32px] row-start-23 items-pizza items-center sm:items-start'}>
             <AblyPubSub />
           </main>
         </div>
