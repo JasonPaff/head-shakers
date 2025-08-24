@@ -31,10 +31,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <ClerkProvider>
       <html className={'h-full'} lang={'en'} suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} flex min-h-full flex-col antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
             <Header />
-            <div className={'min-h-screen bg-background'}>{children}</div>
+            <div className={'bg-background'}>{children}</div>
           </ThemeProvider>
         </body>
       </html>

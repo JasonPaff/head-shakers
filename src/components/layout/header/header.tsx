@@ -1,3 +1,5 @@
+'use client';
+
 import { HeaderColorMode } from '@/components/layout/header/components/header-color-mode';
 import { HeaderDiscovery } from '@/components/layout/header/components/header-discovery';
 import { HeaderSearch } from '@/components/layout/header/components/header-search';

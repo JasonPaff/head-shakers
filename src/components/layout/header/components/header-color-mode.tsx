@@ -4,6 +4,7 @@ import { MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 export const HeaderColorMode = () => {
-  const { setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
 
   const handleDarkMode = () => {
     setTheme('dark');
@@ -26,16 +27,18 @@ export const HeaderColorMode = () => {
     setTheme('system');
   };
 
+  const _isDarkMode = resolvedTheme === 'dark';
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button size={'icon'} variant={'outline'}>
-          <SunIcon
-            className={'h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:rotate-90'}
-          />
-          <MoonIcon
-            className={'h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:-rotate-0'}
-          />
+          <Conditional isCondition={_isDarkMode}>
+            <MoonIcon aria-hidden />
+          </Conditional>
+          <Conditional isCondition={!_isDarkMode}>
+            <SunIcon aria-hidden />
+          </Conditional>
           <span className={'sr-only'}>Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
