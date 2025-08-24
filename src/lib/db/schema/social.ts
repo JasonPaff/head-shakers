@@ -14,7 +14,7 @@ import {
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { users } from '@/db/schema/users';
+import { users } from '@/lib/db/schema/users';
 
 const commentType = ['bobblehead', 'collection'] as const;
 const followType = ['user', 'collection'] as const;

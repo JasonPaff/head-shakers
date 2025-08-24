@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 
-export default function Home() {
+export default function AblyExamplePage() {
   const client = new Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' });
 
   return (
@@ -16,7 +16,7 @@ export default function Home() {
       <ChannelProvider channelName={'get-started'}>
         <main>
           Hello, Ably!
-          <Button variant={'destructive'}>Click Me</Button>
+          <Button variant={'default'}>Click Me</Button>
           <AblyPubSub />
         </main>
       </ChannelProvider>

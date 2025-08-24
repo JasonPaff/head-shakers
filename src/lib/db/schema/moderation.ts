@@ -2,7 +2,7 @@ import { index, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { users } from '@/db/schema/users';
+import { users } from '@/lib/db/schema/users';
 
 const contentReportStatus = ['pending', 'reviewed', 'resolved', 'dismissed'] as const;
 const contentReportTargetType = ['bobblehead', 'comment', 'user', 'collection'] as const;

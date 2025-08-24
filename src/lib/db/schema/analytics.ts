@@ -2,7 +2,7 @@ import { index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, varchar 
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { users } from '@/db/schema/users';
+import { users } from '@/lib/db/schema/users';
 
 export const searchFiltersSchema = z.object({
   category: z.string().optional(),

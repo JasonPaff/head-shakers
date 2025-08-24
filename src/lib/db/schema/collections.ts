@@ -12,7 +12,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import { users } from '@/db/schema/users';
+import { users } from '@/lib/db/schema/users';
 
 export const collections = pgTable(
   'collections',

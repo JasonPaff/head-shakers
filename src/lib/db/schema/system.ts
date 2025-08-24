@@ -14,7 +14,7 @@ import {
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { users } from '@/db/schema/users';
+import { users } from '@/lib/db/schema/users';
 
 export const notificationTypeEnum = pgEnum('notification_type', [
   'comment',

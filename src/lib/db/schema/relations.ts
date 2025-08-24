@@ -1,12 +1,12 @@
 import { relations } from 'drizzle-orm';
 
-import { contentViews, searchQueries } from '@/db/schema/analytics';
-import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/db/schema/bobbleheads';
-import { collections, subCollections } from '@/db/schema/collections';
-import { contentReports } from '@/db/schema/moderation';
-import { comments, follows, likes } from '@/db/schema/social';
-import { featuredContent, notifications } from '@/db/schema/system';
-import { tags } from '@/db/schema/tags';
+import { contentViews, searchQueries } from '@/lib/db/schema/analytics';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads';
+import { collections, subCollections } from '@/lib/db/schema/collections';
+import { contentReports } from '@/lib/db/schema/moderation';
+import { comments, follows, likes } from '@/lib/db/schema/social';
+import { featuredContent, notifications } from '@/lib/db/schema/system';
+import { tags } from '@/lib/db/schema/tags';
 import {
   loginHistory,
   notificationSettings,
@@ -15,7 +15,7 @@ import {
   users,
   userSessions,
   userSettings,
-} from '@/db/schema/users';
+} from '@/lib/db/schema/users';
 
 export const usersRelations = relations(users, ({ many, one }) => ({
   activity: many(userActivity),

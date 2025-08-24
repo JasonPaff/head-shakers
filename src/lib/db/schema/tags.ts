@@ -2,7 +2,7 @@ import { index, integer, pgTable, timestamp, uniqueIndex, uuid, varchar } from '
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { users } from '@/db/schema/users';
+import { users } from '@/lib/db/schema/users';
 
 export const tags = pgTable(
   'tags',
