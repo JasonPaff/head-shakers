@@ -1,17 +1,11 @@
 import { relations } from 'drizzle-orm';
 
-import {
-  comments,
-  contentReports,
-  contentViews,
-  featuredContent,
-  follows,
-  likes,
-  notifications,
-  searchQueries,
-} from '@/db/schema';
+import { contentViews, searchQueries } from '@/db/schema/analytics';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/db/schema/bobbleheads';
 import { collections, subCollections } from '@/db/schema/collections';
+import { contentReports } from '@/db/schema/moderation';
+import { comments, follows, likes } from '@/db/schema/social';
+import { featuredContent, notifications } from '@/db/schema/system';
 import { tags } from '@/db/schema/tags';
 import {
   loginHistory,

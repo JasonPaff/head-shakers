@@ -1,2 +1,9 @@
-export { collections, subCollections } from './collections';
-export { loginHistory, notificationSettings, users, userSessions, userSettings } from './users';
+export * from '@/db/schema/analytics';
+export * from '@/db/schema/bobbleheads';
+export * from '@/db/schema/collections';
+export * from '@/db/schema/moderation';
+export * from '@/db/schema/relations';
+export * from '@/db/schema/social';
+export * from '@/db/schema/system';
+export * from '@/db/schema/tags';
+export * from '@/db/schema/users';

@@ -11,50 +11,57 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
+import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
+import { z } from 'zod';
 
 import { collections, subCollections } from '@/db/schema/collections';
 import { tags } from '@/db/schema/tags';
 import { users } from '@/db/schema/users';
 
+export const customFieldsSchema = z.record(z.string(), z.any()).optional();
+
+export type CustomFields = z.infer<typeof customFieldsSchema>;
+
 export const bobbleheads = pgTable(
   'bobbleheads',
   {
     acquisitionDate: timestamp('acquisition_date'),
-    acquisitionMethod: varchar('acquisition_method', { length: 50 }), // purchase, gift, trade, etc.
+    acquisitionMethod: varchar('acquisition_method', { length: 50 }),
     category: varchar('category', { length: 50 }),
     characterName: varchar('character_name', { length: 100 }),
     collectionId: uuid('collection_id')
       .references(() => collections.id, { onDelete: 'cascade' })
       .notNull(),
-    commentCount: integer('comment_count').default(0),
+    commentCount: integer('comment_count').default(0).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    currentCondition: varchar('current_condition', { length: 20 }).default('excellent'), // mint, excellent, good, fair, poor
-    customFields: jsonb('custom_fields'),
+    currentCondition: varchar('current_condition', { length: 20 }).default('excellent').notNull(),
+    customFields: jsonb('custom_fields').$type<CustomFields>(),
     deletedAt: timestamp('deleted_at'),
     description: text('description'),
-    height: decimal('height', { precision: 5, scale: 2 }), // in cm
+    height: decimal('height', { precision: 5, scale: 2 }),
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(false),
-    isFeatured: boolean('is_featured').default(false),
-    isPublic: boolean('is_public').default(true),
-    likeCount: integer('like_count').default(0),
+    isDeleted: boolean('is_deleted').default(false).notNull(),
+    isFeatured: boolean('is_featured').default(false).notNull(),
+    isPublic: boolean('is_public').default(true).notNull(),
+    likeCount: integer('like_count').default(0).notNull(),
     manufacturer: varchar('manufacturer', { length: 100 }),
     material: varchar('material', { length: 100 }),
     name: varchar('name', { length: 200 }).notNull(),
     purchaseLocation: varchar('purchase_location', { length: 100 }),
     purchasePrice: decimal('purchase_price', { precision: 10, scale: 2 }),
     series: varchar('series', { length: 100 }),
-    status: varchar('status', { length: 20 }).default('owned').notNull(), // owned, for_trade, for_sale, sold, wishlist
+    status: varchar('status', { length: 20 }).default('owned').notNull(),
     subCollectionId: uuid('sub_collection_id').references(() => subCollections.id, { onDelete: 'set null' }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    viewCount: integer('view_count').default(0),
-    weight: decimal('weight', { precision: 6, scale: 2 }), // in grams
+    viewCount: integer('view_count').default(0).notNull(),
+    weight: decimal('weight', { precision: 6, scale: 2 }),
     year: integer('year'),
   },
   (table) => [
+    // single column indexes
     index('bobbleheads_category_idx').on(table.category),
     index('bobbleheads_collection_id_idx').on(table.collectionId),
     index('bobbleheads_created_at_idx').on(table.createdAt),
@@ -74,16 +81,17 @@ export const bobbleheadPhotos = pgTable(
       .references(() => bobbleheads.id, { onDelete: 'cascade' })
       .notNull(),
     caption: text('caption'),
-    fileSize: integer('file_size'), // in bytes
+    fileSize: integer('file_size'),
     height: integer('height'),
     id: uuid('id').primaryKey().defaultRandom(),
-    isPrimary: boolean('is_primary').default(false),
-    sortOrder: integer('sort_order').default(0),
+    isPrimary: boolean('is_primary').default(false).notNull(),
+    sortOrder: integer('sort_order').default(0).notNull(),
     uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
     url: text('url').notNull(),
     width: integer('width'),
   },
   (table) => [
+    // single column indexes
     index('bobblehead_photos_bobblehead_id_idx').on(table.bobbleheadId),
     index('bobblehead_photos_is_primary_idx').on(table.isPrimary),
     index('bobblehead_photos_sort_order_idx').on(table.sortOrder),
@@ -103,9 +111,93 @@ export const bobbleheadTags = pgTable(
       .notNull(),
   },
   (table) => [
+    // single column indexes
     index('bobblehead_tags_bobblehead_id_idx').on(table.bobbleheadId),
     index('bobblehead_tags_tag_id_idx').on(table.tagId),
 
+    // unique composite indexes
     uniqueIndex('bobblehead_tags_unique').on(table.bobbleheadId, table.tagId),
   ],
 );
+
+export const selectBobbleheadSchema = createSelectSchema(bobbleheads);
+export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
+  acquisitionMethod: z.string().min(1).max(50).optional(),
+  category: z.string().min(1).max(50).optional(),
+  characterName: z.string().min(1).max(100).optional(),
+  currentCondition: z.enum(['mint', 'excellent', 'good', 'fair', 'poor']).default('excellent'),
+  customFields: customFieldsSchema,
+  description: z.string().max(1000).optional(),
+  height: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  manufacturer: z.string().min(1).max(100).optional(),
+  material: z.string().min(1).max(100).optional(),
+  name: z.string().min(1).max(200),
+  purchaseLocation: z.string().min(1).max(100).optional(),
+  purchasePrice: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  series: z.string().min(1).max(100).optional(),
+  status: z.enum(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']).default('owned'),
+  weight: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
+  year: z
+    .number()
+    .min(1800)
+    .max(new Date().getFullYear() + 1)
+    .optional(),
+}).omit({
+  commentCount: true,
+  createdAt: true,
+  deletedAt: true,
+  id: true,
+  isDeleted: true,
+  likeCount: true,
+  updatedAt: true,
+  userId: true,
+  viewCount: true,
+});
+
+export const updateBobbleheadSchema = insertBobbleheadSchema.partial();
+
+export const publicBobbleheadSchema = selectBobbleheadSchema.omit({
+  deletedAt: true,
+  isDeleted: true,
+});
+
+export const selectBobbleheadPhotoSchema = createSelectSchema(bobbleheadPhotos);
+export const insertBobbleheadPhotoSchema = createInsertSchema(bobbleheadPhotos, {
+  altText: z.string().min(1).max(255).optional(),
+  caption: z.string().max(500).optional(),
+  fileSize: z.number().min(1).optional(),
+  height: z.number().min(1).optional(),
+  url: z.url(),
+  width: z.number().min(1).optional(),
+}).omit({
+  bobbleheadId: true,
+  id: true,
+  uploadedAt: true,
+});
+
+export const updateBobbleheadPhotoSchema = insertBobbleheadPhotoSchema.partial();
+
+export const selectBobbleheadTagSchema = createSelectSchema(bobbleheadTags);
+export const insertBobbleheadTagSchema = createInsertSchema(bobbleheadTags).omit({
+  createdAt: true,
+  id: true,
+});
+
+export type InsertBobblehead = z.infer<typeof insertBobbleheadSchema>;
+export type InsertBobbleheadPhoto = z.infer<typeof insertBobbleheadPhotoSchema>;
+export type InsertBobbleheadTag = z.infer<typeof insertBobbleheadTagSchema>;
+export type PublicBobblehead = z.infer<typeof publicBobbleheadSchema>;
+export type SelectBobblehead = z.infer<typeof selectBobbleheadSchema>;
+export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
+export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
+export type UpdateBobblehead = z.infer<typeof updateBobbleheadSchema>;
+export type UpdateBobbleheadPhoto = z.infer<typeof updateBobbleheadPhotoSchema>;
