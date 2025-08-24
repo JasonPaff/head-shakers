@@ -27,7 +27,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <ClerkProvider>
       <html lang={'en'}>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body
+          className={`
+            ${geistSans.variable}
+            ${geistMono.variable}
+            antialiased
+          `}
+        >
           <header>
             <SignedOut>
               <SignInButton mode={'redirect'} />

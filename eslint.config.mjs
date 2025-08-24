@@ -1,3 +1,4 @@
+import eslintBetterTailwindCss from 'eslint-plugin-better-tailwindcss';
 import eslintJs from '@eslint/js';
 import eslintJsxA11y from 'eslint-plugin-jsx-a11y';
 import eslintNextJs from '@next/eslint-plugin-next';
@@ -53,6 +54,26 @@ export default eslintTypescript.config([
   eslintTypescript.configs.recommendedTypeChecked,
   eslintPrettier,
   eslintPerfectionist.configs['recommended-natural'],
+  {
+    languageOptions: {
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      'better-tailwindcss': eslintBetterTailwindCss,
+    },
+    rules: {
+      ...eslintBetterTailwindCss.configs['recommended-warn'].rules,
+    },
+    settings: {
+      'better-tailwindcss': {
+        entryPoint: 'src/globals.css',
+      },
+    },
+  },
   {
     ...eslintReactSnob.configs.recommended,
   },

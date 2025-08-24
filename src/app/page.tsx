@@ -14,13 +14,11 @@ export default function Home() {
   return (
     <AblyProvider client={client}>
       <ChannelProvider channelName={'get-started'}>
-        <div className={'bg-blue-400'}>
-          <main>
-            Hello, Ably!
-            <Button variant={'destructive'}>Click Me</Button>
-            <AblyPubSub />
-          </main>
-        </div>
+        <main>
+          Hello, Ably!
+          <Button variant={'destructive'}>Click Me</Button>
+          <AblyPubSub />
+        </main>
       </ChannelProvider>
     </AblyProvider>
   );
