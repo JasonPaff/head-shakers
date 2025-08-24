@@ -3,9 +3,9 @@ import { relations } from 'drizzle-orm';
 import { contentViews, searchQueries } from '@/lib/db/schema/analytics';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads';
 import { collections, subCollections } from '@/lib/db/schema/collections';
-import { contentReports } from '@/lib/db/schema/moderation';
-import { comments, follows, likes } from '@/lib/db/schema/social';
-import { featuredContent, notifications } from '@/lib/db/schema/system';
+import { contentReports } from '@/lib/db/schema/moderations';
+import { comments, follows, likes } from '@/lib/db/schema/socials';
+import { featuredContent, notifications } from '@/lib/db/schema/systems';
 import { tags } from '@/lib/db/schema/tags';
 import {
   loginHistory,
