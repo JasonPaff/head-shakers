@@ -4,7 +4,7 @@ import { ClerkProvider, SignedIn, SignedOut, SignInButton, SignUpButton, UserBut
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import '../globals.css';
-import { cn } from '@/utils/utils';
+import { Button } from '@/components/ui/button';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -28,18 +28,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <ClerkProvider>
       <html lang={'en'}>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <header className={'flex justify-end items-center p-4 gap-4 h-16'}>
+          <header>
             <SignedOut>
               <SignInButton mode={'redirect'} />
               <SignUpButton mode={'redirect'}>
-                <button
-                  className={cn(
-                    'bg-[#6c47ff] text-ceramic-white rounded-full font-medium',
-                    'text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 cursor-pointer',
-                  )}
-                >
-                  Sign Up
-                </button>
+                <Button>Sign Up</Button>
               </SignUpButton>
             </SignedOut>
             <SignedIn>

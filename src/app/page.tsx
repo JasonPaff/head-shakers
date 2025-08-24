@@ -6,18 +6,18 @@ import { Realtime } from 'ably';
 import { AblyProvider, ChannelProvider, useChannel, useConnectionStateListener } from 'ably/react';
 import { useState } from 'react';
 
+import { Button } from '@/components/ui/button';
+
 export default function Home() {
   const client = new Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' });
 
   return (
     <AblyProvider client={client}>
       <ChannelProvider channelName={'get-started'}>
-        <div
-          className={
-            'font-sans grid grid-rows-[20px_1fr_20px] justify-items-center min-h-screen items-center p-8 pb-20 gap-16 sm:p-20'
-          }
-        >
-          <main className={'flex flex-col gap-[32px] row-start-23 items-pizza items-center sm:items-start'}>
+        <div className={'bg-blue-400'}>
+          <main>
+            Hello, Ably!
+            <Button variant={'destructive'}>Click Me</Button>
             <AblyPubSub />
           </main>
         </div>
