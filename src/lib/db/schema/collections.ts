@@ -84,13 +84,15 @@ export const subCollections = pgTable(
   ],
 );
 
-// Collection schemas
 export const selectCollectionSchema = createSelectSchema(collections);
 export const insertCollectionSchema = createInsertSchema(collections, {
   coverImageUrl: z.url().optional(),
   description: z.string().max(1000).optional(),
   name: z.string().min(1).max(100),
-  totalValue: z.string().regex(/^\d+(\.\d{1,2})?$/).optional(),
+  totalValue: z
+    .string()
+    .regex(/^\d+(\.\d{1,2})?$/)
+    .optional(),
 }).omit({
   createdAt: true,
   id: true,
@@ -99,12 +101,9 @@ export const insertCollectionSchema = createInsertSchema(collections, {
   updatedAt: true,
   userId: true,
 });
-
 export const updateCollectionSchema = insertCollectionSchema.partial();
-
 export const publicCollectionSchema = selectCollectionSchema;
 
-// Sub-collection schemas
 export const selectSubCollectionSchema = createSelectSchema(subCollections);
 export const insertSubCollectionSchema = createInsertSchema(subCollections, {
   coverImageUrl: z.url().optional(),
@@ -117,12 +116,9 @@ export const insertSubCollectionSchema = createInsertSchema(subCollections, {
   itemCount: true,
   updatedAt: true,
 });
-
 export const updateSubCollectionSchema = insertSubCollectionSchema.partial();
-
 export const publicSubCollectionSchema = selectSubCollectionSchema;
 
-// Types
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
 export type InsertSubCollection = z.infer<typeof insertSubCollectionSchema>;
 export type PublicCollection = z.infer<typeof publicCollectionSchema>;

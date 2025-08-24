@@ -71,11 +71,11 @@ export const bobbleheads = pgTable(
     index('bobbleheads_sub_collection_id_idx').on(table.subCollectionId),
     index('bobbleheads_user_id_idx').on(table.userId),
 
-    // composite indexes for common query patterns
-    index('bobbleheads_user_public_idx').on(table.userId, table.isPublic),
+    // composite indexes
     index('bobbleheads_collection_public_idx').on(table.collectionId, table.isPublic),
     index('bobbleheads_public_featured_idx').on(table.isPublic, table.isFeatured),
     index('bobbleheads_user_created_idx').on(table.userId, table.createdAt),
+    index('bobbleheads_user_public_idx').on(table.userId, table.isPublic),
   ],
 );
 
