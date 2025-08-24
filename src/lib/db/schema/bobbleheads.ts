@@ -11,15 +11,12 @@ import {
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
 
 import type { CustomFields } from '@/lib/validations/bobblehead';
 
 import { collections, subCollections } from '@/lib/db/schema/collections';
 import { tags } from '@/lib/db/schema/tags';
 import { users } from '@/lib/db/schema/users';
-import { customFieldsSchema } from '@/lib/validations/bobblehead';
 
 export const bobbleheads = pgTable(
   'bobbleheads',
