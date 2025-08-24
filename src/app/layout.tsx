@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import { ClerkProvider } from '@/components/clerk/clerk-provider';
-import { Header } from '@/components/header';
+import { Header } from '@/components/layout/header';
+import '@/globals.css';
 import { ThemeProvider } from '@/components/next-theme/theme-provider';
-
-import './globals.css';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -23,11 +23,11 @@ export const metadata: Metadata = {
   title: 'Clerk Next.js Quickstart',
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+type RootLayoutProps = Readonly<{
+  children: ReactNode;
+}>;
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <ClerkProvider>
       <html className={'h-full'} lang={'en'} suppressHydrationWarning>

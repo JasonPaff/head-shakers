@@ -15,7 +15,7 @@ export function Header() {
             fill={'currentColor'}
           />
         </svg>
-        <span className={'font-semibold'}>Acme Co.</span>
+        <span className={'font-semibold'}>Head Shakers</span>
       </Link>
       <div className={'flex items-center gap-x-4'}>
         <SignedOut>
