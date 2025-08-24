@@ -2,8 +2,8 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
 const isPublicRoute = createRouteMatcher([
   // authentication pages (route group)
-  '/login(.*)',
-  '/signup(.*)',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
 
   // static pages (route group)
   '/about(.*)',
@@ -36,6 +36,9 @@ const isProtectedRoute = createRouteMatcher([
 
   // settings - always protected
   '/settings(.*)',
+
+  // examples - always protected
+  '/examples(.*)',
 
   // creation routes - require auth
   '/collections/create(.*)',

@@ -1,4 +1,4 @@
-@import "../../node_modules/tailwindcss/dist/lib.d.mts";
+@import "tailwindcss";
 
 @plugin "tailwindcss-animate";
 @plugin "tailwindcss-radix" {
@@ -139,5 +139,3 @@ body {
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
 }
-
-@import "shadcn.css"

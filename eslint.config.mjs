@@ -12,7 +12,6 @@ import eslintTypescript from 'typescript-eslint';
 import eslintTypescriptParser from '@typescript-eslint/parser';
 import globals from 'globals';
 
-// TODO: tailwind plugins
 // TODO: testing plugins
 
 export default eslintTypescript.config([
