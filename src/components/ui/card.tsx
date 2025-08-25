@@ -10,7 +10,7 @@ type CardHeaderProps = ComponentProps<'div'>;
 type CardProps = ComponentProps<'div'>;
 type CardTitleProps = ComponentProps<'div'>;
 
-export function Card({ className, ...props }: CardProps) {
+export const Card = ({ className, ...props }: CardProps) => {
   return (
     <div
       className={cn(
@@ -24,9 +24,9 @@ export function Card({ className, ...props }: CardProps) {
       {...props}
     />
   );
-}
+};
 
-export function CardAction({ className, ...props }: CardActionProps) {
+export const CardAction = ({ className, ...props }: CardActionProps) => {
   return (
     <div
       className={cn(`col-start-2 row-span-2 row-start-1 self-start justify-self-end`, className)}
@@ -34,19 +34,19 @@ export function CardAction({ className, ...props }: CardActionProps) {
       {...props}
     />
   );
-}
+};
 
-export function CardContent({ className, ...props }: CardContentProps) {
+export const CardContent = ({ className, ...props }: CardContentProps) => {
   return <div className={cn('px-6', className)} data-slot={'card-content'} {...props} />;
-}
+};
 
-export function CardDescription({ className, ...props }: CardDescriptionProps) {
+export const CardDescription = ({ className, ...props }: CardDescriptionProps) => {
   return (
     <div className={cn('text-sm text-muted-foreground', className)} data-slot={'card-description'} {...props} />
   );
-}
+};
 
-export function CardFooter({ className, ...props }: CardFooterProps) {
+export const CardFooter = ({ className, ...props }: CardFooterProps) => {
   return (
     <div
       className={cn(
@@ -60,9 +60,9 @@ export function CardFooter({ className, ...props }: CardFooterProps) {
       {...props}
     />
   );
-}
+};
 
-export function CardHeader({ className, ...props }: CardHeaderProps) {
+export const CardHeader = ({ className, ...props }: CardHeaderProps) => {
   return (
     <div
       className={cn(
@@ -78,8 +78,8 @@ export function CardHeader({ className, ...props }: CardHeaderProps) {
       {...props}
     />
   );
-}
+};
 
-export function CardTitle({ className, ...props }: CardTitleProps) {
+export const CardTitle = ({ className, ...props }: CardTitleProps) => {
   return <div className={cn('leading-none font-semibold', className)} data-slot={'card-title'} {...props} />;
-}
+};

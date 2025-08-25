@@ -4,7 +4,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 type InputProps = ComponentProps<'input'>;
 
-export function Input({ className, type, ...props }: InputProps) {
+export const Input = ({ className, type, ...props }: InputProps) => {
   return (
     <input
       className={cn(
@@ -24,4 +24,4 @@ export function Input({ className, type, ...props }: InputProps) {
       {...props}
     />
   );
-}
+};

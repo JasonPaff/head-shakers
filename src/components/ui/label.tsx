@@ -8,7 +8,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 type LabelProps = ComponentProps<typeof LabelRoot>;
 
-export function Label({ className, ...props }: LabelProps) {
+export const Label = ({ className, ...props }: LabelProps) => {
   return (
     <LabelRoot
       className={cn(
@@ -21,4 +21,4 @@ export function Label({ className, ...props }: LabelProps) {
       {...props}
     />
   );
-}
+};
