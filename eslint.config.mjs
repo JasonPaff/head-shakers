@@ -74,7 +74,7 @@ export default eslintTypescript.config([
     },
   },
   {
-    ...eslintReactSnob.configs.recommended,
+    ...eslintReactSnob.configs.strict,
   },
   // customize rules
   {
@@ -85,6 +85,12 @@ export default eslintTypescript.config([
       eqeqeq: 'error',
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
+      'react-snob/require-boolean-prefix-is': [
+        'error',
+        {
+          allowedPrefixes: ['as', 'can', 'has', 'is', 'should', 'was', 'will'],
+        },
+      ],
     },
   },
 ]);
