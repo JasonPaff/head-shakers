@@ -1,12 +1,11 @@
 ﻿import type { MouseEvent } from 'react';
 
-import { useEffect } from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface UseSidebarResizeProps {
   currentWidth: string;
-  enableDrag?: boolean;
   isCollapsed: boolean;
+  isEnableDrag?: boolean;
   maxResizeWidth?: string;
   minResizeWidth?: string;
   onResize: (width: string) => void;
@@ -14,19 +13,19 @@ interface UseSidebarResizeProps {
   setIsDraggingRail: (isDraggingRail: boolean) => void;
 }
 
-// format width value and unit into a string.
+// format width value and unit into a string
 const formatWidth = (value: number, unit: 'px' | 'rem'): string => {
   return `${unit === 'rem' ? value.toFixed(1) : Math.round(value)}${unit}`;
 };
 
-// parse width string into value and unit.
+// parse width string into value and unit
 const parseWidth = (width: string): { unit: 'px' | 'rem'; value: number } => {
   const unit = width.endsWith('rem') ? 'rem' : 'px';
   const value = Number.parseFloat(width);
   return { unit, value };
 };
 
-// convert any width to pixels for calculations.
+// convert any width to pixels for calculations
 const toPx = (width: string): number => {
   const { unit, value } = parseWidth(width);
   return unit === 'rem' ? value * 16 : value;
@@ -34,8 +33,8 @@ const toPx = (width: string): number => {
 
 export const useSidebarResize = ({
   currentWidth,
-  enableDrag = true,
   isCollapsed,
+  isEnableDrag = true,
   maxResizeWidth = '20rem',
   minResizeWidth = '14rem',
   onResize,
@@ -59,7 +58,7 @@ export const useSidebarResize = ({
     (e: MouseEvent) => {
       isInteractingWithRail.current = true;
 
-      if (!enableDrag || isCollapsed) return;
+      if (!isEnableDrag || isCollapsed) return;
 
       startWidth.current = toPx(currentWidth);
       startX.current = e.clientX;
@@ -68,7 +67,7 @@ export const useSidebarResize = ({
 
       e.preventDefault();
     },
-    [enableDrag, isCollapsed, currentWidth],
+    [isEnableDrag, isCollapsed, currentWidth],
   );
 
   useEffect(() => {
@@ -87,11 +86,11 @@ export const useSidebarResize = ({
       const minWidthPx = toPx(minResizeWidth);
       const maxWidthPx = toPx(maxResizeWidth);
 
-      // calculate new width in pixels.
+      // calculate new width in pixels
       const deltaWidth = e.clientX - startX.current;
       const newWidthPx = startWidth.current + deltaWidth;
 
-      // auto-collapse if dragged below threshold.
+      // auto-collapse if dragged below thresh-hold
       if (newWidthPx < autoCollapseThreshold.current && !isCollapsed) {
         onToggle();
         isDragging.current = false;
@@ -100,19 +99,19 @@ export const useSidebarResize = ({
         return;
       }
 
-      // rest of the existing width calculation logic.
+      // rest of the existing width calculation logic
       const clampedWidthPx = Math.max(minWidthPx, Math.min(maxWidthPx, newWidthPx));
 
-      // convert to the target unit if needed.
+      // convert to the target unit if needed
       const newWidth = unit === 'rem' ? clampedWidthPx / 16 : clampedWidthPx;
 
-      // use appropriate threshold based on unit.
+      // use appropriate threshold based on unit
       const threshold = unit === 'rem' ? 0.1 : 1;
       if (Math.abs(newWidth - lastWidth.current / (unit === 'rem' ? 16 : 1)) >= threshold) {
         const formattedWidth = formatWidth(newWidth, unit);
         onResize(formattedWidth);
-        persistWidth(formattedWidth); // store width in cookie when it changes.
-        lastWidth.current = clampedWidthPx; // store in px for consistent comparisons.
+        persistWidth(formattedWidth); // store width in cookie when it changes
+        lastWidth.current = clampedWidthPx; // store in px for consistent comparisons
 
         // log on larger changes
         const logThreshold = unit === 'rem' ? 1 : 16;

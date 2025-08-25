@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 
+import { ClerkProvider } from '@clerk/nextjs';
+import { shadcn } from '@clerk/themes';
+import { ThemeProvider } from 'next-themes';
 import { Geist, Geist_Mono } from 'next/font/google';
 
-import { ClerkProvider } from '@/components/clerk/clerk-provider';
 import '@/app/globals.css';
-import { Header } from '@/components/layout/header/header';
-import { ThemeProvider } from '@/components/next-theme/theme-provider';
+import { AppHeader } from '@/components/layout/app-header/app-header';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -29,12 +30,16 @@ type RootLayoutProps = LayoutProps;
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        theme: shadcn,
+      }}
+    >
       <html className={'h-full'} lang={'en'} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
-            <Header />
-            <div className={'bg-background'}>{children}</div>
+            <AppHeader />
+            {children}
           </ThemeProvider>
         </body>
       </html>

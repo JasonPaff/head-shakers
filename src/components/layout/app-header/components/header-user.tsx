@@ -22,10 +22,10 @@ export const HeaderUser = () => {
       <Conditional isCondition={!isSignedIn}>
         <div className={'space-x-2'}>
           <Button asChild size={'sm'}>
-            <SignInButton mode={'redirect'}>Sign In</SignInButton>
+            <SignInButton mode={'modal'}>Sign In</SignInButton>
           </Button>
           <Button asChild size={'sm'}>
-            <SignUpButton mode={'redirect'}>Sign Up</SignUpButton>
+            <SignUpButton mode={'modal'}>Sign Up</SignUpButton>
           </Button>
         </div>
       </Conditional>

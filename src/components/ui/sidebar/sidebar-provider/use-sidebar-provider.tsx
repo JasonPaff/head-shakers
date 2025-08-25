@@ -4,8 +4,8 @@ import { useBreakpoint } from '@/hooks/use-breakpoint';
 import { useToggle } from '@/hooks/use-toggle';
 
 export interface UseSidebarProviderStateProps {
-  isDefaultOpen: boolean;
-  isOpen: boolean;
+  isDefaultOpen?: boolean;
+  isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
 }
 
@@ -15,7 +15,7 @@ export const useSidebarProvider = ({
   onOpenChange,
 }: UseSidebarProviderStateProps) => {
   const [isOpen, setIsOpen] = useToggle(isDefaultOpen);
-  const [isMobileOpen, setIsMobileOpen] = useToggle();
+  const [isMobileOpen, setIsMobileOpen] = useToggle(isDefaultOpen);
 
   const { isMobile } = useBreakpoint();
 

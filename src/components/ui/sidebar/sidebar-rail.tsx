@@ -48,8 +48,8 @@ export const SidebarRail = ({ children, className, isDragEnabled, ref, ...props 
 
   const { dragRef, handleMouseDown } = useSidebarResize({
     currentWidth: width,
-    enableDrag: isDragEnabled,
     isCollapsed: state === 'collapsed',
+    isEnableDrag: isDragEnabled,
     maxResizeWidth: '28rem',
     minResizeWidth: '10rem',
     onResize: setWidth,
