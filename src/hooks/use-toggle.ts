@@ -14,8 +14,8 @@ type UseToggleUpdate = (newValue: ((currentState: boolean) => boolean) | boolean
 
 const isFunction = (value: unknown) => typeof value === 'function';
 
-export const useToggle = (initialState = false, onChange?: UseToggleOnChange) => {
-  const [state, setState] = useState(initialState);
+export const useToggle = (isInitialToggled = false, onChange?: UseToggleOnChange) => {
+  const [state, setState] = useState(isInitialToggled);
   const onChangeRef = useRef(onChange);
 
   onChangeRef.current = onChange;

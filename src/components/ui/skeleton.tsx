@@ -7,7 +7,7 @@ type SkeletonProps = ComponentProps<'div'> & {
   width?: string;
 };
 
-export const Skeleton = ({ className, width, ...props }: SkeletonProps) => {
+export const Skeleton = ({ children, className, width, ...props }: SkeletonProps) => {
   return (
     <div
       className={cn('max-w-[--skeleton-width] animate-pulse rounded-md bg-accent', className)}
@@ -18,6 +18,8 @@ export const Skeleton = ({ className, width, ...props }: SkeletonProps) => {
         } as CSSProperties
       }
       {...props}
-    />
+    >
+      {children}
+    </div>
   );
 };

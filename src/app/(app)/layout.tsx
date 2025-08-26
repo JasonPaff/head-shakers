@@ -1,3 +1,4 @@
+import { AppHeader } from '@/components/layout/app-header/app-header';
 import { AppSidebar } from '@/components/layout/app-sidebar/app-sidebar';
 import { AuthContent } from '@/components/ui/auth';
 import { SidebarProvider } from '@/components/ui/sidebar/sidebar-provider/sidebar-provider';
@@ -8,9 +9,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <AuthContent>
-        <AppSidebar />
+        <AppSidebar collapsible={'icon'} />
       </AuthContent>
-      <main className={'flex-1'}>{children}</main>
+      <main className={'min-h-screen flex-1 bg-background'}>
+        <AppHeader />
+        {children}
+      </main>
     </SidebarProvider>
   );
 }

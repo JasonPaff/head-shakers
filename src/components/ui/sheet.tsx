@@ -20,12 +20,20 @@ type SheetProps = ComponentProps<typeof Root>;
 type SheetTitleProps = ComponentProps<typeof Title>;
 type SheetTriggerProps = ComponentProps<typeof Trigger>;
 
-export const Sheet = ({ ...props }: SheetProps) => {
-  return <Root data-slot={'sheet'} {...props} />;
+export const Sheet = ({ children, ...props }: SheetProps) => {
+  return (
+    <Root data-slot={'sheet'} {...props}>
+      {children}
+    </Root>
+  );
 };
 
-export const SheetClose = ({ ...props }: SheetCloseProps) => {
-  return <Close data-slot={'sheet-close'} {...props} />;
+export const SheetClose = ({ children, ...props }: SheetCloseProps) => {
+  return (
+    <Close data-slot={'sheet-close'} {...props}>
+      {children}
+    </Close>
+  );
 };
 
 export const SheetContent = ({ children, className, side = 'right', ...props }: SheetContentProps) => {
@@ -63,27 +71,35 @@ export const SheetContent = ({ children, className, side = 'right', ...props }: 
   );
 };
 
-export const SheetDescription = ({ className, ...props }: SheetDescriptionProps) => {
+export const SheetDescription = ({ children, className, ...props }: SheetDescriptionProps) => {
   return (
     <Description
       className={cn('text-sm text-muted-foreground', className)}
       data-slot={'sheet-description'}
       {...props}
-    />
+    >
+      {children}
+    </Description>
   );
 };
 
-export const SheetFooter = ({ className, ...props }: SheetFooterProps) => {
+export const SheetFooter = ({ children, className, ...props }: SheetFooterProps) => {
   return (
-    <div className={cn('mt-auto flex flex-col gap-2 p-4', className)} data-slot={'sheet-footer'} {...props} />
+    <div className={cn('mt-auto flex flex-col gap-2 p-4', className)} data-slot={'sheet-footer'} {...props}>
+      {children}
+    </div>
   );
 };
 
-export const SheetHeader = ({ className, ...props }: SheetHeaderProps) => {
-  return <div className={cn('flex flex-col gap-1.5 p-4', className)} data-slot={'sheet-header'} {...props} />;
+export const SheetHeader = ({ children, className, ...props }: SheetHeaderProps) => {
+  return (
+    <div className={cn('flex flex-col gap-1.5 p-4', className)} data-slot={'sheet-header'} {...props}>
+      {children}
+    </div>
+  );
 };
 
-export const SheetOverlay = ({ className, ...props }: SheetOverlayProps) => {
+export const SheetOverlay = ({ children, className, ...props }: SheetOverlayProps) => {
   return (
     <Overlay
       className={cn(
@@ -93,18 +109,32 @@ export const SheetOverlay = ({ className, ...props }: SheetOverlayProps) => {
       )}
       data-slot={'sheet-overlay'}
       {...props}
-    />
+    >
+      {children}
+    </Overlay>
   );
 };
 
-export const SheetPortal = ({ ...props }: SheetPortalProps) => {
-  return <Portal data-slot={'sheet-portal'} {...props} />;
+export const SheetPortal = ({ children, ...props }: SheetPortalProps) => {
+  return (
+    <Portal data-slot={'sheet-portal'} {...props}>
+      {children}
+    </Portal>
+  );
 };
 
-export const SheetTitle = ({ className, ...props }: SheetTitleProps) => {
-  return <Title className={cn('font-semibold text-foreground', className)} data-slot={'sheet-title'} {...props} />;
+export const SheetTitle = ({ children, className, ...props }: SheetTitleProps) => {
+  return (
+    <Title className={cn('font-semibold text-foreground', className)} data-slot={'sheet-title'} {...props}>
+      {children}
+    </Title>
+  );
 };
 
-export const SheetTrigger = ({ ...props }: SheetTriggerProps) => {
-  return <Trigger data-slot={'sheet-trigger'} {...props} />;
+export const SheetTrigger = ({ children, ...props }: SheetTriggerProps) => {
+  return (
+    <Trigger data-slot={'sheet-trigger'} {...props}>
+      {children}
+    </Trigger>
+  );
 };

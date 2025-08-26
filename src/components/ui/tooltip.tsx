@@ -46,10 +46,18 @@ export const TooltipContent = ({ children, className, sideOffset = 0, ...props }
   );
 };
 
-export const TooltipProvider = ({ delayDuration = 0, ...props }: TooltipProviderProps) => {
-  return <Provider data-slot={'tooltip-provider'} delayDuration={delayDuration} {...props} />;
+export const TooltipProvider = ({ children, delayDuration = 0, ...props }: TooltipProviderProps) => {
+  return (
+    <Provider data-slot={'tooltip-provider'} delayDuration={delayDuration} {...props}>
+      {children}
+    </Provider>
+  );
 };
 
-export const TooltipTrigger = ({ ...props }: TooltipTriggerProps) => {
-  return <Trigger data-slot={'tooltip-trigger'} {...props} />;
+export const TooltipTrigger = ({ children, ...props }: TooltipTriggerProps) => {
+  return (
+    <Trigger data-slot={'tooltip-trigger'} {...props}>
+      {children}
+    </Trigger>
+  );
 };

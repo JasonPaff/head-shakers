@@ -6,11 +6,14 @@ import { Root } from '@radix-ui/react-separator';
 
 import { cn } from '@/utils/tailwind-utils';
 
-type SeparatorProps = ComponentProps<typeof Root>;
+type SeparatorProps = Omit<ComponentProps<typeof Root>, 'decorative'> & {
+  isDecorative?: boolean;
+};
 
 export const Separator = ({
+  children,
   className,
-  decorative = true,
+  isDecorative = true,
   orientation = 'horizontal',
   ...props
 }: SeparatorProps) => {
@@ -22,9 +25,11 @@ export const Separator = ({
         className,
       )}
       data-slot={'separator'}
-      decorative={decorative}
+      decorative={isDecorative}
       orientation={orientation}
       {...props}
-    />
+    >
+      {children}
+    </Root>
   );
 };
