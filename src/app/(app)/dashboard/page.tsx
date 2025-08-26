@@ -1,3 +1,6 @@
+'use client';
+
+import { useUser } from '@clerk/nextjs';
 import { EyeIcon, PlusIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 
 import { AppHeader } from '@/components/layout/app-header/app-header';
@@ -7,6 +10,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { SidebarInset } from '@/components/ui/sidebar/sidebar-inset';
 
 export default function DashboardPage() {
+  const { user } = useUser();
+
+  const name = user?.firstName ? `, ${user.firstName}!` : '!';
+
   return (
     <div>
       <AppHeader />
@@ -14,7 +21,7 @@ export default function DashboardPage() {
         <div className={'flex flex-1 flex-col gap-6 p-6'}>
           <div className={'flex items-center justify-between'}>
             <div>
-              <h1 className={'text-3xl font-bold'}>Welcome back, John!</h1>
+              <h1 className={'text-3xl font-bold'}>Welcome back{name}</h1>
               <p className={'text-muted-foreground'}>{`Here's what's happening with your collection`}</p>
             </div>
             <Button className={'gap-2'}>
