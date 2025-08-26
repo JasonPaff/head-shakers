@@ -2,16 +2,8 @@
 
 import type { ComponentProps } from 'react';
 
-import {
-  ActivityIcon,
-  CopyleftIcon,
-  HelpCircleIcon,
-  LayoutDashboardIcon,
-  PlusIcon,
-  SettingsIcon,
-  UploadIcon,
-  UserIcon,
-} from 'lucide-react';
+import { ActivityIcon, CopyleftIcon, LayoutDashboardIcon, PlusIcon, SettingsIcon, UploadIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 
 import { AppSidebarNavMain } from '@/components/layout/app-sidebar/components/app-sidebar-nav-main';
 import { AppSidebarNavSecondary } from '@/components/layout/app-sidebar/components/app-sidebar-nav-secondary';
@@ -25,79 +17,56 @@ const data = {
       icon: LayoutDashboardIcon,
       isActive: true,
       title: 'Dashboard',
-      url: '/dashboard',
+      url: $path({ route: '/dashboard' }),
     },
     {
       icon: CopyleftIcon,
       items: [
         {
-          title: 'All Items',
-          url: '/collection',
+          title: 'Analyze',
+          url: $path({ route: '/dashboard/collection/analytics' }),
         },
         {
-          title: 'Categories',
-          url: '/collection/categories',
-        },
-        {
-          title: 'Wishlist',
-          url: '/collection/wishlist',
+          title: 'Organize',
+          url: $path({ route: '/dashboard/collection/organize' }),
         },
       ],
       title: 'My Collection',
-      url: '/collection',
+      url: $path({ route: '/dashboard/collection' }),
     },
     {
       icon: PlusIcon,
       title: 'Add Bobblehead',
-      url: '/add',
+      url: $path({ route: '/items/add' }),
     },
     {
       icon: UploadIcon,
       items: [
         {
-          title: 'Bulk Upload',
-          url: '/import/bulk',
+          title: 'Import',
+          url: $path({ route: '/settings/data/import' }),
         },
         {
-          title: 'CSV Import',
-          url: '/import/csv',
-        },
-        {
-          title: 'Photo Import',
-          url: '/import/photos',
+          title: 'Export',
+          url: $path({ route: '/settings/data/export' }),
         },
       ],
       title: 'Import Tools',
-      url: '/import',
+      url: $path({ route: '/settings/data/import' }),
     },
   ],
   navSecondary: [
     {
       icon: ActivityIcon,
       title: 'Following Feed',
-      url: '/feed',
-    },
-    {
-      icon: UserIcon,
-      title: 'My Profile',
-      url: '/profile',
+      url: $path({ route: '/dashboard/feed' }),
     },
     {
       icon: SettingsIcon,
       title: 'Account Settings',
-      url: '/settings',
-    },
-    {
-      icon: HelpCircleIcon,
-      title: 'Help & Tutorials',
-      url: '/help',
+      url: $path({ route: '/settings' }),
     },
   ],
-  user: {
-    avatar: '/avatars/user.jpg',
-    email: 'john@example.com',
-    name: 'John Collector',
-  },
 };
 
 type AppSidebarProps = ComponentProps<typeof Sidebar>;

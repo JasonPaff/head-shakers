@@ -3,6 +3,7 @@
 import type { LucideIcon } from 'lucide-react';
 
 import { ChevronRightIcon } from 'lucide-react';
+import Link from 'next/link';
 import { Fragment } from 'react';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -46,10 +47,10 @@ export const AppSidebarNavMain = ({ items }: AppSidebarNavMainProps) => {
           <Collapsible asChild defaultOpen={item.isActive} key={item.title}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
-                <a href={item.url}>
+                <Link href={item.url}>
                   <item.icon />
                   <span>{item.title}</span>
-                </a>
+                </Link>
               </SidebarMenuButton>
               {getHasSubMenuItems(item.items) ?
                 <Fragment>
@@ -64,9 +65,9 @@ export const AppSidebarNavMain = ({ items }: AppSidebarNavMainProps) => {
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
+                            <Link href={subItem.url}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}

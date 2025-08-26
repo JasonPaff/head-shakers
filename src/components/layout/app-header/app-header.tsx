@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { AppHeaderColorMode } from '@/components/layout/app-header/components/app-header-color-mode';
 import { AppHeaderContainer } from '@/components/layout/app-header/components/app-header-container';
-import { AppHeaderDiscovery } from '@/components/layout/app-header/components/app-header-discovery';
+import { AppHeaderNavMenu } from '@/components/layout/app-header/components/app-header-nav-menu';
 import { AppHeaderNotifications } from '@/components/layout/app-header/components/app-header-notifications';
 import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
@@ -43,7 +43,7 @@ export const AppHeader = () => {
 
         <div className={'flex items-center justify-between space-x-4'}>
           {/* Discovery Actions */}
-          <AppHeaderDiscovery />
+          <AppHeaderNavMenu />
 
           {/* Notifications */}
           <AppHeaderNotifications />

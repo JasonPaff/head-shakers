@@ -180,9 +180,7 @@ export const AppHeaderNavMenu = () => {
             </NavigationMenuItem>
           );
 
-          return link.isAuthRequired ? (
-            <AuthContent key={index}>{content}</AuthContent>
-          ) : content;
+          return link.isAuthRequired ? <AuthContent key={index}>{content}</AuthContent> : content;
         })}
       </NavigationMenuList>
     </NavigationMenu>

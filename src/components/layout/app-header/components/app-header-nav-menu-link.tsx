@@ -1,13 +1,18 @@
-import type { ComponentProps } from 'react';
+'use client';
+
+import type { ComponentProps, ReactNode } from 'react';
 
 import Link from 'next/link';
 
 import { NavigationMenuLink } from '@/components/ui/navigation-menu';
 import { cn } from '@/utils/tailwind-utils';
 
-type CollectionListItemProps = ComponentProps<typeof Link>;
+type AppHeaderNavMenuLinkProps = Omit<ComponentProps<typeof Link>, 'title'> & {
+  isAuthRequired?: boolean;
+  title: ReactNode;
+};
 
-export const CollectionListItem = ({ children, className, title, ...props }: CollectionListItemProps) => {
+export const AppHeaderNavMenuLink = ({ children, className, title, ...props }: AppHeaderNavMenuLinkProps) => {
   return (
     <li>
       <NavigationMenuLink asChild>

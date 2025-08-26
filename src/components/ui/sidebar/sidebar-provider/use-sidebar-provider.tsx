@@ -1,6 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import { useBreakpoint } from '@/hooks/use-breakpoint';
+import { useCookie } from '@/hooks/use-cookie';
 import { useToggle } from '@/hooks/use-toggle';
 
 export interface UseSidebarProviderStateProps {
@@ -17,27 +20,38 @@ export const useSidebarProvider = ({
   const [isOpen, setIsOpen] = useToggle(isDefaultOpen);
   const [isMobileOpen, setIsMobileOpen] = useToggle(isDefaultOpen);
 
+  const { setValue: setSidebarState, value: sidebarState } = useCookie('sidebar');
+
   const { isMobile } = useBreakpoint();
 
+  // initialize state from the cookie on mount
+  useEffect(() => {
+    const isOpenFromCookie = sidebarState === 'expanded';
+    if (isMobile) setIsMobileOpen.update(isOpenFromCookie);
+    else setIsOpen.update(isOpenFromCookie);
+  }, [sidebarState, isMobile, setIsOpen, setIsMobileOpen]);
+
   const isControlled = isOpenProp !== undefined;
-  const _isOpen = isOpenProp ?? isOpen ?? isMobileOpen;
+  const _isOpen = isOpenProp ?? (isMobile ? isMobileOpen : isOpen);
 
   const state = _isOpen ? 'expanded' : 'collapsed';
 
   const setOpen = (isOpenNew: boolean) => {
     if (_isOpen === isOpenNew) return;
     onOpenChange?.(isOpenNew);
-    document.cookie = `head-shakers-sidebar-collapsed=${isOpenNew}; path=/; max-age=${60 * 60 * 24 * 365}`;
+    setSidebarState(isOpenNew ? 'expanded' : 'collapsed');
 
-    if (isControlled) {
-      if (isMobile) setIsMobileOpen.update(isOpenNew);
-      else setIsOpen.update(isOpenNew);
+    if (!isControlled) {
+      if (isMobile) {
+        setIsMobileOpen.update(isOpenNew);
+      } else {
+        setIsOpen.update(isOpenNew);
+      }
     }
   };
 
   const toggleOpen = () => {
-    if (isMobile) setIsMobileOpen.toggle();
-    else setIsOpen.toggle();
+    setOpen(!_isOpen);
   };
 
   return {

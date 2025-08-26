@@ -36,6 +36,7 @@
     "ably": "^2.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cookies-next": "^6.1.0",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.4",
     "drizzle-zod": "^0.8.3",
