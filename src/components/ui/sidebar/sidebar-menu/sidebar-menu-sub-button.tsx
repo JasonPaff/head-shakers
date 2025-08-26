@@ -88,6 +88,7 @@ export const SidebarMenuSubButton = ({
           data-active={isActive}
           data-sidebar={'menu-sub-button'}
           data-size={size}
+          data-slot={'sidebar-menu-sub-button'}
           {...props}
         />
       </TooltipTrigger>

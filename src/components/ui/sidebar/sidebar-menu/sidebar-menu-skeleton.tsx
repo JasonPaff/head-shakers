@@ -1,6 +1,7 @@
+/* eslint-disable react-snob/no-inline-styles */
 'use client';
 
-import type { ComponentPropsWithRef } from 'react';
+import type { ComponentPropsWithRef, CSSProperties } from 'react';
 
 import { useMemo } from 'react';
 
@@ -21,12 +22,21 @@ export const SidebarMenuSkeleton = ({ className, isShowIcon = false, ...props }:
     <div
       className={cn('flex h-8 items-center gap-2 rounded-md px-2', className)}
       data-sidebar={'menu-skeleton'}
+      data-slot={'sidebar-menu-skeleton'}
       {...props}
     >
       <Conditional isCondition={isShowIcon}>
         <Skeleton className={'size-4 rounded-md'} data-sidebar={'menu-skeleton-icon'} />
       </Conditional>
-      <Skeleton className={'h-4 flex-1'} data-sidebar={'menu-skeleton-text'} width={width} />
+      <Skeleton
+        className={'h-4 flex-1'}
+        data-sidebar={'menu-skeleton-text'}
+        style={
+          {
+            '--skeleton-width': width,
+          } as CSSProperties
+        }
+      />
     </div>
   );
 };

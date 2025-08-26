@@ -1,8 +1,8 @@
 @import "tailwindcss";
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
-@plugin "tailwindcss-animate";
 @plugin "tailwindcss-radix" {
     variantPrefix: rdx;
 }
@@ -109,9 +109,34 @@
     --color-sidebar-primary: var(--sidebar-primary);
     --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
     --color-sidebar-ring: var(--sidebar-ring);
-    --font-sans: var(--font-geist-sans);
-    --font-mono: var(--font-geist-mono);
 }
+
+@variant data-active (&[data-active="true"]);
+@variant data-collapsible-icon (&[data-collapsible="icon"]);
+@variant data-collapsible-offcanvas (&[data-collapsible="offcanvas"]);
+@variant data-color-mode-dark (&[data-color-mode="dark"]);
+@variant data-color-mode-light (&[data-color-mode="light"]);
+@variant data-disabled (&[data-disabled="true"]);
+@variant data-orientation-horizontal (&[data-orientation="horizontal"]);
+@variant data-orientation-vertical (&[data-orientation="vertical"]);
+@variant data-selected (&[data-selected="true"]);
+@variant data-size-compact (&[data-size="compact"]);
+@variant data-size-default (&[data-size="default"]);
+@variant data-size-full (&[data-size="full"]);
+@variant data-size-lg (&[data-size="lg"]);
+@variant data-size-sm (&[data-size="sm"]);
+@variant data-state-collapsed (&[data-state="collapsed"]);
+@variant data-state-completed (&[data-state="completed"]);
+@variant data-state-expanded (&[data-state="expanded"]);
+@variant data-state-selected (&[data-state="selected"]);
+@variant data-status-active (&[data-status="active"]);
+@variant data-variant-clean (&[data-variant="clean"]);
+@variant data-variant-floating (&[data-variant="floating"]);
+@variant data-variant-full (&[data-variant="full"]);
+@variant data-variant-inset (&[data-variant="inset"]);
+@variant data-variant-outline (&[data-variant="outline"]);
+@variant data-variant-size (&[data-variant="size"]);
+@variant data-variant-striped (&[data-variant="striped"]);
 
 @keyframes caret-blink {
     0%, 70%, 100% {

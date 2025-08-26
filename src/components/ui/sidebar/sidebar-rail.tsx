@@ -13,28 +13,14 @@ import { mergeButtonRefs } from '@/utils/ref-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 const sidebarRailVariants = cva([
-  'absolute inset-y-0 z-20 hidden w-4',
-  // animation styles
-  '-translate-x-1/2 transition-all ease-linear',
-  // after styles
-  'after:absolute after:inset-y-0 after:left-1/2 after:w-[2px]',
-  // hover styles
-  'hover:after:bg-sidebar-border',
-  // group side styles
-  'group-rdx-side-left:-right-4 group-rdx-side-right:left-0',
-  // sm breakpoint styles
-  'sm:flex',
-  // data-side left styles
-  '[[data-side=left]_&]:cursor-w-resize',
+  'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear',
+  'group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0',
+  'after:left-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex',
+  'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
   '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize',
-  // data-side right styles
-  '[[data-side=right]_&]:cursor-e-resize',
   '[[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-  // group data-collapsible styles
-  'group-data-collapsible-offcanvas:translate-x-0',
-  'group-data-collapsible-offcanvas:after:left-full',
-  'group-data-collapsible-offcanvas:hover:bg-sidebar',
-  // data-side data-collapsible styles
+  'group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
+  'hover:group-data-[collapsible=offcanvas]:bg-sidebar',
   '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
   '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
 ]);
@@ -67,6 +53,7 @@ export const SidebarRail = ({ children, className, isDragEnabled, ref, ...props 
       aria-label={'Toggle Sidebar'}
       className={cn(sidebarRailVariants(), className)}
       data-sidebar={'rail'}
+      data-slot={'sidebar-rail'}
       onMouseDown={(e) => {
         handleMouseDown(e);
       }}

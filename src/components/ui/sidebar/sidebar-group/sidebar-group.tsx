@@ -6,7 +6,12 @@ type SidebarGroupProps = ComponentPropsWithRef<'div'>;
 
 export const SidebarGroup = ({ children, className, ...props }: SidebarGroupProps) => {
   return (
-    <div className={cn('relative flex w-full min-w-0 flex-col p-2', className)} data-sidebar={'group'} {...props}>
+    <div
+      className={cn('relative flex w-full min-w-0 flex-col p-2', className)}
+      data-sidebar={'group'}
+      data-slot={'sidebar-group'}
+      {...props}
+    >
       {children}
     </div>
   );

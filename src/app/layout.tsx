@@ -6,7 +6,6 @@ import { ThemeProvider } from 'next-themes';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import '@/app/globals.css';
-import { AppHeader } from '@/components/layout/app-header/app-header';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -35,10 +34,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         theme: shadcn,
       }}
     >
-      <html className={'h-full'} lang={'en'} suppressHydrationWarning>
-        <body className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}>
+      <html lang={'en'} suppressHydrationWarning>
+        <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
-            <AppHeader />
             {children}
           </ThemeProvider>
         </body>

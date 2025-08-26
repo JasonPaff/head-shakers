@@ -1,22 +1,21 @@
 'use client';
 
 import { SignInButton, SignUpButton, useAuth, UserButton } from '@clerk/nextjs';
-import { BellIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
+import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 
-export const HeaderUser = () => {
+export const AppHeaderUser = () => {
   const { isSignedIn } = useAuth();
 
   return (
     <Fragment>
       {/* Signed In */}
-      <Conditional isCondition={isSignedIn}>
-        <BellIcon aria-label={'notifications'} className={'h-5 w-5'} />
+      <AuthContent>
         <UserButton />
-      </Conditional>
+      </AuthContent>
 
       {/* Signed Out */}
       <Conditional isCondition={!isSignedIn}>

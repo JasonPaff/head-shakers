@@ -48,7 +48,7 @@ export default function SentryExamplePage() {
       </Head>
 
       <main>
-        <div className={'flex-spacer'} />
+        <div />
         <svg fill={'none'} height={'40'} width={'40'} xmlns={'http://www.w3.org/2000/svg'}>
           <path
             d={
@@ -59,7 +59,7 @@ export default function SentryExamplePage() {
         </svg>
         <h1>sentry-example-page</h1>
 
-        <p className={'description'}>
+        <p>
           Click the button below, and view the sample error on the Sentry{' '}
           <a
             href={'https://sleepy-bookworm-software.sentry.io/issues/?project=4509874137530368'}
@@ -84,17 +84,17 @@ export default function SentryExamplePage() {
         </button>
 
         {isSentError ?
-          <p className={'success'}>Error sent to Sentry.</p>
+          <p>Error sent to Sentry.</p>
         : !isConnected ?
-          <div className={'connectivity-error'}>
+          <div>
             <p>
               It looks like network requests to Sentry are being blocked, which will prevent errors from being
               captured. Try disabling your ad-blocker to complete the test.
             </p>
           </div>
-        : <div className={'success_placeholder'} />}
+        : <div />}
 
-        <div className={'flex-spacer'} />
+        <div />
       </main>
 
       <style>{`

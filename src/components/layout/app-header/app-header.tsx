@@ -1,35 +1,47 @@
-'use client';
+import Link from 'next/link';
 
-import { HeaderColorMode } from '@/components/layout/app-header/components/header-color-mode';
-import { HeaderDiscovery } from '@/components/layout/app-header/components/header-discovery';
-import { HeaderSearch } from '@/components/layout/app-header/components/header-search';
-import { HeaderUser } from '@/components/layout/app-header/components/header-user';
+import { AppHeaderColorMode } from '@/components/layout/app-header/components/app-header-color-mode';
+import { AppHeaderContainer } from '@/components/layout/app-header/components/app-header-container';
+import { AppHeaderDiscovery } from '@/components/layout/app-header/components/app-header-discovery';
+import { AppHeaderNotifications } from '@/components/layout/app-header/components/app-header-notifications';
+import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
+import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
 
 export const AppHeader = () => {
   return (
-    <header className={'border-b shadow-sm'}>
-      <div className={'mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'}>
-        <div className={'flex h-16 items-center justify-between'}>
-          {/* Logo */}
-          <div className={'flex items-center'}>
-            <div className={'text-2xl font-bold'}>Head Shakers</div>
+    <header className={'sticky top-0 z-50 flex w-full items-center border-b bg-background'}>
+      <AppHeaderContainer>
+        {/* Logo */}
+        <Link className={'flex items-center gap-2 text-xl font-bold'} href={'/'}>
+          <div
+            className={
+              'flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'
+            }
+          >
+            HS
           </div>
+          Head Shakers
+        </Link>
 
-          {/* Discovery Search */}
-          <div className={'mx-8 max-w-2xl flex-1'}>
-            <HeaderSearch />
-          </div>
-
-          <div className={'flex items-center space-x-4'}>
-            {/* Discovery Actions */}
-            <HeaderDiscovery />
-            {/* User Actions */}
-            <HeaderUser />
-            {/* Color Mode Toggle */}
-            <HeaderColorMode />
-          </div>
+        {/* Search */}
+        <div className={'mx-4 max-w-md flex-1'}>
+          <AppHeaderSearch />
         </div>
-      </div>
+
+        <div className={'flex items-center justify-between space-x-4'}>
+          {/* Discovery Actions */}
+          <AppHeaderDiscovery />
+
+          {/* Notifications */}
+          <AppHeaderNotifications />
+
+          {/* User Actions */}
+          <AppHeaderUser />
+
+          {/* Color Mode Toggle */}
+          <AppHeaderColorMode />
+        </div>
+      </AppHeaderContainer>
     </header>
   );
 };

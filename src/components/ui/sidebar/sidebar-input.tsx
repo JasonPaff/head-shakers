@@ -17,6 +17,7 @@ export const SidebarInput = ({ className, ...props }: SidebarInputProps) => {
         className,
       )}
       data-sidebar={'input'}
+      data-slot={'sidebar-input'}
       {...props}
     />
   );

@@ -6,7 +6,12 @@ type SidebarHeaderProps = ComponentPropsWithRef<'div'>;
 
 export const SidebarHeader = ({ children, className, ...props }: SidebarHeaderProps) => {
   return (
-    <div className={cn('flex flex-col gap-2 p-2', className)} data-sidebar={'header'} {...props}>
+    <div
+      className={cn('flex flex-col gap-2 p-2', className)}
+      data-sidebar={'header'}
+      data-slot={'sidebar-header'}
+      {...props}
+    >
       {children}
     </div>
   );

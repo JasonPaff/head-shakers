@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export const HeaderColorMode = () => {
+export const AppHeaderColorMode = () => {
   const { resolvedTheme, setTheme } = useTheme();
 
   const handleDarkMode = () => {

@@ -14,6 +14,11 @@ type SidebarTriggerProps = ComponentPropsWithRef<typeof Button>;
 export const SidebarTrigger = ({ className, onClick, ...props }: SidebarTriggerProps) => {
   const { isOpen, toggleOpen } = useSidebar();
 
+  const handleSidebarToggle = (event: ButtonMouseEvent) => {
+    onClick?.(event);
+    toggleOpen();
+  };
+
   const tooltipText = `${isOpen ? 'Close' : 'Open'} Sidebar`;
 
   return (
@@ -22,10 +27,8 @@ export const SidebarTrigger = ({ className, onClick, ...props }: SidebarTriggerP
         <Button
           className={cn('size-7', className)}
           data-sidebar={'trigger'}
-          onClick={(event) => {
-            onClick?.(event);
-            toggleOpen();
-          }}
+          data-slot={'sidebar-trigger'}
+          onClick={handleSidebarToggle}
           size={'icon'}
           variant={'ghost'}
           {...props}
