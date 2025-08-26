@@ -1,20 +1,25 @@
 import { AppHeader } from '@/components/layout/app-header/app-header';
 import { AppSidebar } from '@/components/layout/app-sidebar/app-sidebar';
 import { AuthContent } from '@/components/ui/auth';
+import { SidebarInset } from '@/components/ui/sidebar/sidebar-inset';
 import { SidebarProvider } from '@/components/ui/sidebar/sidebar-provider/sidebar-provider';
 
 type AppLayoutProps = LayoutProps;
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
-    <SidebarProvider>
-      <AuthContent>
-        <AppSidebar collapsible={'icon'} />
-      </AuthContent>
-      <main className={'min-h-screen flex-1 bg-background'}>
+    <div className={'[--header-height:calc(--spacing(14))]'}>
+      <SidebarProvider className={'flex flex-col'}>
         <AppHeader />
-        {children}
-      </main>
-    </SidebarProvider>
+        <div className={'flex flex-1'}>
+          <AuthContent>
+            <AppSidebar collapsible={'icon'} />
+          </AuthContent>
+          <SidebarInset>
+            <main className={'min-h-screen flex-1 bg-background'}>{children}</main>
+          </SidebarInset>
+        </div>
+      </SidebarProvider>
+    </div>
   );
 }

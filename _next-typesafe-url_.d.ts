@@ -9,19 +9,19 @@ declare module "@@@next-typesafe-url" {
   import type { InferRoute, StaticRoute } from "next-typesafe-url";
 
   interface DynamicRouter {
-  
+    "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
+    "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/route-type").RouteType>;
   }
 
   interface StaticRouter {
+    "/": StaticRoute;
     "/browse/categories": StaticRoute;
-    "/browse/categories/[category]": StaticRoute;
     "/browse/featured": StaticRoute;
     "/browse": StaticRoute;
     "/browse/search": StaticRoute;
     "/browse/trending": StaticRoute;
     "/collections/create": StaticRoute;
     "/collections/[collectionId]/edit": StaticRoute;
-    "/collections/[collectionId]": StaticRoute;
     "/collections/[collectionId]/settings": StaticRoute;
     "/collections/[collectionId]/share": StaticRoute;
     "/dashboard/collection/analytics": StaticRoute;
@@ -52,6 +52,5 @@ declare module "@@@next-typesafe-url" {
     "/about": StaticRoute;
     "/privacy": StaticRoute;
     "/terms": StaticRoute;
-    "/": StaticRoute;
   }
 }

@@ -17,12 +17,7 @@ import { AppSidebarNavMain } from '@/components/layout/app-sidebar/components/ap
 import { AppSidebarNavSecondary } from '@/components/layout/app-sidebar/components/app-sidebar-nav-secondary';
 import { Sidebar } from '@/components/ui/sidebar/sidebar';
 import { SidebarContent } from '@/components/ui/sidebar/sidebar-content';
-import { SidebarHeader } from '@/components/ui/sidebar/sidebar-header';
-import { SidebarMenu } from '@/components/ui/sidebar/sidebar-menu/sidebar-menu';
-import { SidebarMenuButton } from '@/components/ui/sidebar/sidebar-menu/sidebar-menu-button';
-import { SidebarMenuItem } from '@/components/ui/sidebar/sidebar-menu/sidebar-menu-item';
 import { SidebarRail } from '@/components/ui/sidebar/sidebar-rail';
-import { cn } from '@/utils/tailwind-utils';
 
 const data = {
   navMain: [
@@ -109,29 +104,7 @@ type AppSidebarProps = ComponentProps<typeof Sidebar>;
 
 export const AppSidebar = ({ ...props }: AppSidebarProps) => {
   return (
-    <Sidebar className={'top-16 h-[calc(100svh-4rem)]'} {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild size={'lg'}>
-              <a href={'/dashboard'}>
-                <div
-                  className={cn(
-                    'flex aspect-square size-8 items-center justify-center rounded-lg',
-                    'bg-sidebar-primary text-sidebar-primary-foreground',
-                  )}
-                >
-                  HS
-                </div>
-                <div className={'grid flex-1 text-left text-sm leading-tight'}>
-                  <span className={'truncate font-medium'}>Head Shakers</span>
-                  <span className={'truncate text-xs'}>Collection Manager</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarHeader>
+    <Sidebar className={'top-(--header-height) h-[calc(100svh-var(--header-height))]!'} {...props}>
       <SidebarContent>
         <AppSidebarNavMain items={data.navMain} />
         <AppSidebarNavSecondary className={'mt-auto'} items={data.navSecondary} />

@@ -1,8 +1,10 @@
 'use client';
 
 import { SearchIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 import { Fragment } from 'react';
 
+import { AppHeaderMyCollection } from '@/components/layout/app-header/components/app-header-my-collection';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -43,17 +45,17 @@ const navigationLinks: NavigationLink[] = [
     items: [
       {
         description: 'Explore the most popular bobblehead collections right now.',
-        href: '#/discover/trending',
+        href: $path({ route: '/browse/search' }),
         label: 'Trending Collections',
       },
       {
         description: 'See the latest bobbleheads added to the community.',
-        href: '#/discover/recent',
+        href: $path({ route: '/browse/trending' }),
         label: 'Recent Additions',
       },
       {
         description: 'Curated collections and collector spotlights.',
-        href: '#/discover/featured',
+        href: $path({ route: '/browse/featured' }),
         label: 'Featured Collections',
       },
     ],
@@ -65,17 +67,17 @@ const navigationLinks: NavigationLink[] = [
     items: [
       {
         description: 'Baseball, football, basketball and more sports bobbleheads.',
-        href: '#/browse/sports',
+        href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'sports' } }),
         label: 'Sports',
       },
       {
         description: 'Movies, TV shows, cartoons and pop culture figures.',
-        href: '#/browse/entertainment',
+        href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'entertainment' } }),
         label: 'Entertainment',
       },
       {
         description: 'Classic and hard-to-find bobblehead collectibles.',
-        href: '#/browse/vintage',
+        href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'vintage' } }),
         label: 'Vintage & Rare',
       },
     ],
@@ -85,9 +87,9 @@ const navigationLinks: NavigationLink[] = [
   {
     isSubmenu: true,
     items: [
-      { href: '#/community/collectors', icon: 'UsersIcon', label: 'Top Collectors' },
-      { href: '#/community/search', icon: 'SearchIcon', label: 'Advanced Search' },
-      { href: '#/community/trending', icon: 'TrendingUpIcon', label: "What's Hot" },
+      { href: $path({ route: '/browse' }), icon: 'UsersIcon', label: 'Top Collectors' },
+      { href: $path({ route: '/browse/search' }), icon: 'SearchIcon', label: 'Advanced Search' },
+      { href: $path({ route: '/browse/trending' }), icon: 'TrendingUpIcon', label: "What's Hot" },
     ],
     label: 'Community',
     type: 'icon',
@@ -173,6 +175,9 @@ export const AppHeaderDiscovery = () => {
             }
           </NavigationMenuItem>
         ))}
+
+        {/* My Collection */}
+        <AppHeaderMyCollection />
       </NavigationMenuList>
     </NavigationMenu>
   );
