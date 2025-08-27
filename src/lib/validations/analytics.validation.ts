@@ -1,6 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
+import { ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { contentViews, searchQueries } from '@/lib/db/schema';
 
 export const searchFiltersSchema = z.object({
@@ -11,8 +12,8 @@ export const searchFiltersSchema = z.object({
       min: z.number().min(0).optional(),
     })
     .optional(),
-  sortBy: z.enum(['relevance', 'date', 'price', 'popularity']).optional(),
-  sortOrder: z.enum(['asc', 'desc']).optional(),
+  sortBy: z.enum(ENUMS.SEARCH.SORT_BY).optional(),
+  sortOrder: z.enum(ENUMS.SEARCH.SORT_ORDER).optional(),
   tags: z.array(z.string()).optional(),
 });
 
@@ -20,9 +21,13 @@ export type SearchFilters = z.infer<typeof searchFiltersSchema>;
 
 export const selectContentViewSchema = createSelectSchema(contentViews);
 export const insertContentViewSchema = createInsertSchema(contentViews, {
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().max(SCHEMA_LIMITS.CONTENT_VIEW.IP_ADDRESS.MAX).optional(),
   referrerUrl: z.url().optional(),
-  userAgent: z.string().min(1).max(1000).optional(),
+  userAgent: z
+    .string()
+    .min(SCHEMA_LIMITS.CONTENT_VIEW.USER_AGENT.MIN)
+    .max(SCHEMA_LIMITS.CONTENT_VIEW.USER_AGENT.MAX)
+    .optional(),
   viewDuration: z.number().min(0).optional(),
 }).omit({
   id: true,
@@ -34,8 +39,8 @@ export const updateContentViewSchema = insertContentViewSchema.partial();
 export const selectSearchQuerySchema = createSelectSchema(searchQueries);
 export const insertSearchQuerySchema = createInsertSchema(searchQueries, {
   filters: searchFiltersSchema.optional(),
-  ipAddress: z.ipv6().optional(),
-  query: z.string().min(1).max(500),
+  ipAddress: z.string().max(SCHEMA_LIMITS.SEARCH_QUERY.QUERY.MAX).optional(),
+  query: z.string().min(SCHEMA_LIMITS.SEARCH_QUERY.QUERY.MIN).max(SCHEMA_LIMITS.SEARCH_QUERY.QUERY.MAX),
   resultCount: z.number().min(0).optional(),
 }).omit({
   id: true,

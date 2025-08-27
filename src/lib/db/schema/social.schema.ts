@@ -12,15 +12,12 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { users } from '@/lib/db/schema/users.schema';
 
-export const commentType = ['bobblehead', 'collection'] as const;
-export const followType = ['user', 'collection'] as const;
-export const likeType = ['bobblehead', 'collection', 'comment'] as const;
-
-export const commentTargetTypeEnum = pgEnum('comment_target_type', commentType);
-export const followTypeEnum = pgEnum('follow_type', followType);
-export const likeTargetTypeEnum = pgEnum('like_target_type', likeType);
+export const commentTargetTypeEnum = pgEnum('comment_target_type', ENUMS.COMMENT.TARGET_TYPE);
+export const followTypeEnum = pgEnum('follow_type', ENUMS.FOLLOW.TYPE);
+export const likeTargetTypeEnum = pgEnum('like_target_type', ENUMS.LIKE.TARGET_TYPE);
 
 export const follows = pgTable(
   'follows',
@@ -32,7 +29,7 @@ export const follows = pgTable(
     followingId: uuid('following_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    followType: followTypeEnum('follow_type').default('user').notNull(),
+    followType: followTypeEnum('follow_type').default(DEFAULTS.FOLLOW.TYPE).notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
     targetId: uuid('target_id'),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -86,14 +83,14 @@ export const likes = pgTable(
 export const comments = pgTable(
   'comments',
   {
-    content: varchar('content', { length: 5000 }).notNull(),
+    content: varchar('content', { length: SCHEMA_LIMITS.COMMENT.CONTENT.MAX }).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     deletedAt: timestamp('deleted_at'),
     editedAt: timestamp('edited_at'),
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(false).notNull(),
-    isEdited: boolean('is_edited').default(false).notNull(),
-    likeCount: integer('like_count').default(0).notNull(),
+    isDeleted: boolean('is_deleted').default(DEFAULTS.COMMENT.IS_DELETED).notNull(),
+    isEdited: boolean('is_edited').default(DEFAULTS.COMMENT.IS_EDITED).notNull(),
+    likeCount: integer('like_count').default(DEFAULTS.COMMENT.LIKE_COUNT).notNull(),
     parentCommentId: uuid('parent_comment_id'),
     targetId: uuid('target_id').notNull(),
     targetType: commentTargetTypeEnum('comment_target_type').notNull(),

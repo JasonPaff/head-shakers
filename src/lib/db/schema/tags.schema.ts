@@ -1,16 +1,17 @@
 import { index, integer, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 
+import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { users } from '@/lib/db/schema/users.schema';
 
-export const tagsSchema = pgTable(
+export const tags = pgTable(
   'tags',
   {
-    color: varchar('color', { length: 7 }).default('#3B82F6').notNull(),
+    color: varchar('color', { length: SCHEMA_LIMITS.TAG.COLOR.LENGTH }).default(DEFAULTS.TAG.COLOR).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
-    name: varchar('name', { length: 50 }).notNull(),
+    name: varchar('name', { length: SCHEMA_LIMITS.TAG.NAME.MAX }).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    usageCount: integer('usage_count').default(0).notNull(),
+    usageCount: integer('usage_count').default(DEFAULTS.TAG.USAGE_COUNT).notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),

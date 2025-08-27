@@ -6,26 +6,29 @@ import {
   index,
   integer,
   pgTable,
-  text,
   timestamp,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
 
+import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { users } from '@/lib/db/schema/users.schema';
 
-export const collectionsSchema = pgTable(
+export const collections = pgTable(
   'collections',
   {
-    coverImageUrl: text('cover_image_url'),
+    coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    description: text('description'),
+    description: varchar('description', { length: SCHEMA_LIMITS.COLLECTION.DESCRIPTION.MAX }),
     id: uuid('id').primaryKey().defaultRandom(),
-    isPublic: boolean('is_public').default(true).notNull(),
+    isPublic: boolean('is_public').default(DEFAULTS.COLLECTION.IS_PUBLIC).notNull(),
     lastItemAddedAt: timestamp('last_item_added_at'),
-    name: varchar('name', { length: 100 }).notNull(),
-    totalItems: integer('total_items').default(0).notNull(),
-    totalValue: decimal('total_value', { precision: 15, scale: 2 }).default('0.00'),
+    name: varchar('name', { length: SCHEMA_LIMITS.COLLECTION.NAME.MAX }).notNull(),
+    totalItems: integer('total_items').default(DEFAULTS.COLLECTION.TOTAL_ITEMS).notNull(),
+    totalValue: decimal('total_value', {
+      precision: SCHEMA_LIMITS.COLLECTION.TOTAL_VALUE.PRECISION,
+      scale: SCHEMA_LIMITS.COLLECTION.TOTAL_VALUE.SCALE,
+    }).default(DEFAULTS.COLLECTION.TOTAL_VALUE),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
@@ -42,8 +45,8 @@ export const collectionsSchema = pgTable(
     index('collections_user_public_idx').on(table.userId, table.isPublic),
 
     // constraints
-    check('collections_name_length', sql`length(${table.name}) <= 100`),
-    check('collections_name_not_empty', sql`length(${table.name}) > 0`),
+    check('collections_name_length', sql`length(${table.name}) <= ${SCHEMA_LIMITS.COLLECTION.NAME.MAX}`),
+    check('collections_name_not_empty', sql`length(${table.name}) >= ${SCHEMA_LIMITS.COLLECTION.NAME.MIN}`),
     check('collections_total_items_non_negative', sql`${table.totalItems} >= 0`),
     check('collections_total_value_non_negative', sql`${table.totalValue} >= 0`),
   ],
@@ -53,16 +56,16 @@ export const subCollections = pgTable(
   'sub_collections',
   {
     collectionId: uuid('collection_id')
-      .references(() => collectionsSchema.id, { onDelete: 'cascade' })
+      .references(() => collections.id, { onDelete: 'cascade' })
       .notNull(),
-    coverImageUrl: text('cover_image_url'),
+    coverImageUrl: varchar('cover_image_url'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    description: text('description'),
+    description: varchar('description'),
     id: uuid('id').primaryKey().defaultRandom(),
-    isPublic: boolean('is_public').default(true).notNull(),
-    itemCount: integer('item_count').default(0).notNull(),
-    name: varchar('name', { length: 100 }).notNull(),
-    sortOrder: integer('sort_order').default(0).notNull(),
+    isPublic: boolean('is_public').default(DEFAULTS.SUB_COLLECTION.IS_PUBLIC).notNull(),
+    itemCount: integer('item_count').default(DEFAULTS.SUB_COLLECTION.ITEM_COUNT).notNull(),
+    name: varchar('name', { length: SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX }).notNull(),
+    sortOrder: integer('sort_order').default(DEFAULTS.SUB_COLLECTION.SORT_ORDER).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (table) => [
@@ -76,7 +79,10 @@ export const subCollections = pgTable(
 
     // constraints
     check('sub_collections_item_count_non_negative', sql`${table.itemCount} >= 0`),
-    check('sub_collections_name_length', sql`length(${table.name}) <= 100`),
+    check(
+      'sub_collections_name_length',
+      sql`length(${table.name}) <= ${SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX}`,
+    ),
     check('sub_collections_name_not_empty', sql`length(${table.name}) > 0`),
     check('sub_collections_sort_order_non_negative', sql`${table.sortOrder} >= 0`),
   ],

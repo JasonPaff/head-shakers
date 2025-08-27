@@ -1,21 +1,16 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import {
-  CONTENT_REPORT_DEFAULTS,
-  contentReportReason,
-  contentReports,
-  contentReportStatus,
-  contentReportTargetType,
-} from '@/lib/db/schema';
+import { ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
+import { contentReports } from '@/lib/db/schema';
 
 export const selectContentReportSchema = createSelectSchema(contentReports);
 
 export const insertContentReportSchema = createInsertSchema(contentReports, {
-  description: z.string().max(CONTENT_REPORT_DEFAULTS.MAX_DESCRIPTION_LENGTH).optional(),
-  moderatorNotes: z.string().max(CONTENT_REPORT_DEFAULTS.MAX_MODERATOR_NOTES_LENGTH).optional(),
-  reason: z.enum(contentReportReason),
-  targetType: z.enum(contentReportTargetType),
+  description: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.DESCRIPTION.MAX).optional(),
+  moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
+  reason: z.enum(ENUMS.CONTENT_REPORT.REASON),
+  targetType: z.enum(ENUMS.CONTENT_REPORT.TARGET_TYPE),
 }).omit({
   createdAt: true,
   id: true,
@@ -25,9 +20,9 @@ export const insertContentReportSchema = createInsertSchema(contentReports, {
 });
 
 export const updateContentReportSchema = createInsertSchema(contentReports, {
-  moderatorNotes: z.string().max(CONTENT_REPORT_DEFAULTS.MAX_MODERATOR_NOTES_LENGTH).optional(),
+  moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
   resolvedAt: z.date().optional(),
-  status: z.enum(contentReportStatus),
+  status: z.enum(ENUMS.CONTENT_REPORT.STATUS),
 })
   .pick({
     moderatorId: true,

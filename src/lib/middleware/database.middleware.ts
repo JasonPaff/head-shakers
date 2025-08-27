@@ -1,48 +1,49 @@
 import * as Sentry from '@sentry/nextjs';
 import { createMiddleware } from 'next-safe-action';
 
-import type { ActionMetadata, ActionMiddleware } from '@/lib/utils/next-safe-action';
+import type { ActionMetadata, TransactionContext } from '@/lib/utils/next-safe-action';
 
-type DatabaseMiddleware = ActionMiddleware<NonNullable<unknown>, ActionMetadata>;
+import { SENTRY_CONTEXTS, SENTRY_OPERATIONS } from '@/lib/constants';
 
-export const databaseMiddleware = createMiddleware<DatabaseMiddleware>().define(
-  async ({ metadata, next }) => {
-    return await Sentry.startSpan(
-      {
-        attributes: {
-          'action.name': metadata?.actionName,
-          'db.name': 'neon',
-          'db.system': 'postgresql',
-        },
-        name: `db_${metadata?.actionName || 'unknown'}`,
-        op: 'db.action',
+export const databaseMiddleware = createMiddleware<{
+  ctx: TransactionContext;
+  metadata: ActionMetadata;
+}>().define(async ({ metadata, next }) => {
+  return await Sentry.startSpan(
+    {
+      attributes: {
+        'action.name': metadata?.actionName,
+        'db.name': 'neon',
+        'db.system': 'postgresql',
       },
-      async (span) => {
-        // set database context
-        Sentry.setContext('database', {
-          action: metadata?.actionName,
-          orm: 'drizzle',
+      name: `db_${metadata?.actionName || 'unknown'}`,
+      op: SENTRY_OPERATIONS.DATABASE_ACTION,
+    },
+    async (span) => {
+      // set database context
+      Sentry.setContext(SENTRY_CONTEXTS.DATABASE, {
+        action: metadata?.actionName,
+        orm: 'drizzle',
+        provider: 'neon',
+      });
+
+      try {
+        const result = await next();
+        span.setStatus({ code: 1, message: 'ok' });
+        return result;
+      } catch (error) {
+        span.setStatus({ code: 2, message: 'internal_error' });
+        span.recordException(error as Error);
+
+        // add database-specific error context
+        Sentry.setContext(SENTRY_CONTEXTS.DATABASE_ERROR, {
+          operation: metadata?.actionName,
           provider: 'neon',
+          timestamp: new Date().toISOString(),
         });
 
-        try {
-          const result = await next();
-          span.setStatus({ code: 1, message: 'ok' });
-          return result;
-        } catch (error) {
-          span.setStatus({ code: 2, message: 'internal_error' });
-          span.recordException(error as Error);
-
-          // add database-specific error context
-          Sentry.setContext('database_error', {
-            operation: metadata?.actionName,
-            provider: 'neon',
-            timestamp: new Date().toISOString(),
-          });
-
-          throw error;
-        }
-      },
-    );
-  },
-);
+        throw error;
+      }
+    },
+  );
+});

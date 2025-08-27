@@ -5,7 +5,6 @@ import {
   integer,
   jsonb,
   pgTable,
-  text,
   timestamp,
   uniqueIndex,
   uuid,
@@ -14,46 +13,64 @@ import {
 
 import type { CustomFields } from '@/lib/validations/bobbleheads.validation';
 
-import { collectionsSchema, subCollections } from '@/lib/db/schema/collections.schema';
-import { tagsSchema } from '@/lib/db/schema/tags.schema';
-import { usersSchema } from '@/lib/db/schema/users.schema';
+import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
+import { collections, subCollections } from '@/lib/db/schema/collections.schema';
+import { tags } from '@/lib/db/schema/tags.schema';
+import { users } from '@/lib/db/schema/users.schema';
 
 export const bobbleheads = pgTable(
   'bobbleheads',
   {
     acquisitionDate: timestamp('acquisition_date'),
-    acquisitionMethod: varchar('acquisition_method', { length: 50 }),
-    category: varchar('category', { length: 50 }),
-    characterName: varchar('character_name', { length: 100 }),
+    acquisitionMethod: varchar('acquisition_method', {
+      length: SCHEMA_LIMITS.BOBBLEHEAD.ACQUISITION_METHOD.MAX,
+    }),
+    category: varchar('category', { length: SCHEMA_LIMITS.BOBBLEHEAD.CATEGORY.MAX }),
+    characterName: varchar('character_name', { length: SCHEMA_LIMITS.BOBBLEHEAD.CHARACTER_NAME.MAX }),
     collectionId: uuid('collection_id')
-      .references(() => collectionsSchema.id, { onDelete: 'cascade' })
+      .references(() => collections.id, { onDelete: 'cascade' })
       .notNull(),
-    commentCount: integer('comment_count').default(0).notNull(),
+    commentCount: integer('comment_count').default(DEFAULTS.BOBBLEHEAD.COMMENT_COUNT).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    currentCondition: varchar('current_condition', { length: 20 }).default('excellent').notNull(),
+    currentCondition: varchar('current_condition', { length: SCHEMA_LIMITS.BOBBLEHEAD.CURRENT_CONDITION.MAX })
+      .default('excellent')
+      .notNull(),
     customFields: jsonb('custom_fields').$type<CustomFields>(),
     deletedAt: timestamp('deleted_at'),
-    description: text('description'),
-    height: decimal('height', { precision: 5, scale: 2 }),
+    description: varchar('description', { length: SCHEMA_LIMITS.BOBBLEHEAD.DESCRIPTION.MAX }),
+    height: decimal('height', {
+      precision: SCHEMA_LIMITS.BOBBLEHEAD.HEIGHT.PRECISION,
+      scale: SCHEMA_LIMITS.BOBBLEHEAD.HEIGHT.SCALE,
+    }),
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(false).notNull(),
-    isFeatured: boolean('is_featured').default(false).notNull(),
-    isPublic: boolean('is_public').default(true).notNull(),
-    likeCount: integer('like_count').default(0).notNull(),
-    manufacturer: varchar('manufacturer', { length: 100 }),
-    material: varchar('material', { length: 100 }),
-    name: varchar('name', { length: 200 }).notNull(),
-    purchaseLocation: varchar('purchase_location', { length: 100 }),
-    purchasePrice: decimal('purchase_price', { precision: 10, scale: 2 }),
-    series: varchar('series', { length: 100 }),
-    status: varchar('status', { length: 20 }).default('owned').notNull(),
+    isDeleted: boolean('is_deleted').default(DEFAULTS.BOBBLEHEAD.IS_DELETED).notNull(),
+    isFeatured: boolean('is_featured').default(DEFAULTS.BOBBLEHEAD.IS_FEATURED).notNull(),
+    isPublic: boolean('is_public').default(DEFAULTS.BOBBLEHEAD.IS_PUBLIC).notNull(),
+    likeCount: integer('like_count').default(DEFAULTS.BOBBLEHEAD.LIKE_COUNT).notNull(),
+    manufacturer: varchar('manufacturer', { length: SCHEMA_LIMITS.BOBBLEHEAD.MANUFACTURER.MAX }),
+    material: varchar('material', { length: SCHEMA_LIMITS.BOBBLEHEAD.MATERIAL.MAX }),
+    name: varchar('name', { length: SCHEMA_LIMITS.BOBBLEHEAD.NAME.MAX }).notNull(),
+    purchaseLocation: varchar('purchase_location', {
+      length: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_LOCATION.MAX,
+    }),
+    purchasePrice: decimal('purchase_price', {
+      precision: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_PRICE.PRECISION,
+      scale: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_PRICE.SCALE,
+    }),
+    series: varchar('series', { length: SCHEMA_LIMITS.BOBBLEHEAD.SERIES.MAX }),
+    status: varchar('status', { length: SCHEMA_LIMITS.BOBBLEHEAD.STATUS.MAX })
+      .default(DEFAULTS.BOBBLEHEAD.STATUS)
+      .notNull(),
     subCollectionId: uuid('sub_collection_id').references(() => subCollections.id, { onDelete: 'set null' }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    viewCount: integer('view_count').default(0).notNull(),
-    weight: decimal('weight', { precision: 6, scale: 2 }),
+    viewCount: integer('view_count').default(DEFAULTS.BOBBLEHEAD.VIEW_COUNT).notNull(),
+    weight: decimal('weight', {
+      precision: SCHEMA_LIMITS.BOBBLEHEAD.WEIGHT.PRECISION,
+      scale: SCHEMA_LIMITS.BOBBLEHEAD.WEIGHT.SCALE,
+    }),
     year: integer('year'),
   },
   (table) => [
@@ -78,18 +95,18 @@ export const bobbleheads = pgTable(
 export const bobbleheadPhotos = pgTable(
   'bobblehead_photos',
   {
-    altText: varchar('alt_text', { length: 255 }),
+    altText: varchar('alt_text', { length: SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.ALT_TEXT.MAX }),
     bobbleheadId: uuid('bobblehead_id')
       .references(() => bobbleheads.id, { onDelete: 'cascade' })
       .notNull(),
-    caption: text('caption'),
+    caption: varchar('caption', { length: SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.CAPTION.MAX }),
     fileSize: integer('file_size'),
     height: integer('height'),
     id: uuid('id').primaryKey().defaultRandom(),
-    isPrimary: boolean('is_primary').default(false).notNull(),
-    sortOrder: integer('sort_order').default(0).notNull(),
+    isPrimary: boolean('is_primary').default(DEFAULTS.BOBBLEHEAD_PHOTO.IS_PRIMARY).notNull(),
+    sortOrder: integer('sort_order').default(DEFAULTS.BOBBLEHEAD_PHOTO.SORT_ORDER).notNull(),
     uploadedAt: timestamp('uploaded_at').defaultNow().notNull(),
-    url: text('url').notNull(),
+    url: varchar('url', { length: SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.URL.MAX }).notNull(),
     width: integer('width'),
   },
   (table) => [
@@ -109,7 +126,7 @@ export const bobbleheadTags = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
     tagId: uuid('tag_id')
-      .references(() => tagsSchema.id, { onDelete: 'cascade' })
+      .references(() => tags.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [

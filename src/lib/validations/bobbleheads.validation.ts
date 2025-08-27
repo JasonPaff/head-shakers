@@ -1,6 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import z from 'zod';
 
+import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema';
 
 export const customFieldsSchema = z.record(z.string(), z.any()).optional();
@@ -9,14 +10,14 @@ export type CustomFields = z.infer<typeof customFieldsSchema>;
 
 export const selectBobbleheadPhotoSchema = createSelectSchema(bobbleheadPhotos);
 export const insertBobbleheadPhotoSchema = createInsertSchema(bobbleheadPhotos, {
-  altText: z.string().min(1).max(255).optional(),
-  bobbleheadId: z.number().min(1),
-  caption: z.string().max(500).optional(),
+  altText: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.ALT_TEXT.MAX).optional(),
+  bobbleheadId: z.uuid({ error: 'bobbleheadId is required' }),
+  caption: z.string().max(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.CAPTION.MAX).optional(),
   fileSize: z.number().min(1).optional(),
   height: z.number().min(1).optional(),
-  isPrimary: z.boolean().default(false).optional(),
+  isPrimary: z.boolean().default(DEFAULTS.BOBBLEHEAD_PHOTO.IS_PRIMARY).optional(),
   sortOrder: z.number().min(0).default(0).optional(),
-  url: z.url(),
+  url: z.url().min(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.URL.MIN).max(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.URL.MAX),
   width: z.number().min(1).optional(),
 }).omit({
   id: true,
@@ -33,31 +34,31 @@ export const insertBobbleheadTagSchema = createInsertSchema(bobbleheadTags).omit
 export const selectBobbleheadSchema = createSelectSchema(bobbleheads);
 export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   acquisitionDate: z.date().optional(),
-  acquisitionMethod: z.string().min(1).max(50).optional(),
-  category: z.string().min(1).max(50).optional(),
-  characterName: z.string().min(1).max(100).optional(),
-  collectionId: z.uuid().min(1, { message: 'collectionId is required' }),
-  currentCondition: z.enum(['mint', 'excellent', 'good', 'fair', 'poor']).default('excellent'),
+  acquisitionMethod: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.ACQUISITION_METHOD.MAX).optional(),
+  category: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.CATEGORY.MAX).optional(),
+  characterName: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.CHARACTER_NAME.MAX).optional(),
+  collectionId: z.uuid({ error: 'collectionId is required' }),
+  currentCondition: z.enum(ENUMS.BOBBLEHEAD.CONDITION).default(DEFAULTS.BOBBLEHEAD.CONDITION),
   customFields: customFieldsSchema,
-  description: z.string().max(1000).optional(),
+  description: z.string().max(SCHEMA_LIMITS.BOBBLEHEAD.DESCRIPTION.MAX).optional(),
   height: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
     .optional(),
-  isFeatured: z.boolean().default(false),
-  isPublic: z.boolean().default(true),
-  manufacturer: z.string().min(1).max(100).optional(),
-  material: z.string().min(1).max(100).optional(),
-  name: z.string().min(1).max(200),
-  purchaseLocation: z.string().min(1).max(100).optional(),
+  isFeatured: z.boolean().default(DEFAULTS.BOBBLEHEAD.IS_FEATURED),
+  isPublic: z.boolean().default(DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+  manufacturer: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.MANUFACTURER.MAX).optional(),
+  material: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.MATERIAL.MAX).optional(),
+  name: z.string().min(SCHEMA_LIMITS.BOBBLEHEAD.NAME.MIN).max(SCHEMA_LIMITS.BOBBLEHEAD.NAME.MAX),
+  purchaseLocation: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_LOCATION.MAX).optional(),
   purchasePrice: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
     .optional(),
-  series: z.string().min(1).max(100).optional(),
-  status: z.enum(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']).default('owned'),
+  series: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.SERIES.MAX).optional(),
+  status: z.enum(ENUMS.BOBBLEHEAD.STATUS).default(DEFAULTS.BOBBLEHEAD.STATUS),
   subCollectionId: z.uuid().optional(),
-  userId: z.uuid().min(1, { message: 'userId is required' }),
+  userId: z.uuid({ error: 'userId is required' }),
   weight: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)

@@ -1,11 +1,12 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { comments, commentType, follows, followType, likes, likeType } from '@/lib/db/schema';
+import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
+import { comments, follows, likes } from '@/lib/db/schema';
 
 export const selectFollowSchema = createSelectSchema(follows);
 export const insertFollowSchema = createInsertSchema(follows, {
-  followType: z.enum(followType).default('user'),
+  followType: z.enum(ENUMS.FOLLOW.TYPE).default('user'),
 }).omit({
   createdAt: true,
   id: true,
@@ -15,7 +16,7 @@ export const updateFollowSchema = insertFollowSchema.partial();
 
 export const selectLikeSchema = createSelectSchema(likes);
 export const insertLikeSchema = createInsertSchema(likes, {
-  targetType: z.enum(likeType),
+  targetType: z.enum(ENUMS.LIKE.TARGET_TYPE),
 }).omit({
   createdAt: true,
   id: true,
@@ -27,11 +28,11 @@ export const selectCommentSchema = createSelectSchema(comments);
 export const insertCommentSchema = createInsertSchema(comments, {
   content: z
     .string()
-    .min(1)
-    .max(5000)
+    .min(SCHEMA_LIMITS.COMMENT.CONTENT.MIN)
+    .max(SCHEMA_LIMITS.COMMENT.CONTENT.MAX)
     .transform((val) => val.trim()),
-  likeCount: z.number().min(0).default(0),
-  targetType: z.enum(commentType),
+  likeCount: z.number().min(0).default(DEFAULTS.COMMENT.LIKE_COUNT),
+  targetType: z.enum(ENUMS.COMMENT.TARGET_TYPE),
 }).omit({
   createdAt: true,
   deletedAt: true,
@@ -48,7 +49,7 @@ export const updateCommentSchema = insertCommentSchema
   })
   .extend({
     editedAt: z.date().default(() => new Date()),
-    isEdited: z.boolean().default(true),
+    isEdited: z.boolean().default(DEFAULTS.COMMENT.IS_EDITED),
   });
 
 export const publicFollowSchema = selectFollowSchema.omit({

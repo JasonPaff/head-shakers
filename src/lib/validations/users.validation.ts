@@ -1,26 +1,27 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import z from 'zod';
 
+import { SCHEMA_LIMITS } from '@/lib/constants';
 import {
   loginHistory,
   notificationSettings,
   userActivity,
   userBlocks,
+  users,
   userSessions,
   userSettings,
-  usersSchema,
 } from '@/lib/db/schema';
 
 export const selectUserSchema = createSelectSchema(users);
 export const insertUserSchema = createInsertSchema(users, {
-  bio: z.string().max(500).optional(),
-  displayName: z.string().min(1).max(100),
-  email: z.email(),
-  location: z.string().max(100).optional(),
+  bio: z.string().max(SCHEMA_LIMITS.USER.BIO.MAX).optional(),
+  displayName: z.string().min(SCHEMA_LIMITS.USER.DISPLAY_NAME.MIN).max(SCHEMA_LIMITS.USER.DISPLAY_NAME.MAX),
+  email: z.email().max(SCHEMA_LIMITS.USER.EMAIL.MAX),
+  location: z.string().max(SCHEMA_LIMITS.USER.LOCATION.MAX).optional(),
   username: z
     .string()
-    .min(3)
-    .max(50)
+    .min(SCHEMA_LIMITS.USER.USERNAME.MIN)
+    .max(SCHEMA_LIMITS.USER.USERNAME.MAX)
     .regex(/^[a-zA-Z0-9_]+$/),
 }).omit({
   clerkId: true,
@@ -41,9 +42,9 @@ export const updateUserSchema = insertUserSchema.partial();
 
 export const selectUserSessionSchema = createSelectSchema(userSessions);
 export const insertUserSessionSchema = createInsertSchema(userSessions, {
-  ipAddress: z.ipv6().optional(),
-  sessionToken: z.string().min(1).max(255),
-  userAgent: z.string().max(1000).optional(),
+  ipAddress: z.string().max(SCHEMA_LIMITS.USER_SESSION.IP_ADDRESS.MAX).optional(),
+  sessionToken: z.string().min(1).max(SCHEMA_LIMITS.USER_SESSION.SESSION_TOKEN.MAX),
+  userAgent: z.string().max(SCHEMA_LIMITS.USER_SESSION.USER_AGENT.MAX).optional(),
 }).omit({
   createdAt: true,
   id: true,
@@ -54,9 +55,9 @@ export const updateUserSessionSchema = insertUserSessionSchema.partial();
 
 export const selectLoginHistorySchema = createSelectSchema(loginHistory);
 export const insertLoginHistorySchema = createInsertSchema(loginHistory, {
-  failureReason: z.string().max(255).optional(),
-  ipAddress: z.ipv6().optional(),
-  userAgent: z.string().max(1000).optional(),
+  failureReason: z.string().max(SCHEMA_LIMITS.LOGIN_HISTORY.FAILURE_REASON.MAX).optional(),
+  ipAddress: z.string().max(SCHEMA_LIMITS.LOGIN_HISTORY.IP_ADDRESS.MAX).optional(),
+  userAgent: z.string().max(SCHEMA_LIMITS.LOGIN_HISTORY.USER_AGENT.MAX).optional(),
 }).omit({
   id: true,
   loginAt: true,
@@ -65,9 +66,15 @@ export const insertLoginHistorySchema = createInsertSchema(loginHistory, {
 
 export const selectUserSettingsSchema = createSelectSchema(userSettings);
 export const insertUserSettingsSchema = createInsertSchema(userSettings, {
-  currency: z.string().length(3),
-  language: z.string().min(2).max(10),
-  timezone: z.string().min(3).max(50),
+  currency: z.string().length(SCHEMA_LIMITS.USER_SETTINGS.CURRENCY.LENGTH),
+  language: z
+    .string()
+    .min(SCHEMA_LIMITS.USER_SETTINGS.LANGUAGE.MIN)
+    .max(SCHEMA_LIMITS.USER_SETTINGS.LANGUAGE.MAX),
+  timezone: z
+    .string()
+    .min(SCHEMA_LIMITS.USER_SETTINGS.TIMEZONE.MIN)
+    .max(SCHEMA_LIMITS.USER_SETTINGS.TIMEZONE.MAX),
 }).omit({
   createdAt: true,
   id: true,
@@ -89,7 +96,7 @@ export const updateNotificationSettingsSchema = insertNotificationSettingsSchema
 
 export const selectUserBlockSchema = createSelectSchema(userBlocks);
 export const insertUserBlockSchema = createInsertSchema(userBlocks, {
-  reason: z.string().max(100).optional(),
+  reason: z.string().max(SCHEMA_LIMITS.USER_BLOCK.REASON.MAX).optional(),
 }).omit({
   blockerId: true,
   createdAt: true,
@@ -98,7 +105,7 @@ export const insertUserBlockSchema = createInsertSchema(userBlocks, {
 
 export const selectUserActivitySchema = createSelectSchema(userActivity);
 export const insertUserActivitySchema = createInsertSchema(userActivity, {
-  ipAddress: z.ipv6().optional(),
+  ipAddress: z.string().max(SCHEMA_LIMITS.USER_ACTIVITY.IP_ADDRESS.MAX).optional(),
 }).omit({
   createdAt: true,
   id: true,

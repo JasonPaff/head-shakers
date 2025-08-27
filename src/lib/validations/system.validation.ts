@@ -9,13 +9,14 @@ import type {
   valueTypeEnum,
 } from '@/lib/db/schema';
 
-import { FEATURED_CONTENT_DEFAULTS, featuredContent, notifications, platformSettings } from '@/lib/db/schema';
+import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
+import { featuredContent, notifications, platformSettings } from '@/lib/db/schema';
 
 export const selectNotificationSchema = createSelectSchema(notifications);
 export const insertNotificationSchema = createInsertSchema(notifications, {
   actionUrl: z.url().optional(),
   message: z.string().optional(),
-  title: z.string().min(1).max(255),
+  title: z.string().min(SCHEMA_LIMITS.NOTIFICATION.TITLE.MIN).max(SCHEMA_LIMITS.NOTIFICATION.TITLE.MAX),
 }).omit({
   createdAt: true,
   id: true,
@@ -32,9 +33,9 @@ export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
   description: z.string().optional(),
   endDate: z.date().optional(),
   imageUrl: z.url().optional(),
-  sortOrder: z.number().min(0).default(FEATURED_CONTENT_DEFAULTS.SORT_ORDER),
+  sortOrder: z.number().min(0).default(DEFAULTS.FEATURED_CONTENT.SORT_ORDER),
   startDate: z.date().optional(),
-  title: z.string().min(1).max(255).optional(),
+  title: z.string().min(1).max(SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX).optional(),
 }).omit({
   createdAt: true,
   id: true,
@@ -48,8 +49,8 @@ export const insertPlatformSettingSchema = createInsertSchema(platformSettings, 
   description: z.string().optional(),
   key: z
     .string()
-    .min(1)
-    .max(100)
+    .min(SCHEMA_LIMITS.PLATFORM_SETTING.KEY.MIN)
+    .max(SCHEMA_LIMITS.PLATFORM_SETTING.KEY.MAX)
     .regex(/^[a-zA-Z0-9_.-]+$/),
   value: z.string().optional(),
 }).omit({
@@ -79,7 +80,7 @@ export const publicPlatformSettingSchema = selectPlatformSettingSchema
     updatedBy: true,
   })
   .extend({
-    isPublic: z.literal(true),
+    isPublic: z.literal(DEFAULTS.PLATFORM_SETTING.IS_PUBLIC),
   });
 
 export type ContentType = (typeof featuredContentTypeEnum.enumValues)[number];

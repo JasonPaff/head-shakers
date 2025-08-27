@@ -1,13 +1,14 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { collectionsSchema, subCollections } from '@/lib/db/schema';
+import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
+import { collections, subCollections } from '@/lib/db/schema';
 
 export const selectCollectionSchema = createSelectSchema(collections);
 export const insertCollectionSchema = createInsertSchema(collections, {
   coverImageUrl: z.url().optional(),
-  description: z.string().max(1000).optional(),
-  name: z.string().min(1).max(100),
+  description: z.string().max(SCHEMA_LIMITS.COLLECTION.DESCRIPTION.MAX).optional(),
+  name: z.string().min(SCHEMA_LIMITS.COLLECTION.NAME.MIN).max(SCHEMA_LIMITS.COLLECTION.NAME.MAX),
   totalValue: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
@@ -26,9 +27,9 @@ export const publicCollectionSchema = selectCollectionSchema;
 export const selectSubCollectionSchema = createSelectSchema(subCollections);
 export const insertSubCollectionSchema = createInsertSchema(subCollections, {
   coverImageUrl: z.url().optional(),
-  description: z.string().max(1000).optional(),
-  name: z.string().min(1).max(100),
-  sortOrder: z.number().min(0).default(0),
+  description: z.string().max(SCHEMA_LIMITS.SUB_COLLECTION.DESCRIPTION.MAX).optional(),
+  name: z.string().min(SCHEMA_LIMITS.SUB_COLLECTION.NAME.MIN).max(SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX),
+  sortOrder: z.number().min(0).default(DEFAULTS.SUB_COLLECTION.SORT_ORDER),
 }).omit({
   createdAt: true,
   id: true,

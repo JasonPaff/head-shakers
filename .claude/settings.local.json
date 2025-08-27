@@ -4,7 +4,12 @@
       "Bash(npm run:*)",
       "Bash(node:*)",
       "Bash(npx tsx:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "mcp__linear-server__list_my_issues",
+      "mcp__linear-server__list_issues",
+      "mcp__linear-server__list_projects",
+      "mcp__linear-server__list_teams",
+      "mcp__linear-server__create_issue"
     ],
     "deny": [],
     "ask": []

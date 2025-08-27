@@ -3,14 +3,20 @@ import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 import { createMiddleware } from 'next-safe-action';
 
+import type { ActionMetadata } from '@/lib/utils/next-safe-action';
+
+import { ERROR_MESSAGES } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 
-export const authMiddleware = createMiddleware().define(async ({ next }) => {
+export const authMiddleware = createMiddleware<{
+  ctx: Record<string, never>;
+  metadata: ActionMetadata;
+}>().define(async ({ next }) => {
   const { userId: clerkUserId } = await auth();
 
   if (!clerkUserId) {
-    throw new Error('Unauthorized');
+    throw new Error(ERROR_MESSAGES.AUTH.UNAUTHORIZED);
   }
 
   // get the database user record using Clerk ID
@@ -21,8 +27,9 @@ export const authMiddleware = createMiddleware().define(async ({ next }) => {
     .limit(1);
 
   if (!dbUser) {
-    throw new Error('User not found in database');
+    throw new Error(ERROR_MESSAGES.AUTH.USER_NOT_FOUND);
   }
+
   // automatically set Sentry user context
   Sentry.setUser({
     clerkId: clerkUserId,

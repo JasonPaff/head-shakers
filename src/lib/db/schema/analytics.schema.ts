@@ -1,28 +1,28 @@
-import { index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
+import { index, integer, jsonb, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import type { SearchFilters } from '@/lib/validations/analytics.validation';
 
-import { usersSchema } from '@/lib/db/schema/users.schema';
+import { ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
+import { users } from '@/lib/db/schema/users.schema';
 
-export const contentViewsTargetTypeEnum = pgEnum('content_views_target_type', [
-  'bobblehead',
-  'collection',
-  'profile',
-]);
-export const resultTypeEnum = pgEnum('result_type', ['bobblehead', 'collection', 'user']);
+export const contentViewsTargetTypeEnum = pgEnum(
+  'content_views_target_type',
+  ENUMS.CONTENT_VIEWS.TARGET_TYPE,
+);
+export const resultTypeEnum = pgEnum('result_type', ENUMS.SEARCH.RESULT_TYPE);
 
 export const contentViews = pgTable(
   'content_views',
   {
     id: uuid('id').primaryKey().defaultRandom(),
-    ipAddress: varchar('ip_address', { length: 45 }),
-    referrerUrl: text('referrer_url'),
+    ipAddress: varchar('ip_address', { length: SCHEMA_LIMITS.CONTENT_VIEW.IP_ADDRESS.MAX }),
+    referrerUrl: varchar('referrer_url', { length: SCHEMA_LIMITS.CONTENT_VIEW.REFERRER_URL.MAX }),
     targetId: uuid('target_id').notNull(),
     targetType: contentViewsTargetTypeEnum('content_views_target_type').notNull(),
-    userAgent: varchar('user_agent', { length: 1000 }),
+    userAgent: varchar('user_agent', { length: SCHEMA_LIMITS.CONTENT_VIEW.USER_AGENT.MAX }),
     viewDuration: integer('view_duration'), // in seconds
     viewedAt: timestamp('viewed_at').defaultNow().notNull(),
-    viewerId: uuid('viewer_id').references(() => usersSchema.id, { onDelete: 'cascade' }),
+    viewerId: uuid('viewer_id').references(() => users.id, { onDelete: 'cascade' }),
   },
   (table) => [
     // single column indexes
@@ -43,12 +43,12 @@ export const searchQueries = pgTable(
     clickedResultType: resultTypeEnum('clicked_result_type'),
     filters: jsonb('filters').$type<SearchFilters>(),
     id: uuid('id').primaryKey().defaultRandom(),
-    ipAddress: varchar('ip_address', { length: 45 }),
-    query: varchar('query', { length: 500 }).notNull(),
+    ipAddress: varchar('ip_address', { length: SCHEMA_LIMITS.SEARCH_QUERY.IP_ADDRESS.MAX }),
+    query: varchar('query', { length: SCHEMA_LIMITS.SEARCH_QUERY.QUERY.MAX }).notNull(),
     resultCount: integer('result_count'),
     searchedAt: timestamp('searched_at').defaultNow().notNull(),
     sessionId: uuid('session_id'),
-    userId: uuid('user_id').references(() => usersSchema.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   },
   (table) => [
     // single column indexes

@@ -1,35 +1,20 @@
 import { index, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
+import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { users } from '@/lib/db/schema/users.schema';
 
-export const contentReportStatus = ['pending', 'reviewed', 'resolved', 'dismissed'] as const;
-export const contentReportTargetType = ['bobblehead', 'comment', 'user', 'collection'] as const;
-export const contentReportReason = [
-  'spam',
-  'harassment',
-  'inappropriate_content',
-  'copyright_violation',
-  'misinformation',
-  'hate_speech',
-  'violence',
-  'other',
-] as const;
-
-export const CONTENT_REPORT_DEFAULTS = {
-  MAX_DESCRIPTION_LENGTH: 1000,
-  MAX_MODERATOR_NOTES_LENGTH: 2000,
-  STATUS: 'pending',
-} as const;
-
-export const contentReportStatusEnum = pgEnum('content_report_status', contentReportStatus);
-export const contentReportTargetTypeEnum = pgEnum('content_report_target_type', contentReportTargetType);
-export const contentReportReasonEnum = pgEnum('content_report_reason', contentReportReason);
+export const contentReportStatusEnum = pgEnum('content_report_status', ENUMS.CONTENT_REPORT.STATUS);
+export const contentReportTargetTypeEnum = pgEnum(
+  'content_report_target_type',
+  ENUMS.CONTENT_REPORT.TARGET_TYPE,
+);
+export const contentReportReasonEnum = pgEnum('content_report_reason', ENUMS.CONTENT_REPORT.REASON);
 
 export const contentReports = pgTable(
   'content_reports',
   {
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    description: varchar('description', { length: CONTENT_REPORT_DEFAULTS.MAX_DESCRIPTION_LENGTH }),
+    description: varchar('description', { length: SCHEMA_LIMITS.CONTENT_REPORT.DESCRIPTION.MAX }),
     id: uuid('id').primaryKey().defaultRandom(),
     moderatorId: uuid('moderator_id').references(() => users.id, { onDelete: 'set null' }),
     moderatorNotes: varchar('moderator_notes'),
@@ -38,7 +23,7 @@ export const contentReports = pgTable(
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     resolvedAt: timestamp('resolved_at'),
-    status: contentReportStatusEnum('status').default('pending').notNull(),
+    status: contentReportStatusEnum('status').default(DEFAULTS.CONTENT_REPORT.STATUS).notNull(),
     targetId: uuid('target_id').notNull(),
     targetType: contentReportTargetTypeEnum('target_type').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
