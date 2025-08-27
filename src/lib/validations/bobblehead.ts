@@ -33,6 +33,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   acquisitionMethod: z.string().min(1).max(50).optional(),
   category: z.string().min(1).max(50).optional(),
   characterName: z.string().min(1).max(100).optional(),
+  collectionId: z.number().min(1).optional(),
   currentCondition: z.enum(['mint', 'excellent', 'good', 'fair', 'poor']).default('excellent'),
   customFields: customFieldsSchema,
   description: z.string().max(1000).optional(),
@@ -50,6 +51,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
     .optional(),
   series: z.string().min(1).max(100).optional(),
   status: z.enum(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']).default('owned'),
+  subCollectionId: z.number().min(1).optional(),
   weight: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)

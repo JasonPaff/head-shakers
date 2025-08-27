@@ -12,6 +12,8 @@ import eslintTypescript from 'typescript-eslint';
 import eslintTypescriptParser from '@typescript-eslint/parser';
 import globals from 'globals';
 
+// TODO: eslint Drizzle plugin
+
 export default eslintTypescript.config([
   // typescript config
   {
