@@ -14,6 +14,7 @@ export const AppHeader = () => {
   return (
     <header className={'sticky top-0 z-50 flex w-full items-center border-b bg-background'}>
       <AppHeaderContainer>
+        {/* User Sidebar Trigger */}
         <AuthContent>
           <SidebarTrigger
             className={cn(
@@ -23,28 +24,31 @@ export const AppHeader = () => {
           />
         </AuthContent>
 
-        {/* Logo */}
-        <Link className={'flex items-center gap-2 text-xl font-bold'} href={'/'}>
-          <div
-            className={cn(
-              'flex aspect-square size-8 items-center justify-center',
-              'rounded-lg bg-primary text-primary-foreground',
-            )}
-          >
-            HS
-          </div>
-          Head Shakers
-        </Link>
-
-        {/* Search */}
-        <div className={'mx-4 max-w-md flex-1'}>
-          <AppHeaderSearch />
+        {/* Left Section - Logo */}
+        <div className={'flex items-center gap-4'}>
+          <Link className={'flex items-center gap-2 text-xl font-bold'} href={'/'}>
+            <div
+              className={cn(
+                'flex aspect-square size-8 items-center justify-center',
+                'rounded-lg bg-primary text-primary-foreground',
+              )}
+            >
+              HS
+            </div>
+            Head Shakers
+          </Link>
         </div>
 
-        <div className={'flex items-center justify-between space-x-4'}>
-          {/* Discovery Actions */}
+        {/* Center Section - Search & Navigation */}
+        <div className={'flex flex-1 items-center justify-center gap-4'}>
+          <div className={'max-w-md flex-1'}>
+            <AppHeaderSearch />
+          </div>
           <AppHeaderNavMenu />
+        </div>
 
+        {/* Right Section - User Actions */}
+        <div className={'flex items-center space-x-4'}>
           {/* Notifications */}
           <AppHeaderNotifications />
 
