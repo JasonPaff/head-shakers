@@ -10,13 +10,15 @@ export type CustomFields = z.infer<typeof customFieldsSchema>;
 export const selectBobbleheadPhotoSchema = createSelectSchema(bobbleheadPhotos);
 export const insertBobbleheadPhotoSchema = createInsertSchema(bobbleheadPhotos, {
   altText: z.string().min(1).max(255).optional(),
+  bobbleheadId: z.number().min(1),
   caption: z.string().max(500).optional(),
   fileSize: z.number().min(1).optional(),
   height: z.number().min(1).optional(),
+  isPrimary: z.boolean().default(false).optional(),
+  sortOrder: z.number().min(0).default(0).optional(),
   url: z.url(),
   width: z.number().min(1).optional(),
 }).omit({
-  bobbleheadId: true,
   id: true,
   uploadedAt: true,
 });
@@ -30,6 +32,7 @@ export const insertBobbleheadTagSchema = createInsertSchema(bobbleheadTags).omit
 
 export const selectBobbleheadSchema = createSelectSchema(bobbleheads);
 export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
+  acquisitionDate: z.date().optional(),
   acquisitionMethod: z.string().min(1).max(50).optional(),
   category: z.string().min(1).max(50).optional(),
   characterName: z.string().min(1).max(100).optional(),
@@ -41,6 +44,8 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
     .optional(),
+  isFeatured: z.boolean().default(false),
+  isPublic: z.boolean().default(true),
   manufacturer: z.string().min(1).max(100).optional(),
   material: z.string().min(1).max(100).optional(),
   name: z.string().min(1).max(200),
@@ -52,6 +57,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   series: z.string().min(1).max(100).optional(),
   status: z.enum(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']).default('owned'),
   subCollectionId: z.number().min(1).optional(),
+  userId: z.string().min(1),
   weight: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
@@ -69,7 +75,6 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   isDeleted: true,
   likeCount: true,
   updatedAt: true,
-  userId: true,
   viewCount: true,
 });
 
