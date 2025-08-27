@@ -16,12 +16,7 @@ export const AppHeader = () => {
       <AppHeaderContainer>
         {/* User Sidebar Trigger */}
         <AuthContent>
-          <SidebarTrigger
-            className={cn(
-              '-ml-1 text-background/75 hover:bg-primary hover:text-background/50',
-              'dark:text-foreground/75 hover:dark:text-foreground/50',
-            )}
-          />
+          <SidebarTrigger />
         </AuthContent>
 
         {/* Left Section - Logo */}

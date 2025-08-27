@@ -25,7 +25,7 @@ export const SidebarTrigger = ({ className, onClick, ...props }: SidebarTriggerP
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          className={cn('size-7', className)}
+          className={cn('size-6', className)}
           data-sidebar={'trigger'}
           data-slot={'sidebar-trigger'}
           onClick={handleSidebarToggle}
@@ -34,8 +34,8 @@ export const SidebarTrigger = ({ className, onClick, ...props }: SidebarTriggerP
           {...props}
         >
           {isOpen ?
-            <PanelLeftCloseIcon />
-          : <PanelLeftOpenIcon />}
+            <PanelLeftCloseIcon aria-hidden className={'size-5'} />
+          : <PanelLeftOpenIcon aria-hidden className={'size-5'} />}
           <span className={'sr-only'}>{tooltipText}</span>
         </Button>
       </TooltipTrigger>
