@@ -26,7 +26,7 @@ export default eslintTypescript.config([
   },
   // global ignores
   {
-    ignores: ['*.config.{js,cjs,mjs,ts, cts, mts}'],
+    ignores: ['*.config.{js,cjs,mjs,ts, cts, mts}', 'src/lib/db/scripts/**/*.ts'],
   },
   // plugins
   eslintJs.configs.recommended,

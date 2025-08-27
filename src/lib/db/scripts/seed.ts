@@ -697,6 +697,4 @@ async function updateAggregates() {
   console.log('✅ Aggregates updated');
 }
 
-if (require.main === module) {
-  void main();
-}
+void main();
