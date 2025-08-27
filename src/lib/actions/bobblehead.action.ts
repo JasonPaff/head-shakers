@@ -1,5 +1,6 @@
 'use server';
 
+import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
 import { revalidatePath } from 'next/cache';
 
@@ -12,9 +13,24 @@ export const createBobbleheadAction = authActionClient
   .metadata({ actionName: 'createBobblehead' })
   .inputSchema(insertBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { userId } = ctx;
+    const { clerkUserId, userId } = ctx;
+
+    // set user and business context (middleware handles the rest)
+    Sentry.setUser({
+      clerkId: clerkUserId,
+      id: userId,
+    });
+
+    Sentry.setContext('bobblehead_data', {
+      category: parsedInput.category,
+      collectionId: parsedInput.collectionId,
+      hasCustomFields: !!parsedInput.customFields,
+      isPublic: parsedInput.isPublic,
+      name: parsedInput.name,
+    });
 
     try {
+      // create bobblehead
       const [newBobblehead] = await db
         .insert(bobbleheads)
         .values({
@@ -23,7 +39,18 @@ export const createBobbleheadAction = authActionClient
         })
         .returning();
 
-      // revalidate relevant paths
+      // add business logic breadcrumb
+      Sentry.addBreadcrumb({
+        category: 'business_logic',
+        data: {
+          bobbleheadId: newBobblehead.id,
+          collectionId: newBobblehead.collectionId,
+        },
+        level: 'info',
+        message: `Created bobblehead: ${newBobblehead.name}`,
+      });
+
+      // revalidate cache
       if (parsedInput.collectionId) {
         revalidatePath(
           $path({
@@ -40,6 +67,12 @@ export const createBobbleheadAction = authActionClient
         success: true,
       };
     } catch (error) {
+      Sentry.setContext('error_details', {
+        collectionId: parsedInput.collectionId,
+        operation: 'create_bobblehead',
+        userId,
+      });
+
       console.error('Error creating bobblehead:', error);
       throw new Error('Failed to create bobblehead');
     }

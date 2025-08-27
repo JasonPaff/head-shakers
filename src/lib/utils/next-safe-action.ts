@@ -2,6 +2,12 @@ import { createSafeActionClient, DEFAULT_SERVER_ERROR_MESSAGE } from 'next-safe-
 import { z } from 'zod';
 
 import { authMiddleware } from '@/lib/middleware/auth.middleware';
+import { databaseMiddleware } from '@/lib/middleware/database.middleware';
+import { sentryMiddleware } from '@/lib/middleware/sentry.middleware';
+
+export interface ActionMetadata {
+  metadata: { actionName: string };
+}
 
 class ActionError extends Error {}
 
@@ -21,6 +27,6 @@ export const actionClient = createSafeActionClient({
 
     return DEFAULT_SERVER_ERROR_MESSAGE;
   },
-});
+}).use(sentryMiddleware);
 
-export const authActionClient = actionClient.use(authMiddleware);
+export const authActionClient = actionClient.use(authMiddleware).use(databaseMiddleware);
