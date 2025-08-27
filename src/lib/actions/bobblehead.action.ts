@@ -1,26 +1,20 @@
 'use server';
 
-import { auth } from '@clerk/nextjs/server';
-import { createSafeActionClient } from 'next-safe-action';
+import { $path } from 'next-typesafe-url';
 import { revalidatePath } from 'next/cache';
 
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
+import { authActionClient } from '@/lib/utils/next-safe-action';
 import { insertBobbleheadSchema } from '@/lib/validations/bobblehead';
 
-const action = createSafeActionClient();
-
-export const createBobbleheadAction = action
+export const createBobbleheadAction = authActionClient
+  .metadata({ actionName: 'createBobblehead' })
   .inputSchema(insertBobbleheadSchema)
-  .action(async ({ parsedInput }) => {
-    const { userId } = await auth();
-
-    if (!userId) {
-      throw new Error('Unauthorized');
-    }
+  .action(async ({ ctx, parsedInput }) => {
+    const { userId } = ctx;
 
     try {
-      // Insert the new bobblehead with the user ID
       const [newBobblehead] = await db
         .insert(bobbleheads)
         .values({
@@ -29,9 +23,17 @@ export const createBobbleheadAction = action
         })
         .returning();
 
-      // Revalidate relevant paths
-      revalidatePath('/bobbleheads');
-      revalidatePath(`/collections/${parsedInput.collectionId}`);
+      // revalidate relevant paths
+      if (parsedInput.collectionId) {
+        revalidatePath(
+          $path({
+            route: '/collections/[collectionId]',
+            routeParams: {
+              collectionId: parsedInput.collectionId,
+            },
+          }),
+        );
+      }
 
       return {
         data: newBobblehead,
