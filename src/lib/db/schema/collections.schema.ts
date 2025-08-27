@@ -12,9 +12,9 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import { users } from '@/lib/db/schema/users';
+import { usersSchema } from '@/lib/db/schema/users.schema';
 
-export const collections = pgTable(
+export const collectionsSchema = pgTable(
   'collections',
   {
     coverImageUrl: text('cover_image_url'),
@@ -28,7 +28,7 @@ export const collections = pgTable(
     totalValue: decimal('total_value', { precision: 15, scale: 2 }).default('0.00'),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => usersSchema.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [
@@ -53,7 +53,7 @@ export const subCollections = pgTable(
   'sub_collections',
   {
     collectionId: uuid('collection_id')
-      .references(() => collections.id, { onDelete: 'cascade' })
+      .references(() => collectionsSchema.id, { onDelete: 'cascade' })
       .notNull(),
     coverImageUrl: text('cover_image_url'),
     createdAt: timestamp('created_at').defaultNow().notNull(),

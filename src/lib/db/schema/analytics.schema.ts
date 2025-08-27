@@ -2,7 +2,7 @@ import { index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, varchar 
 
 import type { SearchFilters } from '@/lib/validations/analytic';
 
-import { users } from '@/lib/db/schema/users';
+import { usersSchema } from '@/lib/db/schema/users.schema';
 
 export const contentViewsTargetTypeEnum = pgEnum('content_views_target_type', [
   'bobblehead',
@@ -22,7 +22,7 @@ export const contentViews = pgTable(
     userAgent: varchar('user_agent', { length: 1000 }),
     viewDuration: integer('view_duration'), // in seconds
     viewedAt: timestamp('viewed_at').defaultNow().notNull(),
-    viewerId: uuid('viewer_id').references(() => users.id, { onDelete: 'cascade' }),
+    viewerId: uuid('viewer_id').references(() => usersSchema.id, { onDelete: 'cascade' }),
   },
   (table) => [
     // single column indexes
@@ -48,7 +48,7 @@ export const searchQueries = pgTable(
     resultCount: integer('result_count'),
     searchedAt: timestamp('searched_at').defaultNow().notNull(),
     sessionId: uuid('session_id'),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+    userId: uuid('user_id').references(() => usersSchema.id, { onDelete: 'cascade' }),
   },
   (table) => [
     // single column indexes

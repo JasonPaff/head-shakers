@@ -6,14 +6,14 @@ import {
   bobbleheadPhotos,
   bobbleheads,
   bobbleheadTags,
-  collections,
+  collectionsSchema,
   comments,
   follows,
   likes,
   notificationSettings,
   subCollections,
-  tags,
-  users,
+  tagsSchema,
+  usersSchema,
   userSettings,
 } from '@/lib/db/schema';
 
@@ -448,7 +448,10 @@ async function seedBobbleheads(
       if (bobblehead.category === 'Movies' && ['Movies', 'Star Wars'].includes(tag.name)) {
         return true;
       }
-      if (bobblehead.category === 'Comic Books' && ['Comic Books', 'DC Comics', 'Marvel'].includes(tag.name)) {
+      if (
+        bobblehead.category === 'Comic Books' &&
+        ['Comic Books', 'DC Comics', 'Marvel'].includes(tag.name)
+      ) {
         return true;
       }
       if (bobblehead.year && bobblehead.year < 1990 && tag.name === 'Vintage') {

@@ -5,18 +5,18 @@ import { authMiddleware } from '@/lib/middleware/auth.middleware';
 import { databaseMiddleware } from '@/lib/middleware/database.middleware';
 import { sentryMiddleware } from '@/lib/middleware/sentry.middleware';
 
-export interface ActionMiddleware {
-  ctx: ActionContext;
-  metadata: ActionMetadata;
-}
-
-interface ActionContext {
+export interface ActionContext {
   clerkUserId: string;
   userId: string;
 }
 
-interface ActionMetadata {
+export interface ActionMetadata {
   actionName: string;
+}
+
+export interface ActionMiddleware<TContext, TMetadata> {
+  ctx: TContext;
+  metadata: TMetadata;
 }
 
 class ActionError extends Error {}

@@ -14,11 +14,11 @@ import {
 
 import type { CustomFields } from '@/lib/validations/bobblehead';
 
-import { collections, subCollections } from '@/lib/db/schema/collections';
-import { tags } from '@/lib/db/schema/tags';
-import { users } from '@/lib/db/schema/users';
+import { collectionsSchema, subCollections } from '@/lib/db/schema/collections.schema';
+import { tagsSchema } from '@/lib/db/schema/tags.schema';
+import { usersSchema } from '@/lib/db/schema/users.schema';
 
-export const bobbleheads = pgTable(
+export const bobbleheadsSchema = pgTable(
   'bobbleheads',
   {
     acquisitionDate: timestamp('acquisition_date'),
@@ -26,7 +26,7 @@ export const bobbleheads = pgTable(
     category: varchar('category', { length: 50 }),
     characterName: varchar('character_name', { length: 100 }),
     collectionId: uuid('collection_id')
-      .references(() => collections.id, { onDelete: 'cascade' })
+      .references(() => collectionsSchema.id, { onDelete: 'cascade' })
       .notNull(),
     commentCount: integer('comment_count').default(0).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -50,7 +50,7 @@ export const bobbleheads = pgTable(
     subCollectionId: uuid('sub_collection_id').references(() => subCollections.id, { onDelete: 'set null' }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => usersSchema.id, { onDelete: 'cascade' })
       .notNull(),
     viewCount: integer('view_count').default(0).notNull(),
     weight: decimal('weight', { precision: 6, scale: 2 }),
@@ -80,7 +80,7 @@ export const bobbleheadPhotos = pgTable(
   {
     altText: varchar('alt_text', { length: 255 }),
     bobbleheadId: uuid('bobblehead_id')
-      .references(() => bobbleheads.id, { onDelete: 'cascade' })
+      .references(() => bobbleheadsSchema.id, { onDelete: 'cascade' })
       .notNull(),
     caption: text('caption'),
     fileSize: integer('file_size'),
@@ -104,12 +104,12 @@ export const bobbleheadTags = pgTable(
   'bobblehead_tags',
   {
     bobbleheadId: uuid('bobblehead_id')
-      .references(() => bobbleheads.id, { onDelete: 'cascade' })
+      .references(() => bobbleheadsSchema.id, { onDelete: 'cascade' })
       .notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
     tagId: uuid('tag_id')
-      .references(() => tags.id, { onDelete: 'cascade' })
+      .references(() => tagsSchema.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [

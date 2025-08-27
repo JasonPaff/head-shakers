@@ -1,7 +1,7 @@
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
-import { collections, subCollections } from '@/lib/db/schema';
+import { collectionsSchema, subCollections } from '@/lib/db/schema';
 
 export const selectCollectionSchema = createSelectSchema(collections);
 export const insertCollectionSchema = createInsertSchema(collections, {

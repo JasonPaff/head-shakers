@@ -6,9 +6,9 @@ import {
   notificationSettings,
   userActivity,
   userBlocks,
-  users,
   userSessions,
   userSettings,
+  usersSchema,
 } from '@/lib/db/schema';
 
 export const selectUserSchema = createSelectSchema(users);

@@ -12,7 +12,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import { users } from '@/lib/db/schema/users';
+import { usersSchema } from '@/lib/db/schema/users.schema';
 
 export const commentType = ['bobblehead', 'collection'] as const;
 export const followType = ['user', 'collection'] as const;
@@ -27,10 +27,10 @@ export const follows = pgTable(
   {
     createdAt: timestamp('created_at').defaultNow().notNull(),
     followerId: uuid('follower_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => usersSchema.id, { onDelete: 'cascade' })
       .notNull(),
     followingId: uuid('following_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => usersSchema.id, { onDelete: 'cascade' })
       .notNull(),
     followType: followTypeEnum('follow_type').default('user').notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
@@ -65,7 +65,7 @@ export const likes = pgTable(
     targetType: likeTargetTypeEnum('like_target_type').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => usersSchema.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [
@@ -99,7 +99,7 @@ export const comments = pgTable(
     targetType: commentTargetTypeEnum('comment_target_type').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
+      .references(() => usersSchema.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [

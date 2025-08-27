@@ -1,9 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 import { createMiddleware } from 'next-safe-action';
 
-import type { ActionMiddleware } from '@/lib/utils/next-safe-action';
+import type { ActionMetadata, ActionMiddleware } from '@/lib/utils/next-safe-action';
 
-export const sentryMiddleware = createMiddleware<ActionMiddleware>().define(
+type SentryMiddleware = ActionMiddleware<NonNullable<unknown>, ActionMetadata>;
+
+export const sentryMiddleware = createMiddleware<SentryMiddleware>().define(
   async ({ clientInput, metadata, next }) => {
     return Sentry.withScope(async (scope) => {
       // set action context

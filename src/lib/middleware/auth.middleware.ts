@@ -3,12 +3,10 @@ import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 import { createMiddleware } from 'next-safe-action';
 
-import type { ActionMiddleware } from '@/lib/utils/next-safe-action';
-
 import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
+import { usersSchema } from '@/lib/db/schema';
 
-export const authMiddleware = createMiddleware<ActionMiddleware>().define(async ({ next }) => {
+export const authMiddleware = createMiddleware().define(async ({ next }) => {
   const { userId: clerkUserId } = await auth();
 
   if (!clerkUserId) {
