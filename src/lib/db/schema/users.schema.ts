@@ -58,7 +58,7 @@ export const deviceInfoSchema = z.object({
 });
 export type DeviceInfo = z.infer<typeof deviceInfoSchema>;
 
-export const usersSchema = pgTable(
+export const users = pgTable(
   'users',
   {
     avatarUrl: varchar('avatar_url', { length: 100 }),
@@ -103,7 +103,7 @@ export const userSessions = pgTable(
     sessionToken: varchar('session_token', { length: 255 }).notNull().unique(),
     userAgent: varchar('user_agent', { length: 1000 }),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [
@@ -127,7 +127,7 @@ export const loginHistory = pgTable(
     loginMethod: loginMethodEnum('login_method').default('email').notNull(),
     userAgent: varchar('user_agent', { length: 1000 }),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [
@@ -163,7 +163,7 @@ export const userSettings = pgTable(
     timezone: varchar('timezone', { length: 50 }).default(USER_SETTINGS_DEFAULTS.TIMEZONE).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull()
       .unique(),
   },
@@ -193,7 +193,7 @@ export const notificationSettings = pgTable(
     pushNewLikes: boolean('push_new_likes').default(false).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull()
       .unique(),
   },
@@ -207,10 +207,10 @@ export const userBlocks = pgTable(
   'user_blocks',
   {
     blockedId: uuid('blocked_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     blockerId: uuid('blocker_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
@@ -238,7 +238,7 @@ export const userActivity = pgTable(
     targetType: userActivityTargetTypeEnum('user_activity_target_type'),
     userAgent: varchar('user_agent', { length: 1000 }),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [

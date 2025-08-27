@@ -12,13 +12,13 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import type { CustomFields } from '@/lib/validations/bobblehead';
+import type { CustomFields } from '@/lib/validations/bobbleheads.validation';
 
 import { collectionsSchema, subCollections } from '@/lib/db/schema/collections.schema';
 import { tagsSchema } from '@/lib/db/schema/tags.schema';
 import { usersSchema } from '@/lib/db/schema/users.schema';
 
-export const bobbleheadsSchema = pgTable(
+export const bobbleheads = pgTable(
   'bobbleheads',
   {
     acquisitionDate: timestamp('acquisition_date'),
@@ -80,7 +80,7 @@ export const bobbleheadPhotos = pgTable(
   {
     altText: varchar('alt_text', { length: 255 }),
     bobbleheadId: uuid('bobblehead_id')
-      .references(() => bobbleheadsSchema.id, { onDelete: 'cascade' })
+      .references(() => bobbleheads.id, { onDelete: 'cascade' })
       .notNull(),
     caption: text('caption'),
     fileSize: integer('file_size'),
@@ -104,7 +104,7 @@ export const bobbleheadTags = pgTable(
   'bobblehead_tags',
   {
     bobbleheadId: uuid('bobblehead_id')
-      .references(() => bobbleheadsSchema.id, { onDelete: 'cascade' })
+      .references(() => bobbleheads.id, { onDelete: 'cascade' })
       .notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     id: uuid('id').primaryKey().defaultRandom(),

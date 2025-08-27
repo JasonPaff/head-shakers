@@ -12,7 +12,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import { usersSchema } from '@/lib/db/schema/users.schema';
+import { users } from '@/lib/db/schema/users.schema';
 
 export const collectionsSchema = pgTable(
   'collections',
@@ -28,7 +28,7 @@ export const collectionsSchema = pgTable(
     totalValue: decimal('total_value', { precision: 15, scale: 2 }).default('0.00'),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [

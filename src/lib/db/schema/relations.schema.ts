@@ -1,11 +1,11 @@
 import { relations } from 'drizzle-orm';
 
-import { contentViews, searchQueries } from '@/lib/db/schema/analytics';
+import { contentViews, searchQueries } from '@/lib/db/schema/analytics.schema';
 import { bobbleheadPhotos, bobbleheadsSchema, bobbleheadTags } from '@/lib/db/schema/bobbleheads.schema';
 import { collectionsSchema, subCollections } from '@/lib/db/schema/collections.schema';
-import { contentReports } from '@/lib/db/schema/moderations';
-import { comments, follows, likes } from '@/lib/db/schema/socials';
-import { featuredContent, notifications } from '@/lib/db/schema/systems';
+import { contentReports } from '@/lib/db/schema/moderation.schema';
+import { comments, follows, likes } from '@/lib/db/schema/social.schema';
+import { featuredContent, notifications } from '@/lib/db/schema/system.schema';
 import { tagsSchema } from '@/lib/db/schema/tags.schema';
 import {
   loginHistory,

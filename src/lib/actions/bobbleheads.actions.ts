@@ -7,7 +7,7 @@ import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
 import { authActionClient } from '@/lib/utils/next-safe-action';
-import { insertBobbleheadSchema } from '@/lib/validations/bobblehead';
+import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
 
 export const createBobbleheadAction = authActionClient
   .metadata({ actionName: 'createBobblehead' })

@@ -1,6 +1,6 @@
 import { index, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
-import { usersSchema } from '@/lib/db/schema/users.schema';
+import { users } from '@/lib/db/schema/users.schema';
 
 export const contentReportStatus = ['pending', 'reviewed', 'resolved', 'dismissed'] as const;
 export const contentReportTargetType = ['bobblehead', 'comment', 'user', 'collection'] as const;
@@ -31,11 +31,11 @@ export const contentReports = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     description: varchar('description', { length: CONTENT_REPORT_DEFAULTS.MAX_DESCRIPTION_LENGTH }),
     id: uuid('id').primaryKey().defaultRandom(),
-    moderatorId: uuid('moderator_id').references(() => usersSchema.id, { onDelete: 'set null' }),
+    moderatorId: uuid('moderator_id').references(() => users.id, { onDelete: 'set null' }),
     moderatorNotes: varchar('moderator_notes'),
     reason: contentReportReasonEnum('reason').notNull(),
     reporterId: uuid('reporter_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
     resolvedAt: timestamp('resolved_at'),
     status: contentReportStatusEnum('status').default('pending').notNull(),

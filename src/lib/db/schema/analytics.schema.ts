@@ -1,6 +1,6 @@
 import { index, integer, jsonb, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
-import type { SearchFilters } from '@/lib/validations/analytic';
+import type { SearchFilters } from '@/lib/validations/analytics.validation';
 
 import { usersSchema } from '@/lib/db/schema/users.schema';
 

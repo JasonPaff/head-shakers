@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { createMiddleware } from 'next-safe-action';
 
 import { db } from '@/lib/db';
-import { usersSchema } from '@/lib/db/schema';
+import { users } from '@/lib/db/schema';
 
 export const authMiddleware = createMiddleware().define(async ({ next }) => {
   const { userId: clerkUserId } = await auth();

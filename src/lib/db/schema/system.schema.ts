@@ -12,7 +12,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import { usersSchema } from '@/lib/db/schema/users.schema';
+import { users } from '@/lib/db/schema/users.schema';
 
 export const notificationTypeEnum = pgEnum('notification_type', [
   'comment',
@@ -64,11 +64,11 @@ export const notifications = pgTable(
     readAt: timestamp('read_at'),
     relatedId: uuid('related_id'),
     relatedType: notificationRelatedTypeEnum('notification_related_type'),
-    relatedUserId: uuid('related_user_id').references(() => usersSchema.id, { onDelete: 'cascade' }),
+    relatedUserId: uuid('related_user_id').references(() => users.id, { onDelete: 'cascade' }),
     title: varchar('title', { length: 255 }).notNull(),
     type: notificationTypeEnum('type').notNull(),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [
@@ -100,7 +100,7 @@ export const featuredContent = pgTable(
     contentId: uuid('content_id').notNull(),
     contentType: featuredContentTypeEnum('featured_content_type').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    curatorId: uuid('curator_id').references(() => usersSchema.id, { onDelete: 'set null' }),
+    curatorId: uuid('curator_id').references(() => users.id, { onDelete: 'set null' }),
     description: text('description'),
     endDate: timestamp('end_date'),
     featureType: featureTypeEnum('feature_type').notNull(),
@@ -146,7 +146,7 @@ export const platformSettings = pgTable(
     isPublic: boolean('is_public').default(PLATFORM_SETTINGS_DEFAULTS.IS_PUBLIC).notNull(),
     key: varchar('key', { length: 100 }).notNull().unique(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    updatedBy: uuid('updated_by').references(() => usersSchema.id, { onDelete: 'set null' }),
+    updatedBy: uuid('updated_by').references(() => users.id, { onDelete: 'set null' }),
     value: text('value'),
     valueType: valueTypeEnum('value_type').default(PLATFORM_SETTINGS_DEFAULTS.VALUE_TYPE).notNull(),
   },

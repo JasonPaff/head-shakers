@@ -1,6 +1,6 @@
 import { index, integer, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 
-import { usersSchema } from '@/lib/db/schema/users.schema';
+import { users } from '@/lib/db/schema/users.schema';
 
 export const tagsSchema = pgTable(
   'tags',
@@ -12,7 +12,7 @@ export const tagsSchema = pgTable(
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     usageCount: integer('usage_count').default(0).notNull(),
     userId: uuid('user_id')
-      .references(() => usersSchema.id, { onDelete: 'cascade' })
+      .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
   },
   (table) => [
