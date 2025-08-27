@@ -1,4 +1,5 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import * as Sentry from '@sentry/nextjs';
 
 const isPublicRoute = createRouteMatcher([
   // authentication pages (route group)
@@ -51,13 +52,23 @@ const isProtectedRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-  // handle protected routes first
+  const { userId } = await auth();
+
+  // add user context
+  if (userId) Sentry.setUser({ id: userId });
+  Sentry.setContext('request', {
+    method: req.method,
+    url: req.url,
+    userAgent: req.headers.get('user-agent'),
+  });
+
+  // protected routes
   if (isProtectedRoute(req)) {
     await auth.protect();
     return;
   }
 
-  // for public routes, no auth required
+  // public routes, no auth required
   if (isPublicRoute(req)) {
     return;
   }
