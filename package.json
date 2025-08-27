@@ -6,12 +6,16 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev --turbopack",
-    "next-typesafe-url": "next-typesafe-url --filename route-type --pageExtensions ts,tsx",
     "format": "prettier --write .",
+    "db:fresh": "RESET_DB=true bun run db:seed",
     "db:generate": "bunx drizzle-kit generate",
     "db:migrate": "bunx drizzle-kit migrate",
+    "db:reset": "bun run scripts/reset-db.ts",
+    "db:reset-and-seed": "bun run db:reset && bun run db:migrate && bun run db:seed",
+    "db:seed": "bun run scripts/seed.ts",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
+    "next-typesafe-url": "next-typesafe-url --filename route-type --pageExtensions ts,tsx",
     "start": "next start"
   },
   "dependencies": {
