@@ -13,21 +13,9 @@ export const createBobbleheadAction = authActionClient
   .metadata({ actionName: 'createBobblehead' })
   .inputSchema(insertBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { clerkUserId, userId } = ctx;
+    const { userId } = ctx;
 
-    // set user and business context (middleware handles the rest)
-    Sentry.setUser({
-      clerkId: clerkUserId,
-      id: userId,
-    });
-
-    Sentry.setContext('bobblehead_data', {
-      category: parsedInput.category,
-      collectionId: parsedInput.collectionId,
-      hasCustomFields: !!parsedInput.customFields,
-      isPublic: parsedInput.isPublic,
-      name: parsedInput.name,
-    });
+    Sentry.setContext('bobblehead_data', parsedInput);
 
     try {
       // create bobblehead
@@ -38,6 +26,10 @@ export const createBobbleheadAction = authActionClient
           userId,
         })
         .returning();
+
+      if (!newBobblehead) {
+        throw new Error('Failed to create bobblehead');
+      }
 
       // add business logic breadcrumb
       Sentry.addBreadcrumb({
@@ -68,8 +60,8 @@ export const createBobbleheadAction = authActionClient
       };
     } catch (error) {
       Sentry.setContext('error_details', {
-        collectionId: parsedInput.collectionId,
         operation: 'create_bobblehead',
+        parsedInput,
         userId,
       });
 

@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
 import { createMiddleware } from 'next-safe-action';
 
-import type { ActionMetadata } from '@/lib/utils/next-safe-action';
+import type { ActionMiddleware } from '@/lib/utils/next-safe-action';
 
-export const databaseMiddleware = createMiddleware<ActionMetadata>().define(async ({ metadata, next }) => {
+export const databaseMiddleware = createMiddleware<ActionMiddleware>().define(async ({ metadata, next }) => {
   return await Sentry.startSpan(
     {
       attributes: {

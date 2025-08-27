@@ -1,15 +1,15 @@
 import * as Sentry from '@sentry/nextjs';
 import { createMiddleware } from 'next-safe-action';
 
-import type { ActionMetadata } from '@/lib/utils/next-safe-action';
+import type { ActionMiddleware } from '@/lib/utils/next-safe-action';
 
-export const sentryMiddleware = createMiddleware<ActionMetadata>().define(
+export const sentryMiddleware = createMiddleware<ActionMiddleware>().define(
   async ({ clientInput, metadata, next }) => {
     return Sentry.withScope(async (scope) => {
       // set action context
       scope.setTag('action', metadata?.actionName || 'unknown');
       scope.setTag('component', 'server_action');
-      scope.setContext('action_metadata', metadata);
+      scope.setContext('action_metadata', { ...metadata });
 
       // add input size for monitoring large payloads
       if (clientInput) {
