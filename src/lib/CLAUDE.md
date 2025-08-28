@@ -6,8 +6,8 @@ This directory contains the core business logic and infrastructure for the Head 
 
 ```
 lib/
-├── actions/           # Server actions (Next Safe Action-based)
-├── constants/         # Application constants and configuration
+├── actions/          # Server actions (Next Safe Action-based)
+├── constants/        # Application constants and configuration
 ├── db/               # Database schema, migrations, and utilities  
 ├── middleware/       # Server action middleware
 ├── queries/          # Database query functions
@@ -93,12 +93,12 @@ constants/
 ├── action-names.ts    # Server action identifiers
 ├── config.ts          # Application configuration
 ├── defaults.ts        # Default entity values
-├── enums.ts          # Type-safe enumerations
+├── enums.ts           # Type-safe enumerations
 ├── error-messages.ts  # Standardized error messages
-├── redis-keys.ts     # Cache key patterns
-├── schema-limits.ts  # Database field constraints
-├── sentry.ts         # Monitoring configuration
-└── index.ts          # Consolidated exports
+├── redis-keys.ts      # Cache key patterns
+├── schema-limits.ts   # Database field constraints
+├── sentry.ts          # Monitoring configuration
+└── index.ts           # Consolidated exports
 ```
 
 ### Database Layer (`db/`)
@@ -106,12 +106,12 @@ Comprehensive database architecture with PostgreSQL:
 
 ```
 db/
-├── index.ts              # Database connection and config
-├── migrations/           # Database migration files
-├── scripts/             # Database utilities
-│   ├── reset-db.ts      # Database reset utility
-│   └── seed.ts          # Development seed data
-└── schema/              # Drizzle schema definitions
+├── index.ts                   # Database connection and config
+├── migrations/                # Database migration files
+├── scripts/                   # Database utilities
+│   ├── reset-db.ts            # Database reset utility
+│   └── seed.ts                # Development seed data
+└── schema/                    # Drizzle schema definitions
     ├── analytics.schema.ts    # Analytics and tracking
     ├── bobbleheads.schema.ts  # Core bobblehead entities
     ├── collections.schema.ts  # Collection structures

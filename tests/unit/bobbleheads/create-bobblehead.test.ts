@@ -27,7 +27,7 @@ describe('BobbleheadService.createAsync', () => {
       userId: user!.id,
     };
 
-    // @ts-expect-error - Testing with valid data
+    // @ts-expect-error - testing with valid data
     const result = await BobbleheadService.createAsync(bobbleheadData, testDb);
 
     expect(result).toBeDefined();
@@ -53,7 +53,7 @@ describe('BobbleheadService.createAsync', () => {
       userId: user!.id,
     };
 
-    // @ts-expect-error - Testing with valid data
+    // @ts-expect-error - testing with valid data
     const result = await BobbleheadService.createAsync(bobbleheadData, testDb);
 
     expect(result).toBeDefined();

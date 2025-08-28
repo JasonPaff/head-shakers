@@ -9,7 +9,8 @@
       "mcp__linear-server__list_issues",
       "mcp__linear-server__list_projects",
       "mcp__linear-server__list_teams",
-      "mcp__linear-server__create_issue"
+      "mcp__linear-server__create_issue",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
