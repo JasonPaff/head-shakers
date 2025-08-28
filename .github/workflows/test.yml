@@ -38,6 +38,11 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      - name: Run database migrations
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/headshakers_test
+
       - name: Run tests with GitHub services
         run: npm run test:ci
         env:
