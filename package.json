@@ -5,17 +5,26 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "dev": "next dev --turbopack",
-    "format": "prettier --write .",
     "db:fresh": "npm run db:reset && npm run db:migrate && npm run db:seed",
     "db:generate": "bunx drizzle-kit generate",
     "db:migrate": "bunx drizzle-kit migrate",
     "db:reset": "npx tsx src/lib/db/scripts/reset-db.ts",
     "db:seed": "npx tsx src/lib/db/scripts/seed.ts",
+    "dev": "next dev --turbopack",
+    "format": "prettier --write .",
     "lint": "eslint src",
     "lint:fix": "eslint src --fix",
     "next-typesafe-url": "next-typesafe-url --filename route-type --pageExtensions ts,tsx",
-    "start": "next start"
+    "start": "next start",
+    "test": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:db": "vitest run tests/database",
+    "test:e2e": "vitest run tests/e2e",
+    "test:integration": "vitest run tests/integration",
+    "test:performance": "vitest run tests/performance",
+    "test:security": "vitest run tests/security",
+    "test:unit": "vitest run tests/unit",
+    "test:watch": "vitest watch"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
@@ -67,10 +76,12 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.33.0",
+    "@faker-js/faker": "^10.0.0",
     "@next/eslint-plugin-next": "^15.5.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.83.1",
     "@tanstack/react-query-devtools": "^5.85.5",
+    "@testing-library/react": "^16.3.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -85,12 +96,17 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-snob": "^0.0.19",
+    "factory-bot": "^6.3.1",
     "globals": "^16.3.0",
+    "msw": "^2.10.5",
     "prettier": "^3.6.2",
+    "supertest": "^7.1.4",
     "tailwindcss": "^4",
     "tailwindcss-radix": "^4.0.2",
+    "testcontainers": "^11.5.1",
     "tw-animate-css": "^1.3.7",
     "typescript": "^5",
-    "typescript-eslint": "^8.40.0"
+    "typescript-eslint": "^8.40.0",
+    "vitest": "^3.2.4"
   }
 }
