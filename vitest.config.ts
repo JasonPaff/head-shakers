@@ -1,5 +1,9 @@
 import { defineConfig } from 'vitest/config';
 import path from 'path';
+import dotenv from 'dotenv';
+
+// load environment variables
+dotenv.config();
 
 export default defineConfig({
   test: {
@@ -13,10 +17,6 @@ export default defineConfig({
       threads: {
         singleThread: true, // for database tests
       },
-    },
-    env: {
-      // load test-specific environment variables
-      ...process.env,
     },
   },
   resolve: {

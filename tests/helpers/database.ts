@@ -1,18 +1,18 @@
 import { faker } from '@faker-js/faker';
 import { sql } from 'drizzle-orm';
 
-import { db } from '@/lib/db';
+import { testDb } from './test-db';
 
 export const setupTestDatabase = async () => {
-  // Use test-specific database URL or skip if not configured
   const testDbUrl = process.env.DATABASE_URL_TEST;
-  console.log('testDbUrl', testDbUrl);
+
   if (!testDbUrl) {
     console.warn('No test database URL configured, skipping database setup');
     return;
   }
+
   // clear all tables
-  await db.execute(sql`TRUNCATE TABLE
+  await testDb.execute(sql`TRUNCATE TABLE
     bobblehead_tags, bobblehead_photos, bobbleheads,
     sub_collections, collections, tags,
     comments, likes, follows, user_blocks,
@@ -43,12 +43,14 @@ export const createManyBobbleheads = async (collectionId: string, count: number)
   }));
 
   // @ts-expect-error ignoring type issue with array insert
-  return db.insert(bobbleheads).values(bobbleheads).returning();
+  return testDb.insert(bobbleheads).values(bobbleheads).returning();
 };
 
 // transaction-based test isolation
-export const withTestTransaction = async <T>(testFn: (tx: typeof db) => Promise<T>): Promise<T | void> => {
-  return await db
+export const withTestTransaction = async <T>(
+  testFn: (tx: typeof testDb) => Promise<T>,
+): Promise<T | void> => {
+  return await testDb
     .transaction(async (tx) => {
       // @ts-expect-error ignoring type issue with transaction
       await testFn(tx);
@@ -58,7 +60,7 @@ export const withTestTransaction = async <T>(testFn: (tx: typeof db) => Promise<
     .catch((error) => {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.message === 'ROLLBACK_TEST') {
-        return testFn(db);
+        return testFn(testDb);
       }
       throw error;
     });

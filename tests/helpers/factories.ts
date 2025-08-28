@@ -5,7 +5,6 @@ import type { InsertCollection } from '@/lib/validations/collections.validation'
 import type { InsertTag } from '@/lib/validations/tags.validation';
 import type { InsertUser } from '@/lib/validations/users.validation';
 
-import { db } from '@/lib/db';
 import {
   bobbleheadPhotos,
   bobbleheads,
@@ -15,6 +14,8 @@ import {
   users,
   userSettings,
 } from '@/lib/db/schema';
+
+import { testDb } from './test-db';
 
 export class TestDataFactory {
   static async createBobblehead(collectionId?: string, overrides: Partial<InsertBobblehead> = {}) {
@@ -59,7 +60,7 @@ export class TestDataFactory {
     };
 
     // @ts-expect-error ignoring type issue with partial insert
-    const [bobblehead] = await db.insert(bobbleheads).values(bobbleheadData).returning();
+    const [bobblehead] = await testDb.insert(bobbleheads).values(bobbleheadData).returning();
     return { bobblehead, collection, user };
   }
 
@@ -81,7 +82,7 @@ export class TestDataFactory {
     };
 
     // @ts-expect-error ignoring type issue with partial insert
-    const [photo] = await db.insert(bobbleheadPhotos).values(photoData).returning();
+    const [photo] = await testDb.insert(bobbleheadPhotos).values(photoData).returning();
     return { bobblehead, photo };
   }
 
@@ -99,7 +100,7 @@ export class TestDataFactory {
     };
 
     // @ts-expect-error ignoring type issue with partial insert
-    const [collection] = await db.insert(collections).values(collectionData).returning();
+    const [collection] = await testDb.insert(collections).values(collectionData).returning();
     return { collection, user };
   }
 
@@ -115,7 +116,7 @@ export class TestDataFactory {
     };
 
     // @ts-expect-error ignoring type issue with partial insert
-    const [tag] = await db.insert(tags).values(tagData).returning();
+    const [tag] = await testDb.insert(tags).values(tagData).returning();
     return { tag, user };
   }
 
@@ -163,11 +164,11 @@ export class TestDataFactory {
       ...overrides,
     };
 
-    const [user] = await db.insert(users).values(userData).returning();
+    const [user] = await testDb.insert(users).values(userData).returning();
 
     // create associated settings
-    await db.insert(userSettings).values({ userId: user!.id });
-    await db.insert(notificationSettings).values({ userId: user!.id });
+    await testDb.insert(userSettings).values({ userId: user!.id });
+    await testDb.insert(notificationSettings).values({ userId: user!.id });
 
     return user;
   }
