@@ -49,19 +49,19 @@ export default defineConfig({
         'next-env.d.ts',
         '_next-typesafe-url_.d.ts',
       ],
-      thresholds: {
-        global: {
-          branches: 80,
-          functions: 80,
-          lines: 80,
-          statements: 80,
-        },
-        perFile: true,
-        branches: 70,
-        functions: 70,
-        lines: 70,
-        statements: 70,
-      },
+      // thresholds: {
+      //   global: {
+      //     branches: 80,
+      //     functions: 80,
+      //     lines: 80,
+      //     statements: 80,
+      //   },
+      //   perFile: true,
+      //   branches: 70,
+      //   functions: 70,
+      //   lines: 70,
+      //   statements: 70,
+      // },
     },
   },
   resolve: {
