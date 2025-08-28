@@ -16,10 +16,8 @@ The database layer uses Drizzle ORM with PostgreSQL to provide type-safe, perfor
 db/
 ├── index.ts                   # Database connection and config
 ├── migrations/                # Database migration files
-│   ├── 20250827005132_glamorous_dreaming_celestial.sql
 │   └── meta/                  # Migration metadata
-│       ├── _journal.json      # Migration history
-│       └── 20250827005132_snapshot.json
+│       └── _journal.json      # Migration history
 ├── scripts/                   # Database utilities
 │   ├── reset-db.ts            # Database reset utility
 │   └── seed.ts                # Development seed data
