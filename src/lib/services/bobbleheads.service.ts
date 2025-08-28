@@ -1,7 +1,6 @@
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
-import { ERROR_MESSAGES } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { createBobbleheadAsync } from '@/lib/queries/bobbleheads.queries';
 
@@ -16,12 +15,7 @@ export class BobbleheadService {
     photos: Array<InsertBobbleheadPhoto>,
     dbInstance: DatabaseExecutor = db,
   ) {
-    // remove manual transaction - rely on middleware
     const result = await createBobbleheadAsync(data, dbInstance);
-
-    if (!result || result.length === 0) {
-      throw new Error(ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED);
-    }
 
     console.log(photos);
 
@@ -35,6 +29,6 @@ export class BobbleheadService {
     // Update collection aggregates
     //await updateCollectionStats(data.collectionId);
 
-    return result[0];
+    return result?.[0];
   }
 }
