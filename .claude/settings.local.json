@@ -10,7 +10,13 @@
       "mcp__linear-server__list_projects",
       "mcp__linear-server__list_teams",
       "mcp__linear-server__create_issue",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(docker:*)",
+      "Bash(npm test)",
+      "Bash(set DATABASE_URL=postgresql://test_user:test_password@localhost:5433/headshakers_test)",
+      "Bash(bunx drizzle-kit migrate:*)",
+      "Bash(del migrate-test-db.js)",
+      "Bash(del drizzle.test.config.ts)"
     ],
     "deny": [],
     "ask": []

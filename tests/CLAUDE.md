@@ -1,36 +1,48 @@
 # Testing Guide
 
-## Database Testing Setup
+## 🚀 Automatic Test Containers (Recommended)
 
-### Environment Configuration
+### Zero-Config Testing
 
-1. **Copy test environment template:**
-   ```bash
-   cp tests/test.env.example .env.test
-   ```
+**Prerequisites:**
+- Docker Desktop installed and running
 
-2. **Set DATABASE_URL_TEST** (choose one option):
+**Usage:**
+```bash
+# Remove DATABASE_URL_TEST from .env to enable automatic containers
+# Then just run tests - everything is automatic!
+npm run test
 
-   **Option A: Local Docker (Recommended)**
+# With coverage
+npm run test:coverage
+
+# Watch mode  
+npm run test:watch
+```
+
+**What happens automatically:**
+1. 🐳 PostgreSQL container starts
+2. 📊 Database migrations run 
+3. 🧪 Tests execute with transaction isolation
+4. 🧹 Container stops and cleans up
+
+### Manual Database Options (Alternative)
+
+If Docker isn't available or you prefer manual control:
+
+   **Option A: Local Docker**
    ```bash
    # Start test database
    npm run test:db:docker
    
-   # Set in .env.test
+   # Set in .env
    DATABASE_URL_TEST=postgresql://test_user:test_password@localhost:5433/headshakers_test
    ```
 
-   **Option B: Neon Test Branch**
+   **Option B: Neon Test Branch**  
    ```bash
-   # Create separate Neon branch for testing
+   # Set in .env
    DATABASE_URL_TEST=postgresql://user:pass@host/db_test
-   ```
-
-   **Option C: Testcontainers (Automatic)**
-   ```typescript
-   // Will automatically manage container lifecycle
-   import { startTestDatabase } from './helpers/test-container';
-   const url = await startTestDatabase();
    ```
 
 ### Test Isolation Patterns
