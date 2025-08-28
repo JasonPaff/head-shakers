@@ -32,9 +32,7 @@ export const withTestIsolation = async <T>(testFn: (db: PgDatabase<never>) => Pr
       throw new Error('TEST_ROLLBACK');
     })
     .catch((error: Error) => {
-      if (error.message !== 'TEST_ROLLBACK') {
-        throw error;
-      }
+      if (error.message !== 'TEST_ROLLBACK') throw error;
       // the transaction was rolled back, run again to get the actual result
       // @ts-expect-error ignoring type issue with test db
       return testFn(testDb);
