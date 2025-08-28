@@ -12,71 +12,71 @@ describe('BobbleheadService.createAsync', () => {
       console.warn('No test database URL configured, skipping database-dependent tests');
     }
   });
-});
 
-it.skipIf(!process.env.DATABASE_URL_TEST)('should create a bobblehead with valid data', async () => {
-  const { collection, user } = await TestDataFactory.createCollection();
+  it.skipIf(!process.env.DATABASE_URL_TEST)('should create a bobblehead with valid data', async () => {
+    const { collection, user } = await TestDataFactory.createCollection();
 
-  const bobbleheadData = {
-    category: 'Sports',
-    characterName: 'Test Character',
-    collectionId: collection?.id,
-    currentCondition: 'mint' as const,
-    manufacturer: 'Test Manufacturer',
-    name: 'Test Bobblehead',
-    status: 'owned' as const,
-    userId: user!.id,
-  };
-
-  // @ts-expect-error - Testing with valid data
-  const result = await BobbleheadService.createAsync(bobbleheadData, testDb);
-
-  expect(result).toBeDefined();
-  expect(result!.name).toBe('Test Bobblehead');
-  expect(result!.collectionId).toBe(collection?.id);
-  expect(result!.userId).toBe(user!.id);
-  expect(result!.category).toBe('Sports');
-  expect(result!.characterName).toBe('Test Character');
-  expect(result!.manufacturer).toBe('Test Manufacturer');
-  expect(result!.currentCondition).toBe('mint');
-  expect(result!.status).toBe('owned');
-  expect(result!.id).toBeDefined();
-  expect(result!.createdAt).toBeDefined();
-  expect(result!.updatedAt).toBeDefined();
-});
-
-it.skipIf(!process.env.DATABASE_URL)('should create a bobblehead with only required fields', async () => {
-  const { collection, user } = await TestDataFactory.createCollection();
-
-  const bobbleheadData = {
-    collectionId: collection?.id,
-    name: 'Minimal Bobblehead',
-    userId: user!.id,
-  };
-
-  // @ts-expect-error - Testing with valid data
-  const result = await BobbleheadService.createAsync(bobbleheadData, testDb);
-
-  expect(result).toBeDefined();
-  expect(result!.name).toBe('Minimal Bobblehead');
-  expect(result!.collectionId).toBe(collection?.id);
-  expect(result!.userId).toBe(user!.id);
-  expect(result!.currentCondition).toBe('excellent');
-  expect(result!.status).toBe('owned');
-  expect(result!.isPublic).toBe(true);
-  expect(result!.isFeatured).toBe(false);
-  expect(result!.likeCount).toBe(0);
-  expect(result!.commentCount).toBe(0);
-  expect(result!.viewCount).toBe(0);
-});
-
-it('should validate input schema requirements', () => {
-  expect(() => {
-    const validData = {
-      collectionId: 'test-collection-id',
+    const bobbleheadData = {
+      category: 'Sports',
+      characterName: 'Test Character',
+      collectionId: collection?.id,
+      currentCondition: 'mint' as const,
+      manufacturer: 'Test Manufacturer',
       name: 'Test Bobblehead',
-      userId: 'test-user-id',
+      status: 'owned' as const,
+      userId: user!.id,
     };
-    expect(validData).toBeDefined();
-  }).not.toThrow();
+
+    // @ts-expect-error - Testing with valid data
+    const result = await BobbleheadService.createAsync(bobbleheadData, testDb);
+
+    expect(result).toBeDefined();
+    expect(result!.name).toBe('Test Bobblehead');
+    expect(result!.collectionId).toBe(collection?.id);
+    expect(result!.userId).toBe(user!.id);
+    expect(result!.category).toBe('Sports');
+    expect(result!.characterName).toBe('Test Character');
+    expect(result!.manufacturer).toBe('Test Manufacturer');
+    expect(result!.currentCondition).toBe('mint');
+    expect(result!.status).toBe('owned');
+    expect(result!.id).toBeDefined();
+    expect(result!.createdAt).toBeDefined();
+    expect(result!.updatedAt).toBeDefined();
+  });
+
+  it.skipIf(!process.env.DATABASE_URL)('should create a bobblehead with only required fields', async () => {
+    const { collection, user } = await TestDataFactory.createCollection();
+
+    const bobbleheadData = {
+      collectionId: collection?.id,
+      name: 'Minimal Bobblehead',
+      userId: user!.id,
+    };
+
+    // @ts-expect-error - Testing with valid data
+    const result = await BobbleheadService.createAsync(bobbleheadData, testDb);
+
+    expect(result).toBeDefined();
+    expect(result!.name).toBe('Minimal Bobblehead');
+    expect(result!.collectionId).toBe(collection?.id);
+    expect(result!.userId).toBe(user!.id);
+    expect(result!.currentCondition).toBe('excellent');
+    expect(result!.status).toBe('owned');
+    expect(result!.isPublic).toBe(true);
+    expect(result!.isFeatured).toBe(false);
+    expect(result!.likeCount).toBe(0);
+    expect(result!.commentCount).toBe(0);
+    expect(result!.viewCount).toBe(0);
+  });
+
+  it('should validate input schema requirements', () => {
+    expect(() => {
+      const validData = {
+        collectionId: 'test-collection-id',
+        name: 'Test Bobblehead',
+        userId: 'test-user-id',
+      };
+      expect(validData).toBeDefined();
+    }).not.toThrow();
+  });
 });
