@@ -4,7 +4,7 @@ import { createMiddleware } from 'next-safe-action';
 import type { ActionContext, ActionMetadata } from '@/lib/utils/next-safe-action';
 
 import { REDIS_KEYS } from '@/lib/constants';
-import { AppError } from '@/lib/utils/errors';
+import { ActionError, ErrorType } from '@/lib/utils/errors';
 
 const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
@@ -32,9 +32,18 @@ export const createRateLimitMiddleware = (
     }
 
     if (current > requests) {
-      throw new AppError(
-        `Rate limit exceeded. Max ${requests} requests per ${windowInSeconds} seconds.`,
+      throw new ActionError(
+        ErrorType.RATE_LIMIT,
         'RATE_LIMIT_EXCEEDED',
+        `Rate limit exceeded. Max ${requests} requests per ${windowInSeconds} seconds.`,
+        {
+          currentCount: current,
+          limit: requests,
+          operation: metadata?.actionName || 'unknown',
+          userId: ctx.userId,
+          window: windowInSeconds,
+        },
+        false,
         429,
       );
     }

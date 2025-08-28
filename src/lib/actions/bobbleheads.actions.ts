@@ -12,6 +12,8 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
+import { handleActionError } from '@/lib/utils/action-error-handler';
+import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
 
@@ -39,7 +41,14 @@ export const createBobbleheadAction = authActionClient
       );
 
       if (!newBobblehead) {
-        throw new Error(ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED);
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          'BOBBLEHEAD_CREATE_FAILED',
+          ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED,
+          { operation: 'create_bobblehead', userId },
+          false,
+          500,
+        );
       }
 
       // add business logic breadcrumb
@@ -51,29 +60,27 @@ export const createBobbleheadAction = authActionClient
       });
 
       // revalidate cache
-      if (parsedInput.collectionId) {
-        revalidatePath(
-          $path({
-            route: '/collections/[collectionId]',
-            routeParams: {
-              collectionId: parsedInput.collectionId,
-            },
-          }),
-        );
-      }
+      revalidatePath(
+        $path({
+          route: '/collections/[collectionId]',
+          routeParams: {
+            collectionId: parsedInput.collectionId,
+          },
+        }),
+      );
 
       return {
         data: newBobblehead,
         success: true,
       };
     } catch (error) {
-      Sentry.setContext(SENTRY_CONTEXTS.ERROR_DETAILS, {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
+        },
         operation: 'create_bobblehead',
-        parsedInput,
         userId,
       });
-
-      console.error('Error creating bobblehead:', error);
-      throw new Error(ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED);
     }
   });

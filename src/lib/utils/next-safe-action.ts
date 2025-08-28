@@ -9,6 +9,8 @@ import { sanitizationMiddleware } from '@/lib/middleware/sanitization.middleware
 import { sentryMiddleware } from '@/lib/middleware/sentry.middleware';
 import { transactionMiddleware } from '@/lib/middleware/transaction.middleware';
 
+import { ActionError, ErrorType } from './errors';
+
 // final action context (for actions)
 export type ActionContext = TransactionContext;
 
@@ -36,9 +38,7 @@ export interface TransactionContext extends SanitizedContext {
   tx?: DatabaseExecutor;
 }
 
-class ActionError extends Error {}
-
-// base client with error handling and optional logging
+// base client with enhanced error handling
 export const actionClient = createSafeActionClient({
   defineMetadataSchema() {
     return z.object({
@@ -46,11 +46,41 @@ export const actionClient = createSafeActionClient({
       isTransactionRequired: z.boolean().optional().default(false),
     });
   },
-  handleServerError(e) {
-    console.error('Action error:', e.message);
+  handleServerError(error, utils) {
+    console.error('Server action error:', {
+      actionName: utils?.metadata?.actionName,
+      clientInput: utils?.clientInput ? 'present' : 'none',
+      message: error.message,
+    });
 
-    if (e instanceof ActionError) {
-      return e.message;
+    if (error instanceof ActionError) {
+      switch (error.type) {
+        case ErrorType.AUTHORIZATION:
+          return error.statusCode === 401 ? 'Authentication required' : 'Access denied';
+        case ErrorType.BUSINESS_RULE:
+          return error.message;
+        case ErrorType.DATABASE:
+          if (error.code === 'DUPLICATE_ENTRY') {
+            return 'A record with this information already exists.';
+          }
+          if (error.code === 'FOREIGN_KEY_VIOLATION') {
+            return 'Cannot complete operation due to related data constraints.';
+          }
+          return 'A database error occurred. Please try again.';
+        case ErrorType.EXTERNAL_SERVICE:
+          return error.isRecoverable ?
+              'External service temporarily unavailable. Please try again.'
+            : 'External service error occurred.';
+        case ErrorType.NOT_FOUND:
+          return error.message; // Safe to return not found messages
+        case ErrorType.RATE_LIMIT:
+          return 'Rate limit exceeded. Please try again later.';
+        case ErrorType.VALIDATION:
+          return error.message; // Safe to return validation errors
+        case ErrorType.INTERNAL:
+        default:
+          return DEFAULT_SERVER_ERROR_MESSAGE;
+      }
     }
 
     return DEFAULT_SERVER_ERROR_MESSAGE;
