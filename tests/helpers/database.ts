@@ -5,7 +5,8 @@ import { db } from '@/lib/db';
 
 export const setupTestDatabase = async () => {
   // Use test-specific database URL or skip if not configured
-  const testDbUrl = process.env.DATABASE_URL;
+  const testDbUrl = process.env.DATABASE_URL_TEST;
+  console.log('testDbUrl', testDbUrl);
   if (!testDbUrl) {
     console.warn('No test database URL configured, skipping database setup');
     return;

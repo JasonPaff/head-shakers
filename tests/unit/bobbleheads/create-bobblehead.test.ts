@@ -6,13 +6,13 @@ import { TestDataFactory } from '../../helpers/factories';
 
 describe('BobbleheadService.createAsync', () => {
   beforeAll(() => {
-    const testDbUrl = process.env.DATABASE_URL;
+    const testDbUrl = process.env.DATABASE_URL_TEST;
     if (!testDbUrl) {
       console.warn('No test database URL configured, skipping database-dependent tests');
     }
   });
 
-  it.skipIf(!process.env.DATABASE_URL)('should create a bobblehead with valid data', async () => {
+  it.skipIf(!process.env.DATABASE_URL_TEST)('should create a bobblehead with valid data', async () => {
     const { collection, user } = await TestDataFactory.createCollection();
 
     const bobbleheadData = {
