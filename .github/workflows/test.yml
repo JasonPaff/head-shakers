@@ -10,30 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_headshakers
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
-      redis:
-        image: redis:7
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 6379:6379
-
     steps:
       - uses: actions/checkout@v4
 
@@ -46,34 +22,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run database migrations
-        run: npm run db:migrate
+      - name: Run tests with automatic containers
+        run: npm run test:ci
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
-
-      - name: Run unit tests
-        run: npm run test:unit
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
-          REDIS_URL: redis://localhost:6379
-
-      - name: Run integration tests
-        run: npm run test:integration
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
-          REDIS_URL: redis://localhost:6379
-
-      - name: Run security tests
-        run: npm run test:security
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
-
-      - name: Run performance tests
-        run: npm run test:performance
-        env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
+          NODE_ENV: test
+          SKIP_ENV_VALIDATION: true
+          # Mock external services for CI
+          CLERK_SECRET_KEY: test_clerk_secret
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: test_clerk_pk
+          CLOUDINARY_CLOUD_NAME: test_cloudinary
+          CLOUDINARY_API_KEY: test_api_key
+          CLOUDINARY_API_SECRET: test_api_secret
+          ABLY_API_KEY: test_ably_key
+          REDIS_URL: redis://localhost:6379/1
+          RESEND_API_KEY: test_resend_key
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           file: ./coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }}
