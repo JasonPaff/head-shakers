@@ -48,21 +48,3 @@ export const getTestDatabaseUrl = (): string => {
 
   return testContainer.getConnectionUri();
 };
-
-export const isTestDatabaseRunning = (): boolean => {
-  return testContainer !== null;
-};
-
-export const getTestDatabaseHost = (): string => {
-  if (!testContainer) {
-    throw new Error('Test database container not started');
-  }
-  return testContainer.getHost();
-};
-
-export const getTestDatabasePort = (): number => {
-  if (!testContainer) {
-    throw new Error('Test database container not started');
-  }
-  return testContainer.getPort();
-};

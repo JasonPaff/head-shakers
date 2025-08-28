@@ -1,7 +1,7 @@
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
-import { ensureCleanDatabase, setupTestDatabase } from './helpers/database';
+import { setupTestDatabase } from './helpers/database';
 import { checkDockerRequirements } from './helpers/docker-check';
 import { startTestDatabase, stopTestDatabase } from './helpers/test-container';
 
@@ -33,7 +33,7 @@ beforeAll(async () => {
     }
 
     // run migrations on the test database
-    await ensureCleanDatabase();
+    await setupTestDatabase();
     console.log('Test database setup complete');
   } catch (error) {
     console.error('Failed to setup test database:', error);

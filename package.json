@@ -22,8 +22,6 @@
     "test:coverage:open": "vitest run --coverage && start ./coverage/index.html",
     "test:coverage:watch": "vitest --coverage",
     "test:db": "vitest run tests/database",
-    "test:db:docker": "docker-compose -f tests/docker-compose.test.yml up -d",
-    "test:db:docker:down": "docker-compose -f tests/docker-compose.test.yml down -v",
     "test:db:reset": "bun run db:reset && bun run db:migrate",
     "test:db:setup": "bun run db:migrate",
     "test:e2e": "vitest run tests/e2e",
