@@ -6,14 +6,14 @@ import {
   bobbleheadPhotos,
   bobbleheads,
   bobbleheadTags,
-  collectionsSchema,
+  collections,
   comments,
   follows,
   likes,
   notificationSettings,
   subCollections,
-  tagsSchema,
-  usersSchema,
+  tags,
+  users,
   userSettings,
 } from '@/lib/db/schema';
 
