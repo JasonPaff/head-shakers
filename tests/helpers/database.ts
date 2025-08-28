@@ -24,17 +24,18 @@ export const setupTestDatabase = async () => {
 
 // test isolation with transaction rollback
 export const withTestIsolation = async <T>(testFn: (db: PgDatabase<never>) => Promise<T>): Promise<T> => {
-  return testDb
-    .transaction(async (tx) => {
+  let result: T;
+
+  try {
+    await testDb.transaction(async (tx) => {
       // @ts-expect-error ignoring type issue with transaction
-      await testFn(tx);
+      result = await testFn(tx);
       // rollback transaction after getting the result
       throw new Error('TEST_ROLLBACK');
-    })
-    .catch((error: Error) => {
-      if (error.message !== 'TEST_ROLLBACK') throw error;
-      // the transaction was rolled back, run again to get the actual result
-      // @ts-expect-error ignoring type issue with test db
-      return testFn(testDb);
     });
+  } catch (error: unknown) {
+    if ((error as Error).message !== 'TEST_ROLLBACK') throw error;
+  }
+
+  return result!;
 };
