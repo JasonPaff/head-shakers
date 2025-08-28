@@ -1,3 +1,4 @@
+import { $path } from 'next-typesafe-url';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
@@ -27,6 +28,8 @@ describe('BobbleheadService.createAsync', () => {
         status: 'owned' as const,
         userId: user!.id,
       };
+
+      console.log(`${$path({ route: '/sign-in/[[...sign-in]]' })}(.*)`);
 
       // @ts-expect-error - testing with valid data
       const result = await BobbleheadService.createAsync(bobbleheadData, db);

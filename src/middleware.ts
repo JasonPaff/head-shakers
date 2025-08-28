@@ -1,8 +1,10 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import * as Sentry from '@sentry/nextjs';
+import { $path } from 'next-typesafe-url';
 
 const isPublicRoute = createRouteMatcher([
   // authentication pages (route group)
+  `${$path({ route: '/sign-in/[[...sign-in]]' })}(.*)`,
   '/sign-in(.*)',
   '/sign-up(.*)',
 
@@ -15,17 +17,17 @@ const isPublicRoute = createRouteMatcher([
   '/browse(.*)',
 
   // public collection views (read-only)
-  '/collections/:id', // /collections/123 (view only)
-  '/collections/:id/share(.*)', // Share links
+  '/collections/:id',
+  '/collections/:id/share(.*)',
 
   // public item views (read-only)
-  '/items/:id', // /items/456 (view only)
-  '/items/:id/share(.*)', // Share links
+  '/items/:id',
+  '/items/:id/share(.*)',
 
   // public user profiles (read-only)
-  '/users/:username', // /users/john-doe
-  '/users/:username/collections(.*)', // /users/john-doe/collections
-  '/users/:username/following(.*)', // /users/john-doe/following
+  '/users/:username',
+  '/users/:username/collections(.*)',
+  '/users/:username/following(.*)',
 
   // homepage (can be viewed by anyone)
   '/',
