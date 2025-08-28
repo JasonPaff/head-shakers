@@ -12,8 +12,10 @@ export const server = setupServer();
 beforeAll(async () => {
   console.log('Setting up test environment...');
 
-  // start MSW server
-  server.listen({ onUnhandledRequest: 'warn' });
+  // start MSW server - skip in CI to avoid Docker API interference
+  if (process.env.CI !== 'true') {
+    server.listen({ onUnhandledRequest: 'warn' });
+  }
 
   // try the automatic test database container, fallback to existing DATABASE_URL_TEST
   try {
@@ -48,13 +50,17 @@ beforeAll(async () => {
 // cleanup after all tests
 afterAll(async () => {
   console.log('Cleaning up test environment...');
-  server.close();
+  if (process.env.CI !== 'true') {
+    server.close();
+  }
   await stopTestDatabase();
 });
 
 // reset state between tests
 beforeEach(() => {
-  server.resetHandlers();
+  if (process.env.CI !== 'true') {
+    server.resetHandlers();
+  }
 });
 
 // cleanup after each test
