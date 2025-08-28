@@ -10,32 +10,40 @@ The database layer uses Drizzle ORM with PostgreSQL to provide type-safe, perfor
 - **Drizzle Kit** for migration management
 - **Connection pooling** for performance optimization
 
-### Schema Organization
+### Directory Structure
 
 ```
 db/
-├── index.ts          # Database connection configuration
-└── schema/           # Schema definitions and relationships
-    ├── analytics.ts  # Tracking and metrics tables
-    ├── bobbleheads.ts # Core bobblehead entities
-    ├── collections.ts # Collection management
-    ├── moderations.ts # Content moderation system
-    ├── relations.ts   # Table relationships
-    ├── socials.ts     # Social features (likes, follows, comments)
-    ├── systems.ts     # System configuration and features
-    ├── tags.ts        # Tagging and categorization
-    └── users.ts       # User profiles and settings
+├── index.ts                   # Database connection and config
+├── migrations/                # Database migration files
+│   ├── 20250827005132_glamorous_dreaming_celestial.sql
+│   └── meta/                  # Migration metadata
+│       ├── _journal.json      # Migration history
+│       └── 20250827005132_snapshot.json
+├── scripts/                   # Database utilities
+│   ├── reset-db.ts            # Database reset utility
+│   └── seed.ts                # Development seed data
+└── schema/                    # Drizzle schema definitions
+    ├── analytics.schema.ts    # Analytics and tracking
+    ├── bobbleheads.schema.ts  # Core bobblehead entities
+    ├── collections.schema.ts  # Collection structures
+    ├── moderation.schema.ts   # Content moderation
+    ├── relations.schema.ts    # Table relationships
+    ├── social.schema.ts       # Social features
+    ├── system.schema.ts       # System configuration
+    ├── tags.schema.ts         # Tagging system
+    ├── users.schema.ts        # User profiles and settings
+    └── index.ts               # Schema exports
 ```
 
 ## Core Domain Models
 
 ### Collections & Bobbleheads
 
-#### Collections (`collections.ts`)
+#### Collections (`collections.schema.ts`)
 Primary organization structure for bobblehead items:
 
 ```sql
--- Core collection structure
 collections (
   id: uuid PRIMARY KEY,
   user_id: uuid REFERENCES users(id),
@@ -43,7 +51,7 @@ collections (
   description: text,
   is_public: boolean DEFAULT true,
   total_items: integer DEFAULT 0,
-  total_value: decimal(15,2) DEFAULT 0.00,
+  total_value: decimal(15,2) DEFAULT '0.00',
   cover_image_url: text,
   last_item_added_at: timestamp,
   created_at: timestamp DEFAULT NOW(),
@@ -57,8 +65,9 @@ collections (
 - **Cover image** support via Cloudinary
 - **Activity tracking** with last item added timestamp
 - **Performance indexes** on user_id, is_public, updated_at
+- **Check constraints** for data validation
 
-#### Sub-Collections (`collections.ts`)
+#### Sub-Collections (`collections.schema.ts`)
 Organizational structure within collections:
 
 ```sql
@@ -70,11 +79,13 @@ sub_collections (
   sort_order: integer DEFAULT 0,
   item_count: integer DEFAULT 0,
   is_public: boolean DEFAULT true,
-  cover_image_url: text
+  cover_image_url: text,
+  created_at: timestamp DEFAULT NOW(),
+  updated_at: timestamp DEFAULT NOW()
 )
 ```
 
-#### Bobbleheads (`bobbleheads.ts`)  
+#### Bobbleheads (`bobbleheads.schema.ts`)  
 Core item tracking with comprehensive metadata:
 
 ```sql
@@ -119,7 +130,7 @@ bobbleheads (
 - **Rich metadata** for detailed cataloging
 - **Comprehensive indexing** for search and filtering
 
-#### Bobblehead Photos (`bobbleheads.ts`)
+#### Bobblehead Photos (`bobbleheads.schema.ts`)
 Image management with metadata:
 
 ```sql
@@ -138,50 +149,108 @@ bobblehead_photos (
 )
 ```
 
+#### Bobblehead Tags (`bobbleheads.schema.ts`)
+Many-to-many relationship for tagging:
+
+```sql
+bobblehead_tags (
+  id: uuid PRIMARY KEY,
+  bobblehead_id: uuid REFERENCES bobbleheads(id),
+  tag_id: uuid REFERENCES tags(id),
+  created_at: timestamp DEFAULT NOW(),
+  UNIQUE(bobblehead_id, tag_id)
+)
+```
+
 ### User Management
 
-#### Users (`users.ts`)
-Core user profiles with extensive customization:
+#### Users (`users.schema.ts`)
+Core user profiles with Clerk integration:
 
 ```sql
 users (
   id: uuid PRIMARY KEY,
-  clerk_id: varchar(100) UNIQUE NOT NULL,
-  username: varchar(50) UNIQUE,
+  clerk_id: varchar(255) UNIQUE NOT NULL,
+  username: varchar(50) UNIQUE NOT NULL,
   email: varchar(255) UNIQUE NOT NULL,
-  first_name: varchar(100),
-  last_name: varchar(100),
-  display_name: varchar(100),
-  bio: text,
-  profile_image_url: text,
-  banner_image_url: text,
+  display_name: varchar(100) NOT NULL,
+  bio: varchar(500),
+  avatar_url: varchar(100),
   location: varchar(100),
-  website_url: text,
-  social_links: jsonb,
   is_verified: boolean DEFAULT false,
-  is_premium: boolean DEFAULT false,
-  is_private: boolean DEFAULT false,
-  follower_count: integer DEFAULT 0,
-  following_count: integer DEFAULT 0,
-  collection_count: integer DEFAULT 0,
-  total_bobbleheads: integer DEFAULT 0,
-  join_date: timestamp DEFAULT NOW(),
+  is_deleted: boolean DEFAULT false,
+  failed_login_attempts: integer DEFAULT 0,
   last_active_at: timestamp,
-  email_verified_at: timestamp,
+  last_failed_login_at: timestamp,
+  locked_until: timestamp,
+  member_since: timestamp DEFAULT NOW(),
+  deleted_at: timestamp,
   created_at: timestamp DEFAULT NOW(),
   updated_at: timestamp DEFAULT NOW()
 )
 ```
 
-#### User Settings & Preferences
-- **User Settings** (`user_settings`) - Display preferences, privacy
-- **Notification Settings** (`notification_settings`) - Email/push preferences
-- **User Sessions** (`user_sessions`) - Active session tracking
-- **Login History** (`login_history`) - Security audit trail
+#### User Settings (`users.schema.ts`)
+Comprehensive user preferences:
+
+```sql
+user_settings (
+  id: uuid PRIMARY KEY,
+  user_id: uuid REFERENCES users(id) UNIQUE,
+  profile_visibility: privacy_level DEFAULT 'public',
+  allow_comments: comment_permission DEFAULT 'anyone',
+  allow_direct_messages: dm_permission DEFAULT 'followers',
+  show_collection_stats: boolean DEFAULT true,
+  show_collection_value: boolean DEFAULT false,
+  show_join_date: boolean DEFAULT true,
+  show_last_active: boolean DEFAULT false,
+  show_location: boolean DEFAULT false,
+  show_real_name: boolean DEFAULT false,
+  moderate_comments: boolean DEFAULT false,
+  theme: theme DEFAULT 'light',
+  language: varchar(10) DEFAULT 'en',
+  timezone: varchar(50) DEFAULT 'UTC',
+  currency: varchar(10) DEFAULT 'USD',
+  default_item_privacy: varchar(20) DEFAULT 'public',
+  created_at: timestamp DEFAULT NOW(),
+  updated_at: timestamp DEFAULT NOW()
+)
+```
+
+#### Notification Settings (`users.schema.ts`)
+Granular notification preferences:
+
+```sql
+notification_settings (
+  id: uuid PRIMARY KEY,
+  user_id: uuid REFERENCES users(id) UNIQUE,
+  email_new_comments: boolean DEFAULT true,
+  email_new_followers: boolean DEFAULT true,
+  email_new_likes: boolean DEFAULT true,
+  email_platform_updates: boolean DEFAULT true,
+  email_weekly_digest: boolean DEFAULT true,
+  in_app_new_comments: boolean DEFAULT true,
+  in_app_new_followers: boolean DEFAULT true,
+  in_app_new_likes: boolean DEFAULT true,
+  in_app_following_updates: boolean DEFAULT true,
+  push_new_comments: boolean DEFAULT true,
+  push_new_followers: boolean DEFAULT true,
+  push_new_likes: boolean DEFAULT false,
+  digest_frequency: digest_frequency DEFAULT 'weekly',
+  created_at: timestamp DEFAULT NOW(),
+  updated_at: timestamp DEFAULT NOW()
+)
+```
+
+#### Session Management
+- **User Sessions** (`user_sessions`) - Active session tracking with device info
+- **Login History** (`login_history`) - Security audit trail with device tracking
+- **User Activity** (`user_activity`) - Comprehensive activity logging
+- **User Blocks** (`user_blocks`) - User blocking system
 
 ### Social Features
 
-#### Social Interactions (`socials.ts`)
+#### Social Interactions (`social.schema.ts`)
 
 **Follows System:**
 ```sql
@@ -189,8 +258,11 @@ follows (
   id: uuid PRIMARY KEY,
   follower_id: uuid REFERENCES users(id),
   following_id: uuid REFERENCES users(id),
+  follow_type: follow_type DEFAULT 'user',
+  target_id: uuid,
   created_at: timestamp DEFAULT NOW(),
-  UNIQUE(follower_id, following_id)
+  updated_at: timestamp DEFAULT NOW(),
+  UNIQUE(follower_id, following_id, follow_type, target_id)
 )
 ```
 
@@ -199,10 +271,11 @@ follows (
 likes (
   id: uuid PRIMARY KEY,
   user_id: uuid REFERENCES users(id),
-  likeable_type: varchar(50) NOT NULL,
-  likeable_id: uuid NOT NULL,
+  target_type: like_target_type NOT NULL,
+  target_id: uuid NOT NULL,
   created_at: timestamp DEFAULT NOW(),
-  UNIQUE(user_id, likeable_type, likeable_id)
+  updated_at: timestamp DEFAULT NOW(),
+  UNIQUE(user_id, target_type, target_id)
 )
 ```
 
@@ -211,45 +284,35 @@ likes (
 comments (
   id: uuid PRIMARY KEY,
   user_id: uuid REFERENCES users(id),
-  commentable_type: varchar(50) NOT NULL,
-  commentable_id: uuid NOT NULL,
+  target_type: comment_target_type NOT NULL,
+  target_id: uuid NOT NULL,
   parent_comment_id: uuid REFERENCES comments(id),
-  content: text NOT NULL,
+  content: varchar(5000) NOT NULL,
   like_count: integer DEFAULT 0,
-  reply_count: integer DEFAULT 0,
   is_edited: boolean DEFAULT false,
   is_deleted: boolean DEFAULT false,
+  edited_at: timestamp,
+  deleted_at: timestamp,
   created_at: timestamp DEFAULT NOW(),
   updated_at: timestamp DEFAULT NOW()
 )
 ```
 
-**User Blocks:**
-```sql
-user_blocks (
-  id: uuid PRIMARY KEY,
-  blocker_id: uuid REFERENCES users(id),
-  blocked_id: uuid REFERENCES users(id),
-  reason: varchar(255),
-  created_at: timestamp DEFAULT NOW(),
-  UNIQUE(blocker_id, blocked_id)
-)
-```
-
 ### Analytics & Tracking
 
-#### Analytics Tables (`analytics.ts`)
+#### Analytics Tables (`analytics.schema.ts`)
 
 **Content Views:**
 ```sql
 content_views (
   id: uuid PRIMARY KEY,
   viewer_id: uuid REFERENCES users(id),
-  viewable_type: varchar(50) NOT NULL,
-  viewable_id: uuid NOT NULL,
+  target_type: content_views_target_type NOT NULL,
+  target_id: uuid NOT NULL,
   ip_address: varchar(45),
-  user_agent: text,
-  referrer: text,
+  user_agent: varchar(1000),
+  referrer_url: varchar(500),
+  view_duration: integer,
   viewed_at: timestamp DEFAULT NOW()
 )
 ```
@@ -259,34 +322,38 @@ content_views (
 search_queries (
   id: uuid PRIMARY KEY,
   user_id: uuid REFERENCES users(id),
-  query_text: varchar(500) NOT NULL,
+  session_id: uuid,
+  query: varchar(500) NOT NULL,
+  filters: jsonb,
   result_count: integer,
-  filters_used: jsonb,
-  query_time_ms: integer,
   clicked_result_id: uuid,
-  clicked_result_type: varchar(50),
+  clicked_result_type: result_type,
+  ip_address: varchar(45),
   searched_at: timestamp DEFAULT NOW()
 )
 ```
 
 ### System Features
 
-#### System Tables (`systems.ts`)
+#### System Tables (`system.schema.ts`)
 
 **Featured Content:**
 ```sql
 featured_content (
   id: uuid PRIMARY KEY,
-  content_type: varchar(50) NOT NULL,
+  content_type: featured_content_type NOT NULL,
   content_id: uuid NOT NULL,
+  feature_type: feature_type NOT NULL,
   title: varchar(255),
   description: text,
+  image_url: text,
   curator_id: uuid REFERENCES users(id),
-  priority: integer DEFAULT 0,
+  sort_order: integer DEFAULT 0,
+  is_active: boolean DEFAULT true,
   start_date: timestamp,
   end_date: timestamp,
-  is_active: boolean DEFAULT true,
-  created_at: timestamp DEFAULT NOW()
+  created_at: timestamp DEFAULT NOW(),
+  updated_at: timestamp DEFAULT NOW()
 )
 ```
 
@@ -295,38 +362,72 @@ featured_content (
 notifications (
   id: uuid PRIMARY KEY,
   user_id: uuid REFERENCES users(id),
-  type: varchar(50) NOT NULL,
+  type: notification_type NOT NULL,
   title: varchar(255) NOT NULL,
-  message: text NOT NULL,
+  message: text,
+  related_type: notification_related_type,
+  related_id: uuid,
   related_user_id: uuid REFERENCES users(id),
-  related_content_type: varchar(50),
-  related_content_id: uuid,
   action_url: text,
   is_read: boolean DEFAULT false,
+  is_email_sent: boolean DEFAULT false,
+  read_at: timestamp,
+  created_at: timestamp DEFAULT NOW()
+)
+```
+
+**Platform Settings:**
+```sql
+platform_settings (
+  id: uuid PRIMARY KEY,
+  key: varchar(100) UNIQUE NOT NULL,
+  value: text,
+  value_type: value_type DEFAULT 'string',
+  description: text,
+  is_public: boolean DEFAULT false,
+  updated_by: uuid REFERENCES users(id),
   created_at: timestamp DEFAULT NOW(),
-  read_at: timestamp
+  updated_at: timestamp DEFAULT NOW()
 )
 ```
 
 ### Moderation System
 
-#### Content Moderation (`moderations.ts`)
+#### Content Moderation (`moderation.schema.ts`)
 
 **Content Reports:**
 ```sql
 content_reports (
   id: uuid PRIMARY KEY,
   reporter_id: uuid REFERENCES users(id),
-  content_type: varchar(50) NOT NULL,
-  content_id: uuid NOT NULL,
-  reason: varchar(100) NOT NULL,
-  description: text,
-  status: varchar(20) DEFAULT 'pending',
+  target_type: content_report_target_type NOT NULL,
+  target_id: uuid NOT NULL,
+  reason: content_report_reason NOT NULL,
+  description: varchar(1000),
+  status: content_report_status DEFAULT 'pending',
   moderator_id: uuid REFERENCES users(id),
-  moderator_notes: text,
-  action_taken: varchar(50),
+  moderator_notes: varchar,
   resolved_at: timestamp,
-  created_at: timestamp DEFAULT NOW()
+  created_at: timestamp DEFAULT NOW(),
+  updated_at: timestamp DEFAULT NOW()
+)
+```
+
+### Tagging System
+
+#### Tags (`tags.schema.ts`)
+User-created tags for categorization:
+
+```sql
+tags (
+  id: uuid PRIMARY KEY,
+  user_id: uuid REFERENCES users(id),
+  name: varchar(50) NOT NULL,
+  color: varchar(7) DEFAULT '#3B82F6',
+  usage_count: integer DEFAULT 0,
+  created_at: timestamp DEFAULT NOW(),
+  updated_at: timestamp DEFAULT NOW(),
+  UNIQUE(user_id, name)
 )
 ```
 
@@ -335,30 +436,30 @@ content_reports (
 ### Performance Optimization
 
 **Strategic Indexing:**
-- **Single column indexes** on frequently queried fields
-- **Composite indexes** for multi-column queries
-- **Partial indexes** for filtered queries
+- **Single column indexes** on frequently queried fields (user_id, created_at, etc.)
+- **Composite indexes** for multi-column queries (user_id + is_public, etc.)
+- **Unique indexes** for constraint enforcement
 - **Covering indexes** to avoid table lookups
 
 **Query Optimization:**
 - **Proper foreign key relationships** with cascade operations
 - **Aggregate counters** to avoid expensive COUNT queries
-- **Materialized views** for complex reporting (planned)
-- **Connection pooling** for concurrent access
+- **Connection pooling** with Neon Database
+- **Query timeout configuration** for performance
 
 ### Data Integrity
 
 **Constraints:**
 - **Foreign key constraints** maintain referential integrity
-- **Check constraints** enforce business rules
+- **Check constraints** enforce business rules (length limits, non-negative values)
 - **Unique constraints** prevent duplicate data
 - **Not null constraints** on required fields
 
 **Validation:**
-- **Length constraints** on text fields
+- **Length constraints** on text fields via schema limits
 - **Numeric range constraints** on values
-- **Enum-like constraints** via check constraints
-- **JSON schema validation** for JSONB fields
+- **Enum types** for controlled vocabularies
+- **JSONB schema validation** for flexible fields
 
 ### Scalability Features
 
@@ -375,46 +476,86 @@ content_reports (
 - **Change tracking** via updated_at triggers
 
 **Flexible Schema:**
-- **JSONB fields** for extensible metadata
+- **JSONB fields** for extensible metadata (custom_fields, device_info)
 - **Custom fields** for specialized use cases
-- **Dynamic configuration** via system tables
+- **Dynamic configuration** via platform settings
 - **Version compatibility** through migrations
 
 ## Relationship Architecture
 
 ### Core Entity Relationships
-The `relations.ts` file defines comprehensive type-safe relationships:
+The `relations.schema.ts` file defines comprehensive type-safe relationships using Drizzle's relations API:
 
-- **Users** → Collections, Bobbleheads, Social interactions
+- **Users** → Collections, Bobbleheads, Social interactions, Settings
 - **Collections** → Sub-collections, Bobbleheads, User ownership
 - **Bobbleheads** → Photos, Tags, Comments, Likes
 - **Social** → Bidirectional follows, polymorphic likes/comments
 
 ### Polymorphic Relationships
 Several tables use polymorphic patterns for flexibility:
-- **Likes** can target any content type (bobbleheads, comments, collections)
-- **Comments** can be attached to any commentable entity  
+- **Likes** can target bobbleheads, collections, or comments
+- **Comments** can be attached to bobbleheads or collections
 - **Content Views** track views across different content types
 - **Featured Content** can highlight any type of content
 
 ## Migration Strategy
 
 ### Schema Evolution
-- **Drizzle Kit** manages schema migrations
-- **Version-controlled** migration files
+- **Drizzle Kit** manages schema migrations automatically
+- **Version-controlled** migration files in `migrations/`
+- **Snapshot-based** migration system for consistency
 - **Rollback capabilities** for production safety
-- **Seed data** for development environments
 
 ### Development Workflow
 ```bash
 # Generate migration from schema changes
-bun run db:generate
+npm run db:generate
 
 # Apply migrations to database
-bun run db:migrate
+npm run db:migrate
 
-# Reset development database
-bun run db:reset
+# Reset development database (drops all tables)
+npm run db:reset
+
+# Seed development data
+npm run db:seed
+
+# Fresh database setup (reset + migrate + seed)
+npm run db:fresh
 ```
 
-This database architecture provides a robust foundation for the bobblehead collection platform with excellent performance, data integrity, and room for future growth.
+### Database Scripts
+
+#### Reset Script (`scripts/reset-db.ts`)
+- **Complete database reset** by dropping all tables and types
+- **Cascade deletion** to handle foreign key dependencies
+- **Custom type cleanup** for enum types
+- **Safe error handling** with proper exit codes
+
+#### Seed Script (`scripts/seed.ts`)
+- **Sample data generation** for development
+- **Realistic test data** with proper relationships
+- **Aggregate updates** for calculated fields
+- **Configurable reset** via environment variables
+
+## Connection Management
+
+### Database Configuration (`index.ts`)
+- **Neon Database** connection with serverless pool
+- **Connection pooling** for performance optimization
+- **Timeout configuration** for queries and transactions
+- **Schema integration** with full type safety
+
+```typescript
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL!,
+  connectionTimeoutMillis: CONFIG.DATABASE.QUERY_TIMEOUT,
+  idleTimeoutMillis: CONFIG.DATABASE.TRANSACTION_TIMEOUT,
+  max: CONFIG.DATABASE.CONNECTION_POOL_SIZE,
+  maxUses: CONFIG.DATABASE.MAX_USES,
+});
+
+export const db = drizzle(pool, { schema });
+```
+
+This database architecture provides a robust, type-safe foundation for the Head Shakers bobblehead collection platform with excellent performance, data integrity, comprehensive social features, and room for future growth.
