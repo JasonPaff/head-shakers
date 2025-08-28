@@ -1,9 +1,5 @@
 import { faker } from '@faker-js/faker';
-
-import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
-import type { InsertCollection } from '@/lib/validations/collections.validation';
-import type { InsertTag } from '@/lib/validations/tags.validation';
-import type { InsertUser } from '@/lib/validations/users.validation';
+import { Factory } from 'fishery';
 
 import {
   bobbleheadPhotos,
@@ -17,159 +13,194 @@ import {
 
 import { testDb } from './test-db';
 
-export class TestDataFactory {
-  static async createBobblehead(collectionId?: string, overrides: Partial<InsertBobblehead> = {}) {
-    const { collection, user } =
-      collectionId ?
-        { collection: { id: collectionId }, user: { id: 'existing-user' } }
-      : await this.createCollection();
+// factory definitions
+export const userFactory = Factory.define<typeof users.$inferInsert>(({ sequence }) => ({
+  bio: faker.lorem.paragraph(),
+  clerkId: `clerk_${faker.string.uuid()}`,
+  displayName: faker.person.fullName(),
+  email: faker.internet.email(),
+  isVerified: faker.datatype.boolean({ probability: 0.3 }),
+  location: faker.location.city(),
+  username: `${faker.internet.username().toLowerCase()}_${sequence}`,
+}));
 
-    const bobbleheadData = {
-      acquisitionDate: faker.date.past({ years: 5 }),
-      acquisitionMethod: faker.helpers.arrayElement(['purchase', 'gift', 'trade', 'found']),
-      category: faker.helpers.arrayElement(['Sports', 'Movies', 'TV Shows', 'Comics', 'Gaming']),
-      characterName: faker.person.fullName(),
-      collectionId: collection?.id,
-      currentCondition: faker.helpers.arrayElement(['mint', 'excellent', 'good', 'fair', 'poor']),
-      customFields: {
-        edition: faker.helpers.arrayElement(['standard', 'limited', 'special', 'exclusive']),
-        rarity: faker.helpers.arrayElement(['common', 'uncommon', 'rare', 'legendary']),
-        serialNumber: faker.datatype.boolean() ? faker.number.int({ max: 10000, min: 1 }) : null,
-      },
-      description: faker.lorem.paragraph(),
-      height: faker.number.float({ fractionDigits: 1, max: 12, min: 3 }).toString(),
-      isFeatured: faker.datatype.boolean({ probability: 0.1 }),
-      isPublic: faker.datatype.boolean({ probability: 0.8 }),
-      manufacturer: faker.company.name(),
-      material: faker.helpers.arrayElement(['Resin', 'Vinyl', 'Ceramic', 'Plastic', 'Polyresin']),
-      name: `${faker.person.firstName()} ${faker.person.lastName()} Bobblehead`,
-      purchaseLocation: faker.helpers.arrayElement([
-        'eBay',
-        'Amazon',
-        'Local Store',
-        'Comic Con',
-        'Antique Shop',
-      ]),
-      purchasePrice: faker.commerce.price({ max: 500, min: 5 }),
-      series: faker.commerce.productName(),
-      status: faker.helpers.arrayElement(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']),
-      userId: user?.id,
-      weight: faker.number.float({ fractionDigits: 1, max: 5, min: 0.5 }).toString(),
-      year: faker.date.past({ years: 30 }).getFullYear(),
-      ...overrides,
-    };
+export const collectionFactory = Factory.define<typeof collections.$inferInsert>(({ sequence }) => ({
+  description: faker.lorem.paragraph(),
+  isPublic: faker.datatype.boolean({ probability: 0.7 }),
+  name: `${faker.word.adjective()} ${faker.word.noun()} Collection ${sequence}`,
+  totalItems: 0,
+  totalValue: '0.00',
+  userId: faker.string.uuid(),
+}));
 
-    // @ts-expect-error ignoring type issue with partial insert
-    const [bobblehead] = await testDb.insert(bobbleheads).values(bobbleheadData).returning();
-    return { bobblehead, collection, user };
-  }
+export const bobbleheadFactory = Factory.define<typeof bobbleheads.$inferInsert>(() => ({
+  acquisitionDate: faker.date.past({ years: 5 }),
+  acquisitionMethod: faker.helpers.arrayElement(['purchase', 'gift', 'trade', 'found']),
+  category: faker.helpers.arrayElement(['Sports', 'Movies', 'TV Shows', 'Comics', 'Gaming']),
+  characterName: faker.person.fullName(),
+  collectionId: faker.string.uuid(),
+  currentCondition: faker.helpers.arrayElement(['mint', 'excellent', 'good', 'fair', 'poor']),
+  customFields: {
+    edition: faker.helpers.arrayElement(['standard', 'limited', 'special', 'exclusive']),
+    rarity: faker.helpers.arrayElement(['common', 'uncommon', 'rare', 'legendary']),
+    serialNumber: faker.datatype.boolean() ? faker.number.int({ max: 10000, min: 1 }) : null,
+  },
+  description: faker.lorem.paragraph(),
+  height: faker.number.float({ fractionDigits: 1, max: 12, min: 3 }).toString(),
+  isFeatured: faker.datatype.boolean({ probability: 0.1 }),
+  isPublic: faker.datatype.boolean({ probability: 0.8 }),
+  manufacturer: faker.company.name(),
+  material: faker.helpers.arrayElement(['Resin', 'Vinyl', 'Ceramic', 'Plastic', 'Polyresin']),
+  name: `${faker.person.firstName()} ${faker.person.lastName()} Bobblehead`,
+  purchaseLocation: faker.helpers.arrayElement([
+    'eBay',
+    'Amazon',
+    'Local Store',
+    'Comic Con',
+    'Antique Shop',
+  ]),
+  purchasePrice: faker.commerce.price({ max: 500, min: 5 }),
+  series: faker.commerce.productName(),
+  status: faker.helpers.arrayElement(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']),
+  userId: faker.string.uuid(),
+  weight: faker.number.float({ fractionDigits: 1, max: 5, min: 0.5 }).toString(),
+  year: faker.date.past({ years: 30 }).getFullYear(),
+}));
 
-  static async createBobbleheadPhoto(bobbleheadId?: string, overrides: Partial<InsertBobbleheadPhoto> = {}) {
-    const { bobblehead } =
-      bobbleheadId ? { bobblehead: { id: bobbleheadId } } : await this.createBobblehead();
+export const bobbleheadPhotoFactory = Factory.define<typeof bobbleheadPhotos.$inferInsert>(
+  ({ sequence }) => ({
+    altText: `Photo ${sequence} of ${faker.word.noun()} bobblehead`,
+    bobbleheadId: faker.string.uuid(), // Will be overridden when used
+    caption: faker.lorem.sentence(),
+    fileSize: faker.number.int({ max: 2000000, min: 50000 }),
+    height: 600,
+    isPrimary: faker.datatype.boolean({ probability: 0.2 }),
+    sortOrder: sequence,
+    url: faker.image.url({ height: 600, width: 800 }),
+    width: 800,
+  }),
+);
 
-    const photoData = {
-      altText: `Photo of ${faker.word.noun()} bobblehead`,
-      bobbleheadId: bobblehead?.id,
-      caption: faker.lorem.sentence(),
-      fileSize: faker.number.int({ max: 2000000, min: 50000 }),
-      height: 600,
-      isPrimary: faker.datatype.boolean({ probability: 0.2 }),
-      sortOrder: faker.number.int({ max: 10, min: 0 }),
-      url: faker.image.url({ height: 600, width: 800 }),
-      width: 800,
-      ...overrides,
-    };
+export const tagFactory = Factory.define<typeof tags.$inferInsert>(({ sequence }) => ({
+  color: `#${Math.floor(Math.random() * 16777215)
+    .toString(16)
+    .padStart(6, '0')}`,
+  name: `${faker.word.noun()}_${sequence}`,
+  usageCount: faker.number.int({ max: 100, min: 0 }),
+  userId: faker.string.uuid(),
+}));
 
-    // @ts-expect-error ignoring type issue with partial insert
-    const [photo] = await testDb.insert(bobbleheadPhotos).values(photoData).returning();
-    return { bobblehead, photo };
-  }
+export async function createBobblehead(
+  collectionId?: string,
+  overrides: Partial<typeof bobbleheads.$inferInsert> = {},
+) {
+  const { collection, user } =
+    collectionId ?
+      { collection: { id: collectionId }, user: { id: 'existing-user' } }
+    : await createCollection();
 
-  static async createCollection(userId?: string, overrides: Partial<InsertCollection> = {}) {
-    const user = userId ? { id: userId } : await this.createUser();
+  const bobbleheadData = bobbleheadFactory.build({
+    collectionId: collection.id,
+    userId: user.id,
+    ...overrides,
+  });
 
-    const collectionData = {
-      description: faker.lorem.paragraph(),
-      isPublic: faker.datatype.boolean({ probability: 0.7 }),
-      name: `${faker.word.adjective()} ${faker.word.noun()} Collection`,
-      totalItems: 0,
-      totalValue: '0.00',
-      userId: user?.id,
-      ...overrides,
-    };
+  const [bobblehead] = await testDb.insert(bobbleheads).values(bobbleheadData).returning();
+  if (!bobblehead) throw new Error('Failed to create bobblehead');
 
-    // @ts-expect-error ignoring type issue with partial insert
-    const [collection] = await testDb.insert(collections).values(collectionData).returning();
-    return { collection, user };
-  }
+  return { bobblehead, collection, user };
+}
 
-  static async createTag(userId?: string, overrides: Partial<InsertTag> = {}) {
-    const user = userId ? { id: userId } : await this.createUser();
+export async function createBobbleheadPhoto(
+  bobbleheadId?: string,
+  overrides: Partial<typeof bobbleheadPhotos.$inferInsert> = {},
+) {
+  const { bobblehead } = bobbleheadId ? { bobblehead: { id: bobbleheadId } } : await createBobblehead();
 
-    const tagData = {
-      color: faker.color.human(),
-      name: faker.word.noun(),
-      usageCount: faker.number.int({ max: 100, min: 0 }),
-      userId: user?.id,
-      ...overrides,
-    };
+  const photoData = bobbleheadPhotoFactory.build({
+    bobbleheadId: bobblehead.id,
+    ...overrides,
+  });
 
-    // @ts-expect-error ignoring type issue with partial insert
-    const [tag] = await testDb.insert(tags).values(tagData).returning();
-    return { tag, user };
-  }
+  const [photo] = await testDb.insert(bobbleheadPhotos).values(photoData).returning();
+  if (!photo) throw new Error('Failed to create photo');
 
-  // bulk creation methods
-  static async createTestDataSet() {
-    const users = await Promise.all([
-      this.createUser({ displayName: 'Sports Collector', username: 'collector1' }),
-      this.createUser({ displayName: 'Movie Fan', username: 'collector2' }),
-      this.createUser({ displayName: 'Comic Enthusiast', username: 'collector3' }),
-    ]);
+  return { bobblehead, photo };
+}
 
-    const collections = await Promise.all([
-      this.createCollection(users[0]?.id, { name: 'MLB Hall of Fame' }),
-      this.createCollection(users[1]?.id, { name: 'Star Wars Universe' }),
-      this.createCollection(users[2]?.id, { name: 'Marvel Heroes' }),
-    ]);
+export async function createCollection(
+  userId?: string,
+  overrides: Partial<typeof collections.$inferInsert> = {},
+) {
+  const user = userId ? { id: userId } : await createUser();
 
-    const bobbleheads = await Promise.all([
-      this.createBobblehead(collections[0]?.collection?.id, {
-        category: 'Sports',
-        characterName: 'Babe Ruth',
-      }),
-      this.createBobblehead(collections[1]?.collection?.id, {
-        category: 'Movies',
-        characterName: 'Darth Vader',
-      }),
-      this.createBobblehead(collections[2]?.collection?.id, {
-        category: 'Comics',
-        characterName: 'Spider-Man',
-      }),
-    ]);
+  const collectionData = collectionFactory.build({
+    userId: user.id,
+    ...overrides,
+  });
 
-    return { bobbleheads, collections, users };
-  }
+  const [collection] = await testDb.insert(collections).values(collectionData).returning();
+  if (!collection) throw new Error('Failed to create collection');
 
-  static async createUser(overrides: Partial<InsertUser> = {}) {
-    const userData = {
-      bio: faker.lorem.paragraph(),
-      clerkId: `clerk_${faker.string.uuid()}`,
-      displayName: faker.person.fullName(),
-      email: faker.internet.email(),
-      isVerified: faker.datatype.boolean({ probability: 0.3 }),
-      location: faker.location.city(),
-      username: faker.internet.username().toLowerCase(),
-      ...overrides,
-    };
+  return { collection, user };
+}
 
-    const [user] = await testDb.insert(users).values(userData).returning();
+export async function createTag(userId?: string, overrides: Partial<typeof tags.$inferInsert> = {}) {
+  const user = userId ? { id: userId } : await createUser();
 
-    // create associated settings
-    await testDb.insert(userSettings).values({ userId: user!.id });
-    await testDb.insert(notificationSettings).values({ userId: user!.id });
+  const tagData = tagFactory.build({
+    userId: user.id,
+    ...overrides,
+  });
 
-    return user;
-  }
+  const [tag] = await testDb.insert(tags).values(tagData).returning();
+  if (!tag) throw new Error('Failed to create tag');
+
+  return { tag, user };
+}
+
+// convenience function for creating test datasets
+export async function createTestDataSet() {
+  const sportsUser = await createUser({ displayName: 'Sports Collector', username: 'collector1' });
+  const movieUser = await createUser({ displayName: 'Movie Fan', username: 'collector2' });
+  const comicUser = await createUser({ displayName: 'Comic Enthusiast', username: 'collector3' });
+
+  const { collection: mlbCollection } = await createCollection(sportsUser.id, { name: 'MLB Hall of Fame' });
+  const { collection: starWarsCollection } = await createCollection(movieUser.id, {
+    name: 'Star Wars Universe',
+  });
+  const { collection: marvelCollection } = await createCollection(comicUser.id, { name: 'Marvel Heroes' });
+
+  const { bobblehead: babeRuth } = await createBobblehead(mlbCollection.id, {
+    category: 'Sports',
+    characterName: 'Babe Ruth',
+  });
+  const { bobblehead: darthVader } = await createBobblehead(starWarsCollection.id, {
+    category: 'Movies',
+    characterName: 'Darth Vader',
+  });
+  const { bobblehead: spiderMan } = await createBobblehead(marvelCollection.id, {
+    category: 'Comics',
+    characterName: 'Spider-Man',
+  });
+
+  return {
+    bobbleheads: [babeRuth, darthVader, spiderMan],
+    collections: [mlbCollection, starWarsCollection, marvelCollection],
+    users: [sportsUser, movieUser, comicUser],
+  };
+}
+
+// database helpers that create and persist entities with relationships
+export async function createUser(overrides: Partial<typeof users.$inferInsert> = {}) {
+  const userData = userFactory.build(overrides);
+  const [user] = await testDb.insert(users).values(userData).returning();
+
+  if (!user) throw new Error('Failed to create user');
+
+  // create associated settings
+  await testDb.insert(userSettings).values({ userId: user.id });
+  await testDb.insert(notificationSettings).values({ userId: user.id });
+
+  return user;
 }

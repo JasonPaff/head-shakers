@@ -14,8 +14,9 @@
       "Bash(docker:*)",
       "Bash(npm test)",
       "Bash(bunx drizzle-kit migrate:*)",
-      "Bash(del drizzle.test.config.ts)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

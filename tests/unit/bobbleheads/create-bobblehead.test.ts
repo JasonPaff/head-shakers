@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 
 import { withTestIsolation } from '../../helpers/database';
-import { TestDataFactory } from '../../helpers/factories';
+import { createCollection } from '../../helpers/factories';
 
 describe('BobbleheadService.createAsync', () => {
   beforeAll(() => {
@@ -16,17 +16,17 @@ describe('BobbleheadService.createAsync', () => {
 
   it.skipIf(!process.env.DATABASE_URL_TEST)('should create a bobblehead with valid data', async () => {
     await withTestIsolation(async (db) => {
-      const { collection, user } = await TestDataFactory.createCollection();
+      const { collection, user } = await createCollection();
 
       const bobbleheadData = {
         category: 'Sports',
         characterName: 'Test Character',
-        collectionId: collection?.id,
+        collectionId: collection.id,
         currentCondition: 'mint' as const,
         manufacturer: 'Test Manufacturer',
         name: 'Test Bobblehead',
         status: 'owned' as const,
-        userId: user!.id,
+        userId: user.id,
       };
 
       console.log(`${$path({ route: '/sign-in/[[...sign-in]]' })}(.*)`);
@@ -36,8 +36,8 @@ describe('BobbleheadService.createAsync', () => {
 
       expect(result).toBeDefined();
       expect(result!.name).toBe('Test Bobblehead');
-      expect(result!.collectionId).toBe(collection?.id);
-      expect(result!.userId).toBe(user!.id);
+      expect(result!.collectionId).toBe(collection.id);
+      expect(result!.userId).toBe(user.id);
       expect(result!.category).toBe('Sports');
       expect(result!.characterName).toBe('Test Character');
       expect(result!.manufacturer).toBe('Test Manufacturer');
@@ -53,12 +53,12 @@ describe('BobbleheadService.createAsync', () => {
     'should create a bobblehead with only required fields',
     async () => {
       await withTestIsolation(async (db) => {
-        const { collection, user } = await TestDataFactory.createCollection();
+        const { collection, user } = await createCollection();
 
         const bobbleheadData = {
-          collectionId: collection?.id,
+          collectionId: collection.id,
           name: 'Minimal Bobblehead',
-          userId: user!.id,
+          userId: user.id,
         };
 
         // @ts-expect-error - testing with valid data
@@ -66,8 +66,8 @@ describe('BobbleheadService.createAsync', () => {
 
         expect(result).toBeDefined();
         expect(result!.name).toBe('Minimal Bobblehead');
-        expect(result!.collectionId).toBe(collection?.id);
-        expect(result!.userId).toBe(user!.id);
+        expect(result!.collectionId).toBe(collection.id);
+        expect(result!.userId).toBe(user.id);
         expect(result!.currentCondition).toBe('excellent');
         expect(result!.status).toBe('owned');
         expect(result!.isPublic).toBe(true);
