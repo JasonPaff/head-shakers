@@ -2,6 +2,8 @@
 
 import { useUser } from '@clerk/nextjs';
 import { EyeIcon, PlusIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,9 +23,11 @@ export default function DashboardPage() {
             <h1 className={'text-3xl font-bold'}>Welcome back{name}</h1>
             <p className={'text-muted-foreground'}>{`Here's what's happening with your collection`}</p>
           </div>
-          <Button className={'gap-2'}>
-            <PlusIcon className={'h-4 w-4'} />
-            Add Bobblehead
+          <Button asChild className={'gap-2'}>
+            <Link href={$path({ route: '/items/add' })}>
+              <PlusIcon aria-hidden className={'size-4'} />
+              Add Bobblehead
+            </Link>
           </Button>
         </div>
 

@@ -6,7 +6,7 @@ import { cva } from 'class-variance-authority';
 
 import { cn } from '@/utils/tailwind-utils';
 
-const buttonVariants = cva(
+export const buttonVariants = cva(
   `
       inline-flex shrink-0
       items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap
@@ -72,10 +72,13 @@ const buttonVariants = cva(
   },
 );
 
-export type ButtonProps = ComponentProps<'button'> & VariantProps<typeof buttonVariants> & { asChild?: boolean };
+export type ButtonProps = ComponentProps<'button'> &
+  VariantProps<typeof buttonVariants> & { asChild?: boolean };
 
 export const Button = ({ asChild = false, className, size, variant, ...props }: ButtonProps) => {
   const Comp = asChild ? Slot : 'button';
 
-  return <Comp className={cn(buttonVariants({ className, size, variant }))} data-slot={'button'} {...props} />;
+  return (
+    <Comp className={cn(buttonVariants({ className, size, variant }))} data-slot={'button'} {...props} />
+  );
 };
