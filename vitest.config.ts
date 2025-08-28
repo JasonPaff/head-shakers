@@ -14,6 +14,10 @@ export default defineConfig({
         singleThread: true, // for database tests
       },
     },
+    env: {
+      // load test-specific environment variables
+      ...process.env,
+    },
   },
   resolve: {
     alias: {

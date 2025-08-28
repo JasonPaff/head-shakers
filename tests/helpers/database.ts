@@ -4,6 +4,12 @@ import { sql } from 'drizzle-orm';
 import { db } from '@/lib/db';
 
 export const setupTestDatabase = async () => {
+  // Use test-specific database URL or skip if not configured
+  const testDbUrl = process.env.DATABASE_URL;
+  if (!testDbUrl) {
+    console.warn('No test database URL configured, skipping database setup');
+    return;
+  }
   // clear all tables
   await db.execute(sql`TRUNCATE TABLE
     bobblehead_tags, bobblehead_photos, bobbleheads,
