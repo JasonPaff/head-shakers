@@ -1,4 +1,4 @@
-name: Test Suite
+name: Comprehensive Test Suite
 
 on:
   push:
@@ -63,11 +63,15 @@ jobs:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
           REDIS_URL: redis://localhost:6379
 
-      - name: Run E2E tests
-        run: npm run test:e2e
+      - name: Run security tests
+        run: npm run test:security
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
-          REDIS_URL: redis://localhost:6379
+
+      - name: Run performance tests
+        run: npm run test:performance
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_headshakers
 
       - name: Upload coverage reports
         uses: codecov/codecov-action@v3
