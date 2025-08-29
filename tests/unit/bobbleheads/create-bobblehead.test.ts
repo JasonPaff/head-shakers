@@ -117,13 +117,13 @@ describe('BobbleheadService.createAsync', () => {
 
   it('should validate input schema requirements', () => {
     const validData = {
-      collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+      collectionId: randomUUID(),
       currentCondition: 'excellent' as const,
       isFeatured: false,
       isPublic: true,
       name: 'Test Bobblehead',
       status: 'owned' as const,
-      userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+      userId: randomUUID(),
     };
 
     const result = insertBobbleheadSchema.safeParse(validData);
@@ -131,8 +131,29 @@ describe('BobbleheadService.createAsync', () => {
 
     if (result.success) {
       expect(result.data.name).toBe('Test Bobblehead');
-      expect(result.data.collectionId).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d479');
-      expect(result.data.userId).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d480');
+      expect(result.data.collectionId).toBe(validData.collectionId);
+      expect(result.data.userId).toBe(validData.userId);
+      expect(result.data.currentCondition).toBe('excellent');
+      expect(result.data.status).toBe('owned');
+      expect(result.data.isPublic).toBe(true);
+      expect(result.data.isFeatured).toBe(false);
+    }
+  });
+
+  it('should apply default values when fields are omitted', () => {
+    const minimalData = {
+      collectionId: randomUUID(),
+      name: 'Test Bobblehead',
+      userId: randomUUID(),
+    };
+
+    const result = insertBobbleheadSchema.safeParse(minimalData);
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.name).toBe('Test Bobblehead');
+      expect(result.data.collectionId).toBe(minimalData.collectionId);
+      expect(result.data.userId).toBe(minimalData.userId);
       expect(result.data.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
       expect(result.data.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
       expect(result.data.isPublic).toBe(DEFAULTS.BOBBLEHEAD.IS_PUBLIC);
@@ -143,8 +164,8 @@ describe('BobbleheadService.createAsync', () => {
   describe('Validation Tests - Required Fields', () => {
     it('should fail when name is missing', () => {
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        collectionId: randomUUID(),
+        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -158,7 +179,7 @@ describe('BobbleheadService.createAsync', () => {
     it('should fail when collectionId is missing', () => {
       const invalidData = {
         name: 'Test Bobblehead',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -171,7 +192,7 @@ describe('BobbleheadService.createAsync', () => {
 
     it('should fail when userId is missing', () => {
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         name: 'Test Bobblehead',
       };
 
@@ -187,7 +208,7 @@ describe('BobbleheadService.createAsync', () => {
       const invalidData = {
         collectionId: 'invalid-uuid',
         name: 'Test Bobblehead',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -200,7 +221,7 @@ describe('BobbleheadService.createAsync', () => {
 
     it('should fail when userId is invalid UUID', () => {
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         name: 'Test Bobblehead',
         userId: 'invalid-uuid',
       };
@@ -218,21 +239,33 @@ describe('BobbleheadService.createAsync', () => {
     it('should fail when name exceeds 200 characters', () => {
       const longName = 'a'.repeat(201);
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         name: longName,
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
     });
 
+    it('should succeed when name is exactly 200 characters', () => {
+      const maxLengthName = 'a'.repeat(200);
+      const validData = {
+        collectionId: randomUUID(),
+        name: maxLengthName,
+        userId: randomUUID(),
+      };
+
+      const result = insertBobbleheadSchema.safeParse(validData);
+      expect(result.success).toBe(true);
+    });
+
     it('should fail when currentCondition is invalid enum value', () => {
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         currentCondition: 'invalid_condition',
         name: 'Test Bobblehead',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -241,10 +274,10 @@ describe('BobbleheadService.createAsync', () => {
 
     it('should fail when status is invalid enum value', () => {
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         name: 'Test Bobblehead',
         status: 'invalid_status',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -253,9 +286,9 @@ describe('BobbleheadService.createAsync', () => {
 
     it('should fail when year is below 1800', () => {
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         name: 'Test Bobblehead',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
         year: 1799,
       };
 
@@ -266,14 +299,27 @@ describe('BobbleheadService.createAsync', () => {
     it('should fail when year is above next year', () => {
       const nextYear = new Date().getFullYear() + 2;
       const invalidData = {
-        collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+        collectionId: randomUUID(),
         name: 'Test Bobblehead',
-        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+        userId: randomUUID(),
         year: nextYear,
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
+    });
+
+    it('should succeed when year is exactly next year', () => {
+      const nextYear = new Date().getFullYear() + 1;
+      const validData = {
+        collectionId: randomUUID(),
+        name: 'Test Bobblehead',
+        userId: randomUUID(),
+        year: nextYear,
+      };
+
+      const result = insertBobbleheadSchema.safeParse(validData);
+      expect(result.success).toBe(true);
     });
   });
 
@@ -373,11 +419,7 @@ describe('BobbleheadService.createAsync', () => {
 
         const minimalData = {
           collectionId: collection.id,
-          currentCondition: 'excellent' as const,
-          isFeatured: false,
-          isPublic: true,
           name: 'Test Bobblehead',
-          status: 'owned' as const,
           userId: user.id,
         };
 
@@ -393,6 +435,51 @@ describe('BobbleheadService.createAsync', () => {
         expect(result!.viewCount).toBe(DEFAULTS.BOBBLEHEAD.VIEW_COUNT);
       });
     });
+
+    it.skipIf(!process.env.DATABASE_URL_TEST)(
+      'should override defaults when values are explicitly provided',
+      async () => {
+        await withTestIsolation(async (db) => {
+          const userResult = await db
+            .insert(users)
+            .values({
+              clerkId: 'override_test_clerk_id',
+              displayName: 'Override Test User',
+              email: 'overridetest@example.com',
+              username: 'override_user',
+            })
+            .returning();
+          const user = userResult[0]!;
+
+          const collectionResult = await db
+            .insert(collections)
+            .values({
+              name: 'Override Test Collection',
+              userId: user.id,
+            })
+            .returning();
+          const collection = collectionResult[0]!;
+
+          const explicitData = {
+            collectionId: collection.id,
+            currentCondition: 'poor' as const,
+            isFeatured: true,
+            isPublic: false,
+            name: 'Test Bobblehead',
+            status: 'sold' as const,
+            userId: user.id,
+          };
+
+          const result = await BobbleheadService.createAsync(explicitData, db);
+
+          expect(result).toBeDefined();
+          expect(result!.currentCondition).toBe('poor');
+          expect(result!.status).toBe('sold');
+          expect(result!.isPublic).toBe(false);
+          expect(result!.isFeatured).toBe(true);
+        });
+      },
+    );
   });
 
   describe('Error Handling Tests', () => {
