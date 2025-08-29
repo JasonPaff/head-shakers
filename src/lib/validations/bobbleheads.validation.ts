@@ -38,15 +38,15 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   category: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.CATEGORY.MAX).optional(),
   characterName: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.CHARACTER_NAME.MAX).optional(),
   collectionId: z.uuid({ error: 'collectionId is required' }),
-  currentCondition: z.enum(ENUMS.BOBBLEHEAD.CONDITION).default(DEFAULTS.BOBBLEHEAD.CONDITION),
+  currentCondition: z.enum(ENUMS.BOBBLEHEAD.CONDITION).default(DEFAULTS.BOBBLEHEAD.CONDITION).optional(),
   customFields: customFieldsSchema,
   description: z.string().max(SCHEMA_LIMITS.BOBBLEHEAD.DESCRIPTION.MAX).optional(),
   height: z
     .string()
     .regex(/^\d+(\.\d{1,2})?$/)
     .optional(),
-  isFeatured: z.boolean().default(DEFAULTS.BOBBLEHEAD.IS_FEATURED),
-  isPublic: z.boolean().default(DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+  isFeatured: z.boolean().default(DEFAULTS.BOBBLEHEAD.IS_FEATURED).optional(),
+  isPublic: z.boolean().default(DEFAULTS.BOBBLEHEAD.IS_PUBLIC).optional(),
   manufacturer: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.MANUFACTURER.MAX).optional(),
   material: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.MATERIAL.MAX).optional(),
   name: z.string().min(SCHEMA_LIMITS.BOBBLEHEAD.NAME.MIN).max(SCHEMA_LIMITS.BOBBLEHEAD.NAME.MAX),
@@ -56,7 +56,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
     .regex(/^\d+(\.\d{1,2})?$/)
     .optional(),
   series: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.SERIES.MAX).optional(),
-  status: z.enum(ENUMS.BOBBLEHEAD.STATUS).default(DEFAULTS.BOBBLEHEAD.STATUS),
+  status: z.enum(ENUMS.BOBBLEHEAD.STATUS).default(DEFAULTS.BOBBLEHEAD.STATUS).optional(),
   subCollectionId: z.uuid().optional(),
   userId: z.uuid({ error: 'userId is required' }),
   weight: z

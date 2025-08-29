@@ -1,5 +1,7 @@
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { randomUUID } from 'crypto';
+import { beforeAll, describe, expect, it } from 'vitest';
 
+import { DEFAULTS } from '@/lib/constants';
 import { collections, users } from '@/lib/db/schema';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
@@ -16,14 +18,13 @@ describe('BobbleheadService.createAsync', () => {
 
   it.skipIf(!process.env.DATABASE_URL_TEST)('should create a bobblehead with valid data', async () => {
     await withTestIsolation(async (db) => {
-      // Create user and collection directly in transaction
       const userResult = await db
         .insert(users)
         .values({
           clerkId: 'test_clerk_id_1',
           displayName: 'Test User 1',
           email: 'test1@example.com',
-          username: 'testuser1',
+          username: 'test_user_1',
         })
         .returning();
       const user = userResult[0]!;
@@ -41,12 +42,12 @@ describe('BobbleheadService.createAsync', () => {
         category: 'Sports',
         characterName: 'Test Character',
         collectionId: collection.id,
-        currentCondition: 'mint' as const,
+        currentCondition: 'poor' as const,
         isFeatured: false,
         isPublic: true,
         manufacturer: 'Test Manufacturer',
         name: 'Test Bobblehead',
-        status: 'owned' as const,
+        status: 'sold' as const,
         userId: user.id,
       };
 
@@ -59,8 +60,8 @@ describe('BobbleheadService.createAsync', () => {
       expect(result!.category).toBe('Sports');
       expect(result!.characterName).toBe('Test Character');
       expect(result!.manufacturer).toBe('Test Manufacturer');
-      expect(result!.currentCondition).toBe('mint');
-      expect(result!.status).toBe('owned');
+      expect(result!.currentCondition).toBe('poor');
+      expect(result!.status).toBe('sold');
       expect(result!.id).toBeDefined();
       expect(result!.createdAt).toBeDefined();
       expect(result!.updatedAt).toBeDefined();
@@ -71,14 +72,13 @@ describe('BobbleheadService.createAsync', () => {
     'should create a bobblehead with only required fields',
     async () => {
       await withTestIsolation(async (db) => {
-        // Create user and collection directly in transaction
         const userResult = await db
           .insert(users)
           .values({
             clerkId: 'test_clerk_id_2',
             displayName: 'Test User 2',
             email: 'test2@example.com',
-            username: 'testuser2',
+            username: 'test_user_2',
           })
           .returning();
         const user = userResult[0]!;
@@ -94,11 +94,7 @@ describe('BobbleheadService.createAsync', () => {
 
         const bobbleheadData = {
           collectionId: collection.id,
-          currentCondition: 'excellent' as const,
-          isFeatured: false,
-          isPublic: true,
           name: 'Minimal Bobblehead',
-          status: 'owned' as const,
           userId: user.id,
         };
 
@@ -108,26 +104,40 @@ describe('BobbleheadService.createAsync', () => {
         expect(result!.name).toBe('Minimal Bobblehead');
         expect(result!.collectionId).toBe(collection.id);
         expect(result!.userId).toBe(user.id);
-        expect(result!.currentCondition).toBe('excellent');
-        expect(result!.status).toBe('owned');
-        expect(result!.isPublic).toBe(true);
-        expect(result!.isFeatured).toBe(false);
-        expect(result!.likeCount).toBe(0);
-        expect(result!.commentCount).toBe(0);
-        expect(result!.viewCount).toBe(0);
+        expect(result!.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
+        expect(result!.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
+        expect(result!.isPublic).toBe(DEFAULTS.BOBBLEHEAD.IS_PUBLIC);
+        expect(result!.isFeatured).toBe(DEFAULTS.BOBBLEHEAD.IS_FEATURED);
+        expect(result!.likeCount).toBe(DEFAULTS.BOBBLEHEAD.LIKE_COUNT);
+        expect(result!.commentCount).toBe(DEFAULTS.BOBBLEHEAD.COMMENT_COUNT);
+        expect(result!.viewCount).toBe(DEFAULTS.BOBBLEHEAD.VIEW_COUNT);
       });
     },
   );
 
   it('should validate input schema requirements', () => {
-    expect(() => {
-      const validData = {
-        collectionId: 'test-collection-id',
-        name: 'Test Bobblehead',
-        userId: 'test-user-id',
-      };
-      expect(validData).toBeDefined();
-    }).not.toThrow();
+    const validData = {
+      collectionId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
+      currentCondition: 'excellent' as const,
+      isFeatured: false,
+      isPublic: true,
+      name: 'Test Bobblehead',
+      status: 'owned' as const,
+      userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
+    };
+
+    const result = insertBobbleheadSchema.safeParse(validData);
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.name).toBe('Test Bobblehead');
+      expect(result.data.collectionId).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d479');
+      expect(result.data.userId).toBe('f47ac10b-58cc-4372-a567-0e02b2c3d480');
+      expect(result.data.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
+      expect(result.data.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
+      expect(result.data.isPublic).toBe(DEFAULTS.BOBBLEHEAD.IS_PUBLIC);
+      expect(result.data.isFeatured).toBe(DEFAULTS.BOBBLEHEAD.IS_FEATURED);
+    }
   });
 
   describe('Validation Tests - Required Fields', () => {
@@ -148,13 +158,14 @@ describe('BobbleheadService.createAsync', () => {
     it('should fail when collectionId is missing', () => {
       const invalidData = {
         name: 'Test Bobblehead',
-        userId: 'test-user-id',
+        userId: 'f47ac10b-58cc-4372-a567-0e02b2c3d480',
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0]?.message).toBe('collectionId is required');
+        const collectionIdError = result.error.issues.find((issue) => issue.path.includes('collectionId'));
+        expect(collectionIdError?.message).toBe('collectionId is required');
       }
     });
 
@@ -269,22 +280,19 @@ describe('BobbleheadService.createAsync', () => {
   describe('Business Logic Tests - Collection Ownership', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should fail when collectionId does not exist', async () => {
       await withTestIsolation(async (db) => {
-        // Create user directly in transaction
         const userResult = await db
           .insert(users)
           .values({
             clerkId: 'test_clerk_id',
             displayName: 'Test User',
             email: 'test@example.com',
-            username: 'testuser123',
+            username: 'test_user_123',
           })
           .returning();
         const user = userResult[0]!;
 
-        const nonExistentCollectionId = 'f47ac10b-58cc-4372-a567-0e02b2c3d479';
-
         const bobbleheadData = {
-          collectionId: nonExistentCollectionId,
+          collectionId: randomUUID(),
           currentCondition: 'excellent' as const,
           isFeatured: false,
           isPublic: true,
@@ -301,7 +309,7 @@ describe('BobbleheadService.createAsync', () => {
       'should allow user to create bobblehead in their own collection',
       async () => {
         await withTestIsolation(async (db) => {
-          // create user and their collection
+          // create the user and their collection
           const userResult = await db
             .insert(users)
             .values({
@@ -349,7 +357,7 @@ describe('BobbleheadService.createAsync', () => {
             clerkId: 'default_test_clerk_id',
             displayName: 'Default Test User',
             email: 'defaulttest@example.com',
-            username: 'defaultuser',
+            username: 'default_user',
           })
           .returning();
         const user = userResult[0]!;
@@ -376,58 +384,55 @@ describe('BobbleheadService.createAsync', () => {
         const result = await BobbleheadService.createAsync(minimalData, db);
 
         expect(result).toBeDefined();
-        expect(result!.currentCondition).toBe('excellent');
-        expect(result!.status).toBe('owned');
-        expect(result!.isPublic).toBe(true);
-        expect(result!.isFeatured).toBe(false);
-        expect(result!.likeCount).toBe(0);
-        expect(result!.commentCount).toBe(0);
-        expect(result!.viewCount).toBe(0);
+        expect(result!.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
+        expect(result!.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
+        expect(result!.isPublic).toBe(DEFAULTS.BOBBLEHEAD.IS_PUBLIC);
+        expect(result!.isFeatured).toBe(DEFAULTS.BOBBLEHEAD.IS_FEATURED);
+        expect(result!.likeCount).toBe(DEFAULTS.BOBBLEHEAD.LIKE_COUNT);
+        expect(result!.commentCount).toBe(DEFAULTS.BOBBLEHEAD.COMMENT_COUNT);
+        expect(result!.viewCount).toBe(DEFAULTS.BOBBLEHEAD.VIEW_COUNT);
       });
     });
   });
 
   describe('Error Handling Tests', () => {
-    it.skipIf(!process.env.DATABASE_URL_TEST)('should handle service returning null gracefully', async () => {
-      await withTestIsolation(async (db) => {
-        const userResult = await db
-          .insert(users)
-          .values({
-            clerkId: 'mock_test_clerk_id',
-            displayName: 'Mock Test User',
-            email: 'mocktest@example.com',
-            username: 'mockuser',
-          })
-          .returning();
-        const user = userResult[0]!;
+    it.skipIf(!process.env.DATABASE_URL_TEST)(
+      'should handle database constraint violations gracefully',
+      async () => {
+        await withTestIsolation(async (db) => {
+          const userResult = await db
+            .insert(users)
+            .values({
+              clerkId: 'constraint_test_clerk_id',
+              displayName: 'Constraint Test User',
+              email: 'constrainttest@example.com',
+              username: 'constraint_user',
+            })
+            .returning();
+          const user = userResult[0]!;
 
-        const collectionResult = await db
-          .insert(collections)
-          .values({
-            name: 'Mock Test Collection',
-            userId: user.id,
-          })
-          .returning();
-        const collection = collectionResult[0]!;
+          const collectionResult = await db
+            .insert(collections)
+            .values({
+              name: 'Constraint Test Collection',
+              userId: user.id,
+            })
+            .returning();
+          const collection = collectionResult[0]!;
 
-        const originalCreate = BobbleheadService.createAsync.bind(BobbleheadService);
-        BobbleheadService.createAsync = vi.fn().mockResolvedValue(null);
+          const invalidUserIdData = {
+            collectionId: collection.id,
+            currentCondition: 'excellent' as const,
+            isFeatured: false,
+            isPublic: true,
+            name: 'Test Bobblehead',
+            status: 'owned' as const,
+            userId: '00000000-0000-4000-8000-000000000000',
+          };
 
-        const bobbleheadData = {
-          collectionId: collection.id,
-          currentCondition: 'excellent' as const,
-          isFeatured: false,
-          isPublic: true,
-          name: 'Test Bobblehead',
-          status: 'owned' as const,
-          userId: user.id,
-        };
-
-        const result = await BobbleheadService.createAsync(bobbleheadData, db);
-        expect(result).toBeNull();
-
-        BobbleheadService.createAsync = originalCreate;
-      });
-    });
+          await expect(() => BobbleheadService.createAsync(invalidUserIdData, db)).rejects.toThrow();
+        });
+      },
+    );
   });
 });
