@@ -1,6 +1,6 @@
-import type { PgDatabase } from 'drizzle-orm/pg-core';
-
 import { sql } from 'drizzle-orm';
+
+import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { testDb } from './test-db';
 
@@ -23,12 +23,11 @@ export const setupTestDatabase = async () => {
 };
 
 // test isolation with transaction rollback
-export const withTestIsolation = async <T>(testFn: (db: PgDatabase<never>) => Promise<T>): Promise<T> => {
+export const withTestIsolation = async <T>(testFn: (db: DatabaseExecutor) => Promise<T>): Promise<T> => {
   let result: T;
 
   try {
     await testDb.transaction(async (tx) => {
-      // @ts-expect-error ignoring type issue with transaction
       result = await testFn(tx);
       // rollback transaction after getting the result
       throw new Error('TEST_ROLLBACK');
