@@ -94,3 +94,91 @@ export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
 export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
 export type UpdateBobblehead = z.infer<typeof updateBobbleheadSchema>;
 export type UpdateBobbleheadPhoto = z.infer<typeof updateBobbleheadPhotoSchema>;
+
+export const getBobbleheadByIdSchema = z.object({
+  id: z.uuid(),
+});
+
+export const getBobbleheadsByCollectionSchema = z.object({
+  collectionId: z.uuid(),
+  limit: z.number().min(1).max(100).default(20).optional(),
+  offset: z.number().min(0).default(0).optional(),
+});
+
+export const getBobbleheadsByUserSchema = z.object({
+  limit: z.number().min(1).max(100).default(20).optional(),
+  offset: z.number().min(0).default(0).optional(),
+  userId: z.uuid(),
+});
+
+export const searchBobbleheadsSchema = z.object({
+  filters: z
+    .object({
+      category: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.CATEGORY.MAX).optional(),
+      collectionId: z.uuid().optional(),
+      manufacturer: z.string().min(1).max(SCHEMA_LIMITS.BOBBLEHEAD.MANUFACTURER.MAX).optional(),
+      maxYear: z
+        .number()
+        .min(1800)
+        .max(new Date().getFullYear() + 1)
+        .optional(),
+      minYear: z
+        .number()
+        .min(1800)
+        .max(new Date().getFullYear() + 1)
+        .optional(),
+      status: z.enum(ENUMS.BOBBLEHEAD.STATUS).optional(),
+      userId: z.uuid().optional(),
+    })
+    .optional()
+    .default({}),
+  limit: z.number().min(1).max(100).default(20).optional(),
+  offset: z.number().min(0).default(0).optional(),
+  searchTerm: z.string().min(1).max(255).optional(),
+});
+
+export const deleteBobbleheadSchema = z.object({
+  id: z.uuid(),
+});
+
+export const deleteBobbleheadsSchema = z.object({
+  ids: z.array(z.uuid()).min(1).max(50),
+});
+
+export const reorderPhotosSchema = z.object({
+  bobbleheadId: z.uuid(),
+  updates: z
+    .array(
+      z.object({
+        id: z.uuid(),
+        sortOrder: z.number().min(0),
+      }),
+    )
+    .min(1),
+});
+
+export const addTagToBobbleheadSchema = z.object({
+  bobbleheadId: z.uuid(),
+  tagId: z.uuid(),
+});
+
+export const removeTagFromBobbleheadSchema = z.object({
+  bobbleheadId: z.uuid(),
+  tagId: z.uuid(),
+});
+
+export const deleteBobbleheadPhotoSchema = z.object({
+  bobbleheadId: z.uuid(),
+  id: z.uuid(),
+});
+
+export type AddTagToBobblehead = z.infer<typeof addTagToBobbleheadSchema>;
+export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
+export type DeleteBobbleheadPhoto = z.infer<typeof deleteBobbleheadPhotoSchema>;
+export type DeleteBobbleheads = z.infer<typeof deleteBobbleheadsSchema>;
+export type GetBobbleheadById = z.infer<typeof getBobbleheadByIdSchema>;
+export type GetBobbleheadsByCollection = z.infer<typeof getBobbleheadsByCollectionSchema>;
+export type GetBobbleheadsByUser = z.infer<typeof getBobbleheadsByUserSchema>;
+export type RemoveTagFromBobblehead = z.infer<typeof removeTagFromBobbleheadSchema>;
+export type ReorderPhotos = z.infer<typeof reorderPhotosSchema>;
+export type SearchBobbleheads = z.infer<typeof searchBobbleheadsSchema>;

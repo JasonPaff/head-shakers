@@ -15,12 +15,14 @@ export const ERROR_MESSAGES = {
   BOBBLEHEAD: {
     CREATE_FAILED: 'Failed to create bobblehead',
     DELETE_FAILED: 'Failed to delete bobblehead',
+    DELETE_UNAUTHORIZED: 'You can only delete your own bobbleheads',
     INVALID_CONDITION: 'Invalid condition value',
     INVALID_STATUS: 'Invalid status value',
     NOT_FOUND: 'Bobblehead not found',
     PHOTO_DELETE_FAILED: 'Failed to delete photo',
     PHOTO_UPLOAD_FAILED: 'Failed to upload photo',
     UPDATE_FAILED: 'Failed to update bobblehead',
+    UPDATE_UNAUTHORIZED: 'You can only update your own bobbleheads',
   },
   COLLECTION: {
     CREATE_FAILED: 'Failed to create collection',

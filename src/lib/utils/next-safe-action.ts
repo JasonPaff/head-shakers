@@ -62,7 +62,7 @@ export const actionClient = createSafeActionClient({
   defineMetadataSchema() {
     return z.object({
       actionName: z.string(),
-      isTransactionRequired: z.boolean().optional().default(false),
+      isTransactionRequired: z.boolean().default(false).optional(),
     });
   },
   handleServerError(error, utils) {

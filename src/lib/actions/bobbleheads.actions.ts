@@ -12,11 +12,42 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
+import {
+  addTagToBobbleheadAsync,
+  createBobbleheadPhotoAsync,
+  deleteBobbleheadAsync,
+  deleteBobbleheadPhotoAsync,
+  deleteBobbleheadsAsync,
+  getBobbleheadByIdAsync,
+  getBobbleheadsByCollectionAsync,
+  getBobbleheadsByUserAsync,
+  getBobbleheadWithDetailsAsync,
+  removeTagFromBobbleheadAsync,
+  reorderBobbleheadPhotosAsync,
+  searchBobbleheadsAsync,
+  updateBobbleheadAsync,
+  updateBobbleheadPhotoAsync,
+} from '@/lib/queries/bobbleheads.queries';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient } from '@/lib/utils/next-safe-action';
-import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
+import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import {
+  addTagToBobbleheadSchema,
+  deleteBobbleheadPhotoSchema,
+  deleteBobbleheadSchema,
+  deleteBobbleheadsSchema,
+  getBobbleheadByIdSchema,
+  getBobbleheadsByCollectionSchema,
+  getBobbleheadsByUserSchema,
+  insertBobbleheadPhotoSchema,
+  insertBobbleheadSchema,
+  removeTagFromBobbleheadSchema,
+  reorderPhotosSchema,
+  searchBobbleheadsSchema,
+  updateBobbleheadPhotoSchema,
+  updateBobbleheadSchema,
+} from '@/lib/validations/bobbleheads.validation';
 
 export const createBobbleheadAction = authActionClient
   .use(createRateLimitMiddleware(60, 60))
@@ -82,6 +113,656 @@ export const createBobbleheadAction = authActionClient
           actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
         },
         operation: 'create_bobblehead',
+        userId,
+      });
+    }
+  });
+
+// read operations
+export const getBobbleheadByIdAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_ID,
+  })
+  .inputSchema(getBobbleheadByIdSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+
+    try {
+      const bobblehead = await getBobbleheadWithDetailsAsync(sanitizedData.id, undefined, ctx.db);
+
+      if (!bobblehead || bobblehead.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEAD_NOT_FOUND',
+          ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND,
+          { bobbleheadId: sanitizedData.id },
+          false,
+          404,
+        );
+      }
+
+      return {
+        data: bobblehead[0],
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_ID,
+        },
+        operation: 'get_bobblehead_by_id',
+      });
+    }
+  });
+
+export const getBobbleheadsByCollectionAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_COLLECTION,
+  })
+  .inputSchema(getBobbleheadsByCollectionSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+
+    try {
+      const bobbleheads = await getBobbleheadsByCollectionAsync(
+        sanitizedData.collectionId,
+        undefined,
+        ctx.db,
+      );
+
+      return {
+        data: bobbleheads,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_COLLECTION,
+        },
+        operation: 'get_bobbleheads_by_collection',
+      });
+    }
+  });
+
+export const getBobbleheadsByUserAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_USER,
+  })
+  .inputSchema(getBobbleheadsByUserSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+
+    try {
+      const bobbleheads = await getBobbleheadsByUserAsync(sanitizedData.userId, undefined, ctx.db);
+
+      return {
+        data: bobbleheads,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_USER,
+        },
+        operation: 'get_bobbleheads_by_user',
+      });
+    }
+  });
+
+export const searchBobbleheadsAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.SEARCH,
+  })
+  .inputSchema(searchBobbleheadsSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+
+    try {
+      const bobbleheads = await searchBobbleheadsAsync(
+        sanitizedData.searchTerm || '',
+        sanitizedData.filters || {},
+        undefined,
+        sanitizedData.limit || 20,
+        sanitizedData.offset || 0,
+        ctx.db,
+      );
+
+      return {
+        data: bobbleheads,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.SEARCH,
+        },
+        operation: 'search_bobbleheads',
+      });
+    }
+  });
+
+// update operations
+export const updateBobbleheadAction = authActionClient
+  .use(createRateLimitMiddleware(60, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE,
+  })
+  .inputSchema(updateBobbleheadSchema.extend({ id: getBobbleheadByIdSchema.shape.id }))
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+    const { id, ...updateData } = sanitizedData;
+
+    try {
+      // verify ownership
+      const existing = await getBobbleheadByIdAsync(id, ctx.db);
+      if (!existing || existing.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEAD_NOT_FOUND',
+          ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND,
+          { bobbleheadId: id },
+          false,
+          404,
+        );
+      }
+
+      if (existing[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_UPDATE_UNAUTHORIZED',
+          ERROR_MESSAGES.BOBBLEHEAD.UPDATE_UNAUTHORIZED,
+          { bobbleheadId: id, userId },
+          false,
+          403,
+        );
+      }
+
+      const updatedBobblehead = await updateBobbleheadAsync(id, updateData, ctx.db);
+
+      if (!updatedBobblehead || updatedBobblehead.length === 0) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          'BOBBLEHEAD_UPDATE_FAILED',
+          ERROR_MESSAGES.BOBBLEHEAD.UPDATE_FAILED,
+          { bobbleheadId: id, userId },
+          false,
+          500,
+        );
+      }
+
+      // Revalidate cache
+      revalidatePath(
+        $path({
+          route: '/collections/[collectionId]',
+          routeParams: {
+            collectionId: existing[0].collectionId,
+          },
+        }),
+      );
+
+      return {
+        data: updatedBobblehead[0],
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE,
+        },
+        operation: 'update_bobblehead',
+        userId,
+      });
+    }
+  });
+
+// delete operations
+export const deleteBobbleheadAction = authActionClient
+  .use(createRateLimitMiddleware(30, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.DELETE,
+    isTransactionRequired: true,
+  })
+  .inputSchema(deleteBobbleheadSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      // verify ownership before deletion
+      const existing = await getBobbleheadByIdAsync(sanitizedData.id, ctx.db);
+      if (!existing || existing.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEAD_NOT_FOUND',
+          ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND,
+          { bobbleheadId: sanitizedData.id },
+          false,
+          404,
+        );
+      }
+
+      if (existing[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_DELETE_UNAUTHORIZED',
+          ERROR_MESSAGES.BOBBLEHEAD.DELETE_UNAUTHORIZED,
+          { bobbleheadId: sanitizedData.id, userId },
+          false,
+          403,
+        );
+      }
+
+      const deletedBobblehead = await deleteBobbleheadAsync(sanitizedData.id, userId, ctx.db);
+
+      if (!deletedBobblehead || deletedBobblehead.length === 0) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          'BOBBLEHEAD_DELETE_FAILED',
+          ERROR_MESSAGES.BOBBLEHEAD.DELETE_FAILED,
+          { bobbleheadId: sanitizedData.id, userId },
+          false,
+          500,
+        );
+      }
+
+      // revalidate cache
+      revalidatePath(
+        $path({
+          route: '/collections/[collectionId]',
+          routeParams: {
+            collectionId: existing[0].collectionId,
+          },
+        }),
+      );
+
+      return {
+        data: { deleted: true },
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.DELETE,
+        },
+        operation: 'delete_bobblehead',
+        userId,
+      });
+    }
+  });
+
+export const deleteBobbleheadsAction = authActionClient
+  .use(createRateLimitMiddleware(10, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_BULK,
+    isTransactionRequired: true,
+  })
+  .inputSchema(deleteBobbleheadsSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      const deletedBobbleheads = await deleteBobbleheadsAsync(sanitizedData.ids, userId, ctx.db);
+
+      if (!deletedBobbleheads || deletedBobbleheads.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEADS_NOT_FOUND',
+          'No bobbleheads found to delete or access denied',
+          { bobbleheadIds: sanitizedData.ids, userId },
+          false,
+          404,
+        );
+      }
+
+      // revalidate cache for all affected collections
+      const collectionIds = [...new Set(deletedBobbleheads.map((b) => b.collectionId))];
+      for (const collectionId of collectionIds) {
+        revalidatePath(
+          $path({
+            route: '/collections/[collectionId]',
+            routeParams: { collectionId },
+          }),
+        );
+      }
+
+      return {
+        data: { deletedCount: deletedBobbleheads.length },
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_BULK,
+        },
+        operation: 'delete_bobbleheads_bulk',
+        userId,
+      });
+    }
+  });
+
+// photo operations
+export const uploadBobbleheadPhotoAction = authActionClient
+  .use(createRateLimitMiddleware(30, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.UPLOAD_PHOTO,
+    isTransactionRequired: true,
+  })
+  .inputSchema(insertBobbleheadPhotoSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      // verify bobblehead ownership
+      const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
+      if (!bobblehead || bobblehead.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEAD_NOT_FOUND',
+          ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND,
+          { bobbleheadId: sanitizedData.bobbleheadId },
+          false,
+          404,
+        );
+      }
+
+      if (bobblehead[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_PHOTO_UPLOAD_UNAUTHORIZED',
+          'You can only upload photos to your own bobbleheads',
+          { bobbleheadId: sanitizedData.bobbleheadId, userId },
+          false,
+          403,
+        );
+      }
+
+      const newPhoto = await createBobbleheadPhotoAsync(sanitizedData, ctx.db);
+
+      if (!newPhoto || newPhoto.length === 0) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          'BOBBLEHEAD_PHOTO_UPLOAD_FAILED',
+          'Failed to upload photo',
+          { bobbleheadId: sanitizedData.bobbleheadId, userId },
+          false,
+          500,
+        );
+      }
+
+      return {
+        data: newPhoto[0],
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.UPLOAD_PHOTO,
+        },
+        operation: 'upload_bobblehead_photo',
+        userId,
+      });
+    }
+  });
+
+export const updateBobbleheadPhotoAction = authActionClient
+  .use(createRateLimitMiddleware(60, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_PHOTO,
+    isTransactionRequired: true,
+  })
+  .inputSchema(updateBobbleheadPhotoSchema.extend({ id: getBobbleheadByIdSchema.shape.id }))
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+    const { id, ...updateData } = sanitizedData;
+
+    try {
+      const updatedPhoto = await updateBobbleheadPhotoAsync(id, updateData, ctx.db);
+
+      if (!updatedPhoto || updatedPhoto.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEAD_PHOTO_NOT_FOUND',
+          'Photo not found or access denied',
+          { photoId: id, userId },
+          false,
+          404,
+        );
+      }
+
+      return {
+        data: updatedPhoto[0],
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_PHOTO,
+        },
+        operation: 'update_bobblehead_photo',
+        userId,
+      });
+    }
+  });
+
+export const deleteBobbleheadPhotoAction = authActionClient
+  .use(createRateLimitMiddleware(60, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_PHOTO,
+    isTransactionRequired: true,
+  })
+  .inputSchema(deleteBobbleheadPhotoSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      // verify bobblehead ownership
+      const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
+      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_PHOTO_DELETE_UNAUTHORIZED',
+          'You can only delete photos from your own bobbleheads',
+          { bobbleheadId: sanitizedData.bobbleheadId, userId },
+          false,
+          403,
+        );
+      }
+
+      const deletedPhoto = await deleteBobbleheadPhotoAsync(
+        sanitizedData.id,
+        sanitizedData.bobbleheadId,
+        ctx.db,
+      );
+
+      if (!deletedPhoto || deletedPhoto.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'BOBBLEHEAD_PHOTO_NOT_FOUND',
+          'Photo not found',
+          { bobbleheadId: sanitizedData.bobbleheadId, photoId: sanitizedData.id },
+          false,
+          404,
+        );
+      }
+
+      return {
+        data: { deleted: true },
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_PHOTO,
+        },
+        operation: 'delete_bobblehead_photo',
+        userId,
+      });
+    }
+  });
+
+export const reorderBobbleheadPhotosAction = authActionClient
+  .use(createRateLimitMiddleware(30, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.REORDER_PHOTOS,
+    isTransactionRequired: true,
+  })
+  .inputSchema(reorderPhotosSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      // verify bobblehead ownership
+      const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
+      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_PHOTO_REORDER_UNAUTHORIZED',
+          'You can only reorder photos on your own bobbleheads',
+          { bobbleheadId: sanitizedData.bobbleheadId, userId },
+          false,
+          403,
+        );
+      }
+
+      const reorderedPhotos = await reorderBobbleheadPhotosAsync(
+        sanitizedData.updates,
+        sanitizedData.bobbleheadId,
+        ctx.db,
+      );
+
+      return {
+        data: reorderedPhotos,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.REORDER_PHOTOS,
+        },
+        operation: 'reorder_bobblehead_photos',
+        userId,
+      });
+    }
+  });
+
+// Tag operations
+export const addTagToBobbleheadAction = authActionClient
+  .use(createRateLimitMiddleware(60, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.ADD_TAG,
+    isTransactionRequired: true,
+  })
+  .inputSchema(addTagToBobbleheadSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      // verify bobblehead ownership
+      const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
+      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_TAG_ADD_UNAUTHORIZED',
+          'You can only add tags to your own bobbleheads',
+          { bobbleheadId: sanitizedData.bobbleheadId, userId },
+          false,
+          403,
+        );
+      }
+
+      const tagAssignment = await addTagToBobbleheadAsync(
+        sanitizedData.bobbleheadId,
+        sanitizedData.tagId,
+        ctx.db,
+      );
+
+      return {
+        data: tagAssignment[0] || { alreadyExists: true },
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.ADD_TAG,
+        },
+        operation: 'add_tag_to_bobblehead',
+        userId,
+      });
+    }
+  });
+
+export const removeTagFromBobbleheadAction = authActionClient
+  .use(createRateLimitMiddleware(60, 60))
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.REMOVE_TAG,
+    isTransactionRequired: true,
+  })
+  .inputSchema(removeTagFromBobbleheadSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const userId = ctx.userId;
+
+    try {
+      // verify bobblehead ownership
+      const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
+      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+        throw new ActionError(
+          ErrorType.AUTHORIZATION,
+          'BOBBLEHEAD_TAG_REMOVE_UNAUTHORIZED',
+          'You can only remove tags from your own bobbleheads',
+          { bobbleheadId: sanitizedData.bobbleheadId, userId },
+          false,
+          403,
+        );
+      }
+
+      const removedTag = await removeTagFromBobbleheadAsync(
+        sanitizedData.bobbleheadId,
+        sanitizedData.tagId,
+        ctx.db,
+      );
+
+      if (!removedTag || removedTag.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          'TAG_ASSIGNMENT_NOT_FOUND',
+          'Tag assignment not found',
+          { bobbleheadId: sanitizedData.bobbleheadId, tagId: sanitizedData.tagId },
+          false,
+          404,
+        );
+      }
+
+      return {
+        data: { removed: true },
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.BOBBLEHEADS.REMOVE_TAG,
+        },
+        operation: 'remove_tag_from_bobblehead',
         userId,
       });
     }
