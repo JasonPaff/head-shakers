@@ -5,6 +5,7 @@ import { cache } from 'react';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertBobblehead, UpdateBobblehead } from '@/lib/validations/bobbleheads.validation';
 
+import { TAGS } from '@/lib/constants/tags';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
 
@@ -25,5 +26,5 @@ export const getTrendingBobbleheads = unstable_cache(
     return db.select().from(bobbleheads).orderBy(desc(bobbleheads.viewCount)).limit(limit);
   },
   ['trending-bobbleheads'],
-  { revalidate: 300, tags: ['bobbleheads'] },
+  { revalidate: 300, tags: [TAGS.BOBBLEHEAD.BOBBLEHEADS] },
 );
