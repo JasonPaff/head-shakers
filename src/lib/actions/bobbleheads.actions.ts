@@ -70,7 +70,7 @@ export const createBobbleheadAction = authActionClient
           userId,
         },
         [],
-        ctx.db,
+        ctx.tx,
       );
 
       if (!newBobblehead) {
@@ -282,7 +282,7 @@ export const updateBobbleheadAction = authActionClient
         );
       }
 
-      const updatedBobblehead = await updateBobbleheadAsync(id, updateData, ctx.db);
+      const updatedBobblehead = await updateBobbleheadAsync(id, updateData, ctx.tx);
 
       if (!updatedBobblehead || updatedBobblehead.length === 0) {
         throw new ActionError(
@@ -358,7 +358,7 @@ export const deleteBobbleheadAction = authActionClient
         );
       }
 
-      const deletedBobblehead = await deleteBobbleheadAsync(sanitizedData.id, userId, ctx.db);
+      const deletedBobblehead = await deleteBobbleheadAsync(sanitizedData.id, userId, ctx.tx);
 
       if (!deletedBobblehead || deletedBobblehead.length === 0) {
         throw new ActionError(
@@ -409,7 +409,7 @@ export const deleteBobbleheadsAction = authActionClient
     const userId = ctx.userId;
 
     try {
-      const deletedBobbleheads = await deleteBobbleheadsAsync(sanitizedData.ids, userId, ctx.db);
+      const deletedBobbleheads = await deleteBobbleheadsAsync(sanitizedData.ids, userId, ctx.tx);
 
       if (!deletedBobbleheads || deletedBobbleheads.length === 0) {
         throw new ActionError(
@@ -486,7 +486,7 @@ export const uploadBobbleheadPhotoAction = authActionClient
         );
       }
 
-      const newPhoto = await createBobbleheadPhotoAsync(sanitizedData, ctx.db);
+      const newPhoto = await createBobbleheadPhotoAsync(sanitizedData, ctx.tx);
 
       if (!newPhoto || newPhoto.length === 0) {
         throw new ActionError(
@@ -528,7 +528,7 @@ export const updateBobbleheadPhotoAction = authActionClient
     const { id, ...updateData } = sanitizedData;
 
     try {
-      const updatedPhoto = await updateBobbleheadPhotoAsync(id, updateData, ctx.db);
+      const updatedPhoto = await updateBobbleheadPhotoAsync(id, updateData, ctx.tx);
 
       if (!updatedPhoto || updatedPhoto.length === 0) {
         throw new ActionError(
@@ -585,7 +585,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
       const deletedPhoto = await deleteBobbleheadPhotoAsync(
         sanitizedData.id,
         sanitizedData.bobbleheadId,
-        ctx.db,
+        ctx.tx,
       );
 
       if (!deletedPhoto || deletedPhoto.length === 0) {
@@ -643,7 +643,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
       const reorderedPhotos = await reorderBobbleheadPhotosAsync(
         sanitizedData.updates,
         sanitizedData.bobbleheadId,
-        ctx.db,
+        ctx.tx,
       );
 
       return {
@@ -691,7 +691,7 @@ export const addTagToBobbleheadAction = authActionClient
       const tagAssignment = await addTagToBobbleheadAsync(
         sanitizedData.bobbleheadId,
         sanitizedData.tagId,
-        ctx.db,
+        ctx.tx,
       );
 
       return {
@@ -738,7 +738,7 @@ export const removeTagFromBobbleheadAction = authActionClient
       const removedTag = await removeTagFromBobbleheadAsync(
         sanitizedData.bobbleheadId,
         sanitizedData.tagId,
-        ctx.db,
+        ctx.tx,
       );
 
       if (!removedTag || removedTag.length === 0) {

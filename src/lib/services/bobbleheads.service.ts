@@ -65,7 +65,7 @@ export class BobbleheadService {
       );
     }
 
-    // TODO: Update collection aggregates
+    // TODO: update collection aggregates
     // await updateCollectionStats(data.collectionId);
 
     return result?.[0];

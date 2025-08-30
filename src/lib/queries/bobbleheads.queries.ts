@@ -114,7 +114,8 @@ export const searchBobbleheadsAsync = async (
     : eq(bobbleheads.isPublic, true),
   ];
 
-  if (searchTerm) {
+  const escapedSearchTerm = searchTerm.replace(/[%_]/g, '\\$&');
+  if (escapedSearchTerm) {
     conditions.push(
       or(
         like(bobbleheads.name, `%${searchTerm}%`),
@@ -214,16 +215,15 @@ export const reorderBobbleheadPhotosAsync = async (
   bobbleheadId: string,
   dbInstance: DatabaseExecutor = db,
 ) => {
-  const results = [];
-  for (const update of updates) {
-    const result = await dbInstance
-      .update(bobbleheadPhotos)
-      .set({ sortOrder: update.sortOrder })
-      .where(and(eq(bobbleheadPhotos.id, update.id), eq(bobbleheadPhotos.bobbleheadId, bobbleheadId)))
-      .returning();
-    results.push(result[0]);
-  }
-  return results;
+  const sql = `
+    UPDATE bobblehead_photos 
+    SET sort_order = CASE id
+      ${updates.map((u) => `WHEN '${u.id}' THEN ${u.sortOrder}`).join(' ')}
+    END
+    WHERE bobblehead_id = ${bobbleheadId} AND id IN (${updates.map((u) => `'${u.id}'`).join(',')})
+    RETURNING *
+  `;
+  return dbInstance.execute(sql);
 };
 
 export const addTagToBobbleheadAsync = async (
