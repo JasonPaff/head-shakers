@@ -4,16 +4,18 @@ import { z } from 'zod';
 import type { db } from '@/lib/db';
 
 import { authMiddleware } from '@/lib/middleware/auth.middleware';
-import { databaseMiddleware } from '@/lib/middleware/database.middleware';
-import { sanitizationMiddleware } from '@/lib/middleware/sanitization.middleware';
+import { databaseMiddleware, publicDatabaseMiddleware } from '@/lib/middleware/database.middleware';
+import {
+  publicSanitizationMiddleware,
+  sanitizationMiddleware,
+} from '@/lib/middleware/sanitization.middleware';
 import { sentryMiddleware } from '@/lib/middleware/sentry.middleware';
-import { transactionMiddleware } from '@/lib/middleware/transaction.middleware';
+import { publicTransactionMiddleware, transactionMiddleware } from '@/lib/middleware/transaction.middleware';
 
 import { ActionError, ErrorType } from './errors';
 
 // final action context (for actions)
 export type ActionContext = TransactionContext;
-
 export interface ActionMetadata {
   actionName: string;
   isTransactionRequired?: boolean;
@@ -27,12 +29,29 @@ export interface AuthContext {
 
 export type DatabaseExecutor = Parameters<Parameters<typeof db.transaction>[0]>[0] | typeof db;
 
-// context after sanitization middleware
+export type PublicActionContext = PublicTransactionContext;
+
+// base context for public actions (no auth required)
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface PublicContext {}
+
+// context after sanitization middleware (public chain)
+export interface PublicSanitizedContext extends PublicContext {
+  sanitizedInput: unknown;
+}
+
+// context after transaction middleware (public chain)
+export interface PublicTransactionContext extends PublicSanitizedContext {
+  db: DatabaseExecutor;
+  tx?: DatabaseExecutor;
+}
+
+// context after sanitization middleware (auth chain)
 export interface SanitizedContext extends AuthContext {
   sanitizedInput: unknown;
 }
 
-// context after transaction middleware
+// context after transaction middleware (auth chain)
 export interface TransactionContext extends SanitizedContext {
   db: DatabaseExecutor;
   tx?: DatabaseExecutor;
@@ -92,3 +111,8 @@ export const authActionClient = actionClient
   .use(sanitizationMiddleware)
   .use(transactionMiddleware)
   .use(databaseMiddleware);
+
+export const publicActionClient = actionClient
+  .use(publicSanitizationMiddleware)
+  .use(publicTransactionMiddleware)
+  .use(publicDatabaseMiddleware);
