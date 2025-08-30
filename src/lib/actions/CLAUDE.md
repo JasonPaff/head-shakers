@@ -4,20 +4,8 @@ This directory contains all server-side business logic using the ZSA (Zod Server
 
 ## Architecture Overview
 
-### ZSA Pattern
-All server actions follow the ZSA pattern for consistent structure:
-
-```typescript
-import { createServerAction } from 'zsa'
-import { z } from 'zod'
-
-export const exampleAction = createServerAction()
-  .input(validationSchema)
-  .handler(async ({ input }) => {
-    // Type-safe server action logic
-    return result
-  })
-```
+### Next-Server-Action Pattern
+All server actions follow the Next-Server-Action pattern for a consistent structure:
 
 ### Key Benefits
 - **Type safety** from input to output

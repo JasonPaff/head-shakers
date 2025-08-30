@@ -142,15 +142,15 @@ export const searchBobbleheadsSchema = z.object({
 });
 
 export const deleteBobbleheadSchema = z.object({
-  id: z.uuid(),
+  id: z.uuid().trim(),
 });
 
 export const deleteBobbleheadsSchema = z.object({
-  ids: z.array(z.uuid().trim()).min(1).max(50),
+  ids: z.array(z.uuid().trim()).min(1),
 });
 
 export const reorderPhotosSchema = z.object({
-  bobbleheadId: z.uuid(),
+  bobbleheadId: z.uuid().trim(),
   updates: z
     .array(
       z.object({
