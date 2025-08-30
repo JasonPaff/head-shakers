@@ -21,7 +21,8 @@
       "Bash(npm test:*)",
       "Bash(bun run:*)",
       "Bash(mkdir:*)",
-      "Bash(npx vitest run:*)"
+      "Bash(npx vitest run:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
