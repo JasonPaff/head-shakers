@@ -19,7 +19,9 @@
       "Bash(npx tsc:*)",
       "Bash(npx eslint:*)",
       "Bash(npm test:*)",
-      "Bash(bun run:*)"
+      "Bash(bun run:*)",
+      "Bash(mkdir:*)",
+      "Bash(npx vitest run:*)"
     ],
     "deny": [],
     "ask": []
