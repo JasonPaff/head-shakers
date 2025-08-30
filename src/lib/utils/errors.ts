@@ -61,21 +61,6 @@ export class ActionError extends Error {
 }
 
 /**
- * Legacy AppError for backward compatibility
- */
-export class AppError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public statusCode: number = 400,
-    public context?: Record<string, unknown>,
-  ) {
-    super(message);
-    this.name = 'AppError';
-  }
-}
-
-/**
  * Error classification utility
  */
 export function classifyDatabaseError(error: unknown): DatabaseErrorType | null {

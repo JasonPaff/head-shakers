@@ -72,11 +72,11 @@ export const actionClient = createSafeActionClient({
               'External service temporarily unavailable. Please try again.'
             : 'External service error occurred.';
         case ErrorType.NOT_FOUND:
-          return error.message; // Safe to return not found messages
+          return error.message;
         case ErrorType.RATE_LIMIT:
           return 'Rate limit exceeded. Please try again later.';
         case ErrorType.VALIDATION:
-          return error.message; // Safe to return validation errors
+          return error.message;
         case ErrorType.INTERNAL:
         default:
           return DEFAULT_SERVER_ERROR_MESSAGE;

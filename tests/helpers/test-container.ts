@@ -15,7 +15,7 @@ export const startTestDatabase = async (): Promise<string> => {
       .withUsername('test_user')
       .withPassword('test_password')
       .withStartupTimeout(120000)
-      .withReuse() // reuse container if available
+      .withReuse()
       .start();
 
     const databaseUrl = getTestDatabaseUrl();

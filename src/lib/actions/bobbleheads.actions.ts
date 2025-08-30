@@ -11,6 +11,7 @@ import {
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
 } from '@/lib/constants';
+import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -18,6 +19,7 @@ import { authActionClient } from '@/lib/utils/next-safe-action';
 import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
 
 export const createBobbleheadAction = authActionClient
+  .use(createRateLimitMiddleware(60, 60))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
     isTransactionRequired: true,

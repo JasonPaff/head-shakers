@@ -21,9 +21,7 @@ export const createRateLimitMiddleware = (
     metadata: ActionMetadata;
   }>().define(async ({ ctx, metadata, next }) => {
     const key =
-      keyGenerator ?
-        keyGenerator(ctx)
-      : REDIS_KEYS.RATE_LIMIT_ACTION(ctx.userId, metadata?.actionName || 'unknown');
+      keyGenerator ? keyGenerator(ctx) : REDIS_KEYS.RATE_LIMIT_ACTION(ctx.userId, metadata.actionName);
 
     const current = await redis.incr(key);
 
@@ -39,7 +37,7 @@ export const createRateLimitMiddleware = (
         {
           currentCount: current,
           limit: requests,
-          operation: metadata?.actionName || 'unknown',
+          operation: metadata.actionName,
           userId: ctx.userId,
           window: windowInSeconds,
         },
