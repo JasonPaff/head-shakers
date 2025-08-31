@@ -1,9 +1,9 @@
 import { setupServer } from 'msw/node';
 import { afterAll, afterEach, beforeAll, beforeEach } from 'vitest';
 
-import { setupTestDatabase } from './helpers/database';
-import { checkDockerRequirements } from './helpers/docker-check';
-import { startTestDatabase, stopTestDatabase } from './helpers/test-container';
+import { setupTestDatabase } from './helpers/database.helpers';
+import { checkDockerRequirements } from './helpers/docker-check.helpers';
+import { startTestDatabase, stopTestDatabase } from './helpers/test-container.helpers';
 
 // setup MSW server for API mocking
 export const server = setupServer();

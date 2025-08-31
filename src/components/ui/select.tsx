@@ -7,6 +7,10 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
 import { cn } from '@/utils/tailwind-utils';
 
+export interface SelectOptionType {
+  label: string;
+  value: string;
+}
 type SelectContentProps = ComponentProps<typeof SelectPrimitive.Content>;
 type SelectGroupProps = ComponentProps<typeof SelectPrimitive.Group>;
 type SelectItemProps = ComponentProps<typeof SelectPrimitive.Item>;
@@ -18,6 +22,7 @@ type SelectSeparatorProps = ComponentProps<typeof SelectPrimitive.Separator>;
 type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger> & {
   size?: 'default' | 'sm';
 };
+
 type SelectValueProps = ComponentProps<typeof SelectPrimitive.Value>;
 
 export const Select = ({ children, ...props }: SelectProps) => {

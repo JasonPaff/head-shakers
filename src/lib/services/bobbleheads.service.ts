@@ -45,17 +45,18 @@ export class BobbleheadService {
   }
 
   // create operations
-  static async createAsync(data: InsertBobblehead, dbInstance: DatabaseExecutor = db) {
-    const result = await createBobbleheadAsync(data, dbInstance);
+  static async createAsync(data: InsertBobblehead, userId: string, dbInstance: DatabaseExecutor = db) {
+    const result = await createBobbleheadAsync(data, userId, dbInstance);
     return result?.[0] || null;
   }
 
   static async createWithPhotosAsync(
     data: InsertBobblehead,
+    userId: string,
     photos: Array<InsertBobbleheadPhoto>,
     dbInstance: DatabaseExecutor = db,
   ) {
-    const result = await createBobbleheadAsync(data, dbInstance);
+    const result = await createBobbleheadAsync(data, userId, dbInstance);
 
     if (!!result?.[0]?.id && photos.length > 0) {
       await Promise.all(
@@ -148,8 +149,13 @@ export class BobbleheadService {
   }
 
   // update operations
-  static async updateAsync(id: string, data: UpdateBobblehead, dbInstance: DatabaseExecutor = db) {
-    const result = await updateBobbleheadAsync(id, data, dbInstance);
+  static async updateAsync(
+    id: string,
+    data: UpdateBobblehead,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ) {
+    const result = await updateBobbleheadAsync(id, data, userId, dbInstance);
     return result?.[0] || null;
   }
 }

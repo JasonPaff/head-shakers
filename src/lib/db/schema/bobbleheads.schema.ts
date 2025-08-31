@@ -39,6 +39,7 @@ export const bobbleheads = pgTable(
     deletedAt: timestamp('deleted_at'),
     description: varchar('description', { length: SCHEMA_LIMITS.BOBBLEHEAD.DESCRIPTION.MAX }),
     height: decimal('height', {
+      mode: 'number',
       precision: SCHEMA_LIMITS.BOBBLEHEAD.HEIGHT.PRECISION,
       scale: SCHEMA_LIMITS.BOBBLEHEAD.HEIGHT.SCALE,
     }),
@@ -54,6 +55,7 @@ export const bobbleheads = pgTable(
       length: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_LOCATION.MAX,
     }),
     purchasePrice: decimal('purchase_price', {
+      mode: 'number',
       precision: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_PRICE.PRECISION,
       scale: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_PRICE.SCALE,
     }),
@@ -68,6 +70,7 @@ export const bobbleheads = pgTable(
       .notNull(),
     viewCount: integer('view_count').default(DEFAULTS.BOBBLEHEAD.VIEW_COUNT).notNull(),
     weight: decimal('weight', {
+      mode: 'number',
       precision: SCHEMA_LIMITS.BOBBLEHEAD.WEIGHT.PRECISION,
       scale: SCHEMA_LIMITS.BOBBLEHEAD.WEIGHT.SCALE,
     }),

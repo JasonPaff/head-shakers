@@ -6,6 +6,7 @@ import { ThemeProvider } from 'next-themes';
 import { Geist, Geist_Mono } from 'next/font/google';
 
 import '@/app/globals.css';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
             {children}
+            <Toaster closeButton position={'top-right'} richColors />
           </ThemeProvider>
         </body>
       </html>

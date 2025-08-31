@@ -1,0 +1,49 @@
+'use client';
+
+import type { SelectOptionType } from '@/components/ui/select';
+
+import { useFieldContext } from '@/components/ui/form';
+import { FieldAria } from '@/components/ui/form/field-components/field-aria';
+import { FieldDescription } from '@/components/ui/form/field-components/field-description';
+import { FieldError } from '@/components/ui/form/field-components/field-error';
+import { FieldItem } from '@/components/ui/form/field-components/field-item';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface SelectFieldProps {
+  description?: string;
+  isRequired?: boolean;
+  label: string;
+  options: Array<SelectOptionType>;
+  placeholder?: string;
+}
+
+export const SelectField = ({ description, isRequired, label, options, placeholder }: SelectFieldProps) => {
+  const field = useFieldContext<string>();
+
+  return (
+    <FieldItem>
+      <Label htmlFor={field.name} variant={isRequired ? 'required' : undefined}>
+        {label}
+      </Label>
+      <Select onValueChange={field.handleChange} value={field.state.value}>
+        <FieldAria>
+          <SelectTrigger className={'w-full'} id={field.name} onBlur={field.handleBlur}>
+            <SelectValue placeholder={placeholder} />
+          </SelectTrigger>
+        </FieldAria>
+        <SelectContent>
+          {options.map((option) => {
+            return (
+              <SelectItem key={option.value} value={option.value}>
+                <span className={'capitalize'}>{option.label}</span>
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+      <FieldError />
+      <FieldDescription>{description}</FieldDescription>
+    </FieldItem>
+  );
+};

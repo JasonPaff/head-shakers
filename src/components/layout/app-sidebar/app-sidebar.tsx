@@ -2,7 +2,14 @@
 
 import type { ComponentProps } from 'react';
 
-import { ActivityIcon, CopyleftIcon, LayoutDashboardIcon, PlusIcon, SettingsIcon, UploadIcon } from 'lucide-react';
+import {
+  ActivityIcon,
+  CopyleftIcon,
+  LayoutDashboardIcon,
+  PlusIcon,
+  SettingsIcon,
+  UploadIcon,
+} from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
 import { AppSidebarNavMain } from '@/components/layout/app-sidebar/components/app-sidebar-nav-main';

@@ -58,7 +58,7 @@ export interface TransactionContext extends SanitizedContext {
 }
 
 // base client with enhanced error handling
-export const actionClient = createSafeActionClient({
+const actionClient = createSafeActionClient({
   defineMetadataSchema() {
     return z.object({
       actionName: z.string(),

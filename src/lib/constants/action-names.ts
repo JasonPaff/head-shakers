@@ -27,6 +27,8 @@ export const ACTION_NAMES = {
     CREATE_SUB: 'createSubCollection',
     DELETE: 'deleteCollection',
     DELETE_SUB: 'deleteSubCollection',
+    GET_COLLECTIONS_BY_USER: 'getCollectionsByUser',
+    GET_SUB_COLLECTIONS: 'getSubCollectionsByCollection',
     UPDATE: 'updateCollection',
     UPDATE_SUB: 'updateSubCollection',
   },

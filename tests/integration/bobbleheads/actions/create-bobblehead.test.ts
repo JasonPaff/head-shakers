@@ -6,7 +6,7 @@ import { collections, users } from '@/lib/db/schema';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
 
-import { withTestIsolation } from '../../helpers/database';
+import { withTestIsolation } from '../../../helpers/database.helpers';
 
 describe('BobbleheadService.createAsync', () => {
   beforeAll(() => {
@@ -48,10 +48,10 @@ describe('BobbleheadService.createAsync', () => {
         manufacturer: 'Test Manufacturer',
         name: 'Test Bobblehead',
         status: 'sold' as const,
-        userId: user.id,
       };
 
-      const result = await BobbleheadService.createAsync(bobbleheadData, db);
+      const parsedData = insertBobbleheadSchema.parse(bobbleheadData);
+      const result = await BobbleheadService.createAsync(parsedData, user.id, db);
 
       expect(result).toBeDefined();
       expect(result!.name).toBe('Test Bobblehead');
@@ -95,10 +95,10 @@ describe('BobbleheadService.createAsync', () => {
         const bobbleheadData = {
           collectionId: collection.id,
           name: 'Minimal Bobblehead',
-          userId: user.id,
         };
 
-        const result = await BobbleheadService.createAsync(bobbleheadData, db);
+        const parsedData = insertBobbleheadSchema.parse(bobbleheadData);
+        const result = await BobbleheadService.createAsync(parsedData, user.id, db);
 
         expect(result).toBeDefined();
         expect(result!.name).toBe('Minimal Bobblehead');
@@ -123,7 +123,6 @@ describe('BobbleheadService.createAsync', () => {
       isPublic: true,
       name: 'Test Bobblehead',
       status: 'owned' as const,
-      userId: randomUUID(),
     };
 
     const result = insertBobbleheadSchema.safeParse(validData);
@@ -132,7 +131,6 @@ describe('BobbleheadService.createAsync', () => {
     if (result.success) {
       expect(result.data.name).toBe('Test Bobblehead');
       expect(result.data.collectionId).toBe(validData.collectionId);
-      expect(result.data.userId).toBe(validData.userId);
       expect(result.data.currentCondition).toBe('excellent');
       expect(result.data.status).toBe('owned');
       expect(result.data.isPublic).toBe(true);
@@ -144,7 +142,6 @@ describe('BobbleheadService.createAsync', () => {
     const minimalData = {
       collectionId: randomUUID(),
       name: 'Test Bobblehead',
-      userId: randomUUID(),
     };
 
     const result = insertBobbleheadSchema.safeParse(minimalData);
@@ -153,7 +150,6 @@ describe('BobbleheadService.createAsync', () => {
     if (result.success) {
       expect(result.data.name).toBe('Test Bobblehead');
       expect(result.data.collectionId).toBe(minimalData.collectionId);
-      expect(result.data.userId).toBe(minimalData.userId);
       expect(result.data.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
       expect(result.data.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
       expect(result.data.isPublic).toBe(DEFAULTS.BOBBLEHEAD.IS_PUBLIC);
@@ -165,7 +161,6 @@ describe('BobbleheadService.createAsync', () => {
     it('should fail when name is missing', () => {
       const invalidData = {
         collectionId: randomUUID(),
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -179,81 +174,52 @@ describe('BobbleheadService.createAsync', () => {
     it('should fail when collectionId is missing', () => {
       const invalidData = {
         name: 'Test Bobblehead',
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
         const collectionIdError = result.error.issues.find((issue) => issue.path.includes('collectionId'));
-        expect(collectionIdError?.message).toBe('collectionId is required');
+        expect(collectionIdError?.message).toBe('Collection is required');
       }
     });
 
-    it('should fail when userId is missing', () => {
-      const invalidData = {
-        collectionId: randomUUID(),
-        name: 'Test Bobblehead',
-      };
-
-      const result = insertBobbleheadSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const userIdError = result.error.issues.find((issue) => issue.path.includes('userId'));
-        expect(userIdError?.message).toBe('userId is required');
-      }
-    });
+    // userId is not part of the insert schema since it's handled by the service layer
 
     it('should fail when collectionId is invalid UUID', () => {
       const invalidData = {
         collectionId: 'invalid-uuid',
         name: 'Test Bobblehead',
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
         const collectionIdError = result.error.issues.find((issue) => issue.path.includes('collectionId'));
-        expect(collectionIdError?.message).toBe('collectionId is required');
+        expect(collectionIdError?.message).toBe('Collection is required');
       }
     });
 
-    it('should fail when userId is invalid UUID', () => {
-      const invalidData = {
-        collectionId: randomUUID(),
-        name: 'Test Bobblehead',
-        userId: 'invalid-uuid',
-      };
-
-      const result = insertBobbleheadSchema.safeParse(invalidData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const userIdError = result.error.issues.find((issue) => issue.path.includes('userId'));
-        expect(userIdError?.message).toBe('userId is required');
-      }
-    });
+    // userId validation test removed - userId is handled by the service layer
   });
 
   describe('Validation Tests - Data Integrity', () => {
-    it('should fail when name exceeds 200 characters', () => {
-      const longName = 'a'.repeat(201);
+    it('should fail when name exceeds 100 characters', () => {
+      const longName = 'a'.repeat(101);
       const invalidData = {
         collectionId: randomUUID(),
         name: longName,
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
     });
 
-    it('should succeed when name is exactly 200 characters', () => {
-      const maxLengthName = 'a'.repeat(200);
+    it('should succeed when name is exactly 100 characters', () => {
+      const maxLengthName = 'a'.repeat(100);
       const validData = {
         collectionId: randomUUID(),
         name: maxLengthName,
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(validData);
@@ -265,7 +231,6 @@ describe('BobbleheadService.createAsync', () => {
         collectionId: randomUUID(),
         currentCondition: 'invalid_condition',
         name: 'Test Bobblehead',
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -277,7 +242,6 @@ describe('BobbleheadService.createAsync', () => {
         collectionId: randomUUID(),
         name: 'Test Bobblehead',
         status: 'invalid_status',
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -288,8 +252,7 @@ describe('BobbleheadService.createAsync', () => {
       const invalidData = {
         collectionId: randomUUID(),
         name: 'Test Bobblehead',
-        userId: randomUUID(),
-        year: 1799,
+        year: '1799',
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -301,8 +264,7 @@ describe('BobbleheadService.createAsync', () => {
       const invalidData = {
         collectionId: randomUUID(),
         name: 'Test Bobblehead',
-        userId: randomUUID(),
-        year: nextYear,
+        year: nextYear.toString(),
       };
 
       const result = insertBobbleheadSchema.safeParse(invalidData);
@@ -314,8 +276,7 @@ describe('BobbleheadService.createAsync', () => {
       const validData = {
         collectionId: randomUUID(),
         name: 'Test Bobblehead',
-        userId: randomUUID(),
-        year: nextYear,
+        year: nextYear.toString(),
       };
 
       const result = insertBobbleheadSchema.safeParse(validData);
@@ -344,10 +305,10 @@ describe('BobbleheadService.createAsync', () => {
           isPublic: true,
           name: 'Test Bobblehead',
           status: 'owned' as const,
-          userId: user.id,
         };
 
-        await expect(() => BobbleheadService.createAsync(bobbleheadData, db)).rejects.toThrow();
+        const parsedData = insertBobbleheadSchema.parse(bobbleheadData);
+        await expect(() => BobbleheadService.createAsync(parsedData, user.id, db)).rejects.toThrow();
       });
     });
 
@@ -383,10 +344,10 @@ describe('BobbleheadService.createAsync', () => {
             isPublic: true,
             name: 'Test Bobblehead',
             status: 'owned' as const,
-            userId: user.id,
           };
 
-          const result = await BobbleheadService.createAsync(bobbleheadData, db);
+          const parsedData = insertBobbleheadSchema.parse(bobbleheadData);
+          const result = await BobbleheadService.createAsync(parsedData, user.id, db);
           expect(result).toBeDefined();
           expect(result!.name).toBe('Test Bobblehead');
           expect(result!.collectionId).toBe(collection.id);
@@ -420,10 +381,10 @@ describe('BobbleheadService.createAsync', () => {
         const minimalData = {
           collectionId: collection.id,
           name: 'Test Bobblehead',
-          userId: user.id,
         };
 
-        const result = await BobbleheadService.createAsync(minimalData, db);
+        const parsedData = insertBobbleheadSchema.parse(minimalData);
+        const result = await BobbleheadService.createAsync(parsedData, user.id, db);
 
         expect(result).toBeDefined();
         expect(result!.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
@@ -467,10 +428,10 @@ describe('BobbleheadService.createAsync', () => {
             isPublic: false,
             name: 'Test Bobblehead',
             status: 'sold' as const,
-            userId: user.id,
           };
 
-          const result = await BobbleheadService.createAsync(explicitData, db);
+          const parsedData = insertBobbleheadSchema.parse(explicitData);
+          const result = await BobbleheadService.createAsync(parsedData, user.id, db);
 
           expect(result).toBeDefined();
           expect(result!.currentCondition).toBe('poor');
@@ -507,6 +468,8 @@ describe('BobbleheadService.createAsync', () => {
             .returning();
           const collection = collectionResult[0]!;
 
+          const userId = '00000000-0000-4000-8000-000000000000';
+
           const invalidUserIdData = {
             collectionId: collection.id,
             currentCondition: 'excellent' as const,
@@ -514,10 +477,10 @@ describe('BobbleheadService.createAsync', () => {
             isPublic: true,
             name: 'Test Bobblehead',
             status: 'owned' as const,
-            userId: '00000000-0000-4000-8000-000000000000',
           };
 
-          await expect(() => BobbleheadService.createAsync(invalidUserIdData, db)).rejects.toThrow();
+          const parsedData = insertBobbleheadSchema.parse(invalidUserIdData);
+          await expect(() => BobbleheadService.createAsync(parsedData, userId, db)).rejects.toThrow();
         });
       },
     );

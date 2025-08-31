@@ -1,9 +1,21 @@
 import { eq } from 'drizzle-orm';
 import { cache } from 'react';
 
-import { db } from '@/lib/db';
-import { collections } from '@/lib/db/schema';
+import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-export const getCollectionByIdAsync = cache(async (id: string, dbInstance = db) => {
+import { db } from '@/lib/db';
+import { collections, subCollections } from '@/lib/db/schema';
+
+export const getCollectionByIdAsync = cache(async (id: string, dbInstance: DatabaseExecutor = db) => {
   return dbInstance.select().from(collections).where(eq(collections.id, id));
 });
+
+export const getCollectionsByUserAsync = cache(async (userId: string, dbInstance: DatabaseExecutor = db) => {
+  return dbInstance.select().from(collections).where(eq(collections.userId, userId));
+});
+
+export const getSubCollectionsByCollectionAsync = cache(
+  async (collectionId: string, dbInstance: DatabaseExecutor = db) => {
+    return dbInstance.select().from(subCollections).where(eq(subCollections.collectionId, collectionId));
+  },
+);

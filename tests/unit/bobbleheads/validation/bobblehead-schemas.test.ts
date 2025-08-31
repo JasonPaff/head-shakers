@@ -19,15 +19,15 @@ describe('Bobblehead Validation Schemas', () => {
   describe('insertBobbleheadSchema', () => {
     it('should validate a complete bobblehead object', () => {
       const validData = {
-        acquisitionDate: new Date('2024-01-01'),
+        acquisitionDate: '2024-01-01',
         acquisitionMethod: 'purchased',
         category: 'Sports',
         characterName: 'Test Character',
         collectionId: randomUUID(),
         currentCondition: 'excellent' as const,
-        customFields: { isSpecialEdition: true },
+        customFields: [{ isSpecialEdition: 'true' }],
         description: 'A test bobblehead description',
-        height: '6.50',
+        height: '6.5',
         isFeatured: true,
         isPublic: true,
         manufacturer: 'Test Manufacturer',
@@ -38,17 +38,16 @@ describe('Bobblehead Validation Schemas', () => {
         series: 'Test Series',
         status: 'owned' as const,
         subCollectionId: randomUUID(),
-        userId: randomUUID(),
         weight: '2.50',
-        year: 2024,
+        year: '2024',
       };
 
       const result = insertBobbleheadSchema.safeParse(validData);
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.name).toBe('Test Bobblehead');
-        expect(result.data.height).toBe('6.50');
-        expect(result.data.purchasePrice).toBe('49.99');
+        expect(result.data.height).toBe(6.5);
+        expect(result.data.purchasePrice).toBe(49.99);
       }
     });
 
@@ -56,7 +55,6 @@ describe('Bobblehead Validation Schemas', () => {
       const minimalData = {
         collectionId: randomUUID(),
         name: 'Minimal Bobblehead',
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(minimalData);
@@ -75,7 +73,6 @@ describe('Bobblehead Validation Schemas', () => {
         collectionId: randomUUID(),
         manufacturer: '  Test Manufacturer  ',
         name: '  Test Bobblehead  ',
-        userId: randomUUID(),
       };
 
       const result = insertBobbleheadSchema.safeParse(dataWithWhitespace);
@@ -96,7 +93,6 @@ describe('Bobblehead Validation Schemas', () => {
           collectionId: randomUUID(),
           height,
           name: 'Test',
-          userId: randomUUID(),
         });
         expect(result.success).toBe(true);
       });
@@ -106,7 +102,6 @@ describe('Bobblehead Validation Schemas', () => {
           collectionId: randomUUID(),
           height,
           name: 'Test',
-          userId: randomUUID(),
         });
         expect(result.success).toBe(false);
       });
@@ -121,7 +116,6 @@ describe('Bobblehead Validation Schemas', () => {
           collectionId: randomUUID(),
           name: 'Test',
           purchasePrice,
-          userId: randomUUID(),
         });
         expect(result.success).toBe(true);
       });
@@ -131,7 +125,6 @@ describe('Bobblehead Validation Schemas', () => {
           collectionId: randomUUID(),
           name: 'Test',
           purchasePrice,
-          userId: randomUUID(),
         });
         expect(result.success).toBe(false);
       });
@@ -139,14 +132,13 @@ describe('Bobblehead Validation Schemas', () => {
 
     it('should validate year field boundaries', () => {
       const currentYear = new Date().getFullYear();
-      const validYears = [1800, 1900, 2000, currentYear, currentYear + 1];
-      const invalidYears = [1799, currentYear + 2, -1, 0];
+      const validYears = ['1900', '2000', currentYear.toString(), (currentYear + 1).toString()];
+      const invalidYears = ['1799', (currentYear + 2).toString(), '-1', '0', 'not-a-year'];
 
       validYears.forEach((year) => {
         const result = insertBobbleheadSchema.safeParse({
           collectionId: randomUUID(),
           name: 'Test',
-          userId: randomUUID(),
           year,
         });
         expect(result.success).toBe(true);
@@ -156,7 +148,6 @@ describe('Bobblehead Validation Schemas', () => {
         const result = insertBobbleheadSchema.safeParse({
           collectionId: randomUUID(),
           name: 'Test',
-          userId: randomUUID(),
           year,
         });
         expect(result.success).toBe(false);
@@ -172,7 +163,6 @@ describe('Bobblehead Validation Schemas', () => {
           collectionId: randomUUID(),
           currentCondition: condition,
           name: 'Test',
-          userId: randomUUID(),
         });
         expect(result.success).toBe(true);
       });
@@ -182,7 +172,6 @@ describe('Bobblehead Validation Schemas', () => {
           collectionId: randomUUID(),
           name: 'Test',
           status,
-          userId: randomUUID(),
         });
         expect(result.success).toBe(true);
       });
@@ -191,7 +180,6 @@ describe('Bobblehead Validation Schemas', () => {
         collectionId: randomUUID(),
         currentCondition: 'invalid_condition',
         name: 'Test',
-        userId: randomUUID(),
       });
       expect(invalidCondition.success).toBe(false);
 
@@ -199,7 +187,6 @@ describe('Bobblehead Validation Schemas', () => {
         collectionId: randomUUID(),
         name: 'Test',
         status: 'invalid_status',
-        userId: randomUUID(),
       });
       expect(invalidStatus.success).toBe(false);
     });
@@ -213,28 +200,24 @@ describe('Bobblehead Validation Schemas', () => {
       const tooLong = insertBobbleheadSchema.safeParse({
         collectionId: randomUUID(),
         name: longName,
-        userId: randomUUID(),
       });
       expect(tooLong.success).toBe(false);
 
       const maxLength = insertBobbleheadSchema.safeParse({
         collectionId: randomUUID(),
         name: maxName,
-        userId: randomUUID(),
       });
       expect(maxLength.success).toBe(true);
 
       const tooShort = insertBobbleheadSchema.safeParse({
         collectionId: randomUUID(),
         name: shortName,
-        userId: randomUUID(),
       });
       expect(tooShort.success).toBe(false);
 
       const minLength = insertBobbleheadSchema.safeParse({
         collectionId: randomUUID(),
         name: minName,
-        userId: randomUUID(),
       });
       expect(minLength.success).toBe(true);
     });
@@ -346,7 +329,6 @@ describe('Bobblehead Validation Schemas', () => {
           maxYear: 2024,
           minYear: 2000,
           status: 'owned' as const,
-          userId: randomUUID(),
         },
         limit: 50,
         offset: 0,
@@ -495,8 +477,6 @@ describe('Bobblehead Validation Schemas', () => {
 
   describe('publicBobbleheadSchema', () => {
     it('should validate public bobblehead structure', () => {
-      // The publicBobbleheadSchema is selectBobbleheadSchema.omit({ deletedAt: true, isDeleted: true })
-      // So we need all required fields from the select schema
       const publicBobblehead = {
         acquisitionDate: null,
         acquisitionMethod: null,

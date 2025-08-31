@@ -11,7 +11,7 @@ import {
   userSettings,
 } from '@/lib/db/schema';
 
-import { testDb } from './test-db';
+import { testDb } from './test-db.helpers';
 
 // factory definitions
 export const userFactory = Factory.define<typeof users.$inferInsert>(({ sequence }) => ({
@@ -40,13 +40,15 @@ export const bobbleheadFactory = Factory.define<typeof bobbleheads.$inferInsert>
   characterName: faker.person.fullName(),
   collectionId: faker.string.uuid(),
   currentCondition: faker.helpers.arrayElement(['mint', 'excellent', 'good', 'fair', 'poor']),
-  customFields: {
-    edition: faker.helpers.arrayElement(['standard', 'limited', 'special', 'exclusive']),
-    rarity: faker.helpers.arrayElement(['common', 'uncommon', 'rare', 'legendary']),
-    serialNumber: faker.datatype.boolean() ? faker.number.int({ max: 10000, min: 1 }) : null,
-  },
+  customFields: [
+    {
+      edition: faker.airline.airline().name,
+    },
+    { rarity: faker.airline.airline().name },
+    { serialNumber: faker.airline.airline().name },
+  ] as const,
   description: faker.lorem.paragraph(),
-  height: faker.number.float({ fractionDigits: 1, max: 12, min: 3 }).toString(),
+  height: faker.number.float({ fractionDigits: 1, max: 12, min: 3 }),
   isFeatured: faker.datatype.boolean({ probability: 0.1 }),
   isPublic: faker.datatype.boolean({ probability: 0.8 }),
   manufacturer: faker.company.name(),
@@ -59,11 +61,11 @@ export const bobbleheadFactory = Factory.define<typeof bobbleheads.$inferInsert>
     'Comic Con',
     'Antique Shop',
   ]),
-  purchasePrice: faker.commerce.price({ max: 500, min: 5 }),
+  purchasePrice: Number(faker.commerce.price({ max: 500, min: 5 })),
   series: faker.commerce.productName(),
   status: faker.helpers.arrayElement(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']),
   userId: faker.string.uuid(),
-  weight: faker.number.float({ fractionDigits: 1, max: 5, min: 0.5 }).toString(),
+  weight: faker.number.float({ fractionDigits: 1, max: 5, min: 0.5 }),
   year: faker.date.past({ years: 30 }).getFullYear(),
 }));
 

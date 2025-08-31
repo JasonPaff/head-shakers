@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { testDb } from './test-db';
+import { testDb } from './test-db.helpers';
 
 export const setupTestDatabase = async () => {
   const testDbUrl = process.env.DATABASE_URL_TEST;

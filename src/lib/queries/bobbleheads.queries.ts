@@ -14,16 +14,28 @@ import { TAGS } from '@/lib/constants/tags';
 import { db } from '@/lib/db';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema';
 
-export const createBobbleheadAsync = async (data: InsertBobblehead, dbInstance: DatabaseExecutor = db) => {
-  return dbInstance.insert(bobbleheads).values(data).returning();
+export const createBobbleheadAsync = async (
+  data: InsertBobblehead,
+  userId: string,
+  dbInstance: DatabaseExecutor = db,
+) => {
+  return dbInstance
+    .insert(bobbleheads)
+    .values({ ...data, userId })
+    .returning();
 };
 
 export const updateBobbleheadAsync = async (
   id: string,
   data: UpdateBobblehead,
+  userId: string,
   dbInstance: DatabaseExecutor = db,
 ) => {
-  return dbInstance.update(bobbleheads).set(data).where(eq(bobbleheads.id, id)).returning();
+  return dbInstance
+    .update(bobbleheads)
+    .set({ ...data, userId })
+    .where(eq(bobbleheads.id, id))
+    .returning();
 };
 
 export const getBobbleheadByIdAsync = cache(async (id: string, dbInstance: DatabaseExecutor = db) => {

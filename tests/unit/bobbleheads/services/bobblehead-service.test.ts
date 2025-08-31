@@ -3,8 +3,9 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 import { bobbleheads, collections, users } from '@/lib/db/schema';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
+import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
 
-import { withTestIsolation } from '../../../helpers/database';
+import { withTestIsolation } from '../../../helpers/database.helpers';
 
 describe('BobbleheadService', () => {
   beforeAll(() => {
@@ -46,7 +47,8 @@ describe('BobbleheadService', () => {
           userId: user.id,
         };
 
-        const result = await BobbleheadService.createAsync(bobbleheadData, db);
+        const parsed = insertBobbleheadSchema.parse(bobbleheadData);
+        const result = await BobbleheadService.createAsync(parsed, user.id, db);
 
         expect(result).toBeDefined();
         expect(result).not.toBeNull();
@@ -66,7 +68,8 @@ describe('BobbleheadService', () => {
         };
 
         // Should throw due to foreign key constraint
-        await expect(() => BobbleheadService.createAsync(invalidData, db)).rejects.toThrow();
+        const parsed = insertBobbleheadSchema.parse(invalidData);
+        await expect(() => BobbleheadService.createAsync(parsed, randomUUID(), db)).rejects.toThrow();
       });
     });
   });
@@ -101,7 +104,8 @@ describe('BobbleheadService', () => {
           userId: user.id,
         };
 
-        const result = await BobbleheadService.createWithPhotosAsync(bobbleheadData, [], db);
+        const parsed = insertBobbleheadSchema.parse(bobbleheadData);
+        const result = await BobbleheadService.createWithPhotosAsync(parsed, user.id, [], db);
 
         expect(result).toBeDefined();
         expect(result!.name).toBe('No Photos Bobblehead');
@@ -153,7 +157,7 @@ describe('BobbleheadService', () => {
           status: 'sold' as const,
         };
 
-        const result = await BobbleheadService.updateAsync(bobblehead.id, updateData, db);
+        const result = await BobbleheadService.updateAsync(bobblehead.id, updateData, user.id, db);
 
         expect(result).toBeDefined();
         expect(result).not.toBeNull();
@@ -168,7 +172,7 @@ describe('BobbleheadService', () => {
         const fakeId = randomUUID();
         const updateData = { name: 'Will Not Update' };
 
-        const result = await BobbleheadService.updateAsync(fakeId, updateData, db);
+        const result = await BobbleheadService.updateAsync(fakeId, updateData, randomUUID(), db);
 
         expect(result).toBeNull();
       });

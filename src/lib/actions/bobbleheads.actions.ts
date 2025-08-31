@@ -19,45 +19,39 @@ import {
   deleteBobbleheadPhotoAsync,
   deleteBobbleheadsAsync,
   getBobbleheadByIdAsync,
-  getBobbleheadsByCollectionAsync,
-  getBobbleheadsByUserAsync,
-  getBobbleheadWithDetailsAsync,
   removeTagFromBobbleheadAsync,
   reorderBobbleheadPhotosAsync,
-  searchBobbleheadsAsync,
   updateBobbleheadAsync,
   updateBobbleheadPhotoAsync,
 } from '@/lib/queries/bobbleheads.queries';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import { authActionClient } from '@/lib/utils/next-safe-action';
 import {
   addTagToBobbleheadSchema,
   deleteBobbleheadPhotoSchema,
   deleteBobbleheadSchema,
   deleteBobbleheadsSchema,
   getBobbleheadByIdSchema,
-  getBobbleheadsByCollectionSchema,
-  getBobbleheadsByUserSchema,
   insertBobbleheadPhotoSchema,
   insertBobbleheadSchema,
   removeTagFromBobbleheadSchema,
   reorderPhotosSchema,
-  searchBobbleheadsSchema,
   updateBobbleheadPhotoSchema,
   updateBobbleheadSchema,
 } from '@/lib/validations/bobbleheads.validation';
 
+// create operations
 export const createBobbleheadAction = authActionClient
-  .use(createRateLimitMiddleware(60, 60))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
     isTransactionRequired: true,
   })
+  .use(createRateLimitMiddleware(5, 60))
   .inputSchema(insertBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
+    const sanitizedData = insertBobbleheadSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, sanitizedData);
@@ -67,8 +61,8 @@ export const createBobbleheadAction = authActionClient
       const newBobblehead = await BobbleheadService.createWithPhotosAsync(
         {
           ...sanitizedData,
-          userId,
         },
+        userId,
         [],
         ctx.tx,
       );
@@ -118,133 +112,6 @@ export const createBobbleheadAction = authActionClient
     }
   });
 
-// read operations
-export const getBobbleheadByIdAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_ID,
-  })
-  .inputSchema(getBobbleheadByIdSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
-
-    try {
-      const bobblehead = await getBobbleheadWithDetailsAsync(sanitizedData.id, undefined, ctx.db);
-
-      if (!bobblehead || bobblehead.length === 0) {
-        throw new ActionError(
-          ErrorType.NOT_FOUND,
-          'BOBBLEHEAD_NOT_FOUND',
-          ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND,
-          { bobbleheadId: sanitizedData.id },
-          false,
-          404,
-        );
-      }
-
-      return {
-        data: bobblehead[0],
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_ID,
-        },
-        operation: 'get_bobblehead_by_id',
-      });
-    }
-  });
-
-export const getBobbleheadsByCollectionAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_COLLECTION,
-  })
-  .inputSchema(getBobbleheadsByCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
-
-    try {
-      const bobbleheads = await getBobbleheadsByCollectionAsync(
-        sanitizedData.collectionId,
-        undefined,
-        ctx.db,
-      );
-
-      return {
-        data: bobbleheads,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_COLLECTION,
-        },
-        operation: 'get_bobbleheads_by_collection',
-      });
-    }
-  });
-
-export const getBobbleheadsByUserAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_USER,
-  })
-  .inputSchema(getBobbleheadsByUserSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
-
-    try {
-      const bobbleheads = await getBobbleheadsByUserAsync(sanitizedData.userId, undefined, ctx.db);
-
-      return {
-        data: bobbleheads,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.BOBBLEHEADS.GET_BY_USER,
-        },
-        operation: 'get_bobbleheads_by_user',
-      });
-    }
-  });
-
-export const searchBobbleheadsAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.BOBBLEHEADS.SEARCH,
-  })
-  .inputSchema(searchBobbleheadsSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const sanitizedData = ctx.sanitizedInput as typeof parsedInput;
-
-    try {
-      const bobbleheads = await searchBobbleheadsAsync(
-        sanitizedData.searchTerm || '',
-        sanitizedData.filters || {},
-        undefined,
-        sanitizedData.limit || 20,
-        sanitizedData.offset || 0,
-        ctx.db,
-      );
-
-      return {
-        data: bobbleheads,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.BOBBLEHEADS.SEARCH,
-        },
-        operation: 'search_bobbleheads',
-      });
-    }
-  });
-
 // update operations
 export const updateBobbleheadAction = authActionClient
   .use(createRateLimitMiddleware(60, 60))
@@ -282,7 +149,7 @@ export const updateBobbleheadAction = authActionClient
         );
       }
 
-      const updatedBobblehead = await updateBobbleheadAsync(id, updateData, ctx.tx);
+      const updatedBobblehead = await updateBobbleheadAsync(id, updateData, userId, ctx.tx);
 
       if (!updatedBobblehead || updatedBobblehead.length === 0) {
         throw new ActionError(

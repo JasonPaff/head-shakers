@@ -12,7 +12,7 @@ export const SCHEMA_LIMITS = {
     HEIGHT: { PRECISION: 5, SCALE: 2 },
     MANUFACTURER: { MAX: 100 },
     MATERIAL: { MAX: 100 },
-    NAME: { MAX: 200, MIN: 1 },
+    NAME: { MAX: 100, MIN: 1 },
     PURCHASE_LOCATION: { MAX: 100 },
     PURCHASE_PRICE: { PRECISION: 10, SCALE: 2 },
     SERIES: { MAX: 100 },

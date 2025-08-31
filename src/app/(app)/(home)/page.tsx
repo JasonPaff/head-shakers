@@ -1,5 +1,10 @@
 import type { Metadata } from 'next';
 
+import { SignUpButton } from '@clerk/nextjs';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
+
+import { AuthContent } from '@/components/ui/auth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,19 +18,35 @@ export function generateMetadata(): Metadata {
 }
 
 export default function HomePage() {
+  const _browseLink = $path({ route: '/browse' });
+  const _dashboardLink = $path({ route: '/dashboard/collection' });
+
   return (
     <div className={'container mx-auto px-4 py-8'}>
-      {/* Hero Section */}
+      {/* Hero */}
       <section className={'py-12 text-center'}>
         <h1 className={'mb-4 text-4xl font-bold tracking-tight'}>Collect, Share, and Discover Bobbleheads</h1>
         <p className={'mx-auto mb-8 max-w-2xl text-xl text-muted-foreground'}>
-          Build your digital bobblehead collection, connect with other collectors, and discover rare finds from
-          around the world.
+          Build your digital bobblehead collection, connect with other collectors, and discover rare finds
+          from around the world.
         </p>
+        {/* Collections */}{' '}
         <div className={'flex justify-center gap-4'}>
-          <Button size={'lg'}>Start Collecting</Button>
-          <Button size={'lg'} variant={'outline'}>
-            Browse Collections
+          <Button asChild size={'lg'}>
+            <AuthContent
+              fallback={
+                <Button asChild>
+                  <SignUpButton mode={'modal'}>Start Collecting</SignUpButton>
+                </Button>
+              }
+            >
+              <Button asChild>
+                <Link href={_dashboardLink}>My Collection</Link>
+              </Button>
+            </AuthContent>
+          </Button>
+          <Button asChild size={'lg'} variant={'outline'}>
+            <Link href={_browseLink}>Browse Collections</Link>
           </Button>
         </div>
       </section>

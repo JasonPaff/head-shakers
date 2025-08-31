@@ -1,24 +1,32 @@
 'use client';
 
+import type { VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 
 import { Root as LabelRoot } from '@radix-ui/react-label';
+import { cva } from 'class-variance-authority';
 
 import { cn } from '@/utils/tailwind-utils';
 
-type LabelProps = ComponentProps<typeof LabelRoot>;
+const styles = cva(
+  [
+    'flex items-center text-sm leading-none font-medium',
+    'group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50',
+    'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
+  ],
+  {
+    variants: {
+      variant: { required: 'after:ml-1 after:text-destructive after:content-["*"]' },
+    },
+  },
+);
 
-export const Label = ({ className, ...props }: LabelProps) => {
+type LabelProps = ComponentProps<typeof LabelRoot> & VariantProps<typeof styles>;
+
+export const Label = ({ children, className, variant, ...props }: LabelProps) => {
   return (
-    <LabelRoot
-      className={cn(
-        'flex items-center gap-2 text-sm leading-none font-medium select-none',
-        'group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50',
-        'peer-disabled:cursor-not-allowed peer-disabled:opacity-50',
-        className,
-      )}
-      data-slot={'label'}
-      {...props}
-    />
+    <LabelRoot className={cn(styles({ variant }), className)} data-slot={'label'} {...props}>
+      {children}
+    </LabelRoot>
   );
 };

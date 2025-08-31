@@ -11,6 +11,7 @@ declare module "@@@next-typesafe-url" {
   interface DynamicRouter {
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/route-type").RouteType>;
+    "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }
 
   interface StaticRouter {
@@ -30,8 +31,6 @@ declare module "@@@next-typesafe-url" {
     "/dashboard/feed": StaticRoute;
     "/dashboard/notifications": StaticRoute;
     "/dashboard": StaticRoute;
-    "/examples/ably": StaticRoute;
-    "/examples/sentry": StaticRoute;
     "/items/add": StaticRoute;
     "/items/[itemId]/edit": StaticRoute;
     "/items/[itemId]": StaticRoute;
@@ -47,10 +46,11 @@ declare module "@@@next-typesafe-url" {
     "/users/[userId]/followers": StaticRoute;
     "/users/[userId]/following": StaticRoute;
     "/users/[userId]": StaticRoute;
-    "/sign-in/[[...sign-in]]": StaticRoute;
     "/sign-up/[[...sign-up]]": StaticRoute;
     "/about": StaticRoute;
     "/privacy": StaticRoute;
     "/terms": StaticRoute;
+    "/examples/ably": StaticRoute;
+    "/examples/sentry": StaticRoute;
   }
 }

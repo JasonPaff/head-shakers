@@ -5,7 +5,7 @@
 export const ENUMS = {
   BOBBLEHEAD: {
     CONDITION: ['mint', 'excellent', 'good', 'fair', 'poor'] as const,
-    STATUS: ['owned', 'for_trade', 'for_sale', 'sold', 'wishlist'] as const,
+    STATUS: ['owned', 'sold', 'wishlist'] as const,
   },
   COMMENT: {
     TARGET_TYPE: ['bobblehead', 'collection'] as const,

@@ -1,13 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import * as Sentry from '@sentry/nextjs';
-import { $path } from 'next-typesafe-url';
 
 const isPublicRoute = createRouteMatcher([
-  // authentication pages (route group)
-  `${$path({ route: '/sign-in/[[...sign-in]]' })}(.*)`,
-  '/sign-in(.*)',
-  '/sign-up(.*)',
-
   // static pages (route group)
   '/about(.*)',
   '/privacy(.*)',

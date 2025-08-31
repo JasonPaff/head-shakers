@@ -13,8 +13,9 @@ import {
   getBobbleheadWithDetailsAsync,
   updateBobbleheadAsync,
 } from '@/lib/queries/bobbleheads.queries';
+import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
 
-import { withTestIsolation } from '../../../helpers/database';
+import { withTestIsolation } from '../../../helpers/database.helpers';
 
 describe('Bobblehead CRUD Queries', () => {
   beforeAll(() => {
@@ -56,7 +57,8 @@ describe('Bobblehead CRUD Queries', () => {
           userId: user.id,
         };
 
-        const result = await createBobbleheadAsync(bobbleheadData, db);
+        const parsed = insertBobbleheadSchema.parse(bobbleheadData);
+        const result = await createBobbleheadAsync(parsed, user.id, db);
 
         expect(result).toHaveLength(1);
         expect(result[0]).toBeDefined();
@@ -99,7 +101,8 @@ describe('Bobblehead CRUD Queries', () => {
           userId: user.id,
         };
 
-        const result = await createBobbleheadAsync(minimalData, db);
+        const parsed = insertBobbleheadSchema.parse(minimalData);
+        const result = await createBobbleheadAsync(parsed, user.id, db);
 
         expect(result[0]!.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
         expect(result[0]!.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
@@ -323,7 +326,7 @@ describe('Bobblehead CRUD Queries', () => {
           status: 'sold' as const,
         };
 
-        const result = await updateBobbleheadAsync(bobblehead.id, updateData, db);
+        const result = await updateBobbleheadAsync(bobblehead.id, updateData, user.id, db);
 
         expect(result).toHaveLength(1);
         expect(result[0]!.name).toBe('Updated Name');
@@ -374,7 +377,7 @@ describe('Bobblehead CRUD Queries', () => {
           description: 'Only description updated',
         };
 
-        const result = await updateBobbleheadAsync(bobblehead.id, partialUpdate, db);
+        const result = await updateBobbleheadAsync(bobblehead.id, partialUpdate, user.id, db);
 
         expect(result[0]!.description).toBe('Only description updated');
         expect(result[0]!.name).toBe('Original Name'); // Unchanged
