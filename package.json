@@ -32,7 +32,7 @@
     "test:ui": "vitest --ui",
     "test:unit": "vitest run tests/unit",
     "test:watch": "vitest watch",
-    "typecheck": "tsc --noEmit"q
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
