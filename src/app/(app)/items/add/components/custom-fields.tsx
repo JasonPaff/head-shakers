@@ -20,7 +20,7 @@ export const CustomFields = withForm({
           <form.Field mode={'array'} name={'customFields'}>
             {(field) => (
               <div className={'space-y-4'}>
-                {field.state.value.map((_, index) => (
+                {field.state.value?.map((_, index) => (
                   <div className={'flex w-full items-end gap-2'} key={index}>
                     {/* Field Name */}
                     <form.AppField name={`customFields[${index}].fieldName`}>
