@@ -35,7 +35,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         theme: shadcn,
       }}
     >
-      <html lang={'en'} suppressHydrationWarning>
+      <html data-scroll-behavior={'smooth'} lang={'en'} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
             {children}
