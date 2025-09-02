@@ -1,3 +1,5 @@
+'use server';
+
 /* eslint-disable no-useless-catch */
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
