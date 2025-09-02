@@ -22,6 +22,7 @@ export const addItemFormOptions = formOptions({
     manufacturer: '',
     material: '',
     name: '',
+    photos: [] as File[],
     purchaseLocation: '',
     purchasePrice: '',
     series: '',
@@ -29,5 +30,5 @@ export const addItemFormOptions = formOptions({
     subCollectionId: '',
     weight: '',
     year: '',
-  } as z.input<typeof insertBobbleheadSchema>,
+  } as z.input<typeof insertBobbleheadSchema> & { photos: File[] },
 });

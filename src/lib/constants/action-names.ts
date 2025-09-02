@@ -21,6 +21,7 @@ export const ACTION_NAMES = {
     UPDATE: 'updateBobblehead',
     UPDATE_PHOTO: 'updateBobbleheadPhoto',
     UPLOAD_PHOTO: 'uploadBobbleheadPhoto',
+    UPLOAD_PHOTOS: 'uploadBobbleheadPhotos',
   },
   COLLECTIONS: {
     CREATE: 'createCollection',

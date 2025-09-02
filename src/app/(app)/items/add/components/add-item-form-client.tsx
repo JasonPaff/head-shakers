@@ -19,8 +19,8 @@ import { ItemTags } from '@/app/(app)/items/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/items/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
-import { createBobbleheadAction } from '@/lib/actions/bobbleheads.actions';
-import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
+import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads-with-photos.actions';
+import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobblehead-with-photos.validation';
 
 interface AddItemFormClientProps {
   collections: Array<ComboboxItem>;
@@ -29,7 +29,7 @@ interface AddItemFormClientProps {
 export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useAction(createBobbleheadAction, {
+  const { executeAsync, isExecuting } = useAction(createBobbleheadWithPhotosAction, {
     onError: ({ error }) => {
       toast.error(error.serverError || 'Failed to create bobblehead');
     },
@@ -52,7 +52,7 @@ export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
       modeAfterSubmission: 'change',
     }),
     validators: {
-      onSubmit: insertBobbleheadSchema,
+      onSubmit: createBobbleheadWithPhotosSchema,
     },
   });
 
