@@ -23,34 +23,36 @@ export const CustomFields = withForm({
                 {field.state.value?.map((_, index) => (
                   <div className={'flex w-full items-end gap-2'} key={index}>
                     {/* Field Name */}
-                    <form.AppField name={`customFields[${index}].fieldName`}>
-                      {(subfield) => (
-                        <subfield.TextField
-                          className={'flex-1'}
-                          label={'Field Name'}
-                          onChange={(e) => {
-                            subfield.handleChange(e.target.value);
-                          }}
-                          placeholder={'e.g., Edition Number'}
-                          value={subfield.state.value}
-                        />
-                      )}
-                    </form.AppField>
+                    <div className={'flex-1'}>
+                      <form.AppField name={`customFields[${index}].fieldName`}>
+                        {(subfield) => (
+                          <subfield.TextField
+                            label={'Field Name'}
+                            onChange={(e) => {
+                              subfield.handleChange(e.target.value);
+                            }}
+                            placeholder={'e.g., Edition Number'}
+                            value={subfield.state.value}
+                          />
+                        )}
+                      </form.AppField>
+                    </div>
 
                     {/* Value */}
-                    <form.AppField name={`customFields[${index}].value`}>
-                      {(subfield) => (
-                        <subfield.TextField
-                          className={'flex-1'}
-                          label={'Value'}
-                          onChange={(e) => {
-                            subfield.handleChange(e.target.value);
-                          }}
-                          placeholder={'e.g., 1 of 500'}
-                          value={subfield.state.value}
-                        />
-                      )}
-                    </form.AppField>
+                    <div className={'flex-1'}>
+                      <form.AppField name={`customFields[${index}].value`}>
+                        {(subfield) => (
+                          <subfield.TextField
+                            label={'Value'}
+                            onChange={(e) => {
+                              subfield.handleChange(e.target.value);
+                            }}
+                            placeholder={'e.g., 1 of 500'}
+                            value={subfield.state.value}
+                          />
+                        )}
+                      </form.AppField>
+                    </div>
 
                     {/* Remove */}
                     <Button
