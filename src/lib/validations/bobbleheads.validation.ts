@@ -11,10 +11,12 @@ import {
   zodNullableUUID,
   zodYear,
 } from '@/lib/utils/zod.utils';
+import { photosValidationSchema } from '@/lib/validations/photo-upload.validation';
 
 export const customFieldsSchema = z.record(z.string(), z.string());
 
 export type AddTagToBobblehead = z.infer<typeof addTagToBobbleheadSchema>;
+export type CreateBobbleheadWithPhotos = z.infer<typeof createBobbleheadWithPhotosSchema>;
 export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
 export type DeleteBobbleheadPhoto = z.infer<typeof deleteBobbleheadPhotoSchema>;
@@ -78,10 +80,13 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   }).optional(),
   collectionId: z.uuid('Collection is required'),
   currentCondition: z.enum(ENUMS.BOBBLEHEAD.CONDITION).default(DEFAULTS.BOBBLEHEAD.CONDITION),
-  customFields: customFieldsSchema.array().transform((val) => {
-    if (!val || val.length === 0) return null;
-    return val;
-  }).optional(),
+  customFields: customFieldsSchema
+    .array()
+    .transform((val) => {
+      if (!val || val.length === 0) return null;
+      return val;
+    })
+    .optional(),
   description: zodMaxString({
     fieldName: 'Description',
     maxLength: SCHEMA_LIMITS.BOBBLEHEAD.DESCRIPTION.MAX,
@@ -126,7 +131,9 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   userId: true,
   viewCount: true,
 });
-
+export const createBobbleheadWithPhotosSchema = insertBobbleheadSchema.extend({
+  photos: photosValidationSchema.default([]),
+});
 export const updateBobbleheadSchema = insertBobbleheadSchema.partial();
 export const publicBobbleheadSchema = selectBobbleheadSchema.omit({
   deletedAt: true,

@@ -20,7 +20,7 @@ import { PhysicalAttributes } from '@/app/(app)/items/add/components/physical-at
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads-with-photos.actions';
-import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobblehead-with-photos.validation';
+import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
 interface AddItemFormClientProps {
   collections: Array<ComboboxItem>;
