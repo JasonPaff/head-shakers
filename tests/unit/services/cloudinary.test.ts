@@ -1,4 +1,9 @@
 /* eslint-disable react-snob/require-boolean-prefix-is */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import type { UploadApiErrorResponse, UploadApiResponse } from 'cloudinary';
 
 import { v2 as cloudinary } from 'cloudinary';
@@ -215,7 +220,7 @@ describe('Cloudinary Service', () => {
         const publicId = 'test/image/123';
         vi.mocked(cloudinary.url).mockImplementation((id, options) => {
           const params = new URLSearchParams();
-          const opts = options as Record<string, any>;
+          const opts = options as any;
           if (opts?.width) params.set('w', opts.width.toString());
           if (opts?.height) params.set('h', opts.height.toString());
           if (opts?.crop) params.set('c', opts.crop);
