@@ -6,7 +6,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   type CloudinaryUploadOptions,
-  type CloudinaryUploadResult,
   deleteImage,
   extractMetadata,
   fileToBuffer,
@@ -44,13 +43,17 @@ describe('Cloudinary Service', () => {
   const invalidExtensionFile = new File(['test'], 'test.bmp', { type: 'image/bmp' });
 
   const mockUploadResponse: UploadApiResponse = {
+    access_control: [],
     access_mode: 'public',
     asset_id: 'asset123',
     bytes: 152048,
+    context: {},
     created_at: '2024-01-01T00:00:00Z',
     etag: 'abc123',
     format: 'jpg',
     height: 600,
+    metadata: {},
+    moderation: [],
     original_filename: 'test-image',
     pages: 1,
     placeholder: false,
@@ -212,10 +215,11 @@ describe('Cloudinary Service', () => {
         const publicId = 'test/image/123';
         vi.mocked(cloudinary.url).mockImplementation((id, options) => {
           const params = new URLSearchParams();
-          if (options?.width) params.set('w', options.width.toString());
-          if (options?.height) params.set('h', options.height.toString());
-          if (options?.crop) params.set('c', options.crop);
-          if (options?.gravity) params.set('g', options.gravity);
+          const opts = options as Record<string, any>;
+          if (opts?.width) params.set('w', opts.width.toString());
+          if (opts?.height) params.set('h', opts.height.toString());
+          if (opts?.crop) params.set('c', opts.crop);
+          if (opts?.gravity) params.set('g', opts.gravity);
           return `https://res.cloudinary.com/${id}?${params.toString()}`;
         });
 
@@ -244,7 +248,7 @@ describe('Cloudinary Service', () => {
     describe('uploadImage', () => {
       it('should successfully upload an image', async () => {
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[0]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -318,7 +322,7 @@ describe('Cloudinary Service', () => {
       it('should sanitize filename and generate unique public ID', async () => {
         const specialFile = new File(['test'], 'My Special File!@#.jpg', { type: 'image/jpeg' });
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[0]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -331,14 +335,14 @@ describe('Cloudinary Service', () => {
 
         await uploadImage(specialFile, mockUploadOptions);
 
-        const callArgs = vi.mocked(cloudinary.uploader.upload_stream).mock.calls[0]?.[0];
+        const callArgs = vi.mocked(cloudinary.uploader.upload_stream).mock.calls[0]?.[0] as any;
         expect(callArgs?.public_id).toMatch(/bobbleheads\/user123\/bobblehead456\/My_Special_File____\d+$/);
       });
 
       it('should use custom public ID when provided', async () => {
         const optionsWithPublicId = { ...mockUploadOptions, publicId: 'custom-id' };
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[0]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -351,7 +355,7 @@ describe('Cloudinary Service', () => {
 
         await uploadImage(mockFile, optionsWithPublicId);
 
-        const callArgs = vi.mocked(cloudinary.uploader.upload_stream).mock.calls[0]?.[0];
+        const callArgs = vi.mocked(cloudinary.uploader.upload_stream).mock.calls[0]?.[0] as any;
         expect(callArgs?.public_id).toBe('custom-id');
       });
     });
@@ -365,7 +369,7 @@ describe('Cloudinary Service', () => {
         ];
 
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[mockUploadStream.mock.calls.length - 1]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -400,7 +404,7 @@ describe('Cloudinary Service', () => {
         ];
 
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[mockUploadStream.mock.calls.length - 1]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -439,7 +443,7 @@ describe('Cloudinary Service', () => {
         const optionsNoPrimarySet = { bobbleheadId: 'bobblehead456', userId: 'user123' };
 
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[mockUploadStream.mock.calls.length - 1]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -465,7 +469,7 @@ describe('Cloudinary Service', () => {
         const optionsNoPrimary = { ...mockUploadOptions, isPrimary: false };
 
         const mockUploadStream = vi.fn().mockImplementation(() => ({
-          end: vi.fn((buffer) => {
+          end: vi.fn(() => {
             const callback = mockUploadStream.mock.calls[mockUploadStream.mock.calls.length - 1]?.[1];
             if (callback) {
               callback(undefined, mockUploadResponse);
@@ -566,7 +570,7 @@ describe('Cloudinary Service', () => {
       it('should allow overriding default transformations', () => {
         vi.mocked(cloudinary.url).mockReturnValue('https://res.cloudinary.com/override.jpg');
 
-        const url = getOptimizedUrl('test-public-id', {
+        getOptimizedUrl('test-public-id', {
           format: 'jpg',
           quality: 80,
         });
@@ -604,7 +608,7 @@ describe('Cloudinary Service', () => {
       it('should include public ID when provided', () => {
         vi.mocked(cloudinary.utils.api_sign_request).mockReturnValue('signature');
 
-        const result = generateSignedUploadUrl({
+        generateSignedUploadUrl({
           folder: 'test-folder',
           publicId: 'custom-public-id',
         });
