@@ -196,6 +196,8 @@ export const uploadMultipleImages = async (
   const results: Array<CloudinaryUploadResult> = [];
   const errors: Array<Error> = [];
 
+  if (!files || files.length === 0) return [];
+
   for (let i = 0; i < files.length; i++) {
     try {
       const result = await uploadImage(
