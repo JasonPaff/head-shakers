@@ -21,11 +21,12 @@ export const CustomFields = withForm({
             {(field) => (
               <div className={'space-y-4'}>
                 {field.state.value?.map((_, index) => (
-                  <div className={'flex w-full items-end gap-2'} key={index}>
+                  <div className={'flex items-end gap-2'} key={index}>
                     {/* Field Name */}
                     <form.AppField name={`customFields[${index}].fieldName`}>
                       {(subfield) => (
                         <subfield.TextField
+                          className={'flex-1'}
                           label={'Field Name'}
                           onChange={(e) => {
                             subfield.handleChange(e.target.value);
@@ -40,6 +41,7 @@ export const CustomFields = withForm({
                     <form.AppField name={`customFields[${index}].value`}>
                       {(subfield) => (
                         <subfield.TextField
+                          className={'flex-1'}
                           label={'Value'}
                           onChange={(e) => {
                             subfield.handleChange(e.target.value);
