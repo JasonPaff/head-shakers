@@ -21,7 +21,7 @@ export const CustomFields = withForm({
             {(field) => (
               <div className={'space-y-4'}>
                 {field.state.value?.map((_, index) => (
-                  <div className={'flex items-end gap-2'} key={index}>
+                  <div className={'flex w-full items-end gap-2'} key={index}>
                     {/* Field Name */}
                     <form.AppField name={`customFields[${index}].fieldName`}>
                       {(subfield) => (
