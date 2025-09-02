@@ -40,7 +40,9 @@ export const AcquisitionDetails = withForm({
 
             {/* Purchase Price */}
             <form.AppField name={'purchasePrice'}>
-              {(field) => <field.TextField label={'Purchase Price ($)'} placeholder={'25.99'} />}
+              {(field) => (
+                <field.TextField label={'Purchase Price ($)'} placeholder={'25.99'} type={'number'} />
+              )}
             </form.AppField>
           </div>
         </CardContent>
