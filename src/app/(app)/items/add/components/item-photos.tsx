@@ -5,9 +5,8 @@ import { Tag } from 'lucide-react';
 import { addItemFormOptions } from '@/app/(app)/items/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
-import {} from '@/lib/validations/bobbleheads.validation';
 
-export const ItemTags = withForm({
+export const ItemPhotos = withForm({
   ...addItemFormOptions,
   render: () => {
     return (
@@ -15,9 +14,9 @@ export const ItemTags = withForm({
         <CardHeader>
           <CardTitle className={'flex items-center gap-2'}>
             <Tag aria-hidden className={'size-5'} />
-            Tags
+            Photos
           </CardTitle>
-          <CardDescription>Add custom tags to organize and categorize your bobblehead</CardDescription>
+          <CardDescription>Upload photos of your bobblehead</CardDescription>
         </CardHeader>
         <CardContent className={'space-y-4'}>COMING SOON!</CardContent>
       </Card>

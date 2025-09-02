@@ -13,7 +13,9 @@ import { addItemFormOptions } from '@/app/(app)/items/add/components/add-item-fo
 import { BasicInformation } from '@/app/(app)/items/add/components/basic-information';
 import { CollectionAssignment } from '@/app/(app)/items/add/components/collection-assignment';
 import { CustomFields } from '@/app/(app)/items/add/components/custom-fields';
+import { ItemPhotos } from '@/app/(app)/items/add/components/item-photos';
 import { ItemSettings } from '@/app/(app)/items/add/components/item-settings';
+import { ItemTags } from '@/app/(app)/items/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/items/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
@@ -71,7 +73,9 @@ export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
         <BasicInformation form={form} />
         <AcquisitionDetails form={form} />
         <PhysicalAttributes form={form} />
+        <ItemTags form={form} />
         <CustomFields form={form} />
+        <ItemPhotos form={form} />
         <ItemSettings form={form} />
 
         {/* Action Buttons */}
