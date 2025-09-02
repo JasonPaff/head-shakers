@@ -22,7 +22,8 @@
       "Bash(bun run:*)",
       "Bash(mkdir:*)",
       "Bash(npx vitest run:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(wc:*)"
     ],
     "deny": [],
     "ask": []

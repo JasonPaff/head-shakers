@@ -19,12 +19,14 @@ import { ItemTags } from '@/app/(app)/items/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/items/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
-import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads-with-photos.actions';
+import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads.actions';
 import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
 interface AddItemFormClientProps {
   collections: Array<ComboboxItem>;
 }
+
+// TODO: local storage draft save and restore
 
 export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
   const router = useRouter();
@@ -48,11 +50,11 @@ export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
       await executeAsync(value);
     },
     validationLogic: revalidateLogic({
-      mode: 'submit',
+      mode: 'blur',
       modeAfterSubmission: 'change',
     }),
     validators: {
-      onSubmit: createBobbleheadWithPhotosSchema,
+      onBlur: createBobbleheadWithPhotosSchema,
     },
   });
 

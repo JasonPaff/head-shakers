@@ -2,7 +2,8 @@
 'use client';
 
 import { useStore } from '@tanstack/react-form';
-import { Camera } from 'lucide-react';
+import { CameraIcon } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
 
 import type { PhotoWithMetadata } from '@/components/ui/photo-upload';
 
@@ -16,15 +17,28 @@ export const ItemPhotos = withForm({
   render: function ({ form }) {
     const photos = useStore(form.store, (state) => state.values.photos);
 
-    const photosWithMetadata: Array<PhotoWithMetadata> = (photos || []).map((file, index) => ({
-      altText: '',
-      caption: '',
-      file,
-      id: `temp-${index}`,
-      isPrimary: index === 0,
-      preview: URL.createObjectURL(file),
-      sortOrder: index,
-    }));
+    const photosWithMetadata: Array<PhotoWithMetadata> = useMemo(
+      () =>
+        (photos || []).map((file, index) => ({
+          altText: '',
+          caption: '',
+          file,
+          id: `temp-${index}`,
+          isPrimary: index === 0,
+          preview: URL.createObjectURL(file),
+          sortOrder: index,
+        })),
+      [photos],
+    );
+
+    // clean up object URLs on unmount
+    useEffect(() => {
+      return () => {
+        photosWithMetadata.forEach((photo) => {
+          URL.revokeObjectURL(photo.preview);
+        });
+      };
+    }, [photosWithMetadata]);
 
     const handlePhotosChange = (updatedPhotos: Array<PhotoWithMetadata>) => {
       const files = updatedPhotos.map((photo) => photo.file);
@@ -35,7 +49,7 @@ export const ItemPhotos = withForm({
       <Card>
         <CardHeader>
           <CardTitle className={'flex items-center gap-2'}>
-            <Camera aria-hidden className={'size-5'} />
+            <CameraIcon aria-hidden className={'size-5'} />
             Photos
           </CardTitle>
           <CardDescription>Upload photos of your bobblehead (up to 10 photos)</CardDescription>
