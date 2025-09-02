@@ -37,6 +37,8 @@
   "dependencies": {
     "@clerk/nextjs": "^6.31.4",
     "@clerk/themes": "^2.4.13",
+    "@cloudinary/react": "^1.14.3",
+    "@cloudinary/url-gen": "^1.22.0",
     "@neondatabase/serverless": "^1.0.1",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-checkbox": "^1.3.3",
@@ -59,6 +61,7 @@
     "@upstash/redis": "^1.35.3",
     "ably": "^2.11.0",
     "class-variance-authority": "^0.7.1",
+    "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cookies-next": "^6.1.0",
