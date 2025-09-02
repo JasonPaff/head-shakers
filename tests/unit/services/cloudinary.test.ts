@@ -87,10 +87,10 @@ describe('Cloudinary Service', () => {
   };
 
   beforeEach(() => {
-    // Reset all mocks before each test
+    // reset all mocks before each test
     vi.clearAllMocks();
 
-    // Set up environment variables
+    // set up environment variables
     process.env.CLOUDINARY_CLOUD_NAME = 'test-cloud';
     process.env.CLOUDINARY_API_KEY = 'test-api-key';
     process.env.CLOUDINARY_API_SECRET = 'test-api-secret';
@@ -390,12 +390,12 @@ describe('Cloudinary Service', () => {
         expect(results).toHaveLength(3);
         expect(cloudinary.uploader.upload_stream).toHaveBeenCalledTimes(3);
 
-        // Check that first image is not marked as primary since mockUploadOptions.isPrimary is false
+        // check that the first image is not marked as primary since mockUploadOptions.isPrimary is false
         expect(results[0]!.metadata.isPrimary).toBe(false);
         expect(results[1]!.metadata.isPrimary).toBe(false);
         expect(results[2]!.metadata.isPrimary).toBe(false);
 
-        // Check sort order
+        // check sort order
         expect(results[0]?.metadata.sortOrder).toBe(0);
         expect(results[1]?.metadata.sortOrder).toBe(1);
         expect(results[2]?.metadata.sortOrder).toBe(2);
