@@ -30,12 +30,12 @@ export const ItemSettings = withForm({
 
             {/* Is Public */}
             <form.AppField name={'isPublic'}>
-              {(field) => <field.CheckboxField label={'Make this bobblehead public'} />}
+              {(field) => <field.SwitchField label={'Make this bobblehead public'} />}
             </form.AppField>
 
             {/* Is Featured */}
             <form.AppField name={'isFeatured'}>
-              {(field) => <field.CheckboxField label={'Feature this bobblehead'} />}
+              {(field) => <field.SwitchField label={'Feature this bobblehead'} />}
             </form.AppField>
           </div>
         </CardContent>

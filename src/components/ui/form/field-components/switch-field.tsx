@@ -1,0 +1,42 @@
+'use client';
+
+import type { ComponentProps } from 'react';
+
+import { useFieldContext } from '@/components/ui/form';
+import { FieldAria } from '@/components/ui/form/field-components/field-aria';
+import { FieldDescription } from '@/components/ui/form/field-components/field-description';
+import { FieldError } from '@/components/ui/form/field-components/field-error';
+import { FieldItem } from '@/components/ui/form/field-components/field-item';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+
+type SwitchFieldProps = ComponentProps<typeof Switch> & {
+  description?: string;
+  isRequired?: boolean;
+  label: string;
+};
+
+export const SwitchField = ({ description, isRequired, label, ...props }: SwitchFieldProps) => {
+  const field = useFieldContext<boolean>();
+
+  return (
+    <FieldItem>
+      <div className={'flex items-center gap-x-3'}>
+        <FieldAria>
+          <Switch
+            checked={field.state.value}
+            id={field.name}
+            onBlur={field.handleBlur}
+            onCheckedChange={field.handleChange}
+            {...props}
+          />
+        </FieldAria>
+        <Label htmlFor={field.name} variant={isRequired ? 'required' : undefined}>
+          {label}
+        </Label>
+      </div>
+      <FieldError />
+      <FieldDescription>{description}</FieldDescription>
+    </FieldItem>
+  );
+};
