@@ -2,7 +2,7 @@ import type { z } from 'zod';
 
 import { formOptions } from '@tanstack/form-core';
 
-import type { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
+import type { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
 import { DEFAULTS } from '@/lib/constants';
 
@@ -22,7 +22,7 @@ export const addItemFormOptions = formOptions({
     manufacturer: '',
     material: '',
     name: '',
-    photos: [] as File[],
+    photos: [],
     purchaseLocation: '',
     purchasePrice: '',
     series: '',
@@ -30,5 +30,5 @@ export const addItemFormOptions = formOptions({
     subCollectionId: '',
     weight: '',
     year: '',
-  } as z.input<typeof insertBobbleheadSchema> & { photos: File[] },
+  } as z.input<typeof createBobbleheadWithPhotosSchema>,
 });

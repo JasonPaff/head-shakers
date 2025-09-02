@@ -4,6 +4,10 @@ import { CONFIG } from '@/lib/constants';
 
 export type BatchPhotoUpload = z.infer<typeof batchPhotoUploadSchema>;
 export type FileValidation = z.infer<typeof fileValidationSchema>;
+export type NativeBatchPhotoUpload = z.infer<typeof nativeBatchPhotoUploadSchema>;
+export type NativeFileValidation = z.infer<typeof nativeFileValidationSchema>;
+export type NativePhotosValidation = z.infer<typeof nativePhotosValidationSchema>;
+export type NativePhotoUpload = z.infer<typeof nativePhotoUploadSchema>;
 export type PhotoDelete = z.infer<typeof photoDeleteSchema>;
 export type PhotoReorder = z.infer<typeof photoReorderSchema>;
 export type PhotosValidation = z.infer<typeof photosValidationSchema>;
@@ -23,14 +27,36 @@ export const fileValidationSchema = z.object({
   type: z
     .string()
     .refine(
-      (type) => CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(type as any),
+      (type): type is (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number] => 
+        CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(type as (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number]),
       `File type must be one of: ${CONFIG.FILE_UPLOAD.ALLOWED_TYPES.join(', ')}`,
     ),
 });
 
-// array of files validation
+// extended file validation schema that accepts native File objects
+export const nativeFileValidationSchema = z.instanceof(File)
+  .refine(
+    (file) => file.size <= CONFIG.FILE_UPLOAD.MAX_SIZE,
+    `File size must be less than ${CONFIG.FILE_UPLOAD.MAX_SIZE / (1024 * 1024)}MB`,
+  )
+  .refine(
+    (file): file is File & { type: (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number] } =>
+      CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(file.type as (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number]),
+    `File type must be one of: ${CONFIG.FILE_UPLOAD.ALLOWED_TYPES.join(', ')}`,
+  );
+
+// array of files validation for simplified file objects
 export const photosValidationSchema = z
   .array(fileValidationSchema)
+  .max(
+    CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD,
+    `Maximum ${CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD} photos allowed`,
+  )
+  .optional();
+
+// array of native File objects validation
+export const nativePhotosValidationSchema = z
+  .array(nativeFileValidationSchema)
   .max(
     CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD,
     `Maximum ${CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD} photos allowed`,
@@ -52,10 +78,23 @@ export const photoUploadSchema = z.object({
   metadata: photoUploadMetadataSchema,
 });
 
+// photo upload schema for native File objects
+export const nativePhotoUploadSchema = z.object({
+  file: nativeFileValidationSchema,
+  metadata: photoUploadMetadataSchema,
+});
+
 // batch photo upload schema
 export const batchPhotoUploadSchema = z.object({
   bobbleheadId: z.uuid(),
   photos: z.array(photoUploadSchema).min(1).max(CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD),
+  userId: z.uuid(),
+});
+
+// batch photo upload schema for native File objects
+export const nativeBatchPhotoUploadSchema = z.object({
+  bobbleheadId: z.uuid(),
+  photos: z.array(nativePhotoUploadSchema).min(1).max(CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD),
   userId: z.uuid(),
 });
 

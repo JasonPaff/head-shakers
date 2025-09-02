@@ -152,9 +152,7 @@ export const uploadImage = async (
         .upload_stream(
           {
             folder: folderPath,
-            format: 'auto',
             public_id: publicId,
-            quality: 'auto',
             resource_type: 'image',
             signed: true,
             unique_filename: true,

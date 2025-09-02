@@ -11,7 +11,7 @@ import {
   zodNullableUUID,
   zodYear,
 } from '@/lib/utils/zod.utils';
-import { photosValidationSchema } from '@/lib/validations/photo-upload.validation';
+import { nativePhotosValidationSchema } from '@/lib/validations/photo-upload.validation';
 
 export const customFieldsSchema = z.record(z.string(), z.string());
 
@@ -132,7 +132,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   viewCount: true,
 });
 export const createBobbleheadWithPhotosSchema = insertBobbleheadSchema.extend({
-  photos: photosValidationSchema.default([]),
+  photos: nativePhotosValidationSchema.default([]),
 });
 export const updateBobbleheadSchema = insertBobbleheadSchema.partial();
 export const publicBobbleheadSchema = selectBobbleheadSchema.omit({

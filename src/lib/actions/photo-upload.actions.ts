@@ -30,7 +30,11 @@ export const uploadPhotosAction = authActionClient
 
     try {
       // upload all photos to Cloudinary
-      const files = photoUploads.map((upload) => upload.file);
+      const files: Array<File> = photoUploads.map((upload) => {
+        const fileData = upload.file;
+        if (fileData instanceof File) return fileData;
+        throw new Error('Invalid file object received');
+      });
       const cloudinaryResults = await uploadMultipleImages(files, {
         bobbleheadId,
         userId: ctx.userId,

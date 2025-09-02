@@ -16,8 +16,7 @@ export const ItemPhotos = withForm({
   render: function ({ form }) {
     const photos = useStore(form.store, (state) => state.values.photos);
 
-    // convert the file array to PhotoWithMetadata array for the component
-    const photosWithMetadata: Array<PhotoWithMetadata> = photos.map((file, index) => ({
+    const photosWithMetadata: Array<PhotoWithMetadata> = (photos || []).map((file, index) => ({
       altText: '',
       caption: '',
       file,

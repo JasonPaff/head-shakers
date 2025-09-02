@@ -72,10 +72,10 @@ export const createBobbleheadWithPhotosAction = authActionClient
           const photosWithMetadata: Array<PhotoWithMetadata> = photos.map((file, index) => ({
             altText: photosMetadata?.[index]?.altText || '',
             caption: photosMetadata?.[index]?.caption || '',
-            file,
+            file: file,
             id: `temp-${index}`,
             isPrimary: photosMetadata?.[index]?.isPrimary || index === 0,
-            preview: '',
+            preview: URL.createObjectURL(file),
             sortOrder: photosMetadata?.[index]?.sortOrder || index,
           }));
 
