@@ -22,7 +22,7 @@ const createMockPhotoData = (overrides: Partial<InsertBobbleheadPhoto> = {}): In
   ...overrides,
 });
 
-describe('BobbleheadService.createWithPhotosAsync - 1.1 Basic Success Cases', () => {
+describe('BobbleheadService.createWithPhotosAsync - Basic Success Cases', () => {
   beforeAll(() => {
     const testDbUrl = process.env.DATABASE_URL_TEST;
     if (!testDbUrl) {
@@ -57,19 +57,14 @@ describe('BobbleheadService.createWithPhotosAsync - 1.1 Basic Success Cases', ()
 
           const bobbleheadData: InsertBobblehead = {
             collectionId: collection.id,
-            currentCondition: 'mint',
-            isFeatured: false,
-            isPublic: false,
+            currentCondition: DEFAULTS.BOBBLEHEAD.CONDITION,
+            isFeatured: DEFAULTS.BOBBLEHEAD.IS_FEATURED,
+            isPublic: DEFAULTS.BOBBLEHEAD.IS_PUBLIC,
             name: 'Bobblehead Without Photos',
-            status: 'owned',
+            status: DEFAULTS.BOBBLEHEAD.STATUS,
           };
 
-          const result = await BobbleheadService.createWithPhotosAsync(
-            bobbleheadData,
-            user.id,
-            [], // empty photos array
-            db,
-          );
+          const result = await BobbleheadService.createWithPhotosAsync(bobbleheadData, user.id, [], db);
 
           expect(result).toBeDefined();
           expect(result!.name).toBe('Bobblehead Without Photos');
@@ -113,19 +108,14 @@ describe('BobbleheadService.createWithPhotosAsync - 1.1 Basic Success Cases', ()
 
           const bobbleheadData: InsertBobblehead = {
             collectionId: collection.id,
-            currentCondition: 'excellent',
-            isFeatured: false,
-            isPublic: false,
+            currentCondition: DEFAULTS.BOBBLEHEAD.CONDITION,
+            isFeatured: DEFAULTS.BOBBLEHEAD.IS_FEATURED,
+            isPublic: DEFAULTS.BOBBLEHEAD.IS_PUBLIC,
             name: 'Minimal Bobblehead',
-            status: 'owned',
+            status: DEFAULTS.BOBBLEHEAD.STATUS,
           };
 
-          const result = await BobbleheadService.createWithPhotosAsync(
-            bobbleheadData,
-            user.id,
-            [], // no photos
-            db,
-          );
+          const result = await BobbleheadService.createWithPhotosAsync(bobbleheadData, user.id, [], db);
 
           expect(result).toBeDefined();
           expect(result!.name).toBe('Minimal Bobblehead');
