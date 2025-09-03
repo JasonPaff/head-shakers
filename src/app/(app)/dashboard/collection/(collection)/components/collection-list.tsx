@@ -1,14 +1,21 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { ChevronRightIcon, EyeIcon, LockIcon } from 'lucide-react';
+import { ChevronRightIcon, EyeIcon, LockIcon, MoreVerticalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { CollectionCreateButton } from '@/app/(app)/dashboard/collection/(collection)/components/collection-create-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { getCollectionsDashboardDataAsync } from '@/lib/queries/collections.queries';
 
 export const CollectionList = async () => {
@@ -24,20 +31,28 @@ export const CollectionList = async () => {
     <div className={'container mx-auto px-4 py-8'}>
       {/* Collection Stats */}
       <div className={'mb-6 flex items-center justify-between'}>
-        <h2 className={'text-lg font-semibold text-foreground'}>Collections</h2>
-        <div className={'text-sm text-muted-foreground'}>
-          {_totalCollectionCount} Collections • {_totalBobbleheadCount} Bobbleheads
+        <div>
+          <h2 className={'text-lg font-semibold text-foreground'}>Collections</h2>
+          <div className={'text-sm text-muted-foreground'}>
+            {_totalCollectionCount} Collections • {_totalBobbleheadCount} Bobbleheads
+          </div>
         </div>
+
+        {/* Create Collection Button */}
+        <CollectionCreateButton />
       </div>
 
       <div className={'grid gap-6 md:grid-cols-2 lg:grid-cols-3'}>
         {collections.map((collection) => (
-          <Card className={'group flex flex-col transition-shadow hover:shadow-lg'} key={collection.id}>
+          <Card className={'relative flex flex-col'} key={collection.id}>
             {/* Collection Header */}
             <CardHeader className={'pb-3'}>
               <div className={'flex items-start justify-between'}>
+                {/* Title */}
                 <CardTitle className={'text-lg font-semibold text-balance'}>{collection.name}</CardTitle>
-                <div className={'flex gap-1'}>
+
+                {/* Privacy Icon */}
+                <div className={'mr-8 flex gap-1'}>
                   <Conditional isCondition={collection.isPublic}>
                     <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   </Conditional>
@@ -46,7 +61,30 @@ export const CollectionList = async () => {
                   </Conditional>
                 </div>
               </div>
+
+              {/* Collection Description */}
               <p className={'text-sm text-pretty text-muted-foreground'}>{collection.description}</p>
+
+              {/* Collection Actions */}
+              <div className={'absolute top-4 right-4'}>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button size={'sm'} variant={'ghost'}>
+                      <MoreVerticalIcon aria-hidden className={'size-4'} />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align={'end'}>
+                    <DropdownMenuItem>
+                      <PencilIcon aria-hidden className={'mr-2 size-4'} />
+                      Edit Collection
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant={'destructive'}>
+                      <Trash2Icon aria-hidden className={'mr-2 size-4'} />
+                      Delete Collection
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </CardHeader>
 
             <CardContent className={'flex flex-1 flex-col'}>
@@ -76,7 +114,7 @@ export const CollectionList = async () => {
               </div>
 
               {/* View Collection Link */}
-              <Button asChild variant={'outline'}>
+              <Button asChild className={'mt-4'} variant={'outline'}>
                 <Link
                   href={$path({
                     route: '/collections/[collectionId]',
