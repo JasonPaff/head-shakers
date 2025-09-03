@@ -3,7 +3,6 @@
 import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
 import { revalidatePath } from 'next/cache';
-import z from 'zod';
 
 import type { PhotoWithMetadata } from '@/components/ui/photo-upload';
 
@@ -122,22 +121,11 @@ export const createBobbleheadWithPhotosAction = authActionClient
     isTransactionRequired: true,
   })
   .use(createRateLimitMiddleware(5, 60))
-  .inputSchema(
-    createBobbleheadWithPhotosSchema.extend({
-      photosMetadata: z
-        .array(
-          z.object({
-            altText: z.string().optional(),
-            caption: z.string().optional(),
-            isPrimary: z.boolean().default(false),
-            sortOrder: z.number().default(0),
-          }),
-        )
-        .optional(),
-    }),
-  )
+  .inputSchema(createBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { photos, photosMetadata, ...bobbleheadData } = parsedInput;
+    const { photos, photosMetadata, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(
+      ctx.sanitizedInput,
+    );
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);

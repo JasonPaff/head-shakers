@@ -25,7 +25,9 @@ export type GetBobbleheadById = z.infer<typeof getBobbleheadByIdSchema>;
 export type GetBobbleheadsByCollection = z.infer<typeof getBobbleheadsByCollectionSchema>;
 export type GetBobbleheadsByUser = z.infer<typeof getBobbleheadsByUserSchema>;
 export type InsertBobblehead = z.infer<typeof insertBobbleheadSchema>;
+export type InsertBobbleheadInput = z.input<typeof insertBobbleheadSchema>;
 export type InsertBobbleheadPhoto = z.infer<typeof insertBobbleheadPhotoSchema>;
+export type InsertBobbleheadPhotoInput = z.input<typeof insertBobbleheadPhotoSchema>;
 export type InsertBobbleheadTag = z.infer<typeof insertBobbleheadTagSchema>;
 export type PublicBobblehead = z.infer<typeof publicBobbleheadSchema>;
 export type RemoveTagFromBobblehead = z.infer<typeof removeTagFromBobbleheadSchema>;
@@ -133,6 +135,16 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
 });
 export const createBobbleheadWithPhotosSchema = insertBobbleheadSchema.extend({
   photos: nativePhotosValidationSchema.default([]),
+  photosMetadata: z
+    .array(
+      z.object({
+        altText: z.string().optional(),
+        caption: z.string().optional(),
+        isPrimary: z.boolean().default(false),
+        sortOrder: z.number().default(0),
+      }),
+    )
+    .optional(),
 });
 export const updateBobbleheadSchema = insertBobbleheadSchema.partial();
 export const publicBobbleheadSchema = selectBobbleheadSchema.omit({
