@@ -22,10 +22,7 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   blockedBy: many(userBlocks, { relationName: 'blocked' }),
   blocks: many(userBlocks, { relationName: 'blocker' }),
   bobbleheads: many(bobbleheads),
-  collection: one(collections, {
-    fields: [users.id],
-    references: [collections.userId],
-  }),
+  collections: many(collections),
   comments: many(comments),
   contentViews: many(contentViews),
   followers: many(follows, { relationName: 'following' }),

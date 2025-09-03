@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -18,87 +18,59 @@ export const getSubCollectionsByCollectionAsync = cache(
 
 export const getCollectionsDashboardDataAsync = cache(
   async (clerkId: string, dbInstance: DatabaseExecutor = db) => {
-    const user = await dbInstance
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.clerkId, clerkId))
-      .limit(1);
+    // first get the user by clerk ID and their collections with relations
+    const userData = await dbInstance.query.users.findFirst({
+      where: eq(users.clerkId, clerkId),
+      with: {
+        collections: {
+          with: {
+            bobbleheads: {
+              where: eq(bobbleheads.isDeleted, false),
+            },
+            subCollections: {
+              with: {
+                bobbleheads: {
+                  where: eq(bobbleheads.isDeleted, false),
+                },
+              },
+            },
+          },
+        },
+      },
+    });
 
-    if (user.length === 0) {
+    if (!userData) {
       return null;
     }
 
-    const userId = user[0]!.id;
+    // transform the data to include counts and flatten the structure
+    return userData.collections.map((collection) => {
+      // count direct bobbleheads in the collection
+      const directBobbleheadCount = collection.bobbleheads.length;
 
-    // get all collections with aggregated data
-    const collectionsData = await dbInstance
-      .select({
-        // get direct bobblehead count for this collection
-        bobbleheadCount: sql<number>`
-          COALESCE((
-            SELECT COUNT(*)::int
-            FROM ${bobbleheads}
-            WHERE ${bobbleheads.collectionId} = ${collections.id}
-            AND ${bobbleheads.isDeleted} = false
-          ), 0)
-        `,
-        description: collections.description,
-        id: collections.id,
-        isPublic: collections.isPublic,
-        name: collections.name,
-        // get subcollection count
-        subCollectionCount: sql<number>`
-          COALESCE((
-            SELECT COUNT(*)::int
-            FROM ${subCollections}
-            WHERE ${subCollections.collectionId} = ${collections.id}
-          ), 0)
-        `,
-        // get total bobblehead count including subcollections
-        totalBobbleheadCount: sql<number>`
-          COALESCE((
-            SELECT COUNT(*)::int
-            FROM ${bobbleheads}
-            WHERE ${bobbleheads.collectionId} = ${collections.id}
-            AND ${bobbleheads.isDeleted} = false
-          ), 0) + COALESCE((
-            SELECT COUNT(*)::int
-            FROM ${bobbleheads} b
-            INNER JOIN ${subCollections} sc ON b.${bobbleheads.subCollectionId} = sc.id
-            WHERE sc.${subCollections.collectionId} = ${collections.id}
-            AND b.${bobbleheads.isDeleted} = false
-          ), 0)
-        `,
-      })
-      .from(collections)
-      .where(eq(collections.userId, userId));
+      // count bobbleheads in subcollections and get subcollection details
+      const subCollections = collection.subCollections.map((subCollection) => ({
+        bobbleheadCount: subCollection.bobbleheads.length,
+        id: subCollection.id,
+        name: subCollection.name,
+      }));
 
-    // get subcollection details for each collection
-    const collectionsWithSubcollections = await Promise.all(
-      collectionsData.map(async (collection) => {
-        const subcollectionsData = await dbInstance
-          .select({
-            bobbleheadCount: sql<number>`
-              COALESCE((
-                SELECT COUNT(*)::int
-                FROM ${bobbleheads}
-                WHERE ${bobbleheads.subCollectionId} = ${subCollections.id}
-                AND ${bobbleheads.isDeleted} = false
-              ), 0)
-            `,
-            id: subCollections.id,
-            name: subCollections.name,
-          })
-          .from(subCollections)
-          .where(eq(subCollections.collectionId, collection.id));
+      // calculate total bobbleheads in subcollections
+      const subCollectionBobbleheadCount = subCollections.reduce(
+        (sum, subCollection) => sum + subCollection.bobbleheadCount,
+        0,
+      );
 
-        return {
-          ...collection,
-          subCollections: subcollectionsData,
-        };
-      }),
-    );
-
-    return collectionsWithSubcollections;
+      return {
+        bobbleheadCount: directBobbleheadCount,
+        description: collection.description,
+        id: collection.id,
+        isPublic: collection.isPublic,
+        name: collection.name,
+        subCollectionCount: subCollections.length,
+        subCollections,
+        totalBobbleheadCount: directBobbleheadCount + subCollectionBobbleheadCount,
+      };
+    });
   },
 );
