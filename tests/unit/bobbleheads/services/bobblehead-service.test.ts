@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { beforeAll, describe, expect, it } from 'vitest';
 
+import { DEFAULTS } from '@/lib/constants';
 import { bobbleheads, collections, users } from '@/lib/db/schema';
 import { BobbleheadService } from '@/lib/services/bobbleheads.service';
 import { insertBobbleheadSchema } from '@/lib/validations/bobbleheads.validation';
@@ -18,7 +19,6 @@ describe('BobbleheadService', () => {
   describe('createAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should create a bobblehead and return it', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -62,13 +62,13 @@ describe('BobbleheadService', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should handle database errors gracefully', async () => {
       await withTestIsolation(async (db) => {
         const invalidData = {
-          collectionId: randomUUID(), // Non-existent collection
+          collectionId: randomUUID(), // non-existent collection
           name: 'Will Fail',
-          userId: randomUUID(), // Non-existent user
+          userId: randomUUID(), // non-existent user
         };
 
-        // Should throw due to foreign key constraint
         const parsed = insertBobbleheadSchema.parse(invalidData);
+        // should throw due to foreign key constraint
         await expect(() => BobbleheadService.createAsync(parsed, randomUUID(), db)).rejects.toThrow();
       });
     });
@@ -77,7 +77,6 @@ describe('BobbleheadService', () => {
   describe('createWithPhotosAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should create bobblehead without photos', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -111,14 +110,11 @@ describe('BobbleheadService', () => {
         expect(result!.name).toBe('No Photos Bobblehead');
       });
     });
-
-    // Note: Photo creation tests would require photo schema/tables to be set up
   });
 
   describe('updateAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should update a bobblehead and return it', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -182,7 +178,6 @@ describe('BobbleheadService', () => {
   describe('deleteAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should soft delete a bobblehead', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -224,7 +219,6 @@ describe('BobbleheadService', () => {
 
     it.skipIf(!process.env.DATABASE_URL_TEST)('should return null if not authorized', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -266,7 +260,6 @@ describe('BobbleheadService', () => {
   describe('deleteBulkAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should delete multiple bobbleheads', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -320,7 +313,6 @@ describe('BobbleheadService', () => {
   describe('getByIdAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should get bobblehead with details', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -371,7 +363,6 @@ describe('BobbleheadService', () => {
 
     it.skipIf(!process.env.DATABASE_URL_TEST)('should respect privacy settings', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -403,16 +394,16 @@ describe('BobbleheadService', () => {
           .returning();
         const bobblehead = bobbleheadResult[0]!;
 
-        // Try to get private bobblehead without user ID
+        // try to get private bobblehead without user ID
         const anonymousResult = await BobbleheadService.getByIdAsync(bobblehead.id, undefined, db);
         expect(anonymousResult).toBeNull();
 
-        // Try with owner user ID
+        // try with owner user ID
         const ownerResult = await BobbleheadService.getByIdAsync(bobblehead.id, user.id, db);
         expect(ownerResult).not.toBeNull();
         expect(ownerResult!.name).toBe('Private Bobblehead');
 
-        // Try with different user ID
+        // try with different user ID
         const otherResult = await BobbleheadService.getByIdAsync(bobblehead.id, randomUUID(), db);
         expect(otherResult).toBeNull();
       });
@@ -422,7 +413,6 @@ describe('BobbleheadService', () => {
   describe('getByIdBasicAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should get basic bobblehead data', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -447,7 +437,7 @@ describe('BobbleheadService', () => {
           .insert(bobbleheads)
           .values({
             collectionId: collection.id,
-            isPublic: false, // Note: basic doesn't check visibility
+            isPublic: false,
             name: 'Basic Test',
             userId: user.id,
           })
@@ -466,7 +456,6 @@ describe('BobbleheadService', () => {
   describe('getByCollectionAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should get all bobbleheads in collection', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -508,11 +497,11 @@ describe('BobbleheadService', () => {
           },
         ]);
 
-        // Get public items only
+        // get public items only
         const publicResult = await BobbleheadService.getByCollectionAsync(collection.id, undefined, db);
         expect(publicResult).toHaveLength(2);
 
-        // Get all items (owner)
+        // get all items (owner)
         const ownerResult = await BobbleheadService.getByCollectionAsync(collection.id, user.id, db);
         expect(ownerResult).toHaveLength(3);
       });
@@ -522,7 +511,6 @@ describe('BobbleheadService', () => {
   describe('getByUserAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should get all bobbleheads for a user', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -565,11 +553,11 @@ describe('BobbleheadService', () => {
           },
         ]);
 
-        // Get public items only
+        // get public items only
         const publicResult = await BobbleheadService.getByUserAsync(user.id, undefined, db);
         expect(publicResult).toHaveLength(1);
 
-        // Get all items (owner viewing)
+        // get all items (owner viewing)
         const ownerResult = await BobbleheadService.getByUserAsync(user.id, user.id, db);
         expect(ownerResult).toHaveLength(2);
       });
@@ -579,7 +567,6 @@ describe('BobbleheadService', () => {
   describe('existsAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should return true if bobblehead exists', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -630,7 +617,6 @@ describe('BobbleheadService', () => {
   describe('belongsToUserAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should return true if user owns bobblehead', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -682,7 +668,6 @@ describe('BobbleheadService', () => {
   describe('searchAsync', () => {
     it.skipIf(!process.env.DATABASE_URL_TEST)('should search bobbleheads with filters', async () => {
       await withTestIsolation(async (db) => {
-        // Setup test data
         const userResult = await db
           .insert(users)
           .values({
@@ -730,7 +715,7 @@ describe('BobbleheadService', () => {
           },
         ]);
 
-        // Search by category
+        // search by category
         const sportsResult = await BobbleheadService.searchAsync(
           '',
           { category: 'Sports' },
@@ -741,7 +726,7 @@ describe('BobbleheadService', () => {
         );
         expect(sportsResult).toHaveLength(1); // Only public sports item
 
-        // Search by manufacturer
+        // search by manufacturer
         const nikeResult = await BobbleheadService.searchAsync(
           '',
           { manufacturer: 'Nike' },
@@ -752,10 +737,177 @@ describe('BobbleheadService', () => {
         );
         expect(nikeResult).toHaveLength(2); // Both Nike items (owner can see private)
 
-        // Search by text
+        // search by text
         const textResult = await BobbleheadService.searchAsync('Character', {}, undefined, 20, 0, db);
         expect(textResult).toHaveLength(1);
         expect(textResult[0]!.name).toBe('Movie Character');
+      });
+    });
+  });
+
+  describe('Input Validation Tests', () => {
+    it('should validate input schema requirements', () => {
+      const validData = {
+        collectionId: randomUUID(),
+        currentCondition: 'excellent' as const,
+        isFeatured: false,
+        isPublic: true,
+        name: 'Test Bobblehead',
+        status: 'owned' as const,
+      };
+
+      const result = insertBobbleheadSchema.safeParse(validData);
+      expect(result.success).toBe(true);
+
+      if (result.success) {
+        expect(result.data.name).toBe('Test Bobblehead');
+        expect(result.data.collectionId).toBe(validData.collectionId);
+        expect(result.data.currentCondition).toBe('excellent');
+        expect(result.data.status).toBe('owned');
+        expect(result.data.isPublic).toBe(true);
+        expect(result.data.isFeatured).toBe(false);
+      }
+    });
+
+    it('should apply default values when fields are omitted', () => {
+      const minimalData = {
+        collectionId: randomUUID(),
+        name: 'Test Bobblehead',
+      };
+
+      const result = insertBobbleheadSchema.safeParse(minimalData);
+      expect(result.success).toBe(true);
+
+      if (result.success) {
+        expect(result.data.name).toBe('Test Bobblehead');
+        expect(result.data.collectionId).toBe(minimalData.collectionId);
+        expect(result.data.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
+        expect(result.data.status).toBe(DEFAULTS.BOBBLEHEAD.STATUS);
+        expect(result.data.isPublic).toBe(DEFAULTS.BOBBLEHEAD.IS_PUBLIC);
+        expect(result.data.isFeatured).toBe(DEFAULTS.BOBBLEHEAD.IS_FEATURED);
+      }
+    });
+
+    describe('Required Fields', () => {
+      it('should fail when name is missing', () => {
+        const invalidData = {
+          collectionId: randomUUID(),
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const nameError = result.error.issues.find((issue) => issue.path.includes('name'));
+          expect(nameError?.message).toMatch(/Required|expected string/);
+        }
+      });
+
+      it('should fail when collectionId is missing', () => {
+        const invalidData = {
+          name: 'Test Bobblehead',
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const collectionIdError = result.error.issues.find((issue) => issue.path.includes('collectionId'));
+          expect(collectionIdError?.message).toBe('Collection is required');
+        }
+      });
+
+      it('should fail when collectionId is invalid UUID', () => {
+        const invalidData = {
+          collectionId: 'invalid-uuid',
+          name: 'Test Bobblehead',
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const collectionIdError = result.error.issues.find((issue) => issue.path.includes('collectionId'));
+          expect(collectionIdError?.message).toBe('Collection is required');
+        }
+      });
+    });
+
+    describe('Data Integrity', () => {
+      it('should fail when name exceeds 100 characters', () => {
+        const longName = 'a'.repeat(101);
+        const invalidData = {
+          collectionId: randomUUID(),
+          name: longName,
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+      });
+
+      it('should succeed when name is exactly 100 characters', () => {
+        const maxLengthName = 'a'.repeat(100);
+        const validData = {
+          collectionId: randomUUID(),
+          name: maxLengthName,
+        };
+
+        const result = insertBobbleheadSchema.safeParse(validData);
+        expect(result.success).toBe(true);
+      });
+
+      it('should fail when currentCondition is invalid enum value', () => {
+        const invalidData = {
+          collectionId: randomUUID(),
+          currentCondition: 'invalid_condition',
+          name: 'Test Bobblehead',
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+      });
+
+      it('should fail when status is invalid enum value', () => {
+        const invalidData = {
+          collectionId: randomUUID(),
+          name: 'Test Bobblehead',
+          status: 'invalid_status',
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+      });
+
+      it('should fail when year is below 1800', () => {
+        const invalidData = {
+          collectionId: randomUUID(),
+          name: 'Test Bobblehead',
+          year: '1799',
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+      });
+
+      it('should fail when year is above next year', () => {
+        const nextYear = new Date().getFullYear() + 2;
+        const invalidData = {
+          collectionId: randomUUID(),
+          name: 'Test Bobblehead',
+          year: nextYear.toString(),
+        };
+
+        const result = insertBobbleheadSchema.safeParse(invalidData);
+        expect(result.success).toBe(false);
+      });
+
+      it('should succeed when year is exactly next year', () => {
+        const nextYear = new Date().getFullYear() + 1;
+        const validData = {
+          collectionId: randomUUID(),
+          name: 'Test Bobblehead',
+          year: nextYear.toString(),
+        };
+
+        const result = insertBobbleheadSchema.safeParse(validData);
+        expect(result.success).toBe(true);
       });
     });
   });
