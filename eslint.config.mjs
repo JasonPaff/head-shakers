@@ -79,7 +79,10 @@ export default eslintTypescript.config([
   // customize rules
   {
     rules: {
-      '@typescript-eslint/consistent-type-exports': ['error', { fixMixedExportsWithInlineTypeSpecifier: true }],
+      '@typescript-eslint/consistent-type-exports': [
+        'error',
+        { fixMixedExportsWithInlineTypeSpecifier: true },
+      ],
       '@typescript-eslint/consistent-type-imports': 'error',
       'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
       eqeqeq: 'error',
@@ -91,6 +94,7 @@ export default eslintTypescript.config([
           allowedPrefixes: ['as', 'can', 'has', 'is', 'should', 'was', 'will'],
         },
       ],
+      '@next/next/no-img-element': 'off',
     },
   },
 ]);

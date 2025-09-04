@@ -46,8 +46,8 @@ export const ConfirmDeleteAlertDialog = ({ isOpen, onClose, onDelete }: ConfirmD
           <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             asChild
-            onClick={async () => {
-              await handleConfirm();
+            onClick={() => {
+              void handleConfirm;
             }}
           >
             <Button variant={'destructive'}>Delete</Button>
