@@ -11,6 +11,7 @@ declare module "@@@next-typesafe-url" {
   interface DynamicRouter {
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/route-type").RouteType>;
+    "/items/add": InferRoute<import("./src/app/(app)/items/add/route-type").RouteType>;
     "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }
 
@@ -25,13 +26,12 @@ declare module "@@@next-typesafe-url" {
     "/collections/[collectionId]/edit": StaticRoute;
     "/collections/[collectionId]/settings": StaticRoute;
     "/collections/[collectionId]/share": StaticRoute;
+    "/dashboard/collection": StaticRoute;
     "/dashboard/collection/analytics": StaticRoute;
     "/dashboard/collection/organize": StaticRoute;
-    "/dashboard/collection": StaticRoute;
     "/dashboard/feed": StaticRoute;
     "/dashboard/notifications": StaticRoute;
     "/dashboard": StaticRoute;
-    "/items/add": StaticRoute;
     "/items/[itemId]/edit": StaticRoute;
     "/items/[itemId]": StaticRoute;
     "/items/[itemId]/share": StaticRoute;

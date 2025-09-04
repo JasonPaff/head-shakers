@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -23,6 +23,7 @@ export const getCollectionsDashboardDataAsync = cache(
       where: eq(users.clerkId, clerkId),
       with: {
         collections: {
+          orderBy: [sql`lower(${collections.name}) asc`],
           with: {
             bobbleheads: {
               where: eq(bobbleheads.isDeleted, false),

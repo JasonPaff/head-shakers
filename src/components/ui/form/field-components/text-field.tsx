@@ -2,6 +2,8 @@
 
 import type { ComponentProps } from 'react';
 
+import { useId } from 'react';
+
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
 import { FieldDescription } from '@/components/ui/form/field-components/field-description';
@@ -18,15 +20,16 @@ type TextFieldProps = ComponentProps<'input'> & {
 
 export const TextField = ({ description, isRequired, label, ...props }: TextFieldProps) => {
   const field = useFieldContext<string>();
+  const id = useId();
 
   return (
     <FieldItem>
-      <Label htmlFor={field.name} variant={isRequired ? 'required' : undefined}>
+      <Label htmlFor={id} variant={isRequired ? 'required' : undefined}>
         {label}
       </Label>
       <FieldAria>
         <Input
-          id={field.name}
+          id={id}
           onBlur={field.handleBlur}
           onChange={(e) => {
             field.handleChange(e.target.value);

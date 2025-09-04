@@ -45,10 +45,10 @@ export const buttonVariants = cva(
           hover:bg-primary/90
         `,
         destructive: `
-          bg-destructive text-white shadow-xs
-          hover:bg-destructive/90
+          bg-destructive text-white shadow-xs hover:bg-destructive/90
           focus-visible:ring-destructive/20
-          dark:bg-destructive/60 dark:focus-visible:ring-destructive/40
+          dark:bg-destructive/75
+          dark:text-white dark:focus-visible:ring-destructive/40
         `,
         ghost: `
           hover:bg-accent hover:text-accent-foreground

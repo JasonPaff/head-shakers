@@ -6,12 +6,14 @@ import { collections, subCollections } from '@/lib/db/schema';
 import { zodMaxString, zodMinMaxString } from '@/lib/utils/zod.utils';
 
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
+export type InsertCollectionInput = z.input<typeof insertCollectionSchema>;
 export type InsertSubCollection = z.infer<typeof insertSubCollectionSchema>;
 export type PublicCollection = z.infer<typeof publicCollectionSchema>;
 export type PublicSubCollection = z.infer<typeof publicSubCollectionSchema>;
 export type SelectCollection = z.infer<typeof selectCollectionSchema>;
 export type SelectSubCollection = z.infer<typeof selectSubCollectionSchema>;
 export type UpdateCollection = z.infer<typeof updateCollectionSchema>;
+export type UpdateCollectionInput = z.input<typeof updateCollectionSchema>;
 export type UpdateSubCollection = z.infer<typeof updateSubCollectionSchema>;
 
 export const selectCollectionSchema = createSelectSchema(collections);
@@ -21,15 +23,12 @@ export const insertCollectionSchema = createInsertSchema(collections, {
     fieldName: 'Description',
     maxLength: SCHEMA_LIMITS.COLLECTION.DESCRIPTION.MAX,
   }),
+  isPublic: z.boolean().default(DEFAULTS.COLLECTION.IS_PUBLIC),
   name: zodMinMaxString({
     fieldName: 'Name',
     maxLength: SCHEMA_LIMITS.COLLECTION.NAME.MAX,
     minLength: SCHEMA_LIMITS.COLLECTION.NAME.MIN,
   }),
-  totalValue: z
-    .string()
-    .regex(/^\d+(\.\d{1,2})?$/)
-    .optional(),
 }).omit({
   createdAt: true,
   id: true,
@@ -38,7 +37,9 @@ export const insertCollectionSchema = createInsertSchema(collections, {
   updatedAt: true,
   userId: true,
 });
-export const updateCollectionSchema = insertCollectionSchema.partial();
+export const updateCollectionSchema = insertCollectionSchema.extend({
+  collectionId: z.uuid(),
+});
 export const publicCollectionSchema = selectCollectionSchema;
 
 export const selectSubCollectionSchema = createSelectSchema(subCollections);

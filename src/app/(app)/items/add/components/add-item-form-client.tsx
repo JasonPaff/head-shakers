@@ -24,11 +24,12 @@ import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.
 
 interface AddItemFormClientProps {
   collections: Array<ComboboxItem>;
+  initialCollectionId?: string;
 }
 
 // TODO: local storage draft save and restore
 
-export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
+export const AddItemFormClient = ({ collections, initialCollectionId }: AddItemFormClientProps) => {
   const router = useRouter();
 
   const { executeAsync, isExecuting } = useAction(createBobbleheadWithPhotosAction, {
@@ -46,6 +47,10 @@ export const AddItemFormClient = ({ collections }: AddItemFormClientProps) => {
 
   const form = useAppForm({
     ...addItemFormOptions,
+    defaultValues: {
+      ...addItemFormOptions.defaultValues,
+      collectionId: initialCollectionId || '',
+    },
     onSubmit: async ({ value }) => {
       await executeAsync(value);
     },

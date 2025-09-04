@@ -2,6 +2,8 @@
 
 import type { ComponentProps } from 'react';
 
+import { useId } from 'react';
+
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
 import { FieldDescription } from '@/components/ui/form/field-components/field-description';
@@ -18,6 +20,7 @@ type SwitchFieldProps = ComponentProps<typeof Switch> & {
 
 export const SwitchField = ({ description, isRequired, label, ...props }: SwitchFieldProps) => {
   const field = useFieldContext<boolean>();
+  const id = useId();
 
   return (
     <FieldItem>
@@ -25,13 +28,13 @@ export const SwitchField = ({ description, isRequired, label, ...props }: Switch
         <FieldAria>
           <Switch
             checked={field.state.value}
-            id={field.name}
+            id={id}
             onBlur={field.handleBlur}
             onCheckedChange={field.handleChange}
             {...props}
           />
         </FieldAria>
-        <Label htmlFor={field.name} variant={isRequired ? 'required' : undefined}>
+        <Label htmlFor={id} variant={isRequired ? 'required' : undefined}>
           {label}
         </Label>
       </div>

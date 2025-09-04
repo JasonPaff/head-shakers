@@ -1,5 +1,7 @@
 'use client';
 
+import { useId } from 'react';
+
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
 import { FieldDescription } from '@/components/ui/form/field-components/field-description';
@@ -17,15 +19,16 @@ interface TextareaFieldProps {
 
 export const TextareaField = ({ description, isRequired, label, ...props }: TextareaFieldProps) => {
   const field = useFieldContext<string>();
+  const id = useId();
 
   return (
     <FieldItem>
-      <Label htmlFor={field.name} variant={isRequired ? 'required' : undefined}>
+      <Label htmlFor={id} variant={isRequired ? 'required' : undefined}>
         {label}
       </Label>
       <FieldAria>
         <Textarea
-          id={field.name}
+          id={id}
           onBlur={field.handleBlur}
           onChange={(e) => {
             field.handleChange(e.target.value);

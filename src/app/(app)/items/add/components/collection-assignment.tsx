@@ -8,12 +8,14 @@ import { useEffect, useState } from 'react';
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
 import { addItemFormOptions } from '@/app/(app)/items/add/components/add-item-form-options';
-import { CreateCollectionDialog } from '@/app/(app)/items/add/components/create-collection-dialog';
 import { CreateSubCollectionDialog } from '@/app/(app)/items/add/components/create-sub-collection-dialog';
+import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
 import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections.actions';
+
+// TODO: replace server action with tanstack query
 
 export const CollectionAssignment = withForm({
   ...addItemFormOptions,
@@ -120,7 +122,7 @@ export const CollectionAssignment = withForm({
           </div>
         </CardContent>
 
-        <CreateCollectionDialog
+        <CollectionCreateDialog
           isOpen={isCreateCollectionDialogOpen}
           onClose={setIsCreateCollectionDialogOpen.off}
           onCollectionCreated={handleCollectionCreated}

@@ -15,6 +15,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from '@/components/ui/command';
 import { Conditional } from '@/components/ui/conditional';
 import { Input } from '@/components/ui/input';
@@ -131,6 +132,13 @@ export const Combobox = ({
             <CommandList>
               <CommandEmpty>No items found.</CommandEmpty>
               <CommandGroup>
+                <CommandItem className={'text-primary'} onSelect={handleCreateNewSelect}>
+                  <PlusIcon aria-hidden className={'mr-2 size-4'} />
+                  {createNewLabel}
+                </CommandItem>
+              </CommandGroup>
+              <CommandSeparator />
+              <CommandGroup>
                 {items.map((collection) => (
                   <CommandItem
                     key={collection.id}
@@ -147,12 +155,6 @@ export const Combobox = ({
                     {collection.name}
                   </CommandItem>
                 ))}
-              </CommandGroup>
-              <CommandGroup>
-                <CommandItem className={'text-primary'} onSelect={handleCreateNewSelect}>
-                  <PlusIcon aria-hidden className={'mr-2 size-4'} />
-                  {createNewLabel}
-                </CommandItem>
               </CommandGroup>
             </CommandList>
           </Command>

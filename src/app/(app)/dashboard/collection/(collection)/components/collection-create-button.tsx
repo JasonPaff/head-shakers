@@ -3,8 +3,9 @@
 import { PlusIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
-import { CollectionCreateDialog } from '@/app/(app)/dashboard/collection/(collection)/components/collection-create-dialog';
+import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 
 export const CollectionCreateButton = () => {
@@ -17,7 +18,9 @@ export const CollectionCreateButton = () => {
         <PlusIcon aria-hidden className={'size-5'} />
       </Button>
 
-      <CollectionCreateDialog isOpen={isDialogOpen} onClose={setIsDialogOpen.off} />
+      <Conditional isCondition={isDialogOpen}>
+        <CollectionCreateDialog isOpen={isDialogOpen} onClose={setIsDialogOpen.off} />
+      </Conditional>
     </Fragment>
   );
 };

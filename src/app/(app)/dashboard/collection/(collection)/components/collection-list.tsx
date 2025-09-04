@@ -1,21 +1,16 @@
 import 'server-only';
 import { auth } from '@clerk/nextjs/server';
-import { ChevronRightIcon, EyeIcon, LockIcon, MoreVerticalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { ChevronRightIcon, EyeIcon, LockIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
+import { CollectionActions } from '@/app/(app)/dashboard/collection/(collection)/components/collection-actions';
 import { CollectionCreateButton } from '@/app/(app)/dashboard/collection/(collection)/components/collection-create-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { getCollectionsDashboardDataAsync } from '@/lib/queries/collections.queries';
 
 export const CollectionList = async () => {
@@ -67,23 +62,7 @@ export const CollectionList = async () => {
 
               {/* Collection Actions */}
               <div className={'absolute top-4 right-4'}>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button size={'sm'} variant={'ghost'}>
-                      <MoreVerticalIcon aria-hidden className={'size-4'} />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align={'end'}>
-                    <DropdownMenuItem>
-                      <PencilIcon aria-hidden className={'mr-2 size-4'} />
-                      Edit Collection
-                    </DropdownMenuItem>
-                    <DropdownMenuItem variant={'destructive'}>
-                      <Trash2Icon aria-hidden className={'mr-2 size-4'} />
-                      Delete Collection
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <CollectionActions {...collection} collectionId={collection.id} />
               </div>
             </CardHeader>
 

@@ -1,5 +1,7 @@
 'use client';
 
+import { useId } from 'react';
+
 import type { SelectOptionType } from '@/components/ui/select';
 
 import { useFieldContext } from '@/components/ui/form';
@@ -20,15 +22,16 @@ interface SelectFieldProps {
 
 export const SelectField = ({ description, isRequired, label, options, placeholder }: SelectFieldProps) => {
   const field = useFieldContext<string>();
+  const id = useId();
 
   return (
     <FieldItem>
-      <Label htmlFor={field.name} variant={isRequired ? 'required' : undefined}>
+      <Label htmlFor={id} variant={isRequired ? 'required' : undefined}>
         {label}
       </Label>
       <Select onValueChange={field.handleChange} value={field.state.value}>
         <FieldAria>
-          <SelectTrigger className={'w-full'} id={field.name} onBlur={field.handleBlur}>
+          <SelectTrigger className={'w-full'} id={id} onBlur={field.handleBlur}>
             <SelectValue placeholder={placeholder} />
           </SelectTrigger>
         </FieldAria>
