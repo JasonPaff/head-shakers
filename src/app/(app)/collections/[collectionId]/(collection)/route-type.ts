@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const Route = {
   routeParams: z.object({
-    collectionId: z.string().min(1, { message: 'CollectionId is required' }),
+    collectionId: z.uuid('CollectionId is required'),
   }),
 } satisfies DynamicRoute;
 

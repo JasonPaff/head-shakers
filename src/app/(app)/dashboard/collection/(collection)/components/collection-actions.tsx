@@ -38,10 +38,6 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
     onError: ({ error }) => {
       toast.error(error.serverError || 'Failed to delete collection');
     },
-    onSuccess: ({ data }) => {
-      if (!data) return;
-      toast.success('Collection deleted successfully!');
-    },
   });
 
   const handleAddBobblehead = () => {
@@ -49,7 +45,9 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
   };
 
   const handleDeleteCollection = async () => {
-    await executeAsync({ collectionId });
+    await executeAsync({ collectionId }).then(() => {
+      toast.success('Collection deleted successfully!');
+    });
   };
 
   return (
