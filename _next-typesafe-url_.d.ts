@@ -10,7 +10,8 @@ declare module "@@@next-typesafe-url" {
 
   interface DynamicRouter {
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
-    "/collections/[collectionId]": InferRoute<import("@/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
+    "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
+    "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
     "/items/add": InferRoute<import("./src/app/(app)/items/add/route-type").RouteType>;
     "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }

@@ -16,11 +16,85 @@ export const getSubCollectionsByCollectionAsync = cache(
   },
 );
 
+export const getSubCollectionsByCollectionIdAsync = cache(
+  async (collectionId: string, userId: string, dbInstance: DatabaseExecutor = db) => {
+    const collection = await dbInstance.query.collections.findFirst({
+      where: and(eq(collections.id, collectionId), eq(collections.userId, userId)),
+    });
+
+    if (!collection) {
+      return null;
+    }
+
+    const subCollectionData = await dbInstance.query.subCollections.findMany({
+      orderBy: [sql`lower(${subCollections.name}) asc`],
+      where: eq(subCollections.collectionId, collectionId),
+      with: {
+        bobbleheads: {
+          where: eq(bobbleheads.isDeleted, false),
+        },
+      },
+    });
+
+    return subCollectionData.map((subCollection) => ({
+      bobbleheadCount: subCollection.bobbleheads.length,
+      description: subCollection.description,
+      featurePhoto: subCollection.coverImageUrl,
+      id: subCollection.id,
+      name: subCollection.name,
+    }));
+  },
+);
+
 export type CollectionById = Awaited<ReturnType<typeof getCollectionByIdAsync>>;
 
 export const getCollectionByIdAsync = cache(
   async (collectionId: string, userId: string, dbInstance: DatabaseExecutor = db) => {
-    // TODO: implement
+    const collection = await dbInstance.query.collections.findFirst({
+      where: and(eq(collections.id, collectionId), eq(collections.userId, userId)),
+      with: {
+        bobbleheads: {
+          where: eq(bobbleheads.isDeleted, false),
+        },
+        subCollections: {
+          with: {
+            bobbleheads: {
+              where: eq(bobbleheads.isDeleted, false),
+            },
+          },
+        },
+      },
+    });
+
+    if (!collection) {
+      return null;
+    }
+
+    // calculate total bobblehead count (collection plus subcollections)
+    const directBobbleheadCount = collection.bobbleheads.filter(
+      (bobblehead) => bobblehead.subCollectionId === null,
+    ).length;
+    const subCollectionBobbleheadCount = collection.subCollections.reduce(
+      (sum, subCollection) => sum + subCollection.bobbleheads.length,
+      0,
+    );
+    const totalBobbleheadCount = directBobbleheadCount + subCollectionBobbleheadCount;
+
+    // the last updated at is the latest updatedAt from the collection and its subcollections
+    const lastUpdatedAt = [
+      collection.updatedAt,
+      ...collection.subCollections.map((sc) => sc.updatedAt),
+    ].reduce((latest, date) => (date > latest ? date : latest), collection.updatedAt);
+
+    return {
+      createdAt: collection.createdAt,
+      description: collection.description,
+      id: collection.id,
+      lastUpdatedAt,
+      name: collection.name,
+      subCollectionCount: collection.subCollections.length,
+      totalBobbleheadCount,
+    };
   },
 );
 

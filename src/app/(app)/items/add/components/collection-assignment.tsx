@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react';
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
 import { addItemFormOptions } from '@/app/(app)/items/add/components/add-item-form-options';
-import { CreateSubCollectionDialog } from '@/app/(app)/items/add/components/create-sub-collection-dialog';
 import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
+import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
@@ -128,7 +128,7 @@ export const CollectionAssignment = withForm({
           onCollectionCreated={handleCollectionCreated}
         />
 
-        <CreateSubCollectionDialog
+        <SubcollectionCreateDialog
           collectionId={collectionId}
           isOpen={isCreateSubCollectionDialogOpen}
           onClose={setIsCreateSubCollectionDialogOpen.off}

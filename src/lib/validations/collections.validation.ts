@@ -8,6 +8,7 @@ import { zodMaxString, zodMinMaxString } from '@/lib/utils/zod.utils';
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
 export type InsertCollectionInput = z.input<typeof insertCollectionSchema>;
 export type InsertSubCollection = z.infer<typeof insertSubCollectionSchema>;
+export type InsertSubCollectionInput = z.input<typeof insertSubCollectionSchema>;
 export type PublicCollection = z.infer<typeof publicCollectionSchema>;
 export type PublicSubCollection = z.infer<typeof publicSubCollectionSchema>;
 export type SelectCollection = z.infer<typeof selectCollectionSchema>;
@@ -49,6 +50,7 @@ export const insertSubCollectionSchema = createInsertSchema(subCollections, {
     fieldName: 'Description',
     maxLength: SCHEMA_LIMITS.SUB_COLLECTION.DESCRIPTION.MAX,
   }),
+  isPublic: z.boolean().default(DEFAULTS.SUB_COLLECTION.IS_PUBLIC),
   name: zodMinMaxString({
     fieldName: 'Name',
     maxLength: SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX,

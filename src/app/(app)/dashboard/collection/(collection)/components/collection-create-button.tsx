@@ -14,8 +14,8 @@ export const CollectionCreateButton = () => {
   return (
     <Fragment>
       <Button onClick={setIsDialogOpen.on}>
+        <PlusIcon aria-hidden className={'mr-2 size-5'} />
         Add Collection
-        <PlusIcon aria-hidden className={'size-5'} />
       </Button>
 
       <Conditional isCondition={isDialogOpen}>
