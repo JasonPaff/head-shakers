@@ -20,22 +20,7 @@ export type CollectionById = Awaited<ReturnType<typeof getCollectionByIdAsync>>;
 
 export const getCollectionByIdAsync = cache(
   async (collectionId: string, userId: string, dbInstance: DatabaseExecutor = db) => {
-    return dbInstance.query.collections.findFirst({
-      where: and(eq(collections.id, collectionId), eq(collections.userId, userId)),
-      with: {
-        bobbleheads: {
-          where: eq(bobbleheads.isDeleted, false),
-        },
-        subCollections: {
-          orderBy: [sql`lower(${subCollections.name}) asc`],
-          with: {
-            bobbleheads: {
-              where: eq(bobbleheads.isDeleted, false),
-            },
-          },
-        },
-      },
-    });
+    // TODO: implement
   },
 );
 
