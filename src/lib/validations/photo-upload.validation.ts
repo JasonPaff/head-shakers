@@ -27,21 +27,24 @@ export const fileValidationSchema = z.object({
   type: z
     .string()
     .refine(
-      (type): type is (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number] => 
+      (type): type is (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number] =>
         CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(type as (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number]),
       `File type must be one of: ${CONFIG.FILE_UPLOAD.ALLOWED_TYPES.join(', ')}`,
     ),
 });
 
 // extended file validation schema that accepts native File objects
-export const nativeFileValidationSchema = z.instanceof(File)
+export const nativeFileValidationSchema = z
+  .instanceof(File)
   .refine(
     (file) => file.size <= CONFIG.FILE_UPLOAD.MAX_SIZE,
     `File size must be less than ${CONFIG.FILE_UPLOAD.MAX_SIZE / (1024 * 1024)}MB`,
   )
   .refine(
     (file): file is File & { type: (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number] } =>
-      CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(file.type as (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number]),
+      CONFIG.FILE_UPLOAD.ALLOWED_TYPES.includes(
+        file.type as (typeof CONFIG.FILE_UPLOAD.ALLOWED_TYPES)[number],
+      ),
     `File type must be one of: ${CONFIG.FILE_UPLOAD.ALLOWED_TYPES.join(', ')}`,
   );
 
@@ -154,3 +157,49 @@ export const validatePhotosOnClient = (
 
   return { invalid, valid };
 };
+
+// Cloudinary photo validation schemas
+export const cloudinaryPhotoSchema = z.object({
+  altText: z.string().max(255).optional(),
+  bytes: z.number().positive(),
+  caption: z.string().max(500).optional(),
+  format: z.string(),
+  height: z.number().positive(),
+  id: z.string(),
+  isPrimary: z.boolean().default(false),
+  originalFilename: z.string(),
+  publicId: z.string(),
+  sortOrder: z.number().min(0).default(0),
+  uploadedAt: z.string(),
+  url: z.url(),
+  width: z.number().positive(),
+});
+
+export const cloudinaryPhotosValidationSchema = z
+  .array(cloudinaryPhotoSchema)
+  .max(
+    CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD,
+    `Maximum ${CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD} photos allowed`,
+  )
+  .optional();
+
+export const cloudinaryUploadResultSchema = z.object({
+  bytes: z.number(),
+  created_at: z.string(),
+  etag: z.string(),
+  folder: z.string(),
+  format: z.string(),
+  height: z.number(),
+  original_filename: z.string(),
+  public_id: z.string(),
+  resource_type: z.literal('image'),
+  secure_url: z.url(),
+  signature: z.string(),
+  tags: z.array(z.string()),
+  url: z.url(),
+  version: z.number(),
+  width: z.number(),
+});
+
+export type CloudinaryPhoto = z.infer<typeof cloudinaryPhotoSchema>;
+export type CloudinaryUploadResult = z.infer<typeof cloudinaryUploadResultSchema>;

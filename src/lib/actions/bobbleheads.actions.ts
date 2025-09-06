@@ -4,9 +4,6 @@ import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
 import { revalidatePath } from 'next/cache';
 
-import type { PhotoWithMetadata } from '@/components/ui/photo-upload';
-
-import { processPhotosFromFormData } from '@/lib/actions/photo-upload.actions';
 import {
   ACTION_NAMES,
   ERROR_MESSAGES,
@@ -123,15 +120,13 @@ export const createBobbleheadWithPhotosAction = authActionClient
   .use(createRateLimitMiddleware(5, 60))
   .inputSchema(createBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { photos, photosMetadata, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(
-      ctx.sanitizedInput,
-    );
+    const { photos, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
     try {
-      // first create the bobblehead without photos
+      // first create the bobblehead
       const newBobblehead = await BobbleheadService.createAsync(bobbleheadData, userId, ctx.tx);
 
       if (!newBobblehead) {
@@ -145,33 +140,34 @@ export const createBobbleheadWithPhotosAction = authActionClient
         );
       }
 
-      // if photos are provided, process and upload them
+      // if photos are provided, create database records for them
       let uploadedPhotos: Array<unknown> = [];
       if (photos && photos.length > 0) {
         try {
-          // convert File objects with metadata
-          const photosWithMetadata: Array<PhotoWithMetadata> = photos.map((file, index) => ({
-            altText: photosMetadata?.[index]?.altText || '',
-            caption: photosMetadata?.[index]?.caption || '',
-            file: file,
-            id: `temp-${index}`,
-            isPrimary: photosMetadata?.[index]?.isPrimary || index === 0,
-            preview: '', // preview URLs can't be created on the server
-            sortOrder: photosMetadata?.[index]?.sortOrder || index,
+          // create photo records from Cloudinary data
+          const photoRecords = photos.map((photo) => ({
+            altText: photo.altText,
+            bobbleheadId: newBobblehead.id,
+            caption: photo.caption,
+            fileSize: photo.bytes,
+            height: photo.height,
+            isPrimary: photo.isPrimary,
+            sortOrder: photo.sortOrder,
+            url: photo.url,
+            width: photo.width,
           }));
 
-          const photoRecords = await processPhotosFromFormData(photosWithMetadata, newBobblehead.id, userId);
-
           // insert photos into database
-          if (photoRecords.length > 0) {
-            uploadedPhotos = await Promise.all(
-              photoRecords.map((record) => BobbleheadService.addPhotoAsync(record, ctx.tx)),
-            );
-          }
+          uploadedPhotos = await Promise.all(
+            photoRecords.map((record) => BobbleheadService.addPhotoAsync(record, ctx.tx)),
+          );
+
+          // TODO: Move photos from temp folder to permanent location in Cloudinary
+          // This should be done after successful database insertion
         } catch (photoError) {
-          // TODO: notify user about partial failure?
-          // if photo upload fails, we still want to keep the bobblehead
-          console.error('Photo upload failed:', photoError);
+          // if photo database insertion fails, we still want to keep the bobblehead
+          // but we should log this for debugging
+          console.error('Photo database insertion failed:', photoError);
           Sentry.captureException(photoError);
         }
       }
