@@ -63,7 +63,7 @@ export const bobbleheads = pgTable(
     status: varchar('status', { length: SCHEMA_LIMITS.BOBBLEHEAD.STATUS.MAX })
       .default(DEFAULTS.BOBBLEHEAD.STATUS)
       .notNull(),
-    subCollectionId: uuid('sub_collection_id').references(() => subCollections.id, { onDelete: 'set null' }),
+    subcollectionId: uuid('sub_collection_id').references(() => subCollections.id, { onDelete: 'set null' }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
@@ -84,7 +84,7 @@ export const bobbleheads = pgTable(
     index('bobbleheads_is_featured_idx').on(table.isFeatured),
     index('bobbleheads_is_public_idx').on(table.isPublic),
     index('bobbleheads_status_idx').on(table.status),
-    index('bobbleheads_sub_collection_id_idx').on(table.subCollectionId),
+    index('bobbleheads_sub_collection_id_idx').on(table.subcollectionId),
     index('bobbleheads_user_id_idx').on(table.userId),
 
     // composite indexes

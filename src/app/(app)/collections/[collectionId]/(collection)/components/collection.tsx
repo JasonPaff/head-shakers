@@ -23,7 +23,7 @@ export const Collection = ({ collection }: CollectionProps) => {
       </div>
 
       {/* Metrics Section */}
-      <div className={'mx-auto max-w-7xl p-2'}>
+      <div className={'mx-auto mt-4 max-w-7xl p-2'}>
         <CollectionMetrics collection={collection} />
       </div>
 

@@ -19,12 +19,12 @@ export function generateMetadata(): Metadata {
 }
 
 async function AddItemPage({ searchParams }: AddItemPageProps) {
-  const { collectionId } = await searchParams;
+  const { collectionId, subcollectionId } = await searchParams;
 
   return (
     <PageContent>
       <AddItemHeader />
-      <AddItemFormServer initialCollectionId={collectionId} />
+      <AddItemFormServer initialCollectionId={collectionId} initialSubcollectionId={subcollectionId} />
     </PageContent>
   );
 }

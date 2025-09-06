@@ -60,6 +60,7 @@ export const CollectionSubcollections = async ({ collectionId }: CollectionSubco
                             subcollectionId: subcollection.id,
                           },
                         })}
+                        scroll
                       >
                         View Subcollection
                       </Link>

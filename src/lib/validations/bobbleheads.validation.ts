@@ -119,7 +119,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
     maxLength: SCHEMA_LIMITS.BOBBLEHEAD.SERIES.MAX,
   }).optional(),
   status: z.enum(ENUMS.BOBBLEHEAD.STATUS).default(DEFAULTS.BOBBLEHEAD.STATUS),
-  subCollectionId: zodNullableUUID('Subcollection ID').optional(),
+  subcollectionId: zodNullableUUID('Subcollection ID'),
   weight: zodDecimal({ fieldName: 'Weight' }).optional(),
   year: zodYear({ fieldName: 'Year' }).optional(),
 }).omit({

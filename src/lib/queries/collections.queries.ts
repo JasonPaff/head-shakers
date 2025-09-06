@@ -4,7 +4,7 @@ import { cache } from 'react';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { db } from '@/lib/db';
-import { bobbleheads, collections, subCollections, users } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, collections, subCollections, users } from '@/lib/db/schema';
 
 export const getCollectionsByUserAsync = cache(async (userId: string, dbInstance: DatabaseExecutor = db) => {
   return dbInstance.select().from(collections).where(eq(collections.userId, userId));
@@ -15,6 +15,56 @@ export const getSubCollectionsByCollectionAsync = cache(
     return dbInstance.select().from(subCollections).where(eq(subCollections.collectionId, collectionId));
   },
 );
+
+export type SubcollectionByCollectionId = Awaited<ReturnType<typeof getSubCollectionByCollectionIdAsync>>;
+
+export const getSubCollectionByCollectionIdAsync = cache(
+  async (
+    collectionId: string,
+    subcollectionId: string,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ) => {
+    const collection = await dbInstance.query.collections.findFirst({
+      where: and(eq(collections.id, collectionId), eq(collections.userId, userId)),
+    });
+
+    if (!collection) {
+      return null;
+    }
+
+    const subCollection = await dbInstance.query.subCollections.findFirst({
+      where: and(eq(subCollections.collectionId, collectionId), eq(subCollections.id, subcollectionId)),
+      with: {
+        bobbleheads: {
+          where: eq(bobbleheads.isDeleted, false),
+        },
+      },
+    });
+
+    if (!subCollection) {
+      return null;
+    }
+
+    const featuredBobbleheadCount = subCollection.bobbleheads.filter(
+      (bobblehead) => bobblehead.isFeatured,
+    ).length;
+
+    return {
+      bobbleheadCount: subCollection.bobbleheads.length,
+      collectionId: subCollection.collectionId,
+      collectionName: collection.name,
+      createdAt: subCollection.createdAt,
+      description: subCollection.description,
+      featuredBobbleheadCount,
+      featurePhoto: subCollection.coverImageUrl,
+      id: subCollection.id,
+      lastUpdatedAt: subCollection.updatedAt,
+      name: subCollection.name,
+    };
+  },
+);
+export type SubcollectionsByCollectionId = Awaited<ReturnType<typeof getSubCollectionsByCollectionIdAsync>>;
 
 export const getSubCollectionsByCollectionIdAsync = cache(
   async (collectionId: string, userId: string, dbInstance: DatabaseExecutor = db) => {
@@ -72,7 +122,7 @@ export const getCollectionByIdAsync = cache(
 
     // calculate total bobblehead count (collection plus subcollections)
     const directBobbleheadCount = collection.bobbleheads.filter(
-      (bobblehead) => bobblehead.subCollectionId === null,
+      (bobblehead) => bobblehead.subcollectionId === null,
     ).length;
     const subCollectionBobbleheadCount = collection.subCollections.reduce(
       (sum, subCollection) => sum + subCollection.bobbleheads.length,
@@ -155,5 +205,42 @@ export const getCollectionsDashboardDataAsync = cache(
         totalBobbleheadCount: directBobbleheadCount + subCollectionBobbleheadCount,
       };
     });
+  },
+);
+
+export type SubcollectionBobbleheads = Awaited<ReturnType<typeof getBobbleheadsBySubcollectionAsync>>;
+
+export const getBobbleheadsBySubcollectionAsync = cache(
+  async (subcollectionId: string, dbInstance: DatabaseExecutor = db) => {
+    return dbInstance
+      .select({
+        acquisitionDate: bobbleheads.acquisitionDate,
+        acquisitionMethod: bobbleheads.acquisitionMethod,
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        condition: bobbleheads.currentCondition,
+        featurePhoto: bobbleheadPhotos.url,
+        height: bobbleheads.height,
+        id: bobbleheads.id,
+        isFeatured: bobbleheads.isFeatured,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        purchaseLocation: bobbleheads.purchaseLocation,
+        purchasePrice: bobbleheads.purchasePrice,
+        series: bobbleheads.series,
+        status: bobbleheads.status,
+        weight: bobbleheads.weight,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
+          eq(bobbleheads.isDeleted, false),
+        ),
+      )
+      .where(and(eq(bobbleheads.subcollectionId, subcollectionId), eq(bobbleheads.isDeleted, false)));
   },
 );

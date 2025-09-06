@@ -62,12 +62,12 @@ export const CollectionAssignment = withForm({
     const handleCollectionCreated = (newCollection: ComboboxItem) => {
       setCollectionsList((prev) => [...prev, newCollection]);
       form.setFieldValue('collectionId', newCollection.id);
-      form.setFieldValue('subCollectionId', '');
+      form.setFieldValue('subcollectionId', '');
     };
 
     const handleSubCollectionCreated = (newCollection: ComboboxItem) => {
       setSubCollectionsList((prev) => [...prev, newCollection]);
-      form.setFieldValue('subCollectionId', newCollection.id);
+      form.setFieldValue('subcollectionId', newCollection.id);
     };
 
     return (
@@ -82,7 +82,7 @@ export const CollectionAssignment = withForm({
             <form.AppField
               listeners={{
                 onChange: () => {
-                  form.setFieldValue('subCollectionId', '');
+                  form.setFieldValue('subcollectionId', '');
                 },
               }}
               name={'collectionId'}
@@ -101,7 +101,7 @@ export const CollectionAssignment = withForm({
             </form.AppField>
 
             {/* Sub-Collection */}
-            <form.AppField name={'subCollectionId'}>
+            <form.AppField name={'subcollectionId'}>
               {(field) => (
                 <field.ComboboxField
                   createNewLabel={'Create new sub-collection'}

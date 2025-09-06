@@ -1,16 +1,16 @@
 import 'server-only';
 import { CalendarIcon, EyeIcon, StarIcon } from 'lucide-react';
 
-import type { CollectionById } from '@/lib/queries/collections.queries';
+import type { SubcollectionByCollectionId } from '@/lib/queries/collections.queries';
 
 import { Card, CardContent } from '@/components/ui/card';
 
-interface CollectionMetricsProps {
-  collection: CollectionById;
+interface SubcollectionMetricsProps {
+  subcollection: SubcollectionByCollectionId;
 }
 
-export const CollectionMetrics = ({ collection }: CollectionMetricsProps) => {
-  if (!collection) throw new Error('Collection is required');
+export const SubcollectionMetrics = ({ subcollection }: SubcollectionMetricsProps) => {
+  if (!subcollection) throw new Error('Subcollection is required');
 
   return (
     <div className={'mb-8 grid grid-cols-1 gap-6 md:grid-cols-3'}>
@@ -20,20 +20,20 @@ export const CollectionMetrics = ({ collection }: CollectionMetricsProps) => {
           <div className={'flex items-center justify-between'}>
             <div>
               <p className={'text-sm text-muted-foreground'}>Total Bobbleheads</p>
-              <p className={'text-2xl font-bold text-primary'}>{collection.totalBobbleheadCount}</p>
+              <p className={'text-2xl font-bold text-primary'}>{subcollection.bobbleheadCount}</p>
             </div>
             <StarIcon aria-hidden className={'size-8 text-muted-foreground'} />
           </div>
         </CardContent>
       </Card>
 
-      {/* Subcollections Count Card */}
+      {/* Feature Items Card */}
       <Card>
         <CardContent className={'p-6'}>
           <div className={'flex items-center justify-between'}>
             <div>
-              <p className={'text-sm text-muted-foreground'}>Subcollections</p>
-              <p className={'text-2xl font-bold text-primary'}>{collection.subCollectionCount}</p>
+              <p className={'text-sm text-muted-foreground'}>Feature Items</p>
+              <p className={'text-2xl font-bold text-primary'}>{subcollection.featuredBobbleheadCount}</p>
             </div>
             <EyeIcon aria-hidden className={'size-8 text-muted-foreground'} />
           </div>
@@ -47,7 +47,7 @@ export const CollectionMetrics = ({ collection }: CollectionMetricsProps) => {
             <div>
               <p className={'text-sm text-muted-foreground'}>Last Updated</p>
               <p className={'text-sm font-medium text-foreground'}>
-                {collection.lastUpdatedAt?.toLocaleDateString() ?? 'N/A'}
+                {subcollection.lastUpdatedAt?.toLocaleDateString() ?? 'N/A'}
               </p>
             </div>
             <CalendarIcon aria-hidden className={'size-8 text-muted-foreground'} />

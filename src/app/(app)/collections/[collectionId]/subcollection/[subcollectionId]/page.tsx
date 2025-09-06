@@ -4,6 +4,7 @@ import { withParamValidation } from 'next-typesafe-url/app/hoc';
 
 import type { PageProps } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type';
 
+import { Subcollection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection';
 import { Route } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type';
 
 type SubcollectionPageProps = PageProps;
@@ -18,6 +19,7 @@ export function generateMetadata(): Metadata {
 }
 
 async function SubcollectionPage({ routeParams }: SubcollectionPageProps) {
-  console.log(await routeParams);
-  return <div>subcollection page</div>;
+  const { collectionId, subcollectionId } = await routeParams;
+
+  return <Subcollection collectionId={collectionId} subcollectionId={subcollectionId} />;
 }

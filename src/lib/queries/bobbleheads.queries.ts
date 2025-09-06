@@ -87,6 +87,24 @@ export const getBobbleheadsByCollectionAsync = cache(
   },
 );
 
+export const getBobbleheadsBySubcollectionAsync = cache(
+  async (subcollectionId: string, userId?: string, dbInstance: DatabaseExecutor = db) => {
+    return dbInstance
+      .select()
+      .from(bobbleheads)
+      .where(
+        and(
+          eq(bobbleheads.subcollectionId, subcollectionId),
+          eq(bobbleheads.isDeleted, false),
+          userId ?
+            or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, userId))
+          : eq(bobbleheads.isPublic, true),
+        ),
+      )
+      .orderBy(desc(bobbleheads.createdAt));
+  },
+);
+
 export const getBobbleheadsByUserAsync = cache(
   async (userId: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
     return dbInstance

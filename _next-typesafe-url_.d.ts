@@ -13,6 +13,7 @@ declare module "@@@next-typesafe-url" {
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
     "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
     "/items/add": InferRoute<import("./src/app/(app)/items/add/route-type").RouteType>;
+    "/items/[itemId]": InferRoute<import("./src/app/(app)/items/[itemId]/(item)/route-type").RouteType>;
     "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }
 
@@ -34,7 +35,6 @@ declare module "@@@next-typesafe-url" {
     "/dashboard/notifications": StaticRoute;
     "/dashboard": StaticRoute;
     "/items/[itemId]/edit": StaticRoute;
-    "/items/[itemId]": StaticRoute;
     "/items/[itemId]/share": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;

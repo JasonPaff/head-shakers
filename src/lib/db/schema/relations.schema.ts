@@ -72,7 +72,7 @@ export const bobbleheadsRelations = relations(bobbleheads, ({ many, one }) => ({
   likes: many(likes),
   photos: many(bobbleheadPhotos),
   subCollection: one(subCollections, {
-    fields: [bobbleheads.subCollectionId],
+    fields: [bobbleheads.subcollectionId],
     references: [subCollections.id],
   }),
   tags: many(tags, {

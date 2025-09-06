@@ -27,7 +27,7 @@ export const addItemFormOptions = formOptions({
     purchasePrice: '',
     series: '',
     status: DEFAULTS.BOBBLEHEAD.STATUS,
-    subCollectionId: '',
+    subcollectionId: '',
     weight: '',
     year: '',
   } as z.input<typeof createBobbleheadWithPhotosSchema>,

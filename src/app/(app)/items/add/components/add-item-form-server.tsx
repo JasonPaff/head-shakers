@@ -6,9 +6,13 @@ import { getUserId } from '@/utils/user-utils';
 
 interface AddItemFormServerProps {
   initialCollectionId?: string;
+  initialSubcollectionId?: string;
 }
 
-export async function AddItemFormServer({ initialCollectionId }: AddItemFormServerProps) {
+export async function AddItemFormServer({
+  initialCollectionId,
+  initialSubcollectionId,
+}: AddItemFormServerProps) {
   const userId = await getUserId();
 
   const userCollections = (await getCollectionsByUserAsync(userId)) ?? [];
@@ -19,5 +23,11 @@ export async function AddItemFormServer({ initialCollectionId }: AddItemFormServ
     name: collection.name,
   }));
 
-  return <AddItemFormClient collections={collectionsData} initialCollectionId={initialCollectionId} />;
+  return (
+    <AddItemFormClient
+      collections={collectionsData}
+      initialCollectionId={initialCollectionId}
+      initialSubcollectionId={initialSubcollectionId}
+    />
+  );
 }

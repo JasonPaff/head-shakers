@@ -25,11 +25,16 @@ import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.
 interface AddItemFormClientProps {
   collections: Array<ComboboxItem>;
   initialCollectionId?: string;
+  initialSubcollectionId?: string;
 }
 
 // TODO: local storage draft save and restore
 
-export const AddItemFormClient = ({ collections, initialCollectionId }: AddItemFormClientProps) => {
+export const AddItemFormClient = ({
+  collections,
+  initialCollectionId,
+  initialSubcollectionId,
+}: AddItemFormClientProps) => {
   const router = useRouter();
 
   const { executeAsync, isExecuting } = useAction(createBobbleheadWithPhotosAction, {
@@ -38,10 +43,22 @@ export const AddItemFormClient = ({ collections, initialCollectionId }: AddItemF
     },
     onSuccess: ({ input }) => {
       toast.success('Bobblehead created successfully!');
-      router.push(
-        $path({ route: '/collections/[collectionId]', routeParams: { collectionId: input.collectionId } }),
-        { scroll: true },
-      );
+
+      // if there is not a subcollectionId, go back to the collection page
+      if (!input.subcollectionId) {
+        router.push(
+          $path({ route: '/collections/[collectionId]', routeParams: { collectionId: input.collectionId } }),
+        );
+      }
+      // if there is a subcollectionId, go to the subcollection page
+      else {
+        router.push(
+          $path({
+            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+            routeParams: { collectionId: input.collectionId, subcollectionId: input.subcollectionId },
+          }),
+        );
+      }
     },
   });
 
@@ -50,6 +67,7 @@ export const AddItemFormClient = ({ collections, initialCollectionId }: AddItemF
     defaultValues: {
       ...addItemFormOptions.defaultValues,
       collectionId: initialCollectionId || '',
+      subcollectionId: initialSubcollectionId || '',
     },
     onSubmit: async ({ value }) => {
       await executeAsync(value);
@@ -59,7 +77,7 @@ export const AddItemFormClient = ({ collections, initialCollectionId }: AddItemF
       modeAfterSubmission: 'change',
     }),
     validators: {
-      onBlur: createBobbleheadWithPhotosSchema,
+      onSubmit: createBobbleheadWithPhotosSchema,
     },
   });
 
