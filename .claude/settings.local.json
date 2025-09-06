@@ -24,7 +24,8 @@
       "Bash(npx vitest run:*)",
       "Bash(cat:*)",
       "Bash(wc:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__cloudinary-env-config__create-upload-preset"
     ],
     "deny": [],
     "ask": []
