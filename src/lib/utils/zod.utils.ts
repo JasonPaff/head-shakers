@@ -127,6 +127,9 @@ export const zodNullableUUID = (fieldName: string) => {
 
   return z
     .string()
+    .optional()
     .refine((val) => !val || UUIDRegex.test(val), invalidMessage)
-    .transform((val) => (val ? val : null));
+    .transform((val) => (val ? val : null))
+    .nullable()
+    .default(null);
 };

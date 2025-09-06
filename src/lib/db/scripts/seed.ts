@@ -383,13 +383,13 @@ async function seedBobbleheads(
     const user = insertedUsers.find((u) => u.id === collection?.userId)!;
 
     // Assign sub-collection based on bobblehead type
-    let subCollectionId = null;
+    let subcollectionId = null;
     if (bobblehead.characterName === 'Babe Ruth') {
-      subCollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Yankees Legends')?.id;
+      subcollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Yankees Legends')?.id;
     } else if (bobblehead.characterName === 'Luke Skywalker' || bobblehead.characterName === 'Darth Vader') {
-      subCollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Original Trilogy')?.id;
+      subcollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Original Trilogy')?.id;
     } else if (bobblehead.characterName === 'Spider-Man') {
-      subCollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Spider-Verse')?.id;
+      subcollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Spider-Verse')?.id;
     }
 
     return {
@@ -398,7 +398,7 @@ async function seedBobbleheads(
       collectionId: collection!.id,
       commentCount: Math.floor(Math.random() * 10),
       likeCount: Math.floor(Math.random() * 25),
-      subCollectionId,
+      subcollectionId,
       userId: user.id,
       viewCount: Math.floor(Math.random() * 100),
     };

@@ -37,7 +37,7 @@ describe('Bobblehead Validation Schemas', () => {
         purchasePrice: '49.99',
         series: 'Test Series',
         status: 'owned' as const,
-        subCollectionId: randomUUID(),
+        subcollectionId: randomUUID(),
         weight: '2.50',
         year: '2024',
       };
@@ -58,6 +58,9 @@ describe('Bobblehead Validation Schemas', () => {
       };
 
       const result = insertBobbleheadSchema.safeParse(minimalData);
+      if (!result.success) {
+        console.error('Validation error:', result.error);
+      }
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.currentCondition).toBe(DEFAULTS.BOBBLEHEAD.CONDITION);
@@ -500,7 +503,7 @@ describe('Bobblehead Validation Schemas', () => {
         purchasePrice: null,
         series: null,
         status: 'owned',
-        subCollectionId: null,
+        subcollectionId: null,
         updatedAt: new Date(),
         userId: randomUUID(),
         viewCount: 0,
