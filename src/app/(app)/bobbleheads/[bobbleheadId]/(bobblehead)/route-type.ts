@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const Route = {
   routeParams: z.object({
-    itemId: z.uuid('BobbleheadId is required'),
+    bobbleheadId: z.uuid('BobbleheadId is required'),
   }),
 } satisfies DynamicRoute;
 

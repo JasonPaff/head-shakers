@@ -93,7 +93,7 @@ export const SubcollectionBobbleheads = async ({
                   <Link
                     href={$path({
                       route: '/bobbleheads/[bobbleheadId]',
-                      routeParams: { itemId: bobblehead.id },
+                      routeParams: { bobbleheadId: bobblehead.id },
                     })}
                   >
                     View Details
