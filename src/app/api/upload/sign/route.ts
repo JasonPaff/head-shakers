@@ -3,11 +3,13 @@ import type { NextRequest } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-import { generateSignedUploadUrl } from '@/lib/services/cloudinary';
+import { generateSignedUploadUrl, generateUploadSignature } from '@/lib/services/cloudinary';
 
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();
+
+    console.log('Auth userId:', userId); // Debug log
 
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

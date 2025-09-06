@@ -3,8 +3,8 @@
 
 import type { CloudinaryUploadWidgetError, CloudinaryUploadWidgetResults } from 'next-cloudinary';
 
-import { useUser } from '@clerk/nextjs';
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { useAuth } from '@clerk/nextjs';
+// import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { ImagePlusIcon, MoveIcon, StarIcon, StarOffIcon, XIcon } from 'lucide-react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
 import { useCallback, useState } from 'react';
@@ -25,8 +25,8 @@ import { cn } from '@/utils/tailwind-utils';
 interface CloudinaryPhotoUploadProps {
   isDisabled?: boolean;
   maxPhotos?: number;
-  onPhotosChange: (photos: CloudinaryPhoto[]) => void;
-  photos: CloudinaryPhoto[];
+  onPhotosChange: (photos: Array<CloudinaryPhoto>) => void;
+  photos: Array<CloudinaryPhoto>;
 }
 
 export const CloudinaryPhotoUpload = ({
@@ -35,7 +35,7 @@ export const CloudinaryPhotoUpload = ({
   onPhotosChange,
   photos,
 }: CloudinaryPhotoUploadProps) => {
-  const { user } = useUser();
+  const { userId } = useAuth();
   const [uploadState, setUploadState] = useState<PhotoUploadState>({
     isUploading: false,
     totalCount: 0,
@@ -86,7 +86,7 @@ export const CloudinaryPhotoUpload = ({
   const removePhoto = useCallback(
     (photoId: string) => {
       const updatedPhotos = photos.filter((p) => p.id !== photoId);
-      // Reorder remaining photos
+      // reorder remaining photos
       const reorderedPhotos = updatedPhotos.map((photo, index) => ({
         ...photo,
         sortOrder: index,
@@ -150,11 +150,11 @@ export const CloudinaryPhotoUpload = ({
             clientAllowedFormats: ['jpg', 'jpeg', 'png', 'webp', 'heic'],
             context: {
               uploadedAt: new Date().toISOString(),
-              userId: user?.id || '',
+              userId,
             },
             cropping: false,
             croppingAspectRatio: 1,
-            folder: `users/${user?.id}/temp`,
+            folder: `users/${userId}/temp`,
             maxFiles: maxPhotos - photos.length,
             maxFileSize: 10485760, // 10MB
             multiple: true,
@@ -164,7 +164,7 @@ export const CloudinaryPhotoUpload = ({
             showPoweredBy: false,
             showSkipCropButton: true,
             sources: ['local', 'camera', 'url'],
-            tags: ['bobblehead', user?.id || 'unknown', Date.now().toString()],
+            tags: ['bobblehead', userId || 'unknown', Date.now().toString()],
           }}
           signatureEndpoint={'/api/upload/sign'}
         >

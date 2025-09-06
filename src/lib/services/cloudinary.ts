@@ -78,6 +78,15 @@ export const deleteImage = async (publicId: string): Promise<void> => {
   }
 };
 
+// generate signature for upload parameters
+export const generateUploadSignature = (paramsToSign: Record<string, any>): string => {
+  try {
+    return cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET!);
+  } catch (error) {
+    throw new CloudinaryError('Failed to generate upload signature', error as Error);
+  }
+};
+
 // generate signed upload URL for client-side uploads (if needed later)
 export const generateSignedUploadUrl = (options: {
   folder: string;
