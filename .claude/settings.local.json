@@ -23,7 +23,8 @@
       "Bash(mkdir:*)",
       "Bash(npx vitest run:*)",
       "Bash(cat:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

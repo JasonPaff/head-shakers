@@ -1,5 +1,5 @@
 {
-  "id": "d6b9bceb-99b4-497c-bfca-e3c70922c608",
+  "id": "0aff7e69-86c5-4df5-bd0d-f2e7a98ea772",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -23,7 +23,7 @@
         },
         "referrer_url": {
           "name": "referrer_url",
-          "type": "text",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false
         },
@@ -208,7 +208,7 @@
         },
         "ip_address": {
           "name": "ip_address",
-          "type": "varchar(45)",
+          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": false
         },
@@ -387,7 +387,7 @@
         },
         "caption": {
           "name": "caption",
-          "type": "text",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false
         },
@@ -433,7 +433,7 @@
         },
         "url": {
           "name": "url",
-          "type": "text",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": true
         },
@@ -699,7 +699,7 @@
         },
         "description": {
           "name": "description",
-          "type": "text",
+          "type": "varchar(1000)",
           "primaryKey": false,
           "notNull": false
         },
@@ -758,7 +758,7 @@
         },
         "name": {
           "name": "name",
-          "type": "varchar(200)",
+          "type": "varchar(100)",
           "primaryKey": false,
           "notNull": true
         },
@@ -1085,7 +1085,7 @@
       "columns": {
         "cover_image_url": {
           "name": "cover_image_url",
-          "type": "text",
+          "type": "varchar(500)",
           "primaryKey": false,
           "notNull": false
         },
@@ -1098,7 +1098,7 @@
         },
         "description": {
           "name": "description",
-          "type": "text",
+          "type": "varchar(1000)",
           "primaryKey": false,
           "notNull": false
         },
@@ -1266,11 +1266,11 @@
       "checkConstraints": {
         "collections_name_length": {
           "name": "collections_name_length",
-          "value": "length(\"collections\".\"name\") <= 100"
+          "value": "length(\"collections\".\"name\") <= $1"
         },
         "collections_name_not_empty": {
           "name": "collections_name_not_empty",
-          "value": "length(\"collections\".\"name\") > 0"
+          "value": "length(\"collections\".\"name\") >= $1"
         },
         "collections_total_items_non_negative": {
           "name": "collections_total_items_non_negative",
@@ -1295,7 +1295,7 @@
         },
         "cover_image_url": {
           "name": "cover_image_url",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -1308,7 +1308,7 @@
         },
         "description": {
           "name": "description",
-          "type": "text",
+          "type": "varchar",
           "primaryKey": false,
           "notNull": false
         },
@@ -1453,7 +1453,7 @@
         },
         "sub_collections_name_length": {
           "name": "sub_collections_name_length",
-          "value": "length(\"sub_collections\".\"name\") <= 100"
+          "value": "length(\"sub_collections\".\"name\") <= $1"
         },
         "sub_collections_name_not_empty": {
           "name": "sub_collections_name_not_empty",
@@ -2705,7 +2705,7 @@
       "checkConstraints": {
         "featured_content_title_length": {
           "name": "featured_content_title_length",
-          "value": "\"featured_content\".\"title\" IS NULL OR length(\"featured_content\".\"title\") <= 255"
+          "value": "\"featured_content\".\"title\" IS NULL OR length(\"featured_content\".\"title\") <= $1"
         },
         "featured_content_sort_order_non_negative": {
           "name": "featured_content_sort_order_non_negative",
@@ -2985,7 +2985,7 @@
         },
         "notifications_title_length": {
           "name": "notifications_title_length",
-          "value": "length(\"notifications\".\"title\") <= 255"
+          "value": "length(\"notifications\".\"title\") <= $1"
         },
         "notifications_read_at_logic": {
           "name": "notifications_read_at_logic",
@@ -3175,7 +3175,7 @@
         },
         "platform_settings_key_length": {
           "name": "platform_settings_key_length",
-          "value": "length(\"platform_settings\".\"key\") <= 100"
+          "value": "length(\"platform_settings\".\"key\") <= $1"
         }
       },
       "isRLSEnabled": false
@@ -4119,7 +4119,7 @@
         },
         "currency": {
           "name": "currency",
-          "type": "varchar(10)",
+          "type": "varchar(3)",
           "primaryKey": false,
           "notNull": true,
           "default": "'USD'"
@@ -4201,14 +4201,6 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
-        },
-        "theme": {
-          "name": "theme",
-          "type": "theme",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'light'"
         },
         "timezone": {
           "name": "timezone",
@@ -4726,15 +4718,6 @@
         "public",
         "followers",
         "private"
-      ]
-    },
-    "public.theme": {
-      "name": "theme",
-      "schema": "public",
-      "values": [
-        "light",
-        "dark",
-        "auto"
       ]
     },
     "public.user_activity_target_type": {

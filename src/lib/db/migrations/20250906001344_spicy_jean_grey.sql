@@ -17,12 +17,11 @@ CREATE TYPE "public"."digest_frequency" AS ENUM('daily', 'weekly', 'monthly', 'n
 CREATE TYPE "public"."dm_permission" AS ENUM('anyone', 'followers', 'mutual', 'none');--> statement-breakpoint
 CREATE TYPE "public"."login_method" AS ENUM('email', 'facebook', 'github', 'gmail', 'google');--> statement-breakpoint
 CREATE TYPE "public"."privacy_level" AS ENUM('public', 'followers', 'private');--> statement-breakpoint
-CREATE TYPE "public"."theme" AS ENUM('light', 'dark', 'auto');--> statement-breakpoint
 CREATE TYPE "public"."user_activity_target_type" AS ENUM('bobblehead', 'collection', 'user', 'comment');--> statement-breakpoint
 CREATE TABLE "content_views" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"ip_address" varchar(45),
-	"referrer_url" text,
+	"referrer_url" varchar(500),
 	"target_id" uuid NOT NULL,
 	"content_views_target_type" "content_views_target_type" NOT NULL,
 	"user_agent" varchar(1000),
@@ -36,7 +35,7 @@ CREATE TABLE "search_queries" (
 	"clicked_result_type" "result_type",
 	"filters" jsonb,
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"ip_address" varchar(45),
+	"ip_address" varchar(50),
 	"query" varchar(500) NOT NULL,
 	"result_count" integer,
 	"searched_at" timestamp DEFAULT now() NOT NULL,
@@ -47,14 +46,14 @@ CREATE TABLE "search_queries" (
 CREATE TABLE "bobblehead_photos" (
 	"alt_text" varchar(255),
 	"bobblehead_id" uuid NOT NULL,
-	"caption" text,
+	"caption" varchar(500),
 	"file_size" integer,
 	"height" integer,
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"is_primary" boolean DEFAULT false NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	"uploaded_at" timestamp DEFAULT now() NOT NULL,
-	"url" text NOT NULL,
+	"url" varchar(500) NOT NULL,
 	"width" integer
 );
 --> statement-breakpoint
@@ -76,7 +75,7 @@ CREATE TABLE "bobbleheads" (
 	"current_condition" varchar(20) DEFAULT 'excellent' NOT NULL,
 	"custom_fields" jsonb,
 	"deleted_at" timestamp,
-	"description" text,
+	"description" varchar(1000),
 	"height" numeric(5, 2),
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"is_deleted" boolean DEFAULT false NOT NULL,
@@ -85,7 +84,7 @@ CREATE TABLE "bobbleheads" (
 	"like_count" integer DEFAULT 0 NOT NULL,
 	"manufacturer" varchar(100),
 	"material" varchar(100),
-	"name" varchar(200) NOT NULL,
+	"name" varchar(100) NOT NULL,
 	"purchase_location" varchar(100),
 	"purchase_price" numeric(10, 2),
 	"series" varchar(100),
@@ -99,9 +98,9 @@ CREATE TABLE "bobbleheads" (
 );
 --> statement-breakpoint
 CREATE TABLE "collections" (
-	"cover_image_url" text,
+	"cover_image_url" varchar(500),
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"description" text,
+	"description" varchar(1000),
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"is_public" boolean DEFAULT true NOT NULL,
 	"last_item_added_at" timestamp,
@@ -111,16 +110,16 @@ CREATE TABLE "collections" (
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"user_id" uuid NOT NULL,
 	CONSTRAINT "collections_name_length" CHECK (length("collections"."name") <= 100),
-	CONSTRAINT "collections_name_not_empty" CHECK (length("collections"."name") > 0),
+	CONSTRAINT "collections_name_not_empty" CHECK (length("collections"."name") >= 1),
 	CONSTRAINT "collections_total_items_non_negative" CHECK ("collections"."total_items" >= 0),
 	CONSTRAINT "collections_total_value_non_negative" CHECK ("collections"."total_value" >= 0)
 );
 --> statement-breakpoint
 CREATE TABLE "sub_collections" (
 	"collection_id" uuid NOT NULL,
-	"cover_image_url" text,
+	"cover_image_url" varchar,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"description" text,
+	"description" varchar,
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"is_public" boolean DEFAULT true NOT NULL,
 	"item_count" integer DEFAULT 0 NOT NULL,
@@ -320,7 +319,7 @@ CREATE TABLE "user_settings" (
 	"allow_comments" "comment_permission" DEFAULT 'anyone' NOT NULL,
 	"allow_direct_messages" "dm_permission" DEFAULT 'followers' NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"currency" varchar(10) DEFAULT 'USD' NOT NULL,
+	"currency" varchar(3) DEFAULT 'USD' NOT NULL,
 	"default_item_privacy" varchar(20) DEFAULT 'public' NOT NULL,
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"language" varchar(10) DEFAULT 'en' NOT NULL,
@@ -332,7 +331,6 @@ CREATE TABLE "user_settings" (
 	"show_last_active" boolean DEFAULT false NOT NULL,
 	"show_location" boolean DEFAULT false NOT NULL,
 	"show_real_name" boolean DEFAULT false NOT NULL,
-	"theme" "theme" DEFAULT 'light' NOT NULL,
 	"timezone" varchar(50) DEFAULT 'UTC' NOT NULL,
 	"updated_at" timestamp DEFAULT now() NOT NULL,
 	"user_id" uuid NOT NULL,
