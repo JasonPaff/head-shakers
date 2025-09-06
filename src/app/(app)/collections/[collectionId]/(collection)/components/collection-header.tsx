@@ -46,7 +46,7 @@ export const CollectionHeader = ({ collection }: CollectionHeaderProps) => {
 
           {/* Add Bobblehead Button */}
           <Button asChild className={'w-full sm:w-auto'}>
-            <Link href={$path({ route: '/items/add', searchParams: { collectionId: collection.id } })}>
+            <Link href={$path({ route: '/bobbleheads/add', searchParams: { collectionId: collection.id } })}>
               <PlusIcon aria-hidden className={'mr-2 size-4'} />
               Add Bobblehead
             </Link>

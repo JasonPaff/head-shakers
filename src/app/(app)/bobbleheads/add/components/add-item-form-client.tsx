@@ -10,15 +10,15 @@ import { toast } from 'sonner';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
-import { AcquisitionDetails } from '@/app/(app)/items/add/components/acquisition-details';
-import { addItemFormOptions } from '@/app/(app)/items/add/components/add-item-form-options';
-import { BasicInformation } from '@/app/(app)/items/add/components/basic-information';
-import { CollectionAssignment } from '@/app/(app)/items/add/components/collection-assignment';
-import { CustomFields } from '@/app/(app)/items/add/components/custom-fields';
-import { ItemPhotos } from '@/app/(app)/items/add/components/item-photos';
-import { ItemSettings } from '@/app/(app)/items/add/components/item-settings';
-import { ItemTags } from '@/app/(app)/items/add/components/item-tags';
-import { PhysicalAttributes } from '@/app/(app)/items/add/components/physical-attributes';
+import { AcquisitionDetails } from '@/app/(app)/bobbleheads/add/components/acquisition-details';
+import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { BasicInformation } from '@/app/(app)/bobbleheads/add/components/basic-information';
+import { CollectionAssignment } from '@/app/(app)/bobbleheads/add/components/collection-assignment';
+import { CustomFields } from '@/app/(app)/bobbleheads/add/components/custom-fields';
+import { ItemPhotos } from '@/app/(app)/bobbleheads/add/components/item-photos';
+import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settings';
+import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
+import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads.actions';

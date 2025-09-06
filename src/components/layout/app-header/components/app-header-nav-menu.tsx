@@ -133,7 +133,7 @@ const navigationLinks: Array<NavigationLink> = [
       },
       {
         description: 'Add a new bobblehead to your collection',
-        href: $path({ route: '/items/add' }),
+        href: $path({ route: '/bobbleheads/add' }),
         icon: PackagePlusIcon,
         title: 'Add New Item',
       },

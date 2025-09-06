@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { AddItemFormClient } from '@/app/(app)/items/add/components/add-item-form-client';
+import { AddItemFormClient } from '@/app/(app)/bobbleheads/add/components/add-item-form-client';
 import { getCollectionsByUserAsync } from '@/lib/queries/collections.queries';
 import { getUserId } from '@/utils/user-utils';
 

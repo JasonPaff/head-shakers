@@ -9,16 +9,17 @@ declare module "@@@next-typesafe-url" {
   import type { InferRoute, StaticRoute } from "next-typesafe-url";
 
   interface DynamicRouter {
+    "/bobbleheads/add": InferRoute<import("./src/app/(app)/bobbleheads/add/route-type").RouteType>;
+    "/bobbleheads/[bobbleheadId]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/route-type").RouteType>;
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
     "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
-    "/items/add": InferRoute<import("./src/app/(app)/items/add/route-type").RouteType>;
-    "/items/[itemId]": InferRoute<import("./src/app/(app)/items/[itemId]/(item)/route-type").RouteType>;
     "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }
 
   interface StaticRouter {
     "/": StaticRoute;
+    "/bobbleheads/[bobbleheadId]/edit": StaticRoute;
     "/browse/categories": StaticRoute;
     "/browse/featured": StaticRoute;
     "/browse": StaticRoute;
@@ -34,8 +35,6 @@ declare module "@@@next-typesafe-url" {
     "/dashboard/feed": StaticRoute;
     "/dashboard/notifications": StaticRoute;
     "/dashboard": StaticRoute;
-    "/items/[itemId]/edit": StaticRoute;
-    "/items/[itemId]/share": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;

@@ -2,7 +2,7 @@
 
 import { Tag } from 'lucide-react';
 
-import { addItemFormOptions } from '@/app/(app)/items/add/components/add-item-form-options';
+import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import {} from '@/lib/validations/bobbleheads.validation';

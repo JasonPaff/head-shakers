@@ -53,7 +53,7 @@ export const SubcollectionHeader = ({ subcollection }: SubcollectionHeaderProps)
           <Button asChild className={'w-full sm:w-auto'}>
             <Link
               href={$path({
-                route: '/items/add',
+                route: '/bobbleheads/add',
                 searchParams: { collectionId: subcollection.collectionId, subcollectionId: subcollection.id },
               })}
             >

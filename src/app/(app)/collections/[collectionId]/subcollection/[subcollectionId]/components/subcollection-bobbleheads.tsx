@@ -29,7 +29,7 @@ export const SubcollectionBobbleheads = async ({
         <Button asChild size={'sm'} variant={'outline'}>
           <Link
             href={$path({
-              route: '/items/add',
+              route: '/bobbleheads/add',
               searchParams: { collectionId, subcollectionId },
             })}
           >
@@ -90,7 +90,12 @@ export const SubcollectionBobbleheads = async ({
 
               <div className={'pt-2'}>
                 <Button asChild className={'w-full'} size={'sm'}>
-                  <Link href={$path({ route: '/items/[itemId]', routeParams: { itemId: bobblehead.id } })}>
+                  <Link
+                    href={$path({
+                      route: '/bobbleheads/[bobbleheadId]',
+                      routeParams: { itemId: bobblehead.id },
+                    })}
+                  >
                     View Details
                   </Link>
                 </Button>

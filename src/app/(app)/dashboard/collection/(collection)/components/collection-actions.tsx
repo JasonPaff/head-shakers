@@ -41,7 +41,7 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
   });
 
   const handleAddBobblehead = () => {
-    router.push($path({ route: '/items/add', searchParams: { collectionId } }));
+    router.push($path({ route: '/bobbleheads/add', searchParams: { collectionId } }));
   };
 
   const handleDeleteCollection = async () => {
