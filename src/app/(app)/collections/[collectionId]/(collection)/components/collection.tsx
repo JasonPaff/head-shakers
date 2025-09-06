@@ -10,6 +10,8 @@ interface CollectionProps {
   collection: CollectionById;
 }
 
+// TODO: add bobbleheads preview section
+
 export const Collection = ({ collection }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 

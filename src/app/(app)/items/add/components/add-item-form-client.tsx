@@ -1,5 +1,7 @@
 'use client';
 
+import type { z } from 'zod';
+
 import { revalidateLogic } from '@tanstack/form-core';
 import { useAction } from 'next-safe-action/hooks';
 import { $path } from 'next-typesafe-url';
@@ -68,7 +70,7 @@ export const AddItemFormClient = ({
       ...addItemFormOptions.defaultValues,
       collectionId: initialCollectionId || '',
       subcollectionId: initialSubcollectionId || '',
-    },
+    } as z.input<typeof createBobbleheadWithPhotosSchema>,
     onSubmit: async ({ value }) => {
       await executeAsync(value);
     },

@@ -14,6 +14,8 @@ interface SubcollectionBobbleheadsProps {
   subcollectionId: string;
 }
 
+// TODO: add a nice empty state when there are no bobbleheads
+
 export const SubcollectionBobbleheads = async ({
   collectionId,
   subcollectionId,

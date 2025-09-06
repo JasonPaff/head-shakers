@@ -13,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { getCollectionsDashboardDataAsync } from '@/lib/queries/collections.queries';
 
+// TODO: add a nice empty state when there are no collections
+
 export const CollectionList = async () => {
   const { userId } = await auth();
   if (!userId) redirect($path({ route: '/' }));

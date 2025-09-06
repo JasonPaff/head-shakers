@@ -14,6 +14,8 @@ interface CollectionSubcollectionsProps {
   collectionId: string;
 }
 
+// TODO: add a nice empty state when there are no subcollections
+
 export const CollectionSubcollections = async ({ collectionId }: CollectionSubcollectionsProps) => {
   const userId = await getUserId();
   const subcollections = (await getSubCollectionsByCollectionIdAsync(collectionId, userId)) ?? [];
