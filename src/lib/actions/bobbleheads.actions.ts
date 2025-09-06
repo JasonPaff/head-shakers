@@ -156,7 +156,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
             file: file,
             id: `temp-${index}`,
             isPrimary: photosMetadata?.[index]?.isPrimary || index === 0,
-            preview: URL.createObjectURL(file),
+            preview: '', // preview URLs can't be created on the server
             sortOrder: photosMetadata?.[index]?.sortOrder || index,
           }));
 

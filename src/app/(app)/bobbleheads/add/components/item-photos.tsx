@@ -20,8 +20,8 @@ export const ItemPhotos = withForm({
     const photosWithMetadata: Array<PhotoWithMetadata> = useMemo(
       () =>
         (photos || []).map((file, index) => ({
-          altText: '',
-          caption: '',
+          altText: 'test',
+          caption: 'test',
           file,
           id: `temp-${index}`,
           isPrimary: index === 0,
