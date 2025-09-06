@@ -12,7 +12,14 @@ import type {
 
 import { TAGS } from '@/lib/constants/tags';
 import { db } from '@/lib/db';
-import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema';
+import {
+  bobbleheadPhotos,
+  bobbleheads,
+  bobbleheadTags,
+  collections,
+  subCollections,
+  tags,
+} from '@/lib/db/schema';
 
 export const createBobbleheadAsync = async (
   data: InsertBobblehead,
@@ -38,8 +45,44 @@ export const updateBobbleheadAsync = async (
     .returning();
 };
 
+export type GetBobbleheadById = Awaited<ReturnType<typeof getBobbleheadByIdAsync>>;
+
 export const getBobbleheadByIdAsync = cache(async (id: string, dbInstance: DatabaseExecutor = db) => {
-  return dbInstance.select().from(bobbleheads).where(eq(bobbleheads.id, id));
+  const result = await dbInstance
+    .select({
+      bobblehead: bobbleheads,
+      collection: collections,
+      subcollection: subCollections,
+    })
+    .from(bobbleheads)
+    .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+    .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
+    .where(eq(bobbleheads.id, id))
+    .limit(1);
+
+  if (!result[0]) return null;
+
+  const photos = await dbInstance
+    .select()
+    .from(bobbleheadPhotos)
+    .where(eq(bobbleheadPhotos.bobbleheadId, id))
+    .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
+
+  const bobbleheadTagsData = await dbInstance
+    .select({
+      tag: tags,
+    })
+    .from(bobbleheadTags)
+    .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
+    .where(eq(bobbleheadTags.bobbleheadId, id));
+
+  return {
+    ...result[0].bobblehead,
+    collectionName: result[0].collection?.name || null,
+    photos,
+    subcollectionName: result[0].subcollection?.name || null,
+    tags: bobbleheadTagsData.map((t) => t.tag),
+  };
 });
 
 export const getTrendingBobbleheads = unstable_cache(

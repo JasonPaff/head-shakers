@@ -25,7 +25,7 @@ export const CollectionList = async () => {
   const _totalBobbleheadCount = collections?.reduce((acc, col) => acc + col.totalBobbleheadCount, 0) || 0;
 
   return (
-    <div className={'container mx-auto px-4 py-8'}>
+    <div className={'container mx-auto max-w-7xl px-4 py-8'}>
       {/* Collection Stats */}
       <div className={'mb-6 flex items-center justify-between'}>
         <div>

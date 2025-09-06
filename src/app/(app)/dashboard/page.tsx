@@ -24,7 +24,7 @@ export default function DashboardPage() {
             <p className={'text-muted-foreground'}>{`Here's what's happening with your collection`}</p>
           </div>
           <Button asChild className={'gap-2'}>
-            <Link href={$path({ route: '/items/add' })}>
+            <Link href={$path({ route: '/bobbleheads/add' })}>
               <PlusIcon aria-hidden className={'size-4'} />
               Add Bobblehead
             </Link>

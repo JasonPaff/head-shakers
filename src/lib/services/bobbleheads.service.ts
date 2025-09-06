@@ -41,7 +41,7 @@ export class BobbleheadService {
     dbInstance: DatabaseExecutor = db,
   ): Promise<boolean> {
     const result = await getBobbleheadByIdAsync(id, dbInstance);
-    return result?.[0]?.userId === userId;
+    return result?.userId === userId;
   }
 
   // create operations
@@ -89,8 +89,7 @@ export class BobbleheadService {
 
   // utility methods
   static async existsAsync(id: string, dbInstance: DatabaseExecutor = db): Promise<boolean> {
-    const result = await getBobbleheadByIdAsync(id, dbInstance);
-    return result && result.length > 0;
+    return (await getBobbleheadByIdAsync(id, dbInstance)) !== null;
   }
 
   static async getByCollectionAsync(
@@ -108,8 +107,7 @@ export class BobbleheadService {
   }
 
   static async getByIdBasicAsync(id: string, dbInstance: DatabaseExecutor = db) {
-    const result = await getBobbleheadByIdAsync(id, dbInstance);
-    return result?.[0] || null;
+    return getBobbleheadByIdAsync(id, dbInstance);
   }
 
   static async getByUserAsync(userId: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) {

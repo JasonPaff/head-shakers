@@ -132,7 +132,12 @@ describe('Bobblehead Error Handling', () => {
         const result = await BobbleheadService.getByIdAsync(fakeId, undefined, db);
         expect(result).toBeNull();
 
-        const updateResult = await BobbleheadService.updateAsync(fakeId, { name: 'Updated' }, randomUUID(), db);
+        const updateResult = await BobbleheadService.updateAsync(
+          fakeId,
+          { name: 'Updated' },
+          randomUUID(),
+          db,
+        );
         expect(updateResult).toBeNull();
 
         const deleteResult = await BobbleheadService.deleteAsync(fakeId, randomUUID(), db);
@@ -272,12 +277,12 @@ describe('Bobblehead Error Handling', () => {
         // Both updates should complete without throwing errors
         const [result1, result2] = await Promise.all([update1Promise, update2Promise]);
 
-        expect(result1).toHaveLength(1);
-        expect(result2).toHaveLength(1);
+        expect(result1).not.toBe(null);
+        expect(result2).not.toBe(null);
 
         // Final state should be consistent
         const finalState = await getBobbleheadByIdAsync(bobblehead.id, db);
-        expect(finalState).toHaveLength(1);
+        expect(finalState).not.toBe(null);
       });
     });
 

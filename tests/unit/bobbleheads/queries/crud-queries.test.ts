@@ -152,9 +152,9 @@ describe('Bobblehead CRUD Queries', () => {
         // Test get by ID
         const result = await getBobbleheadByIdAsync(bobblehead.id, db);
 
-        expect(result).toHaveLength(1);
-        expect(result[0]!.id).toBe(bobblehead.id);
-        expect(result[0]!.name).toBe('Get Test Bobblehead');
+        expect(result).not.toBe(null);
+        expect(result?.id).toBe(bobblehead.id);
+        expect(result?.name).toBe('Get Test Bobblehead');
       });
     });
 
@@ -163,7 +163,7 @@ describe('Bobblehead CRUD Queries', () => {
         const fakeId = randomUUID();
         const result = await getBobbleheadByIdAsync(fakeId, db);
 
-        expect(result).toHaveLength(0);
+        expect(result).toBe(null);
       });
     });
   });
@@ -483,7 +483,7 @@ describe('Bobblehead CRUD Queries', () => {
 
         // Verify it's not deleted
         const checkResult = await getBobbleheadByIdAsync(bobblehead.id, db);
-        expect(checkResult[0]!.isDeleted).toBe(false);
+        expect(checkResult?.isDeleted).toBe(false);
       });
     });
   });
@@ -625,7 +625,7 @@ describe('Bobblehead CRUD Queries', () => {
 
         // Verify user2's bobblehead is not deleted
         const checkResult = await getBobbleheadByIdAsync(bobblehead2[0]!.id, db);
-        expect(checkResult[0]!.isDeleted).toBe(false);
+        expect(checkResult?.isDeleted).toBe(false);
       });
     });
   });

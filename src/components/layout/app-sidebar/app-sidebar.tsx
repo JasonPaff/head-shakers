@@ -44,7 +44,7 @@ const data = {
     {
       icon: PlusIcon,
       title: 'Add Bobblehead',
-      url: $path({ route: '/items/add' }),
+      url: $path({ route: '/bobbleheads/add' }),
     },
     {
       icon: UploadIcon,

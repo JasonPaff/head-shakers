@@ -229,7 +229,7 @@ export const updateBobbleheadAction = authActionClient
     try {
       // verify ownership
       const existing = await getBobbleheadByIdAsync(id, ctx.db);
-      if (!existing || existing.length === 0) {
+      if (!existing) {
         throw new ActionError(
           ErrorType.NOT_FOUND,
           'BOBBLEHEAD_NOT_FOUND',
@@ -240,7 +240,7 @@ export const updateBobbleheadAction = authActionClient
         );
       }
 
-      if (existing[0]?.userId !== userId) {
+      if (existing.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_UPDATE_UNAUTHORIZED',
@@ -269,7 +269,7 @@ export const updateBobbleheadAction = authActionClient
         $path({
           route: '/collections/[collectionId]',
           routeParams: {
-            collectionId: existing[0].collectionId,
+            collectionId: existing.collectionId,
           },
         }),
       );
@@ -305,7 +305,7 @@ export const deleteBobbleheadAction = authActionClient
     try {
       // verify ownership before deletion
       const existing = await getBobbleheadByIdAsync(sanitizedData.id, ctx.db);
-      if (!existing || existing.length === 0) {
+      if (!existing) {
         throw new ActionError(
           ErrorType.NOT_FOUND,
           'BOBBLEHEAD_NOT_FOUND',
@@ -316,7 +316,7 @@ export const deleteBobbleheadAction = authActionClient
         );
       }
 
-      if (existing[0]?.userId !== userId) {
+      if (existing?.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_DELETE_UNAUTHORIZED',
@@ -345,7 +345,7 @@ export const deleteBobbleheadAction = authActionClient
         $path({
           route: '/collections/[collectionId]',
           routeParams: {
-            collectionId: existing[0].collectionId,
+            collectionId: existing.collectionId,
           },
         }),
       );
@@ -433,7 +433,7 @@ export const uploadBobbleheadPhotoAction = authActionClient
     try {
       // verify bobblehead ownership
       const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
-      if (!bobblehead || bobblehead.length === 0) {
+      if (!bobblehead) {
         throw new ActionError(
           ErrorType.NOT_FOUND,
           'BOBBLEHEAD_NOT_FOUND',
@@ -444,7 +444,7 @@ export const uploadBobbleheadPhotoAction = authActionClient
         );
       }
 
-      if (bobblehead[0]?.userId !== userId) {
+      if (bobblehead?.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_PHOTO_UPLOAD_UNAUTHORIZED',
@@ -540,7 +540,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
     try {
       // verify bobblehead ownership
       const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
-      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+      if (!bobblehead || bobblehead.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_PHOTO_DELETE_UNAUTHORIZED',
@@ -598,7 +598,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
     try {
       // verify bobblehead ownership
       const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
-      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+      if (!bobblehead || bobblehead.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_PHOTO_REORDER_UNAUTHORIZED',
@@ -646,7 +646,7 @@ export const addTagToBobbleheadAction = authActionClient
     try {
       // verify bobblehead ownership
       const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
-      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+      if (!bobblehead || bobblehead.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_TAG_ADD_UNAUTHORIZED',
@@ -693,7 +693,7 @@ export const removeTagFromBobbleheadAction = authActionClient
     try {
       // verify bobblehead ownership
       const bobblehead = await getBobbleheadByIdAsync(sanitizedData.bobbleheadId, ctx.db);
-      if (!bobblehead || bobblehead.length === 0 || bobblehead[0]?.userId !== userId) {
+      if (!bobblehead || bobblehead.userId !== userId) {
         throw new ActionError(
           ErrorType.AUTHORIZATION,
           'BOBBLEHEAD_TAG_REMOVE_UNAUTHORIZED',
