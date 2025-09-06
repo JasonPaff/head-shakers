@@ -4,8 +4,8 @@
 import type { CloudinaryUploadWidgetError, CloudinaryUploadWidgetResults } from 'next-cloudinary';
 
 import { useUser } from '@clerk/nextjs';
-// import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'; // TODO: Install @hello-pangea/dnd
-import { ImagePlus, Move, Star, StarOff, X } from 'lucide-react';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
+import { ImagePlusIcon, MoveIcon, StarIcon, StarOffIcon, XIcon } from 'lucide-react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
 import { useCallback, useState } from 'react';
 
@@ -13,12 +13,14 @@ import type { CloudinaryPhoto, PhotoUploadState } from '@/types/cloudinary.types
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { CONFIG } from '@/lib/constants';
 import { transformCloudinaryResult } from '@/types/cloudinary.types';
+import { cn } from '@/utils/tailwind-utils';
 
 interface CloudinaryPhotoUploadProps {
   isDisabled?: boolean;
@@ -113,21 +115,21 @@ export const CloudinaryPhotoUpload = ({
     [photos, onPhotosChange],
   );
 
-  // TODO: Implement drag and drop when @hello-pangea/dnd is installed
+  // TODO: replace the any type with proper type from @hello-pangea/dnd
   // const handleDragEnd = useCallback(
   //   (result: any) => {
   //     if (!result.destination) return;
-
+  //
   //     const items = Array.from(photos);
   //     const [reorderedItem] = items.splice(result.source.index, 1);
   //     items.splice(result.destination.index, 0, reorderedItem);
-
-  //     // Update sort orders
+  //
+  //     // update sort orders
   //     const reorderedPhotos = items.map((photo, index) => ({
   //       ...photo,
   //       sortOrder: index,
   //     }));
-
+  //
   //     onPhotosChange(reorderedPhotos);
   //   },
   //   [photos, onPhotosChange],
@@ -138,7 +140,7 @@ export const CloudinaryPhotoUpload = ({
   return (
     <div className={'space-y-4'}>
       {/* Upload Widget */}
-      {_canUploadMore && (
+      <Conditional isCondition={_canUploadMore}>
         <CldUploadWidget
           onError={handleError}
           onQueuesEnd={handleQueuesEnd}
@@ -164,7 +166,7 @@ export const CloudinaryPhotoUpload = ({
             sources: ['local', 'camera', 'url'],
             tags: ['bobblehead', user?.id || 'unknown', Date.now().toString()],
           }}
-          uploadPreset={'bobblehead-photos'}
+          signatureEndpoint={'/api/upload/sign'}
         >
           {({ open }) => (
             <Button
@@ -175,28 +177,28 @@ export const CloudinaryPhotoUpload = ({
               variant={'outline'}
             >
               <div className={'flex flex-col items-center gap-2'}>
-                <ImagePlus className={'h-8 w-8'} />
+                <ImagePlusIcon aria-hidden className={'size-8'} />
                 <span>
                   {uploadState.isUploading ? 'Uploading...' : `Add Photos (${photos.length}/${maxPhotos})`}
                 </span>
-                {uploadState.isUploading && (
+                <Conditional isCondition={uploadState.isUploading}>
                   <Progress
                     className={'w-32'}
                     value={(uploadState.uploadedCount / Math.max(uploadState.totalCount, 1)) * 100}
                   />
-                )}
+                </Conditional>
               </div>
             </Button>
           )}
         </CldUploadWidget>
-      )}
+      </Conditional>
 
       {/* Upload Error */}
-      {uploadState.error && (
+      <Conditional isCondition={!!uploadState.error}>
         <div className={'rounded-md bg-red-50 p-3 text-sm text-red-800'}>
           Upload error: {uploadState.error}
         </div>
-      )}
+      </Conditional>
 
       {/* Photo Grid */}
       {photos.length > 0 && (
@@ -229,34 +231,35 @@ export const CloudinaryPhotoUpload = ({
                       >
                         <div className={'flex h-full w-full items-center justify-center gap-2'}>
                           <Button
-                            className={'h-8 w-8 p-0'}
+                            className={'size-8 p-0'}
                             onClick={() => setPrimaryPhoto(photo.id)}
                             size={'sm'}
                             type={'button'}
                             variant={'secondary'}
                           >
                             {photo.isPrimary ?
-                              <Star className={'h-4 w-4 fill-current'} />
-                            : <StarOff className={'h-4 w-4'} />}
+                              <StarIcon aria-hidden className={'size-4 fill-current'} />
+                            : <StarOffIcon aria-hidden className={'size-4'} />}
                           </Button>
 
                           {/* TODO: Add drag handle when drag-drop is implemented */}
                           <div
-                            className={
-                              'flex h-8 w-8 cursor-move items-center justify-center rounded bg-secondary text-secondary-foreground'
-                            }
+                            className={cn(
+                              'flex size-8 cursor-move items-center justify-center',
+                              'rounded bg-secondary text-secondary-foreground',
+                            )}
                           >
-                            <Move className={'h-4 w-4'} />
+                            <MoveIcon aria-hidden className={'size-4'} />
                           </div>
 
                           <Button
-                            className={'h-8 w-8 p-0'}
+                            className={'size-8 p-0'}
                             onClick={() => removePhoto(photo.id)}
                             size={'sm'}
                             type={'button'}
                             variant={'destructive'}
                           >
-                            <X className={'h-4 w-4'} />
+                            <XIcon aria-hidden className={'size-4'} />
                           </Button>
                         </div>
                       </div>
@@ -269,7 +272,7 @@ export const CloudinaryPhotoUpload = ({
                               'inline-flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground'
                             }
                           >
-                            <Star className={'h-3 w-3 fill-current'} />
+                            <StarIcon aria-hidden className={'size-3 fill-current'} />
                             Primary
                           </span>
                         </div>
