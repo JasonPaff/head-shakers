@@ -158,6 +158,7 @@ export const CloudinaryPhotoUpload = ({
         <CldUploadWidget
           onError={handleError}
           onQueuesEnd={handleQueuesEnd}
+          // @ts-expect-error investigate missing types after mvp
           onQueuesStart={handleQueuesStart}
           onSuccess={handleSuccess}
           options={{
