@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, eq, isNull, sql } from 'drizzle-orm';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -205,6 +205,49 @@ export const getCollectionsDashboardDataAsync = cache(
         totalBobbleheadCount: directBobbleheadCount + subCollectionBobbleheadCount,
       };
     });
+  },
+);
+
+export type CollectionBobbleheads = Awaited<ReturnType<typeof getBobbleheadsBySubcollectionAsync>>;
+
+export const getBobbleheadsByCollectionAsync = cache(
+  async (collectionId: string, dbInstance: DatabaseExecutor = db) => {
+    return dbInstance
+      .select({
+        acquisitionDate: bobbleheads.acquisitionDate,
+        acquisitionMethod: bobbleheads.acquisitionMethod,
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        condition: bobbleheads.currentCondition,
+        featurePhoto: bobbleheadPhotos.url,
+        height: bobbleheads.height,
+        id: bobbleheads.id,
+        isFeatured: bobbleheads.isFeatured,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        purchaseLocation: bobbleheads.purchaseLocation,
+        purchasePrice: bobbleheads.purchasePrice,
+        series: bobbleheads.series,
+        status: bobbleheads.status,
+        weight: bobbleheads.weight,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
+          eq(bobbleheads.isDeleted, false),
+        ),
+      )
+      .where(
+        and(
+          eq(bobbleheads.collectionId, collectionId),
+          eq(bobbleheads.isDeleted, false),
+          isNull(bobbleheads.subcollectionId),
+        ),
+      );
   },
 );
 

@@ -7,30 +7,26 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ENUMS } from '@/lib/constants';
-import { getBobbleheadsBySubcollectionAsync } from '@/lib/queries/collections.queries';
+import { getBobbleheadsByCollectionAsync } from '@/lib/queries/collections.queries';
 
-interface SubcollectionBobbleheadsProps {
+interface CollectionBobbleheadsProps {
   collectionId: string;
-  subcollectionId: string;
 }
 
 // TODO: add a nice empty state when there are no bobbleheads
 
-export const SubcollectionBobbleheads = async ({
-  collectionId,
-  subcollectionId,
-}: SubcollectionBobbleheadsProps) => {
-  const bobbleheads = await getBobbleheadsBySubcollectionAsync(subcollectionId);
+export const CollectionBobbleheads = async ({ collectionId }: CollectionBobbleheadsProps) => {
+  const bobbleheads = await getBobbleheadsByCollectionAsync(collectionId);
 
   return (
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
-        <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
+        <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
         <Button asChild size={'sm'} variant={'outline'}>
           <Link
             href={$path({
               route: '/bobbleheads/add',
-              searchParams: { collectionId, subcollectionId },
+              searchParams: { collectionId },
             })}
           >
             <PlusIcon aria-hidden className={'mr-2 size-4'} />

@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { CollectionById } from '@/lib/queries/collections.queries';
 
+import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-bobbleheads';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-header';
 import { CollectionMetrics } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-metrics';
 import { CollectionSubcollections } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-subcollections';
@@ -32,6 +33,11 @@ export const Collection = ({ collection }: CollectionProps) => {
       {/* Subcollections Section */}
       <div className={'mx-auto max-w-7xl p-2'}>
         <CollectionSubcollections collectionId={collection.id} />
+      </div>
+
+      {/* Bobbleheads Section */}
+      <div className={'mx-auto max-w-7xl p-2'}>
+        <CollectionBobbleheads collectionId={collection.id} />
       </div>
     </div>
   );
