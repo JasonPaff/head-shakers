@@ -15,7 +15,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <AuthContent>
             <AppSidebar collapsible={'icon'} />
           </AuthContent>
-          <SidebarInset>
+          <SidebarInset className={'w-full'}>
             <main className={'min-h-screen flex-1 bg-background'}>{children}</main>
           </SidebarInset>
         </div>

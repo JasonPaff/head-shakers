@@ -485,3 +485,94 @@ export const getSubCollectionsByCollectionIdForPublicAsync = cache(
     };
   },
 );
+
+export type CollectionBobbleheadsPublic = Awaited<ReturnType<typeof getBobbleheadsByCollectionForPublicAsync>>;
+
+export const getBobbleheadsByCollectionForPublicAsync = cache(
+  async (collectionId: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
+    return dbInstance
+      .select({
+        acquisitionDate: bobbleheads.acquisitionDate,
+        acquisitionMethod: bobbleheads.acquisitionMethod,
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        condition: bobbleheads.currentCondition,
+        featurePhoto: bobbleheadPhotos.url,
+        height: bobbleheads.height,
+        id: bobbleheads.id,
+        isFeatured: bobbleheads.isFeatured,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        purchaseLocation: bobbleheads.purchaseLocation,
+        purchasePrice: bobbleheads.purchasePrice,
+        series: bobbleheads.series,
+        status: bobbleheads.status,
+        weight: bobbleheads.weight,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
+          eq(bobbleheads.isDeleted, false),
+        ),
+      )
+      .where(
+        and(
+          eq(bobbleheads.collectionId, collectionId),
+          eq(bobbleheads.isDeleted, false),
+          isNull(bobbleheads.subcollectionId),
+          viewerUserId ? 
+            or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+            : eq(bobbleheads.isPublic, true)
+        ),
+      );
+  },
+);
+
+export type SubcollectionBobbleheadsPublic = Awaited<ReturnType<typeof getBobbleheadsBySubcollectionForPublicAsync>>;
+
+export const getBobbleheadsBySubcollectionForPublicAsync = cache(
+  async (subcollectionId: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
+    return dbInstance
+      .select({
+        acquisitionDate: bobbleheads.acquisitionDate,
+        acquisitionMethod: bobbleheads.acquisitionMethod,
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        condition: bobbleheads.currentCondition,
+        featurePhoto: bobbleheadPhotos.url,
+        height: bobbleheads.height,
+        id: bobbleheads.id,
+        isFeatured: bobbleheads.isFeatured,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        purchaseLocation: bobbleheads.purchaseLocation,
+        purchasePrice: bobbleheads.purchasePrice,
+        series: bobbleheads.series,
+        status: bobbleheads.status,
+        weight: bobbleheads.weight,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
+          eq(bobbleheads.isDeleted, false),
+        ),
+      )
+      .where(
+        and(
+          eq(bobbleheads.subcollectionId, subcollectionId), 
+          eq(bobbleheads.isDeleted, false),
+          viewerUserId ? 
+            or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+            : eq(bobbleheads.isPublic, true)
+        )
+      );
+  },
+);

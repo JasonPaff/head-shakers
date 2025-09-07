@@ -4,15 +4,16 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { SubcollectionByCollectionId } from '@/lib/queries/collections.queries';
+import type { SubcollectionByCollectionIdPublic } from '@/lib/queries/collections.queries';
 
 import { Button } from '@/components/ui/button';
 
 interface SubcollectionHeaderProps {
-  subcollection: SubcollectionByCollectionId;
+  isOwner?: boolean;
+  subcollection: SubcollectionByCollectionIdPublic;
 }
 
-export const SubcollectionHeader = ({ subcollection }: SubcollectionHeaderProps) => {
+export const SubcollectionHeader = ({ isOwner = false, subcollection }: SubcollectionHeaderProps) => {
   if (!subcollection) throw new Error('Subcollection is required');
 
   return (
@@ -49,18 +50,20 @@ export const SubcollectionHeader = ({ subcollection }: SubcollectionHeaderProps)
             <div>{subcollection.bobbleheadCount} Bobbleheads</div>
           </div>
 
-          {/* Add Bobblehead Button */}
-          <Button asChild className={'w-full sm:w-auto'}>
-            <Link
-              href={$path({
-                route: '/bobbleheads/add',
-                searchParams: { collectionId: subcollection.collectionId, subcollectionId: subcollection.id },
-              })}
-            >
-              <PlusIcon aria-hidden className={'mr-2 size-4'} />
-              Add Bobblehead
-            </Link>
-          </Button>
+          {/* Add Bobblehead Button - Only show to owners */}
+          {isOwner && (
+            <Button asChild className={'w-full sm:w-auto'}>
+              <Link
+                href={$path({
+                  route: '/bobbleheads/add',
+                  searchParams: { collectionId: subcollection.collectionId, subcollectionId: subcollection.id },
+                })}
+              >
+                <PlusIcon aria-hidden className={'mr-2 size-4'} />
+                Add Bobblehead
+              </Link>
+            </Button>
+          )}
         </div>
       </div>
     </Fragment>

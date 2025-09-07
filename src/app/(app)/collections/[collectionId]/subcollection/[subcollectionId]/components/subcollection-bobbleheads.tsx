@@ -7,10 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ENUMS } from '@/lib/constants';
-import { getBobbleheadsBySubcollectionAsync } from '@/lib/queries/collections.queries';
+import { getBobbleheadsBySubcollectionForPublicAsync } from '@/lib/queries/collections.queries';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsProps {
   collectionId: string;
+  isOwner?: boolean;
   subcollectionId: string;
 }
 
@@ -18,25 +20,29 @@ interface SubcollectionBobbleheadsProps {
 
 export const SubcollectionBobbleheads = async ({
   collectionId,
+  isOwner = false,
   subcollectionId,
 }: SubcollectionBobbleheadsProps) => {
-  const bobbleheads = await getBobbleheadsBySubcollectionAsync(subcollectionId);
+  const currentUserId = await getOptionalUserId();
+  const bobbleheads = await getBobbleheadsBySubcollectionForPublicAsync(subcollectionId, currentUserId || undefined);
 
   return (
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
-        <Button asChild size={'sm'} variant={'outline'}>
-          <Link
-            href={$path({
-              route: '/bobbleheads/add',
-              searchParams: { collectionId, subcollectionId },
-            })}
-          >
-            <PlusIcon aria-hidden className={'mr-2 size-4'} />
-            Add Bobblehead
-          </Link>
-        </Button>
+        {isOwner && (
+          <Button asChild size={'sm'} variant={'outline'}>
+            <Link
+              href={$path({
+                route: '/bobbleheads/add',
+                searchParams: { collectionId, subcollectionId },
+              })}
+            >
+              <PlusIcon aria-hidden className={'mr-2 size-4'} />
+              Add Bobblehead
+            </Link>
+          </Button>
+        )}
       </div>
 
       <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>

@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { ENUMS } from '@/lib/constants';
-import { getBobbleheadsByCollectionAsync } from '@/lib/queries/collections.queries';
+import { getBobbleheadsByCollectionForPublicAsync } from '@/lib/queries/collections.queries';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionBobbleheadsProps {
   collectionId: string;
@@ -21,7 +22,8 @@ export const CollectionBobbleheads = async ({
   collectionId,
   isOwner = false,
 }: CollectionBobbleheadsProps) => {
-  const bobbleheads = await getBobbleheadsByCollectionAsync(collectionId);
+  const currentUserId = await getOptionalUserId();
+  const bobbleheads = await getBobbleheadsByCollectionForPublicAsync(collectionId, currentUserId || undefined);
 
   return (
     <div>

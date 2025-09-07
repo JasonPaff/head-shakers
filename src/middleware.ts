@@ -11,12 +11,13 @@ const isPublicRoute = createRouteMatcher([
   '/browse(.*)',
 
   // public collection views (read-only)
-  '/collections/:id',
-  '/collections/:id/share(.*)',
+  '/collections/:id', // matches /collections/[id] 
+  '/collections/:id/subcollection(.*)', // matches subcollection routes
+  '/collections/:id/share(.*)', // sharing routes
 
-  // public item views (read-only)
-  '/items/:id',
-  '/items/:id/share(.*)',
+  // public bobblehead views (read-only)  
+  '/bobbleheads/:id', // matches /bobbleheads/[id]
+  '/bobbleheads/:id/share(.*)', // sharing routes
 
   // public user profiles (read-only)
   '/users/:username',
@@ -39,12 +40,12 @@ const isProtectedRoute = createRouteMatcher([
 
   // creation routes - require auth
   '/collections/create(.*)',
-  '/items/add(.*)',
+  '/bobbleheads/add(.*)', // updated from items to bobbleheads
 
   // edit routes - require auth + ownership check
   '/collections/:id/edit(.*)',
   '/collections/:id/settings(.*)',
-  '/items/:id/edit(.*)',
+  '/bobbleheads/:id/edit(.*)', // updated from items to bobbleheads
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

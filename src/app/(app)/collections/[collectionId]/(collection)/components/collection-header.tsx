@@ -21,12 +21,14 @@ export const CollectionHeader = ({ collection, isOwner = false }: CollectionHead
     <Fragment>
       {/* Back to Collections Button */}
       <div className={'mb-6 flex items-center gap-4'}>
-        <Button asChild size={'sm'} variant={'outline'}>
-          <Link href={$path({ route: '/dashboard/collection' })}>
-            <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
-            Back to Collections
-          </Link>
-        </Button>
+        <Conditional isCondition={isOwner}>
+          <Button asChild size={'sm'} variant={'outline'}>
+            <Link href={$path({ route: '/dashboard/collection' })}>
+              <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
+              Back to Collections
+            </Link>
+          </Button>
+        </Conditional>
       </div>
 
       <div className={'flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'}>

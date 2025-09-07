@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation';
 import { SubcollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-bobbleheads';
 import { SubcollectionHeader } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-header';
 import { SubcollectionMetrics } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-metrics';
-import { getSubCollectionByCollectionIdAsync } from '@/lib/queries/collections.queries';
-import { getUserId } from '@/utils/user-utils';
+import { getSubCollectionByCollectionIdForPublicAsync } from '@/lib/queries/collections.queries';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionProps {
   collectionId: string;
@@ -13,19 +13,21 @@ interface SubcollectionProps {
 }
 
 export const Subcollection = async ({ collectionId, subcollectionId }: SubcollectionProps) => {
-  const userId = await getUserId();
-  const subcollection = await getSubCollectionByCollectionIdAsync(collectionId, subcollectionId, userId);
+  const currentUserId = await getOptionalUserId();
+  const subcollection = await getSubCollectionByCollectionIdForPublicAsync(collectionId, subcollectionId, currentUserId || undefined);
 
   if (!subcollection) {
     notFound();
   }
+
+  const isOwner = !!(currentUserId && currentUserId === subcollection.userId);
 
   return (
     <div>
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <SubcollectionHeader subcollection={subcollection} />
+          <SubcollectionHeader isOwner={isOwner} subcollection={subcollection} />
         </div>
       </div>
 
@@ -36,7 +38,7 @@ export const Subcollection = async ({ collectionId, subcollectionId }: Subcollec
 
       {/* Bobbleheads Grid */}
       <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <SubcollectionBobbleheads collectionId={collectionId} subcollectionId={subcollectionId} />
+        <SubcollectionBobbleheads collectionId={collectionId} isOwner={isOwner} subcollectionId={subcollectionId} />
       </div>
     </div>
   );
