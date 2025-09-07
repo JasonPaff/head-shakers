@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { BobbleheadAcquisitionCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-acquisition-card';
 import { BobbleheadDetailsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-details-card';
 import { BobbleheadFeatureCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-feature-card';
+import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-photo-gallery';
 import { BobbleheadSpecificationCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-specification-card';
 import { getBobbleheadByIdAsync } from '@/lib/queries/bobbleheads.queries';
 
@@ -26,6 +27,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
         <BobbleheadSpecificationCard bobblehead={bobblehead} />
         <BobbleheadAcquisitionCard bobblehead={bobblehead} />
       </div>
+      <BobbleheadPhotoGalleryCard bobblehead={bobblehead} />
     </div>
   );
 };
