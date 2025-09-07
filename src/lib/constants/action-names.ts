@@ -38,6 +38,9 @@ export const ACTION_NAMES = {
     RESOLVE_REPORT: 'resolveContentReport',
     UPDATE_REPORT: 'updateContentReport',
   },
+  PHOTO: {
+    GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',
+  },
   SOCIAL: {
     BLOCK_USER: 'blockUser',
     CREATE_COMMENT: 'createComment',

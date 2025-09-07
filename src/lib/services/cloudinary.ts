@@ -79,7 +79,7 @@ export const deleteImage = async (publicId: string): Promise<void> => {
 };
 
 // generate signature for upload parameters
-export const generateUploadSignature = (paramsToSign: Record<string, any>): string => {
+export const generateUploadSignature = (paramsToSign: Record<string, unknown>): string => {
   try {
     return cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET!);
   } catch (error) {

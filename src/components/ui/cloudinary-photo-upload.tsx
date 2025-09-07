@@ -35,12 +35,13 @@ export const CloudinaryPhotoUpload = ({
   onPhotosChange,
   photos,
 }: CloudinaryPhotoUploadProps) => {
-  const { userId } = useAuth();
   const [uploadState, setUploadState] = useState<PhotoUploadState>({
     isUploading: false,
     totalCount: 0,
     uploadedCount: 0,
   });
+
+  const { userId } = useAuth();
 
   const handleSuccess = useCallback(
     (results: CloudinaryUploadWidgetResults) => {
@@ -136,6 +137,7 @@ export const CloudinaryPhotoUpload = ({
   // );
 
   const _canUploadMore = photos.length < maxPhotos && !isDisabled;
+  const _hasPhotos = photos.length > 0;
 
   return (
     <div className={'space-y-4'}>
@@ -164,7 +166,7 @@ export const CloudinaryPhotoUpload = ({
             showPoweredBy: false,
             showSkipCropButton: true,
             sources: ['local', 'camera', 'url'],
-            tags: ['bobblehead', userId || 'unknown', Date.now().toString()],
+            tags: ['bobblehead', userId ?? 'unknown', Date.now().toString()],
           }}
           signatureEndpoint={'/api/upload/sign'}
         >
@@ -195,13 +197,13 @@ export const CloudinaryPhotoUpload = ({
 
       {/* Upload Error */}
       <Conditional isCondition={!!uploadState.error}>
-        <div className={'rounded-md bg-red-50 p-3 text-sm text-red-800'}>
+        <div className={'rounded-md bg-red-50 p-3 text-sm text-destructive'}>
           Upload error: {uploadState.error}
         </div>
       </Conditional>
 
       {/* Photo Grid */}
-      {photos.length > 0 && (
+      <Conditional isCondition={_hasPhotos}>
         <div className={'grid grid-cols-1 gap-4 md:grid-cols-2'}>
           {photos
             .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -265,18 +267,19 @@ export const CloudinaryPhotoUpload = ({
                       </div>
 
                       {/* Primary Badge */}
-                      {photo.isPrimary && (
+                      <Conditional isCondition={photo.isPrimary}>
                         <div className={'absolute top-2 left-2'}>
                           <span
-                            className={
-                              'inline-flex items-center gap-1 rounded-full bg-primary px-2 py-1 text-xs text-primary-foreground'
-                            }
+                            className={cn(
+                              'inline-flex items-center gap-1 rounded-full bg-primary',
+                              'px-2 py-1 text-xs text-primary-foreground',
+                            )}
                           >
                             <StarIcon aria-hidden className={'size-3 fill-current'} />
                             Primary
                           </span>
                         </div>
-                      )}
+                      </Conditional>
                     </div>
 
                     {/* Photo Metadata */}
@@ -288,7 +291,9 @@ export const CloudinaryPhotoUpload = ({
                         <Input
                           className={'h-8 text-xs'}
                           id={`alt-${photo.id}`}
-                          onChange={(e) => updatePhoto(photo.id, { altText: e.target.value })}
+                          onChange={(e) => {
+                            updatePhoto(photo.id, { altText: e.target.value });
+                          }}
                           placeholder={'Describe this photo'}
                           type={'text'}
                           value={photo.altText || ''}
@@ -302,7 +307,9 @@ export const CloudinaryPhotoUpload = ({
                         <Textarea
                           className={'min-h-[60px] text-xs'}
                           id={`caption-${photo.id}`}
-                          onChange={(e) => updatePhoto(photo.id, { caption: e.target.value })}
+                          onChange={(e) => {
+                            updatePhoto(photo.id, { caption: e.target.value });
+                          }}
                           placeholder={'Add a caption...'}
                           rows={2}
                           value={photo.caption || ''}
@@ -314,7 +321,7 @@ export const CloudinaryPhotoUpload = ({
               </Card>
             ))}
         </div>
-      )}
+      </Conditional>
 
       {/* Photo Count Info */}
       <div className={'text-center text-sm text-muted-foreground'}>
