@@ -85,6 +85,62 @@ export const getBobbleheadByIdAsync = cache(async (id: string, dbInstance: Datab
   };
 });
 
+export type GetBobbleheadByIdPublic = Awaited<ReturnType<typeof getBobbleheadByIdForPublicAsync>>;
+
+export const getBobbleheadByIdForPublicAsync = cache(
+  async (id: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
+    const result = await dbInstance
+      .select({
+        bobblehead: bobbleheads,
+        collection: collections,
+        subcollection: subCollections,
+      })
+      .from(bobbleheads)
+      .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
+      .where(
+        and(
+          eq(bobbleheads.id, id),
+          eq(bobbleheads.isDeleted, false),
+          viewerUserId ?
+            or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+          : eq(bobbleheads.isPublic, true),
+        ),
+      )
+      .limit(1);
+
+    if (!result[0]) return null;
+
+    // check if the collection is also public (unless the viewer is the owner)
+    const collection = result[0].collection;
+    if (collection && viewerUserId !== collection.userId && !collection.isPublic) {
+      return null;
+    }
+
+    const photos = await dbInstance
+      .select()
+      .from(bobbleheadPhotos)
+      .where(eq(bobbleheadPhotos.bobbleheadId, id))
+      .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
+
+    const bobbleheadTagsData = await dbInstance
+      .select({
+        tag: tags,
+      })
+      .from(bobbleheadTags)
+      .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
+      .where(eq(bobbleheadTags.bobbleheadId, id));
+
+    return {
+      ...result[0].bobblehead,
+      collectionName: result[0].collection?.name || null,
+      photos,
+      subcollectionName: result[0].subcollection?.name || null,
+      tags: bobbleheadTagsData.map((t) => t.tag),
+    };
+  },
+);
+
 export const getTrendingBobbleheads = unstable_cache(
   async (limit: number = 10) => {
     return db.select().from(bobbleheads).orderBy(desc(bobbleheads.viewCount)).limit(limit);

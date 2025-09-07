@@ -7,8 +7,8 @@ import type { PageProps } from '@/app/(app)/collections/[collectionId]/(collecti
 
 import { Collection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
-import { getCollectionByIdAsync } from '@/lib/queries/collections.queries';
-import { getUserId } from '@/utils/user-utils';
+import { getCollectionByIdForPublicAsync } from '@/lib/queries/collections.queries';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type CollectionPageProps = PageProps;
 
@@ -24,9 +24,11 @@ export function generateMetadata(): Metadata {
 async function CollectionPage({ routeParams }: CollectionPageProps) {
   const { collectionId } = await routeParams;
 
-  const userId = await getUserId();
-  const collection = await getCollectionByIdAsync(collectionId, userId);
+  const currentUserId = await getOptionalUserId();
+  const collection = await getCollectionByIdForPublicAsync(collectionId, currentUserId || undefined);
   if (!collection) notFound();
 
-  return <Collection collection={collection} />;
+  const isOwner = !!(currentUserId && currentUserId === collection.userId);
+
+  return <Collection collection={collection} isOwner={isOwner} />;
 }

@@ -6,33 +6,40 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { ENUMS } from '@/lib/constants';
 import { getBobbleheadsByCollectionAsync } from '@/lib/queries/collections.queries';
 
 interface CollectionBobbleheadsProps {
   collectionId: string;
+  isOwner?: boolean;
 }
 
 // TODO: add a nice empty state when there are no bobbleheads
 
-export const CollectionBobbleheads = async ({ collectionId }: CollectionBobbleheadsProps) => {
+export const CollectionBobbleheads = async ({
+  collectionId,
+  isOwner = false,
+}: CollectionBobbleheadsProps) => {
   const bobbleheads = await getBobbleheadsByCollectionAsync(collectionId);
 
   return (
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
-        <Button asChild size={'sm'} variant={'outline'}>
-          <Link
-            href={$path({
-              route: '/bobbleheads/add',
-              searchParams: { collectionId },
-            })}
-          >
-            <PlusIcon aria-hidden className={'mr-2 size-4'} />
-            Add Bobblehead
-          </Link>
-        </Button>
+        <Conditional isCondition={isOwner}>
+          <Button asChild size={'sm'} variant={'outline'}>
+            <Link
+              href={$path({
+                route: '/bobbleheads/add',
+                searchParams: { collectionId },
+              })}
+            >
+              <PlusIcon aria-hidden className={'mr-2 size-4'} />
+              Add Bobblehead
+            </Link>
+          </Button>
+        </Conditional>
       </div>
 
       <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>

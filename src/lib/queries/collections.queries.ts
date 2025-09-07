@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -285,5 +285,203 @@ export const getBobbleheadsBySubcollectionAsync = cache(
         ),
       )
       .where(and(eq(bobbleheads.subcollectionId, subcollectionId), eq(bobbleheads.isDeleted, false)));
+  },
+);
+
+// public access versions of queries
+export type CollectionByIdPublic = Awaited<ReturnType<typeof getCollectionByIdForPublicAsync>>;
+
+export const getCollectionByIdForPublicAsync = cache(
+  async (collectionId: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
+    const collection = await dbInstance.query.collections.findFirst({
+      where: and(
+        eq(collections.id, collectionId),
+        viewerUserId ?
+          or(eq(collections.isPublic, true), eq(collections.userId, viewerUserId))
+        : eq(collections.isPublic, true),
+      ),
+      with: {
+        bobbleheads: {
+          where: and(
+            eq(bobbleheads.isDeleted, false),
+            viewerUserId ?
+              or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+            : eq(bobbleheads.isPublic, true),
+          ),
+        },
+        subCollections: {
+          with: {
+            bobbleheads: {
+              where: and(
+                eq(bobbleheads.isDeleted, false),
+                viewerUserId ?
+                  or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+                : eq(bobbleheads.isPublic, true),
+              ),
+            },
+          },
+        },
+        user: {
+          columns: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!collection) {
+      return null;
+    }
+
+    // calculate total bobblehead count (collection plus subcollections)
+    const directBobbleheadCount = collection.bobbleheads.filter(
+      (bobblehead) => bobblehead.subcollectionId === null,
+    ).length;
+    const subCollectionBobbleheadCount = collection.subCollections.reduce(
+      (sum, subCollection) => sum + subCollection.bobbleheads.length,
+      0,
+    );
+    const totalBobbleheadCount = directBobbleheadCount + subCollectionBobbleheadCount;
+
+    // the last updated at is the latest updatedAt from the collection and its subcollections
+    const lastUpdatedAt = [
+      collection.updatedAt,
+      ...collection.subCollections.map((sc) => sc.updatedAt),
+    ].reduce((latest, date) => (date > latest ? date : latest), collection.updatedAt);
+
+    return {
+      createdAt: collection.createdAt,
+      description: collection.description,
+      id: collection.id,
+      isPublic: collection.isPublic,
+      lastUpdatedAt,
+      name: collection.name,
+      subCollectionCount: collection.subCollections.length,
+      totalBobbleheadCount,
+      userId: collection.user?.id,
+    };
+  },
+);
+
+export type SubcollectionByCollectionIdPublic = Awaited<
+  ReturnType<typeof getSubCollectionByCollectionIdForPublicAsync>
+>;
+
+export const getSubCollectionByCollectionIdForPublicAsync = cache(
+  async (
+    collectionId: string,
+    subcollectionId: string,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ) => {
+    const collection = await dbInstance.query.collections.findFirst({
+      where: and(
+        eq(collections.id, collectionId),
+        viewerUserId ?
+          or(eq(collections.isPublic, true), eq(collections.userId, viewerUserId))
+        : eq(collections.isPublic, true),
+      ),
+      with: {
+        user: {
+          columns: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!collection) {
+      return null;
+    }
+
+    const subCollection = await dbInstance.query.subCollections.findFirst({
+      where: and(eq(subCollections.collectionId, collectionId), eq(subCollections.id, subcollectionId)),
+      with: {
+        bobbleheads: {
+          where: and(
+            eq(bobbleheads.isDeleted, false),
+            viewerUserId ?
+              or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+            : eq(bobbleheads.isPublic, true),
+          ),
+        },
+      },
+    });
+
+    if (!subCollection) {
+      return null;
+    }
+
+    const featuredBobbleheadCount = subCollection.bobbleheads.filter(
+      (bobblehead) => bobblehead.isFeatured,
+    ).length;
+
+    return {
+      bobbleheadCount: subCollection.bobbleheads.length,
+      collectionId: subCollection.collectionId,
+      collectionName: collection.name,
+      createdAt: subCollection.createdAt,
+      description: subCollection.description,
+      featuredBobbleheadCount,
+      featurePhoto: subCollection.coverImageUrl,
+      id: subCollection.id,
+      lastUpdatedAt: subCollection.updatedAt,
+      name: subCollection.name,
+      userId: collection.user?.id,
+    };
+  },
+);
+
+export type SubcollectionsByCollectionIdPublic = Awaited<
+  ReturnType<typeof getSubCollectionsByCollectionIdForPublicAsync>
+>;
+
+export const getSubCollectionsByCollectionIdForPublicAsync = cache(
+  async (collectionId: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
+    const collection = await dbInstance.query.collections.findFirst({
+      where: and(
+        eq(collections.id, collectionId),
+        viewerUserId ?
+          or(eq(collections.isPublic, true), eq(collections.userId, viewerUserId))
+        : eq(collections.isPublic, true),
+      ),
+      with: {
+        user: {
+          columns: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    if (!collection) {
+      return null;
+    }
+
+    const subCollectionData = await dbInstance.query.subCollections.findMany({
+      orderBy: [sql`lower(${subCollections.name}) asc`],
+      where: eq(subCollections.collectionId, collectionId),
+      with: {
+        bobbleheads: {
+          where: and(
+            eq(bobbleheads.isDeleted, false),
+            viewerUserId ?
+              or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, viewerUserId))
+            : eq(bobbleheads.isPublic, true),
+          ),
+        },
+      },
+    });
+
+    return {
+      subCollections: subCollectionData.map((subCollection) => ({
+        bobbleheadCount: subCollection.bobbleheads.length,
+        description: subCollection.description,
+        featurePhoto: subCollection.coverImageUrl,
+        id: subCollection.id,
+        name: subCollection.name,
+      })),
+      userId: collection.user?.id,
+    };
   },
 );

@@ -7,18 +7,27 @@ import { CollectionSubcollectionsAdd } from '@/app/(app)/collections/[collection
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSubCollectionsByCollectionIdAsync } from '@/lib/queries/collections.queries';
-import { getUserId } from '@/utils/user-utils';
+import { Conditional } from '@/components/ui/conditional';
+import { getSubCollectionsByCollectionIdForPublicAsync } from '@/lib/queries/collections.queries';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionSubcollectionsProps {
   collectionId: string;
+  isOwner?: boolean;
 }
 
 // TODO: add a nice empty state when there are no subcollections
 
-export const CollectionSubcollections = async ({ collectionId }: CollectionSubcollectionsProps) => {
-  const userId = await getUserId();
-  const subcollections = (await getSubCollectionsByCollectionIdAsync(collectionId, userId)) ?? [];
+export const CollectionSubcollections = async ({
+  collectionId,
+  isOwner = false,
+}: CollectionSubcollectionsProps) => {
+  const currentUserId = await getOptionalUserId();
+  const result = await getSubCollectionsByCollectionIdForPublicAsync(
+    collectionId,
+    currentUserId || undefined,
+  );
+  const subcollections = result?.subCollections ?? [];
 
   return (
     <Fragment>
@@ -27,7 +36,9 @@ export const CollectionSubcollections = async ({ collectionId }: CollectionSubco
           {/* Header Section */}
           <div className={'mb-6 flex items-center justify-between'}>
             <h2 className={'text-2xl font-bold text-foreground'}>Subcollections</h2>
-            <CollectionSubcollectionsAdd />
+            <Conditional isCondition={isOwner}>
+              <CollectionSubcollectionsAdd />
+            </Conditional>
           </div>
 
           {/* Subcollections Grid */}

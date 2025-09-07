@@ -4,15 +4,17 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { CollectionById } from '@/lib/queries/collections.queries';
+import type { CollectionByIdPublic } from '@/lib/queries/collections.queries';
 
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 
 interface CollectionHeaderProps {
-  collection: CollectionById;
+  collection: CollectionByIdPublic;
+  isOwner?: boolean;
 }
 
-export const CollectionHeader = ({ collection }: CollectionHeaderProps) => {
+export const CollectionHeader = ({ collection, isOwner = false }: CollectionHeaderProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -44,13 +46,17 @@ export const CollectionHeader = ({ collection }: CollectionHeaderProps) => {
             <div>{collection.totalBobbleheadCount} Bobbleheads</div>
           </div>
 
-          {/* Add Bobblehead Button */}
-          <Button asChild className={'w-full sm:w-auto'}>
-            <Link href={$path({ route: '/bobbleheads/add', searchParams: { collectionId: collection.id } })}>
-              <PlusIcon aria-hidden className={'mr-2 size-4'} />
-              Add Bobblehead
-            </Link>
-          </Button>
+          {/* Add Bobblehead Button - Only show to owners */}
+          <Conditional isCondition={isOwner}>
+            <Button asChild className={'w-full sm:w-auto'}>
+              <Link
+                href={$path({ route: '/bobbleheads/add', searchParams: { collectionId: collection.id } })}
+              >
+                <PlusIcon aria-hidden className={'mr-2 size-4'} />
+                Add Bobblehead
+              </Link>
+            </Button>
+          </Conditional>
         </div>
       </div>
     </Fragment>

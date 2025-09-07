@@ -18,9 +18,10 @@ import { Button } from '@/components/ui/button';
 
 interface BobbleheadHeaderProps {
   bobblehead: NonNullable<GetBobbleheadById>;
+  isOwner?: boolean;
 }
 
-export const BobbleheadHeader = ({ bobblehead }: BobbleheadHeaderProps) => {
+export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
 
   return (
@@ -50,21 +51,23 @@ export const BobbleheadHeader = ({ bobblehead }: BobbleheadHeaderProps) => {
           </Link>
         </Button>
 
-        {/* Action Buttons */}
-        <div className={'flex gap-2'}>
-          <Button size={'sm'} variant={'outline'}>
-            <EditIcon aria-hidden className={'mr-2 size-4'} />
-            Edit
-          </Button>
-          <Button size={'sm'} variant={'outline'}>
-            <ShareIcon aria-hidden className={'mr-2 size-4'} />
-            Share
-          </Button>
-          <Button size={'sm'} variant={'destructive'}>
-            <TrashIcon aria-hidden className={'mr-2 size-4'} />
-            Delete
-          </Button>
-        </div>
+        {/* Action Buttons - Only show to owners */}
+        {isOwner && (
+          <div className={'flex gap-2'}>
+            <Button size={'sm'} variant={'outline'}>
+              <EditIcon aria-hidden className={'mr-2 size-4'} />
+              Edit
+            </Button>
+            <Button size={'sm'} variant={'outline'}>
+              <ShareIcon aria-hidden className={'mr-2 size-4'} />
+              Share
+            </Button>
+            <Button size={'sm'} variant={'destructive'}>
+              <TrashIcon aria-hidden className={'mr-2 size-4'} />
+              Delete
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Bobblehead Info */}

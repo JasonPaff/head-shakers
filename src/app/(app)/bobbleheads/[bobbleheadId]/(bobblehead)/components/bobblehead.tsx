@@ -12,19 +12,22 @@ import { BobbleheadSpecificationCard } from '@/app/(app)/bobbleheads/[bobblehead
 import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-status-privacy-card';
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
 import { Conditional } from '@/components/ui/conditional';
-import { getBobbleheadByIdAsync } from '@/lib/queries/bobbleheads.queries';
+import { getBobbleheadByIdForPublicAsync } from '@/lib/queries/bobbleheads.queries';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadProps {
   bobbleheadId: string;
 }
 
 export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
-  const bobblehead = await getBobbleheadByIdAsync(bobbleheadId);
+  const currentUserId = await getOptionalUserId();
+  const bobblehead = await getBobbleheadByIdForPublicAsync(bobbleheadId, currentUserId || undefined);
 
   if (!bobblehead) {
     notFound();
   }
 
+  const isOwner = !!(currentUserId && currentUserId === bobblehead.userId);
   const hasMultiplePhotos = bobblehead.photos.length > 1;
 
   return (
@@ -32,7 +35,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <BobbleheadHeader bobblehead={bobblehead} />
+          <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} />
         </div>
       </div>
 
