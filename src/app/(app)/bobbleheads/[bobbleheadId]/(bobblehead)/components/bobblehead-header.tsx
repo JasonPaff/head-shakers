@@ -23,8 +23,6 @@ interface BobbleheadHeaderProps {
 export const BobbleheadHeader = ({ bobblehead }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
 
-  console.log(bobblehead);
-
   return (
     <Fragment>
       {/* Navigation and Actions Row */}
