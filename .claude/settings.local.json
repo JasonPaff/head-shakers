@@ -25,7 +25,8 @@
       "Bash(cat:*)",
       "Bash(wc:*)",
       "Bash(grep:*)",
-      "mcp__cloudinary-env-config__create-upload-preset"
+      "mcp__cloudinary-env-config__create-upload-preset",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []
