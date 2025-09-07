@@ -15,7 +15,6 @@ import { Fragment } from 'react';
 import type { GetBobbleheadById } from '@/lib/queries/bobbleheads.queries';
 
 import { Button } from '@/components/ui/button';
-import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadHeaderProps {
   bobblehead: NonNullable<GetBobbleheadById>;
