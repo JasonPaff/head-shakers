@@ -55,7 +55,9 @@ export const ACTION_NAMES = {
   SYSTEM: {
     CREATE_FEATURED_CONTENT: 'createFeaturedContent',
     CREATE_NOTIFICATION: 'createNotification',
+    DELETE_FEATURED_CONTENT: 'deleteFeaturedContent',
     MARK_NOTIFICATION_READ: 'markNotificationRead',
+    TOGGLE_FEATURED_CONTENT_STATUS: 'toggleFeaturedContentStatus',
     UPDATE_FEATURED_CONTENT: 'updateFeaturedContent',
     UPDATE_PLATFORM_SETTING: 'updatePlatformSetting',
   },

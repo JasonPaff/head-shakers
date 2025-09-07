@@ -4,6 +4,7 @@ import {
   check,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   text,
@@ -23,6 +24,7 @@ export const notificationRelatedTypeEnum = pgEnum(
 export const featuredContentTypeEnum = pgEnum('featured_content_type', ENUMS.FEATURED_CONTENT.TYPE);
 export const featureTypeEnum = pgEnum('feature_type', ENUMS.FEATURED_CONTENT.FEATURE_TYPE);
 export const valueTypeEnum = pgEnum('value_type', ENUMS.PLATFORM_SETTING.VALUE_TYPE);
+export const contentMetricTypeEnum = pgEnum('content_metric_type', ['view', 'like', 'comment', 'share'] as const);
 
 export const notifications = pgTable(
   'notifications',
@@ -76,31 +78,39 @@ export const featuredContent = pgTable(
     contentType: featuredContentTypeEnum('featured_content_type').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     curatorId: uuid('curator_id').references(() => users.id, { onDelete: 'set null' }),
+    curatorNotes: text('curator_notes'),
     description: text('description'),
     endDate: timestamp('end_date'),
     featureType: featureTypeEnum('feature_type').notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
     imageUrl: text('image_url'),
     isActive: boolean('is_active').default(DEFAULTS.FEATURED_CONTENT.IS_ACTIVE).notNull(),
+    metadata: jsonb('metadata'),
+    priority: integer('priority').default(0).notNull(),
     sortOrder: integer('sort_order').default(DEFAULTS.FEATURED_CONTENT.SORT_ORDER).notNull(),
     startDate: timestamp('start_date'),
     title: varchar('title', { length: SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    viewCount: integer('view_count').default(0).notNull(),
   },
   (table) => [
     // single column indexes
     index('featured_content_feature_type_idx').on(table.featureType),
     index('featured_content_is_active_idx').on(table.isActive),
     index('featured_content_sort_order_idx').on(table.sortOrder),
+    index('featured_content_priority_idx').on(table.priority),
     index('featured_content_curator_id_idx').on(table.curatorId),
     index('featured_content_start_date_idx').on(table.startDate),
     index('featured_content_end_date_idx').on(table.endDate),
+    index('featured_content_view_count_idx').on(table.viewCount),
 
     // composite indexes for common query patterns
     index('featured_content_content_idx').on(table.contentType, table.contentId),
     index('featured_content_active_feature_idx').on(table.isActive, table.featureType),
+    index('featured_content_active_priority_idx').on(table.isActive, table.priority),
     index('featured_content_active_sort_idx').on(table.isActive, table.sortOrder),
     index('featured_content_feature_dates_idx').on(table.featureType, table.startDate, table.endDate),
+    index('featured_content_active_dates_idx').on(table.isActive, table.startDate, table.endDate),
 
     // check constraints
     check(
@@ -108,6 +118,8 @@ export const featuredContent = pgTable(
       sql`${table.title} IS NULL OR length(${table.title}) <= ${SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX}`,
     ),
     check('featured_content_sort_order_non_negative', sql`${table.sortOrder} >= 0`),
+    check('featured_content_priority_non_negative', sql`${table.priority} >= 0`),
+    check('featured_content_view_count_non_negative', sql`${table.viewCount} >= 0`),
     check(
       'featured_content_date_logic',
       sql`${table.startDate} IS NULL OR ${table.endDate} IS NULL OR ${table.startDate} <= ${table.endDate}`,
@@ -144,5 +156,37 @@ export const platformSettings = pgTable(
       'platform_settings_key_length',
       sql`length(${table.key}) <= ${SCHEMA_LIMITS.PLATFORM_SETTING.KEY.MAX}`,
     ),
+  ],
+);
+
+export const contentMetrics = pgTable(
+  'content_metrics',
+  {
+    contentId: uuid('content_id').notNull(),
+    contentType: featuredContentTypeEnum('content_type').notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    date: timestamp('date').notNull(),
+    id: uuid('id').primaryKey().defaultRandom(),
+    metadata: jsonb('metadata'),
+    metricType: contentMetricTypeEnum('metric_type').notNull(),
+    metricValue: integer('metric_value').default(0).notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => [
+    // single column indexes
+    index('content_metrics_content_type_idx').on(table.contentType),
+    index('content_metrics_content_id_idx').on(table.contentId),
+    index('content_metrics_metric_type_idx').on(table.metricType),
+    index('content_metrics_date_idx').on(table.date),
+    index('content_metrics_created_at_idx').on(table.createdAt),
+
+    // composite indexes for common query patterns
+    index('content_metrics_content_idx').on(table.contentType, table.contentId),
+    index('content_metrics_content_date_idx').on(table.contentType, table.contentId, table.date),
+    index('content_metrics_type_date_idx').on(table.metricType, table.date),
+    index('content_metrics_content_metric_idx').on(table.contentType, table.contentId, table.metricType),
+    
+    // check constraints
+    check('content_metrics_value_non_negative', sql`${table.metricValue} >= 0`),
   ],
 );

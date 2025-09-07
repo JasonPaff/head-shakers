@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import type { db } from '@/lib/db';
 
+import { adminMiddleware } from '@/lib/middleware/admin.middleware';
 import { authMiddleware } from '@/lib/middleware/auth.middleware';
 import { databaseMiddleware, publicDatabaseMiddleware } from '@/lib/middleware/database.middleware';
 import {
@@ -19,6 +20,28 @@ export type ActionContext = TransactionContext;
 export interface ActionMetadata {
   actionName: string;
   isTransactionRequired?: boolean;
+}
+
+export type AdminActionContext = AdminTransactionContext;
+
+// base context from admin middleware
+export interface AdminContext {
+  clerkUserId: string;
+  isAdmin: boolean;
+  isModerator: boolean;
+  role: string;
+  userId: string;
+}
+
+// context after sanitization middleware (admin chain)
+export interface AdminSanitizedContext extends AdminContext {
+  sanitizedInput: unknown;
+}
+
+// context after transaction middleware (admin chain)
+export interface AdminTransactionContext extends AdminSanitizedContext {
+  db: DatabaseExecutor;
+  tx?: DatabaseExecutor;
 }
 
 // base context from auth middleware
@@ -105,6 +128,12 @@ const actionClient = createSafeActionClient({
     return DEFAULT_SERVER_ERROR_MESSAGE;
   },
 }).use(sentryMiddleware);
+
+export const adminActionClient = actionClient
+  .use(adminMiddleware)
+  .use(sanitizationMiddleware)
+  .use(transactionMiddleware)
+  .use(databaseMiddleware);
 
 export const authActionClient = actionClient
   .use(authMiddleware)

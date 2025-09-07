@@ -52,6 +52,9 @@ export const ENUMS = {
     SORT_BY: ['relevance', 'date', 'price', 'popularity'] as const,
     SORT_ORDER: ['asc', 'desc'] as const,
   },
+  USER: {
+    ROLE: ['user', 'moderator', 'admin'] as const,
+  },
   USER_ACTIVITY: {
     ACTION_TYPE: ['create', 'update', 'delete', 'like', 'comment', 'follow', 'unfollow', 'view'] as const,
     TARGET_TYPE: ['bobblehead', 'collection', 'user', 'comment'] as const,
@@ -75,6 +78,7 @@ export type FollowType = (typeof ENUMS.FOLLOW.TYPE)[number];
 export type LikeTargetType = (typeof ENUMS.LIKE.TARGET_TYPE)[number];
 export type NotificationType = (typeof ENUMS.NOTIFICATION.TYPE)[number];
 export type PrivacyLevel = (typeof ENUMS.USER_SETTINGS.PRIVACY_LEVEL)[number];
+export type UserRole = (typeof ENUMS.USER.ROLE)[number];
 export type UserTheme = (typeof ENUMS.USER_SETTINGS.THEME)[number];
 
 // helper function to get enum values

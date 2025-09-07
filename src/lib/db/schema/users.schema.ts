@@ -20,6 +20,7 @@ export const digestFrequencyEnum = pgEnum('digest_frequency', ENUMS.USER_SETTING
 export const dmPermissionEnum = pgEnum('dm_permission', ENUMS.USER_SETTINGS.DM_PERMISSION);
 export const loginMethodEnum = pgEnum('login_method', ENUMS.LOGIN.METHOD);
 export const privacyLevelEnum = pgEnum('privacy_level', ENUMS.USER_SETTINGS.PRIVACY_LEVEL);
+export const userRoleEnum = pgEnum('user_role', ENUMS.USER.ROLE);
 export const userActivityTargetTypeEnum = pgEnum(
   'user_activity_target_type',
   ENUMS.USER_ACTIVITY.TARGET_TYPE,
@@ -62,6 +63,7 @@ export const users = pgTable(
     location: varchar('location', { length: SCHEMA_LIMITS.USER.LOCATION.MAX }),
     lockedUntil: timestamp('locked_until'),
     memberSince: timestamp('member_since').defaultNow().notNull(),
+    role: userRoleEnum('role').default(DEFAULTS.USER.ROLE).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     username: varchar('username', { length: SCHEMA_LIMITS.USER.USERNAME.MAX }).notNull().unique(),
   },
@@ -71,6 +73,7 @@ export const users = pgTable(
     index('users_deleted_active_idx').on(table.isDeleted, table.lastActiveAt),
     index('users_email_idx').on(table.email),
     index('users_failed_attempts_idx').on(table.failedLoginAttempts, table.lastFailedLoginAt),
+    index('users_role_idx').on(table.role),
     index('users_username_idx').on(table.username),
     index('users_verified_created_idx').on(table.isVerified, table.createdAt),
   ],

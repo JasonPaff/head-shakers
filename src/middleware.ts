@@ -48,6 +48,11 @@ const isProtectedRoute = createRouteMatcher([
   '/bobbleheads/:id/edit(.*)', // updated from items to bobbleheads
 ]);
 
+const isAdminRoute = createRouteMatcher([
+  // admin dashboard and management
+  '/admin(.*)',
+]);
+
 export default clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
@@ -58,6 +63,12 @@ export default clerkMiddleware(async (auth, req) => {
     url: req.url,
     userAgent: req.headers.get('user-agent'),
   });
+
+  // admin routes - require authentication (role checking done at component level)
+  if (isAdminRoute(req)) {
+    await auth.protect();
+    return;
+  }
 
   // protected routes
   if (isProtectedRoute(req)) {

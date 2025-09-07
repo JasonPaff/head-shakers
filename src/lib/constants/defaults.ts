@@ -80,6 +80,7 @@ export const DEFAULTS = {
     IS_DELETED: false,
     IS_VERIFIED: false,
     LANGUAGE: 'en',
+    ROLE: 'user',
     THEME: 'light',
     TIMEZONE: 'UTC',
   },
