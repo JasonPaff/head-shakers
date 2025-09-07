@@ -14,10 +14,19 @@ import { withForm } from '@/components/ui/form';
 export const ItemPhotos = withForm({
   ...addItemFormOptions,
   render: function ({ form }) {
-    const photos = (useStore(form.store, (state) => state.values.photos) as CloudinaryPhoto[]) || [];
+    const photos = (useStore(form.store, (state) => state.values.photos) as Array<CloudinaryPhoto>) || [];
 
-    const handlePhotosChange = (updatedPhotos: CloudinaryPhoto[]) => {
-      form.setFieldValue('photos', updatedPhotos);
+    const handlePhotosChange = (
+      updatedPhotos:
+        | ((prevPhotos: Array<CloudinaryPhoto>) => Array<CloudinaryPhoto>)
+        | Array<CloudinaryPhoto>,
+    ) => {
+      if (typeof updatedPhotos === 'function') {
+        const currentPhotos = (form.getFieldValue('photos') as Array<CloudinaryPhoto>) || [];
+        form.setFieldValue('photos', updatedPhotos(currentPhotos));
+      } else {
+        form.setFieldValue('photos', updatedPhotos);
+      }
     };
 
     return (

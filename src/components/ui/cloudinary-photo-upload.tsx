@@ -25,7 +25,9 @@ import { cn } from '@/utils/tailwind-utils';
 interface CloudinaryPhotoUploadProps {
   isDisabled?: boolean;
   maxPhotos?: number;
-  onPhotosChange: (photos: Array<CloudinaryPhoto>) => void;
+  onPhotosChange: (
+    photos: ((prevPhotos: Array<CloudinaryPhoto>) => Array<CloudinaryPhoto>) | Array<CloudinaryPhoto>,
+  ) => void;
   photos: Array<CloudinaryPhoto>;
 }
 
@@ -45,19 +47,20 @@ export const CloudinaryPhotoUpload = ({
 
   const handleSuccess = useCallback(
     (results: CloudinaryUploadWidgetResults) => {
-      const newPhoto = transformCloudinaryResult(results, {
-        isPrimary: photos.length === 0, // the first photo is primary
-        sortOrder: photos.length,
+      onPhotosChange((currentPhotos) => {
+        const newPhoto = transformCloudinaryResult(results, {
+          isPrimary: currentPhotos.length === 0, // the first photo is primary
+          sortOrder: currentPhotos.length,
+        });
+        return [...currentPhotos, newPhoto];
       });
-
-      onPhotosChange([...photos, newPhoto]);
 
       setUploadState((prev) => ({
         ...prev,
         uploadedCount: prev.uploadedCount + 1,
       }));
     },
-    [photos, onPhotosChange],
+    [onPhotosChange],
   );
 
   const handleError = useCallback((error: CloudinaryUploadWidgetError) => {
@@ -68,11 +71,12 @@ export const CloudinaryPhotoUpload = ({
     }));
   }, []);
 
-  const handleQueuesStart = useCallback(() => {
+  const handleQueuesStart = useCallback((data: undefined | { files?: Array<File> }) => {
+    const fileCount = data?.files?.length || 1;
     setUploadState({
       error: undefined,
       isUploading: true,
-      totalCount: 0,
+      totalCount: fileCount,
       uploadedCount: 0,
     });
   }, []);
@@ -86,34 +90,42 @@ export const CloudinaryPhotoUpload = ({
 
   const removePhoto = useCallback(
     (photoId: string) => {
-      const updatedPhotos = photos.filter((p) => p.id !== photoId);
-      // reorder remaining photos
-      const reorderedPhotos = updatedPhotos.map((photo, index) => ({
-        ...photo,
-        sortOrder: index,
-      }));
-      onPhotosChange(reorderedPhotos);
+      onPhotosChange((currentPhotos) => {
+        const updatedPhotos = currentPhotos.filter((p) => p.id !== photoId);
+        // reorder remaining photos
+        const reorderedPhotos = updatedPhotos.map((photo, index) => ({
+          ...photo,
+          sortOrder: index,
+        }));
+        return reorderedPhotos;
+      });
     },
-    [photos, onPhotosChange],
+    [onPhotosChange],
   );
 
   const updatePhoto = useCallback(
     (photoId: string, updates: Partial<CloudinaryPhoto>) => {
-      const updatedPhotos = photos.map((photo) => (photo.id === photoId ? { ...photo, ...updates } : photo));
-      onPhotosChange(updatedPhotos);
+      onPhotosChange((currentPhotos) => {
+        const updatedPhotos = currentPhotos.map((photo) =>
+          photo.id === photoId ? { ...photo, ...updates } : photo,
+        );
+        return updatedPhotos;
+      });
     },
-    [photos, onPhotosChange],
+    [onPhotosChange],
   );
 
   const setPrimaryPhoto = useCallback(
     (photoId: string) => {
-      const updatedPhotos = photos.map((photo) => ({
-        ...photo,
-        isPrimary: photo.id === photoId,
-      }));
-      onPhotosChange(updatedPhotos);
+      onPhotosChange((currentPhotos) => {
+        const updatedPhotos = currentPhotos.map((photo) => ({
+          ...photo,
+          isPrimary: photo.id === photoId,
+        }));
+        return updatedPhotos;
+      });
     },
-    [photos, onPhotosChange],
+    [onPhotosChange],
   );
 
   // TODO: replace the any type with proper type from @hello-pangea/dnd
