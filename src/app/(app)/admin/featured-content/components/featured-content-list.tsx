@@ -27,7 +27,7 @@ import {
 } from '@/lib/actions/admin/featured-content.actions';
 
 interface FeaturedContentListProps {
-  initialData: AdminFeaturedContent[];
+  initialData: Array<AdminFeaturedContent>;
   onEdit: (contentId: string) => void;
 }
 

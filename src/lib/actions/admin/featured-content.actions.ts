@@ -1,12 +1,11 @@
 'use server';
 
 import { eq } from 'drizzle-orm';
-import { $path } from 'next-typesafe-url';
-import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
+import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 
 const toggleActiveSchema = z.object({
@@ -32,9 +31,8 @@ export const toggleFeaturedContentActiveAction = authActionClient
       })
       .where(eq(featuredContent.id, id));
 
-    // revalidate pages
-    revalidatePath($path({ route: '/admin/featured-content' }));
-    revalidatePath($path({ route: '/browse/featured' }));
+    // invalidate all caches (Redis and Next.js)
+    await invalidateFeaturedContentCaches(id);
 
     return {
       message: `Featured content ${isActive ? 'activated' : 'deactivated'} successfully`,
@@ -61,11 +59,9 @@ export const deleteFeaturedContentAction = authActionClient
       .where(eq(featuredContent.id, id))
       .returning();
 
-    // revalidate the pages
-    revalidatePath($path({ route: '/admin/featured-content' }));
-
+    // invalidate all caches if the content was active
     if (deletedFeatureContent?.isActive) {
-      revalidatePath($path({ route: '/browse/featured' }));
+      await invalidateFeaturedContentCaches(id);
     }
 
     return {
