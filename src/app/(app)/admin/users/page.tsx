@@ -1,5 +1,8 @@
 import { requireModerator } from '@/lib/utils/admin.utils';
 
+// Force dynamic rendering for admin pages
+export const dynamic = 'force-dynamic';
+
 export default async function AdminUsersPage() {
   await requireModerator();
 
