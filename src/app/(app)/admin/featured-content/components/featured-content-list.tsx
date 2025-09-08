@@ -1,7 +1,11 @@
 'use client';
 
 import { EditIcon, EyeIcon, EyeOffIcon, MoreHorizontalIcon, Trash2Icon, TrendingUpIcon } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Fragment, useMemo, useState, useTransition } from 'react';
+import { toast } from 'sonner';
+
+import type { AdminFeaturedContent } from '@/lib/queries/admin/featured-content.queries';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -17,50 +21,24 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  deleteFeaturedContentAction,
+  toggleFeaturedContentActiveAction,
+} from '@/lib/actions/admin/featured-content.actions';
 
 interface FeaturedContentListProps {
+  initialData: AdminFeaturedContent[];
   onEdit: (contentId: string) => void;
 }
 
-// mock data - this would come from a server action in real implementation
-const mockFeaturedContent = [
-  {
-    contentType: 'collection' as const,
-    curator: 'Admin User',
-    endDate: '2024-02-15',
-    featureType: 'homepage_banner' as const,
-    id: '1',
-    isActive: true,
-    priority: 1,
-    startDate: '2024-01-15',
-    title: 'Baseball Legends Collection',
-    viewCount: 2543,
-  },
-  {
-    contentType: 'bobblehead' as const,
-    curator: 'Moderator User',
-    endDate: null,
-    featureType: 'editor_pick' as const,
-    id: '2',
-    isActive: true,
-    priority: 2,
-    startDate: '2024-01-10',
-    title: 'Vintage Mickey Mouse Bobblehead',
-    viewCount: 1842,
-  },
-  {
-    contentType: 'user' as const,
-    curator: 'Admin User',
-    endDate: '2023-12-31',
-    featureType: 'collection_of_week' as const,
-    id: '3',
-    isActive: false,
-    priority: 3,
-    startDate: '2023-12-01',
-    title: 'Top Collector of the Month',
-    viewCount: 967,
-  },
-];
+const formatDate = (date: Date | null) => {
+  if (!date) return null;
+  return new Date(date).toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+};
 
 const getFeatureTypeLabel = (type: string) => {
   switch (type) {
@@ -90,21 +68,77 @@ const getContentTypeColor = (type: string) => {
   }
 };
 
-export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
+export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentListProps) => {
+  const [filterStatus, setFilterStatus] = useState<string>('active');
   const [filterType, setFilterType] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'priority' | 'views'>('date');
 
-  const filteredContent = mockFeaturedContent.filter((content) => {
-    const matchesSearch = content.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const isMatchesType = filterType === 'all' || content.contentType === filterType;
-    const matchesStatus =
-      filterStatus === 'all' ||
-      (filterStatus === 'active' && content.isActive) ||
-      (filterStatus === 'inactive' && !content.isActive);
+  const [isPending, startTransition] = useTransition();
 
-    return matchesSearch && isMatchesType && matchesStatus;
-  });
+  const router = useRouter();
+
+  const handleToggleActive = (id: string, currentStatus: boolean) => {
+    startTransition(async () => {
+      const result = await toggleFeaturedContentActiveAction({
+        id,
+        isActive: !currentStatus,
+      });
+
+      if (result?.serverError) {
+        toast.error(result.serverError);
+      } else if (result?.data?.success) {
+        toast.success(result.data.message);
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    if (!confirm('Are you sure you want to delete this featured content?')) {
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await deleteFeaturedContentAction({ id });
+
+      if (result?.serverError) {
+        toast.error(result.serverError);
+      } else if (result?.data?.success) {
+        toast.success(result.data.message);
+        router.refresh();
+      }
+    });
+  };
+
+  const filteredContent = useMemo(() => {
+    const filtered = initialData.filter((content) => {
+      const displayTitle = content.title || content.contentTitle || 'Untitled';
+      const matchesSearch = displayTitle.toLowerCase().includes(searchTerm.toLowerCase());
+      const isMatchesType = filterType === 'all' || content.contentType === filterType;
+      const matchesStatus =
+        filterStatus === 'all' ||
+        (filterStatus === 'active' && content.isActive) ||
+        (filterStatus === 'inactive' && !content.isActive);
+
+      return matchesSearch && isMatchesType && matchesStatus;
+    });
+
+    // sort the filtered results
+    filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'priority':
+          return b.priority - a.priority;
+        case 'views':
+          return b.viewCount - a.viewCount;
+        case 'date':
+        default:
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      }
+    });
+
+    return filtered;
+  }, [initialData, searchTerm, filterType, filterStatus, sortBy]);
 
   return (
     <div className={'space-y-4'}>
@@ -145,6 +179,19 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
                 <SelectItem value={'inactive'}>Inactive</SelectItem>
               </SelectContent>
             </Select>
+            <Select
+              onValueChange={(value) => setSortBy(value as 'date' | 'priority' | 'views')}
+              value={sortBy}
+            >
+              <SelectTrigger className={'w-[140px]'}>
+                <SelectValue placeholder={'Sort by'} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={'date'}>Date</SelectItem>
+                <SelectItem value={'priority'}>Priority</SelectItem>
+                <SelectItem value={'views'}>Views</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
@@ -157,7 +204,9 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
               <div className={'flex items-center justify-between'}>
                 <div className={'flex-1'}>
                   <div className={'mb-2 flex items-center gap-2'}>
-                    <h3 className={'text-lg font-semibold'}>{content.title}</h3>
+                    <h3 className={'text-lg font-semibold'}>
+                      {content.title || content.contentTitle || 'Untitled'}
+                    </h3>
                     <Badge className={getContentTypeColor(content.contentType)}>{content.contentType}</Badge>
                     <Badge variant={content.isActive ? 'default' : 'secondary'}>
                       {content.isActive ? 'Active' : 'Inactive'}
@@ -170,15 +219,24 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
                       {content.viewCount.toLocaleString()} views
                     </span>
                     <span>Priority: {content.priority}</span>
-                    <span>Curator: {content.curator}</span>
+                    <span>Curator: {content.curatorName || 'System'}</span>
                   </div>
                   <div className={'mt-1 flex items-center gap-4 text-xs text-muted-foreground'}>
-                    <span>Start: {content.startDate}</span>
-                    {content.endDate && <span>End: {content.endDate}</span>}
+                    <span>Start: {formatDate(content.startDate) || 'Not set'}</span>
+                    {content.endDate && <span>End: {formatDate(content.endDate)}</span>}
+                    <span>Updated: {formatDate(content.updatedAt)}</span>
                   </div>
                 </div>
                 <div className={'flex items-center gap-2'}>
-                  <Button className={'gap-1'} size={'sm'} variant={content.isActive ? 'outline' : 'default'}>
+                  <Button
+                    className={'gap-1'}
+                    disabled={isPending}
+                    onClick={() => {
+                      handleToggleActive(content.id, content.isActive);
+                    }}
+                    size={'sm'}
+                    variant={content.isActive ? 'outline' : 'default'}
+                  >
                     <Conditional isCondition={content.isActive}>
                       <Fragment>
                         <EyeOffIcon aria-hidden className={'size-4'} />
@@ -210,7 +268,12 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className={'text-destructive'}>
+                      <DropdownMenuItem
+                        className={'text-destructive'}
+                        onClick={() => {
+                          handleDelete(content.id);
+                        }}
+                      >
                         <Trash2Icon aria-hidden className={'mr-2 size-4'} />
                         Delete
                       </DropdownMenuItem>

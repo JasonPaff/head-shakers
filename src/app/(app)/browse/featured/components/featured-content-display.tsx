@@ -38,7 +38,7 @@ export interface FeaturedContentItem {
   description: string;
   endDate?: null | string;
   id: string;
-  imageUrl: string;
+  imageUrl: null | string;
   likes: number;
   owner: string;
   ownerDisplayName: string;
@@ -214,7 +214,7 @@ export const FeaturedContentDisplay = ({
           <img
             alt={content.title}
             className={`w-full rounded-t-lg object-cover ${isHero ? 'h-64 lg:h-80' : 'h-48'}`}
-            src={content.imageUrl}
+            src={content.imageUrl ?? '/placeholder.jpg'}
           />
           <div className={'absolute top-4 left-4 flex gap-2'}>
             <Badge className={getContentTypeColor(content.contentType)}>

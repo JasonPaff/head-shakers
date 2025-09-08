@@ -1,10 +1,13 @@
 import { FeaturedContentManager } from '@/app/(app)/admin/featured-content/components/featured-content-manager';
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
+import { getAllFeaturedContentForAdmin } from '@/lib/queries/admin/featured-content.queries';
 
 // Force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
-export default function AdminFeaturedContentPage() {
+export default async function AdminFeaturedContentPage() {
+  const featuredContent = await getAllFeaturedContentForAdmin();
+
   return (
     <AdminLayout isAdminRequired={false}>
       <div className={'space-y-6'}>
@@ -16,7 +19,7 @@ export default function AdminFeaturedContentPage() {
             </p>
           </div>
         </div>
-        <FeaturedContentManager />
+        <FeaturedContentManager initialData={featuredContent} />
       </div>
     </AdminLayout>
   );

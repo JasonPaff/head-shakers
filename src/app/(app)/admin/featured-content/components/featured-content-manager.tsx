@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+
+import type { AdminFeaturedContent } from '@/lib/queries/admin/featured-content.queries';
 
 import { FeaturedContentForm } from '@/app/(app)/admin/featured-content/components/featured-content-form';
 import { Button } from '@/components/ui/button';
@@ -13,7 +15,11 @@ import { ContentSuggestions } from './content-suggestions';
 import { FeaturedContentAnalytics } from './featured-content-analytics';
 import { FeaturedContentList } from './featured-content-list';
 
-export const FeaturedContentManager = () => {
+interface FeaturedContentManagerProps {
+  initialData: Array<AdminFeaturedContent>;
+}
+
+export const FeaturedContentManager = ({ initialData }: FeaturedContentManagerProps) => {
   const [activeTab, setActiveTab] = useState('list');
   const [isShowCreateForm, setIsShowCreateForm] = useToggle();
   const [editingContent, setEditingContent] = useState<null | string>(null);
@@ -36,6 +42,19 @@ export const FeaturedContentManager = () => {
     setActiveTab('list');
   };
 
+  const activeFeatures = useMemo(() => {
+    return initialData.filter((item) => item.isActive).length;
+  }, [initialData]);
+  const totalViews = useMemo(() => {
+    return initialData.reduce((sum, item) => sum + item.viewCount, 0);
+  }, [initialData]);
+  const homepageBanners = useMemo(() => {
+    return initialData.filter((item) => item.isActive && item.featureType === 'homepage_banner').length;
+  }, [initialData]);
+  const editorPicks = useMemo(() => {
+    return initialData.filter((item) => item.isActive && item.featureType === 'editor_pick').length;
+  }, [initialData]);
+
   return (
     <div className={'space-y-6'}>
       {/* Quick Stats */}
@@ -45,8 +64,8 @@ export const FeaturedContentManager = () => {
             <CardTitle className={'text-sm font-medium'}>Active Features</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={'text-2xl font-bold'}>12</div>
-            <p className={'text-xs text-muted-foreground'}>+2 from last week</p>
+            <div className={'text-2xl font-bold'}>{activeFeatures}</div>
+            <p className={'text-xs text-muted-foreground'}>Currently active</p>
           </CardContent>
         </Card>
         <Card>
@@ -54,8 +73,8 @@ export const FeaturedContentManager = () => {
             <CardTitle className={'text-sm font-medium'}>Total Views</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={'text-2xl font-bold'}>8,342</div>
-            <p className={'text-xs text-muted-foreground'}>+12% from last week</p>
+            <div className={'text-2xl font-bold'}>{totalViews.toLocaleString()}</div>
+            <p className={'text-xs text-muted-foreground'}>Total views</p>
           </CardContent>
         </Card>
         <Card>
@@ -63,7 +82,7 @@ export const FeaturedContentManager = () => {
             <CardTitle className={'text-sm font-medium'}>Homepage Banner</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={'text-2xl font-bold'}>1</div>
+            <div className={'text-2xl font-bold'}>{homepageBanners}</div>
             <p className={'text-xs text-muted-foreground'}>Currently active</p>
           </CardContent>
         </Card>
@@ -72,7 +91,7 @@ export const FeaturedContentManager = () => {
             <CardTitle className={'text-sm font-medium'}>Editor Picks</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className={'text-2xl font-bold'}>6</div>
+            <div className={'text-2xl font-bold'}>{editorPicks}</div>
             <p className={'text-xs text-muted-foreground'}>Active selections</p>
           </CardContent>
         </Card>
@@ -95,7 +114,7 @@ export const FeaturedContentManager = () => {
         </div>
 
         <TabsContent className={'space-y-4'} value={'list'}>
-          <FeaturedContentList onEdit={handleEdit} />
+          <FeaturedContentList initialData={initialData} onEdit={handleEdit} />
         </TabsContent>
 
         <TabsContent className={'space-y-4'} value={'suggestions'}>

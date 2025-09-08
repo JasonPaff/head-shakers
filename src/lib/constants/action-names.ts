@@ -3,9 +3,11 @@
  */
 export const ACTION_NAMES = {
   ADMIN: {
+    DELETE_FEATURED_CONTENT: 'deleteFeaturedContent',
     SEARCH_BOBBLEHEADS_FOR_FEATURING: 'searchBobbleheadsForFeaturing',
     SEARCH_COLLECTIONS_FOR_FEATURING: 'searchCollectionsForFeaturing',
     SEARCH_USERS_FOR_FEATURING: 'searchUsersForFeaturing',
+    TOGGLE_FEATURED_CONTENT: 'toggleFeaturedContent',
   },
   ANALYTICS: {
     TRACK_SEARCH: 'trackSearchQuery',
