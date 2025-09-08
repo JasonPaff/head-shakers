@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 
+import { FeaturedContentForm } from '@/app/(app)/admin/featured-content/components/featured-content-form';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -10,7 +11,6 @@ import { useToggle } from '@/hooks/use-toggle';
 
 import { ContentSuggestions } from './content-suggestions';
 import { FeaturedContentAnalytics } from './featured-content-analytics';
-import { FeaturedContentFormWrapper as FeaturedContentForm } from './featured-content-form-wrapper';
 import { FeaturedContentList } from './featured-content-list';
 
 export const FeaturedContentManager = () => {
