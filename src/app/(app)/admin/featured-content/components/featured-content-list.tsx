@@ -117,7 +117,9 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
           <div className={'flex gap-4'}>
             <div className={'flex-1'}>
               <Input
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                }}
                 placeholder={'Search featured content...'}
                 value={searchTerm}
               />
@@ -177,16 +179,18 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
                 </div>
                 <div className={'flex items-center gap-2'}>
                   <Button className={'gap-1'} size={'sm'} variant={content.isActive ? 'outline' : 'default'}>
-                    {content.isActive ?
+                    <Conditional isCondition={content.isActive}>
                       <Fragment>
                         <EyeOffIcon aria-hidden className={'size-4'} />
                         Deactivate
                       </Fragment>
-                    : <Fragment>
+                    </Conditional>
+                    <Conditional isCondition={!content.isActive}>
+                      <Fragment>
                         <EyeIcon aria-hidden className={'size-4'} />
                         Activate
                       </Fragment>
-                    }
+                    </Conditional>
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -197,8 +201,12 @@ export const FeaturedContentList = ({ onEdit }: FeaturedContentListProps) => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align={'end'}>
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem onClick={() => onEdit(content.id)}>
-                        <EditIcon className={'mr-2 size-4'} />
+                      <DropdownMenuItem
+                        onClick={() => {
+                          onEdit(content.id);
+                        }}
+                      >
+                        <EditIcon aria-hidden className={'mr-2 size-4'} />
                         Edit
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
