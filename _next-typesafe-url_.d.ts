@@ -14,11 +14,14 @@ declare module "@@@next-typesafe-url" {
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
     "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
+    "/users/[userId]": InferRoute<import("./src/app/(app)/users/[userId]/route-type").RouteType>;
     "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }
 
   interface StaticRouter {
     "/": StaticRoute;
+    "/admin/featured-content": StaticRoute;
+    "/admin": StaticRoute;
     "/bobbleheads/[bobbleheadId]/edit": StaticRoute;
     "/browse/categories": StaticRoute;
     "/browse/featured": StaticRoute;
@@ -45,7 +48,6 @@ declare module "@@@next-typesafe-url" {
     "/users/[userId]/collections": StaticRoute;
     "/users/[userId]/followers": StaticRoute;
     "/users/[userId]/following": StaticRoute;
-    "/users/[userId]": StaticRoute;
     "/sign-up/[[...sign-up]]": StaticRoute;
     "/about": StaticRoute;
     "/privacy": StaticRoute;

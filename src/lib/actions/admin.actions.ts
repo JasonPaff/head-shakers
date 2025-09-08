@@ -5,6 +5,7 @@ import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
+import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
   insertFeaturedContentSchema,
@@ -57,6 +58,9 @@ export const createFeaturedContentAction = adminActionClient
         })
         .returning();
 
+      // invalidate featured content caches
+      await invalidateFeaturedContentCaches();
+
       return {
         featuredContent: newFeaturedContent,
         message: 'Featured content created successfully',
@@ -102,6 +106,9 @@ export const updateFeaturedContentAction = adminActionClient
         throw new Error('Featured content not found');
       }
 
+      // invalidate featured content caches
+      await invalidateFeaturedContentCaches(id);
+
       return {
         featuredContent: updatedFeaturedContent,
         message: 'Featured content updated successfully',
@@ -136,6 +143,9 @@ export const deleteFeaturedContentAction = adminActionClient
     if (!deletedFeaturedContent) {
       throw new Error('Featured content not found');
     }
+
+    // invalidate featured content caches
+    await invalidateFeaturedContentCaches(parsedInput.id);
 
     return {
       message: 'Featured content deleted successfully',
@@ -177,6 +187,9 @@ export const toggleFeaturedContentStatusAction = adminActionClient
       if (!updatedFeaturedContent) {
         throw new Error('Featured content not found');
       }
+
+      // invalidate featured content caches
+      await invalidateFeaturedContentCaches(parsedInput.id);
 
       return {
         featuredContent: updatedFeaturedContent,
