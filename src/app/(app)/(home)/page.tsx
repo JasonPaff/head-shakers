@@ -40,7 +40,7 @@ export default function HomePage() {
                 </Button>
               }
             >
-              <Button asChild>
+              <Button asChild size={'lg'}>
                 <Link href={_dashboardLink}>My Collection</Link>
               </Button>
             </AuthContent>
