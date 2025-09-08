@@ -8,6 +8,7 @@ import {
   LayoutDashboardIcon,
   PlusIcon,
   SettingsIcon,
+  ShieldIcon,
   UploadIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
@@ -17,9 +18,12 @@ import { AppSidebarNavSecondary } from '@/components/layout/app-sidebar/componen
 import { Sidebar } from '@/components/ui/sidebar/sidebar';
 import { SidebarContent } from '@/components/ui/sidebar/sidebar-content';
 import { SidebarRail } from '@/components/ui/sidebar/sidebar-rail';
+import { useAdminRole } from '@/hooks/use-admin-role';
 
-const data = {
-  navMain: [
+const useNavigationData = () => {
+  const { isLoading, isModerator } = useAdminRole();
+
+  const baseNavMain = [
     {
       icon: LayoutDashboardIcon,
       isActive: true,
@@ -61,8 +65,36 @@ const data = {
       title: 'Import Tools',
       url: $path({ route: '/settings/data/import' }),
     },
-  ],
-  navSecondary: [
+  ];
+
+  // Add admin navigation if user has moderator or admin privileges
+  const adminNavItem = {
+    icon: ShieldIcon,
+    items: [
+      {
+        title: 'Featured Content',
+        url: $path({ route: '/admin/featured-content' }),
+      },
+      {
+        title: 'Content Reports',
+        url: $path({ route: '/admin/reports' }),
+      },
+      {
+        title: 'User Management',
+        url: $path({ route: '/admin/users' }),
+      },
+      {
+        title: 'Analytics',
+        url: $path({ route: '/admin/analytics' }),
+      },
+    ],
+    title: 'Administration',
+    url: $path({ route: '/admin' }),
+  };
+
+  const navMain = !isLoading && isModerator ? [...baseNavMain, adminNavItem] : baseNavMain;
+
+  const navSecondary = [
     {
       icon: ActivityIcon,
       title: 'Following Feed',
@@ -73,17 +105,21 @@ const data = {
       title: 'Account Settings',
       url: $path({ route: '/settings' }),
     },
-  ],
+  ];
+
+  return { navMain, navSecondary };
 };
 
 type AppSidebarProps = ComponentProps<typeof Sidebar>;
 
 export const AppSidebar = ({ ...props }: AppSidebarProps) => {
+  const { navMain, navSecondary } = useNavigationData();
+
   return (
     <Sidebar className={'top-(--header-height) h-[calc(100svh-var(--header-height))]!'} {...props}>
       <SidebarContent>
-        <AppSidebarNavMain items={data.navMain} />
-        <AppSidebarNavSecondary className={'mt-auto'} items={data.navSecondary} />
+        <AppSidebarNavMain items={navMain} />
+        <AppSidebarNavSecondary className={'mt-auto'} items={navSecondary} />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

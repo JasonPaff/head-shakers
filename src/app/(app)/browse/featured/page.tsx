@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { FeaturedContentServer } from '@/components/browse/featured/featured-content-server';
+import { FeaturedContentServer } from '@/app/(app)/browse/featured/components/featured-content-server';
 
 export default function FeaturedPage() {
   return (

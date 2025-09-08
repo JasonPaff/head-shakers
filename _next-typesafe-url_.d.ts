@@ -20,8 +20,11 @@ declare module "@@@next-typesafe-url" {
 
   interface StaticRouter {
     "/": StaticRoute;
+    "/admin/analytics": StaticRoute;
     "/admin/featured-content": StaticRoute;
     "/admin": StaticRoute;
+    "/admin/reports": StaticRoute;
+    "/admin/users": StaticRoute;
     "/bobbleheads/[bobbleheadId]/edit": StaticRoute;
     "/browse/categories": StaticRoute;
     "/browse/featured": StaticRoute;

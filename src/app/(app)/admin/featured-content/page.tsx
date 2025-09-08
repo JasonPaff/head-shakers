@@ -1,4 +1,4 @@
-import { FeaturedContentManager } from '@/components/admin/featured-content/featured-content-manager';
+import { FeaturedContentManager } from '@/app/(app)/admin/featured-content/components/featured-content-manager';
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
 
 export default function AdminFeaturedContentPage() {

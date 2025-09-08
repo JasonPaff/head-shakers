@@ -179,6 +179,7 @@ const getContentTypeColor = (type: string) => {
       return 'bg-gray-100 text-gray-800';
   }
 };
+
 export const FeaturedContentDisplay = ({
   featuredContentData = mockFeaturedContent,
   onViewContent,
