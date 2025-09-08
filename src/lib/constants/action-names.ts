@@ -2,6 +2,11 @@
  * Centralized server action names for type safety and maintainability
  */
 export const ACTION_NAMES = {
+  ADMIN: {
+    SEARCH_BOBBLEHEADS_FOR_FEATURING: 'searchBobbleheadsForFeaturing',
+    SEARCH_COLLECTIONS_FOR_FEATURING: 'searchCollectionsForFeaturing',
+    SEARCH_USERS_FOR_FEATURING: 'searchUsersForFeaturing',
+  },
   ANALYTICS: {
     TRACK_SEARCH: 'trackSearchQuery',
     TRACK_VIEW: 'trackContentView',

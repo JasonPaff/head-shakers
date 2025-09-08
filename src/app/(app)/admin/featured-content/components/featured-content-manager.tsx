@@ -10,7 +10,7 @@ import { useToggle } from '@/hooks/use-toggle';
 
 import { ContentSuggestions } from './content-suggestions';
 import { FeaturedContentAnalytics } from './featured-content-analytics';
-import { FeaturedContentForm } from './featured-content-form';
+import { FeaturedContentFormWrapper as FeaturedContentForm } from './featured-content-form-wrapper';
 import { FeaturedContentList } from './featured-content-list';
 
 export const FeaturedContentManager = () => {

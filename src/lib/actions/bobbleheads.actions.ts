@@ -1,5 +1,6 @@
 'use server';
 
+import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
 import { revalidatePath } from 'next/cache';
