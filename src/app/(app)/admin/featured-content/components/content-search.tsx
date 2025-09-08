@@ -1,6 +1,6 @@
 'use client';
 
-import { Search } from 'lucide-react';
+import { ChevronDown, ChevronRight, Image as ImageIcon, Search } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -21,7 +21,7 @@ import {
 
 interface ContentSearchProps {
   contentType: ContentType;
-  onSelect: (contentId: string, contentName: string) => void;
+  onSelect: (contentId: string, contentName: string, imageUrl?: string) => void;
   selectedContentId?: string;
 }
 
@@ -33,6 +33,12 @@ interface SearchResult {
   name: string;
   ownerName?: string;
   ownerUsername?: string;
+  photos?: Array<{
+    altText: null | string;
+    isPrimary: boolean;
+    sortOrder: number;
+    url: string;
+  }>;
 }
 
 export const ContentSearch = ({ contentType, onSelect, selectedContentId }: ContentSearchProps) => {
@@ -76,10 +82,11 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             additionalInfo: `${bobblehead.manufacturer}${bobblehead.series ? ` - ${bobblehead.series}` : ''}${bobblehead.year ? ` (${bobblehead.year})` : ''}`,
             description: bobblehead.description,
             id: bobblehead.id,
-            imageUrl: bobblehead.primaryPhotoUrl,
+            imageUrl: bobblehead.primaryPhotoUrl || '/placeholder.jpg',
             name: bobblehead.name,
             ownerName: bobblehead.ownerName,
             ownerUsername: bobblehead.ownerUsername,
+            photos: bobblehead.photos || [],
           }));
         }
       } else if (contentType === 'user') {
@@ -161,42 +168,13 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
           return (
             <div className={'space-y-2'}>
               {results.map((result) => (
-                <Card
-                  className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-                    selectedContentId === result.id ? 'ring-2 ring-primary' : ''
-                  }`}
+                <BobbleheadSearchResult
+                  contentType={contentType}
                   key={result.id}
-                >
-                  <CardContent className={'p-3'}>
-                    <div className={'flex items-start justify-between'}>
-                      <div className={'flex-1'}>
-                        <CardTitle className={'text-sm font-medium'}>{result.name}</CardTitle>
-                        {result.description && (
-                          <CardDescription className={'mt-1 line-clamp-2 text-xs'}>
-                            {result.description}
-                          </CardDescription>
-                        )}
-                        {result.ownerName && (
-                          <p className={'mt-1 text-xs text-muted-foreground'}>
-                            by {result.ownerName} (@{result.ownerUsername})
-                          </p>
-                        )}
-                        {result.additionalInfo && (
-                          <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
-                        )}
-                      </div>
-                      <Button
-                        onClick={() => {
-                          onSelect(result.id, result.name);
-                        }}
-                        size={'sm'}
-                        variant={selectedContentId === result.id ? 'default' : 'outline'}
-                      >
-                        {selectedContentId === result.id ? 'Selected' : 'Select'}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                  onSelect={onSelect}
+                  result={result}
+                  selectedContentId={selectedContentId}
+                />
               ))}
             </div>
           );
@@ -219,5 +197,174 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         </Card>
       </Conditional>
     </div>
+  );
+};
+
+interface BobbleheadSearchResultProps {
+  contentType: ContentType;
+  onSelect: (contentId: string, contentName: string, imageUrl?: string) => void;
+  result: SearchResult;
+  selectedContentId?: string;
+}
+
+const BobbleheadSearchResult = ({
+  contentType,
+  onSelect,
+  result,
+  selectedContentId,
+}: BobbleheadSearchResultProps) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // For bobbleheads, prioritize primary photo, then first photo, then placeholder
+  const primaryPhoto = result.photos?.find((p) => p.isPrimary) || result.photos?.[0];
+  const defaultImageUrl = primaryPhoto?.url || '/placeholder.jpg';
+
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>(defaultImageUrl);
+
+  const handleSelect = (imageUrl?: string) => {
+    onSelect(result.id, result.name, imageUrl || selectedImageUrl);
+  };
+
+  const handleImageSelect = (imageUrl: string) => {
+    setSelectedImageUrl(imageUrl);
+  };
+
+  // For non-bobbleheads, use the simple card layout
+  if (contentType !== 'bobblehead') {
+    return (
+      <Card
+        className={`cursor-pointer transition-colors hover:bg-muted/50 ${
+          selectedContentId === result.id ? 'ring-2 ring-primary' : ''
+        }`}
+      >
+        <CardContent className={'p-3'}>
+          <div className={'flex items-start justify-between'}>
+            <div className={'flex-1'}>
+              <CardTitle className={'text-sm font-medium'}>{result.name}</CardTitle>
+              {result.description && (
+                <CardDescription className={'mt-1 line-clamp-2 text-xs'}>
+                  {result.description}
+                </CardDescription>
+              )}
+              {result.ownerName && (
+                <p className={'mt-1 text-xs text-muted-foreground'}>
+                  by {result.ownerName} (@{result.ownerUsername})
+                </p>
+              )}
+              {result.additionalInfo && (
+                <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
+              )}
+            </div>
+            <Button
+              onClick={() => handleSelect()}
+              size={'sm'}
+              variant={selectedContentId === result.id ? 'default' : 'outline'}
+            >
+              {selectedContentId === result.id ? 'Selected' : 'Select'}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // For bobbleheads with photos, show expandable interface
+  const _hasMultiplePhotos = result.photos && result.photos.length > 1;
+
+  return (
+    <Card className={`transition-colors ${selectedContentId === result.id ? 'ring-2 ring-primary' : ''}`}>
+      <CardContent className={'p-3'}>
+        <div className={'flex items-start gap-3'}>
+          {/* Image Preview */}
+          <div className={'flex-shrink-0'}>
+            <div className={'relative h-16 w-16 overflow-hidden rounded-md bg-muted'}>
+              <img alt={result.name} className={'object-cover'} sizes={'64px'} src={selectedImageUrl} />
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className={'min-w-0 flex-1'}>
+            <CardTitle className={'text-sm font-medium'}>{result.name}</CardTitle>
+            {result.description && (
+              <CardDescription className={'mt-1 line-clamp-2 text-xs'}>{result.description}</CardDescription>
+            )}
+            {result.ownerName && (
+              <p className={'mt-1 text-xs text-muted-foreground'}>
+                by {result.ownerName} (@{result.ownerUsername})
+              </p>
+            )}
+            {result.additionalInfo && (
+              <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className={'flex flex-col gap-2'}>
+            <Button
+              onClick={() => handleSelect(selectedImageUrl)}
+              size={'sm'}
+              variant={selectedContentId === result.id ? 'default' : 'outline'}
+            >
+              {selectedContentId === result.id ? 'Selected' : 'Select'}
+            </Button>
+
+            {_hasMultiplePhotos && (
+              <Button
+                className={'h-8 px-2'}
+                onClick={() => setIsExpanded(!isExpanded)}
+                size={'sm'}
+                variant={'ghost'}
+              >
+                {isExpanded ?
+                  <ChevronDown className={'h-3 w-3'} />
+                : <ChevronRight className={'h-3 w-3'} />}
+                <ImageIcon className={'ml-1 h-3 w-3'} />
+                {result.photos?.length}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Expandable Image Selection */}
+        {isExpanded && _hasMultiplePhotos && (
+          <div className={'mt-3 border-t pt-3'}>
+            <p className={'mb-2 text-xs text-muted-foreground'}>Choose feature image:</p>
+            <div className={'grid grid-cols-4 gap-2'}>
+              {result.photos?.map((photo) => {
+                const _isSelected = selectedImageUrl === photo.url;
+                const _photoTitle = photo.altText || `Photo ${photo.sortOrder}`;
+                return (
+                  <button
+                    className={`relative h-16 w-16 cursor-pointer overflow-hidden rounded-md ring-offset-2 transition-all ${
+                      _isSelected ? 'ring-2 ring-primary' : 'ring-muted-foreground hover:ring-1'
+                    }`}
+                    key={photo.url}
+                    onClick={() => handleImageSelect(photo.url)}
+                    title={_photoTitle}
+                    type={'button'}
+                  >
+                    <img
+                      alt={photo.altText || result.name}
+                      className={'object-cover'}
+                      sizes={'64px'}
+                      src={photo.url}
+                    />
+                    {photo.isPrimary && (
+                      <div
+                        className={
+                          'absolute top-0 right-0 rounded-bl bg-primary px-1 text-xs text-primary-foreground'
+                        }
+                      >
+                        1st
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };

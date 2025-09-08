@@ -66,11 +66,15 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
   const currentContentId = useStore(form.store, (state) => state.values.contentId);
   const currentTitle = useStore(form.store, (state) => state.values.title);
 
-  const handleContentSelect = (selectedContentId: string, contentName: string) => {
+  const handleContentSelect = (selectedContentId: string, contentName: string, imageUrl?: string) => {
     form.setFieldValue('contentId', selectedContentId);
     // Optionally set the title to the content name if not already set
     if (!currentTitle) {
       form.setFieldValue('title', `Featured: ${contentName}`);
+    }
+    // Auto-populate imageUrl if provided (for bobbleheads)
+    if (imageUrl) {
+      form.setFieldValue('imageUrl', imageUrl);
     }
   };
 
@@ -152,6 +156,16 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
             <form.AppField name={'description'}>
               {(field) => (
                 <field.TextareaField label={'Description'} placeholder={'Enter feature description'} />
+              )}
+            </form.AppField>
+
+            <form.AppField name={'imageUrl'}>
+              {(field) => (
+                <field.TextField 
+                  label={'Image URL'} 
+                  placeholder={'https://example.com/image.jpg or leave empty for auto-selection'} 
+                  type={'url'} 
+                />
               )}
             </form.AppField>
           </div>

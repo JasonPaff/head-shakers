@@ -1,7 +1,7 @@
 'use server';
 
 import 'server-only';
-import { and, eq, ilike, or } from 'drizzle-orm';
+import { and, eq, ilike, inArray, or } from 'drizzle-orm';
 import { z } from 'zod';
 
 import type { AdminActionContext } from '@/lib/utils/next-safe-action';
@@ -129,9 +129,39 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
         )
         .limit(limit);
 
+      // Get all photos for each bobblehead in a single query
+      const bobbleheadIds = results.map((result) => result.id);
+      const allPhotos = bobbleheadIds.length > 0 ? 
+        await ctx.db
+          .select({
+            altText: bobbleheadPhotos.altText,
+            bobbleheadId: bobbleheadPhotos.bobbleheadId,
+            isPrimary: bobbleheadPhotos.isPrimary,
+            sortOrder: bobbleheadPhotos.sortOrder,
+            url: bobbleheadPhotos.url,
+          })
+          .from(bobbleheadPhotos)
+          .where(inArray(bobbleheadPhotos.bobbleheadId, bobbleheadIds))
+          .orderBy(bobbleheadPhotos.sortOrder) : [];
+
+      // Group photos by bobblehead ID
+      const photosByBobblehead = new Map<string, Array<typeof allPhotos[0]>>();
+      allPhotos.forEach((photo) => {
+        if (!photosByBobblehead.has(photo.bobbleheadId)) {
+          photosByBobblehead.set(photo.bobbleheadId, []);
+        }
+        photosByBobblehead.get(photo.bobbleheadId)?.push(photo);
+      });
+
+      // Attach photos to results
+      const enrichedResults = results.map((result) => ({
+        ...result,
+        photos: photosByBobblehead.get(result.id) || [],
+      }));
+
       return {
-        bobbleheads: results,
-        message: `Found ${results.length} bobbleheads matching "${query}"`,
+        bobbleheads: enrichedResults,
+        message: `Found ${enrichedResults.length} bobbleheads matching "${query}"`,
       };
     },
   );

@@ -314,9 +314,7 @@ export const FeaturedContentDisplay = ({
 
           <TabsContent className={'space-y-6'} value={'all'}>
             <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'}>
-              {getAllFeaturedContent()
-                .slice(1)
-                .map((content) => renderFeaturedCard(content))}
+              {getAllFeaturedContent().map((content) => renderFeaturedCard(content))}
             </div>
           </TabsContent>
 
