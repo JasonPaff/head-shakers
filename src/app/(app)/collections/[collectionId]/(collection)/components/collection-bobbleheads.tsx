@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { ENUMS } from '@/lib/constants';
-import { CollectionsFacade } from '@/lib/facades/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionBobbleheadsProps {

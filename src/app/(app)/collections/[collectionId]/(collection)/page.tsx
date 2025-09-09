@@ -7,7 +7,7 @@ import type { PageProps } from '@/app/(app)/collections/[collectionId]/(collecti
 
 import { Collection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
-import { CollectionsFacade } from '@/lib/facades/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type CollectionPageProps = PageProps;

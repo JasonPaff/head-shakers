@@ -2,20 +2,16 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
-import { collections, subCollections } from '@/lib/db/schema';
+import { collections } from '@/lib/db/schema';
 import { zodMaxString, zodMinMaxString } from '@/lib/utils/zod.utils';
 
+export type DeleteCollection = z.infer<typeof deleteCollectionSchema>;
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
 export type InsertCollectionInput = z.input<typeof insertCollectionSchema>;
-export type InsertSubCollection = z.infer<typeof insertSubCollectionSchema>;
-export type InsertSubCollectionInput = z.input<typeof insertSubCollectionSchema>;
 export type PublicCollection = z.infer<typeof publicCollectionSchema>;
-export type PublicSubCollection = z.infer<typeof publicSubCollectionSchema>;
 export type SelectCollection = z.infer<typeof selectCollectionSchema>;
-export type SelectSubCollection = z.infer<typeof selectSubCollectionSchema>;
 export type UpdateCollection = z.infer<typeof updateCollectionSchema>;
 export type UpdateCollectionInput = z.input<typeof updateCollectionSchema>;
-export type UpdateSubCollection = z.infer<typeof updateSubCollectionSchema>;
 
 export const selectCollectionSchema = createSelectSchema(collections);
 export const insertCollectionSchema = createInsertSchema(collections, {
@@ -42,26 +38,4 @@ export const updateCollectionSchema = insertCollectionSchema.extend({
   collectionId: z.uuid(),
 });
 export const publicCollectionSchema = selectCollectionSchema;
-
-export const selectSubCollectionSchema = createSelectSchema(subCollections);
-export const insertSubCollectionSchema = createInsertSchema(subCollections, {
-  coverImageUrl: z.url().optional(),
-  description: zodMaxString({
-    fieldName: 'Description',
-    maxLength: SCHEMA_LIMITS.SUB_COLLECTION.DESCRIPTION.MAX,
-  }),
-  isPublic: z.boolean().default(DEFAULTS.SUB_COLLECTION.IS_PUBLIC),
-  name: zodMinMaxString({
-    fieldName: 'Name',
-    maxLength: SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX,
-    minLength: SCHEMA_LIMITS.SUB_COLLECTION.NAME.MIN,
-  }),
-  sortOrder: z.number().min(0).default(DEFAULTS.SUB_COLLECTION.SORT_ORDER),
-}).omit({
-  createdAt: true,
-  id: true,
-  itemCount: true,
-  updatedAt: true,
-});
-export const updateSubCollectionSchema = insertSubCollectionSchema.partial();
-export const publicSubCollectionSchema = selectSubCollectionSchema;
+export const deleteCollectionSchema = z.object({ collectionId: z.string() });

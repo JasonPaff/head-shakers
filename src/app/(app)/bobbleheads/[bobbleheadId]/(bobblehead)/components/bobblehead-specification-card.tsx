@@ -2,12 +2,12 @@ import type { LucideIcon } from 'lucide-react';
 
 import { PackageIcon, RulerIcon, WeightIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface BobbleheadSpecificationCardProps {
-  bobblehead: BobbleheadWithCollections;
+  bobblehead: BobbleheadWithRelations;
 }
 
 const SpecificationItem = ({

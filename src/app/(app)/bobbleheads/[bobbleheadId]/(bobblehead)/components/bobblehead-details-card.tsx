@@ -2,14 +2,14 @@ import type { LucideIcon } from 'lucide-react';
 
 import { FolderIcon, HashIcon, TagIcon, UserIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadDetailsCardProps {
-  bobblehead: BobbleheadWithCollections;
+  bobblehead: BobbleheadWithRelations;
 }
 
 const DetailItem = ({

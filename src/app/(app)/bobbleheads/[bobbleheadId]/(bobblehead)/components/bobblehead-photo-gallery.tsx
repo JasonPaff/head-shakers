@@ -5,7 +5,7 @@ import type { KeyboardEvent } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,7 +15,7 @@ import { useToggle } from '@/hooks/use-toggle';
 import { cn } from '@/utils/tailwind-utils';
 
 interface BobbleheadPhotoGalleryCardProps {
-  bobblehead: BobbleheadWithCollections;
+  bobblehead: BobbleheadWithRelations;
 }
 
 export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGalleryCardProps) => {

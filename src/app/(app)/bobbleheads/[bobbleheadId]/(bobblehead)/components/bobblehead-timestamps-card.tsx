@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { ClockIcon, PlusIcon, RefreshCwIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -50,7 +50,7 @@ const getRelativeTime = (date: Date) => {
 };
 
 interface BobbleheadTimestampsCardProps {
-  bobblehead: BobbleheadWithCollections;
+  bobblehead: BobbleheadWithRelations;
 }
 
 const TimestampItem = ({

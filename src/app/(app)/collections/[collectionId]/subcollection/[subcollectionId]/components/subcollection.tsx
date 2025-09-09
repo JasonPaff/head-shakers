@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { SubcollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-bobbleheads';
 import { SubcollectionHeader } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-header';
 import { SubcollectionMetrics } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-metrics';
-import { CollectionsFacade } from '@/lib/facades/collections-facade';
+import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionProps {
@@ -14,7 +14,7 @@ interface SubcollectionProps {
 
 export const Subcollection = async ({ collectionId, subcollectionId }: SubcollectionProps) => {
   const currentUserId = await getOptionalUserId();
-  const subcollection = await CollectionsFacade.getSubCollectionForPublicView(
+  const subcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
     collectionId,
     subcollectionId,
     currentUserId || undefined,

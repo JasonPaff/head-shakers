@@ -9,7 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { CollectionsFacade } from '@/lib/facades/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getUserId } from '@/utils/user-utils';
 
 // TODO: add a nice empty state when there are no collections

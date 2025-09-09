@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { EyeIcon, EyeOffIcon, HeartIcon, MessageCircleIcon, StarIcon, TrendingUpIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -41,7 +41,7 @@ const getColorClass = (color: ColorVariant): string => {
 };
 
 interface BobbleheadStatusPrivacyCardProps {
-  bobblehead: BobbleheadWithCollections;
+  bobblehead: BobbleheadWithRelations;
 }
 
 const StatusItem = ({

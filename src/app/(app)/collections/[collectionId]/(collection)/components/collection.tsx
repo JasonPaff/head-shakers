@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { PublicCollection } from '@/lib/facades/collections-facade';
+import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-bobbleheads';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-header';

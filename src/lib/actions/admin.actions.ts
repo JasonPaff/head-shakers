@@ -8,7 +8,7 @@ import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
-import { AdminFacade } from '@/lib/facades/admin-facade';
+import { AdminFacade } from '@/lib/facades/admin/admin.facade';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {

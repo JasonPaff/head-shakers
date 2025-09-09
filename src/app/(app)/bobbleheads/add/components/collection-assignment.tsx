@@ -13,7 +13,7 @@ import { SubcollectionCreateDialog } from '@/components/feature/subcollections/s
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
-import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections.actions';
+import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 
 // TODO: replace server action with tanstack query
 

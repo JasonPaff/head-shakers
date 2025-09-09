@@ -45,10 +45,6 @@ export interface BobbleheadWithRelationsAndMetrics extends BobbleheadWithRelatio
  * single source of truth for bobblehead operations
  */
 export class BobbleheadsFacade {
-  // ============================================
-  // Database Operations (using Query layer)
-  // ============================================
-
   /**
    * get a bobblehead by ID with permission checking
    */
@@ -170,10 +166,6 @@ export class BobbleheadsFacade {
    * create a new bobblehead
    */
   static async createAsync(data: InsertBobblehead, userId: string, dbInstance: DatabaseExecutor = db) {
-    // validate before creation
-    this.validateBobbleheadCreation(data, userId);
-
-    // delegate to the query layer for database operation
     const result = await (dbInstance ?? db)
       .insert(bobbleheads)
       .values({ ...data, userId })
@@ -214,10 +206,6 @@ export class BobbleheadsFacade {
 
     return BobbleheadsQuery.findByCollection(collectionId, options, context);
   }
-
-  // ============================================
-  // Business Logic & Validation
-  // ============================================
 
   /**
    * get bobbleheads by user with filtering options
@@ -263,67 +251,6 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * validate bobblehead creation data
-   */
-  static validateBobbleheadCreation(
-    data: {
-      collectionId: string;
-      name?: null | string;
-      subcollectionId?: null | string;
-    },
-    userId: string,
-  ): void {
-    this.validateUserId(userId, 'create bobblehead');
-    this.validateBobbleheadName(data.name);
-    this.validateCollectionId(data.collectionId);
-  }
-
-  /**
-   * validate bobblehead name
-   */
-  static validateBobbleheadName(name?: null | string): void {
-    if (!name || name.trim().length === 0) {
-      throw new Error('Bobblehead name is required');
-    }
-
-    if (name.trim().length > 200) {
-      throw new Error('Bobblehead name must be 200 characters or less');
-    }
-  }
-
-  /**
-   * validate bobblehead ownership
-   */
-  static validateBobbleheadOwnership(bobblehead: { userId: string }, currentUserId: string): void {
-    if (bobblehead.userId !== currentUserId) {
-      throw new Error('User does not have permission to access this bobblehead');
-    }
-  }
-
-  /**
-   * validate bobblehead update data
-   */
-  static validateBobbleheadUpdate(
-    data: {
-      [key: string]: unknown;
-      name?: null | string;
-    },
-    currentBobblehead: { userId: string },
-    userId: string,
-  ): void {
-    this.validateUserId(userId, 'update bobblehead');
-    this.validateBobbleheadOwnership(currentBobblehead, userId);
-
-    if (data.name !== undefined) {
-      this.validateBobbleheadName(data.name);
-    }
-  }
-
-  // ============================================
-  // Private Helper Methods
-  // ============================================
-
-  /**
    * get condition multiplier for value estimation
    */
   private static getConditionMultiplier(condition: string): number {
@@ -337,26 +264,5 @@ export class BobbleheadsFacade {
     };
 
     return conditionMap[condition] || 1.0;
-  }
-
-  /**
-   * validate collection ID is provided
-   */
-  private static validateCollectionId(collectionId?: string): void {
-    if (!collectionId || collectionId.trim().length === 0) {
-      throw new Error('Collection ID is required');
-    }
-  }
-
-  /**
-   * validate that a user ID is provided
-   */
-  private static validateUserId(
-    userId: null | string | undefined,
-    operation: string,
-  ): asserts userId is string {
-    if (!userId) {
-      throw new Error(`User ID is required for ${operation}`);
-    }
   }
 }

@@ -13,7 +13,7 @@ import {
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
 } from '@/lib/constants';
-import { BobbleheadsFacade } from '@/lib/facades/bobbleheads-facade';
+import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
@@ -40,7 +40,6 @@ export const createBobbleheadWithPhotosAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
     try {
-      // first create the bobblehead
       const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.tx);
 
       if (!newBobblehead) {
@@ -48,7 +47,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
           ErrorType.INTERNAL,
           'BOBBLEHEAD_CREATE_FAILED',
           ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED,
-          { operation: 'create_bobblehead', userId },
+          { ctx, operation: 'create_bobblehead' },
           false,
           500,
         );
@@ -138,7 +137,6 @@ export const createBobbleheadWithPhotosAction = authActionClient
         }
       }
 
-      // add business logic breadcrumb
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
@@ -149,7 +147,6 @@ export const createBobbleheadWithPhotosAction = authActionClient
         message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos`,
       });
 
-      // revalidate cache
       revalidatePath(
         $path({
           route: '/collections/[collectionId]',

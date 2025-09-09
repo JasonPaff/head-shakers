@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { FeaturedContentServer } from '@/app/(app)/browse/featured/components/featured-content-server';
-import { FeaturedContentFacade } from '@/lib/facades/featured-content-facade';
+import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 
 // enable ISR with 5-minute revalidation
 export const revalidate = 300;

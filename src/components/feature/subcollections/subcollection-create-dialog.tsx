@@ -5,7 +5,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { toast } from 'sonner';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
-import type { InsertSubCollectionInput } from '@/lib/validations/collections.validation';
+import type { InsertSubCollectionInput } from '@/lib/validations/subcollections.validation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -17,9 +17,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
-import { createSubCollectionAction } from '@/lib/actions/collections.actions';
+import { createSubCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 import { DEFAULTS } from '@/lib/constants';
-import { insertSubCollectionSchema } from '@/lib/validations/collections.validation';
+import { insertSubCollectionSchema } from '@/lib/validations/subcollections.validation';
 
 interface SubcollectionCreateDialogProps {
   collectionId: string;
@@ -42,8 +42,8 @@ export const SubcollectionCreateDialog = ({
       if (!data) return;
       toast.success('Subcollection created successfully!');
       onSubCollectionCreated?.({
-        id: data.data!.id,
-        name: data.data!.name,
+        id: data.data.id,
+        name: data.data.name,
       });
       handleClose();
     },

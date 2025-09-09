@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { ENUMS } from '@/lib/constants';
-import { CollectionsFacade } from '@/lib/facades/collections-facade';
+import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsProps {
@@ -25,7 +25,7 @@ export const SubcollectionBobbleheads = async ({
   subcollectionId,
 }: SubcollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
-  const bobbleheads = await CollectionsFacade.getSubcollectionBobbleheadsWithPhotos(
+  const bobbleheads = await SubcollectionsFacade.getSubcollectionBobbleheadsWithPhotos(
     subcollectionId,
     currentUserId || undefined,
   );

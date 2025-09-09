@@ -2,7 +2,7 @@ import { auth } from '@clerk/nextjs/server';
 import { $path } from 'next-typesafe-url';
 import { redirect } from 'next/navigation';
 
-import { UsersFacade } from '@/lib/facades/users-facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 
 export const getUserId = async (): Promise<string> => {
   const { userId: clerkUserId } = await auth();

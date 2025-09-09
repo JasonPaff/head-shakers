@@ -16,7 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
-import { updateCollectionAction } from '@/lib/actions/collections.actions';
+import { updateCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { updateCollectionSchema } from '@/lib/validations/collections.validation';
 
 interface CollectionEditDialogProps {

@@ -2,13 +2,13 @@ import type { LucideIcon } from 'lucide-react';
 
 import { CalendarIcon, DollarSignIcon, MapPinIcon, ShoppingCartIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
+import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface BobbleheadAcquisitionCardProps {
-  bobblehead: BobbleheadWithCollections;
+  bobblehead: BobbleheadWithRelations;
 }
 
 const AcquisitionItem = ({

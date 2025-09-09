@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 
-import { UsersFacade } from '@/lib/facades/users-facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 
 export const getOptionalUserId = async (): Promise<null | string> => {
   try {

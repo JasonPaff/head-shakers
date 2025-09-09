@@ -19,7 +19,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToggle } from '@/hooks/use-toggle';
-import { deleteCollectionAction } from '@/lib/actions/collections.actions';
+import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
 
 interface CollectionActionsProps {
   collectionId: string;

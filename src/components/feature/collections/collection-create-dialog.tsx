@@ -17,7 +17,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
-import { createCollectionAction } from '@/lib/actions/collections.actions';
+import { createCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { DEFAULTS } from '@/lib/constants';
 import { insertCollectionSchema } from '@/lib/validations/collections.validation';
 
@@ -40,8 +40,8 @@ export const CollectionCreateDialog = ({
       if (!data) return;
       toast.success('Collection created successfully!');
       onCollectionCreated?.({
-        id: data.data!.id,
-        name: data.data!.name,
+        id: data.data.id,
+        name: data.data.name,
       });
       handleClose();
     },
