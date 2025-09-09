@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Fragment, useMemo, useState, useTransition } from 'react';
 import { toast } from 'sonner';
 
-import type { AdminFeaturedContent } from '@/lib/queries/admin/admin-facade';
+import type { AdminFeaturedContent } from '@/lib/facades/admin-facade';
 
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Badge } from '@/components/ui/badge';

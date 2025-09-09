@@ -4,7 +4,7 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { PublicCollection } from '@/lib/queries/collections/collections-facade';
+import type { PublicCollection } from '@/lib/facades/collections-facade';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionSubcollectionsProps {

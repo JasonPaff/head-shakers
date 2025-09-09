@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { ClockIcon, PlusIcon, RefreshCwIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';

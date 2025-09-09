@@ -12,7 +12,7 @@ import { BobbleheadSpecificationCard } from '@/app/(app)/bobbleheads/[bobblehead
 import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-status-privacy-card';
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
 import { Conditional } from '@/components/ui/conditional';
-import { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import { BobbleheadsFacade } from '@/lib/facades/bobbleheads-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadProps {
@@ -21,7 +21,10 @@ interface BobbleheadProps {
 
 export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
   const currentUserId = await getOptionalUserId();
-  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined);
+  const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
+    bobbleheadId,
+    currentUserId || undefined,
+  );
 
   if (!bobblehead) {
     notFound();

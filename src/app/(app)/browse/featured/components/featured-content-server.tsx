@@ -1,4 +1,4 @@
-import { FeaturedContentFacade } from '@/lib/queries/featured-content/featured-content-facade';
+import { FeaturedContentFacade } from '@/lib/facades/featured-content-facade';
 
 import { FeaturedContentDisplay } from './featured-content-display';
 

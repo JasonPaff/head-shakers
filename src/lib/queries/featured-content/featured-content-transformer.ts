@@ -1,6 +1,6 @@
 /**
- * Featured Content Service
- * Handles business logic and data transformation for featured content
+ * featured Content Service
+ * handles business logic and data transformation for featured content
  */
 
 export interface FeaturedContentRecord {
@@ -49,9 +49,9 @@ export interface RawFeaturedContentData {
   viewCount: number;
 }
 
-export class FeaturedContentService {
+export class FeaturedContentTransformer {
   /**
-   * Filter featured content by type with business rules
+   * filter featured content by type with business rules
    */
   static filterByType(
     content: Array<FeaturedContentRecord>,
@@ -59,17 +59,17 @@ export class FeaturedContentService {
     limit?: number,
   ): Array<FeaturedContentRecord> {
     let filtered = content.filter((item) => item.featureType === type);
-    
-    // Apply type-specific sorting
+
+    // apply type-specific sorting
     if (type === 'trending') {
       filtered = filtered.sort((a, b) => b.viewCount - a.viewCount);
     }
-    
-    // Apply limits based on type
+
+    // apply limits based on type
     if (limit !== undefined) {
       filtered = filtered.slice(0, limit);
     } else {
-      // Default limits per type
+      // default limits per type
       switch (type) {
         case 'collection_of_week':
           filtered = filtered.slice(0, 1);
@@ -85,12 +85,12 @@ export class FeaturedContentService {
           break;
       }
     }
-    
+
     return filtered;
   }
 
   /**
-   * Transform raw featured content data with business logic
+   * transform the raw, featured content data with business logic
    */
   static transformFeaturedContent(rawData: Array<RawFeaturedContentData>): Array<FeaturedContentRecord> {
     return rawData.map((row) => ({
@@ -117,10 +117,10 @@ export class FeaturedContentService {
   }
 
   /**
-   * Business logic for determining the owner of featured content
+   * business logic for determining the owner of featured content
    */
   private static determineContentOwner(row: RawFeaturedContentData): null | string {
-    // Priority: bobblehead owner > collection owner > user
+    // priority: bobblehead owner > collection owner > user
     return row.bobbleheadOwner || row.collectionOwner || row.userId;
   }
 }

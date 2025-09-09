@@ -1,6 +1,6 @@
 import { HeartIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

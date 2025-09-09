@@ -1,7 +1,7 @@
 import 'server-only';
 import { CalendarIcon, EyeIcon, StarIcon } from 'lucide-react';
 
-import type { PublicSubcollection } from '@/lib/queries/collections/collections-facade';
+import type { PublicSubcollection } from '@/lib/facades/collections-facade';
 
 import { Card, CardContent } from '@/components/ui/card';
 

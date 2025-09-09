@@ -13,8 +13,8 @@ import {
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
 } from '@/lib/constants';
+import { BobbleheadsFacade } from '@/lib/facades/bobbleheads-facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';

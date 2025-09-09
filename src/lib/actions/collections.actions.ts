@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { collections, subCollections } from '@/lib/db/schema';
-import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections-facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 import {

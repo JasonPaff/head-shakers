@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { EyeIcon, EyeOffIcon, HeartIcon, MessageCircleIcon, StarIcon, TrendingUpIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

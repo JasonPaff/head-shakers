@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { AddItemFormClient } from '@/app/(app)/bobbleheads/add/components/add-item-form-client';
-import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections-facade';
 import { getUserId } from '@/utils/user-utils';
 
 interface AddItemFormServerProps {

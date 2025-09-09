@@ -5,7 +5,10 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
-import { type FeaturedContentRecord, FeaturedContentService } from '@/lib/queries/featured-content/featured-content-transformer';
+import {
+  type FeaturedContentRecord,
+  FeaturedContentTransformer,
+} from '@/lib/queries/featured-content/featured-content-transformer';
 
 // cache statistics for monitoring
 const cacheStats = {
@@ -29,7 +32,7 @@ export class FeaturedContentFacade {
 
       const context = createPublicQueryContext({ dbInstance });
       const rawData = await FeaturedContentQuery.findActiveFeaturedContent(context);
-      return FeaturedContentService.transformFeaturedContent(rawData);
+      return FeaturedContentTransformer.transformFeaturedContent(rawData);
     },
   );
 
@@ -56,7 +59,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getCollectionOfWeek');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentService.filterByType(allContent, 'collection_of_week');
+      return FeaturedContentTransformer.filterByType(allContent, 'collection_of_week');
     },
   );
 
@@ -67,7 +70,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getEditorPicks');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentService.filterByType(allContent, 'editor_pick');
+      return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
     },
   );
 
@@ -78,7 +81,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getHomepageBanner');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentService.filterByType(allContent, 'homepage_banner');
+      return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
     },
   );
 
@@ -89,7 +92,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getTrendingContent');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentService.filterByType(allContent, 'trending');
+      return FeaturedContentTransformer.filterByType(allContent, 'trending');
     },
   );
 

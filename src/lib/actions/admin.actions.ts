@@ -8,7 +8,7 @@ import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
-import { AdminFacade } from '@/lib/queries/admin/admin-facade';
+import { AdminFacade } from '@/lib/facades/admin-facade';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -197,7 +197,7 @@ export const getFeaturedContentByIdAction = adminActionClient
       id: z.string().uuid('ID must be a valid UUID'),
     }),
   )
-  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string }; }) => {
+  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
     const dbInstance = ctx.tx ?? ctx.db;
     const featuredContentData = await AdminFacade.getFeaturedContentByIdForAdmin(parsedInput.id, dbInstance);
 

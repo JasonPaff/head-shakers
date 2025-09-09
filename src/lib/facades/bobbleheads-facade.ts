@@ -15,7 +15,7 @@ import {
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 /**
- * Bobblehead with computed metrics and status
+ * bobblehead with computed metrics and status
  */
 export interface BobbleheadMetrics {
   /** estimated current value based on condition and market factors */
@@ -37,16 +37,16 @@ export type BobbleheadWithCollections = NonNullable<
 >;
 
 /**
- * Bobblehead with related data for business operations
+ * bobblehead with related data for business operations
  */
 export interface BobbleheadWithRelationsAndMetrics extends BobbleheadWithRelations {
   metrics?: BobbleheadMetrics;
 }
 
 /**
- * Unified Bobbleheads Facade
- * Handles all business logic and orchestration for bobbleheads
- * Single source of truth for bobblehead operations
+ * unified Bobbleheads Facade
+ * handles all business logic and orchestration for bobbleheads
+ * single source of truth for bobblehead operations
  */
 export class BobbleheadsFacade {
   // ============================================
@@ -54,7 +54,7 @@ export class BobbleheadsFacade {
   // ============================================
 
   /**
-   * Get a bobblehead by ID with permission checking
+   * get a bobblehead by ID with permission checking
    */
   static getBobbleheadById = cache(
     async (
@@ -72,7 +72,7 @@ export class BobbleheadsFacade {
   );
 
   /**
-   * Get a bobblehead with all related data (photos, tags, collection info)
+   * get a bobblehead with all related data (photos, tags, collection info)
    */
   static getBobbleheadWithRelations = cache(
     async (
@@ -90,7 +90,7 @@ export class BobbleheadsFacade {
   );
 
   /**
-   * Get user dashboard statistics
+   * get user dashboard statistics
    */
   static getUserDashboardStats = cache(
     async (
@@ -105,7 +105,7 @@ export class BobbleheadsFacade {
 
       const userBobbleheads = await BobbleheadsQuery.findByUser(userId, {}, context);
 
-      // Calculate total value from purchase prices
+      // calculate total value from purchase prices
       const totalValue = userBobbleheads.reduce((sum, bobblehead) => {
         return sum + (bobblehead.purchasePrice || 0);
       }, 0);
@@ -119,19 +119,16 @@ export class BobbleheadsFacade {
   );
 
   /**
-   * Add a photo to a bobblehead
+   * add a photo to a bobblehead
    */
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db)
-      .insert(bobbleheadPhotos)
-      .values(data)
-      .returning();
-    
+    const result = await (dbInstance ?? db).insert(bobbleheadPhotos).values(data).returning();
+
     return result?.[0] || null;
   }
 
   /**
-   * Check if a user can view a bobblehead (public or owned)
+   * check if a user can view a bobblehead (public or owned)
    */
   static canUserViewBobblehead(
     bobblehead: { isPublic: boolean; userId: string },
@@ -141,13 +138,13 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Compute business metrics for a bobblehead
+   * compute business metrics for a bobblehead
    */
   static computeMetrics(bobblehead: BobbleheadWithRelationsAndMetrics): BobbleheadMetrics {
     const photoCount = bobblehead.photos?.length || 0;
     const tagCount = bobblehead.tags?.length || 0;
 
-    // Determine if bobblehead has all required metadata
+    // determine if bobblehead has all required metadata
     const requiredFields = [
       bobblehead.name,
       bobblehead.characterName,
@@ -156,7 +153,7 @@ export class BobbleheadsFacade {
     ];
     const isComplete = requiredFields.every((field) => Boolean(field)) && photoCount > 0;
 
-    // Simple estimated value calculation based on condition and purchase price
+    // simple estimated value calculation based on condition and purchase price
     let estimatedValue: number | undefined;
     if (bobblehead.purchasePrice && bobblehead.currentCondition) {
       const conditionMultiplier = this.getConditionMultiplier(bobblehead.currentCondition);
@@ -174,23 +171,23 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Create a new bobblehead
+   * create a new bobblehead
    */
   static async createAsync(data: InsertBobblehead, userId: string, dbInstance: DatabaseExecutor = db) {
-    // Validate before creation
+    // validate before creation
     this.validateBobbleheadCreation(data, userId);
 
-    // Delegate to query layer for database operation
+    // delegate to the query layer for database operation
     const result = await (dbInstance ?? db)
       .insert(bobbleheads)
       .values({ ...data, userId })
       .returning();
-    
+
     return result?.[0] || null;
   }
 
   /**
-   * Get photos for a bobblehead
+   * get photos for a bobblehead
    */
   static async getBobbleheadPhotos(
     bobbleheadId: string,
@@ -206,7 +203,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Get bobbleheads by collection with filtering options
+   * get bobbleheads by collection with filtering options
    */
   static async getBobbleheadsByCollection(
     collectionId: string,
@@ -227,7 +224,7 @@ export class BobbleheadsFacade {
   // ============================================
 
   /**
-   * Get bobbleheads by user with filtering options
+   * get bobbleheads by user with filtering options
    */
   static async getBobbleheadsByUser(
     userId: string,
@@ -244,7 +241,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Search bobbleheads with advanced filtering
+   * search bobbleheads with advanced filtering
    */
   static async searchBobbleheads(
     searchTerm: string,
@@ -270,7 +267,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Validate bobblehead creation data
+   * validate bobblehead creation data
    */
   static validateBobbleheadCreation(
     data: {
@@ -286,7 +283,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Validate bobblehead name
+   * validate bobblehead name
    */
   static validateBobbleheadName(name?: null | string): void {
     if (!name || name.trim().length === 0) {
@@ -299,7 +296,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Validate bobblehead ownership
+   * validate bobblehead ownership
    */
   static validateBobbleheadOwnership(bobblehead: { userId: string }, currentUserId: string): void {
     if (bobblehead.userId !== currentUserId) {
@@ -308,7 +305,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Validate bobblehead update data
+   * validate bobblehead update data
    */
   static validateBobbleheadUpdate(
     data: {
@@ -331,7 +328,7 @@ export class BobbleheadsFacade {
   // ============================================
 
   /**
-   * Get condition multiplier for value estimation
+   * get condition multiplier for value estimation
    */
   private static getConditionMultiplier(condition: string): number {
     const conditionMap: Record<string, number> = {
@@ -347,7 +344,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Validate collection ID is provided
+   * validate collection ID is provided
    */
   private static validateCollectionId(collectionId?: string): void {
     if (!collectionId || collectionId.trim().length === 0) {
@@ -356,7 +353,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * Validate that a user ID is provided
+   * validate that a user ID is provided
    */
   private static validateUserId(
     userId: null | string | undefined,

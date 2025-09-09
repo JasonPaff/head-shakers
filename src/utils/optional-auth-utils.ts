@@ -1,11 +1,11 @@
 import { auth } from '@clerk/nextjs/server';
 
-import { UsersFacade } from '@/lib/queries/users/users-facade';
+import { UsersFacade } from '@/lib/facades/users-facade';
 
 export const getOptionalUserId = async (): Promise<null | string> => {
   try {
     const { userId: clerkUserId } = await auth();
-    
+
     if (!clerkUserId) return null;
 
     // get the database user record using Clerk ID
@@ -21,6 +21,6 @@ export const getOptionalUserId = async (): Promise<null | string> => {
 export const checkIsOwner = async (resourceUserId: string): Promise<boolean> => {
   const currentUserId = await getOptionalUserId();
   if (!currentUserId) return false;
-  
+
   return currentUserId === resourceUserId;
 };

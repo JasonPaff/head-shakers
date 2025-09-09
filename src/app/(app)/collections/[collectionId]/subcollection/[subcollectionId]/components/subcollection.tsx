@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { SubcollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-bobbleheads';
 import { SubcollectionHeader } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-header';
 import { SubcollectionMetrics } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-metrics';
-import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import { CollectionsFacade } from '@/lib/facades/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionProps {
@@ -14,7 +14,11 @@ interface SubcollectionProps {
 
 export const Subcollection = async ({ collectionId, subcollectionId }: SubcollectionProps) => {
   const currentUserId = await getOptionalUserId();
-  const subcollection = await CollectionsFacade.getSubCollectionForPublicView(collectionId, subcollectionId, currentUserId || undefined);
+  const subcollection = await CollectionsFacade.getSubCollectionForPublicView(
+    collectionId,
+    subcollectionId,
+    currentUserId || undefined,
+  );
 
   if (!subcollection) {
     notFound();
@@ -38,7 +42,11 @@ export const Subcollection = async ({ collectionId, subcollectionId }: Subcollec
 
       {/* Bobbleheads Grid */}
       <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <SubcollectionBobbleheads collectionId={collectionId} isOwner={isOwner} subcollectionId={subcollectionId} />
+        <SubcollectionBobbleheads
+          collectionId={collectionId}
+          isOwner={isOwner}
+          subcollectionId={subcollectionId}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import { BobbleheadsFacade } from '@/lib/facades/bobbleheads-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 import { DashboardClient } from './dashboard-client';

@@ -7,7 +7,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { AdminFeaturedContent } from '@/lib/queries/admin/admin-facade';
+import type { AdminFeaturedContent } from '@/lib/facades/admin-facade';
 
 import { ContentSearch } from '@/app/(app)/admin/featured-content/components/content-search';
 import { featuredContentFormOptions } from '@/app/(app)/admin/featured-content/components/featured-content-form-options';

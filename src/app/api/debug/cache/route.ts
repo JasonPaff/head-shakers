@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { FeaturedContentFacade } from '@/lib/queries/featured-content/featured-content-facade';
+import { FeaturedContentFacade } from '@/lib/facades/featured-content-facade';
 
 export async function GET() {
   if (process.env.NODE_ENV !== 'development') {
