@@ -2,14 +2,14 @@ import type { LucideIcon } from 'lucide-react';
 
 import { FolderIcon, HashIcon, TagIcon, UserIcon } from 'lucide-react';
 
-import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadDetailsCardProps {
-  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
+  bobblehead: BobbleheadWithCollections;
 }
 
 const DetailItem = ({
@@ -72,7 +72,7 @@ export const BobbleheadDetailsCard = ({ bobblehead }: BobbleheadDetailsCardProps
         </CardHeader>
         <CardContent className={'py-8 text-center'}>
           <div className={'mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-muted/50'}>
-            <TagIcon className={'size-6 text-muted-foreground'} />
+            <TagIcon aria-hidden className={'size-6 text-muted-foreground'} />
           </div>
           <p className={'text-sm text-muted-foreground'}>No additional details have been added yet.</p>
         </CardContent>

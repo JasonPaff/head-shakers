@@ -2,12 +2,12 @@ import type { LucideIcon } from 'lucide-react';
 
 import { PackageIcon, RulerIcon, WeightIcon } from 'lucide-react';
 
-import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface BobbleheadSpecificationCardProps {
-  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
+  bobblehead: BobbleheadWithCollections;
 }
 
 const SpecificationItem = ({
@@ -62,7 +62,7 @@ export const BobbleheadSpecificationCard = ({ bobblehead }: BobbleheadSpecificat
         </CardHeader>
         <CardContent className={'py-8 text-center'}>
           <div className={'mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-muted/50'}>
-            <RulerIcon className={'size-6 text-muted-foreground'} />
+            <RulerIcon aria-hidden className={'size-6 text-muted-foreground'} />
           </div>
           <p className={'text-sm text-muted-foreground'}>No specifications have been added yet.</p>
         </CardContent>

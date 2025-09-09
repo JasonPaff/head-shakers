@@ -4,13 +4,13 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import type { PublicCollection } from '@/lib/queries/collections/collections-facade';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 
 interface CollectionHeaderProps {
-  collection: Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>> & {};
+  collection: PublicCollection;
   isOwner?: boolean;
 }
 

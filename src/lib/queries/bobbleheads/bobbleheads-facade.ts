@@ -13,6 +13,10 @@ import {
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { BobbleheadsService } from '@/lib/services/bobbleheads.service';
 
+export type BobbleheadWithCollections = NonNullable<
+  Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>
+>;
+
 /**
  * unified Bobbleheads Facade
  * combines query operations with business logic validation
@@ -22,34 +26,38 @@ export class BobbleheadsFacade {
   /**
    * get a bobblehead by ID with permission checking
    */
-  static getBobbleheadById = cache(async (
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<BobbleheadRecord | null> => {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+  static getBobbleheadById = cache(
+    async (
+      id: string,
+      viewerUserId?: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<BobbleheadRecord | null> => {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return BobbleheadsQuery.findById(id, context);
-  });
+      return BobbleheadsQuery.findById(id, context);
+    },
+  );
 
   /**
    * get a bobblehead with all related data (photos, tags, collection info)
    */
-  static getBobbleheadWithRelations = cache(async (
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<BobbleheadWithRelations | null> => {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+  static getBobbleheadWithRelations = cache(
+    async (
+      id: string,
+      viewerUserId?: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<BobbleheadWithRelations | null> => {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return BobbleheadsQuery.findByIdWithRelations(id, context);
-  });
+      return BobbleheadsQuery.findByIdWithRelations(id, context);
+    },
+  );
 
   // Legacy service methods for backward compatibility
   static async addPhotoAsync(

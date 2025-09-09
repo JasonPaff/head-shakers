@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import type { PublicCollection } from '@/lib/queries/collections/collections-facade';
 
 import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-bobbleheads';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-header';
@@ -8,7 +8,7 @@ import { CollectionMetrics } from '@/app/(app)/collections/[collectionId]/(colle
 import { CollectionSubcollections } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-subcollections';
 
 interface CollectionProps {
-  collection: Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>> & {};
+  collection: PublicCollection;
   isOwner?: boolean;
 }
 

@@ -16,6 +16,11 @@ import {
 import { type BobbleheadListRecord, CollectionsQuery } from '@/lib/queries/collections/collections-query';
 import { CollectionsService } from '@/lib/services/collections.service';
 
+export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>> & {};
+export type PublicSubcollection = Awaited<
+  ReturnType<typeof CollectionsFacade.getSubCollectionForPublicView>
+> & {};
+
 /**
  * unified Collections Facade
  * combines query operations with business logic validation
@@ -25,114 +30,122 @@ export class CollectionsFacade {
   /**
    * get a collection by ID with permission checking
    */
-  static getCollectionById = cache(async (
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<CollectionRecord | null> => {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+  static getCollectionById = cache(
+    async (
+      id: string,
+      viewerUserId?: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<CollectionRecord | null> => {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return CollectionsQuery.findById(id, context);
-  });
+      return CollectionsQuery.findById(id, context);
+    },
+  );
 
   /**
    * get a collection with relations for dashboard/detailed views
    */
-  static getCollectionWithRelations = cache(async (
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<CollectionWithRelations | null> => {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+  static getCollectionWithRelations = cache(
+    async (
+      id: string,
+      viewerUserId?: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<CollectionWithRelations | null> => {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return CollectionsQuery.findByIdWithRelations(id, context);
-  });
+      return CollectionsQuery.findByIdWithRelations(id, context);
+    },
+  );
 
   /**
    * get a collection by ID for public access with computed metrics
    */
-  static getCollectionForPublicView = cache(async (
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<null | {
-    createdAt: Date;
-    description: null | string;
-    id: string;
-    isPublic: boolean;
-    lastUpdatedAt: Date;
-    name: string;
-    subCollectionCount: number;
-    totalBobbleheadCount: number;
-    userId?: string;
-  }> => {
-    const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
-    
-    if (!collection) {
-      return null;
-    }
+  static getCollectionForPublicView = cache(
+    async (
+      id: string,
+      viewerUserId?: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<null | {
+      createdAt: Date;
+      description: null | string;
+      id: string;
+      isPublic: boolean;
+      lastUpdatedAt: Date;
+      name: string;
+      subCollectionCount: number;
+      totalBobbleheadCount: number;
+      userId?: string;
+    }> => {
+      const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
 
-    const metrics = CollectionsService.computeMetrics(collection);
+      if (!collection) {
+        return null;
+      }
 
-    return {
-      createdAt: collection.createdAt,
-      description: collection.description,
-      id: collection.id,
-      isPublic: collection.isPublic,
-      lastUpdatedAt: metrics.lastUpdated,
-      name: collection.name,
-      subCollectionCount: collection.subCollections.length,
-      totalBobbleheadCount: metrics.totalBobbleheads,
-      userId: collection.userId,
-    };
-  });
+      const metrics = CollectionsService.computeMetrics(collection);
+
+      return {
+        createdAt: collection.createdAt,
+        description: collection.description,
+        id: collection.id,
+        isPublic: collection.isPublic,
+        lastUpdatedAt: metrics.lastUpdated,
+        name: collection.name,
+        subCollectionCount: collection.subCollections.length,
+        totalBobbleheadCount: metrics.totalBobbleheads,
+        userId: collection.userId,
+      };
+    },
+  );
 
   /**
    * get user's collections for dashboard
    */
-  static getUserCollectionsForDashboard = cache(async (
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<
-    Array<{
-      description: null | string;
-      id: string;
-      isPublic: boolean;
-      metrics: ReturnType<typeof CollectionsService.computeMetrics>;
-      name: string;
-      subCollections: Array<{
-        bobbleheadCount: number;
+  static getUserCollectionsForDashboard = cache(
+    async (
+      userId: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<
+      Array<{
+        description: null | string;
         id: string;
+        isPublic: boolean;
+        metrics: ReturnType<typeof CollectionsService.computeMetrics>;
         name: string;
-      }>;
-    }>
-  > => {
-    const context = createProtectedQueryContext(userId, { dbInstance });
-    const collections = await CollectionsQuery.getDashboardData(userId, context);
+        subCollections: Array<{
+          bobbleheadCount: number;
+          id: string;
+          name: string;
+        }>;
+      }>
+    > => {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+      const collections = await CollectionsQuery.getDashboardData(userId, context);
 
-    // transform using service business logic
-    return collections.map((collection) => {
-      const metrics = CollectionsService.computeMetrics(collection);
-      return {
-        description: collection.description,
-        id: collection.id,
-        isPublic: collection.isPublic,
-        metrics,
-        name: collection.name,
-        subCollections: collection.subCollections.map((sub) => ({
-          bobbleheadCount: sub.bobbleheads.length,
-          id: sub.id,
-          name: sub.name,
-        })),
-      };
-    });
-  });
+      // transform using service business logic
+      return collections.map((collection) => {
+        const metrics = CollectionsService.computeMetrics(collection);
+        return {
+          description: collection.description,
+          id: collection.id,
+          isPublic: collection.isPublic,
+          metrics,
+          name: collection.name,
+          subCollections: collection.subCollections.map((sub) => ({
+            bobbleheadCount: sub.bobbleheads.length,
+            id: sub.id,
+            name: sub.name,
+          })),
+        };
+      });
+    },
+  );
 
   /**
    * check if a user can view a collection
@@ -222,10 +235,7 @@ export class CollectionsFacade {
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
-        and(
-          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
-          eq(bobbleheadPhotos.isPrimary, true),
-        ),
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
         CollectionsQuery['combineFilters'](
@@ -299,10 +309,7 @@ export class CollectionsFacade {
       .from(bobbleheads)
       .leftJoin(
         bobbleheadPhotos,
-        and(
-          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
-          eq(bobbleheadPhotos.isPrimary, true),
-        ),
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
         CollectionsQuery['combineFilters'](
@@ -344,12 +351,7 @@ export class CollectionsFacade {
     const collection = await dbInstance_.query.collections.findFirst({
       where: CollectionsQuery['combineFilters'](
         eq(collections.id, collectionId),
-        CollectionsQuery['buildBaseFilters'](
-          collections.isPublic,
-          collections.userId,
-          undefined,
-          context,
-        ),
+        CollectionsQuery['buildBaseFilters'](collections.isPublic, collections.userId, undefined, context),
       ),
       with: {
         user: {
@@ -448,12 +450,7 @@ export class CollectionsFacade {
     const collection = await dbInstance_.query.collections.findFirst({
       where: CollectionsQuery['combineFilters'](
         eq(collections.id, collectionId),
-        CollectionsQuery['buildBaseFilters'](
-          collections.isPublic,
-          collections.userId,
-          undefined,
-          context,
-        ),
+        CollectionsQuery['buildBaseFilters'](collections.isPublic, collections.userId, undefined, context),
       ),
       with: {
         user: {

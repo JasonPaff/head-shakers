@@ -111,7 +111,7 @@ export class BobbleheadsQuery extends BaseQuery {
 
     if (!result[0]) return null;
 
-    // check if a collection is accessible (unless viewer is owner)
+    // check if a collection is accessible (unless viewer is an owner)
     const collection = result[0].collection;
     if (collection && context.userId !== collection.userId && !collection.isPublic) {
       return null;

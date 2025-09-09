@@ -34,6 +34,7 @@ export const SubcollectionBobbleheads = async ({
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
+        {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link

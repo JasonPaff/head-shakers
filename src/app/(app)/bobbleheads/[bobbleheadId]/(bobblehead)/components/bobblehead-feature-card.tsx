@@ -1,6 +1,6 @@
 import { HeartIcon } from 'lucide-react';
 
-import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadFeatureCardProps {
-  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
+  bobblehead: BobbleheadWithCollections;
 }
 
 export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps) => {

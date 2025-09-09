@@ -4,13 +4,13 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import type { PublicSubcollection } from '@/lib/queries/collections/collections-facade';
 
 import { Button } from '@/components/ui/button';
 
 interface SubcollectionHeaderProps {
   isOwner?: boolean;
-  subcollection: Awaited<ReturnType<typeof CollectionsFacade.getSubCollectionForPublicView>> & {};
+  subcollection: PublicSubcollection;
 }
 
 export const SubcollectionHeader = ({ isOwner = false, subcollection }: SubcollectionHeaderProps) => {
@@ -56,7 +56,10 @@ export const SubcollectionHeader = ({ isOwner = false, subcollection }: Subcolle
               <Link
                 href={$path({
                   route: '/bobbleheads/add',
-                  searchParams: { collectionId: subcollection.collectionId, subcollectionId: subcollection.id },
+                  searchParams: {
+                    collectionId: subcollection.collectionId,
+                    subcollectionId: subcollection.id,
+                  },
                 })}
               >
                 <PlusIcon aria-hidden className={'mr-2 size-4'} />
