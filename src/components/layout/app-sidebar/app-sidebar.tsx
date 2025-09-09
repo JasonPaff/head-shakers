@@ -21,7 +21,7 @@ import { SidebarRail } from '@/components/ui/sidebar/sidebar-rail';
 import { useAdminRole } from '@/hooks/use-admin-role';
 
 const useNavigationData = () => {
-  const { isLoading, isModerator } = useAdminRole();
+  const { isAdmin, isLoading, isModerator } = useAdminRole();
 
   const baseNavMain = [
     {
@@ -92,7 +92,7 @@ const useNavigationData = () => {
     url: $path({ route: '/admin' }),
   };
 
-  const navMain = !isLoading && isModerator ? [...baseNavMain, adminNavItem] : baseNavMain;
+  const navMain = !isLoading && (isModerator || isAdmin) ? [...baseNavMain, adminNavItem] : baseNavMain;
 
   const navSecondary = [
     {
