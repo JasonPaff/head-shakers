@@ -169,7 +169,6 @@ export async function incrementViewCount(contentId: string): Promise<void> {
     console.error('Failed to increment view count:', error);
   }
 }
-
 // reset cache statistics (useful for testing)
 export async function resetCacheStats() {
   return new Promise((resolve) => {
