@@ -7,14 +7,17 @@ export interface AdminRoleInfo {
   isAdmin: boolean;
   isLoading: boolean;
   isModerator: boolean;
-  role: 'admin' | 'moderator' | 'user' | null;
+  role: Role;
 }
+
+type Role = 'admin' | 'moderator' | 'user' | null;
 
 /**
  * Client-side hook to check if the current user has admin or moderator privileges
  */
 export const useAdminRole = (): AdminRoleInfo => {
   const { isLoaded, user } = useUser();
+
   const [roleInfo, setRoleInfo] = useState<AdminRoleInfo>({
     isAdmin: false,
     isLoading: true,
@@ -36,13 +39,12 @@ export const useAdminRole = (): AdminRoleInfo => {
     }
 
     // check user's public metadata for role information
-    // this assumes the role is stored in publicMetadata when the user is created/updated
-    const role = user.publicMetadata?.role as 'admin' | 'moderator' | 'user' | undefined;
+    const role = user.publicMetadata?.role as Role;
 
     setRoleInfo({
       isAdmin: role === 'admin',
       isLoading: false,
-      isModerator: role === 'moderator' || role === 'admin',
+      isModerator: role === 'moderator',
       role: role || 'user',
     });
   }, [user, isLoaded]);
