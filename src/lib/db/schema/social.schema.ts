@@ -75,6 +75,14 @@ export const likes = pgTable(
     index('likes_target_idx').on(table.targetType, table.targetId),
     index('likes_user_created_idx').on(table.userId, table.createdAt),
 
+    // partial indexes for polymorphic relationships
+    index('likes_bobblehead_target_idx').on(table.targetId).where(sql`${table.targetType} = 'bobblehead'`),
+    index('likes_collection_target_idx').on(table.targetId).where(sql`${table.targetType} = 'collection'`),
+    index('likes_comment_target_idx').on(table.targetId).where(sql`${table.targetType} = 'comment'`),
+
+    // performance indexes
+    index('likes_target_created_desc_idx').on(table.targetType, table.targetId, sql`${table.createdAt} DESC`),
+
     // unique constraints
     uniqueIndex('likes_unique').on(table.userId, table.targetType, table.targetId),
   ],
@@ -111,6 +119,15 @@ export const comments = pgTable(
     index('comments_user_created_idx').on(table.userId, table.createdAt),
     index('comments_deleted_created_idx').on(table.isDeleted, table.createdAt),
     index('comments_target_deleted_idx').on(table.targetType, table.targetId, table.isDeleted),
+
+    // partial indexes for polymorphic relationships
+    index('comments_bobblehead_target_idx').on(table.targetId).where(sql`${table.targetType} = 'bobblehead'`),
+    index('comments_collection_target_idx').on(table.targetId).where(sql`${table.targetType} = 'collection'`),
+    index('comments_subcollection_target_idx').on(table.targetId).where(sql`${table.targetType} = 'subcollection'`),
+
+    // performance indexes
+    index('comments_target_active_created_idx').on(table.targetType, table.targetId, table.isDeleted, sql`${table.createdAt} DESC`),
+    index('comments_content_search_idx').using('gin', sql`${table.content} gin_trgm_ops`),
 
     // check constraints
     check('comments_content_not_empty', sql`length(trim(${table.content})) > 0`),

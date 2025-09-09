@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import {
   boolean,
   decimal,
@@ -92,6 +93,17 @@ export const bobbleheads = pgTable(
     index('bobbleheads_public_featured_idx').on(table.isPublic, table.isFeatured),
     index('bobbleheads_user_created_idx').on(table.userId, table.createdAt),
     index('bobbleheads_user_public_idx').on(table.userId, table.isPublic),
+
+    // search and performance indexes
+    index('bobbleheads_name_search_idx').using('gin', sql`${table.name} gin_trgm_ops`),
+    index('bobbleheads_description_search_idx').using('gin', sql`${table.description} gin_trgm_ops`),
+    index('bobbleheads_custom_fields_gin_idx').using('gin', table.customFields),
+    index('bobbleheads_custom_fields_path_idx').using('gin', sql`(${table.customFields} jsonb_path_ops)`),
+    
+    // pagination and filtering indexes
+    index('bobbleheads_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
+    index('bobbleheads_public_created_desc_idx').on(table.isPublic, sql`${table.createdAt} DESC`),
+    index('bobbleheads_featured_created_desc_idx').on(table.isFeatured, sql`${table.createdAt} DESC`),
   ],
 );
 

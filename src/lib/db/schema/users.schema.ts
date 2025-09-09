@@ -76,6 +76,12 @@ export const users = pgTable(
     index('users_role_idx').on(table.role),
     index('users_username_idx').on(table.username),
     index('users_verified_created_idx').on(table.isVerified, table.createdAt),
+
+    // performance and search indexes
+    index('users_email_lower_idx').on(sql`lower(${table.email})`),
+    index('users_username_lower_idx').on(sql`lower(${table.username})`),
+    index('users_display_name_search_idx').using('gin', sql`${table.displayName} gin_trgm_ops`),
+    index('users_bio_search_idx').using('gin', sql`${table.bio} gin_trgm_ops`),
   ],
 );
 

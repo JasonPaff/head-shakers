@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { index, integer, jsonb, pgEnum, pgTable, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import type { SearchFilters } from '@/lib/validations/analytics.validation';
@@ -33,6 +34,11 @@ export const contentViews = pgTable(
     // composite indexes
     index('content_views_target_type_id_idx').on(table.targetType, table.targetId),
     index('content_views_viewer_viewed_idx').on(table.viewerId, table.viewedAt),
+
+    // performance indexes
+    index('content_views_viewed_at_desc_idx').on(sql`${table.viewedAt} DESC`),
+    index('content_views_target_viewed_desc_idx').on(table.targetType, table.targetId, sql`${table.viewedAt} DESC`),
+    index('content_views_recent_idx').on(table.viewedAt).where(sql`${table.viewedAt} > NOW() - INTERVAL '30 days'`),
   ],
 );
 
@@ -60,5 +66,10 @@ export const searchQueries = pgTable(
     // composite indexes
     index('search_queries_user_searched_idx').on(table.userId, table.searchedAt),
     index('search_queries_session_searched_idx').on(table.sessionId, table.searchedAt),
+
+    // performance and analytics indexes
+    index('search_queries_query_search_idx').using('gin', sql`${table.query} gin_trgm_ops`),
+    index('search_queries_searched_at_desc_idx').on(sql`${table.searchedAt} DESC`),
+    index('search_queries_popular_idx').on(table.query, table.resultCount).where(sql`${table.resultCount} > 0`),
   ],
 );
