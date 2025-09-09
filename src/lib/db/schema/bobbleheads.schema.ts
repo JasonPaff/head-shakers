@@ -33,7 +33,7 @@ export const bobbleheads = pgTable(
     commentCount: integer('comment_count').default(DEFAULTS.BOBBLEHEAD.COMMENT_COUNT).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     currentCondition: varchar('current_condition', { length: SCHEMA_LIMITS.BOBBLEHEAD.CURRENT_CONDITION.MAX })
-      .default('excellent')
+      .default(DEFAULTS.BOBBLEHEAD.CONDITION)
       .notNull(),
     customFields: jsonb('custom_fields').$type<CustomFields>(),
     deletedAt: timestamp('deleted_at'),

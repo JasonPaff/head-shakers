@@ -10,6 +10,9 @@ export const ENUMS = {
   COMMENT: {
     TARGET_TYPE: ['bobblehead', 'collection', 'subcollection'] as const,
   },
+  CONTENT_METRIC: {
+    TYPE: ['view', 'like', 'comment', 'share'] as const,
+  },
   CONTENT_REPORT: {
     REASON: [
       'spam',
@@ -72,6 +75,7 @@ export const ENUMS = {
 export type BobbleheadCondition = (typeof ENUMS.BOBBLEHEAD.CONDITION)[number];
 export type BobbleheadStatus = (typeof ENUMS.BOBBLEHEAD.STATUS)[number];
 export type CommentTargetType = (typeof ENUMS.COMMENT.TARGET_TYPE)[number];
+export type ContentMetricType = (typeof ENUMS.CONTENT_METRIC.TYPE)[number];
 export type ContentReportReason = (typeof ENUMS.CONTENT_REPORT.REASON)[number];
 export type ContentReportStatus = (typeof ENUMS.CONTENT_REPORT.STATUS)[number];
 export type FollowType = (typeof ENUMS.FOLLOW.TYPE)[number];

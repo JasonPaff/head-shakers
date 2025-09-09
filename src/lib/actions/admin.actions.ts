@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
-import { ACTION_NAMES } from '@/lib/constants';
+import { ACTION_NAMES, DEFAULTS } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
 import { getFeaturedContentByIdForAdmin } from '@/lib/queries/admin/featured-content.queries';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
@@ -23,7 +23,7 @@ const adminCreateFeaturedContentSchema = insertFeaturedContentSchema.extend({
     .union([z.string(), z.number()])
     .transform((val) => {
       const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? 0 : num;
+      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
     })
     .pipe(z.number().int().min(0))
     .default(0),
@@ -31,10 +31,10 @@ const adminCreateFeaturedContentSchema = insertFeaturedContentSchema.extend({
     .union([z.string(), z.number()])
     .transform((val) => {
       const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? 0 : num;
+      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
     })
     .pipe(z.number().int().min(0)),
-  viewCount: z.number().int().min(0).default(0),
+  viewCount: z.number().int().min(0).default(DEFAULTS.SYSTEM.CONTENT_METRIC_VIEW_COUNT),
 });
 
 const adminUpdateFeaturedContentSchema = updateFeaturedContentSchema.extend({
@@ -45,7 +45,7 @@ const adminUpdateFeaturedContentSchema = updateFeaturedContentSchema.extend({
     .union([z.string(), z.number()])
     .transform((val) => {
       const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? 0 : num;
+      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
     })
     .pipe(z.number().int().min(0))
     .optional(),
@@ -53,7 +53,7 @@ const adminUpdateFeaturedContentSchema = updateFeaturedContentSchema.extend({
     .union([z.string(), z.number()])
     .transform((val) => {
       const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? 0 : num;
+      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
     })
     .pipe(z.number().int().min(0))
     .optional(),

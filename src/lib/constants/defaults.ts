@@ -69,6 +69,10 @@ export const DEFAULTS = {
     ITEM_COUNT: 0,
     SORT_ORDER: 0,
   },
+  SYSTEM: {
+    CONTENT_METRIC_PRIORITY: 0,
+    CONTENT_METRIC_VIEW_COUNT: 0,
+  },
   TAG: {
     COLOR: '#3B82F6',
     USAGE_COUNT: 0,

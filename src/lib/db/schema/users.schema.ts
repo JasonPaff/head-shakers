@@ -114,7 +114,7 @@ export const loginHistory = pgTable(
     ipAddress: varchar('ip_address', { length: SCHEMA_LIMITS.LOGIN_HISTORY.IP_ADDRESS.MAX }),
     isSuccessful: boolean('is_successful').notNull(),
     loginAt: timestamp('login_at').defaultNow().notNull(),
-    loginMethod: loginMethodEnum('login_method').default('email').notNull(),
+    loginMethod: loginMethodEnum('login_method').default(DEFAULTS.LOGIN_HISTORY.LOGIN_METHOD).notNull(),
     userAgent: varchar('user_agent', { length: SCHEMA_LIMITS.LOGIN_HISTORY.USER_AGENT.MAX }),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
@@ -132,8 +132,8 @@ export const loginHistory = pgTable(
 export const userSettings = pgTable(
   'user_settings',
   {
-    allowComments: commentPermissionEnum('allow_comments').default('anyone').notNull(),
-    allowDirectMessages: dmPermissionEnum('allow_direct_messages').default('followers').notNull(),
+    allowComments: commentPermissionEnum('allow_comments').default(DEFAULTS.USER_SETTINGS.ALLOW_COMMENTS).notNull(),
+    allowDirectMessages: dmPermissionEnum('allow_direct_messages').default(DEFAULTS.USER_SETTINGS.ALLOW_DIRECT_MESSAGES).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     currency: varchar('currency', { length: SCHEMA_LIMITS.USER_SETTINGS.CURRENCY.LENGTH })
       .default(DEFAULTS.USER.CURRENCY)

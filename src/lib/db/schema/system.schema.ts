@@ -24,12 +24,7 @@ export const notificationRelatedTypeEnum = pgEnum(
 export const featuredContentTypeEnum = pgEnum('featured_content_type', ENUMS.FEATURED_CONTENT.TYPE);
 export const featureTypeEnum = pgEnum('feature_type', ENUMS.FEATURED_CONTENT.FEATURE_TYPE);
 export const valueTypeEnum = pgEnum('value_type', ENUMS.PLATFORM_SETTING.VALUE_TYPE);
-export const contentMetricTypeEnum = pgEnum('content_metric_type', [
-  'view',
-  'like',
-  'comment',
-  'share',
-] as const);
+export const contentMetricTypeEnum = pgEnum('content_metric_type', ENUMS.CONTENT_METRIC.TYPE);
 
 export const notifications = pgTable(
   'notifications',
@@ -90,12 +85,12 @@ export const featuredContent = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     imageUrl: text('image_url'),
     isActive: boolean('is_active').default(DEFAULTS.FEATURED_CONTENT.IS_ACTIVE).notNull(),
-    priority: integer('priority').default(0).notNull(),
+    priority: integer('priority').default(DEFAULTS.SYSTEM.CONTENT_METRIC_PRIORITY).notNull(),
     sortOrder: integer('sort_order').default(DEFAULTS.FEATURED_CONTENT.SORT_ORDER).notNull(),
     startDate: timestamp('start_date'),
     title: varchar('title', { length: SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    viewCount: integer('view_count').default(0).notNull(),
+    viewCount: integer('view_count').default(DEFAULTS.SYSTEM.CONTENT_METRIC_VIEW_COUNT).notNull(),
   },
   (table) => [
     // single column indexes

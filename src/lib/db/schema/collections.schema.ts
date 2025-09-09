@@ -58,9 +58,9 @@ export const subCollections = pgTable(
     collectionId: uuid('collection_id')
       .references(() => collections.id, { onDelete: 'cascade' })
       .notNull(),
-    coverImageUrl: varchar('cover_image_url'),
+    coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    description: varchar('description'),
+    description: varchar('description', { length: SCHEMA_LIMITS.SUB_COLLECTION.DESCRIPTION.MAX }),
     id: uuid('id').primaryKey().defaultRandom(),
     isPublic: boolean('is_public').default(DEFAULTS.SUB_COLLECTION.IS_PUBLIC).notNull(),
     itemCount: integer('item_count').default(DEFAULTS.SUB_COLLECTION.ITEM_COUNT).notNull(),

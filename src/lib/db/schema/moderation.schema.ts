@@ -17,7 +17,7 @@ export const contentReports = pgTable(
     description: varchar('description', { length: SCHEMA_LIMITS.CONTENT_REPORT.DESCRIPTION.MAX }),
     id: uuid('id').primaryKey().defaultRandom(),
     moderatorId: uuid('moderator_id').references(() => users.id, { onDelete: 'set null' }),
-    moderatorNotes: varchar('moderator_notes'),
+    moderatorNotes: varchar('moderator_notes', { length: SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX }),
     reason: contentReportReasonEnum('reason').notNull(),
     reporterId: uuid('reporter_id')
       .references(() => users.id, { onDelete: 'cascade' })

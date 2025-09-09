@@ -7,6 +7,7 @@ import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
+  CONFIG,
   ERROR_MESSAGES,
   SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_CONTEXTS,
@@ -51,7 +52,7 @@ export const createBobbleheadAction = authActionClient
     actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
     isTransactionRequired: true,
   })
-  .use(createRateLimitMiddleware(5, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_CREATE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_CREATE.WINDOW))
   .inputSchema(insertBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
     const sanitizedData = insertBobbleheadSchema.parse(ctx.sanitizedInput);
@@ -119,7 +120,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
     actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
     isTransactionRequired: true,
   })
-  .use(createRateLimitMiddleware(5, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_CREATE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_CREATE.WINDOW))
   .inputSchema(createBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { photos, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
@@ -266,7 +267,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
 // update operations
 export const updateBobbleheadAction = authActionClient
-  .use(createRateLimitMiddleware(60, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_UPDATE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_UPDATE.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE,
   })
@@ -342,7 +343,7 @@ export const updateBobbleheadAction = authActionClient
 
 // delete operations
 export const deleteBobbleheadAction = authActionClient
-  .use(createRateLimitMiddleware(30, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_DELETE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_DELETE.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.DELETE,
     isTransactionRequired: true,
@@ -421,7 +422,7 @@ export const deleteBobbleheadAction = authActionClient
   });
 
 export const deleteBobbleheadsAction = authActionClient
-  .use(createRateLimitMiddleware(10, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_DELETE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_DELETE.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_BULK,
     isTransactionRequired: true,
@@ -474,7 +475,7 @@ export const deleteBobbleheadsAction = authActionClient
 
 // photo operations
 export const uploadBobbleheadPhotoAction = authActionClient
-  .use(createRateLimitMiddleware(30, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_UPLOAD.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_UPLOAD.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.UPLOAD_PHOTO,
     isTransactionRequired: true,
@@ -539,7 +540,7 @@ export const uploadBobbleheadPhotoAction = authActionClient
   });
 
 export const updateBobbleheadPhotoAction = authActionClient
-  .use(createRateLimitMiddleware(60, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_UPDATE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.BOBBLEHEAD_UPDATE.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_PHOTO,
     isTransactionRequired: true,
@@ -581,7 +582,7 @@ export const updateBobbleheadPhotoAction = authActionClient
   });
 
 export const deleteBobbleheadPhotoAction = authActionClient
-  .use(createRateLimitMiddleware(60, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_DELETE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_DELETE.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_PHOTO,
     isTransactionRequired: true,
@@ -639,7 +640,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
   });
 
 export const reorderBobbleheadPhotosAction = authActionClient
-  .use(createRateLimitMiddleware(30, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_SET_PRIMARY.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_SET_PRIMARY.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.REORDER_PHOTOS,
     isTransactionRequired: true,
@@ -687,7 +688,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
 
 // Tag operations
 export const addTagToBobbleheadAction = authActionClient
-  .use(createRateLimitMiddleware(60, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.TAG_ADD.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.TAG_ADD.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.ADD_TAG,
     isTransactionRequired: true,
@@ -734,7 +735,7 @@ export const addTagToBobbleheadAction = authActionClient
   });
 
 export const removeTagFromBobbleheadAction = authActionClient
-  .use(createRateLimitMiddleware(60, 60))
+  .use(createRateLimitMiddleware(CONFIG.RATE_LIMITING.ACTION_SPECIFIC.TAG_REMOVE.REQUESTS, CONFIG.RATE_LIMITING.ACTION_SPECIFIC.TAG_REMOVE.WINDOW))
   .metadata({
     actionName: ACTION_NAMES.BOBBLEHEADS.REMOVE_TAG,
     isTransactionRequired: true,

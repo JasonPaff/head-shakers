@@ -109,9 +109,19 @@ export const CONFIG = {
   },
   RATE_LIMITING: {
     ACTION_SPECIFIC: {
+      BOBBLEHEAD_CREATE: { REQUESTS: 5, WINDOW: 60 }, // 5 creates per minute
+      BOBBLEHEAD_DELETE: { REQUESTS: 10, WINDOW: 60 }, // 10 deletes per minute
+      BOBBLEHEAD_UPDATE: { REQUESTS: 30, WINDOW: 60 }, // 30 updates per minute
+      COLLECTION_CREATE: { REQUESTS: 10, WINDOW: 60 }, // 10 creates per minute
+      COLLECTION_UPDATE: { REQUESTS: 60, WINDOW: 60 }, // 60 updates per minute
       COMMENT: { REQUESTS: 20, WINDOW: 300 }, // 20 comments per 5 minutes
       LIKE: { REQUESTS: 50, WINDOW: 300 }, // 50 likes per 5 minutes
+      PHOTO_DELETE: { REQUESTS: 10, WINDOW: 60 }, // 10 photo deletes per minute
+      PHOTO_SET_PRIMARY: { REQUESTS: 10, WINDOW: 60 }, // 10 photo primary sets per minute
+      PHOTO_UPLOAD: { REQUESTS: 5, WINDOW: 60 }, // 5 photo uploads per minute
       SEARCH: { REQUESTS: 100, WINDOW: 3600 }, // 100 searches per hour
+      TAG_ADD: { REQUESTS: 30, WINDOW: 60 }, // 30 tag adds per minute
+      TAG_REMOVE: { REQUESTS: 30, WINDOW: 60 }, // 30 tag removes per minute
       UPLOAD: { REQUESTS: 5, WINDOW: 300 }, // 5 uploads per 5 minutes
     },
     REQUESTS_PER_MINUTE: 10,

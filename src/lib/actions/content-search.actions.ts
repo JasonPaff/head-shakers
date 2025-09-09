@@ -6,13 +6,13 @@ import { z } from 'zod';
 
 import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
-import { ACTION_NAMES } from '@/lib/constants';
+import { ACTION_NAMES, CONFIG, DEFAULTS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 
 const searchContentSchema = z.object({
-  limit: z.number().int().min(1).max(50).default(20),
-  query: z.string().min(1).max(100),
+  limit: z.number().int().min(1).max(CONFIG.PAGINATION.SEARCH_RESULTS.MAX).default(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),
+  query: z.string().min(1).max(CONFIG.SEARCH.MAX_QUERY_LENGTH),
 });
 
 /**
@@ -49,8 +49,8 @@ export const searchCollectionsForFeaturingAction = adminActionClient
         .innerJoin(users, eq(collections.userId, users.id))
         .where(
           and(
-            eq(collections.isPublic, true),
-            eq(users.isDeleted, false),
+            eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
+            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
             or(
               ilike(collections.name, `%${query}%`),
               ilike(collections.description, `%${query}%`),
@@ -112,9 +112,9 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
         )
         .where(
           and(
-            eq(bobbleheads.isPublic, true),
-            eq(bobbleheads.isDeleted, false),
-            eq(users.isDeleted, false),
+            eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
             or(
               ilike(bobbleheads.name, `%${query}%`),
               ilike(bobbleheads.description, `%${query}%`),
@@ -199,7 +199,7 @@ export const searchUsersForFeaturingAction = adminActionClient
         .from(users)
         .where(
           and(
-            eq(users.isDeleted, false),
+            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
             or(
               ilike(users.displayName, `%${query}%`),
               ilike(users.username, `%${query}%`),
@@ -250,8 +250,8 @@ export const getCollectionForFeaturingAction = adminActionClient
         .where(
           and(
             eq(collections.id, parsedInput.id),
-            eq(collections.isPublic, true),
-            eq(users.isDeleted, false),
+            eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
+            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
           ),
         )
         .limit(1);
@@ -308,9 +308,9 @@ export const getBobbleheadForFeaturingAction = adminActionClient
         .where(
           and(
             eq(bobbleheads.id, parsedInput.id),
-            eq(bobbleheads.isPublic, true),
-            eq(bobbleheads.isDeleted, false),
-            eq(users.isDeleted, false),
+            eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
           ),
         )
         .limit(1);
@@ -374,7 +374,7 @@ export const getUserForFeaturingAction = adminActionClient
         .where(
           and(
             eq(users.id, parsedInput.id),
-            eq(users.isDeleted, false),
+            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
           ),
         )
         .limit(1);
