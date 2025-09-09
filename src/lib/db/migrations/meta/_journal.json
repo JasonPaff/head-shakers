@@ -15,6 +15,13 @@
       "when": 1757282764986,
       "tag": "20250907220604_shallow_winter_soldier",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757419080508,
+      "tag": "20250909115800_friendly_solo",
+      "breakpoints": true
     }
   ]
 }
