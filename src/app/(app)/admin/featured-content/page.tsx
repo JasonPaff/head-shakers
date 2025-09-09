@@ -1,8 +1,10 @@
+import type { Metadata } from 'next';
+
 import { FeaturedContentManager } from '@/app/(app)/admin/featured-content/components/featured-content-manager';
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
 import { getAllFeaturedContentForAdmin } from '@/lib/queries/admin/featured-content.queries';
 
-// Force dynamic rendering for admin pages
+// force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
 export default async function AdminFeaturedContentPage() {
@@ -23,4 +25,11 @@ export default async function AdminFeaturedContentPage() {
       </div>
     </AdminLayout>
   );
+}
+
+export function generateMetadata(): Metadata {
+  return {
+    description: '',
+    title: 'Featured Content Management - Admin',
+  };
 }

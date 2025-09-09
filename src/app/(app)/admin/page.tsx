@@ -1,7 +1,9 @@
+import type { Metadata } from 'next';
+
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-// Force dynamic rendering for admin pages
+// force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
 export default function AdminPage() {
@@ -53,4 +55,11 @@ export default function AdminPage() {
       </div>
     </AdminLayout>
   );
+}
+
+export function generateMetadata(): Metadata {
+  return {
+    description: '',
+    title: 'Admin',
+  };
 }
