@@ -90,6 +90,8 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
       {/* Confirm Delete Dialog */}
       <Conditional isCondition={isDeleteDialogOpen}>
         <ConfirmDeleteAlertDialog
+          description={`This action cannot be undone. This will permanently 
+            delete this collection and any subcollections.`}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
           onDelete={handleDeleteCollection}

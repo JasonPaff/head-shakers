@@ -69,7 +69,7 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
   const handleContentSelect = (selectedContentId: string, contentName: string, imageUrl?: string) => {
     form.setFieldValue('contentId', selectedContentId);
     if (!currentTitle) form.setFieldValue('title', `Featured: ${contentName}`);
-    if (imageUrl) form.setFieldValue('imageUrl', imageUrl);
+    form.setFieldValue('imageUrl', imageUrl || '/placeholder.jpg');
   };
 
   return (
@@ -116,6 +116,7 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
                 )}
               </form.AppField>
 
+              {/* Feature Type */}
               <form.AppField name={'featureType'}>
                 {(field) => (
                   <field.SelectField
@@ -142,23 +143,24 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
               />
             </div>
 
-            {/* Title and Description */}
+            {/* Title */}
             <form.AppField name={'title'}>
               {(field) => <field.TextField label={'Title'} placeholder={'Enter feature title'} />}
             </form.AppField>
 
+            {/* Description */}
             <form.AppField name={'description'}>
               {(field) => (
                 <field.TextareaField label={'Description'} placeholder={'Enter feature description'} />
               )}
             </form.AppField>
 
+            {/* Image URL */}
             <form.AppField name={'imageUrl'}>
               {(field) => (
                 <field.TextField
                   label={'Image URL'}
-                  placeholder={'https://example.com/image.jpg or leave empty for auto-selection'}
-                  type={'url'}
+                  placeholder={'https://example.com/image.jpg or leave empty for placeholder image'}
                 />
               )}
             </form.AppField>

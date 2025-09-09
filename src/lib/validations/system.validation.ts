@@ -32,7 +32,27 @@ export const selectFeaturedContentSchema = createSelectSchema(featuredContent);
 export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
   description: z.string().optional(),
   endDate: z.date().optional(),
-  imageUrl: z.url().optional(),
+  imageUrl: z
+    .string()
+    .optional()
+    .transform((val) => {
+      // if empty or undefined, use the placeholder image
+      if (!val || val.trim() === '') return '/placeholder.jpg';
+      return val;
+    })
+    .refine(
+      (val) => {
+        // allow the placeholder path or valid URLs
+        if (val === '/placeholder.jpg') return true;
+        try {
+          new URL(val);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      { message: 'Must be a valid URL or placeholder image' },
+    ),
   sortOrder: z.number().min(0).default(DEFAULTS.FEATURED_CONTENT.SORT_ORDER),
   startDate: z.date().optional(),
   title: z.string().min(1).max(SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX).optional(),

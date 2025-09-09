@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import type { AdminFeaturedContent } from '@/lib/queries/admin/featured-content.queries';
 
+import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +22,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToggle } from '@/hooks/use-toggle';
 import {
   deleteFeaturedContentAction,
   toggleFeaturedContentActiveAction,
@@ -71,6 +73,7 @@ const getContentTypeColor = (type: string) => {
 export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentListProps) => {
   const [filterStatus, setFilterStatus] = useState<string>('active');
   const [filterType, setFilterType] = useState<string>('all');
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'priority' | 'views'>('date');
 
@@ -95,10 +98,6 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
   };
 
   const handleDelete = (id: string) => {
-    if (!confirm('Are you sure you want to delete this featured content?')) {
-      return;
-    }
-
     startTransition(async () => {
       const result = await deleteFeaturedContentAction({ id });
 
@@ -270,9 +269,7 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
                       <DropdownMenuSeparator />
                       <DropdownMenuItem
                         className={'text-destructive'}
-                        onClick={() => {
-                          handleDelete(content.id);
-                        }}
+                        onClick={setIsConfirmDeleteDialogOpen.on}
                       >
                         <Trash2Icon aria-hidden className={'mr-2 size-4'} />
                         Delete
@@ -281,11 +278,23 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
                   </DropdownMenu>
                 </div>
               </div>
+
+              {/* Confirm Delete Dialog */}
+              <ConfirmDeleteAlertDialog
+                description={`This action cannot be undone. This will permanently 
+                  delete this featured content entry.`}
+                isOpen={isConfirmDeleteDialogOpen}
+                onClose={setIsConfirmDeleteDialogOpen.off}
+                onDelete={() => {
+                  handleDelete(content.id);
+                }}
+              />
             </CardContent>
           </Card>
         ))}
       </div>
 
+      {/* No Results Found */}
       <Conditional isCondition={filteredContent.length === 0}>
         <Card>
           <CardContent className={'p-8 text-center'}>

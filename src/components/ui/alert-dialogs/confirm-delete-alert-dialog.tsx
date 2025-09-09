@@ -13,12 +13,18 @@ import {
 import { Button } from '@/components/ui/button';
 
 interface ConfirmDeleteAlertDialogProps {
+  description: string;
   isOpen: boolean;
   onClose: () => void;
-  onDelete: () => (() => void) | Promise<void>;
+  onDelete: (() => Promise<void>) | (() => void);
 }
 
-export const ConfirmDeleteAlertDialog = ({ isOpen, onClose, onDelete }: ConfirmDeleteAlertDialogProps) => {
+export const ConfirmDeleteAlertDialog = ({
+  description,
+  isOpen,
+  onClose,
+  onDelete,
+}: ConfirmDeleteAlertDialogProps) => {
   const handleCancel = () => {
     onClose();
   };
@@ -39,9 +45,7 @@ export const ConfirmDeleteAlertDialog = ({ isOpen, onClose, onDelete }: ConfirmD
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete this collection and any subcollections.
-          </AlertDialogDescription>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>

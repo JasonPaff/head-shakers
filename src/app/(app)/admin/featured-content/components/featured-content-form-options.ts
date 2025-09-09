@@ -10,7 +10,7 @@ export const featuredContentFormOptions = formOptions({
     description: '',
     endDate: undefined,
     featureType: 'editor_pick' as const,
-    imageUrl: undefined as string | undefined,
+    imageUrl: '/placeholder.jpg',
     isActive: DEFAULTS.FEATURED_CONTENT.IS_ACTIVE,
     metadata: {} as Record<string, unknown>,
     priority: '',
