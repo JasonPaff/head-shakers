@@ -18,7 +18,21 @@ import {
 const adminCreateFeaturedContentSchema = insertFeaturedContentSchema.extend({
   curatorNotes: z.string().optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  priority: z.number().int().min(0).default(0),
+  priority: z
+    .union([z.string(), z.number()])
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseInt(val, 10) : val;
+      return isNaN(num) ? 0 : num;
+    })
+    .pipe(z.number().int().min(0))
+    .default(0),
+  sortOrder: z
+    .union([z.string(), z.number()])
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseInt(val, 10) : val;
+      return isNaN(num) ? 0 : num;
+    })
+    .pipe(z.number().int().min(0)),
   viewCount: z.number().int().min(0).default(0),
 });
 
@@ -26,7 +40,22 @@ const adminUpdateFeaturedContentSchema = updateFeaturedContentSchema.extend({
   curatorNotes: z.string().optional(),
   id: z.string().uuid('ID must be a valid UUID'),
   metadata: z.record(z.string(), z.unknown()).optional(),
-  priority: z.number().int().min(0).optional(),
+  priority: z
+    .union([z.string(), z.number()])
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseInt(val, 10) : val;
+      return isNaN(num) ? 0 : num;
+    })
+    .pipe(z.number().int().min(0))
+    .optional(),
+  sortOrder: z
+    .union([z.string(), z.number()])
+    .transform((val) => {
+      const num = typeof val === 'string' ? parseInt(val, 10) : val;
+      return isNaN(num) ? 0 : num;
+    })
+    .pipe(z.number().int().min(0))
+    .optional(),
   viewCount: z.number().int().min(0).optional(),
 });
 

@@ -45,8 +45,27 @@ export async function invalidateCache(options: CacheInvalidationOptions): Promis
   }
 }
 
-// specific invalidation functions for different operations
+// Simplified featured content cache invalidation using Next.js cache only
 export async function invalidateFeaturedContentCaches(contentId?: string): Promise<void> {
+  try {
+    console.log(`Invalidating featured content caches${contentId ? ` for content: ${contentId}` : ''}`);
+    
+    // Next.js cache invalidation
+    revalidateTag('featured-content');
+    
+    // Specific path revalidation
+    revalidatePath($path({ route: '/browse/featured' }));
+    revalidatePath($path({ route: '/admin/featured-content' }));
+    revalidatePath($path({ route: '/' }));
+    
+    console.log('Featured content caches invalidated successfully');
+  } catch (error) {
+    console.error('Featured content cache invalidation failed:', error);
+  }
+}
+
+// Legacy function for backward compatibility with other parts of the system
+export async function invalidateFeaturedContentCachesLegacy(contentId?: string): Promise<void> {
   const options: CacheInvalidationOptions = {
     invalidateCacheTags: [CACHE_TAGS.FEATURED_CONTENT, CACHE_TAGS.ANALYTICS],
     revalidatePaths: [
