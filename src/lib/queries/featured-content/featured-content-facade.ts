@@ -1,16 +1,11 @@
-import { eq, sql } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { db } from '@/lib/db';
-import { featuredContent } from '@/lib/db/schema';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
-import {
-  FeaturedContentQuery,
-  type FeaturedContentRecord,
-} from '@/lib/queries/featured-content/featured-content-query';
+import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
+import { type FeaturedContentRecord, FeaturedContentService } from '@/lib/queries/featured-content/featured-content-transformer';
 
 // cache statistics for monitoring
 const cacheStats = {
@@ -33,7 +28,8 @@ export class FeaturedContentFacade {
       cacheStats.react.misses++;
 
       const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.findActiveFeaturedContent(context);
+      const rawData = await FeaturedContentQuery.findActiveFeaturedContent(context);
+      return FeaturedContentService.transformFeaturedContent(rawData);
     },
   );
 
@@ -60,7 +56,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getCollectionOfWeek');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return allContent.filter((content) => content.featureType === 'collection_of_week').slice(0, 1);
+      return FeaturedContentService.filterByType(allContent, 'collection_of_week');
     },
   );
 
@@ -71,7 +67,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getEditorPicks');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return allContent.filter((content) => content.featureType === 'editor_pick').slice(0, 6);
+      return FeaturedContentService.filterByType(allContent, 'editor_pick');
     },
   );
 
@@ -82,7 +78,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getHomepageBanner');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return allContent.filter((content) => content.featureType === 'homepage_banner').slice(0, 3);
+      return FeaturedContentService.filterByType(allContent, 'homepage_banner');
     },
   );
 
@@ -93,10 +89,7 @@ export class FeaturedContentFacade {
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       console.log('Cache access: getTrendingContent');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return allContent
-        .filter((content) => content.featureType === 'trending')
-        .sort((a, b) => b.viewCount - a.viewCount)
-        .slice(0, 8);
+      return FeaturedContentService.filterByType(allContent, 'trending');
     },
   );
 
@@ -104,26 +97,17 @@ export class FeaturedContentFacade {
    * get cache statistics for monitoring
    */
   static async getCacheStats() {
-    return new Promise((resolve) => {
-      resolve(cacheStats);
-    });
+    return Promise.resolve(cacheStats);
   }
 
   /**
    * increment view count for featured content
    */
-  static async incrementViewCount(contentId: string, dbInstance: DatabaseExecutor = db): Promise<void> {
-    try {
-      // increment in the database using SQL
-      await dbInstance
-        .update(featuredContent)
-        .set({
-          updatedAt: new Date(),
-          viewCount: sql`${featuredContent.viewCount} + 1`,
-        })
-        .where(eq(featuredContent.id, contentId));
+  static async incrementViewCount(contentId: string, dbInstance?: DatabaseExecutor): Promise<void> {
+    const context = createPublicQueryContext({ dbInstance });
 
-      // Log success for debugging
+    try {
+      await FeaturedContentQuery.incrementViewCount(contentId, context);
       console.log(`View count incremented for content: ${contentId}`);
     } catch (error) {
       console.error(`Failed to increment view count for content ${contentId}:`, error);
@@ -134,13 +118,10 @@ export class FeaturedContentFacade {
    * reset cache statistics
    */
   static async resetCacheStats() {
-    return new Promise((resolve) => {
-      resolve(() => {
-        cacheStats.nextjs.hits = 0;
-        cacheStats.nextjs.misses = 0;
-        cacheStats.react.hits = 0;
-        cacheStats.react.misses = 0;
-      });
-    });
+    cacheStats.nextjs.hits = 0;
+    cacheStats.nextjs.misses = 0;
+    cacheStats.react.hits = 0;
+    cacheStats.react.misses = 0;
+    return Promise.resolve();
   }
 }

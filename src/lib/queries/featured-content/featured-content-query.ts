@@ -1,6 +1,7 @@
-import { and, desc, eq, gte, isNull, lte, or } from 'drizzle-orm';
+import { and, desc, eq, gte, isNull, lte, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
+import type { RawFeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 
 import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
@@ -37,9 +38,9 @@ export interface FeaturedContentRecord {
  */
 export class FeaturedContentQuery extends BaseQuery {
   /**
-   * get active featured content with related data
+   * get active featured content with related data (raw data for service layer transformation)
    */
-  static async findActiveFeaturedContent(context: QueryContext): Promise<Array<FeaturedContentRecord>> {
+  static async findActiveFeaturedContent(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
@@ -79,26 +80,26 @@ export class FeaturedContentQuery extends BaseQuery {
       )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
 
-    return results.map((row) => ({
-      comments: 0, // TODO: implement comments count
-      contentId: row.contentId,
-      contentType: row.contentType,
-      createdAt: row.createdAt,
-      curatorNotes: row.curatorNotes,
-      description: row.description,
-      endDate: row.endDate,
-      featureType: row.featureType,
-      id: row.id,
-      imageUrl: row.imageUrl,
-      isActive: row.isActive,
-      likes: row.bobbleheadLikes || 0,
-      owner: row.bobbleheadOwner || row.collectionOwner || row.userId,
-      ownerDisplayName: row.userDisplayName,
-      priority: row.priority,
-      startDate: row.startDate,
-      title: row.title,
-      updatedAt: row.updatedAt,
-      viewCount: row.viewCount,
-    }));
+    return results;
+  }
+
+  /**
+   * increment view count for featured content
+   */
+  static async incrementViewCount(contentId: string, context: QueryContext): Promise<void> {
+    const dbInstance = this.getDbInstance(context);
+
+    try {
+      await dbInstance
+        .update(featuredContent)
+        .set({
+          updatedAt: new Date(),
+          viewCount: sql`${featuredContent.viewCount} + 1`,
+        })
+        .where(eq(featuredContent.id, contentId));
+    } catch (error) {
+      console.error(`Failed to increment view count for content ${contentId}:`, error);
+      throw error;
+    }
   }
 }

@@ -2,29 +2,59 @@ import { cache } from 'react';
 
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
-import type { BobbleheadWithRelations as ServiceBobbleheadWithRelations } from '@/lib/services/bobbleheads.service';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
+import { db } from '@/lib/db';
+import { bobbleheadPhotos, bobbleheads } from '@/lib/db/schema';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
-import { BobbleheadsService } from '@/lib/services/bobbleheads.service';
+
+/**
+ * Bobblehead with computed metrics and status
+ */
+export interface BobbleheadMetrics {
+  /** estimated current value based on condition and market factors */
+  estimatedValue?: number;
+  /** whether bobblehead has required photos */
+  hasPhotos: boolean;
+  /** whether bobblehead has all required metadata */
+  isComplete: boolean;
+  /** last updated timestamp */
+  lastUpdated: Date;
+  /** number of photos */
+  photoCount: number;
+  /** number of tags */
+  tagCount: number;
+}
 
 export type BobbleheadWithCollections = NonNullable<
   Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>
 >;
 
 /**
- * unified Bobbleheads Facade
- * combines query operations with business logic validation
- * provides a clean API for all bobblehead operations
+ * Bobblehead with related data for business operations
+ */
+export interface BobbleheadWithRelationsAndMetrics extends BobbleheadWithRelations {
+  metrics?: BobbleheadMetrics;
+}
+
+/**
+ * Unified Bobbleheads Facade
+ * Handles all business logic and orchestration for bobbleheads
+ * Single source of truth for bobblehead operations
  */
 export class BobbleheadsFacade {
+  // ============================================
+  // Database Operations (using Query layer)
+  // ============================================
+
   /**
-   * get a bobblehead by ID with permission checking
+   * Get a bobblehead by ID with permission checking
    */
   static getBobbleheadById = cache(
     async (
@@ -42,7 +72,7 @@ export class BobbleheadsFacade {
   );
 
   /**
-   * get a bobblehead with all related data (photos, tags, collection info)
+   * Get a bobblehead with all related data (photos, tags, collection info)
    */
   static getBobbleheadWithRelations = cache(
     async (
@@ -59,43 +89,108 @@ export class BobbleheadsFacade {
     },
   );
 
-  // Legacy service methods for backward compatibility
-  static async addPhotoAsync(
-    data: Parameters<typeof BobbleheadsService.addPhotoAsync>[0],
-    dbInstance?: DatabaseExecutor,
-  ) {
-    return BobbleheadsService.addPhotoAsync(data, dbInstance);
+  /**
+   * Get user dashboard statistics
+   */
+  static getUserDashboardStats = cache(
+    async (
+      userId: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<{
+      collectionValue: number;
+      profileViews: number;
+      totalItems: number;
+    }> => {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      const userBobbleheads = await BobbleheadsQuery.findByUser(userId, {}, context);
+
+      // Calculate total value from purchase prices
+      const totalValue = userBobbleheads.reduce((sum, bobblehead) => {
+        return sum + (bobblehead.purchasePrice || 0);
+      }, 0);
+
+      return {
+        collectionValue: Math.round(totalValue),
+        profileViews: userBobbleheads.length * 5 + 100, // TODO: implement real view tracking
+        totalItems: userBobbleheads.length,
+      };
+    },
+  );
+
+  /**
+   * Add a photo to a bobblehead
+   */
+  static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
+    const result = await (dbInstance ?? db)
+      .insert(bobbleheadPhotos)
+      .values(data)
+      .returning();
+    
+    return result?.[0] || null;
   }
 
   /**
-   * check if a user can view a bobblehead
+   * Check if a user can view a bobblehead (public or owned)
    */
   static canUserViewBobblehead(
     bobblehead: { isPublic: boolean; userId: string },
     currentUserId?: string,
   ): boolean {
-    return BobbleheadsService.canUserViewBobblehead(bobblehead, currentUserId);
+    return bobblehead.isPublic || Boolean(currentUserId && bobblehead.userId === currentUserId);
   }
 
   /**
-   * compute business metrics for a bobblehead
+   * Compute business metrics for a bobblehead
    */
-  static computeMetrics(
-    bobblehead: ServiceBobbleheadWithRelations,
-  ): ReturnType<typeof BobbleheadsService.computeMetrics> {
-    return BobbleheadsService.computeMetrics(bobblehead);
-  }
+  static computeMetrics(bobblehead: BobbleheadWithRelationsAndMetrics): BobbleheadMetrics {
+    const photoCount = bobblehead.photos?.length || 0;
+    const tagCount = bobblehead.tags?.length || 0;
 
-  static async createAsync(
-    data: Parameters<typeof BobbleheadsService.createAsync>[0],
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ) {
-    return BobbleheadsService.createAsync(data, userId, dbInstance);
+    // Determine if bobblehead has all required metadata
+    const requiredFields = [
+      bobblehead.name,
+      bobblehead.characterName,
+      bobblehead.manufacturer,
+      bobblehead.currentCondition,
+    ];
+    const isComplete = requiredFields.every((field) => Boolean(field)) && photoCount > 0;
+
+    // Simple estimated value calculation based on condition and purchase price
+    let estimatedValue: number | undefined;
+    if (bobblehead.purchasePrice && bobblehead.currentCondition) {
+      const conditionMultiplier = this.getConditionMultiplier(bobblehead.currentCondition);
+      estimatedValue = Math.round(bobblehead.purchasePrice * conditionMultiplier);
+    }
+
+    return {
+      estimatedValue,
+      hasPhotos: photoCount > 0,
+      isComplete,
+      lastUpdated: bobblehead.updatedAt,
+      photoCount,
+      tagCount,
+    };
   }
 
   /**
-   * get photos for a bobblehead
+   * Create a new bobblehead
+   */
+  static async createAsync(data: InsertBobblehead, userId: string, dbInstance: DatabaseExecutor = db) {
+    // Validate before creation
+    this.validateBobbleheadCreation(data, userId);
+
+    // Delegate to query layer for database operation
+    const result = await (dbInstance ?? db)
+      .insert(bobbleheads)
+      .values({ ...data, userId })
+      .returning();
+    
+    return result?.[0] || null;
+  }
+
+  /**
+   * Get photos for a bobblehead
    */
   static async getBobbleheadPhotos(
     bobbleheadId: string,
@@ -111,7 +206,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * get bobbleheads by collection with filtering options
+   * Get bobbleheads by collection with filtering options
    */
   static async getBobbleheadsByCollection(
     collectionId: string,
@@ -127,8 +222,12 @@ export class BobbleheadsFacade {
     return BobbleheadsQuery.findByCollection(collectionId, options, context);
   }
 
+  // ============================================
+  // Business Logic & Validation
+  // ============================================
+
   /**
-   * get bobbleheads by user with filtering options
+   * Get bobbleheads by user with filtering options
    */
   static async getBobbleheadsByUser(
     userId: string,
@@ -145,7 +244,7 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * search bobbleheads with advanced filtering
+   * Search bobbleheads with advanced filtering
    */
   static async searchBobbleheads(
     searchTerm: string,
@@ -171,30 +270,100 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * validate bobblehead creation data
+   * Validate bobblehead creation data
    */
   static validateBobbleheadCreation(
-    data: { collectionId: string; name?: null | string; subcollectionId?: null | string },
+    data: {
+      collectionId: string;
+      name?: null | string;
+      subcollectionId?: null | string;
+    },
     userId: string,
   ): void {
-    return BobbleheadsService.validateBobbleheadCreation(data, userId);
+    this.validateUserId(userId, 'create bobblehead');
+    this.validateBobbleheadName(data.name);
+    this.validateCollectionId(data.collectionId);
   }
 
   /**
-   * validate bobblehead ownership
+   * Validate bobblehead name
+   */
+  static validateBobbleheadName(name?: null | string): void {
+    if (!name || name.trim().length === 0) {
+      throw new Error('Bobblehead name is required');
+    }
+
+    if (name.trim().length > 200) {
+      throw new Error('Bobblehead name must be 200 characters or less');
+    }
+  }
+
+  /**
+   * Validate bobblehead ownership
    */
   static validateBobbleheadOwnership(bobblehead: { userId: string }, currentUserId: string): void {
-    return BobbleheadsService.validateBobbleheadOwnership(bobblehead, currentUserId);
+    if (bobblehead.userId !== currentUserId) {
+      throw new Error('User does not have permission to access this bobblehead');
+    }
   }
 
   /**
-   * validate bobblehead update data
+   * Validate bobblehead update data
    */
   static validateBobbleheadUpdate(
-    data: { [key: string]: unknown; name?: null | string },
+    data: {
+      [key: string]: unknown;
+      name?: null | string;
+    },
     currentBobblehead: { userId: string },
     userId: string,
   ): void {
-    return BobbleheadsService.validateBobbleheadUpdate(data, currentBobblehead, userId);
+    this.validateUserId(userId, 'update bobblehead');
+    this.validateBobbleheadOwnership(currentBobblehead, userId);
+
+    if (data.name !== undefined) {
+      this.validateBobbleheadName(data.name);
+    }
+  }
+
+  // ============================================
+  // Private Helper Methods
+  // ============================================
+
+  /**
+   * Get condition multiplier for value estimation
+   */
+  private static getConditionMultiplier(condition: string): number {
+    const conditionMap: Record<string, number> = {
+      Excellent: 1.0,
+      Fair: 0.6,
+      Good: 0.8,
+      Mint: 1.2,
+      'Near Mint': 1.1,
+      Poor: 0.4,
+    };
+
+    return conditionMap[condition] || 1.0;
+  }
+
+  /**
+   * Validate collection ID is provided
+   */
+  private static validateCollectionId(collectionId?: string): void {
+    if (!collectionId || collectionId.trim().length === 0) {
+      throw new Error('Collection ID is required');
+    }
+  }
+
+  /**
+   * Validate that a user ID is provided
+   */
+  private static validateUserId(
+    userId: null | string | undefined,
+    operation: string,
+  ): asserts userId is string {
+    if (!userId) {
+      throw new Error(`User ID is required for ${operation}`);
+    }
   }
 }
