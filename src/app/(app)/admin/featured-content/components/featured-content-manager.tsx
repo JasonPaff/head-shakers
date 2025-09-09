@@ -19,7 +19,7 @@ interface FeaturedContentManagerProps {
   initialData: Array<AdminFeaturedContent>;
 }
 
-export const FeaturedContentManager = ({ initialData }: FeaturedContentManagerProps) => {
+export const FeaturedContentManager = ({ initialData = [] }: FeaturedContentManagerProps) => {
   const [activeTab, setActiveTab] = useState('list');
   const [isShowCreateForm, setIsShowCreateForm] = useToggle();
   const [editingContent, setEditingContent] = useState<null | string>(null);
@@ -43,16 +43,27 @@ export const FeaturedContentManager = ({ initialData }: FeaturedContentManagerPr
   };
 
   const activeFeatures = useMemo(() => {
-    return initialData.filter((item) => item.isActive).length;
+    return initialData.filter((item) => {
+      return item.isActive;
+    }).length;
   }, [initialData]);
-  const totalViews = useMemo(() => {
-    return initialData.reduce((sum, item) => sum + item.viewCount, 0);
-  }, [initialData]);
-  const homepageBanners = useMemo(() => {
-    return initialData.filter((item) => item.isActive && item.featureType === 'homepage_banner').length;
-  }, [initialData]);
+
   const editorPicks = useMemo(() => {
-    return initialData.filter((item) => item.isActive && item.featureType === 'editor_pick').length;
+    return initialData.filter((item) => {
+      return item.isActive && item.featureType === 'editor_pick';
+    }).length;
+  }, [initialData]);
+
+  const homepageBanners = useMemo(() => {
+    return initialData.filter((item) => {
+      return item.isActive && item.featureType === 'homepage_banner';
+    }).length;
+  }, [initialData]);
+
+  const totalViews = useMemo(() => {
+    return initialData.reduce((sum, item) => {
+      return sum + item.viewCount;
+    }, 0);
   }, [initialData]);
 
   return (

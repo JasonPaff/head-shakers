@@ -71,10 +71,6 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
       if (contentId) await updateFeaturedContent({ ...value, id: contentId });
       else await createFeaturedContent(value);
     },
-    onSubmitInvalid: ({ formApi }) => {
-      console.log(formApi.state.errors);
-      toast.error(formApi.state.errors.map((e) => JSON.stringify(e, null, 2)).join('\n\n'));
-    },
     validationLogic: revalidateLogic({
       mode: 'blur',
       modeAfterSubmission: 'change',

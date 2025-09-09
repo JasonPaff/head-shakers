@@ -73,42 +73,14 @@ const getContentTypeColor = (type: string) => {
 export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentListProps) => {
   const [filterStatus, setFilterStatus] = useState<string>('active');
   const [filterType, setFilterType] = useState<string>('all');
-  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'date' | 'priority' | 'views'>('date');
+
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
-
-  const handleToggleActive = (id: string, currentStatus: boolean) => {
-    startTransition(async () => {
-      const result = await toggleFeaturedContentActiveAction({
-        id,
-        isActive: !currentStatus,
-      });
-
-      if (result?.serverError) {
-        toast.error(result.serverError);
-      } else if (result?.data?.success) {
-        toast.success(result.data.message);
-        router.refresh();
-      }
-    });
-  };
-
-  const handleDelete = (id: string) => {
-    startTransition(async () => {
-      const result = await deleteFeaturedContentAction({ id });
-
-      if (result?.serverError) {
-        toast.error(result.serverError);
-      } else if (result?.data?.success) {
-        toast.success(result.data.message);
-        router.refresh();
-      }
-    });
-  };
 
   const filteredContent = useMemo(() => {
     const filtered = initialData.filter((content) => {
@@ -138,6 +110,35 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
 
     return filtered;
   }, [initialData, searchTerm, filterType, filterStatus, sortBy]);
+
+  const handleToggleActive = (id: string, currentStatus: boolean) => {
+    startTransition(async () => {
+      const result = await toggleFeaturedContentActiveAction({
+        id,
+        isActive: !currentStatus,
+      });
+
+      if (result?.serverError) {
+        toast.error(result.serverError);
+      } else if (result?.data?.success) {
+        toast.success(result.data.message);
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDelete = (id: string) => {
+    startTransition(async () => {
+      const result = await deleteFeaturedContentAction({ id });
+
+      if (result?.serverError) {
+        toast.error(result.serverError);
+      } else if (result?.data?.success) {
+        toast.success(result.data.message);
+        router.refresh();
+      }
+    });
+  };
 
   return (
     <div className={'space-y-4'}>
@@ -179,7 +180,9 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
               </SelectContent>
             </Select>
             <Select
-              onValueChange={(value) => setSortBy(value as 'date' | 'priority' | 'views')}
+              onValueChange={(value) => {
+                setSortBy(value as 'date' | 'priority' | 'views');
+              }}
               value={sortBy}
             >
               <SelectTrigger className={'w-[140px]'}>

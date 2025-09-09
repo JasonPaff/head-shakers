@@ -249,7 +249,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
           <p className={'text-sm font-medium text-muted-foreground'}>Currently Selected Content:</p>
           <BobbleheadSearchResult
             contentType={contentType}
-            key={selectedItem!.id}
+            key={selectedItem?.id || 'selected-item'}
             onSelect={onSelect}
             result={selectedItem!}
             selectedContentId={selectedContentId}
