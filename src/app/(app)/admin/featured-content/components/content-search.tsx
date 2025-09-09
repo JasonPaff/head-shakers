@@ -1,8 +1,8 @@
 'use client';
 
-import { ChevronDown, ChevronRight, Image as ImageIcon, Search } from 'lucide-react';
+import { ChevronDownIcon, ChevronRightIcon, Image as ImageIcon, SearchIcon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { ContentType } from '@/lib/validations/system.validation';
@@ -21,6 +21,7 @@ import {
   searchCollectionsForFeaturingAction,
   searchUsersForFeaturingAction,
 } from '@/lib/actions/content-search.actions';
+import { cn } from '@/utils/tailwind-utils';
 
 interface ContentSearchProps {
   contentType: ContentType;
@@ -47,10 +48,11 @@ interface SearchResult {
 export const ContentSearch = ({ contentType, onSelect, selectedContentId }: ContentSearchProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Array<SearchResult>>([]);
-  const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
-  const [isSearching, setIsSearching] = useToggle();
+  const [selectedItem, setSelectedItem] = useState<null | SearchResult>(null);
+
+  const [isLoadingSelected, setIsLoadingSelected] = useToggle();
   const [isPending, startTransition] = useTransition();
-  const [isLoadingSelected, setIsLoadingSelected] = useState(false);
+  const [isSearching, setIsSearching] = useToggle();
 
   const { executeAsync: searchCollections } = useAction(searchCollectionsForFeaturingAction);
   const { executeAsync: searchBobbleheads } = useAction(searchBobbleheadsForFeaturingAction);
@@ -59,11 +61,15 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
   const { executeAsync: getBobblehead } = useAction(getBobbleheadForFeaturingAction);
   const { executeAsync: getUser } = useAction(getUserForFeaturingAction);
 
-  // Fetch selected item when selectedContentId changes
+  const filteredResults = useMemo(() => {
+    return results.filter((result) => result.id !== selectedContentId);
+  }, [results, selectedContentId]);
+
+  // fetch selected item when selectedContentId changes
   useEffect(() => {
     if (selectedContentId && (!selectedItem || selectedItem.id !== selectedContentId)) {
-      setIsLoadingSelected(true);
-      
+      setIsLoadingSelected.on();
+
       const fetchSelectedItem = async () => {
         try {
           if (contentType === 'collection') {
@@ -114,7 +120,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
           console.error('Failed to fetch selected item:', error);
           setSelectedItem(null);
         } finally {
-          setIsLoadingSelected(false);
+          setIsLoadingSelected.off();
         }
       };
 
@@ -122,7 +128,15 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
     } else if (!selectedContentId) {
       setSelectedItem(null);
     }
-  }, [selectedContentId, contentType, selectedItem, getCollection, getBobblehead, getUser]);
+  }, [
+    selectedContentId,
+    contentType,
+    selectedItem,
+    getCollection,
+    getBobblehead,
+    getUser,
+    setIsLoadingSelected,
+  ]);
 
   const performSearch = useDebouncedCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -137,6 +151,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
 
       if (contentType === 'collection') {
         const response = await searchCollections({ query: searchQuery });
+
         if (response?.data?.collections) {
           searchResults = response.data.collections.map((collection) => ({
             additionalInfo: `${collection.totalItems} items`,
@@ -193,10 +208,17 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
     });
   };
 
+  const _shouldShowNoResults = !isSearching && !isPending && !!query && results.length === 0;
+  const _shouldShowResults = !isSearching && !isPending && results.length > 0;
+
   return (
     <div className={'space-y-4'}>
+      {/* Search Input */}
       <div className={'relative'}>
-        <Search className={'absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground'} />
+        <SearchIcon
+          aria-hidden
+          className={'absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground'}
+        />
         <Input
           className={'pl-10'}
           onChange={(e) => {
@@ -207,41 +229,41 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         />
       </div>
 
-      {/* Show loading for selected item */}
-      {isLoadingSelected && (
+      {/* Loading Selected Item */}
+      <Conditional isCondition={isLoadingSelected}>
         <div className={'space-y-2'}>
           <p className={'text-sm font-medium text-muted-foreground'}>Currently Selected Content:</p>
           <div className={'flex items-center space-x-3 rounded-lg border p-3'}>
-            <Skeleton className={'h-10 w-10 rounded'} />
+            <Skeleton className={'size-10 rounded'} />
             <div className={'flex-1 space-y-1'}>
               <Skeleton className={'h-4 w-3/4'} />
               <Skeleton className={'h-3 w-1/2'} />
             </div>
           </div>
         </div>
-      )}
+      </Conditional>
 
-      {/* Show currently selected item */}
-      {!isLoadingSelected && selectedItem && (
+      {/* Selected Item */}
+      <Conditional isCondition={!isLoadingSelected && !!selectedItem}>
         <div className={'space-y-2'}>
           <p className={'text-sm font-medium text-muted-foreground'}>Currently Selected Content:</p>
           <BobbleheadSearchResult
             contentType={contentType}
-            key={selectedItem.id}
+            key={selectedItem!.id}
             onSelect={onSelect}
-            result={selectedItem}
+            result={selectedItem!}
             selectedContentId={selectedContentId}
           />
         </div>
-      )}
+      </Conditional>
 
-      {/* Show loading for search results */}
-      {(isSearching || isPending) && (
+      {/* Loading Search Results */}
+      <Conditional isCondition={isSearching || isPending}>
         <div className={'space-y-2'}>
           <p className={'text-sm font-medium text-muted-foreground'}>Search Results:</p>
           {Array.from({ length: 3 }).map((_, i) => (
             <div className={'flex items-center space-x-3 rounded-lg border p-3'} key={i}>
-              <Skeleton className={'h-10 w-10 rounded'} />
+              <Skeleton className={'size-10 rounded'} />
               <div className={'flex-1 space-y-1'}>
                 <Skeleton className={'h-4 w-3/4'} />
                 <Skeleton className={'h-3 w-1/2'} />
@@ -249,59 +271,51 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             </div>
           ))}
         </div>
-      )}
+      </Conditional>
 
-      {(() => {
-        const shouldShowNoResults = !isSearching && !isPending && query && results.length === 0;
-        const shouldShowResults = !isSearching && !isPending && results.length > 0;
+      {/* No Results Found */}
+      <Conditional isCondition={_shouldShowNoResults}>
+        <Card>
+          <CardContent className={'py-6 text-center'}>
+            <p className={'text-muted-foreground'}>
+              No {contentType}s found matching &quot;{query}&quot;
+            </p>
+          </CardContent>
+        </Card>
+      </Conditional>
 
-        if (shouldShowNoResults) {
-          return (
+      {/* Search Results Found */}
+      <Conditional isCondition={_shouldShowResults}>
+        <div className={'space-y-2'}>
+          <p className={'text-sm font-medium text-muted-foreground'}>Search Results:</p>
+          {/* Search Results */}
+          <Conditional isCondition={filteredResults.length > 0}>
+            <div className={'space-y-2'}>
+              {filteredResults.map((result) => (
+                <BobbleheadSearchResult
+                  contentType={contentType}
+                  key={result.id}
+                  onSelect={onSelect}
+                  result={result}
+                  selectedContentId={selectedContentId}
+                />
+              ))}
+            </div>
+          </Conditional>
+          {/* No Search Results */}
+          <Conditional isCondition={filteredResults.length === 0}>
             <Card>
-              <CardContent className={'py-6 text-center'}>
-                <p className={'text-muted-foreground'}>
-                  No {contentType}s found matching &quot;{query}&quot;
+              <CardContent className={'py-4 text-center'}>
+                <p className={'text-sm text-muted-foreground'}>
+                  No additional {contentType}s found matching &quot;{query}&quot;
                 </p>
               </CardContent>
             </Card>
-          );
-        }
+          </Conditional>
+        </div>
+      </Conditional>
 
-        if (shouldShowResults) {
-          // Filter out the currently selected item from search results to avoid duplication
-          const filteredResults = results.filter(result => result.id !== selectedContentId);
-          
-          return (
-            <div className={'space-y-2'}>
-              <p className={'text-sm font-medium text-muted-foreground'}>Search Results:</p>
-              {filteredResults.length > 0 ? (
-                <div className={'space-y-2'}>
-                  {filteredResults.map((result) => (
-                    <BobbleheadSearchResult
-                      contentType={contentType}
-                      key={result.id}
-                      onSelect={onSelect}
-                      result={result}
-                      selectedContentId={selectedContentId}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className={'py-4 text-center'}>
-                    <p className={'text-sm text-muted-foreground'}>
-                      No additional {contentType}s found matching &quot;{query}&quot;
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          );
-        }
-
-        return null;
-      })()}
-
+      {/* Instructions */}
       <Conditional isCondition={!query}>
         <Card>
           <CardHeader>
@@ -332,13 +346,12 @@ const BobbleheadSearchResult = ({
   result,
   selectedContentId,
 }: BobbleheadSearchResultProps) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useToggle();
+  const primaryPhoto = useMemo(() => {
+    return result.photos?.find((p) => p.isPrimary) || result.photos?.[0];
+  }, [result.photos]);
 
-  // For bobbleheads, prioritize primary photo, then first photo, then placeholder
-  const primaryPhoto = result.photos?.find((p) => p.isPrimary) || result.photos?.[0];
-  const defaultImageUrl = primaryPhoto?.url || '/placeholder.jpg';
-
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string>(defaultImageUrl);
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>(primaryPhoto?.url ?? '/placeholder.jpg');
 
   const handleSelect = (imageUrl?: string) => {
     onSelect(result.id, result.name, imageUrl || selectedImageUrl);
@@ -348,34 +361,38 @@ const BobbleheadSearchResult = ({
     setSelectedImageUrl(imageUrl);
   };
 
-  // For non-bobbleheads, use the simple card layout
+  const _hasMultiplePhotos = result.photos && result.photos.length > 1;
+
   if (contentType !== 'bobblehead') {
     return (
       <Card
-        className={`cursor-pointer transition-colors hover:bg-muted/50 ${
-          selectedContentId === result.id ? 'ring-2 ring-primary' : ''
-        }`}
+        className={cn(
+          'cursor-pointer transition-colors hover:bg-muted/50',
+          selectedContentId === result.id && 'ring-2 ring-primary',
+        )}
       >
         <CardContent className={'p-3'}>
           <div className={'flex items-start justify-between'}>
             <div className={'flex-1'}>
               <CardTitle className={'text-sm font-medium'}>{result.name}</CardTitle>
-              {result.description && (
+              <Conditional isCondition={!!result.description}>
                 <CardDescription className={'mt-1 line-clamp-2 text-xs'}>
                   {result.description}
                 </CardDescription>
-              )}
-              {result.ownerName && (
+              </Conditional>
+              <Conditional isCondition={!!result.ownerName}>
                 <p className={'mt-1 text-xs text-muted-foreground'}>
                   by {result.ownerName} (@{result.ownerUsername})
                 </p>
-              )}
-              {result.additionalInfo && (
+              </Conditional>
+              <Conditional isCondition={!!result.additionalInfo}>
                 <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
-              )}
+              </Conditional>
             </div>
             <Button
-              onClick={() => handleSelect()}
+              onClick={() => {
+                handleSelect();
+              }}
               size={'sm'}
               variant={selectedContentId === result.id ? 'default' : 'outline'}
             >
@@ -387,11 +404,8 @@ const BobbleheadSearchResult = ({
     );
   }
 
-  // For bobbleheads with photos, show expandable interface
-  const _hasMultiplePhotos = result.photos && result.photos.length > 1;
-
   return (
-    <Card className={`transition-colors ${selectedContentId === result.id ? 'ring-2 ring-primary' : ''}`}>
+    <Card className={cn('transition-colors', selectedContentId === result.id && 'ring-2 ring-primary')}>
       <CardContent className={'p-3'}>
         <div className={'flex items-start gap-3'}>
           {/* Image Preview */}
@@ -404,48 +418,45 @@ const BobbleheadSearchResult = ({
           {/* Content */}
           <div className={'min-w-0 flex-1'}>
             <CardTitle className={'text-sm font-medium'}>{result.name}</CardTitle>
-            {result.description && (
+            <Conditional isCondition={!!result.description}>
               <CardDescription className={'mt-1 line-clamp-2 text-xs'}>{result.description}</CardDescription>
-            )}
-            {result.ownerName && (
+            </Conditional>
+            <Conditional isCondition={!!result.ownerName}>
               <p className={'mt-1 text-xs text-muted-foreground'}>
                 by {result.ownerName} (@{result.ownerUsername})
               </p>
-            )}
-            {result.additionalInfo && (
+            </Conditional>
+            <Conditional isCondition={!!result.additionalInfo}>
               <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
-            )}
+            </Conditional>
           </div>
 
           {/* Actions */}
           <div className={'flex flex-col gap-2'}>
             <Button
-              onClick={() => handleSelect(selectedImageUrl)}
+              onClick={() => {
+                handleSelect(selectedImageUrl);
+              }}
               size={'sm'}
               variant={selectedContentId === result.id ? 'default' : 'outline'}
             >
               {selectedContentId === result.id ? 'Selected' : 'Select'}
             </Button>
 
-            {_hasMultiplePhotos && (
-              <Button
-                className={'h-8 px-2'}
-                onClick={() => setIsExpanded(!isExpanded)}
-                size={'sm'}
-                variant={'ghost'}
-              >
+            <Conditional isCondition={_hasMultiplePhotos}>
+              <Button className={'h-8 px-2'} onClick={setIsExpanded.toggle} size={'sm'} variant={'ghost'}>
                 {isExpanded ?
-                  <ChevronDown className={'h-3 w-3'} />
-                : <ChevronRight className={'h-3 w-3'} />}
-                <ImageIcon className={'ml-1 h-3 w-3'} />
+                  <ChevronDownIcon aria-hidden className={'size-3'} />
+                : <ChevronRightIcon aria-hidden className={'size-3'} />}
+                <ImageIcon aria-hidden className={'ml-1 size-3'} />
                 {result.photos?.length}
               </Button>
-            )}
+            </Conditional>
           </div>
         </div>
 
         {/* Expandable Image Selection */}
-        {isExpanded && _hasMultiplePhotos && (
+        <Conditional isCondition={isExpanded && _hasMultiplePhotos}>
           <div className={'mt-3 border-t pt-3'}>
             <p className={'mb-2 text-xs text-muted-foreground'}>Choose feature image:</p>
             <div className={'grid grid-cols-4 gap-2'}>
@@ -454,11 +465,15 @@ const BobbleheadSearchResult = ({
                 const _photoTitle = photo.altText || `Photo ${photo.sortOrder}`;
                 return (
                   <button
-                    className={`relative h-16 w-16 cursor-pointer overflow-hidden rounded-md ring-offset-2 transition-all ${
-                      _isSelected ? 'ring-2 ring-primary' : 'ring-muted-foreground hover:ring-1'
-                    }`}
+                    className={cn(
+                      'relative h-16 w-16 cursor-pointer overflow-hidden',
+                      'rounded-md ring-offset-2 transition-all',
+                      _isSelected ? 'ring-2 ring-primary' : 'ring-muted-foreground hover:ring-1',
+                    )}
                     key={photo.url}
-                    onClick={() => handleImageSelect(photo.url)}
+                    onClick={() => {
+                      handleImageSelect(photo.url);
+                    }}
                     title={_photoTitle}
                     type={'button'}
                   >
@@ -468,21 +483,22 @@ const BobbleheadSearchResult = ({
                       sizes={'64px'}
                       src={photo.url}
                     />
-                    {photo.isPrimary && (
+                    <Conditional isCondition={photo.isPrimary}>
                       <div
-                        className={
-                          'absolute top-0 right-0 rounded-bl bg-primary px-1 text-xs text-primary-foreground'
-                        }
+                        className={cn(
+                          'absolute top-0 right-0 rounded-bl bg-primary',
+                          'px-1 text-xs text-primary-foreground',
+                        )}
                       >
                         1st
                       </div>
-                    )}
+                    </Conditional>
                   </button>
                 );
               })}
             </div>
           </div>
-        )}
+        </Conditional>
       </CardContent>
     </Card>
   );

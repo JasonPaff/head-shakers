@@ -25,7 +25,6 @@ export interface FeaturedContent {
   imageUrl: null | string;
   isActive: boolean;
   likes?: number;
-  metadata: null | Record<string, unknown>;
   // joined content data
   owner?: null | string;
   ownerDisplayName?: null | string;
@@ -57,7 +56,6 @@ const getActiveFeaturedContentBase = cache(async (): Promise<Array<FeaturedConte
       id: featuredContent.id,
       imageUrl: featuredContent.imageUrl,
       isActive: featuredContent.isActive,
-      metadata: featuredContent.metadata,
       priority: featuredContent.priority,
       startDate: featuredContent.startDate,
       title: featuredContent.title,
@@ -93,7 +91,6 @@ const getActiveFeaturedContentBase = cache(async (): Promise<Array<FeaturedConte
     imageUrl: row.imageUrl,
     isActive: row.isActive,
     likes: row.bobbleheadLikes || 0,
-    metadata: (row.metadata as Record<string, unknown>) || null,
     owner: row.collectionOwner || row.bobbleheadOwner || row.userName,
     ownerDisplayName: row.userDisplayName || row.userName,
     priority: row.priority,

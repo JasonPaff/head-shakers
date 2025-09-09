@@ -24,7 +24,12 @@ export const notificationRelatedTypeEnum = pgEnum(
 export const featuredContentTypeEnum = pgEnum('featured_content_type', ENUMS.FEATURED_CONTENT.TYPE);
 export const featureTypeEnum = pgEnum('feature_type', ENUMS.FEATURED_CONTENT.FEATURE_TYPE);
 export const valueTypeEnum = pgEnum('value_type', ENUMS.PLATFORM_SETTING.VALUE_TYPE);
-export const contentMetricTypeEnum = pgEnum('content_metric_type', ['view', 'like', 'comment', 'share'] as const);
+export const contentMetricTypeEnum = pgEnum('content_metric_type', [
+  'view',
+  'like',
+  'comment',
+  'share',
+] as const);
 
 export const notifications = pgTable(
   'notifications',
@@ -78,14 +83,13 @@ export const featuredContent = pgTable(
     contentType: featuredContentTypeEnum('featured_content_type').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     curatorId: uuid('curator_id').references(() => users.id, { onDelete: 'set null' }),
-    curatorNotes: text('curator_notes'),
-    description: text('description'),
+    curatorNotes: varchar('curator_notes', { length: SCHEMA_LIMITS.FEATURED_CONTENT.CURATOR_NOTES.MAX }),
+    description: varchar('description', { length: SCHEMA_LIMITS.FEATURED_CONTENT.DESCRIPTION.MAX }).notNull(),
     endDate: timestamp('end_date'),
     featureType: featureTypeEnum('feature_type').notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
     imageUrl: text('image_url'),
     isActive: boolean('is_active').default(DEFAULTS.FEATURED_CONTENT.IS_ACTIVE).notNull(),
-    metadata: jsonb('metadata'),
     priority: integer('priority').default(0).notNull(),
     sortOrder: integer('sort_order').default(DEFAULTS.FEATURED_CONTENT.SORT_ORDER).notNull(),
     startDate: timestamp('start_date'),
@@ -124,6 +128,7 @@ export const featuredContent = pgTable(
       'featured_content_date_logic',
       sql`${table.startDate} IS NULL OR ${table.endDate} IS NULL OR ${table.startDate} <= ${table.endDate}`,
     ),
+    check('featured_content_description_not_empty', sql`length(${table.description}) > 0`),
   ],
 );
 
@@ -185,7 +190,7 @@ export const contentMetrics = pgTable(
     index('content_metrics_content_date_idx').on(table.contentType, table.contentId, table.date),
     index('content_metrics_type_date_idx').on(table.metricType, table.date),
     index('content_metrics_content_metric_idx').on(table.contentType, table.contentId, table.metricType),
-    
+
     // check constraints
     check('content_metrics_value_non_negative', sql`${table.metricValue} >= 0`),
   ],

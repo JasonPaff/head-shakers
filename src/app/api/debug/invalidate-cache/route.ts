@@ -2,13 +2,13 @@ import { NextResponse } from 'next/server';
 
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 
-export async function POST() {
+export function POST() {
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
   }
 
   try {
-    await invalidateFeaturedContentCaches();
+    invalidateFeaturedContentCaches();
 
     return NextResponse.json({
       message: 'Featured content caches invalidated successfully',

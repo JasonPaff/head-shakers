@@ -7,7 +7,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
   }
 
-  const stats = getCacheStats();
+  const stats = await getCacheStats();
 
   return NextResponse.json({
     cacheStats: stats,
@@ -21,7 +21,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
   }
 
-  resetCacheStats();
+  await resetCacheStats();
 
   return NextResponse.json({
     message: 'Cache statistics reset',

@@ -1,6 +1,7 @@
 'use client';
 
 import { EyeIcon, HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { Fragment } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -114,7 +115,7 @@ export const ContentSuggestions = ({ onFeature }: ContentSuggestionsProps) => {
 
                   <div className={'flex items-center gap-4 text-xs text-muted-foreground'}>
                     {suggestion.type === 'user' ?
-                      <>
+                      <Fragment>
                         <span className={'flex items-center gap-1'}>
                           <EyeIcon aria-hidden className={'size-3'} />
                           {suggestion.metrics.collections} collections
@@ -127,8 +128,8 @@ export const ContentSuggestions = ({ onFeature }: ContentSuggestionsProps) => {
                           <UsersIcon aria-hidden className={'size-3'} />
                           {suggestion.metrics.followers} followers
                         </span>
-                      </>
-                    : <>
+                      </Fragment>
+                    : <Fragment>
                         <span className={'flex items-center gap-1'}>
                           <EyeIcon aria-hidden className={'size-3'} />
                           {suggestion.metrics.views?.toLocaleString()} views
@@ -138,7 +139,7 @@ export const ContentSuggestions = ({ onFeature }: ContentSuggestionsProps) => {
                           {suggestion.metrics.likes} likes
                         </span>
                         <span>{suggestion.metrics.comments} comments</span>
-                      </>
+                      </Fragment>
                     }
                   </div>
                 </div>

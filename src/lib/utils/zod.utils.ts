@@ -55,6 +55,25 @@ export const zodDecimal = ({ fieldName, isRequired }: ZodDecimalOptions) => {
     .transform((val) => (val ? parseFloat(val) : null));
 };
 
+export const zodInteger = ({ fieldName, isRequired }: ZodUtilFieldName) => {
+  const baseSchema = z.string().trim();
+  const requiredMessage = `${fieldName} is required`;
+  const invalidMessage = `${fieldName} must be a valid integer`;
+
+  if (isRequired) {
+    return baseSchema
+      .min(1, requiredMessage)
+      .refine((val) => /^-?\d+$/.test(val), invalidMessage)
+      .transform((val) => parseInt(val, 10));
+  }
+
+  return z
+    .string()
+    .trim()
+    .refine((val) => !val || /^-?\d+$/.test(val), invalidMessage)
+    .transform((val) => (val ? parseInt(val, 10) : null));
+};
+
 interface zodMinMaxStringOptions extends Omit<ZodUtilFieldName, 'isRequired'> {
   maxLength: number;
   minLength: number;

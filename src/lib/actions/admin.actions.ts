@@ -87,12 +87,11 @@ export const createFeaturedContentAction = adminActionClient
         .values({
           ...parsedInput,
           curatorId: ctx.userId,
-          metadata: parsedInput.metadata ? JSON.stringify(parsedInput.metadata) : null,
         })
         .returning();
 
       // invalidate featured content caches
-      await invalidateFeaturedContentCaches();
+      invalidateFeaturedContentCaches();
 
       return {
         featuredContent: newFeaturedContent,
@@ -129,7 +128,6 @@ export const updateFeaturedContentAction = adminActionClient
         .update(featuredContent)
         .set({
           ...updateData,
-          metadata: updateData.metadata ? JSON.stringify(updateData.metadata) : undefined,
           updatedAt: new Date(),
         })
         .where(eq(featuredContent.id, id))
@@ -140,7 +138,7 @@ export const updateFeaturedContentAction = adminActionClient
       }
 
       // invalidate featured content caches
-      await invalidateFeaturedContentCaches(id);
+      invalidateFeaturedContentCaches(id);
 
       return {
         featuredContent: updatedFeaturedContent,
@@ -178,7 +176,7 @@ export const deleteFeaturedContentAction = adminActionClient
     }
 
     // invalidate featured content caches
-    await invalidateFeaturedContentCaches(parsedInput.id);
+    invalidateFeaturedContentCaches(parsedInput.id);
 
     return {
       message: 'Featured content deleted successfully',
@@ -222,7 +220,7 @@ export const toggleFeaturedContentStatusAction = adminActionClient
       }
 
       // invalidate featured content caches
-      await invalidateFeaturedContentCaches(parsedInput.id);
+      invalidateFeaturedContentCaches(parsedInput.id);
 
       return {
         featuredContent: updatedFeaturedContent,

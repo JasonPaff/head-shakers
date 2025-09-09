@@ -11,6 +11,7 @@ import type {
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { featuredContent, notifications, platformSettings } from '@/lib/db/schema';
+import { zodDateString, zodInteger, zodMaxString, zodMinMaxString } from '@/lib/utils/zod.utils';
 
 export const selectNotificationSchema = createSelectSchema(notifications);
 export const insertNotificationSchema = createInsertSchema(notifications, {
@@ -30,8 +31,20 @@ export const updateNotificationSchema = insertNotificationSchema.partial().exten
 
 export const selectFeaturedContentSchema = createSelectSchema(featuredContent);
 export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
-  description: z.string().optional(),
-  endDate: z.date().optional(),
+  contentId: z.uuid('Content ID is required'),
+  curatorNotes: zodMaxString({
+    fieldName: 'Curator Notes',
+    maxLength: SCHEMA_LIMITS.FEATURED_CONTENT.CURATOR_NOTES.MAX,
+  }).optional(),
+  description: zodMinMaxString({
+    fieldName: 'Description',
+    maxLength: SCHEMA_LIMITS.FEATURED_CONTENT.DESCRIPTION.MAX,
+    minLength: 0,
+  }),
+  endDate: zodDateString({
+    fieldName: 'Start Date',
+    isNullable: true,
+  }).optional(),
   imageUrl: z
     .string()
     .optional()
@@ -53,9 +66,21 @@ export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
       },
       { message: 'Must be a valid URL or placeholder image' },
     ),
-  sortOrder: z.number().min(0).default(DEFAULTS.FEATURED_CONTENT.SORT_ORDER),
-  startDate: z.date().optional(),
-  title: z.string().min(1).max(SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX).optional(),
+  priority: zodInteger({
+    fieldName: 'Priority',
+  }),
+  sortOrder: zodInteger({
+    fieldName: 'Sort Order',
+  }),
+  startDate: zodDateString({
+    fieldName: 'Start Date',
+    isNullable: true,
+  }).optional(),
+  title: zodMinMaxString({
+    fieldName: 'Description',
+    maxLength: SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX,
+    minLength: 0,
+  }),
 }).omit({
   createdAt: true,
   id: true,

@@ -19,7 +19,6 @@ export interface AdminFeaturedContent {
   id: string;
   imageUrl: null | string;
   isActive: boolean;
-  metadata: null | Record<string, unknown>;
   priority: number;
   sortOrder: number;
   startDate: Date | null;
@@ -45,7 +44,6 @@ export async function getAllFeaturedContentForAdmin(): Promise<AdminFeaturedCont
       id: featuredContent.id,
       imageUrl: featuredContent.imageUrl,
       isActive: featuredContent.isActive,
-      metadata: featuredContent.metadata,
       priority: featuredContent.priority,
       sortOrder: featuredContent.sortOrder,
       startDate: featuredContent.startDate,
@@ -73,7 +71,6 @@ export async function getAllFeaturedContentForAdmin(): Promise<AdminFeaturedCont
     id: row.id,
     imageUrl: row.imageUrl,
     isActive: row.isActive,
-    metadata: (row.metadata as Record<string, unknown>) || null,
     priority: row.priority,
     sortOrder: row.sortOrder,
     startDate: row.startDate,
@@ -100,7 +97,6 @@ export async function getFeaturedContentByIdForAdmin(id: string): Promise<AdminF
       id: featuredContent.id,
       imageUrl: featuredContent.imageUrl,
       isActive: featuredContent.isActive,
-      metadata: featuredContent.metadata,
       priority: featuredContent.priority,
       sortOrder: featuredContent.sortOrder,
       startDate: featuredContent.startDate,
@@ -132,7 +128,6 @@ export async function getFeaturedContentByIdForAdmin(id: string): Promise<AdminF
     id: row.id,
     imageUrl: row.imageUrl,
     isActive: row.isActive,
-    metadata: (row.metadata as Record<string, unknown>) || null,
     priority: row.priority,
     sortOrder: row.sortOrder,
     startDate: row.startDate,

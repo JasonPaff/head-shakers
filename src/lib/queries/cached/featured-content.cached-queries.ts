@@ -20,7 +20,6 @@ export interface CachedFeaturedContent {
   imageUrl: null | string;
   isActive: boolean;
   likes?: number;
-  metadata: null | Record<string, unknown>;
   // joined content data
   owner?: null | string;
   ownerDisplayName?: null | string;
@@ -52,7 +51,6 @@ export async function getActiveFeaturedContentCached(): Promise<Array<CachedFeat
 
       return results.map((row) => ({
         ...row,
-        metadata: (row.metadata as Record<string, unknown>) || null,
       }));
     },
     {
@@ -111,7 +109,6 @@ export async function getFeaturedContentByCategoryCached(
           id: featuredContent.id,
           imageUrl: featuredContent.imageUrl,
           isActive: featuredContent.isActive,
-          metadata: featuredContent.metadata,
           priority: featuredContent.priority,
           startDate: featuredContent.startDate,
           title: featuredContent.title,
@@ -124,7 +121,6 @@ export async function getFeaturedContentByCategoryCached(
 
       return results.map((row) => ({
         ...row,
-        metadata: (row.metadata as Record<string, unknown>) || null,
       }));
     },
     {
@@ -174,7 +170,6 @@ export async function getFeaturedContentCached(): Promise<Array<CachedFeaturedCo
           id: featuredContent.id,
           imageUrl: featuredContent.imageUrl,
           isActive: featuredContent.isActive,
-          metadata: featuredContent.metadata,
           priority: featuredContent.priority,
           startDate: featuredContent.startDate,
           title: featuredContent.title,
@@ -204,7 +199,6 @@ export async function getFeaturedContentCached(): Promise<Array<CachedFeaturedCo
         imageUrl: row.imageUrl,
         isActive: row.isActive,
         likes: row.bobbleheadLikes || 0, // collections don't have likes yet
-        metadata: (row.metadata as Record<string, unknown>) || null,
         owner: row.collectionOwner || row.bobbleheadOwner || row.userName,
         ownerDisplayName: row.userDisplayName || row.userName,
         priority: row.priority,

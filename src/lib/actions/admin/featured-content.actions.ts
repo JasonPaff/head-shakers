@@ -32,7 +32,7 @@ export const toggleFeaturedContentActiveAction = authActionClient
       .where(eq(featuredContent.id, id));
 
     // invalidate all caches (Redis and Next.js)
-    await invalidateFeaturedContentCaches(id);
+    invalidateFeaturedContentCaches(id);
 
     return {
       message: `Featured content ${isActive ? 'activated' : 'deactivated'} successfully`,
@@ -61,7 +61,7 @@ export const deleteFeaturedContentAction = authActionClient
 
     // invalidate all caches if the content was active
     if (deletedFeatureContent?.isActive) {
-      await invalidateFeaturedContentCaches(id);
+      invalidateFeaturedContentCaches(id);
     }
 
     return {

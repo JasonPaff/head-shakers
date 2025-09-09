@@ -13,75 +13,31 @@ import { ContentSearch } from '@/app/(app)/admin/featured-content/components/con
 import { featuredContentFormOptions } from '@/app/(app)/admin/featured-content/components/featured-content-form-options';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
+import { useToggle } from '@/hooks/use-toggle';
 import {
   createFeaturedContentAction,
   getFeaturedContentByIdAction,
   updateFeaturedContentAction,
 } from '@/lib/actions/admin.actions';
+import { insertFeaturedContentSchema } from '@/lib/validations/system.validation';
 
 type FeaturedContentFormProps = {
   contentId: null | string;
-  onClose: () => void;
-  onSuccess: () => void;
+  onClose: VoidFunction;
+  onSuccess: VoidFunction;
 };
 
 export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedContentFormProps) => {
-  const isEditing = !!contentId;
   const [existingData, setExistingData] = useState<AdminFeaturedContent | null>(null);
-  const [isLoading, setIsLoading] = useState(isEditing);
-
-  const form = useAppForm({
-    ...featuredContentFormOptions,
-    onSubmit: async ({ value }) => {
-      if (isEditing) await updateFeaturedContent({ ...value, id: contentId });
-      else await createFeaturedContent(value);
-    },
-    validationLogic: revalidateLogic({
-      mode: 'blur',
-      modeAfterSubmission: 'change',
-    }),
-  });
+  const [isLoading, setIsLoading] = useToggle(!!contentId);
 
   const { executeAsync: getFeaturedContent } = useAction(getFeaturedContentByIdAction, {
     onError: ({ error }) => {
       toast.error(error.serverError || 'Failed to load featured content');
-      onClose();
     },
   });
-
-  // fetch existing data when editing
-  useEffect(() => {
-    if (isEditing && contentId) {
-      setIsLoading(true);
-      getFeaturedContent({ id: contentId })
-        .then((result) => {
-          if (result?.data?.featuredContent) {
-            const data = result.data.featuredContent;
-            setExistingData(data);
-            // populate form with existing data
-            form.setFieldValue('contentType', data.contentType);
-            form.setFieldValue('featureType', data.featureType);
-            form.setFieldValue('contentId', data.contentId);
-            form.setFieldValue('title', data.title || '');
-            form.setFieldValue('description', data.description || '');
-            form.setFieldValue('imageUrl', data.imageUrl || '/placeholder.jpg');
-            form.setFieldValue('priority', data.priority.toString());
-            form.setFieldValue('sortOrder', data.sortOrder.toString());
-            form.setFieldValue('curatorNotes', data.curatorNotes || '');
-            form.setFieldValue('isActive', data.isActive);
-          }
-        })
-        .catch((error) => {
-          console.error('Error fetching featured content:', error);
-          toast.error('Failed to load featured content data');
-          onClose();
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    }
-  }, [contentId, isEditing, form, onClose, getFeaturedContent]);
 
   const { executeAsync: createFeaturedContent, isExecuting: isCreating } = useAction(
     createFeaturedContentAction,
@@ -109,7 +65,51 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
     },
   );
 
-  const isSubmitting = isCreating || isUpdating;
+  const form = useAppForm({
+    ...featuredContentFormOptions,
+    onSubmit: async ({ value }) => {
+      if (contentId) await updateFeaturedContent({ ...value, id: contentId });
+      else await createFeaturedContent(value);
+    },
+    onSubmitInvalid: ({ formApi }) => {
+      console.log(formApi.state.errors);
+      toast.error(formApi.state.errors.map((e) => JSON.stringify(e, null, 2)).join('\n\n'));
+    },
+    validationLogic: revalidateLogic({
+      mode: 'blur',
+      modeAfterSubmission: 'change',
+    }),
+    validators: { onSubmit: insertFeaturedContentSchema },
+  });
+
+  // fetch existing data when editing
+  useEffect(() => {
+    if (!contentId) return;
+    setIsLoading.on();
+    getFeaturedContent({ id: contentId })
+      .then((result) => {
+        if (result?.data?.featuredContent) {
+          const data = result.data.featuredContent;
+          setExistingData(data);
+          form.setFieldValue('contentType', data.contentType);
+          form.setFieldValue('featureType', data.featureType);
+          form.setFieldValue('contentId', data.contentId);
+          form.setFieldValue('title', data.title || '');
+          form.setFieldValue('description', data.description || '');
+          form.setFieldValue('imageUrl', data.imageUrl || '/placeholder.jpg');
+          form.setFieldValue('priority', data.priority.toString());
+          form.setFieldValue('sortOrder', data.sortOrder.toString());
+          form.setFieldValue('curatorNotes', data.curatorNotes || '');
+          form.setFieldValue('isActive', data.isActive);
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching featured content:', error);
+        toast.error('Failed to load featured content data');
+        onClose();
+      })
+      .finally(setIsLoading.off);
+  }, [contentId, form, onClose, getFeaturedContent, setIsLoading]);
 
   const currentContentType = useStore(form.store, (state) => state.values.contentType);
   const currentContentId = useStore(form.store, (state) => state.values.contentId);
@@ -120,6 +120,9 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
     if (!currentTitle) form.setFieldValue('title', `Featured: ${contentName}`);
     form.setFieldValue('imageUrl', imageUrl || '/placeholder.jpg');
   };
+
+  const _isEditing = !!contentId;
+  const _isSubmitting = isCreating || isUpdating;
 
   if (isLoading) {
     return (
@@ -140,16 +143,19 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
     <Card>
       <CardHeader>
         <div className={'flex items-center justify-between'}>
+          {/* Title */}
           <CardTitle>
             {contentId ? 'Edit Featured Content' : 'Create Featured Content'}
-            {existingData?.contentTitle && (
+            <Conditional isCondition={!!existingData?.contentTitle}>
               <span className={'ml-2 text-sm font-normal text-muted-foreground'}>
-                - {existingData.contentTitle}
+                - {existingData?.contentTitle}
               </span>
-            )}
+            </Conditional>
           </CardTitle>
+
+          {/* Close Button */}
           <Button onClick={onClose} size={'sm'} variant={'ghost'}>
-            <XIcon aria-hidden className={'size-4'} />
+            <XIcon aria-hidden aria-label={'close'} className={'size-4'} />
           </Button>
         </div>
       </CardHeader>
@@ -165,6 +171,7 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
           {/* Basic Information */}
           <div className={'space-y-4'}>
             <div className={'grid grid-cols-2 gap-4'}>
+              {/* Content Type */}
               <form.AppField
                 listeners={{
                   onChange: () => {
@@ -216,13 +223,17 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
 
             {/* Title */}
             <form.AppField name={'title'}>
-              {(field) => <field.TextField label={'Title'} placeholder={'Enter feature title'} />}
+              {(field) => <field.TextField isRequired label={'Title'} placeholder={'Enter feature title'} />}
             </form.AppField>
 
             {/* Description */}
             <form.AppField name={'description'}>
               {(field) => (
-                <field.TextareaField label={'Description'} placeholder={'Enter feature description'} />
+                <field.TextareaField
+                  isRequired
+                  label={'Description'}
+                  placeholder={'Enter feature description'}
+                />
               )}
             </form.AppField>
 
@@ -241,16 +252,19 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
           <div className={'space-y-4'}>
             <h3 className={'font-semibold'}>Advanced Settings</h3>
 
+            {/* Priority */}
             <div className={'grid grid-cols-2 gap-4'}>
               <form.AppField name={'priority'}>
                 {(field) => <field.TextField label={'Priority (0-100)'} type={'number'} />}
               </form.AppField>
 
+              {/* Sort Order */}
               <form.AppField name={'sortOrder'}>
                 {(field) => <field.TextField label={'Sort Order'} type={'number'} />}
               </form.AppField>
             </div>
 
+            {/* Curator Notes */}
             <form.AppField name={'curatorNotes'}>
               {(field) => (
                 <field.TextareaField
@@ -260,6 +274,7 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
               )}
             </form.AppField>
 
+            {/* Is Active */}
             <form.AppField name={'isActive'}>
               {(field) => (
                 <field.SwitchField
@@ -271,18 +286,20 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
           </div>
 
           {/* Form Actions */}
-          <div className={'flex justify-end gap-3'}>
-            <Button onClick={onClose} type={'button'} variant={'outline'}>
-              Cancel
-            </Button>
-            <Button disabled={isSubmitting} type={'submit'}>
-              {isSubmitting ?
-                'Saving...'
-              : isEditing ?
-                'Update Feature'
-              : 'Create Feature'}
-            </Button>
-          </div>
+          <form.AppForm>
+            <div className={'flex justify-end space-x-4'}>
+              <Button onClick={onClose} variant={'outline'}>
+                Cancel
+              </Button>
+              <form.SubmitButton isDisabled={_isSubmitting}>
+                {_isSubmitting ?
+                  'Saving...'
+                : _isEditing ?
+                  'Update Feature'
+                : 'Create Feature'}
+              </form.SubmitButton>
+            </div>
+          </form.AppForm>
         </form>
       </CardContent>
     </Card>
