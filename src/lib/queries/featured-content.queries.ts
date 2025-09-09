@@ -73,7 +73,7 @@ const getActiveFeaturedContentBase = cache(async (): Promise<Array<FeaturedConte
     .where(
       and(
         eq(featuredContent.isActive, true),
-        lte(featuredContent.startDate, now),
+        or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
         // either no end date or end date is in the future
         or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
       ),
@@ -150,7 +150,7 @@ export async function getCacheStats() {
   });
 }
 
-// utility function to update view count with cache invalidation
+// utility function to update view count
 export async function incrementViewCount(contentId: string): Promise<void> {
   try {
     // increment in the database using SQL
@@ -162,13 +162,12 @@ export async function incrementViewCount(contentId: string): Promise<void> {
       })
       .where(eq(featuredContent.id, contentId));
 
-    // note: We don't invalidate cache here since view count updates
-    // don't need immediate visibility and would cause cache thrashing
     console.log(`View count incremented for content: ${contentId}`);
   } catch (error) {
     console.error('Failed to increment view count:', error);
   }
 }
+
 // reset cache statistics (useful for testing)
 export async function resetCacheStats() {
   return new Promise((resolve) => {
