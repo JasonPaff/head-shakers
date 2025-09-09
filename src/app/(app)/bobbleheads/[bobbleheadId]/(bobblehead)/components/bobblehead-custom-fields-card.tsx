@@ -1,13 +1,13 @@
 import { TagIcon } from 'lucide-react';
 
-import type { GetBobbleheadById } from '@/lib/queries/bobbleheads.queries';
+import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadCustomFieldsCardProps {
-  bobblehead: NonNullable<GetBobbleheadById>;
+  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
 }
 
 const CustomFieldItem = ({ label, value }: { label: string; value: unknown }) => {

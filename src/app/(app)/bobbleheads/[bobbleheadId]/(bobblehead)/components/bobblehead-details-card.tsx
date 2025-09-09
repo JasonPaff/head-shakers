@@ -2,14 +2,14 @@ import type { LucideIcon } from 'lucide-react';
 
 import { FolderIcon, HashIcon, TagIcon, UserIcon } from 'lucide-react';
 
-import type { GetBobbleheadById } from '@/lib/queries/bobbleheads.queries';
+import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadDetailsCardProps {
-  bobblehead: NonNullable<GetBobbleheadById>;
+  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
 }
 
 const DetailItem = ({

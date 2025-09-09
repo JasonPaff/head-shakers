@@ -12,12 +12,12 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { GetBobbleheadById } from '@/lib/queries/bobbleheads.queries';
+import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Button } from '@/components/ui/button';
 
 interface BobbleheadHeaderProps {
-  bobblehead: NonNullable<GetBobbleheadById>;
+  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
   isOwner?: boolean;
 }
 

@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { ClockIcon, PlusIcon, RefreshCwIcon } from 'lucide-react';
 
-import type { GetBobbleheadById } from '@/lib/queries/bobbleheads.queries';
+import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -50,7 +50,7 @@ const getRelativeTime = (date: Date) => {
 };
 
 interface BobbleheadTimestampsCardProps {
-  bobblehead: NonNullable<GetBobbleheadById>;
+  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
 }
 
 const TimestampItem = ({

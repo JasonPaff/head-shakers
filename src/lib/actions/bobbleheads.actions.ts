@@ -14,7 +14,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { BobbleheadService } from '@/lib/services/bobbleheads.service';
+import { BobbleheadsService } from '@/lib/services/bobbleheads.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -41,7 +41,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
     try {
       // first create the bobblehead
-      const newBobblehead = await BobbleheadService.createAsync(bobbleheadData, userId, ctx.tx);
+      const newBobblehead = await BobbleheadsService.createAsync(bobbleheadData, userId, ctx.tx);
 
       if (!newBobblehead) {
         throw new ActionError(
@@ -94,7 +94,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
           // insert photos into the database with permanent URLs
           uploadedPhotos = await Promise.all(
-            photoRecords.map((record) => BobbleheadService.addPhotoAsync(record, ctx.tx)),
+            photoRecords.map((record) => BobbleheadsService.addPhotoAsync(record, ctx.tx)),
           );
 
           // clean up any temp photos that failed to move
@@ -129,7 +129,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
             }));
 
             uploadedPhotos = await Promise.all(
-              photoRecords.map((record) => BobbleheadService.addPhotoAsync(record, ctx.tx)),
+              photoRecords.map((record) => BobbleheadsService.addPhotoAsync(record, ctx.tx)),
             );
           } catch (fallbackError) {
             console.error('Fallback photo save also failed:', fallbackError);

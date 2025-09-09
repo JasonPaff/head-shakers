@@ -7,7 +7,6 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { db } from '@/lib/db';
 import { bobbleheadPhotos, bobbleheads, collections, subCollections } from '@/lib/db/schema';
-
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -64,7 +63,7 @@ export class CollectionsFacade {
     collectionId: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: string | null }>> {
+  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
     const dbInstance_ = dbInstance ?? db;
     const context =
       viewerUserId ?
@@ -215,97 +214,61 @@ export class CollectionsFacade {
   }
 
   /**
-   * get subcollections for a collection
+   * get bobbleheads in a subcollection with photo data for public display
    */
-  static async getSubCollectionsByCollection(
-    collectionId: string,
+  static async getSubcollectionBobbleheadsWithPhotos(
+    subcollectionId: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<{ id: string; name: string }>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
-
-    return CollectionsQuery.getSubCollectionsByCollection(collectionId, context);
-  }
-
-  /**
-   * get subcollections for a collection with detailed data for public display
-   */
-  static async getSubCollectionsForPublicView(
-    collectionId: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<{
-    subCollections: Array<{
-      bobbleheadCount: number;
-      description: null | string;
-      featurePhoto: null | string;
-      id: string;
-      name: string;
-    }>;
-    userId?: string;
-  } | null> {
+  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
     const dbInstance_ = dbInstance ?? db;
     const context =
       viewerUserId ?
         createUserQueryContext(viewerUserId, { dbInstance: dbInstance_ })
       : createPublicQueryContext({ dbInstance: dbInstance_ });
 
-    // First check if the collection exists and is accessible
-    const collection = await dbInstance_.query.collections.findFirst({
-      where: CollectionsQuery['combineFilters'](
-        eq(collections.id, collectionId),
-        CollectionsQuery['buildBaseFilters'](
-          collections.isPublic,
-          collections.userId,
-          undefined,
-          context,
+    const bobbleheadFilter = CollectionsQuery['buildBaseFilters'](
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.isDeleted,
+      context,
+    );
+
+    return dbInstance_
+      .select({
+        acquisitionDate: bobbleheads.acquisitionDate,
+        acquisitionMethod: bobbleheads.acquisitionMethod,
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        condition: bobbleheads.currentCondition,
+        featurePhoto: bobbleheadPhotos.url,
+        height: bobbleheads.height,
+        id: bobbleheads.id,
+        isFeatured: bobbleheads.isFeatured,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        purchaseLocation: bobbleheads.purchaseLocation,
+        purchasePrice: bobbleheads.purchasePrice,
+        series: bobbleheads.series,
+        status: bobbleheads.status,
+        weight: bobbleheads.weight,
+      })
+      .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(
+          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
+          eq(bobbleheadPhotos.isPrimary, true),
         ),
-      ),
-      with: {
-        user: {
-          columns: {
-            id: true,
-          },
-        },
-      },
-    });
-
-    if (!collection) {
-      return null;
-    }
-
-    // Get subcollections with bobblehead counts
-    const subCollectionData = await dbInstance_.query.subCollections.findMany({
-      orderBy: [sql`lower(${subCollections.name}) asc`],
-      where: eq(subCollections.collectionId, collectionId),
-      with: {
-        bobbleheads: {
-          where: and(
-            eq(bobbleheads.isDeleted, false),
-            CollectionsQuery['buildBaseFilters'](
-              bobbleheads.isPublic,
-              bobbleheads.userId,
-              undefined,
-              context,
-            ) || eq(bobbleheads.isPublic, true),
-          ),
-        },
-      },
-    });
-
-    return {
-      subCollections: subCollectionData.map((subCollection) => ({
-        bobbleheadCount: subCollection.bobbleheads.length,
-        description: subCollection.description,
-        featurePhoto: subCollection.coverImageUrl,
-        id: subCollection.id,
-        name: subCollection.name,
-      })),
-      userId: collection.user?.id,
-    };
+      )
+      .where(
+        CollectionsQuery['combineFilters'](
+          eq(bobbleheads.subcollectionId, subcollectionId),
+          bobbleheadFilter,
+        ),
+      )
+      .orderBy(bobbleheads.createdAt);
   }
 
   /**
@@ -316,7 +279,7 @@ export class CollectionsFacade {
     subcollectionId: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<{
+  ): Promise<null | {
     bobbleheadCount: number;
     collectionId: string;
     collectionName: string;
@@ -328,7 +291,7 @@ export class CollectionsFacade {
     lastUpdatedAt: Date;
     name: string;
     userId?: string;
-  } | null> {
+  }> {
     const dbInstance_ = dbInstance ?? db;
     const context =
       viewerUserId ?
@@ -401,61 +364,97 @@ export class CollectionsFacade {
   }
 
   /**
-   * get bobbleheads in a subcollection with photo data for public display
+   * get subcollections for a collection
    */
-  static async getSubcollectionBobbleheadsWithPhotos(
-    subcollectionId: string,
+  static async getSubCollectionsByCollection(
+    collectionId: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: string | null }>> {
+  ): Promise<Array<{ id: string; name: string }>> {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
+
+    return CollectionsQuery.getSubCollectionsByCollection(collectionId, context);
+  }
+
+  /**
+   * get subcollections for a collection with detailed data for public display
+   */
+  static async getSubCollectionsForPublicView(
+    collectionId: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | {
+    subCollections: Array<{
+      bobbleheadCount: number;
+      description: null | string;
+      featurePhoto: null | string;
+      id: string;
+      name: string;
+    }>;
+    userId?: string;
+  }> {
     const dbInstance_ = dbInstance ?? db;
     const context =
       viewerUserId ?
         createUserQueryContext(viewerUserId, { dbInstance: dbInstance_ })
       : createPublicQueryContext({ dbInstance: dbInstance_ });
 
-    const bobbleheadFilter = CollectionsQuery['buildBaseFilters'](
-      bobbleheads.isPublic,
-      bobbleheads.userId,
-      bobbleheads.isDeleted,
-      context,
-    );
+    // First check if the collection exists and is accessible
+    const collection = await dbInstance_.query.collections.findFirst({
+      where: CollectionsQuery['combineFilters'](
+        eq(collections.id, collectionId),
+        CollectionsQuery['buildBaseFilters'](
+          collections.isPublic,
+          collections.userId,
+          undefined,
+          context,
+        ),
+      ),
+      with: {
+        user: {
+          columns: {
+            id: true,
+          },
+        },
+      },
+    });
 
-    return dbInstance_
-      .select({
-        acquisitionDate: bobbleheads.acquisitionDate,
-        acquisitionMethod: bobbleheads.acquisitionMethod,
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        condition: bobbleheads.currentCondition,
-        featurePhoto: bobbleheadPhotos.url,
-        height: bobbleheads.height,
-        id: bobbleheads.id,
-        isFeatured: bobbleheads.isFeatured,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        purchaseLocation: bobbleheads.purchaseLocation,
-        purchasePrice: bobbleheads.purchasePrice,
-        series: bobbleheads.series,
-        status: bobbleheads.status,
-        weight: bobbleheads.weight,
-      })
-      .from(bobbleheads)
-      .leftJoin(
-        bobbleheadPhotos,
-        and(
-          eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId),
-          eq(bobbleheadPhotos.isPrimary, true),
-        ),
-      )
-      .where(
-        CollectionsQuery['combineFilters'](
-          eq(bobbleheads.subcollectionId, subcollectionId),
-          bobbleheadFilter,
-        ),
-      )
-      .orderBy(bobbleheads.createdAt);
+    if (!collection) {
+      return null;
+    }
+
+    // Get subcollections with bobblehead counts
+    const subCollectionData = await dbInstance_.query.subCollections.findMany({
+      orderBy: [sql`lower(${subCollections.name}) asc`],
+      where: eq(subCollections.collectionId, collectionId),
+      with: {
+        bobbleheads: {
+          where: and(
+            eq(bobbleheads.isDeleted, false),
+            CollectionsQuery['buildBaseFilters'](
+              bobbleheads.isPublic,
+              bobbleheads.userId,
+              undefined,
+              context,
+            ) || eq(bobbleheads.isPublic, true),
+          ),
+        },
+      },
+    });
+
+    return {
+      subCollections: subCollectionData.map((subCollection) => ({
+        bobbleheadCount: subCollection.bobbleheads.length,
+        description: subCollection.description,
+        featurePhoto: subCollection.coverImageUrl,
+        id: subCollection.id,
+        name: subCollection.name,
+      })),
+      userId: collection.user?.id,
+    };
   }
 
   /**

@@ -1,13 +1,13 @@
 import 'server-only';
 import { DollarSignIcon, HeartIcon, PackageIcon, ShieldCheckIcon } from 'lucide-react';
 
-import type { GetBobbleheadById } from '@/lib/queries/bobbleheads.queries';
+import type { BobbleheadsFacade } from '@/lib/queries/bobbleheads/bobbleheads-facade';
 
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/utils/tailwind-utils';
 
 interface BobbleheadMetricsProps {
-  bobblehead: NonNullable<GetBobbleheadById>;
+  bobblehead: NonNullable<Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>>;
 }
 
 const getConditionColor = (condition: null | string) => {
