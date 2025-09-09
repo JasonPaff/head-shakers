@@ -4,14 +4,21 @@ import { revalidateLogic } from '@tanstack/form-core';
 import { useStore } from '@tanstack/react-form';
 import { XIcon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+
+import type { AdminFeaturedContent } from '@/lib/queries/admin/featured-content.queries';
 
 import { ContentSearch } from '@/app/(app)/admin/featured-content/components/content-search';
 import { featuredContentFormOptions } from '@/app/(app)/admin/featured-content/components/featured-content-form-options';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAppForm } from '@/components/ui/form';
-import { createFeaturedContentAction, updateFeaturedContentAction } from '@/lib/actions/admin.actions';
+import {
+  createFeaturedContentAction,
+  getFeaturedContentByIdAction,
+  updateFeaturedContentAction,
+} from '@/lib/actions/admin.actions';
 
 type FeaturedContentFormProps = {
   contentId: null | string;
@@ -21,6 +28,8 @@ type FeaturedContentFormProps = {
 
 export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedContentFormProps) => {
   const isEditing = !!contentId;
+  const [existingData, setExistingData] = useState<AdminFeaturedContent | null>(null);
+  const [isLoading, setIsLoading] = useState(isEditing);
 
   const form = useAppForm({
     ...featuredContentFormOptions,
@@ -33,6 +42,46 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
       modeAfterSubmission: 'change',
     }),
   });
+
+  const { executeAsync: getFeaturedContent } = useAction(getFeaturedContentByIdAction, {
+    onError: ({ error }) => {
+      toast.error(error.serverError || 'Failed to load featured content');
+      onClose();
+    },
+  });
+
+  // fetch existing data when editing
+  useEffect(() => {
+    if (isEditing && contentId) {
+      setIsLoading(true);
+      getFeaturedContent({ id: contentId })
+        .then((result) => {
+          if (result?.data?.featuredContent) {
+            const data = result.data.featuredContent;
+            setExistingData(data);
+            // populate form with existing data
+            form.setFieldValue('contentType', data.contentType);
+            form.setFieldValue('featureType', data.featureType);
+            form.setFieldValue('contentId', data.contentId);
+            form.setFieldValue('title', data.title || '');
+            form.setFieldValue('description', data.description || '');
+            form.setFieldValue('imageUrl', data.imageUrl || '/placeholder.jpg');
+            form.setFieldValue('priority', data.priority.toString());
+            form.setFieldValue('sortOrder', data.sortOrder.toString());
+            form.setFieldValue('curatorNotes', data.curatorNotes || '');
+            form.setFieldValue('isActive', data.isActive);
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching featured content:', error);
+          toast.error('Failed to load featured content data');
+          onClose();
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  }, [contentId, isEditing, form, onClose, getFeaturedContent]);
 
   const { executeAsync: createFeaturedContent, isExecuting: isCreating } = useAction(
     createFeaturedContentAction,
@@ -72,11 +121,33 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
     form.setFieldValue('imageUrl', imageUrl || '/placeholder.jpg');
   };
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Loading featured content...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className={'flex items-center justify-center p-8'}>
+            <div className={'text-muted-foreground'}>Loading...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
         <div className={'flex items-center justify-between'}>
-          <CardTitle>{contentId ? 'Edit Featured Content' : 'Create Featured Content'}</CardTitle>
+          <CardTitle>
+            {contentId ? 'Edit Featured Content' : 'Create Featured Content'}
+            {existingData?.contentTitle && (
+              <span className={'ml-2 text-sm font-normal text-muted-foreground'}>
+                - {existingData.contentTitle}
+              </span>
+            )}
+          </CardTitle>
           <Button onClick={onClose} size={'sm'} variant={'ghost'}>
             <XIcon aria-hidden className={'size-4'} />
           </Button>

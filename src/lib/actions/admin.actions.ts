@@ -8,6 +8,7 @@ import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
+import { getFeaturedContentByIdForAdmin } from '@/lib/queries/admin/featured-content.queries';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -229,3 +230,27 @@ export const toggleFeaturedContentStatusAction = adminActionClient
       };
     },
   );
+
+/**
+ * Get featured content by ID (admin only)
+ */
+export const getFeaturedContentByIdAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.SYSTEM.GET_FEATURED_CONTENT,
+  })
+  .inputSchema(
+    z.object({
+      id: z.string().uuid('ID must be a valid UUID'),
+    }),
+  )
+  .action(async ({ parsedInput }: { parsedInput: { id: string } }) => {
+    const featuredContentData = await getFeaturedContentByIdForAdmin(parsedInput.id);
+
+    if (!featuredContentData) {
+      throw new Error('Featured content not found');
+    }
+
+    return {
+      featuredContent: featuredContentData,
+    };
+  });
