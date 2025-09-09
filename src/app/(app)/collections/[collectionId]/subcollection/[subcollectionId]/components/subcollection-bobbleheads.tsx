@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { ENUMS } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
@@ -24,13 +25,16 @@ export const SubcollectionBobbleheads = async ({
   subcollectionId,
 }: SubcollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
-  const bobbleheads = await CollectionsFacade.getSubcollectionBobbleheadsWithPhotos(subcollectionId, currentUserId || undefined);
+  const bobbleheads = await CollectionsFacade.getSubcollectionBobbleheadsWithPhotos(
+    subcollectionId,
+    currentUserId || undefined,
+  );
 
   return (
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
-        {isOwner && (
+        <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
               href={$path({
@@ -42,7 +46,7 @@ export const SubcollectionBobbleheads = async ({
               Add Bobblehead
             </Link>
           </Button>
-        )}
+        </Conditional>
       </div>
 
       <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
@@ -50,23 +54,27 @@ export const SubcollectionBobbleheads = async ({
           <Card className={'group transition-shadow hover:shadow-lg'} key={bobblehead.id}>
             <CardHeader className={'pb-3'}>
               <div className={'relative mb-4 aspect-square overflow-hidden rounded-lg bg-muted'}>
+                {/* Bobblehead Image */}
                 <img
                   alt={bobblehead.name || 'Bobblehead'}
                   className={'object-cover transition-transform duration-300 group-hover:scale-105'}
                   src={bobblehead.featurePhoto || '/placeholder.svg'}
                 />
-                {bobblehead.isFeatured && (
+                {/* Featured Badge */}
+                <Conditional isCondition={bobblehead.isFeatured}>
                   <div className={'absolute top-2 right-2'}>
                     <Badge className={'bg-accent text-accent-foreground'}>
-                      <StarIcon className={'mr-1 size-3'} />
+                      <StarIcon aria-hidden className={'mr-1 size-3'} />
                       Featured
                     </Badge>
                   </div>
-                )}
+                </Conditional>
               </div>
               <CardTitle className={'text-lg text-balance'}>{bobblehead.name}</CardTitle>
             </CardHeader>
+
             <CardContent className={'space-y-3 pt-0'}>
+              {/* Bobblehead Details */}
               <div className={'space-y-2'}>
                 <div className={'flex items-center gap-2 text-sm'}>
                   <span className={'font-medium'}>Character:</span>
@@ -82,6 +90,7 @@ export const SubcollectionBobbleheads = async ({
                 </div>
               </div>
 
+              {/* Condition and Price */}
               <div className={'flex items-center justify-between pt-2'}>
                 <Badge
                   variant={bobblehead.condition === ENUMS.BOBBLEHEAD.CONDITION[0] ? 'default' : 'secondary'}
@@ -94,6 +103,7 @@ export const SubcollectionBobbleheads = async ({
                 </div>
               </div>
 
+              {/* View Details Button */}
               <div className={'pt-2'}>
                 <Button asChild className={'w-full'} size={'sm'}>
                   <Link

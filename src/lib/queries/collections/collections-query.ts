@@ -225,7 +225,7 @@ export class CollectionsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     // get user's collections with all relations for dashboard
-    const result = await dbInstance.query.collections.findMany({
+    return await dbInstance.query.collections.findMany({
       orderBy: [sql`lower(${collections.name}) asc`],
       where: eq(collections.userId, userId),
       with: {
@@ -252,8 +252,6 @@ export class CollectionsQuery extends BaseQuery {
         },
       },
     });
-
-    return result as Array<CollectionWithRelations>;
   }
 
   /**
@@ -273,7 +271,7 @@ export class CollectionsQuery extends BaseQuery {
       context,
     );
 
-    const result = await dbInstance
+    return dbInstance
       .select({
         id: subCollections.id,
         name: subCollections.name,
@@ -282,7 +280,5 @@ export class CollectionsQuery extends BaseQuery {
       .innerJoin(collections, eq(subCollections.collectionId, collections.id))
       .where(this.combineFilters(eq(subCollections.collectionId, collectionId), collectionFilter))
       .orderBy(sql`lower(${subCollections.name}) asc`);
-
-    return result;
   }
 }
