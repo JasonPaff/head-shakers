@@ -1,9 +1,7 @@
 import 'server-only';
-import { auth } from '@clerk/nextjs/server';
 import { ChevronRightIcon, EyeIcon, LockIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-import { redirect } from 'next/navigation';
 
 import { CollectionActions } from '@/app/(app)/dashboard/collection/(collection)/components/collection-actions';
 import { CollectionCreateButton } from '@/app/(app)/dashboard/collection/(collection)/components/collection-create-button';
@@ -12,12 +10,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
+import { getUserId } from '@/utils/user-utils';
 
 // TODO: add a nice empty state when there are no collections
 
 export const CollectionList = async () => {
-  const { userId } = await auth();
-  if (!userId) redirect($path({ route: '/' }));
+  const userId = await getUserId();
 
   const collections = await CollectionsFacade.getUserCollectionsForDashboard(userId);
 
