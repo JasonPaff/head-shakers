@@ -26,7 +26,8 @@
       "Bash(wc:*)",
       "Bash(grep:*)",
       "mcp__cloudinary-env-config__create-upload-preset",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(dir srclibmiddleware*.ts)"
     ],
     "deny": [],
     "ask": []
