@@ -96,7 +96,7 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     return (
       <FeaturedContentDisplay
         featuredContentData={featuredContentData}
-        onViewContent={isTrackViews ? (contentId: string) => FeaturedContentFacade.incrementViewCount(contentId) : undefined}
+        onViewContent={isTrackViews ? incrementViewCountAction : undefined}
       />
     );
   } catch (error) {
@@ -111,5 +111,15 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     };
 
     return <FeaturedContentDisplay featuredContentData={emptyData} />;
+  }
+}
+
+async function incrementViewCountAction(contentId: string) {
+  'use server';
+
+  try {
+    await FeaturedContentFacade.incrementViewCount(contentId);
+  } catch (error) {
+    console.error('Failed to increment view count:', error);
   }
 }
