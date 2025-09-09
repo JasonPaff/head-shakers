@@ -11,7 +11,12 @@ import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/sche
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 
 const searchContentSchema = z.object({
-  limit: z.number().int().min(1).max(CONFIG.PAGINATION.SEARCH_RESULTS.MAX).default(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(CONFIG.PAGINATION.SEARCH_RESULTS.MAX)
+    .default(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),
   query: z.string().min(1).max(CONFIG.SEARCH.MAX_QUERY_LENGTH),
 });
 
@@ -131,21 +136,23 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
 
       // Get all photos for each bobblehead in a single query
       const bobbleheadIds = results.map((result) => result.id);
-      const allPhotos = bobbleheadIds.length > 0 ? 
-        await ctx.db
-          .select({
-            altText: bobbleheadPhotos.altText,
-            bobbleheadId: bobbleheadPhotos.bobbleheadId,
-            isPrimary: bobbleheadPhotos.isPrimary,
-            sortOrder: bobbleheadPhotos.sortOrder,
-            url: bobbleheadPhotos.url,
-          })
-          .from(bobbleheadPhotos)
-          .where(inArray(bobbleheadPhotos.bobbleheadId, bobbleheadIds))
-          .orderBy(bobbleheadPhotos.sortOrder) : [];
+      const allPhotos =
+        bobbleheadIds.length > 0 ?
+          await ctx.db
+            .select({
+              altText: bobbleheadPhotos.altText,
+              bobbleheadId: bobbleheadPhotos.bobbleheadId,
+              isPrimary: bobbleheadPhotos.isPrimary,
+              sortOrder: bobbleheadPhotos.sortOrder,
+              url: bobbleheadPhotos.url,
+            })
+            .from(bobbleheadPhotos)
+            .where(inArray(bobbleheadPhotos.bobbleheadId, bobbleheadIds))
+            .orderBy(bobbleheadPhotos.sortOrder)
+        : [];
 
       // Group photos by bobblehead ID
-      const photosByBobblehead = new Map<string, Array<typeof allPhotos[0]>>();
+      const photosByBobblehead = new Map<string, Array<(typeof allPhotos)[0]>>();
       allPhotos.forEach((photo) => {
         if (!photosByBobblehead.has(photo.bobbleheadId)) {
           photosByBobblehead.set(photo.bobbleheadId, []);
@@ -218,7 +225,7 @@ export const searchUsersForFeaturingAction = adminActionClient
   );
 
 /**
- * Get specific collection by ID for featuring (admin/moderator only)
+ * Get a specific collection by ID for featuring (admin/moderator only)
  */
 export const getCollectionForFeaturingAction = adminActionClient
   .metadata({
@@ -226,44 +233,36 @@ export const getCollectionForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(z.object({ id: z.string().uuid() }))
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }: {
-      ctx: AdminActionContext;
-      parsedInput: { id: string };
-    }) => {
-      const result = await ctx.db
-        .select({
-          coverImageUrl: collections.coverImageUrl,
-          description: collections.description,
-          id: collections.id,
-          isPublic: collections.isPublic,
-          name: collections.name,
-          ownerName: users.displayName,
-          ownerUsername: users.username,
-          totalItems: collections.totalItems,
-        })
-        .from(collections)
-        .innerJoin(users, eq(collections.userId, users.id))
-        .where(
-          and(
-            eq(collections.id, parsedInput.id),
-            eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
-          ),
-        )
-        .limit(1);
+  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
+    const result = await ctx.db
+      .select({
+        coverImageUrl: collections.coverImageUrl,
+        description: collections.description,
+        id: collections.id,
+        isPublic: collections.isPublic,
+        name: collections.name,
+        ownerName: users.displayName,
+        ownerUsername: users.username,
+        totalItems: collections.totalItems,
+      })
+      .from(collections)
+      .innerJoin(users, eq(collections.userId, users.id))
+      .where(
+        and(
+          eq(collections.id, parsedInput.id),
+          eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
+          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+        ),
+      )
+      .limit(1);
 
-      const collection = result[0];
-      if (!collection) {
-        throw new Error('Collection not found or not public');
-      }
+    const collection = result[0];
+    if (!collection) {
+      throw new Error('Collection not found or not public');
+    }
 
-      return { collection };
-    },
-  );
+    return { collection };
+  });
 
 /**
  * Get specific bobblehead by ID for featuring (admin/moderator only)
@@ -274,76 +273,68 @@ export const getBobbleheadForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(z.object({ id: z.string().uuid() }))
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }: {
-      ctx: AdminActionContext;
-      parsedInput: { id: string };
-    }) => {
-      const result = await ctx.db
-        .select({
-          category: bobbleheads.category,
-          characterName: bobbleheads.characterName,
-          collectionName: collections.name,
-          description: bobbleheads.description,
-          id: bobbleheads.id,
-          isPublic: bobbleheads.isPublic,
-          manufacturer: bobbleheads.manufacturer,
-          name: bobbleheads.name,
-          ownerName: users.displayName,
-          ownerUsername: users.username,
-          primaryPhotoUrl: bobbleheadPhotos.url,
-          series: bobbleheads.series,
-          year: bobbleheads.year,
-        })
-        .from(bobbleheads)
-        .innerJoin(users, eq(bobbleheads.userId, users.id))
-        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
-        .leftJoin(
-          bobbleheadPhotos,
-          and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-        )
-        .where(
-          and(
-            eq(bobbleheads.id, parsedInput.id),
-            eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
-          ),
-        )
-        .limit(1);
+  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
+    const result = await ctx.db
+      .select({
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        collectionName: collections.name,
+        description: bobbleheads.description,
+        id: bobbleheads.id,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        ownerName: users.displayName,
+        ownerUsername: users.username,
+        primaryPhotoUrl: bobbleheadPhotos.url,
+        series: bobbleheads.series,
+        year: bobbleheads.year,
+      })
+      .from(bobbleheads)
+      .innerJoin(users, eq(bobbleheads.userId, users.id))
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        and(
+          eq(bobbleheads.id, parsedInput.id),
+          eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+        ),
+      )
+      .limit(1);
 
-      const bobblehead = result[0];
-      if (!bobblehead) {
-        throw new Error('Bobblehead not found or not public');
-      }
+    const bobblehead = result[0];
+    if (!bobblehead) {
+      throw new Error('Bobblehead not found or not public');
+    }
 
-      // Get all photos for this bobblehead
-      const photos = await ctx.db
-        .select({
-          altText: bobbleheadPhotos.altText,
-          bobbleheadId: bobbleheadPhotos.bobbleheadId,
-          isPrimary: bobbleheadPhotos.isPrimary,
-          sortOrder: bobbleheadPhotos.sortOrder,
-          url: bobbleheadPhotos.url,
-        })
-        .from(bobbleheadPhotos)
-        .where(eq(bobbleheadPhotos.bobbleheadId, parsedInput.id))
-        .orderBy(bobbleheadPhotos.sortOrder);
+    // Get all photos for this bobblehead
+    const photos = await ctx.db
+      .select({
+        altText: bobbleheadPhotos.altText,
+        bobbleheadId: bobbleheadPhotos.bobbleheadId,
+        isPrimary: bobbleheadPhotos.isPrimary,
+        sortOrder: bobbleheadPhotos.sortOrder,
+        url: bobbleheadPhotos.url,
+      })
+      .from(bobbleheadPhotos)
+      .where(eq(bobbleheadPhotos.bobbleheadId, parsedInput.id))
+      .orderBy(bobbleheadPhotos.sortOrder);
 
-      return {
-        bobblehead: {
-          ...bobblehead,
-          photos,
-        },
-      };
-    },
-  );
+    return {
+      bobblehead: {
+        ...bobblehead,
+        photos,
+      },
+    };
+  });
 
 /**
- * Get specific user by ID for featuring (admin/moderator only)
+ * Get a specific user by ID for featuring (admin/moderator only)
  */
 export const getUserForFeaturingAction = adminActionClient
   .metadata({
@@ -351,39 +342,26 @@ export const getUserForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(z.object({ id: z.string().uuid() }))
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }: {
-      ctx: AdminActionContext;
-      parsedInput: { id: string };
-    }) => {
-      const result = await ctx.db
-        .select({
-          avatarUrl: users.avatarUrl,
-          bio: users.bio,
-          displayName: users.displayName,
-          id: users.id,
-          isVerified: users.isVerified,
-          location: users.location,
-          memberSince: users.memberSince,
-          username: users.username,
-        })
-        .from(users)
-        .where(
-          and(
-            eq(users.id, parsedInput.id),
-            eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
-          ),
-        )
-        .limit(1);
+  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
+    const result = await ctx.db
+      .select({
+        avatarUrl: users.avatarUrl,
+        bio: users.bio,
+        displayName: users.displayName,
+        id: users.id,
+        isVerified: users.isVerified,
+        location: users.location,
+        memberSince: users.memberSince,
+        username: users.username,
+      })
+      .from(users)
+      .where(and(eq(users.id, parsedInput.id), eq(users.isDeleted, DEFAULTS.USER.IS_DELETED)))
+      .limit(1);
 
-      const user = result[0];
-      if (!user) {
-        throw new Error('User not found');
-      }
+    const user = result[0];
+    if (!user) {
+      throw new Error('User not found');
+    }
 
-      return { user };
-    },
-  );
+    return { user };
+  });

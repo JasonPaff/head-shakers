@@ -6,59 +6,15 @@ import { z } from 'zod';
 
 import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
-import { ACTION_NAMES, DEFAULTS } from '@/lib/constants';
+import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
 import { getFeaturedContentByIdForAdmin } from '@/lib/queries/admin/featured-content.queries';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
-  insertFeaturedContentSchema,
-  updateFeaturedContentSchema,
-} from '@/lib/validations/system.validation';
-
-const adminCreateFeaturedContentSchema = insertFeaturedContentSchema.extend({
-  curatorNotes: z.string().optional(),
-  metadata: z.record(z.string(), z.unknown()).optional(),
-  priority: z
-    .union([z.string(), z.number()])
-    .transform((val) => {
-      const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
-    })
-    .pipe(z.number().int().min(0))
-    .default(0),
-  sortOrder: z
-    .union([z.string(), z.number()])
-    .transform((val) => {
-      const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
-    })
-    .pipe(z.number().int().min(0)),
-  viewCount: z.number().int().min(0).default(DEFAULTS.SYSTEM.CONTENT_METRIC_VIEW_COUNT),
-});
-
-const adminUpdateFeaturedContentSchema = updateFeaturedContentSchema.extend({
-  curatorNotes: z.string().optional(),
-  id: z.string().uuid('ID must be a valid UUID'),
-  metadata: z.record(z.string(), z.unknown()).optional(),
-  priority: z
-    .union([z.string(), z.number()])
-    .transform((val) => {
-      const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
-    })
-    .pipe(z.number().int().min(0))
-    .optional(),
-  sortOrder: z
-    .union([z.string(), z.number()])
-    .transform((val) => {
-      const num = typeof val === 'string' ? parseInt(val, 10) : val;
-      return isNaN(num) ? DEFAULTS.FEATURED_CONTENT.SORT_ORDER : num;
-    })
-    .pipe(z.number().int().min(0))
-    .optional(),
-  viewCount: z.number().int().min(0).optional(),
-});
+  adminCreateFeaturedContentSchema,
+  adminUpdateFeaturedContentSchema,
+} from '@/lib/validations/admin.validation';
 
 /**
  * Create featured content (admin only)

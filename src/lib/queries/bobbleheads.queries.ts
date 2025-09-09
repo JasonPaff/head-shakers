@@ -1,5 +1,4 @@
 import { and, desc, eq, inArray, like, or } from 'drizzle-orm';
-import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -7,10 +6,8 @@ import type {
   InsertBobblehead,
   InsertBobbleheadPhoto,
   UpdateBobblehead,
-  UpdateBobbleheadPhoto,
 } from '@/lib/validations/bobbleheads.validation';
 
-import { TAGS } from '@/lib/constants/tags';
 import { db } from '@/lib/db';
 import {
   bobbleheadPhotos,
@@ -85,8 +82,6 @@ export const getBobbleheadByIdAsync = cache(async (id: string, dbInstance: Datab
   };
 });
 
-export type GetBobbleheadByIdPublic = Awaited<ReturnType<typeof getBobbleheadByIdForPublicAsync>>;
-
 export const getBobbleheadByIdForPublicAsync = cache(
   async (id: string, viewerUserId?: string, dbInstance: DatabaseExecutor = db) => {
     const result = await dbInstance
@@ -141,14 +136,6 @@ export const getBobbleheadByIdForPublicAsync = cache(
   },
 );
 
-export const getTrendingBobbleheads = unstable_cache(
-  async (limit: number = 10) => {
-    return db.select().from(bobbleheads).orderBy(desc(bobbleheads.viewCount)).limit(limit);
-  },
-  ['trending-bobbleheads'],
-  { revalidate: 300, tags: [TAGS.BOBBLEHEAD.BOBBLEHEADS] },
-);
-
 export const getBobbleheadWithDetailsAsync = cache(
   async (id: string, userId?: string, dbInstance: DatabaseExecutor = db) => {
     const query = dbInstance
@@ -176,24 +163,6 @@ export const getBobbleheadsByCollectionAsync = cache(
       .where(
         and(
           eq(bobbleheads.collectionId, collectionId),
-          eq(bobbleheads.isDeleted, false),
-          userId ?
-            or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, userId))
-          : eq(bobbleheads.isPublic, true),
-        ),
-      )
-      .orderBy(desc(bobbleheads.createdAt));
-  },
-);
-
-export const getBobbleheadsBySubcollectionAsync = cache(
-  async (subcollectionId: string, userId?: string, dbInstance: DatabaseExecutor = db) => {
-    return dbInstance
-      .select()
-      .from(bobbleheads)
-      .where(
-        and(
-          eq(bobbleheads.subcollectionId, subcollectionId),
           eq(bobbleheads.isDeleted, false),
           userId ?
             or(eq(bobbleheads.isPublic, true), eq(bobbleheads.userId, userId))
@@ -320,14 +289,6 @@ export const getBobbleheadPhotosAsync = cache(
   },
 );
 
-export const updateBobbleheadPhotoAsync = async (
-  id: string,
-  data: UpdateBobbleheadPhoto,
-  dbInstance: DatabaseExecutor = db,
-) => {
-  return dbInstance.update(bobbleheadPhotos).set(data).where(eq(bobbleheadPhotos.id, id)).returning();
-};
-
 export const deleteBobbleheadPhotoAsync = async (
   id: string,
   bobbleheadId: string,
@@ -337,22 +298,6 @@ export const deleteBobbleheadPhotoAsync = async (
     .delete(bobbleheadPhotos)
     .where(and(eq(bobbleheadPhotos.id, id), eq(bobbleheadPhotos.bobbleheadId, bobbleheadId)))
     .returning();
-};
-
-export const reorderBobbleheadPhotosAsync = async (
-  updates: Array<{ id: string; sortOrder: number }>,
-  bobbleheadId: string,
-  dbInstance: DatabaseExecutor = db,
-) => {
-  const sql = `
-    UPDATE bobblehead_photos 
-    SET sort_order = CASE id
-      ${updates.map((u) => `WHEN '${u.id}' THEN ${u.sortOrder}`).join(' ')}
-    END
-    WHERE bobblehead_id = ${bobbleheadId} AND id IN (${updates.map((u) => `'${u.id}'`).join(',')})
-    RETURNING *
-  `;
-  return dbInstance.execute(sql);
 };
 
 export const addTagToBobbleheadAsync = async (
