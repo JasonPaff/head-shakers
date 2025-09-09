@@ -1,15 +1,9 @@
-import type { ReactNode } from 'react';
-
 import { AdminRouteGuard } from '@/components/ui/admin/admin-route-guard';
 
-interface AdminLayoutProps {
-  children: ReactNode;
+type AdminLayoutProps = Children<{
   isAdminRequired?: boolean;
-}
+}>;
 
-/**
- * Layout component for admin pages that includes route protection
- */
 export const AdminLayout = ({ children, isAdminRequired = false }: AdminLayoutProps) => {
   return (
     <AdminRouteGuard isAdminRequired={isAdminRequired}>

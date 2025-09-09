@@ -1,3 +1,5 @@
+import { ENUMS } from '@/lib/constants/enums';
+
 /**
  * Default values used throughout the application
  * Centralized to ensure consistency
@@ -32,7 +34,9 @@ export const DEFAULTS = {
     STATUS: 'pending',
   },
   FEATURED_CONTENT: {
+    CONTENT_TYPE: ENUMS.FEATURED_CONTENT.TYPE[1],
     IS_ACTIVE: true,
+    PRIORITY: 0,
     SORT_ORDER: 0,
   },
   FOLLOW: {
@@ -59,6 +63,11 @@ export const DEFAULTS = {
     IS_PUSH_NEW_COMMENTS: true,
     IS_PUSH_NEW_FOLLOWERS: true,
     IS_PUSH_NEW_LIKES: false,
+  },
+  PAGINATION: {
+    LIMIT: 20,
+    MAX_LIMIT: 100,
+    OFFSET: 0,
   },
   PLATFORM_SETTING: {
     IS_PUBLIC: false,

@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { collections, subCollections } from '@/lib/db/schema';
-import { getSubCollectionsByCollectionAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -27,6 +27,8 @@ export const createCollectionAction = authActionClient
     const dbInstance = ctx.tx ?? ctx.db;
 
     try {
+      CollectionsFacade.validateCollectionCreation(sanitizedData, ctx.userId);
+
       const [newCollection] = await dbInstance
         .insert(collections)
         .values({
@@ -35,7 +37,7 @@ export const createCollectionAction = authActionClient
         })
         .returning();
 
-      // Revalidate the collection list for the user
+      // revalidate the collection list for the user
       revalidatePath(
         $path({
           route: '/dashboard/collection',
@@ -69,6 +71,19 @@ export const updateCollectionAction = authActionClient
     const dbInstance = ctx.tx ?? ctx.db;
 
     try {
+      // get the current collection to validate
+      const currentCollection = await CollectionsFacade.getCollectionById(
+        sanitizedData.collectionId,
+        ctx.userId,
+        dbInstance,
+      );
+
+      if (!currentCollection) {
+        throw new Error('Collection not found');
+      }
+
+      CollectionsFacade.validateCollectionUpdate(sanitizedData, currentCollection, ctx.userId);
+
       const [updatedCollection] = await dbInstance
         .update(collections)
         .set({
@@ -193,10 +208,14 @@ export const getSubCollectionsByCollectionAction = authActionClient
   .inputSchema(z.object({ collectionId: z.string() }))
   .action(async ({ ctx, parsedInput }) => {
     try {
-      const subCollections = await getSubCollectionsByCollectionAsync(parsedInput.collectionId, ctx.db);
+      const subCollections = await CollectionsFacade.getSubCollectionsByCollection(
+        parsedInput.collectionId,
+        ctx.userId,
+        ctx.db,
+      );
 
       return {
-        data: subCollections.map((sc) => ({ id: sc.id, name: sc.name })),
+        data: subCollections,
         success: true,
       };
     } catch (error) {

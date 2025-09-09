@@ -13,6 +13,7 @@ export default async function AdminFeaturedContentPage() {
   return (
     <AdminLayout isAdminRequired={false}>
       <div className={'space-y-6'}>
+        {/* Header */}
         <div className={'flex items-center justify-between'}>
           <div>
             <h2 className={'text-2xl font-bold tracking-tight'}>Featured Content Management</h2>
@@ -21,6 +22,8 @@ export default async function AdminFeaturedContentPage() {
             </p>
           </div>
         </div>
+
+        {/* Featured Content */}
         <FeaturedContentManager initialData={featuredContent} />
       </div>
     </AdminLayout>
