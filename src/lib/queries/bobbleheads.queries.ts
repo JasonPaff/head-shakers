@@ -2,11 +2,7 @@ import { and, desc, eq, inArray, like, or } from 'drizzle-orm';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type {
-  InsertBobblehead,
-  InsertBobbleheadPhoto,
-  UpdateBobblehead,
-} from '@/lib/validations/bobbleheads.validation';
+import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
 import { db } from '@/lib/db';
 import {
@@ -26,19 +22,6 @@ export const createBobbleheadAsync = async (
   return dbInstance
     .insert(bobbleheads)
     .values({ ...data, userId })
-    .returning();
-};
-
-export const updateBobbleheadAsync = async (
-  id: string,
-  data: UpdateBobblehead,
-  userId: string,
-  dbInstance: DatabaseExecutor = db,
-) => {
-  return dbInstance
-    .update(bobbleheads)
-    .set({ ...data, userId })
-    .where(eq(bobbleheads.id, id))
     .returning();
 };
 

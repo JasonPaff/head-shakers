@@ -23,44 +23,6 @@ export interface ErrorContext {
 }
 
 /**
- * Create a business rule violation error
- */
-export function createBusinessRuleViolation(
-  rule: string,
-  message: string,
-  operation: string,
-  context?: Record<string, unknown>,
-): ActionError {
-  return new ActionError(
-    ErrorType.BUSINESS_RULE,
-    'BUSINESS_RULE_VIOLATION',
-    message,
-    { operation, rule, ...context },
-    false,
-    400,
-  );
-}
-
-/**
- * Create a not found error with proper context
- */
-export function createNotFoundError(
-  resource: string,
-  operation: string,
-  id?: string,
-  context?: Record<string, unknown>,
-): ActionError {
-  return new ActionError(
-    ErrorType.NOT_FOUND,
-    'RESOURCE_NOT_FOUND',
-    `${resource} not found${id ? ` with id: ${id}` : ''}`,
-    { operation, resource, resourceId: id, ...context },
-    false,
-    404,
-  );
-}
-
-/**
  * Comprehensive error handler for server actions
  * Provides consistent error classification, logging, and response formatting
  */
@@ -352,62 +314,7 @@ export function handleActionError(error: unknown, context: ErrorContext): never 
 }
 
 /**
- * Specialized error handler for authentication operations
- */
-export function handleAuthError(error: unknown, operation: string): never {
-  if (error instanceof Error) {
-    const message = error.message.toLowerCase();
-
-    if (message.includes('unauthorized') || message.includes('unauthenticated')) {
-      throw new ActionError(
-        ErrorType.AUTHORIZATION,
-        'UNAUTHORIZED',
-        ERROR_MESSAGES.AUTH.UNAUTHORIZED,
-        { operation },
-        false,
-        401,
-        error,
-      );
-    }
-
-    if (message.includes('forbidden') || message.includes('permission')) {
-      throw new ActionError(
-        ErrorType.AUTHORIZATION,
-        'FORBIDDEN',
-        ERROR_MESSAGES.AUTH.INSUFFICIENT_PERMISSIONS,
-        { operation },
-        false,
-        403,
-        error,
-      );
-    }
-
-    if (message.includes('session') || message.includes('expired')) {
-      throw new ActionError(
-        ErrorType.AUTHORIZATION,
-        'SESSION_EXPIRED',
-        ERROR_MESSAGES.AUTH.SESSION_EXPIRED,
-        { operation },
-        false,
-        401,
-        error,
-      );
-    }
-  }
-
-  // fallback to general error handler
-  handleActionError(error, { operation });
-}
-
-/**
- * Type guard for ActionError
- */
-export function isActionError(error: unknown): error is ActionError {
-  return error instanceof ActionError;
-}
-
-/**
- * Extract service name from error message for better categorization
+ * Extract the service name from an error message for better categorization
  */
 function extractServiceName(message: string): string | undefined {
   const lowerMessage = message.toLowerCase();

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access */
 import { v2 as cloudinary } from 'cloudinary';
 
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
@@ -11,64 +11,6 @@ cloudinary.config({
 });
 
 export class CloudinaryService {
-  /**
-   * Clean up temporary photos that are older than specified hours
-   * @param tempFolder - The temporary folder path
-   * @param hoursOld - Delete photos older than this many hours (default: 24)
-   */
-  static async cleanupTempPhotos(tempFolder: string, hoursOld: number = 24): Promise<void> {
-    try {
-      const cutoffDate = new Date();
-      cutoffDate.setHours(cutoffDate.getHours() - hoursOld);
-
-      // search for old assets in the temp folder
-      const searchResult = await cloudinary.search
-        .expression(`folder:${tempFolder} AND created_at<${cutoffDate.toISOString()}`)
-        .max_results(100)
-        .execute();
-
-      if (searchResult.resources && searchResult.resources.length > 0) {
-        // @ts-expect-error ignoring type issue from cloudinary
-        const publicIds = searchResult.resources.map((resource: unknown) => resource.public_id);
-        await CloudinaryService.deletePhotos(publicIds);
-        console.log(`Cleaned up ${publicIds.length} old temporary photos`);
-      }
-    } catch (error) {
-      console.error('Failed to cleanup temp photos:', error);
-    }
-  }
-
-  /**
-   * Delete photos from Cloudinary
-   * @param publicIds - Array of Cloudinary public IDs to delete
-   * @returns Success status for each deletion
-   */
-  static async deletePhotos(publicIds: string[]): Promise<Array<{ publicId: string; success: boolean }>> {
-    const deletionResults = await Promise.all(
-      publicIds.map(async (publicId) => {
-        try {
-          const result = await cloudinary.uploader.destroy(publicId, {
-            invalidate: true,
-            resource_type: 'image',
-          });
-
-          return {
-            publicId,
-            success: result.result === 'ok',
-          };
-        } catch (error) {
-          console.error(`Failed to delete photo ${publicId}:`, error);
-          return {
-            publicId,
-            success: false,
-          };
-        }
-      }),
-    );
-
-    return deletionResults;
-  }
-
   /**
    * Generate optimized URL for a Cloudinary image
    * @param publicId - The Cloudinary public ID

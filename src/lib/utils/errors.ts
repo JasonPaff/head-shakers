@@ -208,32 +208,3 @@ export function isUniqueConstraintError(error: unknown): boolean {
     message.includes('already exists')
   );
 }
-
-/**
- * Utility functions for backward compatibility
- */
-export const createValidationError = (field: string, message: string) =>
-  new ActionError(
-    ErrorType.VALIDATION,
-    'VALIDATION_ERROR',
-    `Validation failed for ${field}: ${message}`,
-    { field },
-    false,
-    400,
-  );
-
-export const createAuthorizationError = (message: string = 'Insufficient permissions') =>
-  new ActionError(ErrorType.AUTHORIZATION, 'AUTHORIZATION_ERROR', message, undefined, false, 403);
-
-export const createNotFoundError = (resource: string, id?: string) =>
-  new ActionError(
-    ErrorType.NOT_FOUND,
-    'NOT_FOUND',
-    `${resource} not found${id ? ` with id: ${id}` : ''}`,
-    { id, resource },
-    false,
-    404,
-  );
-
-export const createBusinessRuleError = (rule: string, message: string) =>
-  new ActionError(ErrorType.BUSINESS_RULE, 'BUSINESS_RULE_VIOLATION', message, { rule }, false, 400);
