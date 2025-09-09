@@ -19,7 +19,7 @@ export const adminMiddleware = createMiddleware<{
     throw new Error(ERROR_MESSAGES.AUTH.UNAUTHORIZED);
   }
 
-  // get the database user record using Clerk ID, including role
+  // get the database user record using Clerk ID, including the role
   const [dbUser] = await db
     .select({
       email: users.email,
