@@ -1,10 +1,10 @@
 import {
-  getCollectionOfWeekCached,
-  getEditorPicksContentCached,
-  getHomepageBannerContentCached,
-  getTrendingContentCached,
-  incrementViewCountCached,
-} from '@/lib/queries/cached/featured-content.cached-queries';
+  getCollectionOfWeek,
+  getEditorPicks,
+  getHomepageBanner,
+  getTrendingContent,
+  incrementViewCount,
+} from '@/lib/queries/featured-content.queries';
 
 import { FeaturedContentDisplay } from './featured-content-display';
 
@@ -14,15 +14,24 @@ export interface FeaturedContentServerProps {
 
 export async function FeaturedContentServer({ isTrackViews = false }: FeaturedContentServerProps) {
   try {
+    console.log('FeaturedContentServer: Fetching featured content data');
+
     // fetch all featured content sections in parallel
     const [homepageBanner, editorPicks, collectionOfWeek, trending] = await Promise.all([
-      getHomepageBannerContentCached(),
-      getEditorPicksContentCached(),
-      getCollectionOfWeekCached(),
-      getTrendingContentCached(),
+      getHomepageBanner(),
+      getEditorPicks(),
+      getCollectionOfWeek(),
+      getTrendingContent(),
     ]);
 
-    // transform cached data to match the expected format
+    console.log('FeaturedContentServer: Data fetched successfully', {
+      collectionOfWeek: collectionOfWeek.length,
+      editorPicks: editorPicks.length,
+      homepageBanner: homepageBanner.length,
+      trending: trending.length,
+    });
+
+    // transform data to match the expected format
     const featuredContentData = {
       collection_of_week: collectionOfWeek.map((content) => ({
         comments: content.comments || 0,
@@ -93,7 +102,7 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     return (
       <FeaturedContentDisplay
         featuredContentData={featuredContentData}
-        onViewContent={isTrackViews ? incrementViewCountCached : undefined}
+        onViewContent={isTrackViews ? incrementViewCount : undefined}
       />
     );
   } catch (error) {

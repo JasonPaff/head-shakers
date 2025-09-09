@@ -7,6 +7,11 @@ import { cache } from 'react';
 import { db } from '@/lib/db';
 import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 
+const cacheStats = {
+  nextjs: { hits: 0, misses: 0 },
+  react: { hits: 0, misses: 0 },
+};
+
 export interface FeaturedContent {
   comments?: number;
   contentId: string;
@@ -31,17 +36,10 @@ export interface FeaturedContent {
   viewCount: number;
 }
 
-// Cache statistics for monitoring
-export const cacheStats = {
-  nextjs: { hits: 0, misses: 0 },
-  react: { hits: 0, misses: 0 }
-};
-
-// React cache for request-level deduplication
-const getActiveFeaturedContentBase = cache(async (): Promise<FeaturedContent[]> => {
+const getActiveFeaturedContentBase = cache(async (): Promise<Array<FeaturedContent>> => {
   console.log('Cache miss: React cache - getActiveFeaturedContentBase');
   cacheStats.react.misses++;
-  
+
   const now = new Date();
 
   const results = await db
@@ -83,7 +81,7 @@ const getActiveFeaturedContentBase = cache(async (): Promise<FeaturedContent[]> 
     .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
 
   return results.map((row) => ({
-    comments: 0, // would come from the comments table when implemented
+    comments: 0, // would come from the comment table when implemented
     contentId: row.contentId,
     contentType: row.contentType,
     createdAt: row.createdAt,
@@ -106,40 +104,38 @@ const getActiveFeaturedContentBase = cache(async (): Promise<FeaturedContent[]> 
   }));
 });
 
-// Next.js unstable_cache for cross-request caching
 export const getActiveFeaturedContent = unstable_cache(
-  async (): Promise<FeaturedContent[]> => {
+  async (): Promise<Array<FeaturedContent>> => {
     console.log('Cache miss: Next.js cache - getActiveFeaturedContent');
     cacheStats.nextjs.misses++;
     return await getActiveFeaturedContentBase();
   },
   ['featured-content-active'],
   {
-    tags: ['featured-content'],
     revalidate: 300, // 5 minutes
-  }
+    tags: ['featured-content'],
+  },
 );
 
-// Specific feature type getters using React cache for deduplication
-export const getCollectionOfWeek = cache(async (): Promise<FeaturedContent[]> => {
+export const getCollectionOfWeek = cache(async (): Promise<Array<FeaturedContent>> => {
   console.log('Cache access: getCollectionOfWeek');
   const allContent = await getActiveFeaturedContent();
   return allContent.filter((content) => content.featureType === 'collection_of_week').slice(0, 1);
 });
 
-export const getEditorPicks = cache(async (): Promise<FeaturedContent[]> => {
+export const getEditorPicks = cache(async (): Promise<Array<FeaturedContent>> => {
   console.log('Cache access: getEditorPicks');
   const allContent = await getActiveFeaturedContent();
   return allContent.filter((content) => content.featureType === 'editor_pick').slice(0, 6);
 });
 
-export const getHomepageBanner = cache(async (): Promise<FeaturedContent[]> => {
+export const getHomepageBanner = cache(async (): Promise<Array<FeaturedContent>> => {
   console.log('Cache access: getHomepageBanner');
   const allContent = await getActiveFeaturedContent();
   return allContent.filter((content) => content.featureType === 'homepage_banner').slice(0, 3);
 });
 
-export const getTrendingContent = cache(async (): Promise<FeaturedContent[]> => {
+export const getTrendingContent = cache(async (): Promise<Array<FeaturedContent>> => {
   console.log('Cache access: getTrendingContent');
   const allContent = await getActiveFeaturedContent();
   return allContent
@@ -148,7 +144,13 @@ export const getTrendingContent = cache(async (): Promise<FeaturedContent[]> => 
     .slice(0, 8);
 });
 
-// Utility function to update view count with cache invalidation
+export async function getCacheStats() {
+  return new Promise((resolve) => {
+    resolve(cacheStats);
+  });
+}
+
+// utility function to update view count with cache invalidation
 export async function incrementViewCount(contentId: string): Promise<void> {
   try {
     // increment in the database using SQL
@@ -160,7 +162,7 @@ export async function incrementViewCount(contentId: string): Promise<void> {
       })
       .where(eq(featuredContent.id, contentId));
 
-    // Note: We don't invalidate cache here since view count updates
+    // note: We don't invalidate cache here since view count updates
     // don't need immediate visibility and would cause cache thrashing
     console.log(`View count incremented for content: ${contentId}`);
   } catch (error) {
@@ -168,18 +170,14 @@ export async function incrementViewCount(contentId: string): Promise<void> {
   }
 }
 
-// Debug function to get cache statistics
-export function getCacheStats() {
-  return {
-    ...cacheStats,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-// Reset cache statistics (useful for testing)
-export function resetCacheStats() {
-  cacheStats.nextjs.hits = 0;
-  cacheStats.nextjs.misses = 0;
-  cacheStats.react.hits = 0;
-  cacheStats.react.misses = 0;
+// reset cache statistics (useful for testing)
+export async function resetCacheStats() {
+  return new Promise((resolve) => {
+    resolve(() => {
+      cacheStats.nextjs.hits = 0;
+      cacheStats.nextjs.misses = 0;
+      cacheStats.react.hits = 0;
+      cacheStats.react.misses = 0;
+    });
+  });
 }
