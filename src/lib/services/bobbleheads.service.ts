@@ -81,7 +81,7 @@ export interface BobbleheadWithRelations {
  * handles business logic and validation for bobbleheads
  */
 export class BobbleheadsService extends BaseService {
-  // Legacy methods for backward compatibility
+  // legacy methods for backward compatibility
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
     const result = await dbInstance.insert(bobbleheadPhotos).values(data).returning();
     return result?.[0] || null;
@@ -104,7 +104,7 @@ export class BobbleheadsService extends BaseService {
     const photoCount = bobblehead.photos?.length || 0;
     const tagCount = bobblehead.tags?.length || 0;
 
-    // Determine if bobblehead has all required metadata
+    // determine if bobblehead has all required metadata
     const requiredFields = [
       bobblehead.name,
       bobblehead.characterName,
@@ -113,7 +113,7 @@ export class BobbleheadsService extends BaseService {
     ];
     const isComplete = requiredFields.every((field) => Boolean(field)) && photoCount > 0;
 
-    // Simple estimated value calculation based on condition and purchase price
+    // simple estimated value calculation based on condition and purchase price
     let estimatedValue: number | undefined;
     if (bobblehead.purchasePrice && bobblehead.currentCondition) {
       const conditionMultiplier = this.getConditionMultiplier(bobblehead.currentCondition);
@@ -198,12 +198,12 @@ export class BobbleheadsService extends BaseService {
    */
   private static getConditionMultiplier(condition: string): number {
     const conditionMap: Record<string, number> = {
-      'Excellent': 1.0,
-      'Fair': 0.6,
-      'Good': 0.8,
-      'Mint': 1.2,
+      Excellent: 1.0,
+      Fair: 0.6,
+      Good: 0.8,
+      Mint: 1.2,
       'Near Mint': 1.1,
-      'Poor': 0.4,
+      Poor: 0.4,
     };
 
     return conditionMap[condition] || 1.0;
