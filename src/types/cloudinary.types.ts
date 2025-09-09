@@ -3,13 +3,6 @@
  */
 import type { CloudinaryUploadWidgetResults } from 'next-cloudinary';
 
-// error types for upload failures
-export interface CloudinaryError {
-  http_code?: number;
-  message: string;
-  name: string;
-}
-
 // our internal photo representation from Cloudinary data
 export interface CloudinaryPhoto {
   altText?: string;
