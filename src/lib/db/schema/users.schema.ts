@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import {
   boolean,
   index,
@@ -77,6 +78,26 @@ export const users = pgTable(
     index('users_username_idx').on(table.username),
     index('users_verified_created_idx').on(table.isVerified, table.createdAt),
 
+    // covering indexes for common queries
+    // authentication query optimization - includes all fields needed for login
+    index('users_auth_covering_idx').on(
+      table.clerkId,
+      table.id,
+      table.email,
+      table.isVerified,
+      table.role,
+      table.isDeleted,
+    ),
+    // user profile query optimization - includes display fields
+    index('users_profile_covering_idx').on(
+      table.username,
+      table.id,
+      table.displayName,
+      table.bio,
+      table.avatarUrl,
+      table.isVerified,
+    ),
+
     // performance and search indexes
     index('users_email_lower_idx').on(sql`lower(${table.email})`),
     index('users_username_lower_idx').on(sql`lower(${table.username})`),
@@ -138,8 +159,12 @@ export const loginHistory = pgTable(
 export const userSettings = pgTable(
   'user_settings',
   {
-    allowComments: commentPermissionEnum('allow_comments').default(DEFAULTS.USER_SETTINGS.ALLOW_COMMENTS).notNull(),
-    allowDirectMessages: dmPermissionEnum('allow_direct_messages').default(DEFAULTS.USER_SETTINGS.ALLOW_DIRECT_MESSAGES).notNull(),
+    allowComments: commentPermissionEnum('allow_comments')
+      .default(DEFAULTS.USER_SETTINGS.ALLOW_COMMENTS)
+      .notNull(),
+    allowDirectMessages: dmPermissionEnum('allow_direct_messages')
+      .default(DEFAULTS.USER_SETTINGS.ALLOW_DIRECT_MESSAGES)
+      .notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     currency: varchar('currency', { length: SCHEMA_LIMITS.USER_SETTINGS.CURRENCY.LENGTH })
       .default(DEFAULTS.USER.CURRENCY)

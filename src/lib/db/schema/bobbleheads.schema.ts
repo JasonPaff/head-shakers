@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import {
   boolean,
+  check,
   decimal,
   index,
   integer,
@@ -78,6 +79,21 @@ export const bobbleheads = pgTable(
     year: integer('year'),
   },
   (table) => [
+    // data validation constraints
+    check(
+      'bobbleheads_year_range',
+      sql`${table.year} IS NULL OR (${table.year} >= 1800 AND ${table.year} <= EXTRACT(YEAR FROM NOW()) + 5)`,
+    ),
+    check('bobbleheads_price_positive', sql`${table.purchasePrice} IS NULL OR ${table.purchasePrice} >= 0`),
+    check('bobbleheads_height_positive', sql`${table.height} IS NULL OR ${table.height} > 0`),
+    check('bobbleheads_weight_positive', sql`${table.weight} IS NULL OR ${table.weight} > 0`),
+    check(
+      'bobbleheads_counts_non_negative',
+      sql`${table.likeCount} >= 0 AND ${table.viewCount} >= 0 AND ${table.commentCount} >= 0`,
+    ),
+    check('bobbleheads_name_not_empty', sql`length(trim(${table.name})) > 0`),
+    check('bobbleheads_dates_logic', sql`${table.createdAt} <= ${table.updatedAt}`),
+
     // single column indexes
     index('bobbleheads_category_idx').on(table.category),
     index('bobbleheads_collection_id_idx').on(table.collectionId),
@@ -94,12 +110,43 @@ export const bobbleheads = pgTable(
     index('bobbleheads_user_created_idx').on(table.userId, table.createdAt),
     index('bobbleheads_user_public_idx').on(table.userId, table.isPublic),
 
+    // covering indexes for common queries
+    // listing query optimization - includes all fields commonly displayed in lists
+    index('bobbleheads_listing_covering_idx').on(
+      table.userId,
+      table.isPublic,
+      table.id,
+      table.name,
+      table.createdAt,
+      table.likeCount,
+      table.viewCount,
+      table.commentCount,
+    ),
+    // collection view optimization
+    index('bobbleheads_collection_covering_idx').on(
+      table.collectionId,
+      table.isPublic,
+      table.id,
+      table.name,
+      table.createdAt,
+    ),
+    // public browse optimization - for homepage/explore views
+    index('bobbleheads_public_browse_covering_idx').on(
+      table.isPublic,
+      table.isFeatured,
+      table.createdAt,
+      table.id,
+      table.name,
+      table.likeCount,
+      table.viewCount,
+    ),
+
     // search and performance indexes
     index('bobbleheads_name_search_idx').using('gin', sql`${table.name} gin_trgm_ops`),
     index('bobbleheads_description_search_idx').using('gin', sql`${table.description} gin_trgm_ops`),
     index('bobbleheads_custom_fields_gin_idx').using('gin', table.customFields),
     index('bobbleheads_custom_fields_path_idx').using('gin', sql`(${table.customFields} jsonb_path_ops)`),
-    
+
     // pagination and filtering indexes
     index('bobbleheads_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
     index('bobbleheads_public_created_desc_idx').on(table.isPublic, sql`${table.createdAt} DESC`),
@@ -125,6 +172,14 @@ export const bobbleheadPhotos = pgTable(
     width: integer('width'),
   },
   (table) => [
+    // data validation constraints
+    check(
+      'bobblehead_photos_dimensions_positive',
+      sql`(${table.width} IS NULL OR ${table.width} > 0) AND (${table.height} IS NULL OR ${table.height} > 0)`,
+    ),
+    check('bobblehead_photos_file_size_positive', sql`${table.fileSize} IS NULL OR ${table.fileSize} > 0`),
+    check('bobblehead_photos_sort_order_non_negative', sql`${table.sortOrder} >= 0`),
+
     // single column indexes
     index('bobblehead_photos_bobblehead_id_idx').on(table.bobbleheadId),
     index('bobblehead_photos_is_primary_idx').on(table.isPrimary),

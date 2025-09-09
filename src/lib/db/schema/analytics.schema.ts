@@ -37,8 +37,12 @@ export const contentViews = pgTable(
 
     // performance indexes
     index('content_views_viewed_at_desc_idx').on(sql`${table.viewedAt} DESC`),
-    index('content_views_target_viewed_desc_idx').on(table.targetType, table.targetId, sql`${table.viewedAt} DESC`),
-    index('content_views_recent_idx').on(table.viewedAt).where(sql`${table.viewedAt} > NOW() - INTERVAL '30 days'`),
+    index('content_views_target_viewed_desc_idx').on(
+      table.targetType,
+      table.targetId,
+      sql`${table.viewedAt} DESC`,
+    ),
+    index('content_views_recent_idx').on(table.viewedAt),
   ],
 );
 
@@ -70,6 +74,8 @@ export const searchQueries = pgTable(
     // performance and analytics indexes
     index('search_queries_query_search_idx').using('gin', sql`${table.query} gin_trgm_ops`),
     index('search_queries_searched_at_desc_idx').on(sql`${table.searchedAt} DESC`),
-    index('search_queries_popular_idx').on(table.query, table.resultCount).where(sql`${table.resultCount} > 0`),
+    index('search_queries_popular_idx')
+      .on(table.query, table.resultCount)
+      .where(sql`${table.resultCount} > 0`),
   ],
 );
