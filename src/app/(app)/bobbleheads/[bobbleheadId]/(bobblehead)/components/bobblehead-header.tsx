@@ -12,7 +12,7 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
 
 import { Button } from '@/components/ui/button';
 

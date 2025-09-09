@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react';
 
 import { PackageIcon, RulerIcon, WeightIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 

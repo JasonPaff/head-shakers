@@ -32,10 +32,6 @@ export interface BobbleheadMetrics {
   tagCount: number;
 }
 
-export type BobbleheadWithCollections = NonNullable<
-  Awaited<ReturnType<typeof BobbleheadsFacade.getBobbleheadWithRelations>>
->;
-
 /**
  * bobblehead with related data for business operations
  */

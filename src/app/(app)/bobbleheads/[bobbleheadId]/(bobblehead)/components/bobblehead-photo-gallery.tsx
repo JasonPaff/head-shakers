@@ -5,7 +5,7 @@ import type { KeyboardEvent } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

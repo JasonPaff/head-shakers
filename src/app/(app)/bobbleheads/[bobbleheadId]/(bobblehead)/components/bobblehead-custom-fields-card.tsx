@@ -1,6 +1,6 @@
 import { TagIcon } from 'lucide-react';
 
-import type { BobbleheadWithCollections } from '@/lib/facades/bobbleheads-facade';
+import type { BobbleheadWithCollections } from '@/lib/facades/types.facade';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
