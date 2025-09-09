@@ -70,11 +70,13 @@ const getContentTypeColor = (type: string) => {
   }
 };
 
+type SortBy = 'date' | 'priority' | 'views';
+
 export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentListProps) => {
   const [filterStatus, setFilterStatus] = useState<string>('active');
   const [filterType, setFilterType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<'date' | 'priority' | 'views'>('date');
+  const [sortBy, setSortBy] = useState<SortBy>('date');
 
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
@@ -99,7 +101,7 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
     filtered.sort((a, b) => {
       switch (sortBy) {
         case 'priority':
-          return b.priority - a.priority;
+          return a.priority - b.priority;
         case 'views':
           return b.viewCount - a.viewCount;
         case 'date':
@@ -181,7 +183,7 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
             </Select>
             <Select
               onValueChange={(value) => {
-                setSortBy(value as 'date' | 'priority' | 'views');
+                setSortBy(value as SortBy);
               }}
               value={sortBy}
             >
