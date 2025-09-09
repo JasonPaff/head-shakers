@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ENUMS } from '@/lib/constants';
-import { getBobbleheadsBySubcollectionForPublicAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsProps {
@@ -24,7 +24,7 @@ export const SubcollectionBobbleheads = async ({
   subcollectionId,
 }: SubcollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
-  const bobbleheads = await getBobbleheadsBySubcollectionForPublicAsync(subcollectionId, currentUserId || undefined);
+  const bobbleheads = await CollectionsFacade.getSubcollectionBobbleheadsWithPhotos(subcollectionId, currentUserId || undefined);
 
   return (
     <div>
@@ -51,7 +51,7 @@ export const SubcollectionBobbleheads = async ({
             <CardHeader className={'pb-3'}>
               <div className={'relative mb-4 aspect-square overflow-hidden rounded-lg bg-muted'}>
                 <img
-                  alt={bobblehead.name}
+                  alt={bobblehead.name || 'Bobblehead'}
                   className={'object-cover transition-transform duration-300 group-hover:scale-105'}
                   src={bobblehead.featurePhoto || '/placeholder.svg'}
                 />

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { AddItemFormClient } from '@/app/(app)/bobbleheads/add/components/add-item-form-client';
-import { getCollectionsByUserAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { getUserId } from '@/utils/user-utils';
 
 interface AddItemFormServerProps {
@@ -15,7 +15,7 @@ export async function AddItemFormServer({
 }: AddItemFormServerProps) {
   const userId = await getUserId();
 
-  const userCollections = (await getCollectionsByUserAsync(userId)) ?? [];
+  const userCollections = (await CollectionsFacade.getCollectionsByUser(userId, {}, userId)) ?? [];
 
   // transform the collection data
   const collectionsData = userCollections.map((collection) => ({

@@ -1,12 +1,12 @@
 import 'server-only';
 import { CalendarIcon, EyeIcon, StarIcon } from 'lucide-react';
 
-import type { CollectionById } from '@/lib/queries/collections.queries';
+import type { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 
 import { Card, CardContent } from '@/components/ui/card';
 
 interface CollectionMetricsProps {
-  collection: CollectionById;
+  collection: Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>> & {};
 }
 
 export const CollectionMetrics = ({ collection }: CollectionMetricsProps) => {

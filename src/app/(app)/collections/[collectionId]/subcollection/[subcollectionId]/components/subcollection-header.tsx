@@ -4,13 +4,13 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
-import type { SubcollectionByCollectionIdPublic } from '@/lib/queries/collections.queries';
+import type { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 
 import { Button } from '@/components/ui/button';
 
 interface SubcollectionHeaderProps {
   isOwner?: boolean;
-  subcollection: SubcollectionByCollectionIdPublic;
+  subcollection: Awaited<ReturnType<typeof CollectionsFacade.getSubCollectionForPublicView>> & {};
 }
 
 export const SubcollectionHeader = ({ isOwner = false, subcollection }: SubcollectionHeaderProps) => {

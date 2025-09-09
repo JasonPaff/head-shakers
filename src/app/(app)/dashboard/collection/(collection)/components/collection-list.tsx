@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { getCollectionsDashboardDataAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 
 // TODO: add a nice empty state when there are no collections
 
@@ -19,10 +19,10 @@ export const CollectionList = async () => {
   const { userId } = await auth();
   if (!userId) redirect($path({ route: '/' }));
 
-  const collections = (await getCollectionsDashboardDataAsync(userId)) || [];
+  const collections = await CollectionsFacade.getUserCollectionsForDashboard(userId);
 
-  const _totalCollectionCount = collections?.length || 0;
-  const _totalBobbleheadCount = collections?.reduce((acc, col) => acc + col.totalBobbleheadCount, 0) || 0;
+  const _totalCollectionCount = collections.length;
+  const _totalBobbleheadCount = collections.reduce((acc, col) => acc + col.metrics.totalBobbleheads, 0);
 
   return (
     <div className={'container mx-auto max-w-7xl px-4 py-8'}>
@@ -72,9 +72,9 @@ export const CollectionList = async () => {
               <div className={'flex-1 space-y-4'}>
                 {/* Collection Stats */}
                 <div className={'flex items-center gap-4 text-sm'}>
-                  <Badge variant={'secondary'}>{collection.bobbleheadCount} bobbleheads</Badge>
-                  <Conditional isCondition={collection.subCollectionCount > 0}>
-                    <Badge variant={'outline'}>{collection.subCollectionCount} subcollections</Badge>
+                  <Badge variant={'secondary'}>{collection.metrics.totalBobbleheads} bobbleheads</Badge>
+                  <Conditional isCondition={collection.subCollections.length > 0}>
+                    <Badge variant={'outline'}>{collection.subCollections.length} subcollections</Badge>
                   </Conditional>
                 </div>
 

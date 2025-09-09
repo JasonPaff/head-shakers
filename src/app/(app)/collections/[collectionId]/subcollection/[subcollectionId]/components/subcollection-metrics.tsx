@@ -1,12 +1,12 @@
 import 'server-only';
 import { CalendarIcon, EyeIcon, StarIcon } from 'lucide-react';
 
-import type { SubcollectionByCollectionId } from '@/lib/queries/collections.queries';
+import type { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 
 import { Card, CardContent } from '@/components/ui/card';
 
 interface SubcollectionMetricsProps {
-  subcollection: SubcollectionByCollectionId;
+  subcollection: Awaited<ReturnType<typeof CollectionsFacade.getSubCollectionForPublicView>> & {};
 }
 
 export const SubcollectionMetrics = ({ subcollection }: SubcollectionMetricsProps) => {

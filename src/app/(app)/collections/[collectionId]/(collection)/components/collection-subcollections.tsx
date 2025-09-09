@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { getSubCollectionsByCollectionIdForPublicAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionSubcollectionsProps {
@@ -23,7 +23,7 @@ export const CollectionSubcollections = async ({
   isOwner = false,
 }: CollectionSubcollectionsProps) => {
   const currentUserId = await getOptionalUserId();
-  const result = await getSubCollectionsByCollectionIdForPublicAsync(
+  const result = await CollectionsFacade.getSubCollectionsForPublicView(
     collectionId,
     currentUserId || undefined,
   );

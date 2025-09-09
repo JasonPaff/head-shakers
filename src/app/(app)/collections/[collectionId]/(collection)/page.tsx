@@ -7,7 +7,7 @@ import type { PageProps } from '@/app/(app)/collections/[collectionId]/(collecti
 
 import { Collection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
-import { getCollectionByIdForPublicAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type CollectionPageProps = PageProps;
@@ -25,7 +25,7 @@ async function CollectionPage({ routeParams }: CollectionPageProps) {
   const { collectionId } = await routeParams;
 
   const currentUserId = await getOptionalUserId();
-  const collection = await getCollectionByIdForPublicAsync(collectionId, currentUserId || undefined);
+  const collection = await CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined);
   if (!collection) notFound();
 
   const isOwner = !!(currentUserId && currentUserId === collection.userId);

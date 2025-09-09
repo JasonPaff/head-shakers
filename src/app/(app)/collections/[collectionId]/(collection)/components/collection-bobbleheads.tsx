@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { ENUMS } from '@/lib/constants';
-import { getBobbleheadsByCollectionForPublicAsync } from '@/lib/queries/collections.queries';
+import { CollectionsFacade } from '@/lib/queries/collections/collections-facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionBobbleheadsProps {
@@ -23,7 +23,7 @@ export const CollectionBobbleheads = async ({
   isOwner = false,
 }: CollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
-  const bobbleheads = await getBobbleheadsByCollectionForPublicAsync(collectionId, currentUserId || undefined);
+  const bobbleheads = await CollectionsFacade.getCollectionBobbleheadsWithPhotos(collectionId, currentUserId || undefined);
 
   return (
     <div>
@@ -50,7 +50,7 @@ export const CollectionBobbleheads = async ({
             <CardHeader className={'pb-3'}>
               <div className={'relative mb-4 aspect-square overflow-hidden rounded-lg bg-muted'}>
                 <img
-                  alt={bobblehead.name}
+                  alt={bobblehead.name || 'Bobblehead'}
                   className={'object-cover transition-transform duration-300 group-hover:scale-105'}
                   src={bobblehead.featurePhoto || '/placeholder.svg'}
                 />
