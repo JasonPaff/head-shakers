@@ -1,10 +1,4 @@
-import {
-  getCollectionOfWeek,
-  getEditorPicks,
-  getHomepageBanner,
-  getTrendingContent,
-  incrementViewCount,
-} from '@/lib/queries/featured-content.queries';
+import { FeaturedContentFacade } from '@/lib/queries/featured-content/featured-content-facade';
 
 import { FeaturedContentDisplay } from './featured-content-display';
 
@@ -18,10 +12,10 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
 
     // fetch all featured content sections in parallel
     const [homepageBanner, editorPicks, collectionOfWeek, trending] = await Promise.all([
-      getHomepageBanner(),
-      getEditorPicks(),
-      getCollectionOfWeek(),
-      getTrendingContent(),
+      FeaturedContentFacade.getHomepageBanner(),
+      FeaturedContentFacade.getEditorPicks(),
+      FeaturedContentFacade.getCollectionOfWeek(),
+      FeaturedContentFacade.getTrendingContent(),
     ]);
 
     console.log('FeaturedContentServer: Data fetched successfully', {
@@ -102,7 +96,7 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     return (
       <FeaturedContentDisplay
         featuredContentData={featuredContentData}
-        onViewContent={isTrackViews ? incrementViewCount : undefined}
+        onViewContent={isTrackViews ? (contentId: string) => FeaturedContentFacade.incrementViewCount(contentId) : undefined}
       />
     );
   } catch (error) {

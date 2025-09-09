@@ -2,13 +2,13 @@ import type { Metadata } from 'next';
 
 import { FeaturedContentManager } from '@/app/(app)/admin/featured-content/components/featured-content-manager';
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
-import { getAllFeaturedContentForAdmin } from '@/lib/queries/admin/featured-content.queries';
+import { AdminFacade } from '@/lib/queries/admin/admin-facade';
 
 // force dynamic rendering for admin pages
 export const dynamic = 'force-dynamic';
 
 export default async function AdminFeaturedContentPage() {
-  const featuredContent = await getAllFeaturedContentForAdmin();
+  const featuredContent = await AdminFacade.getAllFeaturedContentForAdmin();
 
   return (
     <AdminLayout isAdminRequired={false}>

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import type { AdminFeaturedContent } from '@/lib/queries/admin/featured-content.queries';
+import type { AdminFeaturedContent } from '@/lib/queries/admin/admin-facade';
 
 import { FeaturedContentForm } from '@/app/(app)/admin/featured-content/components/featured-content-form';
 import { Button } from '@/components/ui/button';

@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server';
 
-import { getUserByClerkIdAsync } from '@/lib/queries/users.queries';
+import { UsersFacade } from '@/lib/queries/users/users-facade';
 
 export const getOptionalUserId = async (): Promise<null | string> => {
   try {
@@ -9,7 +9,7 @@ export const getOptionalUserId = async (): Promise<null | string> => {
     if (!clerkUserId) return null;
 
     // get the database user record using Clerk ID
-    const dbUser = await getUserByClerkIdAsync(clerkUserId);
+    const dbUser = await UsersFacade.getUserByClerkId(clerkUserId);
     if (!dbUser) return null;
 
     return dbUser.id;

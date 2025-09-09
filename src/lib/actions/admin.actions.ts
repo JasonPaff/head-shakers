@@ -8,7 +8,7 @@ import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
 import { ACTION_NAMES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
-import { getFeaturedContentByIdForAdmin } from '@/lib/queries/admin/featured-content.queries';
+import { AdminFacade } from '@/lib/queries/admin/admin-facade';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -197,8 +197,9 @@ export const getFeaturedContentByIdAction = adminActionClient
       id: z.string().uuid('ID must be a valid UUID'),
     }),
   )
-  .action(async ({ parsedInput }: { parsedInput: { id: string } }) => {
-    const featuredContentData = await getFeaturedContentByIdForAdmin(parsedInput.id);
+  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string }; }) => {
+    const dbInstance = ctx.tx ?? ctx.db;
+    const featuredContentData = await AdminFacade.getFeaturedContentByIdForAdmin(parsedInput.id, dbInstance);
 
     if (!featuredContentData) {
       throw new Error('Featured content not found');

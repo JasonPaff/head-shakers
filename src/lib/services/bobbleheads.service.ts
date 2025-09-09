@@ -2,7 +2,7 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
 import { db } from '@/lib/db';
-import { createBobbleheadAsync, createBobbleheadPhotoAsync } from '@/lib/queries/bobbleheads.queries';
+import { bobbleheadPhotos, bobbleheads } from '@/lib/db/schema';
 import { BaseService } from '@/lib/services/base/base-service';
 
 /**
@@ -83,7 +83,7 @@ export interface BobbleheadWithRelations {
 export class BobbleheadsService extends BaseService {
   // Legacy methods for backward compatibility
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
-    const result = await createBobbleheadPhotoAsync(data, dbInstance);
+    const result = await dbInstance.insert(bobbleheadPhotos).values(data).returning();
     return result?.[0] || null;
   }
 
@@ -131,7 +131,10 @@ export class BobbleheadsService extends BaseService {
   }
 
   static async createAsync(data: InsertBobblehead, userId: string, dbInstance: DatabaseExecutor = db) {
-    const result = await createBobbleheadAsync(data, userId, dbInstance);
+    const result = await dbInstance
+      .insert(bobbleheads)
+      .values({ ...data, userId })
+      .returning();
     return result?.[0] || null;
   }
 

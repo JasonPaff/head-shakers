@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 
-import { getCacheStats, resetCacheStats } from '@/lib/queries/featured-content.queries';
+import { FeaturedContentFacade } from '@/lib/queries/featured-content/featured-content-facade';
 
 export async function GET() {
   if (process.env.NODE_ENV !== 'development') {
     return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
   }
 
-  const stats = await getCacheStats();
+  const stats = await FeaturedContentFacade.getCacheStats();
 
   return NextResponse.json({
     cacheStats: stats,
@@ -21,7 +21,7 @@ export async function POST() {
     return NextResponse.json({ error: 'Not available in production' }, { status: 404 });
   }
 
-  await resetCacheStats();
+  await FeaturedContentFacade.resetCacheStats();
 
   return NextResponse.json({
     message: 'Cache statistics reset',
