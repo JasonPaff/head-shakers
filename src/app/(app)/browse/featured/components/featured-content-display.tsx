@@ -48,99 +48,6 @@ export interface FeaturedContentItem {
   viewCount: number;
 }
 
-// fallback mock data for development/testing
-const mockFeaturedContent = {
-  collection_of_week: [
-    {
-      comments: 67,
-      contentId: 'coll-101',
-      contentType: 'collection' as const,
-      description:
-        'An amazing collection of iconic movie characters from the past 50 years, featuring heroes and villains alike.',
-      endDate: '2024-01-14',
-      id: '4',
-      imageUrl: 'https://images.unsplash.com/photo-1489599953984-75afc8b4b1d8?w=600&h=400&fit=crop',
-      likes: 298,
-      owner: 'cinema_lover',
-      ownerDisplayName: 'Chris Brown',
-      priority: 1,
-      startDate: '2024-01-08',
-      title: 'Movie Character Bobbleheads',
-      viewCount: 12450,
-    },
-  ],
-  editor_pick: [
-    {
-      comments: 56,
-      contentId: 'bob-456',
-      contentType: 'bobblehead' as const,
-      description:
-        'Rare limited edition Batman bobblehead from the 1989 movie series, only 500 made worldwide.',
-      id: '2',
-      imageUrl: 'https://images.unsplash.com/photo-1608889175123-8ee362201f81?w=600&h=600&fit=crop',
-      likes: 234,
-      owner: 'superhero_fan',
-      ownerDisplayName: 'Sarah Wilson',
-      priority: 2,
-      startDate: '2024-01-10',
-      title: 'Limited Edition Batman Bobblehead',
-      viewCount: 8760,
-    },
-    {
-      comments: 34,
-      contentId: 'coll-789',
-      contentType: 'collection' as const,
-      description:
-        'Complete set of Disney Princess bobbleheads featuring all official Disney Princesses in their classic outfits.',
-      id: '3',
-      imageUrl: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop',
-      likes: 156,
-      owner: 'disney_queen',
-      ownerDisplayName: 'Emma Davis',
-      priority: 3,
-      startDate: '2024-01-05',
-      title: 'Disney Princess Collection',
-      viewCount: 6890,
-    },
-  ],
-  homepage_banner: [
-    {
-      comments: 89,
-      contentId: 'coll-123',
-      contentType: 'collection' as const,
-      description:
-        'A comprehensive collection of vintage baseball bobbleheads featuring legendary players from the golden era of baseball.',
-      endDate: '2024-02-15',
-      id: '1',
-      imageUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=800&h=600&fit=crop',
-      likes: 342,
-      owner: 'vintage_collector',
-      ownerDisplayName: 'Mike Johnson',
-      priority: 1,
-      startDate: '2024-01-15',
-      title: 'Baseball Legends Complete Collection',
-      viewCount: 15420,
-    },
-  ],
-  trending: [
-    {
-      comments: 23,
-      contentId: 'user-202',
-      contentType: 'user' as const,
-      description: 'Featured collector with over 500 bobbleheads and 15 years of collecting experience.',
-      id: '5',
-      imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
-      likes: 187,
-      owner: 'collector_spotlight',
-      ownerDisplayName: 'John Smith',
-      priority: 1,
-      startDate: '2024-01-12',
-      title: 'Collector Spotlight: John Smith',
-      viewCount: 5430,
-    },
-  ],
-};
-
 const getContentTypeLabel = (type: string) => {
   switch (type) {
     case 'bobblehead':
@@ -181,7 +88,12 @@ const getContentTypeColor = (type: string) => {
 };
 
 export const FeaturedContentDisplay = ({
-  featuredContentData = mockFeaturedContent,
+  featuredContentData = {
+    collection_of_week: [],
+    editor_pick: [],
+    homepage_banner: [],
+    trending: [],
+  },
   onViewContent,
 }: FeaturedContentDisplayProps) => {
   const [activeTab, setActiveTab] = useState('all');

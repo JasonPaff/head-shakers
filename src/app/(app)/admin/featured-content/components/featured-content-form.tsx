@@ -97,7 +97,7 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
               <form.AppField
                 listeners={{
                   onChange: () => {
-                    // Reset content selection when the content type changes
+                    // reset content selection when the content type changes
                     form.setFieldValue('contentId', '');
                   },
                 }}
