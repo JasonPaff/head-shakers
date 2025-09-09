@@ -2,7 +2,7 @@
 
 import { ChevronDown, ChevronRight, Image as ImageIcon, Search } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { ContentType } from '@/lib/validations/system.validation';
@@ -14,6 +14,9 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToggle } from '@/hooks/use-toggle';
 import {
+  getBobbleheadForFeaturingAction,
+  getCollectionForFeaturingAction,
+  getUserForFeaturingAction,
   searchBobbleheadsForFeaturingAction,
   searchCollectionsForFeaturingAction,
   searchUsersForFeaturingAction,
@@ -44,12 +47,82 @@ interface SearchResult {
 export const ContentSearch = ({ contentType, onSelect, selectedContentId }: ContentSearchProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Array<SearchResult>>([]);
+  const [selectedItem, setSelectedItem] = useState<SearchResult | null>(null);
   const [isSearching, setIsSearching] = useToggle();
   const [isPending, startTransition] = useTransition();
+  const [isLoadingSelected, setIsLoadingSelected] = useState(false);
 
   const { executeAsync: searchCollections } = useAction(searchCollectionsForFeaturingAction);
   const { executeAsync: searchBobbleheads } = useAction(searchBobbleheadsForFeaturingAction);
   const { executeAsync: searchUsers } = useAction(searchUsersForFeaturingAction);
+  const { executeAsync: getCollection } = useAction(getCollectionForFeaturingAction);
+  const { executeAsync: getBobblehead } = useAction(getBobbleheadForFeaturingAction);
+  const { executeAsync: getUser } = useAction(getUserForFeaturingAction);
+
+  // Fetch selected item when selectedContentId changes
+  useEffect(() => {
+    if (selectedContentId && (!selectedItem || selectedItem.id !== selectedContentId)) {
+      setIsLoadingSelected(true);
+      
+      const fetchSelectedItem = async () => {
+        try {
+          if (contentType === 'collection') {
+            const response = await getCollection({ id: selectedContentId });
+            if (response?.data?.collection) {
+              const collection = response.data.collection;
+              setSelectedItem({
+                additionalInfo: `${collection.totalItems} items`,
+                description: collection.description,
+                id: collection.id,
+                imageUrl: collection.coverImageUrl,
+                name: collection.name,
+                ownerName: collection.ownerName,
+                ownerUsername: collection.ownerUsername,
+              });
+            }
+          } else if (contentType === 'bobblehead') {
+            const response = await getBobblehead({ id: selectedContentId });
+            if (response?.data?.bobblehead) {
+              const bobblehead = response.data.bobblehead;
+              setSelectedItem({
+                additionalInfo: `${bobblehead.manufacturer}${bobblehead.series ? ` - ${bobblehead.series}` : ''}${bobblehead.year ? ` (${bobblehead.year})` : ''}`,
+                description: bobblehead.description,
+                id: bobblehead.id,
+                imageUrl: bobblehead.primaryPhotoUrl || '/placeholder.jpg',
+                name: bobblehead.name,
+                ownerName: bobblehead.ownerName,
+                ownerUsername: bobblehead.ownerUsername,
+                photos: bobblehead.photos || [],
+              });
+            }
+          } else if (contentType === 'user') {
+            const response = await getUser({ id: selectedContentId });
+            if (response?.data?.user) {
+              const user = response.data.user;
+              setSelectedItem({
+                additionalInfo: `Member since ${new Date(user.memberSince).getFullYear()}${user.isVerified ? ' ✓' : ''}`,
+                description: user.bio,
+                id: user.id,
+                imageUrl: user.avatarUrl,
+                name: user.displayName,
+                ownerName: undefined,
+                ownerUsername: user.username,
+              });
+            }
+          }
+        } catch (error) {
+          console.error('Failed to fetch selected item:', error);
+          setSelectedItem(null);
+        } finally {
+          setIsLoadingSelected(false);
+        }
+      };
+
+      void fetchSelectedItem();
+    } else if (!selectedContentId) {
+      setSelectedItem(null);
+    }
+  }, [selectedContentId, contentType, selectedItem, getCollection, getBobblehead, getUser]);
 
   const performSearch = useDebouncedCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -134,8 +207,38 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         />
       </div>
 
+      {/* Show loading for selected item */}
+      {isLoadingSelected && (
+        <div className={'space-y-2'}>
+          <p className={'text-sm font-medium text-muted-foreground'}>Currently Selected Content:</p>
+          <div className={'flex items-center space-x-3 rounded-lg border p-3'}>
+            <Skeleton className={'h-10 w-10 rounded'} />
+            <div className={'flex-1 space-y-1'}>
+              <Skeleton className={'h-4 w-3/4'} />
+              <Skeleton className={'h-3 w-1/2'} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Show currently selected item */}
+      {!isLoadingSelected && selectedItem && (
+        <div className={'space-y-2'}>
+          <p className={'text-sm font-medium text-muted-foreground'}>Currently Selected Content:</p>
+          <BobbleheadSearchResult
+            contentType={contentType}
+            key={selectedItem.id}
+            onSelect={onSelect}
+            result={selectedItem}
+            selectedContentId={selectedContentId}
+          />
+        </div>
+      )}
+
+      {/* Show loading for search results */}
       {(isSearching || isPending) && (
         <div className={'space-y-2'}>
+          <p className={'text-sm font-medium text-muted-foreground'}>Search Results:</p>
           {Array.from({ length: 3 }).map((_, i) => (
             <div className={'flex items-center space-x-3 rounded-lg border p-3'} key={i}>
               <Skeleton className={'h-10 w-10 rounded'} />
@@ -165,17 +268,33 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         }
 
         if (shouldShowResults) {
+          // Filter out the currently selected item from search results to avoid duplication
+          const filteredResults = results.filter(result => result.id !== selectedContentId);
+          
           return (
             <div className={'space-y-2'}>
-              {results.map((result) => (
-                <BobbleheadSearchResult
-                  contentType={contentType}
-                  key={result.id}
-                  onSelect={onSelect}
-                  result={result}
-                  selectedContentId={selectedContentId}
-                />
-              ))}
+              <p className={'text-sm font-medium text-muted-foreground'}>Search Results:</p>
+              {filteredResults.length > 0 ? (
+                <div className={'space-y-2'}>
+                  {filteredResults.map((result) => (
+                    <BobbleheadSearchResult
+                      contentType={contentType}
+                      key={result.id}
+                      onSelect={onSelect}
+                      result={result}
+                      selectedContentId={selectedContentId}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <CardContent className={'py-4 text-center'}>
+                    <p className={'text-sm text-muted-foreground'}>
+                      No additional {contentType}s found matching &quot;{query}&quot;
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           );
         }

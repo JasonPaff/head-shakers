@@ -216,3 +216,174 @@ export const searchUsersForFeaturingAction = adminActionClient
       };
     },
   );
+
+/**
+ * Get specific collection by ID for featuring (admin/moderator only)
+ */
+export const getCollectionForFeaturingAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.ADMIN.GET_COLLECTION_FOR_FEATURING,
+    isTransactionRequired: false,
+  })
+  .inputSchema(z.object({ id: z.string().uuid() }))
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }: {
+      ctx: AdminActionContext;
+      parsedInput: { id: string };
+    }) => {
+      const result = await ctx.db
+        .select({
+          coverImageUrl: collections.coverImageUrl,
+          description: collections.description,
+          id: collections.id,
+          isPublic: collections.isPublic,
+          name: collections.name,
+          ownerName: users.displayName,
+          ownerUsername: users.username,
+          totalItems: collections.totalItems,
+        })
+        .from(collections)
+        .innerJoin(users, eq(collections.userId, users.id))
+        .where(
+          and(
+            eq(collections.id, parsedInput.id),
+            eq(collections.isPublic, true),
+            eq(users.isDeleted, false),
+          ),
+        )
+        .limit(1);
+
+      const collection = result[0];
+      if (!collection) {
+        throw new Error('Collection not found or not public');
+      }
+
+      return { collection };
+    },
+  );
+
+/**
+ * Get specific bobblehead by ID for featuring (admin/moderator only)
+ */
+export const getBobbleheadForFeaturingAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.ADMIN.GET_BOBBLEHEAD_FOR_FEATURING,
+    isTransactionRequired: false,
+  })
+  .inputSchema(z.object({ id: z.string().uuid() }))
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }: {
+      ctx: AdminActionContext;
+      parsedInput: { id: string };
+    }) => {
+      const result = await ctx.db
+        .select({
+          category: bobbleheads.category,
+          characterName: bobbleheads.characterName,
+          collectionName: collections.name,
+          description: bobbleheads.description,
+          id: bobbleheads.id,
+          isPublic: bobbleheads.isPublic,
+          manufacturer: bobbleheads.manufacturer,
+          name: bobbleheads.name,
+          ownerName: users.displayName,
+          ownerUsername: users.username,
+          primaryPhotoUrl: bobbleheadPhotos.url,
+          series: bobbleheads.series,
+          year: bobbleheads.year,
+        })
+        .from(bobbleheads)
+        .innerJoin(users, eq(bobbleheads.userId, users.id))
+        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+        .leftJoin(
+          bobbleheadPhotos,
+          and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+        )
+        .where(
+          and(
+            eq(bobbleheads.id, parsedInput.id),
+            eq(bobbleheads.isPublic, true),
+            eq(bobbleheads.isDeleted, false),
+            eq(users.isDeleted, false),
+          ),
+        )
+        .limit(1);
+
+      const bobblehead = result[0];
+      if (!bobblehead) {
+        throw new Error('Bobblehead not found or not public');
+      }
+
+      // Get all photos for this bobblehead
+      const photos = await ctx.db
+        .select({
+          altText: bobbleheadPhotos.altText,
+          bobbleheadId: bobbleheadPhotos.bobbleheadId,
+          isPrimary: bobbleheadPhotos.isPrimary,
+          sortOrder: bobbleheadPhotos.sortOrder,
+          url: bobbleheadPhotos.url,
+        })
+        .from(bobbleheadPhotos)
+        .where(eq(bobbleheadPhotos.bobbleheadId, parsedInput.id))
+        .orderBy(bobbleheadPhotos.sortOrder);
+
+      return {
+        bobblehead: {
+          ...bobblehead,
+          photos,
+        },
+      };
+    },
+  );
+
+/**
+ * Get specific user by ID for featuring (admin/moderator only)
+ */
+export const getUserForFeaturingAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.ADMIN.GET_USER_FOR_FEATURING,
+    isTransactionRequired: false,
+  })
+  .inputSchema(z.object({ id: z.string().uuid() }))
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }: {
+      ctx: AdminActionContext;
+      parsedInput: { id: string };
+    }) => {
+      const result = await ctx.db
+        .select({
+          avatarUrl: users.avatarUrl,
+          bio: users.bio,
+          displayName: users.displayName,
+          id: users.id,
+          isVerified: users.isVerified,
+          location: users.location,
+          memberSince: users.memberSince,
+          username: users.username,
+        })
+        .from(users)
+        .where(
+          and(
+            eq(users.id, parsedInput.id),
+            eq(users.isDeleted, false),
+          ),
+        )
+        .limit(1);
+
+      const user = result[0];
+      if (!user) {
+        throw new Error('User not found');
+      }
+
+      return { user };
+    },
+  );

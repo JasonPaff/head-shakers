@@ -4,6 +4,9 @@
 export const ACTION_NAMES = {
   ADMIN: {
     DELETE_FEATURED_CONTENT: 'deleteFeaturedContent',
+    GET_BOBBLEHEAD_FOR_FEATURING: 'getBobbleheadForFeaturing',
+    GET_COLLECTION_FOR_FEATURING: 'getCollectionForFeaturing',
+    GET_USER_FOR_FEATURING: 'getUserForFeaturing',
     SEARCH_BOBBLEHEADS_FOR_FEATURING: 'searchBobbleheadsForFeaturing',
     SEARCH_COLLECTIONS_FOR_FEATURING: 'searchCollectionsForFeaturing',
     SEARCH_USERS_FOR_FEATURING: 'searchUsersForFeaturing',

@@ -8,7 +8,7 @@ export const ENUMS = {
     STATUS: ['owned', 'sold', 'wishlist'] as const,
   },
   COMMENT: {
-    TARGET_TYPE: ['bobblehead', 'collection'] as const,
+    TARGET_TYPE: ['bobblehead', 'collection', 'subcollection'] as const,
   },
   CONTENT_REPORT: {
     REASON: [
@@ -22,10 +22,10 @@ export const ENUMS = {
       'other',
     ] as const,
     STATUS: ['pending', 'reviewed', 'resolved', 'dismissed'] as const,
-    TARGET_TYPE: ['bobblehead', 'comment', 'user', 'collection'] as const,
+    TARGET_TYPE: ['bobblehead', 'comment', 'user', 'collection', 'subcollection'] as const,
   },
   CONTENT_VIEWS: {
-    TARGET_TYPE: ['bobblehead', 'collection', 'profile'] as const,
+    TARGET_TYPE: ['bobblehead', 'collection', 'subcollection', 'profile'] as const,
   },
   FEATURED_CONTENT: {
     FEATURE_TYPE: ['homepage_banner', 'collection_of_week', 'trending', 'editor_pick'] as const,
@@ -35,20 +35,20 @@ export const ENUMS = {
     TYPE: ['user', 'collection'] as const,
   },
   LIKE: {
-    TARGET_TYPE: ['bobblehead', 'collection', 'comment'] as const,
+    TARGET_TYPE: ['bobblehead', 'collection', 'subcollection'] as const,
   },
   LOGIN: {
     METHOD: ['email', 'facebook', 'github', 'gmail', 'google'] as const,
   },
   NOTIFICATION: {
-    RELATED_TYPE: ['bobblehead', 'collection', 'comment', 'user'] as const,
+    RELATED_TYPE: ['bobblehead', 'collection', 'subcollection', 'comment', 'user'] as const,
     TYPE: ['comment', 'like', 'follow', 'mention', 'system'] as const,
   },
   PLATFORM_SETTING: {
     VALUE_TYPE: ['string', 'number', 'boolean', 'json'] as const,
   },
   SEARCH: {
-    RESULT_TYPE: ['bobblehead', 'collection', 'user'] as const,
+    RESULT_TYPE: ['bobblehead', 'collection', 'subcollection', 'user'] as const,
     SORT_BY: ['relevance', 'date', 'price', 'popularity'] as const,
     SORT_ORDER: ['asc', 'desc'] as const,
   },
@@ -57,7 +57,7 @@ export const ENUMS = {
   },
   USER_ACTIVITY: {
     ACTION_TYPE: ['create', 'update', 'delete', 'like', 'comment', 'follow', 'unfollow', 'view'] as const,
-    TARGET_TYPE: ['bobblehead', 'collection', 'user', 'comment'] as const,
+    TARGET_TYPE: ['bobblehead', 'collection', 'subcollection', 'user', 'comment'] as const,
   },
   USER_SETTINGS: {
     COMMENT_PERMISSION: ['anyone', 'followers', 'none'] as const,
