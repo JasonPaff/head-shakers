@@ -4,8 +4,6 @@ import 'server-only';
 import { eq } from 'drizzle-orm';
 import { z } from 'zod';
 
-import type { AdminActionContext } from '@/lib/utils/next-safe-action';
-
 import { ACTION_NAMES, ERROR_MESSAGES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
 import { AdminFacade } from '@/lib/facades/admin/admin.facade';
@@ -25,36 +23,30 @@ export const createFeaturedContentAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminCreateFeaturedContentSchema)
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }: {
-      ctx: AdminActionContext;
-      parsedInput: z.infer<typeof adminCreateFeaturedContentSchema>;
-    }) => {
-      // ensure the user has admin privileges (moderators cannot create featured content)
-      if (!ctx.isAdmin) {
-        throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_CREATE);
-      }
+  .action(async ({ ctx }) => {
+    // ensure the user has admin privileges (moderators cannot create featured content)
+    if (!ctx.isAdmin) {
+      throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_CREATE);
+    }
 
-      const [newFeaturedContent] = await ctx.db
-        .insert(featuredContent)
-        .values({
-          ...parsedInput,
-          curatorId: ctx.userId,
-        })
-        .returning();
+    const input = adminCreateFeaturedContentSchema.parse(ctx.sanitizedInput);
 
-      // invalidate featured content caches
-      invalidateFeaturedContentCaches();
+    const [newFeaturedContent] = await ctx.db
+      .insert(featuredContent)
+      .values({
+        ...input,
+        curatorId: ctx.userId,
+      })
+      .returning();
 
-      return {
-        featuredContent: newFeaturedContent,
-        message: 'Featured content created successfully',
-      };
-    },
-  );
+    // invalidate featured content caches
+    invalidateFeaturedContentCaches();
+
+    return {
+      featuredContent: newFeaturedContent,
+      message: 'Featured content created successfully',
+    };
+  });
 
 /**
  * update featured content (admin only)
@@ -65,43 +57,39 @@ export const updateFeaturedContentAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminUpdateFeaturedContentSchema)
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }: {
-      ctx: AdminActionContext;
-      parsedInput: z.infer<typeof adminUpdateFeaturedContentSchema>;
-    }) => {
-      // ensure user has admin privileges
-      if (!ctx.isAdmin) {
-        throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_UPDATE);
-      }
+  .action(async ({ ctx }) => {
+    // ensure user has admin privileges
+    if (!ctx.isAdmin) {
+      throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_UPDATE);
+    }
 
-      const { id, ...updateData } = parsedInput;
+    const { id, ...updateData } = adminUpdateFeaturedContentSchema.parse(ctx.sanitizedInput);
 
-      const [updatedFeaturedContent] = await ctx.db
-        .update(featuredContent)
-        .set({
-          ...updateData,
-          updatedAt: new Date(),
-        })
-        .where(eq(featuredContent.id, id))
-        .returning();
+    const [updatedFeaturedContent] = await ctx.db
+      .update(featuredContent)
+      .set({
+        ...updateData,
+        updatedAt: new Date(),
+      })
+      .where(eq(featuredContent.id, id))
+      .returning();
 
-      if (!updatedFeaturedContent) {
-        throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
-      }
+    if (!updatedFeaturedContent) {
+      throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
+    }
 
-      // invalidate featured content caches
-      invalidateFeaturedContentCaches(id);
+    // invalidate featured content caches
+    invalidateFeaturedContentCaches(id);
 
-      return {
-        featuredContent: updatedFeaturedContent,
-        message: 'Featured content updated successfully',
-      };
-    },
-  );
+    return {
+      featuredContent: updatedFeaturedContent,
+      message: 'Featured content updated successfully',
+    };
+  });
+
+const deleteFeaturedContentInputSchema = z.object({
+  id: z.string().uuid('ID must be a valid UUID'),
+});
 
 /**
  * delete featured content (admin only)
@@ -111,20 +99,18 @@ export const deleteFeaturedContentAction = adminActionClient
     actionName: ACTION_NAMES.SYSTEM.DELETE_FEATURED_CONTENT,
     isTransactionRequired: true,
   })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid('ID must be a valid UUID'),
-    }),
-  )
-  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
+  .inputSchema(deleteFeaturedContentInputSchema)
+  .action(async ({ ctx }) => {
     // ensure user has admin privileges
     if (!ctx.isAdmin) {
       throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_DELETE);
     }
 
+    const input = deleteFeaturedContentInputSchema.parse(ctx.sanitizedInput);
+
     const [deletedFeaturedContent] = await ctx.db
       .delete(featuredContent)
-      .where(eq(featuredContent.id, parsedInput.id))
+      .where(eq(featuredContent.id, input.id))
       .returning();
 
     if (!deletedFeaturedContent) {
@@ -132,74 +118,69 @@ export const deleteFeaturedContentAction = adminActionClient
     }
 
     // invalidate featured content caches
-    invalidateFeaturedContentCaches(parsedInput.id);
+    invalidateFeaturedContentCaches(input.id);
 
     return {
       message: 'Featured content deleted successfully',
     };
   });
 
+const toggleFeaturedContentStatusInputSchema = z.object({
+  id: z.string().uuid('ID must be a valid UUID'),
+  isActive: z.boolean(),
+});
+
 /**
- * Toggle featured content active status (moderators can use this)
+ * goggle featured content active status (moderators can use this)
  */
 export const toggleFeaturedContentStatusAction = adminActionClient
   .metadata({
     actionName: ACTION_NAMES.SYSTEM.TOGGLE_FEATURED_CONTENT_STATUS,
     isTransactionRequired: true,
   })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid('ID must be a valid UUID'),
-      isActive: z.boolean(),
-    }),
-  )
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }: {
-      ctx: AdminActionContext;
-      parsedInput: { id: string; isActive: boolean };
-    }) => {
-      // moderators can toggle status, but not create/delete
-      const [updatedFeaturedContent] = await ctx.db
-        .update(featuredContent)
-        .set({
-          isActive: parsedInput.isActive,
-          updatedAt: new Date(),
-        })
-        .where(eq(featuredContent.id, parsedInput.id))
-        .returning();
+  .inputSchema(toggleFeaturedContentStatusInputSchema)
+  .action(async ({ ctx }) => {
+    const input = toggleFeaturedContentStatusInputSchema.parse(ctx.sanitizedInput);
 
-      if (!updatedFeaturedContent) {
-        throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
-      }
+    // moderators can toggle the status but not create/delete
+    const [updatedFeaturedContent] = await ctx.db
+      .update(featuredContent)
+      .set({
+        isActive: input.isActive,
+        updatedAt: new Date(),
+      })
+      .where(eq(featuredContent.id, input.id))
+      .returning();
 
-      // invalidate featured content caches
-      invalidateFeaturedContentCaches(parsedInput.id);
+    if (!updatedFeaturedContent) {
+      throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
+    }
 
-      return {
-        featuredContent: updatedFeaturedContent,
-        message: `Featured content ${parsedInput.isActive ? 'activated' : 'deactivated'} successfully`,
-      };
-    },
-  );
+    // invalidate featured content caches
+    invalidateFeaturedContentCaches(input.id);
+
+    return {
+      featuredContent: updatedFeaturedContent,
+      message: `Featured content ${input.isActive ? 'activated' : 'deactivated'} successfully`,
+    };
+  });
+
+const getFeaturedContentByIdInputSchema = z.object({
+  id: z.string().uuid('ID must be a valid UUID'),
+});
 
 /**
- * Get featured content by ID (admin only)
+ * get featured content by ID (admin only)
  */
 export const getFeaturedContentByIdAction = adminActionClient
   .metadata({
     actionName: ACTION_NAMES.SYSTEM.GET_FEATURED_CONTENT,
   })
-  .inputSchema(
-    z.object({
-      id: z.string().uuid('ID must be a valid UUID'),
-    }),
-  )
-  .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
+  .inputSchema(getFeaturedContentByIdInputSchema)
+  .action(async ({ ctx }) => {
+    const input = getFeaturedContentByIdInputSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.tx ?? ctx.db;
-    const featuredContentData = await AdminFacade.getFeaturedContentByIdForAdmin(parsedInput.id, dbInstance);
+    const featuredContentData = await AdminFacade.getFeaturedContentByIdForAdmin(input.id, dbInstance);
 
     if (!featuredContentData) {
       throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
