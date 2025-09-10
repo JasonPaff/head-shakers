@@ -39,30 +39,39 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
         return originalExecuteAsync(input);
       }
 
-      return toast.promise(originalExecuteAsync(input), {
-        error: (error) => {
-          options?.onBeforeError?.();
-          const message =
-            typeof options?.toastMessages?.error === 'function' ?
-              options.toastMessages.error(error)
-            : options?.toastMessages?.error ||
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-              (error?.serverError as string) ||
-              'Unexpected error, please try again.';
-          options?.onAfterError?.();
-          return message;
+      return toast.promise(
+        originalExecuteAsync(input).then((result) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          if (result?.serverError) {
+            throw result;
+          }
+          return result;
+        }),
+        {
+          error: (error) => {
+            options?.onBeforeError?.();
+            const message =
+              typeof options?.toastMessages?.error === 'function' ?
+                options.toastMessages.error(error)
+              : options?.toastMessages?.error ||
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                (error?.serverError as string) ||
+                'Unexpected error, please try again.';
+            options?.onAfterError?.();
+            return message;
+          },
+          loading: options?.toastMessages?.loading || 'Processing...',
+          success: (data) => {
+            options?.onBeforeSuccess?.();
+            const message =
+              typeof options?.toastMessages?.success === 'function' ?
+                options?.toastMessages.success(data)
+              : options?.toastMessages?.success;
+            options?.onAfterSuccess?.();
+            return message || 'Action completed successfully.';
+          },
         },
-        loading: options?.toastMessages?.loading || 'Processing...',
-        success: (data) => {
-          options?.onBeforeSuccess?.();
-          const message =
-            typeof options?.toastMessages?.success === 'function' ?
-              options?.toastMessages.success(data)
-            : options?.toastMessages?.success;
-          options?.onAfterSuccess?.();
-          return message || 'Action completed successfully.';
-        },
-      });
+      );
     },
     [originalExecuteAsync, options],
   );
