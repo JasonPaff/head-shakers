@@ -17,6 +17,11 @@ import {
 } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
+export type BobbleheadDeleteResult = {
+  bobblehead: BobbleheadRecord | null;
+  photos: Array<typeof bobbleheadPhotos.$inferSelect>;
+};
+
 /**
  * bobblehead record with related data
  */
@@ -64,17 +69,30 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * delete a bobblehead
+   * delete a bobblehead with photos
    */
-  static async delete(data: DeleteBobblehead, userId: string, context: QueryContext) {
+  static async delete(
+    data: DeleteBobblehead,
+    userId: string,
+    context: QueryContext,
+  ): Promise<BobbleheadDeleteResult> {
     const dbInstance = this.getDbInstance(context);
 
+    // get the photos associated with this bobblehead before deletion
+    const photos = await this.getPhotos(data.bobbleheadId, context);
+
+    // delete the bobblehead (cascade will handle photo records)
     const result = await dbInstance
       .delete(bobbleheads)
       .where(and(eq(bobbleheads.id, data.bobbleheadId), eq(bobbleheads.userId, userId)))
       .returning();
 
-    return result?.[0] || null;
+    const deletedBobblehead = result?.[0] || null;
+
+    return {
+      bobblehead: deletedBobblehead,
+      photos,
+    };
   }
 
   /**

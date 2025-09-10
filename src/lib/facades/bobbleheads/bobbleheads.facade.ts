@@ -15,6 +15,7 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { CloudinaryService } from '@/lib/services/cloudinary.service';
 
 /**
  * bobblehead with computed metrics and status
@@ -174,11 +175,52 @@ export class BobbleheadsFacade {
   }
 
   /**
-   * delete a bobblehead
+   * delete a bobblehead with Cloudinary photo cleanup
    */
-  static async deleteAsync(data: DeleteBobblehead, userId: string, dbInstance?: DatabaseExecutor) {
+  static async deleteAsync(
+    data: DeleteBobblehead,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadRecord | null> {
     const context = createUserQueryContext(userId, { dbInstance });
-    return BobbleheadsQuery.delete(data, userId, context);
+
+    // get bobblehead and photos, then delete from the database
+    const deleteResult = await BobbleheadsQuery.delete(data, userId, context);
+
+    const { bobblehead, photos } = deleteResult;
+
+    if (!bobblehead) {
+      return null;
+    }
+
+    // attempt to clean up photos from Cloudinary (non-blocking)
+    if (photos && photos.length > 0) {
+      try {
+        const photoUrls = photos.map((photo) => photo.url);
+        const deletionResults = await CloudinaryService.deletePhotosByUrls(photoUrls);
+
+        const successfulDeletions = deletionResults.filter((result) => result.success).length;
+        const failedDeletions = deletionResults.filter((result) => !result.success);
+
+        if (successfulDeletions > 0) {
+          console.log(
+            `Successfully deleted ${successfulDeletions} photos from Cloudinary for bobblehead ${bobblehead.id}`,
+          );
+        }
+
+        if (failedDeletions.length > 0) {
+          console.warn(
+            `Failed to delete ${failedDeletions.length} photos from Cloudinary for bobblehead ${bobblehead.id}:`,
+            failedDeletions,
+          );
+        }
+      } catch (error) {
+        // don't fail the entire operation if Cloudinary cleanup fails
+        console.error(`Cloudinary cleanup failed for bobblehead ${bobblehead.id}:`, error);
+      }
+    }
+
+    return bobblehead;
   }
 
   /**

@@ -203,7 +203,7 @@ export const deleteBobbleheadAction = authActionClient
           ErrorType.INTERNAL,
           ERROR_CODES.BOBBLEHEADS.DELETE_FAILED,
           ERROR_MESSAGES.BOBBLEHEAD.DELETE_FAILED,
-          { ctx, operation: OPERATIONS.BOBBLEHEADS.DELETE },
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.DELETE_WITH_PHOTOS },
           false,
           500,
         );
@@ -213,9 +213,10 @@ export const deleteBobbleheadAction = authActionClient
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           bobblehead: deletedBobblehead,
+          hasPhotos: Boolean(deletedBobblehead),
         },
         level: SENTRY_LEVELS.INFO,
-        message: `Deleted bobblehead: ${deletedBobblehead.name}`,
+        message: `Deleted bobblehead: ${deletedBobblehead.name} with Cloudinary photo cleanup`,
       });
 
       revalidatePath(
@@ -255,7 +256,7 @@ export const deleteBobbleheadAction = authActionClient
         metadata: {
           actionName: ACTION_NAMES.BOBBLEHEADS.DELETE,
         },
-        operation: OPERATIONS.BOBBLEHEADS.DELETE,
+        operation: OPERATIONS.BOBBLEHEADS.DELETE_WITH_PHOTOS,
         userId: ctx.userId,
       });
     }

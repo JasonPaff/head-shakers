@@ -12,10 +12,128 @@ cloudinary.config({
 
 export class CloudinaryService {
   /**
-   * Generate optimized URL for a Cloudinary image
-   * @param publicId - The Cloudinary public ID
-   * @param transformations - Transformation options
-   * @returns Optimized URL
+   * delete photos from Cloudinary by extracting public IDs from URLs
+   * @param urls - array of Cloudinary URLs to delete
+   * @returns results of deletion operations including URL context
+   */
+  static async deletePhotosByUrls(
+    urls: Array<string>,
+  ): Promise<Array<{ error?: string; publicId: null | string; success: boolean; url: string }>> {
+    if (urls.length === 0) {
+      return [];
+    }
+
+    // extract public IDs from URLs
+    const urlToPublicIdMap = new Map<string, string>();
+    const validPublicIds: Array<string> = [];
+
+    for (const url of urls) {
+      const publicId = this.extractPublicIdFromUrl(url);
+      if (publicId) {
+        urlToPublicIdMap.set(publicId, url);
+        validPublicIds.push(publicId);
+      }
+    }
+
+    if (validPublicIds.length === 0) {
+      return urls.map((url) => ({
+        error: 'Could not extract public ID from URL',
+        publicId: null,
+        success: false,
+        url,
+      }));
+    }
+
+    // delete the photos
+    const deletionResults = await this.deletePhotosFromCloudinary(validPublicIds);
+
+    // map results back to URLs
+    const urlResults = urls.map((url) => {
+      const publicId = this.extractPublicIdFromUrl(url);
+      if (!publicId) {
+        return {
+          error: 'Could not extract public ID from URL',
+          publicId: null,
+          success: false,
+          url,
+        };
+      }
+
+      const deletionResult = deletionResults.find((r) => r.publicId === publicId);
+      return {
+        error: deletionResult?.error,
+        publicId,
+        success: deletionResult?.success || false,
+        url,
+      };
+    });
+
+    return urlResults;
+  }
+
+  /**
+   * delete multiple photos from Cloudinary by their public IDs
+   * @param publicIds - array of Cloudinary public IDs to delete
+   * @returns results of deletion operations
+   */
+  static async deletePhotosFromCloudinary(
+    publicIds: Array<string>,
+  ): Promise<Array<{ error?: string; publicId: string; success: boolean }>> {
+    if (publicIds.length === 0) {
+      return [];
+    }
+
+    try {
+      // use Cloudinary's batch delete API
+      const result = await cloudinary.api.delete_resources(publicIds, {
+        resource_type: 'image',
+      });
+
+      // transform the result to our expected format
+      return publicIds.map((publicId) => {
+        const deletionResult = result.deleted?.[publicId];
+        const isSuccess = deletionResult === 'deleted';
+
+        return {
+          error: isSuccess ? undefined : `Failed to delete: ${deletionResult || 'unknown error'}`,
+          publicId,
+          success: isSuccess,
+        };
+      });
+    } catch (error) {
+      console.error('Batch delete from Cloudinary failed:', error);
+
+      // return failure for all public IDs
+      return publicIds.map((publicId) => ({
+        error: error instanceof Error ? error.message : 'Unknown error occurred',
+        publicId,
+        success: false,
+      }));
+    }
+  }
+
+  /**
+   * extract Cloudinary public ID from a Cloudinary URL
+   * @param url - the Cloudinary secure URL
+   * @returns the public ID or null if extraction fails
+   */
+  static extractPublicIdFromUrl(url: string): null | string {
+    try {
+      // cloudinary URLs follow the pattern: https://res.cloudinary.com/{cloud_name}/image/upload/{transformations}/{public_id}.{format}
+      const urlPattern = /\/image\/upload\/(?:v\d+\/)?(?:[^/]+\/)*([^/.]+(?:\/[^/.]+)*)/;
+      const match = url.match(urlPattern);
+      return match?.[1] || null;
+    } catch (error) {
+      console.error(`Failed to extract public ID from URL ${url}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * generate optimized URL for a Cloudinary image
+   * @param publicId - the Cloudinary public ID
+   * @param transformations - transformation options
+   * @returns optimized URL
    */
   static getOptimizedUrl(
     publicId: string,
@@ -40,10 +158,10 @@ export class CloudinaryService {
   }
 
   /**
-   * Move photos from temporary folder to permanent location
-   * @param photos - Array of photos with their Cloudinary public IDs
-   * @param targetFolder - The permanent folder path
-   * @returns Updated photos with new public IDs and URLs
+   * move photos from temporary folder to permanent location
+   * @param photos - array of photos with their Cloudinary public IDs
+   * @param targetFolder - the permanent folder path
+   * @returns updated photos with new public IDs and URLs
    */
   static async movePhotosToPermFolder(
     photos: Array<Pick<CloudinaryPhoto, 'publicId' | 'url'>>,
