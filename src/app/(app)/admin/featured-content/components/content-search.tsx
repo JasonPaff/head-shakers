@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDownIcon, ChevronRightIcon, Image as ImageIcon, SearchIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronRightIcon, Image as ImageIcon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -214,20 +214,16 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
   return (
     <div className={'space-y-4'}>
       {/* Search Input */}
-      <div className={'relative'}>
-        <SearchIcon
-          aria-hidden
-          className={'absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground'}
-        />
-        <Input
-          className={'pl-10'}
-          onChange={(e) => {
-            handleSearch(e.target.value);
-          }}
-          placeholder={`Search ${contentType}s...`}
-          value={query}
-        />
-      </div>
+      <Input
+        className={'pl-10'}
+        isClearable
+        isSearch
+        onChange={(e) => {
+          handleSearch(e.target.value);
+        }}
+        placeholder={`Search ${contentType}s...`}
+        value={query}
+      />
 
       {/* Loading Selected Item */}
       <Conditional isCondition={isLoadingSelected}>

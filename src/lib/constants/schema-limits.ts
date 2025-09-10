@@ -45,8 +45,8 @@ export const SCHEMA_LIMITS = {
   },
   FEATURED_CONTENT: {
     CURATOR_NOTES: { MAX: 2000 },
-    DESCRIPTION: { MAX: 5000 },
-    TITLE: { MAX: 255 },
+    DESCRIPTION: { MAX: 5000, MIN: 10 },
+    TITLE: { MAX: 255, MIN: 10 },
   },
   LOGIN_HISTORY: {
     FAILURE_REASON: { MAX: 255 },

@@ -31,7 +31,7 @@ export const updateNotificationSchema = insertNotificationSchema.partial().exten
 
 export const selectFeaturedContentSchema = createSelectSchema(featuredContent);
 export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
-  contentId: z.uuid('Content ID is required'),
+  contentId: z.uuid('Content is required'),
   curatorNotes: zodMaxString({
     fieldName: 'Curator Notes',
     maxLength: SCHEMA_LIMITS.FEATURED_CONTENT.CURATOR_NOTES.MAX,
@@ -39,7 +39,7 @@ export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
   description: zodMinMaxString({
     fieldName: 'Description',
     maxLength: SCHEMA_LIMITS.FEATURED_CONTENT.DESCRIPTION.MAX,
-    minLength: 0,
+    minLength: SCHEMA_LIMITS.FEATURED_CONTENT.DESCRIPTION.MIN,
   }),
   endDate: zodDateString({
     fieldName: 'Start Date',
@@ -79,7 +79,7 @@ export const insertFeaturedContentSchema = createInsertSchema(featuredContent, {
   title: zodMinMaxString({
     fieldName: 'Description',
     maxLength: SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MAX,
-    minLength: 0,
+    minLength: SCHEMA_LIMITS.FEATURED_CONTENT.TITLE.MIN,
   }),
 }).omit({
   createdAt: true,

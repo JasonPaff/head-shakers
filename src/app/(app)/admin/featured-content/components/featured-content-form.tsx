@@ -3,7 +3,6 @@
 import { revalidateLogic } from '@tanstack/form-core';
 import { useStore } from '@tanstack/react-form';
 import { XIcon } from 'lucide-react';
-import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -15,6 +14,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
+import { FieldAria } from '@/components/ui/form/field-components/field-aria';
+import { FieldError } from '@/components/ui/form/field-components/field-error';
+import { FieldItem } from '@/components/ui/form/field-components/field-item';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import {
   createFeaturedContentAction,
@@ -33,43 +36,25 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
   const [existingData, setExistingData] = useState<AdminFeaturedContent | null>(null);
   const [isLoading, setIsLoading] = useToggle(!!contentId);
 
-  const { executeAsync: getFeaturedContent } = useAction(getFeaturedContentByIdAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to load featured content');
-    },
-  });
-
-  const { executeAsync: createFeaturedContent, isExecuting: isCreating } = useAction(
+  const { executeAsync: getFeaturedContent } = useServerAction(getFeaturedContentByIdAction);
+  const { executeAsync: createFeaturedContentAsync, isExecuting: isCreating } = useServerAction(
     createFeaturedContentAction,
     {
-      onError: ({ error }) => {
-        toast.error(error.serverError || 'Failed to create featured content');
-      },
-      onSuccess: () => {
-        toast.success('Featured content created successfully!');
-        onSuccess();
-      },
+      successMessage: 'Featured content created successfully!',
     },
   );
-
-  const { executeAsync: updateFeaturedContent, isExecuting: isUpdating } = useAction(
+  const { executeAsync: updateFeaturedContentAsync, isExecuting: isUpdating } = useServerAction(
     updateFeaturedContentAction,
     {
-      onError: ({ error }) => {
-        toast.error(error.serverError || 'Failed to update featured content');
-      },
-      onSuccess: () => {
-        toast.success('Featured content updated successfully!');
-        onSuccess();
-      },
+      successMessage: 'Featured content updated successfully!',
     },
   );
 
   const form = useAppForm({
     ...featuredContentFormOptions,
     onSubmit: async ({ value }) => {
-      if (contentId) await updateFeaturedContent({ ...value, id: contentId });
-      else await createFeaturedContent(value);
+      if (contentId) await updateFeaturedContentAsync({ ...value, id: contentId }).then(onSuccess);
+      else await createFeaturedContentAsync(value).then(onSuccess);
     },
     validationLogic: revalidateLogic({
       mode: 'blur',
@@ -210,11 +195,23 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
             {/* Content Selection */}
             <div>
               <h3 className={'mb-2 text-sm font-medium'}>Select Content to Feature</h3>
-              <ContentSearch
-                contentType={currentContentType}
-                onSelect={handleContentSelect}
-                selectedContentId={currentContentId}
-              />
+
+              <form.AppField name={'contentId'}>
+                {() => (
+                  <FieldItem>
+                    <FieldAria>
+                      <div>
+                        <ContentSearch
+                          contentType={currentContentType}
+                          onSelect={handleContentSelect}
+                          selectedContentId={currentContentId}
+                        />
+                      </div>
+                    </FieldAria>
+                    <FieldError />
+                  </FieldItem>
+                )}
+              </form.AppField>
             </div>
 
             {/* Title */}

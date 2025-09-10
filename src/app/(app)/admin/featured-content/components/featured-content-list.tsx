@@ -1,9 +1,7 @@
 'use client';
 
 import { EditIcon, EyeIcon, EyeOffIcon, MoreHorizontalIcon, Trash2Icon, TrendingUpIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { Fragment, useMemo, useState, useTransition } from 'react';
-import { toast } from 'sonner';
+import { Fragment, useMemo, useState } from 'react';
 
 import type { AdminFeaturedContent } from '@/lib/facades/admin/admin.facade';
 
@@ -22,6 +20,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import {
   deleteFeaturedContentAction,
@@ -80,9 +79,8 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
 
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
-  const [isPending, startTransition] = useTransition();
-
-  const router = useRouter();
+  const { executeAsync: deleteAsync, isPending: isDeleting } = useServerAction(deleteFeaturedContentAction);
+  const { execute: toggleSync, isPending: isToggling } = useServerAction(toggleFeaturedContentActiveAction);
 
   const filteredContent = useMemo(() => {
     const filtered = initialData.filter((content) => {
@@ -113,34 +111,7 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
     return filtered;
   }, [initialData, searchTerm, filterType, filterStatus, sortBy]);
 
-  const handleToggleActive = (id: string, currentStatus: boolean) => {
-    startTransition(async () => {
-      const result = await toggleFeaturedContentActiveAction({
-        id,
-        isActive: !currentStatus,
-      });
-
-      if (result?.serverError) {
-        toast.error(result.serverError);
-      } else if (result?.data?.success) {
-        toast.success(result.data.message);
-        router.refresh();
-      }
-    });
-  };
-
-  const handleDelete = (id: string) => {
-    startTransition(async () => {
-      const result = await deleteFeaturedContentAction({ id });
-
-      if (result?.serverError) {
-        toast.error(result.serverError);
-      } else if (result?.data?.success) {
-        toast.success(result.data.message);
-        router.refresh();
-      }
-    });
-  };
+  const _isPending = isDeleting || isToggling;
 
   return (
     <div className={'space-y-4'}>
@@ -234,9 +205,12 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
                 <div className={'flex items-center gap-2'}>
                   <Button
                     className={'gap-1'}
-                    disabled={isPending}
+                    disabled={_isPending}
                     onClick={() => {
-                      handleToggleActive(content.id, content.isActive);
+                      toggleSync({
+                        id: content.id,
+                        isActive: !content.isActive,
+                      });
                     }}
                     size={'sm'}
                     variant={content.isActive ? 'outline' : 'default'}
@@ -288,8 +262,8 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
               <ConfirmDeleteAlertDialog
                 isOpen={isConfirmDeleteDialogOpen}
                 onClose={setIsConfirmDeleteDialogOpen.off}
-                onDelete={() => {
-                  handleDelete(content.id);
+                onDelete={async () => {
+                  await deleteAsync({ id: content.id });
                 }}
               >
                 This will permanently delete this featured content entry.
