@@ -3,7 +3,11 @@ import { cache } from 'react';
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
+import type {
+  DeleteBobblehead,
+  InsertBobblehead,
+  InsertBobbleheadPhoto,
+} from '@/lib/validations/bobbleheads.validation';
 
 import {
   createProtectedQueryContext,
@@ -160,9 +164,21 @@ export class BobbleheadsFacade {
   /**
    * create a new bobblehead
    */
-  static async createAsync(data: InsertBobblehead, userId: string, dbInstance?: DatabaseExecutor) {
+  static async createAsync(
+    data: InsertBobblehead,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadRecord | null> {
     const context = createUserQueryContext(userId, { dbInstance });
     return BobbleheadsQuery.create(data, userId, context);
+  }
+
+  /**
+   * delete a bobblehead
+   */
+  static async deleteAsync(data: DeleteBobblehead, userId: string, dbInstance?: DatabaseExecutor) {
+    const context = createUserQueryContext(userId, { dbInstance });
+    return BobbleheadsQuery.delete(data, userId, context);
   }
 
   /**

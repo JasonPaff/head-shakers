@@ -1,20 +1,14 @@
 import 'server-only';
-import {
-  ArrowLeftIcon,
-  CalendarIcon,
-  EditIcon,
-  EyeIcon,
-  HeartIcon,
-  ShareIcon,
-  TrashIcon,
-} from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, EditIcon, EyeIcon, HeartIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
+import { BobbleheadDelete } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-delete';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
@@ -23,6 +17,8 @@ interface BobbleheadHeaderProps {
 
 export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
+  const _backButtonLabel =
+    (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';
 
   return (
     <Fragment>
@@ -47,12 +43,12 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHead
             }
           >
             <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
-            Back to {_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName}
+            View {_backButtonLabel}
           </Link>
         </Button>
 
-        {/* Action Buttons - Only show to owners */}
-        {isOwner && (
+        {/* Action Buttons */}
+        <Conditional isCondition={isOwner}>
           <div className={'flex gap-2'}>
             <Button size={'sm'} variant={'outline'}>
               <EditIcon aria-hidden className={'mr-2 size-4'} />
@@ -62,12 +58,9 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHead
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share
             </Button>
-            <Button size={'sm'} variant={'destructive'}>
-              <TrashIcon aria-hidden className={'mr-2 size-4'} />
-              Delete
-            </Button>
+            <BobbleheadDelete>Delete</BobbleheadDelete>
           </div>
-        )}
+        </Conditional>
       </div>
 
       {/* Bobblehead Info */}

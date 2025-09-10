@@ -1,7 +1,11 @@
-import { desc, eq, like, or } from 'drizzle-orm';
+import { and, desc, eq, like, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
-import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
+import type {
+  DeleteBobblehead,
+  InsertBobblehead,
+  InsertBobbleheadPhoto,
+} from '@/lib/validations/bobbleheads.validation';
 
 import {
   bobbleheadPhotos,
@@ -35,11 +39,8 @@ export class BobbleheadsQuery extends BaseQuery {
    */
   static async addPhoto(data: InsertBobbleheadPhoto, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
-    
-    const result = await dbInstance
-      .insert(bobbleheadPhotos)
-      .values(data)
-      .returning();
+
+    const result = await dbInstance.insert(bobbleheadPhotos).values(data).returning();
 
     return result?.[0] || null;
   }
@@ -47,12 +48,30 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * create a new bobblehead
    */
-  static async create(data: InsertBobblehead, userId: string, context: QueryContext) {
+  static async create(
+    data: InsertBobblehead,
+    userId: string,
+    context: QueryContext,
+  ): Promise<BobbleheadRecord | null> {
     const dbInstance = this.getDbInstance(context);
-    
+
     const result = await dbInstance
       .insert(bobbleheads)
       .values({ ...data, userId })
+      .returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * delete a bobblehead
+   */
+  static async delete(data: DeleteBobblehead, userId: string, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .delete(bobbleheads)
+      .where(and(eq(bobbleheads.id, data.bobbleheadId), eq(bobbleheads.userId, userId)))
       .returning();
 
     return result?.[0] || null;

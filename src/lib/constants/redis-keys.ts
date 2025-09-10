@@ -1,6 +1,5 @@
 /**
  * Redis key patterns and builders
- * Centralized key management to prevent collisions and improve debugging
  */
 export const REDIS_KEYS = {
   ANALYTICS: {
@@ -40,17 +39,14 @@ export const REDIS_KEYS = {
   USER_SESSION: (sessionId: string) => `session:${sessionId}`,
 } as const;
 
-// helper function to build namespaced keys
 export const buildRedisKey = (namespace: string, ...parts: Array<string>): string => {
   return [namespace, ...parts].join(':');
 };
 
-// helper function to extract parts from a Redis key
 export const parseRedisKey = (key: string): Array<string> => {
   return key.split(':');
 };
 
-// key expiration times (in seconds)
 export const REDIS_TTL = {
   ANALYTICS: 604800, // 1 week
   CACHE: {
