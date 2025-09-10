@@ -286,14 +286,14 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
 
               {/* Confirm Delete Dialog */}
               <ConfirmDeleteAlertDialog
-                description={`This action cannot be undone. This will permanently 
-                  delete this featured content entry.`}
                 isOpen={isConfirmDeleteDialogOpen}
                 onClose={setIsConfirmDeleteDialogOpen.off}
                 onDelete={() => {
                   handleDelete(content.id);
                 }}
-              />
+              >
+                This will permanently delete this featured content entry.
+              </ConfirmDeleteAlertDialog>
             </CardContent>
           </Card>
         ))}

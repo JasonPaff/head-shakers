@@ -7,8 +7,11 @@ import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
+  CloudinaryPathBuilder,
   CONFIG,
+  ERROR_CODES,
   ERROR_MESSAGES,
+  OPERATIONS,
   SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
@@ -48,9 +51,9 @@ export const createBobbleheadWithPhotosAction = authActionClient
       if (!newBobblehead) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'BOBBLEHEAD_CREATE_FAILED',
+          ERROR_CODES.BOBBLEHEADS.CREATE_FAILED,
           ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED,
-          { ctx, operation: 'create_bobblehead' },
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.CREATE },
           false,
           500,
         );
@@ -61,7 +64,11 @@ export const createBobbleheadWithPhotosAction = authActionClient
       if (photos && photos.length > 0) {
         try {
           // move photos from temp folder to permanent location in Cloudinary
-          const permanentFolder = `users/${userId}/collections/${newBobblehead.collectionId}/bobbleheads/${newBobblehead.id}`;
+          const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
+            userId,
+            newBobblehead.collectionId,
+            newBobblehead.id,
+          );
           const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
             photos.map((photo) => ({
               publicId: photo.publicId,
@@ -170,7 +177,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
       return handleActionError(error, {
         input: parsedInput,
         metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.CREATE },
-        operation: 'create_bobblehead_with_photos',
+        operation: OPERATIONS.BOBBLEHEADS.CREATE_WITH_PHOTOS,
         userId,
       });
     }
@@ -194,9 +201,9 @@ export const deleteBobbleheadAction = authActionClient
       if (!deletedBobblehead) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'BOBBLEHEAD_DELETE_FAILED',
+          ERROR_CODES.BOBBLEHEADS.DELETE_FAILED,
           ERROR_MESSAGES.BOBBLEHEAD.DELETE_FAILED,
-          { ctx, operation: 'delete_bobblehead' },
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.DELETE },
           false,
           500,
         );
@@ -222,17 +229,21 @@ export const deleteBobbleheadAction = authActionClient
           routeParams: { collectionId: deletedBobblehead.id },
         }),
       );
+
       if (deletedBobblehead.subcollectionId) {
         revalidatePath(
           $path({
-            route: '/collections/[collectionId]',
-            routeParams: { collectionId: deletedBobblehead.id },
+            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+            routeParams: {
+              collectionId: deletedBobblehead.id,
+              subcollectionId: deletedBobblehead.subcollectionId,
+            },
           }),
         );
       }
 
       // TODO: if the bobblehead or its parent collection/subcollection is on
-      // the featured page then the featured page cache should be revalidated too
+      //  the featured page then the featured page cache should be revalidated too
 
       return {
         data: null,
@@ -242,9 +253,9 @@ export const deleteBobbleheadAction = authActionClient
       handleActionError(error, {
         input: parsedInput,
         metadata: {
-          actionName: ACTION_NAMES.COLLECTIONS.DELETE,
+          actionName: ACTION_NAMES.BOBBLEHEADS.DELETE,
         },
-        operation: 'delete_collection',
+        operation: OPERATIONS.BOBBLEHEADS.DELETE,
         userId: ctx.userId,
       });
     }

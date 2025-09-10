@@ -6,7 +6,7 @@ import { Fragment } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { BobbleheadDelete } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-delete';
+import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 
@@ -58,7 +58,15 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHead
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share
             </Button>
-            <BobbleheadDelete>Delete</BobbleheadDelete>
+
+            {/* Delete Bobblehead Button */}
+            <BobbleheadDelete
+              bobbleheadId={bobblehead.id}
+              collectionId={bobblehead.collectionId}
+              subcollectionId={bobblehead.subcollectionId}
+            >
+              Delete
+            </BobbleheadDelete>
           </div>
         </Conditional>
       </div>

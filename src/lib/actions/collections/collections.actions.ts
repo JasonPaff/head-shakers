@@ -7,7 +7,9 @@ import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
+  ERROR_CODES,
   ERROR_MESSAGES,
+  OPERATIONS,
   SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
@@ -40,9 +42,9 @@ export const createCollectionAction = authActionClient
       if (!newCollection) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'COLLECTION_CREATE_FAILED',
+          ERROR_CODES.COLLECTIONS.CREATE_FAILED,
           ERROR_MESSAGES.COLLECTION.CREATE_FAILED,
-          { ctx, operation: 'create_collection' },
+          { ctx, operation: OPERATIONS.COLLECTIONS.CREATE },
           false,
           500,
         );
@@ -73,7 +75,7 @@ export const createCollectionAction = authActionClient
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.CREATE,
         },
-        operation: 'create_collection',
+        operation: OPERATIONS.COLLECTIONS.CREATE,
         userId: ctx.userId,
       });
     }
@@ -101,9 +103,9 @@ export const updateCollectionAction = authActionClient
       if (!currentCollection) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'EXISTING_COLLECTION_NOT_FOUND',
+          ERROR_CODES.COLLECTIONS.EXISTING_NOT_FOUND,
           ERROR_MESSAGES.COLLECTION.NOT_FOUND,
-          { ctx, operation: 'update_collection' },
+          { ctx, operation: OPERATIONS.COLLECTIONS.UPDATE },
           false,
           500,
         );
@@ -123,9 +125,9 @@ export const updateCollectionAction = authActionClient
       if (!updatedCollection) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'EXISTING_COLLECTION_UPDATE_FAILED',
+          ERROR_CODES.COLLECTIONS.EXISTING_UPDATE_FAILED,
           ERROR_MESSAGES.COLLECTION.UPDATE_FAILED,
-          { ctx, operation: 'update_collection' },
+          { ctx, operation: OPERATIONS.COLLECTIONS.UPDATE },
           false,
           500,
         );
@@ -153,7 +155,7 @@ export const updateCollectionAction = authActionClient
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.UPDATE,
         },
-        operation: 'update_collection',
+        operation: OPERATIONS.COLLECTIONS.UPDATE,
         userId: ctx.userId,
       });
     }
@@ -177,9 +179,9 @@ export const deleteCollectionAction = authActionClient
       if (!deletedCollection) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'COLLECTION_DELETE_FAILED',
+          ERROR_CODES.COLLECTIONS.DELETE_FAILED,
           ERROR_MESSAGES.COLLECTION.DELETE_FAILED,
-          { ctx, operation: 'delete_collection' },
+          { ctx, operation: OPERATIONS.COLLECTIONS.DELETE },
           false,
           500,
         );
@@ -216,7 +218,7 @@ export const deleteCollectionAction = authActionClient
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.DELETE,
         },
-        operation: 'delete_collection',
+        operation: OPERATIONS.COLLECTIONS.DELETE,
         userId: ctx.userId,
       });
     }

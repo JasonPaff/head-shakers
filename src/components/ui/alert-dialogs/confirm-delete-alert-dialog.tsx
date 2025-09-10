@@ -1,5 +1,6 @@
 'use client';
 
+import { Alert } from '@/components/ui/alert';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,15 +13,14 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 
-interface ConfirmDeleteAlertDialogProps {
-  description: string;
+type ConfirmDeleteAlertDialogProps = Children<{
   isOpen: boolean;
   onClose: () => void;
   onDelete: (() => Promise<void>) | (() => void);
-}
+}>;
 
 export const ConfirmDeleteAlertDialog = ({
-  description,
+  children,
   isOpen,
   onClose,
   onDelete,
@@ -30,7 +30,6 @@ export const ConfirmDeleteAlertDialog = ({
   };
 
   const handleConfirm = async () => {
-    console.log('deleting');
     await onDelete();
     onClose();
   };
@@ -45,20 +44,20 @@ export const ConfirmDeleteAlertDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <Alert variant={'error'}>This action cannot be undone</Alert>
+          <AlertDialogDescription className={'py-4'}>{children}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button
-              onClick={() => {
-                void handleConfirm();
-              }}
-              variant={'destructive'}
-            >
-              Delete
-            </Button>
-          </AlertDialogAction>
+          <Button
+            asChild
+            onClick={() => {
+              void handleConfirm();
+            }}
+            variant={'destructive'}
+          >
+            <AlertDialogAction>Delete</AlertDialogAction>
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

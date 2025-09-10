@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
-import { ACTION_NAMES } from '@/lib/constants';
+import { ACTION_NAMES, ERROR_MESSAGES } from '@/lib/constants';
 import { featuredContent } from '@/lib/db/schema';
 import { AdminFacade } from '@/lib/facades/admin/admin.facade';
 import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
@@ -35,7 +35,7 @@ export const createFeaturedContentAction = adminActionClient
     }) => {
       // ensure the user has admin privileges (moderators cannot create featured content)
       if (!ctx.isAdmin) {
-        throw new Error('Admin privileges required to create featured content');
+        throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_CREATE);
       }
 
       const [newFeaturedContent] = await ctx.db
@@ -75,7 +75,7 @@ export const updateFeaturedContentAction = adminActionClient
     }) => {
       // ensure user has admin privileges
       if (!ctx.isAdmin) {
-        throw new Error('Admin privileges required to update featured content');
+        throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_UPDATE);
       }
 
       const { id, ...updateData } = parsedInput;
@@ -90,7 +90,7 @@ export const updateFeaturedContentAction = adminActionClient
         .returning();
 
       if (!updatedFeaturedContent) {
-        throw new Error('Featured content not found');
+        throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
       }
 
       // invalidate featured content caches
@@ -119,7 +119,7 @@ export const deleteFeaturedContentAction = adminActionClient
   .action(async ({ ctx, parsedInput }: { ctx: AdminActionContext; parsedInput: { id: string } }) => {
     // ensure user has admin privileges
     if (!ctx.isAdmin) {
-      throw new Error('Admin privileges required to delete featured content');
+      throw new Error(ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_DELETE);
     }
 
     const [deletedFeaturedContent] = await ctx.db
@@ -128,7 +128,7 @@ export const deleteFeaturedContentAction = adminActionClient
       .returning();
 
     if (!deletedFeaturedContent) {
-      throw new Error('Featured content not found');
+      throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
     }
 
     // invalidate featured content caches
@@ -172,7 +172,7 @@ export const toggleFeaturedContentStatusAction = adminActionClient
         .returning();
 
       if (!updatedFeaturedContent) {
-        throw new Error('Featured content not found');
+        throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
       }
 
       // invalidate featured content caches
@@ -202,7 +202,7 @@ export const getFeaturedContentByIdAction = adminActionClient
     const featuredContentData = await AdminFacade.getFeaturedContentByIdForAdmin(parsedInput.id, dbInstance);
 
     if (!featuredContentData) {
-      throw new Error('Featured content not found');
+      throw new Error(ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND);
     }
 
     return {

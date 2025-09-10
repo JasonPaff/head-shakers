@@ -1,8 +1,9 @@
 import 'server-only';
-import { DollarSignIcon, PlusIcon, RulerIcon, StarIcon } from 'lucide-react';
+import { DollarSignIcon, EyeIcon, PencilIcon, PlusIcon, RulerIcon, StarIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -105,17 +106,28 @@ export const SubcollectionBobbleheads = async ({
               </div>
 
               {/* View Details Button */}
-              <div className={'pt-2'}>
-                <Button asChild className={'w-full'} size={'sm'}>
+              <div className={'flex gap-2'}>
+                <Button asChild size={'sm'}>
                   <Link
                     href={$path({
                       route: '/bobbleheads/[bobbleheadId]',
                       routeParams: { bobbleheadId: bobblehead.id },
                     })}
                   >
-                    View Details
+                    <EyeIcon aria-hidden className={'mr-2 size-4'} />
+                    View Bobblehead
                   </Link>
                 </Button>
+                <Button size={'sm'} variant={'secondary'}>
+                  <PencilIcon aria-hidden aria-label={'edit bobblehead'} className={'size-4'} />
+                </Button>
+
+                {/* Delete Bobblehead Button */}
+                <BobbleheadDelete
+                  bobbleheadId={bobblehead.id}
+                  collectionId={collectionId}
+                  subcollectionId={subcollectionId}
+                />
               </div>
             </CardContent>
           </Card>

@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import type { AdminActionContext } from '@/lib/utils/next-safe-action';
 
-import { ACTION_NAMES, CONFIG, DEFAULTS } from '@/lib/constants';
+import { ACTION_NAMES, CONFIG, DEFAULTS, ERROR_MESSAGES } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 
@@ -258,7 +258,7 @@ export const getCollectionForFeaturingAction = adminActionClient
 
     const collection = result[0];
     if (!collection) {
-      throw new Error('Collection not found or not public');
+      throw new Error(ERROR_MESSAGES.COLLECTION.NOT_FOUND_OR_NOT_PUBLIC);
     }
 
     return { collection };
@@ -309,7 +309,7 @@ export const getBobbleheadForFeaturingAction = adminActionClient
 
     const bobblehead = result[0];
     if (!bobblehead) {
-      throw new Error('Bobblehead not found or not public');
+      throw new Error(ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND_OR_NOT_PUBLIC);
     }
 
     // Get all photos for this bobblehead
@@ -360,7 +360,7 @@ export const getUserForFeaturingAction = adminActionClient
 
     const user = result[0];
     if (!user) {
-      throw new Error('User not found');
+      throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
     }
 
     return { user };

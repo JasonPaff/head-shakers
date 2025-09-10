@@ -7,7 +7,9 @@ import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
+  ERROR_CODES,
   ERROR_MESSAGES,
+  OPERATIONS,
   SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
@@ -39,9 +41,9 @@ export const createSubCollectionAction = authActionClient
       if (!newSubcollection) {
         throw new ActionError(
           ErrorType.INTERNAL,
-          'SUBCOLLECTION_CREATE_FAILED',
+          ERROR_CODES.SUBCOLLECTIONS.CREATE_FAILED,
           ERROR_MESSAGES.COLLECTION.SUB_COLLECTION_CREATE_FAILED,
-          { ctx, operation: 'create_subcollection' },
+          { ctx, operation: OPERATIONS.SUBCOLLECTIONS.CREATE },
           false,
           500,
         );
@@ -78,7 +80,7 @@ export const createSubCollectionAction = authActionClient
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.CREATE_SUB,
         },
-        operation: 'create_sub_collection',
+        operation: OPERATIONS.SUBCOLLECTIONS.CREATE_ALT,
         userId: ctx.userId,
       });
     }
@@ -121,7 +123,7 @@ export const getSubCollectionsByCollectionAction = authActionClient
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.GET_SUB_COLLECTIONS,
         },
-        operation: 'get_sub_collections',
+        operation: OPERATIONS.SUBCOLLECTIONS.GET,
         userId: ctx.userId,
       });
     }

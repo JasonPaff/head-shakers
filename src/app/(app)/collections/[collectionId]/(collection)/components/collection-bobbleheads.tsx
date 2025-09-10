@@ -1,8 +1,9 @@
 import 'server-only';
-import { DollarSignIcon, PlusIcon, RulerIcon, StarIcon } from 'lucide-react';
+import { DollarSignIcon, EyeIcon, PencilIcon, PlusIcon, RulerIcon, StarIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +33,7 @@ export const CollectionBobbleheads = async ({
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
+        {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
@@ -52,23 +54,27 @@ export const CollectionBobbleheads = async ({
           <Card className={'group transition-shadow hover:shadow-lg'} key={bobblehead.id}>
             <CardHeader className={'pb-3'}>
               <div className={'relative mb-4 aspect-square overflow-hidden rounded-lg bg-muted'}>
+                {/* Bobblehead Image */}
                 <img
                   alt={bobblehead.name || 'Bobblehead'}
                   className={'object-cover transition-transform duration-300 group-hover:scale-105'}
                   src={bobblehead.featurePhoto || '/placeholder.svg'}
                 />
-                {bobblehead.isFeatured && (
+                {/* Featured Badge */}
+                <Conditional isCondition={bobblehead.isFeatured}>
                   <div className={'absolute top-2 right-2'}>
                     <Badge className={'bg-accent text-accent-foreground'}>
                       <StarIcon className={'mr-1 size-3'} />
                       Featured
                     </Badge>
                   </div>
-                )}
+                </Conditional>
               </div>
               <CardTitle className={'text-lg text-balance'}>{bobblehead.name}</CardTitle>
             </CardHeader>
+
             <CardContent className={'space-y-3 pt-0'}>
+              {/* Character, Manufacturer, and Height */}
               <div className={'space-y-2'}>
                 <div className={'flex items-center gap-2 text-sm'}>
                   <span className={'font-medium'}>Character:</span>
@@ -84,6 +90,7 @@ export const CollectionBobbleheads = async ({
                 </div>
               </div>
 
+              {/* Condition and Price */}
               <div className={'flex items-center justify-between pt-2'}>
                 <Badge
                   variant={bobblehead.condition === ENUMS.BOBBLEHEAD.CONDITION[0] ? 'default' : 'secondary'}
@@ -96,17 +103,25 @@ export const CollectionBobbleheads = async ({
                 </div>
               </div>
 
-              <div className={'pt-2'}>
-                <Button asChild className={'w-full'} size={'sm'}>
+              {/* View Details Button */}
+              <div className={'flex gap-2'}>
+                <Button asChild size={'sm'}>
                   <Link
                     href={$path({
                       route: '/bobbleheads/[bobbleheadId]',
                       routeParams: { bobbleheadId: bobblehead.id },
                     })}
                   >
-                    View Details
+                    <EyeIcon aria-hidden className={'mr-2 size-4'} />
+                    View Bobblehead
                   </Link>
                 </Button>
+                <Button size={'sm'} variant={'secondary'}>
+                  <PencilIcon aria-hidden aria-label={'edit bobblehead'} className={'size-4'} />
+                </Button>
+
+                {/* Delete Bobblehead Button */}
+                <BobbleheadDelete bobbleheadId={bobblehead.id} collectionId={collectionId} />
               </div>
             </CardContent>
           </Card>
