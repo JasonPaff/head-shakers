@@ -17,7 +17,7 @@ import {
 } from '@/lib/validations/admin.validation';
 
 /**
- * Create featured content (admin only)
+ * create featured content (admin only)
  */
 export const createFeaturedContentAction = adminActionClient
   .metadata({
@@ -57,7 +57,7 @@ export const createFeaturedContentAction = adminActionClient
   );
 
 /**
- * Update featured content (admin only)
+ * update featured content (admin only)
  */
 export const updateFeaturedContentAction = adminActionClient
   .metadata({
@@ -104,7 +104,7 @@ export const updateFeaturedContentAction = adminActionClient
   );
 
 /**
- * Delete featured content (admin only)
+ * delete featured content (admin only)
  */
 export const deleteFeaturedContentAction = adminActionClient
   .metadata({

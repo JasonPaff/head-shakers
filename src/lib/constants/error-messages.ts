@@ -50,6 +50,13 @@ export const ERROR_MESSAGES = {
     SERVICE_UNAVAILABLE: 'External service is unavailable',
     TIMEOUT: 'Request timeout',
   },
+  FEATURED_CONTENT: {
+    CREATE_FAILED: 'Failed to create featured content',
+    DELETE_FAILED: 'Failed to delete featured content',
+    NOT_FOUND: 'Featured content not found',
+    TOGGLE_FAILED: 'Failed to toggle featured content status',
+    UPDATE_FAILED: 'Failed to update featured content',
+  },
   FILE: {
     DELETE_FAILED: 'File deletion failed',
     INVALID_TYPE: 'Invalid file type',

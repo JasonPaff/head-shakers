@@ -2,8 +2,13 @@ import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type {
+  InsertFeaturedContent,
+  SelectFeaturedContent,
+  UpdateFeaturedContent,
+} from '@/lib/validations/system.validation';
 
-import { createPublicQueryContext } from '@/lib/queries/base/query-context';
+import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import {
   type FeaturedContentRecord,
@@ -53,6 +58,16 @@ export class FeaturedContentFacade {
   );
 
   /**
+   * get all featured content for admin management
+   */
+  static getAllFeaturedContentForAdmin = cache(
+    async (dbInstance?: DatabaseExecutor): Promise<Array<SelectFeaturedContent>> => {
+      const context = createPublicQueryContext({ dbInstance });
+      return FeaturedContentQuery.findAllForAdmin(context);
+    },
+  );
+
+  /**
    * get the collection of the weeks
    */
   static getCollectionOfWeek = cache(
@@ -71,6 +86,16 @@ export class FeaturedContentFacade {
       console.log('Cache access: getEditorPicks');
       const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
       return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
+    },
+  );
+
+  /**
+   * get featured content by ID
+   */
+  static getFeaturedContentById = cache(
+    async (id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> => {
+      const context = createPublicQueryContext({ dbInstance });
+      return FeaturedContentQuery.findById(id, context);
     },
   );
 
@@ -95,6 +120,26 @@ export class FeaturedContentFacade {
       return FeaturedContentTransformer.filterByType(allContent, 'trending');
     },
   );
+
+  /**
+   * create a new featured content entry
+   */
+  static async createAsync(
+    data: InsertFeaturedContent,
+    curatorId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | SelectFeaturedContent> {
+    const context = createUserQueryContext(curatorId, { dbInstance });
+    return FeaturedContentQuery.create(data, curatorId, context);
+  }
+
+  /**
+   * delete a featured content entry
+   */
+  static async deleteAsync(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.delete(id, context);
+  }
 
   /**
    * get cache statistics for monitoring
@@ -126,5 +171,29 @@ export class FeaturedContentFacade {
     cacheStats.react.hits = 0;
     cacheStats.react.misses = 0;
     return Promise.resolve();
+  }
+
+  /**
+   * toggle active status of featured content
+   */
+  static async toggleActiveAsync(
+    id: string,
+    isActive: boolean,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | SelectFeaturedContent> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.toggleActive(id, isActive, context);
+  }
+
+  /**
+   * update a featured content entry
+   */
+  static async updateAsync(
+    id: string,
+    data: UpdateFeaturedContent,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | SelectFeaturedContent> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.update(id, data, context);
   }
 }

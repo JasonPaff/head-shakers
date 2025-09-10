@@ -2,6 +2,11 @@ import { and, desc, eq, gte, isNull, lte, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { RawFeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
+import type {
+  InsertFeaturedContent,
+  SelectFeaturedContent,
+  UpdateFeaturedContent,
+} from '@/lib/validations/system.validation';
 
 import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
@@ -37,6 +42,41 @@ export interface FeaturedContentRecord {
  * handles all database operations for featured content with consistent patterns
  */
 export class FeaturedContentQuery extends BaseQuery {
+  /**
+   * create a new featured content entry
+   */
+  static async create(
+    data: InsertFeaturedContent,
+    curatorId: string,
+    context: QueryContext,
+  ): Promise<null | SelectFeaturedContent> {
+    const dbInstance = this.getDbInstance(context);
+
+    // ensure required fields have default values if not provided
+    const insertData = {
+      ...data,
+      curatorId,
+      priority: data.priority ?? 0,
+      sortOrder: data.sortOrder ?? 0,
+      viewCount: data.viewCount ?? 0,
+    };
+
+    const result = await dbInstance.insert(featuredContent).values(insertData).returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * delete a featured content entry
+   */
+  static async delete(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance.delete(featuredContent).where(eq(featuredContent.id, id)).returning();
+
+    return result?.[0] || null;
+  }
+
   /**
    * get active featured content with related data (raw data for service layer transformation)
    */
@@ -84,6 +124,29 @@ export class FeaturedContentQuery extends BaseQuery {
   }
 
   /**
+   * get all featured content for admin management
+   */
+  static async findAllForAdmin(context: QueryContext): Promise<Array<SelectFeaturedContent>> {
+    const dbInstance = this.getDbInstance(context);
+
+    return dbInstance
+      .select()
+      .from(featuredContent)
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
+  }
+
+  /**
+   * find featured content by ID
+   */
+  static async findById(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance.select().from(featuredContent).where(eq(featuredContent.id, id)).limit(1);
+
+    return result[0] || null;
+  }
+
+  /**
    * increment view count for featured content
    */
   static async incrementViewCount(contentId: string, context: QueryContext): Promise<void> {
@@ -101,5 +164,51 @@ export class FeaturedContentQuery extends BaseQuery {
       console.error(`Failed to increment view count for content ${contentId}:`, error);
       throw error;
     }
+  }
+
+  /**
+   * toggle active status of featured content
+   */
+  static async toggleActive(
+    id: string,
+    isActive: boolean,
+    context: QueryContext,
+  ): Promise<null | SelectFeaturedContent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(featuredContent)
+      .set({
+        isActive,
+        updatedAt: new Date(),
+      })
+      .where(eq(featuredContent.id, id))
+      .returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * update a featured content entry
+   */
+  static async update(
+    id: string,
+    data: UpdateFeaturedContent,
+    context: QueryContext,
+  ): Promise<null | SelectFeaturedContent> {
+    const dbInstance = this.getDbInstance(context);
+
+    // filter out null values to avoid type issues
+    const updateData = Object.fromEntries(
+      Object.entries({ ...data, updatedAt: new Date() }).filter(([, value]) => value !== null),
+    );
+
+    const result = await dbInstance
+      .update(featuredContent)
+      .set(updateData)
+      .where(eq(featuredContent.id, id))
+      .returning();
+
+    return result?.[0] || null;
   }
 }

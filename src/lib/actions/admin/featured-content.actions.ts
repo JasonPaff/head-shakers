@@ -1,11 +1,21 @@
 'use server';
 
-import { eq } from 'drizzle-orm';
+import 'server-only';
+import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
-import { ACTION_NAMES } from '@/lib/constants';
-import { featuredContent } from '@/lib/db/schema';
-import { invalidateFeaturedContentCaches } from '@/lib/utils/cache.utils';
+import {
+  ACTION_NAMES,
+  ERROR_CODES,
+  ERROR_MESSAGES,
+  OPERATIONS,
+  SENTRY_BREADCRUMB_CATEGORIES,
+  SENTRY_CONTEXTS,
+  SENTRY_LEVELS,
+} from '@/lib/constants';
+import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
+import { handleActionError } from '@/lib/utils/action-error-handler';
+import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 
 const toggleActiveSchema = z.object({
@@ -19,25 +29,48 @@ export const toggleFeaturedContentActiveAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(toggleActiveSchema)
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx, parsedInput }) => {
     const { id, isActive } = toggleActiveSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
 
-    // update the featured content status
-    await ctx.db
-      .update(featuredContent)
-      .set({
-        isActive,
-        updatedAt: new Date(),
-      })
-      .where(eq(featuredContent.id, id));
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, { id, isActive });
 
-    // invalidate all caches (Redis and Next.js)
-    invalidateFeaturedContentCaches(id);
+    try {
+      const updatedFeaturedContent = await FeaturedContentFacade.toggleActiveAsync(id, isActive, dbInstance);
 
-    return {
-      message: `Featured content ${isActive ? 'activated' : 'deactivated'} successfully`,
-      success: true,
-    };
+      if (!updatedFeaturedContent) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.FEATURED_CONTENT.NOT_FOUND,
+          ERROR_MESSAGES.FEATURED_CONTENT.NOT_FOUND,
+          { ctx, operation: OPERATIONS.FEATURED_CONTENT.TOGGLE_ACTIVE },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          featuredContent: updatedFeaturedContent,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Featured content ${isActive ? 'activated' : 'deactivated'}: ${updatedFeaturedContent.title}`,
+      });
+
+      return {
+        data: updatedFeaturedContent,
+        message: `Featured content ${isActive ? 'activated' : 'deactivated'} successfully`,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.ADMIN.TOGGLE_FEATURED_CONTENT },
+        operation: OPERATIONS.FEATURED_CONTENT.TOGGLE_ACTIVE,
+        userId: ctx.userId,
+      });
+    }
   });
 
 const deleteFeaturedContentSchema = z.object({
@@ -50,22 +83,46 @@ export const deleteFeaturedContentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteFeaturedContentSchema)
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx, parsedInput }) => {
     const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
 
-    // delete the featured content
-    const [deletedFeatureContent] = await ctx.db
-      .delete(featuredContent)
-      .where(eq(featuredContent.id, id))
-      .returning();
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, { id });
 
-    // invalidate all caches if the content was active
-    if (deletedFeatureContent?.isActive) {
-      invalidateFeaturedContentCaches(id);
+    try {
+      const deletedFeaturedContent = await FeaturedContentFacade.deleteAsync(id, dbInstance);
+
+      if (!deletedFeaturedContent) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.FEATURED_CONTENT.DELETE_FAILED,
+          ERROR_MESSAGES.FEATURED_CONTENT.DELETE_FAILED,
+          { ctx, operation: OPERATIONS.FEATURED_CONTENT.DELETE },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          featuredContent: deletedFeaturedContent,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Deleted featured content: ${deletedFeaturedContent.title}`,
+      });
+
+      return {
+        data: null,
+        message: 'Featured content deleted successfully',
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.ADMIN.DELETE_FEATURED_CONTENT },
+        operation: OPERATIONS.FEATURED_CONTENT.DELETE,
+        userId: ctx.userId,
+      });
     }
-
-    return {
-      message: 'Featured content deleted successfully',
-      success: true,
-    };
   });
