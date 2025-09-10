@@ -3,7 +3,24 @@ export const CACHE_TAGS = {
   ADMIN_CONTENT: 'admin_content',
   ANALYTICS: 'analytics',
   CONTENT_METRICS: 'content_metrics',
-  FEATURED_CONTENT: 'featured_content',
+  // Cross-domain relationship tags
+  CONTENT_RELATIONSHIPS: {
+    BOBBLEHEAD_FEATURED: (bobbleheadId: string) => `bobblehead:${bobbleheadId}:featured`,
+    COLLECTION_FEATURED: (collectionId: string) => `collection:${collectionId}:featured`,
+  },
+  // Hierarchical featured content tags
+  FEATURED_CONTENT: {
+    ACTIVE: 'featured_content:active',
+    ADMIN: 'featured_content:admin',
+    ALL: 'featured_content',
+    BY_CATEGORY: (category: string) => `featured_content:category:${category}`,
+    BY_TYPE: (type: string) => `featured_content:type:${type}`,
+    COLLECTION_OF_WEEK: 'featured_content:collection_of_week',
+    EDITOR_PICKS: 'featured_content:editor_picks',
+    HOMEPAGE: 'featured_content:homepage',
+    HOMEPAGE_BANNER: 'featured_content:homepage_banner',
+    TRENDING: 'featured_content:trending',
+  },
   USER_CONTENT: 'user_content',
 } as const;
 

@@ -14,6 +14,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -56,6 +57,12 @@ export const toggleFeaturedContentActiveAction = authActionClient
         },
         level: SENTRY_LEVELS.INFO,
         message: `Featured content ${isActive ? 'activated' : 'deactivated'}: ${updatedFeaturedContent.title}`,
+      });
+
+      // Revalidate featured content cache
+      CacheRevalidationService.revalidateFeaturedContent('toggle', {
+        affectsHomepage: true,
+        contentType: updatedFeaturedContent.contentType,
       });
 
       return {
@@ -110,6 +117,12 @@ export const deleteFeaturedContentAction = authActionClient
         },
         level: SENTRY_LEVELS.INFO,
         message: `Deleted featured content: ${deletedFeaturedContent.title}`,
+      });
+
+      // Revalidate featured content cache
+      CacheRevalidationService.revalidateFeaturedContent('delete', {
+        affectsHomepage: true,
+        contentType: deletedFeaturedContent.contentType,
       });
 
       return {
