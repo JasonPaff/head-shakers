@@ -1,7 +1,6 @@
 'use client';
 
 import { TrashIcon } from 'lucide-react';
-import { useAction } from 'next-safe-action/hooks';
 import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
@@ -9,6 +8,7 @@ import { toast } from 'sonner';
 
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { cn } from '@/utils/tailwind-utils';
@@ -29,13 +29,9 @@ export const BobbleheadDelete = ({
 
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useAction(deleteBobbleheadAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to delete bobblehead');
-    },
-  });
+  const { executeAsync, isExecuting } = useServerAction(deleteBobbleheadAction);
 
-  const handleDelete = async () => {
+  const handleDeleteAsync = async () => {
     await executeAsync({ bobbleheadId }).then(() => {
       toast.success('Bobblehead deleted successfully!');
 
@@ -84,7 +80,7 @@ export const BobbleheadDelete = ({
       <ConfirmDeleteAlertDialog
         isOpen={isConfirmDeleteDialogOpen}
         onClose={setIsConfirmDeleteDialogOpen.off}
-        onDelete={handleDelete}
+        onDeleteAsync={handleDeleteAsync}
       >
         This will permanently delete all information and photos attached to this bobblehead record.
       </ConfirmDeleteAlertDialog>

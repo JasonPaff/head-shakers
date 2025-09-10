@@ -1,7 +1,6 @@
 'use client';
 
 import { MoreVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react';
-import { useAction } from 'next-safe-action/hooks';
 import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
@@ -18,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
 
@@ -34,17 +34,13 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
 
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useAction(deleteCollectionAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to delete collection');
-    },
-  });
+  const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction);
 
   const handleAddBobblehead = () => {
     router.push($path({ route: '/bobbleheads/add', searchParams: { collectionId } }));
   };
 
-  const handleDeleteCollection = async () => {
+  const handleDeleteCollectionAsync = async () => {
     await executeAsync({ collectionId }).then(() => {
       toast.success('Collection deleted successfully!');
     });
@@ -92,7 +88,7 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
         <ConfirmDeleteAlertDialog
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
-          onDelete={handleDeleteCollection}
+          onDeleteAsync={handleDeleteCollectionAsync}
         >
           This will permanently delete this collection and any subcollections.
         </ConfirmDeleteAlertDialog>
