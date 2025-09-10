@@ -5,8 +5,6 @@ import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bo
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
-import { db } from '@/lib/db';
-import { bobbleheadPhotos, bobbleheads } from '@/lib/db/schema';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -40,9 +38,7 @@ export interface BobbleheadWithRelationsAndMetrics extends BobbleheadWithRelatio
 }
 
 /**
- * unified Bobbleheads Facade
  * handles all business logic and orchestration for bobbleheads
- * single source of truth for bobblehead operations
  */
 export class BobbleheadsFacade {
   /**
@@ -113,10 +109,9 @@ export class BobbleheadsFacade {
   /**
    * add a photo to a bobblehead
    */
-  static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db).insert(bobbleheadPhotos).values(data).returning();
-
-    return result?.[0] || null;
+  static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance?: DatabaseExecutor) {
+    const context = createPublicQueryContext({ dbInstance });
+    return BobbleheadsQuery.addPhoto(data, context);
   }
 
   /**
@@ -165,13 +160,9 @@ export class BobbleheadsFacade {
   /**
    * create a new bobblehead
    */
-  static async createAsync(data: InsertBobblehead, userId: string, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db)
-      .insert(bobbleheads)
-      .values({ ...data, userId })
-      .returning();
-
-    return result?.[0] || null;
+  static async createAsync(data: InsertBobblehead, userId: string, dbInstance?: DatabaseExecutor) {
+    const context = createUserQueryContext(userId, { dbInstance });
+    return BobbleheadsQuery.create(data, userId, context);
   }
 
   /**

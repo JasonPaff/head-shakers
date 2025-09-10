@@ -163,16 +163,6 @@ export class CollectionsFacade {
   );
 
   /**
-   * check if a user can view a collection (public or owned)
-   */
-  static canUserViewCollection(
-    collection: { isPublic: boolean; userId: string },
-    currentUserId?: string,
-  ): boolean {
-    return collection.isPublic || Boolean(currentUserId && collection.userId === currentUserId);
-  }
-
-  /**
    * compute business metrics for a collection
    */
   static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {

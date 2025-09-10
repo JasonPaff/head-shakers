@@ -1,6 +1,7 @@
 import { desc, eq, like, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
+import type { InsertBobblehead, InsertBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
 import {
   bobbleheadPhotos,
@@ -29,6 +30,34 @@ export type BobbleheadWithRelations = BobbleheadRecord & {
  * handles all database operations for bobbleheads with consistent patterns
  */
 export class BobbleheadsQuery extends BaseQuery {
+  /**
+   * add a photo to a bobblehead
+   */
+  static async addPhoto(data: InsertBobbleheadPhoto, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+    
+    const result = await dbInstance
+      .insert(bobbleheadPhotos)
+      .values(data)
+      .returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * create a new bobblehead
+   */
+  static async create(data: InsertBobblehead, userId: string, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+    
+    const result = await dbInstance
+      .insert(bobbleheads)
+      .values({ ...data, userId })
+      .returning();
+
+    return result?.[0] || null;
+  }
+
   /**
    * find bobbleheads by collection with options
    */
