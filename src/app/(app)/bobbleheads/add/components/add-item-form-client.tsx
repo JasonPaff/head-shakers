@@ -21,7 +21,7 @@ import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
-import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads.actions';
+import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
 interface AddItemFormClientProps {

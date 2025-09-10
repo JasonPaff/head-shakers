@@ -70,6 +70,18 @@ export interface SearchOptions {
 }
 
 /**
+ * create a QueryContext for admin/moderator access
+ * admin users can see all content regardless of visibility
+ */
+export function createAdminQueryContext(adminUserId: string, overrides: Partial<QueryContext> = {}): QueryContext {
+  return {
+    shouldIncludeDeleted: false,
+    userId: adminUserId,
+    ...overrides,
+  };
+}
+
+/**
  * create a QueryContext for protected operations (owner required)
  */
 export function createProtectedQueryContext(

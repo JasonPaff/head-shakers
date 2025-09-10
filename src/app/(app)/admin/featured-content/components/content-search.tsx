@@ -20,7 +20,7 @@ import {
   searchBobbleheadsForFeaturingAction,
   searchCollectionsForFeaturingAction,
   searchUsersForFeaturingAction,
-} from '@/lib/actions/content-search.actions';
+} from '@/lib/actions/content-search/content-search.actions';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ContentSearchProps {
@@ -82,8 +82,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
                 id: collection.id,
                 imageUrl: collection.coverImageUrl,
                 name: collection.name,
-                ownerName: collection.ownerName,
-                ownerUsername: collection.ownerUsername,
+                ownerName: collection.ownerName || undefined,
+                ownerUsername: collection.ownerUsername || undefined,
               });
             }
           } else if (contentType === 'bobblehead') {
@@ -95,9 +95,9 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
                 description: bobblehead.description,
                 id: bobblehead.id,
                 imageUrl: bobblehead.primaryPhotoUrl || '/placeholder.jpg',
-                name: bobblehead.name,
-                ownerName: bobblehead.ownerName,
-                ownerUsername: bobblehead.ownerUsername,
+                name: bobblehead.name || '',
+                ownerName: bobblehead.ownerName || undefined,
+                ownerUsername: bobblehead.ownerUsername || undefined,
                 photos: bobblehead.photos || [],
               });
             }
@@ -110,9 +110,9 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
                 description: user.bio,
                 id: user.id,
                 imageUrl: user.avatarUrl,
-                name: user.displayName,
+                name: user.displayName || '',
                 ownerName: undefined,
-                ownerUsername: user.username,
+                ownerUsername: user.username || undefined,
               });
             }
           }
@@ -159,8 +159,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             id: collection.id,
             imageUrl: collection.coverImageUrl,
             name: collection.name,
-            ownerName: collection.ownerName,
-            ownerUsername: collection.ownerUsername,
+            ownerName: collection.ownerName || undefined,
+            ownerUsername: collection.ownerUsername || undefined,
           }));
         }
       } else if (contentType === 'bobblehead') {
@@ -171,9 +171,9 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             description: bobblehead.description,
             id: bobblehead.id,
             imageUrl: bobblehead.primaryPhotoUrl || '/placeholder.jpg',
-            name: bobblehead.name,
-            ownerName: bobblehead.ownerName,
-            ownerUsername: bobblehead.ownerUsername,
+            name: bobblehead.name || '',
+            ownerName: bobblehead.ownerName || undefined,
+            ownerUsername: bobblehead.ownerUsername || undefined,
             photos: bobblehead.photos || [],
           }));
         }
@@ -185,9 +185,9 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             description: user.bio,
             id: user.id,
             imageUrl: user.avatarUrl,
-            name: user.displayName,
+            name: user.displayName || '',
             ownerName: undefined,
-            ownerUsername: user.username,
+            ownerUsername: user.username || undefined,
           }));
         }
       }

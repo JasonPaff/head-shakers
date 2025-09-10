@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToggle } from '@/hooks/use-toggle';
-import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads.actions';
+import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { cn } from '@/utils/tailwind-utils';
 
 type BobbleheadDeleteProps = Children<{

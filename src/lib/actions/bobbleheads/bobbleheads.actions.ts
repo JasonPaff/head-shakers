@@ -161,7 +161,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
         $path({
           route: '/collections/[collectionId]',
           routeParams: {
-            collectionId: parsedInput.collectionId,
+            collectionId: newBobblehead.collectionId,
           },
         }),
       );
