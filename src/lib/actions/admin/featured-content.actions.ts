@@ -13,17 +13,175 @@ import {
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
 } from '@/lib/constants';
+import { AdminFacade } from '@/lib/facades/admin/admin.facade';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient } from '@/lib/utils/next-safe-action';
+import { adminActionClient, authActionClient } from '@/lib/utils/next-safe-action';
+import {
+  adminCreateFeaturedContentSchema,
+  adminGetFeaturedContentByIdSchema,
+  adminUpdateFeaturedContentSchema,
+} from '@/lib/validations/admin.validation';
 
 const toggleActiveSchema = z.object({
   id: z.string().uuid(),
   isActive: z.boolean(),
 });
 
+/**
+ * create featured content (admin only)
+ */
+export const createFeaturedContentAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.ADMIN.CREATE_FEATURED_CONTENT,
+    isTransactionRequired: true,
+  })
+  .inputSchema(adminCreateFeaturedContentSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    // ensure the user has admin privileges (moderators cannot create featured content)
+    if (!ctx.isAdmin) {
+      throw new ActionError(
+        ErrorType.BUSINESS_RULE,
+        ERROR_CODES.ADMIN.INSUFFICIENT_PRIVILEGES,
+        ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_CREATE,
+        { ctx, operation: OPERATIONS.ADMIN.CREATE_FEATURED_CONTENT },
+        false,
+        403,
+      );
+    }
+
+    const featuredContentData = adminCreateFeaturedContentSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
+
+    try {
+      const newFeaturedContent = await AdminFacade.createFeaturedContentAsync(
+        featuredContentData,
+        ctx.userId,
+        dbInstance,
+      );
+
+      if (!newFeaturedContent) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.ADMIN.CREATE_FEATURED_CONTENT_FAILED,
+          ERROR_MESSAGES.FEATURED_CONTENT.CREATE_FAILED,
+          { ctx, operation: OPERATIONS.ADMIN.CREATE_FEATURED_CONTENT },
+          false,
+          500,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          featuredContent: newFeaturedContent,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Created featured content: ${newFeaturedContent.title}`,
+      });
+
+      CacheRevalidationService.revalidateFeaturedContent('create', {
+        affectsHomepage: false,
+        contentType: newFeaturedContent.contentType,
+      });
+
+      return {
+        data: newFeaturedContent,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.ADMIN.CREATE_FEATURED_CONTENT,
+        },
+        operation: OPERATIONS.ADMIN.CREATE_FEATURED_CONTENT,
+        userId: ctx.userId,
+      });
+    }
+  });
+
+/**
+ * update featured content (admin only)
+ */
+export const updateFeaturedContentAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.ADMIN.UPDATE_FEATURED_CONTENT,
+    isTransactionRequired: true,
+  })
+  .inputSchema(adminUpdateFeaturedContentSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    // ensure user has admin privileges
+    if (!ctx.isAdmin) {
+      throw new ActionError(
+        ErrorType.BUSINESS_RULE,
+        ERROR_CODES.ADMIN.INSUFFICIENT_PRIVILEGES,
+        ERROR_MESSAGES.SYSTEM.ADMIN_PRIVILEGES_REQUIRED_UPDATE,
+        { ctx, operation: OPERATIONS.ADMIN.UPDATE_FEATURED_CONTENT },
+        false,
+        403,
+      );
+    }
+
+    const featuredContentData = adminUpdateFeaturedContentSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
+
+    try {
+      const updatedFeaturedContent = await AdminFacade.updateFeaturedContentAsync(
+        featuredContentData,
+        dbInstance,
+      );
+
+      if (!updatedFeaturedContent) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.ADMIN.FEATURED_CONTENT_NOT_FOUND,
+          ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND,
+          { ctx, operation: OPERATIONS.ADMIN.UPDATE_FEATURED_CONTENT },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          featuredContent: updatedFeaturedContent,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Updated featured content: ${updatedFeaturedContent.title}`,
+      });
+
+      CacheRevalidationService.revalidateFeaturedContent('update', {
+        affectsHomepage: updatedFeaturedContent.isActive,
+        contentType: updatedFeaturedContent.contentType,
+      });
+
+      return {
+        data: updatedFeaturedContent,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.ADMIN.UPDATE_FEATURED_CONTENT,
+        },
+        operation: OPERATIONS.ADMIN.UPDATE_FEATURED_CONTENT,
+        userId: ctx.userId,
+      });
+    }
+  });
+
+/**
+ * toggle featured content active status (admin and moderator)
+ */
 export const toggleFeaturedContentActiveAction = authActionClient
   .metadata({
     actionName: ACTION_NAMES.ADMIN.TOGGLE_FEATURED_CONTENT,
@@ -59,7 +217,6 @@ export const toggleFeaturedContentActiveAction = authActionClient
         message: `Featured content ${isActive ? 'activated' : 'deactivated'}: ${updatedFeaturedContent.title}`,
       });
 
-      // Revalidate featured content cache
       CacheRevalidationService.revalidateFeaturedContent('toggle', {
         affectsHomepage: true,
         contentType: updatedFeaturedContent.contentType,
@@ -84,6 +241,9 @@ const deleteFeaturedContentSchema = z.object({
   id: z.string().uuid(),
 });
 
+/**
+ * delete featured content (admin only)
+ */
 export const deleteFeaturedContentAction = authActionClient
   .metadata({
     actionName: ACTION_NAMES.ADMIN.DELETE_FEATURED_CONTENT,
@@ -93,7 +253,14 @@ export const deleteFeaturedContentAction = authActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.tx ?? ctx.db;
-
+    throw new ActionError(
+      ErrorType.INTERNAL,
+      ERROR_CODES.FEATURED_CONTENT.DELETE_FAILED,
+      ERROR_MESSAGES.FEATURED_CONTENT.DELETE_FAILED,
+      { ctx, operation: OPERATIONS.FEATURED_CONTENT.DELETE },
+      false,
+      404,
+    );
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, { id });
 
     try {
@@ -119,7 +286,6 @@ export const deleteFeaturedContentAction = authActionClient
         message: `Deleted featured content: ${deletedFeaturedContent.title}`,
       });
 
-      // Revalidate featured content cache
       CacheRevalidationService.revalidateFeaturedContent('delete', {
         affectsHomepage: true,
         contentType: deletedFeaturedContent.contentType,
@@ -135,6 +301,53 @@ export const deleteFeaturedContentAction = authActionClient
         input: parsedInput,
         metadata: { actionName: ACTION_NAMES.ADMIN.DELETE_FEATURED_CONTENT },
         operation: OPERATIONS.FEATURED_CONTENT.DELETE,
+        userId: ctx.userId,
+      });
+    }
+  });
+
+/**
+ * get featured content by ID (admin only)
+ */
+export const getFeaturedContentByIdAction = adminActionClient
+  .metadata({
+    actionName: ACTION_NAMES.ADMIN.GET_FEATURED_CONTENT_BY_ID,
+  })
+  .inputSchema(adminGetFeaturedContentByIdSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const featuredContentData = adminGetFeaturedContentByIdSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
+
+    try {
+      const featuredContent = await AdminFacade.getFeaturedContentByIdForAdmin(
+        featuredContentData.id,
+        dbInstance,
+      );
+
+      if (!featuredContent) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.ADMIN.FEATURED_CONTENT_NOT_FOUND,
+          ERROR_MESSAGES.SYSTEM.FEATURED_CONTENT_NOT_FOUND,
+          { ctx, operation: OPERATIONS.ADMIN.GET_FEATURED_CONTENT_BY_ID },
+          false,
+          404,
+        );
+      }
+
+      return {
+        data: featuredContent,
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.ADMIN.GET_FEATURED_CONTENT_BY_ID,
+        },
+        operation: OPERATIONS.ADMIN.GET_FEATURED_CONTENT_BY_ID,
         userId: ctx.userId,
       });
     }

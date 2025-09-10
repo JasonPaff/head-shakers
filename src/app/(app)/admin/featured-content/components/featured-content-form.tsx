@@ -2,6 +2,7 @@
 
 import { useStore } from '@tanstack/react-form';
 import { XIcon } from 'lucide-react';
+import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -19,7 +20,7 @@ import {
   createFeaturedContentAction,
   getFeaturedContentByIdAction,
   updateFeaturedContentAction,
-} from '@/lib/actions/admin.actions';
+} from '@/lib/actions/admin/featured-content.actions';
 import { insertFeaturedContentSchema } from '@/lib/validations/system.validation';
 
 type FeaturedContentFormProps = {
@@ -32,17 +33,27 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
   const [existingData, setExistingData] = useState<AdminFeaturedContent | null>(null);
   const [isLoading, setIsLoading] = useToggle(!!contentId);
 
-  const { executeAsync: getFeaturedContent } = useServerAction(getFeaturedContentByIdAction);
+  const { executeAsync: getFeaturedContent } = useAction(getFeaturedContentByIdAction);
+
   const { executeAsync: createFeaturedContentAsync, isExecuting: isCreating } = useServerAction(
     createFeaturedContentAction,
     {
-      successMessage: 'Featured content created successfully!',
+      toastMessages: {
+        error: 'Failed to create featured content. Please try again.',
+        loading: 'Creating featured content...',
+        success: 'Featured content created successfully!',
+      },
     },
   );
+
   const { executeAsync: updateFeaturedContentAsync, isExecuting: isUpdating } = useServerAction(
     updateFeaturedContentAction,
     {
-      successMessage: 'Featured content updated successfully!',
+      toastMessages: {
+        error: 'Failed to update featured content. Please try again.',
+        loading: 'Update featured content...',
+        success: 'Featured content updated successfully!',
+      },
     },
   );
 

@@ -91,7 +91,7 @@ export const AlertDialogOverlay = ({ className, ...props }: AlertDialogOverlayPr
   return (
     <AlertDialogPrimitive.Overlay
       className={cn(
-        'fixed inset-0 z-50 bg-black/30 dark:bg-black/40',
+        'fixed inset-0 z-50 bg-black/30',
         'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
         'data-[state=open]:animate-in data-[state=open]:fade-in-0',
         className,

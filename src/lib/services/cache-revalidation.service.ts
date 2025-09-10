@@ -1,18 +1,15 @@
-'use server';
-
 import { $path } from 'next-typesafe-url';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { CACHE_TAGS } from '@/lib/constants/cache';
 
 /**
- * Enterprise-grade cache revalidation service
- * Provides centralized, type-safe cache invalidation for the Head Shakers platform
+ * provides centralized, type-safe cache invalidation for the Head Shakers platform
  */
 export class CacheRevalidationService {
   /**
-   * Revalidate bobblehead-related featured content
-   * @param bobbleheadId - The ID of the bobblehead
+   * revalidate bobblehead-related featured content
+   * @param bobbleheadId - the id of the bobblehead
    */
   static revalidateBobbleheadFeaturedContent(bobbleheadId: string): void {
     try {
@@ -22,19 +19,17 @@ export class CacheRevalidationService {
         CACHE_TAGS.FEATURED_CONTENT.ACTIVE,
       ];
 
-      const paths = [
-        $path({ route: '/browse/featured' }),
-      ];
+      const paths = [$path({ route: '/browse/featured' })];
 
-      tags.forEach(tag => {
+      tags.forEach((tag) => {
         try {
           revalidateTag(tag);
         } catch (error) {
           console.error(`Failed to revalidate tag ${tag}:`, error);
         }
       });
-      
-      paths.forEach(path => {
+
+      paths.forEach((path) => {
         try {
           revalidatePath(path);
         } catch (error) {
@@ -53,8 +48,8 @@ export class CacheRevalidationService {
   }
 
   /**
-   * Revalidate collection-related featured content
-   * @param collectionId - The ID of the collection
+   * revalidate collection-related featured content
+   * @param collectionId - the id of the collection
    */
   static revalidateCollectionFeaturedContent(collectionId: string): void {
     try {
@@ -65,22 +60,22 @@ export class CacheRevalidationService {
       ];
 
       const paths = [
-        $path({ 
-          route: '/collections/[collectionId]', 
-          routeParams: { collectionId } 
+        $path({
+          route: '/collections/[collectionId]',
+          routeParams: { collectionId },
         }),
         $path({ route: '/browse/featured' }),
       ];
 
-      tags.forEach(tag => {
+      tags.forEach((tag) => {
         try {
           revalidateTag(tag);
         } catch (error) {
           console.error(`Failed to revalidate tag ${tag}:`, error);
         }
       });
-      
-      paths.forEach(path => {
+
+      paths.forEach((path) => {
         try {
           revalidatePath(path);
         } catch (error) {
@@ -99,9 +94,9 @@ export class CacheRevalidationService {
   }
 
   /**
-   * Revalidate featured content across all related pages and data
-   * @param operation - The type of operation performed (create, update, delete, toggle)
-   * @param metadata - Optional metadata for conditional revalidation
+   * revalidate featured content across all related pages and data
+   * @param operation - the type of operation performed (create, update, delete, toggle)
+   * @param metadata - optional metadata for conditional revalidation
    */
   static revalidateFeaturedContent(
     operation: 'create' | 'delete' | 'toggle' | 'update',
@@ -111,14 +106,14 @@ export class CacheRevalidationService {
     },
   ): void {
     try {
-      // Core featured content tags
+      // core featured content tags
       const coreTags = [
         CACHE_TAGS.FEATURED_CONTENT.ALL,
         CACHE_TAGS.FEATURED_CONTENT.ACTIVE,
         CACHE_TAGS.FEATURED_CONTENT.ADMIN,
       ];
 
-      // Conditional tags based on metadata
+      // conditional tags based on metadata
       const conditionalTags: string[] = [];
       if (metadata?.contentType) {
         conditionalTags.push(CACHE_TAGS.FEATURED_CONTENT.BY_TYPE(metadata.contentType));
@@ -127,7 +122,7 @@ export class CacheRevalidationService {
         conditionalTags.push(CACHE_TAGS.FEATURED_CONTENT.HOMEPAGE);
       }
 
-      // Specific section tags for comprehensive invalidation
+      // specific section tags for comprehensive invalidation
       const sectionTags = [
         CACHE_TAGS.FEATURED_CONTENT.COLLECTION_OF_WEEK,
         CACHE_TAGS.FEATURED_CONTENT.EDITOR_PICKS,
@@ -137,13 +132,10 @@ export class CacheRevalidationService {
 
       const allTags = [...coreTags, ...conditionalTags, ...sectionTags];
 
-      // Core paths that always need revalidation
-      const corePaths = [
-        $path({ route: '/admin/featured-content' }),
-        $path({ route: '/browse/featured' }),
-      ];
+      // core paths that always need revalidation
+      const corePaths = [$path({ route: '/admin/featured-content' }), $path({ route: '/browse/featured' })];
 
-      // Conditional paths
+      // conditional paths
       const conditionalPaths: string[] = [];
       if (metadata?.affectsHomepage) {
         conditionalPaths.push($path({ route: '/' }));
@@ -151,16 +143,16 @@ export class CacheRevalidationService {
 
       const allPaths = [...corePaths, ...conditionalPaths];
 
-      // Execute revalidation synchronously (these are not async operations)
-      allTags.forEach(tag => {
+      // execute revalidation synchronously (these are not async operations)
+      allTags.forEach((tag) => {
         try {
           revalidateTag(tag);
         } catch (error) {
           console.error(`Failed to revalidate tag ${tag}:`, error);
         }
       });
-      
-      allPaths.forEach(path => {
+
+      allPaths.forEach((path) => {
         try {
           revalidatePath(path);
         } catch (error) {
@@ -168,7 +160,7 @@ export class CacheRevalidationService {
         }
       });
 
-      // Log successful revalidation for monitoring
+      // log successful revalidation for monitoring
       console.log(`Cache revalidation completed for featured content ${operation}`, {
         metadata,
         operation,
@@ -176,18 +168,18 @@ export class CacheRevalidationService {
         tagsRevalidated: allTags.length,
       });
     } catch (error) {
-      // Log error but don't throw to prevent breaking the main operation
+      // log error but don't throw to prevent breaking the main operation
       console.error('Cache revalidation failed:', error);
     }
   }
 
   /**
-   * Comprehensive cache warming strategy for featured content
-   * This can be called after bulk operations or during off-peak hours
+   * comprehensive cache warming strategy for featured content
+   * this can be called after bulk operations or during off-peak hours
    */
   static warmFeaturedContentCache(): void {
     try {
-      // Revalidate all featured content to ensure fresh cache
+      // revalidate all featured content to ensure fresh cache
       this.revalidateFeaturedContent('update', {
         affectsHomepage: true,
       });
