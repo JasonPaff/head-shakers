@@ -13,7 +13,7 @@ import {
 } from '@/lib/utils/errors';
 
 /**
- * Context information for error handling
+ * context information for error handling
  */
 export interface ErrorContext {
   input?: Record<string, unknown>;
@@ -23,8 +23,7 @@ export interface ErrorContext {
 }
 
 /**
- * Comprehensive error handler for server actions
- * Provides consistent error classification, logging, and response formatting
+ * provides consistent error classification, logging, and response formatting
  */
 export function handleActionError(error: unknown, context: ErrorContext): never {
   const { input, metadata, operation, userId } = context;
@@ -39,7 +38,9 @@ export function handleActionError(error: unknown, context: ErrorContext): never 
     userId,
   });
 
-  // handle Zod validation errors
+  console.log(`Handling error for operation: ${operation}`);
+
+  // handle zod validation errors
   if (error instanceof ZodError) {
     const validationError = fromZodError(error);
 
@@ -55,7 +56,7 @@ export function handleActionError(error: unknown, context: ErrorContext): never 
       'VALIDATION_FAILED',
       validationError.message,
       {
-        input: input ? Object.keys(input) : undefined, // Don't log actual input values
+        input: input ? Object.keys(input) : undefined,
         issues: error.issues,
         operation,
       },
@@ -65,7 +66,7 @@ export function handleActionError(error: unknown, context: ErrorContext): never 
     );
   }
 
-  // handle known ActionError instances
+  // handle known actionError instances
   if (error instanceof ActionError) {
     // add operation context if not present
     if (!error.context?.operation) {
@@ -92,7 +93,7 @@ export function handleActionError(error: unknown, context: ErrorContext): never 
       throw enhancedError;
     }
 
-    // log and re-throw existing ActionError
+    // log and re-throw existing actionError
     Sentry.captureException(error, {
       level: error.isRecoverable ? 'warning' : 'error',
       tags: {
@@ -314,7 +315,7 @@ export function handleActionError(error: unknown, context: ErrorContext): never 
 }
 
 /**
- * Extract the service name from an error message for better categorization
+ * extract the service name from an error message for better categorization
  */
 function extractServiceName(message: string): string | undefined {
   const lowerMessage = message.toLowerCase();

@@ -87,6 +87,15 @@ export const deleteFeaturedContentAction = authActionClient
     const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.tx ?? ctx.db;
 
+    throw new ActionError(
+      ErrorType.INTERNAL,
+      ERROR_CODES.FEATURED_CONTENT.DELETE_FAILED,
+      ERROR_MESSAGES.FEATURED_CONTENT.DELETE_FAILED,
+      { ctx, operation: OPERATIONS.FEATURED_CONTENT.DELETE },
+      false,
+      404,
+    );
+
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, { id });
 
     try {

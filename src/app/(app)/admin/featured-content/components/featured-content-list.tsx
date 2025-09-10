@@ -1,6 +1,7 @@
 'use client';
 
 import { EditIcon, EyeIcon, EyeOffIcon, MoreHorizontalIcon, Trash2Icon, TrendingUpIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Fragment, useMemo, useState } from 'react';
 
 import type { AdminFeaturedContent } from '@/lib/facades/admin/admin.facade';
@@ -79,8 +80,19 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
 
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
-  const { executeAsync: deleteAsync, isPending: isDeleting } = useServerAction(deleteFeaturedContentAction);
-  const { execute: toggleSync, isPending: isToggling } = useServerAction(toggleFeaturedContentActiveAction);
+  const router = useRouter();
+
+  const { executeAsync: deleteAsync, isPending: isDeleting } = useServerAction(deleteFeaturedContentAction, {
+    onAfterSuccess: () => {
+      router.refresh();
+    },
+  });
+
+  const { execute: toggleSync, isPending: isToggling } = useServerAction(toggleFeaturedContentActiveAction, {
+    onAfterSuccess: () => {
+      router.refresh();
+    },
+  });
 
   const filteredContent = useMemo(() => {
     const filtered = initialData.filter((content) => {
@@ -262,7 +274,7 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
               <ConfirmDeleteAlertDialog
                 isOpen={isConfirmDeleteDialogOpen}
                 onClose={setIsConfirmDeleteDialogOpen.off}
-                onDelete={async () => {
+                onDeleteAsync={async () => {
                   await deleteAsync({ id: content.id });
                 }}
               >

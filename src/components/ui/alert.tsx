@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 
 import { cn } from '@/utils/tailwind-utils';
 
-const style = cva('me-3 -mt-0.5 inline-flex size-4', {
+const style = cva('me-3 -mt-0.5 inline-flex size-5', {
   defaultVariants: { variant: 'info' },
   variants: {
     variant: {

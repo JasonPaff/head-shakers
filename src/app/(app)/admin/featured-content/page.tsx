@@ -10,6 +10,8 @@ export const dynamic = 'force-dynamic';
 export default async function AdminFeaturedContentPage() {
   const featuredContent = await AdminFacade.getAllFeaturedContentForAdmin();
 
+  console.log('fetched featured content!!!!!!!!!!!!!!!!!!!');
+
   return (
     <AdminLayout isAdminRequired={false}>
       <div className={'space-y-6'}>

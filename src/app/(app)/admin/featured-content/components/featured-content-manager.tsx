@@ -24,24 +24,6 @@ export const FeaturedContentManager = ({ initialData = [] }: FeaturedContentMana
   const [isShowCreateForm, setIsShowCreateForm] = useToggle();
   const [editingContent, setEditingContent] = useState<null | string>(null);
 
-  const handleCreate = () => {
-    setEditingContent(null);
-    setIsShowCreateForm.on();
-    setActiveTab('form');
-  };
-
-  const handleEdit = (contentId: string) => {
-    setEditingContent(contentId);
-    setIsShowCreateForm.off();
-    setActiveTab('form');
-  };
-
-  const handleFormClose = () => {
-    setIsShowCreateForm.off();
-    setEditingContent(null);
-    setActiveTab('list');
-  };
-
   const activeFeatures = useMemo(() => {
     return initialData.filter((item) => {
       return item.isActive;
@@ -65,6 +47,24 @@ export const FeaturedContentManager = ({ initialData = [] }: FeaturedContentMana
       return sum + item.viewCount;
     }, 0);
   }, [initialData]);
+
+  const handleCreate = () => {
+    setEditingContent(null);
+    setIsShowCreateForm.on();
+    setActiveTab('form');
+  };
+
+  const handleEdit = (contentId: string) => {
+    setEditingContent(contentId);
+    setIsShowCreateForm.off();
+    setActiveTab('form');
+  };
+
+  const handleFormClose = () => {
+    setIsShowCreateForm.off();
+    setEditingContent(null);
+    setActiveTab('list');
+  };
 
   return (
     <div className={'space-y-6'}>

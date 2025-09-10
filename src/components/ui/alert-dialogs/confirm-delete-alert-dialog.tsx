@@ -16,7 +16,8 @@ import { Button } from '@/components/ui/button';
 type ConfirmDeleteAlertDialogProps = Children<{
   isOpen: boolean;
   onClose: () => void;
-  onDelete: (() => Promise<void>) | (() => void);
+  onDelete?: () => void;
+  onDeleteAsync?: () => Promise<void>;
 }>;
 
 export const ConfirmDeleteAlertDialog = ({
@@ -24,13 +25,15 @@ export const ConfirmDeleteAlertDialog = ({
   isOpen,
   onClose,
   onDelete,
+  onDeleteAsync,
 }: ConfirmDeleteAlertDialogProps) => {
   const handleCancel = () => {
     onClose();
   };
 
   const handleConfirm = async () => {
-    await onDelete();
+    onDelete?.();
+    await onDeleteAsync?.();
     onClose();
   };
 
@@ -45,7 +48,7 @@ export const ConfirmDeleteAlertDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <Alert variant={'error'}>This action cannot be undone</Alert>
-          <AlertDialogDescription className={'py-4'}>{children}</AlertDialogDescription>
+          <AlertDialogDescription className={'py-4 text-base'}>{children}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel onClick={handleCancel}>Cancel</AlertDialogCancel>
