@@ -83,13 +83,13 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
   const router = useRouter();
 
   const { executeAsync: deleteAsync, isPending: isDeleting } = useServerAction(deleteFeaturedContentAction, {
-    onAfterSuccess: () => {
+    onBeforeSuccess: () => {
       router.refresh();
     },
   });
 
   const { execute: toggleSync, isPending: isToggling } = useServerAction(toggleFeaturedContentActiveAction, {
-    onAfterSuccess: () => {
+    onBeforeSuccess: () => {
       router.refresh();
     },
   });

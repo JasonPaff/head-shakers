@@ -23,9 +23,12 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
     onError: ({ error }) => {
       options?.onBeforeError?.();
       toast.error(
-        options?.errorMessage || (error.serverError as string) || 'Unexpected error, please try again.',
+        options?.errorMessage || (error?.serverError as string) || 'Unexpected error, please try again.',
       );
       options?.onAfterError?.();
+    },
+    onExecute: () => {
+      toast.message('loading...');
     },
     onSuccess: () => {
       options?.onBeforeSuccess?.();
