@@ -2,6 +2,7 @@ import { cache } from 'react';
 
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   DeleteBobblehead,
@@ -16,6 +17,7 @@ import {
 } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
+import { createFacadeError } from '@/lib/utils/error-builders';
 
 /**
  * bobblehead with computed metrics and status
@@ -115,8 +117,18 @@ export class BobbleheadsFacade {
    * add a photo to a bobblehead
    */
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance?: DatabaseExecutor) {
-    const context = createPublicQueryContext({ dbInstance });
-    return BobbleheadsQuery.addPhoto(data, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return BobbleheadsQuery.addPhoto(data, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId: data.bobbleheadId, url: data.url },
+        facade: 'BobbleheadsFacade',
+        method: 'addPhotoAsync',
+        operation: 'addPhoto',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -170,8 +182,19 @@ export class BobbleheadsFacade {
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    const context = createUserQueryContext(userId, { dbInstance });
-    return BobbleheadsQuery.create(data, userId, context);
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      return BobbleheadsQuery.create(data, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { manufacturer: data.manufacturer, name: data.name },
+        facade: 'BobbleheadsFacade',
+        method: 'createAsync',
+        operation: 'create',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -182,7 +205,8 @@ export class BobbleheadsFacade {
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    const context = createUserQueryContext(userId, { dbInstance });
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
 
     // get bobblehead and photos, then delete from the database
     const deleteResult = await BobbleheadsQuery.delete(data, userId, context);
@@ -220,7 +244,17 @@ export class BobbleheadsFacade {
       }
     }
 
-    return bobblehead;
+      return bobblehead;
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId: data.bobbleheadId },
+        facade: 'BobbleheadsFacade',
+        method: 'deleteAsync',
+        operation: 'delete',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -231,12 +265,23 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ) {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return BobbleheadsQuery.getPhotos(bobbleheadId, context);
+      return BobbleheadsQuery.getPhotos(bobbleheadId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId },
+        facade: 'BobbleheadsFacade',
+        method: 'getBobbleheadPhotos',
+        operation: 'getPhotos',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -248,12 +293,23 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadRecord>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return BobbleheadsQuery.findByCollection(collectionId, options, context);
+      return BobbleheadsQuery.findByCollection(collectionId, options, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId, options },
+        facade: 'BobbleheadsFacade',
+        method: 'getBobbleheadsByCollection',
+        operation: 'findByCollection',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -265,12 +321,23 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadRecord>> {
-    const context =
-      viewerUserId && viewerUserId === userId ?
-        createProtectedQueryContext(userId, { dbInstance })
-      : createUserQueryContext(viewerUserId || userId, { dbInstance });
+    try {
+      const context =
+        viewerUserId && viewerUserId === userId ?
+          createProtectedQueryContext(userId, { dbInstance })
+        : createUserQueryContext(viewerUserId || userId, { dbInstance });
 
-    return BobbleheadsQuery.findByUser(userId, options, context);
+      return BobbleheadsQuery.findByUser(userId, options, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { options, userId },
+        facade: 'BobbleheadsFacade',
+        method: 'getBobbleheadsByUser',
+        operation: 'findByUser',
+        userId: viewerUserId || userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -291,12 +358,23 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadRecord>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return BobbleheadsQuery.search(searchTerm, filters, options, context);
+      return BobbleheadsQuery.search(searchTerm, filters, options, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { filters, options, searchTerm },
+        facade: 'BobbleheadsFacade',
+        method: 'searchBobbleheads',
+        operation: 'search',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**

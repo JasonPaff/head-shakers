@@ -1,10 +1,12 @@
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertSubCollection } from '@/lib/validations/subcollections.validation';
 
 import { db } from '@/lib/db';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
+import { createFacadeError } from '@/lib/utils/error-builders';
 
 export type PublicSubcollection = Awaited<
   ReturnType<typeof SubcollectionsFacade.getSubCollectionForPublicView>
@@ -18,7 +20,17 @@ export class SubcollectionsFacade {
    * create a new subcollection
    */
   static async createAsync(data: InsertSubCollection, dbInstance: DatabaseExecutor = db) {
-    return await SubcollectionsQuery.createAsync(data, dbInstance);
+    try {
+      return await SubcollectionsQuery.createAsync(data, dbInstance);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId: data.collectionId, name: data.name },
+        facade: 'SubcollectionsFacade',
+        method: 'createAsync',
+        operation: 'create',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -29,12 +41,23 @@ export class SubcollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context);
+      return SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { subcollectionId },
+        facade: 'SubcollectionsFacade',
+        method: 'getSubcollectionBobbleheadsWithPhotos',
+        operation: 'getBobbleheadsWithPhotos',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -58,12 +81,23 @@ export class SubcollectionsFacade {
     name: string;
     userId?: string;
   }> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return SubcollectionsQuery.getSubCollectionForPublicView(collectionId, subcollectionId, context);
+      return SubcollectionsQuery.getSubCollectionForPublicView(collectionId, subcollectionId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId, subcollectionId },
+        facade: 'SubcollectionsFacade',
+        method: 'getSubCollectionForPublicView',
+        operation: 'getForPublicView',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -74,12 +108,23 @@ export class SubcollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<{ id: string; name: string }>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return SubcollectionsQuery.getSubCollectionsByCollection(collectionId, context);
+      return SubcollectionsQuery.getSubCollectionsByCollection(collectionId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'SubcollectionsFacade',
+        method: 'getSubCollectionsByCollection',
+        operation: 'getByCollection',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -99,11 +144,22 @@ export class SubcollectionsFacade {
     }>;
     userId?: string;
   }> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return SubcollectionsQuery.getSubCollectionsForPublicView(collectionId, context);
+      return SubcollectionsQuery.getSubCollectionsForPublicView(collectionId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'SubcollectionsFacade',
+        method: 'getSubCollectionsForPublicView',
+        operation: 'getForPublicView',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 }

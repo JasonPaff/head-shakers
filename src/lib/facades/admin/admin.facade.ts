@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   AdminCreateFeaturedContent,
@@ -9,6 +10,7 @@ import type {
 
 import { type AdminFeaturedContentRecord, AdminQuery } from '@/lib/queries/admin/admin-query';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
+import { createFacadeError } from '@/lib/utils/error-builders';
 
 // export type for backward compatibility
 export type AdminFeaturedContent = AdminFeaturedContentRecord;
@@ -74,8 +76,19 @@ export class AdminFacade {
     curatorId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<AdminFeaturedContentRecord | null> {
-    const context = createUserQueryContext(curatorId, { dbInstance });
-    return AdminQuery.createFeaturedContentAsync(data, curatorId, context);
+    try {
+      const context = createUserQueryContext(curatorId, { dbInstance });
+      return AdminQuery.createFeaturedContentAsync(data, curatorId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { contentId: data.contentId, contentType: data.contentType },
+        facade: 'AdminFacade',
+        method: 'createFeaturedContentAsync',
+        operation: 'create',
+        userId: curatorId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -85,8 +98,18 @@ export class AdminFacade {
     id: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<AdminFeaturedContentRecord | null> {
-    const context = createPublicQueryContext({ dbInstance });
-    return AdminQuery.deleteFeaturedContentAsync(id, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return AdminQuery.deleteFeaturedContentAsync(id, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id },
+        facade: 'AdminFacade',
+        method: 'deleteFeaturedContentAsync',
+        operation: 'delete',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -97,8 +120,18 @@ export class AdminFacade {
     isActive: boolean,
     dbInstance?: DatabaseExecutor,
   ): Promise<AdminFeaturedContentRecord | null> {
-    const context = createPublicQueryContext({ dbInstance });
-    return AdminQuery.toggleFeaturedContentStatusAsync(id, isActive, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return AdminQuery.toggleFeaturedContentStatusAsync(id, isActive, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id, isActive },
+        facade: 'AdminFacade',
+        method: 'toggleFeaturedContentStatusAsync',
+        operation: 'toggle',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -108,7 +141,17 @@ export class AdminFacade {
     data: AdminUpdateFeaturedContent,
     dbInstance?: DatabaseExecutor,
   ): Promise<AdminFeaturedContentRecord | null> {
-    const context = createPublicQueryContext({ dbInstance });
-    return AdminQuery.updateFeaturedContentAsync(data, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return AdminQuery.updateFeaturedContentAsync(data, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id: data.id },
+        facade: 'AdminFacade',
+        method: 'updateFeaturedContentAsync',
+        operation: 'update',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 }

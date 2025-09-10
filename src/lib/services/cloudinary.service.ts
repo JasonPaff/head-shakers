@@ -1,7 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return */
 import { v2 as cloudinary } from 'cloudinary';
 
+import type { ServiceErrorContext } from '@/lib/utils/error-types';
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
+
+import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
+import { createServiceError } from '@/lib/utils/error-builders';
+import { withServiceRetry } from '@/lib/utils/retry';
 
 cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -83,21 +88,34 @@ export class CloudinaryService {
       return [];
     }
 
+    const circuitBreaker = circuitBreakers.externalService('cloudinary-delete');
+    
     try {
-      // use Cloudinary's batch delete API
-      const result = await cloudinary.api.delete_resources(publicIds, {
-        resource_type: 'image',
+      const result = await circuitBreaker.execute(async () => {
+        // use Cloudinary's batch delete API with retry logic
+        const retryResult = await withServiceRetry(
+          () => cloudinary.api.delete_resources(publicIds, {
+            resource_type: 'image',
+          }),
+          'cloudinary',
+          {
+            maxAttempts: 3,
+            operationName: 'cloudinary-batch-delete'
+          }
+        );
+        
+        return retryResult.result;
       });
 
       // transform the result to our expected format
       return publicIds.map((publicId) => {
-        const deletionResult = result.deleted?.[publicId];
-        const isSuccess = deletionResult === 'deleted';
+        const deletionResult = result.result.deleted?.[publicId];
+        const wasSuccessful = deletionResult === 'deleted';
 
         return {
-          error: isSuccess ? undefined : `Failed to delete: ${deletionResult || 'unknown error'}`,
+          error: wasSuccessful ? undefined : `Failed to delete: ${deletionResult || 'unknown error'}`,
           publicId,
-          success: isSuccess,
+          success: wasSuccessful,
         };
       });
     } catch (error) {
@@ -174,26 +192,40 @@ export class CloudinaryService {
           const filename = photo.publicId.split('/').pop() || `photo-${Date.now()}`;
           const newPublicId = `${targetFolder}/${filename}`;
 
-          // use cloudinary's rename API to move the asset
-          const result = await cloudinary.uploader.rename(photo.publicId, newPublicId, {
-            invalidate: true, // invalidate CDN cache
-            overwrite: false, // don't overwrite if exists
-            resource_type: 'image',
+          const circuitBreaker = circuitBreakers.upload('cloudinary-rename');
+          
+          const result = await circuitBreaker.execute(async () => {
+            // use cloudinary's rename API with retry logic
+            const retryResult = await withServiceRetry(
+              () => cloudinary.uploader.rename(photo.publicId, newPublicId, {
+                invalidate: true, // invalidate CDN cache
+                overwrite: false, // don't overwrite if exists
+                resource_type: 'image',
+              }),
+              'cloudinary',
+              {
+                maxAttempts: 3,
+                operationName: 'cloudinary-rename'
+              }
+            );
+            
+            return retryResult.result;
           });
 
           return {
-            newPublicId: result.public_id,
-            newUrl: result.secure_url,
+            newPublicId: result.result.public_id,
+            newUrl: result.result.secure_url,
             oldPublicId: photo.publicId,
           };
         } catch (error) {
-          console.error(`Failed to move photo ${photo.publicId}:`, error);
-          // if the move fails, return original values
-          return {
-            newPublicId: photo.publicId,
-            newUrl: photo.url,
-            oldPublicId: photo.publicId,
+          const context: ServiceErrorContext = {
+            endpoint: 'rename',
+            isRetryable: true,
+            method: 'movePhotosToPermFolder',
+            operation: 'movePhoto',
+            service: 'cloudinary',
           };
+          throw createServiceError(context, error);
         }
       }),
     );

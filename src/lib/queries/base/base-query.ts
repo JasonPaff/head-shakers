@@ -4,6 +4,7 @@ import { cache } from 'react';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { RetryResult } from '@/lib/utils/retry';
 
 import { DEFAULTS } from '@/lib/constants';
 import { db } from '@/lib/db';
@@ -12,6 +13,9 @@ import {
   buildSoftDeleteFilter,
   combineFilters,
 } from '@/lib/queries/base/permission-filters';
+import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
+import { createValidationError } from '@/lib/utils/error-builders';
+import { withDatabaseRetry } from '@/lib/utils/retry';
 
 /**
  * abstract base class for all query operations
@@ -60,6 +64,48 @@ export abstract class BaseQuery {
   }
 
   /**
+   * execute a database operation with retry logic and circuit breaker protection
+   * automatically handles transient database errors and connection issues
+   */
+  protected static async executeWithRetry<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+  ): Promise<T> {
+    const circuitBreaker = circuitBreakers.database(operationName);
+    
+    const result = await circuitBreaker.execute(async () => {
+      const retryResult = await withDatabaseRetry(operation, {
+        maxAttempts: 3,
+        operationName,
+      });
+      
+      return retryResult.result;
+    });
+    
+    return result.result;
+  }
+
+  /**
+   * execute a database operation with retry logic and return full retry metadata
+   * useful when you need detailed information about retry attempts
+   */
+  protected static async executeWithRetryDetails<T>(
+    operation: () => Promise<T>,
+    operationName: string,
+  ): Promise<RetryResult<T>> {
+    const circuitBreaker = circuitBreakers.database(operationName);
+    
+    const result = await circuitBreaker.execute(async () => {
+      return withDatabaseRetry(operation, {
+        maxAttempts: 3,
+        operationName,
+      });
+    });
+    
+    return result.result;
+  }
+
+  /**
    * get the database instance to use (transaction or main db)
    */
   protected static getDbInstance(context: QueryContext): DatabaseExecutor {
@@ -86,13 +132,17 @@ export abstract class BaseQuery {
    */
   protected static validateContext(context: QueryContext, isUserIdRequired = false): void {
     if (isUserIdRequired && !context.userId && !context.requiredUserId) {
-      throw new Error('User ID is required for this operation');
+      throw createValidationError(
+        'MISSING_USER_CONTEXT',
+        'User authentication required for this operation',
+        { operation: 'query' },
+      );
     }
   }
 
   /**
-   * create a cached version of a query function
-   * uses React cache for request-level deduplication
+   * create a cached version of a query function with retry logic
+   * uses React cache for request-level deduplication and includes database retry protection
    */
   protected cached<TArgs extends ReadonlyArray<unknown>, TReturn>(
     fn: (...args: TArgs) => Promise<TReturn>,

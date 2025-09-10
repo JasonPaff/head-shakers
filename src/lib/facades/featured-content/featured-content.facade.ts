@@ -1,6 +1,7 @@
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   InsertFeaturedContent,
@@ -14,6 +15,7 @@ import {
   type FeaturedContentRecord,
   FeaturedContentTransformer,
 } from '@/lib/queries/featured-content/featured-content-transformer';
+import { createFacadeError } from '@/lib/utils/error-builders';
 
 // cache statistics for monitoring
 const cacheStats = {
@@ -129,16 +131,37 @@ export class FeaturedContentFacade {
     curatorId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
-    const context = createUserQueryContext(curatorId, { dbInstance });
-    return FeaturedContentQuery.create(data, curatorId, context);
+    try {
+      const context = createUserQueryContext(curatorId, { dbInstance });
+      return FeaturedContentQuery.create(data, curatorId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { contentId: data.contentId, contentType: data.contentType },
+        facade: 'FeaturedContentFacade',
+        method: 'createAsync',
+        operation: 'create',
+        userId: curatorId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
    * delete a featured content entry
    */
   static async deleteAsync(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
-    const context = createPublicQueryContext({ dbInstance });
-    return FeaturedContentQuery.delete(id, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return FeaturedContentQuery.delete(id, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id },
+        facade: 'FeaturedContentFacade',
+        method: 'deleteAsync',
+        operation: 'delete',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -181,8 +204,18 @@ export class FeaturedContentFacade {
     isActive: boolean,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
-    const context = createPublicQueryContext({ dbInstance });
-    return FeaturedContentQuery.toggleActive(id, isActive, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return FeaturedContentQuery.toggleActive(id, isActive, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id, isActive },
+        facade: 'FeaturedContentFacade',
+        method: 'toggleActiveAsync',
+        operation: 'toggle',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -193,7 +226,17 @@ export class FeaturedContentFacade {
     data: UpdateFeaturedContent,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
-    const context = createPublicQueryContext({ dbInstance });
-    return FeaturedContentQuery.update(id, data, context);
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return FeaturedContentQuery.update(id, data, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id },
+        facade: 'FeaturedContentFacade',
+        method: 'updateAsync',
+        operation: 'update',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 }

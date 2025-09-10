@@ -2,6 +2,7 @@ import { cache } from 'react';
 
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord, CollectionRecord } from '@/lib/queries/collections/collections.query';
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   DeleteCollection,
@@ -16,6 +17,7 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
+import { createFacadeError } from '@/lib/utils/error-builders';
 
 /**
  * dashboard data for a collection
@@ -204,14 +206,36 @@ export class CollectionsFacade {
    * create a new collection
    */
   static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    return await CollectionsQuery.createAsync(data, userId, dbInstance);
+    try {
+      return await CollectionsQuery.createAsync(data, userId, dbInstance);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { isPublic: data.isPublic, name: data.name },
+        facade: 'CollectionsFacade',
+        method: 'createAsync',
+        operation: 'create',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
    * delete a collection
    */
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    return await CollectionsQuery.deleteAsync(data, userId, dbInstance);
+    try {
+      return await CollectionsQuery.deleteAsync(data, userId, dbInstance);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId: data.collectionId },
+        facade: 'CollectionsFacade',
+        method: 'deleteAsync',
+        operation: 'delete',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -222,12 +246,23 @@ export class CollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadListRecord>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return CollectionsQuery.getBobbleheadsInCollection(collectionId, context);
+      return CollectionsQuery.getBobbleheadsInCollection(collectionId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionBobbleheads',
+        operation: 'getBobbleheads',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -238,12 +273,23 @@ export class CollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-    return CollectionsQuery.getCollectionBobbleheadsWithPhotos(collectionId, context);
+      return CollectionsQuery.getCollectionBobbleheadsWithPhotos(collectionId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionBobbleheadsWithPhotos',
+        operation: 'getBobbleheadsWithPhotos',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -255,12 +301,23 @@ export class CollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<CollectionRecord>> {
-    const context =
-      viewerUserId && viewerUserId === userId ?
-        createProtectedQueryContext(userId, { dbInstance })
-      : createUserQueryContext(viewerUserId || userId, { dbInstance });
+    try {
+      const context =
+        viewerUserId && viewerUserId === userId ?
+          createProtectedQueryContext(userId, { dbInstance })
+        : createUserQueryContext(viewerUserId || userId, { dbInstance });
 
-    return CollectionsQuery.findByUser(userId, options, context);
+      return CollectionsQuery.findByUser(userId, options, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { options, userId },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionsByUser',
+        operation: 'findByUser',
+        userId: viewerUserId || userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -287,6 +344,17 @@ export class CollectionsFacade {
    * update a collection
    */
   static async updateAsync(data: UpdateCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    return await CollectionsQuery.updateAsync(data, userId, dbInstance);
+    try {
+      return await CollectionsQuery.updateAsync(data, userId, dbInstance);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId: data.collectionId },
+        facade: 'CollectionsFacade',
+        method: 'updateAsync',
+        operation: 'update',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 }
