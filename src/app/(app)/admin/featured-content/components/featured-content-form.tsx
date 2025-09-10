@@ -1,6 +1,5 @@
 'use client';
 
-import { revalidateLogic } from '@tanstack/form-core';
 import { useStore } from '@tanstack/react-form';
 import { XIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -14,9 +13,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
-import { FieldAria } from '@/components/ui/form/field-components/field-aria';
-import { FieldError } from '@/components/ui/form/field-components/field-error';
-import { FieldItem } from '@/components/ui/form/field-components/field-item';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import {
@@ -56,10 +52,6 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
       if (contentId) await updateFeaturedContentAsync({ ...value, id: contentId }).then(onSuccess);
       else await createFeaturedContentAsync(value).then(onSuccess);
     },
-    validationLogic: revalidateLogic({
-      mode: 'blur',
-      modeAfterSubmission: 'change',
-    }),
     validators: { onSubmit: insertFeaturedContentSchema },
   });
 
@@ -96,10 +88,17 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
   const currentContentId = useStore(form.store, (state) => state.values.contentId);
   const currentTitle = useStore(form.store, (state) => state.values.title);
 
-  const handleContentSelect = (selectedContentId: string, contentName: string, imageUrl?: string) => {
+  const handleContentSelect = async (selectedContentId: string, contentName: string, imageUrl?: string) => {
     form.setFieldValue('contentId', selectedContentId);
-    if (!currentTitle) form.setFieldValue('title', `Featured: ${contentName}`);
+    await form.validateField('contentId', 'change');
+
+    if (!currentTitle) {
+      form.setFieldValue('title', `Featured: ${contentName}`);
+      await form.validateField('title', 'change');
+    }
+
     form.setFieldValue('imageUrl', imageUrl || '/placeholder.jpg');
+    await form.validateField('imageUrl', 'change');
   };
 
   const _isEditing = !!contentId;
@@ -195,21 +194,15 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
             {/* Content Selection */}
             <div>
               <h3 className={'mb-2 text-sm font-medium'}>Select Content to Feature</h3>
-
               <form.AppField name={'contentId'}>
                 {() => (
-                  <FieldItem>
-                    <FieldAria>
-                      <div>
-                        <ContentSearch
-                          contentType={currentContentType}
-                          onSelect={handleContentSelect}
-                          selectedContentId={currentContentId}
-                        />
-                      </div>
-                    </FieldAria>
-                    <FieldError />
-                  </FieldItem>
+                  <ContentSearch
+                    contentType={currentContentType}
+                    onSelect={(contentId, contentName, imageUrl) => {
+                      void handleContentSelect(contentId, contentName, imageUrl);
+                    }}
+                    selectedContentId={currentContentId}
+                  />
                 )}
               </form.AppField>
             </div>

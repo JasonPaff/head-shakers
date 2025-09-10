@@ -10,6 +10,10 @@ import type { ContentType } from '@/lib/validations/system.validation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
+import { FieldAria } from '@/components/ui/form/field-components/field-aria';
+import { FieldError } from '@/components/ui/form/field-components/field-error';
+import { FieldErrorBorder } from '@/components/ui/form/field-components/field-error-border';
+import { FieldItem } from '@/components/ui/form/field-components/field-item';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToggle } from '@/hooks/use-toggle';
@@ -214,16 +218,23 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
   return (
     <div className={'space-y-4'}>
       {/* Search Input */}
-      <Input
-        className={'pl-10'}
-        isClearable
-        isSearch
-        onChange={(e) => {
-          handleSearch(e.target.value);
-        }}
-        placeholder={`Search ${contentType}s...`}
-        value={query}
-      />
+      <FieldItem>
+        <FieldAria>
+          <FieldErrorBorder>
+            <Input
+              className={'pl-10'}
+              isClearable
+              isSearch
+              onChange={(e) => {
+                handleSearch(e.target.value);
+              }}
+              placeholder={`Search ${contentType}s...`}
+              value={query}
+            />
+          </FieldErrorBorder>
+        </FieldAria>
+        <FieldError />
+      </FieldItem>
 
       {/* Loading Selected Item */}
       <Conditional isCondition={isLoadingSelected}>

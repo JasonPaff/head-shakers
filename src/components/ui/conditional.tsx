@@ -1,16 +1,22 @@
+import type { ReactNode } from 'react';
+
 type ConditionalProps = Children<ConditionalRenderProps>;
 
 interface ConditionalRenderProps {
+  fallback?: ReactNode;
   isCondition: (() => boolean | null | undefined) | boolean | null | undefined;
 }
 
-export const Conditional = ({ children, isCondition }: ConditionalProps) => {
+export const Conditional = ({ children, fallback, isCondition }: ConditionalProps) => {
   if (typeof isCondition === 'function') {
-    const isAllowed = isCondition();
-    if (!isAllowed) return <></>;
+    if (!isCondition()) {
+      return fallback;
+    }
   }
 
-  if (!isCondition) return <></>;
+  if (!isCondition) {
+    return fallback;
+  }
 
   return children;
 };
