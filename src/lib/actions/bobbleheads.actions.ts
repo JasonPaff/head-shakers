@@ -211,9 +211,6 @@ export const deleteBobbleheadAction = authActionClient
         message: `Deleted bobblehead: ${deletedBobblehead.name}`,
       });
 
-      // TODO: if the bobblehead or its parent collection/subcollection is on
-      //  the featured page then the featured page cache should be revalidated too
-
       revalidatePath(
         $path({
           route: '/dashboard/collection',
@@ -225,7 +222,6 @@ export const deleteBobbleheadAction = authActionClient
           routeParams: { collectionId: deletedBobblehead.id },
         }),
       );
-
       if (deletedBobblehead.subcollectionId) {
         revalidatePath(
           $path({
@@ -234,6 +230,10 @@ export const deleteBobbleheadAction = authActionClient
           }),
         );
       }
+
+      // TODO: if the bobblehead or its parent collection/subcollection is on
+      // the featured page then the featured page cache should be revalidated too
+
       return {
         data: null,
         success: true,
