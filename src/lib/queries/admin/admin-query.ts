@@ -1,6 +1,10 @@
 import { desc, eq } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
+import type {
+  AdminCreateFeaturedContent,
+  AdminUpdateFeaturedContent,
+} from '@/lib/validations/admin.validation';
 
 import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
@@ -36,9 +40,51 @@ export interface AdminFeaturedContentRecord {
  */
 export class AdminQuery extends BaseQuery {
   /**
+   * create a new featured content entry (admin only)
+   */
+  static async createFeaturedContentAsync(
+    data: AdminCreateFeaturedContent,
+    curatorId: string,
+    context: QueryContext,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .insert(featuredContent)
+      .values({
+        ...data,
+        curatorId,
+      })
+      .returning();
+
+    if (!result[0]) return null;
+
+    return this.findFeaturedContentByIdForAdmin(result[0].id, context);
+  }
+
+  /**
+   * delete a featured content entry (admin only)
+   */
+  static async deleteFeaturedContentAsync(
+    id: string,
+    context: QueryContext,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const existing = await this.findFeaturedContentByIdForAdmin(id, context);
+    if (!existing) return null;
+
+    await dbInstance.delete(featuredContent).where(eq(featuredContent.id, id));
+
+    return existing;
+  }
+
+  /**
    * get all featured content for admin management
    */
-  static async findAllFeaturedContentForAdmin(context: QueryContext): Promise<Array<AdminFeaturedContentRecord>> {
+  static async findAllFeaturedContentForAdmin(
+    context: QueryContext,
+  ): Promise<Array<AdminFeaturedContentRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const results = await dbInstance
@@ -156,5 +202,52 @@ export class AdminQuery extends BaseQuery {
       updatedAt: row.updatedAt,
       viewCount: row.viewCount,
     };
+  }
+  /**
+   * toggle the active status of featured content (admin/moderator)
+   */
+  static async toggleFeaturedContentStatusAsync(
+    id: string,
+    isActive: boolean,
+    context: QueryContext,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(featuredContent)
+      .set({
+        isActive,
+        updatedAt: new Date(),
+      })
+      .where(eq(featuredContent.id, id))
+      .returning();
+
+    if (!result[0]) return null;
+
+    return this.findFeaturedContentByIdForAdmin(id, context);
+  }
+
+  /**
+   * update a featured content entry (admin only)
+   */
+  static async updateFeaturedContentAsync(
+    data: AdminUpdateFeaturedContent,
+    context: QueryContext,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+    const { id, ...updateData } = data;
+
+    const result = await dbInstance
+      .update(featuredContent)
+      .set({
+        ...updateData,
+        updatedAt: new Date(),
+      })
+      .where(eq(featuredContent.id, id))
+      .returning();
+
+    if (!result[0]) return null;
+
+    return this.findFeaturedContentByIdForAdmin(id, context);
   }
 }

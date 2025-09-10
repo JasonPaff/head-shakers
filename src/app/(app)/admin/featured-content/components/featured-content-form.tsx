@@ -84,8 +84,8 @@ export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedC
     setIsLoading.on();
     getFeaturedContent({ id: contentId })
       .then((result) => {
-        if (result?.data?.featuredContent) {
-          const data = result.data.featuredContent;
+        if (result?.data) {
+          const data = result.data.data;
           setExistingData(data);
           form.setFieldValue('contentType', data.contentType);
           form.setFieldValue('featureType', data.featureType);

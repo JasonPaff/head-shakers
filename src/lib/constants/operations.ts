@@ -3,6 +3,14 @@
  * centralized for consistency and maintainability
  */
 export const OPERATIONS = {
+  ADMIN: {
+    CREATE_FEATURED_CONTENT: 'admin_create_featured_content',
+    DELETE_FEATURED_CONTENT: 'admin_delete_featured_content',
+    GET_FEATURED_CONTENT_BY_ID: 'admin_get_featured_content_by_id',
+    TOGGLE_FEATURED_CONTENT_ACTIVE: 'admin_toggle_featured_content_active',
+    TOGGLE_FEATURED_CONTENT_STATUS: 'admin_toggle_featured_content_status',
+    UPDATE_FEATURED_CONTENT: 'admin_update_featured_content',
+  },
   BOBBLEHEADS: {
     CREATE: 'create_bobblehead',
     CREATE_WITH_PHOTOS: 'create_bobblehead_with_photos',

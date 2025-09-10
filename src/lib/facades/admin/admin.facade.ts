@@ -2,9 +2,13 @@ import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type {
+  AdminCreateFeaturedContent,
+  AdminUpdateFeaturedContent,
+} from '@/lib/validations/admin.validation';
 
 import { type AdminFeaturedContentRecord, AdminQuery } from '@/lib/queries/admin/admin-query';
-import { createPublicQueryContext } from '@/lib/queries/base/query-context';
+import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 
 // export type for backward compatibility
 export type AdminFeaturedContent = AdminFeaturedContentRecord;
@@ -62,4 +66,49 @@ export class AdminFacade {
       tags: ['admin', 'featured-content'],
     },
   );
+  /**
+   * create a new featured content entry (admin only)
+   */
+  static async createFeaturedContentAsync(
+    data: AdminCreateFeaturedContent,
+    curatorId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const context = createUserQueryContext(curatorId, { dbInstance });
+    return AdminQuery.createFeaturedContentAsync(data, curatorId, context);
+  }
+
+  /**
+   * delete a featured content entry (admin only)
+   */
+  static async deleteFeaturedContentAsync(
+    id: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const context = createPublicQueryContext({ dbInstance });
+    return AdminQuery.deleteFeaturedContentAsync(id, context);
+  }
+
+  /**
+   * toggle featured content active status (admin/moderator)
+   */
+  static async toggleFeaturedContentStatusAsync(
+    id: string,
+    isActive: boolean,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const context = createPublicQueryContext({ dbInstance });
+    return AdminQuery.toggleFeaturedContentStatusAsync(id, isActive, context);
+  }
+
+  /**
+   * update a featured content entry (admin only)
+   */
+  static async updateFeaturedContentAsync(
+    data: AdminUpdateFeaturedContent,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<AdminFeaturedContentRecord | null> {
+    const context = createPublicQueryContext({ dbInstance });
+    return AdminQuery.updateFeaturedContentAsync(data, context);
+  }
 }

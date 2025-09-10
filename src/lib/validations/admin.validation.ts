@@ -49,3 +49,22 @@ export const adminUpdateFeaturedContentSchema = updateFeaturedContentSchema.exte
     .optional(),
   viewCount: z.number().int().min(0).optional(),
 });
+
+export const adminDeleteFeaturedContentSchema = z.object({
+  id: z.string().uuid('ID must be a valid UUID'),
+});
+
+export const adminToggleFeaturedContentStatusSchema = z.object({
+  id: z.string().uuid('ID must be a valid UUID'),
+  isActive: z.boolean(),
+});
+
+export const adminGetFeaturedContentByIdSchema = z.object({
+  id: z.string().uuid('ID must be a valid UUID'),
+});
+
+export type AdminCreateFeaturedContent = z.infer<typeof adminCreateFeaturedContentSchema>;
+export type AdminDeleteFeaturedContent = z.infer<typeof adminDeleteFeaturedContentSchema>;
+export type AdminGetFeaturedContentById = z.infer<typeof adminGetFeaturedContentByIdSchema>;
+export type AdminToggleFeaturedContentStatus = z.infer<typeof adminToggleFeaturedContentStatusSchema>;
+export type AdminUpdateFeaturedContent = z.infer<typeof adminUpdateFeaturedContentSchema>;
