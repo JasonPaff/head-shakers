@@ -19,8 +19,8 @@ export const toggleFeaturedContentActiveAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(toggleActiveSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { id, isActive } = parsedInput;
+  .action(async ({ ctx }) => {
+    const { id, isActive } = toggleActiveSchema.parse(ctx.sanitizedInput);
 
     // update the featured content status
     await ctx.db
@@ -50,8 +50,8 @@ export const deleteFeaturedContentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteFeaturedContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { id } = parsedInput;
+  .action(async ({ ctx }) => {
+    const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
 
     // delete the featured content
     const [deletedFeatureContent] = await ctx.db
