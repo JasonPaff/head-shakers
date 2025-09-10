@@ -8,6 +8,7 @@ export const OPERATIONS = {
     CREATE_WITH_PHOTOS: 'create_bobblehead_with_photos',
     DELETE: 'delete_bobblehead',
     DELETE_PHOTO: 'delete_bobblehead_photo',
+    DELETE_WITH_PHOTOS: 'delete_bobblehead_with_photos',
     REORDER_PHOTOS: 'reorder_bobblehead_photos',
     UPDATE: 'update_bobblehead',
     UPLOAD_PHOTO: 'upload_bobblehead_photo',

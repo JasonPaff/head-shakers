@@ -20,6 +20,7 @@ export const ERROR_MESSAGES = {
     INVALID_STATUS: 'Invalid status value',
     NOT_FOUND: 'Bobblehead not found',
     NOT_FOUND_OR_NOT_PUBLIC: 'Bobblehead not found or not public',
+    PHOTO_CLOUDINARY_CLEANUP_FAILED: 'Some photos could not be removed from cloud storage',
     PHOTO_DELETE_FAILED: 'Failed to delete photo',
     PHOTO_UPLOAD_FAILED: 'Failed to upload photo',
     UPDATE_FAILED: 'Failed to update bobblehead',
