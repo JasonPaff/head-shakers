@@ -67,17 +67,92 @@ const sampleUsers = [
   },
 ];
 
-const sampleTags = [
-  { color: '#22C55E', name: 'Sports' },
-  { color: '#EF4444', name: 'Baseball' },
-  { color: '#F97316', name: 'Football' },
-  { color: '#A855F7', name: 'Basketball' },
-  { color: '#3B82F6', name: 'Movies' },
-  { color: '#8B5CF6', name: 'TV Shows' },
-  { color: '#EC4899', name: 'Comic Books' },
-  { color: '#84CC16', name: 'Vintage' },
-  { color: '#F59E0B', name: 'Limited Edition' },
-  { color: '#DC2626', name: 'Rare' },
+// System tags organized by category as specified in the plan
+const systemTags = [
+  // Sports Category (Green - #10B981)
+  { color: '#10B981', name: 'Baseball' },
+  { color: '#10B981', name: 'Football' },
+  { color: '#10B981', name: 'Basketball' },
+  { color: '#10B981', name: 'Hockey' },
+  { color: '#10B981', name: 'Soccer' },
+  { color: '#10B981', name: 'Golf' },
+  { color: '#10B981', name: 'Tennis' },
+  { color: '#10B981', name: 'Boxing' },
+  { color: '#10B981', name: 'NASCAR' },
+  { color: '#10B981', name: 'Olympics' },
+
+  // Era Category (Amber - #F59E0B)
+  { color: '#F59E0B', name: 'Vintage' },
+  { color: '#F59E0B', name: '1960s' },
+  { color: '#F59E0B', name: '1970s' },
+  { color: '#F59E0B', name: '1980s' },
+  { color: '#F59E0B', name: '1990s' },
+  { color: '#F59E0B', name: '2000s' },
+  { color: '#F59E0B', name: '2010s' },
+  { color: '#F59E0B', name: '2020s' },
+  { color: '#F59E0B', name: 'Modern' },
+  { color: '#F59E0B', name: 'Retro' },
+
+  // Type Category (Blue - #3B82F6)
+  { color: '#3B82F6', name: 'Player' },
+  { color: '#3B82F6', name: 'Mascot' },
+  { color: '#3B82F6', name: 'Coach' },
+  { color: '#3B82F6', name: 'Legend' },
+  { color: '#3B82F6', name: 'Hall of Fame' },
+  { color: '#3B82F6', name: 'Rookie' },
+  { color: '#3B82F6', name: 'All-Star' },
+  { color: '#3B82F6', name: 'MVP' },
+  { color: '#3B82F6', name: 'Championship' },
+
+  // League Category (Red - #EF4444)
+  { color: '#EF4444', name: 'MLB' },
+  { color: '#EF4444', name: 'NFL' },
+  { color: '#EF4444', name: 'NBA' },
+  { color: '#EF4444', name: 'NHL' },
+  { color: '#EF4444', name: 'MLS' },
+  { color: '#EF4444', name: 'NCAA' },
+  { color: '#EF4444', name: 'Minor League' },
+  { color: '#EF4444', name: 'International' },
+
+  // Special Category (Pink - #EC4899)
+  { color: '#EC4899', name: 'Limited Edition' },
+  { color: '#EC4899', name: 'Signed' },
+  { color: '#EC4899', name: 'Game Day Giveaway' },
+  { color: '#EC4899', name: 'Stadium Exclusive' },
+  { color: '#EC4899', name: 'Commemorative' },
+  { color: '#EC4899', name: 'Anniversary' },
+  { color: '#EC4899', name: 'Promotional' },
+  { color: '#EC4899', name: 'Bobblehead Night' },
+
+  // Condition Category (Purple - #8B5CF6)
+  { color: '#8B5CF6', name: 'Mint' },
+  { color: '#8B5CF6', name: 'Near Mint' },
+  { color: '#8B5CF6', name: 'Excellent' },
+  { color: '#8B5CF6', name: 'Good' },
+  { color: '#8B5CF6', name: 'Fair' },
+  { color: '#8B5CF6', name: 'Restored' },
+  { color: '#8B5CF6', name: 'Customized' },
+
+  // Material Category (Gray - #6B7280)
+  { color: '#6B7280', name: 'Ceramic' },
+  { color: '#6B7280', name: 'Resin' },
+  { color: '#6B7280', name: 'Plastic' },
+  { color: '#6B7280', name: 'Wood' },
+  { color: '#6B7280', name: 'Metal' },
+  { color: '#6B7280', name: 'Composite' },
+
+  // Size Category (Teal - #14B8A6)
+  { color: '#14B8A6', name: 'Mini' },
+  { color: '#14B8A6', name: 'Standard' },
+  { color: '#14B8A6', name: 'Oversized' },
+  { color: '#14B8A6', name: 'Life-Size' },
+];
+
+// Sample user tags for testing (these will have userId assigned)
+const sampleUserTags = [
+  { color: '#22C55E', name: 'My Favorites' },
+  { color: '#F97316', name: 'Personal Collection' },
+  { color: '#A855F7', name: 'Wish List' },
   { color: '#1E40AF', name: 'Star Wars' },
   { color: '#DC2626', name: 'Marvel' },
   { color: '#1E40AF', name: 'DC Comics' },
@@ -612,14 +687,26 @@ async function seedSocialData(
 async function seedTags(insertedUsers: (typeof users.$inferSelect)[]) {
   console.log('🏷️  Seeding tags...');
 
-  const tagsWithUsers = sampleTags.map((tag) => ({
+  // Create system tags (userId = null)
+  const systemTagsData = systemTags.map((tag) => ({
     ...tag,
-    usageCount: Math.floor(Math.random() * 10),
+    usageCount: 0, // system tags start with 0 usage
+    userId: null, // system tags have no user owner
+  }));
+
+  // Create sample user tags (assigned to random users)
+  const userTagsData = sampleUserTags.map((tag) => ({
+    ...tag,
+    usageCount: Math.floor(Math.random() * 5),
     userId: insertedUsers[Math.floor(Math.random() * insertedUsers.length)]!.id,
   }));
 
-  const insertedTags = await db.insert(tags).values(tagsWithUsers).returning();
-  console.log(`✅ Created ${insertedTags.length} tags`);
+  // Insert all tags
+  const allTagsData = [...systemTagsData, ...userTagsData];
+  const insertedTags = await db.insert(tags).values(allTagsData).returning();
+  
+  console.log(`✅ Created ${systemTagsData.length} system tags and ${userTagsData.length} user tags`);
+  console.log(`✅ Total tags created: ${insertedTags.length}`);
 
   return insertedTags;
 }

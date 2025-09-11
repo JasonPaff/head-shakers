@@ -13,9 +13,7 @@ export const tags = pgTable(
     name: varchar('name', { length: SCHEMA_LIMITS.TAG.NAME.MAX }).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     usageCount: integer('usage_count').default(DEFAULTS.TAG.USAGE_COUNT).notNull(),
-    userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   },
   (table) => [
     // single column indexes

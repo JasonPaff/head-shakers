@@ -49,9 +49,14 @@ export const OPERATIONS = {
   },
   TAGS: {
     ADD: 'add_tag',
+    ATTACH_TO_BOBBLEHEAD: 'attach_tags_to_bobblehead',
+    BULK_DELETE: 'bulk_delete_tags',
     CREATE: 'create_tag',
     DELETE: 'delete_tag',
+    DETACH_FROM_BOBBLEHEAD: 'detach_tags_from_bobblehead',
     REMOVE: 'remove_tag',
+    SEARCH: 'search_tags',
+    UPDATE: 'update_tag',
   },
   USERS: {
     DELETE_ACCOUNT: 'delete_user_account',

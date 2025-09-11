@@ -78,8 +78,12 @@ export const ACTION_NAMES = {
   },
   TAGS: {
     ASSIGN: 'assignTag',
+    ATTACH_TO_BOBBLEHEAD: 'attachTagsToBobblehead',
+    BULK_DELETE: 'bulkDeleteTags',
     CREATE: 'createTag',
     DELETE: 'deleteTag',
+    DETACH_FROM_BOBBLEHEAD: 'detachTagsFromBobblehead',
+    GET_SUGGESTIONS: 'getTagSuggestions',
     UNASSIGN: 'unassignTag',
     UPDATE: 'updateTag',
   },

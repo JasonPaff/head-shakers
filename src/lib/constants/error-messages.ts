@@ -115,9 +115,12 @@ export const ERROR_MESSAGES = {
   },
   TAG: {
     ASSIGN_FAILED: 'Failed to assign tag',
+    ATTACH_FAILED: 'Failed to attach tags to bobblehead',
     CREATE_FAILED: 'Failed to create tag',
     DELETE_FAILED: 'Failed to delete tag',
+    DETACH_FAILED: 'Failed to detach tags from bobblehead',
     INVALID_COLOR: 'Invalid color format',
+    LIMIT_EXCEEDED: 'Tag limit exceeded',
     NAME_REQUIRED: 'Tag name is required',
     NOT_FOUND: 'Tag not found',
     UNASSIGN_FAILED: 'Failed to unassign tag',

@@ -24,7 +24,9 @@ export const SENTRY_CONTEXTS = {
   FEATURED_CONTENT_DATA: 'featured_content_data',
   INPUT_INFO: 'input_info',
   PERFORMANCE: 'performance',
+  SEARCH_DATA: 'search_data',
   SUBCOLLECTION_DATA: 'subcollection_data',
+  TAG_DATA: 'tag_data',
   USER_DATA: 'user_data',
 } as const;
 
