@@ -8,7 +8,7 @@ import { withForm } from '@/components/ui/form';
 
 export const ItemTags = withForm({
   ...addItemFormOptions,
-  render: () => {
+  render: ({ form }) => {
     return (
       <Card>
         <CardHeader>
@@ -18,7 +18,17 @@ export const ItemTags = withForm({
           </CardTitle>
           <CardDescription>Add custom tags to organize and categorize your bobblehead</CardDescription>
         </CardHeader>
-        <CardContent className={'space-y-4'}></CardContent>
+        <CardContent className={'space-y-4'}>
+          <form.AppField name={'tags'}>
+            {(field) => (
+              <field.TagField
+                description={'Press Enter or comma to add tags. Tags help you organize and find your bobbleheads.'}
+                label={'Tags'}
+                placeholder={'Add a tag...'}
+              />
+            )}
+          </form.AppField>
+        </CardContent>
       </Card>
     );
   },

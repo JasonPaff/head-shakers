@@ -28,6 +28,7 @@ export const addItemFormOptions = formOptions({
     series: '',
     status: DEFAULTS.BOBBLEHEAD.STATUS,
     subcollectionId: '',
+    tags: [],
     weight: '',
     year: '',
   } as z.input<typeof createBobbleheadWithPhotosSchema>,
