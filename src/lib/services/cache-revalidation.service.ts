@@ -3,9 +3,6 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { CACHE_TAGS } from '@/lib/constants/cache';
 
-/**
- * provides centralized, type-safe cache invalidation for the Head Shakers platform
- */
 export class CacheRevalidationService {
   /**
    * revalidate bobblehead-related featured content

@@ -1,4 +1,4 @@
-import { generateUploadSignature } from '@/lib/services/cloudinary';
+import { CloudinaryService } from '@/lib/services/cloudinary.service';
 
 export async function POST(request: Request) {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const { paramsToSign } = body;
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  const signature = generateUploadSignature(paramsToSign);
+  const signature = CloudinaryService.generateUploadSignature(paramsToSign);
 
   return Response.json({ signature });
 }

@@ -5,15 +5,8 @@ import type { QueryContext } from '@/lib/queries/base/query-context';
 import { users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
-/**
- * user record with related data
- */
 export type UserRecord = typeof users.$inferSelect;
 
-/**
- * user domain query service
- * handles all database operations for users with consistent patterns
- */
 export class UsersQuery extends BaseQuery {
   /**
    * find user by Clerk ID

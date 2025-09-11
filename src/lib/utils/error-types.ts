@@ -1,12 +1,7 @@
 import type { ActionError, DatabaseErrorType, ErrorType } from './errors';
 
 /**
- * Type definitions for error contexts across different layers of the application.
- * These types ensure consistent error information capture and processing.
- */
-
-/**
- * Error categories for monitoring and alerting
+ * error categories for monitoring and alerting
  */
 export enum ErrorCategory {
   AUTHENTICATION = 'authentication',
@@ -22,7 +17,7 @@ export enum ErrorCategory {
 }
 
 /**
- * Error severity levels
+ * error severity levels
  */
 export enum ErrorSeverity {
   CRITICAL = 'critical',
@@ -32,7 +27,7 @@ export enum ErrorSeverity {
 }
 
 /**
- * Union type of all specific error contexts
+ * union type of all specific error contexts
  */
 export type AnyErrorContext =
   | AuthErrorContext
@@ -48,127 +43,122 @@ export type AnyErrorContext =
   | ValidationErrorContext;
 
 /**
- * Error context for authentication/authorization operations
+ * error context for authentication/authorization operations
  */
 export interface AuthErrorContext extends BaseErrorContext {
-  /** Action being attempted */
+  /** action being attempted */
   action?: string;
-  /** Clerk user ID if available */
+  /** clerk user id if available */
   clerkUserId?: string;
-  /** Required permission level */
+  /** required permission level */
   requiredRole?: string;
-  /** Resource being accessed */
+  /** resource being accessed */
   resource?: string;
-  /** User ID if known */
+  /** user id if known */
   userId?: string;
-  /** User's actual role */
+  /** user's actual role */
   userRole?: string;
 }
 
 /**
- * Base error context that all specific contexts extend
+ * base error context that all specific contexts extend
  */
 export interface BaseErrorContext {
-  /** Allow additional properties */
+  /** allow additional properties */
   [key: string]: unknown;
-  /** Additional metadata about the error */
+  /** additional metadata about the error */
   metadata?: Record<string, unknown>;
-  /** The operation being performed when the error occurred */
+  /** the operation being performed when the error occurred */
   operation: string;
-  /** Timestamp when the error occurred */
+  /** timestamp when the error occurred */
   timestamp?: Date;
 }
 
 /**
- * Error context for business logic operations
+ * error context for business logic operations
  */
 export interface BusinessLogicErrorContext extends BaseErrorContext {
-  /** Current state of the entity */
+  /** current state of the entity */
   currentState?: Record<string, unknown>;
-  /** Entity ID */
+  /** entity id */
   entityId?: string;
-  /** Business entity type */
+  /** business entity type */
   entityType?: string;
-  /** Expected state for the operation */
+  /** expected state for the operation */
   expectedState?: Record<string, unknown>;
-  /** Business rule that was violated */
+  /** business rule that was violated */
   rule: string;
 }
 
 /**
- * Error context for caching operations
+ * error context for caching operations
  */
 export interface CacheErrorContext extends BaseErrorContext {
-  /** Cache operation type */
+  /** cache operation type */
   cacheOperation: 'DELETE' | 'GET' | 'INVALIDATE' | 'SET';
-  /** Cache hit/miss status */
+  /** cache hit/miss status */
   cacheStatus?: 'ERROR' | 'HIT' | 'MISS';
-  /** Cache key */
+  /** cache key */
   key: string;
-  /** Cache provider (redis, memory, etc.) */
+  /** cache provider (redis, memory, etc.) */
   provider: string;
   /** TTL value */
   ttl?: number;
 }
 
 /**
- * Error context for database operations
+ * error context for database operations
  */
 export interface DatabaseErrorContext extends BaseErrorContext {
-  /** Connection pool information */
+  /** connection pool information */
   connectionInfo?: {
     activeConnections?: number;
     idleConnections?: number;
   };
-  /** Database error type classification */
+  /** database error type classification */
   dbErrorType?: DatabaseErrorType;
-  /** Whether the operation was in a transaction */
+  /** whether the operation was in a transaction */
   isInTransaction?: boolean;
   /** SQL query being executed (sanitized) */
   query?: string;
-  /** Database table being accessed */
+  /** database table being accessed */
   table?: string;
 }
 
 /**
- * Complete error information structure
+ * complete error information structure
  */
 export interface EnhancedErrorInfo {
-  /** The base ActionError */
+  /** the base ActionError */
   error: ActionError;
-  /** Additional metadata */
+  /** additional metadata */
   metadata: ErrorMetadata;
-  /** Performance impact information */
+  /** performance impact information */
   performance?: {
     cpuUsage?: number;
     memoryUsage?: number;
     operationTimeMs: number;
   };
-  /** Recovery information */
+  /** recovery information */
   recovery?: ErrorRecoveryInfo;
-  /** Related errors in the same operation */
+  /** related errors in the same operation */
   relatedErrors?: ActionError[];
 }
 
 /**
- * Utility type for extracting error context based on error type
+ * utility type for extracting error context based on error type
  */
-export type ErrorContextForType<T extends ErrorType> = T extends ErrorType.DATABASE
-  ? DatabaseErrorContext
-  : T extends ErrorType.EXTERNAL_SERVICE
-  ? ServiceErrorContext
-  : T extends ErrorType.VALIDATION
-  ? ValidationErrorContext
-  : T extends ErrorType.AUTHORIZATION
-  ? AuthErrorContext
-  : T extends ErrorType.BUSINESS_RULE
-  ? BusinessLogicErrorContext
-  : T extends ErrorType.RATE_LIMIT
-  ? RateLimitErrorContext
+export type ErrorContextForType<T extends ErrorType> =
+  T extends ErrorType.DATABASE ? DatabaseErrorContext
+  : T extends ErrorType.EXTERNAL_SERVICE ? ServiceErrorContext
+  : T extends ErrorType.VALIDATION ? ValidationErrorContext
+  : T extends ErrorType.AUTHORIZATION ? AuthErrorContext
+  : T extends ErrorType.BUSINESS_RULE ? BusinessLogicErrorContext
+  : T extends ErrorType.RATE_LIMIT ? RateLimitErrorContext
   : BaseErrorContext;
 
 /**
- * Helper type for error handler functions
+ * helper type for error handler functions
  */
 export type ErrorHandler<TContext extends BaseErrorContext = BaseErrorContext> = (
   error: unknown,
@@ -176,25 +166,25 @@ export type ErrorHandler<TContext extends BaseErrorContext = BaseErrorContext> =
 ) => ActionError;
 
 /**
- * Extended error information for monitoring and analytics
+ * extended error information for monitoring and analytics
  */
 export interface ErrorMetadata {
-  /** Error category for classification */
+  /** error category for classification */
   category: ErrorCategory;
-  /** Error fingerprint for deduplication */
+  /** error fingerprint for deduplication */
   fingerprint?: string;
-  /** Whether error should trigger alerts */
+  /** whether error should trigger alerts */
   isAlertable: boolean;
-  /** Whether error affects user experience */
+  /** whether error affects user experience */
   isUserFacing: boolean;
-  /** Related request ID */
+  /** related request ID */
   requestId?: string;
-  /** Session ID if available */
+  /** session ID if available */
   sessionId?: string;
-  /** Error severity level */
+  /** error severity level */
   severity: ErrorSeverity;
-  /** Tags for filtering and searching */
-  tags?: string[];
+  /** tags for filtering and searching */
+  tags?: Array<string>;
 }
 
 // ============================================================================
@@ -202,23 +192,23 @@ export interface ErrorMetadata {
 // ============================================================================
 
 /**
- * Error recovery information
+ * error recovery information
  */
 export interface ErrorRecoveryInfo {
-  /** Recovery strategy used */
+  /** recovery strategy used */
   recoveryStrategy?: string;
-  /** Total time spent on recovery */
+  /** total time spent on recovery */
   recoveryTimeMs?: number;
-  /** Number of retry attempts */
+  /** number of retry attempts */
   retryAttempts?: number;
-  /** Whether automatic recovery was attempted */
+  /** whether automatic recovery was attempted */
   wasAutoRecoveryAttempted: boolean;
-  /** Whether recovery was successful */
+  /** whether recovery was successful */
   wasRecoverySuccessful?: boolean;
 }
 
 /**
- * Error transformation function type
+ * error transformation function type
  */
 export type ErrorTransformer<TInput = unknown, TOutput = ActionError> = (
   input: TInput,
@@ -226,132 +216,132 @@ export type ErrorTransformer<TInput = unknown, TOutput = ActionError> = (
 ) => TOutput;
 
 /**
- * Error context for facade layer operations
+ * error context for facade layer operations
  */
 export interface FacadeErrorContext extends BaseErrorContext {
-  /** Input data (sanitized for logging) */
+  /** input data (sanitized for logging) */
   data?: Record<string, unknown>;
-  /** Name of the facade class */
+  /** name of the facade class */
   facade: string;
-  /** Method name that failed */
+  /** method name that failed */
   method: string;
-  /** User ID if available */
+  /** user ID if available */
   userId?: string;
-  /** Whether operation involved caching */
+  /** whether the operation involved caching */
   wasCached?: boolean;
 }
 
 /**
- * Error context for file operations
+ * error context for file operations
  */
 export interface FileErrorContext extends BaseErrorContext {
-  /** File name or path */
+  /** file name or path */
   fileName?: string;
-  /** File operation type */
+  /** file operation type */
   fileOperation: 'DELETE' | 'MOVE' | 'TRANSFORM' | 'UPLOAD';
-  /** File size in bytes */
+  /** file size in bytes */
   fileSize?: number;
-  /** File type */
+  /** file type */
   fileType?: string;
-  /** Storage provider */
+  /** storage provider */
   storageProvider?: string;
 }
 
 /**
- * Error context for middleware operations
+ * error context for middleware operations
  */
 export interface MiddlewareErrorContext extends BaseErrorContext {
-  /** Action name being processed */
+  /** action name being processed */
   actionName?: string;
-  /** IP address */
+  /** ip address */
   ipAddress?: string;
-  /** Name of the middleware */
+  /** name of the middleware */
   middleware: string;
-  /** Request path */
+  /** request path */
   path?: string;
-  /** User agent */
+  /** user agent */
   userAgent?: string;
 }
 
 // ============================================================================
-// Type guards and utilities
+// type guards and utilities
 // ============================================================================
 
 /**
- * Error context for query layer operations
+ * error context for query layer operations
  */
 export interface QueryErrorContext extends BaseErrorContext {
-  /** Query context type */
+  /** query context type */
   contextType?: 'admin' | 'public' | 'user';
-  /** Query filters applied (sanitized) */
+  /** query filters applied (sanitized) */
   filters?: Record<string, unknown>;
-  /** Query method that failed */
+  /** query method that failed */
   method: string;
-  /** Pagination info if applicable */
+  /** pagination info if applicable */
   pagination?: {
     limit?: number;
     offset?: number;
   };
-  /** Name of the query class */
+  /** name of the query class */
   query: string;
-  /** Database table being queried */
+  /** database table being queried */
   table?: string;
 }
 
 /**
- * Error context for rate limiting operations
+ * error context for rate limiting operations
  */
 export interface RateLimitErrorContext extends BaseErrorContext {
-  /** Current request count */
+  /** current request count */
   currentCount: number;
-  /** Rate limit key */
+  /** rate limit key */
   key: string;
-  /** Maximum allowed requests */
+  /** maximum allowed requests */
   limit: number;
-  /** Reset time */
+  /** reset time */
   resetTime?: Date;
-  /** Time window in seconds */
+  /** time window in seconds */
   windowSeconds: number;
 }
 
 /**
- * Error context for service layer operations (external services)
+ * error context for service layer operations (external services)
  */
 export interface ServiceErrorContext extends BaseErrorContext {
-  /** Circuit breaker state */
+  /** circuit breaker state */
   circuitBreakerState?: 'CLOSED' | 'HALF_OPEN' | 'OPEN';
-  /** API endpoint called */
+  /* API endpoint called */
   endpoint?: string;
   /** HTTP status code if applicable */
   httpStatus?: number;
-  /** Whether the error is retryable */
+  /** whether the error is retryable */
   isRetryable?: boolean;
-  /** Service method that failed */
+  /** service method that failed */
   method: string;
-  /** Name of the service */
+  /** name of the service */
   service: string;
-  /** Request timeout value */
+  /** request timeout value */
   timeout?: number;
 }
 
 /**
- * Error context for validation operations
+ * error context for validation operations
  */
 export interface ValidationErrorContext extends BaseErrorContext {
-  /** Expected format or range */
+  /** expected format or range */
   expected?: string;
-  /** Field that failed validation */
+  /** field that failed validation */
   field?: string;
-  /** Validation rule that failed */
+  /** validation rule that failed */
   rule?: string;
-  /** Schema name being validated */
+  /** schema name being validated */
   schema?: string;
-  /** Input value that failed (sanitized) */
+  /** input value that failed (sanitized) */
   value?: unknown;
 }
 
 /**
- * Type guard to check if a context is a database error context
+ * type guard to check if a context is a database error context
  */
 export function isDatabaseErrorContext(context: unknown): context is DatabaseErrorContext {
   return (
@@ -363,7 +353,7 @@ export function isDatabaseErrorContext(context: unknown): context is DatabaseErr
 }
 
 /**
- * Type guard to check if a context is a facade error context
+ * type guard to check if a context is a facade error context
  */
 export function isFacadeErrorContext(context: unknown): context is FacadeErrorContext {
   return (
@@ -375,7 +365,7 @@ export function isFacadeErrorContext(context: unknown): context is FacadeErrorCo
 }
 
 /**
- * Type guard to check if a context is a service error context
+ * type guard to check if a context is a service error context
  */
 export function isServiceErrorContext(context: unknown): context is ServiceErrorContext {
   return (
@@ -387,7 +377,7 @@ export function isServiceErrorContext(context: unknown): context is ServiceError
 }
 
 /**
- * Type guard to check if a context is a validation error context
+ * type guard to check if a context is a validation error context
  */
 export function isValidationErrorContext(context: unknown): context is ValidationErrorContext {
   return (

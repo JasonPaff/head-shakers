@@ -6,6 +6,7 @@ import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
+import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { withServiceRetry } from '@/lib/utils/retry';
 
 cloudinary.config({
@@ -14,6 +15,26 @@ cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   secure: true,
 });
+
+cloudinary.config({
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+});
+
+class CloudinaryError extends ActionError {
+  constructor(message: string, originalError?: Error) {
+    super(
+      ErrorType.EXTERNAL_SERVICE,
+      'CLOUDINARY_UPLOAD_FAILED',
+      message,
+      { originalError: originalError?.message },
+      true,
+      500,
+      originalError,
+    );
+  }
+}
 
 export class CloudinaryService {
   /**
@@ -89,21 +110,22 @@ export class CloudinaryService {
     }
 
     const circuitBreaker = circuitBreakers.externalService('cloudinary-delete');
-    
+
     try {
       const result = await circuitBreaker.execute(async () => {
         // use Cloudinary's batch delete API with retry logic
         const retryResult = await withServiceRetry(
-          () => cloudinary.api.delete_resources(publicIds, {
-            resource_type: 'image',
-          }),
+          () =>
+            cloudinary.api.delete_resources(publicIds, {
+              resource_type: 'image',
+            }),
           'cloudinary',
           {
             maxAttempts: 3,
-            operationName: 'cloudinary-batch-delete'
-          }
+            operationName: 'cloudinary-batch-delete',
+          },
         );
-        
+
         return retryResult.result;
       });
 
@@ -144,6 +166,15 @@ export class CloudinaryService {
     } catch (error) {
       console.error(`Failed to extract public ID from URL ${url}:`, error);
       return null;
+    }
+  }
+
+  // generate signature for upload parameters
+  static generateUploadSignature(paramsToSign: Record<string, unknown>): string {
+    try {
+      return cloudinary.utils.api_sign_request(paramsToSign, process.env.CLOUDINARY_API_SECRET!);
+    } catch (error) {
+      throw new CloudinaryError('Failed to generate upload signature', error as Error);
     }
   }
 
@@ -193,22 +224,23 @@ export class CloudinaryService {
           const newPublicId = `${targetFolder}/${filename}`;
 
           const circuitBreaker = circuitBreakers.upload('cloudinary-rename');
-          
+
           const result = await circuitBreaker.execute(async () => {
             // use cloudinary's rename API with retry logic
             const retryResult = await withServiceRetry(
-              () => cloudinary.uploader.rename(photo.publicId, newPublicId, {
-                invalidate: true, // invalidate CDN cache
-                overwrite: false, // don't overwrite if exists
-                resource_type: 'image',
-              }),
+              () =>
+                cloudinary.uploader.rename(photo.publicId, newPublicId, {
+                  invalidate: true, // invalidate CDN cache
+                  overwrite: false, // don't overwrite if exists
+                  resource_type: 'image',
+                }),
               'cloudinary',
               {
                 maxAttempts: 3,
-                operationName: 'cloudinary-rename'
-              }
+                operationName: 'cloudinary-rename',
+              },
             );
-            
+
             return retryResult.result;
           });
 

@@ -12,12 +12,7 @@ import type {
 import { ActionError, ErrorType, isRetryableError } from './errors';
 
 /**
- * Builder functions for creating standardized errors across the application.
- * These utilities ensure consistent error creation with proper context.
- */
-
-/**
- * Creates an authorization error
+ * creates an authorization error
  */
 export function createAuthorizationError(
   message: string = ERROR_MESSAGES.AUTH.UNAUTHORIZED,
@@ -27,7 +22,7 @@ export function createAuthorizationError(
 }
 
 /**
- * Creates a business rule violation error
+ * creates a business rule violation error
  */
 export function createBusinessRuleError(
   code: string,
@@ -38,7 +33,7 @@ export function createBusinessRuleError(
 }
 
 /**
- * Creates a database error with retry logic detection
+ * creates a database error with retry logic detection
  */
 export function createDatabaseError(
   code: string,
@@ -66,7 +61,7 @@ export function createDatabaseError(
 }
 
 /**
- * Creates an external service error with retry detection
+ * creates an external service error with retry detection
  */
 export function createExternalServiceError(
   service: string,
@@ -92,12 +87,12 @@ export function createExternalServiceError(
 }
 
 /**
- * Creates an error from a facade operation
+ * creates an error from a facade operation
  */
 export function createFacadeError(context: FacadeErrorContext, originalError?: unknown): ActionError {
   const { data, facade, method, operation } = context;
 
-  // If it's already an ActionError, enhance it with facade context
+  // if it's already an ActionError, enhance it with facade context
   if (originalError instanceof ActionError) {
     return new ActionError(
       originalError.type,
@@ -116,11 +111,11 @@ export function createFacadeError(context: FacadeErrorContext, originalError?: u
     );
   }
 
-  // Determine error type based on the original error
+  // determine the error type based on the original error
   if (originalError instanceof Error) {
     const message = originalError.message.toLowerCase();
 
-    // Check for specific error patterns
+    // check for specific error patterns
     if (message.includes('not found')) {
       return createNotFoundError(facade, data?.id as string, { facade, method, operation });
     }
@@ -133,7 +128,7 @@ export function createFacadeError(context: FacadeErrorContext, originalError?: u
       return createForbiddenError(originalError.message, { facade, method, operation });
     }
 
-    // Default to database error for facade operations
+    // default to database error for facade operations
     return createDatabaseError(
       `${facade.toUpperCase()}_${operation.toUpperCase()}_FAILED`,
       `Failed to ${operation} in ${facade}`,
@@ -145,12 +140,11 @@ export function createFacadeError(context: FacadeErrorContext, originalError?: u
     );
   }
 
-  // Unknown error type
   return createInternalError(`Unexpected error in ${facade}.${method}`, context, originalError as Error);
 }
 
 /**
- * Creates a forbidden error for insufficient permissions
+ * creates a forbidden error for insufficient permissions
  */
 export function createForbiddenError(
   message: string = ERROR_MESSAGES.AUTH.INSUFFICIENT_PERMISSIONS,
@@ -160,7 +154,7 @@ export function createForbiddenError(
 }
 
 /**
- * Creates an internal server error (use sparingly)
+ * creates an internal server error (use sparingly)
  */
 export function createInternalError(
   message: string = ERROR_MESSAGES.GENERIC.INTERNAL_SERVER_ERROR,
@@ -171,12 +165,12 @@ export function createInternalError(
 }
 
 /**
- * Creates an error from middleware
+ * creates an error from middleware
  */
 export function createMiddlewareError(context: MiddlewareErrorContext, originalError?: unknown): ActionError {
   const { actionName, middleware, operation } = context;
 
-  // If it's already an ActionError, enhance with middleware context
+  // if it's already an ActionError, enhance with middleware context
   if (originalError instanceof ActionError) {
     return new ActionError(
       originalError.type,
@@ -193,7 +187,7 @@ export function createMiddlewareError(context: MiddlewareErrorContext, originalE
     );
   }
 
-  // Handle specific middleware errors
+  // handle specific middleware errors
   if (originalError instanceof Error) {
     const message = originalError.message;
 
@@ -221,7 +215,7 @@ export function createMiddlewareError(context: MiddlewareErrorContext, originalE
 }
 
 /**
- * Creates a not found error
+ * creates a not found error
  */
 export function createNotFoundError(
   resource: string,
@@ -244,16 +238,16 @@ export function createNotFoundError(
 }
 
 // ============================================================================
-// Layer-specific error builders
+// layer-specific error builders
 // ============================================================================
 
 /**
- * Creates an error from a query operation
+ * creates an error from a query operation
  */
 export function createQueryError(context: QueryErrorContext, originalError?: unknown): ActionError {
   const { filters, method, operation, query, table } = context;
 
-  // If it's already an ActionError, enhance with query context
+  // if it's already an ActionError, enhance with query context
   if (originalError instanceof ActionError) {
     return new ActionError(
       originalError.type,
@@ -273,7 +267,7 @@ export function createQueryError(context: QueryErrorContext, originalError?: unk
     );
   }
 
-  // Handle specific query errors
+  // handle specific query errors
   if (originalError instanceof Error) {
     const message = originalError.message.toLowerCase();
 
@@ -281,7 +275,7 @@ export function createQueryError(context: QueryErrorContext, originalError?: unk
       return createValidationError('MISSING_USER_CONTEXT', originalError.message, context);
     }
 
-    // Default to database error
+    // default to database error
     return createDatabaseError(
       `QUERY_${operation.toUpperCase()}_FAILED`,
       `Query operation failed: ${operation}`,
@@ -298,7 +292,7 @@ export function createQueryError(context: QueryErrorContext, originalError?: unk
 }
 
 /**
- * Creates a rate limit error
+ * creates a rate limit error
  */
 export function createRateLimitError(
   message: string = ERROR_MESSAGES.RATE_LIMIT.EXCEEDED,
@@ -308,12 +302,12 @@ export function createRateLimitError(
 }
 
 /**
- * Creates an error from a service operation
+ * creates an error from a service operation
  */
 export function createServiceError(context: ServiceErrorContext, originalError?: unknown): ActionError {
   const { method, operation, service } = context;
 
-  // If it's already an ActionError, enhance with service context
+  // if it's already an ActionError, enhance with service context
   if (originalError instanceof ActionError) {
     return new ActionError(
       originalError.type,
@@ -331,7 +325,7 @@ export function createServiceError(context: ServiceErrorContext, originalError?:
     );
   }
 
-  // Service errors are typically external service errors
+  // service errors are typically external service errors
   if (originalError instanceof Error) {
     return createExternalServiceError(service, originalError.message, context, originalError);
   }
@@ -340,7 +334,7 @@ export function createServiceError(context: ServiceErrorContext, originalError?:
 }
 
 /**
- * Creates a validation error with a consistent structure
+ * creates a validation error with a consistent structure
  */
 export function createValidationError(
   code: string,
@@ -352,11 +346,11 @@ export function createValidationError(
 }
 
 // ============================================================================
-// Helper utilities
+// helper utilities
 // ============================================================================
 
 /**
- * Ensures an error is an ActionError, converting if necessary
+ * ensures an error is an ActionError, converting if necessary
  */
 export function ensureActionError(error: unknown, defaultContext?: Record<string, unknown>): ActionError {
   if (isActionError(error)) {
@@ -371,14 +365,14 @@ export function ensureActionError(error: unknown, defaultContext?: Record<string
 }
 
 /**
- * Type guard to check if an error is an ActionError
+ * type guard to check if an error is an ActionError
  */
 export function isActionError(error: unknown): error is ActionError {
   return error instanceof ActionError;
 }
 
 /**
- * Wraps an async operation with consistent error handling
+ * wraps an async operation with consistent error handling
  */
 export async function withErrorContext<T>(
   operation: () => Promise<T>,
@@ -387,7 +381,7 @@ export async function withErrorContext<T>(
   try {
     return await operation();
   } catch (error) {
-    // Import dynamically to avoid circular dependency
+    // import dynamically to avoid circular dependency
     const { handleActionError } = await import('./action-error-handler');
     return handleActionError(error, context);
   }

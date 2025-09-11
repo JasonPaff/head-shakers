@@ -1,5 +1,5 @@
 /**
- * Database-specific error subtypes
+ * database-specific error subtypes
  */
 export enum DatabaseErrorType {
   CONNECTION_FAILED = 'CONNECTION_FAILED',
@@ -13,7 +13,7 @@ export enum DatabaseErrorType {
 }
 
 /**
- * Error classification system for consistent error handling across server actions
+ * error classification system for consistent error handling across server actions
  */
 export enum ErrorType {
   AUTHORIZATION = 'AUTHORIZATION',
@@ -27,7 +27,7 @@ export enum ErrorType {
 }
 
 /**
- * Enhanced error class with structured error information
+ * enhanced error class with structured error information
  */
 export class ActionError extends Error {
   constructor(
@@ -61,7 +61,7 @@ export class ActionError extends Error {
 }
 
 /**
- * Error classification utility
+ * error classification utility
  */
 export function classifyDatabaseError(error: unknown): DatabaseErrorType | null {
   if (!isDatabaseError(error)) return null;
@@ -96,7 +96,7 @@ export function isConnectionError(error: unknown): boolean {
 }
 
 /**
- * Database error detection utilities
+ * database error detection utilities
  */
 export function isDatabaseError(error: unknown): error is Error {
   if (!(error instanceof Error)) return false;
@@ -161,7 +161,7 @@ export function isNotNullConstraintError(error: unknown): boolean {
 }
 
 /**
- * Check if an error is retryable
+ * check if an error is retryable
  */
 export function isRetryableError(error: unknown): boolean {
   if (!(error instanceof Error)) return false;
