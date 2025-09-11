@@ -107,22 +107,6 @@ export class FeaturedContentFacade {
   );
 
   /**
-   * get featured content by ID for admin management
-   */
-  static getFeaturedContentByIdForAdmin = unstable_cache(
-    async (id: string, dbInstance?: DatabaseExecutor): Promise<FeaturedContentRecord | null> => {
-      console.log('Facade: Retrieving featured content by ID:', id);
-      const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.findFeaturedContentByIdForAdmin(id, context);
-    },
-    [CACHE_KEYS.ADMIN.FEATURED_CONTENT],
-    {
-      revalidate: CACHE_TTL.SHORT,
-      tags: [CACHE_TAGS.ADMIN.FEATURED_CONTENT],
-    },
-  );
-
-  /**
    * get homepage banner content
    */
   static getHomepageBanner = cache(
@@ -190,6 +174,17 @@ export class FeaturedContentFacade {
    */
   static async getCacheStats() {
     return Promise.resolve(cacheStats);
+  }
+
+  /**
+   * get featured content by ID for admin management
+   */
+  static async getFeaturedContentByIdForAdmin(
+    id: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<FeaturedContentRecord | null> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.findFeaturedContentByIdForAdmin(id, context);
   }
 
   /**

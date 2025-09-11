@@ -193,7 +193,6 @@ export class FeaturedContentQuery extends BaseQuery {
   ): Promise<FeaturedContentRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
-    console.log('QUERY: Finding featured content by ID:', id);
     const results = await dbInstance
       .select({
         bobbleheadTitle: bobbleheads.name,

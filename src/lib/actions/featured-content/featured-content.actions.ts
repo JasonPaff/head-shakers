@@ -314,13 +314,10 @@ export const getFeaturedContentByIdAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
     try {
-      console.log('Action: Retrieving featured content by ID:', featuredContentData.id);
       const featuredContent = await FeaturedContentFacade.getFeaturedContentByIdForAdmin(
         featuredContentData.id,
         dbInstance,
       );
-
-      console.log('Action: Retrieved featured content by ID:', featuredContentData.id, featuredContent);
 
       if (!featuredContent) {
         throw new ActionError(
