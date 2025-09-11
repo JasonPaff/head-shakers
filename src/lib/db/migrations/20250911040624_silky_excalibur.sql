@@ -1,0 +1,1 @@
+ALTER TABLE "tags" ALTER COLUMN "user_id" DROP NOT NULL;
