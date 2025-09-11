@@ -714,26 +714,45 @@ async function seedTags(insertedUsers: (typeof users.$inferSelect)[]) {
 async function seedUsers() {
   console.log('👥 Seeding users...');
 
-  const insertedUsers = await db.insert(users).values(sampleUsers).returning();
-  console.log(`✅ Created ${insertedUsers.length} users`);
+  // Check for existing users to avoid duplicates
+  const existingUsers = await db.select().from(users);
+  const existingClerkIds = new Set(existingUsers.map(u => u.clerkId));
+  
+  // Filter out users that already exist
+  const newUsers = sampleUsers.filter(user => !existingClerkIds.has(user.clerkId));
+  
+  let insertedUsers: (typeof users.$inferSelect)[] = [];
+  
+  if (newUsers.length > 0) {
+    insertedUsers = await db.insert(users).values(newUsers).returning();
+    console.log(`✅ Created ${insertedUsers.length} new users`);
+  } else {
+    console.log('✅ All users already exist, skipping insertion');
+  }
+  
+  // Return all users (existing + newly inserted)
+  const allUsers = await db.select().from(users);
+  console.log(`✅ Total users in database: ${allUsers.length}`);
 
-  // Create user settings for each user
-  const userSettingsData = insertedUsers.map((user) => ({
-    userId: user.id,
-  }));
+  // Create user settings for new users only
+  if (insertedUsers.length > 0) {
+    const userSettingsData = insertedUsers.map((user) => ({
+      userId: user.id,
+    }));
 
-  await db.insert(userSettings).values(userSettingsData);
-  console.log(`✅ Created user settings for ${userSettingsData.length} users`);
+    await db.insert(userSettings).values(userSettingsData);
+    console.log(`✅ Created user settings for ${userSettingsData.length} new users`);
 
-  // Create notification settings for each user
-  const notificationSettingsData = insertedUsers.map((user) => ({
-    userId: user.id,
-  }));
+    // Create notification settings for new users only
+    const notificationSettingsData = insertedUsers.map((user) => ({
+      userId: user.id,
+    }));
 
-  await db.insert(notificationSettings).values(notificationSettingsData);
-  console.log(`✅ Created notification settings for ${notificationSettingsData.length} users`);
+    await db.insert(notificationSettings).values(notificationSettingsData);
+    console.log(`✅ Created notification settings for ${notificationSettingsData.length} new users`);
+  }
 
-  return insertedUsers;
+  return allUsers;
 }
 
 async function updateAggregates() {
