@@ -124,6 +124,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
 });
 export const createBobbleheadWithPhotosSchema = insertBobbleheadSchema.extend({
   photos: cloudinaryPhotosValidationSchema.default([]),
+  tags: z.array(z.string()).default([]).optional(),
 });
 
 export const getBobbleheadByIdSchema = z.object({

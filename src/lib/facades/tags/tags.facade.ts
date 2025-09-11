@@ -136,6 +136,39 @@ export class TagsFacade {
   );
 
   /**
+   * attach tags to a bobblehead
+   */
+  static async attachToBobblehead(
+    bobbleheadId: string,
+    tagIds: Array<string>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<boolean> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+      
+      // Validate tags first
+      const validation = await TagsFacade.validateTagsForBobblehead(bobbleheadId, tagIds, userId, dbInstance);
+      if (!validation.canCreate) {
+        console.warn('Tag validation failed:', validation.errors);
+        return false;
+      }
+      
+      // Attach tags using the query
+      return TagsQuery.attachToBobblehead(bobbleheadId, tagIds, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId, tagIds, userId },
+        facade: 'TagsFacade',
+        method: 'attachToBobblehead',
+        operation: 'attach',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
    * bulk delete tags for a user
    */
   static async bulkDelete(tagIds: Array<string>, userId: string, dbInstance?: DatabaseExecutor): Promise<{
@@ -254,6 +287,18 @@ export class TagsFacade {
       };
       throw createFacadeError(context, error);
     }
+  }
+
+  /**
+   * get or create a tag by name (simplified version for bobblehead creation)
+   */
+  static async getOrCreateByName(
+    name: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | TagRecord> {
+    // Use default blue color for auto-created tags
+    return TagsFacade.getOrCreateTag(name, '#3B82F6', userId, dbInstance);
   }
 
   /**

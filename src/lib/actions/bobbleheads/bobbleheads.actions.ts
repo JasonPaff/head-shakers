@@ -15,6 +15,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
@@ -39,7 +40,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
   )
   .inputSchema(createBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { photos, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
+    const { photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
@@ -146,14 +147,40 @@ export const createBobbleheadWithPhotosAction = authActionClient
         }
       }
 
+      // Process tags if provided
+      let createdTags: Array<unknown> = [];
+      if (tags && tags.length > 0) {
+        try {
+          // Create or get existing tags for the user
+          const tagPromises = tags.map(async (tagName) => {
+            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.tx);
+            return existingTag;
+          });
+          
+          const tagRecords = await Promise.all(tagPromises);
+          const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
+          
+          // Attach tags to the bobblehead
+          if (tagIds.length > 0) {
+            await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.tx);
+            createdTags = tagRecords.filter(Boolean);
+          }
+        } catch (tagError) {
+          // If tag processing fails, we still want to keep the bobblehead
+          console.error('Tag processing failed:', tagError);
+          Sentry.captureException(tagError);
+        }
+      }
+
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           bobblehead: newBobblehead,
           photosCount: uploadedPhotos.length,
+          tagsCount: createdTags.length,
         },
         level: SENTRY_LEVELS.INFO,
-        message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos`,
+        message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
       });
 
       CacheRevalidationService.revalidateCollectionFeaturedContent(newBobblehead.collectionId);
@@ -164,6 +191,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
         data: {
           bobblehead: newBobblehead,
           photos: uploadedPhotos,
+          tags: createdTags,
         },
         success: true,
       };
