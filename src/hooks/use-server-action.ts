@@ -28,9 +28,6 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
 ) => {
   const { executeAsync: originalExecuteAsync, ...rest } = useAction(action, {
     ...options,
-    onError: undefined,
-    onExecute: undefined,
-    onSuccess: undefined,
   });
 
   const executeAsync = useCallback(
@@ -41,10 +38,8 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
 
       return toast.promise(
         originalExecuteAsync(input).then((result) => {
-          if (result?.serverError) {
-            // eslint-disable-next-line @typescript-eslint/only-throw-error
-            throw result;
-          }
+          // eslint-disable-next-line @typescript-eslint/only-throw-error
+          if (result?.serverError) throw result;
           return result;
         }),
         {

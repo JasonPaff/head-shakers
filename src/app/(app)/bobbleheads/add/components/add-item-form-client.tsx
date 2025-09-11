@@ -3,10 +3,8 @@
 import type { z } from 'zod';
 
 import { revalidateLogic } from '@tanstack/form-core';
-import { useAction } from 'next-safe-action/hooks';
 import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
@@ -21,6 +19,7 @@ import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
+import { useServerAction } from '@/hooks/use-server-action';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
@@ -39,13 +38,8 @@ export const AddItemFormClient = ({
 }: AddItemFormClientProps) => {
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useAction(createBobbleheadWithPhotosAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to create bobblehead');
-    },
+  const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
     onSuccess: ({ input }) => {
-      toast.success('Bobblehead created successfully!');
-
       // if there is not a subcollectionId, go back to the collection page
       if (!input.subcollectionId) {
         router.push(
@@ -61,6 +55,11 @@ export const AddItemFormClient = ({
           }),
         );
       }
+    },
+    toastMessages: {
+      error: 'Failed to add bobblehead. Please try again.',
+      loading: 'Adding bobblehead...',
+      success: 'Bobblehead added successfully!',
     },
   });
 
