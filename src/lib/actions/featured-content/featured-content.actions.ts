@@ -13,7 +13,6 @@ import {
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
 } from '@/lib/constants';
-import { AdminFacade } from '@/lib/facades/admin/admin.facade';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
@@ -58,7 +57,7 @@ export const createFeaturedContentAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
     try {
-      const newFeaturedContent = await AdminFacade.createFeaturedContentAsync(
+      const newFeaturedContent = await FeaturedContentFacade.createAsync(
         featuredContentData,
         ctx.userId,
         dbInstance,
@@ -133,7 +132,8 @@ export const updateFeaturedContentAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
     try {
-      const updatedFeaturedContent = await AdminFacade.updateFeaturedContentAsync(
+      const updatedFeaturedContent = await FeaturedContentFacade.updateAsync(
+        featuredContentData.id,
         featuredContentData,
         dbInstance,
       );
@@ -314,10 +314,13 @@ export const getFeaturedContentByIdAction = adminActionClient
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
     try {
-      const featuredContent = await AdminFacade.getFeaturedContentByIdForAdmin(
+      console.log('Action: Retrieving featured content by ID:', featuredContentData.id);
+      const featuredContent = await FeaturedContentFacade.getFeaturedContentByIdForAdmin(
         featuredContentData.id,
         dbInstance,
       );
+
+      console.log('Action: Retrieved featured content by ID:', featuredContentData.id, featuredContent);
 
       if (!featuredContent) {
         throw new ActionError(

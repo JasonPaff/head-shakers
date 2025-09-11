@@ -1,14 +1,21 @@
 // cache tags for invalidation
 export const CACHE_TAGS = {
-  ADMIN_CONTENT: 'admin_content',
+  ADMIN: {
+    FEATURED_CONTENT: 'admin:featured_content',
+    USER_CONTENT: 'admin:user_content',
+  },
   ANALYTICS: 'analytics',
   CONTENT_METRICS: 'content_metrics',
-  // Cross-domain relationship tags
   CONTENT_RELATIONSHIPS: {
     BOBBLEHEAD_FEATURED: (bobbleheadId: string) => `bobblehead:${bobbleheadId}:featured`,
     COLLECTION_FEATURED: (collectionId: string) => `collection:${collectionId}:featured`,
   },
-  // Hierarchical featured content tags
+  DASHBOARD: {
+    COLLECTION: (collectionId: string) => `dashboard:collection:${collectionId}`,
+    COLLECTIONS: 'dashboard:collections',
+    SUBCOLLECTION: (collectionId: string, subcollectionId: string) =>
+      `dashboard:collection:${collectionId}:subcollection:${subcollectionId}`,
+  },
   FEATURED_CONTENT: {
     ACTIVE: 'featured_content:active',
     ADMIN: 'featured_content:admin',
@@ -34,6 +41,10 @@ export const CACHE_TTL = {
 
 // cache key builders
 export const CACHE_KEYS = {
+  ADMIN: {
+    FEATURED_CONTENT: 'admin:featured_content',
+    USER_CONTENT: 'admin:user_content',
+  },
   CONTENT_METRICS: {
     ANALYTICS_SUMMARY: 'content_metrics:analytics_summary',
     BY_CONTENT: (contentId: string) => `content_metrics:${contentId}`,

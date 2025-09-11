@@ -84,6 +84,7 @@ export default eslintTypescript.config([
         { fixMixedExportsWithInlineTypeSpecifier: true },
       ],
       '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-misused-promises': 'off',
       'better-tailwindcss/enforce-consistent-line-wrapping': 'off',
       eqeqeq: 'error',
       'react/react-in-jsx-scope': 'off',

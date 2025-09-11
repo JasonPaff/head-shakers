@@ -94,6 +94,69 @@ export class CacheRevalidationService {
   }
 
   /**
+   * revalidate dashboard content
+   * @param collectionId - the id of the collection
+   */
+  static revalidateDashboard({
+    collectionId,
+    subcollectionId,
+    userId,
+  }: {
+    collectionId?: string;
+    subcollectionId?: string;
+    userId: string;
+  }): void {
+    try {
+      const tags: Array<string> = [CACHE_TAGS.DASHBOARD.COLLECTIONS];
+      const paths: Array<string> = [$path({ route: '/dashboard/collection' })];
+
+      if (collectionId) {
+        tags.push(CACHE_TAGS.DASHBOARD.COLLECTION(collectionId));
+        paths.push(
+          $path({
+            route: '/dashboard/collection/[collectionId]',
+            routeParams: { collectionId },
+          }),
+        );
+      }
+
+      if (collectionId && subcollectionId) {
+        tags.push(CACHE_TAGS.DASHBOARD.SUBCOLLECTION(collectionId, subcollectionId));
+        paths.push(
+          $path({
+            route: '/dashboard/collection/[collectionId]/[subcollectionId]',
+            routeParams: { collectionId, subcollectionId },
+          }),
+        );
+      }
+
+      tags.forEach((tag) => {
+        try {
+          revalidateTag(tag);
+        } catch (error) {
+          console.error(`Failed to revalidate tag ${tag}:`, error);
+        }
+      });
+
+      paths.forEach((path) => {
+        try {
+          revalidatePath(path);
+        } catch (error) {
+          console.error(`Failed to revalidate path ${path}:`, error);
+        }
+      });
+
+      console.log(`Cache revalidation completed for dashboard content`, {
+        pathsRevalidated: paths.length,
+        tagsRevalidated: tags.length,
+        userId,
+      });
+    } catch (error) {
+      console.error('Dashboard content cache revalidation failed:', error);
+    }
+  }
+
+  /**
    * revalidate featured content across all related pages and data
    * @param operation - the type of operation performed (create, update, delete, toggle)
    * @param metadata - optional metadata for conditional revalidation

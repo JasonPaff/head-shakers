@@ -11,14 +11,13 @@ import type {
 import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
-/**
- * featured content record with related data
- */
 export interface FeaturedContentRecord {
-  comments?: number;
   contentId: string;
+  contentTitle?: null | string;
   contentType: 'bobblehead' | 'collection' | 'user';
   createdAt: Date;
+  curatorId: null | string;
+  curatorName: null | string;
   curatorNotes: null | string;
   description: null | string;
   endDate: Date | null;
@@ -26,21 +25,14 @@ export interface FeaturedContentRecord {
   id: string;
   imageUrl: null | string;
   isActive: boolean;
-  likes?: number;
-  // joined content data
-  owner?: null | string;
-  ownerDisplayName?: null | string;
   priority: number;
+  sortOrder: number;
   startDate: Date | null;
   title: null | string;
   updatedAt: Date;
   viewCount: number;
 }
 
-/**
- * featured content domain query service
- * handles all database operations for featured content with consistent patterns
- */
 export class FeaturedContentQuery extends BaseQuery {
   /**
    * create a new featured content entry
@@ -126,13 +118,59 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * get all featured content for admin management
    */
-  static async findAllForAdmin(context: QueryContext): Promise<Array<SelectFeaturedContent>> {
+  static async findAllFeaturedContentForAdmin(context: QueryContext): Promise<Array<FeaturedContentRecord>> {
     const dbInstance = this.getDbInstance(context);
 
-    return dbInstance
-      .select()
+    const results = await dbInstance
+      .select({
+        bobbleheadTitle: bobbleheads.name,
+        collectionTitle: collections.name,
+        contentId: featuredContent.contentId,
+        contentType: featuredContent.contentType,
+        createdAt: featuredContent.createdAt,
+        curatorId: featuredContent.curatorId,
+        curatorName: users.displayName,
+        curatorNotes: featuredContent.curatorNotes,
+        description: featuredContent.description,
+        endDate: featuredContent.endDate,
+        featureType: featuredContent.featureType,
+        id: featuredContent.id,
+        imageUrl: featuredContent.imageUrl,
+        isActive: featuredContent.isActive,
+        priority: featuredContent.priority,
+        sortOrder: featuredContent.sortOrder,
+        startDate: featuredContent.startDate,
+        title: featuredContent.title,
+        updatedAt: featuredContent.updatedAt,
+        viewCount: featuredContent.viewCount,
+      })
       .from(featuredContent)
-      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
+      .leftJoin(users, eq(featuredContent.curatorId, users.id))
+      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt), desc(featuredContent.title));
+
+    return results.map((row) => ({
+      contentId: row.contentId,
+      contentTitle: row.bobbleheadTitle || row.collectionTitle,
+      contentType: row.contentType,
+      createdAt: row.createdAt,
+      curatorId: row.curatorId,
+      curatorName: row.curatorName,
+      curatorNotes: row.curatorNotes,
+      description: row.description,
+      endDate: row.endDate,
+      featureType: row.featureType,
+      id: row.id,
+      imageUrl: row.imageUrl,
+      isActive: row.isActive,
+      priority: row.priority,
+      sortOrder: row.sortOrder,
+      startDate: row.startDate,
+      title: row.title,
+      updatedAt: row.updatedAt,
+      viewCount: row.viewCount,
+    }));
   }
 
   /**
@@ -140,10 +178,76 @@ export class FeaturedContentQuery extends BaseQuery {
    */
   static async findById(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
     const dbInstance = this.getDbInstance(context);
-
+    console.log('QUERY: Finding featured content by ID:', id);
     const result = await dbInstance.select().from(featuredContent).where(eq(featuredContent.id, id)).limit(1);
 
     return result[0] || null;
+  }
+
+  /**
+   * get featured content by ID for admin management
+   */
+  static async findFeaturedContentByIdForAdmin(
+    id: string,
+    context: QueryContext,
+  ): Promise<FeaturedContentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    console.log('QUERY: Finding featured content by ID:', id);
+    const results = await dbInstance
+      .select({
+        bobbleheadTitle: bobbleheads.name,
+        collectionTitle: collections.name,
+        contentId: featuredContent.contentId,
+        contentType: featuredContent.contentType,
+        createdAt: featuredContent.createdAt,
+        curatorId: featuredContent.curatorId,
+        curatorName: users.displayName,
+        curatorNotes: featuredContent.curatorNotes,
+        description: featuredContent.description,
+        endDate: featuredContent.endDate,
+        featureType: featuredContent.featureType,
+        id: featuredContent.id,
+        imageUrl: featuredContent.imageUrl,
+        isActive: featuredContent.isActive,
+        priority: featuredContent.priority,
+        sortOrder: featuredContent.sortOrder,
+        startDate: featuredContent.startDate,
+        title: featuredContent.title,
+        updatedAt: featuredContent.updatedAt,
+        viewCount: featuredContent.viewCount,
+      })
+      .from(featuredContent)
+      .leftJoin(users, eq(featuredContent.curatorId, users.id))
+      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .where(eq(featuredContent.id, id))
+      .limit(1);
+
+    if (!results[0]) return null;
+
+    const row = results[0];
+    return {
+      contentId: row.contentId,
+      contentTitle: row.bobbleheadTitle || row.collectionTitle,
+      contentType: row.contentType,
+      createdAt: row.createdAt,
+      curatorId: row.curatorId,
+      curatorName: row.curatorName,
+      curatorNotes: row.curatorNotes,
+      description: row.description,
+      endDate: row.endDate,
+      featureType: row.featureType,
+      id: row.id,
+      imageUrl: row.imageUrl,
+      isActive: row.isActive,
+      priority: row.priority,
+      sortOrder: row.sortOrder,
+      startDate: row.startDate,
+      title: row.title,
+      updatedAt: row.updatedAt,
+      viewCount: row.viewCount,
+    };
   }
 
   /**

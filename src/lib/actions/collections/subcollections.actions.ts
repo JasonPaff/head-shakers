@@ -2,8 +2,6 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
-import { $path } from 'next-typesafe-url';
-import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
@@ -15,6 +13,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -58,17 +57,8 @@ export const createSubCollectionAction = authActionClient
         message: `Created subcollection: ${newSubcollection.name}`,
       });
 
-      revalidatePath(
-        $path({
-          route: '/dashboard/collection',
-        }),
-      );
-      revalidatePath(
-        $path({
-          route: '/collections/[collectionId]',
-          routeParams: { collectionId: subcollectionData.collectionId },
-        }),
-      );
+      CacheRevalidationService.revalidateCollectionFeaturedContent(subcollectionData.collectionId);
+      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: newSubcollection,

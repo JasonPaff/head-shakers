@@ -1,98 +1,27 @@
 'use client';
 
-import { EditIcon, EyeIcon, EyeOffIcon, MoreHorizontalIcon, Trash2Icon, TrendingUpIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { Fragment, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import type { AdminFeaturedContent } from '@/lib/facades/admin/admin.facade';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
 
-import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { FeaturedContentListItem } from '@/app/(app)/admin/featured-content/components/featured-content-list-item';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useServerAction } from '@/hooks/use-server-action';
-import { useToggle } from '@/hooks/use-toggle';
-import {
-  deleteFeaturedContentAction,
-  toggleFeaturedContentActiveAction,
-} from '@/lib/actions/admin/featured-content.actions';
 
 interface FeaturedContentListProps {
-  initialData: Array<AdminFeaturedContent>;
+  initialData: Array<FeaturedContentRecord>;
   onEdit: (contentId: string) => void;
 }
-
-const formatDate = (date: Date | null) => {
-  if (!date) return null;
-  return new Date(date).toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
-};
-
-const getFeatureTypeLabel = (type: string) => {
-  switch (type) {
-    case 'collection_of_week':
-      return 'Collection of Week';
-    case 'editor_pick':
-      return 'Editor Pick';
-    case 'homepage_banner':
-      return 'Homepage Banner';
-    case 'trending':
-      return 'Trending';
-    default:
-      return type;
-  }
-};
-
-const getContentTypeColor = (type: string) => {
-  switch (type) {
-    case 'bobblehead':
-      return 'bg-green-100 text-green-800';
-    case 'collection':
-      return 'bg-blue-100 text-blue-800';
-    case 'user':
-      return 'bg-purple-100 text-purple-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
-  }
-};
 
 type SortBy = 'date' | 'priority' | 'views';
 
 export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentListProps) => {
-  const [filterStatus, setFilterStatus] = useState<string>('active');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterType, setFilterType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<SortBy>('date');
-
-  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
-
-  const router = useRouter();
-
-  const { executeAsync: deleteAsync, isPending: isDeleting } = useServerAction(deleteFeaturedContentAction, {
-    onBeforeSuccess: () => {
-      router.refresh();
-    },
-  });
-
-  const { execute: toggleSync, isPending: isToggling } = useServerAction(toggleFeaturedContentActiveAction, {
-    onBeforeSuccess: () => {
-      router.refresh();
-    },
-  });
+  const [sortBy, setSortBy] = useState<SortBy>('priority');
 
   const filteredContent = useMemo(() => {
     const filtered = initialData.filter((content) => {
@@ -110,20 +39,19 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
     // sort the filtered results
     filtered.sort((a, b) => {
       switch (sortBy) {
+        case 'date':
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
         case 'priority':
           return a.priority - b.priority;
         case 'views':
           return b.viewCount - a.viewCount;
-        case 'date':
         default:
-          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+          return 0;
       }
     });
 
     return filtered;
   }, [initialData, searchTerm, filterType, filterStatus, sortBy]);
-
-  const _isPending = isDeleting || isToggling;
 
   return (
     <div className={'space-y-4'}>
@@ -135,6 +63,7 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
         <CardContent>
           <div className={'flex gap-4'}>
             <div className={'flex-1'}>
+              {/* Search Input */}
               <Input
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -143,6 +72,8 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
                 value={searchTerm}
               />
             </div>
+
+            {/* Content Type Filter */}
             <Select onValueChange={setFilterType} value={filterType}>
               <SelectTrigger className={'w-[180px]'}>
                 <SelectValue placeholder={'Content Type'} />
@@ -185,103 +116,8 @@ export const FeaturedContentList = ({ initialData, onEdit }: FeaturedContentList
 
       {/* Featured Content List */}
       <div className={'space-y-4'}>
-        {filteredContent.map((content) => (
-          <Card key={content.id}>
-            <CardContent className={'p-6'}>
-              <div className={'flex items-center justify-between'}>
-                <div className={'flex-1'}>
-                  <div className={'mb-2 flex items-center gap-2'}>
-                    <h3 className={'text-lg font-semibold'}>
-                      {content.title || content.contentTitle || 'Untitled'}
-                    </h3>
-                    <Badge className={getContentTypeColor(content.contentType)}>{content.contentType}</Badge>
-                    <Badge variant={content.isActive ? 'default' : 'secondary'}>
-                      {content.isActive ? 'Active' : 'Inactive'}
-                    </Badge>
-                  </div>
-                  <div className={'flex items-center gap-4 text-sm text-muted-foreground'}>
-                    <span>Feature: {getFeatureTypeLabel(content.featureType)}</span>
-                    <span className={'flex items-center gap-1'}>
-                      <TrendingUpIcon aria-hidden className={'size-4'} />
-                      {content.viewCount.toLocaleString()} views
-                    </span>
-                    <span>Priority: {content.priority}</span>
-                    <span>Curator: {content.curatorName || 'System'}</span>
-                  </div>
-                  <div className={'mt-1 flex items-center gap-4 text-xs text-muted-foreground'}>
-                    <span>Start: {formatDate(content.startDate) || 'Not set'}</span>
-                    {content.endDate && <span>End: {formatDate(content.endDate)}</span>}
-                    <span>Updated: {formatDate(content.updatedAt)}</span>
-                  </div>
-                </div>
-                <div className={'flex items-center gap-2'}>
-                  <Button
-                    className={'gap-1'}
-                    disabled={_isPending}
-                    onClick={() => {
-                      toggleSync({
-                        id: content.id,
-                        isActive: !content.isActive,
-                      });
-                    }}
-                    size={'sm'}
-                    variant={content.isActive ? 'outline' : 'default'}
-                  >
-                    <Conditional isCondition={content.isActive}>
-                      <Fragment>
-                        <EyeOffIcon aria-hidden className={'size-4'} />
-                        Deactivate
-                      </Fragment>
-                    </Conditional>
-                    <Conditional isCondition={!content.isActive}>
-                      <Fragment>
-                        <EyeIcon aria-hidden className={'size-4'} />
-                        Activate
-                      </Fragment>
-                    </Conditional>
-                  </Button>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className={'size-8 p-0'} variant={'ghost'}>
-                        <span className={'sr-only'}>Open menu</span>
-                        <MoreHorizontalIcon aria-hidden className={'size-4'} />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align={'end'}>
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => {
-                          onEdit(content.id);
-                        }}
-                      >
-                        <EditIcon aria-hidden className={'mr-2 size-4'} />
-                        Edit
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className={'text-destructive'}
-                        onClick={setIsConfirmDeleteDialogOpen.on}
-                      >
-                        <Trash2Icon aria-hidden className={'mr-2 size-4'} />
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-
-              {/* Confirm Delete Dialog */}
-              <ConfirmDeleteAlertDialog
-                isOpen={isConfirmDeleteDialogOpen}
-                onClose={setIsConfirmDeleteDialogOpen.off}
-                onDeleteAsync={async () => {
-                  await deleteAsync({ id: content.id });
-                }}
-              >
-                This will permanently delete this featured content entry.
-              </ConfirmDeleteAlertDialog>
-            </CardContent>
-          </Card>
+        {filteredContent.map((content, index) => (
+          <FeaturedContentListItem key={index} onEdit={onEdit} {...content} />
         ))}
       </div>
 

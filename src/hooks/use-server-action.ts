@@ -41,8 +41,8 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
 
       return toast.promise(
         originalExecuteAsync(input).then((result) => {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           if (result?.serverError) {
+            // eslint-disable-next-line @typescript-eslint/only-throw-error
             throw result;
           }
           return result;

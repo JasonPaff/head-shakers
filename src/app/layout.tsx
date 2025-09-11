@@ -39,7 +39,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
           <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
             {children}
-            <Toaster closeButton position={'top-right'} richColors />
+            <Toaster closeButton duration={2500} position={'top-right'} richColors />
           </ThemeProvider>
         </body>
       </html>

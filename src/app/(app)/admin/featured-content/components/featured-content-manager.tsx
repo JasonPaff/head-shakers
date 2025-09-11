@@ -2,21 +2,20 @@
 
 import { useMemo, useState } from 'react';
 
-import type { AdminFeaturedContent } from '@/lib/facades/admin/admin.facade';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
 
+import { ContentSuggestions } from '@/app/(app)/admin/featured-content/components/content-suggestions';
+import { FeaturedContentAnalytics } from '@/app/(app)/admin/featured-content/components/featured-content-analytics';
 import { FeaturedContentForm } from '@/app/(app)/admin/featured-content/components/featured-content-form';
+import { FeaturedContentList } from '@/app/(app)/admin/featured-content/components/featured-content-list';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToggle } from '@/hooks/use-toggle';
 
-import { ContentSuggestions } from './content-suggestions';
-import { FeaturedContentAnalytics } from './featured-content-analytics';
-import { FeaturedContentList } from './featured-content-list';
-
 interface FeaturedContentManagerProps {
-  initialData: Array<AdminFeaturedContent>;
+  initialData: Array<FeaturedContentRecord>;
 }
 
 export const FeaturedContentManager = ({ initialData = [] }: FeaturedContentManagerProps) => {

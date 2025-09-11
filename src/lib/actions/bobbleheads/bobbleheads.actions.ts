@@ -2,8 +2,6 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
-import { $path } from 'next-typesafe-url';
-import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
@@ -18,6 +16,7 @@ import {
 } from '@/lib/constants';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -157,14 +156,9 @@ export const createBobbleheadWithPhotosAction = authActionClient
         message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos`,
       });
 
-      revalidatePath(
-        $path({
-          route: '/collections/[collectionId]',
-          routeParams: {
-            collectionId: newBobblehead.collectionId,
-          },
-        }),
-      );
+      CacheRevalidationService.revalidateCollectionFeaturedContent(newBobblehead.collectionId);
+      CacheRevalidationService.revalidateBobbleheadFeaturedContent(newBobblehead.id);
+      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: {
@@ -219,32 +213,9 @@ export const deleteBobbleheadAction = authActionClient
         message: `Deleted bobblehead: ${deletedBobblehead.name} with Cloudinary photo cleanup`,
       });
 
-      revalidatePath(
-        $path({
-          route: '/dashboard/collection',
-        }),
-      );
-      revalidatePath(
-        $path({
-          route: '/collections/[collectionId]',
-          routeParams: { collectionId: deletedBobblehead.id },
-        }),
-      );
-
-      if (deletedBobblehead.subcollectionId) {
-        revalidatePath(
-          $path({
-            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-            routeParams: {
-              collectionId: deletedBobblehead.id,
-              subcollectionId: deletedBobblehead.subcollectionId,
-            },
-          }),
-        );
-      }
-
-      // TODO: if the bobblehead or its parent collection/subcollection is on
-      //  the featured page then the featured page cache should be revalidated too
+      CacheRevalidationService.revalidateBobbleheadFeaturedContent(deletedBobblehead.id);
+      CacheRevalidationService.revalidateCollectionFeaturedContent(deletedBobblehead.collectionId);
+      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: null,

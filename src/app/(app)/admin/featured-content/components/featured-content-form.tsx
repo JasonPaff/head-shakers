@@ -6,7 +6,7 @@ import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { AdminFeaturedContent } from '@/lib/facades/admin/admin.facade';
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
 
 import { ContentSearch } from '@/app/(app)/admin/featured-content/components/content-search';
 import { featuredContentFormOptions } from '@/app/(app)/admin/featured-content/components/featured-content-form-options';
@@ -20,7 +20,7 @@ import {
   createFeaturedContentAction,
   getFeaturedContentByIdAction,
   updateFeaturedContentAction,
-} from '@/lib/actions/admin/featured-content.actions';
+} from '@/lib/actions/featured-content/featured-content.actions';
 import { insertFeaturedContentSchema } from '@/lib/validations/system.validation';
 
 type FeaturedContentFormProps = {
@@ -30,7 +30,7 @@ type FeaturedContentFormProps = {
 };
 
 export const FeaturedContentForm = ({ contentId, onClose, onSuccess }: FeaturedContentFormProps) => {
-  const [existingData, setExistingData] = useState<AdminFeaturedContent | null>(null);
+  const [existingData, setExistingData] = useState<FeaturedContentRecord | null>(null);
   const [isLoading, setIsLoading] = useToggle(!!contentId);
 
   const { executeAsync: getFeaturedContent } = useAction(getFeaturedContentByIdAction);

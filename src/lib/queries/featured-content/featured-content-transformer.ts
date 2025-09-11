@@ -3,7 +3,7 @@
  * handles business logic and data transformation for featured content
  */
 
-export interface FeaturedContentRecord {
+export interface FeaturedContentData {
   comments?: number;
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
@@ -54,10 +54,10 @@ export class FeaturedContentTransformer {
    * filter featured content by type with business rules
    */
   static filterByType(
-    content: Array<FeaturedContentRecord>,
+    content: Array<FeaturedContentData>,
     type: 'collection_of_week' | 'editor_pick' | 'homepage_banner' | 'trending',
     limit?: number,
-  ): Array<FeaturedContentRecord> {
+  ): Array<FeaturedContentData> {
     let filtered = content.filter((item) => item.featureType === type);
 
     // apply type-specific sorting
@@ -92,7 +92,7 @@ export class FeaturedContentTransformer {
   /**
    * transform the raw, featured content data with business logic
    */
-  static transformFeaturedContent(rawData: Array<RawFeaturedContentData>): Array<FeaturedContentRecord> {
+  static transformFeaturedContent(rawData: Array<RawFeaturedContentData>): Array<FeaturedContentData> {
     return rawData.map((row) => ({
       comments: 0, // TODO: implement comments count
       contentId: row.contentId,

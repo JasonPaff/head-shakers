@@ -1,6 +1,5 @@
+import { FeaturedContentDisplay } from '@/app/(app)/browse/featured/components/featured-content-display';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
-
-import { FeaturedContentDisplay } from './featured-content-display';
 
 export interface FeaturedContentServerProps {
   isTrackViews?: boolean;

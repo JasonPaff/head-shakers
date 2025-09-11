@@ -15,6 +15,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -59,11 +60,8 @@ export const createCollectionAction = authActionClient
         message: `Created collection: ${newCollection.name}`,
       });
 
-      revalidatePath(
-        $path({
-          route: '/dashboard/collection',
-        }),
-      );
+      CacheRevalidationService.revalidateCollectionFeaturedContent(newCollection.id);
+      revalidatePath($path({ route: '/dashboard/collection' }));
 
       return {
         data: newCollection,
@@ -133,17 +131,8 @@ export const updateCollectionAction = authActionClient
         );
       }
 
-      revalidatePath(
-        $path({
-          route: '/dashboard/collection',
-        }),
-      );
-      revalidatePath(
-        $path({
-          route: '/collections/[collectionId]',
-          routeParams: { collectionId: updatedCollection.id },
-        }),
-      );
+      CacheRevalidationService.revalidateCollectionFeaturedContent(updatedCollection.id);
+      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: updatedCollection,
@@ -196,17 +185,8 @@ export const deleteCollectionAction = authActionClient
         message: `Deleted collection: ${deletedCollection.name}`,
       });
 
-      revalidatePath(
-        $path({
-          route: '/dashboard/collection',
-        }),
-      );
-      revalidatePath(
-        $path({
-          route: '/collections/[collectionId]',
-          routeParams: { collectionId: deletedCollection.id },
-        }),
-      );
+      CacheRevalidationService.revalidateCollectionFeaturedContent(deletedCollection.id);
+      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: null,
