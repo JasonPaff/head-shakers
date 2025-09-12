@@ -40,6 +40,17 @@ export const OPERATIONS = {
     COLLECTIONS: 'search_collections',
     USERS: 'search_users',
   },
+  SOCIAL: {
+    CREATE_LIKE: 'create_like',
+    DELETE_LIKE: 'delete_like',
+    GET_LIKE_COUNT: 'get_like_count',
+    GET_LIKE_COUNTS: 'get_like_counts',
+    GET_RECENT_LIKES: 'get_recent_likes',
+    GET_TRENDING_CONTENT: 'get_trending_content',
+    GET_USER_LIKE_STATUS: 'get_user_like_status',
+    GET_USER_LIKE_STATUSES: 'get_user_like_statuses',
+    TOGGLE_LIKE: 'toggle_like',
+  },
   SUBCOLLECTIONS: {
     CREATE: 'create_subcollection',
     CREATE_ALT: 'create_sub_collection',

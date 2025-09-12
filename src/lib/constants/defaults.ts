@@ -22,6 +22,7 @@ export const DEFAULTS = {
   },
   COLLECTION: {
     IS_PUBLIC: true,
+    LIKE_COUNT: 0,
     TOTAL_ITEMS: 0,
     TOTAL_VALUE: '0.00',
   },
@@ -76,6 +77,7 @@ export const DEFAULTS = {
   SUB_COLLECTION: {
     IS_PUBLIC: true,
     ITEM_COUNT: 0,
+    LIKE_COUNT: 0,
     SORT_ORDER: 0,
   },
   SYSTEM: {

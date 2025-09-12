@@ -23,6 +23,7 @@ export const collections = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     isPublic: boolean('is_public').default(DEFAULTS.COLLECTION.IS_PUBLIC).notNull(),
     lastItemAddedAt: timestamp('last_item_added_at'),
+    likeCount: integer('like_count').default(DEFAULTS.COLLECTION.LIKE_COUNT).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.COLLECTION.NAME.MAX }).notNull(),
     totalItems: integer('total_items').default(DEFAULTS.COLLECTION.TOTAL_ITEMS).notNull(),
     totalValue: decimal('total_value', {
@@ -56,6 +57,7 @@ export const collections = pgTable(
     check('collections_name_not_empty', sql`length(${table.name}) >= ${SCHEMA_LIMITS.COLLECTION.NAME.MIN}`),
     check('collections_total_items_non_negative', sql`${table.totalItems} >= 0`),
     check('collections_total_value_non_negative', sql`${table.totalValue} >= 0`),
+    check('collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
   ],
 );
 
@@ -71,6 +73,7 @@ export const subCollections = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     isPublic: boolean('is_public').default(DEFAULTS.SUB_COLLECTION.IS_PUBLIC).notNull(),
     itemCount: integer('item_count').default(DEFAULTS.SUB_COLLECTION.ITEM_COUNT).notNull(),
+    likeCount: integer('like_count').default(DEFAULTS.SUB_COLLECTION.LIKE_COUNT).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX }).notNull(),
     sortOrder: integer('sort_order').default(DEFAULTS.SUB_COLLECTION.SORT_ORDER).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -86,6 +89,7 @@ export const subCollections = pgTable(
 
     // constraints
     check('sub_collections_item_count_non_negative', sql`${table.itemCount} >= 0`),
+    check('sub_collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
     check(
       'sub_collections_name_length',
       sql`length(${table.name}) <= ${SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX}`,

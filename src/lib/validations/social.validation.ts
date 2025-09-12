@@ -21,6 +21,7 @@ export const insertLikeSchema = createInsertSchema(likes, {
   createdAt: true,
   id: true,
   updatedAt: true,
+  userId: true,
 });
 export const updateLikeSchema = insertLikeSchema.partial();
 
