@@ -147,26 +147,26 @@ export const createBobbleheadWithPhotosAction = authActionClient
         }
       }
 
-      // Process tags if provided
+      // process tags if provided
       let createdTags: Array<unknown> = [];
       if (tags && tags.length > 0) {
         try {
-          // Create or get existing tags for the user
+          // create or get existing tags for the user
           const tagPromises = tags.map(async (tagName) => {
             const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.tx);
             return existingTag;
           });
-          
+
           const tagRecords = await Promise.all(tagPromises);
           const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
-          
-          // Attach tags to the bobblehead
+
+          // attach tags to the bobblehead
           if (tagIds.length > 0) {
             await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.tx);
             createdTags = tagRecords.filter(Boolean);
           }
         } catch (tagError) {
-          // If tag processing fails, we still want to keep the bobblehead
+          // iff tag processing fails, we still want to keep the bobblehead
           console.error('Tag processing failed:', tagError);
           Sentry.captureException(tagError);
         }

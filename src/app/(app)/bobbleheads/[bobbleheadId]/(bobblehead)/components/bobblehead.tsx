@@ -13,6 +13,7 @@ import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobblehead
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadProps {
@@ -34,12 +35,24 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
   const isOwner = !!(currentUserId && currentUserId === bobblehead.userId);
   const hasMultiplePhotos = bobblehead.photos.length > 1;
 
+  // Fetch like data for the bobblehead
+  let likeData: { isLiked: boolean; likeCount: number; likeId: string | null } = { isLiked: false, likeCount: bobblehead.likeCount, likeId: null };
+  if (currentUserId) {
+    try {
+      const likeResult = await SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId);
+      likeData = likeResult;
+    } catch (error) {
+      console.error('Failed to fetch like data for bobblehead:', error);
+      // Continue with default like data (using the existing likeCount from bobblehead)
+    }
+  }
+
   return (
     <div>
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} />
+          <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} likeData={likeData} />
         </div>
       </div>
 

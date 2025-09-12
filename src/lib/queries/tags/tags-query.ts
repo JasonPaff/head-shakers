@@ -6,29 +6,9 @@ import type { InsertTag, UpdateTag } from '@/lib/validations/tags.validation';
 import { bobbleheadTags, tags } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
-/**
- * tag record with usage statistics
- */
 export type TagRecord = typeof tags.$inferSelect;
 
-export type TagStats = {
-  bobbleheadCount: number;
-  isSystem: boolean;
-  lastUsed: Date | null;
-};
-
-export type TagWithUsage = TagRecord & {
-  usageCount: number;
-};
-
-/**
- * tag domain query service
- * handles all database operations for tags with consistent patterns
- */
 export class TagsQuery extends BaseQuery {
-  /**
-   * attach tags to a bobblehead
-   */
   static async attachToBobblehead(
     bobbleheadId: string,
     tagIds: Array<string>,
@@ -37,7 +17,7 @@ export class TagsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     try {
-      // insert new associations (ignore duplicates with ON CONFLICT)
+      // insert new bobblehead tags
       const insertData = tagIds.map((tagId) => ({
         bobbleheadId,
         tagId,
@@ -62,23 +42,14 @@ export class TagsQuery extends BaseQuery {
     }
   }
 
-  /**
-   * count total custom tags for a user
-   */
   static async countUserTags(userId: string, context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
-      .select({ count: count() })
-      .from(tags)
-      .where(eq(tags.userId, userId));
+    const result = await dbInstance.select({ count: count() }).from(tags).where(eq(tags.userId, userId));
 
     return result[0]?.count || 0;
   }
 
-  /**
-   * create a new tag
-   */
   static async create(data: InsertTag, userId: string, context: QueryContext): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
@@ -90,9 +61,6 @@ export class TagsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  /**
-   * delete a tag (only if not in use and user owns it)
-   */
   static async delete(tagId: string, userId: string, context: QueryContext): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
@@ -102,11 +70,9 @@ export class TagsQuery extends BaseQuery {
       return null;
     }
 
-    // check if tag is in use
+    // check if the tag is in use
     const isInUse = await this.isTagInUse(tagId, context);
-    if (isInUse) {
-      return null;
-    }
+    if (isInUse) return null;
 
     const result = await dbInstance
       .delete(tags)
@@ -116,9 +82,6 @@ export class TagsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  /**
-   * detach tags from a bobblehead
-   */
   static async detachFromBobblehead(
     bobbleheadId: string,
     tagIds: Array<string>,
@@ -149,9 +112,6 @@ export class TagsQuery extends BaseQuery {
     }
   }
 
-  /**
-   * find all tags accessible to a user (system tags + user's custom tags)
-   */
   static async findAll(userId: null | string, context: QueryContext): Promise<Array<TagRecord>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -179,10 +139,11 @@ export class TagsQuery extends BaseQuery {
       );
   }
 
-  /**
-   * find tag by ID with permission checking
-   */
-  static async findById(tagId: string, userId: null | string, context: QueryContext): Promise<null | TagRecord> {
+  static async findById(
+    tagId: string,
+    userId: null | string,
+    context: QueryContext,
+  ): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const conditions = [eq(tags.id, tagId)];
@@ -190,9 +151,7 @@ export class TagsQuery extends BaseQuery {
     if (userId !== null) {
       // user can access system tags or their own tags
       const userCondition = or(isNull(tags.userId), eq(tags.userId, userId));
-      if (userCondition) {
-        conditions.push(userCondition);
-      }
+      if (userCondition) conditions.push(userCondition);
     } else {
       // anonymous users can only access system tags
       conditions.push(isNull(tags.userId));
@@ -200,19 +159,16 @@ export class TagsQuery extends BaseQuery {
 
     const whereCondition = this.combineFilters(...conditions);
 
-    const result = await dbInstance
-      .select()
-      .from(tags)
-      .where(whereCondition)
-      .limit(1);
+    const result = await dbInstance.select().from(tags).where(whereCondition).limit(1);
 
     return result[0] || null;
   }
 
-  /**
-   * find tag by name within user's namespace
-   */
-  static async findByName(name: string, userId: null | string, context: QueryContext): Promise<null | TagRecord> {
+  static async findByName(
+    name: string,
+    userId: null | string,
+    context: QueryContext,
+  ): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const conditions = [eq(sql`lower(${tags.name})`, name.toLowerCase())];
@@ -230,18 +186,11 @@ export class TagsQuery extends BaseQuery {
 
     const whereCondition = this.combineFilters(...conditions);
 
-    const result = await dbInstance
-      .select()
-      .from(tags)
-      .where(whereCondition)
-      .limit(1);
+    const result = await dbInstance.select().from(tags).where(whereCondition).limit(1);
 
     return result[0] || null;
   }
 
-  /**
-   * get tags associated with a bobblehead
-   */
   static async getByBobbleheadId(bobbleheadId: string, context: QueryContext): Promise<Array<TagRecord>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -261,67 +210,6 @@ export class TagsQuery extends BaseQuery {
       .orderBy(tags.name);
   }
 
-  /**
-   * get popular tags by usage count
-   */
-  static async getPopular(limit: number, userId: null | string, context: QueryContext): Promise<Array<TagRecord>> {
-    const dbInstance = this.getDbInstance(context);
-
-    const conditions = [];
-
-    if (userId) {
-      // mix system and user tags based on usage
-      conditions.push(or(isNull(tags.userId), eq(tags.userId, userId)));
-    } else {
-      // only system tags for anonymous users
-      conditions.push(isNull(tags.userId));
-    }
-
-    return dbInstance
-      .select()
-      .from(tags)
-      .where(this.combineFilters(...conditions))
-      .orderBy(desc(tags.usageCount), tags.name)
-      .limit(Math.min(limit, 50)); // cap at 50 for performance
-  }
-
-  /**
-   * get tag statistics
-   */
-  static async getTagStats(tagId: string, context: QueryContext): Promise<null | TagStats> {
-    const dbInstance = this.getDbInstance(context);
-
-    // get the tag first
-    const tag = await dbInstance.select().from(tags).where(eq(tags.id, tagId)).limit(1);
-
-    if (!tag[0]) {
-      return null;
-    }
-
-    // count bobbleheads using this tag
-    const countResult = await dbInstance
-      .select({ count: count() })
-      .from(bobbleheadTags)
-      .where(eq(bobbleheadTags.tagId, tagId));
-
-    // get the most recent usage
-    const lastUsedResult = await dbInstance
-      .select({ lastUsed: bobbleheadTags.createdAt })
-      .from(bobbleheadTags)
-      .where(eq(bobbleheadTags.tagId, tagId))
-      .orderBy(desc(bobbleheadTags.createdAt))
-      .limit(1);
-
-    return {
-      bobbleheadCount: countResult[0]?.count || 0,
-      isSystem: tag[0].userId === null,
-      lastUsed: lastUsedResult[0]?.lastUsed || null,
-    };
-  }
-
-  /**
-   * check if a tag is currently in use
-   */
   static async isTagInUse(tagId: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
@@ -333,9 +221,38 @@ export class TagsQuery extends BaseQuery {
     return (result[0]?.count || 0) > 0;
   }
 
-  /**
-   * search tags with fuzzy matching
-   */
+  static async removeAllFromBobblehead(bobbleheadId: string, context: QueryContext): Promise<boolean> {
+    const dbInstance = this.getDbInstance(context);
+
+    try {
+      // fetch associated tag IDs
+      const associatedTags = await dbInstance
+        .select({ tagId: bobbleheadTags.tagId })
+        .from(bobbleheadTags)
+        .where(eq(bobbleheadTags.bobbleheadId, bobbleheadId));
+
+      const tagIds = associatedTags.map((tag) => tag.tagId);
+
+      // remove associations
+      await dbInstance.delete(bobbleheadTags).where(eq(bobbleheadTags.bobbleheadId, bobbleheadId));
+
+      // decrement usage count for each tag
+      if (tagIds.length > 0) {
+        await dbInstance
+          .update(tags)
+          .set({
+            updatedAt: sql`now()`,
+            usageCount: sql`GREATEST(${tags.usageCount} - 1, 0)`,
+          })
+          .where(inArray(tags.id, tagIds));
+      }
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   static async search(
     query: string,
     userId: null | string,
@@ -373,9 +290,6 @@ export class TagsQuery extends BaseQuery {
       .limit(Math.min(limit, 15)); // limit for autocomplete performance
   }
 
-  /**
-   * update a tag (only if user owns it and it's not a system tag)
-   */
   static async update(
     tagId: string,
     data: UpdateTag,

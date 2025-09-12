@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
+import { BobbleheadLikeButton } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-like-button';
 import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -13,9 +14,14 @@ import { Conditional } from '@/components/ui/conditional';
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
   isOwner?: boolean;
+  likeData?: {
+    isLiked: boolean;
+    likeCount: number;
+    likeId: null | string;
+  };
 }
 
-export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHeaderProps) => {
+export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
   const _backButtonLabel =
     (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';
@@ -88,10 +94,21 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false }: BobbleheadHead
             <EyeIcon aria-hidden className={'size-4'} />
             {bobblehead.viewCount} views
           </div>
-          <div className={'flex items-center gap-2'}>
-            <HeartIcon aria-hidden className={'size-4'} />
-            {bobblehead.likeCount} likes
-          </div>
+          {/* Interactive Like Button */}
+          <Conditional isCondition={!!likeData}>
+            <BobbleheadLikeButton
+              bobbleheadId={bobblehead.id}
+              initialLikeCount={likeData?.likeCount ?? bobblehead.likeCount}
+              isInitiallyLiked={likeData?.isLiked ?? false}
+            />
+          </Conditional>
+          {/* Fallback static display if no like data */}
+          <Conditional isCondition={!likeData}>
+            <div className={'flex items-center gap-2'}>
+              <HeartIcon aria-hidden className={'size-4'} />
+              {bobblehead.likeCount} likes
+            </div>
+          </Conditional>
         </div>
       </div>
     </Fragment>

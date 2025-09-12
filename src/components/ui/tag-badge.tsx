@@ -43,7 +43,9 @@ export const TagBadge = ({
       {...props}
     >
       {tag.name}
-      {_shouldShowUsageCount && <span className={'ml-1 text-xs opacity-75'}>{tag.usageCount}</span>}
+      <Conditional isCondition={_shouldShowUsageCount}>
+        <span className={'ml-1 text-xs opacity-75'}>{tag.usageCount}</span>{' '}
+      </Conditional>
     </Badge>
   );
 };

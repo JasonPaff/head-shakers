@@ -8,6 +8,7 @@ import type { PageProps } from '@/app/(app)/collections/[collectionId]/(collecti
 import { Collection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type CollectionPageProps = PageProps;
@@ -33,5 +34,26 @@ async function CollectionPage({ routeParams }: CollectionPageProps) {
 
   const isOwner = !!(currentUserId && currentUserId === collection.userId);
 
-  return <Collection collection={collection} isOwner={isOwner} />;
+  // Fetch like data for the collection
+  let likeData: { isLiked: boolean; likeCount: number; likeId: string | null } = { isLiked: false, likeCount: 0, likeId: null };
+  if (currentUserId) {
+    try {
+      const likeResult = await SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId);
+      likeData = likeResult;
+    } catch (error) {
+      console.error('Failed to fetch like data for collection:', error);
+      // Continue with default like data
+    }
+  } else {
+    // For non-authenticated users, get just the like count
+    try {
+      const likeResult = await SocialFacade.getContentLikeData(collectionId, 'collection');
+      likeData = { isLiked: false, likeCount: likeResult.likeCount, likeId: null };
+    } catch (error) {
+      console.error('Failed to fetch like count for collection:', error);
+      // Continue with default like data
+    }
+  }
+
+  return <Collection collection={collection} isOwner={isOwner} likeData={likeData} />;
 }

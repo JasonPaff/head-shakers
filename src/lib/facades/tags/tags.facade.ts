@@ -1,12 +1,13 @@
 import { unstable_cache } from 'next/cache';
 import { cache } from 'react';
 
-import type { TagRecord, TagStats } from '@/lib/queries/tags/tags-query';
+import type { TagRecord } from '@/lib/queries/tags/tags-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertTag, UpdateTag } from '@/lib/validations/tags.validation';
 
-import { CONFIG } from '@/lib/constants';
+import { CONFIG, OPERATIONS } from '@/lib/constants';
+import { CACHE_TAGS, CACHE_TTL } from '@/lib/constants/cache';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -54,9 +55,6 @@ export interface UserTagStats {
  * handles all business logic and orchestration for tags
  */
 export class TagsFacade {
-  /**
-   * get tag suggestions for user with caching
-   */
   static getSuggestionsForUser = unstable_cache(
     async (query: string, userId: null | string): Promise<Array<TagSuggestion>> => {
       try {
@@ -75,21 +73,18 @@ export class TagsFacade {
           data: { query, userId },
           facade: 'TagsFacade',
           method: 'getSuggestionsForUser',
-          operation: 'search',
+          operation: OPERATIONS.TAGS.SEARCH,
         };
         throw createFacadeError(context, error);
       }
     },
-    ['tag-suggestions'],
+    [CACHE_TAGS.TAGS.SUGGESTIONS],
     {
-      revalidate: 300, // 5 minutes
-      tags: ['tags', 'tag-suggestions'],
+      revalidate: CACHE_TTL.SHORT,
+      tags: [CACHE_TAGS.TAGS.TAGS, CACHE_TAGS.TAGS.SUGGESTIONS],
     },
   );
 
-  /**
-   * get user's tag statistics
-   */
   static getUserTagStats = cache(
     async (userId: string, dbInstance?: DatabaseExecutor): Promise<UserTagStats> => {
       try {
@@ -127,7 +122,7 @@ export class TagsFacade {
           data: { userId },
           facade: 'TagsFacade',
           method: 'getUserTagStats',
-          operation: 'getStats',
+          operation: OPERATIONS.TAGS.GET_STATS,
           userId,
         };
         throw createFacadeError(context, error);
@@ -135,9 +130,6 @@ export class TagsFacade {
     },
   );
 
-  /**
-   * attach tags to a bobblehead
-   */
   static async attachToBobblehead(
     bobbleheadId: string,
     tagIds: Array<string>,
@@ -146,32 +138,33 @@ export class TagsFacade {
   ): Promise<boolean> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
-      
-      // Validate tags first
+
+      // validate tags first
       const validation = await TagsFacade.validateTagsForBobblehead(bobbleheadId, tagIds, userId, dbInstance);
       if (!validation.canCreate) {
         console.warn('Tag validation failed:', validation.errors);
         return false;
       }
-      
-      // Attach tags using the query
+
+      // attach tags using the query
       return TagsQuery.attachToBobblehead(bobbleheadId, tagIds, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId, tagIds, userId },
         facade: 'TagsFacade',
         method: 'attachToBobblehead',
-        operation: 'attach',
+        operation: OPERATIONS.TAGS.ATTACH_TO_BOBBLEHEAD,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * bulk delete tags for a user
-   */
-  static async bulkDelete(tagIds: Array<string>, userId: string, dbInstance?: DatabaseExecutor): Promise<{
+  static async bulkDelete(
+    tagIds: Array<string>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{
     deletedCount: number;
     errors: Array<string>;
     skippedCount: number;
@@ -198,7 +191,7 @@ export class TagsFacade {
           continue;
         }
 
-        // check if tag is in use
+        // check if the tag is in use
         const isInUse = await TagsQuery.isTagInUse(tagId, context);
         if (isInUse) {
           errors.push(`Cannot delete tag "${tag.name}" - it is currently in use.`);
@@ -226,16 +219,13 @@ export class TagsFacade {
         data: { tagIds, userId },
         facade: 'TagsFacade',
         method: 'bulkDelete',
-        operation: 'bulkDelete',
+        operation: OPERATIONS.TAGS.BULK_DELETE,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * create a new tag
-   */
   static async createTag(
     data: InsertTag,
     userId: string,
@@ -244,13 +234,13 @@ export class TagsFacade {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
-      // check if user has reached the limit
+      // check if the user has reached the limit
       const userTagCount = await TagsQuery.countUserTags(userId, context);
       if (userTagCount >= CONFIG.CONTENT.MAX_CUSTOM_TAGS_PER_USER) {
         return null;
       }
 
-      // check if tag name already exists
+      // check if the tag name already exists
       const existing = await TagsQuery.findByName(data.name, userId, context);
       if (existing) {
         return null;
@@ -262,16 +252,13 @@ export class TagsFacade {
         data,
         facade: 'TagsFacade',
         method: 'createTag',
-        operation: 'create',
+        operation: OPERATIONS.TAGS.CREATE,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * delete a tag
-   */
   static async deleteTag(tagId: string, userId: string, dbInstance?: DatabaseExecutor): Promise<boolean> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
@@ -282,28 +269,21 @@ export class TagsFacade {
         data: { tagId },
         facade: 'TagsFacade',
         method: 'deleteTag',
-        operation: 'delete',
+        operation: OPERATIONS.TAGS.DELETE,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * get or create a tag by name (simplified version for bobblehead creation)
-   */
   static async getOrCreateByName(
     name: string,
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | TagRecord> {
-    // Use default blue color for auto-created tags
     return TagsFacade.getOrCreateTag(name, '#3B82F6', userId, dbInstance);
   }
 
-  /**
-   * get or create a tag by name for a user
-   */
   static async getOrCreateTag(
     name: string,
     color: string,
@@ -319,13 +299,13 @@ export class TagsFacade {
         return null;
       }
 
-      // check if tag already exists in user's namespace or as system tag
+      // check if the tag already exists in the user's namespace or as a system tag
       const existingTag = await TagsQuery.findByName(normalizedName, userId, context);
       if (existingTag) {
         return existingTag;
       }
 
-      // verify user hasn't exceeded custom tag limit
+      // verify the user hasn't exceeded the custom tag limit
       const userTagCount = await TagsQuery.countUserTags(userId, context);
       if (userTagCount >= CONFIG.CONTENT.MAX_CUSTOM_TAGS_PER_USER) {
         return null;
@@ -344,35 +324,13 @@ export class TagsFacade {
         data: { color, name, userId },
         facade: 'TagsFacade',
         method: 'getOrCreateTag',
-        operation: 'getOrCreate',
+        operation: OPERATIONS.TAGS.GET_OR_CREATE,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * get tag statistics
-   */
-  static async getTagStats(tagId: string, userId?: string, dbInstance?: DatabaseExecutor): Promise<null | TagStats> {
-    try {
-      const context = userId ? createUserQueryContext(userId, { dbInstance }) : createPublicQueryContext({ dbInstance });
-      return TagsQuery.getTagStats(tagId, context);
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { tagId, userId },
-        facade: 'TagsFacade',
-        method: 'getTagStats',
-        operation: 'getStats',
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  /**
-   * merge two tags (move all associations from source to target)
-   */
   static async mergeTags(
     sourceTagId: string,
     targetTagId: string,
@@ -397,23 +355,40 @@ export class TagsFacade {
       // TODO: Implement merge logic in a transaction
       // This would require updating all bobbleheadTags references
       // and combining usage counts, then deleting source tag
-      
+
       return false; // not implemented yet
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { sourceTagId, targetTagId, userId },
         facade: 'TagsFacade',
         method: 'mergeTags',
-        operation: 'merge',
+        operation: OPERATIONS.TAGS.MERGE,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * update a tag
-   */
+  static async removeAllFromBobblehead(
+    bobbleheadId: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<boolean> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+      return TagsQuery.removeAllFromBobblehead(bobbleheadId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId, userId },
+        facade: 'TagsFacade',
+        method: 'removeAllFromBobblehead',
+        operation: OPERATIONS.TAGS.REMOVE_ALL_FROM_BOBBLEHEAD,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async updateTag(
     tagId: string,
     data: UpdateTag,
@@ -428,16 +403,13 @@ export class TagsFacade {
         data: { ...data, tagId },
         facade: 'TagsFacade',
         method: 'updateTag',
-        operation: 'update',
+        operation: OPERATIONS.TAGS.UPDATE,
         userId,
       };
       throw createFacadeError(context, error);
     }
   }
 
-  /**
-   * validate tags for bobblehead attachment
-   */
   static async validateTagsForBobblehead(
     bobbleheadId: string,
     newTagIds: Array<string>,
@@ -488,7 +460,7 @@ export class TagsFacade {
         data: { bobbleheadId, newTagIds, userId },
         facade: 'TagsFacade',
         method: 'validateTagsForBobblehead',
-        operation: 'validate',
+        operation: OPERATIONS.TAGS.VALIDATE,
         userId,
       };
       throw createFacadeError(context, error);

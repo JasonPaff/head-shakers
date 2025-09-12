@@ -16,17 +16,10 @@ import { withDatabaseRetry } from '@/lib/utils/retry';
 
 /**
  * abstract base class for all query operations
- * provides consistent patterns for permissions, caching, and data access
  */
 export abstract class BaseQuery {
-  /**
-   * combine multiple filters with AND logic
-   */
   protected static combineFilters = combineFilters;
 
-  /**
-   * apply pagination to find options
-   */
   protected static applyPagination(options: FindOptions): { limit?: number; offset?: number } {
     const { limit, offset } = options;
 
@@ -36,9 +29,6 @@ export abstract class BaseQuery {
     };
   }
 
-  /**
-   * build base filters for queries with standard permission and soft delete logic
-   */
   protected static buildBaseFilters(
     isPublicColumn: AnyColumn | undefined,
     userIdColumn: AnyColumn,

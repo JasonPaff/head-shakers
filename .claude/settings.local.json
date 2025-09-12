@@ -6,7 +6,8 @@
       "Bash(npm run lint:*)",
       "Bash(npm run:*)",
       "Bash(npx drizzle-kit:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(timeout 30 npm run dev)"
     ],
     "deny": [],
     "ask": []

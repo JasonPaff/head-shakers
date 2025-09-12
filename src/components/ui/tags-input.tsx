@@ -7,25 +7,31 @@ import { cn } from '@/utils/tailwind-utils';
 
 type TagsInputProps = ComponentProps<typeof TagsInputPrimitive.Root>;
 
-export const TagsInput = ({ className, ...props }: TagsInputProps) => {
+export const TagsInput = ({ children, className, ...props }: TagsInputProps) => {
   return (
     <TagsInputPrimitive.Root
       className={cn('flex w-[380px] flex-col gap-2', className)}
       data-slot={'tags-input'}
       {...props}
-    />
+    >
+      {children}
+    </TagsInputPrimitive.Root>
   );
 };
 
 type TagsInputClearProps = ComponentProps<typeof TagsInputPrimitive.Clear>;
 
-export const TagsInputClear = ({ ...props }: TagsInputClearProps) => {
-  return <TagsInputPrimitive.Clear data-slot={'tags-input-clear'} {...props} />;
+export const TagsInputClear = ({ children, ...props }: TagsInputClearProps) => {
+  return (
+    <TagsInputPrimitive.Clear data-slot={'tags-input-clear'} {...props}>
+      {children}
+    </TagsInputPrimitive.Clear>
+  );
 };
 
 type TagsInputInputProps = ComponentProps<typeof TagsInputPrimitive.Input>;
 
-export const TagsInputInput = ({ className, ...props }: TagsInputInputProps) => {
+export const TagsInputInput = ({ children, className, ...props }: TagsInputInputProps) => {
   return (
     <TagsInputPrimitive.Input
       className={cn(
@@ -35,7 +41,9 @@ export const TagsInputInput = ({ className, ...props }: TagsInputInputProps) => 
       )}
       data-slot={'tags-input-input'}
       {...props}
-    />
+    >
+      {children}
+    </TagsInputPrimitive.Input>
   );
 };
 
@@ -70,7 +78,7 @@ export const TagsInputItem = ({ children, className, ...props }: TagsInputItemPr
 
 type TagsInputLabelProps = ComponentProps<typeof TagsInputPrimitive.Label>;
 
-export const TagsInputLabel = ({ className, ...props }: TagsInputLabelProps) => {
+export const TagsInputLabel = ({ children, className, ...props }: TagsInputLabelProps) => {
   return (
     <TagsInputPrimitive.Label
       className={cn(
@@ -79,13 +87,15 @@ export const TagsInputLabel = ({ className, ...props }: TagsInputLabelProps) => 
       )}
       data-slot={'tags-input-label'}
       {...props}
-    />
+    >
+      {children}
+    </TagsInputPrimitive.Label>
   );
 };
 
 type TagsInputListProps = ComponentProps<'div'>;
 
-export const TagsInputList = ({ className, ...props }: TagsInputListProps) => {
+export const TagsInputList = ({ children, className, ...props }: TagsInputListProps) => {
   return (
     <div
       className={cn(
@@ -96,6 +106,8 @@ export const TagsInputList = ({ className, ...props }: TagsInputListProps) => {
       )}
       data-slot={'tags-input-list'}
       {...props}
-    />
+    >
+      {children}
+    </div>
   );
 };

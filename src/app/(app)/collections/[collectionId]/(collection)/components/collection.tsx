@@ -10,11 +10,16 @@ import { CollectionSubcollections } from '@/app/(app)/collections/[collectionId]
 interface CollectionProps {
   collection: PublicCollection;
   isOwner?: boolean;
+  likeData?: {
+    isLiked: boolean;
+    likeCount: number;
+    likeId: null | string;
+  };
 }
 
 // TODO: add bobbleheads preview section
 
-export const Collection = ({ collection, isOwner = false }: CollectionProps) => {
+export const Collection = ({ collection, isOwner = false, likeData }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -22,7 +27,7 @@ export const Collection = ({ collection, isOwner = false }: CollectionProps) => 
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <CollectionHeader collection={collection} isOwner={isOwner} />
+          <CollectionHeader collection={collection} isOwner={isOwner} likeData={likeData} />
         </div>
       </div>
 

@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
+import { LikeButton } from '@/components/ui/like-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 export interface FeaturedContentDisplayProps {
@@ -39,6 +40,8 @@ export interface FeaturedContentItem {
   endDate?: null | string;
   id: string;
   imageUrl: null | string;
+  isLiked: boolean;
+  likeId: null | string;
   likes: number;
   owner: string;
   ownerDisplayName: string;
@@ -169,10 +172,22 @@ export const FeaturedContentDisplay = ({
                 <EyeIcon aria-hidden className={'size-4'} />
                 {content.viewCount.toLocaleString()}
               </span>
-              <span className={'flex items-center gap-1'}>
-                <HeartIcon aria-hidden className={'size-4'} />
-                {content.likes}
-              </span>
+              <Conditional isCondition={['bobblehead', 'collection', 'subcollection'].includes(content.contentType)}>
+                <LikeButton
+                  initialLikeCount={content.likes}
+                  isInitiallyLiked={content.isLiked}
+                  size={"sm"}
+                  targetId={content.contentId}
+                  targetType={content.contentType as 'bobblehead' | 'collection' | 'subcollection'}
+                  variant={"subtle"}
+                />
+              </Conditional>
+              <Conditional isCondition={!['bobblehead', 'collection', 'subcollection'].includes(content.contentType)}>
+                <span className={'flex items-center gap-1'}>
+                  <HeartIcon aria-hidden className={'size-4'} />
+                  {content.likes}
+                </span>
+              </Conditional>
               <span className={'flex items-center gap-1'}>
                 <MessageCircleIcon aria-hidden className={'size-4'} />
                 {content.comments}

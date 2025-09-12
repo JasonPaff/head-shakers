@@ -6,15 +6,21 @@ import { Fragment } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
+import { CollectionLikeButton } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-like-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 
 interface CollectionHeaderProps {
   collection: PublicCollection;
   isOwner?: boolean;
+  likeData?: {
+    isLiked: boolean;
+    likeCount: number;
+    likeId: null | string;
+  };
 }
 
-export const CollectionHeader = ({ collection, isOwner = false }: CollectionHeaderProps) => {
+export const CollectionHeader = ({ collection, isOwner = false, likeData }: CollectionHeaderProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -39,13 +45,21 @@ export const CollectionHeader = ({ collection, isOwner = false }: CollectionHead
         </div>
 
         <div className={'flex flex-col justify-between gap-4 sm:flex-row lg:justify-normal'}>
-          {/* Collection Metadata */}
+          {/* Collection Metadata & Like Button */}
           <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
             <div className={'flex items-center gap-2'}>
               <CalendarIcon aria-hidden className={'size-4'} />
               Created {collection.createdAt.toLocaleDateString()}
             </div>
             <div>{collection.totalBobbleheadCount} Bobbleheads</div>
+            {/* Like Button */}
+            <Conditional isCondition={!!likeData}>
+              <CollectionLikeButton
+                collectionId={collection.id}
+                initialLikeCount={likeData?.likeCount ?? 0}
+                isInitiallyLiked={likeData?.isLiked ?? false}
+              />
+            </Conditional>
           </div>
 
           {/* Add Bobblehead Button - Only show to owners */}

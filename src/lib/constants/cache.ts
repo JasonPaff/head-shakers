@@ -28,6 +28,10 @@ export const CACHE_TAGS = {
     HOMEPAGE_BANNER: 'featured_content:homepage_banner',
     TRENDING: 'featured_content:trending',
   },
+  TAGS: {
+    SUGGESTIONS: 'tags:suggestions',
+    TAGS: 'tags',
+  },
   USER_CONTENT: 'user_content',
 } as const;
 
@@ -59,6 +63,10 @@ export const CACHE_KEYS = {
     EDITOR_PICKS: 'featured_content:editor_picks',
     HOMEPAGE_BANNER: 'featured_content:homepage_banner',
     TRENDING: 'featured_content:trending',
+  },
+  TAGS: {
+    SUGGESTIONS: 'tags:suggestions',
+    TAGS: 'tags',
   },
   USER_CONTENT: {
     BOBBLEHEADS: (userId: string) => `user_content:${userId}:bobbleheads`,

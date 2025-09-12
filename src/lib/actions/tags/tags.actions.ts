@@ -378,8 +378,6 @@ export const getTagSuggestionsAction = authActionClient
         message: `Retrieved ${suggestions.length} tag suggestions`,
       });
 
-      // TODO: invalidate appropriate cache if necessary
-
       return {
         data: { suggestions },
         success: true,
