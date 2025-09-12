@@ -39,21 +39,21 @@ const likeButtonVariants = cva('transition-colors', {
 export interface LikeButtonProps
   extends Omit<ComponentProps<'button'>, 'children' | 'onClick'>,
     VariantProps<typeof likeButtonVariants> {
-  /** Custom aria label for accessibility */
+  /** custom aria label for accessibility */
   ariaLabel?: string;
-  /** Initial like count */
+  /** initial like count */
   initialLikeCount: number;
-  /** Whether to show only the icon (no count) */
+  /** whether to show only the icon (no count) */
   isIconOnly?: boolean;
-  /** Whether the user has initially liked this content */
+  /** whether the user has initially liked this content */
   isInitiallyLiked: boolean;
-  /** Callback fired when like status changes */
+  /** callback fired when like status changes */
   onLikeChange?: (isLiked: boolean, likeCount: number) => void;
-  /** Whether to show the like count */
+  /** whether to show the like count */
   shouldShowCount?: boolean;
-  /** The ID of the target content to like/unlike */
+  /** the ID of the target content to like/unlike */
   targetId: string;
-  /** The type of content being liked */
+  /** the type of content being liked */
   targetType: 'bobblehead' | 'collection' | 'subcollection';
 }
 
@@ -72,7 +72,7 @@ export const LikeButton = ({
   variant = 'default',
   ...props
 }: LikeButtonProps) => {
-  // Base state represents the actual server state
+  // base state represents the actual server state
   const [baseState, setBaseState] = useState({
     isLiked: isInitiallyLiked,
     likeCount: initialLikeCount,
@@ -84,7 +84,7 @@ export const LikeButton = ({
     (_currentState, optimisticUpdate: { isLiked: boolean; likeCount: number }) => optimisticUpdate,
   );
 
-  // Server action hook
+  // server action hook
   const { executeAsync, isPending } = useServerAction(toggleLikeAction, {
     onError: () => {
       onLikeChange?.(baseState.isLiked, baseState.likeCount);
@@ -119,20 +119,16 @@ export const LikeButton = ({
   const handleLikeToggle = useCallback(async () => {
     if (isPending) return;
 
-    // Calculate optimistic values
     const isLiked = !optimisticState.isLiked;
     const likeCount = isLiked ? optimisticState.likeCount + 1 : Math.max(0, optimisticState.likeCount - 1);
 
-    // Apply optimistic update immediately
     addOptimistic({
       isLiked,
       likeCount,
     });
 
-    // Notify parent component with optimistic values
     onLikeChange?.(isLiked, likeCount);
 
-    // Execute server action - callbacks will handle the rest
     await executeAsync({
       targetId,
       targetType,
