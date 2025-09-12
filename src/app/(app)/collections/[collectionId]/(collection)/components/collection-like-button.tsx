@@ -17,10 +17,8 @@ export const CollectionLikeButton = ({
     <LikeButton
       initialLikeCount={initialLikeCount}
       isInitiallyLiked={isInitiallyLiked}
-      size={"default"}
       targetId={collectionId}
-      targetType={"collection"}
-      variant={"ghost"}
+      targetType={'collection'}
     />
   );
 };

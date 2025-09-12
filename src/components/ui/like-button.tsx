@@ -1,46 +1,20 @@
 'use client';
 
-import type { VariantProps } from 'class-variance-authority';
 import type { ComponentProps } from 'react';
 
 import { SignInButton } from '@clerk/nextjs';
-import { cva } from 'class-variance-authority';
-import { HeartIcon, Loader2Icon } from 'lucide-react';
-import { Fragment } from 'react';
-import { useCallback, useOptimistic, useState } from 'react';
+import { StarIcon } from 'lucide-react';
+import { useCallback, useOptimistic } from 'react';
 
 import type { LikeTargetType } from '@/lib/constants';
 
 import { AuthContent } from '@/components/ui/auth';
-import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useServerAction } from '@/hooks/use-server-action';
 import { toggleLikeAction } from '@/lib/actions/social/social.actions';
 import { cn } from '@/utils/tailwind-utils';
 
-const likeButtonVariants = cva('transition-colors', {
-  defaultVariants: {
-    size: 'default',
-    variant: 'ghost',
-  },
-  variants: {
-    size: {
-      default: 'h-9 gap-2',
-      icon: 'size-9',
-      lg: 'h-10 gap-2',
-      sm: 'h-8 gap-1.5 text-sm',
-    },
-    variant: {
-      default: 'hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20',
-      ghost: 'hover:bg-accent hover:text-accent-foreground',
-      subtle: 'text-muted-foreground hover:text-foreground',
-    },
-  },
-});
-
-interface LikeButtonProps
-  extends Omit<ComponentProps<'button'>, 'children' | 'onClick'>,
-    VariantProps<typeof likeButtonVariants> {
+interface LikeButtonProps extends Omit<ComponentProps<'button'>, 'children' | 'onClick'> {
   ariaLabel?: string;
   initialLikeCount: number;
   isIconOnly?: boolean;
@@ -60,51 +34,20 @@ export const LikeButton = ({
   isInitiallyLiked,
   onLikeChange,
   shouldShowCount = true,
-  size = 'default',
   targetId,
   targetType,
-  variant = 'default',
   ...props
 }: LikeButtonProps) => {
-  const [baseState, setBaseState] = useState({
-    isLiked: isInitiallyLiked,
-    likeCount: initialLikeCount,
-  });
-
   const [optimisticState, addOptimistic] = useOptimistic(
-    baseState,
+    {
+      isLiked: isInitiallyLiked,
+      likeCount: initialLikeCount,
+    },
     (_currentState, optimisticUpdate: { isLiked: boolean; likeCount: number }) => optimisticUpdate,
   );
 
   const { executeAsync, isPending } = useServerAction(toggleLikeAction, {
-    onError: () => {
-      onLikeChange?.(baseState.isLiked, baseState.likeCount);
-    },
-    onSuccess: (result) => {
-      if (
-        result?.data &&
-        typeof result.data === 'object' &&
-        'isLiked' in result.data &&
-        'likeCount' in result.data
-      ) {
-        const serverState = {
-          isLiked: Boolean(result.data.isLiked),
-          likeCount: Number(result.data.likeCount) || 0,
-        };
-        setBaseState(serverState);
-        onLikeChange?.(serverState.isLiked, serverState.likeCount);
-      }
-    },
-    toastMessages: {
-      error: 'Failed to update like status. Please try again.',
-      loading: 'Updating...',
-      success: (data: unknown) => {
-        if (data && typeof data === 'object' && 'message' in data && typeof data.message === 'string') {
-          return data.message;
-        }
-        return 'Like updated!';
-      },
-    },
+    isDisableToast: true,
   });
 
   const handleLikeToggle = useCallback(async () => {
@@ -129,80 +72,81 @@ export const LikeButton = ({
   const isLiked = optimisticState.isLiked;
   const shouldShowLikeCount = shouldShowCount && !isIconOnly;
   const displayedLikeCount = shouldShowLikeCount ? optimisticState.likeCount : null;
-  const fallbackAriaLabel = `${optimisticState.likeCount} likes. Sign in to like this ${targetType}`;
-  const authenticatedAriaLabel = `${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${optimisticState.likeCount} likes`;
+  const authenticatedAriaLabel =
+    ariaLabel || `${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${optimisticState.likeCount} likes`;
 
   return (
     <AuthContent
       fallback={
-        <SignInButton mode={'modal'}>
-          <Button
-            aria-label={ariaLabel || fallbackAriaLabel}
-            className={cn(likeButtonVariants({ size, variant }), className)}
-            disabled={true}
-            {...props}
-          >
-            <Fragment>
-              {/* Like Loading */}
-              <Conditional isCondition={isPending}>
-                <Loader2Icon aria-hidden className={'animate-spin'} />
-              </Conditional>
-              {/* Like Icon */}
-              <Conditional isCondition={!isPending}>
-                <HeartIcon
-                  aria-hidden
-                  className={cn(
-                    'transition-all duration-200',
-                    isLiked && 'fill-destructive text-destructive',
-                    !isLiked && 'text-current',
-                    isPending && 'scale-110',
-                  )}
-                />
-              </Conditional>
-
-              {/* Like Count */}
-              <Conditional isCondition={displayedLikeCount !== null}>
-                <span className={'tabular-nums'}>{displayedLikeCount?.toLocaleString()}</span>
-              </Conditional>
-            </Fragment>
-          </Button>
-        </SignInButton>
+        <div className={'flex items-center gap-3'}>
+          <SignInButton mode={'modal'}>
+            <button
+              aria-label={`${optimisticState.likeCount} likes. Sign in to like this ${targetType}`}
+              aria-pressed={isLiked}
+              className={cn(
+                'relative rounded-xl p-4 transition-all duration-500 ease-out',
+                'transform hover:-translate-y-1 hover:shadow-2xl',
+                isLiked ?
+                  'bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white'
+                : 'border border-gray-200 bg-white text-gray-400 hover:border-amber-300',
+                className,
+              )}
+              disabled={disabled || isPending}
+              onClick={handleLikeToggle}
+            >
+              <StarIcon
+                className={cn(
+                  'h-6 w-6 transition-all duration-500',
+                  isLiked ? 'scale-110 rotate-180 fill-current' : 'hover:rotate-12',
+                )}
+              />
+            </button>
+          </SignInButton>
+          <Conditional isCondition={displayedLikeCount !== null}>
+            <div className={'text-right'}>
+              <div className={'text-lg font-bold text-gray-800'}>{displayedLikeCount?.toLocaleString()}</div>
+              <div className={'text-xs text-gray-500'}>likes</div>
+            </div>
+          </Conditional>
+        </div>
       }
     >
-      <Button
-        aria-label={ariaLabel || authenticatedAriaLabel}
-        aria-pressed={isLiked}
-        className={cn(likeButtonVariants({ size, variant }), className)}
-        disabled={disabled || isPending}
-        onClick={handleLikeToggle}
-        {...props}
-      >
-        <Fragment>
-          <Conditional isCondition={isPending}>
-            <Loader2Icon aria-hidden className={'animate-spin'} />
-          </Conditional>
-          <Conditional isCondition={!isPending}>
-            <HeartIcon
-              aria-hidden
-              className={cn(
-                'transition-all duration-200',
-                isLiked && 'fill-destructive text-destructive',
-                !isLiked && 'text-current',
-                isPending && 'scale-110',
-              )}
-            />
-          </Conditional>
-          <Conditional isCondition={displayedLikeCount !== null}>
-            <span className={'tabular-nums'}>{displayedLikeCount?.toLocaleString()}</span>
-          </Conditional>
-        </Fragment>
-      </Button>
+      <div className={'flex items-center gap-3'}>
+        <button
+          aria-label={authenticatedAriaLabel}
+          aria-pressed={isLiked}
+          className={cn(
+            'relative rounded-xl p-4 transition-all duration-500 ease-out',
+            'transform hover:-translate-y-1 hover:shadow-2xl',
+            isLiked ?
+              'bg-gradient-to-br from-amber-400 via-orange-500 to-red-500 text-white'
+            : 'border border-gray-200 bg-white text-gray-400 hover:border-amber-300',
+            className,
+          )}
+          disabled={disabled || isPending}
+          onClick={handleLikeToggle}
+          {...props}
+        >
+          <StarIcon
+            className={cn(
+              'h-6 w-6 transition-all duration-500',
+              isLiked ? 'scale-110 rotate-180 fill-current' : 'hover:rotate-12',
+            )}
+          />
+        </button>
+        <Conditional isCondition={displayedLikeCount !== null}>
+          <div className={'text-right'}>
+            <div className={'text-lg font-bold text-gray-800'}>{displayedLikeCount?.toLocaleString()}</div>
+            <div className={'text-xs text-gray-500'}>likes</div>
+          </div>
+        </Conditional>
+      </div>
     </AuthContent>
   );
 };
 
 export const LikeIconButton = (props: Omit<LikeButtonProps, 'isIconOnly' | 'shouldShowCount'>) => (
-  <LikeButton {...props} isIconOnly shouldShowCount={false} size={'icon'} />
+  <LikeButton {...props} isIconOnly shouldShowCount={false} />
 );
 
 export const LikeCountButton = (props: LikeButtonProps) => <LikeButton {...props} shouldShowCount />;
