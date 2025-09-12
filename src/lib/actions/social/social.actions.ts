@@ -8,6 +8,7 @@ import { z } from 'zod';
 
 import {
   ACTION_NAMES,
+  ENUMS,
   ERROR_CODES,
   ERROR_MESSAGES,
   OPERATIONS,
@@ -16,7 +17,6 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
@@ -26,10 +26,6 @@ import {
   toggleLikeSchema,
 } from '@/lib/validations/like.validation';
 
-/**
- * toggle like status for content (like/unlike)
- * authenticated users only
- */
 export const toggleLikeAction = authActionClient
   .metadata({
     actionName: ACTION_NAMES.SOCIAL.LIKE,
@@ -79,17 +75,31 @@ export const toggleLikeAction = authActionClient
         message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
       });
 
-      // revalidate content pages that might show this data
-      revalidatePath(`/bobbleheads/${likeData.targetId}`);
-      revalidatePath(`/collections/${likeData.targetId}`);
-      revalidatePath($path({ route: '/browse/featured' }));
+      revalidatePath(
+        $path({
+          route: '/bobbleheads/[bobbleheadId]',
+          routeParams: { bobbleheadId: likeData.targetId },
+        }),
+      );
+      revalidatePath(
+        $path({
+          route: '/collections/[collectionId]',
+          routeParams: { collectionId: likeData.targetId },
+        }),
+      );
 
+      // TODO: invalidate the featured browse page if applicable
+      // revalidatePath(
+      //   $path({
+      //     route: '/browse/featured',
+      //   }),
+      // );
       // revalidate cache for content-specific invalidation
-      if (likeData.targetType === 'collection') {
-        CacheRevalidationService.revalidateCollectionFeaturedContent(likeData.targetId);
-      } else if (likeData.targetType === 'bobblehead') {
-        CacheRevalidationService.revalidateBobbleheadFeaturedContent(likeData.targetId);
-      }
+      // if (likeData.targetType === 'collection') {
+      //   CacheRevalidationService.revalidateCollectionFeaturedContent(likeData.targetId);
+      // } else if (likeData.targetType === 'bobblehead') {
+      //   CacheRevalidationService.revalidateBobbleheadFeaturedContent(likeData.targetId);
+      // }
 
       return {
         data: {
@@ -115,10 +125,6 @@ export const toggleLikeAction = authActionClient
     }
   });
 
-/**
- * get like data for content (like count and user's like status)
- * authenticated users only
- */
 export const getContentLikeDataAction = authActionClient
   .metadata({
     actionName: ACTION_NAMES.SOCIAL.LIKE,
@@ -152,10 +158,6 @@ export const getContentLikeDataAction = authActionClient
     }
   });
 
-/**
- * get like data for multiple content items (batch operation)
- * authenticated users only
- */
 export const getBatchContentLikeDataAction = authActionClient
   .metadata({
     actionName: ACTION_NAMES.SOCIAL.LIKE,
@@ -184,10 +186,6 @@ export const getBatchContentLikeDataAction = authActionClient
     }
   });
 
-/**
- * get like count for content (public access)
- * no authentication required - used for displaying like counts to all users
- */
 export const getPublicLikeCountAction = publicActionClient
   .metadata({
     actionName: ACTION_NAMES.SOCIAL.LIKE,
@@ -219,10 +217,6 @@ export const getPublicLikeCountAction = publicActionClient
     }
   });
 
-/**
- * get public like data for multiple content items (batch operation)
- * no authentication required - used for displaying like counts to all users
- */
 export const getPublicBatchLikeCountsAction = publicActionClient
   .metadata({
     actionName: ACTION_NAMES.SOCIAL.LIKE,
@@ -233,11 +227,7 @@ export const getPublicBatchLikeCountsAction = publicActionClient
     const dbInstance = ctx.db;
 
     try {
-      const results = await SocialFacade.getBatchContentLikeData(
-        batchData.targets,
-        undefined, // no user ID for public access
-        dbInstance,
-      );
+      const results = await SocialFacade.getBatchContentLikeData(batchData.targets, undefined, dbInstance);
 
       return {
         data: results,
@@ -254,10 +244,6 @@ export const getPublicBatchLikeCountsAction = publicActionClient
     }
   });
 
-/**
- * get trending content based on like activity
- * no authentication required - public trending data
- */
 export const getTrendingContentAction = publicActionClient
   .metadata({
     actionName: ACTION_NAMES.SOCIAL.LIKE,
@@ -265,7 +251,7 @@ export const getTrendingContentAction = publicActionClient
   .inputSchema(
     z.object({
       limit: z.number().min(1).max(50).default(10),
-      targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+      targetType: z.enum(ENUMS.LIKE.TARGET_TYPE),
     }),
   )
   .action(async ({ ctx, parsedInput }) => {
@@ -276,7 +262,7 @@ export const getTrendingContentAction = publicActionClient
       const results = await SocialFacade.getTrendingContent(
         trendingData.targetType,
         { limit: trendingData.limit },
-        undefined, // no user ID for public access
+        undefined,
         dbInstance,
       );
 

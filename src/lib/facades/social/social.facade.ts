@@ -6,7 +6,7 @@ import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertLike } from '@/lib/validations/social.validation';
 
-import { OPERATIONS } from '@/lib/constants';
+import { type LikeTargetType, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import {
   createProtectedQueryContext,
@@ -16,25 +16,19 @@ import {
 import { SocialQuery } from '@/lib/queries/social/social.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
-/**
- * aggregated like data for content display
- */
 export interface ContentLikeData {
   isLiked: boolean;
   likeCount: number;
   likeId: null | string;
   targetId: string;
-  targetType: 'bobblehead' | 'collection' | 'subcollection';
+  targetType: LikeTargetType;
 }
 
-/**
- * like activity data with user information
- */
 export interface LikeActivity {
   createdAt: Date;
   id: string;
   targetId: string;
-  targetType: 'bobblehead' | 'collection' | 'subcollection';
+  targetType: LikeTargetType;
   user: {
     displayName: null | string;
     id: string;
@@ -43,9 +37,6 @@ export interface LikeActivity {
   userId: string;
 }
 
-/**
- * like toggle result with updated counts
- */
 export interface LikeToggleResult {
   isLiked: boolean;
   isSuccessful: boolean;
@@ -53,58 +44,50 @@ export interface LikeToggleResult {
   likeId: null | string;
 }
 
-/**
- * trending content data
- */
 export interface TrendingContent {
   likeCount: number;
   recentLikeCount: number;
   targetId: string;
 }
 
-/**
- * handles all business logic and orchestration for social features (likes, etc.)
- */
 export class SocialFacade {
-  /**
-   * get like data for multiple targets (batch operation)
-   */
   static getBatchContentLikeData = cache(
     async (
-      targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' | 'subcollection' }>,
+      targets: Array<{ targetId: string; targetType: LikeTargetType }>,
       viewerUserId?: string,
       dbInstance?: DatabaseExecutor,
     ): Promise<Array<ContentLikeData>> => {
       try {
-        if (targets.length === 0) {
-          return [];
-        }
+        if (targets.length === 0) return [];
 
-        const context = viewerUserId
-          ? createUserQueryContext(viewerUserId, { dbInstance })
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
         // get like counts and user statuses in parallel
         const [likeCounts, userStatuses] = await Promise.all([
           SocialQuery.getLikeCounts(targets, context),
-          viewerUserId
-            ? SocialQuery.getUserLikeStatuses(targets, viewerUserId, context)
-            : Promise.resolve(
-                targets.map(({ targetId, targetType }): UserLikeStatus => ({
+          viewerUserId ?
+            SocialQuery.getUserLikeStatuses(targets, viewerUserId, context)
+          : Promise.resolve(
+              targets.map(
+                ({ targetId, targetType }): UserLikeStatus => ({
                   isLiked: false,
                   likeId: null,
                   targetId,
                   targetType,
-                })),
+                }),
               ),
+            ),
         ]);
 
         // create maps for efficient lookup
         const likeCountMap = new Map(
-          likeCounts.map(item => [`${item.targetType}:${item.targetId}`, item.likeCount])
+          likeCounts.map((item) => [`${item.targetType}:${item.targetId}`, item.likeCount]),
         );
         const userStatusMap = new Map(
-          userStatuses.map(status => [`${status.targetType}:${status.targetId}`, status])
+          userStatuses.map((status) => [`${status.targetType}:${status.targetId}`, status]),
         );
 
         // combine data for each target
@@ -134,27 +117,25 @@ export class SocialFacade {
     },
   );
 
-  /**
-   * get comprehensive like data for content (status + count)
-   */
   static getContentLikeData = cache(
     async (
       targetId: string,
-      targetType: 'bobblehead' | 'collection' | 'subcollection',
+      targetType: LikeTargetType,
       viewerUserId?: string,
       dbInstance?: DatabaseExecutor,
     ): Promise<ContentLikeData> => {
       try {
-        const context = viewerUserId 
-          ? createUserQueryContext(viewerUserId, { dbInstance })
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
         // get like count and user status in parallel
         const [likeCount, userStatus] = await Promise.all([
           SocialQuery.getLikeCount(targetId, targetType, context),
-          viewerUserId 
-            ? SocialQuery.getUserLikeStatus(targetId, targetType, viewerUserId, context)
-            : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
+          viewerUserId ?
+            SocialQuery.getUserLikeStatus(targetId, targetType, viewerUserId, context)
+          : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
         ]);
 
         return {
@@ -177,15 +158,8 @@ export class SocialFacade {
     },
   );
 
-  /**
-   * get like count for a specific target
-   */
   static getLikeCount = cache(
-    async (
-      targetId: string,
-      targetType: 'bobblehead' | 'collection' | 'subcollection',
-      dbInstance?: DatabaseExecutor,
-    ): Promise<number> => {
+    async (targetId: string, targetType: LikeTargetType, dbInstance?: DatabaseExecutor): Promise<number> => {
       try {
         const context = createPublicQueryContext({ dbInstance });
         return SocialQuery.getLikeCount(targetId, targetType, context);
@@ -201,25 +175,23 @@ export class SocialFacade {
     },
   );
 
-  /**
-   * get recent like activity for a target with user information
-   */
   static getRecentLikeActivity = cache(
     async (
       targetId: string,
-      targetType: 'bobblehead' | 'collection' | 'subcollection',
+      targetType: LikeTargetType,
       options: FindOptions = {},
       viewerUserId?: string,
       dbInstance?: DatabaseExecutor,
     ): Promise<Array<LikeActivity>> => {
       try {
-        const context = viewerUserId
-          ? createUserQueryContext(viewerUserId, { dbInstance })
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
         const likes = await SocialQuery.getRecentLikes(targetId, targetType, options, context);
 
-        return likes.map(like => ({
+        return likes.map((like) => ({
           createdAt: like.createdAt,
           id: like.id,
           targetId: like.targetId,
@@ -240,19 +212,17 @@ export class SocialFacade {
     },
   );
 
-  /**
-   * get trending content based on recent like activity
-   */
   static getTrendingContent = cache(
     async (
-      targetType: 'bobblehead' | 'collection' | 'subcollection',
+      targetType: LikeTargetType,
       options: FindOptions = {},
       viewerUserId?: string,
       dbInstance?: DatabaseExecutor,
     ): Promise<Array<TrendingContent>> => {
       try {
-        const context = viewerUserId
-          ? createUserQueryContext(viewerUserId, { dbInstance })
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
         return SocialQuery.getTrendingContent(targetType, options, context);
@@ -269,13 +239,10 @@ export class SocialFacade {
     },
   );
 
-  /**
-   * get user's like status for a specific target
-   */
   static getUserLikeStatus = cache(
     async (
       targetId: string,
-      targetType: 'bobblehead' | 'collection' | 'subcollection',
+      targetType: LikeTargetType,
       userId: string,
       dbInstance?: DatabaseExecutor,
     ): Promise<UserLikeStatus> => {
@@ -295,26 +262,16 @@ export class SocialFacade {
     },
   );
 
-  /**
-   * helper method to create like data for insertion
-   */
-  static createLikeData(
-    targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
-  ): InsertLike {
+  static createLikeData(targetId: string, targetType: LikeTargetType): InsertLike {
     return {
       targetId,
       targetType,
     };
   }
 
-  /**
-   * toggle like status for a target (like or unlike)
-   * handles the full business logic including count updates
-   */
   static async toggleLike(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: LikeTargetType,
     userId: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<LikeToggleResult> {
@@ -327,10 +284,10 @@ export class SocialFacade {
 
         if (currentStatus.isLiked) {
           // unlike: delete the like and decrement count
-          const deletedLike = await SocialQuery.deleteLike(targetId, targetType, userId, tx);
+          const deletedLike = await SocialQuery.deleteLike(targetId, targetType, userId, context);
 
           if (deletedLike) {
-            await SocialQuery.decrementLikeCount(targetId, targetType, tx);
+            await SocialQuery.decrementLikeCount(targetId, targetType, context);
           }
 
           // get updated count
@@ -349,10 +306,10 @@ export class SocialFacade {
             targetType,
           };
 
-          const newLike = await SocialQuery.createLike(likeData, userId, tx);
+          const newLike = await SocialQuery.createLike(likeData, userId, context);
 
           if (newLike) {
-            await SocialQuery.incrementLikeCount(targetId, targetType, tx);
+            await SocialQuery.incrementLikeCount(targetId, targetType, context);
           }
 
           // get updated count
@@ -376,12 +333,5 @@ export class SocialFacade {
       };
       throw createFacadeError(context, error);
     }
-  }
-
-  /**
-   * helper method to validate target type
-   */
-  static validateTargetType(targetType: string): targetType is 'bobblehead' | 'collection' | 'subcollection' {
-    return ['bobblehead', 'collection', 'subcollection'].includes(targetType);
   }
 }

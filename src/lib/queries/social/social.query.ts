@@ -1,91 +1,80 @@
 import { and, count, desc, eq, or, sql } from 'drizzle-orm';
 
+import type { LikeTargetType } from '@/lib/constants';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
-import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertLike, PublicLike, SelectLike } from '@/lib/validations/social.validation';
 
-import { db } from '@/lib/db';
+import { ENUMS } from '@/lib/constants';
 import { bobbleheads, collections, likes, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type LikeCountByTarget = {
   likeCount: number;
   targetId: string;
-  targetType: 'bobblehead' | 'collection' | 'subcollection';
+  targetType: LikeTargetType;
 };
 
-/**
- * type definitions for query results
- */
 export type LikeRecord = SelectLike;
-
-export type LikeWithUserInfo = LikeRecord & {
-  user: {
-    displayName: null | string;
-    id: string;
-    username: null | string;
-  };
-};
 
 export type UserLikeStatus = {
   isLiked: boolean;
   likeId: null | string;
   targetId: string;
-  targetType: 'bobblehead' | 'collection' | 'subcollection';
+  targetType: LikeTargetType;
 };
 
-/**
- * social domain query service
- * handles all database operations for likes and social interactions
- */
 export class SocialQuery extends BaseQuery {
-  /**
-   * create a new like
-   */
-  static async createLike(data: InsertLike, userId: string, dbInstance: DatabaseExecutor = db): Promise<LikeRecord | null> {
-    const dbToUse = dbInstance ?? db;
+  static async createLike(
+    data: InsertLike,
+    userId: string,
+    context: QueryContext,
+  ): Promise<LikeRecord | null> {
+    const dbInstance = this.getDbInstance(context);
 
-    try {
-      const result = await dbToUse
-        .insert(likes)
-        .values({ ...data, userId })
-        .returning();
+    const isAlreadyLiked = await dbInstance
+      .select({ id: likes.id })
+      .from(likes)
+      .where(
+        and(
+          eq(likes.targetId, data.targetId),
+          eq(likes.targetType, data.targetType),
+          eq(likes.userId, userId),
+        ),
+      )
+      .limit(1);
 
-      return result?.[0] || null;
-    } catch (error) {
-      // unique constraint violation - user already liked this content
-      if (error instanceof Error && 'code' in error && error.code === '23505') {
-        return null;
-      }
-      throw error;
-    }
+    if (isAlreadyLiked.length > 0) return null;
+
+    const result = await dbInstance
+      .insert(likes)
+      .values({ ...data, userId })
+      .returning();
+
+    return result?.[0] || null;
   }
 
-  /**
-   * decrement like count for a target (used after successful like deletion)
-   */
   static async decrementLikeCount(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
-    dbInstance: DatabaseExecutor = db,
+    targetType: LikeTargetType,
+    context: QueryContext,
   ): Promise<void> {
-    const dbToUse = dbInstance ?? db;
+    const dbInstance = this.getDbInstance(context);
 
     switch (targetType) {
-      case 'bobblehead':
-        await dbToUse
+      case ENUMS.LIKE.TARGET_TYPE[0]:
+        await dbInstance
           .update(bobbleheads)
           .set({ likeCount: sql`GREATEST(0, ${bobbleheads.likeCount} - 1)` })
           .where(eq(bobbleheads.id, targetId));
         break;
-      case 'collection':
-        await dbToUse
+      case ENUMS.LIKE.TARGET_TYPE[1]:
+        await dbInstance
           .update(collections)
           .set({ likeCount: sql`GREATEST(0, ${collections.likeCount} - 1)` })
           .where(eq(collections.id, targetId));
         break;
-      case 'subcollection':
-        await dbToUse
+      case ENUMS.LIKE.TARGET_TYPE[2]:
+        await dbInstance
           .update(subCollections)
           .set({ likeCount: sql`GREATEST(0, ${subCollections.likeCount} - 1)` })
           .where(eq(subCollections.id, targetId));
@@ -95,37 +84,25 @@ export class SocialQuery extends BaseQuery {
     }
   }
 
-  /**
-   * delete a like (unlike)
-   */
   static async deleteLike(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: LikeTargetType,
     userId: string,
-    dbInstance: DatabaseExecutor = db,
+    context: QueryContext,
   ): Promise<LikeRecord | null> {
-    const dbToUse = dbInstance ?? db;
+    const dbInstance = this.getDbInstance(context);
 
-    const result = await dbToUse
+    const result = await dbInstance
       .delete(likes)
-      .where(
-        and(
-          eq(likes.targetId, targetId),
-          eq(likes.targetType, targetType),
-          eq(likes.userId, userId),
-        ),
-      )
+      .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType), eq(likes.userId, userId)))
       .returning();
 
     return result?.[0] || null;
   }
 
-  /**
-   * get like count for a specific target
-   */
   static async getLikeCount(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: LikeTargetType,
     context: QueryContext,
   ): Promise<number> {
     const dbInstance = this.getDbInstance(context);
@@ -133,21 +110,13 @@ export class SocialQuery extends BaseQuery {
     const result = await dbInstance
       .select({ count: count() })
       .from(likes)
-      .where(
-        and(
-          eq(likes.targetId, targetId),
-          eq(likes.targetType, targetType),
-        ),
-      );
+      .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType)));
 
     return result[0]?.count || 0;
   }
 
-  /**
-   * get like counts for multiple targets (batch operation)
-   */
   static async getLikeCounts(
-    targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' | 'subcollection' }>,
+    targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     context: QueryContext,
   ): Promise<Array<LikeCountByTarget>> {
     const dbInstance = this.getDbInstance(context);
@@ -173,7 +142,7 @@ export class SocialQuery extends BaseQuery {
 
     // create a map of like counts
     const likeCountMap = new Map(
-      result.map(item => [`${item.targetType}:${item.targetId}`, item.likeCount])
+      result.map((item) => [`${item.targetType}:${item.targetId}`, item.likeCount]),
     );
 
     // return counts for all requested targets (0 if not found)
@@ -189,15 +158,14 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
-  /**
-   * get recent likes for a target with user information
-   */
   static async getRecentLikes(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: LikeTargetType,
     options: FindOptions = {},
     context: QueryContext,
-  ): Promise<Array<PublicLike & { user: { displayName: null | string; id: string; username: null | string } }>> {
+  ): Promise<
+    Array<PublicLike & { user: { displayName: null | string; id: string; username: null | string } }>
+  > {
     const dbInstance = this.getDbInstance(context);
     const pagination = this.applyPagination(options);
 
@@ -216,12 +184,7 @@ export class SocialQuery extends BaseQuery {
       })
       .from(likes)
       .leftJoin(sql`users`, eq(likes.userId, sql`users.id`))
-      .where(
-        and(
-          eq(likes.targetId, targetId),
-          eq(likes.targetType, targetType),
-        ),
-      )
+      .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType)))
       .orderBy(desc(likes.createdAt));
 
     if (pagination.limit) {
@@ -235,11 +198,8 @@ export class SocialQuery extends BaseQuery {
     return query;
   }
 
-  /**
-   * get trending content based on recent like activity
-   */
   static async getTrendingContent(
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: LikeTargetType,
     options: FindOptions = {},
     context: QueryContext,
   ): Promise<Array<{ likeCount: number; recentLikeCount: number; targetId: string }>> {
@@ -273,12 +233,9 @@ export class SocialQuery extends BaseQuery {
     return query;
   }
 
-  /**
-   * get user's like status for a specific target
-   */
   static async getUserLikeStatus(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: LikeTargetType,
     userId: string,
     context: QueryContext,
   ): Promise<UserLikeStatus> {
@@ -287,13 +244,7 @@ export class SocialQuery extends BaseQuery {
     const result = await dbInstance
       .select({ id: likes.id })
       .from(likes)
-      .where(
-        and(
-          eq(likes.targetId, targetId),
-          eq(likes.targetType, targetType),
-          eq(likes.userId, userId),
-        ),
-      )
+      .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType), eq(likes.userId, userId)))
       .limit(1);
 
     const like = result[0];
@@ -306,9 +257,6 @@ export class SocialQuery extends BaseQuery {
     };
   }
 
-  /**
-   * get multiple user like statuses for batch operations
-   */
   static async getUserLikeStatuses(
     targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' | 'subcollection' }>,
     userId: string,
@@ -332,17 +280,10 @@ export class SocialQuery extends BaseQuery {
         targetType: likes.targetType,
       })
       .from(likes)
-      .where(
-        and(
-          eq(likes.userId, userId),
-          or(...targetConditions),
-        ),
-      );
+      .where(and(eq(likes.userId, userId), or(...targetConditions)));
 
     // create a map of liked targets
-    const likedTargets = new Map(
-      result.map(like => [`${like.targetType}:${like.targetId}`, like.id])
-    );
+    const likedTargets = new Map(result.map((like) => [`${like.targetType}:${like.targetId}`, like.id]));
 
     // return status for all requested targets
     return targets.map(({ targetId, targetType }) => {
@@ -358,31 +299,28 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
-  /**
-   * increment like count for a target (used after successful like creation)
-   */
   static async incrementLikeCount(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
-    dbInstance: DatabaseExecutor = db,
+    targetType: LikeTargetType,
+    context: QueryContext,
   ): Promise<void> {
-    const dbToUse = dbInstance ?? db;
+    const dbInstance = this.getDbInstance(context);
 
     switch (targetType) {
-      case 'bobblehead':
-        await dbToUse
+      case ENUMS.LIKE.TARGET_TYPE[0]:
+        await dbInstance
           .update(bobbleheads)
           .set({ likeCount: sql`${bobbleheads.likeCount} + 1` })
           .where(eq(bobbleheads.id, targetId));
         break;
-      case 'collection':
-        await dbToUse
+      case ENUMS.LIKE.TARGET_TYPE[1]:
+        await dbInstance
           .update(collections)
           .set({ likeCount: sql`${collections.likeCount} + 1` })
           .where(eq(collections.id, targetId));
         break;
-      case 'subcollection':
-        await dbToUse
+      case ENUMS.LIKE.TARGET_TYPE[2]:
+        await dbInstance
           .update(subCollections)
           .set({ likeCount: sql`${subCollections.likeCount} + 1` })
           .where(eq(subCollections.id, targetId));

@@ -9,6 +9,8 @@ import { HeartIcon, Loader2Icon } from 'lucide-react';
 import { Fragment } from 'react';
 import { useCallback, useOptimistic, useState } from 'react';
 
+import type { LikeTargetType } from '@/lib/constants';
+
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -39,22 +41,14 @@ const likeButtonVariants = cva('transition-colors', {
 export interface LikeButtonProps
   extends Omit<ComponentProps<'button'>, 'children' | 'onClick'>,
     VariantProps<typeof likeButtonVariants> {
-  /** custom aria label for accessibility */
   ariaLabel?: string;
-  /** initial like count */
   initialLikeCount: number;
-  /** whether to show only the icon (no count) */
   isIconOnly?: boolean;
-  /** whether the user has initially liked this content */
   isInitiallyLiked: boolean;
-  /** callback fired when like status changes */
   onLikeChange?: (isLiked: boolean, likeCount: number) => void;
-  /** whether to show the like count */
   shouldShowCount?: boolean;
-  /** the ID of the target content to like/unlike */
   targetId: string;
-  /** the type of content being liked */
-  targetType: 'bobblehead' | 'collection' | 'subcollection';
+  targetType: LikeTargetType;
 }
 
 export const LikeButton = ({
@@ -72,19 +66,16 @@ export const LikeButton = ({
   variant = 'default',
   ...props
 }: LikeButtonProps) => {
-  // base state represents the actual server state
   const [baseState, setBaseState] = useState({
     isLiked: isInitiallyLiked,
     likeCount: initialLikeCount,
   });
 
-  // useOptimistic handles optimistic updates automatically
   const [optimisticState, addOptimistic] = useOptimistic(
     baseState,
     (_currentState, optimisticUpdate: { isLiked: boolean; likeCount: number }) => optimisticUpdate,
   );
 
-  // server action hook
   const { executeAsync, isPending } = useServerAction(toggleLikeAction, {
     onError: () => {
       onLikeChange?.(baseState.isLiked, baseState.likeCount);
@@ -152,9 +143,11 @@ export const LikeButton = ({
             {...props}
           >
             <Fragment>
+              {/* Like Loading */}
               <Conditional isCondition={isPending}>
                 <Loader2Icon aria-hidden className={'animate-spin'} />
               </Conditional>
+              {/* Like Icon */}
               <Conditional isCondition={!isPending}>
                 <HeartIcon
                   aria-hidden
@@ -166,6 +159,8 @@ export const LikeButton = ({
                   )}
                 />
               </Conditional>
+
+              {/* Like Count */}
               <Conditional isCondition={displayedLikeCount !== null}>
                 <span className={'tabular-nums'}>{displayedLikeCount?.toLocaleString()}</span>
               </Conditional>
@@ -206,14 +201,8 @@ export const LikeButton = ({
   );
 };
 
-/**
- * compact like button that shows only the heart icon
- */
 export const LikeIconButton = (props: Omit<LikeButtonProps, 'isIconOnly' | 'shouldShowCount'>) => (
   <LikeButton {...props} isIconOnly shouldShowCount={false} size={'icon'} />
 );
 
-/**
- * like button with count for use in cards and listings
- */
 export const LikeCountButton = (props: LikeButtonProps) => <LikeButton {...props} shouldShowCount />;
