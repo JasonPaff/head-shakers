@@ -38,7 +38,7 @@ const likeButtonVariants = cva('transition-colors', {
   },
 });
 
-export interface LikeButtonProps
+interface LikeButtonProps
   extends Omit<ComponentProps<'button'>, 'children' | 'onClick'>,
     VariantProps<typeof likeButtonVariants> {
   ariaLabel?: string;

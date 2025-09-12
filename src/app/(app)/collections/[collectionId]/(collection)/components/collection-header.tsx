@@ -52,6 +52,7 @@ export const CollectionHeader = ({ collection, isOwner = false, likeData }: Coll
               Created {collection.createdAt.toLocaleDateString()}
             </div>
             <div>{collection.totalBobbleheadCount} Bobbleheads</div>
+
             {/* Like Button */}
             <Conditional isCondition={!!likeData}>
               <CollectionLikeButton
@@ -62,7 +63,7 @@ export const CollectionHeader = ({ collection, isOwner = false, likeData }: Coll
             </Conditional>
           </div>
 
-          {/* Add Bobblehead Button - Only show to owners */}
+          {/* Add Bobblehead Button */}
           <Conditional isCondition={isOwner}>
             <Button asChild className={'w-full sm:w-auto'}>
               <Link

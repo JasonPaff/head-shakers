@@ -31,9 +31,6 @@ export type BobbleheadListRecord = {
   weight: null | number;
 };
 
-/**
- * type definitions for query results
- */
 export type CollectionRecord = typeof collections.$inferSelect;
 
 export type CollectionWithRelations = CollectionRecord & {
@@ -55,14 +52,7 @@ export type CollectionWithRelations = CollectionRecord & {
   }>;
 };
 
-/**
- * collection domain query service
- * handles all database operations for collections
- */
 export class CollectionsQuery extends BaseQuery {
-  /**
-   * create a new collection
-   */
   static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     const result = await (dbInstance ?? db)
       .insert(collections)
@@ -72,9 +62,6 @@ export class CollectionsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  /**
-   * delete a collection
-   */
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     const result = await (dbInstance ?? db)
       .delete(collections)
@@ -84,9 +71,6 @@ export class CollectionsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  /**
-   * find collection by ID with standard permission filtering
-   */
   static async findById(id: string, context: QueryContext): Promise<CollectionRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
@@ -96,12 +80,7 @@ export class CollectionsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(collections.id, id),
-          this.buildBaseFilters(
-            collections.isPublic,
-            collections.userId,
-            undefined, // no soft delete for collections
-            context,
-          ),
+          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
         ),
       )
       .limit(1);
@@ -109,9 +88,6 @@ export class CollectionsQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  /**
-   * find the collection with all related data (bobbleheads and subcollections)
-   */
   static async findByIdWithRelations(
     id: string,
     context: QueryContext,
@@ -157,9 +133,6 @@ export class CollectionsQuery extends BaseQuery {
     return collection || null;
   }
 
-  /**
-   * find collections by user with options
-   */
   static async findByUser(
     userId: string,
     options: FindOptions = {},
@@ -190,9 +163,6 @@ export class CollectionsQuery extends BaseQuery {
     return query;
   }
 
-  /**
-   * get bobbleheads in a collection (not in subcollections)
-   */
   static async getBobbleheadsInCollection(
     collectionId: string,
     context: QueryContext,
@@ -246,9 +216,6 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(bobbleheads.createdAt);
   }
 
-  /**
-   * get bobbleheads in a collection with photo data for public display
-   */
   static async getCollectionBobbleheadsWithPhotos(
     collectionId: string,
     context: QueryContext,
@@ -307,9 +274,6 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(bobbleheads.createdAt);
   }
 
-  /**
-   * get dashboard data for user's collections
-   */
   static async getDashboardData(
     userId: string,
     context: QueryContext,
@@ -346,9 +310,6 @@ export class CollectionsQuery extends BaseQuery {
     });
   }
 
-  /**
-   * update a collection
-   */
   static async updateAsync(data: UpdateCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     const result = await (dbInstance ?? db)
       .update(collections)
