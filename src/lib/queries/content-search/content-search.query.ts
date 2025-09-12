@@ -1,9 +1,9 @@
-import { and, eq, ilike, inArray, or } from 'drizzle-orm';
+import { and, eq, ilike, inArray, not, or, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 
 import { DEFAULTS } from '@/lib/constants';
-import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadPhoto = {
@@ -206,13 +206,39 @@ export class ContentSearchQuery extends BaseQuery {
    * search bobbleheads for featuring
    */
   static async searchBobbleheads(
-    query: string,
+    query: string | undefined,
     limit: number,
     context: QueryContext,
+    includeTags?: Array<string>,
+    excludeTags?: Array<string>,
   ): Promise<Array<BobbleheadSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
-    return dbInstance
+    // Build where conditions
+    const conditions: Array<SQL> = [
+      eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+      eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+    ];
+
+    // Add text search conditions if query is provided
+    if (query && query.trim()) {
+      const textSearchCondition = or(
+        ilike(bobbleheads.name, `%${query}%`),
+        ilike(bobbleheads.description, `%${query}%`),
+        ilike(bobbleheads.characterName, `%${query}%`),
+        ilike(bobbleheads.manufacturer, `%${query}%`),
+        ilike(bobbleheads.series, `%${query}%`),
+        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
+        ilike(collections.name, `%${query}%`),
+      );
+      if (textSearchCondition) {
+        conditions.push(textSearchCondition);
+      }
+    }
+
+    const queryBuilder = dbInstance
       .select({
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
@@ -234,38 +260,74 @@ export class ContentSearchQuery extends BaseQuery {
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
-      )
-      .where(
-        and(
-          eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
-          or(
-            ilike(bobbleheads.name, `%${query}%`),
-            ilike(bobbleheads.description, `%${query}%`),
-            ilike(bobbleheads.characterName, `%${query}%`),
-            ilike(bobbleheads.manufacturer, `%${query}%`),
-            ilike(bobbleheads.series, `%${query}%`),
-            ilike(users.displayName, `%${query}%`),
-            ilike(users.username, `%${query}%`),
-            ilike(collections.name, `%${query}%`),
+      );
+
+    // Add tag filtering if includeTags or excludeTags are provided
+    if (includeTags && includeTags.length > 0) {
+      // For include tags, we need bobbleheads that have ALL the specified tags
+      for (const tagId of includeTags) {
+        conditions.push(
+          inArray(
+            bobbleheads.id,
+            dbInstance
+              .select({ bobbleheadId: bobbleheadTags.bobbleheadId })
+              .from(bobbleheadTags)
+              .where(eq(bobbleheadTags.tagId, tagId)),
+          ),
+        );
+      }
+    }
+
+    if (excludeTags && excludeTags.length > 0) {
+      // For exclude tags, we need bobbleheads that DON'T have ANY of the specified tags
+      conditions.push(
+        not(
+          inArray(
+            bobbleheads.id,
+            dbInstance
+              .select({ bobbleheadId: bobbleheadTags.bobbleheadId })
+              .from(bobbleheadTags)
+              .where(inArray(bobbleheadTags.tagId, excludeTags)),
           ),
         ),
-      )
-      .limit(limit);
+      );
+    }
+
+    return queryBuilder.where(and(...conditions)).limit(limit);
   }
 
   /**
    * search collections for featuring
    */
   static async searchCollections(
-    query: string,
+    query: string | undefined,
     limit: number,
     context: QueryContext,
+    includeTags?: Array<string>,
+    excludeTags?: Array<string>,
   ): Promise<Array<CollectionSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
-    return dbInstance
+    // Build where conditions
+    const conditions: Array<SQL> = [
+      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
+      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+    ];
+
+    // Add text search conditions if query is provided
+    if (query && query.trim()) {
+      const textSearchCondition = or(
+        ilike(collections.name, `%${query}%`),
+        ilike(collections.description, `%${query}%`),
+        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
+      );
+      if (textSearchCondition) {
+        conditions.push(textSearchCondition);
+      }
+    }
+
+    const queryBuilder = dbInstance
       .select({
         coverImageUrl: collections.coverImageUrl,
         description: collections.description,
@@ -277,20 +339,54 @@ export class ContentSearchQuery extends BaseQuery {
         totalItems: collections.totalItems,
       })
       .from(collections)
-      .innerJoin(users, eq(collections.userId, users.id))
-      .where(
-        and(
-          eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
-          or(
-            ilike(collections.name, `%${query}%`),
-            ilike(collections.description, `%${query}%`),
-            ilike(users.displayName, `%${query}%`),
-            ilike(users.username, `%${query}%`),
+      .innerJoin(users, eq(collections.userId, users.id));
+
+    // For collections, we search based on tags of bobbleheads within the collection
+    if (includeTags && includeTags.length > 0) {
+      // Find collections that contain bobbleheads with ALL the specified tags
+      for (const tagId of includeTags) {
+        conditions.push(
+          inArray(
+            collections.id,
+            dbInstance
+              .select({ collectionId: bobbleheads.collectionId })
+              .from(bobbleheads)
+              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
+              .where(
+                and(
+                  eq(bobbleheadTags.tagId, tagId),
+                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                ),
+              ),
+          ),
+        );
+      }
+    }
+
+    if (excludeTags && excludeTags.length > 0) {
+      // Find collections that DON'T contain bobbleheads with ANY of the specified tags
+      conditions.push(
+        not(
+          inArray(
+            collections.id,
+            dbInstance
+              .select({ collectionId: bobbleheads.collectionId })
+              .from(bobbleheads)
+              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
+              .where(
+                and(
+                  inArray(bobbleheadTags.tagId, excludeTags),
+                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                ),
+              ),
           ),
         ),
-      )
-      .limit(limit);
+      );
+    }
+
+    return queryBuilder.where(and(...conditions)).limit(limit);
   }
 
   /**

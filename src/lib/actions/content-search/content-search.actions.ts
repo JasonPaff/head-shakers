@@ -17,13 +17,15 @@ import { handleActionError } from '@/lib/utils/action-error-handler';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 
 const searchContentSchema = z.object({
+  excludeTags: z.array(z.string().uuid()).optional(),
+  includeTags: z.array(z.string().uuid()).optional(),
   limit: z
     .number()
     .int()
     .min(1)
     .max(CONFIG.PAGINATION.SEARCH_RESULTS.MAX)
     .default(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),
-  query: z.string().min(1).max(CONFIG.SEARCH.MAX_QUERY_LENGTH),
+  query: z.string().min(1).max(CONFIG.SEARCH.MAX_QUERY_LENGTH).optional(),
 });
 
 const getCollectionSchema = z.object({ id: z.string().uuid() });
@@ -38,10 +40,16 @@ export const searchCollectionsForFeaturingAction = adminActionClient
   })
   .inputSchema(searchContentSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
+    const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.tx ?? ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, { limit, query, type: 'collections' });
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      excludeTags,
+      includeTags,
+      limit,
+      query,
+      type: 'collections',
+    });
 
     try {
       const result = await ContentSearchFacade.searchCollectionsForFeaturing(
@@ -49,12 +57,16 @@ export const searchCollectionsForFeaturingAction = adminActionClient
         limit,
         ctx.userId,
         dbInstance,
+        includeTags,
+        excludeTags,
       );
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
+          excludeTags,
           foundCount: result.collections.length,
+          includeTags,
           limit,
           query,
         },
@@ -83,10 +95,16 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
   })
   .inputSchema(searchContentSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
+    const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.tx ?? ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, { limit, query, type: 'bobbleheads' });
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      excludeTags,
+      includeTags,
+      limit,
+      query,
+      type: 'bobbleheads',
+    });
 
     try {
       const result = await ContentSearchFacade.searchBobbleheadsForFeaturing(
@@ -94,12 +112,16 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
         limit,
         ctx.userId,
         dbInstance,
+        includeTags,
+        excludeTags,
       );
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
+          excludeTags,
           foundCount: result.bobbleheads.length,
+          includeTags,
           limit,
           query,
         },
@@ -128,13 +150,18 @@ export const searchUsersForFeaturingAction = adminActionClient
   })
   .inputSchema(searchContentSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
+    const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.tx ?? ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, { limit, query, type: 'users' });
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, { excludeTags, includeTags, limit, query, type: 'users' });
 
     try {
-      const result = await ContentSearchFacade.searchUsersForFeaturing(query, limit, ctx.userId, dbInstance);
+      const result = await ContentSearchFacade.searchUsersForFeaturing(
+        query || '',
+        limit,
+        ctx.userId,
+        dbInstance,
+      );
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,

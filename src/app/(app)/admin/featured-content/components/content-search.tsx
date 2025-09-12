@@ -5,8 +5,10 @@ import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
+import type { TagSuggestion } from '@/lib/facades/tags/tags.facade';
 import type { ContentType } from '@/lib/validations/system.validation';
 
+import { TagFilter } from '@/app/(app)/admin/featured-content/components/tag-filter';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -25,6 +27,7 @@ import {
   searchCollectionsForFeaturingAction,
   searchUsersForFeaturingAction,
 } from '@/lib/actions/content-search/content-search.actions';
+import { getTagSuggestionsAction } from '@/lib/actions/tags/tags.actions';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ContentSearchProps {
@@ -49,10 +52,13 @@ interface SearchResult {
   }>;
 }
 
+
 export const ContentSearch = ({ contentType, onSelect, selectedContentId }: ContentSearchProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Array<SearchResult>>([]);
   const [selectedItem, setSelectedItem] = useState<null | SearchResult>(null);
+  const [includeTags, setIncludeTags] = useState<Array<string>>([]);
+  const [excludeTags, setExcludeTags] = useState<Array<string>>([]);
 
   const [isLoadingSelected, setIsLoadingSelected] = useToggle();
   const [isPending, startTransition] = useTransition();
@@ -64,6 +70,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
   const { executeAsync: getCollection } = useAction(getCollectionForFeaturingAction);
   const { executeAsync: getBobblehead } = useAction(getBobbleheadForFeaturingAction);
   const { executeAsync: getUser } = useAction(getUserForFeaturingAction);
+  const { executeAsync: getTagSuggestions } = useAction(getTagSuggestionsAction);
 
   const filteredResults = useMemo(() => {
     return results.filter((result) => result.id !== selectedContentId);
@@ -142,81 +149,146 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
     setIsLoadingSelected,
   ]);
 
-  const performSearch = useDebouncedCallback(async (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
-    }
+  const performSearch = useDebouncedCallback(
+    async (searchQuery: string, includeTagIds?: Array<string>, excludeTagIds?: Array<string>) => {
+      const hasQuery = searchQuery.trim().length > 0;
+      const hasTags =
+        (includeTagIds && includeTagIds.length > 0) || (excludeTagIds && excludeTagIds.length > 0);
 
-    setIsSearching.on();
-
-    try {
-      let searchResults: Array<SearchResult> = [];
-
-      if (contentType === 'collection') {
-        const response = await searchCollections({ query: searchQuery });
-
-        if (response?.data?.collections) {
-          searchResults = response.data.collections.map((collection) => ({
-            additionalInfo: `${collection.totalItems} items`,
-            description: collection.description,
-            id: collection.id,
-            imageUrl: collection.coverImageUrl,
-            name: collection.name,
-            ownerName: collection.ownerName || undefined,
-            ownerUsername: collection.ownerUsername || undefined,
-          }));
-        }
-      } else if (contentType === 'bobblehead') {
-        const response = await searchBobbleheads({ query: searchQuery });
-        if (response?.data?.bobbleheads) {
-          searchResults = response.data.bobbleheads.map((bobblehead) => ({
-            additionalInfo: `${bobblehead.manufacturer}${bobblehead.series ? ` - ${bobblehead.series}` : ''}${bobblehead.year ? ` (${bobblehead.year})` : ''}`,
-            description: bobblehead.description,
-            id: bobblehead.id,
-            imageUrl: bobblehead.primaryPhotoUrl || '/placeholder.jpg',
-            name: bobblehead.name || '',
-            ownerName: bobblehead.ownerName || undefined,
-            ownerUsername: bobblehead.ownerUsername || undefined,
-            photos: bobblehead.photos || [],
-          }));
-        }
-      } else if (contentType === 'user') {
-        const response = await searchUsers({ query: searchQuery });
-        if (response?.data?.users) {
-          searchResults = response.data.users.map((user) => ({
-            additionalInfo: `Member since ${new Date(user.memberSince).getFullYear()}${user.isVerified ? ' ✓' : ''}`,
-            description: user.bio,
-            id: user.id,
-            imageUrl: user.avatarUrl,
-            name: user.displayName || '',
-            ownerName: undefined,
-            ownerUsername: user.username || undefined,
-          }));
-        }
+      if (!hasQuery && !hasTags) {
+        setResults([]);
+        return;
       }
 
-      setResults(searchResults);
-    } catch (error) {
-      console.error('Search failed:', error);
-      setResults([]);
-    } finally {
-      setIsSearching.off();
-    }
-  }, 300);
+      setIsSearching.on();
+
+      try {
+        let searchResults: Array<SearchResult> = [];
+        const searchParams = {
+          excludeTags: excludeTagIds,
+          includeTags: includeTagIds,
+          limit: 20,
+          query: hasQuery ? searchQuery : undefined,
+        };
+
+        if (contentType === 'collection') {
+          const response = await searchCollections(searchParams);
+
+          if (response?.data?.collections) {
+            searchResults = response.data.collections.map((collection) => ({
+              additionalInfo: `${collection.totalItems} items`,
+              description: collection.description,
+              id: collection.id,
+              imageUrl: collection.coverImageUrl,
+              name: collection.name,
+              ownerName: collection.ownerName || undefined,
+              ownerUsername: collection.ownerUsername || undefined,
+            }));
+          }
+        } else if (contentType === 'bobblehead') {
+          const response = await searchBobbleheads(searchParams);
+          if (response?.data?.bobbleheads) {
+            searchResults = response.data.bobbleheads.map((bobblehead) => ({
+              additionalInfo: `${bobblehead.manufacturer}${bobblehead.series ? ` - ${bobblehead.series}` : ''}${bobblehead.year ? ` (${bobblehead.year})` : ''}`,
+              description: bobblehead.description,
+              id: bobblehead.id,
+              imageUrl: bobblehead.primaryPhotoUrl || '/placeholder.jpg',
+              name: bobblehead.name || '',
+              ownerName: bobblehead.ownerName || undefined,
+              ownerUsername: bobblehead.ownerUsername || undefined,
+              photos: bobblehead.photos || [],
+            }));
+          }
+        } else if (contentType === 'user') {
+          const response = await searchUsers({ query: searchQuery || '' });
+          if (response?.data?.users) {
+            searchResults = response.data.users.map((user) => ({
+              additionalInfo: `Member since ${new Date(user.memberSince).getFullYear()}${user.isVerified ? ' ✓' : ''}`,
+              description: user.bio,
+              id: user.id,
+              imageUrl: user.avatarUrl,
+              name: user.displayName || '',
+              ownerName: undefined,
+              ownerUsername: user.username || undefined,
+            }));
+          }
+        }
+
+        setResults(searchResults);
+      } catch (error) {
+        console.error('Search failed:', error);
+        setResults([]);
+      } finally {
+        setIsSearching.off();
+      }
+    },
+    300,
+  );
 
   const handleSearch = (value: string) => {
     setQuery(value);
     startTransition(() => {
-      void performSearch(value);
+      void performSearch(value, includeTags, excludeTags);
     });
   };
 
-  const _shouldShowNoResults = !isSearching && !isPending && !!query && results.length === 0;
+  const handleTagFiltersChange = () => {
+    startTransition(() => {
+      void performSearch(query, includeTags, excludeTags);
+    });
+  };
+
+  // Effect to trigger search when tag filters change
+  useEffect(() => {
+    if (includeTags.length > 0 || excludeTags.length > 0 || query.trim().length > 0) {
+      handleTagFiltersChange();
+    }
+  }, [includeTags, excludeTags]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleTagSuggestions = async (tagQuery: string) => {
+    try {
+      const response = await getTagSuggestions({ query: tagQuery });
+      if (response?.data) {
+        // The response structure is { data: { suggestions: TagSuggestion[] }, success: true }
+        const data = response.data as unknown as { suggestions: Array<TagSuggestion> };
+        if (data.suggestions) {
+          return data.suggestions.map((suggestion) => ({
+            color: suggestion.color,
+            id: suggestion.id,
+            name: suggestion.name,
+          }));
+        }
+      }
+      return [];
+    } catch (error) {
+      console.error('Failed to get tag suggestions:', error);
+      return [];
+    }
+  };
+
+  const hasSearchCriteria = query.trim().length > 0 || includeTags.length > 0 || excludeTags.length > 0;
+  const _shouldShowNoResults = !isSearching && !isPending && hasSearchCriteria && results.length === 0;
   const _shouldShowResults = !isSearching && !isPending && results.length > 0;
+  const _hasQueryText = Boolean(query);
+  const _hasIncludeTags = includeTags.length > 0;
+  const _hasExcludeTags = excludeTags.length > 0;
+  const _includeTagsText = `with ${includeTags.length} include tag${includeTags.length === 1 ? '' : 's'}`;
+  const _excludeTagsText = `excluding ${excludeTags.length} tag${excludeTags.length === 1 ? '' : 's'}`;
+  const _showQueryText = _hasQueryText && ` for "${query}"`;
+  const _showIncludeTagsText = _hasIncludeTags && ` ${_includeTagsText}`;
+  const _showExcludeTagsText = _hasExcludeTags && ` ${_excludeTagsText}`;
 
   return (
     <div className={'space-y-4'}>
+      {/* Tag Filter */}
+      <TagFilter
+        excludeTags={excludeTags}
+        includeTags={includeTags}
+        onExcludeTagsChange={setExcludeTags}
+        onIncludeTagsChange={setIncludeTags}
+        onTagSuggestionRequest={handleTagSuggestions}
+      />
+
       {/* Search Input */}
       <FieldItem>
         <FieldAria>
@@ -285,7 +357,10 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         <Card>
           <CardContent className={'py-6 text-center'}>
             <p className={'text-muted-foreground'}>
-              No {contentType}s found matching &quot;{query}&quot;
+              No {contentType}s found matching your search criteria
+              {_showQueryText}
+              {_showIncludeTagsText}
+              {_showExcludeTagsText}
             </p>
           </CardContent>
         </Card>
@@ -323,16 +398,30 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
       </Conditional>
 
       {/* Instructions */}
-      <Conditional isCondition={!query}>
+      <Conditional isCondition={!hasSearchCriteria}>
         <Card>
           <CardHeader>
             <CardTitle className={'text-sm'}>Search Instructions</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className={'text-sm text-muted-foreground'}>
-              Search for {contentType}s to feature by name, description, or owner. The search will find public
-              content that can be highlighted in the featured section.
-            </p>
+            <div className={'space-y-2 text-sm text-muted-foreground'}>
+              <p>
+                Search for {contentType}s to feature by name, description, or owner. You can also filter by
+                tags.
+              </p>
+              <div className={'space-y-1'}>
+                <p>
+                  • <strong>Text search:</strong> Enter keywords to search across content
+                </p>
+                <p>
+                  • <strong>Include tags:</strong> Show content that has ALL selected tags
+                </p>
+                <p>
+                  • <strong>Exclude tags:</strong> Hide content that has ANY of the selected tags
+                </p>
+                <p>• Use both text search and tags together for precise filtering</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </Conditional>

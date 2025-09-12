@@ -120,13 +120,21 @@ export class ContentSearchFacade {
    */
   static searchBobbleheadsForFeaturing = cache(
     async (
-      query: string,
+      query: string | undefined,
       limit: number,
       adminUserId: string,
       dbInstance?: DatabaseExecutor,
+      includeTags?: Array<string>,
+      excludeTags?: Array<string>,
     ): Promise<BobbleheadSearchResponse> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const results = await ContentSearchQuery.searchBobbleheads(query, limit, context);
+      const results = await ContentSearchQuery.searchBobbleheads(
+        query,
+        limit,
+        context,
+        includeTags,
+        excludeTags,
+      );
 
       // get all photos for each bobblehead in a single query
       const bobbleheadIds = results.map((result) => result.id);
@@ -141,9 +149,15 @@ export class ContentSearchFacade {
         photos: photosByBobblehead.get(result.id) || [],
       }));
 
+      const searchTerms = [
+        query,
+        ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
+        ...(excludeTags ? [`excluding tags: ${excludeTags.join(', ')}`] : []),
+      ].filter(Boolean);
+
       return {
         bobbleheads: enrichedResults,
-        message: `Found ${enrichedResults.length} bobbleheads matching "${query}"`,
+        message: `Found ${enrichedResults.length} bobbleheads matching ${searchTerms.join(' ')}`,
       };
     },
   );
@@ -153,17 +167,31 @@ export class ContentSearchFacade {
    */
   static searchCollectionsForFeaturing = cache(
     async (
-      query: string,
+      query: string | undefined,
       limit: number,
       adminUserId: string,
       dbInstance?: DatabaseExecutor,
+      includeTags?: Array<string>,
+      excludeTags?: Array<string>,
     ): Promise<CollectionSearchResponse> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const results = await ContentSearchQuery.searchCollections(query, limit, context);
+      const results = await ContentSearchQuery.searchCollections(
+        query,
+        limit,
+        context,
+        includeTags,
+        excludeTags,
+      );
+
+      const searchTerms = [
+        query,
+        ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
+        ...(excludeTags ? [`excluding tags: ${excludeTags.join(', ')}`] : []),
+      ].filter(Boolean);
 
       return {
         collections: results,
-        message: `Found ${results.length} collections matching "${query}"`,
+        message: `Found ${results.length} collections matching ${searchTerms.join(' ')}`,
       };
     },
   );
@@ -191,7 +219,9 @@ export class ContentSearchFacade {
   /**
    * group photos by bobblehead ID for efficient lookup
    */
-  private static groupPhotosByBobblehead(photos: Array<BobbleheadPhoto>): Map<string, Array<BobbleheadPhoto>> {
+  private static groupPhotosByBobblehead(
+    photos: Array<BobbleheadPhoto>,
+  ): Map<string, Array<BobbleheadPhoto>> {
     const photosByBobblehead = new Map<string, Array<BobbleheadPhoto>>();
 
     photos.forEach((photo) => {
