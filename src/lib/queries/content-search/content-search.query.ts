@@ -1,9 +1,10 @@
 import { and, eq, ilike, inArray, not, or, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
+import type { TagRecord } from '@/lib/queries/tags/tags-query';
 
 import { DEFAULTS } from '@/lib/constants';
-import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, users } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadPhoto = {
@@ -27,6 +28,7 @@ export type BobbleheadSearchResult = {
   ownerUsername: null | string;
   primaryPhotoUrl: null | string;
   series: null | string;
+  tags?: Array<TagRecord>;
   year: null | number;
 };
 
@@ -41,6 +43,7 @@ export type CollectionSearchResult = {
   name: string;
   ownerName: null | string;
   ownerUsername: null | string;
+  tags?: Array<TagRecord>;
   totalItems: null | number;
 };
 
@@ -200,6 +203,106 @@ export class ContentSearchQuery extends BaseQuery {
       .from(bobbleheadPhotos)
       .where(eq(bobbleheadPhotos.bobbleheadId, id))
       .orderBy(bobbleheadPhotos.sortOrder);
+  }
+
+  /**
+   * get tags for multiple bobbleheads
+   */
+  static async getBobbleheadTags(
+    bobbleheadIds: Array<string>,
+    context: QueryContext,
+  ): Promise<Map<string, Array<TagRecord>>> {
+    if (bobbleheadIds.length === 0) {
+      return new Map();
+    }
+
+    const dbInstance = this.getDbInstance(context);
+
+    const results = await dbInstance
+      .select({
+        bobbleheadId: bobbleheadTags.bobbleheadId,
+        color: tags.color,
+        createdAt: tags.createdAt,
+        id: tags.id,
+        name: tags.name,
+        updatedAt: tags.updatedAt,
+        usageCount: tags.usageCount,
+        userId: tags.userId,
+      })
+      .from(bobbleheadTags)
+      .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
+      .where(inArray(bobbleheadTags.bobbleheadId, bobbleheadIds))
+      .orderBy(tags.name);
+
+    // group by bobblehead ID
+    const tagsByBobblehead = new Map<string, Array<TagRecord>>();
+    results.forEach((result) => {
+      const { bobbleheadId, ...tag } = result;
+      if (!tagsByBobblehead.has(bobbleheadId)) {
+        tagsByBobblehead.set(bobbleheadId, []);
+      }
+      tagsByBobblehead.get(bobbleheadId)?.push(tag);
+    });
+
+    return tagsByBobblehead;
+  }
+
+  /**
+   * get tags for collections based on their bobbleheads
+   */
+  static async getCollectionTags(
+    collectionIds: Array<string>,
+    context: QueryContext,
+  ): Promise<Map<string, Array<TagRecord>>> {
+    if (collectionIds.length === 0) {
+      return new Map();
+    }
+
+    const dbInstance = this.getDbInstance(context);
+
+    const results = await dbInstance
+      .select({
+        collectionId: bobbleheads.collectionId,
+        color: tags.color,
+        createdAt: tags.createdAt,
+        id: tags.id,
+        name: tags.name,
+        updatedAt: tags.updatedAt,
+        usageCount: tags.usageCount,
+        userId: tags.userId,
+      })
+      .from(bobbleheads)
+      .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
+      .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
+      .where(
+        and(
+          inArray(bobbleheads.collectionId, collectionIds),
+          eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
+          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+        ),
+      )
+      .orderBy(tags.name);
+
+    // group by collection ID and deduplicate tags
+    const tagsByCollection = new Map<string, Array<TagRecord>>();
+    const seenTags = new Map<string, Set<string>>(); // collectionId -> set of tag IDs
+
+    results.forEach((result) => {
+      const { collectionId, ...tag } = result;
+      
+      if (!tagsByCollection.has(collectionId)) {
+        tagsByCollection.set(collectionId, []);
+        seenTags.set(collectionId, new Set());
+      }
+
+      const tagSet = seenTags.get(collectionId)!;
+      if (!tagSet.has(tag.id)) {
+        tagSet.add(tag.id);
+        tagsByCollection.get(collectionId)?.push(tag);
+      }
+    });
+
+    return tagsByCollection;
   }
 
   /**

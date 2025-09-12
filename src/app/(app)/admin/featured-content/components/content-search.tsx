@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
 
 import type { TagSuggestion } from '@/lib/facades/tags/tags.facade';
+import type { TagRecord } from '@/lib/queries/tags/tags-query';
 import type { ContentType } from '@/lib/validations/system.validation';
 
 import { TagFilter } from '@/app/(app)/admin/featured-content/components/tag-filter';
@@ -18,6 +19,7 @@ import { FieldErrorBorder } from '@/components/ui/form/field-components/field-er
 import { FieldItem } from '@/components/ui/form/field-components/field-item';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TagList } from '@/components/ui/tag-badge';
 import { useToggle } from '@/hooks/use-toggle';
 import {
   getBobbleheadForFeaturingAction,
@@ -50,6 +52,7 @@ interface SearchResult {
     sortOrder: number;
     url: string;
   }>;
+  tags?: Array<TagRecord>;
 }
 
 
@@ -95,6 +98,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
                 name: collection.name,
                 ownerName: collection.ownerName || undefined,
                 ownerUsername: collection.ownerUsername || undefined,
+                tags: collection.tags || [],
               });
             }
           } else if (contentType === 'bobblehead') {
@@ -110,6 +114,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
                 ownerName: bobblehead.ownerName || undefined,
                 ownerUsername: bobblehead.ownerUsername || undefined,
                 photos: bobblehead.photos || [],
+                tags: bobblehead.tags || [],
               });
             }
           } else if (contentType === 'user') {
@@ -183,6 +188,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
               name: collection.name,
               ownerName: collection.ownerName || undefined,
               ownerUsername: collection.ownerUsername || undefined,
+              tags: collection.tags || [],
             }));
           }
         } else if (contentType === 'bobblehead') {
@@ -197,6 +203,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
               ownerName: bobblehead.ownerName || undefined,
               ownerUsername: bobblehead.ownerUsername || undefined,
               photos: bobblehead.photos || [],
+              tags: bobblehead.tags || [],
             }));
           }
         } else if (contentType === 'user') {
@@ -484,6 +491,11 @@ const BobbleheadSearchResult = ({
               <Conditional isCondition={!!result.additionalInfo}>
                 <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
               </Conditional>
+              <Conditional isCondition={!!result.tags && result.tags.length > 0}>
+                <div className={'mt-2'}>
+                  <TagList limit={5} size={'sm'} tags={result.tags || []} />
+                </div>
+              </Conditional>
             </div>
             <Button
               onClick={() => {
@@ -524,6 +536,11 @@ const BobbleheadSearchResult = ({
             </Conditional>
             <Conditional isCondition={!!result.additionalInfo}>
               <p className={'mt-1 text-xs text-muted-foreground'}>{result.additionalInfo}</p>
+            </Conditional>
+            <Conditional isCondition={!!result.tags && result.tags.length > 0}>
+              <div className={'mt-2'}>
+                <TagList limit={5} size={'sm'} tags={result.tags || []} />
+              </div>
             </Conditional>
           </div>
 

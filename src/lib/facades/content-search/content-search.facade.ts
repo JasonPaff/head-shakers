@@ -65,11 +65,16 @@ export class ContentSearchFacade {
 
       // get all photos for this bobblehead
       const photos = await ContentSearchQuery.getBobbleheadPhotosById(id, context);
+      
+      // get all tags for this bobblehead
+      const tagsMap = await ContentSearchQuery.getBobbleheadTags([id], context);
+      const tags = tagsMap.get(id) || [];
 
       return {
         bobblehead: {
           ...bobblehead,
           photos,
+          tags,
         },
       };
     },
@@ -91,7 +96,16 @@ export class ContentSearchFacade {
         throw new Error(ERROR_MESSAGES.COLLECTION.NOT_FOUND_OR_NOT_PUBLIC);
       }
 
-      return { collection };
+      // get all tags for this collection
+      const tagsMap = await ContentSearchQuery.getCollectionTags([id], context);
+      const tags = tagsMap.get(id) || [];
+
+      return { 
+        collection: {
+          ...collection,
+          tags,
+        },
+      };
     },
   );
 
@@ -139,14 +153,18 @@ export class ContentSearchFacade {
       // get all photos for each bobblehead in a single query
       const bobbleheadIds = results.map((result) => result.id);
       const allPhotos = await ContentSearchQuery.getBobbleheadPhotos(bobbleheadIds, context);
+      
+      // get all tags for each bobblehead in a single query
+      const allTags = await ContentSearchQuery.getBobbleheadTags(bobbleheadIds, context);
 
       // group photos by bobblehead ID for efficient lookup
       const photosByBobblehead = this.groupPhotosByBobblehead(allPhotos);
 
-      // enrich results with photos
+      // enrich results with photos and tags
       const enrichedResults = results.map((result) => ({
         ...result,
         photos: photosByBobblehead.get(result.id) || [],
+        tags: allTags.get(result.id) || [],
       }));
 
       const searchTerms = [
@@ -183,6 +201,16 @@ export class ContentSearchFacade {
         excludeTags,
       );
 
+      // get all tags for each collection in a single query
+      const collectionIds = results.map((result) => result.id);
+      const allTags = await ContentSearchQuery.getCollectionTags(collectionIds, context);
+
+      // enrich results with tags
+      const enrichedResults = results.map((result) => ({
+        ...result,
+        tags: allTags.get(result.id) || [],
+      }));
+
       const searchTerms = [
         query,
         ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
@@ -190,8 +218,8 @@ export class ContentSearchFacade {
       ].filter(Boolean);
 
       return {
-        collections: results,
-        message: `Found ${results.length} collections matching ${searchTerms.join(' ')}`,
+        collections: enrichedResults,
+        message: `Found ${enrichedResults.length} collections matching ${searchTerms.join(' ')}`,
       };
     },
   );
