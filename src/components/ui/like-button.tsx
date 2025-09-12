@@ -5,6 +5,7 @@ import type { ComponentProps } from 'react';
 
 import { SignInButton } from '@clerk/nextjs';
 import { HeartIcon } from 'lucide-react';
+import { startTransition } from 'react';
 import { useCallback, useOptimistic } from 'react';
 
 import type { LikeTargetType } from '@/lib/constants';
@@ -27,6 +28,11 @@ interface LikeButtonProps extends Omit<ComponentProps<'button'>, 'children' | 'o
   targetType: LikeTargetType;
 }
 
+type OptimisticState = {
+  isLiked: boolean;
+  likeCount: number;
+};
+
 export const LikeButton = ({
   ariaLabel,
   className,
@@ -42,12 +48,12 @@ export const LikeButton = ({
 }: LikeButtonProps) => {
   const [isBursting, setIsBursting] = useToggle();
 
-  const [optimisticState, addOptimistic] = useOptimistic(
+  const [optimisticState, addOptimistic] = useOptimistic<OptimisticState, OptimisticState>(
     {
       isLiked: isInitiallyLiked,
       likeCount: initialLikeCount,
     },
-    (_currentState, optimisticUpdate: { isLiked: boolean; likeCount: number }) => optimisticUpdate,
+    (_currentState, optimisticUpdate) => optimisticUpdate,
   );
 
   const { executeAsync, isPending } = useServerAction(toggleLikeAction, {
@@ -57,18 +63,23 @@ export const LikeButton = ({
   const handleLikeToggle = useCallback(async () => {
     if (isPending) return;
 
-    const isLiked = !optimisticState.isLiked;
-    const likeCount = isLiked ? optimisticState.likeCount + 1 : Math.max(0, optimisticState.likeCount - 1);
+    const isLikedNew = !optimisticState.isLiked;
+    const likeCountNew =
+      isLikedNew ? optimisticState.likeCount + 1 : Math.max(0, optimisticState.likeCount - 1);
 
-    setIsBursting.update(!optimisticState.isLiked);
-    setTimeout(() => setIsBursting.off(), 800);
+    if (isLikedNew) {
+      setIsBursting.on();
+      setTimeout(() => setIsBursting.off(), 800);
+    }
 
-    addOptimistic({
-      isLiked,
-      likeCount,
-    });
+    startTransition(() =>
+      addOptimistic({
+        isLiked: isLikedNew,
+        likeCount: likeCountNew,
+      }),
+    );
 
-    onLikeChange?.(isLiked, likeCount);
+    onLikeChange?.(isLikedNew, likeCountNew);
 
     await executeAsync({
       targetId,
@@ -109,8 +120,9 @@ export const LikeButton = ({
                   : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400',
                   className,
                 )}
-                disabled={disabled || isPending}
+                disabled={disabled}
                 onClick={handleLikeToggle}
+                {...props}
               >
                 <HeartIcon aria-hidden className={'size-5 transition-all duration-300'} />
               </button>
@@ -135,9 +147,12 @@ export const LikeButton = ({
               'hover:scale-110 hover:shadow-lg active:scale-95',
               isLiked ?
                 'bg-red-500 text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
-              : 'bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500 dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-red-950/30',
+              : [
+                  'bg-gray-100 text-gray-400 hover:bg-red-200 hover:text-destructive',
+                  'dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-red-950',
+                ],
             )}
-            disabled={disabled || isPending}
+            disabled={disabled}
             onClick={handleLikeToggle}
             {...props}
           >
@@ -163,7 +178,10 @@ export const LikeButton = ({
       <Conditional isCondition={isBursting}>
         {[...Array(6)].map((_, i) => (
           <div
-            className={'absolute top-1/2 left-1/2 h-2 w-2 animate-ping rounded-full bg-red-400 opacity-75'}
+            className={cn(
+              'absolute top-1/2 left-1/2 h-2 w-2 animate-ping',
+              'rounded-full bg-destructive opacity-75',
+            )}
             key={i}
             style={{
               animationDelay: `${i * 100}ms`,

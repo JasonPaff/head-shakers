@@ -30,6 +30,7 @@ export const SidebarTrigger = ({ className, onClick, ...props }: SidebarTriggerP
           data-slot={'sidebar-trigger'}
           onClick={handleSidebarToggle}
           size={'icon'}
+          suppressHydrationWarning
           variant={'ghost'}
           {...props}
         >
