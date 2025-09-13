@@ -4,29 +4,21 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
+import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeButton } from '@/components/ui/like-button';
-import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
   isOwner?: boolean;
+  likeData: ContentLikeData;
 }
 
-export const BobbleheadHeader = async ({ bobblehead, isOwner = false }: BobbleheadHeaderProps) => {
-  const currentUserId = await getOptionalUserId();
-
-  const likeData = await SocialFacade.getContentLikeData(
-    bobblehead.id,
-    'bobblehead',
-    currentUserId || undefined,
-  );
-
+export const BobbleheadHeader = async ({ bobblehead, isOwner = false, likeData }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
   const _backButtonLabel =
     (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';

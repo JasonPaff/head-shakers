@@ -1,11 +1,12 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { SignUpButton, useAuth } from '@clerk/nextjs';
 import NumberFlow from '@number-flow/react';
 import { HeartIcon } from 'lucide-react';
 import { useOptimisticAction } from 'next-safe-action/hooks';
+import { Fragment } from 'react';
 
 import type { LikeTargetType } from '@/lib/constants';
 
@@ -16,6 +17,10 @@ import { toggleLikeAction } from '@/lib/actions/social/social.actions';
 import { cn } from '@/utils/tailwind-utils';
 
 interface LikeButtonProps extends Omit<ComponentProps<'button'>, 'children' | 'onClick'> {
+  children?: (options: {
+    onLikeToggle: () => void;
+    optimisticState: { isLiked: boolean; likeCount: number };
+  }) => ReactNode;
   initialLikeCount: number;
   isInitiallyLiked: boolean;
   onLikeChange?: (isLiked: boolean, likeCount: number) => void;
@@ -25,6 +30,7 @@ interface LikeButtonProps extends Omit<ComponentProps<'button'>, 'children' | 'o
 }
 
 export const LikeButton = ({
+  children,
   className,
   disabled,
   initialLikeCount,
@@ -64,7 +70,7 @@ export const LikeButton = ({
     const likedCount = isLiked ? optimisticState.likeCount + 1 : unlikedCount;
 
     // show burst animation only when liking
-    if (isLiked && isSignedIn) {
+    if (isLiked && isSignedIn && !children) {
       setIsBursting.on();
       setTimeout(() => setIsBursting.off(), 800);
     }
@@ -91,30 +97,39 @@ export const LikeButton = ({
           <div className={'flex items-center gap-3'}>
             {/* Sign Up Like Button */}
             <SignUpButton mode={'modal'}>
-              <button
-                aria-label={_unauthenticatedAriaLabel}
-                aria-pressed={optimisticState.isLiked}
-                className={cn(
-                  'group relative rounded-full p-3 transition-all duration-300 ease-out',
-                  'hover:scale-110 active:scale-95',
-                  optimisticState.isLiked ?
-                    'bg-red-50 text-destructive shadow-lg shadow-red-100'
-                  : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400',
-                  className,
-                )}
-                disabled={disabled}
-                onClick={handleLikeToggle}
-                {...props}
+              <Conditional
+                fallback={
+                  <Fragment>{children?.({ onLikeToggle: handleLikeToggle, optimisticState })}</Fragment>
+                }
+                isCondition={!children}
               >
-                <HeartIcon
-                  aria-hidden
+                <button
+                  aria-label={_unauthenticatedAriaLabel}
+                  aria-pressed={optimisticState.isLiked}
                   className={cn(
-                    'size-5 transition-all duration-300',
-                    optimisticState.isLiked ? 'fill-current' : 'group-hover:scale-110',
+                    'group relative rounded-full p-3 transition-all duration-300 ease-out',
+                    'hover:scale-110 active:scale-95',
+                    optimisticState.isLiked ?
+                      'bg-red-50 text-destructive shadow-lg shadow-red-100'
+                    : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400',
+                    className,
                   )}
-                />
-              </button>
+                  disabled={disabled}
+                  onClick={handleLikeToggle}
+                  {...props}
+                >
+                  <HeartIcon
+                    aria-hidden
+                    className={cn(
+                      'size-5 transition-all duration-300',
+                      optimisticState.isLiked ? 'fill-current' : 'group-hover:scale-110',
+                    )}
+                  />
+                </button>
+              </Conditional>
             </SignUpButton>
+
+            {/* Like Count */}
             <Conditional isCondition={shouldShowLikeCount}>
               <div className={'text-right'}>
                 <NumberFlow value={_displayedLikeCount} />
@@ -126,31 +141,36 @@ export const LikeButton = ({
       >
         <div className={'flex items-center gap-3'}>
           {/* Like Button */}
-          <button
-            aria-label={_authenticatedAriaLabel}
-            aria-pressed={optimisticState.isLiked}
-            className={cn(
-              'group relative rounded-full p-3 transition-all duration-300 ease-out',
-              'hover:scale-110 hover:shadow-lg active:scale-95',
-              optimisticState.isLiked ?
-                'bg-destructive text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
-              : [
-                  'bg-gray-100 text-gray-400 hover:bg-red-200 hover:text-destructive',
-                  'dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75',
-                ],
-            )}
-            disabled={disabled}
-            onClick={handleLikeToggle}
-            {...props}
+          <Conditional
+            fallback={<Fragment>{children?.({ onLikeToggle: handleLikeToggle, optimisticState })}</Fragment>}
+            isCondition={!children}
           >
-            <HeartIcon
-              aria-hidden
+            <button
+              aria-label={_authenticatedAriaLabel}
+              aria-pressed={optimisticState.isLiked}
               className={cn(
-                'size-5 transition-all duration-300',
-                optimisticState.isLiked ? 'fill-current' : 'group-hover:scale-110',
+                'group relative rounded-full p-3 transition-all duration-300 ease-out',
+                'hover:scale-110 hover:shadow-lg active:scale-95',
+                optimisticState.isLiked ?
+                  'bg-destructive text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
+                : [
+                    'bg-muted text-gray-400 hover:bg-red-200 hover:text-destructive',
+                    'dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75',
+                  ],
               )}
-            />
-          </button>
+              disabled={disabled}
+              onClick={handleLikeToggle}
+              {...props}
+            >
+              <HeartIcon
+                aria-hidden
+                className={cn(
+                  'size-5 transition-all duration-300',
+                  optimisticState.isLiked ? 'fill-current' : 'group-hover:scale-110',
+                )}
+              />
+            </button>
+          </Conditional>
 
           {/* Like Count */}
           <Conditional isCondition={shouldShowLikeCount}>

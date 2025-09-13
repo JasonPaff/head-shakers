@@ -2,39 +2,36 @@
 
 import type { KeyboardEvent } from 'react';
 
-import { ChevronLeftIcon, ChevronRightIcon, HeartIcon, XIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from 'lucide-react';
 import { useState } from 'react';
 
+import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { LikeButton } from '@/components/ui/like-button';
 import { useToggle } from '@/hooks/use-toggle';
 import { cn } from '@/utils/tailwind-utils';
 
+const getPrimaryPhotoIndex = (photos: BobbleheadWithRelations['photos']) => {
+  const primaryIndex = photos.findIndex((photo) => photo.isPrimary);
+  return primaryIndex !== -1 ? primaryIndex : 0;
+};
+
 interface BobbleheadFeatureCardProps {
   bobblehead: BobbleheadWithRelations;
+  likeData: ContentLikeData;
 }
 
-export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps) => {
-  const primaryPhotoIndex =
-    bobblehead.photos.findIndex((photo) => photo.isPrimary) !== -1 ?
-      bobblehead.photos.findIndex((photo) => photo.isPrimary)
-    : 0;
-
-  const [isHoveringImage, setIsHoveringImage] = useState(false);
+export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatureCardProps) => {
+  const [isHoveringImage, setIsHoveringImage] = useToggle();
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useToggle();
-  const [mainPhotoIndex, setMainPhotoIndex] = useState(primaryPhotoIndex);
-  const [modalPhotoIndex, setModalPhotoIndex] = useState(primaryPhotoIndex);
-
-  const _currentMainPhoto = bobblehead.photos[mainPhotoIndex] || bobblehead.photos[0];
-  const _currentModalPhoto = bobblehead.photos[modalPhotoIndex] || bobblehead.photos[0];
-  const _hasMoreThanThreeTags = bobblehead.tags.length > 3;
-  const _topThreeTags = bobblehead.tags.slice(0, 3);
-  const _hasMultiplePhotos = bobblehead.photos.length > 1;
+  const [mainPhotoIndex, setMainPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
+  const [modalPhotoIndex, setModalPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
 
   const handlePreviousMainPhoto = () => {
     setMainPhotoIndex((prev) => {
@@ -72,6 +69,12 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
     else if (event.key === 'Escape') setIsPhotoDialogOpen.off();
   };
 
+  const _currentMainPhoto = bobblehead.photos[mainPhotoIndex] || bobblehead.photos[0];
+  const _currentModalPhoto = bobblehead.photos[modalPhotoIndex] || bobblehead.photos[0];
+  const _hasMoreThanThreeTags = bobblehead.tags.length > 3;
+  const _topThreeTags = bobblehead.tags.slice(0, 3);
+  const _hasMultiplePhotos = bobblehead.photos.length > 1;
+
   return (
     <Card className={'overflow-hidden'}>
       <div className={'grid grid-cols-1 lg:grid-cols-2'}>
@@ -79,9 +82,13 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
         <div
           className={'relative aspect-[3/4] cursor-pointer lg:aspect-square'}
           onClick={handleImageClick}
-          onKeyDown={(e) => e.key === 'Enter' && handleImageClick()}
-          onMouseEnter={() => setIsHoveringImage(true)}
-          onMouseLeave={() => setIsHoveringImage(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleImageClick();
+            }
+          }}
+          onMouseEnter={setIsHoveringImage.on}
+          onMouseLeave={setIsHoveringImage.off}
           role={'button'}
           tabIndex={0}
         >
@@ -89,11 +96,12 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
           <img
             alt={_currentMainPhoto?.altText ?? bobblehead.name}
             className={'size-full object-cover'}
-            src={_currentMainPhoto?.url || '/placeholder.svg'}
+            src={_currentMainPhoto?.url || '/placeholder.jpg'}
           />
 
           {/* Navigation Arrows  */}
           <Conditional isCondition={_hasMultiplePhotos && isHoveringImage}>
+            {/* Previous Button */}
             <Button
               className={cn(
                 'absolute top-1/2 left-4 z-10 -translate-y-1/2',
@@ -111,6 +119,7 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
               <span className={'sr-only'}>Previous photo</span>
             </Button>
 
+            {/* Next Button */}
             <Button
               className={cn(
                 'absolute top-1/2 right-4 z-10 -translate-y-1/2',
@@ -166,7 +175,7 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
         </div>
 
         {/* Details Section */}
-        <div className={'flex flex-col justify-between p-8'}>
+        <div className={'flex flex-col justify-between px-4'}>
           <div>
             <div className={'mb-4 space-y-1'}>
               {/* Character */}
@@ -217,29 +226,35 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
 
           {/* Like Button */}
           <div className={'mt-6'}>
-            <Button className={'w-full'} size={'lg'}>
-              <HeartIcon aria-hidden className={'mr-2 size-4'} />
-              Like ({bobblehead.likeCount})
-            </Button>
+            <LikeButton
+              initialLikeCount={likeData.likeCount}
+              isInitiallyLiked={likeData.isLiked}
+              shouldShowLikeCount={false}
+              targetId={bobblehead.id}
+              targetType={'bobblehead'}
+            >
+              {({ onLikeToggle, optimisticState }) => (
+                <Button className={'w-full'} onClick={onLikeToggle} size={'lg'}>
+                  <HeartIcon
+                    aria-hidden
+                    className={cn('mr-2 size-4', optimisticState.isLiked && 'fill-white')}
+                  />
+                  Like ({optimisticState.likeCount})
+                </Button>
+              )}
+            </LikeButton>
           </div>
         </div>
       </div>
 
       {/* Image Modal */}
       <Dialog onOpenChange={setIsPhotoDialogOpen.update} open={isPhotoDialogOpen}>
-        <DialogContent className={'max-w-6xl p-0'} isShowCloseButton={false} onKeyDown={handleModalKeyDown}>
-          <div className={'relative flex items-center justify-center bg-black'}>
-            {/* Close button */}
-            <Button
-              className={'absolute top-4 right-4 z-10 bg-black/50 text-white hover:bg-black/70'}
-              onClick={setIsPhotoDialogOpen.off}
-              size={'icon'}
-              variant={'ghost'}
-            >
-              <XIcon aria-hidden className={'size-4'} />
-              <span className={'sr-only'}>Close</span>
-            </Button>
-
+        <DialogContent className={'max-w-6xl p-0'} onKeyDown={handleModalKeyDown}>
+          <DialogHeader className={'p-4'}>
+            <DialogTitle>Bobblehead Photos Placeholder Title</DialogTitle>
+            <DialogDescription>Bobblehead photos placeholder description</DialogDescription>
+          </DialogHeader>
+          <div className={'flex items-center justify-center bg-black'}>
             {/* Previous button */}
             <Conditional isCondition={_hasMultiplePhotos}>
               <Button

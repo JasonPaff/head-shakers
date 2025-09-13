@@ -13,6 +13,7 @@ import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobblehead
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadProps {
@@ -24,6 +25,12 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
 
   const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
     bobbleheadId,
+    currentUserId || undefined,
+  );
+
+  const likeData = await SocialFacade.getContentLikeData(
+    bobbleheadId,
+    'bobblehead',
     currentUserId || undefined,
   );
 
@@ -39,7 +46,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       {/* Header Section */}
       <div className={'border-b border-border bg-muted/75'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} />
+          <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} likeData={likeData} />
         </div>
       </div>
 
@@ -50,7 +57,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
 
       {/* Feature Card Section */}
       <div className={'mx-auto max-w-7xl p-2'}>
-        <BobbleheadFeatureCard bobblehead={bobblehead} />
+        <BobbleheadFeatureCard bobblehead={bobblehead} likeData={likeData} />
       </div>
 
       {/* Photo Gallery Section - Only show if multiple photos */}

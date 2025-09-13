@@ -18,6 +18,7 @@ export type BobbleheadListRecord = {
   category: null | string;
   characterName: null | string;
   condition: null | string;
+  description: null | string;
   height: null | number;
   id: string;
   isFeatured: boolean;
@@ -191,6 +192,7 @@ export class CollectionsQuery extends BaseQuery {
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
         condition: bobbleheads.currentCondition,
+        description: bobbleheads.description,
         height: bobbleheads.height,
         id: bobbleheads.id,
         isFeatured: bobbleheads.isFeatured,
@@ -244,6 +246,7 @@ export class CollectionsQuery extends BaseQuery {
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
         condition: bobbleheads.currentCondition,
+        description: bobbleheads.description,
         featurePhoto: bobbleheadPhotos.url,
         height: bobbleheads.height,
         id: bobbleheads.id,

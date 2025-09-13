@@ -45,6 +45,7 @@ export class SubcollectionsQuery extends BaseQuery {
         category: bobbleheads.category,
         characterName: bobbleheads.characterName,
         condition: bobbleheads.currentCondition,
+        description: bobbleheads.description,
         featurePhoto: bobbleheadPhotos.url,
         height: bobbleheads.height,
         id: bobbleheads.id,
