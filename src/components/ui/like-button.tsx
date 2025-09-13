@@ -98,7 +98,7 @@ export const LikeButton = ({
                   'group relative rounded-full p-3 transition-all duration-300 ease-out',
                   'hover:scale-110 active:scale-95',
                   optimisticState.isLiked ?
-                    'bg-red-50 text-red-500 shadow-lg shadow-red-100'
+                    'bg-red-50 text-destructive shadow-lg shadow-red-100'
                   : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400',
                   className,
                 )}
@@ -133,10 +133,10 @@ export const LikeButton = ({
               'group relative rounded-full p-3 transition-all duration-300 ease-out',
               'hover:scale-110 hover:shadow-lg active:scale-95',
               optimisticState.isLiked ?
-                'bg-red-500 text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
+                'bg-destructive text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
               : [
                   'bg-gray-100 text-gray-400 hover:bg-red-200 hover:text-destructive',
-                  'dark:bg-gray-800 dark:text-gray-500 dark:hover:bg-red-950',
+                  'dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75',
                 ],
             )}
             disabled={disabled}
