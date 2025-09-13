@@ -1,5 +1,5 @@
 import { Loading } from '@/components/ui/loading';
 
-export default function BobbleheadLoading() {
+export default function SubcollectionLoading() {
   return <Loading />;
 }

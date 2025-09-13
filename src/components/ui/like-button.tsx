@@ -12,7 +12,6 @@ import type { LikeTargetType } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useLike } from '@/hooks/use-like';
-import { useToggle } from '@/hooks/use-toggle';
 import { cn } from '@/utils/tailwind-utils';
 
 interface LikeButtonBaseProps extends Omit<ComponentProps<typeof Button>, 'onClick'> {
@@ -24,7 +23,6 @@ interface LikeButtonBaseProps extends Omit<ComponentProps<typeof Button>, 'onCli
 }
 
 interface LikeIconButtonProps extends LikeButtonBaseProps {
-  shouldShowBurstAnimation?: boolean;
   shouldShowCount?: boolean;
 }
 
@@ -34,14 +32,11 @@ export const LikeIconButton = ({
   initialLikeCount,
   isInitiallyLiked,
   onLikeChange,
-  shouldShowBurstAnimation = true,
   shouldShowCount = true,
   targetId,
   targetType,
   ...props
 }: LikeIconButtonProps) => {
-  const [isBursting, setIsBursting] = useToggle();
-
   const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLike({
     initialLikeCount,
     isInitiallyLiked,
@@ -52,12 +47,6 @@ export const LikeIconButton = ({
 
   const handleClick = () => {
     if (!isSignedIn) return;
-
-    if (!isLiked && shouldShowBurstAnimation) {
-      setIsBursting.on();
-      setTimeout(() => setIsBursting.off(), 800);
-    }
-
     toggleLike();
   };
 
@@ -87,24 +76,6 @@ export const LikeIconButton = ({
           isLiked ? 'fill-current' : 'group-hover:scale-110',
         )}
       />
-      <Conditional isCondition={shouldShowBurstAnimation && isBursting}>
-        <Fragment>
-          {[...(Array(6) as unknown[])].map((_, i) => (
-            <div
-              className={cn(
-                'absolute top-1/2 left-1/2 h-2 w-2 animate-ping',
-                'rounded-full bg-destructive opacity-75',
-              )}
-              key={i}
-              style={{
-                animationDelay: `${i * 100}ms`,
-                animationDuration: '600ms',
-                transform: `translate(-50%, -50%) rotate(${i * 60}deg) translateY(-20px)`,
-              }}
-            />
-          ))}
-        </Fragment>
-      </Conditional>
     </button>
   );
 
@@ -161,7 +132,12 @@ export const LikeTextButton = ({
   );
 
   const buttonElement = (
-    <Button className={className} disabled={disabled || isPending} onClick={handleClick} {...props}>
+    <Button
+      className={cn('disabled:opacity-100', className)}
+      disabled={disabled || isPending}
+      onClick={handleClick}
+      {...props}
+    >
       {buttonContent}
     </Button>
   );
