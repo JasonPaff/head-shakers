@@ -12,7 +12,15 @@ import { SubmitButton } from '@/components/ui/form/form-components/submit-button
 export const { fieldContext, formContext, useFieldContext, useFormContext } = createFormHookContexts();
 
 export const { useAppForm, withFieldGroup, withForm } = createFormHook({
-  fieldComponents: { CheckboxField, ComboboxField, SelectField, SwitchField, TagField, TextareaField, TextField },
+  fieldComponents: {
+    CheckboxField,
+    ComboboxField,
+    SelectField,
+    SwitchField,
+    TagField,
+    TextareaField,
+    TextField,
+  },
   fieldContext,
   formComponents: { SubmitButton },
   formContext,

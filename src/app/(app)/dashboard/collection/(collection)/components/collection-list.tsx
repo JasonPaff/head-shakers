@@ -62,7 +62,7 @@ export const CollectionList = async () => {
 
               {/* Collection Actions */}
               <div className={'absolute top-4 right-4'}>
-                <CollectionActions {...collection} collectionId={collection.id} />
+                <CollectionActions collection={collection} />
               </div>
             </CardHeader>
 

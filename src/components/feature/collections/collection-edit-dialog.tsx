@@ -4,6 +4,7 @@ import { revalidateLogic } from '@tanstack/form-core';
 import { useAction } from 'next-safe-action/hooks';
 import { toast } from 'sonner';
 
+import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
 
 import { Button } from '@/components/ui/button';
@@ -20,22 +21,12 @@ import { updateCollectionAction } from '@/lib/actions/collections/collections.ac
 import { updateCollectionSchema } from '@/lib/validations/collections.validation';
 
 interface CollectionEditDialogProps {
-  collectionId: string;
-  description: null | string;
+  collection: CollectionDashboardData;
   isOpen: boolean;
-  isPublic: boolean;
-  name: string;
   onClose: () => void;
 }
 
-export const CollectionEditDialog = ({
-  collectionId,
-  description,
-  isOpen,
-  isPublic,
-  name,
-  onClose,
-}: CollectionEditDialogProps) => {
+export const CollectionEditDialog = ({ collection, isOpen, onClose }: CollectionEditDialogProps) => {
   const { executeAsync, isExecuting } = useAction(updateCollectionAction, {
     onError: ({ error }) => {
       toast.error(error.serverError || 'Failed to update collection');
@@ -49,10 +40,10 @@ export const CollectionEditDialog = ({
 
   const form = useAppForm({
     defaultValues: {
-      collectionId,
-      description,
-      isPublic,
-      name,
+      collectionId: collection.id,
+      description: collection.description || '',
+      isPublic: collection.isPublic,
+      name: collection.name,
     } as UpdateCollectionInput,
     onSubmit: async ({ value }) => {
       await executeAsync(value);
@@ -89,7 +80,7 @@ export const CollectionEditDialog = ({
         >
           {/* Header */}
           <DialogHeader>
-            <DialogTitle>Create New Collection</DialogTitle>
+            <DialogTitle>Update Existing Collection</DialogTitle>
             <DialogDescription>
               Update the details of your collection below. You can change the name, description, and
               visibility.

@@ -74,8 +74,8 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
         </Conditional>
       </div>
 
-      {/* Bobblehead Info */}
       <div className={'flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'}>
+        {/* Title and Description */}
         <div className={'flex-1'}>
           <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{bobblehead.name}</h1>
           <p className={'max-w-3xl text-lg text-pretty text-muted-foreground'}>{bobblehead.description}</p>
@@ -83,14 +83,18 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
 
         {/* Metadata */}
         <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
+          {/* Creation Date */}
           <div className={'flex items-center gap-2'}>
             <CalendarIcon aria-hidden className={'size-4'} />
             Added {bobblehead.createdAt.toLocaleDateString()}
           </div>
+
+          {/* View Count */}
           <div className={'flex items-center gap-2'}>
             <EyeIcon aria-hidden className={'size-4'} />
             {bobblehead.viewCount} views
           </div>
+
           {/* Interactive Like Button */}
           <Conditional isCondition={!!likeData}>
             <LikeIconButton
@@ -100,6 +104,7 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
               targetType={'bobblehead'}
             />
           </Conditional>
+
           {/* Fallback static display if no like data */}
           <Conditional isCondition={!likeData}>
             <div className={'flex items-center gap-2'}>

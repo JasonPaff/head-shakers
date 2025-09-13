@@ -72,7 +72,7 @@ export const LikeIconButton = ({
       <HeartIcon
         aria-hidden
         className={cn(
-          'size-5 transition-all duration-300',
+          'size-4 transition-all duration-300',
           isLiked ? 'fill-current' : 'group-hover:scale-110',
         )}
       />

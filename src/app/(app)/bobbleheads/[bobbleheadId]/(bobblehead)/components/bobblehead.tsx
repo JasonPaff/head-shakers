@@ -11,6 +11,7 @@ import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadI
 import { BobbleheadSpecificationCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-specification-card';
 import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-status-privacy-card';
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
+import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
@@ -51,12 +52,14 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       </div>
 
       {/* Metrics Section */}
-      <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <BobbleheadMetrics bobblehead={bobblehead} />
-      </div>
+      <AuthContent>
+        <div className={'mx-auto mt-4 max-w-7xl p-2'}>
+          <BobbleheadMetrics bobblehead={bobblehead} />
+        </div>
+      </AuthContent>
 
       {/* Feature Card Section */}
-      <div className={'mx-auto max-w-7xl p-2'}>
+      <div className={'mx-auto mt-4 max-w-7xl p-2'}>
         <BobbleheadFeatureCard bobblehead={bobblehead} likeData={likeData} />
       </div>
 

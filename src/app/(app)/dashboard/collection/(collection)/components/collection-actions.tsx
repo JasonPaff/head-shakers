@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
 
+import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
+
 import { CollectionEditDialog } from '@/components/feature/collections/collection-edit-dialog';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -22,13 +24,10 @@ import { useToggle } from '@/hooks/use-toggle';
 import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
 
 interface CollectionActionsProps {
-  collectionId: string;
-  description: null | string;
-  isPublic: boolean;
-  name: string;
+  collection: CollectionDashboardData;
 }
 
-export const CollectionActions = ({ collectionId, description, isPublic, name }: CollectionActionsProps) => {
+export const CollectionActions = ({ collection }: CollectionActionsProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
 
@@ -37,11 +36,11 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
   const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction);
 
   const handleAddBobblehead = () => {
-    router.push($path({ route: '/bobbleheads/add', searchParams: { collectionId } }));
+    router.push($path({ route: '/bobbleheads/add', searchParams: { collectionId: collection.id } }));
   };
 
   const handleDeleteCollectionAsync = async () => {
-    await executeAsync({ collectionId }).then(() => {
+    await executeAsync({ collectionId: collection.id }).then(() => {
       toast.success('Collection deleted successfully!');
     });
   };
@@ -74,11 +73,8 @@ export const CollectionActions = ({ collectionId, description, isPublic, name }:
       {/* Edit Collection Details Dialog */}
       <Conditional isCondition={isEditDialogOpen}>
         <CollectionEditDialog
-          collectionId={collectionId}
-          description={description}
+          collection={collection}
           isOpen={isEditDialogOpen}
-          isPublic={isPublic}
-          name={name}
           onClose={setIsEditDialogOpen.off}
         />
       </Conditional>
