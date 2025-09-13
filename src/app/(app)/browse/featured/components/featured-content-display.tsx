@@ -21,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { LikeButton } from '@/components/ui/like-button';
+import { LikeCompactButton } from '@/components/ui/like-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ENUMS } from '@/lib/constants';
 
@@ -182,7 +182,7 @@ export const FeaturedContentDisplay = ({
               <Conditional
                 isCondition={ENUMS.LIKE.TARGET_TYPE.includes(content.contentType as LikeTargetType)}
               >
-                <LikeButton
+                <LikeCompactButton
                   initialLikeCount={content.likes}
                   isInitiallyLiked={content.isLiked}
                   targetId={content.contentId}

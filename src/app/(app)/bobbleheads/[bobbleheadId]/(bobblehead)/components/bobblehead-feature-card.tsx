@@ -2,7 +2,7 @@
 
 import type { KeyboardEvent } from 'react';
 
-import { ChevronLeftIcon, ChevronRightIcon, HeartIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { LikeButton } from '@/components/ui/like-button';
+import { LikeTextButton } from '@/components/ui/like-button';
 import { useToggle } from '@/hooks/use-toggle';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -226,23 +226,14 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
 
           {/* Like Button */}
           <div className={'mt-6'}>
-            <LikeButton
+            <LikeTextButton
+              className={'w-full'}
               initialLikeCount={likeData.likeCount}
               isInitiallyLiked={likeData.isLiked}
-              shouldShowLikeCount={false}
+              size={'lg'}
               targetId={bobblehead.id}
               targetType={'bobblehead'}
-            >
-              {({ onLikeToggle, optimisticState }) => (
-                <Button className={'w-full'} onClick={onLikeToggle} size={'lg'}>
-                  <HeartIcon
-                    aria-hidden
-                    className={cn('mr-2 size-4', optimisticState.isLiked && 'fill-white')}
-                  />
-                  Like ({optimisticState.likeCount})
-                </Button>
-              )}
-            </LikeButton>
+            />
           </div>
         </div>
       </div>

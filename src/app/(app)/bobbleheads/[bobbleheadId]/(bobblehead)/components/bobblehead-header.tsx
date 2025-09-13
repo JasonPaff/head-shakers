@@ -10,7 +10,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { LikeButton } from '@/components/ui/like-button';
+import { LikeIconButton } from '@/components/ui/like-button';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
@@ -18,7 +18,7 @@ interface BobbleheadHeaderProps {
   likeData: ContentLikeData;
 }
 
-export const BobbleheadHeader = async ({ bobblehead, isOwner = false, likeData }: BobbleheadHeaderProps) => {
+export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
   const _backButtonLabel =
     (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';
@@ -93,7 +93,7 @@ export const BobbleheadHeader = async ({ bobblehead, isOwner = false, likeData }
           </div>
           {/* Interactive Like Button */}
           <Conditional isCondition={!!likeData}>
-            <LikeButton
+            <LikeIconButton
               initialLikeCount={likeData?.likeCount ?? bobblehead.likeCount}
               isInitiallyLiked={likeData?.isLiked ?? false}
               targetId={bobblehead.id}
