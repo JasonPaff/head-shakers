@@ -58,7 +58,7 @@ export const LikeIconButton = ({
       aria-label={isSignedIn ? authenticatedAriaLabel : unauthenticatedAriaLabel}
       aria-pressed={isLiked}
       className={cn(
-        'group relative rounded-full p-3 transition-all duration-300 ease-out',
+        'group relative rounded-full p-2 transition-all duration-300 ease-out',
         'hover:scale-110 active:scale-95',
         isLiked ?
           'bg-destructive text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'

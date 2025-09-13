@@ -1,9 +1,8 @@
 import 'server-only';
 
+import { DashboardClient } from '@/app/(app)/dashboard/(dashboard)/components/dashboard-client';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
-
-import { DashboardClient } from './dashboard-client';
 
 export async function DashboardServer() {
   const currentUserId = await getOptionalUserId();

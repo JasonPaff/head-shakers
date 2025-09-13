@@ -122,43 +122,6 @@ export const SubcollectionBobbleheads = async ({
                     </Button>
                   </div>
                 </div>
-
-                {/*/!* Bobblehead Details *!/*/}
-                {/*<div className={'space-y-2'}>*/}
-                {/*  <div className={'flex items-center gap-2 text-sm'}>*/}
-                {/*    <span className={'font-medium'}>Character:</span>*/}
-                {/*    <span className={'text-muted-foreground'}>{bobblehead.characterName}</span>*/}
-                {/*  </div>*/}
-                {/*  <div className={'flex items-center gap-2 text-sm'}>*/}
-                {/*    <span className={'font-medium'}>Manufacturer:</span>*/}
-                {/*    <span className={'text-muted-foreground'}>{bobblehead.manufacturer}</span>*/}
-                {/*  </div>*/}
-                {/*  <div className={'flex items-center gap-2 text-sm'}>*/}
-                {/*    <RulerIcon aria-hidden className={'size-4'} />*/}
-                {/*    <span className={'text-muted-foreground'}>{bobblehead.height}</span>*/}
-                {/*  </div>*/}
-                {/*</div>*/}
-
-                {/*/!* Condition and Price *!/*/}
-                {/*<div className={'flex items-center justify-between pt-2'}>*/}
-                {/*  <Badge*/}
-                {/*    variant={bobblehead.condition === ENUMS.BOBBLEHEAD.CONDITION[0] ? 'default' : 'secondary'}*/}
-                {/*  >*/}
-                {/*    {bobblehead.condition}*/}
-                {/*  </Badge>*/}
-                {/*  <div className={'flex items-center gap-1 text-sm text-muted-foreground'}>*/}
-                {/*    <DollarSignIcon aria-hidden className={'size-4'} />*/}
-                {/*    {bobblehead.purchasePrice}*/}
-                {/*  </div>*/}
-                {/*</div>*/}
-
-                {/*  /!* Delete Bobblehead Button *!/*/}
-                {/*  <BobbleheadDelete*/}
-                {/*    bobbleheadId={bobblehead.id}*/}
-                {/*    collectionId={collectionId}*/}
-                {/*    subcollectionId={subcollectionId}*/}
-                {/*  />*/}
-                {/*</div>*/}
               </CardContent>
             </Card>
           </Link>
