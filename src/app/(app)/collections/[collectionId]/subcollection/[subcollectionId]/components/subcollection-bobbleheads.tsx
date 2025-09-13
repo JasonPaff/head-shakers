@@ -3,28 +3,29 @@ import { Package2Icon, PlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
+
 import { BobbleheadGalleryCard } from '@/components/feature/bobblehead/bobblehead-gallery-card';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { EmptyState } from '@/components/ui/empty-state';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsProps {
   collectionId: string;
-  isOwner?: boolean;
-  subcollectionId: string;
+  subcollection: NonNullable<PublicSubcollection>;
 }
 
 export const SubcollectionBobbleheads = async ({
   collectionId,
-  isOwner = false,
-  subcollectionId,
+  subcollection,
 }: SubcollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
+  const isOwner = await checkIsOwner(subcollection.userId);
 
   const bobbleheads = await SubcollectionsFacade.getSubcollectionBobbleheadsWithPhotos(
-    subcollectionId,
+    subcollection.id,
     currentUserId || undefined,
   );
 
@@ -34,12 +35,13 @@ export const SubcollectionBobbleheads = async ({
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
+        {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
               href={$path({
                 route: '/bobbleheads/add',
-                searchParams: { collectionId, subcollectionId },
+                searchParams: { collectionId, subcollectionId: subcollection.id },
               })}
             >
               <PlusIcon aria-hidden className={'mr-2 size-4'} />
@@ -58,7 +60,7 @@ export const SubcollectionBobbleheads = async ({
                 <Link
                   href={$path({
                     route: '/bobbleheads/add',
-                    searchParams: { collectionId, subcollectionId },
+                    searchParams: { collectionId, subcollectionId: subcollection.id },
                   })}
                 >
                   <PlusIcon className={'mr-2 h-4 w-4'} />
@@ -83,7 +85,7 @@ export const SubcollectionBobbleheads = async ({
               bobblehead={{
                 ...bobblehead,
                 collectionId,
-                subcollectionId,
+                subcollectionId: subcollection.id,
               }}
               isOwner={isOwner}
               key={bobblehead.id}

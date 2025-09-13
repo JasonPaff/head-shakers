@@ -24,14 +24,12 @@ export const Subcollection = async ({ collectionId, subcollectionId }: Subcollec
     notFound();
   }
 
-  const isOwner = !!(currentUserId && currentUserId === subcollection.userId);
-
   return (
     <div>
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <SubcollectionHeader isOwner={isOwner} subcollection={subcollection} />
+          <SubcollectionHeader subcollection={subcollection} />
         </div>
       </div>
 
@@ -42,11 +40,7 @@ export const Subcollection = async ({ collectionId, subcollectionId }: Subcollec
 
       {/* Bobbleheads Grid */}
       <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <SubcollectionBobbleheads
-          collectionId={collectionId}
-          isOwner={isOwner}
-          subcollectionId={subcollectionId}
-        />
+        <SubcollectionBobbleheads collectionId={collectionId} subcollection={subcollection} />
       </div>
     </div>
   );

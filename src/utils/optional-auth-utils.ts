@@ -19,7 +19,9 @@ export const getOptionalUserId = cache(async (): Promise<null | string> => {
   }
 });
 
-export const checkIsOwner = async (resourceUserId: string): Promise<boolean> => {
+export const checkIsOwner = async (resourceUserId?: null | string): Promise<boolean> => {
+  if (!resourceUserId) return false;
+
   const currentUserId = await getOptionalUserId();
   if (!currentUserId) return false;
 

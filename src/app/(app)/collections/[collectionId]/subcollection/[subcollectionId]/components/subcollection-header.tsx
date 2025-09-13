@@ -7,14 +7,17 @@ import { Fragment } from 'react';
 import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
 
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
+import { checkIsOwner } from '@/utils/optional-auth-utils';
 
 interface SubcollectionHeaderProps {
-  isOwner?: boolean;
   subcollection: PublicSubcollection;
 }
 
-export const SubcollectionHeader = ({ isOwner = false, subcollection }: SubcollectionHeaderProps) => {
+export const SubcollectionHeader = async ({ subcollection }: SubcollectionHeaderProps) => {
   if (!subcollection) throw new Error('Subcollection is required');
+
+  const isOwner = await checkIsOwner(subcollection.userId);
 
   return (
     <Fragment>
@@ -50,8 +53,8 @@ export const SubcollectionHeader = ({ isOwner = false, subcollection }: Subcolle
             <div>{subcollection.bobbleheadCount} Bobbleheads</div>
           </div>
 
-          {/* Add Bobblehead Button - Only show to owners */}
-          {isOwner && (
+          {/* Add Bobblehead Button */}
+          <Conditional isCondition={isOwner}>
             <Button asChild className={'w-full sm:w-auto'}>
               <Link
                 href={$path({
@@ -66,7 +69,7 @@ export const SubcollectionHeader = ({ isOwner = false, subcollection }: Subcolle
                 Add Bobblehead
               </Link>
             </Button>
-          )}
+          </Conditional>
         </div>
       </div>
     </Fragment>

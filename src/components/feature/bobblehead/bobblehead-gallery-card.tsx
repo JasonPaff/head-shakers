@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { useState } from 'react';
 
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
@@ -26,7 +27,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LikeCompactButton } from '@/components/ui/like-button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
@@ -54,35 +54,32 @@ interface BobbleheadGalleryCardProps {
 }
 
 export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGalleryCardProps) => {
-  const [photos, setPhotos] = useState<Array<{ altText?: null | string; url: string }>>([]);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   const [hasLoadedPhotos, setHasLoadedPhotos] = useToggle();
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
 
-  const { executeAsync: fetchPhotos, isExecuting: isLoadingPhotos } = useServerAction(
-    getBobbleheadPhotosAction,
-    { isDisableToast: true },
-  );
+  const {
+    execute: fetchPhotos,
+    isExecuting: isLoadingPhotos,
+    result: photosResult,
+  } = useServerAction(getBobbleheadPhotosAction, { isDisableToast: true });
 
-  const handleMouseEnter = async () => {
+  const photos = useMemo(() => {
+    return (
+      photosResult.data?.data?.map((photo: SelectBobbleheadPhoto) => ({
+        altText: photo.altText,
+        url: photo.url,
+      })) ?? []
+    );
+  }, [photosResult]);
+
+  const handleMouseEnter = () => {
     setIsShowPhotoControls.on();
-    if (!hasLoadedPhotos && !isLoadingPhotos) {
-      setHasLoadedPhotos.on();
-      const result = await fetchPhotos({ bobbleheadId: bobblehead.id });
-      if (result && 'data' in result && result.data && Array.isArray(result.data)) {
-        setPhotos(
-          result.data.map((photo: SelectBobbleheadPhoto) => ({
-            altText: photo.altText,
-            url: photo.url,
-          })),
-        );
-      }
-    }
-  };
+    if (hasLoadedPhotos || isLoadingPhotos) return;
 
-  const handleMouseLeave = () => {
-    setIsShowPhotoControls.off();
+    setHasLoadedPhotos.on();
+    fetchPhotos({ bobbleheadId: bobblehead.id });
   };
 
   const handlePrevPhoto = (e: MouseEvent) => {
@@ -97,28 +94,26 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
     setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
   };
 
-  const _currentPhoto = photos[currentPhotoIndex]?.url || bobblehead.featurePhoto;
-  const _shouldShowControls = photos.length > 1 && isShowPhotoControls;
+  const currentPhoto = photos[currentPhotoIndex]?.url || bobblehead.featurePhoto;
+  const shouldShowControls = photos.length > 1 && isShowPhotoControls;
 
   return (
     <Card className={'overflow-hidden transition-shadow hover:shadow-lg'}>
       <div
         className={'relative aspect-square bg-muted'}
         onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onMouseLeave={setIsShowPhotoControls.off}
       >
         {/* Photo */}
-        <Conditional fallback={<Skeleton className={'size-full'} />} isCondition={!!_currentPhoto}>
-          <img
-            alt={bobblehead.name || 'Bobblehead'}
-            className={'object-cover'}
-            sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
-            src={_currentPhoto ?? undefined}
-          />
-        </Conditional>
+        <img
+          alt={bobblehead.name || 'Bobblehead'}
+          className={'object-cover'}
+          sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
+          src={currentPhoto ?? '/placeholder.jpg'}
+        />
 
         {/* Controls */}
-        <Conditional isCondition={_shouldShowControls}>
+        <Conditional isCondition={shouldShowControls}>
           {/* Previous */}
           <Button
             className={'absolute top-1/2 left-2 -translate-y-1/2 opacity-80 hover:opacity-100'}
@@ -218,7 +213,8 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
           </BobbleheadShareMenu>
         </div>
 
-        {isOwner && (
+        {/* More Options */}
+        <Conditional isCondition={isOwner}>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -233,7 +229,9 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
                 <VisuallyHidden>Open menu</VisuallyHidden>
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align={'end'}>
+              {/* Edit */}
               <DropdownMenuItem asChild>
                 <Link
                   href={$path({
@@ -244,6 +242,8 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
                   Edit
                 </Link>
               </DropdownMenuItem>
+
+              {/* Delete */}
               <DropdownMenuItem
                 onSelect={(e) => {
                   e.preventDefault();
@@ -251,15 +251,17 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
               >
                 <BobbleheadDelete
                   bobbleheadId={bobblehead.id}
+                  className={'h-5'}
                   collectionId={bobblehead.collectionId}
                   subcollectionId={bobblehead.subcollectionId}
+                  variant={'ghost'}
                 >
                   Delete
                 </BobbleheadDelete>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
+        </Conditional>
       </CardFooter>
     </Card>
   );

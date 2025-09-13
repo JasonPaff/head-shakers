@@ -1,10 +1,11 @@
 'use client';
 
+import type { ComponentProps } from 'react';
+
 import { TrashIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
-import { toast } from 'sonner';
 
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -17,24 +18,30 @@ type BobbleheadDeleteProps = Children<{
   bobbleheadId: string;
   collectionId: string;
   subcollectionId?: null | string;
-}>;
+}> &
+  Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
 export const BobbleheadDelete = ({
   bobbleheadId,
   children,
   collectionId,
   subcollectionId,
+  ...props
 }: BobbleheadDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useServerAction(deleteBobbleheadAction);
+  const { executeAsync, isExecuting } = useServerAction(deleteBobbleheadAction, {
+    toastMessages: {
+      error: 'Failed to delete bobblehead. Please try again.',
+      loading: 'Deleting bobblehead...',
+      success: '',
+    },
+  });
 
   const handleDeleteAsync = async () => {
     await executeAsync({ bobbleheadId }).then(() => {
-      toast.success('Bobblehead deleted successfully!');
-
       // redirect to parent collection or subcollection
       if (subcollectionId)
         router.push(
@@ -67,6 +74,7 @@ export const BobbleheadDelete = ({
         onClick={setIsConfirmDeleteDialogOpen.on}
         size={'sm'}
         variant={'destructive'}
+        {...props}
       >
         <TrashIcon
           aria-hidden
