@@ -51,7 +51,7 @@ export const LikeButton = ({
     updateFn: (currentState) => {
       return {
         isLiked: !currentState.isLiked,
-        likeCount: isInitiallyLiked ? Math.max(0, initialLikeCount - 1) : initialLikeCount + 1,
+        likeCount: currentState.isLiked ? Math.max(0, initialLikeCount - 1) : initialLikeCount + 1,
       };
     },
   });
@@ -89,6 +89,7 @@ export const LikeButton = ({
       <AuthContent
         fallback={
           <div className={'flex items-center gap-3'}>
+            {/* Sign Up Like Button */}
             <SignUpButton mode={'modal'}>
               <button
                 aria-label={_unauthenticatedAriaLabel}
@@ -105,19 +106,26 @@ export const LikeButton = ({
                 onClick={handleLikeToggle}
                 {...props}
               >
-                <HeartIcon aria-hidden className={'size-5 transition-all duration-300'} />
+                <HeartIcon
+                  aria-hidden
+                  className={cn(
+                    'size-5 transition-all duration-300',
+                    optimisticState.isLiked ? 'fill-current' : 'group-hover:scale-110',
+                  )}
+                />
               </button>
             </SignUpButton>
             <Conditional isCondition={shouldShowLikeCount}>
               <div className={'text-right'}>
                 <NumberFlow value={_displayedLikeCount} />
-                <div className={'text-xs text-gray-500'}>likes</div>
+                <div className={'text-xs'}>likes</div>
               </div>
             </Conditional>
           </div>
         }
       >
         <div className={'flex items-center gap-3'}>
+          {/* Like Button */}
           <button
             aria-label={_authenticatedAriaLabel}
             aria-pressed={optimisticState.isLiked}
@@ -154,6 +162,7 @@ export const LikeButton = ({
         </div>
       </AuthContent>
 
+      {/* Bursting Animation */}
       <Conditional isCondition={isBursting}>
         {[...(Array(6) as Array<number>)].map((_, i) => (
           <div
