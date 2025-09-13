@@ -1,4 +1,4 @@
-/* eslint-disable react-snob/no-inline-styles */
+ 
 'use client';
 
 import type { CSSProperties } from 'react';
