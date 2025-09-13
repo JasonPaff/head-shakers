@@ -15,7 +15,7 @@ import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadProps {
   bobbleheadId: string;
@@ -29,17 +29,18 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
     currentUserId || undefined,
   );
 
+  if (!bobblehead) {
+    notFound();
+  }
+
+  const isOwner = await checkIsOwner(bobblehead.userId);
+
   const likeData = await SocialFacade.getContentLikeData(
     bobbleheadId,
     'bobblehead',
     currentUserId || undefined,
   );
 
-  if (!bobblehead) {
-    notFound();
-  }
-
-  const isOwner = !!(currentUserId && currentUserId === bobblehead.userId);
   const hasMultiplePhotos = bobblehead.photos.length > 1;
 
   return (
