@@ -9,7 +9,6 @@ import { CollectionSubcollections } from '@/app/(app)/collections/[collectionId]
 
 interface CollectionProps {
   collection: PublicCollection;
-  isOwner?: boolean;
   likeData?: {
     isLiked: boolean;
     likeCount: number;
@@ -19,7 +18,7 @@ interface CollectionProps {
 
 // TODO: add bobbleheads preview section
 
-export const Collection = ({ collection, isOwner = false, likeData }: CollectionProps) => {
+export const Collection = ({ collection, likeData }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -27,7 +26,7 @@ export const Collection = ({ collection, isOwner = false, likeData }: Collection
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <CollectionHeader collection={collection} isOwner={isOwner} likeData={likeData} />
+          <CollectionHeader collection={collection} likeData={likeData} />
         </div>
       </div>
 
@@ -38,12 +37,12 @@ export const Collection = ({ collection, isOwner = false, likeData }: Collection
 
       {/* Subcollections Section */}
       <div className={'mx-auto max-w-7xl p-2'}>
-        <CollectionSubcollections collectionId={collection.id} isOwner={isOwner} />
+        <CollectionSubcollections collection={collection} />
       </div>
 
       {/* Bobbleheads Section */}
       <div className={'mx-auto max-w-7xl p-2'}>
-        <CollectionBobbleheads collectionId={collection.id} isOwner={isOwner} />
+        <CollectionBobbleheads collection={collection} />
       </div>
     </div>
   );

@@ -2,6 +2,7 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
+import { z } from 'zod';
 
 import {
   ACTION_NAMES,
@@ -21,11 +22,12 @@ import { CacheRevalidationService } from '@/lib/services/cache-revalidation.serv
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient } from '@/lib/utils/next-safe-action';
+import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   createBobbleheadWithPhotosSchema,
   deleteBobbleheadSchema,
 } from '@/lib/validations/bobbleheads.validation';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 export const createBobbleheadWithPhotosAction = authActionClient
   .metadata({
@@ -257,6 +259,36 @@ export const deleteBobbleheadAction = authActionClient
         },
         operation: OPERATIONS.BOBBLEHEADS.DELETE_WITH_PHOTOS,
         userId: ctx.userId,
+      });
+    }
+  });
+
+const getBobbleheadPhotosSchema = z.object({
+  bobbleheadId: z.string(),
+});
+
+export const getBobbleheadPhotosAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.GET_PHOTOS_BY_BOBBLEHEAD,
+  })
+  .inputSchema(getBobbleheadPhotosSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const { bobbleheadId } = getBobbleheadPhotosSchema.parse(ctx.sanitizedInput);
+    const userId = (await getOptionalUserId()) ?? undefined;
+
+    try {
+      const photos = await BobbleheadsFacade.getBobbleheadPhotos(bobbleheadId, userId ?? undefined, ctx.db);
+
+      return {
+        data: photos,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: 'getBobbleheadPhotos' },
+        operation: OPERATIONS.BOBBLEHEADS.GET_PHOTOS,
+        userId,
       });
     }
   });

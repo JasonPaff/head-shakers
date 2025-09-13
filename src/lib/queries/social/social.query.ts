@@ -1,4 +1,4 @@
-import { and, count, desc, eq, or, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import type { LikeTargetType } from '@/lib/constants';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
@@ -156,6 +156,62 @@ export class SocialQuery extends BaseQuery {
         targetType,
       };
     });
+  }
+
+  static async getLikesForMultipleContentItems(
+    contentIds: Array<string>,
+    contentType: LikeTargetType,
+    context: QueryContext,
+  ): Promise<Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>> {
+    const dbInstance = this.getDbInstance(context);
+    const result = new Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>();
+
+    if (contentIds.length === 0) {
+      return result;
+    }
+
+    const likeCountQuery = await dbInstance
+      .select({
+        likeCount: count(),
+        targetId: likes.targetId,
+      })
+      .from(likes)
+      .where(and(inArray(likes.targetId, contentIds), eq(likes.targetType, contentType)))
+      .groupBy(likes.targetId);
+
+    const likeCountMap = new Map(likeCountQuery.map((item) => [item.targetId, item.likeCount]));
+
+    let userLikeMap = new Map<string, string>();
+    if (context.userId) {
+      const userLikesQuery = await dbInstance
+        .select({
+          id: likes.id,
+          targetId: likes.targetId,
+        })
+        .from(likes)
+        .where(
+          and(
+            inArray(likes.targetId, contentIds),
+            eq(likes.targetType, contentType),
+            eq(likes.userId, context.userId),
+          ),
+        );
+
+      userLikeMap = new Map(userLikesQuery.map((like) => [like.targetId, like.id]));
+    }
+
+    for (const contentId of contentIds) {
+      const likeCount = likeCountMap.get(contentId) || 0;
+      const likeId = userLikeMap.get(contentId) || null;
+
+      result.set(contentId, {
+        isLiked: !!likeId,
+        likeCount,
+        likeId,
+      });
+    }
+
+    return result;
   }
 
   static async getRecentLikes(

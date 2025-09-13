@@ -9,10 +9,10 @@ import type { PublicCollection } from '@/lib/facades/collections/collections.fac
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
+import { checkIsOwner } from '@/utils/optional-auth-utils';
 
 interface CollectionHeaderProps {
   collection: PublicCollection;
-  isOwner?: boolean;
   likeData?: {
     isLiked: boolean;
     likeCount: number;
@@ -20,8 +20,10 @@ interface CollectionHeaderProps {
   };
 }
 
-export const CollectionHeader = ({ collection, isOwner = false, likeData }: CollectionHeaderProps) => {
+export const CollectionHeader = async ({ collection, likeData }: CollectionHeaderProps) => {
   if (!collection) throw new Error('Collection is required');
+
+  const isOwner = await checkIsOwner(collection.userId);
 
   return (
     <Fragment>
@@ -47,10 +49,13 @@ export const CollectionHeader = ({ collection, isOwner = false, likeData }: Coll
         <div className={'flex flex-col justify-between gap-4 sm:flex-row lg:justify-normal'}>
           {/* Collection Metadata & Like Button */}
           <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
+            {/* Creation Date */}
             <div className={'flex items-center gap-2'}>
               <CalendarIcon aria-hidden className={'size-4'} />
               Created {collection.createdAt.toLocaleDateString()}
             </div>
+
+            {/* Bobblehead Count */}
             <div>{collection.totalBobbleheadCount} Bobbleheads</div>
 
             {/* Like Button */}

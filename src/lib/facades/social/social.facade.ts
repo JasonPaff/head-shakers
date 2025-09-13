@@ -175,6 +175,33 @@ export class SocialFacade {
     },
   );
 
+  static getLikesForMultipleContentItems = cache(
+    async (
+      contentIds: Array<string>,
+      contentType: LikeTargetType,
+      viewerUserId?: string,
+      dbInstance?: DatabaseExecutor,
+    ): Promise<Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>> => {
+      try {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+
+        return SocialQuery.getLikesForMultipleContentItems(contentIds, contentType, context);
+      } catch (error) {
+        const context: FacadeErrorContext = {
+          data: { contentIds, contentType },
+          facade: 'SocialFacade',
+          method: 'getLikesForMultipleContentItems',
+          operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
+          userId: viewerUserId,
+        };
+        throw createFacadeError(context, error);
+      }
+    },
+  );
+
   static getRecentLikeActivity = cache(
     async (
       targetId: string,

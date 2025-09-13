@@ -1,45 +1,45 @@
 import 'server-only';
-import { DollarSignIcon, EyeIcon, PencilIcon, PlusIcon, RulerIcon, StarIcon } from 'lucide-react';
+import { Package2Icon, PlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
-import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
-import { Badge } from '@/components/ui/badge';
+import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
+
+import { BobbleheadGalleryCard } from '@/components/feature/bobblehead/bobblehead-gallery-card';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { ENUMS } from '@/lib/constants';
+import { EmptyState } from '@/components/ui/empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionBobbleheadsProps {
-  collectionId: string;
-  isOwner?: boolean;
+  collection: NonNullable<PublicCollection>;
 }
 
-// TODO: add a nice empty state when there are no bobbleheads
-
-export const CollectionBobbleheads = async ({
-  collectionId,
-  isOwner = false,
-}: CollectionBobbleheadsProps) => {
+export const CollectionBobbleheads = async ({ collection }: CollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
+  const isOwner = await checkIsOwner(collection.userId);
+
   const bobbleheads = await CollectionsFacade.getCollectionBobbleheadsWithPhotos(
-    collectionId,
+    collection.id,
     currentUserId || undefined,
   );
+
+  const isEmpty = bobbleheads.length === 0;
 
   return (
     <div>
       <div className={'mb-6 flex items-center justify-between'}>
+        {/* Section Title */}
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
+
         {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
               href={$path({
                 route: '/bobbleheads/add',
-                searchParams: { collectionId },
+                searchParams: { collectionId: collection.id },
               })}
             >
               <PlusIcon aria-hidden className={'mr-2 size-4'} />
@@ -49,84 +49,47 @@ export const CollectionBobbleheads = async ({
         </Conditional>
       </div>
 
-      <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
-        {bobbleheads.map((bobblehead) => (
-          <Card className={'group transition-shadow hover:shadow-lg'} key={bobblehead.id}>
-            <CardHeader className={'pb-3'}>
-              <div className={'relative mb-4 aspect-square overflow-hidden rounded-lg bg-muted'}>
-                {/* Bobblehead Image */}
-                <img
-                  alt={bobblehead.name || 'Bobblehead'}
-                  className={'object-cover transition-transform duration-300 group-hover:scale-105'}
-                  src={bobblehead.featurePhoto || '/placeholder.svg'}
-                />
-                {/* Featured Badge */}
-                <Conditional isCondition={bobblehead.isFeatured}>
-                  <div className={'absolute top-2 right-2'}>
-                    <Badge className={'bg-accent text-accent-foreground'}>
-                      <StarIcon className={'mr-1 size-3'} />
-                      Featured
-                    </Badge>
-                  </div>
-                </Conditional>
-              </div>
-              <CardTitle className={'text-lg text-balance'}>{bobblehead.name}</CardTitle>
-            </CardHeader>
-
-            <CardContent className={'space-y-3 pt-0'}>
-              {/* Character, Manufacturer, and Height */}
-              <div className={'space-y-2'}>
-                <div className={'flex items-center gap-2 text-sm'}>
-                  <span className={'font-medium'}>Character:</span>
-                  <span className={'text-muted-foreground'}>{bobblehead.characterName}</span>
-                </div>
-                <div className={'flex items-center gap-2 text-sm'}>
-                  <span className={'font-medium'}>Manufacturer:</span>
-                  <span className={'text-muted-foreground'}>{bobblehead.manufacturer}</span>
-                </div>
-                <div className={'flex items-center gap-2 text-sm'}>
-                  <RulerIcon aria-hidden className={'size-4'} />
-                  <span className={'text-muted-foreground'}>{bobblehead.height}</span>
-                </div>
-              </div>
-
-              {/* Condition and Price */}
-              <div className={'flex items-center justify-between pt-2'}>
-                <Badge
-                  variant={bobblehead.condition === ENUMS.BOBBLEHEAD.CONDITION[0] ? 'default' : 'secondary'}
+      {/* Empty State */}
+      <Conditional isCondition={isEmpty}>
+        <EmptyState
+          action={
+            isOwner ?
+              <Button asChild>
+                <Link
+                  href={$path({
+                    route: '/bobbleheads/add',
+                    searchParams: { collectionId: collection.id },
+                  })}
                 >
-                  {bobblehead.condition}
-                </Badge>
-                <div className={'flex items-center gap-1 text-sm text-muted-foreground'}>
-                  <DollarSignIcon aria-hidden className={'size-4'} />
-                  {bobblehead.purchasePrice}
-                </div>
-              </div>
+                  <PlusIcon aria-hidden className={'mr-2 size-4'} />
+                  Add First Bobblehead
+                </Link>
+              </Button>
+            : undefined
+          }
+          description={
+            "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."
+          }
+          icon={Package2Icon}
+          title={'No Bobbleheads Yet'}
+        />
+      </Conditional>
 
-              {/* View Details Button */}
-              <div className={'flex gap-2'}>
-                <Button asChild size={'sm'}>
-                  <Link
-                    href={$path({
-                      route: '/bobbleheads/[bobbleheadId]',
-                      routeParams: { bobbleheadId: bobblehead.id },
-                    })}
-                  >
-                    <EyeIcon aria-hidden className={'mr-2 size-4'} />
-                    View Bobblehead
-                  </Link>
-                </Button>
-                <Button size={'sm'} variant={'secondary'}>
-                  <PencilIcon aria-hidden aria-label={'edit bobblehead'} className={'size-4'} />
-                </Button>
-
-                {/* Delete Bobblehead Button */}
-                <BobbleheadDelete bobbleheadId={bobblehead.id} collectionId={collectionId} />
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {/* Bobblehead Grid */}
+      <Conditional isCondition={!isEmpty}>
+        <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
+          {bobbleheads.map((bobblehead) => (
+            <BobbleheadGalleryCard
+              bobblehead={{
+                ...bobblehead,
+                collectionId: collection.id,
+              }}
+              isOwner={isOwner}
+              key={bobblehead.id}
+            />
+          ))}
+        </div>
+      </Conditional>
     </div>
   );
 };

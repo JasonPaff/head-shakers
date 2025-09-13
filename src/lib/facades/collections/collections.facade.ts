@@ -11,6 +11,7 @@ import type {
 } from '@/lib/validations/collections.validation';
 
 import { db } from '@/lib/db';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -272,14 +273,31 @@ export class CollectionsFacade {
     collectionId: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
+  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string; likeData?: { isLiked: boolean; likeCount: number; likeId: null | string } }>> {
     try {
       const context =
         viewerUserId ?
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return CollectionsQuery.getCollectionBobbleheadsWithPhotos(collectionId, context);
+      const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotos(collectionId, context);
+
+      if (bobbleheads.length === 0) {
+        return bobbleheads;
+      }
+
+      const bobbleheadIds = bobbleheads.map(b => b.id);
+      const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+        bobbleheadIds,
+        'bobblehead',
+        viewerUserId,
+        dbInstance
+      );
+
+      return bobbleheads.map(bobblehead => ({
+        ...bobblehead,
+        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null }
+      }));
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },

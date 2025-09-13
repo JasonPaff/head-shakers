@@ -4,6 +4,7 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertSubCollection } from '@/lib/validations/subcollections.validation';
 
 import { db } from '@/lib/db';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
@@ -40,14 +41,31 @@ export class SubcollectionsFacade {
     subcollectionId: string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
+  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string; likeData?: { isLiked: boolean; likeCount: number; likeId: null | string } }>> {
     try {
       const context =
         viewerUserId ?
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context);
+      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context);
+
+      if (bobbleheads.length === 0) {
+        return bobbleheads;
+      }
+
+      const bobbleheadIds = bobbleheads.map(b => b.id);
+      const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+        bobbleheadIds,
+        'bobblehead',
+        viewerUserId,
+        dbInstance
+      );
+
+      return bobbleheads.map(bobblehead => ({
+        ...bobblehead,
+        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null }
+      }));
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { subcollectionId },

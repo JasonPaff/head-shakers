@@ -29,6 +29,7 @@ export const ACTION_NAMES = {
     GET_BY_COLLECTION: 'getBobbleheadsByCollection',
     GET_BY_ID: 'getBobbleheadById',
     GET_BY_USER: 'getBobbleheadsByUser',
+    GET_PHOTOS_BY_BOBBLEHEAD: 'getBobbleheadPhotos',
     REMOVE_TAG: 'removeTagFromBobblehead',
     REORDER_PHOTOS: 'reorderBobbleheadPhotos',
     SEARCH: 'searchBobbleheads',
