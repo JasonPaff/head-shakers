@@ -34,24 +34,27 @@ async function CollectionPage({ routeParams }: CollectionPageProps) {
 
   const isOwner = !!(currentUserId && currentUserId === collection.userId);
 
-  // Fetch like data for the collection
-  let likeData: { isLiked: boolean; likeCount: number; likeId: string | null } = { isLiked: false, likeCount: 0, likeId: null };
+  // fetch like data for the collection
+  let likeData: { isLiked: boolean; likeCount: number; likeId: null | string } = {
+    isLiked: false,
+    likeCount: 0,
+    likeId: null,
+  };
+
   if (currentUserId) {
     try {
       const likeResult = await SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId);
       likeData = likeResult;
     } catch (error) {
       console.error('Failed to fetch like data for collection:', error);
-      // Continue with default like data
     }
   } else {
-    // For non-authenticated users, get just the like count
+    // for non-authenticated users, get just the like count
     try {
       const likeResult = await SocialFacade.getContentLikeData(collectionId, 'collection');
       likeData = { isLiked: false, likeCount: likeResult.likeCount, likeId: null };
     } catch (error) {
       console.error('Failed to fetch like count for collection:', error);
-      // Continue with default like data
     }
   }
 

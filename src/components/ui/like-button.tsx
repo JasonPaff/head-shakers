@@ -1,121 +1,102 @@
-/* eslint-disable react-snob/no-inline-styles,@typescript-eslint/no-unsafe-assignment */
 'use client';
 
 import type { ComponentProps } from 'react';
 
-import { SignInButton } from '@clerk/nextjs';
+import { SignUpButton, useAuth } from '@clerk/nextjs';
+import NumberFlow from '@number-flow/react';
 import { HeartIcon } from 'lucide-react';
-import { startTransition } from 'react';
-import { useCallback, useOptimistic } from 'react';
+import { useOptimisticAction } from 'next-safe-action/hooks';
 
 import type { LikeTargetType } from '@/lib/constants';
 
 import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
-import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { toggleLikeAction } from '@/lib/actions/social/social.actions';
 import { cn } from '@/utils/tailwind-utils';
 
 interface LikeButtonProps extends Omit<ComponentProps<'button'>, 'children' | 'onClick'> {
-  ariaLabel?: string;
   initialLikeCount: number;
-  isIconOnly?: boolean;
   isInitiallyLiked: boolean;
   onLikeChange?: (isLiked: boolean, likeCount: number) => void;
-  shouldShowCount?: boolean;
+  shouldShowLikeCount?: boolean;
   targetId: string;
   targetType: LikeTargetType;
 }
 
-type OptimisticState = {
-  isLiked: boolean;
-  likeCount: number;
-};
-
 export const LikeButton = ({
-  ariaLabel,
   className,
   disabled,
   initialLikeCount,
-  isIconOnly = false,
   isInitiallyLiked,
   onLikeChange,
-  shouldShowCount = true,
+  shouldShowLikeCount = true,
   targetId,
   targetType,
   ...props
 }: LikeButtonProps) => {
   const [isBursting, setIsBursting] = useToggle();
 
-  const [optimisticState, addOptimistic] = useOptimistic<OptimisticState, OptimisticState>(
-    {
+  const { isSignedIn } = useAuth();
+
+  const {
+    execute: toggleLike,
+    isPending,
+    optimisticState,
+  } = useOptimisticAction(toggleLikeAction, {
+    currentState: {
       isLiked: isInitiallyLiked,
       likeCount: initialLikeCount,
     },
-    (_currentState, optimisticUpdate) => optimisticUpdate,
-  );
-
-  const { executeAsync, isPending } = useServerAction(toggleLikeAction, {
-    isDisableToast: true,
+    updateFn: (currentState) => {
+      return {
+        isLiked: !currentState.isLiked,
+        likeCount: isInitiallyLiked ? Math.max(0, initialLikeCount - 1) : initialLikeCount + 1,
+      };
+    },
   });
 
-  const handleLikeToggle = useCallback(async () => {
+  const handleLikeToggle = () => {
     if (isPending) return;
 
-    const isLikedNew = !optimisticState.isLiked;
-    const likeCountNew =
-      isLikedNew ? optimisticState.likeCount + 1 : Math.max(0, optimisticState.likeCount - 1);
+    const isLiked = !optimisticState.isLiked;
+    const unlikedCount = Math.max(0, optimisticState.likeCount - 1);
+    const likedCount = isLiked ? optimisticState.likeCount + 1 : unlikedCount;
 
-    if (isLikedNew) {
+    // show burst animation only when liking
+    if (isLiked && isSignedIn) {
       setIsBursting.on();
       setTimeout(() => setIsBursting.off(), 800);
     }
 
-    startTransition(() =>
-      addOptimistic({
-        isLiked: isLikedNew,
-        likeCount: likeCountNew,
-      }),
-    );
+    onLikeChange?.(isLiked, likedCount);
 
-    onLikeChange?.(isLikedNew, likeCountNew);
-
-    await executeAsync({
+    toggleLike({
       targetId,
       targetType,
     });
-  }, [
-    isPending,
-    optimisticState.isLiked,
-    optimisticState.likeCount,
-    setIsBursting,
-    addOptimistic,
-    onLikeChange,
-    executeAsync,
-    targetId,
-    targetType,
-  ]);
+  };
 
-  const isLiked = optimisticState.isLiked;
-  const shouldShowLikeCount = shouldShowCount && !isIconOnly;
-  const displayedLikeCount = shouldShowLikeCount ? optimisticState.likeCount : null;
-  const authenticatedAriaLabel =
-    ariaLabel || `${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${optimisticState.likeCount} likes`;
+  const _displayedLikeCount = shouldShowLikeCount ? optimisticState.likeCount : 0;
+  const _authenticatedAriaLabel =
+    props['aria-label'] ||
+    `${optimisticState.isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${optimisticState.likeCount} likes`;
+  const _unauthenticatedAriaLabel =
+    props['aria-label'] || `${optimisticState.likeCount} likes. Sign in to like this ${targetType}`;
 
   return (
     <div className={'relative'}>
       <AuthContent
         fallback={
           <div className={'flex items-center gap-3'}>
-            <SignInButton mode={'modal'}>
+            <SignUpButton mode={'modal'}>
               <button
-                aria-label={`${optimisticState.likeCount} likes. Sign in to like this ${targetType}`}
-                aria-pressed={isLiked}
+                aria-label={_unauthenticatedAriaLabel}
+                aria-pressed={optimisticState.isLiked}
                 className={cn(
                   'group relative rounded-full p-3 transition-all duration-300 ease-out',
                   'hover:scale-110 active:scale-95',
-                  isLiked ?
+                  optimisticState.isLiked ?
                     'bg-red-50 text-red-500 shadow-lg shadow-red-100'
                   : 'bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-400',
                   className,
@@ -126,12 +107,10 @@ export const LikeButton = ({
               >
                 <HeartIcon aria-hidden className={'size-5 transition-all duration-300'} />
               </button>
-            </SignInButton>
-            <Conditional isCondition={displayedLikeCount !== null}>
+            </SignUpButton>
+            <Conditional isCondition={shouldShowLikeCount}>
               <div className={'text-right'}>
-                <div className={'text-lg font-bold text-gray-800'}>
-                  {displayedLikeCount?.toLocaleString()}
-                </div>
+                <NumberFlow value={_displayedLikeCount} />
                 <div className={'text-xs text-gray-500'}>likes</div>
               </div>
             </Conditional>
@@ -140,12 +119,12 @@ export const LikeButton = ({
       >
         <div className={'flex items-center gap-3'}>
           <button
-            aria-label={authenticatedAriaLabel}
-            aria-pressed={isLiked}
+            aria-label={_authenticatedAriaLabel}
+            aria-pressed={optimisticState.isLiked}
             className={cn(
               'group relative rounded-full p-3 transition-all duration-300 ease-out',
               'hover:scale-110 hover:shadow-lg active:scale-95',
-              isLiked ?
+              optimisticState.isLiked ?
                 'bg-red-500 text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
               : [
                   'bg-gray-100 text-gray-400 hover:bg-red-200 hover:text-destructive',
@@ -160,15 +139,15 @@ export const LikeButton = ({
               aria-hidden
               className={cn(
                 'size-5 transition-all duration-300',
-                isLiked ? 'fill-current' : 'group-hover:scale-110',
+                optimisticState.isLiked ? 'fill-current' : 'group-hover:scale-110',
               )}
             />
           </button>
 
           {/* Like Count */}
-          <Conditional isCondition={displayedLikeCount !== null}>
-            <div className={'text-right text-muted-foreground'}>
-              <div className={'text-lg font-bold'}>{displayedLikeCount?.toLocaleString()}</div>
+          <Conditional isCondition={shouldShowLikeCount}>
+            <div className={'text-center text-muted-foreground'}>
+              <NumberFlow value={_displayedLikeCount} />
               <div className={'text-xs'}>likes</div>
             </div>
           </Conditional>
@@ -176,7 +155,7 @@ export const LikeButton = ({
       </AuthContent>
 
       <Conditional isCondition={isBursting}>
-        {[...Array(6)].map((_, i) => (
+        {[...(Array(6) as Array<number>)].map((_, i) => (
           <div
             className={cn(
               'absolute top-1/2 left-1/2 h-2 w-2 animate-ping',

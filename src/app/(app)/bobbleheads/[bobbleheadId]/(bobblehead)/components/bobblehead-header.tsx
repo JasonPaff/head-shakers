@@ -6,10 +6,10 @@ import { Fragment } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { BobbleheadLikeButton } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-like-button';
 import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import { LikeButton } from '@/components/ui/like-button';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
@@ -96,10 +96,11 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
           </div>
           {/* Interactive Like Button */}
           <Conditional isCondition={!!likeData}>
-            <BobbleheadLikeButton
-              bobbleheadId={bobblehead.id}
+            <LikeButton
               initialLikeCount={likeData?.likeCount ?? bobblehead.likeCount}
               isInitiallyLiked={likeData?.isLiked ?? false}
+              targetId={bobblehead.id}
+              targetType={'bobblehead'}
             />
           </Conditional>
           {/* Fallback static display if no like data */}

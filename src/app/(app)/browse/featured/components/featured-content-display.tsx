@@ -14,6 +14,8 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment, useState } from 'react';
 
+import type { LikeTargetType } from '@/lib/constants';
+
 import { AuthContent } from '@/components/ui/auth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +23,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeButton } from '@/components/ui/like-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ENUMS } from '@/lib/constants';
 
 export interface FeaturedContentDisplayProps {
   featuredContentData?: {
@@ -172,26 +175,28 @@ export const FeaturedContentDisplay = ({
                 <EyeIcon aria-hidden className={'size-4'} />
                 {content.viewCount.toLocaleString()}
               </span>
-              <Conditional isCondition={['bobblehead', 'collection', 'subcollection'].includes(content.contentType)}>
+              <span className={'flex items-center gap-1'}>
+                <MessageCircleIcon aria-hidden className={'size-4'} />
+                {content.comments}
+              </span>
+              <Conditional
+                isCondition={ENUMS.LIKE.TARGET_TYPE.includes(content.contentType as LikeTargetType)}
+              >
                 <LikeButton
                   initialLikeCount={content.likes}
                   isInitiallyLiked={content.isLiked}
-                  size={"sm"}
                   targetId={content.contentId}
-                  targetType={content.contentType as 'bobblehead' | 'collection' | 'subcollection'}
-                  variant={"subtle"}
+                  targetType={content.contentType as LikeTargetType}
                 />
               </Conditional>
-              <Conditional isCondition={!['bobblehead', 'collection', 'subcollection'].includes(content.contentType)}>
+              <Conditional
+                isCondition={!ENUMS.LIKE.TARGET_TYPE.includes(content.contentType as LikeTargetType)}
+              >
                 <span className={'flex items-center gap-1'}>
                   <HeartIcon aria-hidden className={'size-4'} />
                   {content.likes}
                 </span>
               </Conditional>
-              <span className={'flex items-center gap-1'}>
-                <MessageCircleIcon aria-hidden className={'size-4'} />
-                {content.comments}
-              </span>
             </div>
 
             <Button

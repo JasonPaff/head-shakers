@@ -6,9 +6,9 @@ import { Fragment } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
-import { CollectionLikeButton } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-like-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import { LikeButton } from '@/components/ui/like-button';
 
 interface CollectionHeaderProps {
   collection: PublicCollection;
@@ -55,10 +55,11 @@ export const CollectionHeader = ({ collection, isOwner = false, likeData }: Coll
 
             {/* Like Button */}
             <Conditional isCondition={!!likeData}>
-              <CollectionLikeButton
-                collectionId={collection.id}
+              <LikeButton
                 initialLikeCount={likeData?.likeCount ?? 0}
                 isInitiallyLiked={likeData?.isLiked ?? false}
+                targetId={collection.id}
+                targetType={'collection'}
               />
             </Conditional>
           </div>
