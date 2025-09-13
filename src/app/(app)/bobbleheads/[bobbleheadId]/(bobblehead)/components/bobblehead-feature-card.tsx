@@ -1,9 +1,6 @@
-import { HeartIcon } from 'lucide-react';
-
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 
@@ -19,19 +16,21 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
   return (
     <Card className={'overflow-hidden'}>
       <div className={'grid grid-cols-1 lg:grid-cols-2'}>
-        {/* Image Section - Larger and better aspect ratio */}
+        {/* Image Section */}
         <div className={'relative aspect-[3/4] lg:aspect-square'}>
           <img
             alt={_primaryPhoto?.altText ?? bobblehead.name}
             className={'size-full object-cover'}
             src={_primaryPhoto?.url || '/placeholder.svg'}
           />
+
           {/* Featured Badge */}
           <Conditional isCondition={bobblehead.isFeatured}>
             <Badge className={'absolute top-4 left-4 bg-accent text-accent-foreground shadow-lg'}>
               Featured
             </Badge>
           </Conditional>
+
           {/* Condition Badge */}
           <Conditional isCondition={!!bobblehead.currentCondition}>
             <Badge
@@ -75,14 +74,19 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
 
             {/* Key Details */}
             <div className={'space-y-3 border-t pt-6'}>
+              {/* Manufacturer */}
               <div className={'flex justify-between'}>
                 <span className={'text-sm text-muted-foreground'}>Manufacturer</span>
                 <span className={'text-sm font-medium'}>{bobblehead.manufacturer || 'Unknown'}</span>
               </div>
+
+              {/* Year */}
               <div className={'flex justify-between'}>
                 <span className={'text-sm text-muted-foreground'}>Year</span>
                 <span className={'text-sm font-medium'}>{bobblehead.year || 'Unknown'}</span>
               </div>
+
+              {/* Category */}
               <Conditional isCondition={!!bobblehead.category}>
                 <div className={'flex justify-between'}>
                   <span className={'text-sm text-muted-foreground'}>Category</span>
@@ -90,14 +94,6 @@ export const BobbleheadFeatureCard = ({ bobblehead }: BobbleheadFeatureCardProps
                 </div>
               </Conditional>
             </div>
-          </div>
-
-          {/* Like Button - simplified */}
-          <div className={'mt-6'}>
-            <Button className={'w-full'} size={'lg'}>
-              <HeartIcon aria-hidden className={'mr-2 size-4'} />
-              Like ({bobblehead.likeCount})
-            </Button>
           </div>
         </div>
       </div>
