@@ -262,13 +262,6 @@ export class SocialFacade {
     },
   );
 
-  static createLikeData(targetId: string, targetType: LikeTargetType): InsertLike {
-    return {
-      targetId,
-      targetType,
-    };
-  }
-
   static async toggleLike(
     targetId: string,
     targetType: LikeTargetType,

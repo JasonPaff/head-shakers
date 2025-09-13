@@ -10,18 +10,23 @@ import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-del
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeButton } from '@/components/ui/like-button';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
   isOwner?: boolean;
-  likeData?: {
-    isLiked: boolean;
-    likeCount: number;
-    likeId: null | string;
-  };
 }
 
-export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: BobbleheadHeaderProps) => {
+export const BobbleheadHeader = async ({ bobblehead, isOwner = false }: BobbleheadHeaderProps) => {
+  const currentUserId = await getOptionalUserId();
+
+  const likeData = await SocialFacade.getContentLikeData(
+    bobblehead.id,
+    'bobblehead',
+    currentUserId || undefined,
+  );
+
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
   const _backButtonLabel =
     (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';

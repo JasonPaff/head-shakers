@@ -67,7 +67,7 @@ export const BobbleheadMetrics = ({ bobblehead }: BobbleheadMetricsProps) => {
                 <span className={'text-sm font-medium'}>{bobblehead.likeCount} likes</span>
               </div>
             </div>
-            <HeartIcon aria-hidden className={'size-8 text-muted-foreground'} />
+            <HeartIcon aria-hidden className={'size-8 text-destructive'} />
           </div>
         </CardContent>
       </Card>
