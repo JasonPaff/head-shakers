@@ -3,7 +3,6 @@
 import { ChevronDownIcon, ChevronRightIcon, EyeIcon, LockIcon, PlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-import { useState } from 'react';
 
 import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
 
@@ -27,9 +26,9 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
   return (
     <Card className={'relative flex flex-col'}>
       <CardHeader className={'pb-3'}>
+        {/* Title and Privacy Status */}
         <div className={'flex items-start justify-between'}>
           <CardTitle className={'text-lg font-semibold text-balance'}>{collection.name}</CardTitle>
-
           <div className={'mr-8 flex gap-1'}>
             <Conditional isCondition={collection.isPublic}>
               <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
@@ -39,9 +38,9 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
             </Conditional>
           </div>
         </div>
-
         <p className={'text-sm text-pretty text-muted-foreground'}>{collection.description}</p>
 
+        {/* Actions Menu */}
         <div className={'absolute top-4 right-4'}>
           <CollectionActions collection={collection} />
         </div>
@@ -49,6 +48,7 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
 
       <CardContent className={'flex flex-1 flex-col'}>
         <div className={'flex-1 space-y-4'}>
+          {/* Metrics Badges */}
           <div className={'flex items-center gap-4 text-sm'}>
             <Badge variant={'secondary'}>{collection.metrics.totalBobbleheads} bobbleheads</Badge>
             <Conditional isCondition={hasSubcollections}>
@@ -59,6 +59,7 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
           <Conditional isCondition={hasSubcollections}>
             <Collapsible onOpenChange={setIsSubcollectionsOpen.update} open={isSubcollectionsOpen}>
               <CollapsibleTrigger asChild>
+                {/* Trigger Button */}
                 <Button className={'w-full justify-between'} size={'sm'} variant={'ghost'}>
                   <span className={'text-sm font-medium'}>Subcollections</span>
                   <Conditional isCondition={isSubcollectionsOpen}>
@@ -70,6 +71,7 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
                 </Button>
               </CollapsibleTrigger>
               <CollapsibleContent className={'space-y-2 pt-2'}>
+                {/* Subcollections List */}
                 <div className={'max-h-32 space-y-1 overflow-y-auto'}>
                   {collection.subCollections.map((sub) => (
                     <div className={'flex items-center justify-between text-sm'} key={sub.id}>
@@ -89,6 +91,8 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
                     </div>
                   ))}
                 </div>
+
+                {/* Add Subcollection Button */}
                 <Button asChild className={'w-full'} size={'sm'} variant={'outline'}>
                   <Link
                     href={$path({
@@ -104,6 +108,7 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
             </Collapsible>
           </Conditional>
 
+          {/* Add Subcollection Button */}
           <Conditional isCondition={!hasSubcollections}>
             <Button asChild className={'w-full'} size={'sm'} variant={'outline'}>
               <Link
@@ -119,6 +124,7 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
           </Conditional>
         </div>
 
+        {/* View COllection Button */}
         <Button asChild className={'mt-4'} variant={'outline'}>
           <Link
             href={$path({
