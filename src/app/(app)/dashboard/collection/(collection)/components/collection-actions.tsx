@@ -4,7 +4,6 @@ import { MoreVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react
 import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
-import { toast } from 'sonner';
 
 import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
 
@@ -33,16 +32,20 @@ export const CollectionActions = ({ collection }: CollectionActionsProps) => {
 
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction);
+  const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction, {
+    toastMessages: {
+      error: 'Failed to delete collection. Please try again.',
+      loading: 'Deleting collection...',
+      success: 'Collection deleted successfully!',
+    },
+  });
 
   const handleAddBobblehead = () => {
     router.push($path({ route: '/bobbleheads/add', searchParams: { collectionId: collection.id } }));
   };
 
   const handleDeleteCollectionAsync = async () => {
-    await executeAsync({ collectionId: collection.id }).then(() => {
-      toast.success('Collection deleted successfully!');
-    });
+    await executeAsync({ collectionId: collection.id });
   };
 
   return (

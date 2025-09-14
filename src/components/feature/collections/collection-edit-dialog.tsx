@@ -1,8 +1,6 @@
 'use client';
 
 import { revalidateLogic } from '@tanstack/form-core';
-import { useAction } from 'next-safe-action/hooks';
-import { toast } from 'sonner';
 
 import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
@@ -17,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
+import { useServerAction } from '@/hooks/use-server-action';
 import { updateCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { updateCollectionSchema } from '@/lib/validations/collections.validation';
 
@@ -27,14 +26,14 @@ interface CollectionEditDialogProps {
 }
 
 export const CollectionEditDialog = ({ collection, isOpen, onClose }: CollectionEditDialogProps) => {
-  const { executeAsync, isExecuting } = useAction(updateCollectionAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to update collection');
-    },
-    onSuccess: ({ data }) => {
-      if (!data) return;
-      toast.success('Collection updated successfully!');
+  const { executeAsync, isExecuting } = useServerAction(updateCollectionAction, {
+    onAfterSuccess: () => {
       handleClose();
+    },
+    toastMessages: {
+      error: 'Failed to update collection. Please try again.',
+      loading: 'Updating collection...',
+      success: 'Collection updated successfully!',
     },
   });
 

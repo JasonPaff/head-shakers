@@ -1,8 +1,6 @@
 'use client';
 
 import { revalidateLogic } from '@tanstack/form-core';
-import { useAction } from 'next-safe-action/hooks';
-import { toast } from 'sonner';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { InsertCollectionInput } from '@/lib/validations/collections.validation';
@@ -17,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
+import { useServerAction } from '@/hooks/use-server-action';
 import { createCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { DEFAULTS } from '@/lib/constants';
 import { insertCollectionSchema } from '@/lib/validations/collections.validation';
@@ -32,18 +31,18 @@ export const CollectionCreateDialog = ({
   onClose,
   onCollectionCreated,
 }: CollectionCreateDialogProps) => {
-  const { executeAsync, isExecuting } = useAction(createCollectionAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to create collection');
-    },
+  const { executeAsync, isExecuting } = useServerAction(createCollectionAction, {
     onSuccess: ({ data }) => {
-      if (!data) return;
-      toast.success('Collection created successfully!');
       onCollectionCreated?.({
         id: data.data.id,
         name: data.data.name,
       });
       handleClose();
+    },
+    toastMessages: {
+      error: 'Failed to create collection. Please try again.',
+      loading: 'Creating collection...',
+      success: 'Collection created successfully!',
     },
   });
 

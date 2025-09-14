@@ -26,9 +26,7 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
   action: HookSafeActionFn<ServerError, S, CVE, Data>,
   options?: HookCallbacks<ServerError, S, CVE, Data> & UseServerActionOptions,
 ) => {
-  const { executeAsync: originalExecuteAsync, ...rest } = useAction(action, {
-    ...options,
-  });
+  const { executeAsync: originalExecuteAsync, ...rest } = useAction(action, options);
 
   const executeAsync = useCallback(
     async (input: Parameters<typeof originalExecuteAsync>[0]) => {
