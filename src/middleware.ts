@@ -11,11 +11,11 @@ const isPublicRoute = createRouteMatcher([
   '/browse(.*)',
 
   // public collection views (read-only)
-  '/collections/:id', // matches /collections/[id] 
+  '/collections/:id', // matches /collections/[id]
   '/collections/:id/subcollection(.*)', // matches subcollection routes
   '/collections/:id/share(.*)', // sharing routes
 
-  // public bobblehead views (read-only)  
+  // public bobblehead views (read-only)
   '/bobbleheads/:id', // matches /bobbleheads/[id]
   '/bobbleheads/:id/share(.*)', // sharing routes
 

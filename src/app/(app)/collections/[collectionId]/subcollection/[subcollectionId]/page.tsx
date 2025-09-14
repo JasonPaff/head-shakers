@@ -22,5 +22,11 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   const { collectionId, subcollectionId } = await routeParams;
   const resolvedSearchParams = await searchParams;
 
-  return <Subcollection collectionId={collectionId} searchParams={resolvedSearchParams} subcollectionId={subcollectionId} />;
+  return (
+    <Subcollection
+      collectionId={collectionId}
+      searchParams={resolvedSearchParams}
+      subcollectionId={subcollectionId}
+    />
+  );
 }

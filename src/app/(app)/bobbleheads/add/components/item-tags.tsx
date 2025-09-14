@@ -22,7 +22,9 @@ export const ItemTags = withForm({
           <form.AppField name={'tags'}>
             {(field) => (
               <field.TagField
-                description={'Press Enter or comma to add tags. Tags help you organize and find your bobbleheads.'}
+                description={
+                  'Press Enter or comma to add tags. Tags help you organize and find your bobbleheads.'
+                }
                 label={'Tags'}
                 placeholder={'Add a tag...'}
               />

@@ -42,7 +42,11 @@ export const CardContent = ({ className, ...props }: CardContentProps) => {
 
 export const CardDescription = ({ className, ...props }: CardDescriptionProps) => {
   return (
-    <div className={cn('text-sm text-muted-foreground', className)} data-slot={'card-description'} {...props} />
+    <div
+      className={cn('text-sm text-muted-foreground', className)}
+      data-slot={'card-description'}
+      {...props}
+    />
   );
 };
 

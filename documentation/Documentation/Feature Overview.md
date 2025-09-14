@@ -23,152 +23,133 @@ Based on your vision, here are the main areas users will navigate:
 **Purpose:** Welcome visitors and provide entry point for logged-in users
 
 - **Public Landing Page**
-    
-    - Site introduction and value proposition
-    - Featured collections showcase
-    - Popular bobbleheads highlights
-    - Sign-up/login prompts
-    - Success stories/testimonials
+  - Site introduction and value proposition
+  - Featured collections showcase
+  - Popular bobbleheads highlights
+  - Sign-up/login prompts
+  - Success stories/testimonials
 - **Logged-in Homepage**
-    
-    - Quick dashboard access
-    - Recent activity feed
-    - Collection quick stats
-    - Shortcuts to add new items
-    - Following feed integration
+  - Quick dashboard access
+  - Recent activity feed
+  - Collection quick stats
+  - Shortcuts to add new items
+  - Following feed integration
 
 ### 2. **User Dashboard (Personal Hub)**
 
 **Purpose:** Central command center for personal collection management
 
 - **Collection Overview**
-    
-    - Total items, estimated value, recent adds
-    - Quick stats and progress tracking
-    - Collection health metrics
-    - Visual collection preview
+  - Total items, estimated value, recent adds
+  - Quick stats and progress tracking
+  - Collection health metrics
+  - Visual collection preview
 - **Quick Actions**
-    
-    - Add new bobblehead (prominent)
-    - Upload multiple photos
-    - Bulk import tools
-    - Collection organization tools
+  - Add new bobblehead (prominent)
+  - Upload multiple photos
+  - Bulk import tools
+  - Collection organization tools
 - **Recent Activity**
-    
-    - Your recent additions/edits
-    - Comments on your items
-    - New followers/interactions
-    - System notifications
+  - Your recent additions/edits
+  - Comments on your items
+  - New followers/interactions
+  - System notifications
 
 ### 3. **Browse/Explore (Discovery Engine)**
 
 **Purpose:** Help users discover collections and connect with community
 
 - **Main Browse Interface**
-    
-    - Featured collections carousel
-    - Popular/trending bobbleheads
-    - Recent community additions
-    - Curated themed showcases
+  - Featured collections carousel
+  - Popular/trending bobbleheads
+  - Recent community additions
+  - Curated themed showcases
 - **Search & Discovery**
-    
-    - Advanced search with filters
-    - Category browsing
-    - Tag-based exploration
-    - "Surprise me" random discovery
+  - Advanced search with filters
+  - Category browsing
+  - Tag-based exploration
+  - "Surprise me" random discovery
 - **Community Features**
-    
-    - Find users by interests
-    - Browse by collection types
-    - Popular collector profiles
-    - Active community discussions
+  - Find users by interests
+  - Browse by collection types
+  - Popular collector profiles
+  - Active community discussions
 
 ### 4. **Individual Bobblehead Pages**
 
 **Purpose:** Detailed view and interaction hub for single items
 
 - **Item Display**
-    
-    - Photo gallery with zoom
-    - Detailed specifications
-    - Owner's notes and story
-    - Acquisition details (optional)
-    - Value tracking (optional)
+  - Photo gallery with zoom
+  - Detailed specifications
+  - Owner's notes and story
+  - Acquisition details (optional)
+  - Value tracking (optional)
 - **Interaction Features**
-    
-    - Comments and discussions
-    - Like/reaction system
-    - Share functionality
-    - Similar items suggestions
+  - Comments and discussions
+  - Like/reaction system
+  - Share functionality
+  - Similar items suggestions
 - **Owner Tools** (when viewing own items)
-    
-    - Edit item details
-    - Manage photos
-    - Privacy settings
-    - Delete/archive options
+  - Edit item details
+  - Manage photos
+  - Privacy settings
+  - Delete/archive options
 
 ### 5. **Collection Pages (Showcases)**
 
 **Purpose:** Display full collections as galleries and inventories
 
 - **Collection Display**
-    
-    - Grid/list view options
-    - Sorting and filtering
-    - Sub-collection organization
-    - Collection statistics
+  - Grid/list view options
+  - Sorting and filtering
+  - Sub-collection organization
+  - Collection statistics
 - **Collection Management** (for owners)
-    
-    - Bulk operations
-    - Organization tools
-    - Privacy controls
-    - Sharing settings
+  - Bulk operations
+  - Organization tools
+  - Privacy controls
+  - Sharing settings
 - **Visitor Experience**
-    
-    - Browse collection easily
-    - Filter by categories/tags
-    - Follow collection option
-    - Comment on collection
+  - Browse collection easily
+  - Filter by categories/tags
+  - Follow collection option
+  - Comment on collection
 
 ### 6. **User Profiles & Settings**
 
 **Purpose:** Account management and public collector presence
 
 - **Public Profile**
-    
-    - Collector bio and interests
-    - Collection highlights
-    - Recent activity
-    - Following/followers counts
+  - Collector bio and interests
+  - Collection highlights
+  - Recent activity
+  - Following/followers counts
 - **Account Settings**
-    
-    - Privacy controls (detailed)
-    - Notification preferences
-    - Profile customization
-    - Data export options
+  - Privacy controls (detailed)
+  - Notification preferences
+  - Profile customization
+  - Data export options
 - **Collection Settings**
-    
-    - Default privacy levels
-    - Sharing preferences
-    - Organization defaults
-    - Value tracking options
+  - Default privacy levels
+  - Sharing preferences
+  - Organization defaults
+  - Value tracking options
 
 ### 7. **Following Feed**
 
 **Purpose:** Stay updated with followed collectors and collections
 
 - **Activity Stream**
-    
-    - New additions from followed users
-    - Collection updates
-    - Community interactions
-    - Featured content
+  - New additions from followed users
+  - Collection updates
+  - Community interactions
+  - Featured content
 - **Feed Management**
-    
-    - Filter by activity type
-    - Manage following list
-    - Notification controls
-    - Discovery suggestions
+  - Filter by activity type
+  - Manage following list
+  - Notification controls
+  - Discovery suggestions
 
 ---
 

@@ -46,6 +46,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
       );
 
   const isEmpty = bobbleheads.length === 0;
+  const hasActiveFilters = searchTerm || sortBy !== 'newest' || view !== 'collection';
 
   return (
     <div>
@@ -78,7 +79,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
       <Conditional isCondition={isEmpty}>
         <EmptyState
           action={
-            <Conditional isCondition={isOwner}>
+            <Conditional isCondition={isOwner && !hasActiveFilters}>
               <Button asChild>
                 <Link
                   href={$path({
@@ -93,10 +94,12 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
             </Conditional>
           }
           description={
-            "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."
+            hasActiveFilters ?
+              'No bobbleheads match your current search or filter criteria. Try adjusting your search terms or clearing filters.'
+            : "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."
           }
           icon={Package2Icon}
-          title={'No Bobbleheads Yet'}
+          title={hasActiveFilters ? 'No Results Found' : 'No Bobbleheads Yet'}
         />
       </Conditional>
 

@@ -13,7 +13,7 @@ This solution creates a `publicActionClient` that works alongside the existing `
 Record<string, never>  // Base actionClient context
   ↓ authMiddleware
 AuthContext           // { clerkUserId: string; userId: string }
-  ↓ sanitizationMiddleware  
+  ↓ sanitizationMiddleware
 SanitizedContext      // extends AuthContext + { sanitizedInput: unknown }
   ↓ transactionMiddleware
 TransactionContext    // extends SanitizedContext + { db: DatabaseExecutor; tx?: DatabaseExecutor }
@@ -52,7 +52,7 @@ export interface PublicTransactionContext extends PublicSanitizedContext {
 }
 
 // Type aliases for final contexts
-export type ActionContext = TransactionContext;        // Authenticated
+export type ActionContext = TransactionContext; // Authenticated
 export type PublicActionContext = PublicTransactionContext; // Public
 ```
 
@@ -126,7 +126,7 @@ export const publicDatabaseMiddleware = createMiddleware<{
     },
     async (span) => {
       // Implementation with public-specific context...
-    }
+    },
   );
 });
 ```
@@ -165,7 +165,7 @@ export const createUserPost = authActionClient
     // ctx has full typing: clerkUserId, userId, sanitizedInput, db, tx?
     const { userId, clerkUserId, sanitizedInput, db, tx } = ctx;
     const executor = tx || db;
-    
+
     // Authenticated database operations...
     return { success: true };
   });
@@ -180,7 +180,7 @@ export const submitContactForm = publicActionClient
   .action(async ({ parsedInput, ctx }) => {
     // ctx has public typing: sanitizedInput, db (no user context)
     const { sanitizedInput, db } = ctx;
-    
+
     // Public database operations...
     return { success: true };
   });
@@ -196,7 +196,7 @@ export const publicDataOperation = publicActionClient
     // ctx has public typing with transaction: sanitizedInput, db, tx?
     const { sanitizedInput, db, tx } = ctx;
     const executor = tx || db;
-    
+
     // Transactional public operations...
     return { success: true };
   });

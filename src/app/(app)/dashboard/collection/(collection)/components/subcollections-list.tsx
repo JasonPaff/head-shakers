@@ -139,7 +139,11 @@ export const SubcollectionsList = ({ groupedSubcollections }: SubcollectionsList
 
               {/* Subcollections List */}
               <CollapsibleContent>
-                <SubcollectionsListItem collection={group} collectionId={collectionId} searchTerm={searchTerm} />
+                <SubcollectionsListItem
+                  collection={group}
+                  collectionId={collectionId}
+                  searchTerm={searchTerm}
+                />
               </CollapsibleContent>
             </Collapsible>
           </Card>

@@ -1,4 +1,3 @@
- 
 'use client';
 
 import type { ComponentPropsWithRef, CSSProperties } from 'react';
@@ -13,7 +12,11 @@ interface SidebarMenuSkeletonProps extends ComponentPropsWithRef<'div'> {
   isShowIcon?: boolean;
 }
 
-export const SidebarMenuSkeleton = ({ className, isShowIcon = false, ...props }: SidebarMenuSkeletonProps) => {
+export const SidebarMenuSkeleton = ({
+  className,
+  isShowIcon = false,
+  ...props
+}: SidebarMenuSkeletonProps) => {
   const width = useMemo(() => {
     return `${Math.floor(Math.random() * 40) + 50}%`;
   }, []);

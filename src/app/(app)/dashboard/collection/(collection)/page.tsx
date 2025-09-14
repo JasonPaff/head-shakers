@@ -8,7 +8,6 @@ import { DashboardTabs } from '@/app/(app)/dashboard/collection/(collection)/com
 import { Route } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { Loading } from '@/components/ui/loading';
 
-
 export default withParamValidation(DashboardCollectionPage, Route);
 
 export function generateMetadata(): Metadata {

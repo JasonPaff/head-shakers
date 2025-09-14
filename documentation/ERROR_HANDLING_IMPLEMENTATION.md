@@ -7,6 +7,7 @@ This implementation provides a comprehensive, structured error handling system f
 ## Files Created/Modified
 
 ### Core Error System
+
 - **`src/lib/utils/errors.ts`** - Enhanced with error classification enums and database detection utilities
 - **`src/lib/utils/action-error-handler.ts`** - New comprehensive error handler with context-aware processing
 - **`src/lib/utils/next-safe-action.ts`** - Updated to use new ActionError system with user-friendly responses
@@ -14,16 +15,18 @@ This implementation provides a comprehensive, structured error handling system f
 - **`src/lib/actions/bobbleheads.actions.ts`** - Updated to demonstrate new error handling patterns
 
 ### Documentation
+
 - **`src/lib/utils/error-handling-examples.ts`** - Examples and patterns for using the new error system
 - **`ERROR_HANDLING_IMPLEMENTATION.md`** - This documentation file
 
 ## Key Features Implemented
 
 ### 1. Error Classification System
+
 ```typescript
 export enum ErrorType {
   VALIDATION = 'VALIDATION',
-  AUTHORIZATION = 'AUTHORIZATION', 
+  AUTHORIZATION = 'AUTHORIZATION',
   NOT_FOUND = 'NOT_FOUND',
   BUSINESS_RULE = 'BUSINESS_RULE',
   EXTERNAL_SERVICE = 'EXTERNAL_SERVICE',
@@ -34,7 +37,9 @@ export enum ErrorType {
 ```
 
 ### 2. Database-Specific Error Detection
+
 Comprehensive PostgreSQL error code detection:
+
 - **Unique constraint violations** (23505)
 - **Foreign key constraint violations** (23503)
 - **Not null constraint violations** (23502)
@@ -43,6 +48,7 @@ Comprehensive PostgreSQL error code detection:
 - **Deadlock detection** (40P01)
 
 ### 3. Structured Error Response System
+
 ```typescript
 export class ActionError extends Error {
   constructor(
@@ -58,15 +64,19 @@ export class ActionError extends Error {
 ```
 
 ### 4. Comprehensive Error Handler
+
 The `handleActionError` function provides:
+
 - **Automatic error classification**
-- **Context-aware logging** 
+- **Context-aware logging**
 - **Sentry integration** with structured context
 - **User-friendly error messages**
 - **Security-conscious information disclosure**
 
 ### 5. Next-Safe-Action Integration
+
 Enhanced error handling in the action client:
+
 - **Type-based response filtering**
 - **User-friendly message mapping**
 - **Security-conscious error exposure**
@@ -75,6 +85,7 @@ Enhanced error handling in the action client:
 ## Usage Patterns
 
 ### Basic Error Handling
+
 ```typescript
 try {
   const result = await someOperation();
@@ -89,17 +100,19 @@ try {
 ```
 
 ### Business Rule Violations
+
 ```typescript
 if (!isValidCondition) {
   throw createBusinessRuleViolation(
     'max_items_exceeded',
     'Collection cannot exceed 100 items',
-    'add_item_to_collection'
+    'add_item_to_collection',
   );
 }
 ```
 
 ### Not Found Errors
+
 ```typescript
 if (!resource) {
   throw createNotFoundError('Collection', 'get_collection', resourceId);
@@ -107,6 +120,7 @@ if (!resource) {
 ```
 
 ### Authorization Errors
+
 ```typescript
 if (resource.userId !== userId) {
   throw new ActionError(
@@ -115,7 +129,7 @@ if (resource.userId !== userId) {
     'Access denied',
     { operation, resourceId, requestedBy: userId },
     false,
-    403
+    403,
   );
 }
 ```
@@ -123,12 +137,14 @@ if (resource.userId !== userId) {
 ## Security Features
 
 ### Information Disclosure Protection
+
 - **Database errors** don't expose internal details
 - **Stack traces** only logged, never returned to users
 - **Input sanitization** in error contexts
 - **Structured logging** for debugging without data leakage
 
 ### User-Friendly Messages
+
 - **Validation errors** show specific field issues
 - **Business rules** provide clear explanations
 - **Database constraints** translated to user language
@@ -137,12 +153,14 @@ if (resource.userId !== userId) {
 ## Monitoring & Observability
 
 ### Sentry Integration
+
 - **Structured context** for all errors
 - **Breadcrumb trails** for debugging
 - **Error classification** tags
 - **Performance spans** for database operations
 
 ### Logging Strategy
+
 - **Console logs** for unexpected errors
 - **Sentry capture** for all classified errors
 - **Context preservation** throughout error chain
@@ -158,18 +176,21 @@ if (resource.userId !== userId) {
 ## Benefits Achieved
 
 ### For Developers
+
 - **Consistent error handling** across all actions
 - **Type-safe error classification**
 - **Rich debugging context**
 - **Clear usage patterns**
 
 ### For Users
+
 - **Clear, actionable error messages**
 - **No technical jargon exposure**
 - **Consistent error experience**
 - **Proper HTTP status codes**
 
 ### For Operations
+
 - **Comprehensive error monitoring**
 - **Structured logging for debugging**
 - **Performance tracking**
@@ -178,14 +199,16 @@ if (resource.userId !== userId) {
 ## Implementation Status
 
 ✅ **Completed:**
+
 - Error classification system
-- Database-specific error handling  
+- Database-specific error handling
 - Structured error response system
 - Next-safe-action integration
 - Comprehensive error handler
 - Documentation and examples
 
 ❌ **Not Implemented (Per Request):**
+
 - Empty action files implementation
 - Rate limiting application to actions
 - Ownership validation middleware
@@ -205,6 +228,7 @@ To fully utilize this error handling system:
 ## Testing
 
 The error handling system should be tested with:
+
 - **Unit tests** for error classification functions
 - **Integration tests** for database error scenarios
 - **End-to-end tests** for user-facing error messages

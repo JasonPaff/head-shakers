@@ -43,6 +43,7 @@ export const SubcollectionBobbleheads = async ({
   );
 
   const hasNoBobbleheads = bobbleheads.length === 0;
+  const hasActiveFilters = searchTerm || sortBy !== 'newest';
 
   return (
     <div>
@@ -73,7 +74,7 @@ export const SubcollectionBobbleheads = async ({
       <Conditional isCondition={hasNoBobbleheads}>
         <EmptyState
           action={
-            <Conditional isCondition={isOwner}>
+            <Conditional isCondition={isOwner && !hasActiveFilters}>
               <Button asChild>
                 <Link
                   href={$path({
@@ -88,10 +89,12 @@ export const SubcollectionBobbleheads = async ({
             </Conditional>
           }
           description={
-            "This subcollection doesn't have any bobbleheads. Start adding bobbleheads to organize your collection."
+            hasActiveFilters ?
+              'No bobbleheads match your current search or filter criteria. Try adjusting your search terms or clearing filters.'
+            : "This subcollection doesn't have any bobbleheads. Start adding bobbleheads to organize your collection."
           }
           icon={Package2Icon}
-          title={'No Bobbleheads Yet'}
+          title={hasActiveFilters ? 'No Results Found' : 'No Bobbleheads Yet'}
         />
       </Conditional>
 

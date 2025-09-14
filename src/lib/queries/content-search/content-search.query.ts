@@ -289,7 +289,7 @@ export class ContentSearchQuery extends BaseQuery {
 
     results.forEach((result) => {
       const { collectionId, ...tag } = result;
-      
+
       if (!tagsByCollection.has(collectionId)) {
         tagsByCollection.set(collectionId, []);
         seenTags.set(collectionId, new Set());

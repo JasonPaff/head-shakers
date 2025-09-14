@@ -26,28 +26,28 @@ export const createRateLimitMiddleware = (
       keyGenerator ? keyGenerator(ctx) : REDIS_KEYS.RATE_LIMIT_ACTION(ctx.userId, metadata.actionName);
 
     const circuitBreaker = circuitBreakers.fast('redis-rate-limit');
-    
+
     try {
       const current = await circuitBreaker.execute(async () => {
         // Redis operations with retry logic
         const retryResult = await withServiceRetry(
           async () => {
             const count = await redis.incr(key);
-            
+
             if (count === 1) {
               await redis.expire(key, windowInSeconds);
             }
-            
+
             return count;
           },
           'redis',
           {
             backoffMs: 50,
             maxAttempts: 2, // Quick retry for rate limiting
-            operationName: 'redis-rate-limit'
-          }
+            operationName: 'redis-rate-limit',
+          },
         );
-        
+
         return retryResult.result;
       });
 
@@ -72,8 +72,10 @@ export const createRateLimitMiddleware = (
     } catch (error) {
       // If Redis is down, we should fail open for rate limiting to maintain availability
       // Log the error but allow the request to proceed
-      console.warn(`Rate limiting unavailable due to Redis failure: ${error instanceof Error ? error.message : String(error)}`);
-      
+      console.warn(
+        `Rate limiting unavailable due to Redis failure: ${error instanceof Error ? error.message : String(error)}`,
+      );
+
       // In production, you might want to use in-memory fallback or fail closed
       return next();
     }

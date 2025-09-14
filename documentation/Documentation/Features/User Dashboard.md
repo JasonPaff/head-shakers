@@ -82,47 +82,41 @@ The User Dashboard is the central command center for collection management. It's
 ### **Recent Activity Feed**
 
 - **Your Recent Actions**
-    
-    - Items added/edited in last 7 days
-    - Sub-collections created/modified
-    - Privacy changes made
-    - Photos uploaded
+  - Items added/edited in last 7 days
+  - Sub-collections created/modified
+  - Privacy changes made
+  - Photos uploaded
 - **Community Activity** (if following others)
-    
-    - New items from followed users
-    - Comments on your items
-    - Likes and reactions received
-    - New followers gained
+  - New items from followed users
+  - Comments on your items
+  - Likes and reactions received
+  - New followers gained
 
 ### **Notification Center**
 
 - **Real-time Notifications**
-    
-    - Comments on your bobbleheads
-    - Likes and reactions
-    - New followers
-    - System announcements
+  - Comments on your bobbleheads
+  - Likes and reactions
+  - New followers
+  - System announcements
 - **Notification Management**
-    
-    - Mark as read/unread
-    - Filter by notification type
-    - Bulk actions (mark all read)
-    - Notification preferences
+  - Mark as read/unread
+  - Filter by notification type
+  - Bulk actions (mark all read)
+  - Notification preferences
 
 ### **Activity Statistics**
 
 - **Engagement Metrics**
-    
-    - Views on your collection this week
-    - Comments received
-    - Likes/reactions earned
-    - Profile visits
+  - Views on your collection this week
+  - Comments received
+  - Likes/reactions earned
+  - Profile visits
 - **Collection Growth**
-    
-    - Items added over time (chart)
-    - Collection milestones achieved
-    - Sub-collection growth
-    - Tag usage trends
+  - Items added over time (chart)
+  - Collection milestones achieved
+  - Sub-collection growth
+  - Tag usage trends
 
 ---
 

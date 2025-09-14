@@ -1,4 +1,3 @@
- 
 import type { ComponentProps, CSSProperties } from 'react';
 
 import { cn } from '@/utils/tailwind-utils';

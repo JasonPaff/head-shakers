@@ -5,6 +5,7 @@ import Link from 'next/link';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionSubcollectionsAdd } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-subcollections-add';
+import { SubcollectionActions } from '@/app/(app)/collections/[collectionId]/(collection)/components/subcollection-actions';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -49,26 +50,41 @@ export const CollectionSidebarSubcollections = async ({
 
         {/* Subcollections */}
         <Conditional isCondition={hasSubcollections}>
-          <ul className={'space-y-2'}>
+          <ul className={'space-y-3'}>
             {subcollections.map((subcollection) => (
-              <li key={subcollection.id}>
-                <Link
-                  className={'block rounded-md p-2 transition-colors hover:bg-muted/50'}
-                  href={$path({
-                    route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-                    routeParams: {
-                      collectionId: collection.id,
-                      subcollectionId: subcollection.id,
-                    },
-                  })}
-                >
-                  <div className={'flex items-center justify-between'}>
-                    <span className={'text-sm font-medium'}>{subcollection.name}</span>
-                    <Badge className={'text-xs'} variant={'secondary'}>
-                      {subcollection.bobbleheadCount}
-                    </Badge>
-                  </div>
-                </Link>
+              <li className={'group relative'} key={subcollection.id}>
+                <div className={'flex items-start justify-between gap-2'}>
+                  <Link
+                    className={'flex-1 rounded-md p-2 transition-colors hover:bg-muted/50'}
+                    href={$path({
+                      route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+                      routeParams: {
+                        collectionId: collection.id,
+                        subcollectionId: subcollection.id,
+                      },
+                    })}
+                  >
+                    <div className={'flex flex-col space-y-1'}>
+                      <div className={'flex items-center justify-between'}>
+                        <span className={'text-sm font-medium'}>{subcollection.name}</span>
+                        <Badge className={'text-xs'} variant={'secondary'}>
+                          {subcollection.bobbleheadCount}
+                        </Badge>
+                      </div>
+                      <Conditional isCondition={!!subcollection.description}>
+                        <p className={'line-clamp-2 text-xs text-muted-foreground'}>
+                          {subcollection.description}
+                        </p>
+                      </Conditional>
+                    </div>
+                  </Link>
+
+                  <Conditional isCondition={isOwner}>
+                    <div className={'opacity-0 transition-opacity group-hover:opacity-100'}>
+                      <SubcollectionActions subcollection={subcollection} />
+                    </div>
+                  </Conditional>
+                </div>
               </li>
             ))}
           </ul>

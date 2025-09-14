@@ -1,6 +1,7 @@
 # Database Queries - CLAUDE.md
 
 ## Purpose
+
 Contains database query functions for the Head Shakers bobblehead collection application, organized by domain entities (bobbleheads, collections, users, featured content).
 
 ## Key Patterns
@@ -22,11 +23,12 @@ Contains database query functions for the Head Shakers bobblehead collection app
 ## Query Patterns
 
 ### Standard CRUD Operations
+
 ```typescript
 // Create with user ownership
 createEntityAsync(data: InsertEntity, userId: string, dbInstance = db)
 
-// Read with optional viewer context  
+// Read with optional viewer context
 getEntityByIdAsync(id: string, viewerUserId?: string, dbInstance = db)
 
 // Update with ownership validation
@@ -37,12 +39,14 @@ deleteEntityAsync(id: string, userId: string, dbInstance = db)
 ```
 
 ### Public Access Patterns
+
 - Functions ending with `ForPublicAsync` filter by public visibility
 - Include viewer context for ownership-based access
 - Always exclude soft-deleted records
 - Collections must be public unless viewer is owner
 
 ### Search and Filtering
+
 - `searchBobbleheadsAsync` supports full-text search across multiple fields
 - Uses `like` with escaped search terms
 - Supports complex filter objects with optional parameters
@@ -51,19 +55,23 @@ deleteEntityAsync(id: string, userId: string, dbInstance = db)
 ## Caching Strategy
 
 ### Three-Tier Caching
+
 1. **React cache()**: Request-level deduplication
 2. **Next.js unstable_cache()**: Persistent caching with revalidation
 3. **Custom cache service**: Redis-backed with tags and TTL
 
 ### Cache Invalidation
+
 - Uses revalidation tags from `@/lib/constants/tags`
 - Featured content has sophisticated cache warming and invalidation
 - View count updates trigger selective cache invalidation
 
 ## Type Exports
+
 Functions export their return types for use across the application:
+
 ```typescript
-export type GetBobbleheadById = Awaited<ReturnType<typeof getBobbleheadByIdAsync>>
+export type GetBobbleheadById = Awaited<ReturnType<typeof getBobbleheadByIdAsync>>;
 ```
 
 ## Directory Structure

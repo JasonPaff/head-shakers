@@ -11,28 +11,28 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Frontend Framework**
 
 - **Next.js 15+** with App Router
-    - Full-stack React framework with server-side rendering
-    - Built-in performance optimizations and image handling
-    - Seamless API routes for backend functionality
-    - Excellent TypeScript integration
+  - Full-stack React framework with server-side rendering
+  - Built-in performance optimizations and image handling
+  - Seamless API routes for backend functionality
+  - Excellent TypeScript integration
 
 ### **Programming Language**
 
 - **TypeScript**
-    - Type safety across the entire application
-    - Better developer experience and fewer runtime errors
-    - Excellent tooling and IDE support
+  - Type safety across the entire application
+  - Better developer experience and fewer runtime errors
+  - Excellent tooling and IDE support
 
 ### **Styling & UI Components**
 
 - **Tailwind CSS**
-    - Utility-first CSS framework
-    - Responsive design made simple
-    - Excellent performance and bundle size
+  - Utility-first CSS framework
+  - Responsive design made simple
+  - Excellent performance and bundle size
 - **shadcn/ui**
-    - High-quality, accessible React components
-    - Built on Radix UI primitives
-    - Fully customizable with Tailwind
+  - High-quality, accessible React components
+  - Built on Radix UI primitives
+  - Fully customizable with Tailwind
 
 ---
 
@@ -41,24 +41,24 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Database**
 
 - **Neon PostgreSQL**
-    - Serverless PostgreSQL with excellent Vercel integration
-    - Automatic scaling and branching
-    - Cost-effective for variable workloads
+  - Serverless PostgreSQL with excellent Vercel integration
+  - Automatic scaling and branching
+  - Cost-effective for variable workloads
 
 ### **ORM & Database Tools**
 
 - **Drizzle ORM**
-    - Lightweight, SQL-first approach
-    - Excellent TypeScript inference
-    - Better performance than traditional ORMs
-    - Perfect for complex collection queries
+  - Lightweight, SQL-first approach
+  - Excellent TypeScript inference
+  - Better performance than traditional ORMs
+  - Perfect for complex collection queries
 
 ### **Caching & Session Storage**
 
 - **Upstash Redis**
-    - Serverless Redis for caching and rate limiting
-    - Session storage and temporary data
-    - Real-time feature support
+  - Serverless Redis for caching and rate limiting
+  - Session storage and temporary data
+  - Real-time feature support
 
 ---
 
@@ -67,11 +67,11 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Authentication Service**
 
 - **Clerk**
-    - Complete authentication solution
-    - Social login support
-    - User management without data harvesting
-    - Excellent Next.js integration
-    - Built-in user profiles and session management
+  - Complete authentication solution
+  - Social login support
+  - User management without data harvesting
+  - Excellent Next.js integration
+  - Built-in user profiles and session management
 
 ---
 
@@ -80,11 +80,11 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Image Storage & Optimization**
 
 - **Cloudinary**
-    - Automatic image optimization and transformation
-    - CDN delivery for fast loading
-    - Multiple format support (WebP, AVIF)
-    - Generous free tier for initial growth
-    - Seamless integration with Next.js Image component
+  - Automatic image optimization and transformation
+  - CDN delivery for fast loading
+  - Multiple format support (WebP, AVIF)
+  - Generous free tier for initial growth
+  - Seamless integration with Next.js Image component
 
 ---
 
@@ -93,11 +93,11 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Platform**
 
 - **Vercel**
-    - Optimized for Next.js applications
-    - Automatic deployments from Git
-    - Global edge network
-    - Built-in analytics and monitoring
-    - Serverless functions for API routes
+  - Optimized for Next.js applications
+  - Automatic deployments from Git
+  - Global edge network
+  - Built-in analytics and monitoring
+  - Serverless functions for API routes
 
 ---
 
@@ -106,18 +106,18 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Email Services**
 
 - **Resend**
-    - Modern email API with excellent deliverability
-    - React Email template support
-    - Perfect for comment notifications and updates
-    - Generous free tier (3,000 emails/month)
+  - Modern email API with excellent deliverability
+  - React Email template support
+  - Perfect for comment notifications and updates
+  - Generous free tier (3,000 emails/month)
 
 ### **Real-time Features**
 
 - **Ably**
-    - Real-time notifications for comments and interactions
-    - WebSocket connections for live updates
-    - Reliable message delivery
-    - Excellent developer experience
+  - Real-time notifications for comments and interactions
+  - WebSocket connections for live updates
+  - Reliable message delivery
+  - Excellent developer experience
 
 ---
 
@@ -126,49 +126,49 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **State Management & Data Fetching**
 
 - **TanStack Query (React Query)**
-    - Server state management and caching
-    - Automatic background refetching
-    - Optimistic updates for better UX
+  - Server state management and caching
+  - Automatic background refetching
+  - Optimistic updates for better UX
 
 ### **Form Handling**
 
 - **TanStack Form**
-    - Type-safe form handling
-    - Built-in validation support
-    - Excellent performance
+  - Type-safe form handling
+  - Built-in validation support
+  - Excellent performance
 
 ### **Data Tables & Visualization**
 
 - **TanStack Table**
-    - Powerful table functionality for collection browsing
-    - Sorting, filtering, and pagination
-    - Fully customizable with shadcn components
+  - Powerful table functionality for collection browsing
+  - Sorting, filtering, and pagination
+  - Fully customizable with shadcn components
 
 ### **Type Safety & Validation**
 
 - **Zod**
-    - Runtime type validation
-    - Schema-first approach
-    - Excellent TypeScript integration
+  - Runtime type validation
+  - Schema-first approach
+  - Excellent TypeScript integration
 - **zsa (Zod Server Actions)**
-    - Type-safe server actions with validation
-    - Seamless client-server communication
+  - Type-safe server actions with validation
+  - Seamless client-server communication
 
 ### **URL & Navigation Management**
 
 - **Next-Typesafe-URL**
-    - Type-safe routing and URL generation
-    - Perfect for collection and user profile URLs
+  - Type-safe routing and URL generation
+  - Perfect for collection and user profile URLs
 - **nuqs**
-    - Type-safe URL search parameters
-    - Essential for filtering and sorting collections
+  - Type-safe URL search parameters
+  - Essential for filtering and sorting collections
 
 ### **Background Processing**
 
 - **Upstash QStash**
-    - Serverless message queue for background jobs
-    - Email notifications and batch processing
-    - Reliable job scheduling
+  - Serverless message queue for background jobs
+  - Email notifications and batch processing
+  - Reliable job scheduling
 
 ---
 
@@ -177,13 +177,13 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Application Monitoring**
 
 - **Vercel Analytics**
-    - Privacy-focused web analytics
-    - Built-in Next.js integration
-    - Performance insights
+  - Privacy-focused web analytics
+  - Built-in Next.js integration
+  - Performance insights
 - **Sentry**
-    - Error tracking and performance monitoring
-    - Real-time error alerts
-    - Detailed stack traces and context
+  - Error tracking and performance monitoring
+  - Real-time error alerts
+  - Detailed stack traces and context
 
 ---
 
@@ -192,9 +192,9 @@ A specialized platform for bobblehead collectors to showcase, track, and manage 
 ### **Payment Processing**
 
 - **Stripe**
-    - Premium features and higher upload limits
-    - Subscription management
-    - Secure payment processing
+  - Premium features and higher upload limits
+  - Subscription management
+  - Secure payment processing
 
 ---
 

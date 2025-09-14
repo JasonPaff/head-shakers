@@ -704,7 +704,7 @@ async function seedTags(insertedUsers: (typeof users.$inferSelect)[]) {
   // Insert all tags
   const allTagsData = [...systemTagsData, ...userTagsData];
   const insertedTags = await db.insert(tags).values(allTagsData).returning();
-  
+
   console.log(`✅ Created ${systemTagsData.length} system tags and ${userTagsData.length} user tags`);
   console.log(`✅ Total tags created: ${insertedTags.length}`);
 
@@ -716,20 +716,20 @@ async function seedUsers() {
 
   // Check for existing users to avoid duplicates
   const existingUsers = await db.select().from(users);
-  const existingClerkIds = new Set(existingUsers.map(u => u.clerkId));
-  
+  const existingClerkIds = new Set(existingUsers.map((u) => u.clerkId));
+
   // Filter out users that already exist
-  const newUsers = sampleUsers.filter(user => !existingClerkIds.has(user.clerkId));
-  
+  const newUsers = sampleUsers.filter((user) => !existingClerkIds.has(user.clerkId));
+
   let insertedUsers: (typeof users.$inferSelect)[] = [];
-  
+
   if (newUsers.length > 0) {
     insertedUsers = await db.insert(users).values(newUsers).returning();
     console.log(`✅ Created ${insertedUsers.length} new users`);
   } else {
     console.log('✅ All users already exist, skipping insertion');
   }
-  
+
   // Return all users (existing + newly inserted)
   const allUsers = await db.select().from(users);
   console.log(`✅ Total users in database: ${allUsers.length}`);

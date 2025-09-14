@@ -3,7 +3,7 @@ import { and, asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type { InsertSubCollection } from '@/lib/validations/subcollections.validation';
+import type { InsertSubCollection, SelectSubCollection } from '@/lib/validations/subcollections.validation';
 
 import { db } from '@/lib/db';
 import { bobbleheadPhotos, bobbleheads, collections, subCollections } from '@/lib/db/schema';
@@ -19,6 +19,29 @@ export class SubcollectionsQuery extends BaseQuery {
    */
   static async createAsync(data: InsertSubCollection, dbInstance: DatabaseExecutor = db) {
     const result = await (dbInstance ?? db).insert(subCollections).values(data).returning();
+    return result?.[0] || null;
+  }
+
+  /**
+   * delete a subcollection
+   */
+  static async deleteAsync(
+    subcollectionId: string,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<null | SelectSubCollection> {
+    const result = await (dbInstance ?? db)
+      .delete(subCollections)
+      .where(
+        and(
+          eq(subCollections.id, subcollectionId),
+          eq(
+            subCollections.collectionId,
+            dbInstance.select({ id: collections.id }).from(collections).where(eq(collections.userId, userId)),
+          ),
+        ),
+      )
+      .returning();
     return result?.[0] || null;
   }
 
@@ -246,6 +269,31 @@ export class SubcollectionsQuery extends BaseQuery {
       })),
       userId: collection.user?.id,
     };
+  }
+
+  /**
+   * update a subcollection
+   */
+  static async updateAsync(
+    subcollectionId: string,
+    data: Partial<InsertSubCollection>,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<null | SelectSubCollection> {
+    const result = await (dbInstance ?? db)
+      .update(subCollections)
+      .set(data)
+      .where(
+        and(
+          eq(subCollections.id, subcollectionId),
+          eq(
+            subCollections.collectionId,
+            dbInstance.select({ id: collections.id }).from(collections).where(eq(collections.userId, userId)),
+          ),
+        ),
+      )
+      .returning();
+    return result?.[0] || null;
   }
 
   private static _getSearchCondition(searchTerm?: string) {

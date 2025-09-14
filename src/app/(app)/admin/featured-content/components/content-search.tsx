@@ -55,7 +55,6 @@ interface SearchResult {
   tags?: Array<TagRecord>;
 }
 
-
 export const ContentSearch = ({ contentType, onSelect, selectedContentId }: ContentSearchProps) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Array<SearchResult>>([]);

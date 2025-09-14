@@ -24,32 +24,28 @@ User Profiles serve two distinct functions:
 ### **Collection Overview**
 
 - **Collection Stats**
-    
-    - Total bobbleheads count
-    - Number of sub-collections
-    - Collection value (if public and enabled)
-    - Last activity date
+  - Total bobbleheads count
+  - Number of sub-collections
+  - Collection value (if public and enabled)
+  - Last activity date
 - **Collection Highlights**
-    
-    - Featured bobbleheads (user-selected)
-    - Recent additions showcase
-    - Most popular items (by community engagement)
-    - Rare/unique items spotlight
+  - Featured bobbleheads (user-selected)
+  - Recent additions showcase
+  - Most popular items (by community engagement)
+  - Rare/unique items spotlight
 
 ### **Activity & Engagement**
 
 - **Public Activity Feed**
-    
-    - Recent additions to collection
-    - New sub-collections created
-    - Items receiving community attention
-    - Milestones achieved (if enabled)
+  - Recent additions to collection
+  - New sub-collections created
+  - Items receiving community attention
+  - Milestones achieved (if enabled)
 - **Community Engagement**
-    
-    - Follower count (if public)
-    - Following count (if public)
-    - Total likes received
-    - Comments contributed to community
+  - Follower count (if public)
+  - Following count (if public)
+  - Total likes received
+  - Comments contributed to community
 
 ### **Social & Discovery**
 
@@ -97,62 +93,54 @@ Advanced Settings
 ### **Profile Visibility Settings**
 
 - **Profile Discoverability**
-    
-    - Public - Appears in search and browse
-    - Followers Only - Visible only to followers
-    - Private - Not discoverable, direct link only
-    - Hidden - Completely private
+  - Public - Appears in search and browse
+  - Followers Only - Visible only to followers
+  - Private - Not discoverable, direct link only
+  - Hidden - Completely private
 - **Profile Information Visibility**
-    
-    - Real name (show/hide)
-    - Location (show/hide/approximate)
-    - Join date (show/hide)
-    - Activity status (show/hide last active)
+  - Real name (show/hide)
+  - Location (show/hide/approximate)
+  - Join date (show/hide)
+  - Activity status (show/hide last active)
 
 ### **Collection Privacy Defaults**
 
 - **New Item Default Privacy**
-    
-    - Public by default
-    - Followers only by default
-    - Private by default
-    - Ask each time
+  - Public by default
+  - Followers only by default
+  - Private by default
+  - Ask each time
 - **Collection Statistics Visibility**
-    
-    - Total count (public/private)
-    - Collection value (public/private/followers)
-    - Activity metrics (public/private)
-    - Sub-collection counts (public/private)
+  - Total count (public/private)
+  - Collection value (public/private/followers)
+  - Activity metrics (public/private)
+  - Sub-collection counts (public/private)
 
 ### **Social Privacy Controls**
 
 - **Following/Followers Visibility**
-    
-    - Public lists - Anyone can see who you follow/follows you
-    - Followers only - Only followers see your lists
-    - Private - Lists completely hidden
-    - Mutual only - Only show mutual connections
+  - Public lists - Anyone can see who you follow/follows you
+  - Followers only - Only followers see your lists
+  - Private - Lists completely hidden
+  - Mutual only - Only show mutual connections
 - **Activity Visibility**
-    
-    - Public activity feed
-    - Followers only activity
-    - No activity feed
-    - Custom activity visibility
+  - Public activity feed
+  - Followers only activity
+  - No activity feed
+  - Custom activity visibility
 
 ### **Communication Privacy**
 
 - **Who Can Contact You**
-    
-    - Anyone
-    - Followers only
-    - Mutual follows only
-    - No one
+  - Anyone
+  - Followers only
+  - Mutual follows only
+  - No one
 - **Comment Permissions**
-    
-    - Anyone can comment on your items
-    - Followers only
-    - No comments allowed
-    - Pre-approve comments
+  - Anyone can comment on your items
+  - Followers only
+  - No comments allowed
+  - Pre-approve comments
 
 ---
 
@@ -161,39 +149,34 @@ Advanced Settings
 ### **Email Notifications**
 
 - **Collection Activity**
-    
-    - New comments on your items
-    - Likes on your bobbleheads
-    - New followers
-    - Collection milestones
+  - New comments on your items
+  - Likes on your bobbleheads
+  - New followers
+  - Collection milestones
 - **Community Activity**
-    
-    - Updates from followed users
-    - Weekly community digest
-    - Featured content notifications
-    - Platform announcements
+  - Updates from followed users
+  - Weekly community digest
+  - Featured content notifications
+  - Platform announcements
 - **Account & Security**
-    
-    - Login from new device
-    - Password changes
-    - Privacy setting changes
-    - Account security alerts
+  - Login from new device
+  - Password changes
+  - Privacy setting changes
+  - Account security alerts
 
 ### **In-App Notifications**
 
 - **Real-time Notifications**
-    
-    - Comments and likes (instant)
-    - New followers (instant)
-    - Messages (if feature exists)
-    - System alerts
+  - Comments and likes (instant)
+  - New followers (instant)
+  - Messages (if feature exists)
+  - System alerts
 - **Notification Frequency**
-    
-    - Instant (real-time)
-    - Hourly digest
-    - Daily digest
-    - Weekly digest
-    - Disabled
+  - Instant (real-time)
+  - Hourly digest
+  - Daily digest
+  - Weekly digest
+  - Disabled
 
 ### **Notification Delivery Methods**
 
@@ -209,47 +192,41 @@ Advanced Settings
 ### **Visual Customization**
 
 - **Profile Theme**
-    
-    - Light/dark mode preference
-    - Accent color selection
-    - Layout density (compact/spacious)
-    - Font size preferences
+  - Light/dark mode preference
+  - Accent color selection
+  - Layout density (compact/spacious)
+  - Font size preferences
 - **Profile Layout**
-    
-    - Featured content arrangement
-    - Section visibility (show/hide sections)
-    - Collection display preferences
-    - Activity feed customization
+  - Featured content arrangement
+  - Section visibility (show/hide sections)
+  - Collection display preferences
+  - Activity feed customization
 
 ### **Content Curation**
 
 - **Featured Items Selection**
-    
-    - Manually select featured bobbleheads
-    - Auto-feature most popular items
-    - Rotate featured items automatically
-    - Season/theme-based featuring
+  - Manually select featured bobbleheads
+  - Auto-feature most popular items
+  - Rotate featured items automatically
+  - Season/theme-based featuring
 - **Profile Story**
-    
-    - Collector journey story
-    - Collection highlights and milestones
-    - Personal collecting philosophy
-    - Favorite finds and memories
+  - Collector journey story
+  - Collection highlights and milestones
+  - Personal collecting philosophy
+  - Favorite finds and memories
 
 ### **Badge & Achievement System**
 
 - **Collector Badges**
-    
-    - Collection size milestones (100, 500, 1000+ items)
-    - Longevity badges (1 year, 5 years member)
-    - Community badges (helpful commenter, popular collector)
-    - Category badges (sports specialist, entertainment expert)
+  - Collection size milestones (100, 500, 1000+ items)
+  - Longevity badges (1 year, 5 years member)
+  - Community badges (helpful commenter, popular collector)
+  - Category badges (sports specialist, entertainment expert)
 - **Custom Badges**
-    
-    - User-created collection themes
-    - Personal achievements
-    - Community recognition
-    - Special event participation
+  - User-created collection themes
+  - Personal achievements
+  - Community recognition
+  - Special event participation
 
 ---
 
@@ -258,47 +235,41 @@ Advanced Settings
 ### **Profile Analytics**
 
 - **Profile Views**
-    
-    - Daily/weekly/monthly profile visits
-    - Geographic distribution of visitors
-    - Referral sources (how people found you)
-    - Most viewed sections of profile
+  - Daily/weekly/monthly profile visits
+  - Geographic distribution of visitors
+  - Referral sources (how people found you)
+  - Most viewed sections of profile
 - **Collection Performance**
-    
-    - Most popular bobbleheads
-    - Engagement rates on items
-    - Collection growth over time
-    - Tag performance and trends
+  - Most popular bobbleheads
+  - Engagement rates on items
+  - Collection growth over time
+  - Tag performance and trends
 
 ### **Community Impact**
 
 - **Engagement Metrics**
-    
-    - Comments received vs given
-    - Likes received vs given
-    - Following growth rate
-    - Community contribution score
+  - Comments received vs given
+  - Likes received vs given
+  - Following growth rate
+  - Community contribution score
 - **Discovery Analytics**
-    
-    - How people find your content
-    - Search terms that lead to your profile
-    - Featured content performance
-    - Social sharing metrics
+  - How people find your content
+  - Search terms that lead to your profile
+  - Featured content performance
+  - Social sharing metrics
 
 ### **Personal Insights**
 
 - **Collection Insights**
-    
-    - Collection completion tracking
-    - Organization effectiveness
-    - Value tracking (if enabled)
-    - Activity patterns
+  - Collection completion tracking
+  - Organization effectiveness
+  - Value tracking (if enabled)
+  - Activity patterns
 - **Goal Tracking**
-    
-    - Collection milestones
-    - Personal collecting goals
-    - Progress toward targets
-    - Achievement unlocking
+  - Collection milestones
+  - Personal collecting goals
+  - Progress toward targets
+  - Achievement unlocking
 
 ---
 
@@ -307,60 +278,52 @@ Advanced Settings
 ### **Basic Account Info**
 
 - **Personal Information**
-    
-    - Real name (private)
-    - Display name (public)
-    - Email address
-    - Phone number (optional)
-    - Birth date (for age verification)
+  - Real name (private)
+  - Display name (public)
+  - Email address
+  - Phone number (optional)
+  - Birth date (for age verification)
 - **Account Preferences**
-    
-    - Timezone settings
-    - Language preferences
-    - Currency settings (for value tracking)
-    - Date/time format preferences
+  - Timezone settings
+  - Language preferences
+  - Currency settings (for value tracking)
+  - Date/time format preferences
 
 ### **Security Settings**
 
 - **Password Management**
-    
-    - Change password
-    - Password strength indicator
-    - Password history (prevent reuse)
-    - Last password change date
+  - Change password
+  - Password strength indicator
+  - Password history (prevent reuse)
+  - Last password change date
 - **Two-Factor Authentication**
-    
-    - Enable/disable 2FA
-    - Backup codes generation
-    - Recovery methods
-    - Trusted devices management
+  - Enable/disable 2FA
+  - Backup codes generation
+  - Recovery methods
+  - Trusted devices management
 - **Login History**
-    
-    - Recent login attempts
-    - Device and location tracking
-    - Suspicious activity alerts
-    - Session management
+  - Recent login attempts
+  - Device and location tracking
+  - Suspicious activity alerts
+  - Session management
 
 ### **Data Management**
 
 - **Data Export**
-    
-    - Download all collection data
-    - Export specific sub-collections
-    - Export activity history
-    - Export following/follower lists
+  - Download all collection data
+  - Export specific sub-collections
+  - Export activity history
+  - Export following/follower lists
 - **Data Import**
-    
-    - Import from CSV files
-    - Import from other platforms
-    - Bulk collection imports
-    - Photo import tools
+  - Import from CSV files
+  - Import from other platforms
+  - Bulk collection imports
+  - Photo import tools
 - **Account Backup**
-    
-    - Automatic backup scheduling
-    - Manual backup creation
-    - Backup restoration
-    - Cloud storage integration
+  - Automatic backup scheduling
+  - Manual backup creation
+  - Backup restoration
+  - Cloud storage integration
 
 ---
 
@@ -369,40 +332,36 @@ Advanced Settings
 ### **Following Management**
 
 - **Following Lists**
-    
-    - View all users you follow
-    - Organize following into lists
-    - Unfollow bulk management
-    - Following activity settings
+  - View all users you follow
+  - Organize following into lists
+  - Unfollow bulk management
+  - Following activity settings
 - **Follower Management**
-    
-    - View your followers
-    - Block/unblock users
-    - Remove followers
-    - Follower notifications
+  - View your followers
+  - Block/unblock users
+  - Remove followers
+  - Follower notifications
 
 ### **Interaction Controls**
 
 - **Blocking & Reporting**
-    
-    - Block users completely
-    - Mute users (hide content without blocking)
-    - Report inappropriate users
-    - Appeal blocking decisions
+  - Block users completely
+  - Mute users (hide content without blocking)
+  - Report inappropriate users
+  - Appeal blocking decisions
 - **Content Moderation**
-    
-    - Pre-approve comments on your items
-    - Auto-hide comments with keywords
-    - Moderate collection discussions
-    - Community guideline enforcement
+  - Pre-approve comments on your items
+  - Auto-hide comments with keywords
+  - Moderate collection discussions
+  - Community guideline enforcement
 
 ### **Communication Preferences**
 
 - **Message Settings** (future feature)
-    - Who can message you
-    - Message filtering
-    - Auto-responses
-    - Message retention
+  - Who can message you
+  - Message filtering
+  - Auto-responses
+  - Message retention
 
 ---
 
@@ -411,40 +370,36 @@ Advanced Settings
 ### **Collection Defaults**
 
 - **New Item Defaults**
-    
-    - Default privacy level
-    - Default sub-collection
-    - Default tags to apply
-    - Auto-fill preferences
+  - Default privacy level
+  - Default sub-collection
+  - Default tags to apply
+  - Auto-fill preferences
 - **Organization Preferences**
-    
-    - Default view modes (grid/list)
-    - Sort preferences
-    - Filter defaults
-    - Tag color schemes
+  - Default view modes (grid/list)
+  - Sort preferences
+  - Filter defaults
+  - Tag color schemes
 
 ### **Value Tracking Settings**
 
 - **Financial Tracking**
-    
-    - Enable/disable value tracking
-    - Currency preferences
-    - Price privacy settings
-    - Value calculation methods
+  - Enable/disable value tracking
+  - Currency preferences
+  - Price privacy settings
+  - Value calculation methods
 - **Investment Insights**
-    
-    - Portfolio analytics
-    - Market trend integration (future)
-    - Insurance documentation
-    - Tax reporting tools (future)
+  - Portfolio analytics
+  - Market trend integration (future)
+  - Insurance documentation
+  - Tax reporting tools (future)
 
 ### **Collection Goals**
 
 - **Personal Targets**
-    - Collection size goals
-    - Category completion goals
-    - Annual acquisition targets
-    - Budget tracking
+  - Collection size goals
+  - Category completion goals
+  - Annual acquisition targets
+  - Budget tracking
 
 ---
 
@@ -471,40 +426,36 @@ Advanced Settings
 ### **New Account Setup**
 
 - **Profile Creation Wizard**
-    
-    - Step-by-step profile setup
-    - Privacy setting explanation
-    - Collection setup guidance
-    - Community feature introduction
+  - Step-by-step profile setup
+  - Privacy setting explanation
+  - Collection setup guidance
+  - Community feature introduction
 - **Onboarding Checklist**
-    
-    - Complete profile information
-    - Add first bobblehead
-    - Set privacy preferences
-    - Follow suggested users
+  - Complete profile information
+  - Add first bobblehead
+  - Set privacy preferences
+  - Follow suggested users
 
 ### **Account Maintenance**
 
 - **Regular Security Checks**
-    - Password update reminders
-    - Security setting reviews
-    - Privacy audit notifications
-    - Account activity summaries
+  - Password update reminders
+  - Security setting reviews
+  - Privacy audit notifications
+  - Account activity summaries
 
 ### **Account Closure**
 
 - **Deactivation Options**
-    
-    - Temporary deactivation
-    - Permanent deletion
-    - Data retention choices
-    - Reactivation process
+  - Temporary deactivation
+  - Permanent deletion
+  - Data retention choices
+  - Reactivation process
 - **Data Handling**
-    
-    - What happens to your content
-    - Follower/following cleanup
-    - Comment and interaction handling
-    - Recovery options
+  - What happens to your content
+  - Follower/following cleanup
+  - Comment and interaction handling
+  - Recovery options
 
 ---
 
@@ -513,25 +464,23 @@ Advanced Settings
 ### **Accessibility Features**
 
 - **Visual Accessibility**
-    
-    - High contrast mode
-    - Large text options
-    - Screen reader support
-    - Color blind friendly design
+  - High contrast mode
+  - Large text options
+  - Screen reader support
+  - Color blind friendly design
 - **Motor Accessibility**
-    
-    - Keyboard navigation
-    - Voice control support
-    - Simplified interactions
-    - Customizable controls
+  - Keyboard navigation
+  - Voice control support
+  - Simplified interactions
+  - Customizable controls
 
 ### **Internationalization**
 
 - **Multi-language Support**
-    - Interface language selection
-    - Right-to-left language support
-    - Cultural customization
-    - Regional privacy compliance
+  - Interface language selection
+  - Right-to-left language support
+  - Cultural customization
+  - Regional privacy compliance
 
 ---
 

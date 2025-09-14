@@ -14,7 +14,10 @@ type NavigationMenuProps = ComponentProps<typeof NavigationMenuPrimitive.Root> &
 export const NavigationMenu = ({ children, className, isViewport = true, ...props }: NavigationMenuProps) => {
   return (
     <NavigationMenuPrimitive.Root
-      className={cn('group/navigation-menu relative flex max-w-max flex-1 items-center justify-center', className)}
+      className={cn(
+        'group/navigation-menu relative flex max-w-max flex-1 items-center justify-center',
+        className,
+      )}
       data-slot={'navigation-menu'}
       data-viewport={isViewport}
       {...props}
@@ -121,7 +124,9 @@ export const NavigationMenuTrigger = ({ children, className, ...props }: Navigat
       {children}{' '}
       <ChevronDownIcon
         aria-hidden={'true'}
-        className={'relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180'}
+        className={
+          'relative top-[1px] ml-1 size-3 transition duration-300 group-data-[state=open]:rotate-180'
+        }
       />
     </NavigationMenuPrimitive.Trigger>
   );

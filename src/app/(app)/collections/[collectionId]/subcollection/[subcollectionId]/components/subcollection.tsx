@@ -47,12 +47,16 @@ export const Subcollection = async ({ collectionId, searchParams, subcollectionI
       <div className={'mx-auto mt-4 max-w-7xl p-2'}>
         <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
           {/* Main Content Area */}
-          <div className={'lg:col-span-9'}>
-            <SubcollectionBobbleheads collectionId={collectionId} searchParams={searchParams} subcollection={subcollection} />
+          <div className={'order-2 lg:order-1 lg:col-span-9'}>
+            <SubcollectionBobbleheads
+              collectionId={collectionId}
+              searchParams={searchParams}
+              subcollection={subcollection}
+            />
           </div>
 
           {/* Sidebar */}
-          <aside className={'flex flex-col gap-6 lg:col-span-3'}>
+          <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
             <SubcollectionMetrics subcollection={subcollection} />
           </aside>
         </div>

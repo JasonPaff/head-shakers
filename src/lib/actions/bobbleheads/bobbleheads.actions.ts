@@ -252,7 +252,7 @@ export const deleteBobbleheadAction = authActionClient
         success: true,
       };
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.BOBBLEHEADS.DELETE,

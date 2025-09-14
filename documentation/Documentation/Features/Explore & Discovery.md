@@ -71,45 +71,39 @@ The Browse/Explore section is the community heart of the platform where users di
 ### **Filter Categories**
 
 - **Content Type**
-    
-    - Bobbleheads only
-    - Collections only
-    - Sub-collections only
-    - Users only
+  - Bobbleheads only
+  - Collections only
+  - Sub-collections only
+  - Users only
 - **Category Filters**
-    
-    - Sports (Baseball, Football, Basketball, etc.)
-    - Entertainment (Movies, TV Shows, Cartoons)
-    - Comics & Superheroes
-    - Historical Figures
-    - Custom/Other
+  - Sports (Baseball, Football, Basketball, etc.)
+  - Entertainment (Movies, TV Shows, Cartoons)
+  - Comics & Superheroes
+  - Historical Figures
+  - Custom/Other
 - **Attribute Filters**
-    
-    - Has Photos / No Photos
-    - Recently Added (1 day, 1 week, 1 month)
-    - High Engagement (lots of likes/comments)
-    - Collection Size (1-10, 11-50, 50+, etc.)
+  - Has Photos / No Photos
+  - Recently Added (1 day, 1 week, 1 month)
+  - High Engagement (lots of likes/comments)
+  - Collection Size (1-10, 11-50, 50+, etc.)
 
 ### **Advanced Filters**
 
 - **Tag-Based Filtering**
-    
-    - Filter by specific tags
-    - Multiple tag selection (AND/OR logic)
-    - Popular tags quick selection
-    - Tag exclusion (NOT logic)
+  - Filter by specific tags
+  - Multiple tag selection (AND/OR logic)
+  - Popular tags quick selection
+  - Tag exclusion (NOT logic)
 - **User Filters**
-    
-    - Active collectors (recent activity)
-    - Verified users (if verification system exists)
-    - Location-based (if users share location)
-    - Collection size ranges
+  - Active collectors (recent activity)
+  - Verified users (if verification system exists)
+  - Location-based (if users share location)
+  - Collection size ranges
 - **Engagement Filters**
-    
-    - Most commented items
-    - Most liked collections
-    - Trending (recent surge in activity)
-    - Community favorites
+  - Most commented items
+  - Most liked collections
+  - Trending (recent surge in activity)
+  - Community favorites
 
 ### **Sort Options**
 

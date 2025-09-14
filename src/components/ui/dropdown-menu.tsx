@@ -105,7 +105,12 @@ export const DropdownMenuGroup = ({ ...props }: DropdownMenuGroupProps) => {
   return <Group data-slot={'dropdown-menu-group'} {...props} />;
 };
 
-export const DropdownMenuItem = ({ className, isInset, variant = 'default', ...props }: DropdownMenuItemProps) => {
+export const DropdownMenuItem = ({
+  className,
+  isInset,
+  variant = 'default',
+  ...props
+}: DropdownMenuItemProps) => {
   return (
     <Item
       className={cn(

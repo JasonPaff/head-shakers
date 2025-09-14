@@ -18,7 +18,12 @@ const styles = cva([
 type SidebarMenuBadgeProps = ComponentPropsWithRef<'div'>;
 
 export const SidebarMenuBadge = ({ children, className, ...props }: SidebarMenuBadgeProps) => (
-  <div className={cn(styles(), className)} data-sidebar={'menu-badge'} data-slot={'sidebar-menu-badge'} {...props}>
+  <div
+    className={cn(styles(), className)}
+    data-sidebar={'menu-badge'}
+    data-slot={'sidebar-menu-badge'}
+    {...props}
+  >
     {children}
   </div>
 );

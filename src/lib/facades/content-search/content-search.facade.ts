@@ -65,7 +65,7 @@ export class ContentSearchFacade {
 
       // get all photos for this bobblehead
       const photos = await ContentSearchQuery.getBobbleheadPhotosById(id, context);
-      
+
       // get all tags for this bobblehead
       const tagsMap = await ContentSearchQuery.getBobbleheadTags([id], context);
       const tags = tagsMap.get(id) || [];
@@ -100,7 +100,7 @@ export class ContentSearchFacade {
       const tagsMap = await ContentSearchQuery.getCollectionTags([id], context);
       const tags = tagsMap.get(id) || [];
 
-      return { 
+      return {
         collection: {
           ...collection,
           tags,
@@ -153,7 +153,7 @@ export class ContentSearchFacade {
       // get all photos for each bobblehead in a single query
       const bobbleheadIds = results.map((result) => result.id);
       const allPhotos = await ContentSearchQuery.getBobbleheadPhotos(bobbleheadIds, context);
-      
+
       // get all tags for each bobblehead in a single query
       const allTags = await ContentSearchQuery.getBobbleheadTags(bobbleheadIds, context);
 

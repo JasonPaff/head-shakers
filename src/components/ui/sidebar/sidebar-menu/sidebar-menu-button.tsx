@@ -90,7 +90,12 @@ export const SidebarMenuButton = ({
   return (
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
-      <TooltipContent align={'center'} hidden={state !== 'collapsed' || isMobile} side={'right'} {...tooltip} />
+      <TooltipContent
+        align={'center'}
+        hidden={state !== 'collapsed' || isMobile}
+        side={'right'}
+        {...tooltip}
+      />
     </Tooltip>
   );
 };

@@ -72,7 +72,7 @@ export interface RegistryStats {
  */
 export class CircuitBreakerRegistry {
   private static instance: CircuitBreakerRegistry;
-  
+
   private readonly breakers = new Map<string, CircuitBreaker>();
   private readonly config: RegistryConfig;
   private readonly startTime = Date.now();
@@ -98,7 +98,7 @@ export class CircuitBreakerRegistry {
    * Get all health statuses from registered circuit breakers
    */
   getAllHealthStatuses(): Array<CircuitHealthStatus> {
-    return Array.from(this.breakers.values()).map(breaker => getCircuitHealth(breaker));
+    return Array.from(this.breakers.values()).map((breaker) => getCircuitHealth(breaker));
   }
 
   /**
@@ -158,8 +158,8 @@ export class CircuitBreakerRegistry {
    */
   getStats(): RegistryStats {
     const healthStatuses = this.getAllHealthStatuses();
-    const healthy = healthStatuses.filter(status => status.isHealthy).length;
-    const open = healthStatuses.filter(status => status.state === CircuitState.OPEN).length;
+    const healthy = healthStatuses.filter((status) => status.isHealthy).length;
+    const open = healthStatuses.filter((status) => status.state === CircuitState.OPEN).length;
     const total = healthStatuses.length;
 
     return {
@@ -189,9 +189,7 @@ export class CircuitBreakerRegistry {
    * Check if registry has any unhealthy breakers
    */
   hasUnhealthyBreakers(): boolean {
-    return Array.from(this.breakers.values()).some(
-      breaker => !getCircuitHealth(breaker).isHealthy
-    );
+    return Array.from(this.breakers.values()).some((breaker) => !getCircuitHealth(breaker).isHealthy);
   }
 
   /**
@@ -228,22 +226,22 @@ export class CircuitBreakerRegistry {
    */
   private getOrCreateBreaker(name: string, options: CircuitBreakerOptions): CircuitBreaker {
     let breaker = this.breakers.get(name);
-    
+
     if (!breaker) {
       breaker = new CircuitBreaker(name, {
         ...options,
         onStateChange: (newState, oldState) => {
           // Log state changes for monitoring
           console.log(`Circuit breaker '${name}' state changed: ${oldState} → ${newState}`);
-          
+
           // Call custom onStateChange if provided
           options.onStateChange?.(newState, oldState);
         },
       });
-      
+
       this.breakers.set(name, breaker);
     }
-    
+
     return breaker;
   }
 }
@@ -260,24 +258,24 @@ export function getCircuitBreakerRegistry(config?: Partial<RegistryConfig>): Cir
  */
 export const circuitBreakers = {
   /** Get a database circuit breaker */
-  database: (name: string, options?: Partial<CircuitBreakerOptions>) => 
+  database: (name: string, options?: Partial<CircuitBreakerOptions>) =>
     getCircuitBreakerRegistry().getDatabaseBreaker(name, options),
-  
+
   /** Get an external service circuit breaker */
-  externalService: (name: string, options?: Partial<CircuitBreakerOptions>) => 
+  externalService: (name: string, options?: Partial<CircuitBreakerOptions>) =>
     getCircuitBreakerRegistry().getExternalServiceBreaker(name, options),
-  
+
   /** Get a fast operation circuit breaker */
-  fast: (name: string, options?: Partial<CircuitBreakerOptions>) => 
+  fast: (name: string, options?: Partial<CircuitBreakerOptions>) =>
     getCircuitBreakerRegistry().getFastOperationBreaker(name, options),
-  
+
   /** Get all health statuses */
   getHealthStatuses: () => getCircuitBreakerRegistry().getAllHealthStatuses(),
-  
+
   /** Get registry statistics */
   getStats: () => getCircuitBreakerRegistry().getStats(),
-  
+
   /** Get an upload circuit breaker */
-  upload: (name: string, options?: Partial<CircuitBreakerOptions>) => 
+  upload: (name: string, options?: Partial<CircuitBreakerOptions>) =>
     getCircuitBreakerRegistry().getUploadBreaker(name, options),
 };

@@ -4,9 +4,9 @@ import { isRetryableError } from './errors';
  * Circuit breaker states
  */
 export enum CircuitState {
-  CLOSED = 'CLOSED',     // Normal operation, requests pass through
+  CLOSED = 'CLOSED', // Normal operation, requests pass through
   HALF_OPEN = 'HALF_OPEN', // Testing if service has recovered
-  OPEN = 'OPEN'         // Circuit is open, requests fail fast
+  OPEN = 'OPEN', // Circuit is open, requests fail fast
 }
 
 /**
@@ -91,12 +91,12 @@ export interface CircuitHealthStatus {
 
 /**
  * Circuit breaker implementation with timeout support
- * 
+ *
  * States:
  * - CLOSED: Normal operation, all requests pass through
  * - OPEN: Circuit is open, requests fail fast without calling service
  * - HALF_OPEN: Testing mode, allowing limited requests to test recovery
- * 
+ *
  * @example
  * ```typescript
  * const breaker = new CircuitBreaker('external-service', {
@@ -104,7 +104,7 @@ export interface CircuitHealthStatus {
  *   resetTimeoutMs: 60000,
  *   onStateChange: (newState) => console.log(`Circuit ${newState}`)
  * });
- * 
+ *
  * const result = await breaker.execute(() => callExternalService());
  * ```
  */
@@ -119,12 +119,12 @@ export class CircuitBreaker {
   private state: CircuitState = CircuitState.CLOSED;
   private successCount = 0;
   private successfulRequests = 0;
-  
+
   private totalRequests = 0;
-  
+
   constructor(
     private readonly name: string,
-    options: CircuitBreakerOptions = {}
+    options: CircuitBreakerOptions = {},
   ) {
     this.options = {
       failureThreshold: 5,
@@ -132,12 +132,9 @@ export class CircuitBreaker {
         // Consider all non-retryable errors as circuit failures
         // and server errors (5xx) as circuit failures
         if (!(error instanceof Error)) return true;
-        
+
         const httpStatus = (error as { status?: number }).status;
-        return (
-          !isRetryableError(error) ||
-          (httpStatus !== undefined && httpStatus >= 500)
-        );
+        return !isRetryableError(error) || (httpStatus !== undefined && httpStatus >= 500);
       },
       name: name,
       onStateChange: () => {
@@ -152,7 +149,7 @@ export class CircuitBreaker {
 
   /**
    * Execute an operation through the circuit breaker
-   * 
+   *
    * @param operation - The operation to execute
    * @returns Promise with operation result and circuit breaker metadata
    */
@@ -166,21 +163,18 @@ export class CircuitBreaker {
     // If circuit is OPEN, reject immediately
     if (this.state === CircuitState.OPEN) {
       this.rejectedRequests++;
-      
-      throw new CircuitBreakerError(
-        `Circuit breaker ${this.name} is OPEN`,
-        this.getMetrics()
-      );
+
+      throw new CircuitBreakerError(`Circuit breaker ${this.name} is OPEN`, this.getMetrics());
     }
 
     try {
       // Execute operation with timeout
       const result = await this.executeWithTimeout(operation);
-      
+
       // Record success
       this.onSuccess();
       const executionTime = Date.now() - startTime;
-      
+
       return {
         executionTimeMs: executionTime,
         metrics: this.getMetrics(),
@@ -193,7 +187,7 @@ export class CircuitBreaker {
       if (this.options.isFailure(error)) {
         this.onFailure();
       }
-      
+
       throw error;
     }
   }
@@ -202,9 +196,8 @@ export class CircuitBreaker {
    * Get current circuit breaker metrics
    */
   getMetrics(): CircuitBreakerMetrics {
-    const failureRate = this.totalRequests > 0 
-      ? Math.round((this.failedRequests / this.totalRequests) * 100)
-      : 0;
+    const failureRate =
+      this.totalRequests > 0 ? Math.round((this.failedRequests / this.totalRequests) * 100) : 0;
 
     return {
       failedRequests: this.failedRequests,
@@ -252,7 +245,7 @@ export class CircuitBreaker {
     const oldState = this.state;
     this.state = newState;
     this.lastStateChangeTime = new Date();
-    
+
     if (oldState !== newState) {
       this.options.onStateChange(newState, oldState);
     }
@@ -291,7 +284,7 @@ export class CircuitBreaker {
     this.failedRequests++;
     this.failureCount++;
     this.lastFailureTime = new Date();
-    
+
     // If we exceed failure threshold, open the circuit
     if (this.failureCount >= this.options.failureThreshold) {
       this.openCircuit();
@@ -304,10 +297,10 @@ export class CircuitBreaker {
   private onSuccess(): void {
     this.successfulRequests++;
     this.failureCount = 0; // Reset failure count on success
-    
+
     if (this.state === CircuitState.HALF_OPEN) {
       this.successCount++;
-      
+
       // If we have enough successes, close the circuit
       if (this.successCount >= this.options.successThreshold) {
         this.changeState(CircuitState.CLOSED);
@@ -330,11 +323,11 @@ export class CircuitBreaker {
 export class CircuitBreakerError extends Error {
   constructor(
     message: string,
-    public readonly metrics: CircuitBreakerMetrics
+    public readonly metrics: CircuitBreakerMetrics,
   ) {
     super(message);
     this.name = 'CircuitBreakerError';
-    
+
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, CircuitBreakerError);
     }
@@ -346,8 +339,9 @@ export class CircuitBreakerError extends Error {
  */
 export function getCircuitHealth(circuitBreaker: CircuitBreaker): CircuitHealthStatus {
   const metrics = circuitBreaker.getMetrics();
-  const isHealthy = metrics.state === CircuitState.CLOSED || 
-                  (metrics.state === CircuitState.HALF_OPEN && metrics.failureRate < 50);
+  const isHealthy =
+    metrics.state === CircuitState.CLOSED ||
+    (metrics.state === CircuitState.HALF_OPEN && metrics.failureRate < 50);
 
   let message: string;
   let nextRetryInMs: number | undefined;
@@ -360,9 +354,8 @@ export function getCircuitHealth(circuitBreaker: CircuitBreaker): CircuitHealthS
       message = `Circuit testing recovery - ${metrics.failureRate}% failure rate`;
       break;
     case CircuitState.OPEN:
-      nextRetryInMs = metrics.nextRetryTime 
-        ? Math.max(0, metrics.nextRetryTime.getTime() - Date.now())
-        : undefined;
+      nextRetryInMs =
+        metrics.nextRetryTime ? Math.max(0, metrics.nextRetryTime.getTime() - Date.now()) : undefined;
       message = `Circuit OPEN - failing fast. Next retry in ${Math.round((nextRetryInMs || 0) / 1000)}s`;
       break;
   }
@@ -380,12 +373,12 @@ export function getCircuitHealth(circuitBreaker: CircuitBreaker): CircuitHealthS
 
 /**
  * Utility function to wrap any function with circuit breaker
- * 
+ *
  * @param name - Circuit breaker name
  * @param operation - Function to wrap
  * @param options - Circuit breaker options
  * @returns Circuit breaker wrapped function
- * 
+ *
  * @example
  * ```typescript
  * const protectedApiCall = withCircuitBreaker(
@@ -393,14 +386,14 @@ export function getCircuitHealth(circuitBreaker: CircuitBreaker): CircuitHealthS
  *   async (userId: string) => await userApi.getUser(userId),
  *   { failureThreshold: 3 }
  * );
- * 
+ *
  * const user = await protectedApiCall('user-123');
  * ```
  */
 export function withCircuitBreaker<TArgs extends unknown[], TReturn>(
   name: string,
   operation: (...args: TArgs) => Promise<TReturn>,
-  options?: CircuitBreakerOptions
+  options?: CircuitBreakerOptions,
 ): {
   (...args: TArgs): Promise<TReturn>;
   getMetrics(): CircuitBreakerMetrics;

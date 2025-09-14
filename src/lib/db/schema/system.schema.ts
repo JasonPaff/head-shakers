@@ -59,7 +59,11 @@ export const notifications = pgTable(
     index('notifications_related_content_idx').on(table.relatedType, table.relatedId),
 
     // performance indexes
-    index('notifications_user_unread_created_idx').on(table.userId, table.isRead, sql`${table.createdAt} DESC`),
+    index('notifications_user_unread_created_idx').on(
+      table.userId,
+      table.isRead,
+      sql`${table.createdAt} DESC`,
+    ),
     index('notifications_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
     index('notifications_unread_created_desc_idx').on(table.isRead, sql`${table.createdAt} DESC`),
 

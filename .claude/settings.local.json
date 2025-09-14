@@ -8,7 +8,8 @@
       "Bash(npx drizzle-kit:*)",
       "Bash(cat:*)",
       "Bash(timeout 30 npm run dev)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(rg:*)"
     ],
     "deny": [],
     "ask": []

@@ -27,7 +27,11 @@ type SubcollectionsListItemProps = {
   searchTerm: string;
 };
 
-export const SubcollectionsListItem = ({ collection, collectionId, searchTerm }: SubcollectionsListItemProps) => {
+export const SubcollectionsListItem = ({
+  collection,
+  collectionId,
+  searchTerm,
+}: SubcollectionsListItemProps) => {
   const subcollections =
     collection.subcollections.filter(
       (subcollection) =>

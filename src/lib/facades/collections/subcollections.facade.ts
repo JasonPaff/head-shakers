@@ -1,7 +1,11 @@
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type { InsertSubCollection } from '@/lib/validations/subcollections.validation';
+import type {
+  DeleteSubCollection,
+  InsertSubCollection,
+  UpdateSubCollection,
+} from '@/lib/validations/subcollections.validation';
 
 import { db } from '@/lib/db';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
@@ -35,6 +39,24 @@ export class SubcollectionsFacade {
   }
 
   /**
+   * delete a subcollection
+   */
+  static async deleteAsync(data: DeleteSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
+    try {
+      return await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, dbInstance);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { subcollectionId: data.subcollectionId },
+        facade: 'SubcollectionsFacade',
+        method: 'deleteAsync',
+        operation: 'delete',
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
    * get bobbleheads in a subcollection with photo data for public display
    */
   static async getSubcollectionBobbleheadsWithPhotos(
@@ -42,30 +64,41 @@ export class SubcollectionsFacade {
     viewerUserId?: string,
     options?: { searchTerm?: string; sortBy?: string },
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string; likeData?: { isLiked: boolean; likeCount: number; likeId: null | string } }>> {
+  ): Promise<
+    Array<
+      BobbleheadListRecord & {
+        featurePhoto?: null | string;
+        likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+      }
+    >
+  > {
     try {
       const context =
         viewerUserId ?
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context, options);
+      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(
+        subcollectionId,
+        context,
+        options,
+      );
 
       if (bobbleheads.length === 0) {
         return bobbleheads;
       }
 
-      const bobbleheadIds = bobbleheads.map(b => b.id);
+      const bobbleheadIds = bobbleheads.map((b) => b.id);
       const likesMap = await SocialFacade.getLikesForMultipleContentItems(
         bobbleheadIds,
         'bobblehead',
         viewerUserId,
-        dbInstance
+        dbInstance,
       );
 
-      return bobbleheads.map(bobblehead => ({
+      return bobbleheads.map((bobblehead) => ({
         ...bobblehead,
-        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null }
+        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
       }));
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -177,6 +210,25 @@ export class SubcollectionsFacade {
         method: 'getSubCollectionsForPublicView',
         operation: 'getForPublicView',
         userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * update a subcollection
+   */
+  static async updateAsync(data: UpdateSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
+    try {
+      const { subcollectionId, ...updateData } = data;
+      return await SubcollectionsQuery.updateAsync(subcollectionId, updateData, userId, dbInstance);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { subcollectionId: data.subcollectionId },
+        facade: 'SubcollectionsFacade',
+        method: 'updateAsync',
+        operation: 'update',
+        userId,
       };
       throw createFacadeError(context, error);
     }

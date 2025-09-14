@@ -15,13 +15,12 @@ export class UsersFacade {
   /**
    * get user by Clerk ID with React cache (request-level deduplication)
    */
-  private static getUserByClerkIdBase = cache(async (
-    clerkId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<null | UserRecord> => {
-    const context = createPublicQueryContext({ dbInstance });
-    return UsersQuery.findByClerkId(clerkId, context);
-  });
+  private static getUserByClerkIdBase = cache(
+    async (clerkId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> => {
+      const context = createPublicQueryContext({ dbInstance });
+      return UsersQuery.findByClerkId(clerkId, context);
+    },
+  );
 
   /**
    * get user by Clerk ID with Next.js unstable_cache (persistent caching)

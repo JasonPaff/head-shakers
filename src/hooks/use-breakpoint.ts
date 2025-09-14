@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 
 const breakpointConstants = {
   desktop: { max: 9999, min: 1440, name: 'desktop', query: `(min-width: ${1440}px)` },
-  laptop: { max: 1440, min: 1024, name: 'laptop', query: `(min-width: ${1024}px) and (max-width: ${1440 - 1}px)` },
+  laptop: {
+    max: 1440,
+    min: 1024,
+    name: 'laptop',
+    query: `(min-width: ${1024}px) and (max-width: ${1440 - 1}px)`,
+  },
   mobile: { max: 768, min: 0, name: 'mobile', query: `(max-width: ${1024 - 1}px)` },
   tablet: {
     max: 1024,

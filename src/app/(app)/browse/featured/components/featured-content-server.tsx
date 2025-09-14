@@ -42,7 +42,7 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
 
     // fetch like data for all content items if user is authenticated
     const likeDataMap = new Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>();
-    
+
     if (currentUserId && likeDataTargets.length > 0) {
       try {
         const likeDataResults = await SocialFacade.getBatchContentLikeData(likeDataTargets, currentUserId);
@@ -64,7 +64,7 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     const transformContentWithLikeData = (content: FeaturedContentData) => {
       const likeKey = `${content.contentType}:${content.contentId}`;
       const likeData = likeDataMap.get(likeKey);
-      
+
       return {
         comments: content.comments || 0,
         contentId: content.contentId,

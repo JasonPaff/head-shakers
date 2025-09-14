@@ -128,6 +128,33 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
   return (
     <Card className={'overflow-hidden transition-shadow hover:shadow-lg'}>
+      {/* Name */}
+      <CardHeader className={'pb-3'}>
+        <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
+        <Conditional isCondition={!!bobblehead.subcollectionId && !!bobblehead.subcollectionName}>
+          <div className={'flex items-center text-xs text-muted-foreground'}>
+            <FolderIcon aria-hidden className={'mr-1.5 size-3.5 flex-shrink-0'} />
+            <Link
+              className={'truncate hover:underline'}
+              href={$path({
+                route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+                routeParams: {
+                  collectionId: bobblehead.collectionId,
+                  subcollectionId: bobblehead.subcollectionId!,
+                },
+              })}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              title={bobblehead.subcollectionName ?? ''}
+            >
+              {bobblehead.subcollectionName}
+            </Link>
+          </div>
+        </Conditional>
+      </CardHeader>
+
+      {/* Photo */}
       <div
         className={'relative aspect-square bg-muted'}
         onMouseEnter={handleMouseEnter}
@@ -193,40 +220,17 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
         </Conditional>
       </div>
 
-      {/* Name */}
-      <CardHeader>
-        <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
-        <Conditional isCondition={!!bobblehead.subcollectionId && !!bobblehead.subcollectionName}>
-          <div className={'mt-1 flex items-center text-xs text-muted-foreground'}>
-            <FolderIcon aria-hidden className={'mr-1.5 size-3.5 flex-shrink-0'} />
-            <Link
-              className={'truncate hover:underline'}
-              href={$path({
-                route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-                routeParams: {
-                  collectionId: bobblehead.collectionId,
-                  subcollectionId: bobblehead.subcollectionId!,
-                },
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              title={bobblehead.subcollectionName ?? ''}
-            >
-              {bobblehead.subcollectionName}
-            </Link>
-          </div>
-        </Conditional>
-      </CardHeader>
-
       {/* Description */}
       <Conditional isCondition={!!bobblehead.description}>
-        <CardContent>
+        <CardContent className={'pt-4 pb-3'}>
           <p className={'line-clamp-2 text-sm text-muted-foreground'}>{bobblehead.description}</p>
         </CardContent>
       </Conditional>
 
-      <CardFooter className={'flex items-center justify-between'}>
+      {/* Visual Separator */}
+      <div className={'border-t border-border'} />
+
+      <CardFooter className={'flex items-center justify-between pt-4'}>
         <div className={'flex items-center gap-2'}>
           {/* Like Button */}
           <LikeCompactButton
