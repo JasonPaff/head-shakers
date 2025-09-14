@@ -2,7 +2,6 @@
 
 import { revalidateLogic } from '@tanstack/form-core';
 
-import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
 
 import { Button } from '@/components/ui/button';
@@ -20,9 +19,16 @@ import { updateCollectionAction } from '@/lib/actions/collections/collections.ac
 import { updateCollectionSchema } from '@/lib/validations/collections.validation';
 
 interface CollectionEditDialogProps {
-  collection: CollectionDashboardData;
+  collection: CollectionForEdit;
   isOpen: boolean;
   onClose: () => void;
+}
+
+interface CollectionForEdit {
+  description: null | string;
+  id: string;
+  isPublic: boolean;
+  name: string;
 }
 
 export const CollectionEditDialog = ({ collection, isOpen, onClose }: CollectionEditDialogProps) => {

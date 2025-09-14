@@ -6,9 +6,11 @@ import { Fragment } from 'react';
 
 import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
 
+import { SubcollectionEditSection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-edit-section';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
+import { checkIsOwner } from '@/utils/optional-auth-utils';
 
 interface SubcollectionHeaderProps {
   likeData?: {
@@ -19,8 +21,10 @@ interface SubcollectionHeaderProps {
   subcollection: PublicSubcollection;
 }
 
-export const SubcollectionHeader = ({ likeData, subcollection }: SubcollectionHeaderProps) => {
+export const SubcollectionHeader = async ({ likeData, subcollection }: SubcollectionHeaderProps) => {
   if (!subcollection) throw new Error('Subcollection is required');
+
+  const isOwner = await checkIsOwner(subcollection.userId);
 
   return (
     <Fragment>
@@ -37,34 +41,36 @@ export const SubcollectionHeader = ({ likeData, subcollection }: SubcollectionHe
             Back to {subcollection.collectionName}
           </Link>
         </Button>
+        <SubcollectionEditSection isOwner={isOwner} subcollection={subcollection} />
       </div>
 
-      <div className={'flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'}>
-        {/* Collection Info */}
-        <div className={'flex-1'}>
+      <div className={'flex flex-col gap-6'}>
+        {/* Subcollection Info */}
+        <div>
           <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{subcollection.name}</h1>
-          <p className={'max-w-3xl text-lg text-pretty text-muted-foreground'}>{subcollection.description}</p>
+          <p className={'text-lg text-pretty text-muted-foreground'}>{subcollection.description}</p>
         </div>
 
-        <div className={'flex flex-col justify-between gap-4 sm:flex-row lg:justify-normal'}>
-          <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
-            {/* Collection Metadata */}
-            <div className={'flex items-center gap-2'}>
-              <CalendarIcon aria-hidden className={'size-4'} />
-              Created {subcollection.createdAt.toLocaleDateString()}
-            </div>
-            <div>{subcollection.bobbleheadCount} Bobbleheads</div>
-
-            {/* Like Button */}
-            <Conditional isCondition={!!likeData}>
-              <LikeIconButton
-                initialLikeCount={likeData?.likeCount ?? 0}
-                isInitiallyLiked={likeData?.isLiked ?? false}
-                targetId={subcollection.id}
-                targetType={'subcollection'}
-              />
-            </Conditional>
+        {/* Subcollection Metadata & Like Button */}
+        <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
+          {/* Creation Date */}
+          <div className={'flex items-center gap-2'}>
+            <CalendarIcon aria-hidden className={'size-4'} />
+            Created {subcollection.createdAt.toLocaleDateString()}
           </div>
+
+          {/* Bobblehead Count */}
+          <div>{subcollection.bobbleheadCount} Bobbleheads</div>
+
+          {/* Like Button */}
+          <Conditional isCondition={!!likeData}>
+            <LikeIconButton
+              initialLikeCount={likeData?.likeCount ?? 0}
+              isInitiallyLiked={likeData?.isLiked ?? false}
+              targetId={subcollection.id}
+              targetType={'subcollection'}
+            />
+          </Conditional>
         </div>
       </div>
     </Fragment>

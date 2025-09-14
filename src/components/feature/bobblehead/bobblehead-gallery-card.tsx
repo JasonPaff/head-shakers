@@ -1,6 +1,6 @@
 'use client';
 
-import type { MouseEvent } from 'react';
+import type { KeyboardEvent, MouseEvent } from 'react';
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -36,6 +36,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadCommentsDialog } from './bobblehead-comments-dialog';
 import { BobbleheadDelete } from './bobblehead-delete';
+import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
 import { BobbleheadShareMenu } from './bobblehead-share-menu';
 
 interface BobbleheadGalleryCardProps {
@@ -64,6 +65,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
   const [hasLoadedPhotos, setHasLoadedPhotos] = useToggle();
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
+  const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useToggle();
 
   const {
     execute: fetchPhotos,
@@ -111,6 +113,34 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
     setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
   };
 
+  const handlePhotoClick = (e: MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // ensure photos are loaded before opening the gallery
+    if (!hasLoadedPhotos && !isLoadingPhotos) {
+      setHasLoadedPhotos.on();
+      fetchPhotos({ bobbleheadId: bobblehead.id });
+    }
+
+    setIsPhotoGalleryOpen.on();
+  };
+
+  const handlePhotoKeyDown = (e: KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // ensure photos are loaded before opening the gallery
+      if (!hasLoadedPhotos && !isLoadingPhotos) {
+        setHasLoadedPhotos.on();
+        fetchPhotos({ bobbleheadId: bobblehead.id });
+      }
+
+      setIsPhotoGalleryOpen.on();
+    }
+  };
+
   const handleImageLoad = () => {
     if (!currentPhoto) return;
 
@@ -121,6 +151,11 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
       return newSet;
     });
   };
+
+  const validPhotos = photos.filter(
+    (photo): photo is { altText: null | string; url: string } =>
+      photo !== undefined && typeof photo.url === 'string',
+  );
 
   const currentPhoto = photos[currentPhotoIndex]?.url || bobblehead.featurePhoto;
   const shouldShowControls = photos.length > 1 && isShowPhotoControls;
@@ -156,21 +191,39 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
       {/* Photo */}
       <div
-        className={'relative h-64 flex-shrink-0 bg-muted'}
+        className={'group relative h-64 flex-shrink-0 cursor-pointer bg-muted'}
+        onClick={handlePhotoClick}
+        onKeyDown={handlePhotoKeyDown}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={setIsShowPhotoControls.off}
+        role={'button'}
+        tabIndex={0}
+        title={'Click to view in gallery'}
       >
         {/* Photo */}
         <img
           alt={bobblehead.name || 'Bobblehead'}
           className={cn(
-            'size-full object-cover transition-opacity duration-300',
+            'size-full object-cover transition-all duration-300 group-hover:scale-105',
             !isCurrentImageLoaded && 'opacity-50',
           )}
           onLoad={handleImageLoad}
           sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
           src={currentPhoto ?? '/placeholder.jpg'}
         />
+
+        {/* Overlay */}
+        <div
+          className={`absolute inset-0 flex items-center justify-center bg-black/0
+             transition-all duration-300 group-hover:bg-black/10`}
+        >
+          <div
+            className={`rounded-md bg-black/50 px-3 py-1 text-sm font-medium text-white
+              opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+          >
+            View Gallery
+          </div>
+        </div>
 
         <Conditional isCondition={!isCurrentImageLoaded}>
           <div className={'absolute inset-0 flex items-center justify-center bg-black/10'}>
@@ -329,6 +382,16 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
           </Conditional>
         </div>
       </CardFooter>
+
+      {/* Photo Gallery Modal */}
+      <BobbleheadPhotoGalleryModal
+        bobbleheadName={bobblehead.name}
+        currentPhotoIndex={currentPhotoIndex}
+        isOpen={isPhotoGalleryOpen}
+        onClose={setIsPhotoGalleryOpen.off}
+        onPhotoChange={setCurrentPhotoIndex}
+        photos={validPhotos}
+      />
     </Card>
   );
 };

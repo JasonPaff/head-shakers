@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
+import { CollectionEditSection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-edit-section';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
@@ -27,7 +28,7 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
 
   return (
     <Fragment>
-      {/* Back to Collections Button */}
+      {/* Back to Collections Button and Edit Button */}
       <div className={'mb-6 flex items-center gap-4'}>
         <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
@@ -37,37 +38,36 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
             </Link>
           </Button>
         </Conditional>
+        <CollectionEditSection collection={collection} isOwner={isOwner} />
       </div>
 
-      <div className={'flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'}>
+      <div className={'flex flex-col gap-6'}>
         {/* Collection Info */}
-        <div className={'flex-1'}>
+        <div>
           <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{collection.name}</h1>
-          <p className={'max-w-3xl text-lg text-pretty text-muted-foreground'}>{collection.description}</p>
+          <p className={'text-lg text-pretty text-muted-foreground'}>{collection.description}</p>
         </div>
 
-        <div className={'flex flex-col justify-between gap-4 sm:flex-row lg:justify-normal'}>
-          {/* Collection Metadata & Like Button */}
-          <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
-            {/* Creation Date */}
-            <div className={'flex items-center gap-2'}>
-              <CalendarIcon aria-hidden className={'size-4'} />
-              Created {collection.createdAt.toLocaleDateString()}
-            </div>
-
-            {/* Bobblehead Count */}
-            <div>{collection.totalBobbleheadCount} Bobbleheads</div>
-
-            {/* Like Button */}
-            <Conditional isCondition={!!likeData}>
-              <LikeIconButton
-                initialLikeCount={likeData?.likeCount ?? 0}
-                isInitiallyLiked={likeData?.isLiked ?? false}
-                targetId={collection.id}
-                targetType={'collection'}
-              />
-            </Conditional>
+        {/* Collection Metadata & Like Button */}
+        <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
+          {/* Creation Date */}
+          <div className={'flex items-center gap-2'}>
+            <CalendarIcon aria-hidden className={'size-4'} />
+            Created {collection.createdAt.toLocaleDateString()}
           </div>
+
+          {/* Bobblehead Count */}
+          <div>{collection.totalBobbleheadCount} Bobbleheads</div>
+
+          {/* Like Button */}
+          <Conditional isCondition={!!likeData}>
+            <LikeIconButton
+              initialLikeCount={likeData?.likeCount ?? 0}
+              isInitiallyLiked={likeData?.isLiked ?? false}
+              targetId={collection.id}
+              targetType={'collection'}
+            />
+          </Conditional>
         </div>
       </div>
     </Fragment>
