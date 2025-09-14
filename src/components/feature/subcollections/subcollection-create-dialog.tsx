@@ -1,8 +1,6 @@
 'use client';
 
 import { revalidateLogic } from '@tanstack/form-core';
-import { useAction } from 'next-safe-action/hooks';
-import { toast } from 'sonner';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { InsertSubCollectionInput } from '@/lib/validations/subcollections.validation';
@@ -17,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
+import { useServerAction } from '@/hooks/use-server-action';
 import { createSubCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 import { DEFAULTS } from '@/lib/constants';
 import { insertSubCollectionSchema } from '@/lib/validations/subcollections.validation';
@@ -34,18 +33,18 @@ export const SubcollectionCreateDialog = ({
   onClose,
   onSubCollectionCreated,
 }: SubcollectionCreateDialogProps) => {
-  const { executeAsync, isExecuting } = useAction(createSubCollectionAction, {
-    onError: ({ error }) => {
-      toast.error(error.serverError || 'Failed to create subcollection');
-    },
+  const { executeAsync, isExecuting } = useServerAction(createSubCollectionAction, {
     onSuccess: ({ data }) => {
-      if (!data) return;
-      toast.success('Subcollection created successfully!');
       onSubCollectionCreated?.({
         id: data.data.id,
         name: data.data.name,
       });
       handleClose();
+    },
+    toastMessages: {
+      error: 'Failed to create subcollection. Please try again.',
+      loading: 'Creating subcollection...',
+      success: 'Subcollection created successfully!',
     },
   });
 
