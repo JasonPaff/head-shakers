@@ -30,18 +30,31 @@ export class SubcollectionsQuery extends BaseQuery {
     userId: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<null | SelectSubCollection> {
-    const result = await (dbInstance ?? db)
-      .delete(subCollections)
+    const database = dbInstance ?? db;
+
+    // First verify the subcollection belongs to a collection owned by the user
+    const subcollection = await database
+      .select()
+      .from(subCollections)
+      .innerJoin(collections, eq(subCollections.collectionId, collections.id))
       .where(
         and(
           eq(subCollections.id, subcollectionId),
-          eq(
-            subCollections.collectionId,
-            dbInstance.select({ id: collections.id }).from(collections).where(eq(collections.userId, userId)),
-          ),
-        ),
+          eq(collections.userId, userId)
+        )
       )
+      .limit(1);
+
+    if (!subcollection || subcollection.length === 0) {
+      return null;
+    }
+
+    // Delete the subcollection
+    const result = await database
+      .delete(subCollections)
+      .where(eq(subCollections.id, subcollectionId))
       .returning();
+
     return result?.[0] || null;
   }
 
@@ -280,19 +293,32 @@ export class SubcollectionsQuery extends BaseQuery {
     userId: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<null | SelectSubCollection> {
-    const result = await (dbInstance ?? db)
-      .update(subCollections)
-      .set(data)
+    const database = dbInstance ?? db;
+
+    // First verify the subcollection belongs to a collection owned by the user
+    const subcollection = await database
+      .select()
+      .from(subCollections)
+      .innerJoin(collections, eq(subCollections.collectionId, collections.id))
       .where(
         and(
           eq(subCollections.id, subcollectionId),
-          eq(
-            subCollections.collectionId,
-            dbInstance.select({ id: collections.id }).from(collections).where(eq(collections.userId, userId)),
-          ),
-        ),
+          eq(collections.userId, userId)
+        )
       )
+      .limit(1);
+
+    if (!subcollection || subcollection.length === 0) {
+      return null;
+    }
+
+    // Update the subcollection
+    const result = await database
+      .update(subCollections)
+      .set(data)
+      .where(eq(subCollections.id, subcollectionId))
       .returning();
+
     return result?.[0] || null;
   }
 

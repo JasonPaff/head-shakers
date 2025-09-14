@@ -6,6 +6,7 @@ import { Fragment } from 'react';
 import { SubcollectionEditDialog } from '@/components/feature/subcollections/subcollection-edit-dialog';
 import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,20 +64,24 @@ export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProp
       </DropdownMenu>
 
       {/* Edit Subcollection Details Dialog */}
-      <SubcollectionEditDialog
-        isOpen={isEditDialogOpen}
-        onClose={setIsEditDialogOpen.off}
-        subcollection={subcollection}
-      />
+      <Conditional isCondition={isEditDialogOpen}>
+        <SubcollectionEditDialog
+          isOpen={isEditDialogOpen}
+          onClose={setIsEditDialogOpen.off}
+          subcollection={subcollection}
+        />
+      </Conditional>
 
       {/* Confirm Delete Dialog */}
-      <ConfirmDeleteAlertDialog
-        isOpen={isDeleteDialogOpen}
-        onClose={setIsDeleteDialogOpen.off}
-        onDeleteAsync={handleDeleteSubcollectionAsync}
-      >
-        This will permanently delete this subcollection and any bobbleheads assigned to it.
-      </ConfirmDeleteAlertDialog>
+      <Conditional isCondition={isDeleteDialogOpen}>
+        <ConfirmDeleteAlertDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={setIsDeleteDialogOpen.off}
+          onDeleteAsync={handleDeleteSubcollectionAsync}
+        >
+          This will permanently delete this subcollection and any bobbleheads assigned to it.
+        </ConfirmDeleteAlertDialog>
+      </Conditional>
     </Fragment>
   );
 };
