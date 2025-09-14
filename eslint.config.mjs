@@ -90,6 +90,7 @@ export default eslintTypescript.config([
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react-snob/no-inline-styles': 'off',
+      'react-snob/require-derived-conditional-prefix': 'off',
       'react-snob/require-boolean-prefix-is': [
         'error',
         {

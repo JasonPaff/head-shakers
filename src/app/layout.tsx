@@ -4,8 +4,10 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { shadcn } from '@clerk/themes';
 import { ThemeProvider } from 'next-themes';
 import { Geist, Geist_Mono } from 'next/font/google';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import '@/app/globals.css';
+import { TanstackQueryProvider } from '@/components/feature/tanstack-query/tanstack-query-provider';
 import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = Geist({
@@ -37,10 +39,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
     >
       <html data-scroll-behavior={'smooth'} lang={'en'} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
-            {children}
-            <Toaster closeButton duration={2500} position={'top-right'} richColors />
-          </ThemeProvider>
+          <NuqsAdapter>
+            <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
+              <TanstackQueryProvider>{children}</TanstackQueryProvider>
+              <Toaster closeButton duration={2500} position={'top-right'} richColors />
+            </ThemeProvider>
+          </NuqsAdapter>
         </body>
       </html>
     </ClerkProvider>
