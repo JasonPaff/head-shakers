@@ -49,13 +49,13 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
 
   return (
     <div>
-      <div className={'mb-6 flex items-center justify-between'}>
+      <div className={'mb-4 flex items-center justify-between'}>
         {/* Section Title */}
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
 
         {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
-          <Button asChild size={'sm'} variant={'outline'}>
+          <Button asChild>
             <Link
               href={$path({
                 route: '/bobbleheads/add',
@@ -70,34 +70,34 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
       </div>
 
       {/* Filter Controls */}
-      <CollectionBobbleheadControls />
+      <div className={'mb-4'}>
+        <CollectionBobbleheadControls />
+      </div>
 
       {/* Empty State */}
       <Conditional isCondition={isEmpty}>
-        <div className={'mt-6'}>
-          <EmptyState
-            action={
-              isOwner ?
-                <Button asChild>
-                  <Link
-                    href={$path({
-                      route: '/bobbleheads/add',
-                      searchParams: { collectionId: collection.id },
-                    })}
-                  >
-                    <PlusIcon aria-hidden className={'mr-2 size-4'} />
-                    Add First Bobblehead
-                  </Link>
-                </Button>
-              : undefined
-            }
-            description={
-              "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."
-            }
-            icon={Package2Icon}
-            title={'No Bobbleheads Yet'}
-          />
-        </div>
+        <EmptyState
+          action={
+            isOwner ?
+              <Button asChild>
+                <Link
+                  href={$path({
+                    route: '/bobbleheads/add',
+                    searchParams: { collectionId: collection.id },
+                  })}
+                >
+                  <PlusIcon aria-hidden className={'mr-2 size-4'} />
+                  Add First Bobblehead
+                </Link>
+              </Button>
+            : undefined
+          }
+          description={
+            "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."
+          }
+          icon={Package2Icon}
+          title={'No Bobbleheads Yet'}
+        />
       </Conditional>
 
       {/* Bobblehead Grid */}

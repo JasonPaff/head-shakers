@@ -46,11 +46,11 @@ export const SubcollectionBobbleheads = async ({
 
   return (
     <div>
-      <div className={'mb-6 flex items-center justify-between'}>
+      <div className={'mb-4 flex items-center justify-between'}>
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
         {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
-          <Button asChild size={'sm'} variant={'outline'}>
+          <Button asChild>
             <Link
               href={$path({
                 route: '/bobbleheads/add',
@@ -65,7 +65,7 @@ export const SubcollectionBobbleheads = async ({
       </div>
 
       {/* Search and Sort Controls */}
-      <div className={'mb-6'}>
+      <div className={'mb-4'}>
         <SubcollectionControls />
       </div>
 
