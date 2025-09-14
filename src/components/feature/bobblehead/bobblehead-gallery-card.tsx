@@ -27,6 +27,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LikeCompactButton } from '@/components/ui/like-button';
+import { Spinner } from '@/components/ui/spinner';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
@@ -55,6 +56,9 @@ interface BobbleheadGalleryCardProps {
 
 export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGalleryCardProps) => {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [loadedImageUrls, setLoadedImageUrls] = useState<Set<string>>(
+    () => new Set(bobblehead.featurePhoto ? [bobblehead.featurePhoto] : []),
+  );
 
   const [hasLoadedPhotos, setHasLoadedPhotos] = useToggle();
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
@@ -94,8 +98,19 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
     setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
   };
 
+  const handleImageLoad = () => {
+    if (!currentPhoto) return;
+    setLoadedImageUrls((prev) => {
+      if (prev.has(currentPhoto)) return prev;
+      const newSet = new Set(prev);
+      newSet.add(currentPhoto);
+      return newSet;
+    });
+  };
+
   const currentPhoto = photos[currentPhotoIndex]?.url || bobblehead.featurePhoto;
   const shouldShowControls = photos.length > 1 && isShowPhotoControls;
+  const isCurrentImageLoaded = !currentPhoto || loadedImageUrls.has(currentPhoto ?? '');
 
   return (
     <Card className={'overflow-hidden transition-shadow hover:shadow-lg'}>
@@ -107,10 +122,20 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
         {/* Photo */}
         <img
           alt={bobblehead.name || 'Bobblehead'}
-          className={'object-cover'}
+          className={cn(
+            'size-full object-cover transition-opacity duration-300',
+            !isCurrentImageLoaded && 'opacity-50',
+          )}
+          onLoad={handleImageLoad}
           sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
           src={currentPhoto ?? '/placeholder.jpg'}
         />
+
+        <Conditional isCondition={!isCurrentImageLoaded}>
+          <div className={'absolute inset-0 flex items-center justify-center bg-black/10'}>
+            <Spinner className={'size-8'} />
+          </div>
+        </Conditional>
 
         {/* Controls */}
         <Conditional isCondition={shouldShowControls}>
@@ -154,25 +179,17 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
         </Conditional>
       </div>
 
-      <Link
-        className={'block'}
-        href={$path({
-          route: '/bobbleheads/[bobbleheadId]',
-          routeParams: { bobbleheadId: bobblehead.id },
-        })}
-      >
-        {/* Name */}
-        <CardHeader>
-          <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
-        </CardHeader>
+      {/* Name */}
+      <CardHeader>
+        <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
+      </CardHeader>
 
-        {/* Description */}
-        <Conditional isCondition={!!bobblehead.description}>
-          <CardContent>
-            <p className={'line-clamp-2 text-sm text-muted-foreground'}>{bobblehead.description}</p>
-          </CardContent>
-        </Conditional>
-      </Link>
+      {/* Description */}
+      <Conditional isCondition={!!bobblehead.description}>
+        <CardContent>
+          <p className={'line-clamp-2 text-sm text-muted-foreground'}>{bobblehead.description}</p>
+        </CardContent>
+      </Conditional>
 
       <CardFooter className={'flex items-center justify-between'}>
         <div className={'flex items-center gap-2'}>
@@ -213,55 +230,67 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
           </BobbleheadShareMenu>
         </div>
 
-        {/* More Options */}
-        <Conditional isCondition={isOwner}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                className={'size-8 p-0'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-                size={'sm'}
-                variant={'ghost'}
-              >
-                <MoreVerticalIcon aria-hidden className={'size-4'} />
-                <VisuallyHidden>Open menu</VisuallyHidden>
-              </Button>
-            </DropdownMenuTrigger>
+        <div className={'flex items-center gap-2'}>
+          <Button asChild size={'sm'} variant={'outline'}>
+            <Link
+              href={$path({
+                route: '/bobbleheads/[bobbleheadId]',
+                routeParams: { bobbleheadId: bobblehead.id },
+              })}
+            >
+              View Details
+            </Link>
+          </Button>
 
-            <DropdownMenuContent align={'end'}>
-              {/* Edit */}
-              <DropdownMenuItem asChild>
-                <Link
-                  href={$path({
-                    route: '/bobbleheads/[bobbleheadId]/edit',
-                    routeParams: { bobbleheadId: bobblehead.id },
-                  })}
-                >
-                  Edit
-                </Link>
-              </DropdownMenuItem>
-
-              {/* Delete */}
-              <DropdownMenuItem
-                onSelect={(e) => {
-                  e.preventDefault();
-                }}
-              >
-                <BobbleheadDelete
-                  bobbleheadId={bobblehead.id}
-                  className={'h-5'}
-                  collectionId={bobblehead.collectionId}
-                  subcollectionId={bobblehead.subcollectionId}
+          <Conditional isCondition={isOwner}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  className={'size-8 p-0'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  size={'sm'}
                   variant={'ghost'}
                 >
-                  Delete
-                </BobbleheadDelete>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </Conditional>
+                  <MoreVerticalIcon aria-hidden className={'size-4'} />
+                  <VisuallyHidden>Open menu</VisuallyHidden>
+                </Button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align={'end'}>
+                {/* Edit */}
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={$path({
+                      route: '/bobbleheads/[bobbleheadId]/edit',
+                      routeParams: { bobbleheadId: bobblehead.id },
+                    })}
+                  >
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+
+                {/* Delete */}
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                  }}
+                >
+                  <BobbleheadDelete
+                    bobbleheadId={bobblehead.id}
+                    className={'h-5'}
+                    collectionId={bobblehead.collectionId}
+                    subcollectionId={bobblehead.subcollectionId}
+                    variant={'ghost'}
+                  >
+                    Delete
+                  </BobbleheadDelete>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </Conditional>
+        </div>
       </CardFooter>
     </Card>
   );
