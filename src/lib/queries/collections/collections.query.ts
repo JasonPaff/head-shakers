@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, isNull, like, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -393,9 +393,9 @@ export class CollectionsQuery extends BaseQuery {
   private static _getSearchCondition(searchTerm?: string) {
     if (!searchTerm) return undefined;
     return or(
-      like(bobbleheads.name, `%${searchTerm}%`),
-      like(bobbleheads.description, `%${searchTerm}%`),
-      like(bobbleheads.characterName, `%${searchTerm}%`),
+      ilike(bobbleheads.name, `%${searchTerm}%`),
+      ilike(bobbleheads.description, `%${searchTerm}%`),
+      ilike(bobbleheads.characterName, `%${searchTerm}%`),
     );
   }
 
