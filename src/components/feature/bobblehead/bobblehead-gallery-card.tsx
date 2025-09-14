@@ -111,6 +111,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
   const handleImageLoad = () => {
     if (!currentPhoto) return;
+
     setLoadedImageUrls((prev) => {
       if (prev.has(currentPhoto)) return prev;
       const newSet = new Set(prev);

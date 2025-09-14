@@ -24,7 +24,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
   const isOwner = await checkIsOwner(collection.userId);
 
   const view = searchParams?.view || 'collection';
-  const searchTerm = searchParams?.q || undefined;
+  const searchTerm = searchParams?.search || undefined;
   const sortBy = searchParams?.sort || 'newest';
 
   const options = {
