@@ -37,7 +37,7 @@ export const CollectionCard = ({ bobblehead }: CollectionCardProps) => {
               <EyeIcon aria-hidden className={'size-4 text-white drop-shadow-sm'} />
             </Conditional>
             <Conditional isCondition={!bobblehead.isPublic}>
-              <LockIcon aria-hidden className={'size-4 text-white drop-shadow-sm'} r />
+              <LockIcon aria-hidden className={'size-4 text-white drop-shadow-sm'} />
             </Conditional>
           </div>
         </div>
