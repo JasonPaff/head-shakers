@@ -23,10 +23,11 @@ type SubcollectionsListItemProps = {
     isCollectionPublic: boolean;
     subcollections: Array<SubcollectionData>;
   };
+  collectionId: string;
   searchTerm: string;
 };
 
-export const SubcollectionsListItem = ({ collection, searchTerm }: SubcollectionsListItemProps) => {
+export const SubcollectionsListItem = ({ collection, collectionId, searchTerm }: SubcollectionsListItemProps) => {
   const subcollections =
     collection.subcollections.filter(
       (subcollection) =>
@@ -113,7 +114,7 @@ export const SubcollectionsListItem = ({ collection, searchTerm }: Subcollection
             })}
           >
             <PlusIcon aria-hidden className={'mr-2 size-4'} />
-            Add Subcollection to {group.collectionName}
+            Add Subcollection to {collection.collectionName}
           </Link>
         </Button>
       </div>
