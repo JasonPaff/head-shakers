@@ -47,6 +47,9 @@ export type CollectionWithRelations = CollectionRecord & {
       isFeatured: boolean;
       updatedAt: Date;
     }>;
+    collectionId: string;
+    createdAt: Date;
+    description: null | string;
     id: string;
     name: string;
     updatedAt: Date;
@@ -387,6 +390,14 @@ export class CollectionsQuery extends BaseQuery {
           where: eq(bobbleheads.isDeleted, false),
         },
         subCollections: {
+          columns: {
+            collectionId: true,
+            createdAt: true,
+            description: true,
+            id: true,
+            name: true,
+            updatedAt: true,
+          },
           with: {
             bobbleheads: {
               columns: {

@@ -1,7 +1,11 @@
 import { cache } from 'react';
 
 import type { FindOptions } from '@/lib/queries/base/query-context';
-import type { BobbleheadListRecord, CollectionRecord } from '@/lib/queries/collections/collections.query';
+import type {
+  BobbleheadListRecord,
+  CollectionRecord,
+  CollectionWithRelations,
+} from '@/lib/queries/collections/collections.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
@@ -28,6 +32,7 @@ export interface CollectionDashboardData {
   name: string;
   subCollections: Array<{
     bobbleheadCount: number;
+    description: null | string;
     id: string;
     name: string;
   }>;
@@ -42,31 +47,6 @@ export interface CollectionMetrics {
   totalBobbleheads: number;
 }
 
-export interface CollectionWithRelations {
-  bobbleheads: Array<{
-    id: string;
-    isFeatured: boolean;
-    subcollectionId: null | string;
-    updatedAt: Date;
-  }>;
-  createdAt: Date;
-  description: null | string;
-  id: string;
-  isPublic: boolean;
-  name: string;
-  subCollections: Array<{
-    bobbleheads: Array<{
-      id: string;
-      isFeatured: boolean;
-      updatedAt: Date;
-    }>;
-    id: string;
-    name: string;
-    updatedAt: Date;
-  }>;
-  updatedAt: Date;
-  userId: string;
-}
 
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
@@ -369,6 +349,7 @@ export class CollectionsFacade {
       name: collection.name,
       subCollections: collection.subCollections.map((sub) => ({
         bobbleheadCount: sub.bobbleheads.length,
+        description: sub.description,
         id: sub.id,
         name: sub.name,
       })),
