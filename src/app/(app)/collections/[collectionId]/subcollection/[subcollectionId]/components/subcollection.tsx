@@ -1,18 +1,22 @@
 import 'server-only';
 import { notFound } from 'next/navigation';
 
+import type { SubcollectionSearchParams } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type';
+
 import { SubcollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-bobbleheads';
 import { SubcollectionHeader } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-header';
 import { SubcollectionMetrics } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-metrics';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionProps {
   collectionId: string;
+  searchParams?: SubcollectionSearchParams;
   subcollectionId: string;
 }
 
-export const Subcollection = async ({ collectionId, subcollectionId }: SubcollectionProps) => {
+export const Subcollection = async ({ collectionId, searchParams, subcollectionId }: SubcollectionProps) => {
   const currentUserId = await getOptionalUserId();
   const subcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
     collectionId,
@@ -24,23 +28,34 @@ export const Subcollection = async ({ collectionId, subcollectionId }: Subcollec
     notFound();
   }
 
+  const likeResult = await SocialFacade.getContentLikeData(
+    subcollectionId,
+    'subcollection',
+    currentUserId ?? undefined,
+  );
+
   return (
     <div>
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
-          <SubcollectionHeader subcollection={subcollection} />
+          <SubcollectionHeader likeData={likeResult} subcollection={subcollection} />
         </div>
       </div>
 
-      {/* Metrics Section */}
+      {/* Main Content */}
       <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <SubcollectionMetrics subcollection={subcollection} />
-      </div>
+        <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+          {/* Main Content Area */}
+          <div className={'lg:col-span-9'}>
+            <SubcollectionBobbleheads collectionId={collectionId} searchParams={searchParams} subcollection={subcollection} />
+          </div>
 
-      {/* Bobbleheads Grid */}
-      <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <SubcollectionBobbleheads collectionId={collectionId} subcollection={subcollection} />
+          {/* Sidebar */}
+          <aside className={'flex flex-col gap-6 lg:col-span-3'}>
+            <SubcollectionMetrics subcollection={subcollection} />
+          </aside>
+        </div>
       </div>
     </div>
   );

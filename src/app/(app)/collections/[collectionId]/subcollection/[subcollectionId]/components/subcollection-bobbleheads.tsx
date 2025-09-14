@@ -3,8 +3,10 @@ import { Package2Icon, PlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import type { SubcollectionSearchParams } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type';
 import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
 
+import { SubcollectionControls } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-controls';
 import { BobbleheadGalleryCard } from '@/components/feature/bobblehead/bobblehead-gallery-card';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -14,19 +16,30 @@ import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsProps {
   collectionId: string;
+  searchParams?: SubcollectionSearchParams;
   subcollection: NonNullable<PublicSubcollection>;
 }
 
 export const SubcollectionBobbleheads = async ({
   collectionId,
+  searchParams,
   subcollection,
 }: SubcollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
   const isOwner = await checkIsOwner(subcollection.userId);
 
+  const searchTerm = searchParams?.search || undefined;
+  const sortBy = searchParams?.sort || 'newest';
+
+  const options = {
+    searchTerm,
+    sortBy,
+  };
+
   const bobbleheads = await SubcollectionsFacade.getSubcollectionBobbleheadsWithPhotos(
     subcollection.id,
     currentUserId || undefined,
+    options,
   );
 
   const hasNoBobbleheads = bobbleheads.length === 0;
@@ -49,6 +62,11 @@ export const SubcollectionBobbleheads = async ({
             </Link>
           </Button>
         </Conditional>
+      </div>
+
+      {/* Search and Sort Controls */}
+      <div className={'mb-6'}>
+        <SubcollectionControls />
       </div>
 
       {/* Empty State */}

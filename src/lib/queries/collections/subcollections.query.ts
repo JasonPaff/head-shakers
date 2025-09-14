@@ -1,4 +1,4 @@
-import { and, eq, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
@@ -28,6 +28,7 @@ export class SubcollectionsQuery extends BaseQuery {
   static async getSubcollectionBobbleheadsWithPhotos(
     subcollectionId: string,
     context: QueryContext,
+    options?: { searchTerm?: string; sortBy?: string },
   ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -37,6 +38,9 @@ export class SubcollectionsQuery extends BaseQuery {
       bobbleheads.isDeleted,
       context,
     );
+
+    const searchCondition = this._getSearchCondition(options?.searchTerm);
+    const sortOrder = this._getSortOrder(options?.sortBy);
 
     return dbInstance
       .select({
@@ -64,8 +68,14 @@ export class SubcollectionsQuery extends BaseQuery {
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
-      .where(this.combineFilters(eq(bobbleheads.subcollectionId, subcollectionId), bobbleheadFilter))
-      .orderBy(bobbleheads.createdAt);
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.subcollectionId, subcollectionId),
+          bobbleheadFilter,
+          searchCondition,
+        ),
+      )
+      .orderBy(sortOrder);
   }
 
   /**
@@ -236,5 +246,28 @@ export class SubcollectionsQuery extends BaseQuery {
       })),
       userId: collection.user?.id,
     };
+  }
+
+  private static _getSearchCondition(searchTerm?: string) {
+    if (!searchTerm) return undefined;
+    return or(
+      ilike(bobbleheads.name, `%${searchTerm}%`),
+      ilike(bobbleheads.description, `%${searchTerm}%`),
+      ilike(bobbleheads.characterName, `%${searchTerm}%`),
+    );
+  }
+
+  private static _getSortOrder(sortBy?: string) {
+    switch (sortBy) {
+      case 'name_asc':
+        return asc(bobbleheads.name);
+      case 'name_desc':
+        return desc(bobbleheads.name);
+      case 'oldest':
+        return asc(bobbleheads.createdAt);
+      case 'newest':
+      default:
+        return desc(bobbleheads.createdAt);
+    }
   }
 }

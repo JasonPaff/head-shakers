@@ -18,8 +18,9 @@ export function generateMetadata(): Metadata {
   };
 }
 
-async function SubcollectionPage({ routeParams }: SubcollectionPageProps) {
+async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPageProps) {
   const { collectionId, subcollectionId } = await routeParams;
+  const resolvedSearchParams = await searchParams;
 
-  return <Subcollection collectionId={collectionId} subcollectionId={subcollectionId} />;
+  return <Subcollection collectionId={collectionId} searchParams={resolvedSearchParams} subcollectionId={subcollectionId} />;
 }

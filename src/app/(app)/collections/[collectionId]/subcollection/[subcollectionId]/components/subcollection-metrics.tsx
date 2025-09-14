@@ -13,7 +13,7 @@ export const SubcollectionMetrics = ({ subcollection }: SubcollectionMetricsProp
   if (!subcollection) throw new Error('Subcollection is required');
 
   return (
-    <div className={'mb-8 grid grid-cols-1 gap-6 md:grid-cols-3'}>
+    <div className={'mb-8 grid grid-cols-1 gap-6'}>
       {/* Total Items Card */}
       <Card>
         <CardContent className={'p-6'}>

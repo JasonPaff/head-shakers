@@ -40,6 +40,7 @@ export class SubcollectionsFacade {
   static async getSubcollectionBobbleheadsWithPhotos(
     subcollectionId: string,
     viewerUserId?: string,
+    options?: { searchTerm?: string; sortBy?: string },
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string; likeData?: { isLiked: boolean; likeCount: number; likeId: null | string } }>> {
     try {
@@ -48,7 +49,7 @@ export class SubcollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context);
+      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(subcollectionId, context, options);
 
       if (bobbleheads.length === 0) {
         return bobbleheads;
