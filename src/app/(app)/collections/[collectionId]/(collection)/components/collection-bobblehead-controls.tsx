@@ -14,7 +14,7 @@ export function CollectionBobbleheadControls() {
   const [{ q, sort, view }, setParams] = useQueryStates({
     q: parseAsString.withDefault(''),
     sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
-    view: parseAsStringEnum([...viewOptions]).withDefault('all'),
+    view: parseAsStringEnum([...viewOptions]).withDefault('collection'),
   });
 
   const handleViewChange = (newView: 'all' | 'collection') => {

@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { CollectionSearchParams } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-bobbleheads';
@@ -14,11 +15,10 @@ interface CollectionProps {
     likeCount: number;
     likeId: null | string;
   };
+  searchParams?: CollectionSearchParams;
 }
 
-// TODO: add bobbleheads preview section
-
-export const Collection = ({ collection, likeData }: CollectionProps) => {
+export const Collection = ({ collection, likeData, searchParams }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -35,7 +35,7 @@ export const Collection = ({ collection, likeData }: CollectionProps) => {
         <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
           {/* Main Content Area */}
           <div className={'lg:col-span-9'}>
-            <CollectionBobbleheads collection={collection} />
+            <CollectionBobbleheads collection={collection} searchParams={searchParams} />
           </div>
 
           {/* Sidebar */}

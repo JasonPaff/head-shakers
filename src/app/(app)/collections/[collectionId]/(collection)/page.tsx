@@ -22,8 +22,9 @@ export function generateMetadata(): Metadata {
   };
 }
 
-async function CollectionPage({ routeParams }: CollectionPageProps) {
+async function CollectionPage({ routeParams, searchParams }: CollectionPageProps) {
   const { collectionId } = await routeParams;
+  const resolvedSearchParams = await searchParams;
   const currentUserId = await getOptionalUserId();
 
   const collection = await CollectionsFacade.getCollectionForPublicView(
@@ -41,5 +42,5 @@ async function CollectionPage({ routeParams }: CollectionPageProps) {
     currentUserId ?? undefined,
   );
 
-  return <Collection collection={collection} likeData={likeResult} />;
+  return <Collection collection={collection} likeData={likeResult} searchParams={resolvedSearchParams} />;
 }

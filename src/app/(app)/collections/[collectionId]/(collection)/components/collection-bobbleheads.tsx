@@ -1,12 +1,9 @@
-'use client';
-
-import { useUser } from '@clerk/nextjs';
-import { useQuery } from '@tanstack/react-query';
+import 'server-only';
 import { Package2Icon, PlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-import { parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
 
+import type { CollectionSearchParams } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionBobbleheadControls } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-bobblehead-controls';
@@ -15,81 +12,42 @@ import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionBobbleheadsProps {
   collection: NonNullable<PublicCollection>;
+  searchParams?: CollectionSearchParams;
 }
 
-const viewOptions = ['all', 'collection'] as const;
-const sortOptions = ['newest', 'oldest', 'name_asc', 'name_desc'] as const;
+export const CollectionBobbleheads = async ({ collection, searchParams }: CollectionBobbleheadsProps) => {
+  const currentUserId = await getOptionalUserId();
+  const isOwner = await checkIsOwner(collection.userId);
 
-export const CollectionBobbleheads = ({ collection }: CollectionBobbleheadsProps) => {
-  const { user } = useUser();
-  const currentUserId = user?.id;
-  const isCurrentUserOwner = collection.userId === currentUserId;
+  const view = searchParams?.view || 'collection';
+  const searchTerm = searchParams?.q || undefined;
+  const sortBy = searchParams?.sort || 'newest';
 
-  const [{ q, sort, view }] = useQueryStates({
-    q: parseAsString.withDefault(''),
-    sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
-    view: parseAsStringEnum([...viewOptions]).withDefault('all'),
-  });
+  const options = {
+    searchTerm,
+    sortBy,
+  };
 
-  const { data: bobbleheads = [], isLoading } = useQuery({
-    queryFn: async () => {
-      const options = {
-        searchTerm: q || undefined,
-        sortBy: sort,
-      };
+  console.log('SEARCHING!!!!!!', searchParams);
 
-      if (view === 'collection') {
-        return CollectionsFacade.getCollectionBobbleheadsWithPhotos(
-          collection.id,
-          currentUserId || undefined,
-          options,
-        );
-      } else {
-        return CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(
-          collection.id,
-          currentUserId || undefined,
-          options,
-        );
-      }
-    },
-    queryKey: ['collection-bobbleheads', collection.id, view, q, sort, currentUserId],
-  });
+  const bobbleheads =
+    view === 'collection' ?
+      await CollectionsFacade.getCollectionBobbleheadsWithPhotos(
+        collection.id,
+        currentUserId || undefined,
+        options,
+      )
+    : await CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(
+        collection.id,
+        currentUserId || undefined,
+        options,
+      );
 
   const isEmpty = bobbleheads.length === 0;
-
-  if (isLoading) {
-    return (
-      <div>
-        <div className={'mb-6 flex items-center justify-between'}>
-          <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
-          <Conditional isCondition={isCurrentUserOwner}>
-            <Button asChild size={'sm'} variant={'outline'}>
-              <Link
-                href={$path({
-                  route: '/bobbleheads/add',
-                  searchParams: { collectionId: collection.id },
-                })}
-              >
-                <PlusIcon aria-hidden className={'mr-2 size-4'} />
-                Add Bobblehead
-              </Link>
-            </Button>
-          </Conditional>
-        </div>
-
-        <CollectionBobbleheadControls />
-
-        <div className={'mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div className={'h-80 animate-pulse rounded-lg bg-muted'} key={i} />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div>
@@ -98,7 +56,7 @@ export const CollectionBobbleheads = ({ collection }: CollectionBobbleheadsProps
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Collection</h2>
 
         {/* Add Bobblehead Button */}
-        <Conditional isCondition={isCurrentUserOwner}>
+        <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
               href={$path({
@@ -121,7 +79,7 @@ export const CollectionBobbleheads = ({ collection }: CollectionBobbleheadsProps
         <div className={'mt-6'}>
           <EmptyState
             action={
-              isCurrentUserOwner ?
+              isOwner ?
                 <Button asChild>
                   <Link
                     href={$path({
@@ -153,7 +111,7 @@ export const CollectionBobbleheads = ({ collection }: CollectionBobbleheadsProps
                 ...bobblehead,
                 collectionId: collection.id,
               }}
-              isOwner={isCurrentUserOwner}
+              isOwner={isOwner}
               key={bobblehead.id}
             />
           ))}
