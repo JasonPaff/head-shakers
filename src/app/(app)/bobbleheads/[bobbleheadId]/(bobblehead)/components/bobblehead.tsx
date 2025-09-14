@@ -11,6 +11,7 @@ import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadI
 import { BobbleheadSpecificationCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-specification-card';
 import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-status-privacy-card';
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
+import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
@@ -47,47 +48,51 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
     <div>
       {/* Header Section */}
       <div className={'border-b border-border'}>
-        <div className={'mx-auto max-w-7xl p-2'}>
+        <ContentLayout>
           <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} likeData={likeData} />
-        </div>
+        </ContentLayout>
       </div>
 
       {/* Metrics Section */}
       <AuthContent>
-        <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-          <BobbleheadMetrics bobblehead={bobblehead} />
+        <div className={'mt-4'}>
+          <ContentLayout>
+            <BobbleheadMetrics bobblehead={bobblehead} />
+          </ContentLayout>
         </div>
       </AuthContent>
 
       {/* Feature Card Section */}
-      <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <BobbleheadFeatureCard bobblehead={bobblehead} likeData={likeData} />
+      <div className={'mt-4'}>
+        <ContentLayout>
+          <BobbleheadFeatureCard bobblehead={bobblehead} likeData={likeData} />
+        </ContentLayout>
       </div>
 
       {/* Photo Gallery Section - Only show if multiple photos */}
       <Conditional isCondition={hasMultiplePhotos}>
-        <div className={'mx-auto max-w-7xl p-2'}>
+        <ContentLayout>
           <BobbleheadPhotoGalleryCard bobblehead={bobblehead} />
-        </div>
+        </ContentLayout>
       </Conditional>
 
       {/* Primary Detail Cards Section */}
-      <div className={'mx-auto max-w-7xl p-2'}>
+      <ContentLayout>
         <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'}>
           <BobbleheadDetailsCard bobblehead={bobblehead} />
           <BobbleheadSpecificationCard bobblehead={bobblehead} />
           <BobbleheadAcquisitionCard bobblehead={bobblehead} />
         </div>
-      </div>
+      </ContentLayout>
 
       {/* Secondary Detail Cards Section */}
-      <div className={'mx-auto max-w-7xl p-2'}>
+      <ContentLayout>
         <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'}>
           <BobbleheadStatusPrivacyCard bobblehead={bobblehead} />
           <BobbleheadTimestampsCard bobblehead={bobblehead} />
           <BobbleheadCustomFieldsCard bobblehead={bobblehead} />
         </div>
-      </div>
+      </ContentLayout>
     </div>
   );
 };

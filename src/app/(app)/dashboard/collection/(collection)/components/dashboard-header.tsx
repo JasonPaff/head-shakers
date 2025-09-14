@@ -21,7 +21,7 @@ export const DashboardHeader = async () => {
 
   return (
     <div className={'mb-8'}>
-      <div className={'mb-6 flex items-start justify-between'}>
+      <div className={'mt-4 mb-6 flex items-start justify-between'}>
         <div>
           <h1 className={'text-2xl font-bold text-foreground'}>My Collections Dashboard</h1>
           <p className={'text-muted-foreground'}>Manage your collections, subcollections, and bobbleheads</p>

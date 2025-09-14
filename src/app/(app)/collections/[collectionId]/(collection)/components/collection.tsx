@@ -7,6 +7,7 @@ import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/(c
 import { CollectionHeader } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-header';
 import { CollectionSidebarSubcollections } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-sidebar-subcollections';
 import { CollectionStats } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-stats';
+import { ContentLayout } from '@/components/layout/content-layout';
 
 interface CollectionProps {
   collection: PublicCollection;
@@ -24,26 +25,28 @@ export const Collection = ({ collection, likeData, searchParams }: CollectionPro
   return (
     <div>
       {/* Header Section */}
-      <div className={'border-b border-border'}>
-        <div className={'mx-auto px-4 py-2 lg:px-8'}>
+      <div className={'mt-3 border-b border-border'}>
+        <ContentLayout>
           <CollectionHeader collection={collection} likeData={likeData} />
-        </div>
+        </ContentLayout>
       </div>
 
       {/* Main Content */}
-      <div className={'mx-auto mt-4 px-4 py-2 lg:px-8'}>
-        <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
-          {/* Main Content Area */}
-          <div className={'lg:col-span-9'}>
-            <CollectionBobbleheads collection={collection} searchParams={searchParams} />
-          </div>
+      <div className={'mt-4'}>
+        <ContentLayout>
+          <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+            {/* Main Content Area */}
+            <div className={'lg:col-span-9'}>
+              <CollectionBobbleheads collection={collection} searchParams={searchParams} />
+            </div>
 
-          {/* Sidebar */}
-          <aside className={'flex flex-col gap-6 lg:col-span-3'}>
-            <CollectionStats collection={collection} />
-            <CollectionSidebarSubcollections collection={collection} />
-          </aside>
-        </div>
+            {/* Sidebar */}
+            <aside className={'flex flex-col gap-6 lg:col-span-3'}>
+              <CollectionStats collection={collection} />
+              <CollectionSidebarSubcollections collection={collection} />
+            </aside>
+          </div>
+        </ContentLayout>
       </div>
     </div>
   );

@@ -127,9 +127,9 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
   const isCurrentImageLoaded = !currentPhoto || loadedImageUrls.has(currentPhoto ?? '');
 
   return (
-    <Card className={'flex h-[480px] flex-col overflow-hidden transition-all duration-200 hover:shadow-lg'}>
+    <Card className={'flex h-[580px] flex-col overflow-hidden transition-all duration-200 hover:shadow-lg'}>
       {/* Name */}
-      <CardHeader className={'h-16 flex-shrink-0 pb-2'}>
+      <CardHeader className={'h-14 flex-shrink-0 pb-2'}>
         <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
         <Conditional isCondition={!!bobblehead.subcollectionId && !!bobblehead.subcollectionName}>
           <div className={'flex items-center text-xs text-muted-foreground'}>
@@ -222,9 +222,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
       {/* Description */}
       <CardContent className={'h-20 flex-shrink-0 pt-3 pb-2'}>
-        <p className={'line-clamp-3 text-sm text-muted-foreground'}>
-          {bobblehead.description || ''}
-        </p>
+        <p className={'line-clamp-3 text-sm text-muted-foreground'}>{bobblehead.description || ''}</p>
       </CardContent>
 
       {/* Visual Separator */}
