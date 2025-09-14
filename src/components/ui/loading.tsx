@@ -23,7 +23,7 @@ export const Loading = ({ message }: LoadingProps) => {
     <div className={'flex min-h-screen items-center justify-center bg-background'}>
       <div className={'space-y-6 text-center'}>
         {/* Clean Spinner */}
-        <div className={'relative mx-auto h-12 w-12'}>
+        <div className={'relative mx-auto size-12'}>
           <div className={'absolute inset-0 rounded-full border-4 border-muted'}></div>
           <div
             className={cn(
