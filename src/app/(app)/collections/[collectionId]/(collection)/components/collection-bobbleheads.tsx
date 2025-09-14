@@ -32,8 +32,6 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
     sortBy,
   };
 
-  console.log('SEARCHING!!!!!!', searchParams);
-
   const bobbleheads =
     view === 'collection' ?
       await CollectionsFacade.getCollectionBobbleheadsWithPhotos(
