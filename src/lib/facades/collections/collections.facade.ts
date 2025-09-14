@@ -130,7 +130,6 @@ export class CollectionsFacade {
       const context = createProtectedQueryContext(userId, { dbInstance });
       const collections = await CollectionsQuery.getDashboardData(userId, context);
 
-      // Transform using business logic
       return collections.map((collection) => this.transformForDashboard(collection));
     },
   );

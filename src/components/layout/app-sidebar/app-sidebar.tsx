@@ -18,7 +18,7 @@ const useNavigationData = () => {
   const baseNavMain = [
     {
       icon: CopyleftIcon,
-      title: 'My Collection',
+      title: 'Collection Dashboard',
       url: $path({ route: '/dashboard/collection' }),
     },
     {
