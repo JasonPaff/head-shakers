@@ -6,6 +6,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  FolderIcon,
   MessageCircleIcon,
   MoreVerticalIcon,
   ShareIcon,
@@ -50,6 +51,7 @@ interface BobbleheadGalleryCardProps {
     };
     name: null | string;
     subcollectionId?: null | string;
+    subcollectionName?: null | string;
   };
   isOwner: boolean;
 }
@@ -194,6 +196,27 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
       {/* Name */}
       <CardHeader>
         <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
+        <Conditional isCondition={!!bobblehead.subcollectionId && !!bobblehead.subcollectionName}>
+          <div className={'mt-1 flex items-center text-xs text-muted-foreground'}>
+            <FolderIcon aria-hidden className={'mr-1.5 size-3.5 flex-shrink-0'} />
+            <Link
+              className={'truncate hover:underline'}
+              href={$path({
+                route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+                routeParams: {
+                  collectionId: bobblehead.collectionId,
+                  subcollectionId: bobblehead.subcollectionId!,
+                },
+              })}
+              onClick={(e) => {
+                e.stopPropagation();
+              }}
+              title={bobblehead.subcollectionName ?? ''}
+            >
+              {bobblehead.subcollectionName}
+            </Link>
+          </div>
+        </Conditional>
       </CardHeader>
 
       {/* Description */}

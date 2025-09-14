@@ -9,7 +9,7 @@ import type {
 } from '@/lib/validations/collections.validation';
 
 import { db } from '@/lib/db';
-import { bobbleheadPhotos, bobbleheads, collections } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, collections, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadListRecord = {
@@ -168,7 +168,15 @@ export class CollectionsQuery extends BaseQuery {
     collectionId: string,
     context: QueryContext,
     options?: { searchTerm?: string; sortBy?: string },
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
+  ): Promise<
+    Array<
+      BobbleheadListRecord & {
+        featurePhoto?: null | string;
+        subcollectionId: null | string;
+        subcollectionName: null | string;
+      }
+    >
+  > {
     const dbInstance = this.getDbInstance(context);
 
     const collectionFilter = this.buildBaseFilters(
@@ -207,6 +215,8 @@ export class CollectionsQuery extends BaseQuery {
         purchasePrice: bobbleheads.purchasePrice,
         series: bobbleheads.series,
         status: bobbleheads.status,
+        subcollectionId: bobbleheads.subcollectionId,
+        subcollectionName: subCollections.name,
         weight: bobbleheads.weight,
       })
       .from(bobbleheads)
@@ -215,6 +225,7 @@ export class CollectionsQuery extends BaseQuery {
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
+      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.collectionId, collectionId),
@@ -284,7 +295,15 @@ export class CollectionsQuery extends BaseQuery {
     collectionId: string,
     context: QueryContext,
     options?: { searchTerm?: string; sortBy?: string },
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
+  ): Promise<
+    Array<
+      BobbleheadListRecord & {
+        featurePhoto?: null | string;
+        subcollectionId: null | string;
+        subcollectionName: null | string;
+      }
+    >
+  > {
     const dbInstance = this.getDbInstance(context);
 
     // build permission filters for both collection and bobbleheads
@@ -324,6 +343,8 @@ export class CollectionsQuery extends BaseQuery {
         purchasePrice: bobbleheads.purchasePrice,
         series: bobbleheads.series,
         status: bobbleheads.status,
+        subcollectionId: bobbleheads.subcollectionId,
+        subcollectionName: subCollections.name,
         weight: bobbleheads.weight,
       })
       .from(bobbleheads)
@@ -332,6 +353,7 @@ export class CollectionsQuery extends BaseQuery {
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
+      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.collectionId, collectionId),

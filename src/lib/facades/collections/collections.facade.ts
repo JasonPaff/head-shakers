@@ -210,6 +210,8 @@ export class CollectionsFacade {
       BobbleheadListRecord & {
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+        subcollectionId: null | string;
+        subcollectionName: null | string;
       }
     >
   > {
@@ -287,6 +289,8 @@ export class CollectionsFacade {
       BobbleheadListRecord & {
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+        subcollectionId: null | string;
+        subcollectionName: null | string;
       }
     >
   > {
