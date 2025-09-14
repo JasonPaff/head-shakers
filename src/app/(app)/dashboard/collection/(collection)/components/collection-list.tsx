@@ -19,8 +19,8 @@ export const CollectionList = async () => {
 
   const collections = await CollectionsFacade.getUserCollectionsForDashboard(userId);
 
-  const _totalCollectionCount = collections.length;
-  const _totalBobbleheadCount = collections.reduce((acc, col) => acc + col.metrics.totalBobbleheads, 0);
+  const totalCollectionCount = collections.length;
+  const totalBobbleheadCount = collections.reduce((acc, col) => acc + col.metrics.totalBobbleheads, 0);
 
   return (
     <div className={'container mx-auto max-w-7xl px-4 py-8'}>
@@ -29,7 +29,7 @@ export const CollectionList = async () => {
         <div>
           <h2 className={'text-lg font-semibold text-foreground'}>Collections</h2>
           <div className={'text-sm text-muted-foreground'}>
-            {_totalCollectionCount} Collections • {_totalBobbleheadCount} Bobbleheads
+            {totalCollectionCount} Collections • {totalBobbleheadCount} Bobbleheads
           </div>
         </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { parseAsString, useQueryState } from 'nuqs';
-import { Children, isValidElement } from 'react';
+import { Children, isValidElement, useMemo } from 'react';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -20,8 +20,12 @@ export const DashboardTabsClient = ({ children }: DashboardTabsClientProps) => {
     }),
   );
 
-  const tabContents = Children.toArray(children).filter(
-    (child) => isValidElement(child) && (child.props as DataTab)['data-tab'],
+  const tabContents = useMemo(
+    () =>
+      Children.toArray(children).filter(
+        (child) => isValidElement(child) && (child.props as DataTab)['data-tab'],
+      ),
+    [children],
   );
 
   const handleTabChange = (value: string) => {

@@ -124,7 +124,7 @@ export const EnhancedCollectionCard = ({ collection }: EnhancedCollectionCardPro
           </Conditional>
         </div>
 
-        {/* View COllection Button */}
+        {/* View Collection Button */}
         <Button asChild className={'mt-4'} variant={'outline'}>
           <Link
             href={$path({

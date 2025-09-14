@@ -57,22 +57,21 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
     [bobbleheads, categoryFilter, searchTerm, visibilityFilter],
   );
 
-  const toggleSelect = (id: string) => {
-    const newSelected = new Set(selectedIds);
-    if (newSelected.has(id)) {
-      newSelected.delete(id);
-    } else {
-      newSelected.add(id);
-    }
-    setSelectedIds(newSelected);
+  const handleClearSelection = () => {
+    setSelectedIds(new Set());
   };
 
   const handleSelectAll = () => {
     setSelectedIds(new Set(filteredBobbleheads.map((b) => b.id)));
   };
 
-  const handleClearSelection = () => {
-    setSelectedIds(new Set());
+  const toggleSelect = (id: string) => {
+    const newSelected = new Set(selectedIds);
+
+    if (newSelected.has(id)) newSelected.delete(id);
+    else newSelected.add(id);
+
+    setSelectedIds(newSelected);
   };
 
   return (
@@ -80,12 +79,15 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
       <div className={'flex items-center justify-between'}>
         <h3 className={'text-lg font-semibold'}>All Bobbleheads ({filteredBobbleheads.length})</h3>
 
+        {/* Bulk Actions */}
         <Conditional isCondition={selectedIds.size > 0}>
           <div className={'flex items-center gap-2'}>
             <span className={'text-sm text-muted-foreground'}>{selectedIds.size} selected</span>
+            {/* Clear Selection Button */}
             <Button onClick={handleClearSelection} size={'sm'} variant={'outline'}>
               Clear
             </Button>
+            {/* Delete Selected Button */}
             <Button size={'sm'} variant={'destructive'}>
               Delete Selected
             </Button>
@@ -94,8 +96,11 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
       </div>
 
       <div className={'flex flex-col gap-4 sm:flex-row sm:items-center'}>
+        {/* Search Input */}
         <div className={'flex-1'}>
           <Input
+            isClearable
+            isSearch
             onChange={(e) => {
               setSearchTerm(e.target.value);
             }}
@@ -105,6 +110,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
         </div>
 
         <div className={'flex gap-2'}>
+          {/* Category Filter */}
           <Select onValueChange={setCategoryFilter} value={categoryFilter}>
             <SelectTrigger className={'w-32'}>
               <SelectValue placeholder={'Category'} />
@@ -119,6 +125,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
             </SelectContent>
           </Select>
 
+          {/* Visibility Filter */}
           <Select onValueChange={setVisibilityFilter} value={visibilityFilter}>
             <SelectTrigger className={'w-24'}>
               <SelectValue placeholder={'Visibility'} />
@@ -130,8 +137,9 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
             </SelectContent>
           </Select>
 
+          {/* Select All Button */}
           <Button onClick={handleSelectAll} size={'sm'} variant={'outline'}>
-            <FilterIcon className={'mr-2 size-4'} />
+            <FilterIcon aria-hidden className={'mr-2 size-4'} />
             Select All
           </Button>
         </div>
@@ -151,6 +159,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
           >
             <CardHeader className={'pb-3'}>
               <div className={'flex items-start justify-between'}>
+                {/* Name and Manufacturer */}
                 <div className={'min-w-0 flex-1'}>
                   <h4 className={'truncate font-medium'}>
                     {bobblehead.characterName || 'Unnamed Bobblehead'}
@@ -158,7 +167,9 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                   <p className={'truncate text-sm text-muted-foreground'}>{bobblehead.manufacturer}</p>
                 </div>
 
+                {/* Actions Dropdown */}
                 <div className={'flex items-center gap-2'}>
+                  {/* Selection Checkbox */}
                   <input
                     checked={selectedIds.has(bobblehead.id)}
                     className={'size-4'}
@@ -183,6 +194,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align={'end'}>
+                      {/* View Details Link */}
                       <DropdownMenuItem asChild>
                         <Link
                           href={$path({
@@ -194,6 +206,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuItem asChild>
+                        {/* Edit Link */}
                         <Link
                           href={$path({
                             route: '/bobbleheads/[bobbleheadId]/edit',
@@ -205,6 +218,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                         </Link>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      {/* Delete Action */}
                       <DropdownMenuItem variant={'destructive'}>
                         <Trash2Icon aria-hidden className={'mr-2 size-4'} />
                         Delete
@@ -217,6 +231,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
 
             <CardContent className={'pt-0'}>
               <div className={'space-y-2'}>
+                {/* Category and Visibility Badges */}
                 <div className={'flex flex-wrap gap-2'}>
                   <Conditional isCondition={!!bobblehead.category}>
                     <Badge variant={'secondary'}>{bobblehead.category}</Badge>
@@ -226,6 +241,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                   </Badge>
                 </div>
 
+                {/* Acquisition Date */}
                 <Conditional isCondition={!!bobblehead.acquisitionDate}>
                   <p className={'text-xs text-muted-foreground'}>
                     Added {new Date(bobblehead.acquisitionDate!).toLocaleDateString()}
@@ -237,6 +253,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
         ))}
       </div>
 
+      {/* No Results Found */}
       <Conditional isCondition={filteredBobbleheads.length === 0}>
         <div className={'py-8 text-center text-muted-foreground'}>
           <p>No bobbleheads match your search criteria.</p>
