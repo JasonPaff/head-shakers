@@ -83,7 +83,7 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
                       <Link
                         className={'text-muted-foreground hover:text-foreground'}
                         href={$path({
-                          route: '/collections/[collectionId]/subcollections/[subcollectionId]',
+                          route: '/collections/[collectionId]/subcollection/[subcollectionId]',
                           routeParams: {
                             collectionId: collection.id,
                             subcollectionId: sub.id,

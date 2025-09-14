@@ -5,7 +5,7 @@ import Link from 'next/link';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionSubcollectionsAdd } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-subcollections-add';
-import { SubcollectionActions } from '@/app/(app)/collections/[collectionId]/(collection)/components/subcollection-actions';
+import { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
