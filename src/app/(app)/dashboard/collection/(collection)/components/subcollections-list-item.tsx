@@ -1,21 +1,16 @@
 'use client';
 
-import { MoreVerticalIcon, PencilIcon, PlusIcon, Trash2Icon } from 'lucide-react';
+import { PlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
 import type { SubcollectionData } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-list';
 
+import { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Conditional } from '@/components/ui/conditional';
 
 type SubcollectionsListItemProps = {
   collection: {
@@ -45,31 +40,45 @@ export const SubcollectionsListItem = ({
       <div className={'space-y-2'}>
         {subcollections.map((subcollection) => (
           <div
-            className={'flex items-center justify-between rounded-md border p-3 hover:bg-muted/50'}
+            className={`group flex items-start justify-between rounded-lg border border-border/50
+              bg-card p-4 shadow-sm transition-all hover:border-border hover:shadow-md`}
             key={subcollection.id}
           >
-            <div className={'flex items-center gap-3'}>
-              <Link
-                className={'font-medium text-foreground hover:text-primary'}
-                href={$path({
-                  route: '/collections/[collectionId]/subcollections/[subcollectionId]',
-                  routeParams: {
-                    collectionId: subcollection.collectionId,
-                    subcollectionId: subcollection.id,
-                  },
-                })}
-              >
-                {subcollection.name}
-              </Link>
-              <Badge variant={'secondary'}>
-                {subcollection.bobbleheadCount} bobblehead
-                {subcollection.bobbleheadCount !== 1 ? 's' : ''}
-              </Badge>
+            <div className={'flex min-w-0 flex-1 flex-col gap-2 pr-4'}>
+              <div className={'flex items-center gap-3'}>
+                {/* Subcollection Link */}
+                <Link
+                  className={'font-medium text-foreground hover:text-primary'}
+                  href={$path({
+                    route: '/collections/[collectionId]/subcollections/[subcollectionId]',
+                    routeParams: {
+                      collectionId: subcollection.collectionId,
+                      subcollectionId: subcollection.id,
+                    },
+                  })}
+                >
+                  {subcollection.name}
+                </Link>
+
+                {/* Bobblehead Count Badge */}
+                <Badge variant={'secondary'}>
+                  {subcollection.bobbleheadCount} bobblehead
+                  {subcollection.bobbleheadCount !== 1 ? 's' : ''}
+                </Badge>
+              </div>
+
+              {/* Subcollection Description */}
+              <Conditional isCondition={!!subcollection.description}>
+                <p className={'line-clamp-2 text-sm text-muted-foreground'}>{subcollection.description}</p>
+              </Conditional>
             </div>
 
-            <div className={'flex items-center gap-2'}>
+            <div
+              className={`flex flex-shrink-0 items-center gap-2 opacity-80
+                transition-opacity group-hover:opacity-100`}
+            >
               {/* Add Bobblehead Button */}
-              <Button asChild size={'sm'} variant={'outline'}>
+              <Button asChild className={'shadow-sm'} size={'sm'} variant={'outline'}>
                 <Link
                   href={$path({
                     route: '/bobbleheads/add',
@@ -85,24 +94,13 @@ export const SubcollectionsListItem = ({
               </Button>
 
               {/* Actions Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size={'sm'} variant={'ghost'}>
-                    <MoreVerticalIcon aria-hidden className={'size-4'} />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align={'end'}>
-                  <DropdownMenuItem>
-                    <PencilIcon aria-hidden className={'mr-2 size-4'} />
-                    Edit Details
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant={'destructive'}>
-                    <Trash2Icon aria-hidden className={'mr-2 size-4'} />
-                    Delete Subcollection
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <SubcollectionActions
+                subcollection={{
+                  description: subcollection.description,
+                  id: subcollection.id,
+                  name: subcollection.name,
+                }}
+              />
             </div>
           </div>
         ))}

@@ -1,6 +1,6 @@
 'use client';
 
-import { EyeIcon, LockIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronRightIcon, EyeIcon, FolderIcon, LockIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import { SubcollectionsListItem } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-list-item';
@@ -15,6 +15,7 @@ export interface SubcollectionData {
   bobbleheadCount: number;
   collectionId: string;
   collectionName: string;
+  description: null | string;
   id: string;
   isCollectionPublic: boolean;
   name: string;
@@ -22,6 +23,7 @@ export interface SubcollectionData {
 
 interface GroupedSubcollections {
   [collectionId: string]: {
+    collectionDescription: null | string;
     collectionName: string;
     isCollectionPublic: boolean;
     subcollections: Array<SubcollectionData>;
@@ -98,7 +100,7 @@ export const SubcollectionsList = ({ groupedSubcollections }: SubcollectionsList
 
       <div className={'space-y-4'}>
         {filteredGroups.map(([collectionId, group]) => (
-          <Card key={collectionId}>
+          <Card className={'border-border/50 shadow-sm transition-shadow hover:shadow-md'} key={collectionId}>
             <Collapsible
               onOpenChange={() => {
                 toggleGroup(collectionId);
@@ -112,26 +114,52 @@ export const SubcollectionsList = ({ groupedSubcollections }: SubcollectionsList
                       '-mx-4 flex cursor-pointer items-center justify-between rounded-md px-4 py-2 hover:bg-muted/50'
                     }
                   >
-                    {/* Collection Title and Info */}
                     <div className={'flex items-center gap-3'}>
-                      <CardTitle className={'text-base font-medium'}>{group.collectionName}</CardTitle>
+                      {/* Collection Name and Description */}
+                      <div className={'flex flex-col gap-1'}>
+                        <div className={'flex items-center gap-2'}>
+                          <FolderIcon className={'size-5 text-primary'} />
+                          <CardTitle className={'text-base font-medium text-foreground'}>
+                            {group.collectionName}
+                          </CardTitle>
+                        </div>
+                        <Conditional isCondition={!!group.collectionDescription}>
+                          <p className={'ml-7 line-clamp-2 text-sm text-muted-foreground'}>
+                            {group.collectionDescription}
+                          </p>
+                        </Conditional>
+                      </div>
+
+                      {/* Subcollection Count and Visibility */}
                       <div className={'flex items-center gap-2'}>
-                        <Badge variant={'outline'}>
+                        <Badge
+                          className={'border-primary/20 bg-primary/10 text-primary'}
+                          variant={'secondary'}
+                        >
                           {group.subcollections.length} subcollection
                           {group.subcollections.length !== 1 ? 's' : ''}
                         </Badge>
                         <Conditional isCondition={group.isCollectionPublic}>
-                          <EyeIcon className={'size-4 text-muted-foreground'} />
+                          <EyeIcon className={'size-4 text-green-600'} />
                         </Conditional>
                         <Conditional isCondition={!group.isCollectionPublic}>
-                          <LockIcon className={'size-4 text-muted-foreground'} />
+                          <LockIcon className={'size-4 text-amber-600'} />
                         </Conditional>
                       </div>
                     </div>
 
                     {/* Expand/Collapse Icon */}
-                    <Button size={'sm'} variant={'ghost'}>
-                      {openGroups[collectionId] ? '▼' : '▶'}
+                    <Button
+                      className={'text-muted-foreground hover:text-foreground'}
+                      size={'sm'}
+                      variant={'ghost'}
+                    >
+                      <Conditional
+                        fallback={<ChevronRightIcon className={'size-4'} />}
+                        isCondition={openGroups[collectionId]}
+                      >
+                        <ChevronDownIcon className={'size-4'} />
+                      </Conditional>
                     </Button>
                   </div>
                 </CollapsibleTrigger>

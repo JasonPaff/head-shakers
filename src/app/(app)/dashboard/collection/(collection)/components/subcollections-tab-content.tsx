@@ -12,8 +12,10 @@ export const SubcollectionsTabContent = async () => {
     .flatMap((collection) =>
       collection.subCollections.map((sub) => ({
         ...sub,
+        collectionDescription: collection.description,
         collectionId: collection.id,
         collectionName: collection.name,
+        description: null,
         isCollectionPublic: collection.isPublic,
       })),
     )
@@ -34,6 +36,7 @@ export const SubcollectionsTabContent = async () => {
     (acc, sub) => {
       if (!acc[sub.collectionId]) {
         acc[sub.collectionId] = {
+          collectionDescription: sub.collectionDescription,
           collectionName: sub.collectionName,
           isCollectionPublic: sub.isCollectionPublic,
           subcollections: [],
@@ -44,7 +47,12 @@ export const SubcollectionsTabContent = async () => {
     },
     {} as Record<
       string,
-      { collectionName: string; isCollectionPublic: boolean; subcollections: typeof subcollections }
+      {
+        collectionDescription: null | string;
+        collectionName: string;
+        isCollectionPublic: boolean;
+        subcollections: typeof subcollections;
+      }
     >,
   );
 
