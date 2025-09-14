@@ -9,6 +9,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import '@/app/globals.css';
 import { TanstackQueryProvider } from '@/components/feature/tanstack-query/tanstack-query-provider';
 import { Toaster } from '@/components/ui/sonner';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -39,12 +40,19 @@ export default function RootLayout({ children }: RootLayoutProps) {
     >
       <html data-scroll-behavior={'smooth'} lang={'en'} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
-          <NuqsAdapter>
-            <ThemeProvider attribute={'class'} defaultTheme={'system'} disableTransitionOnChange enableSystem>
-              <TanstackQueryProvider>{children}</TanstackQueryProvider>
-              <Toaster closeButton duration={2500} position={'top-right'} richColors />
-            </ThemeProvider>
-          </NuqsAdapter>
+          <TooltipProvider>
+            <NuqsAdapter>
+              <ThemeProvider
+                attribute={'class'}
+                defaultTheme={'system'}
+                disableTransitionOnChange
+                enableSystem
+              >
+                <TanstackQueryProvider>{children}</TanstackQueryProvider>
+                <Toaster closeButton duration={2500} position={'top-right'} richColors />
+              </ThemeProvider>
+            </NuqsAdapter>
+          </TooltipProvider>
         </body>
       </html>
     </ClerkProvider>
