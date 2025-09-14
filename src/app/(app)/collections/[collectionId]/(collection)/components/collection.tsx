@@ -4,8 +4,8 @@ import type { PublicCollection } from '@/lib/facades/collections/collections.fac
 
 import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-bobbleheads';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-header';
-import { CollectionMetrics } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-metrics';
-import { CollectionSubcollections } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-subcollections';
+import { CollectionSidebarSubcollections } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-sidebar-subcollections';
+import { CollectionStats } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-stats';
 
 interface CollectionProps {
   collection: PublicCollection;
@@ -30,19 +30,20 @@ export const Collection = ({ collection, likeData }: CollectionProps) => {
         </div>
       </div>
 
-      {/* Metrics Section */}
+      {/* Main Content */}
       <div className={'mx-auto mt-4 max-w-7xl p-2'}>
-        <CollectionMetrics collection={collection} />
-      </div>
+        <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+          {/* Main Content Area */}
+          <div className={'lg:col-span-9'}>
+            <CollectionBobbleheads collection={collection} />
+          </div>
 
-      {/* Subcollections Section */}
-      <div className={'mx-auto max-w-7xl p-2'}>
-        <CollectionSubcollections collection={collection} />
-      </div>
-
-      {/* Bobbleheads Section */}
-      <div className={'mx-auto max-w-7xl p-2'}>
-        <CollectionBobbleheads collection={collection} />
+          {/* Sidebar */}
+          <aside className={'flex flex-col gap-6 lg:col-span-3'}>
+            <CollectionStats collection={collection} />
+            <CollectionSidebarSubcollections collection={collection} />
+          </aside>
+        </div>
       </div>
     </div>
   );

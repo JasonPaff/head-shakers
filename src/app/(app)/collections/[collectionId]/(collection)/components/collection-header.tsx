@@ -1,5 +1,5 @@
 import 'server-only';
-import { ArrowLeftIcon, CalendarIcon, PlusIcon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -68,18 +68,6 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
               />
             </Conditional>
           </div>
-
-          {/* Add Bobblehead Button */}
-          <Conditional isCondition={isOwner}>
-            <Button asChild className={'w-full sm:w-auto'}>
-              <Link
-                href={$path({ route: '/bobbleheads/add', searchParams: { collectionId: collection.id } })}
-              >
-                <PlusIcon aria-hidden className={'mr-2 size-4'} />
-                Add Bobblehead
-              </Link>
-            </Button>
-          </Conditional>
         </div>
       </div>
     </Fragment>
