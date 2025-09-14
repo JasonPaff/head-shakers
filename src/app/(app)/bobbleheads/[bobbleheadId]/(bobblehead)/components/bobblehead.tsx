@@ -46,7 +46,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
   return (
     <div>
       {/* Header Section */}
-      <div className={'border-b border-border bg-muted/75'}>
+      <div className={'border-b border-border'}>
         <div className={'mx-auto max-w-7xl p-2'}>
           <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} likeData={likeData} />
         </div>

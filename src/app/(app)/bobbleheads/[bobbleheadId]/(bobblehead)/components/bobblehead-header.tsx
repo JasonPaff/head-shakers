@@ -53,13 +53,16 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
         {/* Action Buttons */}
         <Conditional isCondition={isOwner}>
           <div className={'flex gap-2'}>
-            <Button size={'sm'} variant={'outline'}>
-              <EditIcon aria-hidden className={'mr-2 size-4'} />
-              Edit
-            </Button>
+            {/* Share Bobblehead Button */}
             <Button size={'sm'} variant={'outline'}>
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share
+            </Button>
+
+            {/* Edit Bobblehead Button */}
+            <Button size={'sm'} variant={'outline'}>
+              <EditIcon aria-hidden className={'mr-2 size-4'} />
+              Edit
             </Button>
 
             {/* Delete Bobblehead Button */}
