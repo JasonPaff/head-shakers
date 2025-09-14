@@ -70,13 +70,24 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
   } = useServerAction(getBobbleheadPhotosAction, { isDisableToast: true });
 
   const photos = useMemo(() => {
-    return (
+    const allPhotos =
       photosResult.data?.data?.map((photo: SelectBobbleheadPhoto) => ({
         altText: photo.altText,
         url: photo.url,
-      })) ?? []
-    );
-  }, [photosResult]);
+      })) ?? [];
+
+    // if we have photos and a featured photo, reorder to put the featured photo first
+    if (allPhotos.length > 0 && bobblehead.featurePhoto) {
+      const featuredPhotoIndex = allPhotos.findIndex((photo) => photo.url === bobblehead.featurePhoto);
+      if (featuredPhotoIndex > 0) {
+        const featuredPhoto = allPhotos[featuredPhotoIndex];
+        const otherPhotos = allPhotos.filter((_, index) => index !== featuredPhotoIndex);
+        return [featuredPhoto, ...otherPhotos];
+      }
+    }
+
+    return allPhotos;
+  }, [photosResult, bobblehead.featurePhoto]);
 
   const handleMouseEnter = () => {
     setIsShowPhotoControls.on();
