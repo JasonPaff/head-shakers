@@ -2,15 +2,7 @@
 
 import type { ComponentProps } from 'react';
 
-import {
-  ActivityIcon,
-  CopyleftIcon,
-  LayoutDashboardIcon,
-  PlusIcon,
-  SettingsIcon,
-  ShieldIcon,
-  UploadIcon,
-} from 'lucide-react';
+import { ActivityIcon, CopyleftIcon, PlusIcon, SettingsIcon, ShieldIcon, UploadIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
 import { AppSidebarNavMain } from '@/components/layout/app-sidebar/components/app-sidebar-nav-main';
@@ -25,23 +17,7 @@ const useNavigationData = () => {
 
   const baseNavMain = [
     {
-      icon: LayoutDashboardIcon,
-      isActive: true,
-      title: 'Dashboard',
-      url: $path({ route: '/dashboard' }),
-    },
-    {
       icon: CopyleftIcon,
-      items: [
-        {
-          title: 'Analyze',
-          url: $path({ route: '/dashboard/collection/analytics' }),
-        },
-        {
-          title: 'Organize',
-          url: $path({ route: '/dashboard/collection/organize' }),
-        },
-      ],
       title: 'My Collection',
       url: $path({ route: '/dashboard/collection' }),
     },

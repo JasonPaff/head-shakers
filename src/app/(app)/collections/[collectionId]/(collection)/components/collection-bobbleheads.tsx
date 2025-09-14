@@ -55,7 +55,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
 
         {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
-          <Button asChild>
+          <Button asChild variant={'outline'}>
             <Link
               href={$path({
                 route: '/bobbleheads/add',
@@ -78,7 +78,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
       <Conditional isCondition={isEmpty}>
         <EmptyState
           action={
-            isOwner ?
+            <Conditional isCondition={isOwner}>
               <Button asChild>
                 <Link
                   href={$path({
@@ -90,7 +90,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
                   Add First Bobblehead
                 </Link>
               </Button>
-            : undefined
+            </Conditional>
           }
           description={
             "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."

@@ -50,7 +50,7 @@ export const SubcollectionBobbleheads = async ({
         <h2 className={'text-2xl font-bold text-foreground'}>Bobbleheads in this Subcollection</h2>
         {/* Add Bobblehead Button */}
         <Conditional isCondition={isOwner}>
-          <Button asChild>
+          <Button asChild variant={'outline'}>
             <Link
               href={$path({
                 route: '/bobbleheads/add',

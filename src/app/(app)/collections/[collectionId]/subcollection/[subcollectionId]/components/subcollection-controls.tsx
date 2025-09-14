@@ -40,6 +40,8 @@ export const SubcollectionControls = () => {
           <Input
             aria-label={'search bobbleheads'}
             className={'w-full'}
+            isClearable
+            isSearch
             name={'search'}
             onChange={(e) => {
               setSearchQuery(e.target.value);

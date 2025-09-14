@@ -7,7 +7,6 @@ import { Fragment } from 'react';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
 import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';
 import { Button } from '@/components/ui/button';
-import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 
 export const CollectionSubcollectionsAdd = () => {
@@ -23,13 +22,7 @@ export const CollectionSubcollectionsAdd = () => {
         Add Subcollection
       </Button>
 
-      <Conditional isCondition={isOpen}>
-        <SubcollectionCreateDialog
-          collectionId={data!.collectionId}
-          isOpen={isOpen}
-          onClose={setIsOpen.off}
-        />
-      </Conditional>
+      <SubcollectionCreateDialog collectionId={data!.collectionId} isOpen={isOpen} onClose={setIsOpen.off} />
     </Fragment>
   );
 };

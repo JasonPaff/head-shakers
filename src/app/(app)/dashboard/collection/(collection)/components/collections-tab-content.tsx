@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { EnhancedCollectionCard } from '@/app/(app)/dashboard/collection/(collection)/components/enhanced-collection-card';
+import { CollectionCard } from '@/app/(app)/dashboard/collection/(collection)/components/collection-card';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getUserId } from '@/utils/user-utils';
 
@@ -22,7 +22,7 @@ export const CollectionsTabContent = async () => {
   return (
     <div className={'mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3'}>
       {collections.map((collection) => (
-        <EnhancedCollectionCard collection={collection} key={collection.id} />
+        <CollectionCard collection={collection} key={collection.id} />
       ))}
     </div>
   );

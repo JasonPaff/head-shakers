@@ -20,9 +20,9 @@ export const SubcollectionMetrics = ({ subcollection }: SubcollectionMetricsProp
           <div className={'flex items-center justify-between'}>
             <div>
               <p className={'text-sm text-muted-foreground'}>Total Bobbleheads</p>
-              <p className={'text-2xl font-bold text-primary'}>{subcollection.bobbleheadCount}</p>
+              <p className={'text-2xl font-bold'}>{subcollection.bobbleheadCount}</p>
             </div>
-            <StarIcon aria-hidden className={'size-8 text-muted-foreground'} />
+            <StarIcon aria-hidden className={'size-8 text-primary'} />
           </div>
         </CardContent>
       </Card>
@@ -33,9 +33,9 @@ export const SubcollectionMetrics = ({ subcollection }: SubcollectionMetricsProp
           <div className={'flex items-center justify-between'}>
             <div>
               <p className={'text-sm text-muted-foreground'}>Feature Items</p>
-              <p className={'text-2xl font-bold text-primary'}>{subcollection.featuredBobbleheadCount}</p>
+              <p className={'text-2xl font-bold'}>{subcollection.featuredBobbleheadCount}</p>
             </div>
-            <EyeIcon aria-hidden className={'size-8 text-muted-foreground'} />
+            <EyeIcon aria-hidden className={'size-8 text-primary'} />
           </div>
         </CardContent>
       </Card>
@@ -50,7 +50,7 @@ export const SubcollectionMetrics = ({ subcollection }: SubcollectionMetricsProp
                 {subcollection.lastUpdatedAt?.toLocaleDateString() ?? 'N/A'}
               </p>
             </div>
-            <CalendarIcon aria-hidden className={'size-8 text-muted-foreground'} />
+            <CalendarIcon aria-hidden className={'size-8 text-primary'} />
           </div>
         </CardContent>
       </Card>
