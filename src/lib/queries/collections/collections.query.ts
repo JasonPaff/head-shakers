@@ -1,4 +1,4 @@
-import { and, eq, isNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, like, or, sql } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -164,6 +164,68 @@ export class CollectionsQuery extends BaseQuery {
     return query;
   }
 
+  static async getAllCollectionBobbleheadsWithPhotos(
+    collectionId: string,
+    context: QueryContext,
+    options?: { searchTerm?: string; sortBy?: string },
+  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
+    const dbInstance = this.getDbInstance(context);
+
+    const collectionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      undefined,
+      context,
+    );
+
+    const bobbleheadFilter = this.buildBaseFilters(
+      bobbleheads.isPublic,
+      bobbleheads.userId,
+      bobbleheads.isDeleted,
+      context,
+    );
+
+    const searchCondition = this._getSearchCondition(options?.searchTerm);
+    const sortOrder = this._getSortOrder(options?.sortBy);
+
+    return dbInstance
+      .select({
+        acquisitionDate: bobbleheads.acquisitionDate,
+        acquisitionMethod: bobbleheads.acquisitionMethod,
+        category: bobbleheads.category,
+        characterName: bobbleheads.characterName,
+        condition: bobbleheads.currentCondition,
+        description: bobbleheads.description,
+        featurePhoto: bobbleheadPhotos.url,
+        height: bobbleheads.height,
+        id: bobbleheads.id,
+        isFeatured: bobbleheads.isFeatured,
+        isPublic: bobbleheads.isPublic,
+        manufacturer: bobbleheads.manufacturer,
+        name: bobbleheads.name,
+        purchaseLocation: bobbleheads.purchaseLocation,
+        purchasePrice: bobbleheads.purchasePrice,
+        series: bobbleheads.series,
+        status: bobbleheads.status,
+        weight: bobbleheads.weight,
+      })
+      .from(bobbleheads)
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.collectionId, collectionId),
+          collectionFilter,
+          bobbleheadFilter,
+          searchCondition,
+        ),
+      )
+      .orderBy(sortOrder);
+  }
+
   static async getBobbleheadsInCollection(
     collectionId: string,
     context: QueryContext,
@@ -221,6 +283,7 @@ export class CollectionsQuery extends BaseQuery {
   static async getCollectionBobbleheadsWithPhotos(
     collectionId: string,
     context: QueryContext,
+    options?: { searchTerm?: string; sortBy?: string },
   ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -238,6 +301,9 @@ export class CollectionsQuery extends BaseQuery {
       bobbleheads.isDeleted,
       context,
     );
+
+    const searchCondition = this._getSearchCondition(options?.searchTerm);
+    const sortOrder = this._getSortOrder(options?.sortBy);
 
     return dbInstance
       .select({
@@ -272,9 +338,10 @@ export class CollectionsQuery extends BaseQuery {
           isNull(bobbleheads.subcollectionId),
           collectionFilter,
           bobbleheadFilter,
+          searchCondition,
         ),
       )
-      .orderBy(bobbleheads.createdAt);
+      .orderBy(sortOrder);
   }
 
   static async getDashboardData(
@@ -321,5 +388,28 @@ export class CollectionsQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
+  }
+
+  private static _getSearchCondition(searchTerm?: string) {
+    if (!searchTerm) return undefined;
+    return or(
+      like(bobbleheads.name, `%${searchTerm}%`),
+      like(bobbleheads.description, `%${searchTerm}%`),
+      like(bobbleheads.characterName, `%${searchTerm}%`),
+    );
+  }
+
+  private static _getSortOrder(sortBy?: string) {
+    switch (sortBy) {
+      case 'name_asc':
+        return asc(bobbleheads.name);
+      case 'name_desc':
+        return desc(bobbleheads.name);
+      case 'oldest':
+        return asc(bobbleheads.createdAt);
+      case 'newest':
+      default:
+        return desc(bobbleheads.createdAt);
+    }
   }
 }

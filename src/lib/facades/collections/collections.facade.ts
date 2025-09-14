@@ -20,9 +20,6 @@ import {
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
-/**
- * dashboard data for a collection
- */
 export interface CollectionDashboardData {
   description: null | string;
   id: string;
@@ -36,27 +33,15 @@ export interface CollectionDashboardData {
   }>;
 }
 
-/**
- * business metrics computed from collection data
- */
 export interface CollectionMetrics {
-  /** number of direct bobbleheads (not in subcollections) */
   directBobbleheads: number;
-  /** number of featured bobbleheads */
   featuredBobbleheads: number;
-  /** whether the collection has subcollections */
   hasSubcollections: boolean;
-  /** last updated timestamp (collection or any subcollection) */
   lastUpdated: Date;
-  /** number of bobbleheads in subcollections */
   subcollectionBobbleheads: number;
-  /** total number of bobbleheads across the collection and subcollections */
   totalBobbleheads: number;
 }
 
-/**
- * collection with related data for business operations
- */
 export interface CollectionWithRelations {
   bobbleheads: Array<{
     id: string;
@@ -85,13 +70,7 @@ export interface CollectionWithRelations {
 
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
-/**
- * handles all business logic and orchestration for collections
- */
 export class CollectionsFacade {
-  /**
-   * get a collection by ID with permission checking
-   */
   static getCollectionById = cache(
     async (
       id: string,
@@ -107,9 +86,6 @@ export class CollectionsFacade {
     },
   );
 
-  /**
-   * get a collection with relations for dashboard/detailed views
-   */
   static getCollectionWithRelations = cache(
     async (
       id: string,
@@ -125,9 +101,6 @@ export class CollectionsFacade {
     },
   );
 
-  /**
-   * get a collection by ID for public access with computed metrics
-   */
   static getCollectionForPublicView = cache(
     async (id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) => {
       const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
@@ -152,9 +125,6 @@ export class CollectionsFacade {
     },
   );
 
-  /**
-   * get user's collections for dashboard
-   */
   static getUserCollectionsForDashboard = cache(
     async (userId: string, dbInstance?: DatabaseExecutor): Promise<Array<CollectionDashboardData>> => {
       const context = createProtectedQueryContext(userId, { dbInstance });
@@ -165,9 +135,6 @@ export class CollectionsFacade {
     },
   );
 
-  /**
-   * compute business metrics for a collection
-   */
   static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
     // count direct bobbleheads (not in subcollections)
     const directBobbleheads = collection.bobbleheads.filter(
@@ -203,9 +170,6 @@ export class CollectionsFacade {
     };
   }
 
-  /**
-   * create a new collection
-   */
   static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       return await CollectionsQuery.createAsync(data, userId, dbInstance);
@@ -221,9 +185,6 @@ export class CollectionsFacade {
     }
   }
 
-  /**
-   * delete a collection
-   */
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       return await CollectionsQuery.deleteAsync(data, userId, dbInstance);
@@ -239,9 +200,59 @@ export class CollectionsFacade {
     }
   }
 
-  /**
-   * get bobbleheads in a collection (not in subcollections)
-   */
+  static async getAllCollectionBobbleheadsWithPhotos(
+    collectionId: string,
+    viewerUserId?: string,
+    options?: { searchTerm?: string; sortBy?: string },
+    dbInstance?: DatabaseExecutor,
+  ): Promise<
+    Array<
+      BobbleheadListRecord & {
+        featurePhoto?: null | string;
+        likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+      }
+    >
+  > {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+
+      const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotos(
+        collectionId,
+        context,
+        options,
+      );
+
+      if (bobbleheads.length === 0) {
+        return bobbleheads;
+      }
+
+      const bobbleheadIds = bobbleheads.map((b) => b.id);
+      const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+        bobbleheadIds,
+        'bobblehead',
+        viewerUserId,
+        dbInstance,
+      );
+
+      return bobbleheads.map((bobblehead) => ({
+        ...bobblehead,
+        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
+      }));
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'CollectionsFacade',
+        method: 'getAllCollectionBobbleheadsWithPhotos',
+        operation: 'getAllBobbleheadsWithPhotos',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async getCollectionBobbleheads(
     collectionId: string,
     viewerUserId?: string,
@@ -266,37 +277,46 @@ export class CollectionsFacade {
     }
   }
 
-  /**
-   * get bobbleheads in a collection with photo data for public display
-   */
   static async getCollectionBobbleheadsWithPhotos(
     collectionId: string,
     viewerUserId?: string,
+    options?: { searchTerm?: string; sortBy?: string },
     dbInstance?: DatabaseExecutor,
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string; likeData?: { isLiked: boolean; likeCount: number; likeId: null | string } }>> {
+  ): Promise<
+    Array<
+      BobbleheadListRecord & {
+        featurePhoto?: null | string;
+        likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+      }
+    >
+  > {
     try {
       const context =
         viewerUserId ?
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotos(collectionId, context);
+      const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotos(
+        collectionId,
+        context,
+        options,
+      );
 
       if (bobbleheads.length === 0) {
         return bobbleheads;
       }
 
-      const bobbleheadIds = bobbleheads.map(b => b.id);
+      const bobbleheadIds = bobbleheads.map((b) => b.id);
       const likesMap = await SocialFacade.getLikesForMultipleContentItems(
         bobbleheadIds,
         'bobblehead',
         viewerUserId,
-        dbInstance
+        dbInstance,
       );
 
-      return bobbleheads.map(bobblehead => ({
+      return bobbleheads.map((bobblehead) => ({
         ...bobblehead,
-        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null }
+        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
       }));
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -310,9 +330,6 @@ export class CollectionsFacade {
     }
   }
 
-  /**
-   * get a collection by user with filtering options
-   */
   static async getCollectionsByUser(
     userId: string,
     options: FindOptions = {},
@@ -338,9 +355,6 @@ export class CollectionsFacade {
     }
   }
 
-  /**
-   * transform collection data for the dashboard display
-   */
   static transformForDashboard(collection: CollectionWithRelations): CollectionDashboardData {
     const metrics = this.computeMetrics(collection);
 
@@ -358,9 +372,6 @@ export class CollectionsFacade {
     };
   }
 
-  /**
-   * update a collection
-   */
   static async updateAsync(data: UpdateCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       return await CollectionsQuery.updateAsync(data, userId, dbInstance);
