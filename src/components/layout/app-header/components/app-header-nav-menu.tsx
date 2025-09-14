@@ -6,7 +6,6 @@ import {
   ClockIcon,
   CompassIcon,
   FilmIcon,
-  Grid3X3Icon,
   GridIcon,
   HeartIcon,
   LayoutDashboardIcon,
@@ -121,7 +120,7 @@ const navigationLinks: Array<NavigationLink> = [
     items: [
       {
         description: 'Overview of your collection and recent activity',
-        href: $path({ route: '/dashboard' }),
+        href: $path({ route: '/dashboard/collection' }),
         icon: LayoutDashboardIcon,
         title: 'Dashboard',
       },
@@ -136,12 +135,6 @@ const navigationLinks: Array<NavigationLink> = [
         href: $path({ route: '/bobbleheads/add' }),
         icon: PackagePlusIcon,
         title: 'Add New Bobblehead',
-      },
-      {
-        description: 'Create sub-collections and manage tags',
-        href: $path({ route: '/dashboard/collection/organize' }),
-        icon: Grid3X3Icon,
-        title: 'Organize Bobbleheads',
       },
     ],
     label: 'My Collection',

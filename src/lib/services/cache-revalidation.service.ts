@@ -111,7 +111,7 @@ export class CacheRevalidationService {
         tags.push(CACHE_TAGS.DASHBOARD.COLLECTION(collectionId));
         paths.push(
           $path({
-            route: '/dashboard/collection/[collectionId]',
+            route: '/collections/[collectionId]',
             routeParams: { collectionId },
           }),
         );
@@ -121,7 +121,7 @@ export class CacheRevalidationService {
         tags.push(CACHE_TAGS.DASHBOARD.SUBCOLLECTION(collectionId, subcollectionId));
         paths.push(
           $path({
-            route: '/dashboard/collection/[collectionId]/[subcollectionId]',
+            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
             routeParams: { collectionId, subcollectionId },
           }),
         );

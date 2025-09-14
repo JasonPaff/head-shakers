@@ -7,10 +7,12 @@ import Link from 'next/link';
 import type { SubcollectionData } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-list';
 
 import { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';
+import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CardContent } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
+import { useToggle } from '@/hooks/use-toggle';
 
 type SubcollectionsListItemProps = {
   collection: {
@@ -27,6 +29,8 @@ export const SubcollectionsListItem = ({
   collectionId,
   searchTerm,
 }: SubcollectionsListItemProps) => {
+  const [isSubcollectionCreateDialogOpen, setIsSubcollectionCreateDialogOpen] = useToggle();
+
   const subcollections =
     collection.subcollections.filter(
       (subcollection) =>
@@ -50,7 +54,7 @@ export const SubcollectionsListItem = ({
                 <Link
                   className={'font-medium text-foreground hover:text-primary'}
                   href={$path({
-                    route: '/collections/[collectionId]/subcollections/[subcollectionId]',
+                    route: '/collections/[collectionId]/subcollection/[subcollectionId]',
                     routeParams: {
                       collectionId: subcollection.collectionId,
                       subcollectionId: subcollection.id,
@@ -108,18 +112,23 @@ export const SubcollectionsListItem = ({
 
       {/* Add Subcollection Button */}
       <div className={'mt-4 border-t pt-4'}>
-        <Button asChild className={'w-full'} size={'sm'} variant={'outline'}>
-          <Link
-            href={$path({
-              route: '/collections/[collectionId]/subcollections/create',
-              routeParams: { collectionId: collectionId },
-            })}
-          >
-            <PlusIcon aria-hidden className={'mr-2 size-4'} />
-            Add Subcollection to {collection.collectionName}
-          </Link>
+        <Button
+          className={'w-full'}
+          onClick={setIsSubcollectionCreateDialogOpen.on}
+          size={'sm'}
+          variant={'outline'}
+        >
+          <PlusIcon aria-hidden className={'mr-2 size-4'} />
+          Add Subcollection to {collection.collectionName}
         </Button>
       </div>
+
+      {/* Create Subcollection Dialog */}
+      <SubcollectionCreateDialog
+        collectionId={collectionId}
+        isOpen={isSubcollectionCreateDialogOpen}
+        onClose={setIsSubcollectionCreateDialogOpen.off}
+      />
     </CardContent>
   );
 };

@@ -11,11 +11,12 @@ declare module "@@@next-typesafe-url" {
   interface DynamicRouter {
     "/bobbleheads/add": InferRoute<import("./src/app/(app)/bobbleheads/add/route-type").RouteType>;
     "/bobbleheads/[bobbleheadId]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/route-type").RouteType>;
+    "/bobbleheads/[bobbleheadId]/edit": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/edit/route-type").RouteType>;
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
     "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
+    "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
     "/users/[userId]": InferRoute<import("./src/app/(app)/users/[userId]/route-type").RouteType>;
-    "/sign-in/[[...sign-in]]": InferRoute<import("./src/app/(auth)/sign-in/[[...sign-in]]/route-type").RouteType>;
   }
 
   interface StaticRouter {
@@ -25,22 +26,16 @@ declare module "@@@next-typesafe-url" {
     "/admin": StaticRoute;
     "/admin/reports": StaticRoute;
     "/admin/users": StaticRoute;
-    "/bobbleheads/[bobbleheadId]/edit": StaticRoute;
     "/browse/categories": StaticRoute;
     "/browse/featured": StaticRoute;
     "/browse": StaticRoute;
     "/browse/search": StaticRoute;
     "/browse/trending": StaticRoute;
-    "/collections/create": StaticRoute;
     "/collections/[collectionId]/edit": StaticRoute;
     "/collections/[collectionId]/settings": StaticRoute;
     "/collections/[collectionId]/share": StaticRoute;
-    "/dashboard/collection": StaticRoute;
-    "/dashboard/collection/analytics": StaticRoute;
-    "/dashboard/collection/organize": StaticRoute;
     "/dashboard/feed": StaticRoute;
     "/dashboard/notifications": StaticRoute;
-    "/dashboard": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;
@@ -51,7 +46,6 @@ declare module "@@@next-typesafe-url" {
     "/users/[userId]/collections": StaticRoute;
     "/users/[userId]/followers": StaticRoute;
     "/users/[userId]/following": StaticRoute;
-    "/sign-up/[[...sign-up]]": StaticRoute;
     "/about": StaticRoute;
     "/privacy": StaticRoute;
     "/terms": StaticRoute;
