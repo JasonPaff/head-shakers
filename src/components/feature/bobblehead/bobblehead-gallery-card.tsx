@@ -19,6 +19,7 @@ import { useState } from 'react';
 
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
+import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -26,6 +27,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LikeCompactButton } from '@/components/ui/like-button';
@@ -36,7 +38,6 @@ import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads
 import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadCommentsDialog } from './bobblehead-comments-dialog';
-import { BobbleheadDelete } from './bobblehead-delete';
 import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
 import { BobbleheadShareMenu } from './bobblehead-share-menu';
 
@@ -162,6 +163,11 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
   const shouldShowControls = photos.length > 1 && isShowPhotoControls;
   const isCurrentImageLoaded = !currentPhoto || loadedImageUrls.has(currentPhoto ?? '');
 
+  // Check if there are actual photos (not just placeholder)
+  const hasActualPhotos =
+    validPhotos.length > 0 && validPhotos.some((photo) => photo.url !== '/placeholder.jpg');
+  const shouldShowGalleryOverlay = hasActualPhotos && isShowPhotoControls;
+
   return (
     <Card className={'flex h-[580px] flex-col overflow-hidden transition-all duration-200 hover:shadow-lg'}>
       {/* Name */}
@@ -214,17 +220,19 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
         />
 
         {/* Overlay */}
-        <div
-          className={`absolute inset-0 flex items-center justify-center bg-black/0
-             transition-all duration-300 group-hover:bg-black/10`}
-        >
+        <Conditional isCondition={shouldShowGalleryOverlay}>
           <div
-            className={`rounded-md bg-black/50 px-3 py-1 text-sm font-medium text-white
-              opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+            className={`absolute inset-0 flex items-start justify-center bg-black/0 pt-4
+               transition-all duration-300 group-hover:bg-black/10`}
           >
-            View Gallery
+            <div
+              className={`rounded-md bg-black/50 px-3 py-1 text-sm font-medium text-white
+                opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+            >
+              View Gallery
+            </div>
           </div>
-        </div>
+        </Conditional>
 
         <Conditional isCondition={!isCurrentImageLoaded}>
           <div className={'absolute inset-0 flex items-center justify-center bg-black/10'}>
@@ -338,14 +346,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
           <Conditional isCondition={isOwner}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  className={'size-8 p-0'}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                  }}
-                  size={'sm'}
-                  variant={'ghost'}
-                >
+                <Button className={'size-8 p-0'} size={'sm'} variant={'ghost'}>
                   <MoreVerticalIcon aria-hidden className={'size-4'} />
                   <VisuallyHidden>Open menu</VisuallyHidden>
                 </Button>
@@ -353,27 +354,17 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
               <DropdownMenuContent align={'end'}>
                 {/* Edit */}
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={$path({
-                      route: '/bobbleheads/[bobbleheadId]/edit',
-                      routeParams: { bobbleheadId: bobblehead.id },
-                    })}
-                  >
-                    <PencilIcon aria-hidden className={'mr-2 size-4'} />
-                    Edit
-                  </Link>
+                <DropdownMenuItem>
+                  <PencilIcon aria-hidden className={'mr-2 size-4'} />
+                  Edit
                 </DropdownMenuItem>
 
                 {/* Delete */}
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                  }}
-                >
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild variant={'destructive'}>
                   <BobbleheadDelete
                     bobbleheadId={bobblehead.id}
-                    className={'h-5'}
+                    className={'w-full justify-start'}
                     collectionId={bobblehead.collectionId}
                     subcollectionId={bobblehead.subcollectionId}
                     variant={'ghost'}

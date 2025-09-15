@@ -1,5 +1,5 @@
 import 'server-only';
-import { ArrowLeftIcon, CalendarIcon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -7,6 +7,8 @@ import { Fragment } from 'react';
 import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
 
 import { SubcollectionEditSection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-edit-section';
+import { SubcollectionDelete } from '@/components/feature/subcollections/subcollection-delete';
+import { SubcollectionShareMenu } from '@/components/feature/subcollections/subcollection-share-menu';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
@@ -42,9 +44,22 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
           </Link>
         </Button>
 
-        {/* Edit Subcollection Button */}
         <div className={'flex items-center gap-2'}>
+          {/* Share Button */}
+          <SubcollectionShareMenu>
+            <Button size={'sm'} variant={'outline'}>
+              <ShareIcon aria-hidden className={'mr-2 size-4'} />
+              Share
+            </Button>
+          </SubcollectionShareMenu>
+
+          {/* Edit Subcollection Button */}
           <SubcollectionEditSection isOwner={isOwner} subcollection={subcollection} />
+
+          {/* Delete Button */}
+          <Conditional isCondition={isOwner}>
+            <SubcollectionDelete subcollectionId={subcollection.id}>Delete</SubcollectionDelete>
+          </Conditional>
         </div>
       </div>
 

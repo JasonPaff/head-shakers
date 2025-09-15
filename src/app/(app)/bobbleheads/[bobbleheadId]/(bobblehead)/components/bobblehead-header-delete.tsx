@@ -14,20 +14,20 @@ import { useToggle } from '@/hooks/use-toggle';
 import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { cn } from '@/utils/tailwind-utils';
 
-type BobbleheadDeleteProps = Children<{
+type BobbleheadHeaderDeleteProps = Children<{
   bobbleheadId: string;
   collectionId: string;
   subcollectionId?: null | string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
-export const BobbleheadDelete = ({
+export const BobbleheadHeaderDelete = ({
   bobbleheadId,
   children,
   collectionId,
   subcollectionId,
   ...props
-}: BobbleheadDeleteProps) => {
+}: BobbleheadHeaderDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const router = useRouter();
@@ -75,6 +75,7 @@ export const BobbleheadDelete = ({
         size={'sm'}
         variant={'destructive'}
         {...props}
+        className={cn(props.className)}
       >
         <TrashIcon
           aria-hidden

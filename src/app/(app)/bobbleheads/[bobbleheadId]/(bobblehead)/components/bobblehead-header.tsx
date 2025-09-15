@@ -7,7 +7,8 @@ import { Fragment } from 'react';
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
+import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header-delete';
+import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
@@ -26,7 +27,7 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
   return (
     <Fragment>
       {/* Navigation and Actions Row */}
-      <div className={'mb-6 flex items-center justify-between'}>
+      <div className={'mb-6 flex items-center justify-between gap-4'}>
         {/* Back Button */}
         <Button asChild size={'sm'} variant={'outline'}>
           <Link
@@ -52,12 +53,14 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
 
         {/* Action Buttons */}
         <Conditional isCondition={isOwner}>
-          <div className={'flex gap-2'}>
-            {/* Share Bobblehead Button */}
-            <Button size={'sm'} variant={'outline'}>
-              <ShareIcon aria-hidden className={'mr-2 size-4'} />
-              Share
-            </Button>
+          <div className={'flex items-center gap-2'}>
+            {/* Share Bobblehead Menu */}
+            <BobbleheadShareMenu>
+              <Button size={'sm'} variant={'outline'}>
+                <ShareIcon aria-hidden className={'mr-2 size-4'} />
+                Share
+              </Button>
+            </BobbleheadShareMenu>
 
             {/* Edit Bobblehead Button */}
             <Button size={'sm'} variant={'outline'}>
@@ -66,39 +69,27 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
             </Button>
 
             {/* Delete Bobblehead Button */}
-            <BobbleheadDelete
+            <BobbleheadHeaderDelete
               bobbleheadId={bobblehead.id}
               collectionId={bobblehead.collectionId}
               subcollectionId={bobblehead.subcollectionId}
             >
               Delete
-            </BobbleheadDelete>
+            </BobbleheadHeaderDelete>
           </div>
         </Conditional>
       </div>
 
-      <div className={'flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between'}>
+      <div className={'flex flex-col gap-6'}>
         {/* Title and Description */}
-        <div className={'flex-1'}>
+        <div>
           <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{bobblehead.name}</h1>
-          <p className={'max-w-3xl text-lg text-pretty text-muted-foreground'}>{bobblehead.description}</p>
+          <p className={'text-lg text-pretty text-muted-foreground'}>{bobblehead.description}</p>
         </div>
 
-        {/* Metadata */}
-        <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
-          {/* Creation Date */}
-          <div className={'flex items-center gap-2'}>
-            <CalendarIcon aria-hidden className={'size-4'} />
-            Added {bobblehead.createdAt.toLocaleDateString()}
-          </div>
-
-          {/* View Count */}
-          <div className={'flex items-center gap-2'}>
-            <EyeIcon aria-hidden className={'size-4'} />
-            {bobblehead.viewCount} views
-          </div>
-
-          {/* Interactive Like Button */}
+        {/* Metadata & Like Button */}
+        <div className={'flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground'}>
+          {/* Like Button */}
           <Conditional isCondition={!!likeData}>
             <LikeIconButton
               initialLikeCount={likeData?.likeCount ?? bobblehead.likeCount}
@@ -115,6 +106,20 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
               {bobblehead.likeCount} likes
             </div>
           </Conditional>
+
+          <div className={'flex items-center gap-4'}>
+            {/* Creation Date */}
+            <div className={'flex items-center gap-2'}>
+              <CalendarIcon aria-hidden className={'size-4'} />
+              Added {bobblehead.createdAt.toLocaleDateString()}
+            </div>
+
+            {/* View Count */}
+            <div className={'flex items-center gap-2'}>
+              <EyeIcon aria-hidden className={'size-4'} />
+              {bobblehead.viewCount} views
+            </div>
+          </div>
         </div>
       </div>
     </Fragment>

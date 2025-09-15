@@ -11,64 +11,35 @@ import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-
 import { Button } from '@/components/ui/button';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
-import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
+import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { cn } from '@/utils/tailwind-utils';
 
-type BobbleheadDeleteProps = Children<{
-  bobbleheadId: string;
+type CollectionDeleteProps = Children<{
   collectionId: string;
-  subcollectionId?: null | string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
-export const BobbleheadDelete = ({
-  bobbleheadId,
-  children,
-  collectionId,
-  subcollectionId,
-  ...props
-}: BobbleheadDeleteProps) => {
+export const CollectionDelete = ({ children, collectionId, ...props }: CollectionDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const router = useRouter();
 
-  const { executeAsync, isExecuting } = useServerAction(deleteBobbleheadAction, {
+  const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction, {
     toastMessages: {
-      error: 'Failed to delete bobblehead. Please try again.',
-      loading: 'Deleting bobblehead...',
-      success: '',
+      error: 'Failed to delete collection. Please try again.',
+      loading: 'Deleting collection...',
+      success: 'Collection deleted successfully!',
     },
   });
 
   const handleDeleteAsync = async () => {
-    await executeAsync({ bobbleheadId }).then(() => {
-      // redirect to parent collection or subcollection
-      if (subcollectionId)
-        router.push(
-          $path({
-            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-            routeParams: {
-              collectionId,
-              subcollectionId,
-            },
-          }),
-        );
-      else {
-        router.push(
-          $path({
-            route: '/collections/[collectionId]',
-            routeParams: {
-              collectionId,
-            },
-          }),
-        );
-      }
+    await executeAsync({ collectionId }).then(() => {
+      router.push($path({ route: '/dashboard/collection' }));
     });
   };
 
   return (
     <Fragment>
-      {/* Delete Button */}
       <Button
         disabled={isExecuting}
         onClick={setIsConfirmDeleteDialogOpen.on}
@@ -78,19 +49,18 @@ export const BobbleheadDelete = ({
       >
         <TrashIcon
           aria-hidden
-          aria-label={'delete bobblehead'}
+          aria-label={'delete collection'}
           className={cn(!!children && 'mr-2', 'size-4')}
         />
         {children}
       </Button>
 
-      {/* Confirm Delete Dialog */}
       <ConfirmDeleteAlertDialog
         isOpen={isConfirmDeleteDialogOpen}
         onClose={setIsConfirmDeleteDialogOpen.off}
         onDeleteAsync={handleDeleteAsync}
       >
-        This will permanently delete all information and photos attached to this bobblehead.
+        This will permanently delete this collection and any subcollections and bobbleheads within.
       </ConfirmDeleteAlertDialog>
     </Fragment>
   );

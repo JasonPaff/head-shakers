@@ -1,5 +1,5 @@
 import 'server-only';
-import { ArrowLeftIcon, CalendarIcon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -7,6 +7,8 @@ import { Fragment } from 'react';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionEditSection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-edit-section';
+import { CollectionDelete } from '@/components/feature/collections/collection-delete';
+import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
@@ -39,9 +41,23 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
           </Button>
         </Conditional>
 
-        {/* Edit Collection Button */}
+        {/* Share, Edit Collection Button and Delete Button */}
         <div className={'flex items-center gap-2'}>
+          {/* Share Collection Button */}
+          <CollectionShareMenu>
+            <Button size={'sm'} variant={'outline'}>
+              <ShareIcon aria-hidden className={'mr-2 size-4'} />
+              Share
+            </Button>
+          </CollectionShareMenu>
+
+          {/* Edit Collection Button */}
           <CollectionEditSection collection={collection} isOwner={isOwner} />
+
+          {/* Delete Collection Button */}
+          <Conditional isCondition={isOwner}>
+            <CollectionDelete collectionId={collection.id}>Delete</CollectionDelete>
+          </Conditional>
         </div>
       </div>
 
