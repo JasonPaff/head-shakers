@@ -1,5 +1,3 @@
-import { cache } from 'react';
-
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type {
   BobbleheadListRecord,
@@ -51,68 +49,60 @@ export interface CollectionMetrics {
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
 export class CollectionsFacade {
-  static getCollectionById = cache(
-    async (
-      id: string,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<CollectionRecord | null> => {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+  static async getCollectionById(
+    id: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CollectionRecord | null> {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
 
-      return CollectionsQuery.findByIdAsync(id, context);
-    },
-  );
+    return CollectionsQuery.findByIdAsync(id, context);
+  }
 
-  static getCollectionWithRelations = cache(
-    async (
-      id: string,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<CollectionWithRelations | null> => {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+  static async getCollectionWithRelations(
+    id: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CollectionWithRelations | null> {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
 
-      return CollectionsQuery.findByIdWithRelationsAsync(id, context);
-    },
-  );
+    return CollectionsQuery.findByIdWithRelationsAsync(id, context);
+  }
 
-  static getCollectionForPublicView = cache(
-    async (id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) => {
-      const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
+  static async getCollectionForPublicView(id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) {
+    const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
 
-      if (!collection) {
-        return null;
-      }
+    if (!collection) {
+      return null;
+    }
 
-      const metrics = this.computeMetrics(collection);
+    const metrics = this.computeMetrics(collection);
 
-      return {
-        createdAt: collection.createdAt,
-        description: collection.description,
-        id: collection.id,
-        isPublic: collection.isPublic,
-        lastUpdatedAt: metrics.lastUpdated,
-        name: collection.name,
-        subCollectionCount: collection.subCollections.length,
-        totalBobbleheadCount: metrics.totalBobbleheads,
-        userId: collection.userId,
-      };
-    },
-  );
+    return {
+      createdAt: collection.createdAt,
+      description: collection.description,
+      id: collection.id,
+      isPublic: collection.isPublic,
+      lastUpdatedAt: metrics.lastUpdated,
+      name: collection.name,
+      subCollectionCount: collection.subCollections.length,
+      totalBobbleheadCount: metrics.totalBobbleheads,
+      userId: collection.userId,
+    };
+  }
 
-  static getUserCollectionsForDashboard = cache(
-    async (userId: string, dbInstance?: DatabaseExecutor): Promise<Array<CollectionDashboardData>> => {
-      const context = createProtectedQueryContext(userId, { dbInstance });
-      const collections = await CollectionsQuery.getDashboardDataAsync(userId, context);
+  static async getUserCollectionsForDashboard(userId: string, dbInstance?: DatabaseExecutor): Promise<Array<CollectionDashboardData>> {
+    const context = createProtectedQueryContext(userId, { dbInstance });
+    const collections = await CollectionsQuery.getDashboardDataAsync(userId, context);
 
-      return collections.map((collection) => this.transformForDashboard(collection));
-    },
-  );
+    return collections.map((collection) => this.transformForDashboard(collection));
+  }
 
   static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
     // count direct bobbleheads (not in subcollections)

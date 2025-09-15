@@ -1,6 +1,3 @@
-import { unstable_cache } from 'next/cache';
-import { cache } from 'react';
-
 import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -11,17 +8,10 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
-import { CACHE_KEYS, CACHE_TAGS, CACHE_TTL } from '@/lib/constants/cache';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featured-content-transformer';
 import { createFacadeError } from '@/lib/utils/error-builders';
-
-// cache statistics for monitoring
-const cacheStats = {
-  nextjs: { hits: 0, misses: 0 },
-  react: { hits: 0, misses: 0 },
-};
 
 /**
  * unified Featured Content Facade
@@ -30,103 +20,61 @@ const cacheStats = {
  */
 export class FeaturedContentFacade {
   /**
-   * get active featured content with React cache (request-level deduplication)
+   * get active featured content
    */
-  private static getActiveFeaturedContentBase = cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> => {
-      console.log('Cache miss: React cache - getActiveFeaturedContentBase');
-      cacheStats.react.misses++;
-
-      const context = createPublicQueryContext({ dbInstance });
-      const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
-      return FeaturedContentTransformer.transformFeaturedContent(rawData);
-    },
-  );
-
-  /**
-   * get active featured content with Next.js unstable_cache (persistent caching)
-   */
-  static getActiveFeaturedContent = unstable_cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> => {
-      console.log('Cache miss: Next.js cache - getActiveFeaturedContent');
-      cacheStats.nextjs.misses++;
-      return await FeaturedContentFacade.getActiveFeaturedContentBase(dbInstance);
-    },
-    ['featured-content-active'],
-    {
-      revalidate: 300, // 5 minutes
-      tags: ['featured-content'],
-    },
-  );
+  static async getActiveFeaturedContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const context = createPublicQueryContext({ dbInstance });
+    const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
+    return FeaturedContentTransformer.transformFeaturedContent(rawData);
+  }
 
   /**
    * get all featured content for admin management
    */
-  static getAllFeaturedContentForAdmin = unstable_cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
-      const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
-    },
-    [CACHE_KEYS.ADMIN.FEATURED_CONTENT],
-    {
-      revalidate: CACHE_TTL.SHORT,
-      tags: [CACHE_TAGS.ADMIN.FEATURED_CONTENT],
-    },
-  );
+  static async getAllFeaturedContentForAdmin(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
+  }
 
   /**
    * get the collection of the weeks
    */
-  static getCollectionOfWeek = cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> => {
-      console.log('Cache access: getCollectionOfWeek');
-      const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentTransformer.filterByType(allContent, 'collection_of_week');
-    },
-  );
+  static async getCollectionOfWeek(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'collection_of_week');
+  }
 
   /**
    * get editor picks
    */
-  static getEditorPicks = cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> => {
-      console.log('Cache access: getEditorPicks');
-      const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
-    },
-  );
+  static async getEditorPicks(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
+  }
 
   /**
    * get featured content by ID
    */
-  static getFeaturedContentById = cache(
-    async (id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> => {
-      const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.findByIdAsync(id, context);
-    },
-  );
+  static async getFeaturedContentById(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.findByIdAsync(id, context);
+  }
 
   /**
    * get homepage banner content
    */
-  static getHomepageBanner = cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> => {
-      console.log('Cache access: getHomepageBanner');
-      const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
-    },
-  );
+  static async getHomepageBanner(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
+  }
 
   /**
    * get trending content sorted by view count
    */
-  static getTrendingContent = cache(
-    async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> => {
-      console.log('Cache access: getTrendingContent');
-      const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-      return FeaturedContentTransformer.filterByType(allContent, 'trending');
-    },
-  );
+  static async getTrendingContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'trending');
+  }
 
   /**
    * create a new featured content entry
@@ -170,13 +118,6 @@ export class FeaturedContentFacade {
   }
 
   /**
-   * get cache statistics for monitoring
-   */
-  static async getCacheStats() {
-    return Promise.resolve(cacheStats);
-  }
-
-  /**
    * get featured content by ID for admin management
    */
   static async getFeaturedContentByIdForAdmin(
@@ -199,17 +140,6 @@ export class FeaturedContentFacade {
     } catch (error) {
       console.error(`Failed to increment view count for content ${contentId}:`, error);
     }
-  }
-
-  /**
-   * reset cache statistics
-   */
-  static async resetCacheStats() {
-    cacheStats.nextjs.hits = 0;
-    cacheStats.nextjs.misses = 0;
-    cacheStats.react.hits = 0;
-    cacheStats.react.misses = 0;
-    return Promise.resolve();
   }
 
   /**

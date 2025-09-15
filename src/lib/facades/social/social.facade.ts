@@ -1,5 +1,3 @@
-import { cache } from 'react';
-
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { UserLikeStatus } from '@/lib/queries/social/social.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -51,92 +49,49 @@ export interface TrendingContent {
 }
 
 export class SocialFacade {
-  static getBatchContentLikeData = cache(
-    async (
-      targets: Array<{ targetId: string; targetType: LikeTargetType }>,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<Array<ContentLikeData>> => {
-      try {
-        if (targets.length === 0) return [];
+  static async getBatchContentLikeData(
+    targets: Array<{ targetId: string; targetType: LikeTargetType }>,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<ContentLikeData>> {
+    try {
+      if (targets.length === 0) return [];
 
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-        // get like counts and user statuses in parallel
-        const [likeCounts, userStatuses] = await Promise.all([
-          SocialQuery.getLikeCountsAsync(targets, context),
-          viewerUserId ?
-            SocialQuery.getUserLikeStatusesAsync(targets, viewerUserId, context)
-          : Promise.resolve(
-              targets.map(
-                ({ targetId, targetType }): UserLikeStatus => ({
-                  isLiked: false,
-                  likeId: null,
-                  targetId,
-                  targetType,
-                }),
-              ),
+      // get like counts and user statuses in parallel
+      const [likeCounts, userStatuses] = await Promise.all([
+        SocialQuery.getLikeCountsAsync(targets, context),
+        viewerUserId ?
+          SocialQuery.getUserLikeStatusesAsync(targets, viewerUserId, context)
+        : Promise.resolve(
+            targets.map(
+              ({ targetId, targetType }): UserLikeStatus => ({
+                isLiked: false,
+                likeId: null,
+                targetId,
+                targetType,
+              }),
             ),
-        ]);
+          ),
+      ]);
 
-        // create maps for efficient lookup
-        const likeCountMap = new Map(
-          likeCounts.map((item) => [`${item.targetType}:${item.targetId}`, item.likeCount]),
-        );
-        const userStatusMap = new Map(
-          userStatuses.map((status) => [`${status.targetType}:${status.targetId}`, status]),
-        );
+      // create maps for efficient lookup
+      const likeCountMap = new Map(
+        likeCounts.map((item) => [`${item.targetType}:${item.targetId}`, item.likeCount]),
+      );
+      const userStatusMap = new Map(
+        userStatuses.map((status) => [`${status.targetType}:${status.targetId}`, status]),
+      );
 
-        // combine data for each target
-        return targets.map(({ targetId, targetType }) => {
-          const key = `${targetType}:${targetId}`;
-          const likeCount = likeCountMap.get(key) || 0;
-          const userStatus = userStatusMap.get(key) || { isLiked: false, likeId: null };
-
-          return {
-            isLiked: userStatus.isLiked,
-            likeCount,
-            likeId: userStatus.likeId,
-            targetId,
-            targetType,
-          };
-        });
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { targetCount: targets.length },
-          facade: 'SocialFacade',
-          method: 'getBatchContentLikeData',
-          operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
-          userId: viewerUserId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
-
-  static getContentLikeData = cache(
-    async (
-      targetId: string,
-      targetType: LikeTargetType,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<ContentLikeData> => {
-      try {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
-
-        // get like count and user status in parallel
-        const [likeCount, userStatus] = await Promise.all([
-          SocialQuery.getLikeCountAsync(targetId, targetType, context),
-          viewerUserId ?
-            SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
-          : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
-        ]);
+      // combine data for each target
+      return targets.map(({ targetId, targetType }) => {
+        const key = `${targetType}:${targetId}`;
+        const likeCount = likeCountMap.get(key) || 0;
+        const userStatus = userStatusMap.get(key) || { isLiked: false, likeId: null };
 
         return {
           isLiked: userStatus.isLiked,
@@ -145,149 +100,178 @@ export class SocialFacade {
           targetId,
           targetType,
         };
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { targetId, targetType },
-          facade: 'SocialFacade',
-          method: 'getContentLikeData',
-          operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
-          userId: viewerUserId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+      });
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetCount: targets.length },
+        facade: 'SocialFacade',
+        method: 'getBatchContentLikeData',
+        operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
-  static getLikeCount = cache(
-    async (targetId: string, targetType: LikeTargetType, dbInstance?: DatabaseExecutor): Promise<number> => {
-      try {
-        const context = createPublicQueryContext({ dbInstance });
-        return SocialQuery.getLikeCountAsync(targetId, targetType, context);
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { targetId, targetType },
-          facade: 'SocialFacade',
-          method: 'getLikeCount',
-          operation: OPERATIONS.SOCIAL.GET_LIKE_COUNT,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+  static async getContentLikeData(
+    targetId: string,
+    targetType: LikeTargetType,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<ContentLikeData> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-  static getLikesForMultipleContentItems = cache(
-    async (
-      contentIds: Array<string>,
-      contentType: LikeTargetType,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>> => {
-      try {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
+      // get like count and user status in parallel
+      const [likeCount, userStatus] = await Promise.all([
+        SocialQuery.getLikeCountAsync(targetId, targetType, context),
+        viewerUserId ?
+          SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
+        : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
+      ]);
 
-        return SocialQuery.getLikesForMultipleContentItemsAsync(contentIds, contentType, context);
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { contentIds, contentType },
-          facade: 'SocialFacade',
-          method: 'getLikesForMultipleContentItems',
-          operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
-          userId: viewerUserId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+      return {
+        isLiked: userStatus.isLiked,
+        likeCount,
+        likeId: userStatus.likeId,
+        targetId,
+        targetType,
+      };
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetId, targetType },
+        facade: 'SocialFacade',
+        method: 'getContentLikeData',
+        operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
-  static getRecentLikeActivity = cache(
-    async (
-      targetId: string,
-      targetType: LikeTargetType,
-      options: FindOptions = {},
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<Array<LikeActivity>> => {
-      try {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
+  static async getLikeCount(targetId: string, targetType: LikeTargetType, dbInstance?: DatabaseExecutor): Promise<number> {
+    try {
+      const context = createPublicQueryContext({ dbInstance });
+      return SocialQuery.getLikeCountAsync(targetId, targetType, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetId, targetType },
+        facade: 'SocialFacade',
+        method: 'getLikeCount',
+        operation: OPERATIONS.SOCIAL.GET_LIKE_COUNT,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
-        const likes = await SocialQuery.getRecentLikesAsync(targetId, targetType, options, context);
+  static async getLikesForMultipleContentItems(
+    contentIds: Array<string>,
+    contentType: LikeTargetType,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-        return likes.map((like) => ({
-          createdAt: like.createdAt,
-          id: like.id,
-          targetId: like.targetId,
-          targetType: like.targetType,
-          user: like.user,
-          userId: like.userId,
-        }));
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { options, targetId, targetType },
-          facade: 'SocialFacade',
-          method: 'getRecentLikeActivity',
-          operation: OPERATIONS.SOCIAL.GET_RECENT_LIKES,
-          userId: viewerUserId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+      return SocialQuery.getLikesForMultipleContentItemsAsync(contentIds, contentType, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { contentIds, contentType },
+        facade: 'SocialFacade',
+        method: 'getLikesForMultipleContentItems',
+        operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
-  static getTrendingContent = cache(
-    async (
-      targetType: LikeTargetType,
-      options: FindOptions = {},
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<Array<TrendingContent>> => {
-      try {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
+  static async getRecentLikeActivity(
+    targetId: string,
+    targetType: LikeTargetType,
+    options: FindOptions = {},
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<LikeActivity>> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
 
-        return SocialQuery.getTrendingContentAsync(targetType, options, context);
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { options, targetType },
-          facade: 'SocialFacade',
-          method: 'getTrendingContent',
-          operation: OPERATIONS.SOCIAL.GET_TRENDING_CONTENT,
-          userId: viewerUserId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+      const likes = await SocialQuery.getRecentLikesAsync(targetId, targetType, options, context);
 
-  static getUserLikeStatus = cache(
-    async (
-      targetId: string,
-      targetType: LikeTargetType,
-      userId: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<UserLikeStatus> => {
-      try {
-        const context = createUserQueryContext(userId, { dbInstance });
-        return SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { targetId, targetType },
-          facade: 'SocialFacade',
-          method: 'getUserLikeStatus',
-          operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
-          userId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+      return likes.map((like) => ({
+        createdAt: like.createdAt,
+        id: like.id,
+        targetId: like.targetId,
+        targetType: like.targetType,
+        user: like.user,
+        userId: like.userId,
+      }));
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { options, targetId, targetType },
+        facade: 'SocialFacade',
+        method: 'getRecentLikeActivity',
+        operation: OPERATIONS.SOCIAL.GET_RECENT_LIKES,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async getTrendingContent(
+    targetType: LikeTargetType,
+    options: FindOptions = {},
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<TrendingContent>> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+
+      return SocialQuery.getTrendingContentAsync(targetType, options, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { options, targetType },
+        facade: 'SocialFacade',
+        method: 'getTrendingContent',
+        operation: OPERATIONS.SOCIAL.GET_TRENDING_CONTENT,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async getUserLikeStatus(
+    targetId: string,
+    targetType: LikeTargetType,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<UserLikeStatus> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      return SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetId, targetType },
+        facade: 'SocialFacade',
+        method: 'getUserLikeStatus',
+        operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
   static async toggleLike(
     targetId: string,

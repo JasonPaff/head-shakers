@@ -1,13 +1,9 @@
-import { unstable_cache } from 'next/cache';
-import { cache } from 'react';
-
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertTag, UpdateTag } from '@/lib/validations/tags.validation';
 
 import { CONFIG, OPERATIONS } from '@/lib/constants';
-import { CACHE_TAGS, CACHE_TTL } from '@/lib/constants/cache';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
@@ -55,80 +51,71 @@ export interface UserTagStats {
  * handles all business logic and orchestration for tags
  */
 export class TagsFacade {
-  static getSuggestionsForUser = unstable_cache(
-    async (query: string, userId: null | string): Promise<Array<TagSuggestion>> => {
-      try {
-        const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
-        const tags = await TagsQuery.searchAsync(query, userId, 10, context);
+  static async getSuggestionsForUser(query: string, userId: null | string): Promise<Array<TagSuggestion>> {
+    try {
+      const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
+      const tags = await TagsQuery.searchAsync(query, userId, 10, context);
 
-        return tags.map((tag) => ({
-          color: tag.color,
-          id: tag.id,
-          isSystem: tag.userId === null,
-          name: tag.name,
-          usageCount: tag.usageCount,
-        }));
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { query, userId },
-          facade: 'TagsFacade',
-          method: 'getSuggestionsForUser',
-          operation: OPERATIONS.TAGS.SEARCH,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-    [CACHE_TAGS.TAGS.SUGGESTIONS],
-    {
-      revalidate: CACHE_TTL.SHORT,
-      tags: [CACHE_TAGS.TAGS.TAGS, CACHE_TAGS.TAGS.SUGGESTIONS],
-    },
-  );
+      return tags.map((tag) => ({
+        color: tag.color,
+        id: tag.id,
+        isSystem: tag.userId === null,
+        name: tag.name,
+        usageCount: tag.usageCount,
+      }));
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { query, userId },
+        facade: 'TagsFacade',
+        method: 'getSuggestionsForUser',
+        operation: OPERATIONS.TAGS.SEARCH,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
-  static getUserTagStats = cache(
-    async (userId: string, dbInstance?: DatabaseExecutor): Promise<UserTagStats> => {
-      try {
-        const context = createProtectedQueryContext(userId, { dbInstance });
+  static async getUserTagStats(userId: string, dbInstance?: DatabaseExecutor): Promise<UserTagStats> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
 
-        // get all user's custom tags
-        const userTags = await TagsQuery.findAllAsync(userId, context);
-        const customTags = userTags.filter((tag) => tag.userId === userId);
+      // get all user's custom tags
+      const userTags = await TagsQuery.findAllAsync(userId, context);
+      const customTags = userTags.filter((tag) => tag.userId === userId);
 
-        // calculate statistics
-        const totalUsage = customTags.reduce((sum, tag) => sum + tag.usageCount, 0);
-        const averageUsagePerTag = customTags.length > 0 ? totalUsage / customTags.length : 0;
+      // calculate statistics
+      const totalUsage = customTags.reduce((sum, tag) => sum + tag.usageCount, 0);
+      const averageUsagePerTag = customTags.length > 0 ? totalUsage / customTags.length : 0;
 
-        // sort by usage for most/least used
-        const sortedByUsage = [...customTags].sort((a, b) => b.usageCount - a.usageCount);
-        const mostUsedTags = sortedByUsage.slice(0, 5);
-        const leastUsedTags = sortedByUsage.slice(-5).reverse();
+      // sort by usage for most/least used
+      const sortedByUsage = [...customTags].sort((a, b) => b.usageCount - a.usageCount);
+      const mostUsedTags = sortedByUsage.slice(0, 5);
+      const leastUsedTags = sortedByUsage.slice(-5).reverse();
 
-        // get recent activity (placeholder - would need junction table data)
-        const recentActivity = customTags.slice(0, 10).map((tag) => ({
-          lastUsed: null as Date | null, // TODO: implement with real last used data
-          tagId: tag.id,
-          tagName: tag.name,
-        }));
+      // get recent activity (placeholder - would need junction table data)
+      const recentActivity = customTags.slice(0, 10).map((tag) => ({
+        lastUsed: null as Date | null, // TODO: implement with real last used data
+        tagId: tag.id,
+        tagName: tag.name,
+      }));
 
-        return {
-          averageUsagePerTag: Math.round(averageUsagePerTag * 100) / 100,
-          leastUsedTags,
-          mostUsedTags,
-          recentActivity,
-          totalCustomTags: customTags.length,
-        };
-      } catch (error) {
-        const context: FacadeErrorContext = {
-          data: { userId },
-          facade: 'TagsFacade',
-          method: 'getUserTagStats',
-          operation: OPERATIONS.TAGS.GET_STATS,
-          userId,
-        };
-        throw createFacadeError(context, error);
-      }
-    },
-  );
+      return {
+        averageUsagePerTag: Math.round(averageUsagePerTag * 100) / 100,
+        leastUsedTags,
+        mostUsedTags,
+        recentActivity,
+        totalCustomTags: customTags.length,
+      };
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { userId },
+        facade: 'TagsFacade',
+        method: 'getUserTagStats',
+        operation: OPERATIONS.TAGS.GET_STATS,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
   static async attachToBobblehead(
     bobbleheadId: string,

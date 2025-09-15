@@ -1,5 +1,3 @@
-import { cache } from 'react';
-
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -22,61 +20,55 @@ import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 export class BobbleheadsFacade {
-  static getBobbleheadById = cache(
-    async (
-      id: string,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<BobbleheadRecord | null> => {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+  static async getBobbleheadById(
+    id: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadRecord | null> {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.findByIdAsync(id, context);
-    },
-  );
+    return BobbleheadsQuery.findByIdAsync(id, context);
+  }
 
-  static getBobbleheadWithRelations = cache(
-    async (
-      id: string,
-      viewerUserId?: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<BobbleheadWithRelations | null> => {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+  static async getBobbleheadWithRelations(
+    id: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadWithRelations | null> {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
-    },
-  );
+    return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
+  }
 
-  static getUserDashboardStats = cache(
-    async (
-      userId: string,
-      dbInstance?: DatabaseExecutor,
-    ): Promise<{
-      collectionValue: number;
-      profileViews: number;
-      totalItems: number;
-    }> => {
-      const context = createUserQueryContext(userId, { dbInstance });
+  static async getUserDashboardStats(
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{
+    collectionValue: number;
+    profileViews: number;
+    totalItems: number;
+  }> {
+    const context = createUserQueryContext(userId, { dbInstance });
 
-      const userBobbleheads = await BobbleheadsQuery.findByUserAsync(userId, {}, context);
+    const userBobbleheads = await BobbleheadsQuery.findByUserAsync(userId, {}, context);
 
-      // calculate total value from purchase prices
-      const totalValue = userBobbleheads.reduce((sum, bobblehead) => {
-        return sum + (bobblehead.purchasePrice || 0);
-      }, 0);
+    // calculate total value from purchase prices
+    const totalValue = userBobbleheads.reduce((sum, bobblehead) => {
+      return sum + (bobblehead.purchasePrice || 0);
+    }, 0);
 
-      return {
-        collectionValue: Math.round(totalValue),
-        profileViews: userBobbleheads.length * 5 + 100, // TODO: implement real view tracking
-        totalItems: userBobbleheads.length,
-      };
-    },
-  );
+    return {
+      collectionValue: Math.round(totalValue),
+      profileViews: userBobbleheads.length * 5 + 100, // TODO: implement real view tracking
+      totalItems: userBobbleheads.length,
+    };
+  }
 
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance?: DatabaseExecutor) {
     try {
