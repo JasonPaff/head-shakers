@@ -20,7 +20,7 @@ Drizzle ORM database schemas for a bobblehead collection social platform. Define
 
 - **users.schema.ts**: User accounts with Clerk integration, authentication, settings, activity tracking
 - **bobbleheads.schema.ts**: Main collectible entity with photos, custom fields, metadata
-- **collections.schema.ts**: User-owned containers with sub-collection support
+- **collections.schema.ts**: User-owned containers with subcollection support
 - **tags.schema.ts**: User-scoped tagging system with usage tracking
 
 ### Social Features
