@@ -50,8 +50,8 @@ export const LikeIconButton = ({
     toggleLike();
   };
 
-  const authenticatedAriaLabel = `${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${likeCount} likes`;
-  const unauthenticatedAriaLabel = `${likeCount} likes. Sign in to like this ${targetType}`;
+  const authenticatedAriaLabel = `${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${likeCount} like${likeCount === 1 ? '' : 's'}`;
+  const unauthenticatedAriaLabel = `${likeCount} like${likeCount === 1 ? '' : 's'}. Sign in to like this ${targetType}`;
 
   const buttonElement = (
     <button
@@ -62,7 +62,8 @@ export const LikeIconButton = ({
         'hover:scale-110 active:scale-95',
         isLiked ?
           'bg-destructive text-white shadow-lg shadow-red-200 dark:shadow-red-900/40'
-        : 'bg-muted text-gray-400 hover:bg-red-200 hover:text-destructive dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75',
+        : `bg-muted text-gray-400 hover:bg-red-200 hover:text-destructive
+         dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75`,
         className,
       )}
       disabled={disabled || isPending}
@@ -84,9 +85,9 @@ export const LikeIconButton = ({
       {isSignedIn ? buttonElement : <SignUpButton mode={'modal'}>{buttonElement}</SignUpButton>}
 
       <Conditional isCondition={shouldShowCount}>
-        <div className={'text-center text-muted-foreground'}>
+        <div className={'flex items-baseline gap-0.5 text-muted-foreground'}>
           <NumberFlow value={likeCount} />
-          <div className={'text-xs'}>likes</div>
+          <div className={'text-xs'}>like{likeCount === 1 ? '' : 's'}</div>
         </div>
       </Conditional>
     </div>
@@ -126,7 +127,9 @@ export const LikeTextButton = ({
 
   const buttonContent = children || (
     <Fragment>
-      {shouldShowIcon && <HeartIcon aria-hidden className={cn('mr-2 size-4', isLiked && 'fill-current')} />}
+      <Conditional isCondition={shouldShowIcon}>
+        <HeartIcon aria-hidden className={cn('mr-2 size-4', isLiked && 'fill-current')} />
+      </Conditional>
       Like ({likeCount})
     </Fragment>
   );
@@ -179,7 +182,7 @@ export const LikeCompactButton = ({
 
   const buttonElement = (
     <button
-      aria-label={`${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${likeCount} likes`}
+      aria-label={`${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${likeCount} like${likeCount === 1 ? '' : 's'}`}
       aria-pressed={isLiked}
       className={cn(
         'inline-flex items-center gap-1 text-sm transition-colors',

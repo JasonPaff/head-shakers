@@ -9,6 +9,7 @@ import {
   FolderIcon,
   MessageCircleIcon,
   MoreVerticalIcon,
+  PencilIcon,
   ShareIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
@@ -321,6 +322,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
         </div>
 
         <div className={'flex items-center gap-2'}>
+          {/* View Details */}
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
               href={$path({
@@ -332,6 +334,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
             </Link>
           </Button>
 
+          {/* Action Menu */}
           <Conditional isCondition={isOwner}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -357,6 +360,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
                       routeParams: { bobbleheadId: bobblehead.id },
                     })}
                   >
+                    <PencilIcon aria-hidden className={'mr-2 size-4'} />
                     Edit
                   </Link>
                 </DropdownMenuItem>

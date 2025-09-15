@@ -29,7 +29,7 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
   return (
     <Fragment>
       {/* Back to Collections Button and Edit Button */}
-      <div className={'mb-6 flex items-center gap-4'}>
+      <div className={'mb-6 flex items-center justify-between gap-4'}>
         <Conditional isCondition={isOwner}>
           <Button asChild size={'sm'} variant={'outline'}>
             <Link href={$path({ route: '/dashboard/collection' })}>
@@ -38,7 +38,11 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
             </Link>
           </Button>
         </Conditional>
-        <CollectionEditSection collection={collection} isOwner={isOwner} />
+
+        {/* Edit Collection Button */}
+        <div className={'flex items-center gap-2'}>
+          <CollectionEditSection collection={collection} isOwner={isOwner} />
+        </div>
       </div>
 
       <div className={'flex flex-col gap-6'}>
@@ -47,18 +51,8 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
           <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{collection.name}</h1>
           <p className={'text-lg text-pretty text-muted-foreground'}>{collection.description}</p>
         </div>
-
-        {/* Collection Metadata & Like Button */}
-        <div className={'flex flex-wrap items-center gap-4 text-sm text-muted-foreground'}>
-          {/* Creation Date */}
-          <div className={'flex items-center gap-2'}>
-            <CalendarIcon aria-hidden className={'size-4'} />
-            Created {collection.createdAt.toLocaleDateString()}
-          </div>
-
-          {/* Bobblehead Count */}
-          <div>{collection.totalBobbleheadCount} Bobbleheads</div>
-
+        {/* Collection Metadata & Like Button */}{' '}
+        <div className={'flex flex-wrap items-center justify-between gap-4 text-sm text-muted-foreground'}>
           {/* Like Button */}
           <Conditional isCondition={!!likeData}>
             <LikeIconButton
@@ -68,6 +62,17 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
               targetType={'collection'}
             />
           </Conditional>
+
+          <div className={'flex items-center gap-4'}>
+            {/* Bobblehead Count */}
+            <div>{collection.totalBobbleheadCount} Bobbleheads</div>
+
+            {/* Creation Date */}
+            <div className={'flex items-center gap-2'}>
+              <CalendarIcon aria-hidden className={'size-4'} />
+              Created {collection.createdAt.toLocaleDateString()}
+            </div>
+          </div>
         </div>
       </div>
     </Fragment>

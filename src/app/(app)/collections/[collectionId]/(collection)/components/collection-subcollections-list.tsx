@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';
 import { Badge } from '@/components/ui/badge';
 import { Conditional } from '@/components/ui/conditional';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CollectionSubcollectionsListProps {
   collectionId: string;
@@ -39,8 +38,8 @@ export const CollectionSubcollectionsList = ({
         <li className={'group relative'} key={subcollection.id}>
           <div className={'flex items-start gap-2'}>
             <Link
-              className={`flex flex-1 items-center gap-3 rounded-lg border border-border bg-card
-                p-3 shadow-sm transition-all hover:bg-accent hover:shadow-md`}
+              className={`flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-border
+                bg-card p-3 shadow-sm transition-all hover:bg-accent hover:shadow-md`}
               href={$path({
                 route: '/collections/[collectionId]/subcollection/[subcollectionId]',
                 routeParams: {
@@ -51,28 +50,21 @@ export const CollectionSubcollectionsList = ({
             >
               {/* Folder Icon */}
               <div className={'flex-shrink-0'}>
-                <FolderIcon className={'size-5 text-primary'} />
+                <FolderIcon aria-hidden className={'size-5 text-primary'} />
               </div>
 
               {/* Content */}
-              <div className={'min-w-0 flex-1'}>
-                <div className={'mb-1 flex items-center justify-between gap-2'}>
-                  <h4 className={'truncate text-sm font-medium'}>{subcollection.name}</h4>
+              <div className={'min-w-0 flex-1 overflow-hidden'}>
+                <div className={'mb-1 flex items-start gap-2'}>
+                  <h4 className={'min-w-0 flex-1 truncate text-sm font-medium'}>{subcollection.name}</h4>
                   <Badge className={'flex-shrink-0 text-xs'} variant={'secondary'}>
                     {subcollection.bobbleheadCount}
                   </Badge>
                 </div>
                 <Conditional isCondition={!!subcollection.description}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <p className={'line-clamp-2 cursor-help text-xs text-muted-foreground'}>
-                        {subcollection.description}
-                      </p>
-                    </TooltipTrigger>
-                    <TooltipContent className={'max-w-sm'} side={'bottom'} sideOffset={5}>
-                      <p className={'text-xs'}>{subcollection.description}</p>
-                    </TooltipContent>
-                  </Tooltip>
+                  <p className={'line-clamp-2 cursor-help text-xs break-words text-muted-foreground'}>
+                    {subcollection.description}
+                  </p>
                 </Conditional>
               </div>
 
@@ -86,7 +78,7 @@ export const CollectionSubcollectionsList = ({
 
             {/* Actions Menu */}
             <Conditional isCondition={isOwner}>
-              <div className={'opacity-0 transition-opacity group-hover:opacity-100'}>
+              <div className={'flex-shrink-0'}>
                 <SubcollectionActions subcollection={subcollection} />
               </div>
             </Conditional>

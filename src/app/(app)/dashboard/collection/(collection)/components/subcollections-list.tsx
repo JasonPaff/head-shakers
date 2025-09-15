@@ -118,7 +118,7 @@ export const SubcollectionsList = ({ groupedSubcollections }: SubcollectionsList
                       {/* Collection Name and Description */}
                       <div className={'flex flex-col gap-1'}>
                         <div className={'flex items-center gap-2'}>
-                          <FolderIcon className={'size-5 text-primary'} />
+                          <FolderIcon aria-hidden className={'size-5 text-primary'} />
                           <CardTitle className={'text-base font-medium text-foreground'}>
                             {group.collectionName}
                           </CardTitle>
