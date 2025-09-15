@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import { FeaturedContentServer } from '@/app/(app)/browse/featured/components/featured-content-server';
-import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 
 // enable ISR with 5-minute revalidation
 export const revalidate = 300;
@@ -14,14 +13,6 @@ export default function FeaturedPage() {
         <p className={'mt-2 text-muted-foreground'}>
           Discover the best collections, bobbleheads, and collectors from our community
         </p>
-        {process.env.NODE_ENV === 'development' && (
-          <details className={'mt-4 text-xs text-muted-foreground'}>
-            <summary className={'cursor-pointer'}>Cache Debug Info</summary>
-            <pre className={'mt-2 rounded bg-muted p-2'}>
-              {JSON.stringify(FeaturedContentFacade.getCacheStats(), null, 2)}
-            </pre>
-          </details>
-        )}
       </div>
       <FeaturedContentServer isTrackViews={true} />
     </div>

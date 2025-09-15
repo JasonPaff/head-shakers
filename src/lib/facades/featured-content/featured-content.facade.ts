@@ -20,63 +20,6 @@ import { createFacadeError } from '@/lib/utils/error-builders';
  */
 export class FeaturedContentFacade {
   /**
-   * get active featured content
-   */
-  static async getActiveFeaturedContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const context = createPublicQueryContext({ dbInstance });
-    const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
-    return FeaturedContentTransformer.transformFeaturedContent(rawData);
-  }
-
-  /**
-   * get all featured content for admin management
-   */
-  static async getAllFeaturedContentForAdmin(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> {
-    const context = createPublicQueryContext({ dbInstance });
-    return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
-  }
-
-  /**
-   * get the collection of the weeks
-   */
-  static async getCollectionOfWeek(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-    return FeaturedContentTransformer.filterByType(allContent, 'collection_of_week');
-  }
-
-  /**
-   * get editor picks
-   */
-  static async getEditorPicks(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-    return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
-  }
-
-  /**
-   * get featured content by ID
-   */
-  static async getFeaturedContentById(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
-    const context = createPublicQueryContext({ dbInstance });
-    return FeaturedContentQuery.findByIdAsync(id, context);
-  }
-
-  /**
-   * get homepage banner content
-   */
-  static async getHomepageBanner(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-    return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
-  }
-
-  /**
-   * get trending content sorted by view count
-   */
-  static async getTrendingContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
-    return FeaturedContentTransformer.filterByType(allContent, 'trending');
-  }
-
-  /**
    * create a new featured content entry
    */
   static async createAsync(
@@ -118,6 +61,47 @@ export class FeaturedContentFacade {
   }
 
   /**
+   * get active featured content
+   */
+  static async getActiveFeaturedContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const context = createPublicQueryContext({ dbInstance });
+    const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
+    return FeaturedContentTransformer.transformFeaturedContent(rawData);
+  }
+
+  /**
+   * get all featured content for admin management
+   */
+  static async getAllFeaturedContentForAdmin(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
+  }
+
+  /**
+   * get the collection of the weeks
+   */
+  static async getCollectionOfWeek(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'collection_of_week');
+  }
+
+  /**
+   * get editor picks
+   */
+  static async getEditorPicks(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
+  }
+
+  /**
+   * get featured content by ID
+   */
+  static async getFeaturedContentById(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
+    const context = createPublicQueryContext({ dbInstance });
+    return FeaturedContentQuery.findByIdAsync(id, context);
+  }
+
+  /**
    * get featured content by ID for admin management
    */
   static async getFeaturedContentByIdForAdmin(
@@ -126,6 +110,22 @@ export class FeaturedContentFacade {
   ): Promise<FeaturedContentRecord | null> {
     const context = createPublicQueryContext({ dbInstance });
     return FeaturedContentQuery.findFeaturedContentByIdForAdminAsync(id, context);
+  }
+
+  /**
+   * get homepage banner content
+   */
+  static async getHomepageBanner(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
+  }
+
+  /**
+   * get trending content sorted by view count
+   */
+  static async getTrendingContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    return FeaturedContentTransformer.filterByType(allContent, 'trending');
   }
 
   /**
