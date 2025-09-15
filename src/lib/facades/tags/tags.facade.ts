@@ -59,7 +59,7 @@ export class TagsFacade {
     async (query: string, userId: null | string): Promise<Array<TagSuggestion>> => {
       try {
         const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
-        const tags = await TagsQuery.search(query, userId, 10, context);
+        const tags = await TagsQuery.searchAsync(query, userId, 10, context);
 
         return tags.map((tag) => ({
           color: tag.color,
@@ -91,7 +91,7 @@ export class TagsFacade {
         const context = createProtectedQueryContext(userId, { dbInstance });
 
         // get all user's custom tags
-        const userTags = await TagsQuery.findAll(userId, context);
+        const userTags = await TagsQuery.findAllAsync(userId, context);
         const customTags = userTags.filter((tag) => tag.userId === userId);
 
         // calculate statistics
@@ -147,7 +147,7 @@ export class TagsFacade {
       }
 
       // attach tags using the query
-      return TagsQuery.attachToBobblehead(bobbleheadId, tagIds, context);
+      return TagsQuery.attachToBobbleheadAsync(bobbleheadId, tagIds, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId, tagIds, userId },
@@ -178,7 +178,7 @@ export class TagsFacade {
 
       for (const tagId of tagIds) {
         // verify ownership
-        const tag = await TagsQuery.findById(tagId, userId, context);
+        const tag = await TagsQuery.findByIdAsync(tagId, userId, context);
         if (!tag) {
           errors.push(`Tag ${tagId} not found.`);
           skippedCount++;
@@ -192,7 +192,7 @@ export class TagsFacade {
         }
 
         // check if the tag is in use
-        const isInUse = await TagsQuery.isTagInUse(tagId, context);
+        const isInUse = await TagsQuery.isTagInUseAsync(tagId, context);
         if (isInUse) {
           errors.push(`Cannot delete tag "${tag.name}" - it is currently in use.`);
           skippedCount++;
@@ -200,7 +200,7 @@ export class TagsFacade {
         }
 
         // delete the tag
-        const deleted = await TagsQuery.delete(tagId, userId, context);
+        const deleted = await TagsQuery.deleteAsync(tagId, userId, context);
         if (deleted) {
           deletedCount++;
         } else {
@@ -235,18 +235,18 @@ export class TagsFacade {
       const context = createUserQueryContext(userId, { dbInstance });
 
       // check if the user has reached the limit
-      const userTagCount = await TagsQuery.countUserTags(userId, context);
+      const userTagCount = await TagsQuery.countUserTagsAsync(userId, context);
       if (userTagCount >= CONFIG.CONTENT.MAX_CUSTOM_TAGS_PER_USER) {
         return null;
       }
 
       // check if the tag name already exists
-      const existing = await TagsQuery.findByName(data.name, userId, context);
+      const existing = await TagsQuery.findByNameAsync(data.name, userId, context);
       if (existing) {
         return null;
       }
 
-      return TagsQuery.create(data, userId, context);
+      return TagsQuery.createAsync(data, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data,
@@ -262,7 +262,7 @@ export class TagsFacade {
   static async deleteTag(tagId: string, userId: string, dbInstance?: DatabaseExecutor): Promise<boolean> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
-      const deleted = await TagsQuery.delete(tagId, userId, context);
+      const deleted = await TagsQuery.deleteAsync(tagId, userId, context);
       return Boolean(deleted);
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -270,6 +270,27 @@ export class TagsFacade {
         facade: 'TagsFacade',
         method: 'deleteTag',
         operation: OPERATIONS.TAGS.DELETE,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async detachFromBobblehead(
+    bobbleheadId: string,
+    tagIds: Array<string>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<boolean> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+      return TagsQuery.detachFromBobbleheadAsync(bobbleheadId, tagIds, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId, tagIds, userId },
+        facade: 'TagsFacade',
+        method: 'detachFromBobblehead',
+        operation: OPERATIONS.TAGS.DETACH_FROM_BOBBLEHEAD,
         userId,
       };
       throw createFacadeError(context, error);
@@ -300,13 +321,13 @@ export class TagsFacade {
       }
 
       // check if the tag already exists in the user's namespace or as a system tag
-      const existingTag = await TagsQuery.findByName(normalizedName, userId, context);
+      const existingTag = await TagsQuery.findByNameAsync(normalizedName, userId, context);
       if (existingTag) {
         return existingTag;
       }
 
       // verify the user hasn't exceeded the custom tag limit
-      const userTagCount = await TagsQuery.countUserTags(userId, context);
+      const userTagCount = await TagsQuery.countUserTagsAsync(userId, context);
       if (userTagCount >= CONFIG.CONTENT.MAX_CUSTOM_TAGS_PER_USER) {
         return null;
       }
@@ -318,7 +339,7 @@ export class TagsFacade {
         usageCount: 0,
       };
 
-      return TagsQuery.create(tagData, userId, context);
+      return TagsQuery.createAsync(tagData, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { color, name, userId },
@@ -341,8 +362,8 @@ export class TagsFacade {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
       // verify ownership of both tags
-      const sourceTag = await TagsQuery.findById(sourceTagId, userId, context);
-      const targetTag = await TagsQuery.findById(targetTagId, userId, context);
+      const sourceTag = await TagsQuery.findByIdAsync(sourceTagId, userId, context);
+      const targetTag = await TagsQuery.findByIdAsync(targetTagId, userId, context);
 
       if (!sourceTag || !targetTag) {
         return false;
@@ -376,7 +397,7 @@ export class TagsFacade {
   ): Promise<boolean> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
-      return TagsQuery.removeAllFromBobblehead(bobbleheadId, context);
+      return TagsQuery.removeAllFromBobbleheadAsync(bobbleheadId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId, userId },
@@ -397,7 +418,7 @@ export class TagsFacade {
   ): Promise<null | TagRecord> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return TagsQuery.update(tagId, data, userId, context);
+      return TagsQuery.updateAsync(tagId, data, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { ...data, tagId },
@@ -423,7 +444,7 @@ export class TagsFacade {
       const warnings: Array<string> = [];
 
       // get current tags on bobblehead
-      const currentTags = await TagsQuery.getByBobbleheadId(bobbleheadId, context);
+      const currentTags = await TagsQuery.getByBobbleheadIdAsync(bobbleheadId, context);
       const totalTagsAfterAdd = currentTags.length + newTagIds.length;
 
       // check tag limit
@@ -435,7 +456,7 @@ export class TagsFacade {
 
       // validate all tag IDs belong to user or are system tags
       for (const tagId of newTagIds) {
-        const tag = await TagsQuery.findById(tagId, userId, context);
+        const tag = await TagsQuery.findByIdAsync(tagId, userId, context);
         if (!tag) {
           errors.push(`Tag with ID ${tagId} not found or not accessible.`);
         } else if (tag.userId !== null && tag.userId !== userId) {

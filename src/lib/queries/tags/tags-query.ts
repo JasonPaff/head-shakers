@@ -9,7 +9,7 @@ import { BaseQuery } from '@/lib/queries/base/base-query';
 export type TagRecord = typeof tags.$inferSelect;
 
 export class TagsQuery extends BaseQuery {
-  static async attachToBobblehead(
+  static async attachToBobbleheadAsync(
     bobbleheadId: string,
     tagIds: Array<string>,
     context: QueryContext,
@@ -42,7 +42,7 @@ export class TagsQuery extends BaseQuery {
     }
   }
 
-  static async countUserTags(userId: string, context: QueryContext): Promise<number> {
+  static async countUserTagsAsync(userId: string, context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.select({ count: count() }).from(tags).where(eq(tags.userId, userId));
@@ -50,7 +50,7 @@ export class TagsQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
-  static async create(data: InsertTag, userId: string, context: QueryContext): Promise<null | TagRecord> {
+  static async createAsync(data: InsertTag, userId: string, context: QueryContext): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -61,17 +61,17 @@ export class TagsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async delete(tagId: string, userId: string, context: QueryContext): Promise<null | TagRecord> {
+  static async deleteAsync(tagId: string, userId: string, context: QueryContext): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
     // verify ownership and that tag is not a system tag
-    const tag = await this.findById(tagId, userId, context);
+    const tag = await this.findByIdAsync(tagId, userId, context);
     if (!tag || tag.userId !== userId) {
       return null;
     }
 
     // check if the tag is in use
-    const isInUse = await this.isTagInUse(tagId, context);
+    const isInUse = await this.isTagInUseAsync(tagId, context);
     if (isInUse) return null;
 
     const result = await dbInstance
@@ -82,7 +82,7 @@ export class TagsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async detachFromBobblehead(
+  static async detachFromBobbleheadAsync(
     bobbleheadId: string,
     tagIds: Array<string>,
     context: QueryContext,
@@ -112,7 +112,7 @@ export class TagsQuery extends BaseQuery {
     }
   }
 
-  static async findAll(userId: null | string, context: QueryContext): Promise<Array<TagRecord>> {
+  static async findAllAsync(userId: null | string, context: QueryContext): Promise<Array<TagRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const conditions = [];
@@ -139,7 +139,7 @@ export class TagsQuery extends BaseQuery {
       );
   }
 
-  static async findById(
+  static async findByIdAsync(
     tagId: string,
     userId: null | string,
     context: QueryContext,
@@ -164,7 +164,7 @@ export class TagsQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  static async findByName(
+  static async findByNameAsync(
     name: string,
     userId: null | string,
     context: QueryContext,
@@ -191,7 +191,7 @@ export class TagsQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  static async getByBobbleheadId(bobbleheadId: string, context: QueryContext): Promise<Array<TagRecord>> {
+  static async getByBobbleheadIdAsync(bobbleheadId: string, context: QueryContext): Promise<Array<TagRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -210,7 +210,7 @@ export class TagsQuery extends BaseQuery {
       .orderBy(tags.name);
   }
 
-  static async isTagInUse(tagId: string, context: QueryContext): Promise<boolean> {
+  static async isTagInUseAsync(tagId: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -221,7 +221,7 @@ export class TagsQuery extends BaseQuery {
     return (result[0]?.count || 0) > 0;
   }
 
-  static async removeAllFromBobblehead(bobbleheadId: string, context: QueryContext): Promise<boolean> {
+  static async removeAllFromBobbleheadAsync(bobbleheadId: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
     try {
@@ -253,7 +253,7 @@ export class TagsQuery extends BaseQuery {
     }
   }
 
-  static async search(
+  static async searchAsync(
     query: string,
     userId: null | string,
     limit: number,
@@ -290,7 +290,7 @@ export class TagsQuery extends BaseQuery {
       .limit(Math.min(limit, 15)); // limit for autocomplete performance
   }
 
-  static async update(
+  static async updateAsync(
     tagId: string,
     data: UpdateTag,
     userId: string,
@@ -299,7 +299,7 @@ export class TagsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     // verify ownership (prevent system tag modification)
-    const existing = await this.findById(tagId, userId, context);
+    const existing = await this.findByIdAsync(tagId, userId, context);
     if (!existing || existing.userId !== userId) {
       return null;
     }

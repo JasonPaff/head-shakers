@@ -62,7 +62,7 @@ export class CollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return CollectionsQuery.findById(id, context);
+      return CollectionsQuery.findByIdAsync(id, context);
     },
   );
 
@@ -77,7 +77,7 @@ export class CollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return CollectionsQuery.findByIdWithRelations(id, context);
+      return CollectionsQuery.findByIdWithRelationsAsync(id, context);
     },
   );
 
@@ -108,7 +108,7 @@ export class CollectionsFacade {
   static getUserCollectionsForDashboard = cache(
     async (userId: string, dbInstance?: DatabaseExecutor): Promise<Array<CollectionDashboardData>> => {
       const context = createProtectedQueryContext(userId, { dbInstance });
-      const collections = await CollectionsQuery.getDashboardData(userId, context);
+      const collections = await CollectionsQuery.getDashboardDataAsync(userId, context);
 
       return collections.map((collection) => this.transformForDashboard(collection));
     },
@@ -151,7 +151,8 @@ export class CollectionsFacade {
 
   static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
-      return await CollectionsQuery.createAsync(data, userId, dbInstance);
+      const context = createUserQueryContext(userId, { dbInstance });
+      return await CollectionsQuery.createAsync(data, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { isPublic: data.isPublic, name: data.name },
@@ -166,7 +167,8 @@ export class CollectionsFacade {
 
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
-      return await CollectionsQuery.deleteAsync(data, userId, dbInstance);
+      const context = createUserQueryContext(userId, { dbInstance });
+      return await CollectionsQuery.deleteAsync(data, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId },
@@ -200,7 +202,7 @@ export class CollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotos(
+      const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotosAsync(
         collectionId,
         context,
         options,
@@ -245,7 +247,7 @@ export class CollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return CollectionsQuery.getBobbleheadsInCollection(collectionId, context);
+      return CollectionsQuery.getBobbleheadsInCollectionAsync(collectionId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },
@@ -279,7 +281,7 @@ export class CollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotos(
+      const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotosAsync(
         collectionId,
         context,
         options,
@@ -325,7 +327,7 @@ export class CollectionsFacade {
           createProtectedQueryContext(userId, { dbInstance })
         : createUserQueryContext(viewerUserId || userId, { dbInstance });
 
-      return CollectionsQuery.findByUser(userId, options, context);
+      return CollectionsQuery.findByUserAsync(userId, options, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, userId },
@@ -358,7 +360,8 @@ export class CollectionsFacade {
 
   static async updateAsync(data: UpdateCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
-      return await CollectionsQuery.updateAsync(data, userId, dbInstance);
+      const context = createUserQueryContext(userId, { dbInstance });
+      return await CollectionsQuery.updateAsync(data, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId },

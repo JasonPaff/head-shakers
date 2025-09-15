@@ -18,7 +18,7 @@ export class UsersFacade {
   private static getUserByClerkIdBase = cache(
     async (clerkId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> => {
       const context = createPublicQueryContext({ dbInstance });
-      return UsersQuery.findByClerkId(clerkId, context);
+      return UsersQuery.findByClerkIdAsync(clerkId, context);
     },
   );
 

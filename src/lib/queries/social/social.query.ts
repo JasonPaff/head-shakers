@@ -24,7 +24,7 @@ export type UserLikeStatus = {
 };
 
 export class SocialQuery extends BaseQuery {
-  static async createLike(
+  static async createLikeAsync(
     data: InsertLike,
     userId: string,
     context: QueryContext,
@@ -53,7 +53,7 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async decrementLikeCount(
+  static async decrementLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
     context: QueryContext,
@@ -84,7 +84,7 @@ export class SocialQuery extends BaseQuery {
     }
   }
 
-  static async deleteLike(
+  static async deleteLikeAsync(
     targetId: string,
     targetType: LikeTargetType,
     userId: string,
@@ -100,7 +100,7 @@ export class SocialQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async getLikeCount(
+  static async getLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
     context: QueryContext,
@@ -115,7 +115,7 @@ export class SocialQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
-  static async getLikeCounts(
+  static async getLikeCountsAsync(
     targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     context: QueryContext,
   ): Promise<Array<LikeCountByTarget>> {
@@ -158,7 +158,7 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
-  static async getLikesForMultipleContentItems(
+  static async getLikesForMultipleContentItemsAsync(
     contentIds: Array<string>,
     contentType: LikeTargetType,
     context: QueryContext,
@@ -214,7 +214,7 @@ export class SocialQuery extends BaseQuery {
     return result;
   }
 
-  static async getRecentLikes(
+  static async getRecentLikesAsync(
     targetId: string,
     targetType: LikeTargetType,
     options: FindOptions = {},
@@ -254,7 +254,7 @@ export class SocialQuery extends BaseQuery {
     return query;
   }
 
-  static async getTrendingContent(
+  static async getTrendingContentAsync(
     targetType: LikeTargetType,
     options: FindOptions = {},
     context: QueryContext,
@@ -289,7 +289,7 @@ export class SocialQuery extends BaseQuery {
     return query;
   }
 
-  static async getUserLikeStatus(
+  static async getUserLikeStatusAsync(
     targetId: string,
     targetType: LikeTargetType,
     userId: string,
@@ -313,7 +313,7 @@ export class SocialQuery extends BaseQuery {
     };
   }
 
-  static async getUserLikeStatuses(
+  static async getUserLikeStatusesAsync(
     targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' | 'subcollection' }>,
     userId: string,
     context: QueryContext,
@@ -355,7 +355,7 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
-  static async incrementLikeCount(
+  static async incrementLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
     context: QueryContext,

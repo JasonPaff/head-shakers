@@ -9,7 +9,7 @@ import type {
 
 import { db } from '@/lib/db';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
+import { createProtectedQueryContext, createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
@@ -26,7 +26,8 @@ export class SubcollectionsFacade {
    */
   static async createAsync(data: InsertSubCollection, dbInstance: DatabaseExecutor = db) {
     try {
-      return await SubcollectionsQuery.createAsync(data, dbInstance);
+      const context = createPublicQueryContext({ dbInstance });
+      return await SubcollectionsQuery.createAsync(data, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId, name: data.name },
@@ -43,7 +44,8 @@ export class SubcollectionsFacade {
    */
   static async deleteAsync(data: DeleteSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
-      return await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, dbInstance);
+      const context = createProtectedQueryContext(userId, { dbInstance });
+      return await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { subcollectionId: data.subcollectionId },
@@ -78,7 +80,7 @@ export class SubcollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotos(
+      const bobbleheads = await SubcollectionsQuery.getSubcollectionBobbleheadsWithPhotosAsync(
         subcollectionId,
         context,
         options,
@@ -139,7 +141,7 @@ export class SubcollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return SubcollectionsQuery.getSubCollectionForPublicView(collectionId, subcollectionId, context);
+      return SubcollectionsQuery.getSubCollectionForPublicViewAsync(collectionId, subcollectionId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId, subcollectionId },
@@ -166,7 +168,7 @@ export class SubcollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return SubcollectionsQuery.getSubCollectionsByCollection(collectionId, context);
+      return SubcollectionsQuery.getSubCollectionsByCollectionAsync(collectionId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },
@@ -202,7 +204,7 @@ export class SubcollectionsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return SubcollectionsQuery.getSubCollectionsForPublicView(collectionId, context);
+      return SubcollectionsQuery.getSubCollectionsForPublicViewAsync(collectionId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },
@@ -220,8 +222,9 @@ export class SubcollectionsFacade {
    */
   static async updateAsync(data: UpdateSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
       const { subcollectionId, ...updateData } = data;
-      return await SubcollectionsQuery.updateAsync(subcollectionId, updateData, userId, dbInstance);
+      return await SubcollectionsQuery.updateAsync(subcollectionId, updateData, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { subcollectionId: data.subcollectionId },

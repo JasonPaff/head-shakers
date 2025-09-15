@@ -57,17 +57,17 @@ export class ContentSearchFacade {
       dbInstance?: DatabaseExecutor,
     ): Promise<{ bobblehead: BobbleheadSearchResultWithPhotos }> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const bobblehead = await ContentSearchQuery.findBobbleheadById(id, context);
+      const bobblehead = await ContentSearchQuery.findBobbleheadByIdAsync(id, context);
 
       if (!bobblehead) {
         throw new Error(ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND_OR_NOT_PUBLIC);
       }
 
       // get all photos for this bobblehead
-      const photos = await ContentSearchQuery.getBobbleheadPhotosById(id, context);
+      const photos = await ContentSearchQuery.getBobbleheadPhotosByIdAsync(id, context);
 
       // get all tags for this bobblehead
-      const tagsMap = await ContentSearchQuery.getBobbleheadTags([id], context);
+      const tagsMap = await ContentSearchQuery.getBobbleheadTagsAsync([id], context);
       const tags = tagsMap.get(id) || [];
 
       return {
@@ -90,14 +90,14 @@ export class ContentSearchFacade {
       dbInstance?: DatabaseExecutor,
     ): Promise<{ collection: CollectionSearchResult }> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const collection = await ContentSearchQuery.findCollectionById(id, context);
+      const collection = await ContentSearchQuery.findCollectionByIdAsync(id, context);
 
       if (!collection) {
         throw new Error(ERROR_MESSAGES.COLLECTION.NOT_FOUND_OR_NOT_PUBLIC);
       }
 
       // get all tags for this collection
-      const tagsMap = await ContentSearchQuery.getCollectionTags([id], context);
+      const tagsMap = await ContentSearchQuery.getCollectionTagsAsync([id], context);
       const tags = tagsMap.get(id) || [];
 
       return {
@@ -119,7 +119,7 @@ export class ContentSearchFacade {
       dbInstance?: DatabaseExecutor,
     ): Promise<{ user: UserSearchResult }> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const user = await ContentSearchQuery.findUserById(id, context);
+      const user = await ContentSearchQuery.findUserByIdAsync(id, context);
 
       if (!user) {
         throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
@@ -142,7 +142,7 @@ export class ContentSearchFacade {
       excludeTags?: Array<string>,
     ): Promise<BobbleheadSearchResponse> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const results = await ContentSearchQuery.searchBobbleheads(
+      const results = await ContentSearchQuery.searchBobbleheadsAsync(
         query,
         limit,
         context,
@@ -152,10 +152,10 @@ export class ContentSearchFacade {
 
       // get all photos for each bobblehead in a single query
       const bobbleheadIds = results.map((result) => result.id);
-      const allPhotos = await ContentSearchQuery.getBobbleheadPhotos(bobbleheadIds, context);
+      const allPhotos = await ContentSearchQuery.getBobbleheadPhotosAsync(bobbleheadIds, context);
 
       // get all tags for each bobblehead in a single query
-      const allTags = await ContentSearchQuery.getBobbleheadTags(bobbleheadIds, context);
+      const allTags = await ContentSearchQuery.getBobbleheadTagsAsync(bobbleheadIds, context);
 
       // group photos by bobblehead ID for efficient lookup
       const photosByBobblehead = this.groupPhotosByBobblehead(allPhotos);
@@ -193,7 +193,7 @@ export class ContentSearchFacade {
       excludeTags?: Array<string>,
     ): Promise<CollectionSearchResponse> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const results = await ContentSearchQuery.searchCollections(
+      const results = await ContentSearchQuery.searchCollectionsAsync(
         query,
         limit,
         context,
@@ -203,7 +203,7 @@ export class ContentSearchFacade {
 
       // get all tags for each collection in a single query
       const collectionIds = results.map((result) => result.id);
-      const allTags = await ContentSearchQuery.getCollectionTags(collectionIds, context);
+      const allTags = await ContentSearchQuery.getCollectionTagsAsync(collectionIds, context);
 
       // enrich results with tags
       const enrichedResults = results.map((result) => ({
@@ -235,7 +235,7 @@ export class ContentSearchFacade {
       dbInstance?: DatabaseExecutor,
     ): Promise<UserSearchResponse> => {
       const context = createAdminQueryContext(adminUserId, { dbInstance });
-      const results = await ContentSearchQuery.searchUsers(query, limit, context);
+      const results = await ContentSearchQuery.searchUsersAsync(query, limit, context);
 
       return {
         message: `Found ${results.length} users matching "${query}"`,

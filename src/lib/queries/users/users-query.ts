@@ -11,7 +11,7 @@ export class UsersQuery extends BaseQuery {
   /**
    * find user by Clerk ID
    */
-  static async findByClerkId(clerkId: string, context: QueryContext): Promise<null | UserRecord> {
+  static async findByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);

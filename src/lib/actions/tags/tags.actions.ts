@@ -15,7 +15,6 @@ import {
 } from '@/lib/constants';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { TagsQuery } from '@/lib/queries/tags/tags-query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -233,10 +232,7 @@ export const attachTagsAction = authActionClient
         );
       }
 
-      const success = await TagsQuery.attachToBobblehead(bobbleheadId, tagIds, {
-        dbInstance,
-        userId,
-      });
+      const success = await TagsFacade.attachToBobblehead(bobbleheadId, tagIds, userId, dbInstance);
 
       if (!success) {
         throw new ActionError(
@@ -301,10 +297,7 @@ export const detachTagsAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.TAG_DATA, { tagIds });
 
     try {
-      const success = await TagsQuery.detachFromBobblehead(bobbleheadId, tagIds, {
-        dbInstance,
-        userId,
-      });
+      const success = await TagsFacade.detachFromBobblehead(bobbleheadId, tagIds, userId, dbInstance);
 
       if (!success) {
         throw new ActionError(

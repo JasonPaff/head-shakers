@@ -67,9 +67,9 @@ export class SocialFacade {
 
         // get like counts and user statuses in parallel
         const [likeCounts, userStatuses] = await Promise.all([
-          SocialQuery.getLikeCounts(targets, context),
+          SocialQuery.getLikeCountsAsync(targets, context),
           viewerUserId ?
-            SocialQuery.getUserLikeStatuses(targets, viewerUserId, context)
+            SocialQuery.getUserLikeStatusesAsync(targets, viewerUserId, context)
           : Promise.resolve(
               targets.map(
                 ({ targetId, targetType }): UserLikeStatus => ({
@@ -132,9 +132,9 @@ export class SocialFacade {
 
         // get like count and user status in parallel
         const [likeCount, userStatus] = await Promise.all([
-          SocialQuery.getLikeCount(targetId, targetType, context),
+          SocialQuery.getLikeCountAsync(targetId, targetType, context),
           viewerUserId ?
-            SocialQuery.getUserLikeStatus(targetId, targetType, viewerUserId, context)
+            SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
           : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
         ]);
 
@@ -162,7 +162,7 @@ export class SocialFacade {
     async (targetId: string, targetType: LikeTargetType, dbInstance?: DatabaseExecutor): Promise<number> => {
       try {
         const context = createPublicQueryContext({ dbInstance });
-        return SocialQuery.getLikeCount(targetId, targetType, context);
+        return SocialQuery.getLikeCountAsync(targetId, targetType, context);
       } catch (error) {
         const context: FacadeErrorContext = {
           data: { targetId, targetType },
@@ -188,7 +188,7 @@ export class SocialFacade {
             createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
-        return SocialQuery.getLikesForMultipleContentItems(contentIds, contentType, context);
+        return SocialQuery.getLikesForMultipleContentItemsAsync(contentIds, contentType, context);
       } catch (error) {
         const context: FacadeErrorContext = {
           data: { contentIds, contentType },
@@ -216,7 +216,7 @@ export class SocialFacade {
             createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
-        const likes = await SocialQuery.getRecentLikes(targetId, targetType, options, context);
+        const likes = await SocialQuery.getRecentLikesAsync(targetId, targetType, options, context);
 
         return likes.map((like) => ({
           createdAt: like.createdAt,
@@ -252,7 +252,7 @@ export class SocialFacade {
             createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
 
-        return SocialQuery.getTrendingContent(targetType, options, context);
+        return SocialQuery.getTrendingContentAsync(targetType, options, context);
       } catch (error) {
         const context: FacadeErrorContext = {
           data: { options, targetType },
@@ -275,7 +275,7 @@ export class SocialFacade {
     ): Promise<UserLikeStatus> => {
       try {
         const context = createUserQueryContext(userId, { dbInstance });
-        return SocialQuery.getUserLikeStatus(targetId, targetType, userId, context);
+        return SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
       } catch (error) {
         const context: FacadeErrorContext = {
           data: { targetId, targetType },
@@ -300,18 +300,18 @@ export class SocialFacade {
         const context = createProtectedQueryContext(userId, { dbInstance: tx });
 
         // check current like status
-        const currentStatus = await SocialQuery.getUserLikeStatus(targetId, targetType, userId, context);
+        const currentStatus = await SocialQuery.getUserLikeStatusAsync(targetId, targetType, userId, context);
 
         if (currentStatus.isLiked) {
           // unlike: delete the like and decrement count
-          const deletedLike = await SocialQuery.deleteLike(targetId, targetType, userId, context);
+          const deletedLike = await SocialQuery.deleteLikeAsync(targetId, targetType, userId, context);
 
           if (deletedLike) {
-            await SocialQuery.decrementLikeCount(targetId, targetType, context);
+            await SocialQuery.decrementLikeCountAsync(targetId, targetType, context);
           }
 
           // get updated count
-          const updatedCount = await SocialQuery.getLikeCount(targetId, targetType, context);
+          const updatedCount = await SocialQuery.getLikeCountAsync(targetId, targetType, context);
 
           return {
             isLiked: false,
@@ -326,14 +326,14 @@ export class SocialFacade {
             targetType,
           };
 
-          const newLike = await SocialQuery.createLike(likeData, userId, context);
+          const newLike = await SocialQuery.createLikeAsync(likeData, userId, context);
 
           if (newLike) {
-            await SocialQuery.incrementLikeCount(targetId, targetType, context);
+            await SocialQuery.incrementLikeCountAsync(targetId, targetType, context);
           }
 
           // get updated count
-          const updatedCount = await SocialQuery.getLikeCount(targetId, targetType, context);
+          const updatedCount = await SocialQuery.getLikeCountAsync(targetId, targetType, context);
 
           return {
             isLiked: !!newLike,

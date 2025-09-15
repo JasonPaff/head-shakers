@@ -8,6 +8,7 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
+import { DEFAULTS } from '@/lib/constants';
 import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -37,7 +38,7 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * create a new featured content entry
    */
-  static async create(
+  static async createAsync(
     data: InsertFeaturedContent,
     curatorId: string,
     context: QueryContext,
@@ -61,7 +62,7 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * delete a featured content entry
    */
-  static async delete(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
+  static async deleteAsync(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.delete(featuredContent).where(eq(featuredContent.id, id)).returning();
@@ -72,7 +73,7 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * get active featured content with related data (raw data for service layer transformation)
    */
-  static async findActiveFeaturedContent(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
+  static async findActiveFeaturedContentAsync(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
@@ -105,7 +106,7 @@ export class FeaturedContentQuery extends BaseQuery {
       .leftJoin(users, eq(featuredContent.contentId, users.id))
       .where(
         and(
-          eq(featuredContent.isActive, true),
+          eq(featuredContent.isActive, DEFAULTS.FEATURED_CONTENT.IS_ACTIVE),
           or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
           or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
         ),
@@ -118,7 +119,7 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * get all featured content for admin management
    */
-  static async findAllFeaturedContentForAdmin(context: QueryContext): Promise<Array<FeaturedContentRecord>> {
+  static async findAllFeaturedContentForAdminAsync(context: QueryContext): Promise<Array<FeaturedContentRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const results = await dbInstance
@@ -176,9 +177,9 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * find featured content by ID
    */
-  static async findById(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
+  static async findByIdAsync(id: string, context: QueryContext): Promise<null | SelectFeaturedContent> {
     const dbInstance = this.getDbInstance(context);
-    console.log('QUERY: Finding featured content by ID:', id);
+
     const result = await dbInstance.select().from(featuredContent).where(eq(featuredContent.id, id)).limit(1);
 
     return result[0] || null;
@@ -187,7 +188,7 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * get featured content by ID for admin management
    */
-  static async findFeaturedContentByIdForAdmin(
+  static async findFeaturedContentByIdForAdminAsync(
     id: string,
     context: QueryContext,
   ): Promise<FeaturedContentRecord | null> {
@@ -252,27 +253,22 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * increment view count for featured content
    */
-  static async incrementViewCount(contentId: string, context: QueryContext): Promise<void> {
+  static async incrementViewCountAsync(contentId: string, context: QueryContext): Promise<void> {
     const dbInstance = this.getDbInstance(context);
 
-    try {
-      await dbInstance
-        .update(featuredContent)
-        .set({
-          updatedAt: new Date(),
-          viewCount: sql`${featuredContent.viewCount} + 1`,
-        })
-        .where(eq(featuredContent.id, contentId));
-    } catch (error) {
-      console.error(`Failed to increment view count for content ${contentId}:`, error);
-      throw error;
-    }
+    await dbInstance
+      .update(featuredContent)
+      .set({
+        updatedAt: new Date(),
+        viewCount: sql`${featuredContent.viewCount} + 1`,
+      })
+      .where(eq(featuredContent.id, contentId));
   }
 
   /**
    * toggle active status of featured content
    */
-  static async toggleActive(
+  static async toggleActiveAsync(
     id: string,
     isActive: boolean,
     context: QueryContext,
@@ -294,7 +290,7 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * update a featured content entry
    */
-  static async update(
+  static async updateAsync(
     id: string,
     data: UpdateFeaturedContent,
     context: QueryContext,

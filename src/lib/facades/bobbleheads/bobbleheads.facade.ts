@@ -33,7 +33,7 @@ export class BobbleheadsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.findById(id, context);
+      return BobbleheadsQuery.findByIdAsync(id, context);
     },
   );
 
@@ -48,7 +48,7 @@ export class BobbleheadsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.findByIdWithRelations(id, context);
+      return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
     },
   );
 
@@ -63,7 +63,7 @@ export class BobbleheadsFacade {
     }> => {
       const context = createUserQueryContext(userId, { dbInstance });
 
-      const userBobbleheads = await BobbleheadsQuery.findByUser(userId, {}, context);
+      const userBobbleheads = await BobbleheadsQuery.findByUserAsync(userId, {}, context);
 
       // calculate total value from purchase prices
       const totalValue = userBobbleheads.reduce((sum, bobblehead) => {
@@ -81,7 +81,7 @@ export class BobbleheadsFacade {
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance?: DatabaseExecutor) {
     try {
       const context = createPublicQueryContext({ dbInstance });
-      return BobbleheadsQuery.addPhoto(data, context);
+      return BobbleheadsQuery.addPhotoAsync(data, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId, url: data.url },
@@ -100,7 +100,7 @@ export class BobbleheadsFacade {
   ): Promise<BobbleheadRecord | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return BobbleheadsQuery.create(data, userId, context);
+      return BobbleheadsQuery.createAsync(data, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { manufacturer: data.manufacturer, name: data.name },
@@ -122,7 +122,7 @@ export class BobbleheadsFacade {
       const context = createUserQueryContext(userId, { dbInstance });
 
       // get bobblehead and photos, then delete from the database
-      const deleteResult = await BobbleheadsQuery.delete(data, userId, context);
+      const deleteResult = await BobbleheadsQuery.deleteAsync(data, userId, context);
 
       const { bobblehead, photos } = deleteResult;
 
@@ -188,7 +188,7 @@ export class BobbleheadsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.getPhotos(bobbleheadId, context);
+      return BobbleheadsQuery.getPhotosAsync(bobbleheadId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId },
@@ -213,7 +213,7 @@ export class BobbleheadsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.findByCollection(collectionId, options, context);
+      return BobbleheadsQuery.findByCollectionAsync(collectionId, options, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId, options },
@@ -238,7 +238,7 @@ export class BobbleheadsFacade {
           createProtectedQueryContext(userId, { dbInstance })
         : createUserQueryContext(viewerUserId || userId, { dbInstance });
 
-      return BobbleheadsQuery.findByUser(userId, options, context);
+      return BobbleheadsQuery.findByUserAsync(userId, options, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, userId },
@@ -272,7 +272,7 @@ export class BobbleheadsFacade {
           createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
 
-      return BobbleheadsQuery.search(searchTerm, filters, options, context);
+      return BobbleheadsQuery.searchAsync(searchTerm, filters, options, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { filters, options, searchTerm },

@@ -1,14 +1,13 @@
 import { and, asc, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
-import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   DeleteCollection,
   InsertCollection,
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { db } from '@/lib/db';
+import { DEFAULTS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, collections, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -57,8 +56,10 @@ export type CollectionWithRelations = CollectionRecord & {
 };
 
 export class CollectionsQuery extends BaseQuery {
-  static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db)
+  static async createAsync(data: InsertCollection, userId: string, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
       .insert(collections)
       .values({ ...data, userId })
       .returning();
@@ -66,8 +67,10 @@ export class CollectionsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async deleteAsync(data: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db)
+  static async deleteAsync(data: DeleteCollection, userId: string, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
       .delete(collections)
       .where(and(eq(collections.id, data.collectionId), eq(collections.userId, userId)))
       .returning();
@@ -75,7 +78,7 @@ export class CollectionsQuery extends BaseQuery {
     return result?.[0] || null;
   }
 
-  static async findById(id: string, context: QueryContext): Promise<CollectionRecord | null> {
+  static async findByIdAsync(id: string, context: QueryContext): Promise<CollectionRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -92,7 +95,7 @@ export class CollectionsQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  static async findByIdWithRelations(
+  static async findByIdWithRelationsAsync(
     id: string,
     context: QueryContext,
   ): Promise<CollectionWithRelations | null> {
@@ -117,7 +120,7 @@ export class CollectionsQuery extends BaseQuery {
             subcollectionId: true,
             updatedAt: true,
           },
-          where: eq(bobbleheads.isDeleted, false),
+          where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
         },
         subCollections: {
           with: {
@@ -127,7 +130,7 @@ export class CollectionsQuery extends BaseQuery {
                 isFeatured: true,
                 updatedAt: true,
               },
-              where: eq(bobbleheads.isDeleted, false),
+              where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
             },
           },
         },
@@ -137,7 +140,7 @@ export class CollectionsQuery extends BaseQuery {
     return collection || null;
   }
 
-  static async findByUser(
+  static async findByUserAsync(
     userId: string,
     options: FindOptions = {},
     context: QueryContext,
@@ -167,7 +170,7 @@ export class CollectionsQuery extends BaseQuery {
     return query;
   }
 
-  static async getAllCollectionBobbleheadsWithPhotos(
+  static async getAllCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
     options?: { searchTerm?: string; sortBy?: string },
@@ -200,28 +203,7 @@ export class CollectionsQuery extends BaseQuery {
     const sortOrder = this._getSortOrder(options?.sortBy);
 
     return dbInstance
-      .select({
-        acquisitionDate: bobbleheads.acquisitionDate,
-        acquisitionMethod: bobbleheads.acquisitionMethod,
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        condition: bobbleheads.currentCondition,
-        description: bobbleheads.description,
-        featurePhoto: bobbleheadPhotos.url,
-        height: bobbleheads.height,
-        id: bobbleheads.id,
-        isFeatured: bobbleheads.isFeatured,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        purchaseLocation: bobbleheads.purchaseLocation,
-        purchasePrice: bobbleheads.purchasePrice,
-        series: bobbleheads.series,
-        status: bobbleheads.status,
-        subcollectionId: bobbleheads.subcollectionId,
-        subcollectionName: subCollections.name,
-        weight: bobbleheads.weight,
-      })
+      .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
@@ -240,7 +222,7 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(sortOrder);
   }
 
-  static async getBobbleheadsInCollection(
+  static async getBobbleheadsInCollectionAsync(
     collectionId: string,
     context: QueryContext,
   ): Promise<Array<BobbleheadListRecord>> {
@@ -262,25 +244,7 @@ export class CollectionsQuery extends BaseQuery {
     );
 
     return dbInstance
-      .select({
-        acquisitionDate: bobbleheads.acquisitionDate,
-        acquisitionMethod: bobbleheads.acquisitionMethod,
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        condition: bobbleheads.currentCondition,
-        description: bobbleheads.description,
-        height: bobbleheads.height,
-        id: bobbleheads.id,
-        isFeatured: bobbleheads.isFeatured,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        purchaseLocation: bobbleheads.purchaseLocation,
-        purchasePrice: bobbleheads.purchasePrice,
-        series: bobbleheads.series,
-        status: bobbleheads.status,
-        weight: bobbleheads.weight,
-      })
+      .select(this._selectBobbleheadBase())
       .from(bobbleheads)
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .where(
@@ -294,7 +258,7 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(bobbleheads.createdAt);
   }
 
-  static async getCollectionBobbleheadsWithPhotos(
+  static async getCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
     options?: { searchTerm?: string; sortBy?: string },
@@ -328,28 +292,7 @@ export class CollectionsQuery extends BaseQuery {
     const sortOrder = this._getSortOrder(options?.sortBy);
 
     return dbInstance
-      .select({
-        acquisitionDate: bobbleheads.acquisitionDate,
-        acquisitionMethod: bobbleheads.acquisitionMethod,
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        condition: bobbleheads.currentCondition,
-        description: bobbleheads.description,
-        featurePhoto: bobbleheadPhotos.url,
-        height: bobbleheads.height,
-        id: bobbleheads.id,
-        isFeatured: bobbleheads.isFeatured,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        purchaseLocation: bobbleheads.purchaseLocation,
-        purchasePrice: bobbleheads.purchasePrice,
-        series: bobbleheads.series,
-        status: bobbleheads.status,
-        subcollectionId: bobbleheads.subcollectionId,
-        subcollectionName: subCollections.name,
-        weight: bobbleheads.weight,
-      })
+      .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
@@ -369,7 +312,7 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(sortOrder);
   }
 
-  static async getDashboardData(
+  static async getDashboardDataAsync(
     userId: string,
     context: QueryContext,
   ): Promise<Array<CollectionWithRelations>> {
@@ -387,7 +330,7 @@ export class CollectionsQuery extends BaseQuery {
             subcollectionId: true,
             updatedAt: true,
           },
-          where: eq(bobbleheads.isDeleted, false),
+          where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
         },
         subCollections: {
           columns: {
@@ -405,7 +348,7 @@ export class CollectionsQuery extends BaseQuery {
                 isFeatured: true,
                 updatedAt: true,
               },
-              where: eq(bobbleheads.isDeleted, false),
+              where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
             },
           },
         },
@@ -413,8 +356,10 @@ export class CollectionsQuery extends BaseQuery {
     });
   }
 
-  static async updateAsync(data: UpdateCollection, userId: string, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db)
+  static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
       .update(collections)
       .set({ ...data, userId })
       .where(and(eq(collections.id, data.collectionId), eq(collections.userId, userId)))
@@ -444,5 +389,36 @@ export class CollectionsQuery extends BaseQuery {
       default:
         return desc(bobbleheads.createdAt);
     }
+  }
+
+  private static _selectBobbleheadBase() {
+    return {
+      acquisitionDate: bobbleheads.acquisitionDate,
+      acquisitionMethod: bobbleheads.acquisitionMethod,
+      category: bobbleheads.category,
+      characterName: bobbleheads.characterName,
+      condition: bobbleheads.currentCondition,
+      description: bobbleheads.description,
+      height: bobbleheads.height,
+      id: bobbleheads.id,
+      isFeatured: bobbleheads.isFeatured,
+      isPublic: bobbleheads.isPublic,
+      manufacturer: bobbleheads.manufacturer,
+      name: bobbleheads.name,
+      purchaseLocation: bobbleheads.purchaseLocation,
+      purchasePrice: bobbleheads.purchasePrice,
+      series: bobbleheads.series,
+      status: bobbleheads.status,
+      weight: bobbleheads.weight,
+    };
+  }
+
+  private static _selectBobbleheadWithPhoto() {
+    return {
+      ...this._selectBobbleheadBase(),
+      featurePhoto: bobbleheadPhotos.url,
+      subcollectionId: bobbleheads.subcollectionId,
+      subcollectionName: subCollections.name,
+    };
   }
 }

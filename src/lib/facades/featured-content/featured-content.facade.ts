@@ -38,7 +38,7 @@ export class FeaturedContentFacade {
       cacheStats.react.misses++;
 
       const context = createPublicQueryContext({ dbInstance });
-      const rawData = await FeaturedContentQuery.findActiveFeaturedContent(context);
+      const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
       return FeaturedContentTransformer.transformFeaturedContent(rawData);
     },
   );
@@ -65,7 +65,7 @@ export class FeaturedContentFacade {
   static getAllFeaturedContentForAdmin = unstable_cache(
     async (dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> => {
       const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.findAllFeaturedContentForAdmin(context);
+      return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
     },
     [CACHE_KEYS.ADMIN.FEATURED_CONTENT],
     {
@@ -102,7 +102,7 @@ export class FeaturedContentFacade {
   static getFeaturedContentById = cache(
     async (id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> => {
       const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.findById(id, context);
+      return FeaturedContentQuery.findByIdAsync(id, context);
     },
   );
 
@@ -138,7 +138,7 @@ export class FeaturedContentFacade {
   ): Promise<null | SelectFeaturedContent> {
     try {
       const context = createUserQueryContext(curatorId, { dbInstance });
-      return FeaturedContentQuery.create(data, curatorId, context);
+      return FeaturedContentQuery.createAsync(data, curatorId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { contentId: data.contentId, contentType: data.contentType },
@@ -157,7 +157,7 @@ export class FeaturedContentFacade {
   static async deleteAsync(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
     try {
       const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.delete(id, context);
+      return FeaturedContentQuery.deleteAsync(id, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id },
@@ -184,7 +184,7 @@ export class FeaturedContentFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<FeaturedContentRecord | null> {
     const context = createPublicQueryContext({ dbInstance });
-    return FeaturedContentQuery.findFeaturedContentByIdForAdmin(id, context);
+    return FeaturedContentQuery.findFeaturedContentByIdForAdminAsync(id, context);
   }
 
   /**
@@ -194,7 +194,7 @@ export class FeaturedContentFacade {
     const context = createPublicQueryContext({ dbInstance });
 
     try {
-      await FeaturedContentQuery.incrementViewCount(contentId, context);
+      await FeaturedContentQuery.incrementViewCountAsync(contentId, context);
       console.log(`View count incremented for content: ${contentId}`);
     } catch (error) {
       console.error(`Failed to increment view count for content ${contentId}:`, error);
@@ -222,7 +222,7 @@ export class FeaturedContentFacade {
   ): Promise<null | SelectFeaturedContent> {
     try {
       const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.toggleActive(id, isActive, context);
+      return FeaturedContentQuery.toggleActiveAsync(id, isActive, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id, isActive },
@@ -244,7 +244,7 @@ export class FeaturedContentFacade {
   ): Promise<null | SelectFeaturedContent> {
     try {
       const context = createPublicQueryContext({ dbInstance });
-      return FeaturedContentQuery.update(id, data, context);
+      return FeaturedContentQuery.updateAsync(id, data, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id },

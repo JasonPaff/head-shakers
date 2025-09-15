@@ -2,10 +2,9 @@ import { and, asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
-import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertSubCollection, SelectSubCollection } from '@/lib/validations/subcollections.validation';
 
-import { db } from '@/lib/db';
+import { DEFAULTS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, collections, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -17,8 +16,10 @@ export class SubcollectionsQuery extends BaseQuery {
   /**
    * create a new subcollection
    */
-  static async createAsync(data: InsertSubCollection, dbInstance: DatabaseExecutor = db) {
-    const result = await (dbInstance ?? db).insert(subCollections).values(data).returning();
+  static async createAsync(data: InsertSubCollection, context: QueryContext) {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance.insert(subCollections).values(data).returning();
     return result?.[0] || null;
   }
 
@@ -28,9 +29,9 @@ export class SubcollectionsQuery extends BaseQuery {
   static async deleteAsync(
     subcollectionId: string,
     userId: string,
-    dbInstance: DatabaseExecutor = db,
+    context: QueryContext,
   ): Promise<null | SelectSubCollection> {
-    const database = dbInstance ?? db;
+    const database = this.getDbInstance(context);
 
     // First verify the subcollection belongs to a collection owned by the user
     const subcollection = await database
@@ -61,7 +62,7 @@ export class SubcollectionsQuery extends BaseQuery {
   /**
    * get bobbleheads in a subcollection with photo data for public display
    */
-  static async getSubcollectionBobbleheadsWithPhotos(
+  static async getSubcollectionBobbleheadsWithPhotosAsync(
     subcollectionId: string,
     context: QueryContext,
     options?: { searchTerm?: string; sortBy?: string },
@@ -79,26 +80,7 @@ export class SubcollectionsQuery extends BaseQuery {
     const sortOrder = this._getSortOrder(options?.sortBy);
 
     return dbInstance
-      .select({
-        acquisitionDate: bobbleheads.acquisitionDate,
-        acquisitionMethod: bobbleheads.acquisitionMethod,
-        category: bobbleheads.category,
-        characterName: bobbleheads.characterName,
-        condition: bobbleheads.currentCondition,
-        description: bobbleheads.description,
-        featurePhoto: bobbleheadPhotos.url,
-        height: bobbleheads.height,
-        id: bobbleheads.id,
-        isFeatured: bobbleheads.isFeatured,
-        isPublic: bobbleheads.isPublic,
-        manufacturer: bobbleheads.manufacturer,
-        name: bobbleheads.name,
-        purchaseLocation: bobbleheads.purchaseLocation,
-        purchasePrice: bobbleheads.purchasePrice,
-        series: bobbleheads.series,
-        status: bobbleheads.status,
-        weight: bobbleheads.weight,
-      })
+      .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
       .leftJoin(
         bobbleheadPhotos,
@@ -117,7 +99,7 @@ export class SubcollectionsQuery extends BaseQuery {
   /**
    * get a specific subcollection for public view with collection context
    */
-  static async getSubCollectionForPublicView(
+  static async getSubCollectionForPublicViewAsync(
     collectionId: string,
     subcollectionId: string,
     context: QueryContext,
@@ -161,9 +143,9 @@ export class SubcollectionsQuery extends BaseQuery {
       with: {
         bobbleheads: {
           where: and(
-            eq(bobbleheads.isDeleted, false),
+            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
             this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, undefined, context) ||
-              eq(bobbleheads.isPublic, true),
+              eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
           ),
         },
       },
@@ -195,7 +177,7 @@ export class SubcollectionsQuery extends BaseQuery {
   /**
    * Get subcollections for a collection
    */
-  static async getSubCollectionsByCollection(
+  static async getSubCollectionsByCollectionAsync(
     collectionId: string,
     context: QueryContext,
   ): Promise<Array<{ id: string; name: string }>> {
@@ -223,7 +205,7 @@ export class SubcollectionsQuery extends BaseQuery {
   /**
    * get subcollections for a collection with detailed data for public display
    */
-  static async getSubCollectionsForPublicView(
+  static async getSubCollectionsForPublicViewAsync(
     collectionId: string,
     context: QueryContext,
   ): Promise<null | {
@@ -264,9 +246,9 @@ export class SubcollectionsQuery extends BaseQuery {
       with: {
         bobbleheads: {
           where: and(
-            eq(bobbleheads.isDeleted, false),
+            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
             this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, undefined, context) ||
-              eq(bobbleheads.isPublic, true),
+              eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
           ),
         },
       },
@@ -291,9 +273,9 @@ export class SubcollectionsQuery extends BaseQuery {
     subcollectionId: string,
     data: Partial<InsertSubCollection>,
     userId: string,
-    dbInstance: DatabaseExecutor = db,
+    context: QueryContext,
   ): Promise<null | SelectSubCollection> {
-    const database = dbInstance ?? db;
+    const database = this.getDbInstance(context);
 
     // First verify the subcollection belongs to a collection owned by the user
     const subcollection = await database
@@ -343,5 +325,28 @@ export class SubcollectionsQuery extends BaseQuery {
       default:
         return desc(bobbleheads.createdAt);
     }
+  }
+
+  private static _selectBobbleheadWithPhoto() {
+    return {
+      acquisitionDate: bobbleheads.acquisitionDate,
+      acquisitionMethod: bobbleheads.acquisitionMethod,
+      category: bobbleheads.category,
+      characterName: bobbleheads.characterName,
+      condition: bobbleheads.currentCondition,
+      description: bobbleheads.description,
+      featurePhoto: bobbleheadPhotos.url,
+      height: bobbleheads.height,
+      id: bobbleheads.id,
+      isFeatured: bobbleheads.isFeatured,
+      isPublic: bobbleheads.isPublic,
+      manufacturer: bobbleheads.manufacturer,
+      name: bobbleheads.name,
+      purchaseLocation: bobbleheads.purchaseLocation,
+      purchasePrice: bobbleheads.purchasePrice,
+      series: bobbleheads.series,
+      status: bobbleheads.status,
+      weight: bobbleheads.weight,
+    };
   }
 }

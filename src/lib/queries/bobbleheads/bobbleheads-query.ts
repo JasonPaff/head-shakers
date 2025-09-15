@@ -42,7 +42,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * add a photo to a bobblehead
    */
-  static async addPhoto(data: InsertBobbleheadPhoto, context: QueryContext) {
+  static async addPhotoAsync(data: InsertBobbleheadPhoto, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.insert(bobbleheadPhotos).values(data).returning();
@@ -53,7 +53,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * create a new bobblehead
    */
-  static async create(
+  static async createAsync(
     data: InsertBobblehead,
     userId: string,
     context: QueryContext,
@@ -71,7 +71,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * delete a bobblehead with photos
    */
-  static async delete(
+  static async deleteAsync(
     data: DeleteBobblehead,
     userId: string,
     context: QueryContext,
@@ -79,7 +79,7 @@ export class BobbleheadsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     // get the photos associated with this bobblehead before deletion
-    const photos = await this.getPhotos(data.bobbleheadId, context);
+    const photos = await this.getPhotosAsync(data.bobbleheadId, context);
 
     // delete the bobblehead (cascade will handle photo records)
     const result = await dbInstance
@@ -98,7 +98,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * find bobbleheads by collection with options
    */
-  static async findByCollection(
+  static async findByCollectionAsync(
     collectionId: string,
     options: FindOptions = {},
     context: QueryContext,
@@ -131,7 +131,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * find bobblehead by ID with standard permission filtering
    */
-  static async findById(id: string, context: QueryContext): Promise<BobbleheadRecord | null> {
+  static async findByIdAsync(id: string, context: QueryContext): Promise<BobbleheadRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -151,7 +151,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * find bobblehead by ID with all related data (photos, tags, collections)
    */
-  static async findByIdWithRelations(
+  static async findByIdWithRelationsAsync(
     id: string,
     context: QueryContext,
   ): Promise<BobbleheadWithRelations | null> {
@@ -211,7 +211,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * find bobbleheads by user with options
    */
-  static async findByUser(
+  static async findByUserAsync(
     userId: string,
     options: FindOptions = {},
     context: QueryContext,
@@ -253,7 +253,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * get photos for a bobblehead
    */
-  static async getPhotos(
+  static async getPhotosAsync(
     bobbleheadId: string,
     context: QueryContext,
   ): Promise<Array<typeof bobbleheadPhotos.$inferSelect>> {
@@ -269,7 +269,7 @@ export class BobbleheadsQuery extends BaseQuery {
   /**
    * search bobbleheads with advanced filtering
    */
-  static async search(
+  static async searchAsync(
     searchTerm: string,
     filters: {
       category?: string;
