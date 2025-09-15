@@ -10,20 +10,6 @@ export const CONFIG = {
     RETENTION_DAYS: 90,
     SAMPLE_RATE: 1.0, // 100% sampling
   },
-  CACHE: {
-    KEYS: {
-      MAX_LENGTH: 250,
-      SEPARATOR: ':',
-    },
-    TTL: {
-      ANALYTICS: 86400, // 24 hours
-      COLLECTION_DATA: 900, // 15 minutes
-      FEATURED_CONTENT: 3600, // 1 hour
-      POPULAR_CONTENT: 300, // 5 minutes
-      SEARCH_RESULTS: 1800, // 30 minutes
-      USER_PROFILE: 600, // 10 minutes
-    },
-  },
   CONTENT: {
     MAX_BOBBLEHEADS_PER_COLLECTION: 1000,
     MAX_COLLECTIONS_PER_USER: 100,
@@ -163,13 +149,6 @@ export function getEnvironmentConfig() {
   if (env === 'development') {
     return {
       ...CONFIG,
-      CACHE: {
-        ...CONFIG.CACHE,
-        TTL: {
-          ...CONFIG.CACHE.TTL,
-          POPULAR_CONTENT: 60,
-        },
-      },
       RATE_LIMITING: {
         ...CONFIG.RATE_LIMITING,
         REQUESTS_PER_MINUTE: 100,

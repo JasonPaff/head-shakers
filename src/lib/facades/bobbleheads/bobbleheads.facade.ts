@@ -19,6 +19,8 @@ import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
+const facadeName = 'BobbleheadsFacade';
+
 export class BobbleheadsFacade {
   static async addPhotoAsync(data: InsertBobbleheadPhoto, dbInstance?: DatabaseExecutor) {
     try {
@@ -27,7 +29,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId, url: data.url },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'addPhotoAsync',
         operation: 'addPhoto',
       };
@@ -46,7 +48,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { manufacturer: data.manufacturer, name: data.name },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'createAsync',
         operation: OPERATIONS.BOBBLEHEADS.CREATE,
         userId,
@@ -110,7 +112,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'deleteAsync',
         operation: OPERATIONS.BOBBLEHEADS.DELETE,
         userId,
@@ -147,7 +149,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'getBobbleheadPhotos',
         operation: OPERATIONS.BOBBLEHEADS.GET_PHOTOS,
         userId: viewerUserId,
@@ -172,7 +174,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId, options },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'getBobbleheadsByCollection',
         operation: OPERATIONS.BOBBLEHEADS.FIND_BY_COLLECTION,
         userId: viewerUserId,
@@ -197,7 +199,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, userId },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'getBobbleheadsByUser',
         operation: OPERATIONS.BOBBLEHEADS.GET_BY_USER,
         userId: viewerUserId || userId,
@@ -217,30 +219,6 @@ export class BobbleheadsFacade {
       : createPublicQueryContext({ dbInstance });
 
     return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
-  }
-
-  static async getUserDashboardStats(
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<{
-    collectionValue: number;
-    profileViews: number;
-    totalItems: number;
-  }> {
-    const context = createUserQueryContext(userId, { dbInstance });
-
-    const userBobbleheads = await BobbleheadsQuery.findByUserAsync(userId, {}, context);
-
-    // calculate total value from purchase prices
-    const totalValue = userBobbleheads.reduce((sum, bobblehead) => {
-      return sum + (bobblehead.purchasePrice || 0);
-    }, 0);
-
-    return {
-      collectionValue: Math.round(totalValue),
-      profileViews: userBobbleheads.length * 5 + 100, // TODO: implement real view tracking
-      totalItems: userBobbleheads.length,
-    };
   }
 
   static async searchBobbleheads(
@@ -268,7 +246,7 @@ export class BobbleheadsFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { filters, options, searchTerm },
-        facade: 'BobbleheadsFacade',
+        facade: facadeName,
         method: 'searchBobbleheads',
         operation: OPERATIONS.BOBBLEHEADS.SEARCH,
         userId: viewerUserId,

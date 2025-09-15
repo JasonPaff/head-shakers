@@ -232,21 +232,4 @@ export class CacheRevalidationService {
       console.error('Cache revalidation failed:', error);
     }
   }
-
-  /**
-   * comprehensive cache warming strategy for featured content
-   * this can be called after bulk operations or during off-peak hours
-   */
-  static warmFeaturedContentCache(): void {
-    try {
-      // revalidate all featured content to ensure fresh cache
-      this.revalidateFeaturedContent('update', {
-        affectsHomepage: true,
-      });
-
-      console.log('Featured content cache warming completed');
-    } catch (error) {
-      console.error('Featured content cache warming failed:', error);
-    }
-  }
 }
