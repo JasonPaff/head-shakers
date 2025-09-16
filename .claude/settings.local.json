@@ -22,7 +22,9 @@
       "mcp__playwright__browser_press_key",
       "mcp__playwright__browser_evaluate",
       "mcp__playwright__browser_close",
-      "mcp__playwright__browser_navigate_back"
+      "mcp__playwright__browser_navigate_back",
+      "Bash(ls:*)",
+      "mcp__Ref__ref_search_documentation"
     ],
     "deny": [],
     "ask": []
