@@ -19,8 +19,6 @@ export const CollectionSidebarSubcollectionsAsync = async ({
     currentUserId || undefined,
   );
 
-  await new Promise((resolve) => setTimeout(resolve, 7000));
-
   if (!collection) {
     notFound();
   }

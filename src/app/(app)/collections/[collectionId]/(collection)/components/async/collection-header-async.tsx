@@ -17,8 +17,6 @@ export const CollectionHeaderAsync = async ({ collectionId, currentUserId }: Col
     SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId || undefined),
   ]);
 
-  await new Promise((resolve) => setTimeout(resolve, 5000));
-
   if (!collection) {
     notFound();
   }

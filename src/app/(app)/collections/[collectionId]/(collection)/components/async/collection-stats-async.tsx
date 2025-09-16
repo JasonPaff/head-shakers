@@ -16,8 +16,6 @@ export const CollectionStatsAsync = async ({ collectionId, currentUserId }: Coll
     currentUserId || undefined,
   );
 
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-
   if (!collection) {
     notFound();
   }
