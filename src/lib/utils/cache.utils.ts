@@ -35,7 +35,7 @@ export function createFacadeCacheKey(
   entityType: string,
   operation: string,
   identifier: string,
-  options?: Record<string, unknown>
+  options?: Record<string, unknown>,
 ): string {
   const baseKey = `${entityType}:${operation}:${identifier}`;
 
@@ -49,7 +49,6 @@ export function createFacadeCacheKey(
 
 /**
  * create a hash from an object for consistent cache keys
- * uses crypto.createHash for security and collision resistance
  */
 export function createHashFromObject(obj: unknown): string {
   try {
@@ -80,7 +79,7 @@ export function createSearchCacheKey(
     limit?: number;
     offset?: number;
     userId?: string;
-  }
+  },
 ): string {
   const baseKey = `search:${searchType}:${sanitizeCacheKey(query)}`;
 
@@ -100,7 +99,7 @@ export function createUserContextCacheKey(
   entityType: string,
   entityId: string,
   viewerUserId?: string,
-  options?: Record<string, unknown>
+  options?: Record<string, unknown>,
 ): string {
   const baseKey = `${entityType}:${entityId}`;
   const viewerPart = viewerUserId ? `:viewer:${viewerUserId}` : ':public';

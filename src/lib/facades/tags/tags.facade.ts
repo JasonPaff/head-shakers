@@ -283,6 +283,7 @@ export class TagsFacade {
           try {
             const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
             const tags = await TagsQuery.searchAsync(query, userId, 10, context);
+
             return tags.map((tag) => ({
               color: tag.color,
               id: tag.id,
