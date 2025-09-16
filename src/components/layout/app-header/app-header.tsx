@@ -8,6 +8,7 @@ import { AppHeaderSearch } from '@/components/layout/app-header/components/app-h
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
 import { AuthContent } from '@/components/ui/auth';
 import { SidebarTrigger } from '@/components/ui/sidebar/sidebar-trigger';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/utils/tailwind-utils';
 
 export const AppHeader = () => {
@@ -15,7 +16,7 @@ export const AppHeader = () => {
     <header className={'sticky top-0 z-50 flex w-full items-center border-b bg-background'}>
       <AppHeaderContainer>
         {/* User Sidebar Trigger */}
-        <AuthContent>
+        <AuthContent loadingSkeleton={<Skeleton className={"h-9 w-9"} />}>
           <SidebarTrigger />
         </AuthContent>
 

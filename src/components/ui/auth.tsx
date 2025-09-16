@@ -7,15 +7,19 @@ import { Fragment } from 'react';
 
 import { Conditional } from '@/components/ui/conditional';
 
-type AuthContentProps = RequiredChildren<{ fallback?: ReactNode }>;
+type AuthContentProps = RequiredChildren<{
+  fallback?: ReactNode;
+  loadingSkeleton?: ReactNode;
+}>;
 
-export const AuthContent = ({ children, fallback }: AuthContentProps) => {
-  const { isSignedIn } = useAuth();
+export const AuthContent = ({ children, fallback, loadingSkeleton }: AuthContentProps) => {
+  const { isLoaded, isSignedIn } = useAuth();
 
   return (
     <Fragment>
-      <Conditional isCondition={isSignedIn}>{children}</Conditional>
-      <Conditional isCondition={!isSignedIn}>{fallback}</Conditional>
+      <Conditional isCondition={!isLoaded}>{loadingSkeleton}</Conditional>
+      <Conditional isCondition={isLoaded && isSignedIn}>{children}</Conditional>
+      <Conditional isCondition={isLoaded && !isSignedIn}>{fallback}</Conditional>
     </Fragment>
   );
 };
