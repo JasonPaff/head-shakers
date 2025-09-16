@@ -278,119 +278,56 @@ export class TagsFacade {
 
   static async getSuggestionsForUser(query: string, userId: null | string): Promise<Array<TagSuggestion>> {
     try {
-      return CacheService.cached(
-        () => {
-          const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
-          return TagsQuery.searchAsync(query, userId, 10, context).then(tags =>
-            tags.map((tag) => ({
+      return await CacheService.cached(
+        async () => {
+          try {
+            const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
+            const tags = await TagsQuery.searchAsync(query, userId, 10, context);
+            return tags.map((tag) => ({
               color: tag.color,
               id: tag.id,
               isSystem: tag.userId === null,
               name: tag.name,
               usageCount: tag.usageCount,
-            }))
-          );
+            }));
+          } catch (queryError) {
+            console.error('Query error in getSuggestionsForUser:', queryError);
+            return [];
+          }
         },
         CACHE_KEYS.SEARCH.SUGGESTIONS(query, 'tags'),
         {
-          context: { entityType: 'search', facade: 'TagsFacade', operation: 'getSuggestionsForUser', userId: userId || undefined },
-          tags: CacheTagGenerators.search.results(query, 'tags')
-        }
-      );
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { query, userId },
-        facade: 'TagsFacade',
-        method: 'getSuggestionsForUser',
-        operation: OPERATIONS.TAGS.SEARCH,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  static async getUserTagStats(userId: string, dbInstance?: DatabaseExecutor): Promise<UserTagStats> {
-    try {
-      return CacheService.users.stats(
-        () => {
-          const context = createProtectedQueryContext(userId, { dbInstance });
-          return TagsQuery.findAllAsync(userId, context).then(userTags => {
-            const customTags = userTags.filter((tag) => tag.userId === userId);
-
-            // calculate statistics
-            const totalUsage = customTags.reduce((sum, tag) => sum + tag.usageCount, 0);
-            const averageUsagePerTag = customTags.length > 0 ? totalUsage / customTags.length : 0;
-
-            // sort by usage for most/least used
-            const sortedByUsage = [...customTags].sort((a, b) => b.usageCount - a.usageCount);
-            const mostUsedTags = sortedByUsage.slice(0, 5);
-            const leastUsedTags = sortedByUsage.slice(-5).reverse();
-
-            // get recent activity (placeholder - would need junction table data)
-            const recentActivity = customTags.slice(0, 10).map((tag) => ({
-              lastUsed: null as Date | null, // TODO: implement with real last used data
-              tagId: tag.id,
-              tagName: tag.name,
-            }));
-
-            return {
-              averageUsagePerTag: Math.round(averageUsagePerTag * 100) / 100,
-              leastUsedTags,
-              mostUsedTags,
-              recentActivity,
-              totalCustomTags: customTags.length,
-            };
-          });
+          context: {
+            entityType: 'search',
+            facade: 'TagsFacade',
+            operation: 'getSuggestionsForUser',
+            userId: userId || undefined,
+          },
+          tags: CacheTagGenerators.search.results(query, 'tags'),
         },
-        userId,
-        { context: { entityType: 'user', facade: 'TagsFacade', operation: 'getUserTagStats', userId } }
       );
     } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { userId },
-        facade: 'TagsFacade',
-        method: 'getUserTagStats',
-        operation: OPERATIONS.TAGS.GET_STATS,
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
+      console.error('Cache error in getSuggestionsForUser, falling back to direct query:', error);
 
-  static async mergeTags(
-    sourceTagId: string,
-    targetTagId: string,
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<boolean> {
-    try {
-      const context = createProtectedQueryContext(userId, { dbInstance });
-
-      // verify ownership of both tags
-      const sourceTag = await TagsQuery.findByIdAsync(sourceTagId, userId, context);
-      const targetTag = await TagsQuery.findByIdAsync(targetTagId, userId, context);
-
-      if (!sourceTag || !targetTag) {
-        return false;
+      try {
+        const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
+        const tags = await TagsQuery.searchAsync(query, userId, 10, context);
+        return tags.map((tag) => ({
+          color: tag.color,
+          id: tag.id,
+          isSystem: tag.userId === null,
+          name: tag.name,
+          usageCount: tag.usageCount,
+        }));
+      } catch (fallbackError) {
+        const context: FacadeErrorContext = {
+          data: { query, userId },
+          facade: 'TagsFacade',
+          method: 'getSuggestionsForUser',
+          operation: OPERATIONS.TAGS.SEARCH,
+        };
+        throw createFacadeError(context, fallbackError);
       }
-
-      if (sourceTag.userId !== userId || targetTag.userId !== userId) {
-        return false; // cannot merge system tags
-      }
-
-      // TODO: Implement merge logic in a transaction
-      // This would require updating all bobbleheadTags references
-      // and combining usage counts, then deleting source tag
-
-      return false; // not implemented yet
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { sourceTagId, targetTagId, userId },
-        facade: 'TagsFacade',
-        method: 'mergeTags',
-        operation: OPERATIONS.TAGS.MERGE,
-        userId,
-      };
-      throw createFacadeError(context, error);
     }
   }
 

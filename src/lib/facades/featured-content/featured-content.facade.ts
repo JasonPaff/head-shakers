@@ -67,21 +67,22 @@ export class FeaturedContentFacade {
    */
   static async getActiveFeaturedContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
     return CacheService.featured.content(
-      () => {
+      async () => {
         const context = createPublicQueryContext({ dbInstance });
-        return FeaturedContentQuery.findActiveFeaturedContentAsync(context).then(rawData =>
-          FeaturedContentTransformer.transformFeaturedContent(rawData)
-        );
+        const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
+        return FeaturedContentTransformer.transformFeaturedContent(rawData);
       },
       'active',
-      { context: { entityType: 'featured', facade: 'FeaturedContentFacade', operation: 'getActive' } }
+      { context: { entityType: 'featured', facade: 'FeaturedContentFacade', operation: 'getActive' } },
     );
   }
 
   /**
    * get all featured content for admin management
    */
-  static async getAllFeaturedContentForAdmin(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentRecord>> {
+  static async getAllFeaturedContentForAdmin(
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<FeaturedContentRecord>> {
     const context = createPublicQueryContext({ dbInstance });
     return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
   }
@@ -105,7 +106,10 @@ export class FeaturedContentFacade {
   /**
    * get featured content by ID
    */
-  static async getFeaturedContentById(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
+  static async getFeaturedContentById(
+    id: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | SelectFeaturedContent> {
     const context = createPublicQueryContext({ dbInstance });
     return FeaturedContentQuery.findByIdAsync(id, context);
   }

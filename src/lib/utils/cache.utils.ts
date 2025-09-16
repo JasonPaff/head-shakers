@@ -28,6 +28,26 @@ export function createCacheKey(...parts: Array<number | string | undefined>): st
 }
 
 /**
+ * standardized cache key generation for facade operations
+ * ensures consistency across all facade implementations
+ */
+export function createFacadeCacheKey(
+  entityType: string,
+  operation: string,
+  identifier: string,
+  options?: Record<string, unknown>
+): string {
+  const baseKey = `${entityType}:${operation}:${identifier}`;
+
+  if (!options || Object.keys(options).length === 0) {
+    return baseKey;
+  }
+
+  const optionsHash = createHashFromObject(options);
+  return `${baseKey}:${optionsHash}`;
+}
+
+/**
  * create a hash from an object for consistent cache keys
  * uses crypto.createHash for security and collision resistance
  */
@@ -44,6 +64,53 @@ export function createHashFromObject(obj: unknown): string {
     const fallbackData = `error-${Date.now()}-${Math.random()}`;
     return simpleSafeHash(fallbackData);
   }
+}
+
+/**
+ * standardized cache key generation for search operations
+ * handles complex filtering and pagination parameters
+ */
+export function createSearchCacheKey(
+  searchType: string,
+  query: string,
+  filters?: {
+    [key: string]: unknown;
+    excludeTags?: Array<string>;
+    includeTags?: Array<string>;
+    limit?: number;
+    offset?: number;
+    userId?: string;
+  }
+): string {
+  const baseKey = `search:${searchType}:${sanitizeCacheKey(query)}`;
+
+  if (!filters || Object.keys(filters).length === 0) {
+    return baseKey;
+  }
+
+  const filtersHash = createHashFromObject(filters);
+  return `${baseKey}:${filtersHash}`;
+}
+
+/**
+ * standardized cache key generation for user-specific operations
+ * handles viewer context and privacy concerns
+ */
+export function createUserContextCacheKey(
+  entityType: string,
+  entityId: string,
+  viewerUserId?: string,
+  options?: Record<string, unknown>
+): string {
+  const baseKey = `${entityType}:${entityId}`;
+  const viewerPart = viewerUserId ? `:viewer:${viewerUserId}` : ':public';
+
+  if (!options || Object.keys(options).length === 0) {
+    return `${baseKey}${viewerPart}`;
+  }
+
+  const optionsHash = createHashFromObject(options);
+  return `${baseKey}${viewerPart}:${optionsHash}`;
 }
 
 /**

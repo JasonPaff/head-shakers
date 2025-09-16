@@ -56,31 +56,38 @@ export class ContentSearchFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<{ bobblehead: BobbleheadSearchResultWithPhotos }> {
     return CacheService.bobbleheads.byId(
-      () => {
+      async () => {
         const context = createAdminQueryContext(adminUserId, { dbInstance });
-        return ContentSearchQuery.findBobbleheadByIdAsync(id, context).then(async (bobblehead) => {
-          if (!bobblehead) {
-            throw new Error(ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND_OR_NOT_PUBLIC);
-          }
+        const bobblehead = await ContentSearchQuery.findBobbleheadByIdAsync(id, context);
 
-          // get all photos for this bobblehead
-          const photos = await ContentSearchQuery.getBobbleheadPhotosByIdAsync(id, context);
+        if (!bobblehead) {
+          throw new Error(ERROR_MESSAGES.BOBBLEHEAD.NOT_FOUND_OR_NOT_PUBLIC);
+        }
 
-          // get all tags for this bobblehead
-          const tagsMap = await ContentSearchQuery.getBobbleheadTagsAsync([id], context);
-          const tags = tagsMap.get(id) || [];
+        // get all photos for this bobblehead
+        const photos = await ContentSearchQuery.getBobbleheadPhotosByIdAsync(id, context);
 
-          return {
-            bobblehead: {
-              ...bobblehead,
-              photos,
-              tags,
-            },
-          };
-        });
+        // get all tags for this bobblehead
+        const tagsMap = await ContentSearchQuery.getBobbleheadTagsAsync([id], context);
+        const tags = tagsMap.get(id) || [];
+
+        return {
+          bobblehead: {
+            ...bobblehead,
+            photos,
+            tags,
+          },
+        };
       },
       id,
-      { context: { entityId: id, entityType: 'bobblehead', facade: 'ContentSearchFacade', operation: 'getBobbleheadForFeaturing' } }
+      {
+        context: {
+          entityId: id,
+          entityType: 'bobblehead',
+          facade: 'ContentSearchFacade',
+          operation: 'getBobbleheadForFeaturing',
+        },
+      },
     );
   }
 
@@ -93,27 +100,34 @@ export class ContentSearchFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<{ collection: CollectionSearchResult }> {
     return CacheService.collections.byId(
-      () => {
+      async () => {
         const context = createAdminQueryContext(adminUserId, { dbInstance });
-        return ContentSearchQuery.findCollectionByIdAsync(id, context).then(async (collection) => {
-          if (!collection) {
-            throw new Error(ERROR_MESSAGES.COLLECTION.NOT_FOUND_OR_NOT_PUBLIC);
-          }
+        const collection = await ContentSearchQuery.findCollectionByIdAsync(id, context);
 
-          // get all tags for this collection
-          const tagsMap = await ContentSearchQuery.getCollectionTagsAsync([id], context);
-          const tags = tagsMap.get(id) || [];
+        if (!collection) {
+          throw new Error(ERROR_MESSAGES.COLLECTION.NOT_FOUND_OR_NOT_PUBLIC);
+        }
 
-          return {
-            collection: {
-              ...collection,
-              tags,
-            },
-          };
-        });
+        // get all tags for this collection
+        const tagsMap = await ContentSearchQuery.getCollectionTagsAsync([id], context);
+        const tags = tagsMap.get(id) || [];
+
+        return {
+          collection: {
+            ...collection,
+            tags,
+          },
+        };
       },
       id,
-      { context: { entityId: id, entityType: 'collection', facade: 'ContentSearchFacade', operation: 'getCollectionForFeaturing' } }
+      {
+        context: {
+          entityId: id,
+          entityType: 'collection',
+          facade: 'ContentSearchFacade',
+          operation: 'getCollectionForFeaturing',
+        },
+      },
     );
   }
 
@@ -126,18 +140,23 @@ export class ContentSearchFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<{ user: UserSearchResult }> {
     return CacheService.users.profile(
-      () => {
+      async () => {
         const context = createAdminQueryContext(adminUserId, { dbInstance });
-        return ContentSearchQuery.findUserByIdAsync(id, context).then(user => {
-          if (!user) {
-            throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
-          }
-
-          return { user };
-        });
+        const user = await ContentSearchQuery.findUserByIdAsync(id, context);
+        if (!user) {
+          throw new Error(ERROR_MESSAGES.USER.NOT_FOUND);
+        }
+        return { user };
       },
       id,
-      { context: { entityType: 'user', facade: 'ContentSearchFacade', operation: 'getUserForFeaturing', userId: id } }
+      {
+        context: {
+          entityType: 'user',
+          facade: 'ContentSearchFacade',
+          operation: 'getUserForFeaturing',
+          userId: id,
+        },
+      },
     );
   }
 
@@ -154,48 +173,55 @@ export class ContentSearchFacade {
   ): Promise<BobbleheadSearchResponse> {
     const filtersHash = createHashFromObject({ excludeTags, includeTags, limit, query });
     return CacheService.search.results(
-      () => {
+      async () => {
         const context = createAdminQueryContext(adminUserId, { dbInstance });
-        return ContentSearchQuery.searchBobbleheadsAsync(
+
+        const results = await ContentSearchQuery.searchBobbleheadsAsync(
           query,
           limit,
           context,
           includeTags,
           excludeTags,
-        ).then(async (results) => {
-          // get all photos for each bobblehead in a single query
-          const bobbleheadIds = results.map((result) => result.id);
-          const allPhotos = await ContentSearchQuery.getBobbleheadPhotosAsync(bobbleheadIds, context);
+        );
 
-          // get all tags for each bobblehead in a single query
-          const allTags = await ContentSearchQuery.getBobbleheadTagsAsync(bobbleheadIds, context);
+        // get all photos for each bobblehead in a single query
+        const bobbleheadIds = results.map((result) => result.id);
+        const allPhotos = await ContentSearchQuery.getBobbleheadPhotosAsync(bobbleheadIds, context);
 
-          // group photos by bobblehead ID for efficient lookup
-          const photosByBobblehead = this.groupPhotosByBobblehead(allPhotos);
+        // get all tags for each bobblehead in a single query
+        const allTags = await ContentSearchQuery.getBobbleheadTagsAsync(bobbleheadIds, context);
 
-          // enrich results with photos and tags
-          const enrichedResults = results.map((result) => ({
-            ...result,
-            photos: photosByBobblehead.get(result.id) || [],
-            tags: allTags.get(result.id) || [],
-          }));
+        // group photos by bobblehead ID for efficient lookup
+        const photosByBobblehead = this.groupPhotosByBobblehead(allPhotos);
 
-          const searchTerms = [
-            query,
-            ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
-            ...(excludeTags ? [`excluding tags: ${excludeTags.join(', ')}`] : []),
-          ].filter(Boolean);
+        // enrich results with photos and tags
+        const enrichedResults = results.map((result_1) => ({
+          ...result_1,
+          photos: photosByBobblehead.get(result_1.id) || [],
+          tags: allTags.get(result_1.id) || [],
+        }));
 
-          return {
-            bobbleheads: enrichedResults,
-            message: `Found ${enrichedResults.length} bobbleheads matching ${searchTerms.join(' ')}`,
-          };
-        });
+        const searchTerms = [
+          query,
+          ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
+          ...(excludeTags ? [`excluding tags: ${excludeTags.join(', ')}`] : []),
+        ].filter(Boolean);
+
+        return {
+          bobbleheads: enrichedResults,
+          message: `Found ${enrichedResults.length} bobbleheads matching ${searchTerms.join(' ')}`,
+        };
       },
       query || '',
       'bobbleheads',
       filtersHash,
-      { context: { entityType: 'search', facade: 'ContentSearchFacade', operation: 'searchBobbleheadsForFeaturing' } }
+      {
+        context: {
+          entityType: 'search',
+          facade: 'ContentSearchFacade',
+          operation: 'searchBobbleheadsForFeaturing',
+        },
+      },
     );
   }
 
@@ -212,41 +238,46 @@ export class ContentSearchFacade {
   ): Promise<CollectionSearchResponse> {
     const filtersHash = createHashFromObject({ excludeTags, includeTags, limit, query });
     return CacheService.search.results(
-      () => {
+      async () => {
         const context = createAdminQueryContext(adminUserId, { dbInstance });
-        return ContentSearchQuery.searchCollectionsAsync(
+        const results = await ContentSearchQuery.searchCollectionsAsync(
           query,
           limit,
           context,
           includeTags,
           excludeTags,
-        ).then(async (results) => {
-          // get all tags for each collection in a single query
-          const collectionIds = results.map((result) => result.id);
-          const allTags = await ContentSearchQuery.getCollectionTagsAsync(collectionIds, context);
+        );
+        // get all tags for each collection in a single query
+        const collectionIds = results.map((result) => result.id);
+        const allTags = await ContentSearchQuery.getCollectionTagsAsync(collectionIds, context);
 
-          // enrich results with tags
-          const enrichedResults = results.map((result) => ({
-            ...result,
-            tags: allTags.get(result.id) || [],
-          }));
+        // enrich results with tags
+        const enrichedResults = results.map((result_1) => ({
+          ...result_1,
+          tags: allTags.get(result_1.id) || [],
+        }));
 
-          const searchTerms = [
-            query,
-            ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
-            ...(excludeTags ? [`excluding tags: ${excludeTags.join(', ')}`] : []),
-          ].filter(Boolean);
+        const searchTerms = [
+          query,
+          ...(includeTags ? [`with tags: ${includeTags.join(', ')}`] : []),
+          ...(excludeTags ? [`excluding tags: ${excludeTags.join(', ')}`] : []),
+        ].filter(Boolean);
 
-          return {
-            collections: enrichedResults,
-            message: `Found ${enrichedResults.length} collections matching ${searchTerms.join(' ')}`,
-          };
-        });
+        return {
+          collections: enrichedResults,
+          message: `Found ${enrichedResults.length} collections matching ${searchTerms.join(' ')}`,
+        };
       },
       query || '',
       'collections',
       filtersHash,
-      { context: { entityType: 'search', facade: 'ContentSearchFacade', operation: 'searchCollectionsForFeaturing' } }
+      {
+        context: {
+          entityType: 'search',
+          facade: 'ContentSearchFacade',
+          operation: 'searchCollectionsForFeaturing',
+        },
+      },
     );
   }
 
@@ -261,17 +292,25 @@ export class ContentSearchFacade {
   ): Promise<UserSearchResponse> {
     const filtersHash = createHashFromObject({ limit, query });
     return CacheService.search.results(
-      () => {
+      async () => {
         const context = createAdminQueryContext(adminUserId, { dbInstance });
-        return ContentSearchQuery.searchUsersAsync(query, limit, context).then(results => ({
+        const results = await ContentSearchQuery.searchUsersAsync(query, limit, context);
+
+        return {
           message: `Found ${results.length} users matching "${query}"`,
           users: results,
-        }));
+        };
       },
       query || '',
       'users',
       filtersHash,
-      { context: { entityType: 'search', facade: 'ContentSearchFacade', operation: 'searchUsersForFeaturing' } }
+      {
+        context: {
+          entityType: 'search',
+          facade: 'ContentSearchFacade',
+          operation: 'searchUsersForFeaturing',
+        },
+      },
     );
   }
 

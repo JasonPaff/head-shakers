@@ -71,6 +71,8 @@ export const createTagAction = authActionClient
         message: `Created tag: ${newTag.name}`,
       });
 
+      CacheRevalidationService.admin.onSystemChange('Tag created - invalidating search and user tag caches');
+
       return {
         data: newTag,
         success: true,
@@ -123,6 +125,8 @@ export const updateTagAction = authActionClient
         message: `Updated tag: ${updatedTag.name}`,
       });
 
+      CacheRevalidationService.admin.onSystemChange('Tag updated - invalidating search and user tag caches');
+
       return {
         data: updatedTag,
         success: true,
@@ -174,6 +178,8 @@ export const deleteTagAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted tag: ${tagId}`,
       });
+
+      CacheRevalidationService.admin.onSystemChange('Tag deleted - invalidating search and user tag caches');
 
       return {
         data: { deleted: true },
@@ -407,6 +413,8 @@ export const bulkDeleteTagsAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Bulk deleted ${result.deletedCount} tags`,
       });
+
+      CacheRevalidationService.admin.onSystemChange('Tags bulk deleted - invalidating search and user tag caches');
 
       return {
         data: result,
