@@ -1,5 +1,5 @@
-import { Loading } from '@/components/ui/loading';
+import { DashboardSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/dashboard-skeleton';
 
 export default function DashboardCollectionLoading() {
-  return <Loading />;
+  return <DashboardSkeleton />;
 }

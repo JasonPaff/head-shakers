@@ -4,26 +4,28 @@ import { Suspense } from 'react';
 import { BobbleheadsTabContent } from '@/app/(app)/dashboard/collection/(collection)/components/bobbleheads-tab-content';
 import { CollectionsTabContent } from '@/app/(app)/dashboard/collection/(collection)/components/collections-tab-content';
 import { DashboardTabsClient } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-tabs-client';
+import { BobbleheadsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/bobbleheads-tab-skeleton';
+import { CollectionsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/collections-tab-skeleton';
+import { SubcollectionsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/subcollections-tab-skeleton';
 import { SubcollectionsTabContent } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-tab-content';
-import { Loading } from '@/components/ui/loading';
 
 export const DashboardTabs = () => {
   return (
     <DashboardTabsClient>
       <div data-tab={'collections'}>
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<CollectionsTabSkeleton />}>
           <CollectionsTabContent />
         </Suspense>
       </div>
 
       <div data-tab={'subcollections'}>
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<SubcollectionsTabSkeleton />}>
           <SubcollectionsTabContent />
         </Suspense>
       </div>
 
       <div data-tab={'bobbleheads'}>
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={<BobbleheadsTabSkeleton />}>
           <BobbleheadsTabContent />
         </Suspense>
       </div>
