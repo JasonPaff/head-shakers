@@ -1,4 +1,5 @@
 export * from './action-names';
+export * from './cache';
 export * from './cloudinary-paths';
 export * from './config';
 export * from './defaults';

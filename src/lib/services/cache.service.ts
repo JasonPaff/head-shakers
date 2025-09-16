@@ -1,0 +1,599 @@
+import { unstable_cache } from 'next/cache';
+
+import {
+  CACHE_CONFIG,
+  CACHE_KEYS,
+  getEnvironmentTTL,
+  isCacheEnabled,
+  isCacheLoggingEnabled,
+} from '@/lib/constants/cache';
+import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
+
+/**
+ * cache operation context for consistent tracking
+ */
+export interface CacheContext {
+  entityId?: string;
+  entityType?: string;
+  facade?: string;
+  operation: string;
+  userId?: string;
+}
+
+/**
+ * cache options for customizing cache behavior
+ */
+export interface CacheOptions {
+  context?: CacheContext;
+  isBypassCache?: boolean;
+  isForceRefresh?: boolean;
+  tags?: Array<string>;
+  ttl?: number;
+}
+
+/**
+ * cache statistics for monitoring
+ */
+export interface CacheStats {
+  errors: number;
+  hitRate: number;
+  hits: number;
+  misses: number;
+  totalOperations: number;
+}
+
+export class CacheService {
+  /**
+   * bobblehead-specific cache utilities
+   */
+  static readonly bobbleheads = {
+    /**
+     * cache bobbleheads by collection
+     */
+    byCollection: async <T>(
+      fn: () => Promise<T>,
+      collectionId: string,
+      optionsHash?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.BY_COLLECTION(collectionId, optionsHash);
+      const tags = [
+        ...CacheTagGenerators.collection.read(collectionId, options.context?.userId),
+        CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: collectionId,
+          entityType: 'collection',
+          operation: 'bobblehead:by-collection',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache a bobblehead by ID
+     */
+    byId: async <T>(fn: () => Promise<T>, bobbleheadId: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.BY_ID(bobbleheadId);
+      const tags = CacheTagGenerators.bobblehead.read(bobbleheadId, options.context?.userId);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: bobbleheadId,
+          entityType: 'bobblehead',
+          operation: 'bobblehead:by-id',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+
+    /**
+     * cache bobbleheads by user
+     */
+    byUser: async <T>(
+      fn: () => Promise<T>,
+      userId: string,
+      optionsHash?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.BY_USER(userId, optionsHash);
+      const tags = CacheTagGenerators.bobblehead.read(userId, userId);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'bobblehead', operation: 'bobblehead:by-user', userId },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache bobblehead photos
+     */
+    photos: async <T>(
+      fn: () => Promise<T>,
+      bobbleheadId: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.PHOTOS(bobbleheadId);
+      const tags = CacheTagGenerators.bobblehead.read(bobbleheadId, options.context?.userId);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: bobbleheadId,
+          entityType: 'bobblehead',
+          operation: 'bobblehead:photos',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
+      });
+    },
+
+    /**
+     * cache bobblehead search results
+     */
+    search: async <T>(
+      fn: () => Promise<T>,
+      query: string,
+      filtersHash: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.SEARCH(query, filtersHash);
+      const tags = CacheTagGenerators.search.results(query, 'bobbleheads');
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'search', operation: 'bobblehead:search' },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+      });
+    },
+
+    /**
+     * cache bobblehead with relations
+     */
+    withRelations: async <T>(
+      fn: () => Promise<T>,
+      bobbleheadId: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.BOBBLEHEADS.WITH_RELATIONS(bobbleheadId);
+      const tags = [
+        ...CacheTagGenerators.bobblehead.read(bobbleheadId, options.context?.userId),
+        CACHE_CONFIG.TAGS.BOBBLEHEAD_TAGS(bobbleheadId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: bobbleheadId,
+          entityType: 'bobblehead',
+          operation: 'bobblehead:with-relations',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+  };
+
+  /**
+   * collection-specific cache utilities
+   */
+  static readonly collections = {
+    /**
+     * cache a collection by ID
+     */
+    byId: async <T>(fn: () => Promise<T>, collectionId: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.COLLECTIONS.BY_ID(collectionId);
+      const tags = CacheTagGenerators.collection.read(collectionId, options.context?.userId);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: collectionId,
+          entityType: 'collection',
+          operation: 'collection:by-id',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+
+    /**
+     * cache collections by user
+     */
+    byUser: async <T>(
+      fn: () => Promise<T>,
+      userId: string,
+      optionsHash?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.COLLECTIONS.BY_USER(userId, optionsHash);
+      const tags = [CACHE_CONFIG.TAGS.USER(userId), CACHE_CONFIG.TAGS.USER_COLLECTIONS(userId)];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'collection', operation: 'collection:by-user', userId },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache collection dashboard data
+     */
+    dashboard: async <T>(fn: () => Promise<T>, userId: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.COLLECTIONS.DASHBOARD(userId);
+      const tags = [
+        CACHE_CONFIG.TAGS.USER(userId),
+        CACHE_CONFIG.TAGS.USER_COLLECTIONS(userId),
+        CACHE_CONFIG.TAGS.USER_STATS(userId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'collection', operation: 'collection:dashboard', userId },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+      });
+    },
+
+    /**
+     * cache collection metrics
+     */
+    metrics: async <T>(
+      fn: () => Promise<T>,
+      collectionId: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.COLLECTIONS.METRICS(collectionId);
+      const tags = [
+        CACHE_CONFIG.TAGS.COLLECTION(collectionId),
+        CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: collectionId,
+          entityType: 'collection',
+          operation: 'collection:metrics',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+      });
+    },
+
+    /**
+     * cache public collections
+     */
+    public: async <T>(
+      fn: () => Promise<T>,
+      optionsHash?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.COLLECTIONS.PUBLIC(optionsHash);
+      const tags = [CACHE_CONFIG.TAGS.PUBLIC_CONTENT];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'collection', operation: 'collection:public' },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache collection with relations
+     */
+    withRelations: async <T>(
+      fn: () => Promise<T>,
+      collectionId: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.COLLECTIONS.WITH_RELATIONS(collectionId);
+      const tags = [
+        ...CacheTagGenerators.collection.read(collectionId, options.context?.userId),
+        CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionId),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: collectionId,
+          entityType: 'collection',
+          operation: 'collection:with-relations',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+  };
+
+  /**
+   * featured content cache utilities
+   */
+  static readonly featured = {
+    /**
+     * cache featured content by type
+     */
+    content: async <T>(fn: () => Promise<T>, type: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.FEATURED.CONTENT(type);
+      const tags = CacheTagGenerators.featured.content(type);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'featured', operation: 'featured:content' },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
+      });
+    },
+  };
+
+  /**
+   * Search cache utilities
+   */
+  static readonly search = {
+    /**
+     * cache popular searches
+     */
+    popular: async <T>(fn: () => Promise<T>, timeframe: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.SEARCH.POPULAR(timeframe);
+      const tags = CacheTagGenerators.search.popular();
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'search', operation: 'search:popular' },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
+      });
+    },
+
+    /**
+     * cache search results
+     */
+    results: async <T>(
+      fn: () => Promise<T>,
+      query: string,
+      type: string,
+      filtersHash: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.SEARCH.RESULTS(query, type, filtersHash);
+      const tags = CacheTagGenerators.search.results(query, type);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'search', operation: 'search:results' },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+      });
+    },
+  };
+
+  /**
+   * user-specific cache utilities
+   */
+  static readonly users = {
+    /**
+     * cache user profile
+     */
+    profile: async <T>(fn: () => Promise<T>, userId: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.USERS.PROFILE(userId);
+      const tags = CacheTagGenerators.user.profile(userId);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'user', operation: 'user:profile', userId },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+
+    /**
+     * cache user statistics
+     */
+    stats: async <T>(fn: () => Promise<T>, userId: string, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.USERS.STATS(userId);
+      const tags = CacheTagGenerators.user.stats(userId);
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'user', operation: 'user:stats', userId },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+  };
+
+  private static stats: CacheStats = {
+    errors: 0,
+    hitRate: 0,
+    hits: 0,
+    misses: 0,
+    totalOperations: 0,
+  };
+
+  /**
+   * Generic cache wrapper for any async function using NextJS unstable_cache
+   *
+   * @template T - The return type of the cached function
+   * @param fn - The async function to cache
+   * @param key - Unique cache key for this operation
+   * @param options - Cache options including TTL, tags, and behavior flags
+   * @returns Promise resolving to the cached or fresh result
+   *
+   * @example
+   * ```typescript
+   * const result = await CacheService.cached(
+   *   () => fetchUserData(userId),
+   *   `user:${userId}`,
+   *   {
+   *     ttl: CACHE_CONFIG.TTL.LONG,
+   *     tags: ['user', `user:${userId}`],
+   *     context: { operation: 'fetchUser', userId }
+   *   }
+   * );
+   * ```
+   *
+   * @remarks
+   * This function provides comprehensive error handling, fallback to direct function calls,
+   * and integrates with the project's monitoring and logging systems.
+   */
+  static async cached<T>(fn: () => Promise<T>, key: string, options: CacheOptions = {}): Promise<T> {
+    // check if caching is enabled
+    if (!isCacheEnabled() || options.isBypassCache) {
+      this.logCacheOperation('bypass', key, options.context);
+      return fn();
+    }
+
+    try {
+      const ttl = options.ttl ? getEnvironmentTTL(options.ttl) : getEnvironmentTTL(CACHE_CONFIG.TTL.MEDIUM);
+      const tags = options.tags || [];
+
+      this.stats.totalOperations++;
+
+      // force refresh bypasses cache but still populates it
+      if (options.isForceRefresh) {
+        this.logCacheOperation('force-refresh', key, options.context);
+        const result = await fn();
+
+        // try to cache the fresh result, but don't fail if caching fails
+        try {
+          await this.cacheResult(fn, key, ttl, tags);
+        } catch (cacheError) {
+          this.stats.errors++;
+          this.logCacheOperation('error', key, options.context, cacheError);
+          // continue - we have the result even if caching fails
+        }
+
+        return result;
+      }
+
+      // use unstable_cache with our configuration
+      const cachedFn = unstable_cache(fn, [key], {
+        revalidate: ttl,
+        tags,
+      });
+
+      const result = await cachedFn();
+      this.stats.hits++;
+      this.updateHitRate();
+      this.logCacheOperation('hit', key, options.context);
+
+      return result;
+    } catch (error) {
+      this.stats.errors++;
+      this.stats.misses++;
+      this.updateHitRate();
+      this.logCacheOperation('error', key, options.context, error);
+
+      // fallback to direct function call on cache error
+      try {
+        return await fn();
+      } catch (functionError) {
+        // if both cache and function fail, throw the original function error
+        this.logCacheOperation('error', key, options.context, functionError);
+        throw functionError;
+      }
+    }
+  }
+
+  /**
+   * get cache statistics
+   */
+  static getStats(): CacheStats {
+    return { ...this.stats };
+  }
+
+  /**
+   * reset cache statistics
+   */
+  static resetStats() {
+    this.stats = {
+      errors: 0,
+      hitRate: 0,
+      hits: 0,
+      misses: 0,
+      totalOperations: 0,
+    };
+  }
+
+  /**
+   * cache result directly without going through unstable_cache wrapper
+   */
+  private static async cacheResult<T>(
+    fn: () => Promise<T>,
+    key: string,
+    ttl: number,
+    tags: Array<string>,
+  ): Promise<T> {
+    const cachedFn = unstable_cache(fn, [key], {
+      revalidate: ttl,
+      tags,
+    });
+    return cachedFn();
+  }
+
+  /**
+   * log cache operations for monitoring
+   */
+  private static logCacheOperation(
+    operation: 'bypass' | 'error' | 'force-refresh' | 'hit' | 'miss',
+    key: string,
+    context?: CacheContext,
+    error?: unknown,
+  ) {
+    if (!isCacheLoggingEnabled()) return;
+
+    const logData: Record<string, unknown> = {
+      context,
+      key,
+      operation,
+      timestamp: new Date().toISOString(),
+    };
+
+    if (error) {
+      logData.error =
+        error instanceof Error ? error.message
+        : typeof error === 'string' ? error
+        : JSON.stringify(error);
+    }
+
+    // use an appropriate log level based on operation
+    switch (operation) {
+      case 'bypass':
+      case 'force-refresh':
+        console.info(`[CacheService] ${operation.toUpperCase()}:`, logData);
+        break;
+      case 'error':
+        console.error(`[CacheService] ${operation.toUpperCase()}:`, logData);
+        break;
+      default:
+        console.debug(`[CacheService] ${operation.toUpperCase()}:`, logData);
+        break;
+    }
+  }
+
+  /**
+   * update hit rate statistics
+   */
+  private static updateHitRate() {
+    this.stats.hitRate =
+      this.stats.totalOperations > 0 ? (this.stats.hits / this.stats.totalOperations) * 100 : 0;
+  }
+}
