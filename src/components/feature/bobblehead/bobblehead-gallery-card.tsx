@@ -11,6 +11,7 @@ import {
   MoreVerticalIcon,
   PencilIcon,
   ShareIcon,
+  TrashIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
@@ -19,7 +20,7 @@ import { useState } from 'react';
 
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
-import { BobbleheadDelete } from '@/components/feature/bobblehead/bobblehead-delete';
+import { BobbleheadDeleteDialog } from '@/components/feature/bobblehead/bobblehead-delete-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -68,6 +69,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
   const [hasLoadedPhotos, setHasLoadedPhotos] = useToggle();
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useToggle();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
 
   const {
     execute: fetchPhotos,
@@ -361,16 +363,9 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
                 {/* Delete */}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild variant={'destructive'}>
-                  <BobbleheadDelete
-                    bobbleheadId={bobblehead.id}
-                    className={'w-full justify-start'}
-                    collectionId={bobblehead.collectionId}
-                    subcollectionId={bobblehead.subcollectionId}
-                    variant={'ghost'}
-                  >
-                    Delete
-                  </BobbleheadDelete>
+                <DropdownMenuItem onClick={setIsDeleteDialogOpen.on} variant={'destructive'}>
+                  <TrashIcon aria-hidden className={'mr-2 size-4'} />
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -387,6 +382,17 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
         onPhotoChange={setCurrentPhotoIndex}
         photos={validPhotos}
       />
+
+      {/* Delete Dialog */}
+      <Conditional isCondition={isDeleteDialogOpen}>
+        <BobbleheadDeleteDialog
+          bobbleheadId={bobblehead.id}
+          collectionId={bobblehead.collectionId}
+          isOpen={isDeleteDialogOpen}
+          onClose={setIsDeleteDialogOpen.off}
+          subcollectionId={bobblehead.subcollectionId}
+        />
+      </Conditional>
     </Card>
   );
 };
