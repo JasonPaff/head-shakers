@@ -136,15 +136,16 @@ project/
 │   └── user-stories.md
 ├── src/
 │   ├── components/
+│   ├── lib/
 │   ├── services/
-│   ├── utils/
-│   └── types/
+│   ├── types/
+│   └── utils/
 ├── tests/
 │   ├── unit/
 │   ├── integration/
 │   └── e2e/
 ├── package.json
-└── README.md
+└── CLAUDE.md
 ```
 
 **Begin execution now with the provided feature description and report progress after each sub-agent completion.**
