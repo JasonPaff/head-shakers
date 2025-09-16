@@ -11,6 +11,8 @@ import type {
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featured-content-transformer';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
+import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 /**
@@ -64,9 +66,16 @@ export class FeaturedContentFacade {
    * get active featured content
    */
   static async getActiveFeaturedContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const context = createPublicQueryContext({ dbInstance });
-    const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
-    return FeaturedContentTransformer.transformFeaturedContent(rawData);
+    return CacheService.featured.content(
+      () => {
+        const context = createPublicQueryContext({ dbInstance });
+        return FeaturedContentQuery.findActiveFeaturedContentAsync(context).then(rawData =>
+          FeaturedContentTransformer.transformFeaturedContent(rawData)
+        );
+      },
+      'active',
+      { context: { entityType: 'featured', facade: 'FeaturedContentFacade', operation: 'getActive' } }
+    );
   }
 
   /**
@@ -137,6 +146,7 @@ export class FeaturedContentFacade {
     try {
       await FeaturedContentQuery.incrementViewCountAsync(contentId, context);
       console.log(`View count incremented for content: ${contentId}`);
+      CacheRevalidationService.featured.onContentChange();
     } catch (error) {
       console.error(`Failed to increment view count for content ${contentId}:`, error);
     }

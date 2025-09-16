@@ -16,7 +16,9 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
+import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 const facadeName = 'BobbleheadsFacade';
@@ -126,12 +128,17 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
-
-    return BobbleheadsQuery.findByIdAsync(id, context);
+    return CacheService.bobbleheads.byId(
+      () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return BobbleheadsQuery.findByIdAsync(id, context);
+      },
+      id,
+      { context: { entityId: id, entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'getById', userId: viewerUserId } }
+    );
   }
 
   static async getBobbleheadPhotos(
@@ -140,12 +147,17 @@ export class BobbleheadsFacade {
     dbInstance?: DatabaseExecutor,
   ) {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      return BobbleheadsQuery.getPhotosAsync(bobbleheadId, context);
+      return CacheService.bobbleheads.photos(
+        () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+          return BobbleheadsQuery.getPhotosAsync(bobbleheadId, context);
+        },
+        bobbleheadId,
+        { context: { entityId: bobbleheadId, entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'getPhotos', userId: viewerUserId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId },
@@ -165,12 +177,19 @@ export class BobbleheadsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadRecord>> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      return BobbleheadsQuery.findByCollectionAsync(collectionId, options, context);
+      const optionsHash = createHashFromObject({ options, viewerUserId });
+      return CacheService.bobbleheads.byCollection(
+        () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+          return BobbleheadsQuery.findByCollectionAsync(collectionId, options, context);
+        },
+        collectionId,
+        optionsHash,
+        { context: { entityId: collectionId, entityType: 'collection', facade: 'BobbleheadsFacade', operation: 'findByCollection', userId: viewerUserId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId, options },
@@ -190,12 +209,19 @@ export class BobbleheadsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadRecord>> {
     try {
-      const context =
-        viewerUserId && viewerUserId === userId ?
-          createProtectedQueryContext(userId, { dbInstance })
-        : createUserQueryContext(viewerUserId || userId, { dbInstance });
-
-      return BobbleheadsQuery.findByUserAsync(userId, options, context);
+      const optionsHash = createHashFromObject({ options, viewerUserId });
+      return CacheService.bobbleheads.byUser(
+        () => {
+          const context =
+            viewerUserId && viewerUserId === userId ?
+              createProtectedQueryContext(userId, { dbInstance })
+            : createUserQueryContext(viewerUserId || userId, { dbInstance });
+          return BobbleheadsQuery.findByUserAsync(userId, options, context);
+        },
+        userId,
+        optionsHash,
+        { context: { entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'findByUser', userId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, userId },
@@ -213,12 +239,17 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadWithRelations | null> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
-
-    return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
+    return CacheService.bobbleheads.withRelations(
+      () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
+      },
+      id,
+      { context: { entityId: id, entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'getWithRelations', userId: viewerUserId } }
+    );
   }
 
   static async searchBobbleheads(
@@ -237,12 +268,19 @@ export class BobbleheadsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadRecord>> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      return BobbleheadsQuery.searchAsync(searchTerm, filters, options, context);
+      const filtersHash = createHashFromObject(filters || {});
+      return CacheService.bobbleheads.search(
+        () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+          return BobbleheadsQuery.searchAsync(searchTerm, filters, options, context);
+        },
+        searchTerm,
+        filtersHash,
+        { context: { entityType: 'search', facade: 'BobbleheadsFacade', operation: 'search', userId: viewerUserId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { filters, options, searchTerm },

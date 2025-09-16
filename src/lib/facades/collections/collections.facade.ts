@@ -20,6 +20,8 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
+import { CacheService } from '@/lib/services/cache.service';
+import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 export interface CollectionDashboardData {
@@ -132,33 +134,41 @@ export class CollectionsFacade {
     >
   > {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      const optionsHash = createHashFromObject({ all: true, options, photos: true, viewerUserId });
+      return CacheService.bobbleheads.byCollection(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotosAsync(
+          const bobbleheads = await CollectionsQuery.getAllCollectionBobbleheadsWithPhotosAsync(
+            collectionId,
+            context,
+            options,
+          );
+
+          if (bobbleheads.length === 0) {
+            return bobbleheads;
+          }
+
+          const bobbleheadIds = bobbleheads.map((b) => b.id);
+          const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+            bobbleheadIds,
+            'bobblehead',
+            viewerUserId,
+            dbInstance,
+          );
+
+          return bobbleheads.map((bobblehead) => ({
+            ...bobblehead,
+            likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
+          }));
+        },
         collectionId,
-        context,
-        options,
+        optionsHash,
+        { context: { entityId: collectionId, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getAllBobbleheadsWithPhotos', userId: viewerUserId } }
       );
-
-      if (bobbleheads.length === 0) {
-        return bobbleheads;
-      }
-
-      const bobbleheadIds = bobbleheads.map((b) => b.id);
-      const likesMap = await SocialFacade.getLikesForMultipleContentItems(
-        bobbleheadIds,
-        'bobblehead',
-        viewerUserId,
-        dbInstance,
-      );
-
-      return bobbleheads.map((bobblehead) => ({
-        ...bobblehead,
-        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
-      }));
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },
@@ -177,12 +187,19 @@ export class CollectionsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<BobbleheadListRecord>> {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-
-      return CollectionsQuery.getBobbleheadsInCollectionAsync(collectionId, context);
+      const optionsHash = createHashFromObject({ scope: 'basic', viewerUserId });
+      return CacheService.bobbleheads.byCollection(
+        () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+          return CollectionsQuery.getBobbleheadsInCollectionAsync(collectionId, context);
+        },
+        collectionId,
+        optionsHash,
+        { context: { entityId: collectionId, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getBobbleheads', userId: viewerUserId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },
@@ -211,33 +228,41 @@ export class CollectionsFacade {
     >
   > {
     try {
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      const optionsHash = createHashFromObject({ options, photos: true, viewerUserId });
+      return CacheService.bobbleheads.byCollection(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
 
-      const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotosAsync(
+          const bobbleheads = await CollectionsQuery.getCollectionBobbleheadsWithPhotosAsync(
+            collectionId,
+            context,
+            options,
+          );
+
+          if (bobbleheads.length === 0) {
+            return bobbleheads;
+          }
+
+          const bobbleheadIds = bobbleheads.map((b) => b.id);
+          const likesMap = await SocialFacade.getLikesForMultipleContentItems(
+            bobbleheadIds,
+            'bobblehead',
+            viewerUserId,
+            dbInstance,
+          );
+
+          return bobbleheads.map((bobblehead) => ({
+            ...bobblehead,
+            likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
+          }));
+        },
         collectionId,
-        context,
-        options,
+        optionsHash,
+        { context: { entityId: collectionId, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getBobbleheadsWithPhotos', userId: viewerUserId } }
       );
-
-      if (bobbleheads.length === 0) {
-        return bobbleheads;
-      }
-
-      const bobbleheadIds = bobbleheads.map((b) => b.id);
-      const likesMap = await SocialFacade.getLikesForMultipleContentItems(
-        bobbleheadIds,
-        'bobblehead',
-        viewerUserId,
-        dbInstance,
-      );
-
-      return bobbleheads.map((bobblehead) => ({
-        ...bobblehead,
-        likeData: likesMap.get(bobblehead.id) || { isLiked: false, likeCount: 0, likeId: null },
-      }));
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId },
@@ -255,12 +280,17 @@ export class CollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<CollectionRecord | null> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
-
-    return CollectionsQuery.findByIdAsync(id, context);
+    return CacheService.collections.byId(
+      () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return CollectionsQuery.findByIdAsync(id, context);
+      },
+      id,
+      { context: { entityId: id, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getById', userId: viewerUserId } }
+    );
   }
 
   static async getCollectionForPublicView(id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) {
@@ -292,12 +322,19 @@ export class CollectionsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<CollectionRecord>> {
     try {
-      const context =
-        viewerUserId && viewerUserId === userId ?
-          createProtectedQueryContext(userId, { dbInstance })
-        : createUserQueryContext(viewerUserId || userId, { dbInstance });
-
-      return CollectionsQuery.findByUserAsync(userId, options, context);
+      const optionsHash = createHashFromObject({ options, viewerUserId });
+      return CacheService.collections.byUser(
+        () => {
+          const context =
+            viewerUserId && viewerUserId === userId ?
+              createProtectedQueryContext(userId, { dbInstance })
+            : createUserQueryContext(viewerUserId || userId, { dbInstance });
+          return CollectionsQuery.findByUserAsync(userId, options, context);
+        },
+        userId,
+        optionsHash,
+        { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'findByUser', userId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, userId },
@@ -315,19 +352,30 @@ export class CollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<CollectionWithRelations | null> {
-    const context =
-      viewerUserId ?
-        createUserQueryContext(viewerUserId, { dbInstance })
-      : createPublicQueryContext({ dbInstance });
-
-    return CollectionsQuery.findByIdWithRelationsAsync(id, context);
+    return CacheService.collections.withRelations(
+      () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return CollectionsQuery.findByIdWithRelationsAsync(id, context);
+      },
+      id,
+      { context: { entityId: id, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getWithRelations', userId: viewerUserId } }
+    );
   }
 
   static async getUserCollectionsForDashboard(userId: string, dbInstance?: DatabaseExecutor): Promise<Array<CollectionDashboardData>> {
-    const context = createProtectedQueryContext(userId, { dbInstance });
-    const collections = await CollectionsQuery.getDashboardDataAsync(userId, context);
-
-    return collections.map((collection) => this.transformForDashboard(collection));
+    return CacheService.collections.dashboard(
+      () => {
+        const context = createProtectedQueryContext(userId, { dbInstance });
+        return CollectionsQuery.getDashboardDataAsync(userId, context).then(collections =>
+          collections.map((collection) => this.transformForDashboard(collection))
+        );
+      },
+      userId,
+      { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'dashboard', userId } }
+    );
   }
 
   static transformForDashboard(collection: CollectionWithRelations): CollectionDashboardData {

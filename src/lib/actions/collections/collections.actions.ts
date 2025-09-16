@@ -13,6 +13,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -56,6 +57,8 @@ export const createCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created collection: ${newCollection.name}`,
       });
+
+      CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId);
 
       return {
         data: newCollection,
@@ -125,6 +128,8 @@ export const updateCollectionAction = authActionClient
         );
       }
 
+      CacheRevalidationService.collections.onUpdate(collectionData.collectionId, ctx.userId);
+
       return {
         data: updatedCollection,
         success: true,
@@ -175,6 +180,8 @@ export const deleteCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted collection: ${deletedCollection.name}`,
       });
+
+      CacheRevalidationService.collections.onDelete(collectionData.collectionId, ctx.userId);
 
       return {
         data: null,

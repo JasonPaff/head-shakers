@@ -15,6 +15,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
@@ -72,6 +73,8 @@ export const toggleLikeAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
       });
+
+      CacheRevalidationService.social.onLikeChange(likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType, likeData.targetId, ctx.userId, result.isLiked ? 'like' : 'unlike');
 
       return {
         data: {

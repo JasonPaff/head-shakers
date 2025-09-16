@@ -13,6 +13,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -57,6 +58,8 @@ export const createSubCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created subcollection: ${newSubcollection.name}`,
       });
+
+      CacheRevalidationService.collections.onUpdate(subcollectionData.collectionId, ctx.userId);
 
       return {
         data: newSubcollection,

@@ -14,6 +14,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { adminActionClient, authActionClient } from '@/lib/utils/next-safe-action';
@@ -81,6 +82,8 @@ export const createFeaturedContentAction = adminActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created featured content: ${newFeaturedContent.title}`,
       });
+
+      CacheRevalidationService.featured.onContentChange();
 
       return {
         data: newFeaturedContent,
@@ -152,6 +155,8 @@ export const updateFeaturedContentAction = adminActionClient
         message: `Updated featured content: ${updatedFeaturedContent.title}`,
       });
 
+      CacheRevalidationService.featured.onContentChange();
+
       return {
         data: updatedFeaturedContent,
         success: true,
@@ -205,6 +210,8 @@ export const toggleFeaturedContentActiveAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Featured content ${isActive ? 'activated' : 'deactivated'}: ${updatedFeaturedContent.title}`,
       });
+
+      CacheRevalidationService.featured.onContentChange();
 
       return {
         data: updatedFeaturedContent,
@@ -262,6 +269,8 @@ export const deleteFeaturedContentAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted featured content: ${deletedFeaturedContent.title}`,
       });
+
+      CacheRevalidationService.featured.onContentChange();
 
       return {
         data: null,

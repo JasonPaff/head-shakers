@@ -4,12 +4,15 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertTag, UpdateTag } from '@/lib/validations/tags.validation';
 
 import { CONFIG, OPERATIONS } from '@/lib/constants';
+import { CACHE_KEYS } from '@/lib/constants/cache';
 import {
   createProtectedQueryContext,
   createPublicQueryContext,
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { TagsQuery } from '@/lib/queries/tags/tags-query';
+import { CacheService } from '@/lib/services/cache.service';
+import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 /**
@@ -275,16 +278,25 @@ export class TagsFacade {
 
   static async getSuggestionsForUser(query: string, userId: null | string): Promise<Array<TagSuggestion>> {
     try {
-      const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
-      const tags = await TagsQuery.searchAsync(query, userId, 10, context);
-
-      return tags.map((tag) => ({
-        color: tag.color,
-        id: tag.id,
-        isSystem: tag.userId === null,
-        name: tag.name,
-        usageCount: tag.usageCount,
-      }));
+      return CacheService.cached(
+        () => {
+          const context = userId ? createUserQueryContext(userId) : createPublicQueryContext();
+          return TagsQuery.searchAsync(query, userId, 10, context).then(tags =>
+            tags.map((tag) => ({
+              color: tag.color,
+              id: tag.id,
+              isSystem: tag.userId === null,
+              name: tag.name,
+              usageCount: tag.usageCount,
+            }))
+          );
+        },
+        CACHE_KEYS.SEARCH.SUGGESTIONS(query, 'tags'),
+        {
+          context: { entityType: 'search', facade: 'TagsFacade', operation: 'getSuggestionsForUser', userId: userId || undefined },
+          tags: CacheTagGenerators.search.results(query, 'tags')
+        }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { query, userId },
@@ -298,35 +310,40 @@ export class TagsFacade {
 
   static async getUserTagStats(userId: string, dbInstance?: DatabaseExecutor): Promise<UserTagStats> {
     try {
-      const context = createProtectedQueryContext(userId, { dbInstance });
+      return CacheService.users.stats(
+        () => {
+          const context = createProtectedQueryContext(userId, { dbInstance });
+          return TagsQuery.findAllAsync(userId, context).then(userTags => {
+            const customTags = userTags.filter((tag) => tag.userId === userId);
 
-      // get all user's custom tags
-      const userTags = await TagsQuery.findAllAsync(userId, context);
-      const customTags = userTags.filter((tag) => tag.userId === userId);
+            // calculate statistics
+            const totalUsage = customTags.reduce((sum, tag) => sum + tag.usageCount, 0);
+            const averageUsagePerTag = customTags.length > 0 ? totalUsage / customTags.length : 0;
 
-      // calculate statistics
-      const totalUsage = customTags.reduce((sum, tag) => sum + tag.usageCount, 0);
-      const averageUsagePerTag = customTags.length > 0 ? totalUsage / customTags.length : 0;
+            // sort by usage for most/least used
+            const sortedByUsage = [...customTags].sort((a, b) => b.usageCount - a.usageCount);
+            const mostUsedTags = sortedByUsage.slice(0, 5);
+            const leastUsedTags = sortedByUsage.slice(-5).reverse();
 
-      // sort by usage for most/least used
-      const sortedByUsage = [...customTags].sort((a, b) => b.usageCount - a.usageCount);
-      const mostUsedTags = sortedByUsage.slice(0, 5);
-      const leastUsedTags = sortedByUsage.slice(-5).reverse();
+            // get recent activity (placeholder - would need junction table data)
+            const recentActivity = customTags.slice(0, 10).map((tag) => ({
+              lastUsed: null as Date | null, // TODO: implement with real last used data
+              tagId: tag.id,
+              tagName: tag.name,
+            }));
 
-      // get recent activity (placeholder - would need junction table data)
-      const recentActivity = customTags.slice(0, 10).map((tag) => ({
-        lastUsed: null as Date | null, // TODO: implement with real last used data
-        tagId: tag.id,
-        tagName: tag.name,
-      }));
-
-      return {
-        averageUsagePerTag: Math.round(averageUsagePerTag * 100) / 100,
-        leastUsedTags,
-        mostUsedTags,
-        recentActivity,
-        totalCustomTags: customTags.length,
-      };
+            return {
+              averageUsagePerTag: Math.round(averageUsagePerTag * 100) / 100,
+              leastUsedTags,
+              mostUsedTags,
+              recentActivity,
+              totalCustomTags: customTags.length,
+            };
+          });
+        },
+        userId,
+        { context: { entityType: 'user', facade: 'TagsFacade', operation: 'getUserTagStats', userId } }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { userId },

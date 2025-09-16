@@ -18,6 +18,7 @@ import {
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -184,6 +185,8 @@ export const createBobbleheadWithPhotosAction = authActionClient
         message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
       });
 
+      CacheRevalidationService.bobbleheads.onCreate(newBobblehead.id, userId, newBobblehead.collectionId);
+
       return {
         data: {
           bobblehead: newBobblehead,
@@ -237,6 +240,8 @@ export const deleteBobbleheadAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted bobblehead: ${deletedBobblehead.name} with Cloudinary photo cleanup`,
       });
+
+      CacheRevalidationService.bobbleheads.onDelete(bobbleheadData.bobbleheadId, ctx.userId, deletedBobblehead?.collectionId);
 
       return {
         data: null,

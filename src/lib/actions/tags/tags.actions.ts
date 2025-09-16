@@ -15,6 +15,7 @@ import {
 } from '@/lib/constants';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -248,6 +249,8 @@ export const attachTagsAction = authActionClient
         message: `Attached ${tagIds.length} tags to bobblehead`,
       });
 
+      CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'add');
+
       return {
         data: { attached: tagIds.length, warnings: validation.warnings },
         success: true,
@@ -308,6 +311,8 @@ export const detachTagsAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Detached ${tagIds.length} tags from bobblehead`,
       });
+
+      CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'remove');
 
       return {
         data: { detached: tagIds.length },

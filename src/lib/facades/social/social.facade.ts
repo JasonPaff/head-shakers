@@ -5,6 +5,7 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertLike } from '@/lib/validations/social.validation';
 
 import { type LikeTargetType, OPERATIONS } from '@/lib/constants';
+import { CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import {
   createProtectedQueryContext,
@@ -12,6 +13,8 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { SocialQuery } from '@/lib/queries/social/social.query';
+import { CacheService } from '@/lib/services/cache.service';
+import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 export interface ContentLikeData {
@@ -127,7 +130,7 @@ export class SocialFacade {
 
       // get like count and user status in parallel
       const [likeCount, userStatus] = await Promise.all([
-        SocialQuery.getLikeCountAsync(targetId, targetType, context),
+        await SocialFacade.getLikeCount(targetId, targetType, dbInstance),
         viewerUserId ?
           SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
         : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),
@@ -154,8 +157,17 @@ export class SocialFacade {
 
   static async getLikeCount(targetId: string, targetType: LikeTargetType, dbInstance?: DatabaseExecutor): Promise<number> {
     try {
-      const context = createPublicQueryContext({ dbInstance });
-      return SocialQuery.getLikeCountAsync(targetId, targetType, context);
+      return CacheService.cached(
+        () => {
+          const context = createPublicQueryContext({ dbInstance });
+          return SocialQuery.getLikeCountAsync(targetId, targetType, context);
+        },
+        CACHE_KEYS.SOCIAL.LIKES(targetType, targetId),
+        {
+          context: { entityId: targetId, entityType: 'social', facade: 'SocialFacade', operation: 'getLikeCount' },
+          tags: CacheTagGenerators.social.like(targetType === 'subcollection' ? 'collection' : targetType, targetId, 'system')
+        }
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
