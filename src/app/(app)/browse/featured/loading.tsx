@@ -1,5 +1,5 @@
-import { Loading } from '@/components/ui/loading';
+import { FeaturedPageSkeleton } from './components/skeletons/featured-page-skeleton';
 
 export default function BrowseFeaturedLoading() {
-  return <Loading />;
+  return <FeaturedPageSkeleton />;
 }
