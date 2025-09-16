@@ -20,23 +20,6 @@ Infrastructure service layer providing resilient external integrations and cross
 
 ## Service Architecture
 
-### CacheRevalidationService
-
-**Purpose**: Orchestrates Next.js cache invalidation for content updates
-
-**Key Methods**:
-- `revalidateBobbleheadFeaturedContent()`: Invalidates bobblehead-related cache tags and paths
-- `revalidateCollectionFeaturedContent()`: Invalidates collection-specific cache
-- `revalidateDashboard()`: Invalidates user dashboard with optional collection/subcollection scope
-- `revalidateFeaturedContent()`: Comprehensive featured content invalidation with operation context
-- `warmFeaturedContentCache()`: Proactive cache warming for bulk operations
-
-**Patterns**:
-- Always revalidates both tags AND paths for comprehensive cache clearing
-- Uses try-catch per tag/path to prevent cascading failures
-- Logs success/failure metrics for monitoring
-- Never throws errors - logs and continues to prevent breaking main operations
-
 ### CloudinaryService
 
 **Purpose**: Manages image operations with Cloudinary CDN
@@ -67,7 +50,6 @@ Infrastructure service layer providing resilient external integrations and cross
 
 ## Important Notes
 
-- **Cache Invalidation Order**: Tags before paths, core before conditional
 - **Cloudinary Config**: Duplicate config calls exist (lines 12-23 in cloudinary.service.ts) - second overwrites first
 - **Error Recovery**: Services never throw on cache invalidation failures to prevent disrupting operations
 - **Batch Limits**: Cloudinary batch operations have API limits - consider chunking for large sets

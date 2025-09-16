@@ -2,8 +2,6 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
-import { $path } from 'next-typesafe-url';
-import { revalidatePath } from 'next/cache';
 
 import {
   ACTION_NAMES,
@@ -15,7 +13,6 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -59,9 +56,6 @@ export const createCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created collection: ${newCollection.name}`,
       });
-
-      CacheRevalidationService.revalidateCollectionFeaturedContent(newCollection.id);
-      revalidatePath($path({ route: '/dashboard/collection' }));
 
       return {
         data: newCollection,
@@ -131,9 +125,6 @@ export const updateCollectionAction = authActionClient
         );
       }
 
-      CacheRevalidationService.revalidateCollectionFeaturedContent(updatedCollection.id);
-      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
-
       return {
         data: updatedCollection,
         success: true,
@@ -184,9 +175,6 @@ export const deleteCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted collection: ${deletedCollection.name}`,
       });
-
-      CacheRevalidationService.revalidateCollectionFeaturedContent(deletedCollection.id);
-      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: null,

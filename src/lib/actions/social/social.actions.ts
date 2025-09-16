@@ -2,8 +2,6 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
-import { $path } from 'next-typesafe-url';
-import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
 import {
@@ -74,32 +72,6 @@ export const toggleLikeAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
       });
-
-      revalidatePath(
-        $path({
-          route: '/bobbleheads/[bobbleheadId]',
-          routeParams: { bobbleheadId: likeData.targetId },
-        }),
-      );
-      revalidatePath(
-        $path({
-          route: '/collections/[collectionId]',
-          routeParams: { collectionId: likeData.targetId },
-        }),
-      );
-
-      // TODO: invalidate the featured browse page if applicable
-      // revalidatePath(
-      //   $path({
-      //     route: '/browse/featured',
-      //   }),
-      // );
-      // revalidate cache for content-specific invalidation
-      // if (likeData.targetType === 'collection') {
-      //   CacheRevalidationService.revalidateCollectionFeaturedContent(likeData.targetId);
-      // } else if (likeData.targetType === 'bobblehead') {
-      //   CacheRevalidationService.revalidateBobbleheadFeaturedContent(likeData.targetId);
-      // }
 
       return {
         data: {

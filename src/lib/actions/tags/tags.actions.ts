@@ -15,7 +15,6 @@ import {
 } from '@/lib/constants';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -71,8 +70,6 @@ export const createTagAction = authActionClient
         message: `Created tag: ${newTag.name}`,
       });
 
-      // TODO: invalidate appropriate cache if necessary
-
       return {
         data: newTag,
         success: true,
@@ -125,8 +122,6 @@ export const updateTagAction = authActionClient
         message: `Updated tag: ${updatedTag.name}`,
       });
 
-      // TODO: invalidate appropriate cache if necessary
-
       return {
         data: updatedTag,
         success: true,
@@ -178,8 +173,6 @@ export const deleteTagAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted tag: ${tagId}`,
       });
-
-      // TODO: invalidate appropriate cache if necessary
 
       return {
         data: { deleted: true },
@@ -255,10 +248,6 @@ export const attachTagsAction = authActionClient
         message: `Attached ${tagIds.length} tags to bobblehead`,
       });
 
-      // TODO: invalidate appropriate cache if necessary
-
-      CacheRevalidationService.revalidateBobbleheadFeaturedContent(bobbleheadId);
-
       return {
         data: { attached: tagIds.length, warnings: validation.warnings },
         success: true,
@@ -319,9 +308,6 @@ export const detachTagsAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Detached ${tagIds.length} tags from bobblehead`,
       });
-
-      // TODO: invalidate appropriate cache if necessary
-      CacheRevalidationService.revalidateBobbleheadFeaturedContent(bobbleheadId);
 
       return {
         data: { detached: tagIds.length },
@@ -416,8 +402,6 @@ export const bulkDeleteTagsAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Bulk deleted ${result.deletedCount} tags`,
       });
-
-      // TODO: invalidate appropriate cache if necessary
 
       return {
         data: result,

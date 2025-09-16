@@ -13,7 +13,6 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -58,9 +57,6 @@ export const createSubCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created subcollection: ${newSubcollection.name}`,
       });
-
-      CacheRevalidationService.revalidateCollectionFeaturedContent(subcollectionData.collectionId);
-      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: newSubcollection,
@@ -160,9 +156,6 @@ export const deleteSubCollectionAction = authActionClient
         message: `Deleted subcollection: ${deletedSubcollection.name}`,
       });
 
-      CacheRevalidationService.revalidateCollectionFeaturedContent(deletedSubcollection.collectionId);
-      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
-
       return {
         data: null,
         success: true,
@@ -217,9 +210,6 @@ export const updateSubCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Updated subcollection: ${updatedSubcollection.name}`,
       });
-
-      CacheRevalidationService.revalidateCollectionFeaturedContent(updatedSubcollection.collectionId);
-      CacheRevalidationService.revalidateDashboard({ userId: ctx.userId });
 
       return {
         data: updatedSubcollection,

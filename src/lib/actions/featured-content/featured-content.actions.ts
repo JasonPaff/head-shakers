@@ -14,7 +14,6 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { adminActionClient, authActionClient } from '@/lib/utils/next-safe-action';
@@ -81,11 +80,6 @@ export const createFeaturedContentAction = adminActionClient
         },
         level: SENTRY_LEVELS.INFO,
         message: `Created featured content: ${newFeaturedContent.title}`,
-      });
-
-      CacheRevalidationService.revalidateFeaturedContent('create', {
-        affectsHomepage: false,
-        contentType: newFeaturedContent.contentType,
       });
 
       return {
@@ -158,11 +152,6 @@ export const updateFeaturedContentAction = adminActionClient
         message: `Updated featured content: ${updatedFeaturedContent.title}`,
       });
 
-      CacheRevalidationService.revalidateFeaturedContent('update', {
-        affectsHomepage: updatedFeaturedContent.isActive,
-        contentType: updatedFeaturedContent.contentType,
-      });
-
       return {
         data: updatedFeaturedContent,
         success: true,
@@ -215,11 +204,6 @@ export const toggleFeaturedContentActiveAction = authActionClient
         },
         level: SENTRY_LEVELS.INFO,
         message: `Featured content ${isActive ? 'activated' : 'deactivated'}: ${updatedFeaturedContent.title}`,
-      });
-
-      CacheRevalidationService.revalidateFeaturedContent('toggle', {
-        affectsHomepage: true,
-        contentType: updatedFeaturedContent.contentType,
       });
 
       return {
@@ -277,11 +261,6 @@ export const deleteFeaturedContentAction = authActionClient
         },
         level: SENTRY_LEVELS.INFO,
         message: `Deleted featured content: ${deletedFeaturedContent.title}`,
-      });
-
-      CacheRevalidationService.revalidateFeaturedContent('delete', {
-        affectsHomepage: true,
-        contentType: deletedFeaturedContent.contentType,
       });
 
       return {

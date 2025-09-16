@@ -2,7 +2,8 @@
 
 ## Purpose
 
-Server-side actions implementing business logic for the Head Shakers platform using Next.js server actions with Next-Safe-Action (Server Actions) for type-safe operations and comprehensive error handling.
+Server-side actions implementing business logic for the Head Shakers platform using Next.js server actions
+with Next-Safe-Action (Server Actions) for type-safe operations and comprehensive error handling.
 
 ## Key Patterns
 
@@ -12,7 +13,6 @@ Server-side actions implementing business logic for the Head Shakers platform us
   - `publicActionClient`: No authentication required (database → sanitization → transaction)
 - **Consistent Structure**: All actions follow `.metadata()` → `.inputSchema()` → `.action()` pattern
 - **Transaction Support**: Optional database transactions via `isTransactionRequired` metadata
-- **Cache Invalidation**: Automatic path revalidation using `revalidatePath()` with type-safe routes
 
 ## Authentication
 
