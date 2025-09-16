@@ -2,12 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(npm run typecheck:*)",
-      "Bash(npm run lint:*)",
-      "Bash(npm run:*)",
+      "Bash(npm run typecheck)",
+      "Bash(npm run lint:fix)",
+      "Bash(npm run db:*)",
+      "Bash(npm run next-typesafe-url)",
       "Bash(npx drizzle-kit:*)",
       "Bash(cat:*)",
-      "Bash(timeout 30 npm run dev)",
+      "Bash(timeout 60 npm run dev)",
       "Bash(sed:*)",
       "Bash(rg:*)",
       "mcp__playwright__browser_navigate",
