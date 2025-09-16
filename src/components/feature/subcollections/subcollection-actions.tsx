@@ -1,10 +1,10 @@
 'use client';
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { MoreVerticalIcon, PencilIcon } from 'lucide-react';
+import { MoreVerticalIcon, PencilIcon, TrashIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
-import { SubcollectionDelete } from '@/components/feature/subcollections/subcollection-delete';
+import { SubcollectionDeleteDialog } from '@/components/feature/subcollections/subcollection-delete-dialog';
 import { SubcollectionEditDialog } from '@/components/feature/subcollections/subcollection-edit-dialog';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -27,6 +27,7 @@ interface SubcollectionActionsProps {
 
 export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
 
   return (
     <Fragment>
@@ -43,14 +44,9 @@ export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProp
             Edit Details
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild variant={'destructive'}>
-            <SubcollectionDelete
-              className={'w-full justify-start'}
-              subcollectionId={subcollection.id}
-              variant={'ghost'}
-            >
-              Delete Subcollection
-            </SubcollectionDelete>
+          <DropdownMenuItem onClick={setIsDeleteDialogOpen.on} variant={'destructive'}>
+            <TrashIcon aria-hidden className={'mr-2 size-4'} />
+            Delete Subcollection
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -61,6 +57,15 @@ export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProp
           isOpen={isEditDialogOpen}
           onClose={setIsEditDialogOpen.off}
           subcollection={subcollection}
+        />
+      </Conditional>
+
+      {/* Delete Subcollection Dialog */}
+      <Conditional isCondition={isDeleteDialogOpen}>
+        <SubcollectionDeleteDialog
+          isOpen={isDeleteDialogOpen}
+          onClose={setIsDeleteDialogOpen.off}
+          subcollectionId={subcollection.id}
         />
       </Conditional>
     </Fragment>
