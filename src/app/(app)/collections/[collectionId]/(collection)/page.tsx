@@ -2,13 +2,22 @@ import type { Metadata } from 'next';
 
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
 
-import { Collection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection';
+import { CollectionBobbleheadsAsync } from '@/app/(app)/collections/[collectionId]/(collection)/components/async/collection-bobbleheads-async';
+import { CollectionHeaderAsync } from '@/app/(app)/collections/[collectionId]/(collection)/components/async/collection-header-async';
+import { CollectionSidebarSubcollectionsAsync } from '@/app/(app)/collections/[collectionId]/(collection)/components/async/collection-sidebar-subcollections-async';
+import { CollectionStatsAsync } from '@/app/(app)/collections/[collectionId]/(collection)/components/async/collection-stats-async';
+import { CollectionErrorBoundary } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-error-boundary';
+import { CollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[collectionId]/(collection)/components/skeletons/collection-bobbleheads-skeleton';
+import { CollectionHeaderSkeleton } from '@/app/(app)/collections/[collectionId]/(collection)/components/skeletons/collection-header-skeleton';
+import { CollectionStatsSkeleton } from '@/app/(app)/collections/[collectionId]/(collection)/components/skeletons/collection-stats-skeleton';
+import { SubcollectionsSkeleton } from '@/app/(app)/collections/[collectionId]/(collection)/components/skeletons/subcollections-skeleton';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
+import { ContentLayout } from '@/components/layout/content-layout';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type CollectionPageProps = PageProps;
@@ -27,6 +36,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   const resolvedSearchParams = await searchParams;
   const currentUserId = await getOptionalUserId();
 
+  // only fetch basic collection info for the initial render to verify it exists
   const collection = await CollectionsFacade.getCollectionForPublicView(
     collectionId,
     currentUserId || undefined,
@@ -36,11 +46,56 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
     notFound();
   }
 
-  const likeResult = await SocialFacade.getContentLikeData(
-    collectionId,
-    'collection',
-    currentUserId ?? undefined,
-  );
+  return (
+    <div>
+      {/* Header Section with Suspense */}
+      <div className={'mt-3 border-b border-border'}>
+        <ContentLayout>
+          <CollectionErrorBoundary section={'header'}>
+            <Suspense fallback={<CollectionHeaderSkeleton />}>
+              <CollectionHeaderAsync collectionId={collectionId} currentUserId={currentUserId} />
+            </Suspense>
+          </CollectionErrorBoundary>
+        </ContentLayout>
+      </div>
 
-  return <Collection collection={collection} likeData={likeResult} searchParams={resolvedSearchParams} />;
+      {/* Main Content */}
+      <div className={'mt-4'}>
+        <ContentLayout>
+          <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+            {/* Main Content Area */}
+            <div className={'lg:col-span-9'}>
+              <CollectionErrorBoundary section={'bobbleheads'}>
+                <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
+                  <CollectionBobbleheadsAsync
+                    collectionId={collectionId}
+                    currentUserId={currentUserId}
+                    searchParams={resolvedSearchParams}
+                  />
+                </Suspense>
+              </CollectionErrorBoundary>
+            </div>
+
+            {/* Sidebar */}
+            <aside className={'flex flex-col gap-6 lg:col-span-3'}>
+              <CollectionErrorBoundary section={'stats'}>
+                <Suspense fallback={<CollectionStatsSkeleton />}>
+                  <CollectionStatsAsync collectionId={collectionId} currentUserId={currentUserId} />
+                </Suspense>
+              </CollectionErrorBoundary>
+
+              <CollectionErrorBoundary section={'subcollections'}>
+                <Suspense fallback={<SubcollectionsSkeleton />}>
+                  <CollectionSidebarSubcollectionsAsync
+                    collectionId={collectionId}
+                    currentUserId={currentUserId}
+                  />
+                </Suspense>
+              </CollectionErrorBoundary>
+            </aside>
+          </div>
+        </ContentLayout>
+      </div>
+    </div>
+  );
 }
