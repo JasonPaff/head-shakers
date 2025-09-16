@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   title: { default: 'Dashboard', template: '%s | Head Shakers' },
 };
 
-type RootLayoutProps = LayoutProps;
+type RootLayoutProps = RequiredChildren;
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (

@@ -4,7 +4,7 @@ import { AuthContent } from '@/components/ui/auth';
 import { SidebarInset } from '@/components/ui/sidebar/sidebar-inset';
 import { SidebarProvider } from '@/components/ui/sidebar/sidebar-provider/sidebar-provider';
 
-type AppLayoutProps = LayoutProps;
+type AppLayoutProps = RequiredChildren;
 
 export default function AppLayout({ children }: AppLayoutProps) {
   return (
