@@ -33,7 +33,7 @@ export const CollectionStats = ({ collection }: CollectionStatsProps) => {
             <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />
             <span className={'text-sm text-muted-foreground'}>Last Updated:</span>
             <span className={'text-sm font-medium'}>
-              {collection.lastUpdatedAt?.toLocaleDateString() ?? 'N/A'}
+              {collection.lastUpdatedAt ? new Date(collection.lastUpdatedAt).toLocaleDateString() : 'N/A'}
             </span>
           </li>
         </ul>

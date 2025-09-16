@@ -86,7 +86,7 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
             {/* Creation Date */}
             <div className={'flex items-center gap-2'}>
               <CalendarIcon aria-hidden className={'size-4'} />
-              Created {collection.createdAt.toLocaleDateString()}
+              Created {new Date(collection.createdAt).toLocaleDateString()}
             </div>
           </div>
         </div>

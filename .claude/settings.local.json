@@ -9,7 +9,9 @@
       "Bash(cat:*)",
       "Bash(timeout 30 npm run dev)",
       "Bash(sed:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_console_messages"
     ],
     "deny": [],
     "ask": []
