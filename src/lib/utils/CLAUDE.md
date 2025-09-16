@@ -40,12 +40,35 @@ Contains core utility functions for server actions, error handling, caching, aut
 - **Service identification**: External service errors auto-detect service names (Cloudinary, Clerk, Redis, etc.)
 - **Validation errors**: Zod validation errors are transformed into structured ActionError format
 
-## Caching Strategy
+## Enterprise Cache Management System
 
-- **Dual caching**: Both Redis (via Upstash) and Next.js cache integration
-- **Cache invalidation**: Supports both key-based and tag-based invalidation across both systems
-- **Performance monitoring**: Cache operations are tracked with hit/miss metrics
-- **Error resilience**: Cache failures fallback gracefully without breaking operations
+### Core Cache Utilities
+
+- **Cache Key Generation**: `createCacheKey()` function with automatic length validation and truncation
+- **Secure Hashing**: `createHashFromObject()` using collision-resistant djb2-variant algorithm
+- **Key Sanitization**: `sanitizeCacheKey()` for safe cache key formatting
+- **Object Normalization**: Deterministic object serialization for consistent cache keys
+
+### Cache Tag Management
+
+- **Type-Safe Tags**: Strict TypeScript unions for entity types (`CacheEntityType`, `CacheFeatureType`, etc.)
+- **CacheTagBuilder**: Fluent builder pattern with memory leak protection (50 tag limit)
+- **Smart Generators**: Pre-built tag generators for common scenarios (bobbleheads, collections, users)
+- **Hierarchical Tags**: Entity-based, feature-based, and relationship-based tag organization
+
+### Cache Tag Patterns
+
+- **Entity Tags**: `bobblehead:${id}`, `collection:${id}`, `user:${id}`
+- **Feature Tags**: `featured-content`, `popular-content`, `public-content`
+- **Relationship Tags**: `user-bobbleheads:${userId}`, `collection-bobbleheads:${collectionId}`
+- **Aggregate Tags**: `global-stats`, `trending`, `user-stats:${userId}`
+
+### Memory Management
+
+- **Tag Limits**: Maximum 50 tags per builder instance to prevent memory leaks
+- **Builder Reset**: `reset()` method for builder reuse and memory cleanup
+- **Length Validation**: Cache keys auto-truncated at 250 characters with hash suffixes
+- **Resource Protection**: Hard limits and validation throughout the system
 
 ## Performance Monitoring
 
@@ -70,6 +93,10 @@ Contains core utility functions for server actions, error handling, caching, aut
 
 - **Error security**: Action error handler strips sensitive input data from logs while preserving structure
 - **Memory monitoring**: Performance utilities include Node.js memory usage tracking
-- **Cache keys**: Use consistent naming patterns like `featured-content:${type}` for cache keys
+- **Cache Security**: Secure hash functions replace unsafe btoa() with collision-resistant algorithms
+- **Environment Safety**: Environment validation with safe fallbacks to production configuration
 - **Service detection**: External service errors are automatically categorized by service name for better monitoring
 - **PostgreSQL focus**: Database error handling is specifically designed for PostgreSQL error codes and patterns
+- **Cache Key Patterns**: Use `CACHE_KEYS` builders for consistent naming: `CACHE_KEYS.BOBBLEHEADS.BY_ID(id)`
+- **Tag Generation**: Use `CacheTagGenerators` for type-safe, validated tag creation
+- **Memory Protection**: All cache builders include automatic memory leak prevention
