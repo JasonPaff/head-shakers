@@ -81,8 +81,29 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 ## Development Commands
 - `npm run dev` - Start development server with Turbopack
 - `npm run build` - Build for production
+- `npm run next-typesafe-url` - Generate type-safe routes
+- `npm run format` - Format code with Prettier
 - `npm run test` - Run test suite
 - `npm run lint:fix` - Run ESLint
 - `npm run typecheck` - TypeScript type checking
+- `npm run db:generate` - Generate database migrations
 - `npm run db:migrate` - Run database migrations
 - `npm run db:seed` - Seed database with test data
+
+## Project Rules
+- **Code Formatting**: All code must be formatted using Prettier. Run `npm run format` before committing.
+- **Linting**: Ensure code passes ESLint checks. Run `npm run lint:fix` to fix issues.
+- **Type Safety**: Use TypeScript and Zod for type safety. Run `npm run typecheck` to verify. 
+- **No Any Type**: Avoid using `any` type in TypeScript. Use proper types, generics, or unknown with type narrowing.
+
+## Project Documentation Conventions (Important)
+
+**Documentation Files:** All new documentation or task files must be saved under the `docs/` folder in this repository.For example:
+
+- **Tasks & TODOs**: Save in `docs/{YYYY_MM_DD}/tasks/` (e.g., `docs/t2025_08_08/asks/ReleaseTodo.md` for a release checklist).
+- **Requirements/Specs**: Save in `docs/{YYYY_MM_DD}/specs/` (e.g., `docs/2025_08_08/specs/AuthModuleRequirements.md`).
+- **Design Docs**: Save in `docs/{YYYY_MM_DD}/design/` (e.g., `docs/2025_08_08/design/ArchitectureOverview.md`).
+- **Code Files:** Follow the project structure (place new code in the appropriate src/module folder as discussed).
+- **Tests:** Put new test files under the `tests/` directory, mirroring the code structure.
+
+> **Important:** When creating a new file, ensure the directory exists or create it. Never default to the root directory for these files.
