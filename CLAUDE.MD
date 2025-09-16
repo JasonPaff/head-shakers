@@ -19,7 +19,9 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 ### Database & Backend
 - **PostgreSQL** with Neon serverless
 - **Drizzle ORM** for database operations and migrations
+- **Drizzle-Zod** for schema validation based on Drizzle schemas
 - **Zod** for schema validation and type safety
+- **Next-Safe-Action** for server actions
 
 ### Authentication & User Management
 - **Clerk** for authentication and user management with themes support
