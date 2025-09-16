@@ -79,12 +79,10 @@ const TimestampItem = ({
 };
 
 export const BobbleheadTimestampsCard = ({ bobblehead }: BobbleheadTimestampsCardProps) => {
-  const _hasMultipleTimestamps =
-    !!bobblehead?.createdAt &&
-    !!bobblehead?.updatedAt &&
-    bobblehead.createdAt.getTime() !== bobblehead.updatedAt.getTime();
+  const _hasMultipleTimestamps = !!bobblehead?.createdAt && !!bobblehead?.updatedAt; // &&
+  //bobblehead.createdAt.getTime() !== bobblehead.updatedAt.getTime();
   const _hasOnlyUpdatedAt = !_hasMultipleTimestamps && bobblehead.updatedAt && !bobblehead.createdAt;
-  const _hasTimestamp = !!bobblehead.createdAt || !!bobblehead.updatedAt;
+  const _hasTimestamp = false; // !!bobblehead.createdAt || !!bobblehead.updatedAt;
 
   return (
     <Conditional isCondition={_hasTimestamp}>

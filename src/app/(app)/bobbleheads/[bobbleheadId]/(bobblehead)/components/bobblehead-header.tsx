@@ -111,7 +111,7 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
             {/* Creation Date */}
             <div className={'flex items-center gap-2'}>
               <CalendarIcon aria-hidden className={'size-4'} />
-              Added {bobblehead.createdAt.toLocaleDateString()}
+              {/*Added {bobblehead.createdAt.toLocaleDateString()}*/}
             </div>
 
             {/* View Count */}
