@@ -3,6 +3,15 @@ You are an advanced implementation planning orchestrator that transforms feature
 @CLAUDE.MD
 @package.json
 
+## CRITICAL: How This Command Works
+
+This is a Claude Code custom command that orchestrates multiple stages of analysis. When the user runs `/plan-feature "task description"`, you MUST:
+
+1. Use the Task tool with `subagent_type: "general-purpose"` for EACH stage
+2. Pass the appropriate command instructions from `.claude/commands/` to each agent
+3. Collect results from each agent and pass them to the next stage
+4. Generate and save the final implementation plan
+
 ## Workflow Overview
 This command orchestrates a multi-stage pipeline that:
 1. Analyzes project structure to identify relevant areas
@@ -14,48 +23,50 @@ This command orchestrates a multi-stage pipeline that:
 ## Execution Protocol
 
 ### STAGE 1: SCOPE ANALYSIS
-Execute the root-folder-selection command to identify relevant directories:
-- Pass the 5-level directory tree
-- Receive list of relevant root folders
-- If no folders identified, expand search depth and retry once
+Use Task tool with general-purpose agent:
+- Include the content of `.claude/commands/root-folder-selection.md`
+- Replace `{{DIRECTORY_TREE}}` with actual 5-level directory tree
+- Agent returns list of relevant root folders
 
 ### STAGE 2: FILE DISCOVERY
 #### 2A: Pattern-Based Filtering
-Execute the regex-file-filter command:
-- Provide the selected root folders and directory tree
-- Receive pattern groups for targeted file discovery
-- Apply patterns to find initial file candidates
+Use Task tool with general-purpose agent:
+- Include the content of `.claude/commands/regex-file-filter.md`
+- Replace `{{DIRECTORY_TREE}}` with actual directory tree
+- Pass the selected root folders from Stage 1
+- Agent returns JSON with pattern groups
 
 #### 2B: Content Relevance Assessment
-Execute the relevance-assessment command:
-- Pass task description and file contents (up to 50 files)
-- Receive filtered list of actually relevant files
-- If < 3 files found and task seems complex, proceed to 2C
+Use Task tool with general-purpose agent:
+- Include the content of `.claude/commands/relevance-assessment.md`
+- Replace `{{FILE_CONTENTS}}` with actual file contents (up to 50 files)
+- Agent returns filtered list of relevant files
 
 #### 2C: Extended Path Finding (Conditional)
-Execute the extended-path-finding command if:
-- Complex task with < 10 relevant files found
-- Task mentions integration or cross-cutting concerns
-- Initial discovery seems incomplete
+Use Task tool with general-purpose agent if needed:
+- Include the content of `.claude/commands/extended-path-finding.md`
+- Replace placeholders with actual content
+- Agent returns additional relevant files
 
 ### STAGE 3: VALIDATION
-Execute the path-correction command:
+Use Task tool with general-purpose agent:
+- Include the content of `.claude/commands/path-correction.md`
+- Replace `{{DIRECTORY_TREE}}` with actual tree
 - Pass all discovered file paths
-- Receive corrected, valid file paths
-- Remove any paths that couldn't be validated
+- Agent returns corrected, valid file paths
 
 ### STAGE 4: PLAN GENERATION
 #### 4A: Task Refinement
-Execute the task-refinement command:
-- Pass original task and discovered file contents
-- Receive refined task description with codebase-specific details
-- Append refinements to original task
+Use Task tool with general-purpose agent:
+- Include the content of `.claude/commands/task-refinement.md`
+- Replace `{{FILE_CONTENTS}}` with relevant file contents
+- Agent returns refined task description
 
 #### 4B: Implementation Plan Generation
-Execute the implementation-plan command:
-- Pass refined task, file contents, and project context
-- Receive detailed XML implementation plan
-- Validate plan completeness before returning
+Use Task tool with general-purpose agent:
+- Include the content of `.claude/commands/implementation-plan.md`
+- Replace all placeholders with collected data
+- Agent returns detailed XML implementation plan
 
 ## Stage Decision Heuristics
 
@@ -79,6 +90,17 @@ Execute the implementation-plan command:
 - Summarize directory structure rather than passing full tree to later stages
 - Use file path lists instead of full contents where possible
 
+## Implementation Instructions for Claude
+
+When executing this workflow:
+
+1. **Generate Directory Tree**: Use Bash to get a 5-level directory tree
+2. **Execute Each Stage**: Use Task tool with `subagent_type: "general-purpose"`
+3. **Pass Instructions**: Read the appropriate `.claude/commands/*.md` file and include it in the agent prompt
+4. **Replace Placeholders**: Replace all `{{VARIABLE}}` placeholders with actual data
+5. **Collect Results**: Store each agent's output for the next stage
+6. **Save Final Plan**: Write the implementation plan to the docs folder
+
 ## Output Format
 Save the implementation plan to the project documentation and return a summary:
 
@@ -86,8 +108,8 @@ Save the implementation plan to the project documentation and return a summary:
 Save the generated plan to: `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md`
 
 Where:
-- `{YYYY_MM_DD}` is the current date (e.g., `2025_01_15`)
-- `{feature-name}` is a kebab-case version of the feature name (e.g., `user-authentication-system`)
+- `{YYYY_MM_DD}` is the current date (e.g., `2025_01_17`)
+- `{feature-name}` is a kebab-case version of the feature name
 
 ### File Contents Structure
 ```markdown
@@ -131,9 +153,23 @@ Before saving and returning the plan, verify:
 
 ## Required Context
 The orchestrator needs:
-- Original task description
-- Project directory structure (3-5 levels)
-- Access to file contents via read operations
-- Ability to execute subordinate commands
+- Original task description from the user
+- Project directory structure (3-5 levels) - generate with `find` or `tree` command
+- Access to file contents via Read tool
+- Ability to execute Task tool with general-purpose agents
+
+## Example Execution Flow
+
+When user runs: `/plan-feature "Add user authentication with JWT"`
+
+You should:
+1. Generate directory tree with Bash
+2. Read `.claude/commands/root-folder-selection.md`
+3. Use Task tool to run root folder selection agent with the tree
+4. Read `.claude/commands/regex-file-filter.md`
+5. Use Task tool to run filter agent with results from step 3
+6. Continue through all stages...
+7. Save final plan to docs folder
+8. Return summary to user
 
 This orchestration ensures thorough codebase analysis and produces implementation plans that are grounded in the actual project structure and patterns.

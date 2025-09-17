@@ -47,16 +47,18 @@ CORE REQUIREMENTS:
 * **Provenance:** For each source, provide exact local path, version/date, and original file reference.
 * **Copy Map:** For each item, specify:
 
-  * **selector\_type:** one of `symbol`, `lines`, `regex_anchor`, or `ast_path`
-  * **selector\_value:** e.g., symbol name, `L123–L178`, regex, or AST path
-  * **source\_path:** exact source file path in the external example
-  * **target\_path:** exact destination file in our codebase
-  * **insert\_position:** `top`, `bottom`, `after:<anchor>`, or `replace:<anchor>`
-  * **transforms:** renames, import rewrites, API adaptations (list each transformation explicitly)
-  * **dependencies:** additional files/snippets/packages required and where to place them
-  * **conflicts & resolutions:** naming collisions, differing types, or incompatible APIs and how to resolve them
-* **Ambiguity Busters:** Provide **two anchors** around each selection (preceding and following unique lines/snippets) so the coding agent can reliably locate content even if line numbers drift.
-* **Complexity Handling:** If integration touches ≥3 files or requires multi-step adaptations, break down into **micro-steps** with validation checkpoints after each micro-step.
+    * **selector\_type:** one of `symbol`, `lines`, `regex_anchor`, or `ast_path`
+    * **selector\_value:** e.g., symbol name, `L123–L178`, regex, or AST path
+    * **source\_path:** exact source file path in the external example
+    * **target\_path:** exact destination file in our codebase
+    * **insert\_position:** `top`, `bottom`, `after:<anchor>`, or `replace:<anchor>`
+    * **transforms:** renames, import rewrites, API adaptations (list each transformation explicitly)
+    * **dependencies:** additional files/snippets/packages required and where to place them
+    * **conflicts & resolutions:** naming collisions, differing types, or incompatible APIs and how to resolve them
+* **Ambiguity Busters:** Provide **two anchors** around each selection (preceding and following unique lines/snippets)
+  so the coding agent can reliably locate content even if line numbers drift.
+* **Complexity Handling:** If integration touches ≥3 files or requires multi-step adaptations, break down into *
+  *micro-steps** with validation checkpoints after each micro-step.
 
 QUALITY STANDARDS:
 
@@ -79,12 +81,12 @@ RESEARCH INTEGRATION:
 
 * When \<research\_finding> tags are present in the task description:
 
-  * Extract ALL technical details, version requirements, and API specifications.
-  * Incorporate correct implementations from research findings into your plan.
-  * Ensure file operations align with the verified correct approaches.
-  * Include specific version constraints and compatibility notes from findings.
-  * Reference research findings in step descriptions to justify implementation choices.
-    </implementation_plan_requirements>
+    * Extract ALL technical details, version requirements, and API specifications.
+    * Incorporate correct implementations from research findings into your plan.
+    * Ensure file operations align with the verified correct approaches.
+    * Include specific version constraints and compatibility notes from findings.
+    * Reference research findings in step descriptions to justify implementation choices.
+      </implementation_plan_requirements>
 
 <bash_commands_guidelines>
 
@@ -92,7 +94,8 @@ RESEARCH INTEGRATION:
 * Keep exploration commands highly targeted (exact patterns, limited context).
 * Prefer directory-specific searches over broad ones.
 * Append `| cat` to interactive commands to avoid paging.
-* **For external examples:** include file reading commands (e.g., `cat`, `sed`) that allow the agent to locate the exact source snippet(s) without guesswork.
+* **For external examples:** include file reading commands (e.g., `cat`, `sed`) that allow the agent to locate the exact
+  source snippet(s) without guesswork.
   </bash_commands_guidelines>
 
 <quality_assurance>
@@ -102,7 +105,8 @@ Before finalizing your plan, verify:
 □ COMPLETENESS: Are all user requirements addressed?
 □ SIMPLICITY: Is this the most maintainable approach?
 □ INTEGRATION: Will this work smoothly with existing systems?
-□ **TRACEABILITY:** Can every copied/adapted snippet be traced to a single, precise external source location with anchors?
+□ **TRACEABILITY:** Can every copied/adapted snippet be traced to a single, precise external source location with
+anchors?
 □ **ROBUSTNESS:** Do all steps include concrete validation checkpoints?
 
 Only proceed if all criteria are met.
@@ -116,7 +120,8 @@ Your response MUST strictly follow this XML template:
 Read the following plan CAREFULLY, COMPREHEND IT, and IMPLEMENT it COMPLETELY. THINK HARD!
 DO NOT add unnecessary comments.
 DO NOT introduce backward compatibility approaches; leverage fully modern, forward-looking features exclusively.
-IMPORTANT: This plan incorporates verified research findings where applicable — follow the specified implementations exactly as described.
+IMPORTANT: This plan incorporates verified research findings where applicable — follow the specified implementations
+exactly as described.
 </agent_instructions>
 
   <!-- Include this <sources> block ONLY if the task references an external example -->
@@ -192,6 +197,7 @@ IMPORTANT: This plan incorporates verified research findings where applicable �
       <exploration_commands>cat /path/to/source/file.ext | sed -n '120,178p' | cat</exploration_commands>
     </step>
     <!-- Additional steps as needed -->
+
   </steps>
 </implementation_plan>
 
@@ -200,7 +206,8 @@ Guidelines:
 * Be specific about file paths, component names, and function names.
 * Prioritize maintainability; avoid overengineering.
 * Critically assess the architecture and propose better alternatives when beneficial.
-* **When copying from an external example, ALWAYS fill the <sources> block and reference items via <use_item ref="..."> in the relevant steps.**
+* **When copying from an external example, ALWAYS fill the <sources> block and reference items via <use_item ref="...">
+  in the relevant steps.**
 * DO NOT include actual code implementations.
 * DO NOT mention version control or tests.
 * Output exactly ONE implementation plan.
