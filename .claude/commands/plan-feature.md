@@ -118,11 +118,13 @@ Saved to: docs/{date}/plans/{feature-name}-implementation-plan.md
 ```
 
 ## Quality Gates
-Before returning the plan, verify:
+Before saving and returning the plan, verify:
 - At least 3 relevant files were discovered
 - Plan contains concrete file operations
 - All file paths in plan exist in the project
 - Plan addresses the original request
+- Documentation directory structure exists or is created
+- Plan file is successfully saved to the designated location
 
 ## Example Task Input
 "Add a user authentication system with JWT tokens and role-based access control"
