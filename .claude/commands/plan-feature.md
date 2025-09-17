@@ -1,6 +1,6 @@
 ---
 allowed-tools: Bash(git status, npm run)
-description: "Create detailed implementation plan for a feature"
+description: "Create a detailed implementation plan for a feature"
 argument-hint: "feature-description"
 ---
 
@@ -8,8 +8,8 @@ argument-hint: "feature-description"
 
 ## Project Health Check
 !`git status --porcelain`
-!`npm run typecheck 2>&1 | head -5`
-!`npm run lint 2>&1 | head -5`
+!`npm run typecheck 2>&1 | head -10`
+!`npm run lint:fix 2>&1 | head -10`
 
 ## Current Codebase Context
 @CLAUDE.MD
