@@ -12,7 +12,7 @@ export const AddItemHeader = () => {
           <div
             className={cn(
               'flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br',
-              'from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/25',
+              'from-orange-500 to-orange-600 shadow-lg shadow-orange-500/25',
             )}
           >
             <PlusIcon aria-hidden className={'size-8 text-white'} />

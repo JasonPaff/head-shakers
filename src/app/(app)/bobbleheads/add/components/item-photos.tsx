@@ -9,6 +9,7 @@ import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
+import { Conditional } from '@/components/ui/conditional';
 import { withForm } from '@/components/ui/form';
 
 export const ItemPhotos = withForm({
@@ -30,14 +31,10 @@ export const ItemPhotos = withForm({
     };
 
     return (
-      <Card
-        aria-labelledby={'photos-section-title'}
-        className={'group relative overflow-hidden border-0'}
-        role={'region'}
-      >
+      <Card aria-labelledby={'photos-section-title'} role={'region'}>
         <CardHeader className={'relative'}>
           <div className={'flex items-center gap-3'}>
-            <div className={'flex size-10 items-center justify-center rounded-xl shadow-sm'}>
+            <div className={'flex size-10 items-center justify-center rounded-xl bg-green-500 shadow-sm'}>
               <CameraIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>
@@ -106,12 +103,13 @@ export const ItemPhotos = withForm({
             className={'flex items-center justify-between rounded-lg bg-green-100 p-3 dark:bg-green-900/40'}
           >
             <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
-              <div className={'size-2 rounded-full bg-green-500'} />
-              <span>
-                {photos.length === 0 ?
-                  'Add photos to make your bobblehead stand out!'
-                : `${photos.length}/8 photos uploaded - looking great!`}
-              </span>
+              <div className={'size-2 rounded-full bg-green-500'} />{' '}
+              <Conditional
+                fallback={`${photos.length}/8 photos uploaded - looking great!`}
+                isCondition={photos.length === 0}
+              >
+                <span>Add photos to make your bobblehead stand out!</span>
+              </Conditional>
             </div>
           </div>
         </CardContent>

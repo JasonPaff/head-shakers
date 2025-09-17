@@ -1,37 +1,58 @@
 'use client';
 
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, SettingsIcon, StarIcon, Trash2 } from 'lucide-react';
 
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
+import { cn } from '@/utils/tailwind-utils';
 
 export const CustomFields = withForm({
   ...addItemFormOptions,
   render: ({ form }) => {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Custom Fields</CardTitle>
-          <CardDescription>Add custom attributes specific to this bobblehead</CardDescription>
+        <CardHeader className={'relative'}>
+          {/* Title / Description */}
+          <div className={'flex items-center gap-3'}>
+            <div className={'flex size-10 items-center justify-center rounded-xl bg-indigo-500 shadow-sm'}>
+              <SettingsIcon aria-hidden className={'size-5 text-white'} />
+            </div>
+            <div>
+              <CardTitle className={'text-xl font-semibold text-foreground'}>Custom Fields</CardTitle>
+              <CardDescription className={'text-muted-foreground'}>
+                Add unique attributes that make your bobblehead special
+              </CardDescription>
+            </div>
+          </div>
+
+          {/* Info tip */}
+          <div className={'flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400'}>
+            <StarIcon aria-hidden className={'size-3 fill-current'} />
+            <span>
+              Custom fields help capture unique details like edition numbers, special features, or rarity info
+            </span>
+          </div>
         </CardHeader>
-        <CardContent className={'space-y-4'}>
+
+        <CardContent className={'relative space-y-6'}>
           <form.Field mode={'array'} name={'customFields'}>
             {(field) => (
               <div className={'space-y-4'}>
                 {field.state.value?.map((_, index) => (
-                  <div className={'flex w-full items-end gap-2'} key={index}>
+                  <div className={'flex w-full items-end gap-4'} key={index}>
                     {/* Field Name */}
-                    <div className={'flex-1'}>
+                    <div className={'flex-1 space-y-2'}>
                       <form.AppField name={`customFields[${index}].fieldName`}>
                         {(subfield) => (
                           <subfield.TextField
+                            description={'What type of information is this?'}
                             label={'Field Name'}
                             onChange={(e) => {
                               subfield.handleChange(e.target.value);
                             }}
-                            placeholder={'e.g., Edition Number'}
+                            placeholder={'Edition Number, Special Feature...'}
                             value={subfield.state.value}
                           />
                         )}
@@ -39,15 +60,16 @@ export const CustomFields = withForm({
                     </div>
 
                     {/* Value */}
-                    <div className={'flex-1'}>
+                    <div className={'flex-1 space-y-2'}>
                       <form.AppField name={`customFields[${index}].value`}>
                         {(subfield) => (
                           <subfield.TextField
+                            description={'The specific value or detail'}
                             label={'Value'}
                             onChange={(e) => {
                               subfield.handleChange(e.target.value);
                             }}
-                            placeholder={'e.g., 1 of 500'}
+                            placeholder={'1 of 500, Gold Base, Signed...'}
                             value={subfield.state.value}
                           />
                         )}
@@ -56,7 +78,7 @@ export const CustomFields = withForm({
 
                     {/* Remove */}
                     <Button
-                      className={'h-9 hover:text-destructive'}
+                      className={'h-10 hover:text-destructive'}
                       onClick={() => {
                         field.removeValue(index);
                       }}
@@ -70,7 +92,7 @@ export const CustomFields = withForm({
 
                 {/* Add */}
                 <Button
-                  className={'w-full bg-transparent'}
+                  className={'w-full border-dashed bg-transparent'}
                   onClick={() => {
                     field.pushValue({ fieldName: '', value: '' });
                   }}
@@ -83,6 +105,19 @@ export const CustomFields = withForm({
               </div>
             )}
           </form.Field>
+
+          {/* Progress indicator */}
+          <div
+            className={cn(
+              'mt-6 flex items-center justify-between rounded-lg',
+              'bg-indigo-100 p-3 dark:bg-indigo-950/40',
+            )}
+          >
+            <div className={'flex items-center gap-2 text-sm text-indigo-700 dark:text-indigo-300'}>
+              <div className={'size-2 rounded-full bg-indigo-500'} />
+              <span>Perfect! These custom details make your bobblehead truly unique.</span>
+            </div>
+          </div>
         </CardContent>
       </Card>
     );

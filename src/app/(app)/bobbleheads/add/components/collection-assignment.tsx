@@ -2,6 +2,7 @@
 'use client';
 
 import { useStore } from '@tanstack/react-form';
+import { FolderIcon, StarIcon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useState } from 'react';
 
@@ -14,6 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
 import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections/subcollections.actions';
+import { cn } from '@/utils/tailwind-utils';
 
 // TODO: replace server action with tanstack query
 
@@ -73,52 +75,88 @@ export const CollectionAssignment = withForm({
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Collection Assignment</CardTitle>
-          <CardDescription>Choose which collection this bobblehead belongs to</CardDescription>
+          {/* Title / Description */}
+          <div className={'flex items-center gap-3'}>
+            <div className={'flex size-10 items-center justify-center rounded-xl bg-purple-500 shadow-sm'}>
+              <FolderIcon aria-hidden className={'size-5 text-white'} />
+            </div>
+            <div>
+              <CardTitle className={'text-xl font-semibold text-foreground'}>Collection Assignment</CardTitle>
+              <CardDescription className={'text-muted-foreground'}>
+                Organize your bobblehead by placing it in the right collection
+              </CardDescription>
+            </div>
+          </div>
+
+          {/* Info tip */}
+          <div className={'flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400'}>
+            <StarIcon className={'size-3 fill-current'} />
+            <span>Collections help you organize and showcase related bobbleheads together</span>
+          </div>
         </CardHeader>
-        <CardContent className={'space-y-4'}>
-          <div className={'grid grid-cols-1 gap-4 md:grid-cols-2'}>
+
+        <CardContent className={'space-y-6'}>
+          <div className={'grid grid-cols-1 gap-6 md:grid-cols-2'}>
             {/* Collection */}
-            <form.AppField
-              listeners={{
-                onChange: () => {
-                  form.setFieldValue('subcollectionId', '');
-                },
-              }}
-              name={'collectionId'}
-            >
-              {(field) => (
-                <field.ComboboxField
-                  createNewLabel={'Create new collection'}
-                  isRequired
-                  items={collectionsList}
-                  label={'Collection'}
-                  onCreateNewSelect={setIsCreateCollectionDialogOpen.on}
-                  placeholder={'Select a collection...'}
-                  searchPlaceholder={'Search collections...'}
-                />
-              )}
-            </form.AppField>
+            <div className={'space-y-2'}>
+              <form.AppField
+                listeners={{
+                  onChange: () => {
+                    form.setFieldValue('subcollectionId', '');
+                  },
+                }}
+                name={'collectionId'}
+              >
+                {(field) => (
+                  <field.ComboboxField
+                    createNewLabel={'Create new collection'}
+                    description={'Choose an existing collection or create a new one'}
+                    isRequired
+                    items={collectionsList}
+                    label={'Collection'}
+                    onCreateNewSelect={setIsCreateCollectionDialogOpen.on}
+                    placeholder={'Select a collection...'}
+                    searchPlaceholder={'Search collections...'}
+                  />
+                )}
+              </form.AppField>
+            </div>
 
             {/* Sub-Collection */}
-            <form.AppField name={'subcollectionId'}>
-              {(field) => (
-                <field.ComboboxField
-                  createNewLabel={'Create new sub-collection'}
-                  isDisabled={!collectionId || isLoadingSubCollections}
-                  items={subCollectionsList}
-                  label={'Sub-Collection'}
-                  onCreateNewSelect={setIsCreateSubCollectionDialogOpen.on}
-                  placeholder={
-                    isLoadingSubCollections ? 'Loading sub-collections...'
-                    : !collectionId ?
-                      'Select a collection first...'
-                    : 'Select a sub-collection...'
-                  }
-                  searchPlaceholder={'Search sub-collections...'}
-                />
-              )}
-            </form.AppField>
+            <div className={'space-y-2'}>
+              <form.AppField name={'subcollectionId'}>
+                {(field) => (
+                  <field.ComboboxField
+                    createNewLabel={'Create new sub-collection'}
+                    description={'Optional: Further organize within your collection'}
+                    isDisabled={!collectionId || isLoadingSubCollections}
+                    items={subCollectionsList}
+                    label={'Sub-Collection'}
+                    onCreateNewSelect={setIsCreateSubCollectionDialogOpen.on}
+                    placeholder={
+                      isLoadingSubCollections ? 'Loading sub-collections...'
+                      : !collectionId ?
+                        'Select a collection first...'
+                      : 'Select a sub-collection...'
+                    }
+                    searchPlaceholder={'Search sub-collections...'}
+                  />
+                )}
+              </form.AppField>
+            </div>
+          </div>
+
+          {/* Progress indicator */}
+          <div
+            className={cn(
+              'mt-6 flex items-center justify-between rounded-lg',
+              'bg-purple-100 p-3 dark:bg-purple-950/40',
+            )}
+          >
+            <div className={'flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300'}>
+              <div className={'size-2 rounded-full bg-purple-500'} />
+              <span>Perfect! Your bobblehead now has a home in your collection.</span>
+            </div>
           </div>
         </CardContent>
 

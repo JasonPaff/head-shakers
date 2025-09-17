@@ -11,11 +11,11 @@ export const BasicInformation = withForm({
   ...addItemFormOptions,
   render: ({ form }) => {
     return (
-      <Card className={'group relative overflow-hidden border-0'}>
-        <CardHeader className={'relative'}>
+      <Card>
+        <CardHeader>
           {/* Title / Description */}
           <div className={'flex items-center gap-3'}>
-            <div className={'flex size-10 items-center justify-center rounded-xl shadow-sm'}>
+            <div className={'flex size-10 items-center justify-center rounded-xl bg-blue-500 shadow-sm'}>
               <InfoIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>
@@ -33,7 +33,7 @@ export const BasicInformation = withForm({
           </div>
         </CardHeader>
 
-        <CardContent className={'relative space-y-6'}>
+        <CardContent className={'space-y-6'}>
           {/* Name and Character Name Row */}
           <div className={'grid grid-cols-1 gap-6 md:grid-cols-2'}>
             {/* Name - Enhanced with styling */}

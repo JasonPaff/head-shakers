@@ -1,9 +1,12 @@
 'use client';
 
+import { RulerIcon, StarIcon } from 'lucide-react';
+
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { ENUMS } from '@/lib/constants';
+import { cn } from '@/utils/tailwind-utils';
 
 const conditionOptions = ENUMS.BOBBLEHEAD.CONDITION.map((condition) => ({
   label: condition,
@@ -15,46 +18,111 @@ export const PhysicalAttributes = withForm({
   render: ({ form }) => {
     return (
       <Card>
-        <CardHeader>
-          <CardTitle>Physical Attributes</CardTitle>
-          <CardDescription>Physical characteristics and condition</CardDescription>
-        </CardHeader>
-        <CardContent className={'space-y-4'}>
-          <div className={'grid grid-cols-1 gap-4 md:grid-cols-3'}>
-            {/* Height */}
-            <form.AppField name={'height'}>
-              {(field) => (
-                <field.TextField label={'Height (centimeters)'} placeholder={'7.5'} type={'number'} />
-              )}
-            </form.AppField>
-
-            {/* Weight */}
-            <form.AppField name={'weight'}>
-              {(field) => <field.TextField label={'Weight (grams)'} placeholder={'5.2'} type={'number'} />}
-            </form.AppField>
-
-            {/* Material */}
-            <form.AppField name={'material'}>
-              {(field) => <field.TextField label={'Material'} placeholder={'Resin, Ceramic, etc.'} />}
-            </form.AppField>
+        <CardHeader className={'relative'}>
+          {/* Title / Description */}
+          <div className={'flex items-center gap-3'}>
+            <div className={'flex size-10 items-center justify-center rounded-xl bg-green-500 shadow-sm'}>
+              <RulerIcon aria-hidden className={'size-5 text-white'} />
+            </div>
+            <div>
+              <CardTitle className={'text-xl font-semibold text-foreground'}>Physical Attributes</CardTitle>
+              <CardDescription className={'text-muted-foreground'}>
+                Record the physical characteristics and condition of your bobblehead
+              </CardDescription>
+            </div>
           </div>
 
-          <div className={'grid grid-cols-1 gap-4 md:grid-cols-2'}>
+          {/* Info tip */}
+          <div className={'flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400'}>
+            <StarIcon aria-hidden className={'size-3 fill-current'} />
+            <span>Accurate measurements help with authenticity verification and value assessment</span>
+          </div>
+        </CardHeader>
+
+        <CardContent className={'relative space-y-6'}>
+          <div className={'grid grid-cols-1 gap-6 md:grid-cols-3'}>
+            {/* Height */}
+            <div className={'space-y-2'}>
+              <form.AppField name={'height'}>
+                {(field) => (
+                  <field.TextField
+                    description={'Measure from base to top of head'}
+                    label={'Height (centimeters)'}
+                    placeholder={'18'}
+                    type={'number'}
+                  />
+                )}
+              </form.AppField>
+            </div>
+
+            {/* Weight */}
+            <div className={'space-y-2'}>
+              <form.AppField name={'weight'}>
+                {(field) => (
+                  <field.TextField
+                    description={'Total weight including base'}
+                    label={'Weight (grams)'}
+                    placeholder={'250'}
+                    type={'number'}
+                  />
+                )}
+              </form.AppField>
+            </div>
+
+            {/* Material */}
+            <div className={'space-y-2'}>
+              <form.AppField name={'material'}>
+                {(field) => (
+                  <field.TextField
+                    description={'Primary material composition'}
+                    label={'Material'}
+                    placeholder={'Resin, Ceramic, Plastic...'}
+                  />
+                )}
+              </form.AppField>
+            </div>
+          </div>
+
+          <div className={'grid grid-cols-1 gap-6 md:grid-cols-2'}>
             {/* Manufacturer */}
-            <form.AppField name={'manufacturer'}>
-              {(field) => <field.TextField label={'Manufacturer'} placeholder={'Company name'} />}
-            </form.AppField>
+            <div className={'space-y-2'}>
+              <form.AppField name={'manufacturer'}>
+                {(field) => (
+                  <field.TextField
+                    description={'Company or brand that produced it'}
+                    label={'Manufacturer'}
+                    placeholder={'Forever Collectibles, FOCO...'}
+                  />
+                )}
+              </form.AppField>
+            </div>
 
             {/* Condition */}
-            <form.AppField name={'currentCondition'}>
-              {(field) => (
-                <field.SelectField
-                  label={'Current Condition'}
-                  options={conditionOptions}
-                  placeholder={'Select the current condition'}
-                />
-              )}
-            </form.AppField>
+            <div className={'space-y-2'}>
+              <form.AppField name={'currentCondition'}>
+                {(field) => (
+                  <field.SelectField
+                    description={'Assess the overall condition honestly'}
+                    label={'Current Condition'}
+                    options={conditionOptions}
+                    placeholder={'Select the current condition'}
+                  />
+                )}
+              </form.AppField>
+            </div>
+          </div>
+
+          {/* Progress indicator */}
+          <div
+            className={cn(
+              'mt-6 flex items-center justify-between rounded-lg',
+              'bg-green-100 p-3 dark:bg-green-950/40',
+            )}
+          >
+            <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
+              <div className={'size-2 rounded-full bg-green-500'} />
+              <span>Excellent! These details help establish authenticity and value.</span>
+            </div>
           </div>
         </CardContent>
       </Card>
