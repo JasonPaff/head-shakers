@@ -3,6 +3,7 @@
 import type { z } from 'zod';
 
 import { revalidateLogic } from '@tanstack/form-core';
+import { CheckCircle2Icon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 
@@ -18,6 +19,7 @@ import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settin
 import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
 import { useServerAction } from '@/hooks/use-server-action';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
@@ -28,8 +30,6 @@ interface AddItemFormClientProps {
   initialCollectionId?: string;
   initialSubcollectionId?: string;
 }
-
-// TODO: local storage draft save and restore
 
 export const AddItemFormClient = ({
   collections,
@@ -58,8 +58,8 @@ export const AddItemFormClient = ({
     },
     toastMessages: {
       error: 'Failed to add bobblehead. Please try again.',
-      loading: 'Adding bobblehead...',
-      success: 'Bobblehead added successfully!',
+      loading: 'Adding your bobblehead to the collection...',
+      success: 'Bobblehead added successfully! 🎉',
     },
   });
 
@@ -94,25 +94,48 @@ export const AddItemFormClient = ({
         void form.handleSubmit();
       }}
     >
-      <div className={'space-y-6'}>
+      <div className={'space-y-8'}>
         <CollectionAssignment collections={collections} form={form} />
         <BasicInformation form={form} />
+        <ItemPhotos form={form} />
         <AcquisitionDetails form={form} />
         <PhysicalAttributes form={form} />
         <ItemTags form={form} />
         <CustomFields form={form} />
-        <ItemPhotos form={form} />
         <ItemSettings form={form} />
 
-        {/* Action Buttons */}
         <form.AppForm>
-          <div className={'flex justify-end space-x-4'}>
-            <Button onClick={handleCancel} variant={'outline'}>
-              Cancel
-            </Button>
-            <form.SubmitButton isDisabled={isExecuting}>
-              {isExecuting ? 'Adding...' : 'Add Bobblehead'}
-            </form.SubmitButton>
+          <div
+            className={
+              'sticky bottom-0 z-10 -mx-6 border-t border-border/50 bg-background/80 p-6 backdrop-blur-sm'
+            }
+          >
+            <div className={'flex items-center justify-end'}>
+              {/* Form actions */}
+              <div className={'flex items-center gap-4'}>
+                <Button className={'min-w-[100px]'} onClick={handleCancel} variant={'outline'}>
+                  Cancel
+                </Button>
+                <form.SubmitButton isDisabled={isExecuting}>
+                  <Conditional
+                    fallback={
+                      <div className={'flex items-center gap-2'}>
+                        <CheckCircle2Icon aria-hidden className={'size-4'} />
+                        <span>Add Bobblehead</span>
+                      </div>
+                    }
+                    isCondition={isExecuting}
+                  >
+                    <div className={'flex items-center gap-2'}>
+                      <div
+                        className={'size-4 animate-spin rounded-full border-2 border-white/20 border-t-white'}
+                      />
+                      <span>Adding...</span>
+                    </div>
+                  </Conditional>
+                </form.SubmitButton>
+              </div>
+            </div>
           </div>
         </form.AppForm>
       </div>
