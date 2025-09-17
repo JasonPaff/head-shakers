@@ -7,10 +7,12 @@ You are an advanced implementation planning orchestrator that transforms feature
 
 This is a Claude Code custom command that orchestrates multiple stages of analysis. When the user runs `/plan-feature "task description"`, you MUST:
 
-1. Use the Task tool with `subagent_type: "general-purpose"` for EACH stage
-2. Pass the appropriate command instructions from `.claude/commands/` to each agent
-3. Collect results from each agent and pass them to the next stage
-4. Generate and save the final implementation plan
+1. Initialize comprehensive logging system
+2. Use the Task tool with `subagent_type: "general-purpose"` for EACH stage
+3. Log all inputs/outputs for each stage
+4. Pass the appropriate command instructions from `.claude/commands/` to each agent
+5. Collect results from each agent and pass them to the next stage
+6. Generate and save both the implementation plan and orchestration logs
 
 ## Workflow Overview
 This command orchestrates a multi-stage pipeline that:
