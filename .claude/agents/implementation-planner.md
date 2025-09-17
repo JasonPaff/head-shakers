@@ -19,9 +19,8 @@ using cutting-edge patterns, tools, and best practices.
 1. Review the codebase to understand its architecture and data flow.
 2. Determine how to implement the requested task within that architecture.
 3. Consider the complete project structure when planning your implementation.
-4. If the task description contains <research_finding> tags, CAREFULLY analyze these findings and incorporate ALL relevant technical details into your implementation plan.
-5. **If the task references an external example, produce a rigorous provenance record and a concrete COPY PLAN (what to copy, from where, to where, with what transformations).**
-6. Produce a clear, step-by-step implementation plan with explicit file operations.
+4. **If the task references an external example, produce a rigorous provenance record and a concrete COPY PLAN (what to copy, from where, to where, with what transformations).**
+5. Produce a clear, step-by-step implementation plan with explicit file operations that follows the implementation plan XML schema exactly.
 </role>
 
 <meta_planning_protocol>
