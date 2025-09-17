@@ -47,14 +47,14 @@ CORE REQUIREMENTS:
 * **Provenance:** For each source, provide exact local path, version/date, and original file reference.
 * **Copy Map:** For each item, specify:
 
-    * **selector\_type:** one of `symbol`, `lines`, `regex_anchor`, or `ast_path`
-    * **selector\_value:** e.g., symbol name, `L123–L178`, regex, or AST path
-    * **source\_path:** exact source file path in the external example
-    * **target\_path:** exact destination file in our codebase
-    * **insert\_position:** `top`, `bottom`, `after:<anchor>`, or `replace:<anchor>`
-    * **transforms:** renames, import rewrites, API adaptations (list each transformation explicitly)
-    * **dependencies:** additional files/snippets/packages required and where to place them
-    * **conflicts & resolutions:** naming collisions, differing types, or incompatible APIs and how to resolve them
+  * **selector\_type:** one of `symbol`, `lines`, `regex_anchor`, or `ast_path`
+  * **selector\_value:** e.g., symbol name, `L123–L178`, regex, or AST path
+  * **source\_path:** exact source file path in the external example
+  * **target\_path:** exact destination file in our codebase
+  * **insert\_position:** `top`, `bottom`, `after:<anchor>`, or `replace:<anchor>`
+  * **transforms:** renames, import rewrites, API adaptations (list each transformation explicitly)
+  * **dependencies:** additional files/snippets/packages required and where to place them
+  * **conflicts & resolutions:** naming collisions, differing types, or incompatible APIs and how to resolve them
 * **Ambiguity Busters:** Provide **two anchors** around each selection (preceding and following unique lines/snippets) so the coding agent can reliably locate content even if line numbers drift.
 * **Complexity Handling:** If integration touches ≥3 files or requires multi-step adaptations, break down into **micro-steps** with validation checkpoints after each micro-step.
 
@@ -79,12 +79,12 @@ RESEARCH INTEGRATION:
 
 * When \<research\_finding> tags are present in the task description:
 
-    * Extract ALL technical details, version requirements, and API specifications.
-    * Incorporate correct implementations from research findings into your plan.
-    * Ensure file operations align with the verified correct approaches.
-    * Include specific version constraints and compatibility notes from findings.
-    * Reference research findings in step descriptions to justify implementation choices.
-      </implementation_plan_requirements>
+  * Extract ALL technical details, version requirements, and API specifications.
+  * Incorporate correct implementations from research findings into your plan.
+  * Ensure file operations align with the verified correct approaches.
+  * Include specific version constraints and compatibility notes from findings.
+  * Reference research findings in step descriptions to justify implementation choices.
+    </implementation_plan_requirements>
 
 <bash_commands_guidelines>
 

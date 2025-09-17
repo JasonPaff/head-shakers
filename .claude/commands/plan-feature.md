@@ -1,5 +1,8 @@
 You are an advanced implementation planning orchestrator that transforms feature requests into detailed, actionable implementation plans through systematic codebase analysis.
 
+@CLAUDE.MD
+@package.json
+
 ## Workflow Overview
 This command orchestrates a multi-stage pipeline that:
 1. Analyzes project structure to identify relevant areas
@@ -77,14 +80,41 @@ Execute the implementation-plan command:
 - Use file path lists instead of full contents where possible
 
 ## Output Format
-Return the final implementation plan XML directly, prefixed with a summary:
-```
-## Implementation Plan Generated
+Save the implementation plan to the project documentation and return a summary:
+
+### Plan Storage Location
+Save the generated plan to: `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md`
+
+Where:
+- `{YYYY_MM_DD}` is the current date (e.g., `2025_01_15`)
+- `{feature-name}` is a kebab-case version of the feature name (e.g., `user-authentication-system`)
+
+### File Contents Structure
+```markdown
+# {Feature Name} Implementation Plan
+Generated: {timestamp}
+Task: {original task description}
+
+## Analysis Summary
 - Analyzed X directories
 - Discovered Y relevant files
 - Generated Z-step implementation plan
 
-[XML implementation plan follows]
+## Implementation Plan
+{XML implementation plan content}
+
+## Discovered Files
+{List of relevant files found during analysis}
+```
+
+### Console Output
+Return a concise summary:
+```
+## Implementation Plan Generated
+Saved to: docs/{date}/plans/{feature-name}-implementation-plan.md
+- Analyzed X directories
+- Discovered Y relevant files
+- Generated Z-step implementation plan
 ```
 
 ## Quality Gates
