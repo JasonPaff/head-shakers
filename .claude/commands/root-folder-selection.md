@@ -3,7 +3,7 @@ identify which folders are most relevant for the given task.
 
 {{DIRECTORY_TREE}}
 
-The directory tree above shows folder paths up to 2 levels deep from the project root and any configured external
+The directory tree above shows folder paths up to 5 levels deep from the project root and any configured external
 folders. Your role is to:
 
 1. Analyze the directory structure and identify areas relevant to the task
