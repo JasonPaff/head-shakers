@@ -17,7 +17,6 @@ export async function AddItemFormServer({
 
   const userCollections = (await CollectionsFacade.getCollectionsByUser(userId, {}, userId)) ?? [];
 
-  // transform the collection data
   const collectionsData = userCollections.map((collection) => ({
     id: collection.id,
     name: collection.name,
