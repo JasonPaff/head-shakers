@@ -92,7 +92,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - `npm run db:migrate` - Run database migrations
 - `npm run db:seed` - Seed database with test data
 
-## Project Rules
+## Project Rules (Important)
 - **Code Formatting**: All code must be formatted using Prettier. Run `npm run format` before committing.
 - **Linting**: Ensure code passes ESLint checks. Run `npm run lint:fix` to fix issues.
 - **Type Safety**: Use TypeScript and Zod for type safety. Run `npm run typecheck` to verify. 
