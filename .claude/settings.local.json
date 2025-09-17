@@ -29,7 +29,21 @@
       "mcp__Ref__ref_read_url",
       "Bash(npm run lint)",
       "Bash(timeout 10 npm run dev)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(mkdir:*)",
+      "Bash(for file in \"src/components/ui/form/index.tsx\" \"src/components/ui/form/form-components/submit-button.tsx\" \"src/components/ui/form/field-components/text-field.tsx\" \"src/components/ui/form/field-components/field-error.tsx\" \"src/components/ui/form/field-components/field-item.tsx\" \"src/app/(app)/bobbleheads/add/components/add-item-form-client.tsx\")",
+      "Bash(do [ -f \"$file\" ])",
+      "Bash(echo \"$file exists\")",
+      "Bash(echo:*)",
+      "Bash(done)",
+      "Bash(tree:*)",
+      "Bash(for:*)",
+      "Bash(do if [ -f \"$file\" ])",
+      "Bash(then echo \"$file exists\")",
+      "Bash(else echo \"$file does not exist\")",
+      "Bash(fi)",
+      "Read(//c/Users/JasonPaff/**)",
+      "Bash(grep:*)"
     ],
     "deny": [],
     "ask": []

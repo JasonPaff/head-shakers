@@ -70,6 +70,26 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - Real-time notifications
 - Data import/export functionality
 
+## Folder Structure
+- **`src/app/`** - Next.js App Router pages and API routes
+  - `(app)/` - App routes (dashboard, collections, bobbleheads, etc.)
+  - `(public)/` - Public routes (about, terms, privacy)
+  - `api/` - API endpoints
+- **`src/components/`** - React components
+  - `ui/` - Reusable UI components (forms, dialogs, icons)
+  - `feature/` - Feature-specific components (bobblehead, collections)
+  - `layout/` - Layout components (headers, sidebars)
+- **`src/lib/`** - Core application logic
+  - `db/` - Database schema, migrations, and scripts
+  - `actions/` - Server actions for mutations
+  - `queries/` - Database queries and data fetching
+  - `facades/` - Business logic layer
+  - `validations/` - Zod schemas for validation
+  - `utils/` - Utility functions and helpers
+- **`tests/`** - Test files mirroring src structure
+- **`docs/`** - Project documentation and task files
+- **`public/`** - Static assets (images, icons, etc.)
+
 ## Architecture
 - **App Router** structure with route groups for organization
 - **Server Actions** for form handling and mutations
