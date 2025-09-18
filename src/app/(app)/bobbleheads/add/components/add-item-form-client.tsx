@@ -69,6 +69,7 @@ const AddItemFormContent = ({
 
   const form = useAppForm({
     ...addItemFormOptions,
+    canSubmitWhenInvalid: true,
     defaultValues: {
       ...addItemFormOptions.defaultValues,
       collectionId: initialCollectionId || '',
@@ -78,7 +79,6 @@ const AddItemFormContent = ({
       await executeAsync(value);
     },
     onSubmitInvalid: ({ formApi }) => {
-      // Focus the first field with an error when form submission is invalid
       focusFirstError(formApi);
     },
     validationLogic: revalidateLogic({
