@@ -117,6 +117,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **Linting**: Ensure code passes ESLint checks. Run `npm run lint:fix` to fix issues.
 - **Type Safety**: Use TypeScript and Zod for type safety. Run `npm run typecheck` to verify. 
 - **No Any Type**: Avoid using `any` type in TypeScript. Use proper types, generics, or unknown with type narrowing.
+- **No forwardRef()**: Do not use `forwardRef` in React 19, pass refs directly through props.
 
 ## Project Documentation Conventions (Important)
 
