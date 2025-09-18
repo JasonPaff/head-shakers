@@ -47,3 +47,6 @@ next-env.d.ts
 .idea
 # clerk configuration (can include secrets)
 /.clerk/
+
+# playwright auth state
+playwright/.clerk

@@ -44,7 +44,8 @@
       "Bash(fi)",
       "Bash(grep:*)",
       "Bash(npm run lint:*)",
-      "Bash(npm run typecheck:*)"
+      "Bash(npm run typecheck:*)",
+      "Bash(npm install:*)"
     ],
     "deny": [],
     "ask": []
