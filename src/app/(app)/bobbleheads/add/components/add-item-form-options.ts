@@ -1,8 +1,6 @@
-import type { z } from 'zod';
-
 import { formOptions } from '@tanstack/form-core';
 
-import type { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
+import type { AddBobbleheadFormSchema } from '@/lib/validations/bobbleheads.validation';
 
 import { DEFAULTS } from '@/lib/constants';
 
@@ -31,5 +29,5 @@ export const addItemFormOptions = formOptions({
     tags: [],
     weight: '',
     year: '',
-  } as z.input<typeof createBobbleheadWithPhotosSchema>,
+  } as AddBobbleheadFormSchema,
 });

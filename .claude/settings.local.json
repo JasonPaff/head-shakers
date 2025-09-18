@@ -1,45 +1,4 @@
 {
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python \".claude\\hooks\\validate_agent_output.py\""
-          },
-          {
-            "type": "command",
-            "command": "python \".claude\\hooks\\orchestration_tracker.py\""
-          }
-        ]
-      },
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python \".claude\\hooks\\orchestration_quality_gates.py\""
-          },
-          {
-            "type": "command",
-            "command": "python \".claude\\hooks\\orchestration_tracker.py\""
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "Task",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "echo 📋 Reminder: Follow agent prompt constraints exactly. Check .claude/memory/orchestration-standards.md for requirements."
-          }
-        ]
-      }
-    ]
-  },
   "permissions": {
     "allow": [
       "Bash(find:*)",
@@ -83,10 +42,53 @@
       "Bash(then echo \"$file exists\")",
       "Bash(else echo \"$file does not exist\")",
       "Bash(fi)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run typecheck:*)"
     ],
     "deny": [],
     "ask": []
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \".claude\\hooks\\validate_agent_output.py\""
+          },
+          {
+            "type": "command",
+            "command": "python \".claude\\hooks\\orchestration_tracker.py\""
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \".claude\\hooks\\orchestration_quality_gates.py\""
+          },
+          {
+            "type": "command",
+            "command": "python \".claude\\hooks\\orchestration_tracker.py\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 📋 Reminder: Follow agent prompt constraints exactly. Check .claude/memory/orchestration-standards.md for requirements."
+          }
+        ]
+      }
+    ]
   },
   "outputStyle": "default"
 }

@@ -15,6 +15,7 @@ import { cloudinaryPhotosValidationSchema } from '@/lib/validations/photo-upload
 
 export const customFieldsSchema = z.record(z.string(), z.string());
 
+export type AddBobbleheadFormSchema = z.input<typeof createBobbleheadWithPhotosSchema>;
 export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
 export type InsertBobblehead = z.infer<typeof insertBobbleheadSchema>;
