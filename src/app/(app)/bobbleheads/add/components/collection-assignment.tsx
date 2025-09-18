@@ -4,7 +4,7 @@
 import { useStore } from '@tanstack/react-form';
 import { FolderIcon, StarIcon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
@@ -16,8 +16,6 @@ import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
 import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 import { cn } from '@/utils/tailwind-utils';
-
-// TODO: replace server action with tanstack query
 
 export const CollectionAssignment = withForm({
   ...addItemFormOptions,
@@ -31,6 +29,9 @@ export const CollectionAssignment = withForm({
 
     const [collectionsList, setCollectionsList] = useState<Array<ComboboxItem>>(collections);
     const [subCollectionsList, setSubCollectionsList] = useState<Array<ComboboxItem>>([]);
+
+    const collectionRef = useRef<HTMLElement | null>(null);
+    const subcollectionRef = useRef<HTMLElement | null>(null);
 
     const collectionId = useStore(form.store, (state) => state.values.collectionId);
 
@@ -111,6 +112,7 @@ export const CollectionAssignment = withForm({
                   <field.ComboboxField
                     createNewLabel={'Create new collection'}
                     description={'Choose an existing collection or create a new one'}
+                    focusRef={collectionRef}
                     isRequired
                     items={collectionsList}
                     label={'Collection'}
@@ -129,6 +131,7 @@ export const CollectionAssignment = withForm({
                   <field.ComboboxField
                     createNewLabel={'Create new sub-collection'}
                     description={'Optional: Further organize within your collection'}
+                    focusRef={subcollectionRef}
                     isDisabled={!collectionId || isLoadingSubCollections}
                     items={subCollectionsList}
                     label={'Sub-Collection'}

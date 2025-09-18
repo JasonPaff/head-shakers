@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client';
 
 import { InfoIcon, StarIcon } from 'lucide-react';
+import { useRef } from 'react';
 
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +12,9 @@ import { cn } from '@/utils/tailwind-utils';
 export const BasicInformation = withForm({
   ...addItemFormOptions,
   render: ({ form }) => {
+    const nameRef = useRef<HTMLElement | null>(null);
+    const descriptionRef = useRef<HTMLElement | null>(null);
+
     return (
       <Card>
         <CardHeader>
@@ -42,6 +47,7 @@ export const BasicInformation = withForm({
                 {(field) => (
                   <field.TextField
                     description={'Give your bobblehead a descriptive name that collectors will remember'}
+                    focusRef={nameRef}
                     isRequired
                     label={'Bobblehead Name'}
                     placeholder={'e.g., "Babe Ruth Yankees Bobblehead"'}
@@ -71,6 +77,7 @@ export const BasicInformation = withForm({
                 <field.TextareaField
                   className={'min-h-[120px] resize-none'}
                   description={'Tell other collectors what makes this bobblehead unique'}
+                  focusRef={descriptionRef}
                   label={'Description'}
                   placeholder={
                     'Share the story behind this bobblehead... Where did you find it? What makes it special? Any interesting details about its condition or rarity?'

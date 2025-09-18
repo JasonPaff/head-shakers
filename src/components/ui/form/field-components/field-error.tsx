@@ -4,7 +4,7 @@ import type { ZodError } from 'zod';
 
 import { Conditional } from '@/components/ui/conditional';
 import { useFieldContext } from '@/components/ui/form';
-import { useFieldAria } from '@/components/ui/form/use-field-aria';
+import { useFieldAria } from '@/components/ui/form/field-components/use-field-aria';
 
 export const FieldError = () => {
   const { errorId } = useFieldAria();

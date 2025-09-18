@@ -1,6 +1,6 @@
 'use client';
 
-import type { KeyboardEvent } from 'react';
+import type { KeyboardEvent, RefObject } from 'react';
 
 import { CheckIcon, ChevronsUpDownIcon, PlusIcon } from 'lucide-react';
 import { useEffect } from 'react';
@@ -114,7 +114,8 @@ export const Combobox = ({
     }
   };
 
-  const triggerRef = useRef<HTMLButtonElement>((focusRef as unknown as HTMLButtonElement) ?? null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const effectiveRef = focusRef || triggerRef;
 
   return (
     <div className={'space-y-2'}>
@@ -125,7 +126,7 @@ export const Combobox = ({
             aria-expanded={isOpen}
             className={cn('w-full justify-between', triggerClassName)}
             disabled={isDisabled}
-            ref={triggerRef}
+            ref={effectiveRef as RefObject<HTMLButtonElement>}
             role={'combobox'}
             variant={'outline'}
           >

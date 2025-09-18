@@ -8,8 +8,8 @@ import { useEffect, useRef } from 'react';
 import type { FocusRef } from '@/components/ui/form/types';
 
 import { useFieldContext } from '@/components/ui/form';
-import { useFocusContext } from '@/components/ui/form/focus-context';
-import { useFieldAria } from '@/components/ui/form/use-field-aria';
+import { useFieldAria } from '@/components/ui/form/field-components/use-field-aria';
+import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 
 type FieldAriaProps = ComponentProps<typeof Slot> & {
   focusRef?: FocusRef;

@@ -4,7 +4,7 @@ import { createContext, useContext, useMemo } from 'react';
 
 import type { FocusRef } from '@/components/ui/form/types';
 
-import { useFocusManagement } from '@/components/ui/form/use-focus-management';
+import { useFocusManagement } from '@/components/ui/form/focus-management/use-focus-management';
 
 interface FocusContextValue {
   focusFirstError: ReturnType<typeof useFocusManagement>['focusFirstError'];

@@ -21,6 +21,7 @@ import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physi
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
+import { FocusProvider, useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { useServerAction } from '@/hooks/use-server-action';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
@@ -31,12 +32,15 @@ interface AddItemFormClientProps {
   initialSubcollectionId?: string;
 }
 
-export const AddItemFormClient = ({
+type AddItemFormContentProps = AddItemFormClientProps;
+
+const AddItemFormContent = ({
   collections,
   initialCollectionId,
   initialSubcollectionId,
-}: AddItemFormClientProps) => {
+}: AddItemFormContentProps) => {
   const router = useRouter();
+  const { focusFirstError } = useFocusContext();
 
   const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
     onSuccess: ({ input }) => {
@@ -72,6 +76,10 @@ export const AddItemFormClient = ({
     } as z.input<typeof createBobbleheadWithPhotosSchema>,
     onSubmit: async ({ value }) => {
       await executeAsync(value);
+    },
+    onSubmitInvalid: ({ formApi }) => {
+      // Focus the first field with an error when form submission is invalid
+      focusFirstError(formApi);
     },
     validationLogic: revalidateLogic({
       mode: 'blur',
@@ -140,5 +148,13 @@ export const AddItemFormClient = ({
         </form.AppForm>
       </div>
     </form>
+  );
+};
+
+export const AddItemFormClient = (props: AddItemFormClientProps) => {
+  return (
+    <FocusProvider>
+      <AddItemFormContent {...props} />
+    </FocusProvider>
   );
 };

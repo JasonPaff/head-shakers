@@ -11,8 +11,8 @@ interface FieldRegistration {
 
 interface FormApiLike {
   getAllErrors: () => {
-    fields: Record<string, { errorMap: Record<string, Array<string>>; errors: Array<unknown> }>;
-    form: { errorMap: Record<string, Array<string>>; errors: unknown[] };
+    fields: Record<string, { errorMap: unknown; errors: Array<unknown> }>;
+    form: { errorMap: unknown; errors: Array<unknown> };
   };
 }
 

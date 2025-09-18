@@ -2,9 +2,9 @@
 
 import { useId, useMemo } from 'react';
 
-import type { UseFieldAriaContext } from '@/components/ui/form/use-field-aria';
+import type { UseFieldAriaContext } from '@/components/ui/form/field-components/use-field-aria';
 
-import { FieldAriaContext } from '@/components/ui/form/use-field-aria';
+import { FieldAriaContext } from '@/components/ui/form/field-components/use-field-aria';
 
 type FieldAriaProviderProps = RequiredChildren;
 

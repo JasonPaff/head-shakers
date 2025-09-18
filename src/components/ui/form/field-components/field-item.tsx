@@ -1,6 +1,6 @@
 'use client';
 
-import { FieldAriaProvider } from '@/components/ui/form/field-aria-provider';
+import { FieldAriaProvider } from '@/components/ui/form/field-components/field-aria-provider';
 import { cn } from '@/utils/tailwind-utils';
 
 type FieldItemProps = ClassName<RequiredChildren>;
