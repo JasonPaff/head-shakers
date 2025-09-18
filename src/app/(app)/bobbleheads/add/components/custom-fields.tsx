@@ -36,9 +36,7 @@ export const CustomFields = withForm({
           {/* Info tip */}
           <div className={'flex items-center gap-1 text-xs text-amber-600 dark:text-amber-400'}>
             <StarIcon aria-hidden className={'size-3 fill-current'} />
-            <span>
-              Custom fields help capture unique details like edition numbers, special features, or rarity info
-            </span>
+            Custom fields help capture unique details like edition numbers, special features, or rarity info
           </div>
         </CardHeader>
 
@@ -53,7 +51,6 @@ export const CustomFields = withForm({
                       <form.AppField name={`customFields[${index}].fieldName`}>
                         {(subfield) => (
                           <subfield.TextField
-                            description={'What type of information is this?'}
                             label={'Field Name'}
                             onChange={(e) => {
                               subfield.handleChange(e.target.value);
@@ -70,7 +67,6 @@ export const CustomFields = withForm({
                       <form.AppField name={`customFields[${index}].value`}>
                         {(subfield) => (
                           <subfield.TextField
-                            description={'The specific value or detail'}
                             label={'Value'}
                             onChange={(e) => {
                               subfield.handleChange(e.target.value);
@@ -84,11 +80,11 @@ export const CustomFields = withForm({
 
                     {/* Remove */}
                     <Button
-                      className={'h-10 hover:text-destructive'}
+                      className={'hover:text-destructive'}
                       onClick={() => {
                         field.removeValue(index);
                       }}
-                      size={'sm'}
+                      size={'icon'}
                       variant={'outline'}
                     >
                       <Trash2 aria-hidden className={'size-4'} />

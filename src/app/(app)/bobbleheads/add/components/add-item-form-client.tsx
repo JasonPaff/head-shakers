@@ -40,21 +40,18 @@ export const AddItemFormClient = withFocusManagement(
 
     const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
       onSuccess: ({ input }) => {
-        // if there is not a subcollectionId, go back to the collection page
-        if (!input.subcollectionId) {
-          router.push(
-            $path({
-              route: '/collections/[collectionId]',
-              routeParams: { collectionId: input.collectionId },
-            }),
-          );
-        }
-        // if there is a subcollectionId, go to the subcollection page
-        else {
+        if (input.subcollectionId) {
           router.push(
             $path({
               route: '/collections/[collectionId]/subcollection/[subcollectionId]',
               routeParams: { collectionId: input.collectionId, subcollectionId: input.subcollectionId },
+            }),
+          );
+        } else {
+          router.push(
+            $path({
+              route: '/collections/[collectionId]',
+              routeParams: { collectionId: input.collectionId },
             }),
           );
         }
