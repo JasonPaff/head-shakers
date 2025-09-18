@@ -1,3 +1,10 @@
+---
+allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
+argument-hint: "feature description"
+description: Generate detailed implementation plans through automated 3-step orchestration
+model: claude-3-5-sonnet-20241022
+---
+
 You are a streamlined feature planning orchestrator that creates detailed implementation plans through a simple 3-step process.
 
 @CLAUDE.MD
@@ -7,7 +14,6 @@ You are a streamlined feature planning orchestrator that creates detailed implem
 
 ```
 /plan-feature "feature description"
-/plan-feature $ARGUMENTS
 ```
 
 **Examples:**
@@ -17,7 +23,7 @@ You are a streamlined feature planning orchestrator that creates detailed implem
 
 ## Workflow Overview
 
-When the user runs `/plan-feature $ARGUMENTS`, execute this simple 3-step workflow:
+When the user runs this command, execute this simple 3-step workflow:
 
 1. **Feature Request Refinement**: Enhance the user request with project context
 2. **File Discovery**: Find all relevant files for the implementation
@@ -36,8 +42,9 @@ When the user runs `/plan-feature $ARGUMENTS`, execute this simple 3-step workfl
 5. Use Task tool with `subagent_type: "general-purpose"`:
    - Description: "Refine feature request with project context"
    - **IMPORTANT**: Request single paragraph output (200-500 words) without headers or sections
-   - **ERROR HANDLING**: If subagent fails, retry once with simplified prompt
+   - **ERROR HANDLING**: If subagent fails, retry once with simplified prompt and log the failure
    - **TIMEOUT**: Set 30-second timeout for subagent response
+   - **RETRY STRATEGY**: Maximum 2 attempts with exponential backoff
    - Prompt template: "Refine this feature request into a SINGLE PARAGRAPH (no headers, bullet points, or sections): '$ARGUMENTS'. Using the project context from CLAUDE.md and package.json dependencies, expand this request with relevant technical details while maintaining its core intent. Output ONLY the refined paragraph (200-500 words), nothing else."
    - **CONSTRAINT**: Output must be single paragraph format only
    - **CONSTRAINT**: Refined request must be 2-4x original length (no excessive expansion)
@@ -72,8 +79,9 @@ When the user runs `/plan-feature $ARGUMENTS`, execute this simple 3-step workfl
 2. Use Task tool with `subagent_type: "file-discovery-agent"`:
    - Description: "Discover relevant files for implementation"
    - Pass the refined feature request from Step 1
-   - **ERROR HANDLING**: If subagent fails, retry with project structure context
+   - **ERROR HANDLING**: If subagent fails, retry with project structure context and log the failure
    - **TIMEOUT**: Set 45-second timeout for file discovery
+   - **RETRY STRATEGY**: Maximum 2 attempts with fallback to basic file patterns
    - **MINIMUM REQUIREMENT**: Must discover at least 3 relevant files
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
    - **PARALLEL EXECUTION**: Can run concurrently with other read-only operations
@@ -103,9 +111,10 @@ When the user runs `/plan-feature $ARGUMENTS`, execute this simple 3-step workfl
 2. Use Task tool with `subagent_type: "implementation-planner"`:
    - Description: "Generate detailed implementation plan"
    - **CRITICAL**: Explicitly request MARKDOWN format following the agent's template
-   - **ERROR HANDLING**: If XML format returned, attempt automatic conversion to markdown
+   - **ERROR HANDLING**: If XML format returned, attempt automatic conversion to markdown and log the issue
    - **TIMEOUT**: Set 60-second timeout for plan generation
-   - **RETRY STRATEGY**: If format validation fails, retry with explicit format constraints
+   - **RETRY STRATEGY**: If format validation fails, retry with explicit format constraints (maximum 2 attempts)
+   - **FALLBACK**: If all retries fail, flag for manual review and continue with available output
    - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples."
    - Pass refined feature request, discovered files analysis, and project context
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
@@ -221,7 +230,7 @@ Execution time: X.X seconds
 - **Logging Success**: All agent responses captured in full for debugging and review
 - **Error Recovery**: All errors handled gracefully with appropriate fallback strategies
 
-## Hooks Integration (Optional)
+## Hooks Integration
 
 **PostToolUse Hook for Automatic Formatting**:
 Add this hook to automatically format generated markdown files:
@@ -235,7 +244,8 @@ Add this hook to automatically format generated markdown files:
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -q 'docs/.*\.md$'; then npx prettier --write \"$file_path\" 2>/dev/null || echo 'Prettier not available, skipping format'; fi; }"
+            "command": "if echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path' | grep -q 'docs/.*\\.md$'; then npx prettier --write \"$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r '.file_path')\" 2>/dev/null || true; fi",
+            "timeout": 10
           }
         ]
       }
@@ -256,7 +266,8 @@ Add this hook to validate orchestration outputs:
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -c \"import json, sys, os; data=json.load(sys.stdin); path=data.get('tool_input',{}).get('file_path',''); sys.exit(0 if not 'docs/' in path or os.path.exists(os.path.dirname(path)) else (os.makedirs(os.path.dirname(path), exist_ok=True) or 0))\""
+            "command": "python3 -c \"import json, sys, os; data=json.load(sys.stdin); path=data.get('tool_input',{}).get('file_path',''); sys.exit(0 if not 'docs/' in path or os.path.exists(os.path.dirname(path)) else (os.makedirs(os.path.dirname(path), exist_ok=True) or 0))\"",
+            "timeout": 5
           }
         ]
       }
@@ -301,20 +312,3 @@ Refined Request: {enhanced request with project context}
 ## Implementation Plan
 {Markdown implementation plan from planning agent}
 ```
-
-## Team Integration
-
-**Sharing this Command**:
-- This command is stored in `.claude/commands/` and shared with your team
-- Team members can run `/plan-feature` after cloning the repository
-- Consider adding project-specific subagents in `.claude/agents/` for consistency
-
-**Customization**:
-- Modify validation commands in Step 3 to match your project's npm scripts
-- Adjust timeout values based on your project complexity
-- Add additional quality gates as needed
-
-**Version Control**:
-- Include `.claude/commands/` in your repository
-- Generated docs/ files can be committed for team reference
-- Consider gitignoring temporary orchestration logs if desired
