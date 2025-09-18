@@ -43,11 +43,12 @@
   "permissions": {
     "allow": [
       "Bash(find:*)",
-      "Bash(npm run typecheck)",
-      "Bash(npm run lint:fix)",
-      "Bash(npm run db:*)",
-      "Bash(npm run next-typesafe-url)",
-      "Bash(npx drizzle-kit:*)",
+      "Bash(timeout 120 npm run typecheck)",
+      "Bash(timeout 600 npm run test)",
+      "Bash(timeout 600 npm run test:*)",
+      "Bash(timeout 120 npm run lint:fix)",
+      "Bash(timeout 600 npm run db:*)",
+      "Bash(timeout 60 npm run next-typesafe-url)",
       "Bash(cat:*)",
       "Bash(timeout 60 npm run dev)",
       "Bash(sed:*)",
@@ -69,7 +70,6 @@
       "mcp__Ref__ref_search_documentation",
       "mcp__Ref__ref_read_url",
       "Bash(npm run lint)",
-      "Bash(timeout 10 npm run dev)",
       "Bash(dir:*)",
       "Bash(mkdir:*)",
       "Bash(for file in \"src/components/ui/form/index.tsx\" \"src/components/ui/form/form-components/submit-button.tsx\" \"src/components/ui/form/field-components/text-field.tsx\" \"src/components/ui/form/field-components/field-error.tsx\" \"src/components/ui/form/field-components/field-item.tsx\" \"src/app/(app)/bobbleheads/add/components/add-item-form-client.tsx\")",
@@ -83,7 +83,6 @@
       "Bash(then echo \"$file exists\")",
       "Bash(else echo \"$file does not exist\")",
       "Bash(fi)",
-      "Read(//c/Users/JasonPaff/**)",
       "Bash(grep:*)"
     ],
     "deny": [],

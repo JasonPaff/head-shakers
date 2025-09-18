@@ -1,10 +1,10 @@
 'use client';
 
-import type { ComponentProps, RefObject } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useId } from 'react';
 
-import type { FocusableElement } from '@/components/ui/form/types';
+import type { FocusRef } from '@/components/ui/form/types';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { useFieldContext } from '@/components/ui/form';
@@ -16,7 +16,7 @@ import { Label } from '@/components/ui/label';
 
 type CheckboxFieldProps = ComponentProps<typeof Checkbox> & {
   description?: string;
-  focusRef?: RefObject<FocusableElement>;
+  focusRef?: FocusRef;
   isRequired?: boolean;
   label: string;
 };

@@ -1,10 +1,10 @@
 'use client';
 
-import type { ComponentProps, RefObject } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useId } from 'react';
 
-import type { FocusableElement } from '@/components/ui/form/types';
+import type { FocusRef } from '@/components/ui/form/types';
 
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
@@ -16,7 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 type TextareaFieldProps = ComponentProps<typeof Textarea> & {
   description?: string;
-  focusRef?: RefObject<FocusableElement>;
+  focusRef?: FocusRef;
   isRequired?: boolean;
   label: string;
 };

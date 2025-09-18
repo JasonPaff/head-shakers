@@ -1,10 +1,8 @@
 'use client';
 
-import type { RefObject } from 'react';
-
 import { useId } from 'react';
 
-import type { FocusableElement } from '@/components/ui/form/types';
+import type { FocusRef } from '@/components/ui/form/types';
 import type { SelectOptionType } from '@/components/ui/select';
 
 import { useFieldContext } from '@/components/ui/form';
@@ -17,14 +15,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 interface SelectFieldProps {
   description?: string;
-  focusRef?: RefObject<FocusableElement>;
+  focusRef?: FocusRef;
   isRequired?: boolean;
   label: string;
   options: Array<SelectOptionType>;
   placeholder?: string;
 }
 
-export const SelectField = ({ description, focusRef, isRequired, label, options, placeholder }: SelectFieldProps) => {
+export const SelectField = ({
+  description,
+  focusRef,
+  isRequired,
+  label,
+  options,
+  placeholder,
+}: SelectFieldProps) => {
   const field = useFieldContext<string>();
   const id = useId();
 

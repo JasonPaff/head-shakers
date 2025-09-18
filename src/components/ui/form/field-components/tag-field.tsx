@@ -1,10 +1,10 @@
 'use client';
 
-import type { ComponentProps, KeyboardEvent, RefObject } from 'react';
+import type { ComponentProps, KeyboardEvent } from 'react';
 
 import { useId, useState } from 'react';
 
-import type { FocusableElement } from '@/components/ui/form/types';
+import type { FocusRef } from '@/components/ui/form/types';
 
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
@@ -16,7 +16,7 @@ import { TagsInput, TagsInputInput, TagsInputItem, TagsInputList } from '@/compo
 
 type TagFieldProps = Omit<ComponentProps<typeof TagsInput>, 'onValueChange' | 'value'> & {
   description?: string;
-  focusRef?: RefObject<FocusableElement>;
+  focusRef?: FocusRef;
   isRequired?: boolean;
   label: string;
   placeholder?: string;

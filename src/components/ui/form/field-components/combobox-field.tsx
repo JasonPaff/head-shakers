@@ -1,5 +1,7 @@
 'use client';
 
+import type { FocusRef } from '@/components/ui/form/types';
+
 import { Combobox } from '@/components/ui/combo-box';
 import { useFieldContext } from '@/components/ui/form';
 import { FieldDescription } from '@/components/ui/form/field-components/field-description';
@@ -15,6 +17,7 @@ export interface ComboboxItem {
 interface ComboboxFieldProps {
   createNewLabel?: string;
   description?: string;
+  focusRef?: FocusRef;
   isDisabled?: boolean;
   isRequired?: boolean;
   items: Array<ComboboxItem>;

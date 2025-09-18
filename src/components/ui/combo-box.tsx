@@ -7,6 +7,8 @@ import { useEffect } from 'react';
 import { useRef } from 'react';
 import { useMemo, useState } from 'react';
 
+import type { FocusRef } from '@/components/ui/form/types';
+
 import { Button } from '@/components/ui/button';
 import {
   Command,
@@ -31,6 +33,7 @@ interface ComboboxItem {
 
 interface ComboboxProps {
   createNewLabel?: string;
+  focusRef?: FocusRef;
   isDisabled?: boolean;
   isRequired?: boolean;
   items: Array<ComboboxItem>;
@@ -46,6 +49,7 @@ interface ComboboxProps {
 
 export const Combobox = ({
   createNewLabel = 'New item name',
+  focusRef,
   isDisabled,
   isRequired = false,
   items,
@@ -110,6 +114,8 @@ export const Combobox = ({
     }
   };
 
+  const triggerRef = useRef<HTMLButtonElement>((focusRef as unknown as HTMLButtonElement) ?? null);
+
   return (
     <div className={'space-y-2'}>
       <Label variant={isRequired ? 'required' : undefined}>{label}</Label>
@@ -119,6 +125,7 @@ export const Combobox = ({
             aria-expanded={isOpen}
             className={cn('w-full justify-between', triggerClassName)}
             disabled={isDisabled}
+            ref={triggerRef}
             role={'combobox'}
             variant={'outline'}
           >
