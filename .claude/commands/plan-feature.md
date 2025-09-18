@@ -3,9 +3,21 @@ You are a streamlined feature planning orchestrator that creates detailed implem
 @CLAUDE.MD
 @package.json
 
+## Command Usage
+
+```
+/plan-feature "feature description"
+/plan-feature $ARGUMENTS
+```
+
+**Examples:**
+- `/plan-feature "Add user authentication with OAuth"`
+- `/plan-feature "Implement real-time notifications system"`
+- `/plan-feature "Create admin dashboard with analytics"`
+
 ## Workflow Overview
 
-When the user runs `/plan-feature "feature description"`, execute this simple 3-step workflow:
+When the user runs `/plan-feature $ARGUMENTS`, execute this simple 3-step workflow:
 
 1. **Feature Request Refinement**: Enhance the user request with project context
 2. **File Discovery**: Find all relevant files for the implementation
@@ -24,19 +36,23 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 5. Use Task tool with `subagent_type: "general-purpose"`:
    - Description: "Refine feature request with project context"
    - **IMPORTANT**: Request single paragraph output (200-500 words) without headers or sections
-   - Prompt template: "Refine this feature request into a SINGLE PARAGRAPH (no headers, bullet points, or sections): '{original_request}'. Using the project context from CLAUDE.md and package.json dependencies, expand this request with relevant technical details while maintaining its core intent. Output ONLY the refined paragraph (200-500 words), nothing else."
+   - **ERROR HANDLING**: If subagent fails, retry once with simplified prompt
+   - **TIMEOUT**: Set 30-second timeout for subagent response
+   - Prompt template: "Refine this feature request into a SINGLE PARAGRAPH (no headers, bullet points, or sections): '$ARGUMENTS'. Using the project context from CLAUDE.md and package.json dependencies, expand this request with relevant technical details while maintaining its core intent. Output ONLY the refined paragraph (200-500 words), nothing else."
    - **CONSTRAINT**: Output must be single paragraph format only
    - **CONSTRAINT**: Refined request must be 2-4x original length (no excessive expansion)
    - **CONSTRAINT**: Preserve original intent and scope (no feature creep)
    - **CONSTRAINT**: Add only essential technical context, not exhaustive details
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
+   - **FALLBACK**: If subagent returns invalid format, extract paragraph content manually
    - Agent returns enhanced feature request as single paragraph
 6. Record step end time and validate output
    - **Format Check**: Verify output is single paragraph (no headers, sections, or bullet points)
    - **Length Check**: Verify refined request is 200-500 words and 2-4x original length
    - **Scope Check**: Confirm core intent preserved without feature creep
    - **Quality Check**: Ensure only essential technical context added
-   - If format is wrong, extract just the paragraph content if possible
+   - **Error Recovery**: If format is wrong, extract just the paragraph content if possible
+   - **Validation Success**: Log successful validation or detailed error messages
 7. **SAVE STEP 1 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/01-feature-refinement.md` with:
    - Step metadata (timestamps, duration, status)
    - Original request and context provided
@@ -56,9 +72,17 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 2. Use Task tool with `subagent_type: "file-discovery-agent"`:
    - Description: "Discover relevant files for implementation"
    - Pass the refined feature request from Step 1
+   - **ERROR HANDLING**: If subagent fails, retry with project structure context
+   - **TIMEOUT**: Set 45-second timeout for file discovery
+   - **MINIMUM REQUIREMENT**: Must discover at least 3 relevant files
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
+   - **PARALLEL EXECUTION**: Can run concurrently with other read-only operations
    - Agent performs comprehensive file discovery and returns the prioritized file list with analysis
-3. Validate all discovered file paths exist
+3. **Enhanced File Validation**:
+   - Validate all discovered file paths exist using Read tool
+   - Check file permissions and accessibility
+   - Log any missing or inaccessible files
+   - Flag files that may need creation vs modification
 4. Record step end time and validation results
 5. **SAVE STEP 2 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/02-file-discovery.md` with:
    - Step metadata (timestamps, duration, status)
@@ -79,16 +103,24 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 2. Use Task tool with `subagent_type: "implementation-planner"`:
    - Description: "Generate detailed implementation plan"
    - **CRITICAL**: Explicitly request MARKDOWN format following the agent's template
+   - **ERROR HANDLING**: If XML format returned, attempt automatic conversion to markdown
+   - **TIMEOUT**: Set 60-second timeout for plan generation
+   - **RETRY STRATEGY**: If format validation fails, retry with explicit format constraints
    - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples."
    - Pass refined feature request, discovered files analysis, and project context
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
+   - **VALIDATION COMMANDS**: Ensure all steps include appropriate validation commands
    - Agent generates structured markdown implementation plan
-3. **Validate Plan Format and Content**:
+3. **Enhanced Plan Validation**:
    - **Format Check**: Verify output is markdown with required sections (not XML)
+   - **Auto-Conversion**: If XML format detected, attempt automatic conversion to markdown
    - **Template Compliance**: Check for Overview, Prerequisites, Implementation Steps, Quality Gates
-   - **Validation Commands**: Ensure steps include `npm run lint:fix && npm run typecheck`
-   - **No Code Check**: Verify no code examples or implementations included
-   - If format is XML, log error and consider format conversion or retry
+   - **Section Validation**: Verify each required section contains appropriate content
+   - **Command Validation**: Ensure steps include `npm run lint:fix && npm run typecheck`
+   - **Content Quality**: Verify no code examples or implementations included
+   - **Completeness Check**: Confirm plan addresses all aspects of the refined request
+   - **Error Recovery**: If validation fails, retry with explicit format constraints
+   - **Manual Review Flag**: If auto-conversion fails, flag for manual review
 4. Record step end time and validation results
 5. **SAVE STEP 3 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/03-implementation-planning.md` with:
    - Step metadata (timestamps, duration, status)
@@ -156,23 +188,98 @@ Execution time: X.X seconds
 
 **Essential Requirements**:
 - **CRITICAL**: Capture complete agent inputs and outputs (not summaries)
-- **CRITICAL**: Record precise timestamps for each step
-- **CRITICAL**: Validate and log all discovered file paths
-- Create comprehensive logging for each step with full data
-- Save implementation plan and logs to the docs folder
-- Ensure the directory structure exists before saving
-- Return concise execution summary
+- **CRITICAL**: Record precise timestamps for each step with ISO format
+- **CRITICAL**: Validate and log all discovered file paths with existence checks
+- **CRITICAL**: Implement proper error handling and recovery for all subagent failures
+- **LOGGING**: Create comprehensive logging for each step with full data capture
+- **PERSISTENCE**: Save implementation plan and logs to the docs folder structure
+- **PREPARATION**: Ensure the directory structure exists before saving (create if needed)
+- **FEEDBACK**: Return concise execution summary with links to generated files
+- **PARALLEL EXECUTION**: Use batched tool calls where possible for performance
+- **TIMEOUT HANDLING**: Implement appropriate timeouts for all subagent operations
+- **VALIDATION**: Validate all outputs against expected formats and requirements
+- **FALLBACK**: Provide fallback strategies for common failure scenarios
 
-**Quality Gates**:
-- Feature request successfully refined with project context
-- **Refinement Length Constraint**: Refined request must be 2-4x the length of original (not 10x+)
-- **Focus Preservation**: Core intent of original request must remain unchanged
-- **Conciseness Check**: No unnecessary elaboration or scope creep in refinement
-- At least 5 relevant files discovered through analysis
-- All discovered file paths validated to exist
-- Implementation plan contains concrete, actionable steps
-- Plan addresses the refined feature request completely
-- All agent responses captured in full for debugging
+**Enhanced Quality Gates**:
+- **Step 1 Success**: Feature request successfully refined with project context
+  - **Length Constraint**: Refined request must be 2-4x the length of original (not 10x+)
+  - **Format Validation**: Output must be single paragraph without headers or sections
+  - **Intent Preservation**: Core intent of original request must remain unchanged
+  - **Scope Control**: No unnecessary elaboration or feature creep in refinement
+- **Step 2 Success**: File discovery completed with comprehensive analysis
+  - **Minimum Files**: At least 3 relevant files discovered through analysis
+  - **File Validation**: All discovered file paths validated to exist and be accessible
+  - **Categorization**: Files properly categorized by modification priority
+  - **Coverage**: Discovery covers all major components affected by the feature
+- **Step 3 Success**: Implementation plan generated in correct format
+  - **Format Compliance**: Plan must be in markdown format (not XML)
+  - **Template Adherence**: Includes all required sections (Overview, Prerequisites, Steps, Quality Gates)
+  - **Validation Commands**: Every step includes appropriate lint/typecheck commands
+  - **No Code Examples**: Plan contains no implementation code, only instructions
+  - **Actionable Steps**: Implementation plan contains concrete, actionable steps
+  - **Complete Coverage**: Plan addresses the refined feature request completely
+- **Logging Success**: All agent responses captured in full for debugging and review
+- **Error Recovery**: All errors handled gracefully with appropriate fallback strategies
+
+## Hooks Integration (Optional)
+
+**PostToolUse Hook for Automatic Formatting**:
+Add this hook to automatically format generated markdown files:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path' | { read file_path; if echo \"$file_path\" | grep -q 'docs/.*\.md$'; then npx prettier --write \"$file_path\" 2>/dev/null || echo 'Prettier not available, skipping format'; fi; }"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**PreToolUse Hook for Validation**:
+Add this hook to validate orchestration outputs:
+
+```json
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -c \"import json, sys, os; data=json.load(sys.stdin); path=data.get('tool_input',{}).get('file_path',''); sys.exit(0 if not 'docs/' in path or os.path.exists(os.path.dirname(path)) else (os.makedirs(os.path.dirname(path), exist_ok=True) or 0))\""
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Troubleshooting
+
+**Common Issues and Solutions**:
+
+1. **Subagent Timeout**: If subagents timeout, check system load and retry with simplified prompts
+2. **File Discovery Failures**: Ensure project structure is readable and files exist
+3. **Format Validation Errors**: XML output from implementation-planner can be converted to markdown
+4. **Directory Creation Errors**: Verify write permissions in docs/ directory
+5. **Missing Dependencies**: Check that required npm scripts exist in package.json
+
+**Debug Mode**:
+Add `--verbose` flag when running Claude Code to see detailed subagent communications:
+```bash
+claude --verbose
+```
 
 ## File Output Structure
 
@@ -192,5 +299,22 @@ Refined Request: {enhanced request with project context}
 {File discovery agent output}
 
 ## Implementation Plan
-{XML implementation plan from planning agent}
+{Markdown implementation plan from planning agent}
 ```
+
+## Team Integration
+
+**Sharing this Command**:
+- This command is stored in `.claude/commands/` and shared with your team
+- Team members can run `/plan-feature` after cloning the repository
+- Consider adding project-specific subagents in `.claude/agents/` for consistency
+
+**Customization**:
+- Modify validation commands in Step 3 to match your project's npm scripts
+- Adjust timeout values based on your project complexity
+- Add additional quality gates as needed
+
+**Version Control**:
+- Include `.claude/commands/` in your repository
+- Generated docs/ files can be committed for team reference
+- Consider gitignoring temporary orchestration logs if desired
