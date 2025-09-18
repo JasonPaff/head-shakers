@@ -1,8 +1,10 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, RefObject } from 'react';
 
 import { useId } from 'react';
+
+import type { FocusableElement } from '@/components/ui/form/types';
 
 import { Checkbox } from '@/components/ui/checkbox';
 import { useFieldContext } from '@/components/ui/form';
@@ -14,18 +16,19 @@ import { Label } from '@/components/ui/label';
 
 type CheckboxFieldProps = ComponentProps<typeof Checkbox> & {
   description?: string;
+  focusRef?: RefObject<FocusableElement>;
   isRequired?: boolean;
   label: string;
 };
 
-export const CheckboxField = ({ description, isRequired, label, ...props }: CheckboxFieldProps) => {
+export const CheckboxField = ({ description, focusRef, isRequired, label, ...props }: CheckboxFieldProps) => {
   const field = useFieldContext<boolean>();
   const id = useId();
 
   return (
     <FieldItem>
       <div className={'flex items-center gap-x-3'}>
-        <FieldAria>
+        <FieldAria focusRef={focusRef}>
           <Checkbox
             checked={field.state.value}
             id={id}

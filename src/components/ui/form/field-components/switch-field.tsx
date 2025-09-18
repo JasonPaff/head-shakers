@@ -1,8 +1,10 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, RefObject } from 'react';
 
 import { useId } from 'react';
+
+import type { FocusableElement } from '@/components/ui/form/types';
 
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
@@ -14,18 +16,19 @@ import { Switch } from '@/components/ui/switch';
 
 type SwitchFieldProps = ComponentProps<typeof Switch> & {
   description?: string;
+  focusRef?: RefObject<FocusableElement>;
   isRequired?: boolean;
   label: string;
 };
 
-export const SwitchField = ({ description, isRequired, label, ...props }: SwitchFieldProps) => {
+export const SwitchField = ({ description, focusRef, isRequired, label, ...props }: SwitchFieldProps) => {
   const field = useFieldContext<boolean>();
   const id = useId();
 
   return (
     <FieldItem>
       <div className={'flex items-center gap-x-3'}>
-        <FieldAria>
+        <FieldAria focusRef={focusRef}>
           <Switch
             checked={field.state.value}
             id={id}

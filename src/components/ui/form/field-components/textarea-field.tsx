@@ -1,8 +1,10 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, RefObject } from 'react';
 
 import { useId } from 'react';
+
+import type { FocusableElement } from '@/components/ui/form/types';
 
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
@@ -14,11 +16,12 @@ import { Textarea } from '@/components/ui/textarea';
 
 type TextareaFieldProps = ComponentProps<typeof Textarea> & {
   description?: string;
+  focusRef?: RefObject<FocusableElement>;
   isRequired?: boolean;
   label: string;
 };
 
-export const TextareaField = ({ description, isRequired, label, ...props }: TextareaFieldProps) => {
+export const TextareaField = ({ description, focusRef, isRequired, label, ...props }: TextareaFieldProps) => {
   const field = useFieldContext<string>();
   const id = useId();
 
@@ -27,7 +30,7 @@ export const TextareaField = ({ description, isRequired, label, ...props }: Text
       <Label htmlFor={id} variant={isRequired ? 'required' : undefined}>
         {label}
       </Label>
-      <FieldAria>
+      <FieldAria focusRef={focusRef}>
         <Textarea
           id={id}
           onBlur={field.handleBlur}

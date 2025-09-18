@@ -1,8 +1,10 @@
 'use client';
 
-import type { ComponentProps, KeyboardEvent } from 'react';
+import type { ComponentProps, KeyboardEvent, RefObject } from 'react';
 
 import { useId, useState } from 'react';
+
+import type { FocusableElement } from '@/components/ui/form/types';
 
 import { useFieldContext } from '@/components/ui/form';
 import { FieldAria } from '@/components/ui/form/field-components/field-aria';
@@ -14,6 +16,7 @@ import { TagsInput, TagsInputInput, TagsInputItem, TagsInputList } from '@/compo
 
 type TagFieldProps = Omit<ComponentProps<typeof TagsInput>, 'onValueChange' | 'value'> & {
   description?: string;
+  focusRef?: RefObject<FocusableElement>;
   isRequired?: boolean;
   label: string;
   placeholder?: string;
@@ -21,6 +24,7 @@ type TagFieldProps = Omit<ComponentProps<typeof TagsInput>, 'onValueChange' | 'v
 
 export const TagField = ({
   description,
+  focusRef,
   isRequired,
   label,
   placeholder = 'Add a tag...',
@@ -60,7 +64,7 @@ export const TagField = ({
       <Label htmlFor={id} variant={isRequired ? 'required' : undefined}>
         {label}
       </Label>
-      <FieldAria>
+      <FieldAria focusRef={focusRef}>
         <TagsInput
           onValueChange={(value) => field.handleChange(value)}
           value={field.state.value || []}
