@@ -118,6 +118,8 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **Type Safety**: Use TypeScript and Zod for type safety. Run `npm run typecheck` to verify. 
 - **No Any Type**: Avoid using `any` type in TypeScript. Use proper types, generics, or unknown with type narrowing.
 - **No forwardRef()**: Do not use `forwardRef` in React 19, pass refs directly through props.
+- **Never use Eslint disable comments**: Always fix the underlying issue instead of disabling lint rules. If you cannot fix it, discuss with the team.
+- **Never use TS-ignore comments**: Always fix type errors instead of ignoring them. If you cannot fix it, use a TypeScript pro subagent to fix it.
 
 ## Project Documentation Conventions (Important)
 
