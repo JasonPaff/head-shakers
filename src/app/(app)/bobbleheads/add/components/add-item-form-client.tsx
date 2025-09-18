@@ -21,7 +21,8 @@ import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physi
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useAppForm } from '@/components/ui/form';
-import { FocusProvider, useFocusContext } from '@/components/ui/form/focus-management/focus-context';
+import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
+import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { createBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
@@ -32,129 +33,122 @@ interface AddItemFormClientProps {
   initialSubcollectionId?: string;
 }
 
-type AddItemFormContentProps = AddItemFormClientProps;
+export const AddItemFormClient = withFocusManagement(
+  ({ collections, initialCollectionId, initialSubcollectionId }: AddItemFormClientProps) => {
+    const router = useRouter();
+    const { focusFirstError } = useFocusContext();
 
-const AddItemFormContent = ({
-  collections,
-  initialCollectionId,
-  initialSubcollectionId,
-}: AddItemFormContentProps) => {
-  const router = useRouter();
-  const { focusFirstError } = useFocusContext();
+    const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
+      onSuccess: ({ input }) => {
+        // if there is not a subcollectionId, go back to the collection page
+        if (!input.subcollectionId) {
+          router.push(
+            $path({
+              route: '/collections/[collectionId]',
+              routeParams: { collectionId: input.collectionId },
+            }),
+          );
+        }
+        // if there is a subcollectionId, go to the subcollection page
+        else {
+          router.push(
+            $path({
+              route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+              routeParams: { collectionId: input.collectionId, subcollectionId: input.subcollectionId },
+            }),
+          );
+        }
+      },
+      toastMessages: {
+        error: 'Failed to add bobblehead. Please try again.',
+        loading: 'Adding your bobblehead to the collection...',
+        success: 'Bobblehead added successfully! 🎉',
+      },
+    });
 
-  const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
-    onSuccess: ({ input }) => {
-      // if there is not a subcollectionId, go back to the collection page
-      if (!input.subcollectionId) {
-        router.push(
-          $path({ route: '/collections/[collectionId]', routeParams: { collectionId: input.collectionId } }),
-        );
-      }
-      // if there is a subcollectionId, go to the subcollection page
-      else {
-        router.push(
-          $path({
-            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-            routeParams: { collectionId: input.collectionId, subcollectionId: input.subcollectionId },
-          }),
-        );
-      }
-    },
-    toastMessages: {
-      error: 'Failed to add bobblehead. Please try again.',
-      loading: 'Adding your bobblehead to the collection...',
-      success: 'Bobblehead added successfully! 🎉',
-    },
-  });
+    const form = useAppForm({
+      ...addItemFormOptions,
+      canSubmitWhenInvalid: true,
+      defaultValues: {
+        ...addItemFormOptions.defaultValues,
+        collectionId: initialCollectionId || '',
+        subcollectionId: initialSubcollectionId || '',
+      } as z.input<typeof createBobbleheadWithPhotosSchema>,
+      onSubmit: async ({ value }) => {
+        await executeAsync(value);
+      },
+      onSubmitInvalid: ({ formApi }) => {
+        focusFirstError(formApi);
+      },
+      validationLogic: revalidateLogic({
+        mode: 'blur',
+        modeAfterSubmission: 'change',
+      }),
+      validators: {
+        onSubmit: createBobbleheadWithPhotosSchema,
+      },
+    });
 
-  const form = useAppForm({
-    ...addItemFormOptions,
-    canSubmitWhenInvalid: true,
-    defaultValues: {
-      ...addItemFormOptions.defaultValues,
-      collectionId: initialCollectionId || '',
-      subcollectionId: initialSubcollectionId || '',
-    } as z.input<typeof createBobbleheadWithPhotosSchema>,
-    onSubmit: async ({ value }) => {
-      await executeAsync(value);
-    },
-    onSubmitInvalid: ({ formApi }) => {
-      focusFirstError(formApi);
-    },
-    validationLogic: revalidateLogic({
-      mode: 'blur',
-      modeAfterSubmission: 'change',
-    }),
-    validators: {
-      onSubmit: createBobbleheadWithPhotosSchema,
-    },
-  });
+    const handleCancel = () => {
+      router.back();
+    };
 
-  const handleCancel = () => {
-    router.back();
-  };
+    return (
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          void form.handleSubmit();
+        }}
+      >
+        <div className={'space-y-8'}>
+          <CollectionAssignment collections={collections} form={form} />
+          <BasicInformation form={form} />
+          <ItemPhotos form={form} />
+          <AcquisitionDetails form={form} />
+          <PhysicalAttributes form={form} />
+          <ItemTags form={form} />
+          <CustomFields form={form} />
+          <ItemSettings form={form} />
 
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        void form.handleSubmit();
-      }}
-    >
-      <div className={'space-y-8'}>
-        <CollectionAssignment collections={collections} form={form} />
-        <BasicInformation form={form} />
-        <ItemPhotos form={form} />
-        <AcquisitionDetails form={form} />
-        <PhysicalAttributes form={form} />
-        <ItemTags form={form} />
-        <CustomFields form={form} />
-        <ItemSettings form={form} />
-
-        <form.AppForm>
-          <div
-            className={
-              'sticky bottom-0 z-10 -mx-6 border-t border-border/50 bg-background/80 p-6 backdrop-blur-sm'
-            }
-          >
-            <div className={'flex items-center justify-end'}>
-              {/* Form actions */}
-              <div className={'flex items-center gap-4'}>
-                <Button className={'min-w-[100px]'} onClick={handleCancel} variant={'outline'}>
-                  Cancel
-                </Button>
-                <form.SubmitButton isDisabled={isExecuting}>
-                  <Conditional
-                    fallback={
+          <form.AppForm>
+            <div
+              className={
+                'sticky bottom-0 z-10 -mx-6 border-t border-border/50 bg-background/80 p-6 backdrop-blur-sm'
+              }
+            >
+              <div className={'flex items-center justify-end'}>
+                {/* Form actions */}
+                <div className={'flex items-center gap-4'}>
+                  <Button className={'min-w-[100px]'} onClick={handleCancel} variant={'outline'}>
+                    Cancel
+                  </Button>
+                  <form.SubmitButton isDisabled={isExecuting}>
+                    <Conditional
+                      fallback={
+                        <div className={'flex items-center gap-2'}>
+                          <CheckCircle2Icon aria-hidden className={'size-4'} />
+                          <span>Add Bobblehead</span>
+                        </div>
+                      }
+                      isCondition={isExecuting}
+                    >
                       <div className={'flex items-center gap-2'}>
-                        <CheckCircle2Icon aria-hidden className={'size-4'} />
-                        <span>Add Bobblehead</span>
+                        <div
+                          className={
+                            'size-4 animate-spin rounded-full border-2 border-white/20 border-t-white'
+                          }
+                        />
+                        <span>Adding...</span>
                       </div>
-                    }
-                    isCondition={isExecuting}
-                  >
-                    <div className={'flex items-center gap-2'}>
-                      <div
-                        className={'size-4 animate-spin rounded-full border-2 border-white/20 border-t-white'}
-                      />
-                      <span>Adding...</span>
-                    </div>
-                  </Conditional>
-                </form.SubmitButton>
+                    </Conditional>
+                  </form.SubmitButton>
+                </div>
               </div>
             </div>
-          </div>
-        </form.AppForm>
-      </div>
-    </form>
-  );
-};
-
-export const AddItemFormClient = (props: AddItemFormClientProps) => {
-  return (
-    <FocusProvider>
-      <AddItemFormContent {...props} />
-    </FocusProvider>
-  );
-};
+          </form.AppForm>
+        </div>
+      </form>
+    );
+  },
+);

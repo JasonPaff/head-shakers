@@ -14,6 +14,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
+import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
+import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateSubCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 import { updateSubCollectionSchema } from '@/lib/validations/subcollections.validation';
@@ -28,93 +30,103 @@ interface SubcollectionEditDialogProps {
   };
 }
 
-export const SubcollectionEditDialog = ({ isOpen, onClose, subcollection }: SubcollectionEditDialogProps) => {
-  const { executeAsync, isExecuting } = useServerAction(updateSubCollectionAction, {
-    onAfterSuccess: () => {
-      handleClose();
-    },
-    toastMessages: {
-      error: 'Failed to update subcollection. Please try again.',
-      loading: 'Updating subcollection...',
-      success: 'Subcollection updated successfully!',
-    },
-  });
+export const SubcollectionEditDialog = withFocusManagement(
+  ({ isOpen, onClose, subcollection }: SubcollectionEditDialogProps) => {
+    const { focusFirstError } = useFocusContext();
 
-  const form = useAppForm({
-    defaultValues: {
-      description: subcollection.description || '',
-      name: subcollection.name,
-      subcollectionId: subcollection.id,
-    } as UpdateSubCollectionInput,
-    onSubmit: async ({ value }) => {
-      await executeAsync(value);
-    },
-    validationLogic: revalidateLogic({
-      mode: 'submit',
-      modeAfterSubmission: 'change',
-    }),
-    validators: {
-      onSubmit: updateSubCollectionSchema,
-    },
-  });
-
-  const handleClose = () => {
-    setTimeout(() => form.reset(), 300);
-    onClose();
-  };
-
-  return (
-    <Dialog
-      onOpenChange={(open) => {
-        if (open) return;
+    const { executeAsync, isExecuting } = useServerAction(updateSubCollectionAction, {
+      onAfterSuccess: () => {
         handleClose();
-      }}
-      open={isOpen}
-    >
-      <DialogContent className={'sm:max-w-[425px]'}>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            void form.handleSubmit();
-          }}
-        >
-          {/* Header */}
-          <DialogHeader>
-            <DialogTitle>Update Subcollection</DialogTitle>
-            <DialogDescription>
-              Update the details of your subcollection below. You can change the name and description.
-            </DialogDescription>
-          </DialogHeader>
+      },
+      toastMessages: {
+        error: 'Failed to update subcollection. Please try again.',
+        loading: 'Updating subcollection...',
+        success: 'Subcollection updated successfully!',
+      },
+    });
 
-          {/* Form Fields */}
-          <div className={'grid gap-4 py-4'}>
-            {/* Name */}
-            <form.AppField name={'name'}>
-              {(field) => (
-                <field.TextField isRequired label={'Name'} placeholder={'Enter subcollection name'} />
-              )}
-            </form.AppField>
+    const form = useAppForm({
+      defaultValues: {
+        description: subcollection.description || '',
+        name: subcollection.name,
+        subcollectionId: subcollection.id,
+      } as UpdateSubCollectionInput,
+      onSubmit: async ({ value }) => {
+        await executeAsync(value);
+      },
+      onSubmitInvalid: ({ formApi }) => {
+        focusFirstError(formApi);
+      },
+      validationLogic: revalidateLogic({
+        mode: 'submit',
+        modeAfterSubmission: 'change',
+      }),
+      validators: {
+        onSubmit: updateSubCollectionSchema,
+      },
+    });
 
-            {/* Description */}
-            <form.AppField name={'description'}>
-              {(field) => (
-                <field.TextareaField label={'Description'} placeholder={'Enter subcollection description'} />
-              )}
-            </form.AppField>
-          </div>
+    const handleClose = () => {
+      setTimeout(() => form.reset(), 300);
+      onClose();
+    };
 
-          {/* Action Buttons */}
-          <DialogFooter>
-            <Button disabled={isExecuting} onClick={handleClose} variant={'outline'}>
-              Cancel
-            </Button>
-            <Button disabled={isExecuting} type={'submit'}>
-              {isExecuting ? 'Updating...' : 'Update Subcollection'}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-};
+    return (
+      <Dialog
+        onOpenChange={(open) => {
+          if (open) return;
+          handleClose();
+        }}
+        open={isOpen}
+      >
+        <DialogContent className={'sm:max-w-[425px]'}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              void form.handleSubmit();
+            }}
+          >
+            {/* Header */}
+            <DialogHeader>
+              <DialogTitle>Update Subcollection</DialogTitle>
+              <DialogDescription>
+                Update the details of your subcollection below. You can change the name and description.
+              </DialogDescription>
+            </DialogHeader>
+
+            {/* Form Fields */}
+            <div className={'grid gap-4 py-4'}>
+              {/* Name */}
+              <form.AppField name={'name'}>
+                {(field) => (
+                  <field.TextField isRequired label={'Name'} placeholder={'Enter subcollection name'} />
+                )}
+              </form.AppField>
+
+              {/* Description */}
+              <form.AppField name={'description'}>
+                {(field) => (
+                  <field.TextareaField
+                    label={'Description'}
+                    placeholder={'Enter subcollection description'}
+                  />
+                )}
+              </form.AppField>
+            </div>
+
+            {/* Action Buttons */}
+            <DialogFooter>
+              <Button disabled={isExecuting} onClick={handleClose} variant={'outline'}>
+                Cancel
+              </Button>
+              <Button disabled={isExecuting} type={'submit'}>
+                {isExecuting ? 'Updating...' : 'Update Subcollection'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    );
+  },
+);
