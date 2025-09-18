@@ -27,7 +27,7 @@ When the user runs this command, execute this simple 3-step workflow:
 
 1. **Feature Request Refinement**: Enhance the user request with project context
 2. **File Discovery**: Find all relevant files for the implementation
-3. **Implementation Planning**: Generate detailed XML implementation plan
+3. **Implementation Planning**: Generate detailed Markdown implementation plan
 
 ## Step-by-Step Execution
 
@@ -268,6 +268,27 @@ Add this hook to validate orchestration outputs:
             "type": "command",
             "command": "python3 -c \"import json, sys, os; data=json.load(sys.stdin); path=data.get('tool_input',{}).get('file_path',''); sys.exit(0 if not 'docs/' in path or os.path.exists(os.path.dirname(path)) else (os.makedirs(os.path.dirname(path), exist_ok=True) or 0))\"",
             "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+**Stop Hook for Quality Gates Validation**:
+Add this hook to automatically validate orchestration quality after completion:
+
+```json
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/orchestration_quality_gates.py",
+            "timeout": 30
           }
         ]
       }
