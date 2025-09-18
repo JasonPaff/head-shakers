@@ -1,6 +1,7 @@
 'use client';
 
 import { revalidateLogic } from '@tanstack/form-core';
+import { useRef } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { InsertCollectionInput } from '@/lib/validations/collections.validation';
@@ -15,6 +16,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
+import { FocusProvider, useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { useServerAction } from '@/hooks/use-server-action';
 import { createCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { DEFAULTS } from '@/lib/constants';
@@ -26,11 +28,23 @@ interface CollectionCreateDialogProps {
   onCollectionCreated?: (collection: ComboboxItem) => void;
 }
 
-export const CollectionCreateDialog = ({
+export const CollectionCreateDialog = (props: CollectionCreateDialogProps) => {
+  return (
+    <FocusProvider>
+      <CollectionCreateContent {...props} />
+    </FocusProvider>
+  );
+};
+
+type CollectionCreateContentProps = CollectionCreateDialogProps;
+
+export const CollectionCreateContent = ({
   isOpen,
   onClose,
   onCollectionCreated,
-}: CollectionCreateDialogProps) => {
+}: CollectionCreateContentProps) => {
+  const { focusFirstError } = useFocusContext();
+
   const { executeAsync, isExecuting } = useServerAction(createCollectionAction, {
     onSuccess: ({ data }) => {
       onCollectionCreated?.({
@@ -47,6 +61,7 @@ export const CollectionCreateDialog = ({
   });
 
   const form = useAppForm({
+    canSubmitWhenInvalid: true,
     defaultValues: {
       description: '',
       isPublic: DEFAULTS.COLLECTION.IS_PUBLIC,
@@ -54,6 +69,9 @@ export const CollectionCreateDialog = ({
     } as InsertCollectionInput,
     onSubmit: async ({ value }) => {
       await executeAsync(value);
+    },
+    onSubmitInvalid: ({ formApi }) => {
+      focusFirstError(formApi);
     },
     validationLogic: revalidateLogic({
       mode: 'submit',
@@ -73,6 +91,8 @@ export const CollectionCreateDialog = ({
     setTimeout(() => form.reset(), 300);
     onClose();
   };
+
+  const nameRef = useRef<HTMLInputElement>(null);
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={isOpen}>
@@ -96,7 +116,14 @@ export const CollectionCreateDialog = ({
           <div className={'grid gap-4 py-4'}>
             {/* Name */}
             <form.AppField name={'name'}>
-              {(field) => <field.TextField isRequired label={'Name'} placeholder={'Enter collection name'} />}
+              {(field) => (
+                <field.TextField
+                  focusRef={nameRef}
+                  isRequired
+                  label={'Name'}
+                  placeholder={'Enter collection name'}
+                />
+              )}
             </form.AppField>
 
             {/* Description */}
