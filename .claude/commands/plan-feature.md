@@ -23,17 +23,20 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 4. Read CLAUDE.md and package.json for project context
 5. Use Task tool with `subagent_type: "general-purpose"`:
    - Description: "Refine feature request with project context"
-   - Pass original user request, CLAUDE.md content, and package.json content
-   - Pass he full `initial-feature-refinement.md` prompt
+   - **IMPORTANT**: Request single paragraph output (200-500 words) without headers or sections
+   - Prompt template: "Refine this feature request into a SINGLE PARAGRAPH (no headers, bullet points, or sections): '{original_request}'. Using the project context from CLAUDE.md and package.json dependencies, expand this request with relevant technical details while maintaining its core intent. Output ONLY the refined paragraph (200-500 words), nothing else."
+   - **CONSTRAINT**: Output must be single paragraph format only
    - **CONSTRAINT**: Refined request must be 2-4x original length (no excessive expansion)
    - **CONSTRAINT**: Preserve original intent and scope (no feature creep)
    - **CONSTRAINT**: Add only essential technical context, not exhaustive details
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
-   - Agent returns enhanced feature request with project context
+   - Agent returns enhanced feature request as single paragraph
 6. Record step end time and validate output
-   - **Length Check**: Verify refined request is 2-4x original length
+   - **Format Check**: Verify output is single paragraph (no headers, sections, or bullet points)
+   - **Length Check**: Verify refined request is 200-500 words and 2-4x original length
    - **Scope Check**: Confirm core intent preserved without feature creep
    - **Quality Check**: Ensure only essential technical context added
+   - If format is wrong, extract just the paragraph content if possible
 7. **SAVE STEP 1 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/01-feature-refinement.md` with:
    - Step metadata (timestamps, duration, status)
    - Original request and context provided
@@ -69,28 +72,38 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 7. **CHECKPOINT**: Step 2 markdown log now available for review/debugging
 
 ### Step 3: Implementation Planning
-**Objective**: Generate detailed XML implementation plan.
+**Objective**: Generate detailed markdown implementation plan following the required template.
 
 **Process**:
 1. Record step start time with ISO timestamp
 2. Use Task tool with `subagent_type: "implementation-planner"`:
    - Description: "Generate detailed implementation plan"
+   - **CRITICAL**: Explicitly request MARKDOWN format following the agent's template
+   - Prompt must include: "Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections: ## Overview (with Estimated Duration, Complexity, Risk Level), ## Quick Summary, ## Prerequisites, ## Implementation Steps (each step with What/Why/Confidence/Files/Changes/Validation Commands/Success Criteria), ## Quality Gates, ## Notes. IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every step touching JS/JSX/TS/TSX files. Do NOT include code examples."
    - Pass refined feature request, discovered files analysis, and project context
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
-   - Agent generates structured XML implementation plan
-3. Validate plan completeness and actionability
+   - Agent generates structured markdown implementation plan
+3. **Validate Plan Format and Content**:
+   - **Format Check**: Verify output is markdown with required sections (not XML)
+   - **Template Compliance**: Check for Overview, Prerequisites, Implementation Steps, Quality Gates
+   - **Validation Commands**: Ensure steps include `npm run lint:fix && npm run typecheck`
+   - **No Code Check**: Verify no code examples or implementations included
+   - If format is XML, log error and consider format conversion or retry
 4. Record step end time and validation results
 5. **SAVE STEP 3 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/03-implementation-planning.md` with:
    - Step metadata (timestamps, duration, status)
    - Refined request and file analysis used as input
    - Complete agent prompt sent
    - Full agent response with implementation plan
-   - Plan validation results
+   - Plan format validation results (markdown vs XML check)
+   - Template compliance validation results
    - Complexity assessment and time estimates
    - Quality gate results
 6. **UPDATE INDEX**: Append Step 3 summary to orchestration index
 7. **FINAL CHECKPOINT**: All step logs now available for review
 8. **SAVE IMPLEMENTATION PLAN**: Create separate `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md` file
+   - Ensure plan is saved in proper markdown format
+   - If agent returned XML, convert to markdown or flag for manual review
 
 ## Logging and Output
 

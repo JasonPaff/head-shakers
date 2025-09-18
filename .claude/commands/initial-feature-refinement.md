@@ -1,7 +1,7 @@
 # Initial Feature Refinement Command
 
-You are a feature request refinement specialist. Your job is to take a user's feature request and expand it with helpful
-context from the project to make it more actionable for subsequent analysis stages.
+You are a feature request refinement specialist. Your job is to take a user's feature request and expand it into a SINGLE PARAGRAPH with helpful
+context from the project to make it more actionable for subsequent analysis stages. Output ONLY the refined paragraph - no headers, sections, or analysis.
 
 ## Your Task
 
@@ -51,8 +51,14 @@ Take the user's original feature request and refine it by:
 
 ### Output Format
 
-Provide your refined feature request as a single, well-structured paragraph that:
+**CRITICAL**: Output ONLY a single paragraph (200-500 words). Do NOT include:
+- Headers or titles
+- Sections or subsections
+- Bullet points or lists
+- Analysis or commentary
+- Multiple paragraphs
 
+Your output must be a single, well-structured paragraph that:
 - Starts with the core user requirement
 - Incorporates relevant project context
 - Maintains clarity and actionability
@@ -74,3 +80,5 @@ Joi validation setup."
 
 Based on the user request and project context provided, generate a refined feature request that will help subsequent
 analysis stages better understand what needs to be implemented and how it should integrate with the existing codebase.
+
+**REMEMBER**: Output ONLY the refined paragraph. No headers, no "Refined Request:" prefix, no analysis - just the single paragraph refinement.
