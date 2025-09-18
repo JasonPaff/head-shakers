@@ -25,15 +25,23 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
    - Description: "Refine feature request with project context"
    - Pass original user request, CLAUDE.md content, and package.json content
    - Pass he full `initial-feature-refinement.md` prompt
+   - **CONSTRAINT**: Refined request must be 2-4x original length (no excessive expansion)
+   - **CONSTRAINT**: Preserve original intent and scope (no feature creep)
+   - **CONSTRAINT**: Add only essential technical context, not exhaustive details
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
    - Agent returns enhanced feature request with project context
 6. Record step end time and validate output
+   - **Length Check**: Verify refined request is 2-4x original length
+   - **Scope Check**: Confirm core intent preserved without feature creep
+   - **Quality Check**: Ensure only essential technical context added
 7. **SAVE STEP 1 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/01-feature-refinement.md` with:
    - Step metadata (timestamps, duration, status)
    - Original request and context provided
    - Complete agent prompt sent
    - Full agent response received
    - Refined feature request extracted
+   - **Length Analysis**: Original vs refined word count comparison
+   - **Scope Analysis**: Assessment of intent preservation
    - Validation results and any warnings
 8. **CHECKPOINT**: Step 1 markdown log now available for review/debugging
 
@@ -144,6 +152,9 @@ Execution time: X.X seconds
 
 **Quality Gates**:
 - Feature request successfully refined with project context
+- **Refinement Length Constraint**: Refined request must be 2-4x the length of original (not 10x+)
+- **Focus Preservation**: Core intent of original request must remain unchanged
+- **Conciseness Check**: No unnecessary elaboration or scope creep in refinement
 - At least 5 relevant files discovered through analysis
 - All discovered file paths validated to exist
 - Implementation plan contains concrete, actionable steps
