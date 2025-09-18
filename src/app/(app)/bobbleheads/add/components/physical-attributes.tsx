@@ -2,11 +2,12 @@
 
 import { RulerIcon, StarIcon } from 'lucide-react';
 
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { ENUMS } from '@/lib/constants';
-import { cn } from '@/utils/tailwind-utils';
 
 const conditionOptions = ENUMS.BOBBLEHEAD.CONDITION.map((condition) => ({
   label: condition,
@@ -16,6 +17,10 @@ const conditionOptions = ENUMS.BOBBLEHEAD.CONDITION.map((condition) => ({
 export const PhysicalAttributes = withForm({
   ...addItemFormOptions,
   render: ({ form }) => {
+    const { shouldShowMessage } = useMotivationalMessage(form, {
+      optionalFields: ['height', 'weight', 'material', 'manufacturer', 'currentCondition'],
+    });
+
     return (
       <Card>
         <CardHeader className={'relative'}>
@@ -113,17 +118,15 @@ export const PhysicalAttributes = withForm({
           </div>
 
           {/* Progress indicator */}
-          <div
-            className={cn(
-              'mt-6 flex items-center justify-between rounded-lg',
-              'bg-green-100 p-3 dark:bg-green-950/40',
-            )}
+          <AnimatedMotivationalMessage
+            className={'bg-green-100 dark:bg-green-950/40'}
+            shouldShow={shouldShowMessage}
           >
             <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
               <div className={'size-2 rounded-full bg-green-500'} />
               <span>Excellent! These details help establish authenticity and value.</span>
             </div>
-          </div>
+          </AnimatedMotivationalMessage>
         </CardContent>
       </Card>
     );

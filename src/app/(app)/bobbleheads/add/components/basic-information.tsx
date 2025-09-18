@@ -4,16 +4,21 @@
 import { InfoIcon, StarIcon } from 'lucide-react';
 import { useRef } from 'react';
 
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
-import { cn } from '@/utils/tailwind-utils';
 
 export const BasicInformation = withForm({
   ...addItemFormOptions,
   render: ({ form }) => {
     const nameRef = useRef<HTMLElement | null>(null);
     const descriptionRef = useRef<HTMLElement | null>(null);
+
+    const { shouldShowMessage } = useMotivationalMessage(form, {
+      requiredFields: ['name'],
+    });
 
     return (
       <Card>
@@ -131,17 +136,15 @@ export const BasicInformation = withForm({
           </div>
 
           {/* Progress indicator */}
-          <div
-            className={cn(
-              'mt-6 flex items-center justify-between rounded-lg',
-              'bg-blue-100 p-3 dark:bg-blue-950/40',
-            )}
+          <AnimatedMotivationalMessage
+            className={'bg-blue-100 dark:bg-blue-950/40'}
+            shouldShow={shouldShowMessage}
           >
             <div className={'flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300'}>
               <div className={'size-2 rounded-full bg-blue-500'} />
               <span>Great start! Add photos next to bring your bobblehead to life.</span>
             </div>
-          </div>
+          </AnimatedMotivationalMessage>
         </CardContent>
       </Card>
     );

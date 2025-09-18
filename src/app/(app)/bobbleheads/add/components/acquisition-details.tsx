@@ -2,14 +2,19 @@
 
 import { ShoppingCartIcon, StarIcon } from 'lucide-react';
 
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
-import { cn } from '@/utils/tailwind-utils';
 
 export const AcquisitionDetails = withForm({
   ...addItemFormOptions,
   render: ({ form }) => {
+    const { shouldShowMessage } = useMotivationalMessage(form, {
+      optionalFields: ['acquisitionDate', 'acquisitionMethod', 'purchaseLocation', 'purchasePrice'],
+    });
+
     return (
       <Card>
         <CardHeader className={'relative'}>
@@ -93,17 +98,15 @@ export const AcquisitionDetails = withForm({
           </div>
 
           {/* Progress indicator */}
-          <div
-            className={cn(
-              'mt-6 flex items-center justify-between rounded-lg',
-              'bg-orange-100 p-3 dark:bg-orange-950/40',
-            )}
+          <AnimatedMotivationalMessage
+            className={'bg-orange-100 dark:bg-orange-950/40'}
+            shouldShow={shouldShowMessage}
           >
             <div className={'flex items-center gap-2 text-sm text-orange-700 dark:text-orange-300'}>
               <div className={'size-2 rounded-full bg-orange-500'} />
               <span>Great! You&apos;re building a detailed record of your collection&apos;s history.</span>
             </div>
-          </div>
+          </AnimatedMotivationalMessage>
         </CardContent>
       </Card>
     );

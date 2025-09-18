@@ -6,6 +6,7 @@ import { CameraIcon, ImageIcon, StarIcon, UploadIcon } from 'lucide-react';
 
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
@@ -16,6 +17,9 @@ export const ItemPhotos = withForm({
   ...addItemFormOptions,
   render: function ({ form }) {
     const photos = (useStore(form.store, (state) => state.values.photos) as Array<CloudinaryPhoto>) || [];
+
+    // Show message when at least one photo is uploaded
+    const shouldShowMessage = photos.length > 0;
 
     const handlePhotosChange = (
       updatedPhotos:
@@ -99,11 +103,12 @@ export const ItemPhotos = withForm({
           </div>
 
           {/* Progress indicator */}
-          <div
-            className={'flex items-center justify-between rounded-lg bg-green-100 p-3 dark:bg-green-900/40'}
+          <AnimatedMotivationalMessage
+            className={'bg-green-100 dark:bg-green-900/40'}
+            shouldShow={shouldShowMessage}
           >
             <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
-              <div className={'size-2 rounded-full bg-green-500'} />{' '}
+              <div className={'size-2 rounded-full bg-green-500'} />
               <Conditional
                 fallback={`${photos.length}/8 photos uploaded - looking great!`}
                 isCondition={photos.length === 0}
@@ -111,7 +116,7 @@ export const ItemPhotos = withForm({
                 <span>Add photos to make your bobblehead stand out!</span>
               </Conditional>
             </div>
-          </div>
+          </AnimatedMotivationalMessage>
         </CardContent>
       </Card>
     );

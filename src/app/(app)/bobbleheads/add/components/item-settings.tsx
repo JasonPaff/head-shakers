@@ -2,11 +2,11 @@
 
 import { EyeIcon, StarIcon } from 'lucide-react';
 
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { ENUMS } from '@/lib/constants';
-import { cn } from '@/utils/tailwind-utils';
 
 const statusOptions = ENUMS.BOBBLEHEAD.STATUS.map((status) => ({
   label: status,
@@ -83,17 +83,15 @@ export const ItemSettings = withForm({
           </div>
 
           {/* Progress indicator */}
-          <div
-            className={cn(
-              'mt-6 flex items-center justify-between rounded-lg',
-              'bg-slate-100 p-3 dark:bg-slate-950/40',
-            )}
+          <AnimatedMotivationalMessage
+            className={'bg-slate-100 dark:bg-slate-950/40'}
+            shouldShow={true}
           >
             <div className={'flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300'}>
               <div className={'size-2 rounded-full bg-slate-500'} />
               <span>Almost done! Your bobblehead is ready to join your collection.</span>
             </div>
-          </div>
+          </AnimatedMotivationalMessage>
         </CardContent>
       </Card>
     );

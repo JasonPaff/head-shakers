@@ -8,14 +8,15 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
 import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
 import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections/subcollections.actions';
-import { cn } from '@/utils/tailwind-utils';
 
 export const CollectionAssignment = withForm({
   ...addItemFormOptions,
@@ -36,6 +37,10 @@ export const CollectionAssignment = withForm({
     const collectionId = useStore(form.store, (state) => state.values.collectionId);
 
     const { executeAsync: getSubCollections } = useAction(getSubCollectionsByCollectionAction);
+
+    const { shouldShowMessage } = useMotivationalMessage(form, {
+      requiredFields: ['collectionId'],
+    });
 
     // load the subcollections when the collectionId changes
     useEffect(() => {
@@ -150,17 +155,15 @@ export const CollectionAssignment = withForm({
           </div>
 
           {/* Progress indicator */}
-          <div
-            className={cn(
-              'mt-6 flex items-center justify-between rounded-lg',
-              'bg-purple-100 p-3 dark:bg-purple-950/40',
-            )}
+          <AnimatedMotivationalMessage
+            className={'bg-purple-100 dark:bg-purple-950/40'}
+            shouldShow={shouldShowMessage}
           >
             <div className={'flex items-center gap-2 text-sm text-purple-700 dark:text-purple-300'}>
               <div className={'size-2 rounded-full bg-purple-500'} />
               <span>Perfect! Your bobblehead now has a home in your collection.</span>
             </div>
-          </div>
+          </AnimatedMotivationalMessage>
         </CardContent>
 
         <CollectionCreateDialog
