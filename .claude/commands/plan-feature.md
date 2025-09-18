@@ -21,7 +21,7 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 2. **Create Orchestration Index**: Save `docs/{YYYY_MM_DD}/orchestration/{feature-name}/00-orchestration-index.md` with workflow overview and links
 3. Record step start time with ISO timestamp
 4. Read CLAUDE.md and package.json for project context
-5. Use Task tool with `subagent_type: "prompt-engineer"`:
+5. Use Task tool with `subagent_type: "general-purpose"`:
    - Description: "Refine feature request with project context"
    - Pass original user request, CLAUDE.md content, and package.json content
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
