@@ -23,7 +23,9 @@ export const DashboardHeader = async () => {
     <div className={'mb-8'}>
       <div className={'mt-4 mb-6 flex items-start justify-between'}>
         <div>
-          <h1 className={'text-2xl font-bold text-foreground'}>My Collections Dashboard</h1>
+          <h1 className={'text-2xl font-bold text-foreground'} data-testid={'dashboard-header'}>
+            My Collections Dashboard
+          </h1>
           <p className={'text-muted-foreground'}>Manage your collections, subcollections, and bobbleheads</p>
         </div>
         <CollectionCreateButton />

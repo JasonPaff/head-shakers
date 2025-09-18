@@ -1,4 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+// load E2E environment variables
+dotenv.config({ path: '.env.e2e' });
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -6,12 +10,12 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  reporter: 'null',
   use: {
     baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
   },
-
+  timeout: 120 * 1000,
   projects: [
     {
       name: 'global setup',

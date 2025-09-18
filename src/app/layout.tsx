@@ -3,10 +3,12 @@ import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
 import { shadcn } from '@clerk/themes';
 import { ThemeProvider } from 'next-themes';
+import { $path } from 'next-typesafe-url';
 import { Geist, Geist_Mono } from 'next/font/google';
-import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
 import '@/app/globals.css';
+import { NuqsAdapter } from 'nuqs/adapters/next/app';
+
 import { TanstackQueryProvider } from '@/components/feature/tanstack-query/tanstack-query-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -37,6 +39,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       appearance={{
         theme: shadcn,
       }}
+      signInUrl={$path({ route: '/' })}
+      signUpUrl={$path({ route: '/' })}
     >
       <html data-scroll-behavior={'smooth'} lang={'en'} suppressHydrationWarning>
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
