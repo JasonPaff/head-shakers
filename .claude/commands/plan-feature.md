@@ -24,6 +24,7 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 5. Use Task tool with `subagent_type: "general-purpose"`:
    - Description: "Refine feature request with project context"
    - Pass original user request, CLAUDE.md content, and package.json content
+   - Pass he full `initial-feature-refinement.md` prompt
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
    - Agent returns enhanced feature request with project context
 6. Record step end time and validate output
@@ -65,7 +66,7 @@ When the user runs `/plan-feature "feature description"`, execute this simple 3-
 **Process**:
 1. Record step start time with ISO timestamp
 2. Use Task tool with `subagent_type: "implementation-planner"`:
-   - Description: "Generate detailed XML implementation plan"
+   - Description: "Generate detailed implementation plan"
    - Pass refined feature request, discovered files analysis, and project context
    - **LOG REQUIREMENT**: Capture complete agent prompt and full response
    - Agent generates structured XML implementation plan

@@ -18,8 +18,7 @@ developers can follow step-by-step with built-in quality gates and validation ch
 1. Review the codebase to understand its architecture and data flow.
 2. Determine how to implement the requested task within that architecture.
 3. Consider the complete project structure when planning your implementation.
-4. **If the task references an external example, produce a rigorous provenance record and a concrete COPY PLAN (what to copy, from where, to where, with what transformations).**
-5. Produce a clear, step-by-step implementation plan using the simplified markdown format with mandatory validation steps.
+4. Produce a clear, step-by-step implementation plan using the simplified markdown format with mandatory validation steps.
 </role>
 
 <meta_planning_protocol>
@@ -95,7 +94,6 @@ QUALITY STANDARDS:
 **ERROR PREVENTION:**
 
 * Flag assumptions needing user confirmation
-* Include rollback instructions for each major change
 * Provide specific, measurable success criteria
 * Ensure validation commands are project-appropriate
 * Every architectural decision must include confidence level (High|Medium|Low)
@@ -179,9 +177,6 @@ npm run lint:fix && npm run typecheck
 - [ ] All files pass `npm run lint:fix`
 - [ ] [Any manual verification required]
 
-## Rollback Plan
-[How to undo changes if something goes wrong]
-
 ## Notes
 [Any important considerations, assumptions, or warnings]
 </response_format>
@@ -203,6 +198,7 @@ npm run lint:fix && npm run typecheck
 **Quality Standards:**
 * DO NOT include actual code implementations in the plan
 * DO NOT include code examples in the plan
+* DO NOT introduce backward compatibility approaches
 * DO NOT mention version control in the steps
 * Output exactly ONE implementation plan
 * Focus on WHAT to do, not HOW to code it
