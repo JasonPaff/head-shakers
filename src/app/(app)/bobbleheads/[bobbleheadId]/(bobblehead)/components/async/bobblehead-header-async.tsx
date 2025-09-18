@@ -11,10 +11,7 @@ interface BobbleheadHeaderAsyncProps {
   currentUserId?: string;
 }
 
-export const BobbleheadHeaderAsync = async ({
-  bobbleheadId,
-  currentUserId,
-}: BobbleheadHeaderAsyncProps) => {
+export const BobbleheadHeaderAsync = async ({ bobbleheadId, currentUserId }: BobbleheadHeaderAsyncProps) => {
   const [bobblehead, likeData] = await Promise.all([
     BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
     SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId || undefined),

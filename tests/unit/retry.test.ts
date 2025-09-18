@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { withRetry, withDatabaseRetry, withServiceRetry } from '@/lib/utils/retry';
+import { withDatabaseRetry, withRetry, withServiceRetry } from '@/lib/utils/retry';
 
 describe('Retry Utilities', () => {
   it('should succeed on first attempt', async () => {
@@ -18,7 +18,6 @@ describe('Retry Utilities', () => {
   });
 
   it('should retry on failure and succeed', async () => {
-    // Use a connection error which is retryable
     const retryableError = new Error('Connection timeout') as Error & { code?: string };
     retryableError.code = 'ECONNRESET';
 
@@ -27,7 +26,7 @@ describe('Retry Utilities', () => {
     const result = await withRetry(mockOperation, {
       maxAttempts: 3,
       operationName: 'test-operation',
-      shouldRetry: () => true, // Force retry for this test
+      shouldRetry: () => true,
     });
 
     expect(result.result).toBe('success');
@@ -46,7 +45,7 @@ describe('Retry Utilities', () => {
       withRetry(mockOperation, {
         maxAttempts: 2,
         operationName: 'test-operation',
-        shouldRetry: () => true, // Force retry for this test
+        shouldRetry: () => true,
       }),
     ).rejects.toThrow('Operation failed');
 
@@ -85,7 +84,7 @@ describe('Retry Utilities', () => {
       maxAttempts: 3,
       onRetry,
       operationName: 'test-operation',
-      shouldRetry: () => true, // Force retry for this test
+      shouldRetry: () => true,
     });
 
     expect(onRetry).toHaveBeenCalledTimes(1);

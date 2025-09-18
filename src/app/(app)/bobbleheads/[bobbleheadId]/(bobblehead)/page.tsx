@@ -38,11 +38,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
   const { bobbleheadId } = await routeParams;
   const currentUserId = await getOptionalUserId();
 
-  // Only fetch basic info to verify existence
-  const basicBobblehead = await BobbleheadsFacade.getBobbleheadById(
-    bobbleheadId,
-    currentUserId || undefined,
-  );
+  const basicBobblehead = await BobbleheadsFacade.getBobbleheadById(bobbleheadId, currentUserId || undefined);
 
   if (!basicBobblehead) {
     notFound();
@@ -53,7 +49,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <ContentLayout>
-          <BobbleheadErrorBoundary section={"header"}>
+          <BobbleheadErrorBoundary section={'header'}>
             <Suspense fallback={<BobbleheadHeaderSkeleton />}>
               <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} currentUserId={currentUserId || undefined} />
             </Suspense>
@@ -65,9 +61,12 @@ async function ItemPage({ routeParams }: ItemPageProps) {
       <AuthContent>
         <div className={'mt-4'}>
           <ContentLayout>
-            <BobbleheadErrorBoundary section={"metrics"}>
+            <BobbleheadErrorBoundary section={'metrics'}>
               <Suspense fallback={<BobbleheadMetricsSkeleton />}>
-                <BobbleheadMetricsAsync bobbleheadId={bobbleheadId} currentUserId={currentUserId || undefined} />
+                <BobbleheadMetricsAsync
+                  bobbleheadId={bobbleheadId}
+                  currentUserId={currentUserId || undefined}
+                />
               </Suspense>
             </BobbleheadErrorBoundary>
           </ContentLayout>
@@ -77,9 +76,12 @@ async function ItemPage({ routeParams }: ItemPageProps) {
       {/* Feature Card Section */}
       <div className={'mt-4'}>
         <ContentLayout>
-          <BobbleheadErrorBoundary section={"feature"}>
+          <BobbleheadErrorBoundary section={'feature'}>
             <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
-              <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} currentUserId={currentUserId || undefined} />
+              <BobbleheadFeatureCardAsync
+                bobbleheadId={bobbleheadId}
+                currentUserId={currentUserId || undefined}
+              />
             </Suspense>
           </BobbleheadErrorBoundary>
         </ContentLayout>
@@ -87,27 +89,36 @@ async function ItemPage({ routeParams }: ItemPageProps) {
 
       {/* Photo Gallery Section */}
       <ContentLayout>
-        <BobbleheadErrorBoundary section={"gallery"}>
+        <BobbleheadErrorBoundary section={'gallery'}>
           <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
-            <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} currentUserId={currentUserId || undefined} />
+            <BobbleheadPhotoGalleryAsync
+              bobbleheadId={bobbleheadId}
+              currentUserId={currentUserId || undefined}
+            />
           </Suspense>
         </BobbleheadErrorBoundary>
       </ContentLayout>
 
       {/* Primary Detail Cards Section */}
       <ContentLayout>
-        <BobbleheadErrorBoundary section={"details"}>
+        <BobbleheadErrorBoundary section={'details'}>
           <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
-            <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} currentUserId={currentUserId || undefined} />
+            <BobbleheadDetailCardsAsync
+              bobbleheadId={bobbleheadId}
+              currentUserId={currentUserId || undefined}
+            />
           </Suspense>
         </BobbleheadErrorBoundary>
       </ContentLayout>
 
       {/* Secondary Detail Cards Section */}
       <ContentLayout>
-        <BobbleheadErrorBoundary section={"secondary"}>
+        <BobbleheadErrorBoundary section={'secondary'}>
           <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
-            <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} currentUserId={currentUserId || undefined} />
+            <BobbleheadSecondaryCardsAsync
+              bobbleheadId={bobbleheadId}
+              currentUserId={currentUserId || undefined}
+            />
           </Suspense>
         </BobbleheadErrorBoundary>
       </ContentLayout>

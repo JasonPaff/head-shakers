@@ -79,8 +79,8 @@ export const BobbleheadSpecificationCard = ({ bobblehead }: BobbleheadSpecificat
         </CardTitle>
       </CardHeader>
       <CardContent className={'space-y-4'}>
-        <SpecificationItem icon={RulerIcon} label={'Height'} unit={'inches'} value={bobblehead.height} />
-        <SpecificationItem icon={WeightIcon} label={'Weight'} unit={'oz'} value={bobblehead.weight} />
+        <SpecificationItem icon={RulerIcon} label={'Height'} unit={'cm'} value={bobblehead.height} />
+        <SpecificationItem icon={WeightIcon} label={'Weight'} unit={'g'} value={bobblehead.weight} />
         <SpecificationItem icon={PackageIcon} label={'Material'} value={bobblehead.material} />
       </CardContent>
     </Card>

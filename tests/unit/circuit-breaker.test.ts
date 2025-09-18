@@ -28,11 +28,11 @@ describe('Circuit Breaker', () => {
 
     const mockOperation = vi.fn().mockRejectedValue(new Error('Operation failed'));
 
-    // First failure
+    // first failure
     await expect(breaker.execute(mockOperation)).rejects.toThrow('Operation failed');
     expect(breaker.getState()).toBe(CircuitState.CLOSED);
 
-    // Second failure should open the circuit
+    // second failure; should open the circuit
     await expect(breaker.execute(mockOperation)).rejects.toThrow('Operation failed');
     expect(breaker.getState()).toBe(CircuitState.OPEN);
   });
@@ -44,11 +44,11 @@ describe('Circuit Breaker', () => {
 
     const mockOperation = vi.fn().mockRejectedValue(new Error('Operation failed'));
 
-    // Trigger circuit to open
+    // trigger circuit to open
     await expect(breaker.execute(mockOperation)).rejects.toThrow('Operation failed');
     expect(breaker.getState()).toBe(CircuitState.OPEN);
 
-    // Next request should be rejected immediately
+    // the next request should be rejected immediately
     await expect(breaker.execute(mockOperation)).rejects.toThrow('Circuit breaker test-breaker is OPEN');
     expect(mockOperation).toHaveBeenCalledTimes(1); // Should not call operation again
   });
@@ -60,10 +60,10 @@ describe('Circuit Breaker', () => {
 
     const mockOperation = vi.fn().mockRejectedValue(new Error('Operation failed'));
 
-    // Open the circuit
+    // open the circuit
     await expect(breaker.execute(mockOperation)).rejects.toThrow();
 
-    // Reset should close the circuit
+    // reset should close the circuit
     breaker.reset();
     expect(breaker.getState()).toBe(CircuitState.CLOSED);
   });
