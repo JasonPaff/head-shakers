@@ -8,8 +8,8 @@ import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
 import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';

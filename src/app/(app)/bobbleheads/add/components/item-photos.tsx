@@ -6,8 +6,8 @@ import { CameraIcon, ImageIcon, StarIcon, UploadIcon } from 'lucide-react';
 
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
 import { Conditional } from '@/components/ui/conditional';
@@ -17,9 +17,6 @@ export const ItemPhotos = withForm({
   ...addItemFormOptions,
   render: function ({ form }) {
     const photos = (useStore(form.store, (state) => state.values.photos) as Array<CloudinaryPhoto>) || [];
-
-    // Show message when at least one photo is uploaded
-    const shouldShowMessage = photos.length > 0;
 
     const handlePhotosChange = (
       updatedPhotos:
@@ -33,6 +30,8 @@ export const ItemPhotos = withForm({
         form.setFieldValue('photos', updatedPhotos);
       }
     };
+
+    const shouldShowMessage = photos.length > 0;
 
     return (
       <Card aria-labelledby={'photos-section-title'} role={'region'}>

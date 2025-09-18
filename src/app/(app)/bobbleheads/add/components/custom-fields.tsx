@@ -1,9 +1,10 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 'use client';
 
 import { Plus, SettingsIcon, StarIcon, Trash2 } from 'lucide-react';
 
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

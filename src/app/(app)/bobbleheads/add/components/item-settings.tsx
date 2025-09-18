@@ -2,8 +2,8 @@
 
 import { EyeIcon, StarIcon } from 'lucide-react';
 
-import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { ENUMS } from '@/lib/constants';
