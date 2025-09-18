@@ -15,7 +15,7 @@ def check_step1_refinement_quality(step_file_path):
     if not step_file_path.exists():
         return ["Step 1 log file missing"]
 
-    content = step_file_path.read_text()
+    content = step_file_path.read_text(encoding='utf-8')
     violations = []
 
     # Check for original vs refined length analysis
@@ -46,7 +46,7 @@ def check_step2_file_discovery_quality(step_file_path):
     if not step_file_path.exists():
         return ["Step 2 log file missing"]
 
-    content = step_file_path.read_text()
+    content = step_file_path.read_text(encoding='utf-8')
     violations = []
 
     # Count discovered files
@@ -78,7 +78,7 @@ def check_step3_implementation_planning_quality(step_file_path):
     if not step_file_path.exists():
         return ["Step 3 log file missing"]
 
-    content = step_file_path.read_text()
+    content = step_file_path.read_text(encoding='utf-8')
     violations = []
 
     # Check for XML implementation plan
@@ -204,7 +204,7 @@ def main():
                 violations = validate_orchestration_complete()
 
                 if violations:
-                    print(f"\n🚨 ORCHESTRATION QUALITY VIOLATIONS:")
+                    print(f"\nORCHESTRATION QUALITY VIOLATIONS:")
                     for i, violation in enumerate(violations, 1):
                         print(f"  {i}. {violation}")
 
@@ -212,18 +212,18 @@ def main():
                     log_dir = Path('.claude/logs')
                     log_dir.mkdir(exist_ok=True)
 
-                    with open(log_dir / 'orchestration_quality.log', 'a') as f:
+                    with open(log_dir / 'orchestration_quality.log', 'a', encoding='utf-8') as f:
                         f.write(f"\n[{datetime.now().isoformat()}] Orchestration Quality Check:\n")
                         for violation in violations:
                             f.write(f"  - {violation}\n")
 
-                    print(f"\n📝 Quality issues logged to .claude/logs/orchestration_quality.log")
-                    print("🔧 Consider reviewing orchestration steps for improvements")
+                    print(f"\nQuality issues logged to .claude/logs/orchestration_quality.log")
+                    print("Consider reviewing orchestration steps for improvements")
                 else:
-                    print("✅ Orchestration quality validation passed")
+                    print("Orchestration quality validation passed")
 
     except Exception as e:
-        print(f"❌ Quality gates hook error: {e}", file=sys.stderr)
+        print(f"Quality gates hook error: {e}", file=sys.stderr)
         sys.exit(1)
 
 if __name__ == '__main__':
