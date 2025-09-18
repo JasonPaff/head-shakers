@@ -59,7 +59,7 @@ CORE REQUIREMENTS:
   ```bash
   npm run lint:fix && npm run typecheck
   ```
-* **Quality Gates**: Plan must include overall quality gates section with all validation commands
+* **Quality Gates**: Plan must include overall quality gates section with lint and typecheck validation commands
 * **Success Criteria**: Each step must have checkboxes for validation command success
 * **Rollback Plan**: Include how to undo changes if validation fails
 
@@ -177,8 +177,7 @@ npm run lint:fix && npm run typecheck
 ## Quality Gates
 - [ ] All TypeScript files pass `npm run typecheck`
 - [ ] All files pass `npm run lint:fix`
-- [ ] [Any specific tests to run]
-- [ ] [Any manual testing required]
+- [ ] [Any manual verification required]
 
 ## Rollback Plan
 [How to undo changes if something goes wrong]
@@ -203,6 +202,7 @@ npm run lint:fix && npm run typecheck
 
 **Quality Standards:**
 * DO NOT include actual code implementations in the plan
+* DO NOT include code examples in the plan
 * DO NOT mention version control in the steps
 * Output exactly ONE implementation plan
 * Focus on WHAT to do, not HOW to code it
