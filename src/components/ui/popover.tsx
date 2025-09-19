@@ -4,24 +4,31 @@ import type { ComponentProps } from 'react';
 
 import * as PopoverPrimitive from '@radix-ui/react-popover';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type PopoverAnchorProps = ComponentProps<typeof PopoverPrimitive.Anchor>;
-type PopoverContentProps = ComponentProps<typeof PopoverPrimitive.Content>;
-type PopoverProps = ComponentProps<typeof PopoverPrimitive.Root>;
-type PopoverTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger>;
+type PopoverAnchorProps = ComponentProps<typeof PopoverPrimitive.Anchor> & ComponentTestIdProps;
+type PopoverContentProps = ComponentProps<typeof PopoverPrimitive.Content> & ComponentTestIdProps;
+type PopoverProps = ComponentProps<typeof PopoverPrimitive.Root> & ComponentTestIdProps;
+type PopoverTriggerProps = ComponentProps<typeof PopoverPrimitive.Trigger> & ComponentTestIdProps;
 
-export const Popover = ({ children, ...props }: PopoverProps) => {
+export const Popover = ({ children, testId, ...props }: PopoverProps) => {
+  const popoverTestId = testId || generateTestId('ui', 'popover');
+
   return (
-    <PopoverPrimitive.Root data-slot={'popover'} {...props}>
+    <PopoverPrimitive.Root data-slot={'popover'} data-testid={popoverTestId} {...props}>
       {children}
     </PopoverPrimitive.Root>
   );
 };
 
-export const PopoverAnchor = ({ children, ...props }: PopoverAnchorProps) => {
+export const PopoverAnchor = ({ children, testId, ...props }: PopoverAnchorProps) => {
+  const popoverAnchorTestId = testId || generateTestId('ui', 'popover', 'anchor');
+
   return (
-    <PopoverPrimitive.Anchor data-slot={'popover-anchor'} {...props}>
+    <PopoverPrimitive.Anchor data-slot={'popover-anchor'} data-testid={popoverAnchorTestId} {...props}>
       {children}
     </PopoverPrimitive.Anchor>
   );
@@ -32,8 +39,11 @@ export const PopoverContent = ({
   children,
   className,
   sideOffset = 4,
+  testId,
   ...props
 }: PopoverContentProps) => {
+  const popoverContentTestId = testId || generateTestId('ui', 'popover', 'content');
+
   return (
     <PopoverPrimitive.Portal>
       <PopoverPrimitive.Content
@@ -49,6 +59,7 @@ export const PopoverContent = ({
           className,
         )}
         data-slot={'popover-content'}
+        data-testid={popoverContentTestId}
         sideOffset={sideOffset}
         {...props}
       >
@@ -58,9 +69,11 @@ export const PopoverContent = ({
   );
 };
 
-export const PopoverTrigger = ({ children, ...props }: PopoverTriggerProps) => {
+export const PopoverTrigger = ({ children, testId, ...props }: PopoverTriggerProps) => {
+  const popoverTriggerTestId = testId || generateTestId('ui', 'popover', 'trigger');
+
   return (
-    <PopoverPrimitive.Trigger data-slot={'popover-trigger'} {...props}>
+    <PopoverPrimitive.Trigger data-slot={'popover-trigger'} data-testid={popoverTriggerTestId} {...props}>
       {children}
     </PopoverPrimitive.Trigger>
   );

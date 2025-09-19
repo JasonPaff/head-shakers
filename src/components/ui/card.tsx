@@ -33,7 +33,7 @@ export const Card = ({ className, testId, ...props }: CardProps) => {
 };
 
 export const CardAction = ({ className, testId, ...props }: CardActionProps) => {
-  const cardActionTestId = testId;
+  const cardActionTestId = testId || generateTestId('ui', 'card', 'action');
 
   return (
     <div
@@ -46,13 +46,13 @@ export const CardAction = ({ className, testId, ...props }: CardActionProps) => 
 };
 
 export const CardContent = ({ className, testId, ...props }: CardContentProps) => {
-  const cardContentTestId = testId;
+  const cardContentTestId = testId || generateTestId('ui', 'card', 'content');
 
   return <div className={cn('px-6', className)} data-slot={'card-content'} data-testid={cardContentTestId} {...props} />;
 };
 
 export const CardDescription = ({ className, testId, ...props }: CardDescriptionProps) => {
-  const cardDescriptionTestId = testId;
+  const cardDescriptionTestId = testId || generateTestId('ui', 'card', 'description');
 
   return (
     <div
@@ -65,7 +65,7 @@ export const CardDescription = ({ className, testId, ...props }: CardDescription
 };
 
 export const CardFooter = ({ className, testId, ...props }: CardFooterProps) => {
-  const cardFooterTestId = testId;
+  const cardFooterTestId = testId || generateTestId('ui', 'card', 'footer');
 
   return (
     <div
@@ -84,7 +84,7 @@ export const CardFooter = ({ className, testId, ...props }: CardFooterProps) => 
 };
 
 export const CardHeader = ({ className, testId, ...props }: CardHeaderProps) => {
-  const cardHeaderTestId = testId;
+  const cardHeaderTestId = testId || generateTestId('ui', 'card', 'header');
 
   return (
     <div
@@ -105,7 +105,7 @@ export const CardHeader = ({ className, testId, ...props }: CardHeaderProps) => 
 };
 
 export const CardTitle = ({ className, testId, ...props }: CardTitleProps) => {
-  const cardTitleTestId = testId;
+  const cardTitleTestId = testId || generateTestId('ui', 'card', 'title');
 
   return (
     <div

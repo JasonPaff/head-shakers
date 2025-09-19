@@ -71,7 +71,7 @@ export const AlertDialogContent = ({ className, testId, ...props }: AlertDialogC
 };
 
 export const AlertDialogDescription = ({ className, testId, ...props }: AlertDialogDescriptionProps) => {
-  const alertDialogDescriptionTestId = testId;
+  const alertDialogDescriptionTestId = testId || generateTestId('ui', 'alert-dialog', 'description');
 
   return (
     <AlertDialogPrimitive.Description
@@ -84,7 +84,7 @@ export const AlertDialogDescription = ({ className, testId, ...props }: AlertDia
 };
 
 export const AlertDialogFooter = ({ className, testId, ...props }: AlertDialogFooterProps) => {
-  const alertDialogFooterTestId = testId;
+  const alertDialogFooterTestId = testId || generateTestId('ui', 'alert-dialog', 'footer');
 
   return (
     <div
@@ -97,7 +97,7 @@ export const AlertDialogFooter = ({ className, testId, ...props }: AlertDialogFo
 };
 
 export const AlertDialogHeader = ({ className, testId, ...props }: AlertDialogHeaderProps) => {
-  const alertDialogHeaderTestId = testId;
+  const alertDialogHeaderTestId = testId || generateTestId('ui', 'alert-dialog', 'header');
 
   return (
     <div
@@ -110,7 +110,7 @@ export const AlertDialogHeader = ({ className, testId, ...props }: AlertDialogHe
 };
 
 export const AlertDialogOverlay = ({ className, testId, ...props }: AlertDialogOverlayProps) => {
-  const alertDialogOverlayTestId = testId;
+  const alertDialogOverlayTestId = testId || generateTestId('ui', 'alert-dialog', 'overlay');
 
   return (
     <AlertDialogPrimitive.Overlay
@@ -128,13 +128,13 @@ export const AlertDialogOverlay = ({ className, testId, ...props }: AlertDialogO
 };
 
 export const AlertDialogPortal = ({ testId, ...props }: AlertDialogPortalProps) => {
-  const alertDialogPortalTestId = testId;
+  const alertDialogPortalTestId = testId || generateTestId('ui', 'alert-dialog', 'portal');
 
   return <AlertDialogPrimitive.Portal data-slot={'alert-dialog-portal'} data-testid={alertDialogPortalTestId} {...props} />;
 };
 
 export const AlertDialogTitle = ({ className, testId, ...props }: AlertDialogTitleProps) => {
-  const alertDialogTitleTestId = testId;
+  const alertDialogTitleTestId = testId || generateTestId('ui', 'alert-dialog', 'title');
 
   return (
     <AlertDialogPrimitive.Title

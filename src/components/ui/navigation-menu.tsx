@@ -4,14 +4,19 @@ import * as NavigationMenuPrimitive from '@radix-ui/react-navigation-menu';
 import { cva } from 'class-variance-authority';
 import { ChevronDownIcon } from 'lucide-react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { Conditional } from '@/components/ui/conditional';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type NavigationMenuProps = ComponentProps<typeof NavigationMenuPrimitive.Root> & {
+type NavigationMenuProps = ComponentProps<typeof NavigationMenuPrimitive.Root> & ComponentTestIdProps & {
   isViewport?: boolean;
 };
 
-export const NavigationMenu = ({ children, className, isViewport = true, ...props }: NavigationMenuProps) => {
+export const NavigationMenu = ({ children, className, isViewport = true, testId, ...props }: NavigationMenuProps) => {
+  const navigationMenuTestId = testId || generateTestId('ui', 'navigation-menu');
+
   return (
     <NavigationMenuPrimitive.Root
       className={cn(
@@ -19,6 +24,7 @@ export const NavigationMenu = ({ children, className, isViewport = true, ...prop
         className,
       )}
       data-slot={'navigation-menu'}
+      data-testid={navigationMenuTestId}
       data-viewport={isViewport}
       {...props}
     >
@@ -30,13 +36,16 @@ export const NavigationMenu = ({ children, className, isViewport = true, ...prop
   );
 };
 
-type NavigationMenuItemProps = ComponentProps<typeof NavigationMenuPrimitive.Item>;
+type NavigationMenuItemProps = ComponentProps<typeof NavigationMenuPrimitive.Item> & ComponentTestIdProps;
 
-export const NavigationMenuItem = ({ children, className, ...props }: NavigationMenuItemProps) => {
+export const NavigationMenuItem = ({ children, className, testId, ...props }: NavigationMenuItemProps) => {
+  const navigationMenuItemTestId = testId || generateTestId('ui', 'navigation-menu', 'item');
+
   return (
     <NavigationMenuPrimitive.Item
       className={cn('relative', className)}
       data-slot={'navigation-menu-item'}
+      data-testid={navigationMenuItemTestId}
       {...props}
     >
       {children}
@@ -44,21 +53,26 @@ export const NavigationMenuItem = ({ children, className, ...props }: Navigation
   );
 };
 
-type NavigationMenuListProps = ComponentProps<typeof NavigationMenuPrimitive.List>;
+type NavigationMenuListProps = ComponentProps<typeof NavigationMenuPrimitive.List> & ComponentTestIdProps;
 
-export const NavigationMenuList = ({ className, ...props }: NavigationMenuListProps) => {
+export const NavigationMenuList = ({ className, testId, ...props }: NavigationMenuListProps) => {
+  const navigationMenuListTestId = testId || generateTestId('ui', 'navigation-menu', 'list');
+
   return (
     <NavigationMenuPrimitive.List
       className={cn('group flex flex-1 list-none items-center justify-center gap-1', className)}
       data-slot={'navigation-menu-list'}
+      data-testid={navigationMenuListTestId}
       {...props}
     />
   );
 };
 
-type NavigationMenuContentProps = ComponentProps<typeof NavigationMenuPrimitive.Content>;
+type NavigationMenuContentProps = ComponentProps<typeof NavigationMenuPrimitive.Content> & ComponentTestIdProps;
 
-export const NavigationMenuContent = ({ children, className, ...props }: NavigationMenuContentProps) => {
+export const NavigationMenuContent = ({ children, className, testId, ...props }: NavigationMenuContentProps) => {
+  const navigationMenuContentTestId = testId || generateTestId('ui', 'navigation-menu', 'content');
+
   return (
     <NavigationMenuPrimitive.Content
       className={cn(
@@ -67,6 +81,7 @@ export const NavigationMenuContent = ({ children, className, ...props }: Navigat
         className,
       )}
       data-slot={'navigation-menu-content'}
+      data-testid={navigationMenuContentTestId}
       {...props}
     >
       {children}
@@ -74,9 +89,11 @@ export const NavigationMenuContent = ({ children, className, ...props }: Navigat
   );
 };
 
-type NavigationMenuIndicatorProps = ComponentProps<typeof NavigationMenuPrimitive.Indicator>;
+type NavigationMenuIndicatorProps = ComponentProps<typeof NavigationMenuPrimitive.Indicator> & ComponentTestIdProps;
 
-export const NavigationMenuIndicator = ({ className, ...props }: NavigationMenuIndicatorProps) => {
+export const NavigationMenuIndicator = ({ className, testId, ...props }: NavigationMenuIndicatorProps) => {
+  const navigationMenuIndicatorTestId = testId || generateTestId('ui', 'navigation-menu', 'indicator');
+
   return (
     <NavigationMenuPrimitive.Indicator
       className={cn(
@@ -84,6 +101,7 @@ export const NavigationMenuIndicator = ({ className, ...props }: NavigationMenuI
         className,
       )}
       data-slot={'navigation-menu-indicator'}
+      data-testid={navigationMenuIndicatorTestId}
       {...props}
     >
       <div className={'relative top-[60%] h-2 w-2 rotate-45 rounded-tl-sm bg-border shadow-md'} />
@@ -91,9 +109,11 @@ export const NavigationMenuIndicator = ({ className, ...props }: NavigationMenuI
   );
 };
 
-type NavigationMenuLinkProps = ComponentProps<typeof NavigationMenuPrimitive.Link>;
+type NavigationMenuLinkProps = ComponentProps<typeof NavigationMenuPrimitive.Link> & ComponentTestIdProps;
 
-export const NavigationMenuLink = ({ children, className, ...props }: NavigationMenuLinkProps) => {
+export const NavigationMenuLink = ({ children, className, testId, ...props }: NavigationMenuLinkProps) => {
+  const navigationMenuLinkTestId = testId || generateTestId('ui', 'navigation-menu', 'link');
+
   return (
     <NavigationMenuPrimitive.Link
       className={cn(
@@ -101,6 +121,7 @@ export const NavigationMenuLink = ({ children, className, ...props }: Navigation
         className,
       )}
       data-slot={'navigation-menu-link'}
+      data-testid={navigationMenuLinkTestId}
       {...props}
     >
       {children}
@@ -112,13 +133,16 @@ export const navigationMenuTriggerStyle = cva(
   'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-[color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-accent/50 data-[state=open]:text-accent-foreground data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent',
 );
 
-type NavigationMenuTriggerProps = ComponentProps<typeof NavigationMenuPrimitive.Trigger>;
+type NavigationMenuTriggerProps = ComponentProps<typeof NavigationMenuPrimitive.Trigger> & ComponentTestIdProps;
 
-export const NavigationMenuTrigger = ({ children, className, ...props }: NavigationMenuTriggerProps) => {
+export const NavigationMenuTrigger = ({ children, className, testId, ...props }: NavigationMenuTriggerProps) => {
+  const navigationMenuTriggerTestId = testId || generateTestId('ui', 'navigation-menu', 'trigger');
+
   return (
     <NavigationMenuPrimitive.Trigger
       className={cn(navigationMenuTriggerStyle(), 'group', className)}
       data-slot={'navigation-menu-trigger'}
+      data-testid={navigationMenuTriggerTestId}
       {...props}
     >
       {children}{' '}
@@ -132,10 +156,12 @@ export const NavigationMenuTrigger = ({ children, className, ...props }: Navigat
   );
 };
 
-type NavigationMenuViewportProps = ComponentProps<typeof NavigationMenuPrimitive.Viewport>;
+type NavigationMenuViewportProps = ComponentProps<typeof NavigationMenuPrimitive.Viewport> & ComponentTestIdProps;
 
 // TODO: investigate origin-top-center
-export const NavigationMenuViewport = ({ children, className, ...props }: NavigationMenuViewportProps) => {
+export const NavigationMenuViewport = ({ children, className, testId, ...props }: NavigationMenuViewportProps) => {
+  const navigationMenuViewportTestId = testId || generateTestId('ui', 'navigation-menu', 'viewport');
+
   return (
     <div className={cn('absolute top-full left-0 isolate z-50 flex justify-center')}>
       <NavigationMenuPrimitive.Viewport
@@ -144,6 +170,7 @@ export const NavigationMenuViewport = ({ children, className, ...props }: Naviga
           className,
         )}
         data-slot={'navigation-menu-viewport'}
+        data-testid={navigationMenuViewportTestId}
         {...props}
       >
         {children}

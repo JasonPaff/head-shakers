@@ -36,8 +36,10 @@ export const Dialog = ({ children, testId, ...props }: DialogProps) => {
 };
 
 export const DialogClose = ({ children, testId, ...props }: DialogCloseProps) => {
+  const dialogCloseTestId = testId || generateTestId('ui', 'dialog', 'close');
+
   return (
-    <DialogPrimitive.Close data-slot={'dialog-close'} data-testid={testId} {...props}>
+    <DialogPrimitive.Close data-slot={'dialog-close'} data-testid={dialogCloseTestId} {...props}>
       {children}
     </DialogPrimitive.Close>
   );
@@ -50,7 +52,7 @@ export const DialogContent = ({
   testId,
   ...props
 }: DialogContentProps) => {
-  const dialogContentTestId = testId;
+  const dialogContentTestId = testId || generateTestId('ui', 'dialog', 'content');
   const closeButtonTestId = testId ? `${testId}-close` : generateTestId('ui', 'dialog', 'close');
 
   return (
@@ -94,11 +96,13 @@ export const DialogContent = ({
 };
 
 export const DialogDescription = ({ children, className, testId, ...props }: DialogDescriptionProps) => {
+  const dialogDescriptionTestId = testId || generateTestId('ui', 'dialog', 'description');
+
   return (
     <DialogPrimitive.Description
       className={cn('text-sm text-muted-foreground', className)}
       data-slot={'dialog-description'}
-      data-testid={testId}
+      data-testid={dialogDescriptionTestId}
       {...props}
     >
       {children}
@@ -107,11 +111,13 @@ export const DialogDescription = ({ children, className, testId, ...props }: Dia
 };
 
 export const DialogFooter = ({ children, className, testId, ...props }: DialogFooterProps) => {
+  const dialogFooterTestId = testId || generateTestId('ui', 'dialog', 'footer');
+
   return (
     <div
       className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
       data-slot={'dialog-footer'}
-      data-testid={testId}
+      data-testid={dialogFooterTestId}
       {...props}
     >
       {children}
@@ -120,11 +126,13 @@ export const DialogFooter = ({ children, className, testId, ...props }: DialogFo
 };
 
 export const DialogHeader = ({ children, className, testId, ...props }: DialogHeaderProps) => {
+  const dialogHeaderTestId = testId || generateTestId('ui', 'dialog', 'header');
+
   return (
     <div
       className={cn('flex flex-col gap-2 text-center sm:text-left', className)}
       data-slot={'dialog-header'}
-      data-testid={testId}
+      data-testid={dialogHeaderTestId}
       {...props}
     >
       {children}
@@ -133,6 +141,8 @@ export const DialogHeader = ({ children, className, testId, ...props }: DialogHe
 };
 
 export const DialogOverlay = ({ children, className, testId, ...props }: DialogOverlayProps) => {
+  const dialogOverlayTestId = testId || generateTestId('ui', 'dialog', 'overlay');
+
   return (
     <DialogPrimitive.Overlay
       className={cn(
@@ -144,7 +154,7 @@ export const DialogOverlay = ({ children, className, testId, ...props }: DialogO
         className,
       )}
       data-slot={'dialog-overlay'}
-      data-testid={testId}
+      data-testid={dialogOverlayTestId}
       {...props}
     >
       {children}
@@ -153,19 +163,23 @@ export const DialogOverlay = ({ children, className, testId, ...props }: DialogO
 };
 
 export const DialogPortal = ({ children, testId, ...props }: DialogPortalProps) => {
+  const dialogPortalTestId = testId || generateTestId('ui', 'dialog', 'portal');
+
   return (
-    <DialogPrimitive.Portal data-slot={'dialog-portal'} data-testid={testId} {...props}>
+    <DialogPrimitive.Portal data-slot={'dialog-portal'} data-testid={dialogPortalTestId} {...props}>
       {children}
     </DialogPrimitive.Portal>
   );
 };
 
 export const DialogTitle = ({ children, className, testId, ...props }: DialogTitleProps) => {
+  const dialogTitleTestId = testId || generateTestId('ui', 'dialog', 'title');
+
   return (
     <DialogPrimitive.Title
       className={cn('text-lg leading-none font-semibold', className)}
       data-slot={'dialog-title'}
-      data-testid={testId}
+      data-testid={dialogTitleTestId}
       {...props}
     >
       {children}
@@ -174,8 +188,10 @@ export const DialogTitle = ({ children, className, testId, ...props }: DialogTit
 };
 
 export const DialogTrigger = ({ children, testId, ...props }: DialogTriggerProps) => {
+  const dialogTriggerTestId = testId || generateTestId('ui', 'dialog', 'trigger');
+
   return (
-    <DialogPrimitive.Trigger data-slot={'dialog-trigger'} data-testid={testId} {...props}>
+    <DialogPrimitive.Trigger data-slot={'dialog-trigger'} data-testid={dialogTriggerTestId} {...props}>
       {children}
     </DialogPrimitive.Trigger>
   );

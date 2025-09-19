@@ -24,7 +24,7 @@ export const Tabs = ({ children, className, testId, ...props }: TabsProps) => {
 type TabsContentProps = ComponentProps<typeof TabsPrimitive.Content> & ComponentTestIdProps;
 
 export const TabsContent = ({ children, className, testId, ...props }: TabsContentProps) => {
-  const tabsContentTestId = testId;
+  const tabsContentTestId = testId || generateTestId('ui', 'tabs', 'content');
 
   return (
     <TabsPrimitive.Content
@@ -41,7 +41,7 @@ export const TabsContent = ({ children, className, testId, ...props }: TabsConte
 type TabsListProps = ComponentProps<typeof TabsPrimitive.List> & ComponentTestIdProps;
 
 export const TabsList = ({ children, className, testId, ...props }: TabsListProps) => {
-  const tabsListTestId = testId;
+  const tabsListTestId = testId || generateTestId('ui', 'tabs', 'list');
 
   return (
     <TabsPrimitive.List
@@ -62,7 +62,7 @@ export const TabsList = ({ children, className, testId, ...props }: TabsListProp
 type TabsTriggerProps = ComponentProps<typeof TabsPrimitive.Trigger> & ComponentTestIdProps;
 
 export const TabsTrigger = ({ children, className, testId, ...props }: TabsTriggerProps) => {
-  const tabsTriggerTestId = testId;
+  const tabsTriggerTestId = testId || generateTestId('ui', 'tabs', 'trigger');
 
   return (
     <TabsPrimitive.Trigger

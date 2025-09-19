@@ -1,16 +1,22 @@
 import type { ComponentProps, CSSProperties } from 'react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type SkeletonProps = ComponentProps<'div'> & {
+type SkeletonProps = ComponentProps<'div'> & ComponentTestIdProps & {
   width?: string;
 };
 
-export const Skeleton = ({ children, className, width, ...props }: SkeletonProps) => {
+export const Skeleton = ({ children, className, testId, width, ...props }: SkeletonProps) => {
+  const skeletonTestId = testId || generateTestId('ui', 'skeleton');
+
   return (
     <div
       className={cn('max-w-[--skeleton-width] animate-pulse rounded-md bg-accent', className)}
       data-slot={'skeleton'}
+      data-testid={skeletonTestId}
       style={
         {
           '--skeleton-width': width,

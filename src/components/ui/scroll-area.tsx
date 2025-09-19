@@ -4,13 +4,18 @@ import type { ComponentProps } from 'react';
 
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type ScrollAreaProps = ComponentProps<typeof ScrollAreaPrimitive.Root>;
+type ScrollAreaProps = ComponentProps<typeof ScrollAreaPrimitive.Root> & ComponentTestIdProps;
 
-export const ScrollArea = ({ children, className, ...props }: ScrollAreaProps) => {
+export const ScrollArea = ({ children, className, testId, ...props }: ScrollAreaProps) => {
+  const scrollAreaTestId = testId || generateTestId('ui', 'scroll-area');
+
   return (
-    <ScrollAreaPrimitive.Root className={cn('relative', className)} data-slot={'scroll-area'} {...props}>
+    <ScrollAreaPrimitive.Root className={cn('relative', className)} data-slot={'scroll-area'} data-testid={scrollAreaTestId} {...props}>
       <ScrollAreaPrimitive.Viewport
         className={cn(
           'size-full rounded-[inherit] transition-[color,box-shadow]',
@@ -27,9 +32,11 @@ export const ScrollArea = ({ children, className, ...props }: ScrollAreaProps) =
   );
 };
 
-type ScrollBarProps = ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaScrollbar>;
+type ScrollBarProps = ComponentProps<typeof ScrollAreaPrimitive.ScrollAreaScrollbar> & ComponentTestIdProps;
 
-export const ScrollBar = ({ className, orientation = 'vertical', ...props }: ScrollBarProps) => {
+export const ScrollBar = ({ className, orientation = 'vertical', testId, ...props }: ScrollBarProps) => {
+  const scrollBarTestId = testId || generateTestId('ui', 'scroll-area', 'scrollbar');
+
   return (
     <ScrollAreaPrimitive.ScrollAreaScrollbar
       className={cn(
@@ -39,6 +46,7 @@ export const ScrollBar = ({ className, orientation = 'vertical', ...props }: Scr
         className,
       )}
       data-slot={'scroll-area-scrollbar'}
+      data-testid={scrollBarTestId}
       orientation={orientation}
       {...props}
     >

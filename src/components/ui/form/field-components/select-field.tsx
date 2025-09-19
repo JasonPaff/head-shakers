@@ -38,6 +38,7 @@ export const SelectField = ({
 
   // generate testIds based on field name or provided testId
   const fieldName = field.name || 'select-field';
+  const selectTestId = testId || generateFormFieldTestId(fieldName);
   const labelTestId = testId ? `${testId}-label` : generateFormFieldTestId(fieldName, 'label');
   const errorTestId = testId ? `${testId}-error` : generateFormFieldTestId(fieldName, 'error');
   const descriptionTestId = testId ? `${testId}-description` : generateFormFieldTestId(fieldName, 'description');
@@ -47,7 +48,7 @@ export const SelectField = ({
       <Label htmlFor={id} testId={labelTestId} variant={isRequired ? 'required' : undefined}>
         {label}
       </Label>
-      <Select onValueChange={field.handleChange} value={field.state.value}>
+      <Select onValueChange={field.handleChange} testId={selectTestId} value={field.state.value}>
         <FieldAria focusRef={focusRef}>
           <SelectTrigger className={'w-full'} id={id} onBlur={field.handleBlur}>
             <SelectValue placeholder={placeholder} />

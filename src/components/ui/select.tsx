@@ -157,7 +157,7 @@ export const SelectSeparator = ({ children, className, ...props }: SelectSeparat
 };
 
 export const SelectTrigger = ({ children, className, size = 'default', testId, ...props }: SelectTriggerProps) => {
-  const selectTriggerTestId = testId;
+  const selectTriggerTestId = testId || generateTestId('ui', 'select', 'trigger');
 
   return (
     <SelectPrimitive.Trigger

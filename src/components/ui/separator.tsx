@@ -4,9 +4,12 @@ import type { ComponentProps } from 'react';
 
 import { Root } from '@radix-ui/react-separator';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type SeparatorProps = Omit<ComponentProps<typeof Root>, 'decorative'> & {
+type SeparatorProps = ComponentTestIdProps & Omit<ComponentProps<typeof Root>, 'decorative'> & {
   isDecorative?: boolean;
 };
 
@@ -15,8 +18,11 @@ export const Separator = ({
   className,
   isDecorative = true,
   orientation = 'horizontal',
+  testId,
   ...props
 }: SeparatorProps) => {
+  const separatorTestId = testId || generateTestId('ui', 'separator');
+
   return (
     <Root
       className={cn(
@@ -25,6 +31,7 @@ export const Separator = ({
         className,
       )}
       data-slot={'separator'}
+      data-testid={separatorTestId}
       decorative={isDecorative}
       orientation={orientation}
       {...props}
