@@ -12,7 +12,6 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { db } from '@/lib/db';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
@@ -101,7 +100,7 @@ export class CollectionsFacade {
     collection: CollectionWithRelations,
     shouldIncludeViewData = false,
     viewerUserId?: string,
-    dbInstance: DatabaseExecutor = db,
+    dbInstance?: DatabaseExecutor,
   ): Promise<CollectionMetrics> {
     const baseMetrics = this.computeMetrics(collection);
 
@@ -132,7 +131,7 @@ export class CollectionsFacade {
     }
   }
 
-  static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
+  static async createAsync(data: InsertCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
       return await CollectionsQuery.createAsync(data, userId, context);
@@ -148,7 +147,7 @@ export class CollectionsFacade {
     }
   }
 
-  static async deleteAsync(data: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
+  static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
       return await CollectionsQuery.deleteAsync(data, userId, context);
@@ -428,13 +427,13 @@ export class CollectionsFacade {
   }
 
   /**
-   * Get view count for a collection
+   * Get the view count for a collection
    */
   static async getCollectionViewCountAsync(
     collectionId: string,
     shouldIncludeAnonymous = true,
     viewerUserId?: string,
-    dbInstance: DatabaseExecutor = db,
+    dbInstance?: DatabaseExecutor,
   ): Promise<number> {
     try {
       return await ViewTrackingFacade.getViewCountAsync(
@@ -466,7 +465,7 @@ export class CollectionsFacade {
       timeframe?: 'day' | 'hour' | 'month' | 'week' | 'year';
     },
     viewerUserId?: string,
-    dbInstance: DatabaseExecutor = db,
+    dbInstance?: DatabaseExecutor,
   ) {
     try {
       return await ViewTrackingFacade.getViewStatsAsync(
@@ -524,7 +523,7 @@ export class CollectionsFacade {
       timeframe?: 'day' | 'hour' | 'month' | 'week';
     },
     viewerUserId?: string,
-    dbInstance: DatabaseExecutor = db,
+    dbInstance?: DatabaseExecutor,
   ) {
     try {
       return await ViewTrackingFacade.getTrendingContentAsync(
@@ -550,7 +549,7 @@ export class CollectionsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<CollectionDashboardData>> {
     return CacheService.collections.dashboard(
-      () => {
+      async () => {
         const context = createProtectedQueryContext(userId, { dbInstance });
         return CollectionsQuery.getDashboardDataAsync(userId, context).then((collections) =>
           collections.map((collection) => this.transformForDashboard(collection)),
@@ -573,7 +572,7 @@ export class CollectionsFacade {
       userAgent?: string;
       viewDuration?: number;
     },
-    dbInstance: DatabaseExecutor = db,
+    dbInstance?: DatabaseExecutor,
   ) {
     try {
       return await ViewTrackingFacade.recordViewAsync(
@@ -623,7 +622,7 @@ export class CollectionsFacade {
     };
   }
 
-  static async updateAsync(data: UpdateCollection, userId: string, dbInstance: DatabaseExecutor = db) {
+  static async updateAsync(data: UpdateCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
       return await CollectionsQuery.updateAsync(data, userId, context);
