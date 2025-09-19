@@ -9,6 +9,7 @@ import type {
 } from '@/lib/validations/bobbleheads.validation';
 
 import { OPERATIONS } from '@/lib/constants';
+import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import {
   createProtectedQueryContext,
@@ -149,6 +150,60 @@ export class BobbleheadsFacade {
     );
   }
 
+  /**
+   * Get content performance metrics for multiple bobbleheads
+   */
+  static async getBobbleheadContentPerformanceAsync(
+    bobbleheadIds: Array<string>,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ) {
+    try {
+      return await ViewTrackingFacade.getContentPerformanceAsync(
+        bobbleheadIds,
+        'bobblehead',
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadIds },
+        facade: facadeName,
+        method: 'getBobbleheadContentPerformanceAsync',
+        operation: 'getContentPerformance',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get engagement metrics for multiple bobbleheads
+   */
+  static async getBobbleheadEngagementMetricsAsync(
+    bobbleheadIds: Array<string>,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ) {
+    try {
+      return await ViewTrackingFacade.getEngagementMetricsAsync(
+        bobbleheadIds,
+        'bobblehead',
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadIds },
+        facade: facadeName,
+        method: 'getBobbleheadEngagementMetricsAsync',
+        operation: 'getEngagementMetrics',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async getBobbleheadPhotos(
     bobbleheadId: string,
     viewerUserId?: string,
@@ -260,6 +315,67 @@ export class BobbleheadsFacade {
     }
   }
 
+  /**
+   * Get view count for a bobblehead
+   */
+  static async getBobbleheadViewCountAsync(
+    bobbleheadId: string,
+    shouldIncludeAnonymous = true,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<number> {
+    try {
+      return await ViewTrackingFacade.getViewCountAsync(
+        'bobblehead',
+        bobbleheadId,
+        shouldIncludeAnonymous,
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId },
+        facade: facadeName,
+        method: 'getBobbleheadViewCountAsync',
+        operation: 'getViewCount',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get view statistics for a bobblehead
+   */
+  static async getBobbleheadViewStatsAsync(
+    bobbleheadId: string,
+    options?: {
+      includeAnonymous?: boolean;
+      timeframe?: 'day' | 'hour' | 'month' | 'week' | 'year';
+    },
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ) {
+    try {
+      return await ViewTrackingFacade.getViewStatsAsync(
+        'bobblehead',
+        bobbleheadId,
+        options,
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId, options },
+        facade: facadeName,
+        method: 'getBobbleheadViewStatsAsync',
+        operation: 'getViewStats',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async getBobbleheadWithRelations(
     id: string,
     viewerUserId?: string,
@@ -284,6 +400,81 @@ export class BobbleheadsFacade {
         },
       },
     );
+  }
+
+  /**
+   * Get trending bobbleheads based on view data
+   */
+  static async getTrendingBobbleheadsAsync(
+    options?: {
+      includeAnonymous?: boolean;
+      limit?: number;
+      timeframe?: 'day' | 'hour' | 'month' | 'week';
+    },
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ) {
+    try {
+      return await ViewTrackingFacade.getTrendingContentAsync(
+        'bobblehead',
+        options,
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { options },
+        facade: facadeName,
+        method: 'getTrendingBobbleheadsAsync',
+        operation: 'getTrendingContent',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Record a view for a bobblehead
+   */
+  static async recordBobbleheadViewAsync(
+    bobbleheadId: string,
+    viewerUserId?: string,
+    metadata?: {
+      ipAddress?: string;
+      referrerUrl?: string;
+      userAgent?: string;
+      viewDuration?: number;
+    },
+    dbInstance?: DatabaseExecutor,
+  ) {
+    try {
+      return await ViewTrackingFacade.recordViewAsync(
+        {
+          ipAddress: metadata?.ipAddress,
+          referrerUrl: metadata?.referrerUrl,
+          targetId: bobbleheadId,
+          targetType: 'bobblehead',
+          userAgent: metadata?.userAgent,
+          viewDuration: metadata?.viewDuration,
+          viewerId: viewerUserId,
+        },
+        viewerUserId,
+        {
+          deduplicationWindow: 300, // 5 minutes
+          shouldRespectPrivacySettings: true,
+        },
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId },
+        facade: facadeName,
+        method: 'recordBobbleheadViewAsync',
+        operation: 'recordView',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   static async searchBobbleheads(

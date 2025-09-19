@@ -13,6 +13,7 @@ import type {
 } from '@/lib/validations/collections.validation';
 
 import { db } from '@/lib/db';
+import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
   createProtectedQueryContext,
@@ -45,6 +46,14 @@ export interface CollectionMetrics {
   lastUpdated: Date;
   subcollectionBobbleheads: number;
   totalBobbleheads: number;
+  viewCount?: number;
+  viewStats?: {
+    anonymousViews: number;
+    authenticatedViews: number;
+    averageViewDuration: null | number;
+    totalViews: number;
+    uniqueViewers: number;
+  };
 }
 
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
@@ -83,6 +92,44 @@ export class CollectionsFacade {
       subcollectionBobbleheads,
       totalBobbleheads: directBobbleheads.length + subcollectionBobbleheads,
     };
+  }
+
+  /**
+   * Compute metrics with view data included
+   */
+  static async computeMetricsWithViews(
+    collection: CollectionWithRelations,
+    shouldIncludeViewData = false,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionMetrics> {
+    const baseMetrics = this.computeMetrics(collection);
+
+    if (!shouldIncludeViewData) {
+      return baseMetrics;
+    }
+
+    try {
+      const [viewCount, viewStats] = await Promise.all([
+        this.getCollectionViewCountAsync(collection.id, true, viewerUserId, dbInstance),
+        this.getCollectionViewStatsAsync(
+          collection.id,
+          { includeAnonymous: true, timeframe: 'month' },
+          viewerUserId,
+          dbInstance,
+        ),
+      ]);
+
+      return {
+        ...baseMetrics,
+        viewCount,
+        viewStats,
+      };
+    } catch (error) {
+      // return base metrics if view data fails to load
+      console.warn('Failed to load view data for collection metrics:', error);
+      return baseMetrics;
+    }
   }
 
   static async createAsync(data: InsertCollection, userId: string, dbInstance: DatabaseExecutor = db) {
@@ -380,6 +427,67 @@ export class CollectionsFacade {
     }
   }
 
+  /**
+   * Get view count for a collection
+   */
+  static async getCollectionViewCountAsync(
+    collectionId: string,
+    shouldIncludeAnonymous = true,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<number> {
+    try {
+      return await ViewTrackingFacade.getViewCountAsync(
+        'collection',
+        collectionId,
+        shouldIncludeAnonymous,
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionViewCountAsync',
+        operation: 'getViewCount',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get view statistics for a collection
+   */
+  static async getCollectionViewStatsAsync(
+    collectionId: string,
+    options?: {
+      includeAnonymous?: boolean;
+      timeframe?: 'day' | 'hour' | 'month' | 'week' | 'year';
+    },
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ) {
+    try {
+      return await ViewTrackingFacade.getViewStatsAsync(
+        'collection',
+        collectionId,
+        options,
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId, options },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionViewStatsAsync',
+        operation: 'getViewStats',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async getCollectionWithRelations(
     id: string,
     viewerUserId?: string,
@@ -406,6 +514,37 @@ export class CollectionsFacade {
     );
   }
 
+  /**
+   * Get trending collections based on view data
+   */
+  static async getTrendingCollectionsAsync(
+    options?: {
+      includeAnonymous?: boolean;
+      limit?: number;
+      timeframe?: 'day' | 'hour' | 'month' | 'week';
+    },
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ) {
+    try {
+      return await ViewTrackingFacade.getTrendingContentAsync(
+        'collection',
+        options,
+        viewerUserId,
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { options },
+        facade: 'CollectionsFacade',
+        method: 'getTrendingCollectionsAsync',
+        operation: 'getTrendingContent',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async getUserCollectionsForDashboard(
     userId: string,
     dbInstance?: DatabaseExecutor,
@@ -420,6 +559,50 @@ export class CollectionsFacade {
       userId,
       { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'dashboard', userId } },
     );
+  }
+
+  /**
+   * Record a view for a collection
+   */
+  static async recordCollectionViewAsync(
+    collectionId: string,
+    viewerUserId?: string,
+    metadata?: {
+      ipAddress?: string;
+      referrerUrl?: string;
+      userAgent?: string;
+      viewDuration?: number;
+    },
+    dbInstance: DatabaseExecutor = db,
+  ) {
+    try {
+      return await ViewTrackingFacade.recordViewAsync(
+        {
+          ipAddress: metadata?.ipAddress,
+          referrerUrl: metadata?.referrerUrl,
+          targetId: collectionId,
+          targetType: 'collection',
+          userAgent: metadata?.userAgent,
+          viewDuration: metadata?.viewDuration,
+          viewerId: viewerUserId,
+        },
+        viewerUserId,
+        {
+          deduplicationWindow: 300, // 5 minutes
+          shouldRespectPrivacySettings: true,
+        },
+        dbInstance,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionId },
+        facade: 'CollectionsFacade',
+        method: 'recordCollectionViewAsync',
+        operation: 'recordView',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   static transformForDashboard(collection: CollectionWithRelations): CollectionDashboardData {
