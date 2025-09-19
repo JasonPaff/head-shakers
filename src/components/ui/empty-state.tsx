@@ -11,7 +11,8 @@ type EmptyStateProps = ClassName<{
   description: string;
   icon?: ElementType;
   title: string;
-}> & ComponentTestIdProps;
+}> &
+  ComponentTestIdProps;
 
 export function EmptyState({ action, className, description, icon: Icon, testId, title }: EmptyStateProps) {
   const emptyStateTestId = testId || generateTestId('ui', 'empty-state');

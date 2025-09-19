@@ -5,9 +5,10 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type SkeletonProps = ComponentProps<'div'> & ComponentTestIdProps & {
-  width?: string;
-};
+type SkeletonProps = ComponentProps<'div'> &
+  ComponentTestIdProps & {
+    width?: string;
+  };
 
 export const Skeleton = ({ children, className, testId, width, ...props }: SkeletonProps) => {
   const skeletonTestId = testId || generateTestId('ui', 'skeleton');

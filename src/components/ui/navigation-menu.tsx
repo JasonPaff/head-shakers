@@ -10,11 +10,18 @@ import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type NavigationMenuProps = ComponentProps<typeof NavigationMenuPrimitive.Root> & ComponentTestIdProps & {
-  isViewport?: boolean;
-};
+type NavigationMenuProps = ComponentProps<typeof NavigationMenuPrimitive.Root> &
+  ComponentTestIdProps & {
+    isViewport?: boolean;
+  };
 
-export const NavigationMenu = ({ children, className, isViewport = true, testId, ...props }: NavigationMenuProps) => {
+export const NavigationMenu = ({
+  children,
+  className,
+  isViewport = true,
+  testId,
+  ...props
+}: NavigationMenuProps) => {
   const navigationMenuTestId = testId || generateTestId('ui', 'navigation-menu');
 
   return (
@@ -68,9 +75,15 @@ export const NavigationMenuList = ({ className, testId, ...props }: NavigationMe
   );
 };
 
-type NavigationMenuContentProps = ComponentProps<typeof NavigationMenuPrimitive.Content> & ComponentTestIdProps;
+type NavigationMenuContentProps = ComponentProps<typeof NavigationMenuPrimitive.Content> &
+  ComponentTestIdProps;
 
-export const NavigationMenuContent = ({ children, className, testId, ...props }: NavigationMenuContentProps) => {
+export const NavigationMenuContent = ({
+  children,
+  className,
+  testId,
+  ...props
+}: NavigationMenuContentProps) => {
   const navigationMenuContentTestId = testId || generateTestId('ui', 'navigation-menu', 'content');
 
   return (
@@ -89,7 +102,8 @@ export const NavigationMenuContent = ({ children, className, testId, ...props }:
   );
 };
 
-type NavigationMenuIndicatorProps = ComponentProps<typeof NavigationMenuPrimitive.Indicator> & ComponentTestIdProps;
+type NavigationMenuIndicatorProps = ComponentProps<typeof NavigationMenuPrimitive.Indicator> &
+  ComponentTestIdProps;
 
 export const NavigationMenuIndicator = ({ className, testId, ...props }: NavigationMenuIndicatorProps) => {
   const navigationMenuIndicatorTestId = testId || generateTestId('ui', 'navigation-menu', 'indicator');
@@ -133,9 +147,15 @@ export const navigationMenuTriggerStyle = cva(
   'group inline-flex h-9 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-[color,box-shadow] outline-none hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1 disabled:pointer-events-none disabled:opacity-50 data-[state=open]:bg-accent/50 data-[state=open]:text-accent-foreground data-[state=open]:hover:bg-accent data-[state=open]:focus:bg-accent',
 );
 
-type NavigationMenuTriggerProps = ComponentProps<typeof NavigationMenuPrimitive.Trigger> & ComponentTestIdProps;
+type NavigationMenuTriggerProps = ComponentProps<typeof NavigationMenuPrimitive.Trigger> &
+  ComponentTestIdProps;
 
-export const NavigationMenuTrigger = ({ children, className, testId, ...props }: NavigationMenuTriggerProps) => {
+export const NavigationMenuTrigger = ({
+  children,
+  className,
+  testId,
+  ...props
+}: NavigationMenuTriggerProps) => {
   const navigationMenuTriggerTestId = testId || generateTestId('ui', 'navigation-menu', 'trigger');
 
   return (
@@ -156,10 +176,16 @@ export const NavigationMenuTrigger = ({ children, className, testId, ...props }:
   );
 };
 
-type NavigationMenuViewportProps = ComponentProps<typeof NavigationMenuPrimitive.Viewport> & ComponentTestIdProps;
+type NavigationMenuViewportProps = ComponentProps<typeof NavigationMenuPrimitive.Viewport> &
+  ComponentTestIdProps;
 
 // TODO: investigate origin-top-center
-export const NavigationMenuViewport = ({ children, className, testId, ...props }: NavigationMenuViewportProps) => {
+export const NavigationMenuViewport = ({
+  children,
+  className,
+  testId,
+  ...props
+}: NavigationMenuViewportProps) => {
   const navigationMenuViewportTestId = testId || generateTestId('ui', 'navigation-menu', 'viewport');
 
   return (

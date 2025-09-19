@@ -28,39 +28,43 @@ The Head Shakers application uses a comprehensive, type-safe data-testid system 
 The system uses four primary namespaces to organize testids:
 
 ### 1. UI Namespace (`ui`)
+
 For reusable UI components like buttons, inputs, dialogs, cards, etc.
 
 ```typescript
 // Examples
-generateTestId('ui', 'button')           // → "ui-button"
-generateTestId('ui', 'dialog', 'confirm') // → "ui-dialog-confirm"
+generateTestId('ui', 'button'); // → "ui-button"
+generateTestId('ui', 'dialog', 'confirm'); // → "ui-dialog-confirm"
 ```
 
 ### 2. Layout Namespace (`layout`)
+
 For layout and structural components like headers, sidebars, navigation.
 
 ```typescript
 // Examples
-generateTestId('layout', 'app-header')     // → "layout-app-header"
-generateTestId('layout', 'app-sidebar')   // → "layout-app-sidebar"
+generateTestId('layout', 'app-header'); // → "layout-app-header"
+generateTestId('layout', 'app-sidebar'); // → "layout-app-sidebar"
 ```
 
 ### 3. Feature Namespace (`feature`)
+
 For domain-specific feature components like bobblehead cards, collection dialogs.
 
 ```typescript
 // Examples
-generateTestId('feature', 'bobblehead-card')        // → "feature-bobblehead-card"
-generateTestId('feature', 'collection-create-dialog') // → "feature-collection-create-dialog"
+generateTestId('feature', 'bobblehead-card'); // → "feature-bobblehead-card"
+generateTestId('feature', 'collection-create-dialog'); // → "feature-collection-create-dialog"
 ```
 
 ### 4. Form Namespace (`form`)
+
 For form-related components and field identification.
 
 ```typescript
 // Examples
-generateFormFieldTestId('name')              // → "form-field-name"
-generateFormFieldTestId('email', 'error')   // → "form-field-email-error"
+generateFormFieldTestId('name'); // → "form-field-name"
+generateFormFieldTestId('email', 'error'); // → "form-field-email-error"
 ```
 
 ## Component Integration Patterns
@@ -209,18 +213,22 @@ test('should fill form and submit', async ({ page }) => {
 ## Naming Conventions
 
 ### Component Names
+
 - Use kebab-case for component names
 - Be descriptive but concise
 - Follow the pattern: `{domain}-{type}-{variant?}`
 
 Examples:
+
 - `bobblehead-card`
 - `collection-create-dialog`
 - `user-profile-menu`
 - `photo-gallery-modal`
 
 ### Suffixes
+
 Common suffixes for interactive elements:
+
 - `button` - clickable buttons
 - `link` - navigation links
 - `input` - form inputs
@@ -230,6 +238,7 @@ Common suffixes for interactive elements:
 - `nav` - navigation elements
 
 ### Form Field Naming
+
 - Use field names that match your form schema
 - Common suffixes: `label`, `error`, `description`, `input`
 - Examples: `form-field-email`, `form-field-name-error`
@@ -237,11 +246,13 @@ Common suffixes for interactive elements:
 ## Best Practices
 
 ### 1. Consistent Application
+
 - Every interactive element should have a testid
 - Use the namespace system consistently
 - Don't skip testids for "minor" elements
 
 ### 2. Avoid Hardcoded Values
+
 ```typescript
 // ❌ Bad
 <button data-testid="my-button">Click me</button>
@@ -252,6 +263,7 @@ const buttonTestId = testId || generateTestId('ui', 'button');
 ```
 
 ### 3. Meaningful Suffixes
+
 Use suffixes to distinguish between multiple elements of the same type:
 
 ```typescript
@@ -260,6 +272,7 @@ const nextButtonTestId = generateTestId('feature', 'nav', 'next');
 ```
 
 ### 4. Form Field Integration
+
 Always use the form field name for automatic testid generation:
 
 ```typescript
@@ -267,7 +280,7 @@ Always use the form field name for automatic testid generation:
 const schema = {
   email: '',
   firstName: '',
-  lastName: ''
+  lastName: '',
 };
 
 // This automatically generates:
@@ -275,11 +288,13 @@ const schema = {
 ```
 
 ### 5. TestId Props
+
 - Always make testId props optional
 - Provide sensible defaults using generators
 - Pass testIds down to child components when needed
 
 ### 6. Playwright Test Organization
+
 ```typescript
 // Group related test actions
 const formActions = {
@@ -300,27 +315,29 @@ The system provides compile-time validation:
 
 ```typescript
 // ✅ Valid - 'button' is in ComponentTestId union
-generateTestId('ui', 'button')
+generateTestId('ui', 'button');
 
 // ❌ TypeScript error - 'invalid' not in ComponentTestId union
-generateTestId('ui', 'invalid')
+generateTestId('ui', 'invalid');
 
 // ✅ Valid namespace
-finder.feature('bobblehead-card')
+finder.feature('bobblehead-card');
 
 // ❌ TypeScript error - invalid namespace method
-finder.invalid('some-component')
+finder.invalid('some-component');
 ```
 
 ## Migration Guide
 
 ### Existing Components
+
 1. Add `ComponentTestIdProps` to your interface
 2. Import `generateTestId` or appropriate generator
 3. Add testid generation logic
 4. Apply testids to interactive elements
 
 ### Existing Tests
+
 1. Replace hardcoded selectors with testId helpers
 2. Use `ComponentFinder` for new tests
 3. Update selectors to use namespace pattern
@@ -329,6 +346,7 @@ finder.invalid('some-component')
 ## Examples
 
 ### Complete Component Example
+
 ```typescript
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import { generateTestId } from '@/lib/test-ids';
@@ -364,6 +382,7 @@ export const ProductCard = ({ testId, product, onLike, onShare }: ProductCardPro
 ```
 
 ### Complete Test Example
+
 ```typescript
 import { test, expect } from '@playwright/test';
 import { createComponentFinder, signInWithTestUser } from '@/tests/e2e/helpers/test-helpers';

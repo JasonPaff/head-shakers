@@ -75,6 +75,49 @@ export class CacheRevalidationService {
   };
 
   /**
+   * analytics-specific revalidation utilities
+   */
+  static readonly analytics = {
+    /**
+     * revalidate after trending content update
+     */
+    onTrendingUpdate: (): RevalidationResult => {
+      const tags = CacheTagInvalidation.onTrendingUpdate();
+      return CacheRevalidationService.revalidateTags(tags, {
+        entityType: 'analytics',
+        operation: 'analytics:trending:update',
+        reason: 'Trending analytics updated',
+      });
+    },
+
+    /**
+     * revalidate after view aggregation
+     */
+    onViewAggregation: (entityType: CacheEntityType, processedCount: number): RevalidationResult => {
+      const tags = CacheTagInvalidation.onTrendingUpdate();
+      return CacheRevalidationService.revalidateTags(tags, {
+        entityType,
+        operation: 'analytics:view:aggregation',
+        reason: `View aggregation completed for ${processedCount} ${entityType}s`,
+      });
+    },
+
+    /**
+     * revalidate after view tracking
+     */
+    onViewRecord: (entityType: CacheEntityType, entityId: string, userId?: string): RevalidationResult => {
+      const tags = CacheTagInvalidation.onAnalyticsView(entityType, entityId);
+      return CacheRevalidationService.revalidateTags(tags, {
+        entityId,
+        entityType,
+        operation: 'analytics:view:record',
+        reason: 'Analytics view recorded',
+        userId,
+      });
+    },
+  };
+
+  /**
    * bobblehead-specific revalidation utilities
    */
   static readonly bobbleheads = {

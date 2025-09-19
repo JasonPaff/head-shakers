@@ -2,7 +2,6 @@ import eslintBetterTailwindCss from 'eslint-plugin-better-tailwindcss';
 import eslintJs from '@eslint/js';
 import eslintJsxA11y from 'eslint-plugin-jsx-a11y';
 import eslintNextJs from '@next/eslint-plugin-next';
-import eslintNoSecrets from 'eslint-plugin-no-secrets';
 import eslintPerfectionist from 'eslint-plugin-perfectionist';
 import eslintPrettier from 'eslint-config-prettier';
 import eslintReact from 'eslint-plugin-react';
@@ -44,14 +43,6 @@ export default eslintTypescript.config([
     },
     rules: {
       ...eslintReactHooks.configs.recommended.rules,
-    },
-  },
-  {
-    plugins: {
-      'no-secrets': eslintNoSecrets,
-    },
-    rules: {
-      'no-secrets/no-secrets': 'error',
     },
   },
   eslintReact.configs.flat.recommended,

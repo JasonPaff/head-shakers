@@ -14,6 +14,7 @@
 ## File Discovery Results
 
 ### High Priority Files (Core Implementation)
+
 - `/src/app/(app)/browse/page.tsx` - Main browse page (needs implementation)
 - `/src/lib/queries/content-search/content-search.query.ts` - Existing search infrastructure
 - `/src/lib/db/schema/bobbleheads.schema.ts` - Bobblehead schema with searchable fields
@@ -24,6 +25,7 @@
 - `/src/app/(app)/browse/featured/components/featured-content-display.tsx` - Display patterns
 
 ### Supporting Files (Integration)
+
 - `/src/lib/actions/content-search/content-search.actions.ts` - Server actions
 - `/src/lib/queries/collections/collections.query.ts` - Collection queries
 - Form field components (text-field, select-field, checkbox-field)
@@ -57,9 +59,11 @@ Implement a comprehensive browse page that enables users to discover collections
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\content-search\content-search.query.ts` - Add browseBobbleheadsAsync and browseCollectionsAsync methods with pagination
 
 **Changes:**
+
 - Add browseBobbleheadsAsync method with filters for category, manufacturer, condition, pagination
 - Add browseCollectionsAsync method with pagination and sorting options
 - Add getTotalCountAsync methods for both content types
@@ -67,11 +71,13 @@ Implement a comprehensive browse page that enables users to discover collections
 - Add sorting options including newest, oldest, most liked, most viewed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New browse methods accept pagination, filtering, and sorting parameters
 - [ ] Methods return properly typed results with pagination metadata
 - [ ] All validation commands pass
@@ -86,20 +92,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\browse.validation.ts` - Browse-specific validation schemas
 
 **Changes:**
+
 - Create browseFiltersSchema with category, manufacturer, condition, search query
 - Create browsePaginationSchema with page, limit, sort order
 - Create browse result types extending existing search result types
 - Export type definitions for components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All browse parameters have proper Zod validation
 - [ ] TypeScript types are exported for component usage
 - [ ] Schema integrates with existing validation patterns
@@ -114,20 +124,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\browse\browse.actions.ts` - Browse server actions
 
 **Changes:**
+
 - Create browseBobbleheadsAction with input validation and error handling
 - Create browseCollectionsAction with proper permission context
 - Implement proper error handling and success response patterns
 - Add action for getting filter options (categories, manufacturers)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Actions follow established patterns from content-search actions
 - [ ] Proper input validation using browse schemas
 - [ ] Error handling matches project conventions
@@ -142,9 +156,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\components\browse-filters.tsx` - Filter sidebar component
 
 **Changes:**
+
 - Create BrowseFilters component using SelectField for dropdowns
 - Implement search input using existing TextField pattern
 - Add filter reset functionality
@@ -152,11 +168,13 @@ npm run lint:fix && npm run typecheck
 - Use existing form field components for consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component uses existing form field components consistently
 - [ ] Filter options are properly typed using project enums
 - [ ] Reset functionality clears all filters
@@ -171,11 +189,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\components\browse-results.tsx` - Results grid component
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\components\collection-card.tsx` - Collection display card
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\components\bobblehead-card.tsx` - Bobblehead display card
 
 **Changes:**
+
 - Create responsive grid layout using Tailwind CSS Grid
 - Implement CollectionCard with cover image, name, owner, item count
 - Implement BobbleheadCard with primary photo, name, manufacturer, year
@@ -183,11 +203,13 @@ npm run lint:fix && npm run typecheck
 - Integrate Cloudinary image optimization
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid layout is responsive across device sizes
 - [ ] Cards display essential information clearly
 - [ ] Images load properly with Cloudinary optimization
@@ -203,9 +225,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\components\browse-pagination.tsx` - Pagination controls
 
 **Changes:**
+
 - Create pagination component with first, previous, next, last buttons
 - Add page number display and total results count
 - Implement URL state synchronization for sharable links
@@ -213,11 +237,13 @@ npm run lint:fix && npm run typecheck
 - Handle edge cases for first/last pages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Pagination correctly updates URL state
 - [ ] Navigation buttons work as expected
 - [ ] Accessibility attributes are properly implemented
@@ -233,9 +259,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\page.tsx` - Main browse page implementation
 
 **Changes:**
+
 - Implement URL state management using Nuqs for filters and pagination
 - Integrate TanStack Query for data fetching with proper error handling
 - Add content type toggle (Collections vs Bobbleheads)
@@ -244,11 +272,13 @@ npm run lint:fix && npm run typecheck
 - Add loading states and error boundaries
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] URL state properly manages all filter parameters
 - [ ] Content type toggle functions correctly
 - [ ] Search queries are properly debounced
@@ -265,21 +295,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\loading.tsx` - Loading page
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\error.tsx` - Error page
 
 **Changes:**
+
 - Create loading page with skeleton components matching browse layout
 - Implement error page with retry functionality
 - Use existing skeleton patterns from admin components
 - Add proper error logging and user-friendly messages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Loading page matches browse layout structure
 - [ ] Error page provides retry functionality
 - [ ] Skeleton components align with final layout
@@ -300,18 +334,21 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Critical Assumptions:**
+
 - Existing ContentSearchQuery infrastructure supports browse modifications
 - Cloudinary integration handles image optimization properly
 - Clerk authentication provides proper permission context for public content
 - Database indexes support efficient filtering and pagination queries
 
 **Performance Considerations:**
+
 - Implement proper pagination limits to prevent large result sets
 - Use debounced search to minimize database queries
 - Leverage existing database indexes for filtering operations
 - Consider implementing virtual scrolling for very large result sets
 
 **Integration Points:**
+
 - Must maintain consistency with existing admin featured-content search patterns
 - Filter components should reuse established form field component patterns
 - URL state management should follow existing collection controls implementation

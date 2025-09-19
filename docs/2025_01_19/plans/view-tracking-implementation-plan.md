@@ -14,6 +14,7 @@ Refined Request: I want to implement comprehensive view tracking functionality i
 ## File Discovery Results
 
 ### Critical Existing Infrastructure
+
 - `src/lib/db/schema/analytics.schema.ts` - Contains contentViews table with comprehensive schema
 - `src/lib/validations/analytics.validation.ts` - Contains validation schemas for contentViews
 - `src/lib/constants/redis-keys.ts` - Contains Redis key patterns including analytics
@@ -21,6 +22,7 @@ Refined Request: I want to implement comprehensive view tracking functionality i
 - `src/middleware.ts` - Clerk middleware with Sentry integration
 
 ### New Files To Create
+
 - Server actions, queries, facades for view tracking
 - Client components for automatic view tracking
 - Admin dashboard components for analytics visualization
@@ -444,17 +446,20 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Assumptions:**
+
 - Upstash Redis and QStash are properly configured
 - Current analytics schema is sufficient for requirements
 - Existing caching patterns can be extended for view tracking
 
 **Risk Mitigation:**
+
 - Implement fallback mechanisms if Redis is unavailable
 - Use circuit breaker pattern for external service dependencies
 - Add comprehensive error logging for troubleshooting
 - Include feature flags for gradual rollout
 
 **Performance Considerations:**
+
 - Batch view recording to minimize database writes
 - Use Redis for high-frequency operations
 - Implement proper database indexes for analytics queries

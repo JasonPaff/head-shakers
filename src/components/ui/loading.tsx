@@ -25,7 +25,10 @@ export const Loading = ({ message, testId }: LoadingProps) => {
   }, []);
 
   return (
-    <div className={'flex min-h-screen items-center justify-center bg-background'} data-testid={loadingTestId}>
+    <div
+      className={'flex min-h-screen items-center justify-center bg-background'}
+      data-testid={loadingTestId}
+    >
       <div className={'space-y-6 text-center'}>
         {/* Clean Spinner */}
         <div className={'relative mx-auto size-12'} data-testid={spinnerTestId}>

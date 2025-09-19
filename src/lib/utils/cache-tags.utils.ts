@@ -421,6 +421,13 @@ export const CacheTagGenerators = {
  */
 export const CacheTagInvalidation = {
   /**
+   * get tags to invalidate when analytics view is recorded
+   */
+  onAnalyticsView: (entityType: CacheEntityType, entityId: string) => {
+    return CacheTagGenerators.analytics.view(entityType, entityId);
+  },
+
+  /**
    * get tags to invalidate when a bobblehead is modified
    */
   onBobbleheadChange: (bobbleheadId: string, userId: string, collectionId?: string) => {
@@ -464,6 +471,13 @@ export const CacheTagInvalidation = {
       );
     }
     return CacheTagGenerators.social.like(entityType, entityId, userId);
+  },
+
+  /**
+   * get tags to invalidate when trending content is updated
+   */
+  onTrendingUpdate: () => {
+    return CacheTagGenerators.analytics.trending();
   },
 
   /**

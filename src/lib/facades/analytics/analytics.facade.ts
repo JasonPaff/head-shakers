@@ -1,13 +1,43 @@
 // Temporary stub for analytics facade - will be implemented in later steps
 
-interface BatchViewRecordResult {
+export interface AnalyticsFacadeInterface {
+  aggregateViews: (
+    targetIds: Array<string>,
+    targetType: string,
+    db: unknown,
+    options: { batchSize: number; isForced: boolean },
+  ) => Promise<ViewAggregationResult>;
+  batchRecordViews: (
+    views: Array<unknown>,
+    db: unknown,
+    options: { batchId?: string; deduplicationWindow: number; shouldRespectPrivacySettings: boolean },
+  ) => Promise<BatchViewRecordResult>;
+  getTrendingContent: (
+    targetType: string,
+    options: { limit: number; shouldIncludeAnonymous: boolean; timeframe: string },
+    db: unknown,
+  ) => Promise<Array<TrendingContentResult>>;
+  getViewStats: (
+    targetId: string,
+    targetType: string,
+    options: { shouldIncludeAnonymous: boolean; timeframe: string },
+    db: unknown,
+  ) => Promise<ViewStatsResult>;
+  recordView: (
+    viewData: unknown,
+    db: unknown,
+    options: { deduplicationWindow: number; shouldRespectPrivacySettings: boolean },
+  ) => Promise<ViewRecordResult>;
+}
+
+export interface BatchViewRecordResult {
   batchId: string;
   duplicateViews: number;
   isSuccessful: boolean;
   recordedViews: number;
 }
 
-interface TrendingContentResult {
+export interface TrendingContentResult {
   averageViewDuration?: number;
   rank: number;
   targetId: string;
@@ -16,21 +46,21 @@ interface TrendingContentResult {
   uniqueViewers: number;
 }
 
-interface ViewAggregationResult {
+export interface ViewAggregationResult {
   duration: number;
   errors: Array<string>;
   isSuccessful: boolean;
   processedTargets: number;
 }
 
-interface ViewRecordResult {
+export interface ViewRecordResult {
   isDuplicate: boolean;
   isSuccessful: boolean;
   totalViews: number;
   viewId: string;
 }
 
-interface ViewStatsResult {
+export interface ViewStatsResult {
   averageViewDuration?: number;
   totalViews: number;
   uniqueViewers: number;

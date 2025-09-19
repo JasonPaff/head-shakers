@@ -9,9 +9,10 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type SeparatorProps = ComponentTestIdProps & Omit<ComponentProps<typeof Root>, 'decorative'> & {
-  isDecorative?: boolean;
-};
+type SeparatorProps = ComponentTestIdProps &
+  Omit<ComponentProps<typeof Root>, 'decorative'> & {
+    isDecorative?: boolean;
+  };
 
 export const Separator = ({
   children,

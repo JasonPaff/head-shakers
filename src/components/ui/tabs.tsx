@@ -15,7 +15,12 @@ export const Tabs = ({ children, className, testId, ...props }: TabsProps) => {
   const tabsTestId = testId || generateTestId('ui', 'tabs');
 
   return (
-    <TabsPrimitive.Root className={cn('flex flex-col gap-2', className)} data-slot={'tabs'} data-testid={tabsTestId} {...props}>
+    <TabsPrimitive.Root
+      className={cn('flex flex-col gap-2', className)}
+      data-slot={'tabs'}
+      data-testid={tabsTestId}
+      {...props}
+    >
       {children}
     </TabsPrimitive.Root>
   );

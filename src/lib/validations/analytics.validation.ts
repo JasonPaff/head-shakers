@@ -49,6 +49,37 @@ export const insertSearchQuerySchema = createInsertSchema(searchQueries, {
 
 export const updateSearchQuerySchema = insertSearchQuerySchema.partial();
 
+// schemas for the view tracking actions
+export const recordViewSchema = insertContentViewSchema.extend({
+  metadata: z.record(z.string(), z.any()).optional(),
+  sessionId: z.string().uuid().optional(),
+});
+
+export const batchRecordViewsSchema = z.object({
+  batchId: z.string().uuid().optional(),
+  views: z.array(recordViewSchema),
+});
+
+export const viewStatsSchema = z.object({
+  includeAnonymous: z.boolean().default(true),
+  targetId: z.string().uuid(),
+  targetType: z.enum(ENUMS.CONTENT_VIEWS.TARGET_TYPE),
+  timeframe: z.enum(['hour', 'day', 'week', 'month', 'year']).default('day'),
+});
+
+export const trendingContentSchema = z.object({
+  includeAnonymous: z.boolean().default(true),
+  limit: z.number().min(1).max(100).default(10),
+  targetType: z.enum(ENUMS.CONTENT_VIEWS.TARGET_TYPE),
+  timeframe: z.enum(['hour', 'day', 'week', 'month']).default('day'),
+});
+
+export const aggregateViewsSchema = z.object({
+  force: z.boolean().default(false),
+  targetIds: z.array(z.string().uuid()),
+  targetType: z.enum(ENUMS.CONTENT_VIEWS.TARGET_TYPE),
+});
+
 export type InsertContentView = z.infer<typeof insertContentViewSchema>;
 export type InsertSearchQuery = z.infer<typeof insertSearchQuerySchema>;
 export type SelectContentView = z.infer<typeof selectContentViewSchema>;

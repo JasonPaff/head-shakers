@@ -15,7 +15,12 @@ export const ScrollArea = ({ children, className, testId, ...props }: ScrollArea
   const scrollAreaTestId = testId || generateTestId('ui', 'scroll-area');
 
   return (
-    <ScrollAreaPrimitive.Root className={cn('relative', className)} data-slot={'scroll-area'} data-testid={scrollAreaTestId} {...props}>
+    <ScrollAreaPrimitive.Root
+      className={cn('relative', className)}
+      data-slot={'scroll-area'}
+      data-testid={scrollAreaTestId}
+      {...props}
+    >
       <ScrollAreaPrimitive.Viewport
         className={cn(
           'size-full rounded-[inherit] transition-[color,box-shadow]',

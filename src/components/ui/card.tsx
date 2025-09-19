@@ -48,7 +48,14 @@ export const CardAction = ({ className, testId, ...props }: CardActionProps) => 
 export const CardContent = ({ className, testId, ...props }: CardContentProps) => {
   const cardContentTestId = testId || generateTestId('ui', 'card', 'content');
 
-  return <div className={cn('px-6', className)} data-slot={'card-content'} data-testid={cardContentTestId} {...props} />;
+  return (
+    <div
+      className={cn('px-6', className)}
+      data-slot={'card-content'}
+      data-testid={cardContentTestId}
+      {...props}
+    />
+  );
 };
 
 export const CardDescription = ({ className, testId, ...props }: CardDescriptionProps) => {

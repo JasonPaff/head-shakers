@@ -34,11 +34,20 @@ const badgeVariants = cva(
   },
 );
 
-type BadgeProps = ComponentProps<'span'> & ComponentTestIdProps & VariantProps<typeof badgeVariants> & { asChild?: boolean };
+type BadgeProps = ComponentProps<'span'> &
+  ComponentTestIdProps &
+  VariantProps<typeof badgeVariants> & { asChild?: boolean };
 
 export const Badge = ({ asChild = false, className, testId, variant, ...props }: BadgeProps) => {
   const Comp = asChild ? Slot : 'span';
   const badgeTestId = testId || generateTestId('ui', 'badge');
 
-  return <Comp className={cn(badgeVariants({ variant }), className)} data-slot={'badge'} data-testid={badgeTestId} {...props} />;
+  return (
+    <Comp
+      className={cn(badgeVariants({ variant }), className)}
+      data-slot={'badge'}
+      data-testid={badgeTestId}
+      {...props}
+    />
+  );
 };

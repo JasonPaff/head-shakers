@@ -22,9 +22,10 @@ type SelectProps = ComponentProps<typeof SelectPrimitive.Root> & ComponentTestId
 type SelectScrollDownButtonProps = ComponentProps<typeof SelectPrimitive.ScrollDownButton>;
 type SelectScrollUpButtonProps = ComponentProps<typeof SelectPrimitive.ScrollUpButton>;
 type SelectSeparatorProps = ComponentProps<typeof SelectPrimitive.Separator>;
-type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger> & ComponentTestIdProps & {
-  size?: 'default' | 'sm';
-};
+type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger> &
+  ComponentTestIdProps & {
+    size?: 'default' | 'sm';
+  };
 
 type SelectValueProps = ComponentProps<typeof SelectPrimitive.Value>;
 
@@ -38,7 +39,13 @@ export const Select = ({ children, testId, ...props }: SelectProps) => {
   );
 };
 
-export const SelectContent = ({ children, className, position = 'popper', testId, ...props }: SelectContentProps) => {
+export const SelectContent = ({
+  children,
+  className,
+  position = 'popper',
+  testId,
+  ...props
+}: SelectContentProps) => {
   const selectContentTestId = testId || generateTestId('ui', 'select', 'content');
 
   return (
@@ -162,7 +169,13 @@ export const SelectSeparator = ({ children, className, ...props }: SelectSeparat
   );
 };
 
-export const SelectTrigger = ({ children, className, size = 'default', testId, ...props }: SelectTriggerProps) => {
+export const SelectTrigger = ({
+  children,
+  className,
+  size = 'default',
+  testId,
+  ...props
+}: SelectTriggerProps) => {
   const selectTriggerTestId = testId || generateTestId('ui', 'select', 'trigger');
 
   return (

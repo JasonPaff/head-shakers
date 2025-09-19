@@ -24,7 +24,13 @@ export const Tooltip = ({ testId, ...props }: TooltipProps) => {
   );
 };
 
-export const TooltipContent = ({ children, className, sideOffset = 0, testId, ...props }: TooltipContentProps) => {
+export const TooltipContent = ({
+  children,
+  className,
+  sideOffset = 0,
+  testId,
+  ...props
+}: TooltipContentProps) => {
   const contentTestId = testId || generateTestId('ui', 'tooltip', 'content');
 
   return (
@@ -58,7 +64,12 @@ export const TooltipProvider = ({ children, delayDuration = 0, testId, ...props 
   const providerTestId = testId || generateTestId('ui', 'tooltip', 'provider');
 
   return (
-    <Provider data-slot={'tooltip-provider'} data-testid={providerTestId} delayDuration={delayDuration} {...props}>
+    <Provider
+      data-slot={'tooltip-provider'}
+      data-testid={providerTestId}
+      delayDuration={delayDuration}
+      {...props}
+    >
       {children}
     </Provider>
   );

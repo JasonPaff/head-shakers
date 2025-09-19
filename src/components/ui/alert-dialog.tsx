@@ -13,7 +13,8 @@ import { cn } from '@/utils/tailwind-utils';
 type AlertDialogActionProps = ComponentProps<typeof AlertDialogPrimitive.Action> & ComponentTestIdProps;
 type AlertDialogCancelProps = ComponentProps<typeof AlertDialogPrimitive.Cancel> & ComponentTestIdProps;
 type AlertDialogContentProps = ComponentProps<typeof AlertDialogPrimitive.Content> & ComponentTestIdProps;
-type AlertDialogDescriptionProps = ComponentProps<typeof AlertDialogPrimitive.Description> & ComponentTestIdProps;
+type AlertDialogDescriptionProps = ComponentProps<typeof AlertDialogPrimitive.Description> &
+  ComponentTestIdProps;
 type AlertDialogFooterProps = ComponentProps<'div'> & ComponentTestIdProps;
 type AlertDialogHeaderProps = ComponentProps<'div'> & ComponentTestIdProps;
 type AlertDialogOverlayProps = ComponentProps<typeof AlertDialogPrimitive.Overlay> & ComponentTestIdProps;
@@ -31,7 +32,13 @@ export const AlertDialog = ({ testId, ...props }: AlertDialogProps) => {
 export const AlertDialogAction = ({ className, testId, ...props }: AlertDialogActionProps) => {
   const alertDialogActionTestId = testId || generateTestId('ui', 'alert-dialog', 'action');
 
-  return <AlertDialogPrimitive.Action className={cn(buttonVariants(), className)} data-testid={alertDialogActionTestId} {...props} />;
+  return (
+    <AlertDialogPrimitive.Action
+      className={cn(buttonVariants(), className)}
+      data-testid={alertDialogActionTestId}
+      {...props}
+    />
+  );
 };
 
 export const AlertDialogCancel = ({ className, testId, ...props }: AlertDialogCancelProps) => {
@@ -130,7 +137,13 @@ export const AlertDialogOverlay = ({ className, testId, ...props }: AlertDialogO
 export const AlertDialogPortal = ({ testId, ...props }: AlertDialogPortalProps) => {
   const alertDialogPortalTestId = testId || generateTestId('ui', 'alert-dialog', 'portal');
 
-  return <AlertDialogPrimitive.Portal data-slot={'alert-dialog-portal'} data-testid={alertDialogPortalTestId} {...props} />;
+  return (
+    <AlertDialogPrimitive.Portal
+      data-slot={'alert-dialog-portal'}
+      data-testid={alertDialogPortalTestId}
+      {...props}
+    />
+  );
 };
 
 export const AlertDialogTitle = ({ className, testId, ...props }: AlertDialogTitleProps) => {
@@ -149,5 +162,11 @@ export const AlertDialogTitle = ({ className, testId, ...props }: AlertDialogTit
 export const AlertDialogTrigger = ({ testId, ...props }: AlertDialogTriggerProps) => {
   const alertDialogTriggerTestId = testId || generateTestId('ui', 'alert-dialog', 'trigger');
 
-  return <AlertDialogPrimitive.Trigger data-slot={'alert-dialog-trigger'} data-testid={alertDialogTriggerTestId} {...props} />;
+  return (
+    <AlertDialogPrimitive.Trigger
+      data-slot={'alert-dialog-trigger'}
+      data-testid={alertDialogTriggerTestId}
+      {...props}
+    />
+  );
 };
