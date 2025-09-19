@@ -17,6 +17,10 @@ export const ACTION_NAMES = {
     UPDATE_FEATURED_CONTENT: 'updateFeaturedContent',
   },
   ANALYTICS: {
+    AGGREGATE_VIEWS: 'aggregateViews',
+    BATCH_RECORD_VIEWS: 'batchRecordViews',
+    GET_TRENDING_CONTENT: 'getTrendingContent',
+    GET_VIEW_STATS: 'getViewStats',
     TRACK_SEARCH: 'trackSearchQuery',
     TRACK_VIEW: 'trackContentView',
   },

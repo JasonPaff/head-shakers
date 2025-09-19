@@ -3,6 +3,11 @@
  * Organized by domain for easy management
  */
 export const ERROR_MESSAGES = {
+  ANALYTICS: {
+    BATCH_VIEW_RECORD_FAILED: 'Failed to record batch views',
+    VIEW_AGGREGATION_FAILED: 'Failed to aggregate view data',
+    VIEW_RECORD_FAILED: 'Failed to record view',
+  },
   AUTH: {
     ACCOUNT_LOCKED: 'Account is temporarily locked',
     EMAIL_NOT_VERIFIED: 'Email address not verified',

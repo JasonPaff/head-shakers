@@ -11,6 +11,13 @@ export const OPERATIONS = {
     TOGGLE_FEATURED_CONTENT_STATUS: 'admin_toggle_featured_content_status',
     UPDATE_FEATURED_CONTENT: 'admin_update_featured_content',
   },
+  ANALYTICS: {
+    AGGREGATE_VIEWS: 'aggregate_views',
+    BATCH_RECORD_VIEWS: 'batch_record_views',
+    GET_TRENDING_CONTENT: 'get_trending_content',
+    GET_VIEW_STATS: 'get_view_stats',
+    RECORD_VIEW: 'record_view',
+  },
   BOBBLEHEADS: {
     CREATE: 'create_bobblehead',
     CREATE_WITH_PHOTOS: 'create_bobblehead_with_photos',

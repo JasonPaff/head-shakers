@@ -37,6 +37,18 @@ export const REDIS_KEYS = {
   },
   USER_ACTIVE_SESSIONS: (userId: string) => `sessions:${userId}`,
   USER_SESSION: (sessionId: string) => `session:${sessionId}`,
+  VIEW_TRACKING: {
+    BATCH_QUEUE: (batchId: string) => `view_tracking:batch_queue:${batchId}`,
+    DEDUPLICATION: (targetType: string, targetId: string, viewerId: string) => `view_tracking:dedupe:${targetType}:${targetId}:${viewerId}`,
+    DEDUPLICATION_ANONYMOUS: (targetType: string, targetId: string, ipAddress: string) => `view_tracking:dedupe_anon:${targetType}:${targetId}:${ipAddress}`,
+    PENDING_VIEWS: (sessionId: string) => `view_tracking:pending:${sessionId}`,
+    RECENT_VIEWS: (targetType: string, targetId: string) => `view_tracking:recent:${targetType}:${targetId}`,
+    SESSION_VIEWS: (sessionId: string) => `view_tracking:session:${sessionId}`,
+    TRENDING_CACHE: (targetType: string, timeframe: string) => `view_tracking:trending:${targetType}:${timeframe}`,
+    VIEW_AGGREGATES: (targetType: string, targetId: string, period: string) => `view_tracking:aggregates:${targetType}:${targetId}:${period}`,
+    VIEW_COUNTS: (targetType: string, targetId: string) => `view_tracking:counts:${targetType}:${targetId}`,
+    VIEW_STATS: (targetType: string, targetId: string, timeframe: string) => `view_tracking:stats:${targetType}:${targetId}:${timeframe}`,
+  },
 } as const;
 
 export const buildRedisKey = (namespace: string, ...parts: Array<string>): string => {
@@ -59,4 +71,14 @@ export const REDIS_TTL = {
   RATE_LIMIT: 60, // 1 minute
   SESSION: 86400, // 24 hours
   TEMP: 3600, // 1 hour
+  VIEW_TRACKING: {
+    AGGREGATES: 86400, // 24 hours
+    BATCH_QUEUE: 3600, // 1 hour
+    COUNTS: 3600, // 1 hour
+    DEDUPLICATION: 300, // 5 minutes
+    PENDING_VIEWS: 1800, // 30 minutes
+    SESSION_VIEWS: 28800, // 8 hours
+    STATS: 1800, // 30 minutes
+    TRENDING: 900, // 15 minutes
+  },
 } as const;

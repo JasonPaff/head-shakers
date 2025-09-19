@@ -15,6 +15,8 @@ export const SENTRY_TAGS = {
 
 export const SENTRY_CONTEXTS = {
   ACTION_METADATA: 'action_metadata',
+  AGGREGATE_DATA: 'aggregate_data',
+  BATCH_VIEW_DATA: 'batch_view_data',
   BOBBLEHEAD_DATA: 'bobblehead_data',
   COLLECTION_DATA: 'collection_data',
   DATABASE: 'database',
@@ -29,6 +31,7 @@ export const SENTRY_CONTEXTS = {
   SUBCOLLECTION_DATA: 'subcollection_data',
   TAG_DATA: 'tag_data',
   USER_DATA: 'user_data',
+  VIEW_DATA: 'view_data',
 } as const;
 
 export const SENTRY_OPERATIONS = {
