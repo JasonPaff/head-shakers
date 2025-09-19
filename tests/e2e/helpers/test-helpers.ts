@@ -1,31 +1,10 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { clerk } from '@clerk/testing/playwright';
 import { $path } from 'next-typesafe-url';
 
 import type { ComponentTestId, TestIdNamespace } from '@/lib/test-ids';
 
 import { generateFormFieldTestId, generateTableCellTestId, generateTestId } from '@/lib/test-ids';
-
-export async function signInWithTestUser(page: Page) {
-  await page.goto($path({ route: '/' }));
-  await clerk.signIn({
-    page,
-    signInParams: {
-      identifier: process.env.E2E_CLERK_USER_USERNAME!,
-      password: process.env.E2E_CLERK_USER_PASSWORD!,
-      strategy: 'password',
-    },
-  });
-}
-
-export async function signOutUser(page: Page) {
-  await clerk.signOut({ page });
-}
-
-export async function waitForClerkLoaded(page: Page) {
-  await clerk.loaded({ page });
-}
 
 export const testIds = {
   // Legacy selectors for backward compatibility

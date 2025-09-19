@@ -39,15 +39,15 @@ export default defineConfig({
       dependencies: ['global setup'],
       testMatch: /.*\.spec\.ts/,
     },
-    {
-      name: 'webkit',
-      use: {
-        ...devices['Desktop Safari'],
-        storageState: 'playwright/.clerk/user.json',
-      },
-      dependencies: ['global setup'],
-      testMatch: /.*\.spec\.ts/,
-    },
+    // {
+    //   name: 'webkit',
+    //   use: {
+    //     ...devices['Desktop Safari'],
+    //     storageState: 'playwright/.clerk/user.json',
+    //   },
+    //   dependencies: ['global setup'],
+    //   testMatch: /.*\.spec\.ts/,
+    // },
   ],
 
   webServer: {

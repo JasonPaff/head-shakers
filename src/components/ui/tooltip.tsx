@@ -4,22 +4,29 @@ import type { ComponentProps } from 'react';
 
 import { Arrow, Content, Portal, Provider, Root, Trigger } from '@radix-ui/react-tooltip';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type TooltipContentProps = ComponentProps<typeof Content>;
-type TooltipProps = ComponentProps<typeof Root>;
-type TooltipProviderProps = ComponentProps<typeof Provider>;
-type TooltipTriggerProps = ComponentProps<typeof Trigger>;
+type TooltipContentProps = ComponentProps<typeof Content> & ComponentTestIdProps;
+type TooltipProps = ComponentProps<typeof Root> & ComponentTestIdProps;
+type TooltipProviderProps = ComponentProps<typeof Provider> & ComponentTestIdProps;
+type TooltipTriggerProps = ComponentProps<typeof Trigger> & ComponentTestIdProps;
 
-export const Tooltip = ({ ...props }: TooltipProps) => {
+export const Tooltip = ({ testId, ...props }: TooltipProps) => {
+  const tooltipTestId = testId || generateTestId('ui', 'tooltip');
+
   return (
     <TooltipProvider>
-      <Root data-slot={'tooltip'} {...props} />
+      <Root data-slot={'tooltip'} data-testid={tooltipTestId} {...props} />
     </TooltipProvider>
   );
 };
 
-export const TooltipContent = ({ children, className, sideOffset = 0, ...props }: TooltipContentProps) => {
+export const TooltipContent = ({ children, className, sideOffset = 0, testId, ...props }: TooltipContentProps) => {
+  const contentTestId = testId || generateTestId('ui', 'tooltip', 'content');
+
   return (
     <Portal>
       <Content
@@ -32,6 +39,7 @@ export const TooltipContent = ({ children, className, sideOffset = 0, ...props }
           className,
         )}
         data-slot={'tooltip-content'}
+        data-testid={contentTestId}
         sideOffset={sideOffset}
         {...props}
       >
@@ -46,17 +54,21 @@ export const TooltipContent = ({ children, className, sideOffset = 0, ...props }
   );
 };
 
-export const TooltipProvider = ({ children, delayDuration = 0, ...props }: TooltipProviderProps) => {
+export const TooltipProvider = ({ children, delayDuration = 0, testId, ...props }: TooltipProviderProps) => {
+  const providerTestId = testId || generateTestId('ui', 'tooltip', 'provider');
+
   return (
-    <Provider data-slot={'tooltip-provider'} delayDuration={delayDuration} {...props}>
+    <Provider data-slot={'tooltip-provider'} data-testid={providerTestId} delayDuration={delayDuration} {...props}>
       {children}
     </Provider>
   );
 };
 
-export const TooltipTrigger = ({ children, ...props }: TooltipTriggerProps) => {
+export const TooltipTrigger = ({ children, testId, ...props }: TooltipTriggerProps) => {
+  const triggerTestId = testId || generateTestId('ui', 'tooltip', 'trigger');
+
   return (
-    <Trigger data-slot={'tooltip-trigger'} {...props}>
+    <Trigger data-slot={'tooltip-trigger'} data-testid={triggerTestId} {...props}>
       {children}
     </Trigger>
   );

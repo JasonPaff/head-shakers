@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { $path } from 'next-typesafe-url';
 
-import { testIds } from './helpers/test-helpers';
+import { createComponentFinder } from './helpers/test-helpers';
 
 test.describe('App Navigation', () => {
   test('should navigate through main pages', async ({ page }) => {
@@ -18,14 +18,15 @@ test.describe('App Navigation', () => {
   });
 
   test('should show user profile menu', async ({ page }) => {
+    const finder = createComponentFinder(page);
     await page.goto($path({ route: '/dashboard/collection' }));
 
-    const userButton = page.locator(testIds.userButton);
+    const userButton = finder.layout('user-nav', 'button');
     await expect(userButton).toBeVisible();
 
     await userButton.click();
 
-    const userMenu = page.locator(testIds.userMenu);
+    const userMenu = page.locator('.cl-userButtonPopoverCard');
     await expect(userMenu).toBeVisible();
   });
 

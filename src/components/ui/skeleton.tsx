@@ -29,16 +29,20 @@ export const Skeleton = ({ children, className, testId, width, ...props }: Skele
   );
 };
 
-export const ButtonSkeleton = ({ className }: { className?: string }) => {
+export const ButtonSkeleton = ({ className, testId }: { className?: string; testId?: string }) => {
+  const buttonSkeletonTestId = testId || generateTestId('ui', 'skeleton-button');
+
   return (
-    <div className={cn('flex space-x-2', className)}>
+    <div className={cn('flex space-x-2', className)} data-testid={buttonSkeletonTestId}>
       <Skeleton className={'h-9 w-16'} />
       <Skeleton className={'h-9 w-16'} />
     </div>
   );
 };
 
-export const SidebarSkeleton = ({ className }: { className?: string }) => {
+export const SidebarSkeleton = ({ className, testId }: { className?: string; testId?: string }) => {
+  const sidebarSkeletonTestId = testId || generateTestId('ui', 'skeleton-sidebar');
+
   return (
     <div
       className={cn(
@@ -46,6 +50,7 @@ export const SidebarSkeleton = ({ className }: { className?: string }) => {
         'border-r bg-sidebar',
         className,
       )}
+      data-testid={sidebarSkeletonTestId}
     >
       <div className={'flex flex-col gap-2 p-2'}>
         <Skeleton className={'h-10 w-full'} />
@@ -60,6 +65,8 @@ export const SidebarSkeleton = ({ className }: { className?: string }) => {
   );
 };
 
-export const UserButtonSkeleton = ({ className }: { className?: string }) => {
-  return <Skeleton className={cn('h-8 w-8 rounded-full', className)} />;
+export const UserButtonSkeleton = ({ className, testId }: { className?: string; testId?: string }) => {
+  const userButtonSkeletonTestId = testId || generateTestId('ui', 'skeleton-user-button');
+
+  return <Skeleton className={cn('h-8 w-8 rounded-full', className)} testId={userButtonSkeletonTestId} />;
 };

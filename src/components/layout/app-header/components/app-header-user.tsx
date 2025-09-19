@@ -4,6 +4,7 @@ import { SignInButton, SignUpButton, useAuth, UserButton } from '@clerk/nextjs';
 
 import { Button } from '@/components/ui/button';
 import { UserButtonSkeleton } from '@/components/ui/skeleton';
+import { generateTestId } from '@/lib/test-ids';
 
 export const AppHeaderUser = () => {
   const { isLoaded, isSignedIn } = useAuth();
@@ -13,7 +14,12 @@ export const AppHeaderUser = () => {
   }
 
   if (isSignedIn) {
-    return <UserButton />;
+    const userMenuTestId = generateTestId('layout', 'user-avatar', 'button');
+    return (
+      <div data-testid={userMenuTestId}>
+        <UserButton />
+      </div>
+    );
   }
 
   return (

@@ -4,7 +4,7 @@ import { $path } from 'next-typesafe-url';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-import { testIds } from './helpers/test-helpers';
+import { createComponentFinder } from './helpers/test-helpers';
 
 // setup must be run serially
 setup.describe.configure({ mode: 'serial' });
@@ -21,6 +21,8 @@ const __dirname = path.dirname(__filename);
 const authFile = path.join(__dirname, '../../playwright/.clerk/user.json');
 
 setup('authenticate and save state to storage', async ({ page }) => {
+  const finder = createComponentFinder(page);
+
   // navigate to the home page to load Clerk
   await page.goto($path({ route: '/' }));
 
@@ -38,9 +40,7 @@ setup('authenticate and save state to storage', async ({ page }) => {
   await page.goto($path({ route: '/dashboard/collection' }));
 
   // wait for an element that only authenticated users can see
-  await page.waitForSelector(testIds.layout('app-header', 'dashboard'), {
-    timeout: 10000,
-  });
+  await finder.layout('user-avatar', 'button').waitFor({ timeout: 10000 });
 
   // save the authentication state
   await page.context().storageState({ path: authFile });

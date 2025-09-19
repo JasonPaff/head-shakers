@@ -1,4 +1,5 @@
 import type { VariantProps } from 'class-variance-authority';
+import type { ComponentProps } from 'react';
 
 import { cva } from 'class-variance-authority';
 import { CircleAlertIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon } from 'lucide-react';
@@ -36,14 +37,14 @@ const getIcon = (variant: VariantProps<typeof style>['variant']) => {
   }
 };
 
-type AlertProps = Children<ClassName<VariantProps<typeof style>>> & ComponentTestIdProps;
+type AlertProps = ComponentProps<'div'> & ComponentTestIdProps & VariantProps<typeof style>;
 
-export const Alert = ({ children, className, testId, variant }: AlertProps) => {
+export const Alert = ({ children, className, testId, variant, ...props }: AlertProps) => {
   const Icon = useMemo(() => getIcon(variant), [variant]);
   const alertTestId = testId || generateTestId('ui', 'alert');
 
   return (
-    <div className={'rounded-md border px-4 py-3'} data-testid={alertTestId}>
+    <div className={'rounded-md border px-4 py-3'} data-testid={alertTestId} {...props}>
       <p className={'text-sm'}>
         <Icon aria-hidden className={cn(style({ variant }), className)} />
         {children}
