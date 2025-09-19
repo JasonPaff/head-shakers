@@ -36,12 +36,12 @@ export const SelectField = ({
   const field = useFieldContext<string>();
   const id = useId();
 
-  // generate testIds based on field name or provided testId
   const fieldName = field.name || 'select-field';
   const selectTestId = testId || generateFormFieldTestId(fieldName);
   const labelTestId = testId ? `${testId}-label` : generateFormFieldTestId(fieldName, 'label');
   const errorTestId = testId ? `${testId}-error` : generateFormFieldTestId(fieldName, 'error');
-  const descriptionTestId = testId ? `${testId}-description` : generateFormFieldTestId(fieldName, 'description');
+  const descriptionTestId =
+    testId ? `${testId}-description` : generateFormFieldTestId(fieldName, 'description');
 
   return (
     <FieldItem>

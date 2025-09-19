@@ -24,11 +24,17 @@ type SwitchFieldProps = ComponentProps<typeof Switch> &
     label: string;
   };
 
-export const SwitchField = ({ description, focusRef, isRequired, label, testId, ...props }: SwitchFieldProps) => {
+export const SwitchField = ({
+  description,
+  focusRef,
+  isRequired,
+  label,
+  testId,
+  ...props
+}: SwitchFieldProps) => {
   const field = useFieldContext<boolean>();
   const id = useId();
 
-  // generate testIds based on field name or provided testId
   const fieldName = field.name || 'switch-field';
   const switchTestId = testId || generateFormFieldTestId(fieldName);
   const labelTestId = testId ? `${testId}-label` : generateFormFieldTestId(fieldName, 'label');

@@ -28,7 +28,6 @@ export const TextField = ({ description, focusRef, isRequired, label, testId, ..
   const field = useFieldContext<string>();
   const id = useId();
 
-  // generate testIds based on field name or provided testId
   const fieldName = field.name || 'text-field';
   const inputTestId = testId || generateFormFieldTestId(fieldName);
   const labelTestId = testId ? `${testId}-label` : generateFormFieldTestId(fieldName, 'label');

@@ -16,23 +16,31 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { generateFormFieldTestId } from '@/lib/test-ids';
 
-type TextareaFieldProps = ComponentProps<typeof Textarea> & ComponentTestIdProps & {
-  description?: string;
-  focusRef?: FocusRef;
-  isRequired?: boolean;
-  label: string;
-};
+type TextareaFieldProps = ComponentProps<typeof Textarea> &
+  ComponentTestIdProps & {
+    description?: string;
+    focusRef?: FocusRef;
+    isRequired?: boolean;
+    label: string;
+  };
 
-export const TextareaField = ({ description, focusRef, isRequired, label, testId, ...props }: TextareaFieldProps) => {
+export const TextareaField = ({
+  description,
+  focusRef,
+  isRequired,
+  label,
+  testId,
+  ...props
+}: TextareaFieldProps) => {
   const field = useFieldContext<string>();
   const id = useId();
 
-  // generate testIds based on field name or provided testId
   const fieldName = field.name || 'textarea-field';
   const textareaTestId = testId || generateFormFieldTestId(fieldName);
   const labelTestId = testId ? `${testId}-label` : generateFormFieldTestId(fieldName, 'label');
   const errorTestId = testId ? `${testId}-error` : generateFormFieldTestId(fieldName, 'error');
-  const descriptionTestId = testId ? `${testId}-description` : generateFormFieldTestId(fieldName, 'description');
+  const descriptionTestId =
+    testId ? `${testId}-description` : generateFormFieldTestId(fieldName, 'description');
 
   return (
     <FieldItem>

@@ -71,6 +71,9 @@ export const CollectionAssignment = withForm({
       setCollectionsList((prev) => [...prev, newCollection]);
       form.setFieldValue('collectionId', newCollection.id);
       form.setFieldValue('subcollectionId', '');
+      if (!form.getFieldMeta('collectionId')?.isValid) {
+        void form.validateField('collectionId', 'change');
+      }
     };
 
     const handleSubCollectionCreated = (newCollection: ComboboxItem) => {
