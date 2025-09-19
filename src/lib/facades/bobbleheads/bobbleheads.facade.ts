@@ -137,7 +137,15 @@ export class BobbleheadsFacade {
         return BobbleheadsQuery.findByIdAsync(id, context);
       },
       id,
-      { context: { entityId: id, entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'getById', userId: viewerUserId } }
+      {
+        context: {
+          entityId: id,
+          entityType: 'bobblehead',
+          facade: 'BobbleheadsFacade',
+          operation: 'getById',
+          userId: viewerUserId,
+        },
+      },
     );
   }
 
@@ -156,7 +164,15 @@ export class BobbleheadsFacade {
           return BobbleheadsQuery.getPhotosAsync(bobbleheadId, context);
         },
         bobbleheadId,
-        { context: { entityId: bobbleheadId, entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'getPhotos', userId: viewerUserId } }
+        {
+          context: {
+            entityId: bobbleheadId,
+            entityType: 'bobblehead',
+            facade: 'BobbleheadsFacade',
+            operation: 'getPhotos',
+            userId: viewerUserId,
+          },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -188,7 +204,15 @@ export class BobbleheadsFacade {
         },
         collectionId,
         optionsHash,
-        { context: { entityId: collectionId, entityType: 'collection', facade: 'BobbleheadsFacade', operation: 'findByCollection', userId: viewerUserId } }
+        {
+          context: {
+            entityId: collectionId,
+            entityType: 'collection',
+            facade: 'BobbleheadsFacade',
+            operation: 'findByCollection',
+            userId: viewerUserId,
+          },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -220,7 +244,9 @@ export class BobbleheadsFacade {
         },
         userId,
         optionsHash,
-        { context: { entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'findByUser', userId } }
+        {
+          context: { entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'findByUser', userId },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -248,7 +274,15 @@ export class BobbleheadsFacade {
         return BobbleheadsQuery.findByIdWithRelationsAsync(id, context);
       },
       id,
-      { context: { entityId: id, entityType: 'bobblehead', facade: 'BobbleheadsFacade', operation: 'getWithRelations', userId: viewerUserId } }
+      {
+        context: {
+          entityId: id,
+          entityType: 'bobblehead',
+          facade: 'BobbleheadsFacade',
+          operation: 'getWithRelations',
+          userId: viewerUserId,
+        },
+      },
     );
   }
 
@@ -279,7 +313,14 @@ export class BobbleheadsFacade {
         },
         searchTerm,
         filtersHash,
-        { context: { entityType: 'search', facade: 'BobbleheadsFacade', operation: 'search', userId: viewerUserId } }
+        {
+          context: {
+            entityType: 'search',
+            facade: 'BobbleheadsFacade',
+            operation: 'search',
+            userId: viewerUserId,
+          },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {

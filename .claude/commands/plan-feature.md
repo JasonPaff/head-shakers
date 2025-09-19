@@ -1,6 +1,6 @@
 ---
 allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
-argument-hint: "feature description"
+argument-hint: 'feature description'
 description: Generate detailed implementation plans through automated 3-step orchestration
 ---
 
@@ -16,6 +16,7 @@ You are a streamlined feature planning orchestrator that creates detailed implem
 ```
 
 **Examples:**
+
 - `/plan-feature "Add user authentication with OAuth"`
 - `/plan-feature "Implement real-time notifications system"`
 - `/plan-feature "Create admin dashboard with analytics"`
@@ -31,9 +32,11 @@ When the user runs this command, execute this simple 3-step workflow:
 ## Step-by-Step Execution
 
 ### Step 1: Feature Request Refinement
+
 **Objective**: Enhance the user's request with project context to make it more actionable.
 
 **Process**:
+
 1. **Initialize Orchestration Directory**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/` directory structure
 2. **Create Orchestration Index**: Save `docs/{YYYY_MM_DD}/orchestration/{feature-name}/00-orchestration-index.md` with workflow overview and links
 3. Record step start time with ISO timestamp
@@ -71,9 +74,11 @@ When the user runs this command, execute this simple 3-step workflow:
 8. **CHECKPOINT**: Step 1 markdown log now available for review/debugging
 
 ### Step 2: File Discovery
+
 **Objective**: Identify all files relevant to implementing the feature.
 
 **Process**:
+
 1. Record step start time with ISO timestamp
 2. Use Task tool with `subagent_type: "file-discovery-agent"`:
    - Description: "Discover relevant files for implementation"
@@ -103,9 +108,11 @@ When the user runs this command, execute this simple 3-step workflow:
 7. **CHECKPOINT**: Step 2 markdown log now available for review/debugging
 
 ### Step 3: Implementation Planning
+
 **Objective**: Generate detailed markdown implementation plan following the required template.
 
 **Process**:
+
 1. Record step start time with ISO timestamp
 2. Use Task tool with `subagent_type: "implementation-planner"`:
    - Description: "Generate detailed implementation plan"
@@ -148,6 +155,7 @@ When the user runs this command, execute this simple 3-step workflow:
 ## Logging and Output
 
 **Initialize Orchestration Structure**: Create directory hierarchy and index file:
+
 - Create orchestration directory: `docs/{YYYY_MM_DD}/orchestration/{feature-name}/`
 - Initialize orchestration index with workflow overview and navigation links
 - Each step saves its own detailed markdown log file
@@ -155,6 +163,7 @@ When the user runs this command, execute this simple 3-step workflow:
 - Complete capture of all inputs, outputs, and metadata
 
 **Critical Logging Requirements**:
+
 - **Separate Step Files**: Each step saves its own markdown file with full details
 - **Human Readable**: Use markdown formatting with headers, lists, and code blocks
 - **Complete Data Capture**: Full input prompts and agent responses in formatted sections
@@ -163,6 +172,7 @@ When the user runs this command, execute this simple 3-step workflow:
 - **Raw Agent Outputs**: Preserved in code blocks for debugging
 
 **Incremental Save Strategy**:
+
 - **Initial**: Create orchestration directory and index file with workflow overview
 - **After Step 1**: Save `01-feature-refinement.md` with complete step details
 - **After Step 2**: Save `02-file-discovery.md` with complete step details
@@ -170,6 +180,7 @@ When the user runs this command, execute this simple 3-step workflow:
 - **Final**: Update orchestration index with summary and save implementation plan
 
 **Save Results**:
+
 - Implementation plan: `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md`
 - Orchestration logs: `docs/{YYYY_MM_DD}/orchestration/{feature-name}/`
   - `00-orchestration-index.md` - Workflow overview and navigation
@@ -178,6 +189,7 @@ When the user runs this command, execute this simple 3-step workflow:
   - `03-implementation-planning.md` - Step 3 detailed log
 
 **Return Summary**:
+
 ```
 ## Implementation Plan Generated
 Saved to: docs/{date}/plans/{feature-name}-implementation-plan.md
@@ -195,6 +207,7 @@ Execution time: X.X seconds
 ## Implementation Details
 
 **Essential Requirements**:
+
 - **CRITICAL**: Capture complete agent inputs and outputs (not summaries)
 - **CRITICAL**: Record precise timestamps for each step with ISO format
 - **CRITICAL**: Validate and log all discovered file paths with existence checks
@@ -209,6 +222,7 @@ Execution time: X.X seconds
 - **FALLBACK**: Provide fallback strategies for common failure scenarios
 
 **Enhanced Quality Gates**:
+
 - **Step 1 Success**: Feature request successfully refined with project context
   - **Length Constraint**: Refined request must be 2-4x the length of original (not 10x+)
   - **Format Validation**: Output must be single paragraph without headers or sections
@@ -308,6 +322,7 @@ Add this hook to automatically validate orchestration quality after completion:
 
 **Debug Mode**:
 Add `--verbose` flag when running Claude Code to see detailed subagent communications:
+
 ```bash
 claude --verbose
 ```
@@ -315,20 +330,25 @@ claude --verbose
 ## File Output Structure
 
 **Implementation Plan**: `docs/{YYYY_MM_DD}/plans/{feature-name}-implementation-plan.md`
+
 ```markdown
 # {Feature Name} Implementation Plan
+
 Generated: {timestamp}
 Original Request: {original user request}
 Refined Request: {enhanced request with project context}
 
 ## Analysis Summary
+
 - Feature request refined with project context
 - Discovered X files across Y directories
 - Generated Z-step implementation plan
 
 ## File Discovery Results
+
 {File discovery agent output}
 
 ## Implementation Plan
+
 {Markdown implementation plan from planning agent}
 ```

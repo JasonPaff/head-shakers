@@ -19,6 +19,8 @@ import { useMemo } from 'react';
 import { useState } from 'react';
 
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+import { generateTestId } from '@/lib/test-ids';
 
 import { BobbleheadDeleteDialog } from '@/components/feature/bobblehead/bobblehead-delete-dialog';
 import { Button } from '@/components/ui/button';
@@ -42,7 +44,7 @@ import { BobbleheadCommentsDialog } from './bobblehead-comments-dialog';
 import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
 import { BobbleheadShareMenu } from './bobblehead-share-menu';
 
-interface BobbleheadGalleryCardProps {
+interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   bobblehead: {
     collectionId: string;
     description?: null | string;
@@ -60,7 +62,18 @@ interface BobbleheadGalleryCardProps {
   isOwner: boolean;
 }
 
-export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGalleryCardProps) => {
+export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: BobbleheadGalleryCardProps) => {
+  // Generate testids for components
+  const cardTestId = testId || generateTestId('feature', 'bobblehead-card');
+  const photoAreaTestId = generateTestId('feature', 'bobblehead-photo', 'clickable');
+  const prevButtonTestId = generateTestId('feature', 'bobblehead-nav', 'prev');
+  const nextButtonTestId = generateTestId('feature', 'bobblehead-nav', 'next');
+  const likeButtonTestId = generateTestId('feature', 'like-button', 'bobblehead');
+  const commentsButtonTestId = generateTestId('feature', 'comments-button', 'bobblehead');
+  const shareButtonTestId = generateTestId('feature', 'share-button', 'bobblehead');
+  const viewDetailsButtonTestId = generateTestId('feature', 'view-details-button', 'bobblehead');
+  const actionMenuTestId = generateTestId('feature', 'action-menu', 'bobblehead');
+
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [loadedImageUrls, setLoadedImageUrls] = useState<Set<string>>(
     () => new Set(bobblehead.featurePhoto ? [bobblehead.featurePhoto] : []),
@@ -171,7 +184,10 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
   const shouldShowGalleryOverlay = hasActualPhotos && isShowPhotoControls;
 
   return (
-    <Card className={'flex h-[580px] flex-col overflow-hidden transition-all duration-200 hover:shadow-lg'}>
+    <Card
+      className={'flex h-[580px] flex-col overflow-hidden transition-all duration-200 hover:shadow-lg'}
+      testId={cardTestId}
+    >
       {/* Name */}
       <CardHeader className={'h-14 flex-shrink-0 pb-2'}>
         <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
@@ -201,6 +217,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
       {/* Photo */}
       <div
         className={'group relative h-64 flex-shrink-0 cursor-pointer bg-muted'}
+        data-testid={photoAreaTestId}
         onClick={handlePhotoClick}
         onKeyDown={handlePhotoKeyDown}
         onMouseEnter={handleMouseEnter}
@@ -249,6 +266,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
             className={'absolute top-1/2 left-2 -translate-y-1/2 opacity-80 hover:opacity-100'}
             onClick={handlePrevPhoto}
             size={'icon'}
+            testId={prevButtonTestId}
             variant={'secondary'}
           >
             <ChevronLeftIcon aria-hidden className={'size-4'} />
@@ -259,6 +277,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
             className={'absolute top-1/2 right-2 -translate-y-1/2 opacity-80 hover:opacity-100'}
             onClick={handleNextPhoto}
             size={'icon'}
+            testId={nextButtonTestId}
             variant={'secondary'}
           >
             <ChevronRightIcon aria-hidden className={'size-4'} />
@@ -300,6 +319,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
             isInitiallyLiked={bobblehead.likeData?.isLiked || false}
             targetId={bobblehead.id}
             targetType={'bobblehead'}
+            testId={likeButtonTestId}
           />
 
           {/* Comments */}
@@ -310,6 +330,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
                 e.stopPropagation();
               }}
               size={'sm'}
+              testId={commentsButtonTestId}
               variant={'ghost'}
             >
               <MessageCircleIcon aria-hidden className={'size-4'} />
@@ -324,6 +345,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
                 e.stopPropagation();
               }}
               size={'sm'}
+              testId={shareButtonTestId}
               variant={'ghost'}
             >
               <ShareIcon aria-hidden className={'size-4'} />
@@ -333,7 +355,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
 
         <div className={'flex items-center gap-2'}>
           {/* View Details */}
-          <Button asChild size={'sm'} variant={'outline'}>
+          <Button asChild size={'sm'} testId={viewDetailsButtonTestId} variant={'outline'}>
             <Link
               href={$path({
                 route: '/bobbleheads/[bobbleheadId]',
@@ -348,7 +370,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner }: BobbleheadGallery
           <Conditional isCondition={isOwner}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button className={'size-8 p-0'} size={'sm'} variant={'ghost'}>
+                <Button className={'size-8 p-0'} size={'sm'} testId={actionMenuTestId} variant={'ghost'}>
                   <MoreVerticalIcon aria-hidden className={'size-4'} />
                   <VisuallyHidden>Open menu</VisuallyHidden>
                 </Button>

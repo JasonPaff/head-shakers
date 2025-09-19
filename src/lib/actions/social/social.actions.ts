@@ -74,7 +74,12 @@ export const toggleLikeAction = authActionClient
         message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
       });
 
-      CacheRevalidationService.social.onLikeChange(likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType, likeData.targetId, ctx.userId, result.isLiked ? 'like' : 'unlike');
+      CacheRevalidationService.social.onLikeChange(
+        likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType,
+        likeData.targetId,
+        ctx.userId,
+        result.isLiked ? 'like' : 'unlike',
+      );
 
       return {
         data: {

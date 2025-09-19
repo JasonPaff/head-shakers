@@ -15,7 +15,12 @@ export const FieldDescription = ({ children, className, testId, ...props }: Fiel
 
   return (
     <Conditional isCondition={!!children}>
-      <p className={cn('text-sm text-muted-foreground', className)} data-testid={testId} id={descriptionId} {...props}>
+      <p
+        className={cn('text-sm text-muted-foreground', className)}
+        data-testid={testId}
+        id={descriptionId}
+        {...props}
+      >
         {children}
       </p>
     </Conditional>

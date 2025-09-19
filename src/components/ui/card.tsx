@@ -92,5 +92,12 @@ export const CardHeader = ({ className, testId, ...props }: CardHeaderProps) => 
 };
 
 export const CardTitle = ({ className, testId, ...props }: CardTitleProps) => {
-  return <div className={cn('leading-none font-semibold', className)} data-slot={'card-title'} data-testid={testId} {...props} />;
+  return (
+    <div
+      className={cn('leading-none font-semibold', className)}
+      data-slot={'card-title'}
+      data-testid={testId}
+      {...props}
+    />
+  );
 };

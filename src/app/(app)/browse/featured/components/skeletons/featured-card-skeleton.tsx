@@ -34,16 +34,15 @@ export const FeaturedCardSkeleton = ({ isHero = false }: FeaturedCardSkeletonPro
       {/* Card content */}
       <CardContent className={'pt-0'}>
         <Skeleton className={`mb-4 ${isHero ? 'h-5 w-full' : 'h-4 w-full'}`} /> {/* Description line 1 */}
-        <Skeleton className={`mb-4 ${isHero ? 'h-5 w-3/4' : 'h-4 w-2/3'}`} />   {/* Description line 2 */}
-
+        <Skeleton className={`mb-4 ${isHero ? 'h-5 w-3/4' : 'h-4 w-2/3'}`} /> {/* Description line 2 */}
         {/* Stats and actions */}
         <div className={'flex items-center justify-between'}>
           <div className={'flex items-center gap-4 text-sm'}>
             <Skeleton className={'h-4 w-12'} /> {/* Views */}
-            <Skeleton className={'h-4 w-8'} />  {/* Comments */}
-            <Skeleton className={'h-4 w-8'} />  {/* Likes */}
+            <Skeleton className={'h-4 w-8'} /> {/* Comments */}
+            <Skeleton className={'h-4 w-8'} /> {/* Likes */}
           </div>
-          <Skeleton className={'h-9 w-24'} />   {/* View button */}
+          <Skeleton className={'h-9 w-24'} /> {/* View button */}
         </div>
       </CardContent>
     </Card>

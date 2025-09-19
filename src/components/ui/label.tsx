@@ -27,7 +27,12 @@ type LabelProps = ComponentProps<typeof LabelRoot> & ComponentTestIdProps & Vari
 
 export const Label = ({ children, className, testId, variant, ...props }: LabelProps) => {
   return (
-    <LabelRoot className={cn(styles({ variant }), className)} data-slot={'label'} data-testid={testId} {...props}>
+    <LabelRoot
+      className={cn(styles({ variant }), className)}
+      data-slot={'label'}
+      data-testid={testId}
+      {...props}
+    >
       {children}
     </LabelRoot>
   );

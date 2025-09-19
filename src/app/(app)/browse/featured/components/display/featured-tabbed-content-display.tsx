@@ -88,14 +88,14 @@ const getContentTypeColor = (type: string) => {
   }
 };
 
-export const FeaturedTabbedContentDisplay = ({ onViewContent, tabbedData }: FeaturedTabbedContentDisplayProps) => {
+export const FeaturedTabbedContentDisplay = ({
+  onViewContent,
+  tabbedData,
+}: FeaturedTabbedContentDisplayProps) => {
   const [activeTab, setActiveTab] = useState('all');
 
   const getAllFeaturedContent = () => {
-    return [
-      ...tabbedData.editor_pick,
-      ...tabbedData.trending,
-    ].sort((a, b) => a.priority - b.priority);
+    return [...tabbedData.editor_pick, ...tabbedData.trending].sort((a, b) => a.priority - b.priority);
   };
 
   const handleContentView = async (contentId: string) => {

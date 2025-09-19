@@ -34,20 +34,14 @@ export default async function FeaturedPage() {
         {/* Hero Banner Section with Suspense */}
         <FeaturedContentErrorBoundary section={'hero'}>
           <Suspense fallback={<FeaturedHeroSkeleton />}>
-            <FeaturedHeroAsync
-              currentUserId={currentUserId}
-              isTrackViews={true}
-            />
+            <FeaturedHeroAsync currentUserId={currentUserId} isTrackViews={true} />
           </Suspense>
         </FeaturedContentErrorBoundary>
 
         {/* Tabbed Content Section with Suspense */}
         <FeaturedContentErrorBoundary section={'tabbed'}>
           <Suspense fallback={<FeaturedTabbedContentSkeleton />}>
-            <FeaturedTabbedContentAsync
-              currentUserId={currentUserId}
-              isTrackViews={true}
-            />
+            <FeaturedTabbedContentAsync currentUserId={currentUserId} isTrackViews={true} />
           </Suspense>
         </FeaturedContentErrorBoundary>
 

@@ -45,7 +45,9 @@
       "Bash(grep:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npm run format:*)"
     ],
     "deny": [],
     "ask": []

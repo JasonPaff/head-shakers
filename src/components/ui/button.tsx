@@ -76,8 +76,7 @@ export const buttonVariants = cva(
 
 export type ButtonProps = ComponentProps<'button'> &
   ComponentTestIdProps &
-  VariantProps<typeof buttonVariants> &
-  { asChild?: boolean };
+  VariantProps<typeof buttonVariants> & { asChild?: boolean };
 
 export const Button = ({ asChild = false, className, size, testId, variant, ...props }: ButtonProps) => {
   const Comp = asChild ? Slot : 'button';

@@ -119,7 +119,9 @@ export class FeaturedContentQuery extends BaseQuery {
   /**
    * get all featured content for admin management
    */
-  static async findAllFeaturedContentForAdminAsync(context: QueryContext): Promise<Array<FeaturedContentRecord>> {
+  static async findAllFeaturedContentForAdminAsync(
+    context: QueryContext,
+  ): Promise<Array<FeaturedContentRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     const results = await dbInstance

@@ -241,7 +241,11 @@ export const deleteBobbleheadAction = authActionClient
         message: `Deleted bobblehead: ${deletedBobblehead.name} with Cloudinary photo cleanup`,
       });
 
-      CacheRevalidationService.bobbleheads.onDelete(bobbleheadData.bobbleheadId, ctx.userId, deletedBobblehead?.collectionId);
+      CacheRevalidationService.bobbleheads.onDelete(
+        bobbleheadData.bobbleheadId,
+        ctx.userId,
+        deletedBobblehead?.collectionId,
+      );
 
       return {
         data: null,

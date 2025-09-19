@@ -20,9 +20,9 @@ export const BobbleheadCardSkeleton = () => (
       <div className={'flex w-full items-center justify-between'}>
         {/* Action Buttons */}
         <div className={'flex gap-2'}>
-          <Skeleton className={'h-8 w-12'} />  {/* Like */}
-          <Skeleton className={'h-8 w-8'} />   {/* Share */}
-          <Skeleton className={'h-8 w-8'} />   {/* More */}
+          <Skeleton className={'h-8 w-12'} /> {/* Like */}
+          <Skeleton className={'h-8 w-8'} /> {/* Share */}
+          <Skeleton className={'h-8 w-8'} /> {/* More */}
         </div>
 
         {/* View Details Button */}

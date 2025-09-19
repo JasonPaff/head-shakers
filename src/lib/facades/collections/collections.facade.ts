@@ -47,7 +47,6 @@ export interface CollectionMetrics {
   totalBobbleheads: number;
 }
 
-
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
 export class CollectionsFacade {
@@ -167,7 +166,15 @@ export class CollectionsFacade {
         },
         collectionId,
         optionsHash,
-        { context: { entityId: collectionId, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getAllBobbleheadsWithPhotos', userId: viewerUserId } }
+        {
+          context: {
+            entityId: collectionId,
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'getAllBobbleheadsWithPhotos',
+            userId: viewerUserId,
+          },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -198,7 +205,15 @@ export class CollectionsFacade {
         },
         collectionId,
         optionsHash,
-        { context: { entityId: collectionId, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getBobbleheads', userId: viewerUserId } }
+        {
+          context: {
+            entityId: collectionId,
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'getBobbleheads',
+            userId: viewerUserId,
+          },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -261,7 +276,15 @@ export class CollectionsFacade {
         },
         collectionId,
         optionsHash,
-        { context: { entityId: collectionId, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getBobbleheadsWithPhotos', userId: viewerUserId } }
+        {
+          context: {
+            entityId: collectionId,
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'getBobbleheadsWithPhotos',
+            userId: viewerUserId,
+          },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -289,7 +312,15 @@ export class CollectionsFacade {
         return CollectionsQuery.findByIdAsync(id, context);
       },
       id,
-      { context: { entityId: id, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getById', userId: viewerUserId } }
+      {
+        context: {
+          entityId: id,
+          entityType: 'collection',
+          facade: 'CollectionsFacade',
+          operation: 'getById',
+          userId: viewerUserId,
+        },
+      },
     );
   }
 
@@ -333,7 +364,9 @@ export class CollectionsFacade {
         },
         userId,
         optionsHash,
-        { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'findByUser', userId } }
+        {
+          context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'findByUser', userId },
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -361,20 +394,31 @@ export class CollectionsFacade {
         return CollectionsQuery.findByIdWithRelationsAsync(id, context);
       },
       id,
-      { context: { entityId: id, entityType: 'collection', facade: 'CollectionsFacade', operation: 'getWithRelations', userId: viewerUserId } }
+      {
+        context: {
+          entityId: id,
+          entityType: 'collection',
+          facade: 'CollectionsFacade',
+          operation: 'getWithRelations',
+          userId: viewerUserId,
+        },
+      },
     );
   }
 
-  static async getUserCollectionsForDashboard(userId: string, dbInstance?: DatabaseExecutor): Promise<Array<CollectionDashboardData>> {
+  static async getUserCollectionsForDashboard(
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<CollectionDashboardData>> {
     return CacheService.collections.dashboard(
       () => {
         const context = createProtectedQueryContext(userId, { dbInstance });
-        return CollectionsQuery.getDashboardDataAsync(userId, context).then(collections =>
-          collections.map((collection) => this.transformForDashboard(collection))
+        return CollectionsQuery.getDashboardDataAsync(userId, context).then((collections) =>
+          collections.map((collection) => this.transformForDashboard(collection)),
         );
       },
       userId,
-      { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'dashboard', userId } }
+      { context: { entityType: 'collection', facade: 'CollectionsFacade', operation: 'dashboard', userId } },
     );
   }
 

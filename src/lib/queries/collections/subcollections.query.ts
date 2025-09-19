@@ -38,12 +38,7 @@ export class SubcollectionsQuery extends BaseQuery {
       .select()
       .from(subCollections)
       .innerJoin(collections, eq(subCollections.collectionId, collections.id))
-      .where(
-        and(
-          eq(subCollections.id, subcollectionId),
-          eq(collections.userId, userId)
-        )
-      )
+      .where(and(eq(subCollections.id, subcollectionId), eq(collections.userId, userId)))
       .limit(1);
 
     if (!subcollection || subcollection.length === 0) {
@@ -282,12 +277,7 @@ export class SubcollectionsQuery extends BaseQuery {
       .select()
       .from(subCollections)
       .innerJoin(collections, eq(subCollections.collectionId, collections.id))
-      .where(
-        and(
-          eq(subCollections.id, subcollectionId),
-          eq(collections.userId, userId)
-        )
-      )
+      .where(and(eq(subCollections.id, subcollectionId), eq(collections.userId, userId)))
       .limit(1);
 
     if (!subcollection || subcollection.length === 0) {

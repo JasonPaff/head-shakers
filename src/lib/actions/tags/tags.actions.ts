@@ -414,7 +414,9 @@ export const bulkDeleteTagsAction = authActionClient
         message: `Bulk deleted ${result.deletedCount} tags`,
       });
 
-      CacheRevalidationService.admin.onSystemChange('Tags bulk deleted - invalidating search and user tag caches');
+      CacheRevalidationService.admin.onSystemChange(
+        'Tags bulk deleted - invalidating search and user tag caches',
+      );
 
       return {
         data: result,

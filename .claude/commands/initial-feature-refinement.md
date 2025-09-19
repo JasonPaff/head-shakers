@@ -52,6 +52,7 @@ Take the user's original feature request and refine it by:
 ### Output Format
 
 **CRITICAL**: Output ONLY a single paragraph (200-500 words). Do NOT include:
+
 - Headers or titles
 - Sections or subsections
 - Bullet points or lists
@@ -59,6 +60,7 @@ Take the user's original feature request and refine it by:
 - Multiple paragraphs
 
 Your output must be a single, well-structured paragraph that:
+
 - Starts with the core user requirement
 - Incorporates relevant project context
 - Maintains clarity and actionability

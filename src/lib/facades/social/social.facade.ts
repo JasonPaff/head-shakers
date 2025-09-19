@@ -155,7 +155,11 @@ export class SocialFacade {
     }
   }
 
-  static async getLikeCount(targetId: string, targetType: LikeTargetType, dbInstance?: DatabaseExecutor): Promise<number> {
+  static async getLikeCount(
+    targetId: string,
+    targetType: LikeTargetType,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<number> {
     try {
       return CacheService.cached(
         () => {
@@ -164,9 +168,18 @@ export class SocialFacade {
         },
         CACHE_KEYS.SOCIAL.LIKES(targetType, targetId),
         {
-          context: { entityId: targetId, entityType: 'social', facade: 'SocialFacade', operation: 'getLikeCount' },
-          tags: CacheTagGenerators.social.like(targetType === 'subcollection' ? 'collection' : targetType, targetId, 'system')
-        }
+          context: {
+            entityId: targetId,
+            entityType: 'social',
+            facade: 'SocialFacade',
+            operation: 'getLikeCount',
+          },
+          tags: CacheTagGenerators.social.like(
+            targetType === 'subcollection' ? 'collection' : targetType,
+            targetId,
+            'system',
+          ),
+        },
       );
     } catch (error) {
       const context: FacadeErrorContext = {

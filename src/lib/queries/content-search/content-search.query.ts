@@ -66,7 +66,10 @@ export class ContentSearchQuery extends BaseQuery {
   /**
    * find bobblehead by ID for featuring
    */
-  static async findBobbleheadByIdAsync(id: string, context: QueryContext): Promise<BobbleheadSearchResult | null> {
+  static async findBobbleheadByIdAsync(
+    id: string,
+    context: QueryContext,
+  ): Promise<BobbleheadSearchResult | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -108,7 +111,10 @@ export class ContentSearchQuery extends BaseQuery {
   /**
    * find a collection by ID for featuring
    */
-  static async findCollectionByIdAsync(id: string, context: QueryContext): Promise<CollectionSearchResult | null> {
+  static async findCollectionByIdAsync(
+    id: string,
+    context: QueryContext,
+  ): Promise<CollectionSearchResult | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -189,7 +195,10 @@ export class ContentSearchQuery extends BaseQuery {
   /**
    * get photos for a single bobblehead
    */
-  static async getBobbleheadPhotosByIdAsync(id: string, context: QueryContext): Promise<Array<BobbleheadPhoto>> {
+  static async getBobbleheadPhotosByIdAsync(
+    id: string,
+    context: QueryContext,
+  ): Promise<Array<BobbleheadPhoto>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance

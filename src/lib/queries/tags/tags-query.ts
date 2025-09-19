@@ -50,7 +50,11 @@ export class TagsQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
-  static async createAsync(data: InsertTag, userId: string, context: QueryContext): Promise<null | TagRecord> {
+  static async createAsync(
+    data: InsertTag,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | TagRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -191,7 +195,10 @@ export class TagsQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  static async getByBobbleheadIdAsync(bobbleheadId: string, context: QueryContext): Promise<Array<TagRecord>> {
+  static async getByBobbleheadIdAsync(
+    bobbleheadId: string,
+    context: QueryContext,
+  ): Promise<Array<TagRecord>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance

@@ -15,8 +15,8 @@ export const SubcollectionBobbleheadsSkeleton = () => (
     <div className={'mb-4'}>
       <div className={'flex justify-between'}>
         <div className={'flex gap-2'}>
-          <Skeleton className={'h-10 w-64'} />  {/* Search */}
-          <Skeleton className={'h-10 w-48'} />  {/* Sort */}
+          <Skeleton className={'h-10 w-64'} /> {/* Search */}
+          <Skeleton className={'h-10 w-48'} /> {/* Sort */}
         </div>
       </div>
     </div>

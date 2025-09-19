@@ -3,6 +3,7 @@
 import { revalidateLogic } from '@tanstack/form-core';
 
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -18,9 +19,10 @@ import { useFocusContext } from '@/components/ui/form/focus-management/focus-con
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateCollectionAction } from '@/lib/actions/collections/collections.actions';
+import { generateTestId } from '@/lib/test-ids';
 import { updateCollectionSchema } from '@/lib/validations/collections.validation';
 
-interface CollectionEditDialogProps {
+interface CollectionEditDialogProps extends ComponentTestIdProps {
   collection: CollectionForEdit;
   isOpen: boolean;
   onClose: () => void;
@@ -34,7 +36,13 @@ interface CollectionForEdit {
 }
 
 export const CollectionEditDialog = withFocusManagement(
-  ({ collection, isOpen, onClose }: CollectionEditDialogProps) => {
+  ({ collection, isOpen, onClose, testId }: CollectionEditDialogProps) => {
+    // Generate testids for components
+    const dialogTestId = testId || generateTestId('feature', 'collection-edit-dialog');
+    const formTestId = generateTestId('feature', 'collection-edit-form');
+    const cancelButtonTestId = generateTestId('feature', 'collection-edit-cancel');
+    const submitButtonTestId = generateTestId('feature', 'collection-edit-submit');
+
     const { focusFirstError } = useFocusContext();
 
     const { executeAsync, isExecuting } = useServerAction(updateCollectionAction, {
@@ -83,8 +91,9 @@ export const CollectionEditDialog = withFocusManagement(
         }}
         open={isOpen}
       >
-        <DialogContent className={'sm:max-w-[425px]'}>
+        <DialogContent className={'sm:max-w-[425px]'} testId={dialogTestId}>
           <form
+            data-testid={formTestId}
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -124,10 +133,10 @@ export const CollectionEditDialog = withFocusManagement(
 
             {/* Action Buttons */}
             <DialogFooter>
-              <Button disabled={isExecuting} onClick={handleClose} variant={'outline'}>
+              <Button disabled={isExecuting} onClick={handleClose} testId={cancelButtonTestId} variant={'outline'}>
                 Cancel
               </Button>
-              <Button disabled={isExecuting} type={'submit'}>
+              <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>
                 {isExecuting ? 'Updating...' : 'Update Collection'}
               </Button>
             </DialogFooter>

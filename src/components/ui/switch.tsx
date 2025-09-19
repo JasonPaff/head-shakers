@@ -4,11 +4,13 @@ import type { ComponentProps } from 'react';
 
 import { Root, Thumb } from '@radix-ui/react-switch';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { cn } from '@/utils/tailwind-utils';
 
-type SwitchProps = ComponentProps<typeof Root>;
+type SwitchProps = ComponentProps<typeof Root> & ComponentTestIdProps;
 
-export const Switch = ({ className, ...props }: SwitchProps) => {
+export const Switch = ({ className, testId, ...props }: SwitchProps) => {
   return (
     <Root
       className={cn(
@@ -19,6 +21,7 @@ export const Switch = ({ className, ...props }: SwitchProps) => {
         className,
       )}
       data-slot={'switch'}
+      data-testid={testId}
       {...props}
     >
       <Thumb

@@ -5,6 +5,7 @@ import { useRef } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { InsertCollectionInput } from '@/lib/validations/collections.validation';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -21,16 +22,23 @@ import { withFocusManagement } from '@/components/ui/form/focus-management/with-
 import { useServerAction } from '@/hooks/use-server-action';
 import { createCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { DEFAULTS } from '@/lib/constants';
+import { generateTestId } from '@/lib/test-ids';
 import { insertCollectionSchema } from '@/lib/validations/collections.validation';
 
-interface CollectionCreateDialogProps {
+interface CollectionCreateDialogProps extends ComponentTestIdProps {
   isOpen: boolean;
   onClose: () => void;
   onCollectionCreated?: (collection: ComboboxItem) => void;
 }
 
 export const CollectionCreateDialog = withFocusManagement(
-  ({ isOpen, onClose, onCollectionCreated }: CollectionCreateDialogProps) => {
+  ({ isOpen, onClose, onCollectionCreated, testId }: CollectionCreateDialogProps) => {
+    // Generate testids for components
+    const dialogTestId = testId || generateTestId('feature', 'collection-create-dialog');
+    const formTestId = generateTestId('feature', 'collection-create-form');
+    const cancelButtonTestId = generateTestId('feature', 'collection-create-cancel');
+    const submitButtonTestId = generateTestId('feature', 'collection-create-submit');
+
     const { focusFirstError } = useFocusContext();
 
     const { executeAsync, isExecuting } = useServerAction(createCollectionAction, {
@@ -84,8 +92,9 @@ export const CollectionCreateDialog = withFocusManagement(
 
     return (
       <Dialog onOpenChange={handleOpenChange} open={isOpen}>
-        <DialogContent className={'sm:max-w-[425px]'}>
+        <DialogContent className={'sm:max-w-[425px]'} testId={dialogTestId}>
           <form
+            data-testid={formTestId}
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -129,10 +138,10 @@ export const CollectionCreateDialog = withFocusManagement(
 
             {/* Action Buttons */}
             <DialogFooter>
-              <Button disabled={isExecuting} onClick={handleClose} variant={'outline'}>
+              <Button disabled={isExecuting} onClick={handleClose} testId={cancelButtonTestId} variant={'outline'}>
                 Cancel
               </Button>
-              <Button disabled={isExecuting} type={'submit'}>
+              <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>
                 {isExecuting ? 'Creating...' : 'Create Collection'}
               </Button>
             </DialogFooter>

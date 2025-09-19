@@ -122,7 +122,11 @@ export class TestIdAssertions {
   /**
    * Assert that a component with the given testid exists
    */
-  async expectComponentExists(namespace: TestIdNamespace, component: ComponentTestId, suffix?: string): Promise<void> {
+  async expectComponentExists(
+    namespace: TestIdNamespace,
+    component: ComponentTestId,
+    suffix?: string,
+  ): Promise<void> {
     const selector = `[data-testid="${generateTestId(namespace, component, suffix)}"]`;
     await this.page.locator(selector).waitFor({ state: 'visible' });
   }

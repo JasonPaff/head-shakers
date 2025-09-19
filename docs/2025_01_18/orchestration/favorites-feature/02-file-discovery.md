@@ -12,22 +12,29 @@ Implement a comprehensive favoriting system that allows authenticated users to f
 ## File Discovery Results
 
 ### Priority 1 - Core Schema & Database Files
+
 ✅ **Schema Files (Must Modify)**
+
 - `src/lib/db/schema/social.schema.ts` - Contains existing `likes` table (polymorphic structure similar to favorites)
 - `src/lib/db/schema/index.ts` - Main schema export file
 - `src/lib/db/schema/relations.schema.ts` - Database relationships
 
 ### Priority 2 - Server Actions & Validation
+
 ✅ **Action Files (Create New)**
+
 - `src/lib/actions/social/social.actions.ts` - Contains like/unlike actions (reference for favorites)
 - NEW: `src/lib/actions/favorites/favorites.actions.ts` - To be created
 
 ✅ **Validation Schemas**
+
 - `src/lib/validations/social.validation.ts` - Contains like validation schemas
 - NEW: `src/lib/validations/favorites.validation.ts` - To be created
 
 ### Priority 3 - Query & Data Fetching
+
 ✅ **Query Files**
+
 - `src/lib/queries/social/social.query.ts` - Contains like queries
 - `src/lib/queries/collections/collections.query.ts` - Collection queries
 - `src/lib/queries/collections/subcollections.query.ts` - Subcollection queries
@@ -35,31 +42,39 @@ Implement a comprehensive favoriting system that allows authenticated users to f
 - NEW: `src/lib/queries/favorites/favorites.query.ts` - To be created
 
 ### Priority 4 - UI Components (Must Modify)
+
 ✅ **Collection Components**
+
 - `src/app/(app)/collections/[collectionId]/(collection)/components/collection.tsx`
 - `src/app/(app)/dashboard/collection/(collection)/components/collection-card.tsx`
 - `src/components/feature/collections/collection-share-menu.tsx`
 
 ✅ **Subcollection Components**
+
 - `src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection.tsx`
 - `src/app/(app)/dashboard/collection/(collection)/components/subcollections-list-item.tsx`
 - `src/components/feature/subcollections/subcollection-share-menu.tsx`
 
 ✅ **Bobblehead Components**
+
 - `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead.tsx`
 - `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header.tsx`
 - `src/components/feature/bobblehead/bobblehead-gallery-card.tsx`
 
 ### Priority 5 - New Component Files (To Create)
+
 - NEW: `src/components/feature/favorites/favorite-button.tsx` - Reusable favorite button
 - NEW: `src/components/feature/favorites/favorite-button-skeleton.tsx` - Loading state
 
 ### Priority 6 - Supporting Files
+
 ✅ **Constants & Types**
+
 - `src/lib/constants/index.ts` - Add favorite-related constants
 - `src/lib/types/favorites.types.ts` - New type definitions
 
 ✅ **Hooks (If Needed)**
+
 - NEW: `src/hooks/use-favorite.ts` - Custom hook for favorite operations
 
 ## File Path Validation Results

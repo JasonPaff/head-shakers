@@ -26,8 +26,8 @@ export const Skeleton = ({ children, className, width, ...props }: SkeletonProps
 export const ButtonSkeleton = ({ className }: { className?: string }) => {
   return (
     <div className={cn('flex space-x-2', className)}>
-      <Skeleton className={"h-9 w-16"} />
-      <Skeleton className={"h-9 w-16"} />
+      <Skeleton className={'h-9 w-16'} />
+      <Skeleton className={'h-9 w-16'} />
     </div>
   );
 };
@@ -38,24 +38,22 @@ export const SidebarSkeleton = ({ className }: { className?: string }) => {
       className={cn(
         'flex h-[calc(100svh-var(--header-height))] w-[--sidebar-width] flex-col',
         'border-r bg-sidebar',
-        className
+        className,
       )}
     >
-      <div className={"flex flex-col gap-2 p-2"}>
-        <Skeleton className={"h-10 w-full"} />
-        <Skeleton className={"h-10 w-full"} />
-        <Skeleton className={"h-10 w-full"} />
+      <div className={'flex flex-col gap-2 p-2'}>
+        <Skeleton className={'h-10 w-full'} />
+        <Skeleton className={'h-10 w-full'} />
+        <Skeleton className={'h-10 w-full'} />
       </div>
-      <div className={"mt-auto flex flex-col gap-2 p-2"}>
-        <Skeleton className={"h-10 w-full"} />
-        <Skeleton className={"h-10 w-full"} />
+      <div className={'mt-auto flex flex-col gap-2 p-2'}>
+        <Skeleton className={'h-10 w-full'} />
+        <Skeleton className={'h-10 w-full'} />
       </div>
     </div>
   );
 };
 
 export const UserButtonSkeleton = ({ className }: { className?: string }) => {
-  return (
-    <Skeleton className={cn('h-8 w-8 rounded-full', className)} />
-  );
+  return <Skeleton className={cn('h-8 w-8 rounded-full', className)} />;
 };

@@ -22,16 +22,20 @@ export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
       className={'sticky top-0 z-50 flex w-full items-center border-b bg-background'}
       data-testid={headerTestId}
     >
-      <AppHeaderContainer testId={testId ? `${testId}-container` : generateTestId('layout', 'app-header', 'container')}>
+      <AppHeaderContainer
+        testId={testId ? `${testId}-container` : generateTestId('layout', 'app-header', 'container')}
+      >
         {/* User Sidebar Trigger */}
-        <AuthContent loadingSkeleton={<Skeleton className={"h-9 w-9"} />}>
+        <AuthContent loadingSkeleton={<Skeleton className={'h-9 w-9'} />}>
           <SidebarTrigger />
         </AuthContent>
 
         {/* Left Section - Logo */}
         <div
           className={'flex items-center gap-4'}
-          data-testid={testId ? `${testId}-logo-section` : generateTestId('layout', 'app-header', 'logo-section')}
+          data-testid={
+            testId ? `${testId}-logo-section` : generateTestId('layout', 'app-header', 'logo-section')
+          }
         >
           <Link
             className={'flex items-center gap-2 text-xl font-bold'}
@@ -43,7 +47,9 @@ export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
                 'flex aspect-square size-8 items-center justify-center',
                 'rounded-lg bg-primary text-primary-foreground',
               )}
-              data-testid={testId ? `${testId}-logo-icon` : generateTestId('layout', 'app-header', 'logo-icon')}
+              data-testid={
+                testId ? `${testId}-logo-icon` : generateTestId('layout', 'app-header', 'logo-icon')
+              }
             >
               HS
             </div>
@@ -54,7 +60,9 @@ export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
         {/* Center Section - Search & Navigation */}
         <div
           className={'flex flex-1 items-center justify-center gap-4'}
-          data-testid={testId ? `${testId}-center-section` : generateTestId('layout', 'app-header', 'center-section')}
+          data-testid={
+            testId ? `${testId}-center-section` : generateTestId('layout', 'app-header', 'center-section')
+          }
         >
           <div className={'max-w-md flex-1'}>
             <AppHeaderSearch />
@@ -65,7 +73,9 @@ export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
         {/* Right Section - User Actions */}
         <div
           className={'flex items-center space-x-4'}
-          data-testid={testId ? `${testId}-actions-section` : generateTestId('layout', 'app-header', 'actions-section')}
+          data-testid={
+            testId ? `${testId}-actions-section` : generateTestId('layout', 'app-header', 'actions-section')
+          }
         >
           {/* Notifications */}
           <AppHeaderNotifications />

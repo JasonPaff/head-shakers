@@ -57,8 +57,21 @@ export type ComponentTestId =
   | 'search-results'
 
   // Feature Components
+  | 'action-menu'
+  | 'bobblehead-nav'
+  | 'bobblehead-photo'
+  | 'collection-create-cancel'
+  | 'collection-create-dialog'
+  | 'collection-create-form'
+  | 'collection-create-submit'
+  | 'collection-edit-cancel'
+  | 'collection-edit-dialog'
+  | 'collection-edit-form'
+  | 'collection-edit-submit'
+  | 'comments-button'
   | 'select'
   | 'separator'
+  | 'share-button'
   | 'sheet'
   | 'skeleton'
   | 'slider'
@@ -70,6 +83,7 @@ export type ComponentTestId =
   | 'theme-toggle'
   | 'toast'
   | 'toggle'
+  | 'view-details-button'
 
   // Form Components
   | 'toggle-group'
