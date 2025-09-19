@@ -18,6 +18,16 @@ export default defineConfig({
         singleThread: true, // for database tests
       },
     },
+    // Exclude E2E tests from Vitest - these should be run with Playwright
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/cypress/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/e2e/**',
+      'tests/e2e/**',
+      '**/*.e2e.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}',
+    ],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],

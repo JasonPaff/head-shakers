@@ -4,6 +4,8 @@ import type { ComponentProps } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { cn } from '@/utils/tailwind-utils';
 
 export const buttonVariants = cva(
@@ -73,15 +75,18 @@ export const buttonVariants = cva(
 );
 
 export type ButtonProps = ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & { asChild?: boolean };
+  ComponentTestIdProps &
+  VariantProps<typeof buttonVariants> &
+  { asChild?: boolean };
 
-export const Button = ({ asChild = false, className, size, variant, ...props }: ButtonProps) => {
+export const Button = ({ asChild = false, className, size, testId, variant, ...props }: ButtonProps) => {
   const Comp = asChild ? Slot : 'button';
 
   return (
     <Comp
       className={cn(buttonVariants({ className, size, variant }))}
       data-slot={'button'}
+      data-testid={testId}
       type={'button'}
       {...props}
     />

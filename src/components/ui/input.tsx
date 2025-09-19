@@ -4,18 +4,21 @@ import type { ChangeEvent, ComponentProps } from 'react';
 
 import { SearchIcon, XIcon } from 'lucide-react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/utils/tailwind-utils';
 
 import { Conditional } from './conditional';
 
-type InputProps = ComponentProps<'input'> & {
-  isClearable?: boolean;
-  isSearch?: boolean;
-  onClear?: () => void;
-};
+type InputProps = ComponentProps<'input'> &
+  ComponentTestIdProps & {
+    isClearable?: boolean;
+    isSearch?: boolean;
+    onClear?: () => void;
+  };
 
-export const Input = ({ className, isClearable, isSearch, onClear, type, ...props }: InputProps) => {
+export const Input = ({ className, isClearable, isSearch, onClear, testId, type, ...props }: InputProps) => {
   const handleInputClear = () => {
     props.onChange?.({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
     onClear?.();
@@ -39,6 +42,7 @@ export const Input = ({ className, isClearable, isSearch, onClear, type, ...prop
           className,
         )}
         data-slot={'input'}
+        data-testid={testId}
         type={type}
         {...props}
       />

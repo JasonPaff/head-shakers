@@ -5,33 +5,36 @@ import type { ComponentProps } from 'react';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { XIcon } from 'lucide-react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
 
-type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close>;
-type DialogContentProps = ComponentProps<typeof DialogPrimitive.Content> & {
-  isShowCloseButton?: boolean;
-};
-type DialogDescriptionProps = ComponentProps<typeof DialogPrimitive.Description>;
-type DialogFooterProps = ComponentProps<'div'>;
-type DialogHeaderProps = ComponentProps<'div'>;
-type DialogOverlayProps = ComponentProps<typeof DialogPrimitive.Overlay>;
-type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal>;
-type DialogProps = ComponentProps<typeof DialogPrimitive.Root>;
-type DialogTitleProps = ComponentProps<typeof DialogPrimitive.Title>;
-type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger>;
+type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close> & ComponentTestIdProps;
+type DialogContentProps = ComponentProps<typeof DialogPrimitive.Content> &
+  ComponentTestIdProps & {
+    isShowCloseButton?: boolean;
+  };
+type DialogDescriptionProps = ComponentProps<typeof DialogPrimitive.Description> & ComponentTestIdProps;
+type DialogFooterProps = ComponentProps<'div'> & ComponentTestIdProps;
+type DialogHeaderProps = ComponentProps<'div'> & ComponentTestIdProps;
+type DialogOverlayProps = ComponentProps<typeof DialogPrimitive.Overlay> & ComponentTestIdProps;
+type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal> & ComponentTestIdProps;
+type DialogProps = ComponentProps<typeof DialogPrimitive.Root> & ComponentTestIdProps;
+type DialogTitleProps = ComponentProps<typeof DialogPrimitive.Title> & ComponentTestIdProps;
+type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger> & ComponentTestIdProps;
 
-export const Dialog = ({ children, ...props }: DialogProps) => {
+export const Dialog = ({ children, testId, ...props }: DialogProps) => {
   return (
-    <DialogPrimitive.Root data-slot={'dialog'} {...props}>
+    <DialogPrimitive.Root data-slot={'dialog'} data-testid={testId} {...props}>
       {children}
     </DialogPrimitive.Root>
   );
 };
 
-export const DialogClose = ({ children, ...props }: DialogCloseProps) => {
+export const DialogClose = ({ children, testId, ...props }: DialogCloseProps) => {
   return (
-    <DialogPrimitive.Close data-slot={'dialog-close'} {...props}>
+    <DialogPrimitive.Close data-slot={'dialog-close'} data-testid={testId} {...props}>
       {children}
     </DialogPrimitive.Close>
   );
@@ -41,6 +44,7 @@ export const DialogContent = ({
   children,
   className,
   isShowCloseButton = true,
+  testId,
   ...props
 }: DialogContentProps) => {
   return (
@@ -56,6 +60,7 @@ export const DialogContent = ({
           className,
         )}
         data-slot={'dialog-content'}
+        data-testid={testId}
         {...props}
       >
         {children}
@@ -71,6 +76,7 @@ export const DialogContent = ({
               "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
             )}
             data-slot={'dialog-close'}
+            data-testid={testId ? `${testId}-close` : undefined}
           >
             <XIcon aria-hidden className={'size-4'} />
             <span className={'sr-only'}>Close</span>
@@ -81,11 +87,12 @@ export const DialogContent = ({
   );
 };
 
-export const DialogDescription = ({ children, className, ...props }: DialogDescriptionProps) => {
+export const DialogDescription = ({ children, className, testId, ...props }: DialogDescriptionProps) => {
   return (
     <DialogPrimitive.Description
       className={cn('text-sm text-muted-foreground', className)}
       data-slot={'dialog-description'}
+      data-testid={testId}
       {...props}
     >
       {children}
@@ -93,11 +100,12 @@ export const DialogDescription = ({ children, className, ...props }: DialogDescr
   );
 };
 
-export const DialogFooter = ({ children, className, ...props }: DialogFooterProps) => {
+export const DialogFooter = ({ children, className, testId, ...props }: DialogFooterProps) => {
   return (
     <div
       className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)}
       data-slot={'dialog-footer'}
+      data-testid={testId}
       {...props}
     >
       {children}
@@ -105,11 +113,12 @@ export const DialogFooter = ({ children, className, ...props }: DialogFooterProp
   );
 };
 
-export const DialogHeader = ({ children, className, ...props }: DialogHeaderProps) => {
+export const DialogHeader = ({ children, className, testId, ...props }: DialogHeaderProps) => {
   return (
     <div
       className={cn('flex flex-col gap-2 text-center sm:text-left', className)}
       data-slot={'dialog-header'}
+      data-testid={testId}
       {...props}
     >
       {children}
@@ -117,7 +126,7 @@ export const DialogHeader = ({ children, className, ...props }: DialogHeaderProp
   );
 };
 
-export const DialogOverlay = ({ children, className, ...props }: DialogOverlayProps) => {
+export const DialogOverlay = ({ children, className, testId, ...props }: DialogOverlayProps) => {
   return (
     <DialogPrimitive.Overlay
       className={cn(
@@ -129,6 +138,7 @@ export const DialogOverlay = ({ children, className, ...props }: DialogOverlayPr
         className,
       )}
       data-slot={'dialog-overlay'}
+      data-testid={testId}
       {...props}
     >
       {children}
@@ -136,19 +146,20 @@ export const DialogOverlay = ({ children, className, ...props }: DialogOverlayPr
   );
 };
 
-export const DialogPortal = ({ children, ...props }: DialogPortalProps) => {
+export const DialogPortal = ({ children, testId, ...props }: DialogPortalProps) => {
   return (
-    <DialogPrimitive.Portal data-slot={'dialog-portal'} {...props}>
+    <DialogPrimitive.Portal data-slot={'dialog-portal'} data-testid={testId} {...props}>
       {children}
     </DialogPrimitive.Portal>
   );
 };
 
-export const DialogTitle = ({ children, className, ...props }: DialogTitleProps) => {
+export const DialogTitle = ({ children, className, testId, ...props }: DialogTitleProps) => {
   return (
     <DialogPrimitive.Title
       className={cn('text-lg leading-none font-semibold', className)}
       data-slot={'dialog-title'}
+      data-testid={testId}
       {...props}
     >
       {children}
@@ -156,9 +167,9 @@ export const DialogTitle = ({ children, className, ...props }: DialogTitleProps)
   );
 };
 
-export const DialogTrigger = ({ children, ...props }: DialogTriggerProps) => {
+export const DialogTrigger = ({ children, testId, ...props }: DialogTriggerProps) => {
   return (
-    <DialogPrimitive.Trigger data-slot={'dialog-trigger'} {...props}>
+    <DialogPrimitive.Trigger data-slot={'dialog-trigger'} data-testid={testId} {...props}>
       {children}
     </DialogPrimitive.Trigger>
   );

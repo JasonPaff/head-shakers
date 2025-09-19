@@ -1,0 +1,161 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - link "HS Head Shakers" [ref=e7] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e8] [cursor=pointer]: HS
+          - text: Head Shakers
+        - generic [ref=e9]:
+          - generic [ref=e11]:
+            - img [ref=e12]
+            - textbox "Discover collections, bobbleheads, collectors..." [ref=e16]
+          - navigation "Main" [ref=e17]:
+            - list [ref=e19]:
+              - listitem [ref=e20]:
+                - button "Discover" [ref=e21]:
+                  - img [ref=e22]
+                  - text: Discover
+                  - img [ref=e25]
+              - listitem [ref=e27]:
+                - button "Browse" [ref=e28]:
+                  - img [ref=e29]
+                  - text: Browse
+                  - img [ref=e31]
+              - listitem [ref=e33]:
+                - button "Community" [ref=e34]:
+                  - img [ref=e35]
+                  - text: Community
+                  - img [ref=e40]
+        - generic [ref=e42]:
+          - generic [ref=e43]:
+            - button "Sign In" [ref=e44]
+            - button "Sign Up" [ref=e45]
+          - button "Toggle theme" [ref=e46]:
+            - img
+            - generic [ref=e47]: Toggle theme
+    - main [ref=e50]:
+      - generic [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - heading "My Collections Dashboard" [level=1] [ref=e55]
+              - paragraph [ref=e56]: Manage your collections, subcollections, and bobbleheads
+            - button "Add Collection" [ref=e57]:
+              - img
+              - text: Add Collection
+          - generic [ref=e58]:
+            - generic [ref=e60]:
+              - img [ref=e62]
+              - generic [ref=e67]:
+                - paragraph [ref=e68]: Collections
+                - generic [ref=e69]: "4"
+            - generic [ref=e71]:
+              - img [ref=e73]
+              - generic [ref=e75]:
+                - paragraph [ref=e76]: Subcollections
+                - generic [ref=e77]: "5"
+            - generic [ref=e79]:
+              - img [ref=e81]
+              - generic [ref=e85]:
+                - paragraph [ref=e86]: Bobbleheads
+                - generic [ref=e87]: "12"
+        - generic [ref=e88]:
+          - tablist [ref=e89]:
+            - tab "Collections" [selected] [ref=e90]
+            - tab "Subcollections" [ref=e91]
+            - tab "Bobbleheads" [ref=e92]
+          - tabpanel "Collections" [ref=e93]:
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - generic [ref=e98]:
+                    - generic [ref=e99]: Cats, Spiders, and Brooks!!!
+                    - img [ref=e101]
+                  - paragraph [ref=e104]: A cat, spider, and Brooks!!!
+                  - button [ref=e106]:
+                    - img
+                - generic [ref=e107]:
+                  - generic [ref=e108]:
+                    - generic [ref=e109]:
+                      - generic [ref=e110]: 9 bobbleheads
+                      - generic [ref=e111]: 1 subcollections
+                    - button "Subcollections" [ref=e113]:
+                      - generic [ref=e114]: Subcollections
+                      - img
+                  - link "View Collection" [ref=e115] [cursor=pointer]:
+                    - /url: /collections/fe43b909-64f7-4ebf-980a-3c14a7d83171
+                    - text: View Collection
+                    - img
+              - generic [ref=e116]:
+                - generic [ref=e117]:
+                  - generic [ref=e118]:
+                    - generic [ref=e119]: Empty Collection
+                    - img [ref=e121]
+                  - paragraph [ref=e124]: This collection should never have a bobblehead in it
+                  - button [ref=e126]:
+                    - img
+                - generic [ref=e127]:
+                  - generic [ref=e128]:
+                    - generic [ref=e129]:
+                      - generic [ref=e130]: 0 bobbleheads
+                      - generic [ref=e131]: 1 subcollections
+                    - button "Subcollections" [ref=e133]:
+                      - generic [ref=e134]: Subcollections
+                      - img
+                  - link "View Collection" [ref=e135] [cursor=pointer]:
+                    - /url: /collections/395aebb5-4687-45f9-a582-eb85104db867
+                    - text: View Collection
+                    - img
+              - generic [ref=e136]:
+                - generic [ref=e137]:
+                  - generic [ref=e138]:
+                    - generic [ref=e139]: Private Collection
+                    - img [ref=e141]
+                  - paragraph [ref=e144]: Private Rare and vintage bobbleheads from the 1960s-1980s.
+                  - button [ref=e146]:
+                    - img
+                - generic [ref=e147]:
+                  - generic [ref=e148]:
+                    - generic [ref=e149]:
+                      - generic [ref=e150]: 3 bobbleheads
+                      - generic [ref=e151]: 1 subcollections
+                    - button "Subcollections" [ref=e153]:
+                      - generic [ref=e154]: Subcollections
+                      - img
+                  - link "View Collection" [ref=e155] [cursor=pointer]:
+                    - /url: /collections/1368687f-5574-4603-be39-d60cbf831a80
+                    - text: View Collection
+                    - img
+              - generic [ref=e156]:
+                - generic [ref=e157]:
+                  - generic [ref=e158]:
+                    - generic [ref=e159]: This is a collection with a very long name
+                    - img [ref=e161]
+                  - paragraph [ref=e164]: This is a very long description, it just goes on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on and on
+                  - button [ref=e166]:
+                    - img
+                - generic [ref=e167]:
+                  - generic [ref=e168]:
+                    - generic [ref=e169]:
+                      - generic [ref=e170]: 0 bobbleheads
+                      - generic [ref=e171]: 2 subcollections
+                    - button "Subcollections" [ref=e173]:
+                      - generic [ref=e174]: Subcollections
+                      - img
+                  - link "View Collection" [ref=e175] [cursor=pointer]:
+                    - /url: /collections/709dd4df-e83a-4787-8df5-4ab757fb61ce
+                    - text: View Collection
+                    - img
+  - generic [ref=e176]:
+    - img [ref=e178]
+    - button "Open Tanstack query devtools" [ref=e226] [cursor=pointer]:
+      - img [ref=e227] [cursor=pointer]
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e280] [cursor=pointer]:
+    - img [ref=e281] [cursor=pointer]
+  - alert [ref=e284]
+```

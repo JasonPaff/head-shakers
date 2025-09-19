@@ -1,16 +1,18 @@
 import type { ComponentProps } from 'react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { cn } from '@/utils/tailwind-utils';
 
-type CardActionProps = ComponentProps<'div'>;
-type CardContentProps = ComponentProps<'div'>;
-type CardDescriptionProps = ComponentProps<'div'>;
-type CardFooterProps = ComponentProps<'div'>;
-type CardHeaderProps = ComponentProps<'div'>;
-type CardProps = ComponentProps<'div'>;
-type CardTitleProps = ComponentProps<'div'>;
+type CardActionProps = ComponentProps<'div'> & ComponentTestIdProps;
+type CardContentProps = ComponentProps<'div'> & ComponentTestIdProps;
+type CardDescriptionProps = ComponentProps<'div'> & ComponentTestIdProps;
+type CardFooterProps = ComponentProps<'div'> & ComponentTestIdProps;
+type CardHeaderProps = ComponentProps<'div'> & ComponentTestIdProps;
+type CardProps = ComponentProps<'div'> & ComponentTestIdProps;
+type CardTitleProps = ComponentProps<'div'> & ComponentTestIdProps;
 
-export const Card = ({ className, ...props }: CardProps) => {
+export const Card = ({ className, testId, ...props }: CardProps) => {
   return (
     <div
       className={cn(
@@ -21,36 +23,39 @@ export const Card = ({ className, ...props }: CardProps) => {
         className,
       )}
       data-slot={'card'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const CardAction = ({ className, ...props }: CardActionProps) => {
+export const CardAction = ({ className, testId, ...props }: CardActionProps) => {
   return (
     <div
       className={cn(`col-start-2 row-span-2 row-start-1 self-start justify-self-end`, className)}
       data-slot={'card-action'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const CardContent = ({ className, ...props }: CardContentProps) => {
-  return <div className={cn('px-6', className)} data-slot={'card-content'} {...props} />;
+export const CardContent = ({ className, testId, ...props }: CardContentProps) => {
+  return <div className={cn('px-6', className)} data-slot={'card-content'} data-testid={testId} {...props} />;
 };
 
-export const CardDescription = ({ className, ...props }: CardDescriptionProps) => {
+export const CardDescription = ({ className, testId, ...props }: CardDescriptionProps) => {
   return (
     <div
       className={cn('text-sm text-muted-foreground', className)}
       data-slot={'card-description'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const CardFooter = ({ className, ...props }: CardFooterProps) => {
+export const CardFooter = ({ className, testId, ...props }: CardFooterProps) => {
   return (
     <div
       className={cn(
@@ -61,12 +66,13 @@ export const CardFooter = ({ className, ...props }: CardFooterProps) => {
         className,
       )}
       data-slot={'card-footer'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const CardHeader = ({ className, ...props }: CardHeaderProps) => {
+export const CardHeader = ({ className, testId, ...props }: CardHeaderProps) => {
   return (
     <div
       className={cn(
@@ -79,11 +85,12 @@ export const CardHeader = ({ className, ...props }: CardHeaderProps) => {
         className,
       )}
       data-slot={'card-header'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const CardTitle = ({ className, ...props }: CardTitleProps) => {
-  return <div className={cn('leading-none font-semibold', className)} data-slot={'card-title'} {...props} />;
+export const CardTitle = ({ className, testId, ...props }: CardTitleProps) => {
+  return <div className={cn('leading-none font-semibold', className)} data-slot={'card-title'} data-testid={testId} {...props} />;
 };

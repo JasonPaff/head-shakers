@@ -9,7 +9,11 @@ import type {
 
 import { db } from '@/lib/db';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { createProtectedQueryContext, createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
+import {
+  createProtectedQueryContext,
+  createPublicQueryContext,
+  createUserQueryContext,
+} from '@/lib/queries/base/query-context';
 import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
@@ -209,6 +213,7 @@ export class SubcollectionsFacade {
       const context: FacadeErrorContext = {
         data: { collectionId },
         facade: 'SubcollectionsFacade',
+        // eslint-disable-next-line no-secrets/no-secrets
         method: 'getSubCollectionsForPublicView',
         operation: 'getForPublicView',
         userId: viewerUserId,

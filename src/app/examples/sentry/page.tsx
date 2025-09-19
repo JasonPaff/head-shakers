@@ -62,6 +62,7 @@ export default function SentryExamplePage() {
         <p>
           Click the button below, and view the sample error on the Sentry{' '}
           <a
+            // eslint-disable-next-line no-secrets/no-secrets
             href={'https://sleepy-bookworm-software.sentry.io/issues/?project=4509874137530368'}
             rel={'noreferrer'}
             target={'_blank'}

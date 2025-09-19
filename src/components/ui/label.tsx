@@ -6,6 +6,8 @@ import type { ComponentProps } from 'react';
 import { Root as LabelRoot } from '@radix-ui/react-label';
 import { cva } from 'class-variance-authority';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { cn } from '@/utils/tailwind-utils';
 
 const styles = cva(
@@ -21,11 +23,11 @@ const styles = cva(
   },
 );
 
-type LabelProps = ComponentProps<typeof LabelRoot> & VariantProps<typeof styles>;
+type LabelProps = ComponentProps<typeof LabelRoot> & ComponentTestIdProps & VariantProps<typeof styles>;
 
-export const Label = ({ children, className, variant, ...props }: LabelProps) => {
+export const Label = ({ children, className, testId, variant, ...props }: LabelProps) => {
   return (
-    <LabelRoot className={cn(styles({ variant }), className)} data-slot={'label'} {...props}>
+    <LabelRoot className={cn(styles({ variant }), className)} data-slot={'label'} data-testid={testId} {...props}>
       {children}
     </LabelRoot>
   );

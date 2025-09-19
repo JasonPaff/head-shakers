@@ -5,6 +5,8 @@ import type { ComponentProps } from 'react';
 import { ActivityIcon, CopyleftIcon, PlusIcon, SettingsIcon, ShieldIcon, UploadIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { AppSidebarNavMain } from '@/components/layout/app-sidebar/components/app-sidebar-nav-main';
 import { AppSidebarNavSecondary } from '@/components/layout/app-sidebar/components/app-sidebar-nav-secondary';
 import { Sidebar } from '@/components/ui/sidebar/sidebar';
@@ -86,7 +88,7 @@ const useNavigationData = () => {
   return { navMain, navSecondary };
 };
 
-type AppSidebarProps = ComponentProps<typeof Sidebar>;
+type AppSidebarProps = ComponentProps<typeof Sidebar> & ComponentTestIdProps;
 
 export const AppSidebar = ({ ...props }: AppSidebarProps) => {
   const { navMain, navSecondary } = useNavigationData();
