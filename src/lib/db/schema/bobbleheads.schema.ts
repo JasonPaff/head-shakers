@@ -131,7 +131,6 @@ export const bobbleheads = pgTable(
       table.createdAt,
     ),
     // public browse optimization - for homepage/explore views
-    // eslint-disable-next-line no-secrets/no-secrets
     index('bobbleheads_public_browse_covering_idx').on(
       table.isPublic,
       table.isFeatured,

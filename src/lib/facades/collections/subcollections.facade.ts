@@ -213,7 +213,6 @@ export class SubcollectionsFacade {
       const context: FacadeErrorContext = {
         data: { collectionId },
         facade: 'SubcollectionsFacade',
-        // eslint-disable-next-line no-secrets/no-secrets
         method: 'getSubCollectionsForPublicView',
         operation: 'getForPublicView',
         userId: viewerUserId,

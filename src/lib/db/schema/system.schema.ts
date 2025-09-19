@@ -1,4 +1,3 @@
-/* eslint-disable no-secrets/no-secrets */
 import { sql } from 'drizzle-orm';
 import {
   boolean,
