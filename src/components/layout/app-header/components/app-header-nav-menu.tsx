@@ -2,6 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 
+import { EarthIcon } from 'lucide-react';
 import {
   ClockIcon,
   CompassIcon,
@@ -70,6 +71,12 @@ const navigationLinks: Array<NavigationLink> = [
     icon: GridIcon,
     items: [
       {
+        description: "Discover the featured bobbleheads and collections'",
+        href: $path({ route: '/browse' }),
+        icon: EarthIcon,
+        title: 'Browse Home',
+      },
+      {
         description: 'Baseball, football, basketball and more sports bobbleheads',
         href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'sports' } }),
         icon: TrophyIcon,
@@ -95,7 +102,7 @@ const navigationLinks: Array<NavigationLink> = [
     items: [
       {
         description: 'Discover the most active collectors in the community',
-        href: $path({ route: '/browse' }),
+        href: $path({ route: '/browse/featured' }),
         icon: UsersIcon,
         title: 'Top Collectors',
       },
