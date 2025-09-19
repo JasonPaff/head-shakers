@@ -28,6 +28,7 @@ export default defineConfig({
         storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
+      testMatch: /.*\.spec\.ts/,
     },
     {
       name: 'firefox',
@@ -36,6 +37,7 @@ export default defineConfig({
         storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
+      testMatch: /.*\.spec\.ts/,
     },
     {
       name: 'webkit',
@@ -44,6 +46,7 @@ export default defineConfig({
         storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
+      testMatch: /.*\.spec\.ts/,
     },
   ],
 

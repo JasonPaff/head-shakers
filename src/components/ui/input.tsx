@@ -7,6 +7,7 @@ import { SearchIcon, XIcon } from 'lucide-react';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 import { Conditional } from './conditional';
@@ -19,6 +20,9 @@ type InputProps = ComponentProps<'input'> &
   };
 
 export const Input = ({ className, isClearable, isSearch, onClear, testId, type, ...props }: InputProps) => {
+  const inputTestId = testId || generateTestId('ui', 'input');
+  const clearButtonTestId = generateTestId('ui', 'button', 'clear');
+
   const handleInputClear = () => {
     props.onChange?.({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
     onClear?.();
@@ -42,7 +46,7 @@ export const Input = ({ className, isClearable, isSearch, onClear, testId, type,
           className,
         )}
         data-slot={'input'}
-        data-testid={testId}
+        data-testid={inputTestId}
         type={type}
         {...props}
       />
@@ -61,6 +65,7 @@ export const Input = ({ className, isClearable, isSearch, onClear, testId, type,
           className={'absolute top-1/2 right-2 size-6 -translate-y-1/2'}
           onClick={handleInputClear}
           size={'icon'}
+          testId={clearButtonTestId}
           variant={'ghost'}
         >
           <XIcon aria-hidden aria-label={'clear input'} className={'size-4.5'} />

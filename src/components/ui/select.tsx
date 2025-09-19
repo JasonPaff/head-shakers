@@ -5,6 +5,9 @@ import type { ComponentProps } from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 export interface SelectOptionType {
@@ -15,19 +18,21 @@ type SelectContentProps = ComponentProps<typeof SelectPrimitive.Content>;
 type SelectGroupProps = ComponentProps<typeof SelectPrimitive.Group>;
 type SelectItemProps = ComponentProps<typeof SelectPrimitive.Item>;
 type SelectLabelProps = ComponentProps<typeof SelectPrimitive.Label>;
-type SelectProps = ComponentProps<typeof SelectPrimitive.Root>;
+type SelectProps = ComponentProps<typeof SelectPrimitive.Root> & ComponentTestIdProps;
 type SelectScrollDownButtonProps = ComponentProps<typeof SelectPrimitive.ScrollDownButton>;
 type SelectScrollUpButtonProps = ComponentProps<typeof SelectPrimitive.ScrollUpButton>;
 type SelectSeparatorProps = ComponentProps<typeof SelectPrimitive.Separator>;
-type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger> & {
+type SelectTriggerProps = ComponentProps<typeof SelectPrimitive.Trigger> & ComponentTestIdProps & {
   size?: 'default' | 'sm';
 };
 
 type SelectValueProps = ComponentProps<typeof SelectPrimitive.Value>;
 
-export const Select = ({ children, ...props }: SelectProps) => {
+export const Select = ({ children, testId, ...props }: SelectProps) => {
+  const selectTestId = testId || generateTestId('ui', 'select');
+
   return (
-    <SelectPrimitive.Root data-slot={'select'} {...props}>
+    <SelectPrimitive.Root data-slot={'select'} data-testid={selectTestId} {...props}>
       {children}
     </SelectPrimitive.Root>
   );
@@ -151,7 +156,9 @@ export const SelectSeparator = ({ children, className, ...props }: SelectSeparat
   );
 };
 
-export const SelectTrigger = ({ children, className, size = 'default', ...props }: SelectTriggerProps) => {
+export const SelectTrigger = ({ children, className, size = 'default', testId, ...props }: SelectTriggerProps) => {
+  const selectTriggerTestId = testId;
+
   return (
     <SelectPrimitive.Trigger
       className={cn(
@@ -170,6 +177,7 @@ export const SelectTrigger = ({ children, className, size = 'default', ...props 
       )}
       data-size={size}
       data-slot={'select-trigger'}
+      data-testid={selectTriggerTestId}
       {...props}
     >
       {children}

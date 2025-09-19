@@ -3,6 +3,9 @@ import type { ComponentProps } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 const badgeVariants = cva(
@@ -31,9 +34,11 @@ const badgeVariants = cva(
   },
 );
 
-type BadgeProps = ComponentProps<'span'> & VariantProps<typeof badgeVariants> & { asChild?: boolean };
+type BadgeProps = ComponentProps<'span'> & ComponentTestIdProps & VariantProps<typeof badgeVariants> & { asChild?: boolean };
 
-export const Badge = ({ asChild = false, className, variant, ...props }: BadgeProps) => {
+export const Badge = ({ asChild = false, className, testId, variant, ...props }: BadgeProps) => {
   const Comp = asChild ? Slot : 'span';
-  return <Comp className={cn(badgeVariants({ variant }), className)} data-slot={'badge'} {...props} />;
+  const badgeTestId = testId || generateTestId('ui', 'badge');
+
+  return <Comp className={cn(badgeVariants({ variant }), className)} data-slot={'badge'} data-testid={badgeTestId} {...props} />;
 };

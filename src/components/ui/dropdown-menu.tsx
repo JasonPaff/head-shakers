@@ -21,39 +21,43 @@ import {
 } from '@radix-ui/react-dropdown-menu';
 import { CheckIcon, ChevronRightIcon, CircleIcon } from 'lucide-react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type DropdownMenuCheckboxItemProps = ComponentProps<typeof CheckboxItem>;
-type DropdownMenuContentProps = ComponentProps<typeof Content>;
-type DropdownMenuGroupProps = ComponentProps<typeof Group>;
-type DropdownMenuItemProps = ComponentProps<typeof Item> & {
+type DropdownMenuCheckboxItemProps = ComponentProps<typeof CheckboxItem> & ComponentTestIdProps;
+type DropdownMenuContentProps = ComponentProps<typeof Content> & ComponentTestIdProps;
+type DropdownMenuGroupProps = ComponentProps<typeof Group> & ComponentTestIdProps;
+type DropdownMenuItemProps = ComponentProps<typeof Item> & ComponentTestIdProps & {
   isInset?: boolean;
   variant?: 'default' | 'destructive';
 };
-type DropdownMenuLabelProps = ComponentProps<typeof Label> & {
+type DropdownMenuLabelProps = ComponentProps<typeof Label> & ComponentTestIdProps & {
   isInset?: boolean;
 };
-type DropdownMenuPortalProps = ComponentProps<typeof Portal>;
-type DropdownMenuProps = ComponentProps<typeof Root>;
-type DropdownMenuRadioGroupProps = ComponentProps<typeof RadioGroup>;
-type DropdownMenuRadioItemProps = ComponentProps<typeof RadioItem>;
-type DropdownMenuSeparatorProps = ComponentProps<typeof Separator>;
-type DropdownMenuShortcutProps = ComponentProps<'span'>;
-type DropdownMenuSubContentProps = ComponentProps<typeof SubContent>;
-type DropdownMenuSubProps = ComponentProps<typeof Sub>;
-type DropdownMenuSubTriggerProps = ComponentProps<typeof SubTrigger> & {
+type DropdownMenuPortalProps = ComponentProps<typeof Portal> & ComponentTestIdProps;
+type DropdownMenuProps = ComponentProps<typeof Root> & ComponentTestIdProps;
+type DropdownMenuRadioGroupProps = ComponentProps<typeof RadioGroup> & ComponentTestIdProps;
+type DropdownMenuRadioItemProps = ComponentProps<typeof RadioItem> & ComponentTestIdProps;
+type DropdownMenuSeparatorProps = ComponentProps<typeof Separator> & ComponentTestIdProps;
+type DropdownMenuShortcutProps = ComponentProps<'span'> & ComponentTestIdProps;
+type DropdownMenuSubContentProps = ComponentProps<typeof SubContent> & ComponentTestIdProps;
+type DropdownMenuSubProps = ComponentProps<typeof Sub> & ComponentTestIdProps;
+type DropdownMenuSubTriggerProps = ComponentProps<typeof SubTrigger> & ComponentTestIdProps & {
   isInset?: boolean;
 };
-type DropdownMenuTriggerProps = ComponentProps<typeof Trigger>;
+type DropdownMenuTriggerProps = ComponentProps<typeof Trigger> & ComponentTestIdProps;
 
-export const DropdownMenu = ({ ...props }: DropdownMenuProps) => {
-  return <Root data-slot={'dropdown-menu'} {...props} />;
+export const DropdownMenu = ({ testId = generateTestId('ui', 'dropdown-menu'), ...props }: DropdownMenuProps) => {
+  return <Root data-slot={'dropdown-menu'} data-testid={testId} {...props} />;
 };
 
 export const DropdownMenuCheckboxItem = ({
   checked,
   children,
   className,
+  testId = generateTestId('ui', 'dropdown-menu-checkbox-item'),
   ...props
 }: DropdownMenuCheckboxItemProps) => {
   return (
@@ -67,6 +71,7 @@ export const DropdownMenuCheckboxItem = ({
         className,
       )}
       data-slot={'dropdown-menu-checkbox-item'}
+      data-testid={testId}
       {...props}
     >
       <span className={'pointer-events-none absolute left-2 flex size-3.5 items-center justify-center'}>
@@ -79,7 +84,7 @@ export const DropdownMenuCheckboxItem = ({
   );
 };
 
-export const DropdownMenuContent = ({ className, sideOffset = 4, ...props }: DropdownMenuContentProps) => {
+export const DropdownMenuContent = ({ className, sideOffset = 4, testId = generateTestId('ui', 'dropdown-menu-content'), ...props }: DropdownMenuContentProps) => {
   return (
     <Portal>
       <Content
@@ -94,6 +99,7 @@ export const DropdownMenuContent = ({ className, sideOffset = 4, ...props }: Dro
           className,
         )}
         data-slot={'dropdown-menu-content'}
+        data-testid={testId}
         sideOffset={sideOffset}
         {...props}
       />
@@ -101,13 +107,14 @@ export const DropdownMenuContent = ({ className, sideOffset = 4, ...props }: Dro
   );
 };
 
-export const DropdownMenuGroup = ({ ...props }: DropdownMenuGroupProps) => {
-  return <Group data-slot={'dropdown-menu-group'} {...props} />;
+export const DropdownMenuGroup = ({ testId = generateTestId('ui', 'dropdown-menu-group'), ...props }: DropdownMenuGroupProps) => {
+  return <Group data-slot={'dropdown-menu-group'} data-testid={testId} {...props} />;
 };
 
 export const DropdownMenuItem = ({
   className,
   isInset,
+  testId = generateTestId('ui', 'dropdown-menu-item'),
   variant = 'default',
   ...props
 }: DropdownMenuItemProps) => {
@@ -125,32 +132,34 @@ export const DropdownMenuItem = ({
       )}
       data-inset={isInset}
       data-slot={'dropdown-menu-item'}
+      data-testid={testId}
       data-variant={variant}
       {...props}
     />
   );
 };
 
-export const DropdownMenuLabel = ({ className, isInset, ...props }: DropdownMenuLabelProps) => {
+export const DropdownMenuLabel = ({ className, isInset, testId = generateTestId('ui', 'dropdown-menu-label'), ...props }: DropdownMenuLabelProps) => {
   return (
     <Label
       className={cn('px-2 py-1.5 text-sm font-medium data-[inset]:pl-8', className)}
       data-inset={isInset}
       data-slot={'dropdown-menu-label'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const DropdownMenuPortal = ({ ...props }: DropdownMenuPortalProps) => {
-  return <Portal data-slot={'dropdown-menu-portal'} {...props} />;
+export const DropdownMenuPortal = ({ testId = generateTestId('ui', 'dropdown-menu-portal'), ...props }: DropdownMenuPortalProps) => {
+  return <Portal data-slot={'dropdown-menu-portal'} data-testid={testId} {...props} />;
 };
 
-export const DropdownMenuRadioGroup = ({ ...props }: DropdownMenuRadioGroupProps) => {
-  return <RadioGroup data-slot={'dropdown-menu-radio-group'} {...props} />;
+export const DropdownMenuRadioGroup = ({ testId = generateTestId('ui', 'dropdown-menu-radio-group'), ...props }: DropdownMenuRadioGroupProps) => {
+  return <RadioGroup data-slot={'dropdown-menu-radio-group'} data-testid={testId} {...props} />;
 };
 
-export const DropdownMenuRadioItem = ({ children, className, ...props }: DropdownMenuRadioItemProps) => {
+export const DropdownMenuRadioItem = ({ children, className, testId = generateTestId('ui', 'dropdown-menu-radio-item'), ...props }: DropdownMenuRadioItemProps) => {
   return (
     <RadioItem
       className={cn(
@@ -161,6 +170,7 @@ export const DropdownMenuRadioItem = ({ children, className, ...props }: Dropdow
         className,
       )}
       data-slot={'dropdown-menu-radio-item'}
+      data-testid={testId}
       {...props}
     >
       <span className={'pointer-events-none absolute left-2 flex size-3.5 items-center justify-center'}>
@@ -173,31 +183,33 @@ export const DropdownMenuRadioItem = ({ children, className, ...props }: Dropdow
   );
 };
 
-export const DropdownMenuSeparator = ({ className, ...props }: DropdownMenuSeparatorProps) => {
+export const DropdownMenuSeparator = ({ className, testId = generateTestId('ui', 'dropdown-menu-separator'), ...props }: DropdownMenuSeparatorProps) => {
   return (
     <Separator
       className={cn('-mx-1 my-1 h-px bg-border', className)}
       data-slot={'dropdown-menu-separator'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const DropdownMenuShortcut = ({ className, ...props }: DropdownMenuShortcutProps) => {
+export const DropdownMenuShortcut = ({ className, testId = generateTestId('ui', 'dropdown-menu-shortcut'), ...props }: DropdownMenuShortcutProps) => {
   return (
     <span
       className={cn('ml-auto text-xs tracking-widest text-muted-foreground', className)}
       data-slot={'dropdown-menu-shortcut'}
+      data-testid={testId}
       {...props}
     />
   );
 };
 
-export const DropdownMenuSub = ({ ...props }: DropdownMenuSubProps) => {
-  return <Sub data-slot={'dropdown-menu-sub'} {...props} />;
+export const DropdownMenuSub = ({ testId = generateTestId('ui', 'dropdown-menu-sub'), ...props }: DropdownMenuSubProps) => {
+  return <Sub data-slot={'dropdown-menu-sub'} data-testid={testId} {...props} />;
 };
 
-export const DropdownMenuSubContent = ({ className, ...props }: DropdownMenuSubContentProps) => {
+export const DropdownMenuSubContent = ({ className, testId = generateTestId('ui', 'dropdown-menu-sub-content'), ...props }: DropdownMenuSubContentProps) => {
   return (
     <SubContent
       className={cn(
@@ -210,6 +222,7 @@ export const DropdownMenuSubContent = ({ className, ...props }: DropdownMenuSubC
         className,
       )}
       data-slot={'dropdown-menu-sub-content'}
+      data-testid={testId}
       {...props}
     />
   );
@@ -219,6 +232,7 @@ export const DropdownMenuSubTrigger = ({
   children,
   className,
   isInset,
+  testId = generateTestId('ui', 'dropdown-menu-sub-trigger'),
   ...props
 }: DropdownMenuSubTriggerProps) => {
   return (
@@ -232,6 +246,7 @@ export const DropdownMenuSubTrigger = ({
       )}
       data-inset={isInset}
       data-slot={'dropdown-menu-sub-trigger'}
+      data-testid={testId}
       {...props}
     >
       {children}
@@ -240,6 +255,6 @@ export const DropdownMenuSubTrigger = ({
   );
 };
 
-export const DropdownMenuTrigger = ({ ...props }: DropdownMenuTriggerProps) => {
-  return <Trigger data-slot={'dropdown-menu-trigger'} {...props} />;
+export const DropdownMenuTrigger = ({ testId = generateTestId('ui', 'dropdown-menu-trigger'), ...props }: DropdownMenuTriggerProps) => {
+  return <Trigger data-slot={'dropdown-menu-trigger'} data-testid={testId} {...props} />;
 };

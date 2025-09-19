@@ -8,6 +8,7 @@ import { XIcon } from 'lucide-react';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Conditional } from '@/components/ui/conditional';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close> & ComponentTestIdProps;
@@ -25,8 +26,10 @@ type DialogTitleProps = ComponentProps<typeof DialogPrimitive.Title> & Component
 type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger> & ComponentTestIdProps;
 
 export const Dialog = ({ children, testId, ...props }: DialogProps) => {
+  const dialogTestId = testId || generateTestId('ui', 'dialog');
+
   return (
-    <DialogPrimitive.Root data-slot={'dialog'} data-testid={testId} {...props}>
+    <DialogPrimitive.Root data-slot={'dialog'} data-testid={dialogTestId} {...props}>
       {children}
     </DialogPrimitive.Root>
   );
@@ -47,6 +50,9 @@ export const DialogContent = ({
   testId,
   ...props
 }: DialogContentProps) => {
+  const dialogContentTestId = testId;
+  const closeButtonTestId = testId ? `${testId}-close` : generateTestId('ui', 'dialog', 'close');
+
   return (
     <DialogPortal data-slot={'dialog-portal'}>
       <DialogOverlay />
@@ -60,7 +66,7 @@ export const DialogContent = ({
           className,
         )}
         data-slot={'dialog-content'}
-        data-testid={testId}
+        data-testid={dialogContentTestId}
         {...props}
       >
         {children}
@@ -76,7 +82,7 @@ export const DialogContent = ({
               "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
             )}
             data-slot={'dialog-close'}
-            data-testid={testId ? `${testId}-close` : undefined}
+            data-testid={closeButtonTestId}
           >
             <XIcon aria-hidden className={'size-4'} />
             <span className={'sr-only'}>Close</span>

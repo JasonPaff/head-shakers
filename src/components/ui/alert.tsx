@@ -4,6 +4,9 @@ import { cva } from 'class-variance-authority';
 import { CircleAlertIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon } from 'lucide-react';
 import { useMemo } from 'react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 const style = cva('me-3 -mt-0.5 inline-flex size-5', {
@@ -33,13 +36,14 @@ const getIcon = (variant: VariantProps<typeof style>['variant']) => {
   }
 };
 
-type AlertProps = Children<ClassName<VariantProps<typeof style>>>;
+type AlertProps = Children<ClassName<VariantProps<typeof style>>> & ComponentTestIdProps;
 
-export const Alert = ({ children, className, variant }: AlertProps) => {
+export const Alert = ({ children, className, testId, variant }: AlertProps) => {
   const Icon = useMemo(() => getIcon(variant), [variant]);
+  const alertTestId = testId || generateTestId('ui', 'alert');
 
   return (
-    <div className={'rounded-md border px-4 py-3'}>
+    <div className={'rounded-md border px-4 py-3'} data-testid={alertTestId}>
       <p className={'text-sm'}>
         <Icon aria-hidden className={cn(style({ variant }), className)} />
         {children}

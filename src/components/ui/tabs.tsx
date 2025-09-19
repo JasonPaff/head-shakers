@@ -4,25 +4,33 @@ import type { ComponentProps } from 'react';
 
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type TabsProps = ComponentProps<typeof TabsPrimitive.Root>;
+type TabsProps = ComponentProps<typeof TabsPrimitive.Root> & ComponentTestIdProps;
 
-export const Tabs = ({ children, className, ...props }: TabsProps) => {
+export const Tabs = ({ children, className, testId, ...props }: TabsProps) => {
+  const tabsTestId = testId || generateTestId('ui', 'tabs');
+
   return (
-    <TabsPrimitive.Root className={cn('flex flex-col gap-2', className)} data-slot={'tabs'} {...props}>
+    <TabsPrimitive.Root className={cn('flex flex-col gap-2', className)} data-slot={'tabs'} data-testid={tabsTestId} {...props}>
       {children}
     </TabsPrimitive.Root>
   );
 };
 
-type TabsContentProps = ComponentProps<typeof TabsPrimitive.Content>;
+type TabsContentProps = ComponentProps<typeof TabsPrimitive.Content> & ComponentTestIdProps;
 
-export const TabsContent = ({ children, className, ...props }: TabsContentProps) => {
+export const TabsContent = ({ children, className, testId, ...props }: TabsContentProps) => {
+  const tabsContentTestId = testId;
+
   return (
     <TabsPrimitive.Content
       className={cn('flex-1 outline-none', className)}
       data-slot={'tabs-content'}
+      data-testid={tabsContentTestId}
       {...props}
     >
       {children}
@@ -30,9 +38,11 @@ export const TabsContent = ({ children, className, ...props }: TabsContentProps)
   );
 };
 
-type TabsListProps = ComponentProps<typeof TabsPrimitive.List>;
+type TabsListProps = ComponentProps<typeof TabsPrimitive.List> & ComponentTestIdProps;
 
-export const TabsList = ({ children, className, ...props }: TabsListProps) => {
+export const TabsList = ({ children, className, testId, ...props }: TabsListProps) => {
+  const tabsListTestId = testId;
+
   return (
     <TabsPrimitive.List
       className={cn(
@@ -41,6 +51,7 @@ export const TabsList = ({ children, className, ...props }: TabsListProps) => {
         className,
       )}
       data-slot={'tabs-list'}
+      data-testid={tabsListTestId}
       {...props}
     >
       {children}
@@ -48,9 +59,11 @@ export const TabsList = ({ children, className, ...props }: TabsListProps) => {
   );
 };
 
-type TabsTriggerProps = ComponentProps<typeof TabsPrimitive.Trigger>;
+type TabsTriggerProps = ComponentProps<typeof TabsPrimitive.Trigger> & ComponentTestIdProps;
 
-export const TabsTrigger = ({ children, className, ...props }: TabsTriggerProps) => {
+export const TabsTrigger = ({ children, className, testId, ...props }: TabsTriggerProps) => {
+  const tabsTriggerTestId = testId;
+
   return (
     <TabsPrimitive.Trigger
       className={cn(
@@ -66,6 +79,7 @@ export const TabsTrigger = ({ children, className, ...props }: TabsTriggerProps)
         className,
       )}
       data-slot={'tabs-trigger'}
+      data-testid={tabsTriggerTestId}
       {...props}
     >
       {children}

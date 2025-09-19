@@ -1,10 +1,15 @@
 import type { ComponentProps } from 'react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type TextareaProps = ComponentProps<'textarea'>;
+type TextareaProps = ComponentProps<'textarea'> & ComponentTestIdProps;
 
-export const Textarea = ({ children, className, ...props }: TextareaProps) => {
+export const Textarea = ({ children, className, testId, ...props }: TextareaProps) => {
+  const textareaTestId = testId || generateTestId('ui', 'textarea');
+
   return (
     <textarea
       className={cn(
@@ -17,6 +22,7 @@ export const Textarea = ({ children, className, ...props }: TextareaProps) => {
         className,
       )}
       data-slot={'textarea'}
+      data-testid={textareaTestId}
       {...props}
     >
       {children}

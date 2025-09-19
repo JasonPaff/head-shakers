@@ -6,6 +6,7 @@ import { cva } from 'class-variance-authority';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 export const buttonVariants = cva(
@@ -80,12 +81,13 @@ export type ButtonProps = ComponentProps<'button'> &
 
 export const Button = ({ asChild = false, className, size, testId, variant, ...props }: ButtonProps) => {
   const Comp = asChild ? Slot : 'button';
+  const buttonTestId = testId || generateTestId('ui', 'button');
 
   return (
     <Comp
       className={cn(buttonVariants({ className, size, variant }))}
       data-slot={'button'}
-      data-testid={testId}
+      data-testid={buttonTestId}
       type={'button'}
       {...props}
     />

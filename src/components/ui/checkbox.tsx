@@ -5,11 +5,16 @@ import type { ComponentProps } from 'react';
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
 import { CheckIcon } from 'lucide-react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root>;
+type CheckboxProps = ComponentProps<typeof CheckboxPrimitive.Root> & ComponentTestIdProps;
 
-export const Checkbox = ({ className, ...props }: CheckboxProps) => {
+export const Checkbox = ({ className, testId, ...props }: CheckboxProps) => {
+  const checkboxTestId = testId || generateTestId('ui', 'checkbox');
+
   return (
     <CheckboxPrimitive.Root
       className={cn(
@@ -23,6 +28,7 @@ export const Checkbox = ({ className, ...props }: CheckboxProps) => {
         className,
       )}
       data-slot={'checkbox'}
+      data-testid={checkboxTestId}
       {...props}
     >
       <CheckboxPrimitive.Indicator
