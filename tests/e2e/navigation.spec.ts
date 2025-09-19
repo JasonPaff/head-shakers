@@ -1,6 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { $path } from 'next-typesafe-url';
 
+import { testIds } from './helpers/test-helpers';
+
 test.describe('App Navigation', () => {
   test('should navigate through main pages', async ({ page }) => {
     await page.goto($path({ route: '/dashboard/collection' }));
@@ -18,12 +20,12 @@ test.describe('App Navigation', () => {
   test('should show user profile menu', async ({ page }) => {
     await page.goto($path({ route: '/dashboard/collection' }));
 
-    const userButton = page.locator('.cl-userButtonTrigger');
+    const userButton = page.locator(testIds.userButton);
     await expect(userButton).toBeVisible();
 
     await userButton.click();
 
-    const userMenu = page.locator('.cl-userButtonPopoverCard');
+    const userMenu = page.locator(testIds.userMenu);
     await expect(userMenu).toBeVisible();
   });
 

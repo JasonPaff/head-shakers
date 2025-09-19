@@ -71,24 +71,18 @@ export default clerkMiddleware(async (auth, req) => {
 
   // admin routes - require authentication (role checking done at component level)
   if (isAdminRoute(req)) {
-    await auth.protect({
-      unauthenticatedUrl: '/',
-    });
+    await auth.protect();
     return;
   }
 
   // protected routes
   if (isProtectedRoute(req)) {
-    await auth.protect({
-      unauthenticatedUrl: '/',
-    });
+    await auth.protect();
     return;
   }
 
   // for any other routes, protect by default (fail-safe)
-  await auth.protect({
-    unauthenticatedUrl: '/',
-  });
+  await auth.protect();
 });
 
 export const config = {

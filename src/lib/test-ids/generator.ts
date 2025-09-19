@@ -67,14 +67,14 @@ export function generateTestId(
   component: ComponentTestId,
   suffix?: string,
 ): string {
-  const parts: string[] = [namespace, component];
+  const parts: Array<string> = [namespace, component];
 
   if (suffix) {
-    // Normalize suffix to lowercase and replace spaces/special chars with hyphens
+    // normalize suffix to lowercase and replace spaces/special chars with hyphens
     const normalizedSuffix = suffix
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, TESTID_SEPARATOR)
-      .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
+      .replace(/^-+|-+$/g, ''); // remove leading/trailing hyphens
 
     if (normalizedSuffix) {
       parts.push(normalizedSuffix);
@@ -102,35 +102,35 @@ export const testIdBuilder: TestIdBuilder = {
 };
 
 /**
- * Helper function to create form field testid from pattern object
+ * Helper function to create form field testid from the pattern object
  */
 export function createFormFieldTestId(pattern: FormFieldTestIdPattern): string {
   return generateFormFieldTestId(pattern.fieldName, pattern.suffix);
 }
 
 /**
- * Helper function to create table cell testid from pattern object
+ * Helper function to create table cell testid from the pattern object
  */
 export function createTableCellTestId(pattern: TableCellTestIdPattern): string {
   return generateTableCellTestId(pattern.row, pattern.column);
 }
 
 /**
- * Helper function to create testid from pattern object
+ * Helper function to create testid from the pattern object
  */
 export function createTestId(pattern: TestIdPattern): string {
   return generateTestId(pattern.namespace, pattern.component, pattern.suffix);
 }
 
 /**
- * Utility to extract component from a testid
+ * Utility to extract the component from a testid
  */
 export function extractComponent(testId: string): ComponentTestId | null {
   const parts = testId.split(TESTID_SEPARATOR);
 
   if (parts.length >= 2 && parts[1]) {
     const component = parts[1];
-    // Use type guard to check if component is valid
+    // use type guard to check if the component is valid
     if (isValidComponentTestId(component)) {
       return component;
     }
@@ -206,8 +206,21 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'search-command',
     'search-results',
     'content-layout',
+    'action-menu',
+    'bobblehead-nav',
+    'bobblehead-photo',
+    'collection-create-cancel',
+    'collection-create-dialog',
+    'collection-create-form',
+    'collection-create-submit',
+    'collection-edit-cancel',
+    'collection-edit-dialog',
+    'collection-edit-form',
+    'collection-edit-submit',
+    'comments-button',
     'select',
     'separator',
+    'share-button',
     'sheet',
     'skeleton',
     'slider',
@@ -224,6 +237,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'user-avatar',
     'user-nav',
     'user-profile',
+    'view-details-button',
   ] as const;
 
   return validComponents.includes(component as ComponentTestId);

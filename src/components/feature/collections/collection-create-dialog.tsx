@@ -4,8 +4,8 @@ import { revalidateLogic } from '@tanstack/form-core';
 import { useRef } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
-import type { InsertCollectionInput } from '@/lib/validations/collections.validation';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
+import type { InsertCollectionInput } from '@/lib/validations/collections.validation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +33,6 @@ interface CollectionCreateDialogProps extends ComponentTestIdProps {
 
 export const CollectionCreateDialog = withFocusManagement(
   ({ isOpen, onClose, onCollectionCreated, testId }: CollectionCreateDialogProps) => {
-    // Generate testids for components
     const dialogTestId = testId || generateTestId('feature', 'collection-create-dialog');
     const formTestId = generateTestId('feature', 'collection-create-form');
     const cancelButtonTestId = generateTestId('feature', 'collection-create-cancel');
@@ -138,7 +137,12 @@ export const CollectionCreateDialog = withFocusManagement(
 
             {/* Action Buttons */}
             <DialogFooter>
-              <Button disabled={isExecuting} onClick={handleClose} testId={cancelButtonTestId} variant={'outline'}>
+              <Button
+                disabled={isExecuting}
+                onClick={handleClose}
+                testId={cancelButtonTestId}
+                variant={'outline'}
+              >
                 Cancel
               </Button>
               <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>

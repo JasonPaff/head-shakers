@@ -1,15 +1,11 @@
-import type { Page, Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { clerk } from '@clerk/testing/playwright';
 import { $path } from 'next-typesafe-url';
 
-import {
-  generateTestId,
-  generateFormFieldTestId,
-  generateTableCellTestId,
-  type TestIdNamespace,
-  type ComponentTestId,
-} from '@/lib/test-ids';
+import type { ComponentTestId, TestIdNamespace } from '@/lib/test-ids';
+
+import { generateFormFieldTestId, generateTableCellTestId, generateTestId } from '@/lib/test-ids';
 
 export async function signInWithTestUser(page: Page) {
   await page.goto($path({ route: '/' }));
@@ -31,40 +27,38 @@ export async function waitForClerkLoaded(page: Page) {
   await clerk.loaded({ page });
 }
 
-// Enhanced testIds with type-safe testid integration
 export const testIds = {
   // Legacy selectors for backward compatibility
   addBobbleheadButton: '[data-testid="add-bobblehead-button"]',
   bobbleheadCard: '[data-testid="bobblehead-card"]',
   collectionCard: '[data-testid="collection-card"]',
   dashboardHeader: '[data-testid="dashboard-header"]',
-  userButton: '.cl-userButtonTrigger',
-  userMenu: '.cl-userButtonPopoverCard',
+  feature: (component: ComponentTestId, suffix?: string) =>
+    `[data-testid="${generateTestId('feature', component, suffix)}"]`,
+  form: (component: ComponentTestId, suffix?: string) =>
+    `[data-testid="${generateTestId('form', component, suffix)}"]`,
 
+  formField: (fieldName: string, suffix?: string) =>
+    `[data-testid="${generateFormFieldTestId(fieldName, suffix)}"]`,
+  layout: (component: ComponentTestId, suffix?: string) =>
+    `[data-testid="${generateTestId('layout', component, suffix)}"]`,
+  tableCell: (row: number | string, column: string) =>
+    `[data-testid="${generateTableCellTestId(row, column)}"]`,
   // Type-safe testid generators
   ui: (component: ComponentTestId, suffix?: string) =>
     `[data-testid="${generateTestId('ui', component, suffix)}"]`,
-  feature: (component: ComponentTestId, suffix?: string) =>
-    `[data-testid="${generateTestId('feature', component, suffix)}"]`,
-  layout: (component: ComponentTestId, suffix?: string) =>
-    `[data-testid="${generateTestId('layout', component, suffix)}"]`,
-  form: (component: ComponentTestId, suffix?: string) =>
-    `[data-testid="${generateTestId('form', component, suffix)}"]`,
-  formField: (fieldName: string, suffix?: string) =>
-    `[data-testid="${generateFormFieldTestId(fieldName, suffix)}"]`,
-  tableCell: (row: number | string, column: string) =>
-    `[data-testid="${generateTableCellTestId(row, column)}"]`,
+  userButton: '.cl-userButtonTrigger',
+  userMenu: '.cl-userButtonPopoverCard',
 } as const;
 
-// Type-safe component finder utilities for Playwright
 export class ComponentFinder {
   constructor(private page: Page) {}
 
   /**
-   * Find a UI component by testid
+   * Find any component by namespace and component type
    */
-  ui(component: ComponentTestId, suffix?: string): Locator {
-    return this.page.locator(testIds.ui(component, suffix));
+  component(namespace: TestIdNamespace, component: ComponentTestId, suffix?: string): Locator {
+    return this.page.locator(`[data-testid="${generateTestId(namespace, component, suffix)}"]`);
   }
 
   /**
@@ -72,13 +66,6 @@ export class ComponentFinder {
    */
   feature(component: ComponentTestId, suffix?: string): Locator {
     return this.page.locator(testIds.feature(component, suffix));
-  }
-
-  /**
-   * Find a layout component by testid
-   */
-  layout(component: ComponentTestId, suffix?: string): Locator {
-    return this.page.locator(testIds.layout(component, suffix));
   }
 
   /**
@@ -96,6 +83,13 @@ export class ComponentFinder {
   }
 
   /**
+   * Find a layout component by testid
+   */
+  layout(component: ComponentTestId, suffix?: string): Locator {
+    return this.page.locator(testIds.layout(component, suffix));
+  }
+
+  /**
    * Find a table cell by row and column
    */
   tableCell(row: number | string, column: string): Locator {
@@ -103,19 +97,14 @@ export class ComponentFinder {
   }
 
   /**
-   * Find any component by namespace and component type
+   * Find a UI component by testid
    */
-  component(namespace: TestIdNamespace, component: ComponentTestId, suffix?: string): Locator {
-    return this.page.locator(`[data-testid="${generateTestId(namespace, component, suffix)}"]`);
+  ui(component: ComponentTestId, suffix?: string): Locator {
+    return this.page.locator(testIds.ui(component, suffix));
   }
 }
 
-// Helper for creating ComponentFinder
-export function createComponentFinder(page: Page): ComponentFinder {
-  return new ComponentFinder(page);
-}
-
-// TestId assertion utilities for component testing
+// testId assertion utilities for component testing
 export class TestIdAssertions {
   constructor(private page: Page) {}
 
@@ -148,6 +137,11 @@ export class TestIdAssertions {
   }
 }
 
+// Helper for creating ComponentFinder
+export function createComponentFinder(page: Page): ComponentFinder {
+  return new ComponentFinder(page);
+}
+
 // Helper for creating TestIdAssertions
 export function createTestIdAssertions(page: Page): TestIdAssertions {
   return new TestIdAssertions(page);
@@ -166,14 +160,14 @@ export const uiHelpers = {
   dialog: (suffix?: string) => testIds.ui('dialog', suffix),
 
   /**
-   * Get selector for UI input with optional suffix
-   */
-  input: (suffix?: string) => testIds.ui('input', suffix),
-
-  /**
    * Get selector for UI form with optional suffix
    */
   form: (suffix?: string) => testIds.ui('form', suffix),
+
+  /**
+   * Get selector for UI input with optional suffix
+   */
+  input: (suffix?: string) => testIds.ui('input', suffix),
 
   /**
    * Get selector for UI table with optional suffix
@@ -193,14 +187,14 @@ export const featureHelpers = {
   collectionCard: (suffix?: string) => testIds.feature('collection-card', suffix),
 
   /**
-   * Get selector for like button with optional suffix
-   */
-  likeButton: (suffix?: string) => testIds.feature('like-button', suffix),
-
-  /**
    * Get selector for follow button with optional suffix
    */
   followButton: (suffix?: string) => testIds.feature('follow-button', suffix),
+
+  /**
+   * Get selector for like button with optional suffix
+   */
+  likeButton: (suffix?: string) => testIds.feature('like-button', suffix),
 };
 
 export const layoutHelpers = {
@@ -215,14 +209,14 @@ export const layoutHelpers = {
   appSidebar: (suffix?: string) => testIds.layout('app-sidebar', suffix),
 
   /**
-   * Get selector for user nav with optional suffix
-   */
-  userNav: (suffix?: string) => testIds.layout('user-nav', suffix),
-
-  /**
    * Get selector for main nav with optional suffix
    */
   mainNav: (suffix?: string) => testIds.layout('main-nav', suffix),
+
+  /**
+   * Get selector for user nav with optional suffix
+   */
+  userNav: (suffix?: string) => testIds.layout('user-nav', suffix),
 };
 
 // Type-safe route helpers using $path

@@ -25,10 +25,10 @@ async function AddItemPage({ searchParams }: AddItemPageProps) {
 
   return (
     <PageContent>
-      {/* Header Section - No suspense needed (static) */}
+      {/* Header Section */}
       <AddItemHeader />
 
-      {/* Form Section with Suspense */}
+      {/* Form Section */}
       <Suspense fallback={<AddItemFormSkeleton />}>
         <AddItemFormServer initialCollectionId={collectionId} initialSubcollectionId={subcollectionId} />
       </Suspense>

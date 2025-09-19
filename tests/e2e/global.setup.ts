@@ -4,6 +4,8 @@ import { $path } from 'next-typesafe-url';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { testIds } from './helpers/test-helpers';
+
 // setup must be run serially
 setup.describe.configure({ mode: 'serial' });
 
@@ -36,7 +38,7 @@ setup('authenticate and save state to storage', async ({ page }) => {
   await page.goto($path({ route: '/dashboard/collection' }));
 
   // wait for an element that only authenticated users can see
-  await page.waitForSelector('[data-testid="dashboard-header"]', {
+  await page.waitForSelector(testIds.layout('app-header', 'dashboard'), {
     timeout: 10000,
   });
 
