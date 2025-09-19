@@ -128,6 +128,7 @@
     "eslint-plugin-better-tailwindcss": "^3.7.5",
     "eslint-plugin-drizzle": "^0.2.3",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-no-secrets": "^2.2.1",
     "eslint-plugin-perfectionist": "^4.15.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
