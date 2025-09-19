@@ -8,13 +8,15 @@ import { HeartIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
 import type { LikeTargetType } from '@/lib/constants';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useLike } from '@/hooks/use-like';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface LikeButtonBaseProps extends Omit<ComponentProps<typeof Button>, 'onClick'> {
+interface LikeButtonBaseProps extends ComponentTestIdProps, Omit<ComponentProps<typeof Button>, 'onClick'> {
   initialLikeCount: number;
   isInitiallyLiked: boolean;
   onLikeChange?: (isLiked: boolean, likeCount: number) => void;
@@ -35,6 +37,7 @@ export const LikeIconButton = ({
   shouldShowCount = true,
   targetId,
   targetType,
+  testId,
   ...props
 }: LikeIconButtonProps) => {
   const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLike({
@@ -44,6 +47,8 @@ export const LikeIconButton = ({
     targetId,
     targetType,
   });
+
+  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'icon');
 
   const handleClick = () => {
     if (!isSignedIn) return;
@@ -66,6 +71,7 @@ export const LikeIconButton = ({
          dark:bg-gray-800 dark:text-white dark:hover:bg-destructive/75`,
         className,
       )}
+      data-testid={likeButtonTestId}
       disabled={disabled || isPending}
       onClick={handleClick}
       {...props}
@@ -110,6 +116,7 @@ export const LikeTextButton = ({
   shouldShowIcon = true,
   targetId,
   targetType,
+  testId,
   ...props
 }: LikeTextButtonProps) => {
   const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLike({
@@ -119,6 +126,8 @@ export const LikeTextButton = ({
     targetId,
     targetType,
   });
+
+  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'text');
 
   const handleClick = () => {
     if (!isSignedIn) return;
@@ -139,6 +148,7 @@ export const LikeTextButton = ({
       className={cn('disabled:opacity-100', className)}
       disabled={disabled || isPending}
       onClick={handleClick}
+      testId={likeButtonTestId}
       {...props}
     >
       {buttonContent}
@@ -165,6 +175,7 @@ export const LikeCompactButton = ({
   shouldShowIcon = true,
   targetId,
   targetType,
+  testId,
   ...props
 }: LikeCompactButtonProps) => {
   const { isLiked, isPending, isSignedIn, likeCount, toggleLike } = useLike({
@@ -174,6 +185,8 @@ export const LikeCompactButton = ({
     targetId,
     targetType,
   });
+
+  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'compact');
 
   const handleClick = () => {
     if (!isSignedIn) return;
@@ -189,6 +202,7 @@ export const LikeCompactButton = ({
         isLiked ? 'text-destructive' : 'text-muted-foreground hover:text-destructive',
         className,
       )}
+      data-testid={likeButtonTestId}
       disabled={disabled || isPending}
       onClick={handleClick}
       {...props}
@@ -213,6 +227,7 @@ interface CustomLikeButtonProps extends Omit<LikeButtonBaseProps, 'children'> {
     isPending: boolean;
     isSignedIn: boolean;
     likeCount: number;
+    testId: string;
     toggleLike: () => void;
   }) => ReactNode;
 }
@@ -224,6 +239,7 @@ export const CustomLikeButton = ({
   onLikeChange,
   targetId,
   targetType,
+  testId,
 }: CustomLikeButtonProps) => {
   const likeProps = useLike({
     initialLikeCount,
@@ -233,9 +249,12 @@ export const CustomLikeButton = ({
     targetType,
   });
 
+  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'custom');
+
   const childElement = children({
     ...likeProps,
     isSignedIn: likeProps.isSignedIn ?? false,
+    testId: likeButtonTestId,
   });
 
   if (!likeProps.isSignedIn) {

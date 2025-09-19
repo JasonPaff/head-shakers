@@ -3,12 +3,14 @@
 import type { ComponentProps, CSSProperties } from 'react';
 
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
 import { Conditional } from '@/components/ui/conditional';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface TagBadgeProps extends Omit<ComponentProps<typeof Badge>, 'children'> {
+interface TagBadgeProps extends ComponentTestIdProps, Omit<ComponentProps<typeof Badge>, 'children'> {
   isShowUsageCount?: boolean;
   size?: 'default' | 'lg' | 'sm';
   tag: TagRecord;
@@ -19,6 +21,7 @@ export const TagBadge = ({
   isShowUsageCount = false,
   size = 'default',
   tag,
+  testId,
   ...props
 }: TagBadgeProps) => {
   const sizeClasses = {
@@ -27,6 +30,7 @@ export const TagBadge = ({
     sm: 'px-1.5 py-0.5 text-xs',
   };
 
+  const tagBadgeTestId = testId || generateTestId('ui', 'tag-badge');
   const _shouldShowUsageCount = isShowUsageCount && tag.usageCount > 0;
 
   return (
@@ -38,6 +42,7 @@ export const TagBadge = ({
           backgroundColor: 'var(--tag-color)',
         } as CSSProperties
       }
+      testId={tagBadgeTestId}
       variant={'secondary'}
       {...props}
     >
@@ -49,7 +54,7 @@ export const TagBadge = ({
   );
 };
 
-interface TagListProps extends ComponentProps<'div'> {
+interface TagListProps extends ComponentProps<'div'>, ComponentTestIdProps {
   isShowUsageCount?: boolean;
   limit?: number;
   size?: 'default' | 'lg' | 'sm';
@@ -62,18 +67,20 @@ export const TagList = ({
   limit,
   size = 'default',
   tags,
+  testId,
   ...props
 }: TagListProps) => {
   const displayTags = limit ? tags.slice(0, limit) : tags;
   const remainingCount = limit && tags.length > limit ? tags.length - limit : 0;
   const _shouldShowRemainingCount = remainingCount > 0;
+  const tagListTestId = testId || generateTestId('ui', 'tag-list');
 
   if (tags.length === 0) {
     return null;
   }
 
   return (
-    <div className={cn('flex flex-wrap gap-1', className)} {...props}>
+    <div className={cn('flex flex-wrap gap-1', className)} data-testid={tagListTestId} {...props}>
       {displayTags.map((tag) => (
         <TagBadge isShowUsageCount={isShowUsageCount} key={tag.id} size={size} tag={tag} />
       ))}

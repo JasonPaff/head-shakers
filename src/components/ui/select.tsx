@@ -14,10 +14,10 @@ export interface SelectOptionType {
   label: string;
   value: string;
 }
-type SelectContentProps = ComponentProps<typeof SelectPrimitive.Content>;
-type SelectGroupProps = ComponentProps<typeof SelectPrimitive.Group>;
-type SelectItemProps = ComponentProps<typeof SelectPrimitive.Item>;
-type SelectLabelProps = ComponentProps<typeof SelectPrimitive.Label>;
+type SelectContentProps = ComponentProps<typeof SelectPrimitive.Content> & ComponentTestIdProps;
+type SelectGroupProps = ComponentProps<typeof SelectPrimitive.Group> & ComponentTestIdProps;
+type SelectItemProps = ComponentProps<typeof SelectPrimitive.Item> & ComponentTestIdProps;
+type SelectLabelProps = ComponentProps<typeof SelectPrimitive.Label> & ComponentTestIdProps;
 type SelectProps = ComponentProps<typeof SelectPrimitive.Root> & ComponentTestIdProps;
 type SelectScrollDownButtonProps = ComponentProps<typeof SelectPrimitive.ScrollDownButton>;
 type SelectScrollUpButtonProps = ComponentProps<typeof SelectPrimitive.ScrollUpButton>;
@@ -38,7 +38,9 @@ export const Select = ({ children, testId, ...props }: SelectProps) => {
   );
 };
 
-export const SelectContent = ({ children, className, position = 'popper', ...props }: SelectContentProps) => {
+export const SelectContent = ({ children, className, position = 'popper', testId, ...props }: SelectContentProps) => {
+  const selectContentTestId = testId || generateTestId('ui', 'select', 'content');
+
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -58,6 +60,7 @@ export const SelectContent = ({ children, className, position = 'popper', ...pro
           className,
         )}
         data-slot={'select-content'}
+        data-testid={selectContentTestId}
         position={position}
         {...props}
       >
@@ -88,7 +91,9 @@ export const SelectGroup = ({ children, ...props }: SelectGroupProps) => {
   );
 };
 
-export const SelectItem = ({ children, className, ...props }: SelectItemProps) => {
+export const SelectItem = ({ children, className, testId, ...props }: SelectItemProps) => {
+  const selectItemTestId = testId || generateTestId('ui', 'select', 'item');
+
   return (
     <SelectPrimitive.Item
       className={cn(
@@ -96,6 +101,7 @@ export const SelectItem = ({ children, className, ...props }: SelectItemProps) =
         className,
       )}
       data-slot={'select-item'}
+      data-testid={selectItemTestId}
       {...props}
     >
       <span className={'absolute right-2 flex size-3.5 items-center justify-center'}>

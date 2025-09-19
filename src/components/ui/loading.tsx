@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from 'react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface LoadingProps {
+interface LoadingProps extends ComponentTestIdProps {
   message?: string;
 }
 
-export const Loading = ({ message }: LoadingProps) => {
+export const Loading = ({ message, testId }: LoadingProps) => {
   const [dots, setDots] = useState('');
+  const loadingTestId = testId || generateTestId('ui', 'loading');
+  const spinnerTestId = generateTestId('ui', 'loading', 'spinner');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -20,10 +25,10 @@ export const Loading = ({ message }: LoadingProps) => {
   }, []);
 
   return (
-    <div className={'flex min-h-screen items-center justify-center bg-background'}>
+    <div className={'flex min-h-screen items-center justify-center bg-background'} data-testid={loadingTestId}>
       <div className={'space-y-6 text-center'}>
         {/* Clean Spinner */}
-        <div className={'relative mx-auto size-12'}>
+        <div className={'relative mx-auto size-12'} data-testid={spinnerTestId}>
           <div className={'absolute inset-0 rounded-full border-4 border-muted'}></div>
           <div
             className={cn(

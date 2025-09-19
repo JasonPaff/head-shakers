@@ -56,6 +56,7 @@ export type ComponentTestId =
   | 'dropdown-menu-sub-content'
   | 'dropdown-menu-sub-trigger'
   | 'dropdown-menu-trigger'
+  | 'empty-state'
   | 'follow-button'
   | 'form'
   | 'form-description'
@@ -69,6 +70,7 @@ export type ComponentTestId =
   | 'input'
   | 'label'
   | 'like-button'
+  | 'loading'
 
   // Feature Components
   | 'main-nav'
@@ -90,9 +92,12 @@ export type ComponentTestId =
   | 'skeleton'
   | 'slider'
   | 'sonner'
+  | 'spinner'
   | 'switch'
   | 'table'
   | 'tabs'
+  | 'tag-badge'
+  | 'tag-list'
   | 'textarea'
   | 'theme-toggle'
   | 'toast'

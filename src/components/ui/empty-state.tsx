@@ -1,6 +1,9 @@
 import type { ElementType, ReactNode } from 'react';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { Conditional } from '@/components/ui/conditional';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 type EmptyStateProps = ClassName<{
@@ -8,9 +11,11 @@ type EmptyStateProps = ClassName<{
   description: string;
   icon?: ElementType;
   title: string;
-}>;
+}> & ComponentTestIdProps;
 
-export function EmptyState({ action, className, description, icon: Icon, title }: EmptyStateProps) {
+export function EmptyState({ action, className, description, icon: Icon, testId, title }: EmptyStateProps) {
+  const emptyStateTestId = testId || generateTestId('ui', 'empty-state');
+
   return (
     <div
       className={cn(
@@ -18,6 +23,7 @@ export function EmptyState({ action, className, description, icon: Icon, title }
         'rounded-lg border border-dashed bg-card p-8 text-center',
         className,
       )}
+      data-testid={emptyStateTestId}
     >
       {Icon && <Icon aria-hidden className={'mb-4 size-12 text-muted-foreground/50'} />}
       <h3 className={'mb-2 text-lg font-semibold'}>{title}</h3>
