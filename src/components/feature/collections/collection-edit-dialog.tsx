@@ -2,8 +2,8 @@
 
 import { revalidateLogic } from '@tanstack/form-core';
 
-import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
+import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,7 +37,6 @@ interface CollectionForEdit {
 
 export const CollectionEditDialog = withFocusManagement(
   ({ collection, isOpen, onClose, testId }: CollectionEditDialogProps) => {
-    // Generate testids for components
     const dialogTestId = testId || generateTestId('feature', 'collection-edit-dialog');
     const formTestId = generateTestId('feature', 'collection-edit-form');
     const cancelButtonTestId = generateTestId('feature', 'collection-edit-cancel');
@@ -133,7 +132,12 @@ export const CollectionEditDialog = withFocusManagement(
 
             {/* Action Buttons */}
             <DialogFooter>
-              <Button disabled={isExecuting} onClick={handleClose} testId={cancelButtonTestId} variant={'outline'}>
+              <Button
+                disabled={isExecuting}
+                onClick={handleClose}
+                testId={cancelButtonTestId}
+                variant={'outline'}
+              >
                 Cancel
               </Button>
               <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>

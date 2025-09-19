@@ -18,9 +18,8 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 import { useState } from 'react';
 
-import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
-import { generateTestId } from '@/lib/test-ids';
+import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
 import { BobbleheadDeleteDialog } from '@/components/feature/bobblehead/bobblehead-delete-dialog';
 import { Button } from '@/components/ui/button';
@@ -38,6 +37,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
+import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadCommentsDialog } from './bobblehead-comments-dialog';
@@ -63,7 +63,6 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
 }
 
 export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: BobbleheadGalleryCardProps) => {
-  // Generate testids for components
   const cardTestId = testId || generateTestId('feature', 'bobblehead-card');
   const photoAreaTestId = generateTestId('feature', 'bobblehead-photo', 'clickable');
   const prevButtonTestId = generateTestId('feature', 'bobblehead-nav', 'prev');
