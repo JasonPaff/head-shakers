@@ -334,7 +334,6 @@ export const aggregateViewsAction = authActionClient
         message: `Aggregated views for ${result.processedTargets}/${aggregateData.targetIds.length} targets`,
       });
 
-      // Invalidate cache after aggregation
       if (aggregateData.targetType === 'bobblehead' || aggregateData.targetType === 'collection') {
         CacheRevalidationService.analytics.onViewAggregation(
           aggregateData.targetType,
