@@ -8,6 +8,7 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { RecordViewInput } from '@/lib/validations/analytics.validation';
 
 import { useServerAction } from '@/hooks/use-server-action';
+import { useSessionId } from '@/hooks/use-session-id';
 import { recordViewAction } from '@/lib/actions/analytics/view-tracking.actions';
 import { generateTestId } from '@/lib/test-ids';
 
@@ -47,6 +48,7 @@ export const ViewTracker = ({
   const isMountedRef = useRef(false);
 
   const { userId } = useAuth();
+  const effectiveSessionId = useSessionId(sessionId);
 
   const viewTrackerTestId = testId || generateTestId('feature', 'view-details-button', targetType);
 
@@ -67,13 +69,13 @@ export const ViewTracker = ({
 
   const recordViewCallback = useCallback(
     (duration: number) => {
-      if (hasRecordedViewRef.current || isExecuting) return;
+      if (hasRecordedViewRef.current || isExecuting || !effectiveSessionId) return;
 
       const viewData: RecordViewInput = {
         ipAddress: undefined, // will be determined server-side
         metadata,
         referrerUrl: typeof window !== 'undefined' ? window.document.referrer || undefined : undefined,
-        sessionId,
+        sessionId: effectiveSessionId,
         targetId,
         targetType,
         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
@@ -83,7 +85,7 @@ export const ViewTracker = ({
 
       recordView(viewData);
     },
-    [targetId, targetType, userId, sessionId, metadata, recordView, isExecuting],
+    [targetId, targetType, userId, effectiveSessionId, metadata, recordView, isExecuting],
   );
 
   const handleVisibilityChange = useCallback(() => {

@@ -10,7 +10,6 @@ import { ViewTracker } from '@/components/analytics/view-tracker';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
-import { getOrCreateSessionId } from '@/utils/session-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
@@ -32,10 +31,8 @@ async function UserPage({ routeParams }: UserPageProps) {
     notFound();
   }
 
-  const sessionId = getOrCreateSessionId();
-
   return (
-    <ViewTracker sessionId={sessionId} targetId={userId} targetType={'profile'}>
+    <ViewTracker targetId={userId} targetType={'profile'}>
       <div className={'py-8'}>
         <ContentLayout>
           <div className={'mx-auto max-w-4xl'}>

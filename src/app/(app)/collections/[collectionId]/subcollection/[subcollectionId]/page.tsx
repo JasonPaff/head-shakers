@@ -18,7 +18,6 @@ import { CollectionViewTracker } from '@/components/analytics/collection-view-tr
 import { ContentLayout } from '@/components/layout/content-layout';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
-import { getOrCreateSessionId } from '@/utils/session-utils';
 
 type SubcollectionPageProps = PageProps;
 
@@ -47,12 +46,9 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
     notFound();
   }
 
-  const sessionId = getOrCreateSessionId();
-
   return (
     <CollectionViewTracker
       collectionId={collectionId}
-      sessionId={sessionId}
       subcollectionId={subcollectionId}
     >
       <div>

@@ -25,7 +25,6 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
-import { getOrCreateSessionId } from '@/utils/session-utils';
 
 type ItemPageProps = PageProps;
 
@@ -46,13 +45,10 @@ async function ItemPage({ routeParams }: ItemPageProps) {
     notFound();
   }
 
-  const sessionId = getOrCreateSessionId();
-
   return (
     <BobbleheadViewTracker
       bobbleheadId={bobbleheadId}
       collectionId={basicBobblehead.collectionId || undefined}
-      sessionId={sessionId}
     >
       <div>
         {/* Header Section */}

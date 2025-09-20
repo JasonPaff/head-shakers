@@ -20,7 +20,6 @@ import { CollectionViewTracker } from '@/components/analytics/collection-view-tr
 import { ContentLayout } from '@/components/layout/content-layout';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
-import { getOrCreateSessionId } from '@/utils/session-utils';
 
 type CollectionPageProps = PageProps;
 
@@ -48,10 +47,8 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
     notFound();
   }
 
-  const sessionId = getOrCreateSessionId();
-
   return (
-    <CollectionViewTracker collectionId={collectionId} sessionId={sessionId}>
+    <CollectionViewTracker collectionId={collectionId}>
       <div>
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>
