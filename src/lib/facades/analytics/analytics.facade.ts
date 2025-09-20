@@ -1,7 +1,6 @@
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { RecordViewInput } from '@/lib/validations/analytics.validation';
 
-import { db } from '@/lib/db';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { ViewAggregationJob } from '@/lib/jobs/view-aggregation.job';
 import { ViewAnalyticsQuery } from '@/lib/queries/analytics/view-analytics.query';
@@ -170,7 +169,7 @@ export const AnalyticsFacade = {
         deduplicationWindow: options.deduplicationWindow || 600,
         shouldRespectPrivacySettings: options.shouldRespectPrivacySettings || true,
       },
-      dbInstance || db,
+      dbInstance,
     );
 
     return {
@@ -192,7 +191,7 @@ export const AnalyticsFacade = {
     } = {},
     dbInstance?: DatabaseExecutor,
   ): Promise<DashboardData> {
-    const context = { dbInstance: dbInstance || db };
+    const context = { dbInstance: dbInstance };
 
     const result = await ViewAnalyticsQuery.getViewAnalyticsDashboardAsync(options, context);
 
@@ -223,8 +222,8 @@ export const AnalyticsFacade = {
       timeframe?: 'day' | 'hour' | 'month' | 'week';
     } = {},
     dbInstance?: DatabaseExecutor,
-  ): Promise<TrendingContentResult[]> {
-    const context = { dbInstance: dbInstance || db };
+  ): Promise<Array<TrendingContentResult>> {
+    const context = { dbInstance: dbInstance };
     const { isIncludingAnonymous = true, limit = 10, timeframe = 'week' } = options;
 
     const results = await ViewAnalyticsQuery.getTrendingContentAsync(
@@ -262,7 +261,7 @@ export const AnalyticsFacade = {
         timeframe: timeframe as 'day' | 'hour' | 'month' | 'week' | 'year',
       },
       undefined,
-      dbInstance || db,
+      dbInstance,
     );
 
     return {
@@ -292,7 +291,7 @@ export const AnalyticsFacade = {
       viewCount: number;
     }>
   > {
-    const context = { dbInstance: dbInstance || db };
+    const context = { dbInstance: dbInstance };
 
     return await ViewAnalyticsQuery.getViewTrendsAsync(options, context);
   },
@@ -312,7 +311,7 @@ export const AnalyticsFacade = {
         deduplicationWindow: options.deduplicationWindow || 600,
         shouldRespectPrivacySettings: options.shouldRespectPrivacySettings || true,
       },
-      dbInstance || db,
+      dbInstance,
     );
 
     if (!result) {
@@ -329,7 +328,7 @@ export const AnalyticsFacade = {
       result.targetId,
       true,
       viewData.viewerId || undefined,
-      dbInstance || db,
+      dbInstance,
     );
 
     return {
