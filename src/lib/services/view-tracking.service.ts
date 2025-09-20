@@ -1,3 +1,4 @@
+import { Client } from '@upstash/qstash';
 import { Redis } from '@upstash/redis/node';
 
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
@@ -10,6 +11,10 @@ import { withServiceRetry } from '@/lib/utils/retry';
 const redis = new Redis({
   token: process.env.UPSTASH_REDIS_REST_TOKEN,
   url: process.env.UPSTASH_REDIS_REST_URL,
+});
+
+const qstash = new Client({
+  token: process.env.QSTASH_TOKEN || '',
 });
 
 export interface TrendingCacheData {
@@ -135,9 +140,10 @@ export class ViewTrackingService {
       const result = await circuitBreaker.execute(async () => {
         const retryResult = await withServiceRetry(
           async () => {
-            const cacheKey = isAnonymous ?
-              REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, identifier)
-            : REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, identifier);
+            const cacheKey =
+              isAnonymous ?
+                REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, identifier)
+              : REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, identifier);
 
             const exists = await redis.exists(cacheKey);
             return exists === 1;
@@ -161,12 +167,9 @@ export class ViewTrackingService {
   }
 
   /**
-   * Get trending content from cache
+   * Get trending content from the cache
    */
-  static async getTrendingContent(
-    targetType: string,
-    timeframe: string,
-  ): Promise<null | TrendingCacheData> {
+  static async getTrendingContent(targetType: string, timeframe: string): Promise<null | TrendingCacheData> {
     const circuitBreaker = circuitBreakers.fast('redis-trending-get');
 
     try {
@@ -178,7 +181,9 @@ export class ViewTrackingService {
 
             if (!cached) return null;
 
-            return typeof cached === 'string' ? JSON.parse(cached) as TrendingCacheData : cached as TrendingCacheData;
+            return typeof cached === 'string' ?
+                (JSON.parse(cached) as TrendingCacheData)
+              : (cached as TrendingCacheData);
           },
           'redis',
           {
@@ -230,14 +235,26 @@ export class ViewTrackingService {
             }
 
             return {
-              anonymous: typeof aggregateData.anonymous === 'number' ? aggregateData.anonymous : parseInt(String(aggregateData.anonymous), 10) || 0,
-              authenticated: typeof aggregateData.authenticated === 'number' ? aggregateData.authenticated : parseInt(String(aggregateData.authenticated), 10) || 0,
+              anonymous:
+                typeof aggregateData.anonymous === 'number' ?
+                  aggregateData.anonymous
+                : parseInt(String(aggregateData.anonymous), 10) || 0,
+              authenticated:
+                typeof aggregateData.authenticated === 'number' ?
+                  aggregateData.authenticated
+                : parseInt(String(aggregateData.authenticated), 10) || 0,
               hourly,
-              lastUpdated: typeof aggregateData.lastUpdated === 'number' ? aggregateData.lastUpdated : parseInt(String(aggregateData.lastUpdated), 10) || 0,
+              lastUpdated:
+                typeof aggregateData.lastUpdated === 'number' ?
+                  aggregateData.lastUpdated
+                : parseInt(String(aggregateData.lastUpdated), 10) || 0,
               period,
               targetId,
               targetType,
-              total: typeof aggregateData.total === 'number' ? aggregateData.total : parseInt(String(aggregateData.total), 10) || 0,
+              total:
+                typeof aggregateData.total === 'number' ?
+                  aggregateData.total
+                : parseInt(String(aggregateData.total), 10) || 0,
             };
           },
           'redis',
@@ -359,10 +376,7 @@ export class ViewTrackingService {
                 const viewData = JSON.parse(item) as ViewBatchItem;
 
                 // Update view counts
-                const countKey = REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(
-                  viewData.targetType,
-                  viewData.targetId,
-                );
+                const countKey = REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(viewData.targetType, viewData.targetId);
                 pipeline.incr(countKey);
                 pipeline.expire(countKey, REDIS_TTL.VIEW_TRACKING.COUNTS);
 
@@ -396,7 +410,9 @@ export class ViewTrackingService {
 
                 processedCount++;
               } catch (parseError) {
-                errors.push(`Failed to parse batch item: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`);
+                errors.push(
+                  `Failed to parse batch item: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`,
+                );
                 skippedCount++;
               }
             }
@@ -438,6 +454,153 @@ export class ViewTrackingService {
   }
 
   /**
+   * Schedule batch processing for pending view queues
+   */
+  static async scheduleBatchProcessing(batchIds: Array<string>): Promise<null | { messageId: string }> {
+    if (batchIds.length === 0) return null;
+
+    return this.scheduleViewAggregation({
+      batchIds,
+      delay: 60, // process batches after 1 minute
+    });
+  }
+
+  /**
+   * Schedule periodic view processing jobs
+   */
+  static async schedulePeriodicJobs(): Promise<{
+    aggregationJobId: null | string;
+    trendingJobId: null | string;
+  }> {
+    try {
+      // schedule the aggregation job to run every 15 minutes
+      const aggregationResult = await this.scheduleViewAggregation({
+        delay: 900, // 15 minutes
+        timeframe: 'hour',
+      });
+
+      // schedule trending calculation to run every 30 minutes
+      const trendingResult = await this.scheduleTrendingCalculation({
+        delay: 1800, // 30 minutes
+        timeframes: ['hour', 'day'],
+      });
+
+      return {
+        aggregationJobId: aggregationResult?.messageId || null,
+        trendingJobId: trendingResult?.messageId || null,
+      };
+    } catch (error) {
+      console.error('Failed to schedule periodic jobs:', error);
+      return {
+        aggregationJobId: null,
+        trendingJobId: null,
+      };
+    }
+  }
+
+  /**
+   * Schedule trending calculation job using QStash
+   */
+  static async scheduleTrendingCalculation(
+    options: {
+      delay?: number; // in seconds
+      minViews?: number;
+      targetTypes?: Array<string>;
+      timeframes?: Array<'day' | 'hour' | 'month' | 'week'>;
+    } = {},
+  ): Promise<null | { messageId: string }> {
+    try {
+      const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/analytics/process-views`;
+
+      const payload = {
+        jobType: 'trending',
+        payload: {
+          minViews: options.minViews,
+          targetTypes: options.targetTypes,
+          timeframes: options.timeframes || ['hour', 'day', 'week'],
+        },
+      };
+
+      const publishOptions = {
+        body: payload,
+        url: webhookUrl,
+        ...(options.delay && { delay: options.delay }),
+      };
+
+      const result = await qstash.publishJSON(publishOptions);
+
+      // handle response based on type
+      if (Array.isArray(result)) {
+        // URL group response
+        if (result.length > 0 && result[0] && typeof result[0] === 'object' && 'messageId' in result[0]) {
+          return { messageId: (result[0] as { messageId: string }).messageId };
+        }
+      } else if (typeof result === 'object' && result && 'messageId' in result) {
+        // single URL response
+        return { messageId: (result as { messageId: string }).messageId };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Failed to schedule trending calculation job:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Schedule view aggregation job using QStash
+   */
+  static async scheduleViewAggregation(options: {
+    batchIds?: Array<string>;
+    delay?: number; // in seconds
+    targetIds?: Array<string>;
+    targetType?: string;
+    timeframe?: 'day' | 'hour' | 'month' | 'week';
+  }): Promise<null | { messageId: string }> {
+    try {
+      const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/analytics/process-views`;
+
+      const payload = {
+        jobType: 'aggregation',
+        payload: {
+          batchIds: options.batchIds,
+          targetIds: options.targetIds,
+          targetType: options.targetType,
+          timeframe: options.timeframe || 'day',
+        },
+      };
+
+      const publishOptions = {
+        body: payload,
+        url: webhookUrl,
+        ...(options.delay && { delay: options.delay }),
+      };
+
+      const result = await qstash.publishJSON(publishOptions);
+
+      // handle response based on type
+      if (Array.isArray(result)) {
+        // URL group response
+        if (result.length > 0 && result[0] && typeof result[0] === 'object' && 'messageId' in result[0]) {
+          return { messageId: (result[0] as { messageId: string }).messageId };
+        }
+      } else if (typeof result === 'object' && result && 'messageId' in result) {
+        // single URL response
+        return { messageId: (result as { messageId: string }).messageId };
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Failed to schedule view aggregation job:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Private helper methods
+   */
+
+  /**
    * Set deduplication cache
    */
   static async setDeduplication(
@@ -453,9 +616,10 @@ export class ViewTrackingService {
       await circuitBreaker.execute(async () => {
         await withServiceRetry(
           async () => {
-            const cacheKey = isAnonymous ?
-              REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, identifier)
-            : REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, identifier);
+            const cacheKey =
+              isAnonymous ?
+                REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, identifier)
+              : REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, identifier);
 
             await redis.set(cacheKey, Date.now(), { ex: ttl });
           },
@@ -467,7 +631,7 @@ export class ViewTrackingService {
         );
       });
     } catch (error) {
-      // Non-blocking cache operation
+      // non-blocking cache operation
       console.warn(`Failed to set deduplication for ${targetType}:${targetId}:`, error);
     }
   }
@@ -526,7 +690,7 @@ export class ViewTrackingService {
         );
       });
     } catch (error) {
-      // Non-blocking cache operation
+      // non-blocking cache operation
       console.warn(`Failed to set view count for ${targetType}:${targetId}:`, error);
     }
   }
@@ -551,24 +715,24 @@ export class ViewTrackingService {
 
             const pipeline = redis.pipeline();
 
-            // Increment total count
+            // increment total count
             pipeline.hincrby(aggregateKey, 'total', increment);
 
-            // Increment anonymous or authenticated count
+            // increment anonymous or authenticated count
             if (isAnonymous) {
               pipeline.hincrby(aggregateKey, 'anonymous', increment);
             } else {
               pipeline.hincrby(aggregateKey, 'authenticated', increment);
             }
 
-            // Update hourly tracking
+            // update hourly tracking
             const currentHour = new Date().getHours();
             pipeline.hincrby(aggregateKey, `hourly:${currentHour}`, increment);
 
-            // Update last updated timestamp
+            // update last updated timestamp
             pipeline.hset(aggregateKey, { lastUpdated: Date.now() });
 
-            // Set expiration
+            // set expiration
             pipeline.expire(aggregateKey, REDIS_TTL.VIEW_TRACKING.AGGREGATES);
 
             await pipeline.exec();
@@ -584,10 +748,6 @@ export class ViewTrackingService {
       console.warn(`Failed to update aggregates for ${targetType}:${targetId}:`, error);
     }
   }
-
-  /**
-   * Private helper methods
-   */
 
   private static generateBatchId(): string {
     const timestamp = Date.now();

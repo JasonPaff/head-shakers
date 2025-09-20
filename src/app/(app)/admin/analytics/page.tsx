@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { AnalyticsLoading } from '@/app/(app)/admin/analytics/loading';
+import AnalyticsLoading from '@/app/(app)/admin/analytics/loading';
 import { ViewAnalyticsDashboard } from '@/components/admin/analytics/view-analytics-dashboard';
 import { requireModerator } from '@/lib/utils/admin.utils';
 
