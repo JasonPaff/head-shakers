@@ -26,7 +26,7 @@ async function UserPage({ routeParams }: UserPageProps) {
   const { userId } = await routeParams;
 
   // fetch user data
-  const user = await UsersFacade.getUserById(userId);
+  const user = await UsersFacade.getUserByClerkId(userId);
 
   if (!user) {
     notFound();
