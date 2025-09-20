@@ -14,12 +14,9 @@ import { SidebarTrigger } from '@/components/ui/sidebar/sidebar-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
-import { getUserId } from '@/utils/user-utils';
 
-export const AppHeader = async ({ testId }: ComponentTestIdProps = {}) => {
+export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
   const headerTestId = testId || generateTestId('layout', 'app-header');
-
-  const userId = await getUserId();
 
   return (
     <header
@@ -85,7 +82,7 @@ export const AppHeader = async ({ testId }: ComponentTestIdProps = {}) => {
           <AppHeaderNotifications />
 
           {/* User Actions */}
-          <AppHeaderUser userId={userId} />
+          <AppHeaderUser />
 
           {/* Color Mode Toggle */}
           <AppHeaderColorMode />

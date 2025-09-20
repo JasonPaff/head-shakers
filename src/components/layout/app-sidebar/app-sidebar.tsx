@@ -2,9 +2,17 @@
 
 import type { ComponentProps } from 'react';
 
-import { ActivityIcon, CopyleftIcon, PlusIcon, SettingsIcon, ShieldIcon, UploadIcon, User } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
 import { useUser } from '@clerk/nextjs';
+import {
+  ActivityIcon,
+  CopyleftIcon,
+  PlusIcon,
+  SettingsIcon,
+  ShieldIcon,
+  UploadIcon,
+  User,
+} from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -47,7 +55,7 @@ const useNavigationData = () => {
     },
   ];
 
-  // Add admin navigation if user has moderator or admin privileges
+  // add admin navigation if user has moderator or admin privileges
   const adminNavItem = {
     icon: ShieldIcon,
     items: [
@@ -80,11 +88,15 @@ const useNavigationData = () => {
       title: 'Following Feed',
       url: $path({ route: '/dashboard/feed' }),
     },
-    ...(user ? [{
-      icon: User,
-      title: 'My Profile',
-      url: $path({ route: '/users/[userId]', routeParams: { userId: user.id } }),
-    }] : []),
+    ...(user ?
+      [
+        {
+          icon: User,
+          title: 'My Profile',
+          url: $path({ route: '/users/[userId]', routeParams: { userId: user.id } }),
+        },
+      ]
+    : []),
     {
       icon: SettingsIcon,
       title: 'Account Settings',
