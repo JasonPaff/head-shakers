@@ -1,3 +1,4 @@
+import 'server-only';
 import Link from 'next/link';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -13,9 +14,12 @@ import { SidebarTrigger } from '@/components/ui/sidebar/sidebar-trigger';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
+import { getUserId } from '@/utils/user-utils';
 
-export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
+export const AppHeader = async ({ testId }: ComponentTestIdProps = {}) => {
   const headerTestId = testId || generateTestId('layout', 'app-header');
+
+  const userId = await getUserId();
 
   return (
     <header
@@ -81,7 +85,7 @@ export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
           <AppHeaderNotifications />
 
           {/* User Actions */}
-          <AppHeaderUser />
+          <AppHeaderUser userId={userId} />
 
           {/* Color Mode Toggle */}
           <AppHeaderColorMode />
