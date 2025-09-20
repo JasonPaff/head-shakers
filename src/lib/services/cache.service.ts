@@ -44,6 +44,220 @@ export interface CacheStats {
 
 export class CacheService {
   /**
+   * analytics-specific cache utilities
+   */
+  static readonly analytics = {
+    /**
+     * cache view aggregates
+     */
+    aggregates: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      targetId: string,
+      period: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.AGGREGATES(targetType, targetId, period);
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:${targetType}`,
+        `analytics:${targetType}:${targetId}`,
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: targetId,
+          entityType: 'analytics',
+          operation: 'analytics:aggregates',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache engagement metrics
+     */
+    engagement: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      targetIds: Array<string>,
+      optionsHash?: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.ENGAGEMENT(targetType, targetIds.join(','), optionsHash);
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:${targetType}`,
+        `analytics:engagement:${targetType}`,
+        ...targetIds.map((id) => `analytics:${targetType}:${id}`),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'analytics',
+          operation: 'analytics:engagement',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache content performance metrics
+     */
+    performance: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      targetIds: Array<string>,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.PERFORMANCE(targetType, targetIds.join(','));
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:${targetType}`,
+        `analytics:performance:${targetType}`,
+        ...targetIds.map((id) => `analytics:${targetType}:${id}`),
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'analytics',
+          operation: 'analytics:performance',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache recent views
+     */
+    recentViews: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      targetId: string,
+      limit: number,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.RECENT_VIEWS(targetType, targetId, limit);
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:${targetType}`,
+        `analytics:${targetType}:${targetId}`,
+        `analytics:recent:${targetType}:${targetId}`,
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: targetId,
+          entityType: 'analytics',
+          operation: 'analytics:recent-views',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+      });
+    },
+
+    /**
+     * cache trending content
+     */
+    trending: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      timeframe: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.TRENDING(targetType, timeframe);
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:trending:${targetType}`,
+        `analytics:trending:${timeframe}`,
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'analytics',
+          operation: 'analytics:trending',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,
+      });
+    },
+
+    /**
+     * cache view counts
+     */
+    viewCounts: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      targetId: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.VIEW_COUNTS(targetType, targetId);
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:${targetType}`,
+        `analytics:${targetType}:${targetId}`,
+        `analytics:views:${targetType}:${targetId}`,
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: targetId,
+          entityType: 'analytics',
+          operation: 'analytics:view-counts',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+
+    /**
+     * cache view statistics
+     */
+    viewStats: async <T>(
+      fn: () => Promise<T>,
+      targetType: string,
+      targetId: string,
+      timeframe: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.ANALYTICS.VIEW_STATS(targetType, targetId, timeframe);
+      const tags = [
+        CACHE_CONFIG.TAGS.ANALYTICS,
+        `analytics:${targetType}`,
+        `analytics:${targetType}:${targetId}`,
+        `analytics:stats:${targetType}:${targetId}`,
+      ];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityId: targetId,
+          entityType: 'analytics',
+          operation: 'analytics:view-stats',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
+      });
+    },
+  };
+
+  /**
    * bobblehead-specific cache utilities
    */
   static readonly bobbleheads = {

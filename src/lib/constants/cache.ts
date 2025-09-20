@@ -43,10 +43,13 @@ export const CACHE_CONFIG = {
    * cache tag patterns for efficient invalidation
    */
   TAGS: {
+    // analytics tags
+    ANALYTICS: 'analytics',
     // entity-based tags
     BOBBLEHEAD: (id: string) => `bobblehead:${id}`,
     BOBBLEHEAD_TAGS: (bobbleheadId: string) => `bobblehead-tags:${bobbleheadId}`,
     COLLECTION: (id: string) => `collection:${id}`,
+
     COLLECTION_BOBBLEHEADS: (collectionId: string) => `collection-bobbleheads:${collectionId}`,
 
     // feature-based tags
@@ -102,9 +105,23 @@ export const CACHE_KEYS = {
    * analytics cache keys
    */
   ANALYTICS: {
+    AGGREGATES: (targetType: string, targetId: string, period: string) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:aggregates:${targetType}:${targetId}:${period}`,
+    ENGAGEMENT: (targetType: string, targetIds: string, optionsHash?: string) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:engagement:${targetType}:${targetIds}${optionsHash ? `:${optionsHash}` : ''}`,
+    PERFORMANCE: (targetType: string, targetIds: string) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:performance:${targetType}:${targetIds}`,
     POPULAR: (entityType: string, timeframe: string) =>
       `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:popular:${entityType}:${timeframe}`,
+    RECENT_VIEWS: (targetType: string, targetId: string, limit: number) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:recent-views:${targetType}:${targetId}:${limit}`,
+    TRENDING: (targetType: string, timeframe: string) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:trending:${targetType}:${timeframe}`,
     TRENDS: (timeframe: string) => `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:trends:${timeframe}`,
+    VIEW_COUNTS: (targetType: string, targetId: string) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:view-counts:${targetType}:${targetId}`,
+    VIEW_STATS: (targetType: string, targetId: string, timeframe: string) =>
+      `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:view-stats:${targetType}:${targetId}:${timeframe}`,
     VIEWS: (entityType: string, entityId: string, timeframe: string) =>
       `${CACHE_CONFIG.NAMESPACES.ANALYTICS}:views:${entityType}:${entityId}:${timeframe}`,
   },
