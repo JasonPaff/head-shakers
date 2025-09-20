@@ -34,7 +34,7 @@ export const recordViewAction = publicActionClient
   })
   .inputSchema(recordViewSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const viewData = parsedInput;
+    const viewData = recordViewSchema.parse(ctx.sanitizedInput || parsedInput);
 
     Sentry.setContext(SENTRY_CONTEXTS.VIEW_DATA, {
       ipAddress: viewData.ipAddress,
@@ -81,7 +81,6 @@ export const recordViewAction = publicActionClient
         message: `View recorded for ${viewData.targetType} ${viewData.targetId}${result.isDuplicate ? ' (duplicate)' : ''}`,
       });
 
-      // Invalidate cache for view tracking
       if (viewData.targetType === 'bobblehead' || viewData.targetType === 'collection') {
         CacheRevalidationService.analytics.onViewRecord(
           viewData.targetType,

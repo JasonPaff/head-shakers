@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { contentViews, searchQueries } from '@/lib/db/schema';
 
+export type RecordViewInput = z.infer<typeof recordViewSchema>;
+
 export const searchFiltersSchema = z.object({
   category: z.string().optional(),
   priceRange: z
