@@ -355,45 +355,6 @@ npm run lint:fix && npm run typecheck
 
 ---
 
-### Step 9: Add TanStack Query Integration and Real-time Updates
-
-**What**: Integrate view tracking with TanStack Query for efficient state management
-**Why**: TanStack Query provides optimized caching and real-time updates for view data
-**Confidence**: High
-
-**Files to Create:**
-
-- `src/lib/hooks/use-view-tracking.ts` - Custom hook for view tracking
-- `src/lib/hooks/use-view-analytics.ts` - Hook for analytics data
-
-**Files to Modify:**
-
-- `src/components/analytics/view-tracker.tsx` - Integrate TanStack Query
-- `src/components/admin/analytics/view-analytics-dashboard.tsx` - Add real-time updates
-
-**Changes:**
-
-- Add TanStack Query mutations for view recording
-- Implement optimistic updates for view counts
-- Create real-time analytics data fetching
-- Add proper cache invalidation on view updates
-- Include error handling and retry logic
-
-**Validation Commands:**
-
-```bash
-npm run lint:fix && npm run typecheck
-```
-
-**Success Criteria:**
-
-- [ ] View counts update in real-time across components
-- [ ] Query caching improves performance
-- [ ] Error handling provides good user experience
-- [ ] All validation commands pass
-
----
-
 ## Quality Gates
 
 - [ ] All TypeScript files pass `npm run typecheck`
