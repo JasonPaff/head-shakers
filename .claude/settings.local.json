@@ -38,9 +38,6 @@
       "Bash(done)",
       "Bash(tree:*)",
       "Bash(for:*)",
-      "Bash(do if [ -f \"$file\" ])",
-      "Bash(then echo \"$file exists\")",
-      "Bash(else echo \"$file does not exist\")",
       "Bash(fi)",
       "Bash(grep:*)",
       "Bash(npm run lint:*)",
@@ -49,8 +46,6 @@
       "Bash(npx playwright test:*)",
       "Bash(npm run format:*)",
       "Bash(npm run dev:*)",
-      "mcp__Neon__*",
-      "Bash(/hooks)",
       "mcp__Neon__get_database_tables",
       "mcp__Neon__describe_table_schema",
       "mcp__Neon__run_sql_transaction",
@@ -62,5 +57,9 @@
     "deny": [],
     "ask": []
   },
-  "outputStyle": "default"
+  "enabledMcpjsonServers": [
+    "shared-server"
+  ],
+  "outputStyle": "default",
+  "enableAllProjectMcpServers": true
 }
