@@ -125,7 +125,7 @@ export class ViewAggregationJob {
       try {
         await withServiceRetry(
           async () => {
-            // get current view stats from database
+            // get current view stats from the database
             const viewStats = await ViewTrackingQuery.getViewStatsAsync(
               targetType as (typeof ENUMS.CONTENT_VIEWS.TARGET_TYPE)[number],
               targetId,
@@ -135,7 +135,7 @@ export class ViewAggregationJob {
               queryContext,
             );
 
-            // Update Redis aggregates based on database stats
+            // update Redis aggregates based on database stats
             await ViewTrackingService.updateViewAggregates(
               targetType,
               targetId,

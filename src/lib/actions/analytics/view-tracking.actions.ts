@@ -45,17 +45,10 @@ export const recordViewAction = publicActionClient
     });
 
     try {
-      // TODO: Pass parameters when facade is implemented
-      // const result = await AnalyticsFacade.recordView(viewData, ctx.db, {
-      //   deduplicationWindow: 300, // 5 minutes
-      //   shouldRespectPrivacySettings: true,
-      // });
-      const result = await AnalyticsFacade.recordView().catch(() => ({
-        isDuplicate: false,
-        isSuccessful: true,
-        totalViews: 1,
-        viewId: 'stub-' + Date.now(),
-      }));
+      const result = await AnalyticsFacade.recordView(viewData, ctx.db, {
+        deduplicationWindow: 300,
+        shouldRespectPrivacySettings: true,
+      });
 
       if (!result.isSuccessful) {
         throw new ActionError(
@@ -120,8 +113,8 @@ export const batchRecordViewsAction = authActionClient
   })
   .inputSchema(batchRecordViewsSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const batchData = parsedInput;
-    // const dbInstance = ctx.tx ?? ctx.db; // TODO: Use when facade is implemented
+    const batchData = batchRecordViewsSchema.parse(ctx.sanitizedInput || parsedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.BATCH_VIEW_DATA, {
       batchId: batchData.batchId,
@@ -130,18 +123,11 @@ export const batchRecordViewsAction = authActionClient
     });
 
     try {
-      // TODO: Pass parameters when facade is implemented
-      // const result = await AnalyticsFacade.batchRecordViews(batchData.views, dbInstance, {
-      //   batchId: batchData.batchId,
-      //   deduplicationWindow: 300, // 5 minutes
-      //   shouldRespectPrivacySettings: true,
-      // });
-      const result = await AnalyticsFacade.batchRecordViews().catch(() => ({
-        batchId: batchData.batchId || 'stub-batch',
-        duplicateViews: 0,
-        isSuccessful: true,
-        recordedViews: batchData.views.length,
-      }));
+      const result = await AnalyticsFacade.batchRecordViews(batchData.views, dbInstance, {
+        batchId: batchData.batchId,
+        deduplicationWindow: 300,
+        shouldRespectPrivacySettings: true,
+      });
 
       if (!result.isSuccessful) {
         throw new ActionError(
@@ -196,26 +182,19 @@ export const getViewStatsAction = publicActionClient
     actionName: ACTION_NAMES.ANALYTICS.GET_VIEW_STATS,
   })
   .inputSchema(viewStatsSchema)
-  .action(async ({ parsedInput }) => {
-    // const statsData = parsedInput; // TODO: Use when facade is implemented
-    // const dbInstance = ctx.db; // TODO: Use when facade is implemented
+  .action(async ({ ctx, parsedInput }) => {
+    const statsData = viewStatsSchema.parse(ctx.sanitizedInput);
 
     try {
-      // TODO: Pass parameters when facade is implemented
-      // const result = await AnalyticsFacade.getViewStats(
-      //   statsData.targetId,
-      //   statsData.targetType,
-      //   {
-      //     shouldIncludeAnonymous: statsData.includeAnonymous,
-      //     timeframe: statsData.timeframe,
-      //   },
-      //   ctx.db,
-      // );
-      const result = await AnalyticsFacade.getViewStats().catch(() => ({
-        averageViewDuration: 0,
-        totalViews: 0,
-        uniqueViewers: 0,
-      }));
+      const result = await AnalyticsFacade.getViewStats(
+        statsData.targetId,
+        statsData.targetType,
+        {
+          shouldIncludeAnonymous: statsData.includeAnonymous,
+          timeframe: statsData.timeframe,
+        },
+        ctx.db,
+      );
 
       return {
         data: result,
@@ -240,22 +219,19 @@ export const getTrendingContentAction = publicActionClient
     actionName: ACTION_NAMES.ANALYTICS.GET_TRENDING_CONTENT,
   })
   .inputSchema(trendingContentSchema)
-  .action(async ({ parsedInput }) => {
-    // const trendingData = parsedInput; // TODO: Use when facade is implemented
-    // const dbInstance = ctx.db; // TODO: Use when facade is implemented
+  .action(async ({ ctx, parsedInput }) => {
+    const trendingData = trendingContentSchema.parse(ctx.sanitizedInput || parsedInput);
 
     try {
-      // TODO: Pass parameters when facade is implemented
-      // const result = await AnalyticsFacade.getTrendingContent(
-      //   trendingData.targetType,
-      //   {
-      //     limit: trendingData.limit,
-      //     shouldIncludeAnonymous: trendingData.includeAnonymous,
-      //     timeframe: trendingData.timeframe,
-      //   },
-      //   ctx.db,
-      // );
-      const result = await AnalyticsFacade.getTrendingContent().catch(() => []);
+      const result = await AnalyticsFacade.getTrendingContent(
+        trendingData.targetType,
+        {
+          isIncludingAnonymous: trendingData.includeAnonymous,
+          limit: trendingData.limit,
+          timeframe: trendingData.timeframe,
+        },
+        ctx.db,
+      );
 
       return {
         data: result,
@@ -282,8 +258,7 @@ export const aggregateViewsAction = authActionClient
   })
   .inputSchema(aggregateViewsSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const aggregateData = parsedInput;
-    // const dbInstance = ctx.tx ?? ctx.db; // TODO: Use when facade is implemented
+    const aggregateData = aggregateViewsSchema.parse(ctx.sanitizedInput || parsedInput);
 
     Sentry.setContext(SENTRY_CONTEXTS.AGGREGATE_DATA, {
       force: aggregateData.force,
@@ -293,22 +268,10 @@ export const aggregateViewsAction = authActionClient
     });
 
     try {
-      // TODO: Pass parameters when facade is implemented
-      // const result = await AnalyticsFacade.aggregateViews(
-      //   aggregateData.targetIds,
-      //   aggregateData.targetType,
-      //   dbInstance,
-      //   {
-      //     batchSize: 100,
-      //     isForced: aggregateData.force,
-      //   },
-      // );
-      const result = await AnalyticsFacade.aggregateViews().catch(() => ({
-        duration: 0,
-        errors: [],
-        isSuccessful: true,
-        processedTargets: aggregateData.targetIds.length,
-      }));
+      const result = await AnalyticsFacade.aggregateViews(aggregateData.targetIds, aggregateData.targetType, {
+        batchSize: 100,
+        isForced: aggregateData.force,
+      });
 
       if (!result.isSuccessful) {
         throw new ActionError(

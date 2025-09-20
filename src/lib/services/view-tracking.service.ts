@@ -1,17 +1,14 @@
 import { Client } from '@upstash/qstash';
-import { Redis } from '@upstash/redis/node';
 
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
 import { REDIS_KEYS, REDIS_TTL } from '@/lib/constants';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
+import { getRedisClient } from '@/lib/utils/redis-client';
 import { withServiceRetry } from '@/lib/utils/retry';
 
-const redis = new Redis({
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-  url: process.env.UPSTASH_REDIS_REST_URL,
-});
+const redis = getRedisClient();
 
 const qstash = new Client({
   token: process.env.QSTASH_TOKEN || '',

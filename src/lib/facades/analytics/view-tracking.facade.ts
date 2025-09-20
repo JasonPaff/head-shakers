@@ -16,6 +16,7 @@ import { ViewTrackingQuery } from '@/lib/queries/analytics/view-tracking.query';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { RedisOperations } from '@/lib/utils/redis-client';
 
 const facadeName = 'ViewTrackingFacade';
 
@@ -107,7 +108,7 @@ export class ViewTrackingFacade {
 
           // check privacy settings
           if (options.shouldRespectPrivacySettings && viewerUserId) {
-            const canTrack = await this.checkUserPrivacySettings(viewerUserId, dbInstance);
+            const canTrack = this.checkUserPrivacySettings(viewerUserId, dbInstance);
             if (!canTrack) {
               skippedViews++;
               continue;
@@ -188,9 +189,19 @@ export class ViewTrackingFacade {
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<ContentPerformanceRecord>> {
     try {
-      console.log(dbInstance);
-      // TODO: Implement when getContentPerformanceAsync signature is known
-      return await Promise.resolve([]);
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+
+      return await ViewAnalyticsQuery.getContentPerformanceAsync(
+        targetIds,
+        targetType,
+        {
+          isIncludingAnonymous: true, // Default to including anonymous views
+        },
+        context,
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetIds, targetType },
@@ -213,9 +224,23 @@ export class ViewTrackingFacade {
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<EngagementMetric>> {
     try {
-      console.log(dbInstance);
-      // TODO: Implement when getEngagementMetricsAsync is available in ViewAnalyticsQuery
-      return await Promise.resolve([]);
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+
+      // get engagement metrics for all targets
+      const results = await ViewAnalyticsQuery.getUserEngagementAsync(
+        targetType,
+        {
+          minViews: 1, // minimum views to include in engagement metrics
+          timeframe: 'week', // default timeframe
+        },
+        context,
+      );
+
+      // filter results to only include the requested target IDs
+      return results.filter((result) => targetIds.includes(result.targetId));
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetIds, targetType },
@@ -337,7 +362,6 @@ export class ViewTrackingFacade {
     dbInstance: DatabaseExecutor = db,
   ): Promise<number> {
     try {
-      console.log(shouldIncludeAnonymous);
       const cacheKey = REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(targetType, targetId);
 
       return CacheService.cached(
@@ -354,6 +378,8 @@ export class ViewTrackingFacade {
             context,
           );
 
+          // shouldIncludeAnonymous parameter is reserved for future use
+          void shouldIncludeAnonymous;
           return stats.totalViews;
         },
         cacheKey,
@@ -461,7 +487,7 @@ export class ViewTrackingFacade {
 
       // check privacy settings if requested
       if (options.shouldRespectPrivacySettings && viewerUserId) {
-        const canTrack = await this.checkUserPrivacySettings(viewerUserId, dbInstance);
+        const canTrack = this.checkUserPrivacySettings(viewerUserId, dbInstance);
         if (!canTrack) {
           return null;
         }
@@ -515,21 +541,14 @@ export class ViewTrackingFacade {
   /**
    * Check user privacy settings for view tracking
    */
-  private static async checkUserPrivacySettings(
-    userId: string,
-    dbInstance: DatabaseExecutor,
-  ): Promise<boolean> {
-    try {
-      console.log(userId);
-      console.log(dbInstance);
-      // for now, assume tracking is allowed unless specifically opted out
-      // this should be implemented based on the user settings schema
-      return await Promise.resolve(true);
-    } catch (error) {
-      // on error, default to allowing tracking
-      console.warn('Failed to check user privacy settings:', error);
-      return true;
-    }
+  private static checkUserPrivacySettings(userId: string, dbInstance: DatabaseExecutor): boolean {
+    // for now, assume tracking is allowed unless specifically opted out
+    // this should be implemented based on the user settings schema
+    // TODO: Implement actual privacy settings check from database
+    // Reserved parameters for future implementation
+    void userId;
+    void dbInstance;
+    return true;
   }
 
   /**
@@ -544,7 +563,6 @@ export class ViewTrackingFacade {
   ): Promise<ViewDeduplicationResult> {
     try {
       let cacheKey: string;
-      console.log(deduplicationWindow);
 
       if (viewerUserId) {
         cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, viewerUserId);
@@ -555,13 +573,13 @@ export class ViewTrackingFacade {
       }
 
       // check if the cache key exists
-      const cachedView = await this.getCacheValue(cacheKey);
+      const exists = await RedisOperations.exists(cacheKey);
 
-      if (cachedView) {
+      if (exists) {
         return {
           isDuplicate: true,
           isSuccessful: true,
-          reason: 'View recorded within deduplication window',
+          reason: `View recorded within deduplication window (${deduplicationWindow}s)`,
         };
       }
 
@@ -577,20 +595,11 @@ export class ViewTrackingFacade {
   }
 
   private static async deleteCacheValue(key: string): Promise<void> {
-    console.log(key);
-    // this would use Redis client
-    // non-blocking operation
-    return await Promise.resolve();
-  }
-
-  /**
-   * Cache utility methods (these would be implemented using the Redis client)
-   */
-  private static async getCacheValue(key: string): Promise<null | string> {
-    console.log(key);
-    // this would use the Redis client
-    // for now, return null to indicate no cache hit
-    return await Promise.resolve(null);
+    try {
+      await RedisOperations.del(key);
+    } catch (error) {
+      console.warn(`Failed to delete cache key ${key}:`, error);
+    }
   }
 
   /**
@@ -603,6 +612,10 @@ export class ViewTrackingFacade {
     try {
       const cacheKey = REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(targetType, targetId);
       await this.deleteCacheValue(cacheKey);
+
+      // also invalidate view stats cache
+      const statsKey = REDIS_KEYS.VIEW_TRACKING.VIEW_STATS(targetType, targetId, 'day');
+      await this.deleteCacheValue(statsKey);
     } catch (error) {
       // non-blocking cache operation
       console.warn('Failed to invalidate view count cache:', error);
@@ -620,18 +633,11 @@ export class ViewTrackingFacade {
   ): Promise<void> {
     try {
       const cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, ipAddress);
-      await this.setCacheValue(cacheKey, Date.now().toString(), ttl);
+      await RedisOperations.set(cacheKey, Date.now().toString(), ttl);
     } catch (error) {
       // non-blocking cache operation
       console.warn('Failed to set anonymous deduplication cache:', error);
     }
-  }
-
-  private static async setCacheValue(key: string, value: string, ttl: number): Promise<void> {
-    console.log(key, value, ttl);
-    await Promise.resolve();
-    // this would use Redis client
-    // non-blocking operation
   }
 
   /**
@@ -645,7 +651,7 @@ export class ViewTrackingFacade {
   ): Promise<void> {
     try {
       const cacheKey = REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, viewerUserId);
-      await this.setCacheValue(cacheKey, Date.now().toString(), ttl);
+      await RedisOperations.set(cacheKey, Date.now().toString(), ttl);
     } catch (error) {
       // non-blocking cache operation
       console.warn('Failed to set deduplication cache:', error);
