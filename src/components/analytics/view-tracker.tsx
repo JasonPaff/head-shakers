@@ -53,6 +53,11 @@ export const ViewTracker = ({
     isDisableToast: true,
     onAfterSuccess: () => {
       hasRecordedViewRef.current = true;
+      if (viewStartTimeRef.current) {
+        const duration = Date.now() - viewStartTimeRef.current;
+        setSessionDuration((prev) => prev + duration);
+        viewStartTimeRef.current = null;
+      }
     },
     onSuccess: ({ data }) => {
       onViewRecorded?.(data.data);
@@ -82,17 +87,21 @@ export const ViewTracker = ({
 
   const handleVisibilityChange = useCallback(() => {
     if (document.hidden) {
-      // the page is hidden, stop tracking view duration
+      // the page is hidden, pause tracking but don't accumulate session duration yet
       if (viewStartTimeRef.current) {
         const currentDuration = Date.now() - viewStartTimeRef.current;
         setSessionDuration((prev) => prev + currentDuration);
         viewStartTimeRef.current = null;
       }
-    } else {
-      // page is visible again, restart tracking
-      if (!hasRecordedViewRef.current) {
-        viewStartTimeRef.current = Date.now();
+      // clear any pending timeout since the page is hidden
+      if (visibilityTimeoutRef.current) {
+        clearTimeout(visibilityTimeoutRef.current);
+        visibilityTimeoutRef.current = null;
       }
+    } else {
+      // page is visible again, only restart tracking if we haven't recorded a view yet
+      // and the element is still in viewport (this will be handled by intersection observer)
+      // don't automatically restart here to prevent double tracking
     }
   }, []);
 
@@ -114,7 +123,6 @@ export const ViewTracker = ({
             visibilityTimeoutRef.current = setTimeout(() => {
               if (viewStartTimeRef.current && !hasRecordedViewRef.current) {
                 const duration = Date.now() - viewStartTimeRef.current;
-                setSessionDuration((prev) => prev + duration);
                 void recordViewCallback(duration + sessionDuration);
               }
             }, viewTimeThreshold);
@@ -152,14 +160,6 @@ export const ViewTracker = ({
 
       if (visibilityTimeoutRef.current) {
         clearTimeout(visibilityTimeoutRef.current);
-      }
-
-      // record final view duration if needed
-      if (viewStartTimeRef.current && !hasRecordedViewRef.current) {
-        const finalDuration = Date.now() - viewStartTimeRef.current + sessionDuration;
-        if (finalDuration >= viewTimeThreshold) {
-          void recordViewCallback(finalDuration);
-        }
       }
     };
   }, [
