@@ -3,108 +3,87 @@
 import { CalendarIcon, DownloadIcon, RefreshCwIcon } from 'lucide-react';
 import { useState } from 'react';
 
-// Type imports for future use when integrating with real server actions
-// import type { TrendingContentResult } from '@/lib/facades/analytics/analytics.facade';
+type ChartData = {
+  avgDuration: number;
+  date: string;
+  uniqueViewers: number;
+  views: number;
+};
+
+// Type imports for analytics data
+type OverviewData = {
+  avgViewDuration: number;
+  bounceRate: number;
+  periodComparison: {
+    bounceRate: number;
+    duration: number;
+    viewers: number;
+    views: number;
+  };
+  totalViewers: number;
+  totalViews: number;
+};
+
+type TrendingData = {
+  averageViewDuration?: number;
+  rank: number;
+  targetId: string;
+  targetType: 'bobblehead' | 'collection' | 'user';
+  title: string;
+  totalViews: number;
+  trendDirection: 'down' | 'up';
+  trendPercentage: number;
+  uniqueViewers: number;
+};
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToggle } from '@/hooks/use-toggle';
 
 import { EngagementMetricsCard } from './engagement-metrics-card';
 import { TrendingContentTable } from './trending-content-table';
 import { ViewCharts } from './view-charts';
 
 interface ViewAnalyticsDashboardProps {
+  chartData: Array<ChartData>;
   className?: string;
+  overviewData: OverviewData;
+  timeRange: string;
+  trendingData: Array<TrendingData>;
 }
 
-export const ViewAnalyticsDashboard = ({ className }: ViewAnalyticsDashboardProps) => {
-  const [timeRange, setTimeRange] = useState('7days');
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  // Mock data - in real implementation, this would come from TanStack Query hooks
-  const mockOverviewData = {
-    avgViewDuration: 142, // seconds
-    bounceRate: 23.4, // percentage
-    periodComparison: {
-      bounceRate: -2.1,
-      duration: -5.2,
-      viewers: 8.9,
-      views: 12.8, // percentage change
-    },
-    totalViewers: 12450,
-    totalViews: 156780,
-  };
-
-  // TODO: Replace with real server action calls in future implementation
-  const mockTrendingData = [
-    {
-      averageViewDuration: 180,
-      rank: 1,
-      targetId: '1',
-      targetType: 'collection' as const,
-      title: 'Baseball Legends Collection',
-      totalViews: 8420,
-      trendDirection: 'up' as const,
-      trendPercentage: 24.5,
-      uniqueViewers: 1240,
-    },
-    {
-      averageViewDuration: 95,
-      rank: 2,
-      targetId: '2',
-      targetType: 'bobblehead' as const,
-      title: 'Vintage Mickey Mouse',
-      totalViews: 6340,
-      trendDirection: 'up' as const,
-      trendPercentage: 18.2,
-      uniqueViewers: 890,
-    },
-    {
-      averageViewDuration: 120,
-      rank: 3,
-      targetId: '3',
-      targetType: 'user' as const,
-      title: 'John Collector Profile',
-      totalViews: 4890,
-      trendDirection: 'down' as const,
-      trendPercentage: -3.1,
-      uniqueViewers: 670,
-    },
-  ];
-
-  const mockChartData = Array.from({ length: 30 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - (29 - i));
-    const dateString = date.toISOString().split('T')[0];
-    return {
-      avgDuration: Math.floor(Math.random() * 60) + 90,
-      date: dateString || '',
-      uniqueViewers: Math.floor(Math.random() * 200) + 100,
-      views: Math.floor(Math.random() * 1000) + 500,
-    };
-  });
+export const ViewAnalyticsDashboard = ({
+  chartData,
+  className,
+  overviewData,
+  timeRange: initialTimeRange,
+  trendingData,
+}: ViewAnalyticsDashboardProps) => {
+  const [timeRange, setTimeRange] = useState(initialTimeRange);
+  const [isRefreshing, setIsRefreshing] = useToggle();
 
   const handleRefresh = async () => {
-    setIsRefreshing(true);
-    // In real implementation, this would invalidate and refetch queries
+    setIsRefreshing.on();
+    // TODO: refresh server component data
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsRefreshing(false);
+    setIsRefreshing.off();
   };
 
   const handleExport = () => {
-    // In real implementation, this would export analytics data
+    // TODO: export analytics data
     const exportData = {
-      chartData: mockChartData,
+      chartData,
       exportedAt: new Date().toISOString(),
-      overview: mockOverviewData,
+      overview: overviewData,
       timeRange,
-      trending: mockTrendingData,
+      trending: trendingData,
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
       type: 'application/json',
     });
 
+    // TODO: turn into a reusable utility
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -162,33 +141,33 @@ export const ViewAnalyticsDashboard = ({ className }: ViewAnalyticsDashboardProp
       {/* Overview Metrics */}
       <div className={'mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4'}>
         <EngagementMetricsCard
-          change={mockOverviewData.periodComparison.views}
+          change={overviewData.periodComparison.views}
           format={'number'}
           timeRange={timeRange}
           title={'Total Views'}
-          value={mockOverviewData.totalViews}
+          value={overviewData.totalViews}
         />
         <EngagementMetricsCard
-          change={mockOverviewData.periodComparison.viewers}
+          change={overviewData.periodComparison.viewers}
           format={'number'}
           timeRange={timeRange}
           title={'Unique Viewers'}
-          value={mockOverviewData.totalViewers}
+          value={overviewData.totalViewers}
         />
         <EngagementMetricsCard
-          change={mockOverviewData.periodComparison.duration}
+          change={overviewData.periodComparison.duration}
           format={'duration'}
           timeRange={timeRange}
           title={'Avg View Duration'}
-          value={mockOverviewData.avgViewDuration}
+          value={overviewData.avgViewDuration}
         />
         <EngagementMetricsCard
-          change={mockOverviewData.periodComparison.bounceRate}
+          change={overviewData.periodComparison.bounceRate}
           format={'percentage'}
           isInverseGood={true}
           timeRange={timeRange}
           title={'Bounce Rate'}
-          value={mockOverviewData.bounceRate}
+          value={overviewData.bounceRate}
         />
       </div>
 
@@ -199,7 +178,7 @@ export const ViewAnalyticsDashboard = ({ className }: ViewAnalyticsDashboardProp
             <CardTitle>View Trends</CardTitle>
           </CardHeader>
           <CardContent>
-            <ViewCharts data={mockChartData} timeRange={timeRange} />
+            <ViewCharts data={chartData} timeRange={timeRange} />
           </CardContent>
         </Card>
       </div>
@@ -211,7 +190,7 @@ export const ViewAnalyticsDashboard = ({ className }: ViewAnalyticsDashboardProp
             <CardTitle>Trending Content</CardTitle>
           </CardHeader>
           <CardContent>
-            <TrendingContentTable data={mockTrendingData} timeRange={timeRange} />
+            <TrendingContentTable data={trendingData} timeRange={timeRange} />
           </CardContent>
         </Card>
       </div>
