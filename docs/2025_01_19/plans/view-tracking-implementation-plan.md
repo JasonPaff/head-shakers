@@ -355,46 +355,7 @@ npm run lint:fix && npm run typecheck
 
 ---
 
-### Step 9: Add Privacy Controls and Rate Limiting
-
-**What**: Implement privacy controls and rate limiting for view tracking
-**Why**: Privacy compliance and spam prevention are essential for user trust
-**Confidence**: High
-
-**Files to Create:**
-
-- `src/lib/utils/view-privacy.utils.ts` - Privacy utilities for view tracking
-- `src/lib/utils/rate-limiting.utils.ts` - Rate limiting utilities
-
-**Files to Modify:**
-
-- `src/lib/actions/analytics/view-tracking.actions.ts` - Add privacy and rate limiting
-- `src/middleware.ts` - Add view tracking rate limiting middleware
-
-**Changes:**
-
-- Add user privacy preference checking
-- Implement IP-based rate limiting for anonymous users
-- Create session-based rate limiting for authenticated users
-- Add opt-out functionality for view tracking
-- Include proper GDPR compliance measures
-
-**Validation Commands:**
-
-```bash
-npm run lint:fix && npm run typecheck
-```
-
-**Success Criteria:**
-
-- [ ] Privacy preferences are properly respected
-- [ ] Rate limiting prevents abuse without affecting normal users
-- [ ] GDPR compliance requirements are met
-- [ ] All validation commands pass
-
----
-
-### Step 10: Add TanStack Query Integration and Real-time Updates
+### Step 9: Add TanStack Query Integration and Real-time Updates
 
 **What**: Integrate view tracking with TanStack Query for efficient state management
 **Why**: TanStack Query provides optimized caching and real-time updates for view data
