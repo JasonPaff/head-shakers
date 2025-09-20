@@ -46,7 +46,7 @@ export const recordViewAction = publicActionClient
 
     try {
       const result = await AnalyticsFacade.recordView(viewData, ctx.db, {
-        deduplicationWindow: 300,
+        deduplicationWindow: 600,
         shouldRespectPrivacySettings: true,
       });
 
@@ -125,7 +125,7 @@ export const batchRecordViewsAction = authActionClient
     try {
       const result = await AnalyticsFacade.batchRecordViews(batchData.views, dbInstance, {
         batchId: batchData.batchId,
-        deduplicationWindow: 300,
+        deduplicationWindow: 600,
         shouldRespectPrivacySettings: true,
       });
 

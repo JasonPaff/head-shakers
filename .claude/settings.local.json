@@ -47,7 +47,12 @@
       "Bash(npm run typecheck:*)",
       "Bash(npm install:*)",
       "Bash(npx playwright test:*)",
-      "Bash(npm run format:*)"
+      "Bash(npm run format:*)",
+      "mcp__Neon__get_database_tables",
+      "mcp__Neon__describe_table_schema",
+      "mcp__Neon__list_projects",
+      "Bash(npm run dev:*)",
+      "mcp__Neon__run_sql"
     ],
     "deny": [],
     "ask": []

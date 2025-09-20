@@ -45,7 +45,14 @@ export default eslintTypescript.config([
       ...eslintReactHooks.configs.recommended.rules,
     },
   },
-  eslintReact.configs.flat.recommended,
+  {
+    ...eslintReact.configs.flat.recommended,
+    settings: {
+      react: {
+        version: '19.1.0',
+      },
+    },
+  },
   eslintJsxA11y?.flatConfigs.recommended,
   ...eslintTanstackQuery.configs['flat/recommended'],
   eslintTypescript.configs.recommendedTypeChecked,

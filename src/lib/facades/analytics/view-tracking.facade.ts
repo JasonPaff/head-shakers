@@ -98,7 +98,7 @@ export class ViewTrackingFacade {
             viewData.targetId,
             viewerUserId,
             viewData.ipAddress || undefined,
-            options.deduplicationWindow || 300,
+            options.deduplicationWindow || 600,
           );
 
           if (deduplicationResult.isDuplicate) {
@@ -142,14 +142,14 @@ export class ViewTrackingFacade {
                   view.targetType,
                   view.targetId,
                   viewerUserId,
-                  options.deduplicationWindow || 300,
+                  options.deduplicationWindow || 600,
                 )
               : view.ipAddress ?
                 this.setAnonymousDeduplicationCache(
                   view.targetType,
                   view.targetId,
                   view.ipAddress,
-                  options.deduplicationWindow || 300,
+                  options.deduplicationWindow || 600,
                 )
               : Promise.resolve(),
             ),
@@ -478,7 +478,7 @@ export class ViewTrackingFacade {
         viewData.targetId,
         viewerUserId,
         viewData.ipAddress || undefined,
-        options.deduplicationWindow || 300, // 5 minutes default
+        options.deduplicationWindow || 600, // 10 minutes default
       );
 
       if (deduplicationResult.isDuplicate) {
@@ -559,7 +559,7 @@ export class ViewTrackingFacade {
     targetId: string,
     viewerUserId?: string,
     ipAddress?: string,
-    deduplicationWindow = 300,
+    deduplicationWindow = 600,
   ): Promise<ViewDeduplicationResult> {
     try {
       let cacheKey: string;

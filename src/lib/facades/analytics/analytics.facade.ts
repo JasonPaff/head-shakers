@@ -167,7 +167,7 @@ export const AnalyticsFacade = {
       views,
       undefined, // viewerUserId - will be determined from individual view data
       {
-        deduplicationWindow: options.deduplicationWindow || 300,
+        deduplicationWindow: options.deduplicationWindow || 600,
         shouldRespectPrivacySettings: options.shouldRespectPrivacySettings || true,
       },
       dbInstance || db,
@@ -309,7 +309,7 @@ export const AnalyticsFacade = {
       viewData,
       viewData.viewerId || undefined,
       {
-        deduplicationWindow: options.deduplicationWindow || 300,
+        deduplicationWindow: options.deduplicationWindow || 600,
         shouldRespectPrivacySettings: options.shouldRespectPrivacySettings || true,
       },
       dbInstance || db,

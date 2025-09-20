@@ -27,8 +27,8 @@ export const BobbleheadViewTracker = ({
   sessionId,
   subcollectionId,
   testId,
-  viewThreshold = 0.5, // standard threshold for bobbleheads
-  viewTimeThreshold = 1500, // moderate threshold for bobblehead engagement
+  viewThreshold = 0.1,
+  viewTimeThreshold = 3000,
 }: BobbleheadViewTrackerProps) => {
   const bobbleheadTrackerTestId = testId || generateTestId('feature', 'bobblehead-card');
 
