@@ -148,3 +148,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **Tests:** Put new test files under the `tests/` directory, mirroring the code structure.
 
 > **Important:** When creating a new file, ensure the directory exists or create it. Never default to the root directory for these files.
+
+## Project Agentic AI Rules (Important!)
+
+- **Claude Code Agent Database Access**: Always use the Neon DB Expert subagent for database access. Never connect directly to the database.

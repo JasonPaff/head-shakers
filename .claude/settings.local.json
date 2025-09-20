@@ -53,7 +53,8 @@
       "Bash(/hooks)",
       "mcp__Neon__get_database_tables",
       "mcp__Neon__describe_table_schema",
-      "mcp__Neon__run_sql_transaction"
+      "mcp__Neon__run_sql_transaction",
+      "mcp__Neon__run_sql"
     ],
     "deny": [],
     "ask": []
