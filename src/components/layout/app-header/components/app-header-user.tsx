@@ -28,7 +28,7 @@ export const AppHeaderUser = ({ userId }: AppHeaderUserProps) => {
             <UserButton.Link
               href={$path({ route: '/users/[userId]', routeParams: { userId } })}
               label={'View Profile'}
-              labelIcon={<User size={16} />}
+              labelIcon={<User aria-hidden size={16} />}
             />
           </UserButton.MenuItems>
         </UserButton>

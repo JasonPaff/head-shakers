@@ -2,8 +2,9 @@
 
 import type { ComponentProps } from 'react';
 
-import { ActivityIcon, CopyleftIcon, PlusIcon, SettingsIcon, ShieldIcon, UploadIcon } from 'lucide-react';
+import { ActivityIcon, CopyleftIcon, PlusIcon, SettingsIcon, ShieldIcon, UploadIcon, User } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
+import { useUser } from '@clerk/nextjs';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -16,6 +17,7 @@ import { useAdminRole } from '@/hooks/use-admin-role';
 
 const useNavigationData = () => {
   const { isAdmin, isLoading, isModerator } = useAdminRole();
+  const { user } = useUser();
 
   const baseNavMain = [
     {
@@ -78,6 +80,11 @@ const useNavigationData = () => {
       title: 'Following Feed',
       url: $path({ route: '/dashboard/feed' }),
     },
+    ...(user ? [{
+      icon: User,
+      title: 'My Profile',
+      url: $path({ route: '/users/[userId]', routeParams: { userId: user.id } }),
+    }] : []),
     {
       icon: SettingsIcon,
       title: 'Account Settings',
