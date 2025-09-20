@@ -48,13 +48,11 @@
       "Bash(npm install:*)",
       "Bash(npx playwright test:*)",
       "Bash(npm run format:*)",
-      "mcp__Neon__get_database_tables",
-      "mcp__Neon__describe_table_schema",
-      "mcp__Neon__list_projects",
-      "Bash(npm run dev:*)",
-      "mcp__Neon__run_sql"
+      "Bash(npm run dev:*)"
     ],
-    "deny": [],
+    "deny": [
+      "mcp__Neon__*"
+    ],
     "ask": []
   },
   "outputStyle": "default"

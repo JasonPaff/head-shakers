@@ -44,6 +44,7 @@ export const ViewTracker = ({
   const viewStartTimeRef = useRef<null | number>(null);
   const visibilityTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasRecordedViewRef = useRef(false);
+  const isMountedRef = useRef(false);
 
   const { userId } = useAuth();
 
@@ -86,6 +87,8 @@ export const ViewTracker = ({
   );
 
   const handleVisibilityChange = useCallback(() => {
+    if (typeof document === 'undefined') return;
+
     if (document.hidden) {
       // the page is hidden, pause tracking but don't accumulate session duration yet
       if (viewStartTimeRef.current) {
@@ -106,8 +109,11 @@ export const ViewTracker = ({
   }, []);
 
   useEffect(() => {
+    // Set mounted flag and setup intersection observer
+    isMountedRef.current = true;
+
     const element = containerRef.current;
-    if (!element) return;
+    if (!element || typeof window === 'undefined') return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -152,11 +158,15 @@ export const ViewTracker = ({
     observer.observe(element);
 
     // listen for page visibility changes
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
 
     return () => {
       observer.disconnect();
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      }
 
       if (visibilityTimeoutRef.current) {
         clearTimeout(visibilityTimeoutRef.current);
