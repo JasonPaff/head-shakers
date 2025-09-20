@@ -69,18 +69,18 @@ export const ViewTracker = ({
 
   const recordViewCallback = useCallback(
     (duration: number) => {
-      if (hasRecordedViewRef.current || isExecuting || !effectiveSessionId) return;
+      if (hasRecordedViewRef.current || isExecuting) return;
 
       const viewData: RecordViewInput = {
         ipAddress: undefined, // will be determined server-side
         metadata,
         referrerUrl: typeof window !== 'undefined' ? window.document.referrer || undefined : undefined,
-        sessionId: effectiveSessionId,
+        sessionId: effectiveSessionId ?? undefined,
         targetId,
         targetType,
         userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : undefined,
         viewDuration: Math.round(duration / 1000),
-        viewerId: userId || null,
+        viewerId: userId || undefined,
       };
 
       recordView(viewData);
@@ -89,7 +89,7 @@ export const ViewTracker = ({
   );
 
   const handleVisibilityChange = useCallback(() => {
-    if (typeof document === 'undefined') return;
+    if (typeof window === 'undefined') return;
 
     if (document.hidden) {
       // the page is hidden, pause tracking but don't accumulate session duration yet
@@ -111,7 +111,7 @@ export const ViewTracker = ({
   }, []);
 
   useEffect(() => {
-    // Set mounted flag and setup intersection observer
+    // set mounted flag and setup intersection observer
     isMountedRef.current = true;
 
     const element = containerRef.current;

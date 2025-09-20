@@ -13,6 +13,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { AnalyticsFacade } from '@/lib/facades/analytics/analytics.facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -36,16 +37,34 @@ export const recordViewAction = publicActionClient
   .action(async ({ ctx, parsedInput }) => {
     const viewData = recordViewSchema.parse(ctx.sanitizedInput || parsedInput);
 
+    // convert Clerk ID to internal UUID if needed
+    let resolvedViewerId: null | string = null;
+    if (viewData.viewerId) {
+      // check if it's already a UUID (36 chars with hyphens) or a Clerk ID (starts with user_)
+      if (viewData.viewerId.startsWith('user_')) {
+        const user = await UsersFacade.getUserByClerkId(viewData.viewerId, ctx.db);
+        if (user) resolvedViewerId = user.id;
+      } else {
+        // assume it's already a UUID
+        resolvedViewerId = viewData.viewerId;
+      }
+    }
+
+    const processedViewData = {
+      ...viewData,
+      viewerId: resolvedViewerId ?? undefined,
+    };
+
     Sentry.setContext(SENTRY_CONTEXTS.VIEW_DATA, {
-      ipAddress: viewData.ipAddress,
-      sessionId: viewData.sessionId,
-      targetId: viewData.targetId,
-      targetType: viewData.targetType,
-      viewerId: viewData.viewerId,
+      ipAddress: processedViewData.ipAddress,
+      sessionId: processedViewData.sessionId,
+      targetId: processedViewData.targetId,
+      targetType: processedViewData.targetType,
+      viewerId: processedViewData.viewerId,
     });
 
     try {
-      const result = await AnalyticsFacade.recordView(viewData, ctx.db, {
+      const result = await AnalyticsFacade.recordView(processedViewData, ctx.db, {
         deduplicationWindow: 600,
         shouldRespectPrivacySettings: true,
       });
@@ -65,20 +84,20 @@ export const recordViewAction = publicActionClient
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           isDuplicate: result.isDuplicate,
-          targetId: viewData.targetId,
-          targetType: viewData.targetType,
-          viewerId: viewData.viewerId,
+          targetId: processedViewData.targetId,
+          targetType: processedViewData.targetType,
+          viewerId: processedViewData.viewerId,
           viewId: result.viewId,
         },
         level: SENTRY_LEVELS.INFO,
-        message: `View recorded for ${viewData.targetType} ${viewData.targetId}${result.isDuplicate ? ' (duplicate)' : ''}`,
+        message: `View recorded for ${processedViewData.targetType} ${processedViewData.targetId}${result.isDuplicate ? ' (duplicate)' : ''}`,
       });
 
-      if (viewData.targetType === 'bobblehead' || viewData.targetType === 'collection') {
+      if (processedViewData.targetType === 'bobblehead' || processedViewData.targetType === 'collection') {
         CacheRevalidationService.analytics.onViewRecord(
-          viewData.targetType,
-          viewData.targetId,
-          viewData.viewerId ?? undefined,
+          processedViewData.targetType,
+          processedViewData.targetId,
+          processedViewData.viewerId ?? undefined,
         );
       }
 
@@ -98,7 +117,7 @@ export const recordViewAction = publicActionClient
           actionName: ACTION_NAMES.ANALYTICS.TRACK_VIEW,
         },
         operation: OPERATIONS.ANALYTICS.RECORD_VIEW,
-        userId: viewData.viewerId ?? undefined,
+        userId: processedViewData.viewerId ?? undefined,
       });
     }
   });

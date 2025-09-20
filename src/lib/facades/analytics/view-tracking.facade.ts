@@ -478,7 +478,7 @@ export class ViewTrackingFacade {
         viewData.targetId,
         viewerUserId,
         viewData.ipAddress || undefined,
-        options.deduplicationWindow || 600, // 10 minutes default
+        options.deduplicationWindow || 600, // 10-minute default
       );
 
       if (deduplicationResult.isDuplicate) {

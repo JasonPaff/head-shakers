@@ -55,6 +55,7 @@ export const updateSearchQuerySchema = insertSearchQuerySchema.partial();
 export const recordViewSchema = insertContentViewSchema.extend({
   metadata: z.record(z.string(), z.any()).optional(),
   sessionId: z.string().uuid().optional(),
+  viewerId: z.string().optional(),
 });
 
 export const batchRecordViewsSchema = z.object({
