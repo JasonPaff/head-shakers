@@ -14,9 +14,11 @@ import { SubcollectionHeaderSkeleton } from '@/app/(app)/collections/[collection
 import { SubcollectionMetricsSkeleton } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/skeletons/subcollection-metrics-skeleton';
 import { SubcollectionErrorBoundary } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-error-boundary';
 import { Route } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type';
+import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOrCreateSessionId } from '@/utils/session-utils';
 
 type SubcollectionPageProps = PageProps;
 
@@ -45,56 +47,64 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
     notFound();
   }
 
+  const sessionId = getOrCreateSessionId();
+
   return (
-    <div>
-      {/* Header Section with Suspense */}
-      <div className={'mt-3 border-b border-border'}>
-        <ContentLayout>
-          <SubcollectionErrorBoundary section={'header'}>
-            <Suspense fallback={<SubcollectionHeaderSkeleton />}>
-              <SubcollectionHeaderAsync
-                collectionId={collectionId}
-                currentUserId={currentUserId}
-                subcollectionId={subcollectionId}
-              />
-            </Suspense>
-          </SubcollectionErrorBoundary>
-        </ContentLayout>
-      </div>
+    <CollectionViewTracker
+      collectionId={collectionId}
+      sessionId={sessionId}
+      subcollectionId={subcollectionId}
+    >
+      <div>
+        {/* Header Section with Suspense */}
+        <div className={'mt-3 border-b border-border'}>
+          <ContentLayout>
+            <SubcollectionErrorBoundary section={'header'}>
+              <Suspense fallback={<SubcollectionHeaderSkeleton />}>
+                <SubcollectionHeaderAsync
+                  collectionId={collectionId}
+                  currentUserId={currentUserId}
+                  subcollectionId={subcollectionId}
+                />
+              </Suspense>
+            </SubcollectionErrorBoundary>
+          </ContentLayout>
+        </div>
 
-      {/* Main Content */}
-      <div className={'mt-4'}>
-        <ContentLayout>
-          <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
-            {/* Main Content Area */}
-            <div className={'order-2 lg:order-1 lg:col-span-9'}>
-              <SubcollectionErrorBoundary section={'bobbleheads'}>
-                <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
-                  <SubcollectionBobbleheadsAsync
-                    collectionId={collectionId}
-                    currentUserId={currentUserId}
-                    searchParams={resolvedSearchParams}
-                    subcollectionId={subcollectionId}
-                  />
-                </Suspense>
-              </SubcollectionErrorBoundary>
+        {/* Main Content */}
+        <div className={'mt-4'}>
+          <ContentLayout>
+            <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+              {/* Main Content Area */}
+              <div className={'order-2 lg:order-1 lg:col-span-9'}>
+                <SubcollectionErrorBoundary section={'bobbleheads'}>
+                  <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
+                    <SubcollectionBobbleheadsAsync
+                      collectionId={collectionId}
+                      currentUserId={currentUserId}
+                      searchParams={resolvedSearchParams}
+                      subcollectionId={subcollectionId}
+                    />
+                  </Suspense>
+                </SubcollectionErrorBoundary>
+              </div>
+
+              {/* Sidebar */}
+              <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
+                <SubcollectionErrorBoundary section={'metrics'}>
+                  <Suspense fallback={<SubcollectionMetricsSkeleton />}>
+                    <SubcollectionMetricsAsync
+                      collectionId={collectionId}
+                      currentUserId={currentUserId}
+                      subcollectionId={subcollectionId}
+                    />
+                  </Suspense>
+                </SubcollectionErrorBoundary>
+              </aside>
             </div>
-
-            {/* Sidebar */}
-            <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
-              <SubcollectionErrorBoundary section={'metrics'}>
-                <Suspense fallback={<SubcollectionMetricsSkeleton />}>
-                  <SubcollectionMetricsAsync
-                    collectionId={collectionId}
-                    currentUserId={currentUserId}
-                    subcollectionId={subcollectionId}
-                  />
-                </Suspense>
-              </SubcollectionErrorBoundary>
-            </aside>
-          </div>
-        </ContentLayout>
+          </ContentLayout>
+        </div>
       </div>
-    </div>
+    </CollectionViewTracker>
   );
 }

@@ -23,4 +23,18 @@ export class UsersFacade {
       { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByClerkId', userId: clerkId } },
     );
   }
+
+  /**
+   * get user by user ID
+   */
+  static async getUserById(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {
+    return CacheService.users.profile(
+      () => {
+        const context = createPublicQueryContext({ dbInstance });
+        return UsersQuery.findByIdAsync(userId, context);
+      },
+      userId,
+      { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },
+    );
+  }
 }
