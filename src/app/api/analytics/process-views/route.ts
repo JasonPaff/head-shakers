@@ -1,4 +1,4 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server';
 
 import { verifySignatureAppRouter } from '@upstash/qstash/dist/nextjs';
 import { NextResponse } from 'next/server';
@@ -15,7 +15,7 @@ import { createServiceError } from '@/lib/utils/error-builders';
  */
 async function handler(request: NextRequest) {
   try {
-    const requestData = await request.json() as {
+    const requestData = (await request.json()) as {
       jobType: 'aggregation' | 'trending';
       payload: unknown;
     };

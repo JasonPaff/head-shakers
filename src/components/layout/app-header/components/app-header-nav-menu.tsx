@@ -4,9 +4,8 @@ import type { LucideIcon } from 'lucide-react';
 
 import { EarthIcon } from 'lucide-react';
 import {
-  ClockIcon,
+  ActivityIcon,
   CompassIcon,
-  FilmIcon,
   GridIcon,
   HeartIcon,
   LayoutDashboardIcon,
@@ -47,22 +46,22 @@ const navigationLinks: Array<NavigationLink> = [
     icon: CompassIcon,
     items: [
       {
-        description: 'Explore the most popular bobblehead collections right now',
-        href: $path({ route: '/browse/search' }),
-        icon: TrendingUpIcon,
-        title: 'Trending Collections',
-      },
-      {
-        description: 'See the latest bobbleheads added to the community',
+        description: 'Most popular bobbleheads and collections right now',
         href: $path({ route: '/browse/trending' }),
-        icon: StarIcon,
-        title: 'Recent Additions',
+        icon: TrendingUpIcon,
+        title: 'Trending Now',
       },
       {
         description: 'Curated collections and collector spotlights',
         href: $path({ route: '/browse/featured' }),
-        icon: TrophyIcon,
+        icon: StarIcon,
         title: 'Featured Collections',
+      },
+      {
+        description: 'Advanced search with detailed filters and options',
+        href: $path({ route: '/browse/search' }),
+        icon: SearchIcon,
+        title: 'Advanced Search',
       },
     ],
     label: 'Discover',
@@ -71,52 +70,47 @@ const navigationLinks: Array<NavigationLink> = [
     icon: GridIcon,
     items: [
       {
-        description: "Discover the featured bobbleheads and collections'",
+        description: 'Browse all public collections in the community',
         href: $path({ route: '/browse' }),
         icon: EarthIcon,
-        title: 'Browse Home',
+        title: 'Browse All',
       },
       {
-        description: 'Baseball, football, basketball and more sports bobbleheads',
-        href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'sports' } }),
+        description: 'Browse by category - sports, entertainment, vintage and more',
+        href: $path({ route: '/browse/categories' }),
         icon: TrophyIcon,
-        title: 'Sports',
+        title: 'By Category',
       },
       {
-        description: 'Movies, TV shows, cartoons and pop culture figures',
-        href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'entertainment' } }),
-        icon: FilmIcon,
-        title: 'Entertainment',
-      },
-      {
-        description: 'Classic and hard-to-find bobblehead collectibles',
-        href: $path({ route: '/browse/categories/[category]', routeParams: { category: 'vintage' } }),
-        icon: ClockIcon,
-        title: 'Vintage & Rare',
-      },
-    ],
-    label: 'Browse',
-  },
-  {
-    icon: UsersIcon,
-    items: [
-      {
-        description: 'Discover the most active collectors in the community',
+        description: 'Discover the most respected collectors in the community',
         href: $path({ route: '/browse/featured' }),
         icon: UsersIcon,
         title: 'Top Collectors',
       },
+    ],
+    label: 'Collections',
+  },
+  {
+    icon: UsersIcon,
+    isAuthRequired: true,
+    items: [
       {
-        description: 'Find specific bobbleheads with detailed filters',
-        href: $path({ route: '/browse/search' }),
-        icon: SearchIcon,
-        title: 'Advanced Search',
+        description: 'Activity updates from collectors you follow',
+        href: $path({ route: '/dashboard/feed' }),
+        icon: ActivityIcon,
+        title: 'My Feed',
       },
       {
-        description: "See what's trending in the bobblehead world",
-        href: $path({ route: '/browse/trending' }),
-        icon: TrendingUpIcon,
-        title: "What's Hot",
+        description: 'Manage your following and followers',
+        href: $path({ route: '/dashboard/feed' }),
+        icon: UsersIcon,
+        title: 'Following',
+      },
+      {
+        description: 'Likes, comments, and social notifications',
+        href: $path({ route: '/dashboard/notifications' }),
+        icon: HeartIcon,
+        title: 'Notifications',
       },
     ],
     label: 'Community',
@@ -132,19 +126,19 @@ const navigationLinks: Array<NavigationLink> = [
         title: 'Dashboard',
       },
       {
-        description: 'View and manage your complete collection',
-        href: $path({ route: '/dashboard/collection' }),
-        icon: HeartIcon,
-        title: 'My Bobbleheads',
-      },
-      {
         description: 'Add a new bobblehead to your collection',
         href: $path({ route: '/bobbleheads/add' }),
         icon: PackagePlusIcon,
-        title: 'Add New Bobblehead',
+        title: 'Add Bobblehead',
+      },
+      {
+        description: 'Your public collector profile and social presence',
+        href: $path({ route: '/settings/profile' }),
+        icon: UserIcon,
+        title: 'Profile',
       },
     ],
-    label: 'My Collection',
+    label: 'My Hub',
   },
 ];
 

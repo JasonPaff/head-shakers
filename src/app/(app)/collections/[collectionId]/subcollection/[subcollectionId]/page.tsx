@@ -47,10 +47,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   }
 
   return (
-    <CollectionViewTracker
-      collectionId={collectionId}
-      subcollectionId={subcollectionId}
-    >
+    <CollectionViewTracker collectionId={collectionId} subcollectionId={subcollectionId}>
       <div>
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>
