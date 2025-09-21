@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
 
-// load E2E environment variables
 dotenv.config({ path: '.env.e2e' });
 
 export default defineConfig({
@@ -9,7 +8,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   reporter: 'null',
   use: {
     baseURL: 'http://localhost:3000',
@@ -22,86 +21,29 @@ export default defineConfig({
       testMatch: /global\.setup\.ts/,
     },
     {
-      name: 'authenticated-chromium',
+      name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
-      testMatch: /authenticated\.spec\.ts/,
+      testIgnore: /global\.setup\.ts/,
     },
     {
-      name: 'auth-flow-chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        // No shared storageState - each test handles its own auth
-      },
-      dependencies: ['global setup'],
-      testMatch: /auth-flow\.spec\.ts/,
-    },
-    {
-      name: 'other-tests-chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: 'playwright/.clerk/user.json',
-      },
-      dependencies: ['global setup'],
-      testMatch: /^(?!.*(authenticated|auth-flow)\.spec\.ts$).*\.spec\.ts$/,
-    },
-    {
-      name: 'authenticated-firefox',
+      name: 'firefox',
       use: {
         ...devices['Desktop Firefox'],
-        storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
-      testMatch: /authenticated\.spec\.ts/,
+      testIgnore: /global\.setup\.ts/,
     },
     {
-      name: 'auth-flow-firefox',
+      name: 'safari',
       use: {
-        ...devices['Desktop Firefox'],
-        // No shared storageState - each test handles its own auth
+        ...devices['Desktop Safari'],
       },
       dependencies: ['global setup'],
-      testMatch: /auth-flow\.spec\.ts/,
+      testIgnore: /global\.setup\.ts/,
     },
-    {
-      name: 'other-tests-firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-        storageState: 'playwright/.clerk/user.json',
-      },
-      dependencies: ['global setup'],
-      testMatch: /^(?!.*(authenticated|auth-flow)\.spec\.ts$).*\.spec\.ts$/,
-    },
-    // {
-    //   name: 'authenticated-webkit',
-    //   use: {
-    //     ...devices['Desktop Safari'],
-    //     storageState: 'playwright/.clerk/user.json',
-    //   },
-    //   dependencies: ['global setup'],
-    //   testMatch: /authenticated\.spec\.ts/,
-    // },
-    // {
-    //   name: 'auth-flow-webkit',
-    //   use: {
-    //     ...devices['Desktop Safari'],
-    //     // No shared storageState - each test handles its own auth
-    //   },
-    //   dependencies: ['global setup'],
-    //   testMatch: /auth-flow\.spec\.ts/,
-    // },
-    // {
-    //   name: 'other-tests-webkit',
-    //   use: {
-    //     ...devices['Desktop Safari'],
-    //     storageState: 'playwright/.clerk/user.json',
-    //   },
-    //   dependencies: ['global setup'],
-    //   testMatch: /(?!authenticated|auth-flow).*\.spec\.ts/,
-    // },
   ],
 
   webServer: {
