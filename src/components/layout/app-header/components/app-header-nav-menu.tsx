@@ -93,7 +93,7 @@ const navigationLinks: Array<NavigationLink> = [
     label: 'Collections',
   },
   {
-    icon: UsersIcon,
+    icon: UserIcon,
     isAuthRequired: true,
     items: [
       {
@@ -114,13 +114,6 @@ const navigationLinks: Array<NavigationLink> = [
         icon: HeartIcon,
         title: 'Notifications',
       },
-    ],
-    label: 'Community',
-  },
-  {
-    icon: UserIcon,
-    isAuthRequired: true,
-    items: [
       {
         description: 'Overview of your collection and recent activity',
         href: $path({ route: '/dashboard/collection' }),
