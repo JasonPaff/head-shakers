@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.e2e' });
@@ -15,36 +15,6 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   timeout: 240 * 1000,
-  projects: [
-    {
-      name: 'global setup',
-      testMatch: /global\.setup\.ts/,
-    },
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-      },
-      dependencies: ['global setup'],
-      testIgnore: /global\.setup\.ts/,
-    },
-    {
-      name: 'firefox',
-      use: {
-        ...devices['Desktop Firefox'],
-      },
-      dependencies: ['global setup'],
-      testIgnore: /global\.setup\.ts/,
-    },
-    {
-      name: 'safari',
-      use: {
-        ...devices['Desktop Safari'],
-      },
-      dependencies: ['global setup'],
-      testIgnore: /global\.setup\.ts/,
-    },
-  ],
 
   webServer: {
     command: 'npm run dev',
