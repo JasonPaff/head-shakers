@@ -42,6 +42,16 @@ export const ERROR_MESSAGES = {
     SUB_COLLECTION_UPDATE_FAILED: 'Failed to update sub-collection',
     UPDATE_FAILED: 'Failed to update collection',
   },
+  CONTENT_REPORTS: {
+    CREATE_FAILED: 'Failed to create content report',
+    DUPLICATE_REPORT: 'You have already reported this content',
+    INVALID_TARGET: 'Invalid report target specified',
+    NOT_FOUND: 'Content report not found',
+    RATE_LIMIT_EXCEEDED: 'Too many reports. Please try again later',
+    SELF_REPORT: 'You cannot report your own content',
+    TARGET_NOT_FOUND: 'The reported content does not exist',
+    UPDATE_FAILED: 'Failed to update content report',
+  },
   DATABASE: {
     CONNECTION_FAILED: 'Database connection failed',
     CONSTRAINT_VIOLATION: 'Database constraint violation',

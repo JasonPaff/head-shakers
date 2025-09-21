@@ -19,6 +19,7 @@ export const SENTRY_CONTEXTS = {
   BATCH_VIEW_DATA: 'batch_view_data',
   BOBBLEHEAD_DATA: 'bobblehead_data',
   COLLECTION_DATA: 'collection_data',
+  CONTENT_REPORT: 'content_report',
   DATABASE: 'database',
   DATABASE_ERROR: 'database_error',
   ERROR_DETAILS: 'error_details',

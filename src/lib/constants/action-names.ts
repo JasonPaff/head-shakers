@@ -53,6 +53,7 @@ export const ACTION_NAMES = {
     UPDATE_SUB: 'updateSubCollection',
   },
   MODERATION: {
+    CHECK_REPORT_STATUS: 'checkContentReportStatus',
     CREATE_REPORT: 'createContentReport',
     RESOLVE_REPORT: 'resolveContentReport',
     UPDATE_REPORT: 'updateContentReport',

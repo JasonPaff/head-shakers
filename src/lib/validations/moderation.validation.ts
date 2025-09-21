@@ -19,6 +19,27 @@ export const insertContentReportSchema = createInsertSchema(contentReports, {
   updatedAt: true,
 });
 
+export const createContentReportSchema = insertContentReportSchema.extend({
+  description: z.string().optional(),
+  reason: z.enum([
+    'spam',
+    'harassment',
+    'inappropriate_content',
+    'copyright_violation',
+    'misinformation',
+    'hate_speech',
+    'violence',
+    'other',
+  ]),
+  targetId: z.string(),
+  targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+});
+
+export const checkReportStatusSchema = z.object({
+  targetId: z.string(),
+  targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+});
+
 export const updateContentReportSchema = createInsertSchema(contentReports, {
   moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
   resolvedAt: z.date().optional(),
