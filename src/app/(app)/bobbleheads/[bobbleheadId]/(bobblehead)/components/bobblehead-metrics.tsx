@@ -1,13 +1,17 @@
 import 'server-only';
 import { DollarSignIcon, HeartIcon, PackageIcon, ShieldCheckIcon } from 'lucide-react';
+import { Suspense } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
+import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/utils/tailwind-utils';
 
 interface BobbleheadMetricsProps {
   bobblehead: BobbleheadWithRelations;
+  bobbleheadId: string;
+  currentUserId?: string;
 }
 
 const getConditionColor = (condition: null | string) => {
@@ -21,7 +25,7 @@ const getConditionColor = (condition: null | string) => {
   return 'text-muted-foreground';
 };
 
-export const BobbleheadMetrics = ({ bobblehead }: BobbleheadMetricsProps) => {
+export const BobbleheadMetrics = ({ bobblehead, bobbleheadId, currentUserId }: BobbleheadMetricsProps) => {
   const conditionColor = getConditionColor(bobblehead.currentCondition);
 
   return (
@@ -63,7 +67,15 @@ export const BobbleheadMetrics = ({ bobblehead }: BobbleheadMetricsProps) => {
             <div>
               <p className={'text-sm text-muted-foreground'}>Engagement</p>
               <div className={'flex items-center gap-3'}>
-                <span className={'text-sm font-medium'}>{bobblehead.viewCount} views</span>
+                <span className={'text-sm font-medium'}>
+                  <Suspense fallback={'-- views'}>
+                    <ViewCountAsync
+                      currentUserId={currentUserId}
+                      targetId={bobbleheadId}
+                      targetType={'bobblehead'}
+                    />
+                  </Suspense>
+                </span>
                 <span className={'text-sm font-medium'}>{bobblehead.likeCount} likes</span>
               </div>
             </div>

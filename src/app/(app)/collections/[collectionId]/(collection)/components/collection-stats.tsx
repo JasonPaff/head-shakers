@@ -1,15 +1,19 @@
 import 'server-only';
-import { CalendarIcon, FolderIcon, StarIcon } from 'lucide-react';
+import { CalendarIcon, EyeIcon, FolderIcon, StarIcon } from 'lucide-react';
+import { Suspense } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
+import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface CollectionStatsProps {
   collection: PublicCollection;
+  collectionId: string;
+  currentUserId?: string;
 }
 
-export const CollectionStats = ({ collection }: CollectionStatsProps) => {
+export const CollectionStats = ({ collection, collectionId, currentUserId }: CollectionStatsProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -19,6 +23,19 @@ export const CollectionStats = ({ collection }: CollectionStatsProps) => {
       </CardHeader>
       <CardContent>
         <ul className={'space-y-3'}>
+          <li className={'flex items-center gap-3'}>
+            <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
+            <span className={'text-sm text-muted-foreground'}>Views:</span>
+            <span className={'font-medium'}>
+              <Suspense fallback={'-- views'}>
+                <ViewCountAsync
+                  currentUserId={currentUserId}
+                  targetId={collectionId}
+                  targetType={'collection'}
+                />
+              </Suspense>
+            </span>
+          </li>
           <li className={'flex items-center gap-3'}>
             <StarIcon aria-hidden className={'size-4 text-muted-foreground'} />
             <span className={'text-sm text-muted-foreground'}>Total Bobbleheads:</span>

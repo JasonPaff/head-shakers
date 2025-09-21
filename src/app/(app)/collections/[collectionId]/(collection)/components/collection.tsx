@@ -11,6 +11,8 @@ import { ContentLayout } from '@/components/layout/content-layout';
 
 interface CollectionProps {
   collection: PublicCollection;
+  collectionId: string;
+  currentUserId?: string;
   likeData?: {
     isLiked: boolean;
     likeCount: number;
@@ -19,7 +21,7 @@ interface CollectionProps {
   searchParams?: CollectionSearchParams;
 }
 
-export const Collection = ({ collection, likeData, searchParams }: CollectionProps) => {
+export const Collection = ({ collection, collectionId, currentUserId, likeData, searchParams }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -42,7 +44,7 @@ export const Collection = ({ collection, likeData, searchParams }: CollectionPro
 
             {/* Sidebar */}
             <aside className={'flex flex-col gap-6 lg:col-span-3'}>
-              <CollectionStats collection={collection} />
+              <CollectionStats collection={collection} collectionId={collectionId} currentUserId={currentUserId} />
               <CollectionSidebarSubcollections collection={collection} />
             </aside>
           </div>

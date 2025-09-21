@@ -6,6 +6,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 
 type ColorVariant = 'destructive' | 'primary' | 'secondary' | 'success' | 'warning' | undefined;
 type StatusVariant = 'owned' | 'sold' | 'trading' | 'wanted' | undefined;
@@ -116,7 +117,7 @@ export const BobbleheadStatusPrivacyCard = ({ bobblehead }: BobbleheadStatusPriv
           variant={'badge'}
         />
 
-        {bobblehead.isFeatured && (
+        <Conditional isCondition={bobblehead.isFeatured}>
           <StatusItem
             color={'warning'}
             icon={TrendingUpIcon}
@@ -124,14 +125,14 @@ export const BobbleheadStatusPrivacyCard = ({ bobblehead }: BobbleheadStatusPriv
             value={bobblehead.isFeatured}
             variant={'badge'}
           />
-        )}
+        </Conditional>
 
         <div className={'border-t pt-2'}>
           <span className={'mb-3 block text-sm text-muted-foreground'}>Engagement</span>
           <div className={'grid grid-cols-3 gap-4'}>
             <div className={'text-center'}>
               <div className={'mb-1 flex items-center justify-center gap-1'}>
-                <EyeIcon className={'size-4 text-muted-foreground'} />
+                <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
                 <span className={'text-sm font-medium'}>{formatNumber(bobblehead.viewCount || 0)}</span>
               </div>
               <p className={'text-xs text-muted-foreground'}>Views</p>
@@ -139,7 +140,7 @@ export const BobbleheadStatusPrivacyCard = ({ bobblehead }: BobbleheadStatusPriv
 
             <div className={'text-center'}>
               <div className={'mb-1 flex items-center justify-center gap-1'}>
-                <HeartIcon className={'size-4 text-muted-foreground'} />
+                <HeartIcon aria-hidden className={'size-4 text-muted-foreground'} />
                 <span className={'text-sm font-medium'}>{formatNumber(bobblehead.likeCount || 0)}</span>
               </div>
               <p className={'text-xs text-muted-foreground'}>Likes</p>
@@ -147,7 +148,7 @@ export const BobbleheadStatusPrivacyCard = ({ bobblehead }: BobbleheadStatusPriv
 
             <div className={'text-center'}>
               <div className={'mb-1 flex items-center justify-center gap-1'}>
-                <MessageCircleIcon className={'size-4 text-muted-foreground'} />
+                <MessageCircleIcon aria-hidden className={'size-4 text-muted-foreground'} />
                 <span className={'text-sm font-medium'}>{formatNumber(bobblehead.commentCount || 0)}</span>
               </div>
               <p className={'text-xs text-muted-foreground'}>Comments</p>

@@ -1,13 +1,14 @@
 import 'server-only';
-import { ArrowLeftIcon, CalendarIcon, EditIcon, EyeIcon, HeartIcon, ShareIcon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, EditIcon, HeartIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-import { Fragment } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header-delete';
+import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -15,11 +16,17 @@ import { LikeIconButton } from '@/components/ui/like-button';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
+  currentUserId?: string;
   isOwner?: boolean;
   likeData: ContentLikeData;
 }
 
-export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: BobbleheadHeaderProps) => {
+export const BobbleheadHeader = ({
+  bobblehead,
+  currentUserId,
+  isOwner = false,
+  likeData,
+}: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
   const _backButtonLabel =
     (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';
@@ -116,8 +123,15 @@ export const BobbleheadHeader = ({ bobblehead, isOwner = false, likeData }: Bobb
 
             {/* View Count */}
             <div className={'flex items-center gap-2'}>
-              <EyeIcon aria-hidden className={'size-4'} />
-              {bobblehead.viewCount} views
+              <span className={'text-sm font-medium'}>
+                <Suspense fallback={'-- views'}>
+                  <ViewCountAsync
+                    currentUserId={currentUserId}
+                    targetId={bobblehead.id}
+                    targetType={'bobblehead'}
+                  />
+                </Suspense>
+              </span>
             </div>
           </div>
         </div>

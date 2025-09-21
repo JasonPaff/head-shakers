@@ -49,7 +49,12 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       {/* Header Section */}
       <div className={'border-b border-border'}>
         <ContentLayout>
-          <BobbleheadHeader bobblehead={bobblehead} isOwner={isOwner} likeData={likeData} />
+          <BobbleheadHeader
+            bobblehead={bobblehead}
+            currentUserId={currentUserId || undefined}
+            isOwner={isOwner}
+            likeData={likeData}
+          />
         </ContentLayout>
       </div>
 
@@ -57,7 +62,11 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       <AuthContent>
         <div className={'mt-4'}>
           <ContentLayout>
-            <BobbleheadMetrics bobblehead={bobblehead} />
+            <BobbleheadMetrics
+              bobblehead={bobblehead}
+              bobbleheadId={bobbleheadId}
+              currentUserId={currentUserId || undefined}
+            />
           </ContentLayout>
         </div>
       </AuthContent>
