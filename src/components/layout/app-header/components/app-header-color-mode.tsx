@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -16,10 +16,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export const AppHeaderColorMode = () => {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setIsMounted(true);
   }, []);
 
   const handleDarkMode = () => {
@@ -34,17 +34,17 @@ export const AppHeaderColorMode = () => {
     setTheme('system');
   };
 
-  const _isDarkMode = mounted && resolvedTheme === 'dark';
+  const _isDarkMode = isMounted && resolvedTheme === 'dark';
 
   // Prevent hydration mismatch by showing skeleton until mounted
-  if (!mounted) {
+  if (!isMounted) {
     return <Skeleton className={'h-9 w-9 rounded-md'} />;
   }
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={'icon'} variant={'outline'}>
+        <Button className={'size-8'} size={'icon'} variant={'outline'}>
           <Conditional isCondition={_isDarkMode}>
             <MoonIcon aria-hidden />
           </Conditional>

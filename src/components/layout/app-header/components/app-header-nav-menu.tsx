@@ -2,26 +2,19 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-import { EarthIcon } from 'lucide-react';
 import {
-  ActivityIcon,
   CompassIcon,
+  EarthIcon,
   GridIcon,
-  HeartIcon,
-  LayoutDashboardIcon,
-  PackagePlusIcon,
   SearchIcon,
   StarIcon,
   TrendingUpIcon,
   TrophyIcon,
-  UserIcon,
   UsersIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
 import { AppHeaderNavMenuLink } from '@/components/layout/app-header/components/app-header-nav-menu-link';
-import { AuthContent } from '@/components/ui/auth';
-import { Conditional } from '@/components/ui/conditional';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -29,9 +22,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { NavMenuItemSkeleton } from '@/components/ui/skeleton';
 
-interface NavigationLink {
+export interface NavigationLink {
   icon: LucideIcon;
   isAuthRequired?: boolean;
   items: Array<{
@@ -93,47 +85,28 @@ const navigationLinks: Array<NavigationLink> = [
     label: 'Collections',
   },
   {
-    icon: UserIcon,
-    isAuthRequired: true,
+    icon: GridIcon,
     items: [
       {
-        description: 'Activity updates from collectors you follow',
-        href: $path({ route: '/dashboard/feed' }),
-        icon: ActivityIcon,
-        title: 'My Feed',
+        description: 'Coming soon - additional features and tools',
+        href: $path({ route: '/browse' }),
+        icon: CompassIcon,
+        title: 'Feature One',
       },
       {
-        description: 'Manage your following and followers',
-        href: $path({ route: '/dashboard/feed' }),
-        icon: UsersIcon,
-        title: 'Following',
+        description: 'Coming soon - more collector utilities',
+        href: $path({ route: '/browse' }),
+        icon: StarIcon,
+        title: 'Feature Two',
       },
       {
-        description: 'Likes, comments, and social notifications',
-        href: $path({ route: '/dashboard/notifications' }),
-        icon: HeartIcon,
-        title: 'Notifications',
-      },
-      {
-        description: 'Overview of your collection and recent activity',
-        href: $path({ route: '/dashboard/collection' }),
-        icon: LayoutDashboardIcon,
-        title: 'Dashboard',
-      },
-      {
-        description: 'Add a new bobblehead to your collection',
-        href: $path({ route: '/bobbleheads/add' }),
-        icon: PackagePlusIcon,
-        title: 'Add Bobblehead',
-      },
-      {
-        description: 'Your public collector profile and social presence',
-        href: $path({ route: '/settings/profile' }),
-        icon: UserIcon,
-        title: 'Profile',
+        description: 'Coming soon - enhanced platform tools',
+        href: $path({ route: '/browse' }),
+        icon: TrendingUpIcon,
+        title: 'Feature Three',
       },
     ],
-    label: 'My Hub',
+    label: 'More',
   },
 ];
 
@@ -142,7 +115,7 @@ export const AppHeaderNavMenu = () => {
     <NavigationMenu className={'max-md:hidden'}>
       <NavigationMenuList className={'gap-2'}>
         {navigationLinks.map((link, index) => {
-          const Content = (
+          return (
             <NavigationMenuItem key={index}>
               <NavigationMenuTrigger>
                 <link.icon aria-hidden className={'mr-2 size-4'} />
@@ -167,12 +140,6 @@ export const AppHeaderNavMenu = () => {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
-          );
-
-          return (
-            <Conditional fallback={Content} isCondition={link.isAuthRequired} key={index}>
-              <AuthContent loadingSkeleton={<NavMenuItemSkeleton />}>{Content}</AuthContent>
-            </Conditional>
           );
         })}
       </NavigationMenuList>

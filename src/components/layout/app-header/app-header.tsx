@@ -1,6 +1,7 @@
 import 'server-only';
 import Link from 'next/link';
 
+import { AppHeaderAuthNavMenu } from '@/components/layout/app-header/components/app-header-auth-nav-menu';
 import { AppHeaderColorMode } from '@/components/layout/app-header/components/app-header-color-mode';
 import { AppHeaderContainer } from '@/components/layout/app-header/components/app-header-container';
 import { AppHeaderNavMenu } from '@/components/layout/app-header/components/app-header-nav-menu';
@@ -13,13 +14,13 @@ import { cn } from '@/utils/tailwind-utils';
 export const AppHeader = () => {
   return (
     <header
-      className={'sticky top-0 z-50 flex w-full items-center border-b bg-background'}
+      className={'sticky top-0 z-50 flex w-full items-center border-b bg-background px-10'}
       data-testid={generateTestId('layout', 'app-header')}
     >
       <AppHeaderContainer data-testid={generateTestId('layout', 'app-header', 'container')}>
-        {/* Left Section - Logo */}
+        {/* Logo */}
         <div
-          className={'flex items-center gap-4'}
+          className={'flex items-center'}
           data-testid={generateTestId('layout', 'app-header', 'logo-section')}
         >
           <Link
@@ -40,29 +41,43 @@ export const AppHeader = () => {
           </Link>
         </div>
 
-        {/* Center Section - Search & Navigation */}
+        {/* Navigation Menus */}
         <div
-          className={'flex flex-1 items-center justify-center gap-4'}
-          data-testid={generateTestId('layout', 'app-header', 'center-section')}
+          className={'flex items-center'}
+          data-testid={generateTestId('layout', 'app-header', 'navigation-section')}
         >
-          <div className={'max-w-md flex-1'}>
-            <AppHeaderSearch />
-          </div>
           <AppHeaderNavMenu />
         </div>
 
-        {/* Right Section - User Actions */}
+        {/* Search */}
         <div
-          className={'flex items-center space-x-4'}
-          data-testid={generateTestId('layout', 'app-header', 'actions-section')}
+          className={'flex flex-1 items-center px-4'}
+          data-testid={generateTestId('layout', 'app-header', 'search-section')}
         >
-          {/* Notifications */}
+          <div className={'mr-8 w-full max-w-md'}>
+            <AppHeaderSearch />
+          </div>
+
+          {/* Auth Nav Menus */}
+          <AppHeaderAuthNavMenu />
+        </div>
+
+        {/* Notifications */}
+        <div
+          className={'flex items-center'}
+          data-testid={generateTestId('layout', 'app-header', 'notifications-section')}
+        >
           <AppHeaderNotifications />
+        </div>
 
-          {/* User Actions */}
-          <AppHeaderUser />
-
-          {/* Color Mode Toggle */}
+        {/* User Menu */}
+        <div
+          className={'flex items-center gap-4'}
+          data-testid={generateTestId('layout', 'app-header', 'user-section')}
+        >
+          <div className={'mt-1.5'}>
+            <AppHeaderUser />
+          </div>
           <AppHeaderColorMode />
         </div>
       </AppHeaderContainer>

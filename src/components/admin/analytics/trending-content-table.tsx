@@ -1,6 +1,8 @@
 'use client';
 
 import { ArrowDownIcon, ArrowUpIcon, ExternalLinkIcon, EyeIcon, TimerIcon, UsersIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 import { useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
@@ -21,11 +23,10 @@ interface TrendingContentItem {
   uniqueViewers: number;
 }
 
-interface TrendingContentTableProps {
-  className?: string;
+type TrendingContentTableProps = ClassName<{
   data: Array<TrendingContentItem>;
   timeRange: string;
-}
+}>;
 
 export const TrendingContentTable = ({ className, data, timeRange }: TrendingContentTableProps) => {
   const [sortBy, setSortBy] = useState<'duration' | 'trend' | 'viewers' | 'views'>('views');
@@ -68,6 +69,20 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
     );
   };
 
+  const getContentLink = (item?: TrendingContentItem) => {
+    if (!item) return '#';
+    switch (item.targetType) {
+      case 'bobblehead':
+        return $path({ route: '/bobbleheads/[bobbleheadId]', routeParams: { bobbleheadId: item.targetId } });
+      case 'collection':
+        return $path({ route: '/collections/[collectionId]', routeParams: { collectionId: item.targetId } });
+      case 'user':
+        return $path({ route: '/users/[userId]', routeParams: { userId: item.targetId } });
+      default:
+        return '#';
+    }
+  };
+
   const filteredData = data.filter((item) => filterType === 'all' || item.targetType === filterType);
 
   const sortedData = [...filteredData].sort((a, b) => {
@@ -106,11 +121,6 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
       setSortBy(column);
       setSortOrder('desc');
     }
-  };
-
-  const handleViewContent = (item: TrendingContentItem) => {
-    // in real implementation, this would navigate to the content
-    console.log('Viewing content:', item);
   };
 
   return (
@@ -255,16 +265,11 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
                   </TableCell>
                   <TableCell>{getTrendIcon(item.trendDirection, item.trendPercentage)}</TableCell>
                   <TableCell>
-                    <Button
-                      className={'h-8 px-2'}
-                      onClick={() => {
-                        handleViewContent(item);
-                      }}
-                      size={'sm'}
-                      variant={'ghost'}
-                    >
-                      <ExternalLinkIcon aria-hidden className={'size-3'} />
-                      <span className={'sr-only'}>View {item.title}</span>
+                    <Button asChild className={'h-8 px-2'} size={'sm'} variant={'ghost'}>
+                      <Link href={getContentLink(item)}>
+                        <ExternalLinkIcon aria-hidden className={'size-3'} />
+                        <span className={'sr-only'}>View {item.title}</span>
+                      </Link>
                     </Button>
                   </TableCell>
                 </TableRow>
