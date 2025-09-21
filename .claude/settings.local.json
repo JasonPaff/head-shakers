@@ -53,7 +53,8 @@
       "mcp__Neon__list_projects",
       "mcp__Neon__describe_project",
       "mcp__Neon__describe_branch",
-      "Bash(npm run test:e2e:*)"
+      "Bash(npm run test:e2e:*)",
+      "Bash(head:*)"
     ],
     "deny": [],
     "ask": []
