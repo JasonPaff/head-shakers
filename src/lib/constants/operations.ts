@@ -46,6 +46,13 @@ export const OPERATIONS = {
     TOGGLE_STATUS: 'toggle_featured_content_status',
     UPDATE: 'update_featured_content',
   },
+  MODERATION: {
+    CHECK_EXISTING_REPORT: 'check_existing_report',
+    CHECK_RATE_LIMIT: 'check_rate_limit',
+    CREATE_REPORT: 'create_content_report',
+    GET_REPORT_STATUS: 'get_report_status',
+    VALIDATE_REPORT_TARGET: 'validate_report_target',
+  },
   SEARCH: {
     BOBBLEHEADS: 'search_bobbleheads',
     COLLECTIONS: 'search_collections',
