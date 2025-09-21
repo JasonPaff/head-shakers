@@ -9,9 +9,6 @@ import { AppHeaderNavMenu } from '@/components/layout/app-header/components/app-
 import { AppHeaderNotifications } from '@/components/layout/app-header/components/app-header-notifications';
 import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
-import { AuthContent } from '@/components/ui/auth';
-import { SidebarTrigger } from '@/components/ui/sidebar/sidebar-trigger';
-import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -26,11 +23,6 @@ export const AppHeader = ({ testId }: ComponentTestIdProps = {}) => {
       <AppHeaderContainer
         testId={testId ? `${testId}-container` : generateTestId('layout', 'app-header', 'container')}
       >
-        {/* User Sidebar Trigger */}
-        <AuthContent loadingSkeleton={<Skeleton className={'h-9 w-9'} />}>
-          <SidebarTrigger />
-        </AuthContent>
-
         {/* Left Section - Logo */}
         <div
           className={'flex items-center gap-4'}

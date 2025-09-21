@@ -107,16 +107,15 @@ export const ViewAnalyticsDashboard = ({
 
         <div className={'flex flex-wrap gap-2'}>
           <Select onValueChange={setTimeRange} value={timeRange}>
-            <SelectTrigger className={'w-[140px]'}>
+            <SelectTrigger className={'w-[180px]'}>
               <CalendarIcon aria-hidden className={'mr-2 size-4'} />
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={'1day'}>Last 24 hours</SelectItem>
-              <SelectItem value={'7days'}>Last 7 days</SelectItem>
-              <SelectItem value={'30days'}>Last 30 days</SelectItem>
-              <SelectItem value={'90days'}>Last 90 days</SelectItem>
-              <SelectItem value={'1year'}>Last year</SelectItem>
+              <SelectItem value={'day'}>Last 24 hours</SelectItem>
+              <SelectItem value={'week'}>Last 7 days</SelectItem>
+              <SelectItem value={'month'}>Last 30 days</SelectItem>
+              <SelectItem value={'year'}>Last year</SelectItem>
             </SelectContent>
           </Select>
 
