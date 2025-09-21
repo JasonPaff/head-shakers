@@ -52,12 +52,15 @@
       "mcp__Neon__run_sql",
       "mcp__Neon__list_projects",
       "mcp__Neon__describe_project",
-      "mcp__Neon__describe_branch"
+      "mcp__Neon__describe_branch",
+      "Bash(npm run test:e2e:*)"
     ],
     "deny": [],
     "ask": []
   },
-  "enabledMcpjsonServers": ["shared-server"],
-  "outputStyle": "default",
-  "enableAllProjectMcpServers": true
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "shared-server"
+  ],
+  "outputStyle": "default"
 }
