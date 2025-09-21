@@ -30,6 +30,7 @@ import { generateTestId } from '@/lib/test-ids';
 const navigationLinks: Array<NavigationLink> = [
   {
     icon: ShieldHalfIcon,
+    isAdminRequired: true,
     items: [
       {
         description: 'Manage featured content',
@@ -60,6 +61,7 @@ const navigationLinks: Array<NavigationLink> = [
   },
   {
     icon: UserIcon,
+    isAuthRequired: true,
     items: [
       {
         description: 'Activity updates from collectors you follow',

@@ -25,6 +25,7 @@ import {
 
 export interface NavigationLink {
   icon: LucideIcon;
+  isAdminRequired?: boolean;
   isAuthRequired?: boolean;
   items: Array<{
     description: string;

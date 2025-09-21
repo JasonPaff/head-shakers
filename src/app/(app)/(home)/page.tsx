@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { SignUpButton } from '@clerk/nextjs';
+import { HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
@@ -19,14 +20,13 @@ export function generateMetadata(): Metadata {
 }
 
 export default function HomePage() {
-  const _browseLink = $path({ route: '/browse' });
-  const _dashboardLink = $path({ route: '/dashboard/collection' });
-
   return (
     <div className={'container mx-auto px-4 py-8'}>
       {/* Hero */}
       <section className={'py-12 text-center'}>
-        <h1 className={'mb-4 text-4xl font-bold tracking-tight'}>Collect, Share, and Discover Bobbleheads</h1>
+        <h1 className={'mb-6 text-5xl font-bold text-balance md:text-6xl'}>
+          Collect, Share, and <span className={'text-primary'}>Discover</span> Bobbleheads
+        </h1>
         <p className={'mx-auto mb-8 max-w-2xl text-xl text-muted-foreground'}>
           Build your digital bobblehead collection, connect with other collectors, and discover rare finds
           from around the world.
@@ -42,11 +42,11 @@ export default function HomePage() {
             loadingSkeleton={<Skeleton className={'h-11 w-32 rounded-md'} />}
           >
             <Button asChild size={'lg'}>
-              <Link href={_dashboardLink}>My Collection</Link>
+              <Link href={$path({ route: '/dashboard/collection' })}>My Collection</Link>
             </Button>
           </AuthContent>
           <Button asChild size={'lg'} variant={'outline'}>
-            <Link href={_browseLink}>Browse Collections</Link>
+            <Link href={$path({ route: '/browse' })}>Browse Collections</Link>
           </Button>
         </div>
       </section>
@@ -115,6 +115,52 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Call to Action */}
+        <div className={'mt-8 rounded-2xl bg-primary/10 p-8'}>
+          <div className={'mb-8 text-center'}>
+            <h2 className={'mb-4 text-3xl font-bold'}>Join the Community</h2>
+            <p className={'mx-auto max-w-2xl text-muted-foreground'}>
+              Connect with fellow collectors, share your finds, and discover new additions to your collection.
+            </p>
+          </div>
+
+          <div className={'grid gap-6 md:grid-cols-3'}>
+            <div className={'text-center'}>
+              <div
+                className={'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-primary/10'}
+              >
+                <UsersIcon className={'size-8 text-primary'} />
+              </div>
+              <h3 className={'mb-2 font-semibold'}>Connect</h3>
+              <p className={'text-sm text-muted-foreground'}>
+                Follow other collectors and build your network
+              </p>
+            </div>
+            <div className={'text-center'}>
+              <div
+                className={'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-secondary'}
+              >
+                <TrendingUpIcon className={'size-8 text-muted-foreground'} />
+              </div>
+              <h3 className={'mb-2 font-semibold'}>Discover</h3>
+              <p className={'text-sm text-muted-foreground'}>
+                Find trending bobbleheads and rare collectibles
+              </p>
+            </div>
+            <div className={'text-center'}>
+              <div
+                className={
+                  'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-destructive/50'
+                }
+              >
+                <HeartIcon className={'size-8 text-muted-foreground'} />
+              </div>
+              <h3 className={'mb-2 font-semibold'}>Share</h3>
+              <p className={'text-sm text-muted-foreground'}>Showcase your collection and get feedback</p>
+            </div>
+          </div>
         </div>
       </section>
     </div>

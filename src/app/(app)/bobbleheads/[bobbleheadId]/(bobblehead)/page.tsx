@@ -65,22 +65,6 @@ async function ItemPage({ routeParams }: ItemPageProps) {
           </ContentLayout>
         </div>
 
-        {/* Metrics Section */}
-        <AuthContent>
-          <div className={'mt-4'}>
-            <ContentLayout>
-              <BobbleheadErrorBoundary section={'metrics'}>
-                <Suspense fallback={<BobbleheadMetricsSkeleton />}>
-                  <BobbleheadMetricsAsync
-                    bobbleheadId={bobbleheadId}
-                    currentUserId={currentUserId || undefined}
-                  />
-                </Suspense>
-              </BobbleheadErrorBoundary>
-            </ContentLayout>
-          </div>
-        </AuthContent>
-
         {/* Feature Card Section */}
         <div className={'mt-4'}>
           <ContentLayout>
@@ -106,6 +90,22 @@ async function ItemPage({ routeParams }: ItemPageProps) {
             </Suspense>
           </BobbleheadErrorBoundary>
         </ContentLayout>
+
+        {/* Metrics Section */}
+        <AuthContent>
+          <div className={'mt-4'}>
+            <ContentLayout>
+              <BobbleheadErrorBoundary section={'metrics'}>
+                <Suspense fallback={<BobbleheadMetricsSkeleton />}>
+                  <BobbleheadMetricsAsync
+                    bobbleheadId={bobbleheadId}
+                    currentUserId={currentUserId || undefined}
+                  />
+                </Suspense>
+              </BobbleheadErrorBoundary>
+            </ContentLayout>
+          </div>
+        </AuthContent>
 
         {/* Primary Detail Cards Section */}
         <ContentLayout>
