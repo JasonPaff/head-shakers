@@ -1,7 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import * as Sentry from '@sentry/nextjs';
+import { $path } from 'next-typesafe-url';
 
 const isPublicRoute = createRouteMatcher([
+  // homepage - anyone can view
+  '/',
+
   // static pages (route group)
   '/about(.*)',
   '/privacy(.*)',
@@ -23,9 +27,6 @@ const isPublicRoute = createRouteMatcher([
   '/users/:username',
   '/users/:username/collections(.*)',
   '/users/:username/following(.*)',
-
-  // homepage (can be viewed by anyone)
-  '/',
 ]);
 
 const isProtectedRoute = createRouteMatcher([
@@ -69,20 +70,23 @@ export default clerkMiddleware(async (auth, req) => {
     return;
   }
 
+  // construct absolute URL for homepage
+  const homeUrl = new URL($path({ route: '/' }), req.url).toString();
+
   // admin routes - require authentication (role checking done at component level)
   if (isAdminRoute(req)) {
-    await auth.protect();
+    await auth.protect({ unauthenticatedUrl: homeUrl });
     return;
   }
 
   // protected routes
   if (isProtectedRoute(req)) {
-    await auth.protect();
+    await auth.protect({ unauthenticatedUrl: homeUrl });
     return;
   }
 
   // for any other routes, protect by default (fail-safe)
-  await auth.protect();
+  await auth.protect({ unauthenticatedUrl: homeUrl });
 });
 
 export const config = {

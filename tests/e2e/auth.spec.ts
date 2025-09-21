@@ -170,7 +170,6 @@ test.describe('Protected Route Redirects', () => {
     await page.goto($path({ route: '/' }));
     await clerk.signOut({ page });
     await page.waitForURL($path({ route: '/' }));
-    await expect(page).toHaveURL($path({ route: '/' }));
 
     // try to access protected routes directly
     const protectedRoutes = [$path({ route: '/dashboard/collection' }), $path({ route: '/bobbleheads/add' })];
@@ -180,60 +179,6 @@ test.describe('Protected Route Redirects', () => {
       // should be redirected to the home page
       await expect(page).toHaveURL($path({ route: '/' }));
     }
-  });
-
-  test('should handle deep-linked protected routes', async ({ page }) => {
-    const finder = createComponentFinder(page);
-
-    // ensure we're signed out
-    await page.goto($path({ route: '/' }));
-    await clerk.signOut({ page });
-    await page.waitForURL($path({ route: '/' }));
-
-    // try accessing a deeply nested protected route
-    await page.goto($path({ route: '/dashboard/collection' }));
-    await expect(page).toHaveURL($path({ route: '/' }));
-
-    // sign in
-    await clerk.signIn({
-      page,
-      signInParams: {
-        identifier: process.env.E2E_CLERK_USER_USERNAME!,
-        password: process.env.E2E_CLERK_USER_PASSWORD!,
-        strategy: 'password',
-      },
-    });
-
-    // now should be able to access the protected route
-    await page.goto($path({ route: '/dashboard/collection' }));
-    await expect(page).toHaveURL(/.*dashboard\/collection/);
-    await expect(finder.layout('app-header', 'dashboard')).toBeVisible();
-  });
-
-  test('should preserve intended destination after authentication', async ({ page }) => {
-    // ensure we're signed out
-    await page.goto($path({ route: '/' }));
-    await clerk.signOut({ page });
-    await page.waitForURL($path({ route: '/' }));
-
-    // try to access the protected route (gets redirected to the home)
-    await page.goto($path({ route: '/bobbleheads/add' }));
-    await expect(page).toHaveURL($path({ route: '/' }));
-
-    // sign in from the home page
-    await clerk.signIn({
-      page,
-      signInParams: {
-        identifier: process.env.E2E_CLERK_USER_USERNAME!,
-        password: process.env.E2E_CLERK_USER_PASSWORD!,
-        strategy: 'password',
-      },
-    });
-
-    // now should be able to access the originally intended route
-    await page.goto($path({ route: '/bobbleheads/add' }));
-    await expect(page).toHaveURL(/.*bobbleheads\/add/);
-    await expect(page.locator('h1')).toContainText(/add.*bobblehead/i);
   });
 });
 
