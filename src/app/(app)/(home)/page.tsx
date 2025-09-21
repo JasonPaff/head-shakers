@@ -8,6 +8,7 @@ import { AuthContent } from '@/components/ui/auth';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/utils/tailwind-utils';
 
 export function generateMetadata(): Metadata {
@@ -32,19 +33,18 @@ export default function HomePage() {
         </p>
         {/* Collections */}{' '}
         <div className={'flex justify-center gap-4'}>
-          <Button asChild size={'lg'}>
-            <AuthContent
-              fallback={
-                <Button asChild>
-                  <SignUpButton mode={'modal'}>Start Collecting</SignUpButton>
-                </Button>
-              }
-            >
+          <AuthContent
+            fallback={
               <Button asChild size={'lg'}>
-                <Link href={_dashboardLink}>My Collection</Link>
+                <SignUpButton mode={'modal'}>Start Collecting</SignUpButton>
               </Button>
-            </AuthContent>
-          </Button>
+            }
+            loadingSkeleton={<Skeleton className={'h-11 w-32 rounded-md'} />}
+          >
+            <Button asChild size={'lg'}>
+              <Link href={_dashboardLink}>My Collection</Link>
+            </Button>
+          </AuthContent>
           <Button asChild size={'lg'} variant={'outline'}>
             <Link href={_browseLink}>Browse Collections</Link>
           </Button>

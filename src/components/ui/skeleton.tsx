@@ -67,7 +67,19 @@ export const SidebarSkeleton = ({ className, testId }: { className?: string; tes
 };
 
 export const UserButtonSkeleton = ({ className, testId }: { className?: string; testId?: string }) => {
-  const userButtonSkeletonTestId = testId || generateTestId('ui', 'skeleton-user-button');
+  const userButtonSkeletonTestId = testId || generateTestId('ui', 'skeleton', 'user-button');
 
-  return <Skeleton className={cn('h-8 w-8 rounded-full', className)} testId={userButtonSkeletonTestId} />;
+  return <Skeleton className={cn('h-[35px] w-7 rounded-full', className)} testId={userButtonSkeletonTestId} />;
+};
+
+export const NavMenuItemSkeleton = ({ className, testId }: { className?: string; testId?: string }) => {
+  const navMenuItemSkeletonTestId = testId || generateTestId('ui', 'skeleton', 'nav-menu-item');
+
+  return <Skeleton className={cn('h-9 w-32 rounded-md', className)} testId={navMenuItemSkeletonTestId} />;
+};
+
+export const NotificationBellSkeleton = ({ className, testId }: { className?: string; testId?: string }) => {
+  const notificationBellSkeletonTestId = testId || generateTestId('ui', 'skeleton', 'notification-bell');
+
+  return <Skeleton className={cn('size-5 rounded-sm', className)} testId={notificationBellSkeletonTestId} />;
 };

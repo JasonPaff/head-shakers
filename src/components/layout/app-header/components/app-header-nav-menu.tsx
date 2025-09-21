@@ -21,6 +21,7 @@ import { $path } from 'next-typesafe-url';
 
 import { AppHeaderNavMenuLink } from '@/components/layout/app-header/components/app-header-nav-menu-link';
 import { AuthContent } from '@/components/ui/auth';
+import { Conditional } from '@/components/ui/conditional';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -28,6 +29,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { NavMenuItemSkeleton } from '@/components/ui/skeleton';
 
 interface NavigationLink {
   icon: LucideIcon;
@@ -147,10 +149,10 @@ export const AppHeaderNavMenu = () => {
     <NavigationMenu className={'max-md:hidden'}>
       <NavigationMenuList className={'gap-2'}>
         {navigationLinks.map((link, index) => {
-          const content = (
+          const Content = (
             <NavigationMenuItem key={index}>
               <NavigationMenuTrigger>
-                <link.icon aria-hidden className={'mr-2 h-4 w-4'} />
+                <link.icon aria-hidden className={'mr-2 size-4'} />
                 {link.label}
               </NavigationMenuTrigger>
               <NavigationMenuContent>
@@ -161,7 +163,7 @@ export const AppHeaderNavMenu = () => {
                       key={itemIndex}
                       title={
                         <div className={'flex items-center gap-2'}>
-                          <item.icon aria-hidden className={'h-4 w-4'} />
+                          <item.icon aria-hidden className={'size-4'} />
                           {item.title}
                         </div>
                       }
@@ -174,7 +176,11 @@ export const AppHeaderNavMenu = () => {
             </NavigationMenuItem>
           );
 
-          return link.isAuthRequired ? <AuthContent key={index}>{content}</AuthContent> : content;
+          return (
+            <Conditional fallback={Content} isCondition={link.isAuthRequired} key={index}>
+              <AuthContent loadingSkeleton={<NavMenuItemSkeleton />}>{Content}</AuthContent>
+            </Conditional>
+          );
         })}
       </NavigationMenuList>
     </NavigationMenu>
