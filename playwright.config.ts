@@ -46,7 +46,7 @@ export default defineConfig({
         storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
-      testMatch: /^(?!.*\/(authenticated|auth-flow)\.spec\.ts$).*\.spec\.ts$/,
+      testMatch: /^(?!.*(authenticated|auth-flow)\.spec\.ts$).*\.spec\.ts$/,
     },
     {
       name: 'authenticated-firefox',
@@ -73,7 +73,7 @@ export default defineConfig({
         storageState: 'playwright/.clerk/user.json',
       },
       dependencies: ['global setup'],
-      testMatch: /^(?!.*\/(authenticated|auth-flow)\.spec\.ts$).*\.spec\.ts$/,
+      testMatch: /^(?!.*(authenticated|auth-flow)\.spec\.ts$).*\.spec\.ts$/,
     },
     // {
     //   name: 'authenticated-webkit',
