@@ -91,7 +91,7 @@ export const CollectionCreateDialog = withFocusManagement(
 
     return (
       <Dialog onOpenChange={handleOpenChange} open={isOpen}>
-        <DialogContent className={'sm:max-w-[425px]'} testId={dialogTestId}>
+        <DialogContent className={'sm:max-w-md'} testId={dialogTestId}>
           <form
             data-testid={formTestId}
             onSubmit={(e) => {

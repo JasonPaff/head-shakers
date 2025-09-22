@@ -5,17 +5,16 @@ import { Loader2Icon } from 'lucide-react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
@@ -132,8 +131,8 @@ export const ReportReasonDialog = withFocusManagement(
     };
 
     return (
-      <AlertDialog onOpenChange={handleOpenChange} open={isOpen}>
-        <AlertDialogContent className={'sm:max-w-md'} testId={reportDialogTestId}>
+      <Dialog onOpenChange={handleOpenChange} open={isOpen}>
+        <DialogContent className={'sm:max-w-md'} testId={reportDialogTestId}>
           <form
             data-testid={formTestId}
             onSubmit={(e) => {
@@ -143,10 +142,10 @@ export const ReportReasonDialog = withFocusManagement(
             }}
           >
             {/* Header */}
-            <AlertDialogHeader>
-              <AlertDialogTitle>{getDialogTitle()}</AlertDialogTitle>
-              <AlertDialogDescription>{getDialogDescription()}</AlertDialogDescription>
-            </AlertDialogHeader>
+            <DialogHeader>
+              <DialogTitle>{getDialogTitle()}</DialogTitle>
+              <DialogDescription>{getDialogDescription()}</DialogDescription>
+            </DialogHeader>
 
             {/* Form Fields */}
             <div className={'space-y-4 py-4'}>
@@ -176,10 +175,15 @@ export const ReportReasonDialog = withFocusManagement(
             </div>
 
             {/* Action Buttons */}
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={isExecuting} onClick={handleClose} testId={cancelButtonTestId}>
+            <DialogFooter>
+              <Button
+                disabled={isExecuting}
+                onClick={handleClose}
+                testId={cancelButtonTestId}
+                variant={'outline'}
+              >
                 Cancel
-              </AlertDialogCancel>
+              </Button>
               <Button
                 className={'min-w-[100px]'}
                 disabled={isExecuting}
@@ -192,10 +196,10 @@ export const ReportReasonDialog = withFocusManagement(
                   Submitting...
                 </Conditional>
               </Button>
-            </AlertDialogFooter>
+            </DialogFooter>
           </form>
-        </AlertDialogContent>
-      </AlertDialog>
+        </DialogContent>
+      </Dialog>
     );
   },
 );
