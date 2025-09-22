@@ -33,6 +33,8 @@ export const createContentReportSchema = insertContentReportSchema.extend({
   ]),
   targetId: z.string(),
   targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+}).omit({
+  reporterId: true,
 });
 
 export const checkReportStatusSchema = z.object({

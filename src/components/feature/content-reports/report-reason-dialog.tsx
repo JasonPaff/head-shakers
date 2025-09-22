@@ -16,9 +16,12 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useServerAction } from '@/hooks/use-server-action';
+import { createContentReportAction } from '@/lib/actions/content-reports/content-reports.actions';
 import { generateTestId } from '@/lib/test-ids';
 
 import type { ReportTargetType } from './report-button';
@@ -44,21 +47,29 @@ const REPORT_REASONS = [
 export const ReportReasonDialog = ({
   isOpen,
   onClose,
-  targetId, // eslint-disable-line @typescript-eslint/no-unused-vars -- will be used for server actions
+  targetId,
   targetType,
   testId,
 }: ReportReasonDialogProps) => {
   const [selectedReason, setSelectedReason] = useState<string>('');
   const [description, setDescription] = useState<string>('');
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+  const { executeAsync, isExecuting } = useServerAction(createContentReportAction, {
+    onSuccess: () => {
+      handleClose();
+    },
+    toastMessages: {
+      error: 'Failed to submit report. Please try again.',
+      loading: 'Submitting report...',
+      success: 'Report submitted successfully. Thank you for helping keep our community safe.',
+    },
+  });
 
   const reportDialogTestId = testId || generateTestId('feature', 'dialog', 'report');
 
   const handleClose = () => {
-    // Reset form state when closing
     setSelectedReason('');
     setDescription('');
-    setIsSubmitting(false);
     onClose();
   };
 
@@ -68,27 +79,20 @@ export const ReportReasonDialog = ({
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      // TODO: Replace with actual server action call when available
-      // await createContentReportAction({
-      //   targetType,
-      //   reason: selectedReason as any,
-      //   description: description.trim() || undefined,
-      // });
-
-      // Simulate API call for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success('Report submitted successfully. Thank you for helping keep our community safe.');
-      handleClose();
-    } catch (error) {
-      console.error('Failed to submit report:', error);
-      toast.error('Failed to submit report. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    await executeAsync({
+      description: description.trim() || undefined,
+      reason: selectedReason as
+        | 'copyright_violation'
+        | 'harassment'
+        | 'hate_speech'
+        | 'inappropriate_content'
+        | 'misinformation'
+        | 'other'
+        | 'spam'
+        | 'violence',
+      targetId,
+      targetType,
+    });
   };
 
   const getDialogTitle = () => {
@@ -126,6 +130,7 @@ export const ReportReasonDialog = ({
         </AlertDialogHeader>
 
         <div className={'space-y-4 py-4'}>
+          {/* Report Reason */}
           <div className={'space-y-2'}>
             <Label htmlFor={'reason'}>Reason for reporting *</Label>
             <Select onValueChange={setSelectedReason} value={selectedReason}>
@@ -142,13 +147,16 @@ export const ReportReasonDialog = ({
             </Select>
           </div>
 
+          {/* Description */}
           <div className={'space-y-2'}>
             <Label htmlFor={'description'}>Additional details (optional)</Label>
             <Textarea
               aria-label={'Additional details about the report'}
               id={'description'}
               maxLength={500}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value);
+              }}
               placeholder={"Provide additional context about why you're reporting this content..."}
               rows={3}
               value={description}
@@ -157,22 +165,21 @@ export const ReportReasonDialog = ({
           </div>
         </div>
 
+        {/* Action Buttons */}
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isSubmitting} onClick={handleClose}>
+          <AlertDialogCancel disabled={isExecuting} onClick={handleClose}>
             Cancel
           </AlertDialogCancel>
           <Button
             className={'min-w-[100px]'}
-            disabled={isSubmitting || !selectedReason}
+            disabled={isExecuting || !selectedReason}
             onClick={handleSubmit}
             variant={'destructive'}
           >
-            {isSubmitting ?
-              <>
-                <Loader2Icon className={'animate-spin'} />
-                Submitting...
-              </>
-            : 'Submit Report'}
+            <Conditional fallback={'Submit Report'} isCondition={isExecuting}>
+              <Loader2Icon aria-hidden className={'animate-spin'} />
+              Submitting...
+            </Conditional>
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
