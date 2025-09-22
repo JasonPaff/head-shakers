@@ -3,8 +3,16 @@ import type { z } from 'zod';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertContentReport, SelectContentReport } from '@/lib/validations/moderation.validation';
-import type { createContentReportSchema } from '@/lib/validations/moderation.validation';
+import type {
+  adminBulkUpdateReportsSchema,
+  adminReportsFilterSchema,
+  adminUpdateReportSchema,
+  createContentReportSchema,
+} from '@/lib/validations/moderation.validation';
 
+type AdminBulkUpdateReportsInput = z.infer<typeof adminBulkUpdateReportsSchema>;
+type AdminReportsFilterInput = z.infer<typeof adminReportsFilterSchema>;
+type AdminUpdateReportInput = z.infer<typeof adminUpdateReportSchema>;
 type CreateContentReportInput = z.infer<typeof createContentReportSchema>;
 
 import { ENUMS, OPERATIONS } from '@/lib/constants';
@@ -12,7 +20,10 @@ import { db } from '@/lib/db';
 import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
-import { ContentReportsQuery } from '@/lib/queries/content-reports/content-reports.query';
+import {
+  ContentReportsQuery,
+  type ReportsStatsResult,
+} from '@/lib/queries/content-reports/content-reports.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 const facadeName = 'ContentReportsFacade';
@@ -43,6 +54,36 @@ export interface ReportValidationResult {
 
 export class ContentReportsFacade {
   private static readonly DAILY_REPORT_LIMIT = 10;
+
+  /**
+   * Bulk update multiple reports status (admin only)
+   */
+  static async bulkUpdateReportsStatusAsync(
+    bulkUpdateData: AdminBulkUpdateReportsInput,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<SelectContentReport[]> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      return await ContentReportsQuery.bulkUpdateReportsStatusAsync(
+        bulkUpdateData.reportIds,
+        bulkUpdateData.status,
+        userId,
+        context,
+        bulkUpdateData.moderatorNotes,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { reportCount: bulkUpdateData.reportIds.length, status: bulkUpdateData.status },
+        facade: facadeName,
+        method: 'bulkUpdateReportsStatusAsync',
+        operation: OPERATIONS.ADMIN.BULK_UPDATE_REPORTS,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
   /**
    * check if the user has already reported this target
@@ -203,7 +244,7 @@ export class ContentReportsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<SelectContentReport> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
+      const context = createProtectedQueryContext(userId, { dbInstance });
 
       // validate target exists and gets owner info
       const targetInfo = await ContentReportsQuery.validateTargetAsync(
@@ -246,6 +287,55 @@ export class ContentReportsFacade {
         facade: facadeName,
         method: 'createReportAsync',
         operation: OPERATIONS.MODERATION.CREATE_REPORT,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get all reports for the admin dashboard with filtering and pagination
+   */
+  static async getAllReportsForAdminAsync(
+    filterOptions: AdminReportsFilterInput,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{ reports: SelectContentReport[]; stats: ReportsStatsResult }> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      const reports = await ContentReportsQuery.getAllReportsForAdminAsync(filterOptions, context);
+      const stats = await ContentReportsQuery.getReportsStatsAsync(context);
+
+      return { reports, stats };
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { filterOptions },
+        facade: facadeName,
+        method: 'getAllReportsForAdminAsync',
+        operation: OPERATIONS.ADMIN.GET_ADMIN_REPORTS,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get reports statistics for the admin dashboard
+   */
+  static async getReportsStatsAsync(
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<ReportsStatsResult> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+      return await ContentReportsQuery.getReportsStatsAsync(context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        facade: facadeName,
+        method: 'getReportsStatsAsync',
+        operation: OPERATIONS.ADMIN.GET_REPORTS_STATS,
+        userId,
       };
       throw createFacadeError(context, error);
     }
@@ -294,7 +384,7 @@ export class ContentReportsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<{ hasReported: boolean; report: null | SelectContentReport }> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
+      const context = createProtectedQueryContext(userId, { dbInstance });
       return ContentReportsQuery.getReportStatusAsync(userId, targetId, targetType, context);
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -302,6 +392,36 @@ export class ContentReportsFacade {
         facade: facadeName,
         method: 'getReportStatusAsync',
         operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Update individual report status (admin only)
+   */
+  static async updateReportStatusAsync(
+    updateData: AdminUpdateReportInput,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<SelectContentReport> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      return await ContentReportsQuery.updateReportStatusAsync(
+        updateData.reportId,
+        updateData.status,
+        userId,
+        updateData.moderatorNotes,
+        context,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { reportId: updateData.reportId, status: updateData.status },
+        facade: facadeName,
+        method: 'updateReportStatusAsync',
+        operation: OPERATIONS.ADMIN.UPDATE_REPORT_STATUS,
+        userId,
       };
       throw createFacadeError(context, error);
     }
@@ -410,7 +530,7 @@ export class ContentReportsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<{ canReport: boolean; reason?: string }> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
+      const context = createProtectedQueryContext(userId, { dbInstance });
       const targetInfo = await ContentReportsQuery.validateTargetAsync(targetId, targetType, context);
 
       if (!targetInfo.isExists) {
