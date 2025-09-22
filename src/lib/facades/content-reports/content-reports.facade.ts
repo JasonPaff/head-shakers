@@ -1,13 +1,18 @@
+import type { z } from 'zod';
+
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertContentReport, SelectContentReport } from '@/lib/validations/moderation.validation';
+import type { createContentReportSchema } from '@/lib/validations/moderation.validation';
+
+type CreateContentReportInput = z.infer<typeof createContentReportSchema>;
 
 import { ENUMS, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
-// import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
+import { ContentReportsQuery } from '@/lib/queries/content-reports/content-reports.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 const facadeName = 'ContentReportsFacade';
@@ -37,7 +42,6 @@ export interface ReportValidationResult {
 }
 
 export class ContentReportsFacade {
-  // rate limiting constants
   private static readonly DAILY_REPORT_LIMIT = 10;
 
   /**
@@ -109,6 +113,38 @@ export class ContentReportsFacade {
   }
 
   /**
+   * check rate limiting for user reports
+   */
+  static async checkReportRateLimitAsync(
+    userId: string,
+    hoursWindow: number = 1,
+    maxReports: number = 3,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{ canReport: boolean; recentReportCount: number }> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      const recentReports = await ContentReportsQuery.getRecentReportsByUserAsync(
+        userId,
+        hoursWindow,
+        context,
+      );
+
+      return {
+        canReport: recentReports.length < maxReports,
+        recentReportCount: recentReports.length,
+      };
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { hoursWindow, maxReports },
+        facade: facadeName,
+        method: 'checkReportRateLimitAsync',
+        operation: OPERATIONS.MODERATION.CHECK_RATE_LIMIT,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
    * create a new content report with comprehensive validation
    */
   static async createReport(
@@ -159,6 +195,63 @@ export class ContentReportsFacade {
   }
 
   /**
+   * Create a new content report with validation
+   */
+  static async createReportAsync(
+    reportData: CreateContentReportInput,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<SelectContentReport> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      // validate target exists and gets owner info
+      const targetInfo = await ContentReportsQuery.validateTargetAsync(
+        reportData.targetId,
+        reportData.targetType,
+        context,
+      );
+
+      if (!targetInfo.isExists) {
+        throw new Error('Target content does not exist');
+      }
+
+      if (targetInfo.ownerId === userId) {
+        throw new Error('Cannot report your own content');
+      }
+
+      // check for an existing report
+      const existingReport = await ContentReportsQuery.checkExistingReportAsync(
+        userId,
+        reportData.targetId,
+        reportData.targetType,
+        context,
+      );
+
+      if (existingReport) {
+        throw new Error('You have already reported this content');
+      }
+
+      // create the report
+      return ContentReportsQuery.createContentReportAsync(
+        {
+          ...reportData,
+          reporterId: userId,
+        },
+        context,
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetId: reportData.targetId, targetType: reportData.targetType },
+        facade: facadeName,
+        method: 'createReportAsync',
+        operation: OPERATIONS.MODERATION.CREATE_REPORT,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
    * get report status for a target (for UI display)
    */
   static getReportStatus(
@@ -186,6 +279,29 @@ export class ContentReportsFacade {
         method: 'getReportStatus',
         operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
         userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * check if the user has already reported content
+   */
+  static async getReportStatusAsync(
+    userId: string,
+    targetId: string,
+    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{ hasReported: boolean; report: null | SelectContentReport }> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      return ContentReportsQuery.getReportStatusAsync(userId, targetId, targetType, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetId, targetType },
+        facade: facadeName,
+        method: 'getReportStatusAsync',
+        operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
       };
       throw createFacadeError(context, error);
     }
@@ -279,6 +395,51 @@ export class ContentReportsFacade {
         method: 'validateReportTarget',
         operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET,
         userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Validate that target exists and can be reported
+   */
+  static async validateReportTargetAsync(
+    targetId: string,
+    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{ canReport: boolean; reason?: string }> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      const targetInfo = await ContentReportsQuery.validateTargetAsync(targetId, targetType, context);
+
+      if (!targetInfo.isExists) {
+        return { canReport: false, reason: 'Target content does not exist' };
+      }
+
+      if (targetInfo.ownerId === userId) {
+        return { canReport: false, reason: 'Cannot report your own content' };
+      }
+
+      // Check for an existing report
+      const existingReport = await ContentReportsQuery.checkExistingReportAsync(
+        userId,
+        targetId,
+        targetType,
+        context,
+      );
+
+      if (existingReport) {
+        return { canReport: false, reason: 'You have already reported this content' };
+      }
+
+      return { canReport: true };
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { targetId, targetType },
+        facade: facadeName,
+        method: 'validateReportTargetAsync',
+        operation: OPERATIONS.MODERATION.VALIDATE_REPORT_TARGET,
       };
       throw createFacadeError(context, error);
     }
