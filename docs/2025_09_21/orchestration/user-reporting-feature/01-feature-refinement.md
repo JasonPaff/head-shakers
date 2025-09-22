@@ -10,7 +10,7 @@
 ## Original Request
 
 ```
-I want to add a feature to the app where users can report specific bobbleheads/subcollections/collections. This will be implemented as a report button somewhere on those respective pages. These reports will be visable and actionable from an admin area. The admin actions will be implemented in a different feature request. This request is specifically to build out the ability for users to report things, the admin side will come later.
+I want to add a feature to the app where users can report specific bobbleheads/subcollections/collections.
 ```
 
 ## Context Provided

@@ -4,12 +4,16 @@
  */
 export const OPERATIONS = {
   ADMIN: {
+    BULK_UPDATE_REPORTS: 'admin_bulk_update_reports',
     CREATE_FEATURED_CONTENT: 'admin_create_featured_content',
     DELETE_FEATURED_CONTENT: 'admin_delete_featured_content',
+    GET_ADMIN_REPORTS: 'admin_get_reports',
     GET_FEATURED_CONTENT_BY_ID: 'admin_get_featured_content_by_id',
+    GET_REPORTS_STATS: 'admin_get_reports_stats',
     TOGGLE_FEATURED_CONTENT_ACTIVE: 'admin_toggle_featured_content_active',
     TOGGLE_FEATURED_CONTENT_STATUS: 'admin_toggle_featured_content_status',
     UPDATE_FEATURED_CONTENT: 'admin_update_featured_content',
+    UPDATE_REPORT_STATUS: 'admin_update_report_status',
   },
   ANALYTICS: {
     AGGREGATE_VIEWS: 'aggregate_views',

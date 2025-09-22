@@ -65,6 +65,41 @@ export const publicContentReportSchema = selectContentReportSchema.omit({
   reporterId: true,
 });
 
+// Admin validation schemas
+export const adminUpdateReportSchema = z.object({
+  moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
+  reportId: z.string(),
+  status: z.enum(ENUMS.CONTENT_REPORT.STATUS),
+});
+
+export const adminBulkUpdateReportsSchema = z.object({
+  moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
+  reportIds: z.array(z.string()).min(1, 'At least one report must be selected').max(100, 'Cannot update more than 100 reports at once'),
+  status: z.enum(ENUMS.CONTENT_REPORT.STATUS),
+});
+
+export const adminReportsFilterSchema = z.object({
+  limit: z.number().min(1).max(100).default(25).optional(),
+  moderatorId: z.string().optional(),
+  offset: z.number().min(0).default(0).optional(),
+  reason: z.enum(ENUMS.CONTENT_REPORT.REASON).optional(),
+  reporterId: z.string().optional(),
+  status: z.enum(ENUMS.CONTENT_REPORT.STATUS).optional(),
+  targetType: z.enum(['bobblehead', 'collection', 'subcollection']).optional(),
+});
+
+export const adminReportsQuerySchema = z.object({
+  limit: z.number().min(1).max(100).default(25).optional(),
+  page: z.number().min(1).default(1).optional(),
+  sortBy: z.enum(['createdAt', 'updatedAt', 'status', 'targetType']).default('createdAt').optional(),
+  sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
+});
+
+export type AdminBulkUpdateReports = z.infer<typeof adminBulkUpdateReportsSchema>;
+export type AdminReportsFilter = z.infer<typeof adminReportsFilterSchema>;
+export type AdminReportsQuery = z.infer<typeof adminReportsQuerySchema>;
+export type AdminUpdateReport = z.infer<typeof adminUpdateReportSchema>;
+// Type exports
 export type InsertContentReport = z.infer<typeof insertContentReportSchema>;
 export type PublicContentReport = z.infer<typeof publicContentReportSchema>;
 export type SelectContentReport = z.infer<typeof selectContentReportSchema>;

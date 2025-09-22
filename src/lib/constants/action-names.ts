@@ -3,11 +3,14 @@
  */
 export const ACTION_NAMES = {
   ADMIN: {
+    BULK_UPDATE_REPORTS: 'bulkUpdateReports',
     CREATE_FEATURED_CONTENT: 'createFeaturedContent',
     DELETE_FEATURED_CONTENT: 'deleteFeaturedContent',
+    GET_ADMIN_REPORTS: 'getAdminReports',
     GET_BOBBLEHEAD_FOR_FEATURING: 'getBobbleheadForFeaturing',
     GET_COLLECTION_FOR_FEATURING: 'getCollectionForFeaturing',
     GET_FEATURED_CONTENT_BY_ID: 'getFeaturedContentById',
+    GET_REPORTS_STATS: 'getReportsStats',
     GET_USER_FOR_FEATURING: 'getUserForFeaturing',
     SEARCH_BOBBLEHEADS_FOR_FEATURING: 'searchBobbleheadsForFeaturing',
     SEARCH_COLLECTIONS_FOR_FEATURING: 'searchCollectionsForFeaturing',
@@ -15,6 +18,7 @@ export const ACTION_NAMES = {
     TOGGLE_FEATURED_CONTENT: 'toggleFeaturedContent',
     TOGGLE_FEATURED_CONTENT_STATUS: 'toggleFeaturedContentStatus',
     UPDATE_FEATURED_CONTENT: 'updateFeaturedContent',
+    UPDATE_REPORT_STATUS: 'updateReportStatus',
   },
   ANALYTICS: {
     AGGREGATE_VIEWS: 'aggregateViews',
