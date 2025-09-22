@@ -35,7 +35,7 @@ export const Collection = ({
       {/* Header Section */}
       <div className={'mt-3 border-b border-border'}>
         <ContentLayout>
-          <CollectionHeader collection={collection} likeData={likeData} />
+          <CollectionHeader collection={collection} currentUserId={currentUserId || null} likeData={likeData} />
         </ContentLayout>
       </div>
 

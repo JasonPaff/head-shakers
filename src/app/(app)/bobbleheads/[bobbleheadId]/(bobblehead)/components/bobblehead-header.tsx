@@ -10,13 +10,14 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header-delete';
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
+import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
-  currentUserId?: string;
+  currentUserId: null | string;
   isOwner?: boolean;
   likeData: ContentLikeData;
 }
@@ -59,32 +60,40 @@ export const BobbleheadHeader = ({
         </Button>
 
         {/* Action Buttons */}
-        <Conditional isCondition={isOwner}>
-          <div className={'flex items-center gap-2'}>
-            {/* Share Bobblehead Menu */}
-            <BobbleheadShareMenu>
-              <Button size={'sm'} variant={'outline'}>
-                <ShareIcon aria-hidden className={'mr-2 size-4'} />
-                Share
-              </Button>
-            </BobbleheadShareMenu>
-
-            {/* Edit Bobblehead Button */}
+        <div className={'flex items-center gap-2'}>
+          {/* Share Menu */}
+          <BobbleheadShareMenu>
             <Button size={'sm'} variant={'outline'}>
-              <EditIcon aria-hidden className={'mr-2 size-4'} />
-              Edit
+              <ShareIcon aria-hidden className={'mr-2 size-4'} />
+              Share
             </Button>
+          </BobbleheadShareMenu>
 
-            {/* Delete Bobblehead Button */}
-            <BobbleheadHeaderDelete
-              bobbleheadId={bobblehead.id}
-              collectionId={bobblehead.collectionId}
-              subcollectionId={bobblehead.subcollectionId}
-            >
-              Delete
-            </BobbleheadHeaderDelete>
-          </div>
-        </Conditional>
+          {/* Owner Actions */}
+          <Conditional isCondition={isOwner}>
+            <Fragment>
+              {/* Edit Bobblehead Button */}
+              <Button size={'sm'} variant={'outline'}>
+                <EditIcon aria-hidden className={'mr-2 size-4'} />
+                Edit
+              </Button>
+
+              {/* Delete Bobblehead Button */}
+              <BobbleheadHeaderDelete
+                bobbleheadId={bobblehead.id}
+                collectionId={bobblehead.collectionId}
+                subcollectionId={bobblehead.subcollectionId}
+              >
+                Delete
+              </BobbleheadHeaderDelete>
+            </Fragment>
+          </Conditional>
+
+          {/* Non-Owner Actions */}
+          <Conditional isCondition={!isOwner && !!currentUserId}>
+            <ReportButton targetId={bobblehead.id} targetType={'bobblehead'} variant={'outline'} />
+          </Conditional>
+        </div>
       </div>
 
       <div className={'flex flex-col gap-6'}>
@@ -125,11 +134,7 @@ export const BobbleheadHeader = ({
             <div className={'flex items-center gap-2'}>
               <span className={'text-sm font-medium'}>
                 <Suspense fallback={'-- views'}>
-                  <ViewCountAsync
-                    currentUserId={currentUserId}
-                    targetId={bobblehead.id}
-                    targetType={'bobblehead'}
-                  />
+                  <ViewCountAsync targetId={bobblehead.id} targetType={'bobblehead'} />
                 </Suspense>
               </span>
             </div>

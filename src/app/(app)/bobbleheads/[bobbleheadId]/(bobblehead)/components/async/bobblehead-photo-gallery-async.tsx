@@ -3,16 +3,14 @@ import { notFound } from 'next/navigation';
 
 import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-photo-gallery';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadPhotoGalleryAsyncProps {
   bobbleheadId: string;
-  currentUserId?: string;
 }
 
-export const BobbleheadPhotoGalleryAsync = async ({
-  bobbleheadId,
-  currentUserId,
-}: BobbleheadPhotoGalleryAsyncProps) => {
+export const BobbleheadPhotoGalleryAsync = async ({ bobbleheadId }: BobbleheadPhotoGalleryAsyncProps) => {
+  const currentUserId = await getOptionalUserId();
   const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
     bobbleheadId,
     currentUserId || undefined,

@@ -9,6 +9,7 @@ import type { PublicCollection } from '@/lib/facades/collections/collections.fac
 import { CollectionEditSection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-edit-section';
 import { CollectionDelete } from '@/components/feature/collections/collection-delete';
 import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
+import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
@@ -16,6 +17,7 @@ import { checkIsOwner } from '@/utils/optional-auth-utils';
 
 interface CollectionHeaderProps {
   collection: PublicCollection;
+  currentUserId: null | string;
   likeData?: {
     isLiked: boolean;
     likeCount: number;
@@ -23,7 +25,7 @@ interface CollectionHeaderProps {
   };
 }
 
-export const CollectionHeader = async ({ collection, likeData }: CollectionHeaderProps) => {
+export const CollectionHeader = async ({ collection, currentUserId, likeData }: CollectionHeaderProps) => {
   if (!collection) throw new Error('Collection is required');
 
   const isOwner = await checkIsOwner(collection.userId);
@@ -51,12 +53,20 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
             </Button>
           </CollectionShareMenu>
 
-          {/* Edit Collection Button */}
-          <CollectionEditSection collection={collection} isOwner={isOwner} />
-
-          {/* Delete Collection Button */}
+          {/* Owner Actions */}
           <Conditional isCondition={isOwner}>
-            <CollectionDelete collectionId={collection.id}>Delete</CollectionDelete>
+            <Fragment>
+              {/* Edit Collection Button */}
+              <CollectionEditSection collection={collection} isOwner={isOwner} />
+
+              {/* Delete Collection Button */}
+              <CollectionDelete collectionId={collection.id}>Delete</CollectionDelete>
+            </Fragment>
+          </Conditional>
+
+          {/* Non-Owner Actions */}
+          <Conditional isCondition={!isOwner && !!currentUserId}>
+            <ReportButton targetId={collection.id} targetType={'collection'} variant={'outline'} />
           </Conditional>
         </div>
       </div>

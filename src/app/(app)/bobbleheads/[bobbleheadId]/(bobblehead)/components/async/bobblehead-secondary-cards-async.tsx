@@ -5,16 +5,14 @@ import { BobbleheadCustomFieldsCard } from '@/app/(app)/bobbleheads/[bobbleheadI
 import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-status-privacy-card';
 import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-timestamps-card';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface BobbleheadSecondaryCardsAsyncProps {
   bobbleheadId: string;
-  currentUserId?: string;
 }
 
-export const BobbleheadSecondaryCardsAsync = async ({
-  bobbleheadId,
-  currentUserId,
-}: BobbleheadSecondaryCardsAsyncProps) => {
+export const BobbleheadSecondaryCardsAsync = async ({ bobbleheadId }: BobbleheadSecondaryCardsAsyncProps) => {
+  const currentUserId = await getOptionalUserId();
   const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
     bobbleheadId,
     currentUserId || undefined,

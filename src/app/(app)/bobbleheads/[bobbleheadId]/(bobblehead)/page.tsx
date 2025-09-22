@@ -56,10 +56,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
           <ContentLayout>
             <BobbleheadErrorBoundary section={'header'}>
               <Suspense fallback={<BobbleheadHeaderSkeleton />}>
-                <BobbleheadHeaderAsync
-                  bobbleheadId={bobbleheadId}
-                  currentUserId={currentUserId || undefined}
-                />
+                <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
               </Suspense>
             </BobbleheadErrorBoundary>
           </ContentLayout>
@@ -70,10 +67,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
           <ContentLayout>
             <BobbleheadErrorBoundary section={'feature'}>
               <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
-                <BobbleheadFeatureCardAsync
-                  bobbleheadId={bobbleheadId}
-                  currentUserId={currentUserId || undefined}
-                />
+                <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} />
               </Suspense>
             </BobbleheadErrorBoundary>
           </ContentLayout>
@@ -83,10 +77,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
         <ContentLayout>
           <BobbleheadErrorBoundary section={'gallery'}>
             <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
-              <BobbleheadPhotoGalleryAsync
-                bobbleheadId={bobbleheadId}
-                currentUserId={currentUserId || undefined}
-              />
+              <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} />
             </Suspense>
           </BobbleheadErrorBoundary>
         </ContentLayout>
@@ -97,10 +88,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
             <ContentLayout>
               <BobbleheadErrorBoundary section={'metrics'}>
                 <Suspense fallback={<BobbleheadMetricsSkeleton />}>
-                  <BobbleheadMetricsAsync
-                    bobbleheadId={bobbleheadId}
-                    currentUserId={currentUserId || undefined}
-                  />
+                  <BobbleheadMetricsAsync bobbleheadId={bobbleheadId} />
                 </Suspense>
               </BobbleheadErrorBoundary>
             </ContentLayout>
@@ -111,10 +99,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
         <ContentLayout>
           <BobbleheadErrorBoundary section={'details'}>
             <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
-              <BobbleheadDetailCardsAsync
-                bobbleheadId={bobbleheadId}
-                currentUserId={currentUserId || undefined}
-              />
+              <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} />
             </Suspense>
           </BobbleheadErrorBoundary>
         </ContentLayout>
@@ -123,10 +108,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
         <ContentLayout>
           <BobbleheadErrorBoundary section={'secondary'}>
             <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
-              <BobbleheadSecondaryCardsAsync
-                bobbleheadId={bobbleheadId}
-                currentUserId={currentUserId || undefined}
-              />
+              <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} />
             </Suspense>
           </BobbleheadErrorBoundary>
         </ContentLayout>

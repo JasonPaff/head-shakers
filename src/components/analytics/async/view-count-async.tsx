@@ -1,9 +1,9 @@
 import type { ContentViewTargetType } from '@/lib/facades/analytics/view-tracking.facade';
 
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 export interface ViewCountAsyncProps {
-  currentUserId?: string;
   isShowingLabel?: boolean;
   shouldIncludeAnonymous?: boolean;
   targetId: string;
@@ -15,13 +15,14 @@ export interface ViewCountAsyncProps {
  * Provides error boundaries and fallback for failed view count fetches
  */
 export async function ViewCountAsync({
-  currentUserId,
   isShowingLabel = true,
   shouldIncludeAnonymous = true,
   targetId,
   targetType,
 }: ViewCountAsyncProps) {
   try {
+    const currentUserId = (await getOptionalUserId()) || undefined;
+
     const viewCount = await ViewTrackingFacade.getViewCountAsync(
       targetType,
       targetId,

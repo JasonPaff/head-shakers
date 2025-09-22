@@ -51,7 +51,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
         <ContentLayout>
           <BobbleheadHeader
             bobblehead={bobblehead}
-            currentUserId={currentUserId || undefined}
+            currentUserId={currentUserId}
             isOwner={isOwner}
             likeData={likeData}
           />
@@ -62,11 +62,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
       <AuthContent>
         <div className={'mt-4'}>
           <ContentLayout>
-            <BobbleheadMetrics
-              bobblehead={bobblehead}
-              bobbleheadId={bobbleheadId}
-              currentUserId={currentUserId || undefined}
-            />
+            <BobbleheadMetrics bobblehead={bobblehead} bobbleheadId={bobbleheadId} />
           </ContentLayout>
         </div>
       </AuthContent>

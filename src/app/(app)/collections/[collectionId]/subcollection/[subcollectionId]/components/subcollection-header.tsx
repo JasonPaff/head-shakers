@@ -7,12 +7,13 @@ import { Fragment } from 'react';
 import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
 
 import { SubcollectionEditSection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-edit-section';
+import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { SubcollectionDelete } from '@/components/feature/subcollections/subcollection-delete';
 import { SubcollectionShareMenu } from '@/components/feature/subcollections/subcollection-share-menu';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
-import { checkIsOwner } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionHeaderProps {
   likeData?: {
@@ -27,6 +28,7 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
   if (!subcollection) throw new Error('Subcollection is required');
 
   const isOwner = await checkIsOwner(subcollection.userId);
+  const currentUserId = await getOptionalUserId();
 
   return (
     <Fragment>
@@ -53,12 +55,20 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
             </Button>
           </SubcollectionShareMenu>
 
-          {/* Edit Subcollection Button */}
-          <SubcollectionEditSection isOwner={isOwner} subcollection={subcollection} />
-
-          {/* Delete Button */}
+          {/* Owner Actions */}
           <Conditional isCondition={isOwner}>
-            <SubcollectionDelete subcollectionId={subcollection.id}>Delete</SubcollectionDelete>
+            <Fragment>
+              {/* Edit Subcollection Button */}
+              <SubcollectionEditSection isOwner={isOwner} subcollection={subcollection} />
+
+              {/* Delete Button */}
+              <SubcollectionDelete subcollectionId={subcollection.id}>Delete</SubcollectionDelete>
+            </Fragment>
+          </Conditional>
+
+          {/* Non-Owner Actions */}
+          <Conditional isCondition={!isOwner && !!currentUserId}>
+            <ReportButton targetId={subcollection.id} targetType={'subcollection'} variant={'outline'} />
           </Conditional>
         </div>
       </div>

@@ -21,5 +21,5 @@ export const CollectionHeaderAsync = async ({ collectionId, currentUserId }: Col
     notFound();
   }
 
-  return <CollectionHeader collection={collection} likeData={likeData} />;
+  return <CollectionHeader collection={collection} currentUserId={currentUserId} likeData={likeData} />;
 };
