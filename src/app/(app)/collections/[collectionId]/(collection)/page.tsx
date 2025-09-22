@@ -55,7 +55,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
           <ContentLayout>
             <CollectionErrorBoundary section={'header'}>
               <Suspense fallback={<CollectionHeaderSkeleton />}>
-                <CollectionHeaderAsync collectionId={collectionId} currentUserId={currentUserId} />
+                <CollectionHeaderAsync collectionId={collectionId} />
               </Suspense>
             </CollectionErrorBoundary>
           </ContentLayout>
