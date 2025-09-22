@@ -12,6 +12,7 @@ Original Request: The bobblehead page needs to display the real view count for t
 ## File Discovery Results
 
 ### Critical Priority Files (5)
+
 - `src/lib/facades/analytics/view-tracking.facade.ts` - Main business logic facade with getViewCountAsync method
 - `src/lib/queries/analytics/view-tracking.query.ts` - Database query layer for real-time view counts
 - `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-metrics.tsx` - Currently displays cached view count
@@ -19,6 +20,7 @@ Original Request: The bobblehead page needs to display the real view count for t
 - `src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-metrics.tsx` - Needs view count display added
 
 ### High Priority Files (5)
+
 - Redis caching service and async component wrappers
 - Database schema and TanStack Query infrastructure
 

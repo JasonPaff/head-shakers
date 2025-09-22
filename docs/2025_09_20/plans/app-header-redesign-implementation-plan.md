@@ -14,12 +14,14 @@
 ## File Discovery Results
 
 ### High Priority Files
+
 - `src/components/layout/app-header/app-header.tsx` - Main header requiring layout restructure
 - `src/components/layout/app-header/components/app-header-container.tsx` - Container with auth-dependent styling
 - `src/components/layout/app-header/components/app-header-nav-menu.tsx` - Navigation requiring 3rd menu addition
 - `src/components/layout/app-header/components/app-header-search.tsx` - Search component to reposition
 
 ### Medium Priority Files
+
 - `src/components/layout/app-header/components/app-header-user.tsx` - User component for right section
 - `src/components/layout/app-header/components/app-header-notifications.tsx` - Notifications component
 - `src/components/layout/app-header/components/app-header-nav-menu-link.tsx` - Navigation link component

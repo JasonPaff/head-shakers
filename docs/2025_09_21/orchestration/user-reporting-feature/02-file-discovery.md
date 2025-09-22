@@ -1,6 +1,7 @@
 # Step 2: File Discovery
 
 **Step Metadata**
+
 - Start Time: 2025-09-21T00:01:00Z
 - End Time: 2025-09-21T00:02:00Z
 - Duration: ~60 seconds

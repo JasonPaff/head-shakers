@@ -46,23 +46,28 @@ Implement a comprehensive content reporting system that allows authenticated use
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/facades/content-reports.facade.ts` - Content reporting business logic facade
 
 **Files to Modify:**
+
 - `src/lib/facades/index.ts` - Export new facade
 
 **Changes:**
+
 - Add ContentReportsFacade class with methods for creating reports, checking existing reports, and retrieving report status
 - Implement rate limiting logic to prevent spam reporting
 - Add validation for report target existence
 - Include proper error handling and type safety
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade compiles without TypeScript errors
 - [ ] All validation commands pass
 - [ ] Facade exports are properly typed
@@ -76,12 +81,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/queries/content-reports.queries.ts` - Database queries for content reports
 
 **Files to Modify:**
+
 - `src/lib/queries/index.ts` - Export new query functions
 
 **Changes:**
+
 - Add functions for creating new reports with proper relations
 - Implement query to check existing reports by user and target
 - Add function to retrieve report status for targets
@@ -89,11 +97,13 @@ npm run lint:fix && npm run typecheck
 - Implement efficient queries with proper indexing on target type/ID combinations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All query functions are properly typed
 - [ ] Database operations use proper Drizzle ORM patterns
 - [ ] All validation commands pass
@@ -108,12 +118,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/content-reports.actions.ts` - Server actions for content reporting
 
 **Files to Modify:**
+
 - `src/lib/actions/index.ts` - Export new actions
 
 **Changes:**
+
 - Add createContentReportAction using existing validation schemas
 - Implement proper authentication checks using Clerk
 - Add rate limiting to prevent abuse
@@ -121,11 +134,13 @@ npm run lint:fix && npm run typecheck
 - Use existing Next-Safe-Action patterns for consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Actions are properly authenticated and validated
 - [ ] Rate limiting is implemented and tested
 - [ ] All validation commands pass
@@ -140,11 +155,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/content-reports/report-button.tsx` - Main report button component
 - `src/components/feature/content-reports/report-reason-dialog.tsx` - Report reason selection dialog
 - `src/components/feature/content-reports/index.ts` - Export components
 
 **Changes:**
+
 - Create ReportButton component with loading states and accessibility
 - Implement ReportReasonDialog using Radix UI Alert Dialog
 - Add proper Tailwind CSS styling following existing patterns
@@ -152,11 +169,13 @@ npm run lint:fix && npm run typecheck
 - Implement proper error boundaries and fallbacks
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Components render without errors
 - [ ] Accessibility features are properly implemented
 - [ ] All validation commands pass
@@ -171,9 +190,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/hooks/use-content-reports.ts` - TanStack Query hooks for content reports
 
 **Changes:**
+
 - Add useCreateContentReport mutation hook
 - Implement useReportStatus query hook for checking existing reports
 - Add proper cache invalidation and optimistic updates
@@ -181,11 +202,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing TanStack Query patterns in the project
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hooks provide proper loading and error states
 - [ ] Cache invalidation works correctly
 - [ ] All validation commands pass
@@ -200,21 +223,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[id]/page.tsx` - Add report button to bobblehead detail page
 - `src/components/feature/bobblehead/bobblehead-detail.tsx` - Integrate report button component
 
 **Changes:**
+
 - Add ReportButton component to bobblehead action menu or toolbar
 - Implement proper authentication checks before showing report option
 - Add contextual styling and positioning
 - Ensure proper data flow for bobblehead ID and type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Report button appears in appropriate location
 - [ ] Authentication checks work correctly
 - [ ] All validation commands pass
@@ -229,21 +256,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[id]/page.tsx` - Add report button to collection detail page
 - `src/components/feature/collections/collection-detail.tsx` - Integrate report button component
 
 **Changes:**
+
 - Add ReportButton component to collection action menu
 - Implement authentication and ownership checks
 - Add proper styling and positioning
 - Ensure data flow for collection ID and type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Report button integrates seamlessly with existing UI
 - [ ] Access controls prevent inappropriate reporting
 - [ ] All validation commands pass
@@ -258,21 +289,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/subcollections/[id]/page.tsx` - Add report button to subcollection detail page
 - `src/components/feature/collections/subcollection-detail.tsx` - Integrate report button component
 
 **Changes:**
+
 - Add ReportButton component to subcollection action area
 - Implement proper authentication and validation
 - Add consistent styling with other detail pages
 - Ensure proper data handling for subcollection reporting
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Report functionality works across all content types
 - [ ] UI consistency is maintained
 - [ ] All validation commands pass
@@ -287,10 +322,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/content-reports.actions.ts` - Add enhanced rate limiting
 - `src/middleware.ts` - Add rate limiting middleware if needed
 
 **Changes:**
+
 - Implement per-user rate limiting for report submissions
 - Add IP-based rate limiting for additional protection
 - Include logging for suspicious reporting patterns
@@ -298,11 +335,13 @@ npm run lint:fix && npm run typecheck
 - Implement cooldown periods for repeated reports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Rate limiting prevents abuse without blocking legitimate use
 - [ ] Security measures are properly implemented
 - [ ] All validation commands pass
@@ -317,10 +356,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/content-reports/report-button.tsx` - Add toast notifications
 - `src/lib/hooks/use-content-reports.ts` - Integrate notification triggers
 
 **Changes:**
+
 - Add success notifications for successful report submissions
 - Implement error notifications with helpful messages
 - Add loading states with progress indicators
@@ -328,11 +369,13 @@ npm run lint:fix && npm run typecheck
 - Ensure accessibility compliance for all notifications
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Users receive clear feedback for all report actions
 - [ ] Notifications are accessible and user-friendly
 - [ ] All validation commands pass

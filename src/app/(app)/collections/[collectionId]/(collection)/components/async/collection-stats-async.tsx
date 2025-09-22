@@ -20,5 +20,11 @@ export const CollectionStatsAsync = async ({ collectionId, currentUserId }: Coll
     notFound();
   }
 
-  return <CollectionStats collection={collection} collectionId={collectionId} currentUserId={currentUserId || undefined} />;
+  return (
+    <CollectionStats
+      collection={collection}
+      collectionId={collectionId}
+      currentUserId={currentUserId || undefined}
+    />
+  );
 };

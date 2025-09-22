@@ -1,6 +1,7 @@
 # Step 1: Feature Request Refinement
 
 **Step Metadata**
+
 - Start Time: 2025-09-21T00:00:00Z
 - End Time: 2025-09-21T00:01:00Z
 - Duration: ~60 seconds
@@ -15,10 +16,12 @@ I want to add a feature to the app where users can report specific bobbleheads/s
 ## Context Provided
 
 **Project Context**:
+
 - CLAUDE.md (project overview, tech stack, architecture)
 - package.json (dependencies and development commands)
 
 **Key Technical Context**:
+
 - Next.js 15.5.3 with App Router
 - React 19.1.0 with TypeScript
 - Drizzle ORM with PostgreSQL/Neon

@@ -25,5 +25,11 @@ export const SubcollectionMetricsAsync = async ({
     notFound();
   }
 
-  return <SubcollectionMetrics currentUserId={currentUserId || undefined} subcollection={subcollection} subcollectionId={subcollectionId} />;
+  return (
+    <SubcollectionMetrics
+      currentUserId={currentUserId || undefined}
+      subcollection={subcollection}
+      subcollectionId={subcollectionId}
+    />
+  );
 };

@@ -3,11 +3,15 @@ import { z } from 'zod';
 
 import { ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { contentReports } from '@/lib/db/schema';
+import { zodMaxString } from '@/lib/utils/zod.utils';
 
 export const selectContentReportSchema = createSelectSchema(contentReports);
 
 export const insertContentReportSchema = createInsertSchema(contentReports, {
-  description: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.DESCRIPTION.MAX).optional(),
+  description: zodMaxString({
+    fieldName: 'Description',
+    maxLength: SCHEMA_LIMITS.CONTENT_REPORT.DESCRIPTION.MAX,
+  }),
   moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
   reason: z.enum(ENUMS.CONTENT_REPORT.REASON),
   targetType: z.enum(ENUMS.CONTENT_REPORT.TARGET_TYPE),
@@ -19,23 +23,24 @@ export const insertContentReportSchema = createInsertSchema(contentReports, {
   updatedAt: true,
 });
 
-export const createContentReportSchema = insertContentReportSchema.extend({
-  description: z.string().optional(),
-  reason: z.enum([
-    'spam',
-    'harassment',
-    'inappropriate_content',
-    'copyright_violation',
-    'misinformation',
-    'hate_speech',
-    'violence',
-    'other',
-  ]),
-  targetId: z.string(),
-  targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
-}).omit({
-  reporterId: true,
-});
+export const createContentReportSchema = insertContentReportSchema
+  .extend({
+    reason: z.enum([
+      'spam',
+      'harassment',
+      'inappropriate_content',
+      'copyright_violation',
+      'misinformation',
+      'hate_speech',
+      'violence',
+      'other',
+    ]),
+    targetId: z.string(),
+    targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+  })
+  .omit({
+    reporterId: true,
+  });
 
 export const checkReportStatusSchema = z.object({
   targetId: z.string(),

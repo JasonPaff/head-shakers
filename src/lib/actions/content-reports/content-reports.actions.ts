@@ -47,11 +47,7 @@ export const createContentReportAction = rateLimitedAuthClient
 
     try {
       // Use facade to create report with all validation
-      const newReport = await ContentReportsFacade.createReportAsync(
-        reportData,
-        userId,
-        ctx.tx ?? ctx.db,
-      );
+      const newReport = await ContentReportsFacade.createReportAsync(reportData, userId, ctx.tx ?? ctx.db);
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,

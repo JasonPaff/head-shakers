@@ -22,5 +22,7 @@ export const BobbleheadMetricsAsync = async ({
     notFound();
   }
 
-  return <BobbleheadMetrics bobblehead={bobblehead} bobbleheadId={bobbleheadId} currentUserId={currentUserId} />;
+  return (
+    <BobbleheadMetrics bobblehead={bobblehead} bobbleheadId={bobbleheadId} currentUserId={currentUserId} />
+  );
 };
