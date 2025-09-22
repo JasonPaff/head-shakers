@@ -1,10 +1,19 @@
-import { and, desc, eq, gte } from 'drizzle-orm';
+import { and, count, desc, eq, gte, inArray, sql, type SQL } from 'drizzle-orm';
 
+import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/enums';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { InsertContentReport, SelectContentReport } from '@/lib/validations/moderation.validation';
 
 import { bobbleheads, collections, contentReports, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+
+export type AdminReportsFilterOptions = FindOptions & {
+  moderatorId?: string;
+  reason?: ContentReportReason;
+  reporterId?: string;
+  status?: ContentReportStatus;
+  targetType?: 'bobblehead' | 'collection' | 'subcollection';
+};
 
 export type ContentReportRecord = typeof contentReports.$inferSelect;
 
@@ -13,7 +22,74 @@ export type ContentReportTargetInfo = {
   ownerId: null | string;
 };
 
+export type ReportsStatsResult = {
+  dismissed: number;
+  pending: number;
+  resolved: number;
+  reviewed: number;
+  total: number;
+};
+
 export class ContentReportsQuery extends BaseQuery {
+  /**
+   * Bulk update report statuses for admin operations
+   * @param reportIds - Array of report IDs to update (max 100)
+   * @param status - New status to set for all reports
+   * @param moderatorId - ID of the moderator performing the action
+   * @param context - Query context for database access
+   * @param moderatorNotes - Optional notes from the moderator
+   * @returns Promise<SelectContentReport[]> - Updated reports
+   */
+  static async bulkUpdateReportsStatusAsync(
+    reportIds: Array<string>,
+    status: ContentReportStatus,
+    moderatorId: string,
+    context: QueryContext,
+    moderatorNotes?: string,
+  ): Promise<Array<SelectContentReport>> {
+    if (reportIds.length === 0) {
+      return [];
+    }
+
+    if (reportIds.length > 100) {
+      throw new Error('Cannot update more than 100 reports at once');
+    }
+
+    return this.executeWithRetry(async () => {
+      const dbInstance = this.getDbInstance(context);
+
+      const updateData: {
+        moderatorId: string;
+        moderatorNotes?: string;
+        resolvedAt?: Date | null;
+        status: ContentReportStatus;
+        updatedAt: Date;
+      } = {
+        moderatorId,
+        status,
+        updatedAt: new Date(),
+      };
+
+      if (moderatorNotes) {
+        updateData.moderatorNotes = moderatorNotes;
+      }
+
+      if (status === 'resolved' || status === 'dismissed') {
+        updateData.resolvedAt = new Date();
+      } else {
+        updateData.resolvedAt = null;
+      }
+
+      const updatedReports = await dbInstance
+        .update(contentReports)
+        .set(updateData)
+        .where(inArray(contentReports.id, reportIds))
+        .returning();
+
+      return updatedReports;
+    }, 'bulkUpdateReportsStatus');
+  }
+
   /**
    * Check if a user has already reported a specific target
    */
@@ -74,13 +150,68 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
+   * Get all reports for admin with comprehensive filtering and pagination
+   * @param options - Filter and pagination options
+   * @param context - Query context for database access
+   * @returns Promise<SelectContentReport[]> - Filtered and paginated reports
+   */
+  static async getAllReportsForAdminAsync(
+    options: AdminReportsFilterOptions = {},
+    context: QueryContext,
+  ): Promise<Array<SelectContentReport>> {
+    return this.executeWithRetry(async () => {
+      const dbInstance = this.getDbInstance(context);
+      const pagination = this.applyPagination(options);
+
+      const filters: Array<SQL | undefined> = [];
+
+      if (options.status) {
+        filters.push(eq(contentReports.status, options.status));
+      }
+
+      if (options.targetType) {
+        filters.push(eq(contentReports.targetType, options.targetType));
+      }
+
+      if (options.reason) {
+        filters.push(eq(contentReports.reason, options.reason));
+      }
+
+      if (options.reporterId) {
+        filters.push(eq(contentReports.reporterId, options.reporterId));
+      }
+
+      if (options.moderatorId) {
+        filters.push(eq(contentReports.moderatorId, options.moderatorId));
+      }
+
+      let query = dbInstance
+        .select()
+        .from(contentReports)
+        .where(filters.length > 0 ? and(...filters) : undefined)
+        .orderBy(desc(contentReports.createdAt))
+        .$dynamic();
+
+      if (pagination.limit) {
+        query = query.limit(pagination.limit);
+      }
+
+      if (pagination.offset) {
+        query = query.offset(pagination.offset);
+      }
+
+      return query;
+    }, 'getAllReportsForAdmin');
+  }
+
+  /**
    * Get recent reports by a specific user (for rate limiting checks)
    */
   static async getRecentReportsByUserAsync(
     userId: string,
     hoursAgo: number = 24,
     context: QueryContext,
-  ): Promise<SelectContentReport[]> {
+  ): Promise<Array<SelectContentReport>> {
     const dbInstance = this.getDbInstance(context);
     const timeThreshold = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
 
@@ -91,6 +222,41 @@ export class ContentReportsQuery extends BaseQuery {
   }
 
   /**
+   * Get reports filtered by status for admin dashboard
+   * @param status - Report status to filter by
+   * @param options - Pagination options
+   * @param context - Query context for database access
+   * @returns Promise<SelectContentReport[]> - Reports with specified status
+   */
+  static async getReportsByStatusAsync(
+    status: ContentReportStatus,
+    options: FindOptions = {},
+    context: QueryContext,
+  ): Promise<Array<SelectContentReport>> {
+    return this.executeWithRetry(async () => {
+      const dbInstance = this.getDbInstance(context);
+      const pagination = this.applyPagination(options);
+
+      let query = dbInstance
+        .select()
+        .from(contentReports)
+        .where(eq(contentReports.status, status))
+        .orderBy(desc(contentReports.createdAt))
+        .$dynamic();
+
+      if (pagination.limit) {
+        query = query.limit(pagination.limit);
+      }
+
+      if (pagination.offset) {
+        query = query.offset(pagination.offset);
+      }
+
+      return query;
+    }, 'getReportsByStatus');
+  }
+
+  /**
    * Get all reports for a specific target
    */
   static async getReportsByTargetAsync(
@@ -98,7 +264,7 @@ export class ContentReportsQuery extends BaseQuery {
     targetType: 'bobblehead' | 'collection' | 'subcollection',
     options: FindOptions = {},
     context: QueryContext,
-  ): Promise<SelectContentReport[]> {
+  ): Promise<Array<SelectContentReport>> {
     const dbInstance = this.getDbInstance(context);
     const pagination = this.applyPagination(options);
 
@@ -118,6 +284,45 @@ export class ContentReportsQuery extends BaseQuery {
     }
 
     return query;
+  }
+
+  // Admin-specific methods
+
+  /**
+   * Get report statistics for admin dashboard
+   * @param context - Query context for database access
+   * @returns Promise<ReportsStatsResult> - Report statistics by status
+   */
+  static async getReportsStatsAsync(context: QueryContext): Promise<ReportsStatsResult> {
+    return this.executeWithRetry(async () => {
+      const dbInstance = this.getDbInstance(context);
+
+      const [stats] = await dbInstance
+        .select({
+          dismissed: sql<number>`COUNT(CASE WHEN ${contentReports.status} = 'dismissed' THEN 1 END)`.as(
+            'dismissed',
+          ),
+          pending: sql<number>`COUNT(CASE WHEN ${contentReports.status} = 'pending' THEN 1 END)`.as(
+            'pending',
+          ),
+          resolved: sql<number>`COUNT(CASE WHEN ${contentReports.status} = 'resolved' THEN 1 END)`.as(
+            'resolved',
+          ),
+          reviewed: sql<number>`COUNT(CASE WHEN ${contentReports.status} = 'reviewed' THEN 1 END)`.as(
+            'reviewed',
+          ),
+          total: count(),
+        })
+        .from(contentReports);
+
+      return {
+        dismissed: parseInt(String(stats?.dismissed ?? 0), 10),
+        pending: parseInt(String(stats?.pending ?? 0), 10),
+        resolved: parseInt(String(stats?.resolved ?? 0), 10),
+        reviewed: parseInt(String(stats?.reviewed ?? 0), 10),
+        total: parseInt(String(stats?.total ?? 0), 10),
+      };
+    }, 'getReportsStats');
   }
 
   /**
