@@ -5,20 +5,20 @@ import type { SubcollectionSearchParams } from '@/app/(app)/collections/[collect
 
 import { SubcollectionBobbleheads } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-bobbleheads';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsAsyncProps {
   collectionId: string;
-  currentUserId: null | string;
   searchParams?: SubcollectionSearchParams;
   subcollectionId: string;
 }
 
 export const SubcollectionBobbleheadsAsync = async ({
   collectionId,
-  currentUserId,
   searchParams,
   subcollectionId,
 }: SubcollectionBobbleheadsAsyncProps) => {
+  const currentUserId = await getOptionalUserId();
   const subcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
     collectionId,
     subcollectionId,

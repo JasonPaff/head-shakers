@@ -59,11 +59,7 @@ export const Subcollection = async ({ collectionId, searchParams, subcollectionI
 
             {/* Sidebar */}
             <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
-              <SubcollectionMetrics
-                currentUserId={currentUserId || undefined}
-                subcollection={subcollection}
-                subcollectionId={subcollectionId}
-              />
+              <SubcollectionMetrics subcollection={subcollection} subcollectionId={subcollectionId} />
             </aside>
           </div>
         </ContentLayout>

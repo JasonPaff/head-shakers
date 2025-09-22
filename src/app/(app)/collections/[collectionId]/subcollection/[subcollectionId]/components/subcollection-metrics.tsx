@@ -8,16 +8,11 @@ import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { Card, CardContent } from '@/components/ui/card';
 
 interface SubcollectionMetricsProps {
-  currentUserId?: string;
   subcollection: PublicSubcollection;
   subcollectionId: string;
 }
 
-export const SubcollectionMetrics = ({
-  currentUserId,
-  subcollection,
-  subcollectionId,
-}: SubcollectionMetricsProps) => {
+export const SubcollectionMetrics = ({ subcollection, subcollectionId }: SubcollectionMetricsProps) => {
   if (!subcollection) throw new Error('Subcollection is required');
 
   return (
@@ -31,7 +26,6 @@ export const SubcollectionMetrics = ({
               <p className={'text-2xl font-bold'}>
                 <Suspense fallback={'--'}>
                   <ViewCountAsync
-                    currentUserId={currentUserId}
                     isShowingLabel={false}
                     targetId={subcollectionId}
                     targetType={'subcollection'}

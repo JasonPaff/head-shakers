@@ -71,7 +71,6 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
                   <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
                     <CollectionBobbleheadsAsync
                       collectionId={collectionId}
-                      currentUserId={currentUserId}
                       searchParams={resolvedSearchParams}
                     />
                   </Suspense>
@@ -82,16 +81,13 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
               <aside className={'flex flex-col gap-6 lg:col-span-3'}>
                 <CollectionErrorBoundary section={'stats'}>
                   <Suspense fallback={<CollectionStatsSkeleton />}>
-                    <CollectionStatsAsync collectionId={collectionId} currentUserId={currentUserId} />
+                    <CollectionStatsAsync collectionId={collectionId} />
                   </Suspense>
                 </CollectionErrorBoundary>
 
                 <CollectionErrorBoundary section={'subcollections'}>
                   <Suspense fallback={<SubcollectionsSkeleton />}>
-                    <CollectionSidebarSubcollectionsAsync
-                      collectionId={collectionId}
-                      currentUserId={currentUserId}
-                    />
+                    <CollectionSidebarSubcollectionsAsync collectionId={collectionId} />
                   </Suspense>
                 </CollectionErrorBoundary>
               </aside>

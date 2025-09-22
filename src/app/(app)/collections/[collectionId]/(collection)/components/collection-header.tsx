@@ -13,11 +13,10 @@ import { ReportButton } from '@/components/feature/content-reports/report-button
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
-import { checkIsOwner } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 interface CollectionHeaderProps {
   collection: PublicCollection;
-  currentUserId: null | string;
   likeData?: {
     isLiked: boolean;
     likeCount: number;
@@ -25,9 +24,10 @@ interface CollectionHeaderProps {
   };
 }
 
-export const CollectionHeader = async ({ collection, currentUserId, likeData }: CollectionHeaderProps) => {
+export const CollectionHeader = async ({ collection, likeData }: CollectionHeaderProps) => {
   if (!collection) throw new Error('Collection is required');
 
+  const currentUserId = await getOptionalUserId();
   const isOwner = await checkIsOwner(collection.userId);
 
   return (

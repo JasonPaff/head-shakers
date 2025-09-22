@@ -12,7 +12,6 @@ import { ContentLayout } from '@/components/layout/content-layout';
 interface CollectionProps {
   collection: PublicCollection;
   collectionId: string;
-  currentUserId?: string;
   likeData?: {
     isLiked: boolean;
     likeCount: number;
@@ -21,13 +20,7 @@ interface CollectionProps {
   searchParams?: CollectionSearchParams;
 }
 
-export const Collection = ({
-  collection,
-  collectionId,
-  currentUserId,
-  likeData,
-  searchParams,
-}: CollectionProps) => {
+export const Collection = ({ collection, collectionId, likeData, searchParams }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -35,7 +28,7 @@ export const Collection = ({
       {/* Header Section */}
       <div className={'mt-3 border-b border-border'}>
         <ContentLayout>
-          <CollectionHeader collection={collection} currentUserId={currentUserId || null} likeData={likeData} />
+          <CollectionHeader collection={collection} likeData={likeData} />
         </ContentLayout>
       </div>
 
@@ -50,11 +43,7 @@ export const Collection = ({
 
             {/* Sidebar */}
             <aside className={'flex flex-col gap-6 lg:col-span-3'}>
-              <CollectionStats
-                collection={collection}
-                collectionId={collectionId}
-                currentUserId={currentUserId}
-              />
+              <CollectionStats collection={collection} collectionId={collectionId} />
               <CollectionSidebarSubcollections collection={collection} />
             </aside>
           </div>

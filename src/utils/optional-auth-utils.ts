@@ -1,9 +1,8 @@
 import { auth } from '@clerk/nextjs/server';
-import { cache } from 'react';
 
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 
-export const getOptionalUserId = cache(async (): Promise<null | string> => {
+export const getOptionalUserId = async (): Promise<null | string> => {
   try {
     const { userId: clerkUserId } = await auth();
 
@@ -17,7 +16,7 @@ export const getOptionalUserId = cache(async (): Promise<null | string> => {
   } catch {
     return null;
   }
-});
+};
 
 export const checkIsOwner = async (resourceUserId?: null | string): Promise<boolean> => {
   if (!resourceUserId) return false;

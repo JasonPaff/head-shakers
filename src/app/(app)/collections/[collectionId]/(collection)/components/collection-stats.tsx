@@ -10,10 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface CollectionStatsProps {
   collection: PublicCollection;
   collectionId: string;
-  currentUserId?: string;
 }
 
-export const CollectionStats = ({ collection, collectionId, currentUserId }: CollectionStatsProps) => {
+export const CollectionStats = ({ collection, collectionId }: CollectionStatsProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -28,11 +27,7 @@ export const CollectionStats = ({ collection, collectionId, currentUserId }: Col
             <span className={'text-sm text-muted-foreground'}>Views:</span>
             <span className={'font-medium'}>
               <Suspense fallback={'-- views'}>
-                <ViewCountAsync
-                  currentUserId={currentUserId}
-                  targetId={collectionId}
-                  targetType={'collection'}
-                />
+                <ViewCountAsync targetId={collectionId} targetType={'collection'} />
               </Suspense>
             </span>
           </li>

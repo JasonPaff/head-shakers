@@ -54,11 +54,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
           <ContentLayout>
             <SubcollectionErrorBoundary section={'header'}>
               <Suspense fallback={<SubcollectionHeaderSkeleton />}>
-                <SubcollectionHeaderAsync
-                  collectionId={collectionId}
-                  currentUserId={currentUserId}
-                  subcollectionId={subcollectionId}
-                />
+                <SubcollectionHeaderAsync collectionId={collectionId} subcollectionId={subcollectionId} />
               </Suspense>
             </SubcollectionErrorBoundary>
           </ContentLayout>
@@ -74,7 +70,6 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
                   <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
                     <SubcollectionBobbleheadsAsync
                       collectionId={collectionId}
-                      currentUserId={currentUserId}
                       searchParams={resolvedSearchParams}
                       subcollectionId={subcollectionId}
                     />
@@ -88,7 +83,6 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
                   <Suspense fallback={<SubcollectionMetricsSkeleton />}>
                     <SubcollectionMetricsAsync
                       collectionId={collectionId}
-                      currentUserId={currentUserId}
                       subcollectionId={subcollectionId}
                     />
                   </Suspense>
