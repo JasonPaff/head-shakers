@@ -37,7 +37,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun format.ts"
+            "command": "bun prettier-formatter.ts"
           }
         ]
       },
