@@ -37,6 +37,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/claude-code": "^1.0.123",
     "@clerk/nextjs": "^6.31.4",
     "@clerk/themes": "^2.4.13",
     "@cloudinary/react": "^1.14.3",
