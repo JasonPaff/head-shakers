@@ -5,6 +5,7 @@ import {
   type FeaturePlannerResult,
   FileDiscoveryService,
   LoggingService,
+  ORCHESTRATION_CONFIG,
   PlanGenerationService,
   RefinementService,
 } from './feature-planner';
@@ -101,7 +102,7 @@ export class FeaturePlannerAgent {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-|-$/g, '')
-      .slice(0, 50);
+      .slice(0, ORCHESTRATION_CONFIG.maxFeatureNameLength);
 
     return cleanName || 'feature';
   }
