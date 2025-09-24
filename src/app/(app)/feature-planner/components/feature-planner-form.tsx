@@ -210,24 +210,7 @@ export function FeaturePlannerForm() {
   const [result, setResult] = useState<FeaturePlanningResult | null>(null);
 
   const { executeAsync, isExecuting } = useServerAction(generateFeaturePlanAction, {
-    toastMessages: {
-      error: 'Failed to generate feature plan. Please try again.',
-      loading: 'Generating feature plan...',
-      success: (data) => {
-        if (
-          data &&
-          typeof data === 'object' &&
-          'data' in data &&
-          data.data &&
-          typeof data.data === 'object' &&
-          'isSuccessful' in data.data &&
-          data.data.isSuccessful
-        ) {
-          setResult(data.data as FeaturePlanningResult);
-        }
-        return 'Feature plan generated successfully!';
-      },
-    },
+    isDisableToast: true,
   });
 
   const handleSubmit = async (e: FormEvent) => {
