@@ -119,9 +119,9 @@ export const ContextContent = ({ className, ...props }: ContextContentProps) => 
   <HoverCardContent className={cn('min-w-[240px] divide-y overflow-hidden p-0', className)} {...props} />
 );
 
-export type ContextContentHeader = ComponentProps<'div'>;
+export type ContextContentHeaderProps = ComponentProps<'div'>;
 
-export const ContextContentHeader = ({ children, className, ...props }: ContextContentHeader) => {
+export const ContextContentHeader = ({ children, className, ...props }: ContextContentHeaderProps) => {
   const { maxTokens, usedTokens } = useContextValue();
   const usedPercent = usedTokens / maxTokens;
   const displayPct = new Intl.NumberFormat('en-US', {
@@ -154,17 +154,17 @@ export const ContextContentHeader = ({ children, className, ...props }: ContextC
   );
 };
 
-export type ContextContentBody = ComponentProps<'div'>;
+export type ContextContentBodyProps = ComponentProps<'div'>;
 
-export const ContextContentBody = ({ children, className, ...props }: ContextContentBody) => (
+export const ContextContentBody = ({ children, className, ...props }: ContextContentBodyProps) => (
   <div className={cn('w-full p-3', className)} {...props}>
     {children}
   </div>
 );
 
-export type ContextContentFooter = ComponentProps<'div'>;
+export type ContextContentFooterProps = ComponentProps<'div'>;
 
-export const ContextContentFooter = ({ children, className, ...props }: ContextContentFooter) => {
+export const ContextContentFooter = ({ children, className, ...props }: ContextContentFooterProps) => {
   const { modelId, usage } = useContextValue();
   const costUSD =
     modelId ?

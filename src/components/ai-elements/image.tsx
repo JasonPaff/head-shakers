@@ -7,7 +7,7 @@ export type ImageProps = Experimental_GeneratedImage & {
   className?: string;
 };
 
-export const Image = ({ base64, mediaType, uint8Array, ...props }: ImageProps) => (
+export const Image = ({ base64, mediaType, ...props }: ImageProps) => (
   <img
     {...props}
     alt={props.alt}

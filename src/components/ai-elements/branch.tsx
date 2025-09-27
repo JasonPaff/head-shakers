@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access */
 'use client';
 
 import type { UIMessage } from 'ai';
@@ -79,6 +80,7 @@ export const BranchMessages = ({ children, ...props }: BranchMessagesProps) => {
   // Use useEffect to update branches when they change
   useEffect(() => {
     if (branches.length !== childrenArray.length) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       setBranches(childrenArray);
     }
   }, [childrenArray, branches, setBranches]);

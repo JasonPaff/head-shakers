@@ -14,14 +14,14 @@ export const Message = ({ className, from, ...props }: MessageProps) => (
   <div
     className={cn(
       'group flex w-full items-end justify-end gap-2 py-4',
-      from === 'user' ? 'is-user' : 'is-assistant flex-row-reverse justify-end',
+      from === 'user' && 'flex-row-reverse justify-end',
       className,
     )}
     {...props}
   />
 );
 
-const messageContentVariants = cva('is-user:dark flex flex-col gap-2 overflow-hidden rounded-lg text-sm', {
+const messageContentVariants = cva('flex flex-col gap-2 overflow-hidden rounded-lg text-sm', {
   defaultVariants: {
     variant: 'contained',
   },

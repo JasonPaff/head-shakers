@@ -10,7 +10,7 @@ import { cn } from '@/utils/tailwind-utils';
 export type SourcesProps = ComponentProps<'div'>;
 
 export const Sources = ({ className, ...props }: SourcesProps) => (
-  <Collapsible className={cn('not-prose mb-4 text-xs text-primary', className)} {...props} />
+  <Collapsible className={cn('mb-4 text-xs text-primary', className)} {...props} />
 );
 
 export type SourcesTriggerProps = ComponentProps<typeof CollapsibleTrigger> & {

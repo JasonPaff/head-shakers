@@ -26,17 +26,24 @@ const useChainOfThought = () => {
 };
 
 export type ChainOfThoughtProps = ComponentProps<'div'> & {
-  defaultOpen?: boolean;
+  isDefaultOpen?: boolean;
+  isOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  open?: boolean;
 };
 
 export const ChainOfThought = memo(
-  ({ children, className, defaultOpen = false, onOpenChange, open, ...props }: ChainOfThoughtProps) => {
+  ({
+    children,
+    className,
+    isDefaultOpen = false,
+    isOpen: isOpenProp,
+    onOpenChange,
+    ...props
+  }: ChainOfThoughtProps) => {
     const [isOpen, setIsOpen] = useControllableState({
-      defaultProp: defaultOpen,
+      defaultProp: isDefaultOpen,
       onChange: onOpenChange,
-      prop: open,
+      prop: isOpenProp,
     });
 
     return (

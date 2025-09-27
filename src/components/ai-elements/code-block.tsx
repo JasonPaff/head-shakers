@@ -21,16 +21,16 @@ const CodeBlockContext = createContext<CodeBlockContextType>({
 export type CodeBlockProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
   code: string;
+  isShowLineNumbers?: boolean;
   language: string;
-  showLineNumbers?: boolean;
 };
 
 export const CodeBlock = ({
   children,
   className,
   code,
+  isShowLineNumbers = false,
   language,
-  showLineNumbers = false,
   ...props
 }: CodeBlockProps) => (
   <CodeBlockContext.Provider value={{ code }}>
@@ -60,7 +60,7 @@ export const CodeBlock = ({
             minWidth: '2.5rem',
             paddingRight: '1rem',
           }}
-          showLineNumbers={showLineNumbers}
+          showLineNumbers={isShowLineNumbers}
           style={oneLight}
         >
           {code}
@@ -83,7 +83,7 @@ export const CodeBlock = ({
             minWidth: '2.5rem',
             paddingRight: '1rem',
           }}
-          showLineNumbers={showLineNumbers}
+          showLineNumbers={isShowLineNumbers}
           style={oneDark}
         >
           {code}
@@ -111,7 +111,7 @@ export const CodeBlockCopyButton = ({
   const [isCopied, setIsCopied] = useState(false);
   const { code } = useContext(CodeBlockContext);
 
-  const copyToClipboard = async () => {
+  const handleCopyToClipboard = async () => {
     if (typeof window === 'undefined' || !navigator.clipboard.writeText) {
       onError?.(new Error('Clipboard API not available'));
       return;
@@ -132,7 +132,7 @@ export const CodeBlockCopyButton = ({
   return (
     <Button
       className={cn('shrink-0', className)}
-      onClick={copyToClipboard}
+      onClick={handleCopyToClipboard}
       size={'icon'}
       variant={'ghost'}
       {...props}

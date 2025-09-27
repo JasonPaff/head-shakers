@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access */
 'use client';
 
 import type { ChatStatus, FileUIPart } from 'ai';
-import type { ClipboardEventHandler } from 'react';
+import type { ClipboardEventHandler, ReactNode } from 'react';
 
 import { ImageIcon, Loader2Icon, PaperclipIcon, PlusIcon, SendIcon, SquareIcon, XIcon } from 'lucide-react';
 import { nanoid } from 'nanoid';
@@ -67,15 +68,17 @@ export type PromptInputAttachmentProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export type PromptInputAttachmentsProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'> & {
-  children: (attachment: FileUIPart & { id: string }) => React.ReactNode;
+  children: (attachment: FileUIPart & { id: string }) => ReactNode;
 };
 
 export function PromptInputAttachment({ className, data, ...props }: PromptInputAttachmentProps) {
   const attachments = usePromptInputAttachments();
 
+  const hasImage = data.mediaType?.startsWith('image/') && data.url;
+
   return (
     <div className={cn('group relative h-14 w-14 rounded-md border', className)} key={data.id} {...props}>
-      {data.mediaType?.startsWith('image/') && data.url ?
+      {hasImage ?
         <img
           alt={data.filename || 'attachment'}
           className={'size-full rounded-md object-cover'}
@@ -161,28 +164,28 @@ export type PromptInputMessage = {
 
 export type PromptInputProps = Omit<HTMLAttributes<HTMLFormElement>, 'onSubmit'> & {
   accept?: string; // e.g., "image/*" or leave undefined for any
-  // When true, accepts drops anywhere on document. Default false (opt-in).
-  globalDrop?: boolean;
+  // When true, accepts drops anywhere on the document. Default false (opt-in).
+  isGlobalDrop?: boolean;
+  isMultiple?: boolean;
+  // Render a hidden input with a given name and keep it in sync for native form posts. Default false.
+  isSyncHiddenInput?: boolean;
   // Minimal constraints
   maxFiles?: number;
   maxFileSize?: number; // bytes
-  multiple?: boolean;
   onError?: (err: { code: 'accept' | 'max_file_size' | 'max_files'; message: string }) => void;
   onSubmit: (message: PromptInputMessage, event: FormEvent<HTMLFormElement>) => void;
-  // Render a hidden input with given name and keep it in sync for native form posts. Default false.
-  syncHiddenInput?: boolean;
 };
 
 export const PromptInput = ({
   accept,
   className,
-  globalDrop,
+  isGlobalDrop,
+  isMultiple,
+  isSyncHiddenInput,
   maxFiles,
   maxFileSize,
-  multiple,
   onError,
   onSubmit,
-  syncHiddenInput,
   ...props
 }: PromptInputProps) => {
   const [items, setItems] = useState<(FileUIPart & { id: string })[]>([]);
@@ -285,13 +288,13 @@ export const PromptInput = ({
   // Note: File input cannot be programmatically set for security reasons
   // The syncHiddenInput prop is no longer functional
   useEffect(() => {
-    if (syncHiddenInput && inputRef.current) {
+    if (isSyncHiddenInput && inputRef.current) {
       // Clear the input when items are cleared
       if (items.length === 0) {
         inputRef.current.value = '';
       }
     }
-  }, [items, syncHiddenInput]);
+  }, [items, isSyncHiddenInput]);
 
   // Attach drop handlers on nearest form and document (opt-in)
   useEffect(() => {
@@ -299,12 +302,12 @@ export const PromptInput = ({
     if (!form) {
       return;
     }
-    const onDragOver = (e: DragEvent) => {
+    const handleOnDragOver = (e: DragEvent) => {
       if (e.dataTransfer?.types?.includes('Files')) {
         e.preventDefault();
       }
     };
-    const onDrop = (e: DragEvent) => {
+    const handleOnDrop = (e: DragEvent) => {
       if (e.dataTransfer?.types?.includes('Files')) {
         e.preventDefault();
       }
@@ -312,24 +315,24 @@ export const PromptInput = ({
         add(e.dataTransfer.files);
       }
     };
-    form.addEventListener('dragover', onDragOver);
-    form.addEventListener('drop', onDrop);
+    form.addEventListener('dragover', handleOnDragOver);
+    form.addEventListener('drop', handleOnDrop);
     return () => {
-      form.removeEventListener('dragover', onDragOver);
-      form.removeEventListener('drop', onDrop);
+      form.removeEventListener('dragover', handleOnDragOver);
+      form.removeEventListener('drop', handleOnDrop);
     };
   }, [add]);
 
   useEffect(() => {
-    if (!globalDrop) {
+    if (!isGlobalDrop) {
       return;
     }
-    const onDragOver = (e: DragEvent) => {
+    const handleOnDragOver = (e: DragEvent) => {
       if (e.dataTransfer?.types?.includes('Files')) {
         e.preventDefault();
       }
     };
-    const onDrop = (e: DragEvent) => {
+    const handleOnDrop = (e: DragEvent) => {
       if (e.dataTransfer?.types?.includes('Files')) {
         e.preventDefault();
       }
@@ -337,13 +340,13 @@ export const PromptInput = ({
         add(e.dataTransfer.files);
       }
     };
-    document.addEventListener('dragover', onDragOver);
-    document.addEventListener('drop', onDrop);
+    document.addEventListener('dragover', handleOnDragOver);
+    document.addEventListener('drop', handleOnDrop);
     return () => {
-      document.removeEventListener('dragover', onDragOver);
-      document.removeEventListener('drop', onDrop);
+      document.removeEventListener('dragover', handleOnDragOver);
+      document.removeEventListener('drop', handleOnDrop);
     };
-  }, [add, globalDrop]);
+  }, [add, isGlobalDrop]);
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     if (event.currentTarget.files) {
@@ -379,7 +382,7 @@ export const PromptInput = ({
       <input
         accept={accept}
         className={'hidden'}
-        multiple={multiple}
+        multiple={isMultiple}
         onChange={handleChange}
         ref={inputRef}
         type={'file'}
