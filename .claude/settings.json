@@ -41,15 +41,6 @@
             "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
           }
         ]
-      },
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "./.claude/hooks/markdown_formatter.py"
-          }
-        ]
       }
     ]
   }
