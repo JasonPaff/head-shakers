@@ -2,7 +2,7 @@
 
 import type { ComponentProps } from 'react';
 
-import { Activity, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { ActivityIcon, AlertCircleIcon, CheckCircle2Icon, ClockIcon } from 'lucide-react';
 
 import type { WorkflowStep } from '@/app/(app)/feature-planner/page';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -10,6 +10,7 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 import { Loader } from '@/components/ui/ai-elements/loader';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -17,7 +18,7 @@ interface StreamingPanelProps extends ComponentProps<'div'>, ComponentTestIdProp
   currentStep: WorkflowStep;
   hasError: boolean;
   isActive: boolean;
-  progress: string[];
+  progress: Array<string>;
 }
 
 const stepTitles = {
@@ -38,10 +39,10 @@ export const StreamingPanel = ({
   const streamingPanelTestId = testId || generateTestId('feature', 'card');
 
   const getStatusIcon = () => {
-    if (hasError) return <AlertCircle className={'h-4 w-4 text-destructive'} />;
+    if (hasError) return <AlertCircleIcon aria-hidden className={'size-4 text-destructive'} />;
     if (isActive) return <Loader className={'text-primary'} size={16} />;
-    if (progress.length > 0) return <CheckCircle2 className={'h-4 w-4 text-green-600'} />;
-    return <Clock className={'h-4 w-4 text-muted-foreground'} />;
+    if (progress.length > 0) return <CheckCircle2Icon aria-hidden className={'size-4 text-green-600'} />;
+    return <ClockIcon aria-hidden className={'size-4 text-muted-foreground'} />;
   };
 
   const getStatusText = () => {
@@ -71,7 +72,7 @@ export const StreamingPanel = ({
         <CardHeader className={'pb-3'}>
           <CardTitle className={'flex items-center justify-between'}>
             <div className={'flex items-center gap-2'}>
-              <Activity className={'h-5 w-5'} />
+              <ActivityIcon aria-hidden className={'size-5'} />
               Real-time Updates
             </div>
             <Badge className={'gap-1'} variant={getStatusVariant()}>
@@ -87,12 +88,12 @@ export const StreamingPanel = ({
 
           {/* Progress Log */}
           <div className={'max-h-[300px] space-y-2 overflow-y-auto'}>
-            {shouldShowEmptyState ?
+            <Conditional isCondition={shouldShowEmptyState}>
               <div className={'py-8 text-center text-muted-foreground'}>
-                <Clock className={'mx-auto mb-2 h-8 w-8 opacity-50'} />
+                <ClockIcon aria-hidden className={'mx-auto mb-2 h-8 w-8 opacity-50'} />
                 <p>Real-time updates will appear here when processing begins.</p>
               </div>
-            : null}
+            </Conditional>
 
             {progress.map((message, index) => (
               <div
@@ -113,24 +114,26 @@ export const StreamingPanel = ({
               </div>
             ))}
 
-            {isActive && (
+            <Conditional isCondition={isActive}>
               <div className={'rounded-md border-l-2 border-l-primary bg-primary/5 p-3 text-sm'}>
                 <div className={'flex items-center gap-2'}>
                   <Loader size={14} />
                   <span>Processing request...</span>
                 </div>
               </div>
-            )}
+            </Conditional>
           </div>
 
           {/* Status Summary */}
           <div className={'border-t pt-3 text-xs text-muted-foreground'}>
-            {progress.length > 0 && (
+            <Conditional isCondition={progress.length > 0}>
               <p>
                 {progress.length} update{progress.length !== 1 ? 's' : ''} received
               </p>
-            )}
-            {isActive && <p>⚡ Streaming active - updates will appear in real-time</p>}
+            </Conditional>
+            <Conditional isCondition={isActive}>
+              <p>⚡ Streaming active - updates will appear in real-time</p>
+            </Conditional>
           </div>
         </CardContent>
       </Card>

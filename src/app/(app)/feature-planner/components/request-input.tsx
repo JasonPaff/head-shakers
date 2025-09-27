@@ -2,13 +2,14 @@
 
 import type { ComponentProps } from 'react';
 
-import { ArrowRight, RotateCcw, Sparkles } from 'lucide-react';
+import { ArrowRightIcon, RotateCcwIcon, SparklesIcon } from 'lucide-react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
@@ -51,7 +52,7 @@ export const RequestInput = ({
       <Card>
         <CardHeader>
           <CardTitle className={'flex items-center gap-2'}>
-            <Sparkles className={'h-5 w-5 text-primary'} />
+            <SparklesIcon aria-hidden className={'size-5 text-primary'} />
             Step 1: Feature Request Input
           </CardTitle>
         </CardHeader>
@@ -62,7 +63,9 @@ export const RequestInput = ({
               className={'min-h-[120px] resize-none'}
               disabled={isRefining}
               id={'feature-request'}
-              onChange={(e) => onChange(e.target.value)}
+              onChange={(e) => {
+                onChange(e.target.value);
+              }}
               placeholder={'Describe the feature you want to implement... (50-500 characters recommended)'}
               value={value}
             />
@@ -74,33 +77,33 @@ export const RequestInput = ({
                 })}
               >
                 {characterCount} characters
-                {characterCount > 0 && (
+                <Conditional isCondition={characterCount > 0}>
                   <span className={'ml-1'}>{isValidLength ? '✓ Good length' : '(50-500 recommended)'}</span>
-                )}
+                </Conditional>
               </span>
-              {isValidLength && (
+              <Conditional isCondition={isValidLength}>
                 <Badge className={'text-xs'} variant={'secondary'}>
                   Optimal length
                 </Badge>
-              )}
+              </Conditional>
             </div>
           </div>
 
           <div className={'flex gap-3'}>
             <Button className={'flex-1'} disabled={!canRefine} onClick={onRefineRequest} size={'lg'}>
-              <Sparkles className={'mr-2 h-4 w-4'} />
+              <SparklesIcon aria-hidden className={'mr-2 size-4'} />
               {isRefining ? 'Refining...' : 'Refine Request'}
             </Button>
             <Button disabled={!canSkip} onClick={onSkipToFileDiscovery} size={'lg'} variant={'outline'}>
               Skip to File Discovery
-              <ArrowRight className={'ml-2 h-4 w-4'} />
+              <ArrowRightIcon aria-hidden className={'ml-2 size-4'} />
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Refinement Result */}
-      {refinedRequest && (
+      <Conditional isCondition={!!refinedRequest}>
         <Card>
           <CardHeader>
             <CardTitle className={'text-lg text-green-600'}>Refinement Complete</CardTitle>
@@ -129,16 +132,16 @@ export const RequestInput = ({
             <div className={'flex gap-3'}>
               <Button className={'flex-1'} onClick={onUseRefinedRequest} size={'lg'}>
                 Use Enhanced Request
-                <ArrowRight className={'ml-2 h-4 w-4'} />
+                <ArrowRightIcon className={'ml-2 size-4'} />
               </Button>
               <Button onClick={onUseOriginalRequest} size={'lg'} variant={'outline'}>
-                <RotateCcw className={'mr-2 h-4 w-4'} />
+                <RotateCcwIcon className={'mr-2 size-4'} />
                 Use Original
               </Button>
             </div>
           </CardContent>
         </Card>
-      )}
+      </Conditional>
     </div>
   );
 };
