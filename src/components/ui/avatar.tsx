@@ -1,53 +1,41 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
+import type { ComponentProps } from 'react';
 
-import { cn } from "@/utils"
+import * as AvatarPrimitive from '@radix-ui/react-avatar';
 
-function Avatar({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root>) {
+import { cn } from '@/utils/tailwind-utils';
+
+type AvatarFallbackProps = ComponentProps<typeof AvatarPrimitive.Fallback>;
+type AvatarImageProps = ComponentProps<typeof AvatarPrimitive.Image>;
+type AvatarProps = ComponentProps<typeof AvatarPrimitive.Root>;
+
+export const Avatar = ({ className, ...props }: AvatarProps) => {
   return (
     <AvatarPrimitive.Root
-      data-slot="avatar"
-      className={cn(
-        "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        className
-      )}
+      className={cn('relative flex size-8 shrink-0 overflow-hidden rounded-full', className)}
+      data-slot={'avatar'}
       {...props}
     />
-  )
-}
+  );
+};
 
-function AvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  return (
-    <AvatarPrimitive.Image
-      data-slot="avatar-image"
-      className={cn("aspect-square size-full", className)}
-      {...props}
-    />
-  )
-}
-
-function AvatarFallback({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
+export const AvatarFallback = ({ className, ...props }: AvatarFallbackProps) => {
   return (
     <AvatarPrimitive.Fallback
-      data-slot="avatar-fallback"
-      className={cn(
-        "bg-muted flex size-full items-center justify-center rounded-full",
-        className
-      )}
+      className={cn('flex size-full items-center justify-center rounded-full bg-muted', className)}
+      data-slot={'avatar-fallback'}
       {...props}
     />
-  )
-}
+  );
+};
 
-export { Avatar, AvatarImage, AvatarFallback }
+export const AvatarImage = ({ className, ...props }: AvatarImageProps) => {
+  return (
+    <AvatarPrimitive.Image
+      className={cn('aspect-square size-full', className)}
+      data-slot={'avatar-image'}
+      {...props}
+    />
+  );
+};

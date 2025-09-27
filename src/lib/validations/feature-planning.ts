@@ -38,7 +38,33 @@ export const featureRefinementResultSchema = z.object({
   refinedRequest: z.string().optional(),
 });
 
+// streaming progress update schemas
+export const streamingProgressTodoSchema = z.object({
+  activeForm: z.string(),
+  content: z.string(),
+  status: z.string(),
+});
+
+export const streamingProgressUpdateSchema = z.object({
+  data: z.any().optional(),
+  error: z.string().optional(),
+  status: z.enum(['pending', 'in_progress', 'completed', 'error']),
+  step: z.number(),
+  stepName: z.string(),
+  timestamp: z.string(),
+  todos: z.array(streamingProgressTodoSchema).optional(),
+});
+
+export const featurePlanningStreamingResultSchema = z.object({
+  isSuccessful: z.boolean(),
+  stream: z.any(), // streamable value type from ai/rsc
+});
+
+// type exports
 export type FeaturePlanningInput = z.infer<typeof featurePlanningInputSchema>;
 export type FeaturePlanningResult = z.infer<typeof featurePlanningResultSchema>;
+export type FeaturePlanningStreamingResult = z.infer<typeof featurePlanningStreamingResultSchema>;
 export type FeatureRefinementInput = z.infer<typeof featureRefinementInputSchema>;
 export type FeatureRefinementResult = z.infer<typeof featureRefinementResultSchema>;
+export type StreamingProgressTodo = z.infer<typeof streamingProgressTodoSchema>;
+export type StreamingProgressUpdate = z.infer<typeof streamingProgressUpdateSchema>;
