@@ -40,14 +40,12 @@ export const generateFeaturePlanAction = authActionClient
     isTransactionRequired: false,
   })
   .inputSchema(featurePlanningInputSchema)
-  .action(async ({ ctx }) => {
-    const { featureRequest, skipRefinement } = ctx.sanitizedInput as {
-      featureRequest: string;
-      skipRefinement?: boolean;
-    };
+  .action(async ({ ctx, parsedInput }) => {
+    const { featureRequest, skipRefinement } = featurePlanningInputSchema.parse(ctx.sanitizedInput);
 
     Sentry.setContext('feature_planning', {
       featureRequest: featureRequest,
+      input: parsedInput,
       skipRefinement: skipRefinement,
       userId: ctx.userId,
     });
@@ -99,11 +97,12 @@ export const refineFeatureRequestAction = authActionClient
     isTransactionRequired: false,
   })
   .inputSchema(featureRefinementInputSchema)
-  .action(async ({ ctx }) => {
-    const { featureRequest } = ctx.sanitizedInput as { featureRequest: string };
+  .action(async ({ ctx, parsedInput }) => {
+    const { featureRequest } = featureRefinementInputSchema.parse(ctx.sanitizedInput);
 
     Sentry.setContext('feature_refinement', {
       featureRequest: featureRequest,
+      input: parsedInput,
       userId: ctx.userId,
     });
 
@@ -143,7 +142,7 @@ export const refineFeatureRequestAction = authActionClient
           ErrorType.INTERNAL,
           FEATURE_PLANNING_ERROR_CODES.REFINEMENT_FAILED,
           'Refinement result is not a valid string',
-          { ctx, operation: FEATURE_PLANNING_OPERATIONS.REFINE_REQUEST },
+          { ctx, operation: FEATURE_PLANNING_OPERATIONS.REFINE_REQUEST, parsedInput },
           true,
           500,
         );

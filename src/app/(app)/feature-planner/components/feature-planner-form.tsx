@@ -232,7 +232,7 @@ export function FeaturePlannerForm() {
       onError: ({ error }) => {
         console.error('Failed to refine request:', error);
         toast.error('Failed to refine feature request');
-        // Reset original request if refinement fails and this was the first attempt
+        // reset original request if refinement fails and this was the first attempt
         if (!isRefined && originalRequest === featureRequest) {
           setOriginalRequest('');
         }
@@ -258,7 +258,6 @@ export function FeaturePlannerForm() {
     setCurrentStep(1);
     setResult(null);
 
-    // simulate step progression for UI feedback
     setTimeout(() => setCurrentStep(2), 1000);
     setTimeout(() => setCurrentStep(3), 2000);
 
@@ -277,7 +276,7 @@ export function FeaturePlannerForm() {
       return;
     }
 
-    // store original request if not already stored - ensure this happens synchronously
+    // store the original request if not already stored
     if (!isRefined && !originalRequest) {
       setOriginalRequest(featureRequest);
     }
@@ -293,7 +292,6 @@ export function FeaturePlannerForm() {
     }
   };
 
-  // extract complex conditions to descriptive variables
   const canRefineRequest = !isExecuting && !isRefining && featureRequest.trim().length >= 10;
   const canSubmitForm = !isExecuting && !isRefining && featureRequest.trim().length >= 10;
 
