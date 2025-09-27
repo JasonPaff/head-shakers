@@ -73,37 +73,41 @@ When the user runs this command, execute this simple 3-step workflow:
    - Validation results and any warnings
 8. **CHECKPOINT**: Step 1 markdown log now available for review/debugging
 
-### Step 2: File Discovery
+### Step 2: AI-Powered File Discovery
 
-**Objective**: Identify all files relevant to implementing the feature.
+**Objective**: Use AI to intelligently identify all files relevant to implementing the feature by analyzing the refined request and codebase structure.
 
 **Process**:
 
 1. Record step start time with ISO timestamp
-2. Use Task tool with `subagent_type: "file-discovery-agent"`:
-   - Description: "Discover relevant files for implementation"
-   - Pass the refined feature request from Step 1
-   - **ERROR HANDLING**: If subagent fails, retry with project structure context and log the failure
-   - **TIMEOUT**: Set 45-second timeout for file discovery
-   - **RETRY STRATEGY**: Maximum 2 attempts with fallback to basic file patterns
-   - **MINIMUM REQUIREMENT**: Must discover at least 3 relevant files
-   - **LOG REQUIREMENT**: Capture complete agent prompt and full response
-   - **PARALLEL EXECUTION**: Can run concurrently with other read-only operations
-   - Agent performs comprehensive file discovery and returns the prioritized file list with analysis
+2. **AI-Powered Discovery**: Use integrated Claude API for intelligent file analysis:
+   - **Context-Aware Analysis**: AI examines the refined feature request and understands implementation requirements
+   - **Codebase Structure Analysis**: AI analyzes the Head Shakers project architecture and patterns
+   - **Content-Based Discovery**: AI reads and analyzes file contents for relevance (not just filenames)
+   - **Smart Prioritization**: AI categorizes files by implementation priority (Critical/High/Medium/Low)
+   - **Comprehensive Coverage**: AI searches across all architectural layers (schemas, actions, queries, validations, components, pages)
+   - **Pattern Recognition**: AI identifies existing similar functionality and integration points
+   - **ERROR HANDLING**: If AI analysis fails, retry with simplified prompt and log the failure
+   - **TIMEOUT**: Set 60-second timeout for AI file discovery
+   - **RETRY STRATEGY**: Maximum 2 attempts with fallback strategies
+   - **MINIMUM REQUIREMENT**: Must discover at least 3 relevant files through AI analysis
+   - **LOG REQUIREMENT**: Capture complete AI prompt and full analysis response
 3. **Enhanced File Validation**:
-   - Validate all discovered file paths exist using Read tool
+   - Validate all AI-discovered file paths exist using file system checks
    - Check file permissions and accessibility
-   - Log any missing or inaccessible files
+   - Log any missing or inaccessible files discovered by AI
    - Flag files that may need creation vs modification
+   - Cross-reference AI analysis with actual file contents
 4. Record step end time and validation results
 5. **SAVE STEP 2 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/02-file-discovery.md` with:
    - Step metadata (timestamps, duration, status)
    - Refined request used as input
-   - Complete agent prompt sent
-   - Full agent response with file analysis
-   - Discovered files list with categorization
-   - File path validation results
-   - Discovery metrics and statistics
+   - Complete AI prompt sent and analysis received
+   - AI file discovery analysis with reasoning
+   - Discovered files list with AI-generated categorization and priorities
+   - File path validation results and existence checks
+   - AI analysis metrics (API cost, duration, tokens used)
+   - Discovery statistics and coverage analysis
 6. **UPDATE INDEX**: Append Step 2 summary to orchestration index
 7. **CHECKPOINT**: Step 2 markdown log now available for review/debugging
 
@@ -228,11 +232,14 @@ Execution time: X.X seconds
   - **Format Validation**: Output must be single paragraph without headers or sections
   - **Intent Preservation**: Core intent of original request must remain unchanged
   - **Scope Control**: No unnecessary elaboration or feature creep in refinement
-- **Step 2 Success**: File discovery completed with comprehensive analysis
-  - **Minimum Files**: At least 3 relevant files discovered through analysis
-  - **File Validation**: All discovered file paths validated to exist and be accessible
-  - **Categorization**: Files properly categorized by modification priority
-  - **Coverage**: Discovery covers all major components affected by the feature
+- **Step 2 Success**: AI-powered file discovery completed with comprehensive analysis
+  - **Minimum Files**: At least 3 relevant files discovered through AI analysis
+  - **AI Analysis Quality**: AI provides detailed reasoning for each file's relevance and priority
+  - **File Validation**: All AI-discovered file paths validated to exist and be accessible
+  - **Smart Categorization**: Files properly categorized by AI-determined implementation priority
+  - **Comprehensive Coverage**: AI discovery covers all major components affected by the feature
+  - **Content Validation**: AI analysis based on actual file contents, not just filenames
+  - **Pattern Recognition**: AI identifies existing similar functionality and integration points
 - **Step 3 Success**: Implementation plan generated in correct format
   - **Format Compliance**: Plan must be in markdown format (not XML)
   - **Template Adherence**: Includes all required sections (Overview, Prerequisites, Steps, Quality Gates)

@@ -1,48 +1,186 @@
+import { query } from '@anthropic-ai/claude-code';
 import { promises as fs } from 'fs';
 import path from 'path';
 
 import type { StepResult } from './types';
 
+import { isClaudeSuccessResult, validateClaudeResult } from './validation-utils';
+
+interface ProjectContext {
+  architecture: {
+    authSystem: string;
+    database: string;
+    framework: string;
+    stateManagement: string[];
+    styling: string;
+  };
+  codebase: {
+    formatting: string;
+    isTypeCheckingEnabled: boolean;
+    linting: string;
+    testingFramework: string;
+  };
+  documentation: {
+    claudeMd: string;
+    packageInfo: Record<string, unknown>;
+    readme: string;
+  };
+  infrastructure: {
+    caching: string;
+    deployment: string;
+    monitoring: string;
+    realtime: string;
+  };
+  patterns: {
+    componentStructure: string;
+    hasServerActions: boolean;
+    isTypeSafetyEnabled: boolean;
+    routingPattern: string;
+  };
+}
+
 export class PlanGenerationService {
   async generateImplementationPlan(
     refinedRequest: string,
     discoveredFiles: string[],
-    contextData: Record<string, unknown>,
+    contextData: ProjectContext,
     orchestrationDir: string,
   ): Promise<StepResult> {
     const stepStart = Date.now();
+    const stepLog = {
+      errors: [] as Array<{ error: string; timestamp: string }>,
+      metrics: {
+        apiCalls: 0,
+        apiDuration: 0,
+        totalCost: 0,
+        totalDuration: 0,
+      },
+      status: 'in_progress' as 'completed' | 'failed' | 'in_progress',
+      timestamps: {
+        promptStart: '',
+        queryEnd: '',
+        queryStart: '',
+        start: new Date(stepStart).toISOString(),
+      },
+    };
 
     try {
-      // for MVP, generate a simple implementation plan
-      // in production; this would use the implementation-planner agent
-      const plan = this.simpleImplementationPlan(refinedRequest, discoveredFiles);
+      // build comprehensive prompt for plan generation
+      stepLog.timestamps.promptStart = new Date().toISOString();
+      const systemPrompt = this.buildSystemPrompt(refinedRequest, discoveredFiles, contextData);
 
-      // save step log
-      const logPath = path.join(orchestrationDir, '03-implementation-planning.md');
-      const logContent = `# Step 3: Implementation Planning
+      const promptInstruction = `Based on the refined feature request, discovered files, and project context, generate a comprehensive implementation plan that follows the Head Shakers project patterns.
 
-**Started:** ${new Date(stepStart).toISOString()}
-**Duration:** ${((Date.now() - stepStart) / 1000).toFixed(2)}s
-**Status:** Success
+The plan should include:
+1. Analysis summary with file discovery results
+2. Detailed step-by-step implementation with specific file modifications
+3. What/Why/Confidence structure for each step
+4. Specific validation commands based on the project setup
+5. Measurable success criteria
+6. Quality gates and testing requirements
 
-## Input Summary
+Format the response as a detailed markdown implementation plan similar to professional project documentation.`;
 
-- Refined Request: ${refinedRequest.slice(0, 100)}...
-- Discovered Files: ${discoveredFiles.length} files
-- Context Data: ${JSON.stringify(contextData)}
+      const messages = [];
 
-## Generated Plan
+      stepLog.timestamps.queryStart = new Date().toISOString();
+      stepLog.metrics.apiCalls++;
 
-${plan}
-`;
+      for await (const message of query({
+        options: {
+          allowedTools: ['Read'],
+          customSystemPrompt: systemPrompt,
+          maxTurns: 3,
+        },
+        prompt: promptInstruction,
+      })) {
+        messages.push(message);
+      }
 
-      await fs.writeFile(logPath, logContent);
+      stepLog.timestamps.queryEnd = new Date().toISOString();
+
+      // find and validate the result message
+      const resultMessage = messages.find((m) => m.type === 'result');
+      if (!resultMessage) {
+        stepLog.errors.push({
+          error: `No result message found. Message count: ${messages.length}`,
+          timestamp: new Date().toISOString(),
+        });
+        throw new Error(`No result message found`);
+      }
+
+      // validate the Claude result structure
+      const validatedResult = validateClaudeResult(resultMessage);
+
+      if (!isClaudeSuccessResult(validatedResult)) {
+        stepLog.errors.push({
+          error: `Claude execution failed with subtype: ${validatedResult.subtype}`,
+          timestamp: new Date().toISOString(),
+        });
+        stepLog.metrics.apiDuration = validatedResult.duration_api_ms;
+        stepLog.metrics.totalCost = validatedResult.total_cost_usd;
+        throw new Error(`Claude plan generation failed: ${validatedResult.subtype}`);
+      }
+
+      const successResult = validatedResult;
+      stepLog.metrics.apiDuration = successResult.duration_api_ms;
+      stepLog.metrics.totalCost = successResult.total_cost_usd;
+
+      if (typeof successResult.result !== 'string') {
+        stepLog.errors.push({
+          error: `Invalid result type: ${typeof successResult.result}`,
+          timestamp: new Date().toISOString(),
+        });
+        throw new Error(`Invalid result type: ${typeof successResult.result}`);
+      }
+
+      const implementationPlan = successResult.result.trim();
+
+      if (!implementationPlan) {
+        stepLog.errors.push({
+          error: 'Empty implementation plan after trimming',
+          timestamp: new Date().toISOString(),
+        });
+        throw new Error('Empty implementation plan');
+      }
+
+      // update final metrics
+      stepLog.metrics.totalDuration = Date.now() - stepStart;
+      stepLog.status = 'completed';
+
+      // save enhanced step log
+      await this.saveStepLog({
+        discoveredFiles,
+        implementationPlan,
+        orchestrationDir,
+        refinedRequest,
+        stepLog,
+        successResult,
+      });
 
       return {
-        data: plan,
+        data: implementationPlan,
         isSuccessful: true,
       };
     } catch (error) {
+      stepLog.status = 'failed';
+      stepLog.metrics.totalDuration = Date.now() - stepStart;
+      stepLog.errors.push({
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      });
+
+      // save error log
+      await this.saveErrorLog({
+        contextData,
+        discoveredFiles,
+        error: error instanceof Error ? error : new Error('Unknown error'),
+        orchestrationDir,
+        refinedRequest,
+        stepLog,
+        stepStart,
+      });
+
       return {
         error: error instanceof Error ? error.message : 'Unknown error',
         isSuccessful: false,
@@ -50,67 +188,193 @@ ${plan}
     }
   }
 
-  private simpleImplementationPlan(_refinedRequest: string, files: string[]): string {
-    // simple plan generation for MVP
-    return `# Implementation Plan
+  private buildSystemPrompt(refinedRequest: string, discoveredFiles: string[], contextData: ProjectContext): string {
+    return `You are an expert software architect creating implementation plans for the Head Shakers bobblehead collection platform.
 
-## Overview
+# Project Context
 
-**Estimated Duration:** 2-4 hours
-**Complexity:** Medium
-**Risk Level:** Low
+## Architecture
+- Framework: ${contextData.architecture.framework}
+- Authentication: ${contextData.architecture.authSystem}
+- Database: ${contextData.architecture.database}
+- Styling: ${contextData.architecture.styling}
+- State Management: ${contextData.architecture.stateManagement.join(', ')}
 
-## Quick Summary
+## Development Patterns
+- Server Actions: ${contextData.patterns.hasServerActions ? 'Yes' : 'No'}
+- Type Safety: ${contextData.patterns.isTypeSafetyEnabled ? 'Yes' : 'No'}
+- Component Structure: ${contextData.patterns.componentStructure}
+- Routing: ${contextData.patterns.routingPattern}
 
-Implement the requested feature following Head Shakers project patterns and conventions.
+## Infrastructure
+- Deployment: ${contextData.infrastructure.deployment}
+- Monitoring: ${contextData.infrastructure.monitoring}
+- Caching: ${contextData.infrastructure.caching}
+- Real-time: ${contextData.infrastructure.realtime}
 
-## Prerequisites
+## Code Quality
+- Testing: ${contextData.codebase.testingFramework}
+- Linting: ${contextData.codebase.linting}
+- Formatting: ${contextData.codebase.formatting}
+- Type Checking: ${contextData.codebase.isTypeCheckingEnabled ? 'Yes' : 'No'}
 
-- Node.js and npm installed
-- PostgreSQL database running
-- Environment variables configured
-- Dependencies installed
+# Feature Request
 
-## Implementation Steps
+${refinedRequest}
 
-### Step 1: Setup and Planning
-**What:** Review requirements and existing codebase
-**Why:** Ensure understanding of the task and existing patterns
-**Confidence:** High
-**Files:** ${files.slice(0, 3).join(', ')}
-**Validation Commands:** npm run lint:fix && npm run typecheck
-**Success Criteria:** Clear understanding of implementation approach
+# Discovered Files (${discoveredFiles.length})
 
-### Step 2: Core Implementation
-**What:** Implement the main feature logic
-**Why:** Core functionality is the foundation
-**Confidence:** High
-**Files:** ${files.slice(3, 6).join(', ')}
-**Validation Commands:** npm run lint:fix && npm run typecheck
-**Success Criteria:** Feature works as expected
+${discoveredFiles.map((file, index) => `${index + 1}. ${file}`).join('\n')}
 
-### Step 3: Testing and Validation
-**What:** Add tests and validate implementation
-**Why:** Ensure quality and prevent regressions
-**Confidence:** High
-**Files:** Test files
-**Validation Commands:** npm run test && npm run lint:fix && npm run typecheck
-**Success Criteria:** All tests pass, no lint or type errors
+# Instructions
 
-## Quality Gates
+Create a detailed implementation plan that:
+1. References specific discovered files in implementation steps
+2. Follows the project's architectural patterns
+3. Includes proper validation commands for this project
+4. Provides step-by-step file modifications
+5. Includes comprehensive testing strategy
+6. Follows the quality standards and conventions
 
-- All TypeScript types properly defined
-- No use of 'any' type
-- Code formatted with Prettier
-- ESLint rules pass
-- Tests provide adequate coverage
-- Documentation updated if needed
+The plan should be professional, detailed, and actionable - similar to enterprise software project documentation.`;
+  }
 
-## Notes
+  private async saveErrorLog(params: {
+    contextData: ProjectContext;
+    discoveredFiles: string[];
+    error: Error;
+    orchestrationDir: string;
+    refinedRequest: string;
+    stepLog: {
+      errors: Array<{ error: string; timestamp: string }>;
+      metrics: Record<string, number>;
+      timestamps: Record<string, string>;
+    };
+    stepStart: number;
+  }): Promise<void> {
+    const { contextData, discoveredFiles, error, orchestrationDir, refinedRequest, stepLog, stepStart } = params;
 
-- Follow existing patterns in the codebase
-- Use existing UI components from Radix UI
-- Implement proper error handling
-- Add appropriate logging`;
+    const logPath = path.join(orchestrationDir, '03-implementation-planning.md');
+    const errorLog = `# Step 3: Implementation Planning
+
+## Execution Summary
+
+| Metric | Value |
+|--------|-------|
+| **Status** | ❌ Failed |
+| **Duration** | ${((Date.now() - stepStart) / 1000).toFixed(2)}s |
+| **Error Type** | ${error.constructor.name} |
+| **Timestamp** | ${new Date().toISOString()} |
+
+## Input Context
+
+### Refined Request
+${refinedRequest}
+
+### Discovered Files (${discoveredFiles.length})
+${discoveredFiles.map((f, i) => `${i + 1}. ${f}`).join('\n')}
+
+### Project Architecture
+- Framework: ${contextData.architecture.framework}
+- Database: ${contextData.architecture.database}
+- Authentication: ${contextData.architecture.authSystem}
+
+## Error Details
+
+\`\`\`
+${error.message}
+\`\`\`
+
+${error.stack ? `### Stack Trace\n\n\`\`\`\n${error.stack}\n\`\`\`` : ''}
+
+## Processing Timeline
+
+${Object.entries(stepLog.timestamps)
+  .filter(([, value]) => value)
+  .map(([key, value]) => `- **${key}**: ${value}`)
+  .join('\n')}
+
+## Error Log
+
+${stepLog.errors.map((e) => `- **${e.timestamp}**: ${e.error}`).join('\n')}
+
+## Troubleshooting Information
+
+- Ensure Claude API access and sufficient credits
+- Verify all discovered files exist and are accessible
+- Check that project context data is properly formatted
+- Confirm that the refined request meets quality requirements
+`;
+
+    await fs.mkdir(path.dirname(logPath), { recursive: true });
+    await fs.writeFile(logPath, errorLog).catch(() => {});
+  }
+
+  private async saveStepLog(params: {
+    discoveredFiles: string[];
+    implementationPlan: string;
+    orchestrationDir: string;
+    refinedRequest: string;
+    stepLog: {
+      errors: Array<{ error: string; timestamp: string }>;
+      metrics: {
+        apiCalls: number;
+        apiDuration: number;
+        totalCost: number;
+        totalDuration: number;
+      };
+      status: string;
+      timestamps: Record<string, string>;
+    };
+    successResult: {
+      duration_api_ms: number;
+      num_turns: number;
+      total_cost_usd: number;
+      usage: Record<string, number>;
+    };
+  }): Promise<void> {
+    const { discoveredFiles, implementationPlan, orchestrationDir, refinedRequest, stepLog, successResult } = params;
+
+    const logPath = path.join(orchestrationDir, '03-implementation-planning.md');
+    const logContent = `# Step 3: Implementation Planning
+
+## Execution Summary
+
+| Metric | Value |
+|--------|-------|
+| **Status** | ✅ ${stepLog.status} |
+| **Total Duration** | ${(stepLog.metrics.totalDuration / 1000).toFixed(2)}s |
+| **API Duration** | ${stepLog.metrics.apiDuration}ms |
+| **Total Cost** | $${stepLog.metrics.totalCost.toFixed(4)} |
+| **API Calls** | ${stepLog.metrics.apiCalls} |
+
+## Input Context
+
+### Refined Request
+${refinedRequest}
+
+### Discovered Files (${discoveredFiles.length})
+${discoveredFiles.map((f, i) => `${i + 1}. ${f}`).join('\n')}
+
+## Generated Implementation Plan
+
+${implementationPlan}
+
+## Claude API Response
+
+| Metric | Value |
+|--------|-------|
+| **Total API Cost** | $${successResult.total_cost_usd.toFixed(4)} |
+| **API Duration** | ${successResult.duration_api_ms}ms |
+| **Total Turns** | ${successResult.num_turns} |
+| **Token Usage** | ${JSON.stringify(successResult.usage, null, 2)} |
+
+## Processing Log
+
+${stepLog.errors.length > 0 ? `### Errors Encountered\n\n${stepLog.errors.map((e) => `- **${e.timestamp}**: ${e.error}`).join('\n')}` : '✅ No errors encountered during processing'}
+`;
+
+    await fs.mkdir(path.dirname(logPath), { recursive: true });
+    await fs.writeFile(logPath, logContent);
   }
 }
