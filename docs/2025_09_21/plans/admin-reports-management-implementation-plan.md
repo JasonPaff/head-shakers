@@ -13,6 +13,7 @@ Refined Request: The Head Shakers bobblehead collection platform requires an adm
 ## File Discovery Results
 
 ### High Priority Files (Core Implementation) - 6 files
+
 1. `src/app/(app)/admin/reports/page.tsx` - Existing minimal admin reports page (needs full implementation)
 2. `src/lib/db/schema/moderation.schema.ts` - Complete content reports database schema
 3. `src/lib/queries/content-reports/content-reports.query.ts` - Comprehensive query methods with admin operations
@@ -21,6 +22,7 @@ Refined Request: The Head Shakers bobblehead collection platform requires an adm
 6. `src/lib/validations/moderation.validation.ts` - Zod validation schemas
 
 ### Supporting Infrastructure
+
 - Admin layout pattern exists (`src/components/layout/admin/admin-layout.tsx`)
 - Admin authentication/authorization (`src/components/ui/admin/admin-route-guard.tsx`)
 - Table component patterns (`src/components/admin/analytics/trending-content-table.tsx`)

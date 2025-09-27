@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Conditional } from '@/components/ui/conditional';
 import { Textarea } from '@/components/ui/textarea';
 import { useServerAction } from '@/hooks/use-server-action';
-import { generateFeaturePlanAction } from '@/lib/actions/feature-planning.action';
+import { generateFeaturePlanAction, refineFeatureRequestAction } from '@/lib/actions/feature-planning.action';
 import { cn } from '@/utils/tailwind-utils';
 
 interface PlanningStep {
@@ -207,11 +207,45 @@ const ResultDisplay = ({ result }: { result: FeaturePlanningResult }) => {
 export function FeaturePlannerForm() {
   const [currentStep, setCurrentStep] = useState(0);
   const [featureRequest, setFeatureRequest] = useState('');
+  const [originalRequest, setOriginalRequest] = useState('');
+  const [isRefined, setIsRefined] = useState(false);
   const [result, setResult] = useState<FeaturePlanningResult | null>(null);
 
   const { executeAsync, isExecuting } = useServerAction(generateFeaturePlanAction, {
     isDisableToast: true,
+    onError: ({ error }) => {
+      console.error('Failed to generate plan:', error);
+      toast.error('Failed to generate feature plan');
+    },
+    onSuccess: ({ data }) => {
+      if (data.data?.isSuccessful) {
+        setResult(data.data);
+        toast.success('Feature plan generated successfully');
+      }
+    },
   });
+
+  const { executeAsync: executeRefinement, isExecuting: isRefining } = useServerAction(
+    refineFeatureRequestAction,
+    {
+      isDisableToast: true,
+      onError: ({ error }) => {
+        console.error('Failed to refine request:', error);
+        toast.error('Failed to refine feature request');
+        // Reset original request if refinement fails and this was the first attempt
+        if (!isRefined && originalRequest === featureRequest) {
+          setOriginalRequest('');
+        }
+      },
+      onSuccess: ({ data }) => {
+        if (data.data?.isSuccessful && data.data.refinedRequest) {
+          setFeatureRequest(data.data.refinedRequest);
+          setIsRefined(true);
+          toast.success('Feature request refined successfully');
+        }
+      },
+    },
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -229,13 +263,39 @@ export function FeaturePlannerForm() {
     setTimeout(() => setCurrentStep(3), 2000);
 
     try {
-      await executeAsync({ featureRequest });
+      await executeAsync({ featureRequest, skipRefinement: isRefined });
     } catch (error) {
       console.error('Failed to generate plan:', error);
     } finally {
       setCurrentStep(0);
     }
   };
+
+  const handleRefineRequest = async () => {
+    if (!featureRequest || featureRequest.trim().length < 10) {
+      toast.error('Feature request must be at least 10 characters');
+      return;
+    }
+
+    // store original request if not already stored - ensure this happens synchronously
+    if (!isRefined && !originalRequest) {
+      setOriginalRequest(featureRequest);
+    }
+
+    await executeRefinement({ featureRequest });
+  };
+
+  const handleUndoRefinement = () => {
+    if (originalRequest) {
+      setFeatureRequest(originalRequest);
+      setIsRefined(false);
+      toast.info('Reverted to original request');
+    }
+  };
+
+  // extract complex conditions to descriptive variables
+  const canRefineRequest = !isExecuting && !isRefining && featureRequest.trim().length >= 10;
+  const canSubmitForm = !isExecuting && !isRefining && featureRequest.trim().length >= 10;
 
   return (
     <div className={'space-y-6'}>
@@ -273,19 +333,46 @@ export function FeaturePlannerForm() {
                 required
                 value={featureRequest}
               />
-              <p className={'text-xs text-muted-foreground'}>
-                Tell us about the feature you want to implement. Be specific about requirements, user
-                interactions, and technical considerations.
-              </p>
             </div>
             <div className={'flex items-center justify-between'}>
-              <span className={'text-sm text-muted-foreground'}>{featureRequest.length}/1000 characters</span>
-              <Button disabled={isExecuting || featureRequest.trim().length < 10} type={'submit'}>
-                <Conditional fallback={'Generate Plan'} isCondition={isExecuting}>
-                  <Loader2Icon aria-hidden className={'mr-2 size-4 animate-spin'} />
-                  Generating Plan...
+              <div className={'flex items-center space-x-2'}>
+                <span className={'text-sm text-muted-foreground'}>
+                  {featureRequest.length}/1000 characters
+                </span>
+                <Conditional isCondition={isRefined}>
+                  <span className={'rounded bg-green-100 px-2 py-1 text-xs text-green-600'}>Refined</span>
                 </Conditional>
-              </Button>
+              </div>
+              <div className={'flex items-center space-x-2'}>
+                <Conditional isCondition={isRefined}>
+                  <Button
+                    disabled={isExecuting || isRefining}
+                    onClick={handleUndoRefinement}
+                    size={'sm'}
+                    type={'button'}
+                    variant={'outline'}
+                  >
+                    Undo Refinement
+                  </Button>
+                </Conditional>
+                <Button
+                  disabled={!canRefineRequest}
+                  onClick={handleRefineRequest}
+                  type={'button'}
+                  variant={'outline'}
+                >
+                  <Conditional fallback={'Refine Request'} isCondition={isRefining}>
+                    <Loader2Icon aria-hidden className={'mr-2 size-4 animate-spin'} />
+                    Refining...
+                  </Conditional>
+                </Button>
+                <Button disabled={!canSubmitForm} type={'submit'}>
+                  <Conditional fallback={'Generate Plan'} isCondition={isExecuting}>
+                    <Loader2Icon aria-hidden className={'mr-2 size-4 animate-spin'} />
+                    Generating Plan...
+                  </Conditional>
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

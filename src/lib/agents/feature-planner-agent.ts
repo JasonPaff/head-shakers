@@ -27,7 +27,7 @@ export class FeaturePlannerAgent {
     this.date = now.toISOString().split('T')[0]?.replace(/-/g, '_') ?? 'unknown_date';
   }
 
-  async plan(featureRequest: string): Promise<FeaturePlannerResult> {
+  async plan(featureRequest: string, shouldSkipRefinement: boolean = false): Promise<FeaturePlannerResult> {
     this.startTime = Date.now();
     this.featureName = this.generateFeatureName(featureRequest);
     this.orchestrationDir = path.join(process.cwd(), 'docs', this.date, 'orchestration', this.featureName);
@@ -36,18 +36,25 @@ export class FeaturePlannerAgent {
       // create the orchestration directory structure
       await this.loggingService.initializeOrchestrationDirectory(this.orchestrationDir, this.featureName);
 
-      // step 1: refine feature request
-      const refinedResult = await this.refinementService.refineFeatureRequest(
-        featureRequest,
-        this.orchestrationDir,
-      );
-      if (!refinedResult.isSuccessful) {
-        throw new Error(`Feature refinement failed: ${refinedResult.error}`);
+      let finalRequest = featureRequest;
+      let refinedRequest: string | undefined;
+
+      // step 1: refine feature request (optional)
+      if (!shouldSkipRefinement) {
+        const refinedResult = await this.refinementService.refineFeatureRequest(
+          featureRequest,
+          this.orchestrationDir,
+        );
+        if (!refinedResult.isSuccessful) {
+          throw new Error(`Feature refinement failed: ${refinedResult.error}`);
+        }
+        finalRequest = refinedResult.data as string;
+        refinedRequest = finalRequest;
       }
 
       // step 2 & 3: run file discovery and context gathering in parallel
       const [filesResult, contextData] = await Promise.all([
-        this.fileDiscoveryService.discoverFiles(refinedResult.data as string, this.orchestrationDir),
+        this.fileDiscoveryService.discoverFiles(finalRequest, this.orchestrationDir),
         this.contextService.gatherProjectContext(),
       ]);
 
@@ -57,7 +64,7 @@ export class FeaturePlannerAgent {
 
       // step 4: generate the implementation plan
       const planResult = await this.planGenerationService.generateImplementationPlan(
-        refinedResult.data as string,
+        finalRequest,
         filesResult.data as string[],
         contextData,
         this.orchestrationDir,
@@ -71,7 +78,7 @@ export class FeaturePlannerAgent {
       const planPath = await this.loggingService.saveFinalPlan(
         planResult.data as string,
         featureRequest,
-        refinedResult.data as string,
+        finalRequest,
         this.featureName,
         this.date,
       );
@@ -85,7 +92,7 @@ export class FeaturePlannerAgent {
         isSuccessful: true,
         orchestrationPath: this.orchestrationDir,
         planPath,
-        refinedRequest: refinedResult.data as string,
+        refinedRequest,
       };
     } catch (error) {
       return {

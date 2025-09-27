@@ -1,4 +1,5 @@
 {
+  "model": "claude-sonnet-4-20250514",
   "hooks": {
     "Notification": [
       {
@@ -37,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun prettier-formatter.ts"
+            "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
           }
         ]
       },

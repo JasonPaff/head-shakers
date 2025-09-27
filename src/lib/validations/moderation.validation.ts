@@ -74,7 +74,10 @@ export const adminUpdateReportSchema = z.object({
 
 export const adminBulkUpdateReportsSchema = z.object({
   moderatorNotes: z.string().max(SCHEMA_LIMITS.CONTENT_REPORT.MODERATOR_NOTES.MAX).optional(),
-  reportIds: z.array(z.string()).min(1, 'At least one report must be selected').max(100, 'Cannot update more than 100 reports at once'),
+  reportIds: z
+    .array(z.string())
+    .min(1, 'At least one report must be selected')
+    .max(100, 'Cannot update more than 100 reports at once'),
   status: z.enum(ENUMS.CONTENT_REPORT.STATUS),
 });
 

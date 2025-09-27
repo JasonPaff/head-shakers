@@ -52,6 +52,9 @@ const isProtectedRoute = createRouteMatcher([
 const isAdminRoute = createRouteMatcher([
   // admin dashboard and management
   '/admin(.*)',
+
+  // feature planner - admin only
+  '/feature-planner(.*)',
 ]);
 
 export default clerkMiddleware(async (auth, req) => {

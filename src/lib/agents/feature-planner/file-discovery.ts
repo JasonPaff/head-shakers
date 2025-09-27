@@ -4,10 +4,7 @@ import path from 'path';
 import type { StepResult } from './types';
 
 export class FileDiscoveryService {
-  async discoverFiles(
-    refinedRequest: string,
-    orchestrationDir: string,
-  ): Promise<StepResult> {
+  async discoverFiles(refinedRequest: string, orchestrationDir: string): Promise<StepResult> {
     const stepStart = Date.now();
 
     try {

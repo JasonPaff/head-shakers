@@ -8,9 +8,9 @@ export default function FeaturePlannerPage() {
   return (
     <PageContent>
       {/* Header */}
-      <div className={"mb-8"}>
-        <h1 className={"text-3xl font-bold"}>Feature Planner</h1>
-        <p className={"mt-2 text-muted-foreground"}>
+      <div className={'mb-8'}>
+        <h1 className={'text-3xl font-bold'}>Feature Planner</h1>
+        <p className={'mt-2 text-muted-foreground'}>
           Enter a feature description to generate a detailed implementation plan
         </p>
       </div>

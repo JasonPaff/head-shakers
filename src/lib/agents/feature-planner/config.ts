@@ -2,9 +2,9 @@ import type { RefinementConfig } from './types';
 
 export const REFINEMENT_CONFIG: RefinementConfig = {
   allowedTools: ['Read'],
-  maxTurns: 3,
-  maxWords: 400,
-  minWords: 200,
+  maxTurns: 2,
+  maxWords: 250,
+  minWords: 100,
 };
 
 export const FEATURE_REQUEST_VALIDATION = {

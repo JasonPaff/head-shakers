@@ -2,10 +2,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 
 export class LoggingService {
-  async initializeOrchestrationDirectory(
-    orchestrationDir: string,
-    featureName: string,
-  ): Promise<void> {
+  async initializeOrchestrationDirectory(orchestrationDir: string, featureName: string): Promise<void> {
     await fs.mkdir(orchestrationDir, { recursive: true });
 
     const indexPath = path.join(orchestrationDir, '00-orchestration-index.md');

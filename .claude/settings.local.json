@@ -54,7 +54,8 @@
       "mcp__Neon__describe_project",
       "mcp__Neon__describe_branch",
       "Bash(npm run test:e2e:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "mcp__playwright__browser_type"
     ],
     "deny": [],
     "ask": []

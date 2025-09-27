@@ -136,6 +136,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **No forwardRef()**: Do not use `forwardRef` in React 19, pass refs directly through props.
 - **Never use Eslint disable comments**: Always fix the underlying issue instead of disabling lint rules. If you cannot fix it, discuss with the team.
 - **Never use TS-ignore comments**: Always fix type errors instead of ignoring them. If you cannot fix it, use a TypeScript pro subagent to fix it.
+- **No Barrel Files**: Do not use `index.ts` files for re-exports. Always import directly from the file path.
 
 ## Project Documentation Conventions (Important)
 
