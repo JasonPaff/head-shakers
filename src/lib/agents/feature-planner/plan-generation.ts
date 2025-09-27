@@ -11,7 +11,7 @@ interface ProjectContext {
     authSystem: string;
     database: string;
     framework: string;
-    stateManagement: string[];
+    stateManagement: Array<string>;
     styling: string;
   };
   codebase: {
@@ -42,7 +42,7 @@ interface ProjectContext {
 export class PlanGenerationService {
   async generateImplementationPlan(
     refinedRequest: string,
-    discoveredFiles: string[],
+    discoveredFiles: Array<string>,
     contextData: ProjectContext,
     orchestrationDir: string,
   ): Promise<StepResult> {
@@ -148,7 +148,7 @@ Format the response as a detailed markdown implementation plan similar to profes
       stepLog.metrics.totalDuration = Date.now() - stepStart;
       stepLog.status = 'completed';
 
-      // save enhanced step log
+      // save the enhanced step log
       await this.saveStepLog({
         discoveredFiles,
         implementationPlan,
@@ -188,7 +188,11 @@ Format the response as a detailed markdown implementation plan similar to profes
     }
   }
 
-  private buildSystemPrompt(refinedRequest: string, discoveredFiles: string[], contextData: ProjectContext): string {
+  private buildSystemPrompt(
+    refinedRequest: string,
+    discoveredFiles: Array<string>,
+    contextData: ProjectContext,
+  ): string {
     return `You are an expert software architect creating implementation plans for the Head Shakers bobblehead collection platform.
 
 # Project Context
@@ -241,7 +245,7 @@ The plan should be professional, detailed, and actionable - similar to enterpris
 
   private async saveErrorLog(params: {
     contextData: ProjectContext;
-    discoveredFiles: string[];
+    discoveredFiles: Array<string>;
     error: Error;
     orchestrationDir: string;
     refinedRequest: string;
@@ -252,7 +256,8 @@ The plan should be professional, detailed, and actionable - similar to enterpris
     };
     stepStart: number;
   }): Promise<void> {
-    const { contextData, discoveredFiles, error, orchestrationDir, refinedRequest, stepLog, stepStart } = params;
+    const { contextData, discoveredFiles, error, orchestrationDir, refinedRequest, stepLog, stepStart } =
+      params;
 
     const logPath = path.join(orchestrationDir, '03-implementation-planning.md');
     const errorLog = `# Step 3: Implementation Planning
@@ -311,7 +316,7 @@ ${stepLog.errors.map((e) => `- **${e.timestamp}**: ${e.error}`).join('\n')}
   }
 
   private async saveStepLog(params: {
-    discoveredFiles: string[];
+    discoveredFiles: Array<string>;
     implementationPlan: string;
     orchestrationDir: string;
     refinedRequest: string;
@@ -333,7 +338,8 @@ ${stepLog.errors.map((e) => `- **${e.timestamp}**: ${e.error}`).join('\n')}
       usage: Record<string, number>;
     };
   }): Promise<void> {
-    const { discoveredFiles, implementationPlan, orchestrationDir, refinedRequest, stepLog, successResult } = params;
+    const { discoveredFiles, implementationPlan, orchestrationDir, refinedRequest, stepLog, successResult } =
+      params;
 
     const logPath = path.join(orchestrationDir, '03-implementation-planning.md');
     const logContent = `# Step 3: Implementation Planning

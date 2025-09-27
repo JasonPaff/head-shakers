@@ -6,7 +6,7 @@ interface ProjectContext {
     authSystem: string;
     database: string;
     framework: string;
-    stateManagement: string[];
+    stateManagement: Array<string>;
     styling: string;
   };
   codebase: {
@@ -76,7 +76,6 @@ export class ContextService {
         },
       };
     } catch {
-      // fallback context
       return this.getDefaultContext();
     }
   }

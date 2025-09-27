@@ -22,7 +22,7 @@ export interface ClaudeSuccessResult {
 }
 
 export interface FeaturePlannerResult {
-  discoveredFiles?: string[];
+  discoveredFiles?: Array<string>;
   error?: string;
   executionTime?: number;
   implementationPlan?: string;
@@ -33,13 +33,13 @@ export interface FeaturePlannerResult {
 }
 
 export interface FeatureRequestValidation {
-  errors: string[];
+  errors: Array<string>;
   isValid: boolean;
   wordCount: number;
 }
 
 export interface RefinementConfig {
-  allowedTools: string[];
+  allowedTools: Array<string>;
   maxTurns: number;
   maxWords: number;
   minWords: number;

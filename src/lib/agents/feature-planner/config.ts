@@ -2,7 +2,7 @@ import type { RefinementConfig } from './types';
 
 export const REFINEMENT_CONFIG: RefinementConfig = {
   allowedTools: ['Read'],
-  maxTurns: 2,
+  maxTurns: 4,
   maxWords: 250,
   minWords: 100,
 };
