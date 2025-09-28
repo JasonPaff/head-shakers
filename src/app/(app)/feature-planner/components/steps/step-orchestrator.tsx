@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from 'react';
 
+import type { ProgressEntry, RealTimeProgressEntry } from '@/app/(app)/feature-planner/types/streaming';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { RefinementSettings, StepData } from '@/lib/validations/feature-planner.validation';
 
@@ -20,12 +21,15 @@ interface StepOrchestratorProps extends ComponentTestIdProps, Omit<ComponentProp
   isRefining: boolean;
   onChange: (value: string) => void;
   onParallelRefineRequest: () => void;
+  onRealtimeMessage?: (message: RealTimeProgressEntry) => void;
   onRefinedRequestChange: (value: string) => void;
   onRefineRequest: () => void;
   onSkipToFileDiscovery: () => void;
   onUseOriginalRequest: () => void;
   onUseRefinedRequest: () => void;
+  progress?: Array<ProgressEntry>;
   refinedRequest: null | string;
+  sessionId: string;
   settings: RefinementSettings;
   stepData: StepData;
   value: string;
@@ -42,12 +46,15 @@ export const StepOrchestrator = ({
   isRefining,
   onChange,
   onParallelRefineRequest,
+  onRealtimeMessage,
   onRefinedRequestChange,
   onRefineRequest,
   onSkipToFileDiscovery,
   onUseOriginalRequest,
   onUseRefinedRequest,
+  progress = [],
   refinedRequest,
+  sessionId,
   settings,
   stepData,
   testId,
@@ -65,12 +72,15 @@ export const StepOrchestrator = ({
             isRefining={isRefining}
             onChange={onChange}
             onParallelRefineRequest={onParallelRefineRequest}
+            onRealtimeMessage={onRealtimeMessage}
             onRefinedRequestChange={onRefinedRequestChange}
             onRefineRequest={onRefineRequest}
             onSkipToFileDiscovery={onSkipToFileDiscovery}
             onUseOriginalRequest={onUseOriginalRequest}
             onUseRefinedRequest={onUseRefinedRequest}
+            progress={progress}
             refinedRequest={refinedRequest}
+            sessionId={sessionId}
             settings={settings}
             value={value}
           />

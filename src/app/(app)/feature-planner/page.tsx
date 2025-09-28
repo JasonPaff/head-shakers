@@ -328,7 +328,9 @@ export default function FeaturePlannerPage() {
                     onSkipToFileDiscovery={handleSkipToFileDiscovery}
                     onUseOriginalRequest={handleUseOriginalRequest}
                     onUseRefinedRequest={handleUseRefinedRequest}
+                    progress={state.progress}
                     refinedRequest={state.refinedRequest}
+                    sessionId={sessionId}
                     settings={state.settings}
                     stepData={state.stepData}
                     value={state.originalRequest}
