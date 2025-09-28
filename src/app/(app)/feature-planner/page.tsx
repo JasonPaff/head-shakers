@@ -98,6 +98,10 @@ export default function FeaturePlannerPage() {
     updateState({ currentStep: 2, refinedRequest: null });
   };
 
+  const handleRefinedRequestChange = (refinedRequest: string) => {
+    updateState({ refinedRequest });
+  };
+
   const handleSettingsChange = (settings: RefinementSettingsType) => {
     updateState({ settings });
   };
@@ -138,6 +142,7 @@ export default function FeaturePlannerPage() {
               isRefining={isRefining}
               onChange={(value) => updateState({ originalRequest: value })}
               onParallelRefineRequest={handleParallelRefineRequest}
+              onRefinedRequestChange={handleRefinedRequestChange}
               onRefineRequest={handleRefineRequest}
               onSkipToFileDiscovery={handleSkipToFileDiscovery}
               onUseOriginalRequest={handleUseOriginalRequest}
@@ -173,6 +178,7 @@ export default function FeaturePlannerPage() {
                   isRefining={isRefining}
                   onChange={(value) => updateState({ originalRequest: value })}
                   onParallelRefineRequest={handleParallelRefineRequest}
+                  onRefinedRequestChange={handleRefinedRequestChange}
                   onRefineRequest={handleRefineRequest}
                   onSkipToFileDiscovery={handleSkipToFileDiscovery}
                   onUseOriginalRequest={handleUseOriginalRequest}

@@ -21,6 +21,7 @@ interface RequestInputProps extends ComponentTestIdProps, Omit<ComponentProps<'d
   isRefining: boolean;
   onChange: (value: string) => void;
   onParallelRefineRequest: () => void;
+  onRefinedRequestChange: (value: string) => void;
   onRefineRequest: () => void;
   onSkipToFileDiscovery: () => void;
   onUseOriginalRequest: () => void;
@@ -35,6 +36,7 @@ export const RequestInput = ({
   isRefining,
   onChange,
   onParallelRefineRequest,
+  onRefinedRequestChange,
   onRefineRequest,
   onSkipToFileDiscovery,
   onUseOriginalRequest,
@@ -97,7 +99,12 @@ export const RequestInput = ({
           <div className={'space-y-3'}>
             {/* Primary Refinement Actions */}
             <div className={'flex gap-3'}>
-              <Button className={'flex-1'} disabled={!canRefine} onClick={onParallelRefineRequest} size={'lg'}>
+              <Button
+                className={'flex-1'}
+                disabled={!canRefine}
+                onClick={onParallelRefineRequest}
+                size={'lg'}
+              >
                 <UsersIcon aria-hidden className={'mr-2 size-4'} />
                 {isRefining ? 'Processing...' : `Parallel Refine (${settings.agentCount} Agents)`}
               </Button>
@@ -138,24 +145,33 @@ export const RequestInput = ({
               <Separator />
 
               <div>
-                <Label className={'text-sm font-medium text-muted-foreground'}>Enhanced Request:</Label>
-                <p
+                <Label className={'text-sm font-medium text-muted-foreground'} htmlFor={'enhanced-request'}>
+                  Enhanced Request (editable):
+                </Label>
+                <Textarea
                   className={
-                    'mt-1 rounded-md border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950'
+                    'mt-1 min-h-[120px] resize-none border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
                   }
-                >
-                  {refinedRequest}
-                </p>
+                  id={'enhanced-request'}
+                  onChange={(e) => {
+                    onRefinedRequestChange(e.target.value);
+                  }}
+                  placeholder={'Your enhanced feature request will appear here for editing...'}
+                  value={refinedRequest || ''}
+                />
+                <div className={'mt-1 text-xs text-muted-foreground'}>
+                  You can edit this refined request before proceeding to file discovery.
+                </div>
               </div>
             </div>
 
             <div className={'flex gap-3'}>
               <Button className={'flex-1'} onClick={onUseRefinedRequest} size={'lg'}>
                 Use Enhanced Request
-                <ArrowRightIcon className={'ml-2 size-4'} />
+                <ArrowRightIcon aria-hidden className={'ml-2 size-4'} />
               </Button>
               <Button onClick={onUseOriginalRequest} size={'lg'} variant={'outline'}>
-                <RotateCcwIcon className={'mr-2 size-4'} />
+                <RotateCcwIcon aria-hidden className={'mr-2 size-4'} />
                 Use Original
               </Button>
             </div>
