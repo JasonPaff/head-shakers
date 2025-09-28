@@ -27,7 +27,6 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { refineFeatureRequestAction } from '@/lib/actions/feature-planner/feature-planner.actions';
 
 export interface FeaturePlannerState {
-  isSettingsExpanded: boolean;
   originalRequest: string;
   parallelResults: null | ParallelRefinementResponse;
   progress: Array<ProgressEntry>;
@@ -50,7 +49,6 @@ export default function FeaturePlannerPage() {
   );
 
   const [state, setState] = useState<FeaturePlannerState>({
-    isSettingsExpanded: false,
     originalRequest: '',
     parallelResults: null,
     progress: [],
@@ -267,9 +265,6 @@ export default function FeaturePlannerPage() {
     [updateState],
   );
 
-  const handleToggleSettings = useCallback(() => {
-    updateState({ isSettingsExpanded: !state.isSettingsExpanded });
-  }, [state.isSettingsExpanded, updateState]);
 
   const shouldShowFullWidthParallelResults = currentStep === 1 && state.parallelResults;
 
@@ -292,9 +287,7 @@ export default function FeaturePlannerPage() {
         <div className={'mt-8 space-y-8'}>
           {/* Settings Panel */}
           <RefinementSettings
-            isExpanded={state.isSettingsExpanded}
             onSettingsChange={handleSettingsChange}
-            onToggleExpanded={handleToggleSettings}
             settings={state.settings}
           />
 

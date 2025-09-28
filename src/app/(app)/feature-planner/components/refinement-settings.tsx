@@ -9,9 +9,8 @@ import type { RefinementSettings as RefinementSettingsType } from '@/lib/validat
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Conditional } from '@/components/ui/conditional';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
@@ -19,17 +18,13 @@ import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 interface RefinementSettingsProps extends ComponentProps<'div'>, ComponentTestIdProps {
-  isExpanded: boolean;
   onSettingsChange: (settings: RefinementSettingsType) => void;
-  onToggleExpanded: () => void;
   settings: RefinementSettingsType;
 }
 
 export const RefinementSettings = ({
   className,
-  isExpanded,
   onSettingsChange,
-  onToggleExpanded,
   settings,
   testId,
   ...props
@@ -53,28 +48,28 @@ export const RefinementSettings = ({
   };
 
   return (
-    <div className={cn('space-y-4', className)} data-testid={settingsTestId} {...props}>
-      {/* Settings Toggle */}
-      <div className={'flex items-center justify-between'}>
-        <div className={'flex items-center gap-2'}>
-          <SettingsIcon aria-hidden className={'size-4'} />
-          <span className={'text-sm font-medium'}>Refinement Settings</span>
-          <Badge variant={getAgentCountBadgeVariant()}>
-            {settings.agentCount} Agent{settings.agentCount !== 1 ? 's' : ''}
-          </Badge>
-        </div>
-        <Button onClick={onToggleExpanded} size={'sm'} variant={'ghost'}>
-          {isExpanded ? 'Hide' : 'Show'} Settings
-        </Button>
-      </div>
+    <div className={cn('flex items-center gap-2', className)} data-testid={settingsTestId} {...props}>
+      <SettingsIcon aria-hidden className={'size-4'} />
+      <span className={'text-sm font-medium'}>Refinement Settings</span>
+      <Badge variant={getAgentCountBadgeVariant()}>
+        {settings.agentCount} Agent{settings.agentCount !== 1 ? 's' : ''}
+      </Badge>
 
-      {/* Expanded Settings Panel */}
-      <Conditional isCondition={isExpanded}>
-        <Card>
-          <CardHeader>
-            <CardTitle className={'text-lg'}>Advanced Refinement Configuration</CardTitle>
-          </CardHeader>
-          <CardContent className={'space-y-6'}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button size={'sm'} variant={'ghost'}>
+            Settings
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align={'end'} className={'w-80'}>
+          <div className={'space-y-4'}>
+            <div>
+              <h4 className={'font-medium leading-none'}>Refinement Configuration</h4>
+              <p className={'text-sm text-muted-foreground'}>
+                Adjust settings for the refinement process
+              </p>
+            </div>
+
             {/* Agent Count */}
             <div className={'space-y-3'}>
               <div className={'flex items-center justify-between'}>
@@ -153,9 +148,9 @@ export const RefinementSettings = ({
                 }}
               />
             </div>
-          </CardContent>
-        </Card>
-      </Conditional>
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   );
 };
