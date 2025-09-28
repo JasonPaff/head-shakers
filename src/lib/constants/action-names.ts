@@ -56,6 +56,10 @@ export const ACTION_NAMES = {
     UPDATE: 'updateCollection',
     UPDATE_SUB: 'updateSubCollection',
   },
+  FEATURE_PLANNER: {
+    PARALLEL_REFINE_REQUEST: 'parallelRefineFeatureRequest',
+    REFINE_REQUEST: 'refineFeatureRequest',
+  },
   MODERATION: {
     CHECK_REPORT_STATUS: 'checkContentReportStatus',
     CREATE_REPORT: 'createContentReport',

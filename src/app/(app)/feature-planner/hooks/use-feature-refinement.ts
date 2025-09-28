@@ -3,6 +3,13 @@
 import { useCallback, useState } from 'react';
 
 import { useToggle } from '@/hooks/use-toggle';
+import { refineFeatureRequestAction } from '@/lib/actions/feature-planner/feature-planner.actions';
+
+interface RefinementOptions {
+  maxRetries?: number;
+  shouldFallbackToSimplePrompt?: boolean;
+  timeoutMs?: number;
+}
 
 interface RefinementResult {
   error?: string;
@@ -14,51 +21,98 @@ interface UseFeatureRefinementReturn {
   error: null | string;
   isRefining: boolean;
   progress: Array<string>;
-  refineFeatureRequest: (originalRequest: string) => Promise<RefinementResult>;
+  refineFeatureRequest: (originalRequest: string, options?: RefinementOptions) => Promise<RefinementResult>;
+  retryCount: number;
 }
 
 export const useFeatureRefinement = (): UseFeatureRefinementReturn => {
   const [error, setError] = useState<null | string>(null);
   const [isRefining, setIsRefining] = useToggle();
   const [progress, setProgress] = useState<Array<string>>([]);
+  const [retryCount, setRetryCount] = useState(0);
 
   const addProgress = useCallback((message: string) => {
     setProgress((prev) => [...prev, message]);
   }, []);
 
   const refineFeatureRequest = useCallback(
-    async (originalRequest: string): Promise<RefinementResult> => {
-      setIsRefining.on();
-      setProgress([]);
-      setError(null);
-
+    async (originalRequest: string, options: RefinementOptions = {}): Promise<RefinementResult> => {
       try {
+        setIsRefining.on();
+        setProgress([]);
+        setError(null);
+        setRetryCount(0);
+
         addProgress('Starting feature refinement...');
-        addProgress('Reading project context (CLAUDE.md, package.json)...');
+        addProgress('Sending request to server...');
 
-        // TODO: Replace with actual Claude Code SDK integration
-        // For now, use a mock implementation for UI testing
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        addProgress('Analyzing request with project context...');
+        const result = await refineFeatureRequestAction({
+          options,
+          originalRequest,
+        });
 
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        addProgress('Generating enhanced request...');
+        if (result.serverError) {
+          const serverError = result.serverError;
+          const errorMessage =
+            typeof serverError === 'string' ? serverError
+            : (
+              serverError &&
+              typeof serverError === 'object' &&
+              'message' in serverError &&
+              typeof (serverError as { message: unknown }).message === 'string'
+            ) ?
+              (serverError as { message: string }).message
+            : 'Server error occurred';
+          setError(errorMessage);
+          addProgress(`Error: ${errorMessage}`);
 
-        await new Promise((resolve) => setTimeout(resolve, 800));
+          return {
+            error: errorMessage,
+            isSuccess: false,
+            refinedRequest: '',
+          };
+        }
 
-        const enhancedRequest = `Implement ${originalRequest} using Next.js 15 App Router with TypeScript, 
-        integrating with the existing Head Shakers bobblehead collection platform architecture. 
-        The feature should use server actions with Next-Safe-Action for form handling, 
-        leverage Clerk for authentication, utilize Drizzle ORM for PostgreSQL database 
-        operations, and follow the established component patterns with Radix UI components 
-        and Tailwind CSS styling. Implementation should include proper Zod validation schemas, 
-        error handling, and maintain consistency with the current file organization structure.`;
+        if (result.validationErrors) {
+          const validationErrorsArray = Object.values(result.validationErrors)
+            .flat()
+            .map((error) => {
+              if (typeof error === 'string') return error;
+              if (error && typeof error === 'object' && 'message' in error) {
+                return String(error.message);
+              }
+              return 'Unknown validation error';
+            });
+          const errorMessage = 'Validation failed: ' + validationErrorsArray.join(', ');
+          setError(errorMessage);
+          addProgress(`Error: ${errorMessage}`);
 
-        addProgress('Refinement complete!');
+          return {
+            error: errorMessage,
+            isSuccess: false,
+            refinedRequest: '',
+          };
+        }
+
+        if (result.data) {
+          addProgress('Refinement completed successfully!');
+          setRetryCount(result.data.retryCount || 0);
+
+          return {
+            error: result.data.error,
+            isSuccess: result.data.isSuccess,
+            refinedRequest: result.data.refinedRequest,
+          };
+        }
+
+        const errorMessage = 'Unexpected response from server';
+        setError(errorMessage);
+        addProgress(`Error: ${errorMessage}`);
 
         return {
-          isSuccess: true,
-          refinedRequest: enhancedRequest,
+          error: errorMessage,
+          isSuccess: false,
+          refinedRequest: '',
         };
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
@@ -82,5 +136,6 @@ export const useFeatureRefinement = (): UseFeatureRefinementReturn => {
     isRefining,
     progress,
     refineFeatureRequest,
+    retryCount,
   };
 };
