@@ -2,9 +2,10 @@
 
 import type { ComponentProps } from 'react';
 
-import { ArrowRightIcon, RotateCcwIcon, SparklesIcon } from 'lucide-react';
+import { ArrowRightIcon, RotateCcwIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
+import type { RefinementSettings } from '@/lib/validations/feature-planner.validation';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,11 +20,13 @@ import { cn } from '@/utils/tailwind-utils';
 interface RequestInputProps extends ComponentTestIdProps, Omit<ComponentProps<'div'>, 'onChange'> {
   isRefining: boolean;
   onChange: (value: string) => void;
+  onParallelRefineRequest: () => void;
   onRefineRequest: () => void;
   onSkipToFileDiscovery: () => void;
   onUseOriginalRequest: () => void;
   onUseRefinedRequest: () => void;
   refinedRequest: null | string;
+  settings: RefinementSettings;
   value: string;
 }
 
@@ -31,11 +34,13 @@ export const RequestInput = ({
   className,
   isRefining,
   onChange,
+  onParallelRefineRequest,
   onRefineRequest,
   onSkipToFileDiscovery,
   onUseOriginalRequest,
   onUseRefinedRequest,
   refinedRequest,
+  settings,
   testId,
   value,
   ...props
@@ -89,12 +94,27 @@ export const RequestInput = ({
             </div>
           </div>
 
-          <div className={'flex gap-3'}>
-            <Button className={'flex-1'} disabled={!canRefine} onClick={onRefineRequest} size={'lg'}>
-              <SparklesIcon aria-hidden className={'mr-2 size-4'} />
-              {isRefining ? 'Refining...' : 'Refine Request'}
-            </Button>
-            <Button disabled={!canSkip} onClick={onSkipToFileDiscovery} size={'lg'} variant={'outline'}>
+          <div className={'space-y-3'}>
+            {/* Primary Refinement Actions */}
+            <div className={'flex gap-3'}>
+              <Button className={'flex-1'} disabled={!canRefine} onClick={onParallelRefineRequest} size={'lg'}>
+                <UsersIcon aria-hidden className={'mr-2 size-4'} />
+                {isRefining ? 'Processing...' : `Parallel Refine (${settings.agentCount} Agents)`}
+              </Button>
+              <Button disabled={!canRefine} onClick={onRefineRequest} size={'lg'} variant={'outline'}>
+                <SparklesIcon aria-hidden className={'mr-2 size-4'} />
+                Single Refine
+              </Button>
+            </div>
+
+            {/* Secondary Action */}
+            <Button
+              className={'w-full'}
+              disabled={!canSkip}
+              onClick={onSkipToFileDiscovery}
+              size={'lg'}
+              variant={'ghost'}
+            >
               Skip to File Discovery
               <ArrowRightIcon aria-hidden className={'ml-2 size-4'} />
             </Button>

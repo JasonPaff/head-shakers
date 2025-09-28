@@ -85,9 +85,9 @@ export const parallelRefinementResponseSchema = z.object({
   totalAgents: z.number().int().min(1).max(5),
 });
 
-export type RefinementSettings = z.infer<typeof refinementSettingsSchema>;
 export type FeatureRefinementRequest = z.infer<typeof featureRefinementRequestSchema>;
 export type FeatureRefinementResponse = z.infer<typeof featureRefinementResponseSchema>;
 export type ParallelRefinementRequest = z.infer<typeof parallelRefinementRequestSchema>;
 export type ParallelRefinementResponse = z.infer<typeof parallelRefinementResponseSchema>;
 export type RefinementResult = z.infer<typeof refinementResultSchema>;
+export type RefinementSettings = z.infer<typeof refinementSettingsSchema>;

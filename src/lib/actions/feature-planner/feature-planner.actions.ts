@@ -17,8 +17,8 @@ import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   featureRefinementRequestSchema,
-  parallelRefinementRequestSchema,
   type FeatureRefinementResponse,
+  parallelRefinementRequestSchema,
   type ParallelRefinementResponse,
   type RefinementResult,
   type RefinementSettings,
@@ -42,6 +42,94 @@ interface StreamEventMessage {
   type: 'stream_event';
 }
 
+async function buildRefinementPrompt(originalRequest: string, settings: RefinementSettings): Promise<string> {
+  // Read project context files
+  let claudeMdContent = '';
+  let packageJsonContent = '';
+
+  try {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const projectRoot = process.cwd();
+
+    claudeMdContent = await fs.readFile(path.join(projectRoot, 'CLAUDE.md'), 'utf-8');
+    packageJsonContent = await fs.readFile(path.join(projectRoot, 'package.json'), 'utf-8');
+  } catch {
+    // If files can't be read, proceed without project context
+    claudeMdContent = 'Project documentation not available';
+    packageJsonContent = 'Package configuration not available';
+  }
+
+  const styleInstructions = {
+    balanced: 'Add balanced technical context following the project patterns',
+    conservative: 'Be conservative and minimal in adding technical context',
+    detailed: 'Provide comprehensive technical details while preserving scope',
+  };
+
+  const detailInstructions = {
+    comprehensive: 'Include detailed technology stack and architectural considerations',
+    minimal: 'Include only essential technology mentions',
+    moderate: 'Include key technologies and integration points',
+  };
+
+  return `
+    You are a feature request refinement specialist. Your job is to take a user's feature request 
+    and add MINIMAL project context to make it clearer for subsequent analysis stages. 
+    Output ONLY the refined paragraph - no headers, sections, or analysis.
+
+    ## Your Task
+
+    Take the user's original feature request and refine it by:
+    
+    1. Preserving the exact functionality requested - do not add features
+    2. Mentioning key technologies that will be involved (from the project stack)
+    3. Identifying which existing systems it will need to integrate with
+    4. Keeping the scope exactly as the user specified
+    
+    ## Context Available
+    
+    **User's Original Request:**
+    ${originalRequest}
+    
+    **Project Documentation (CLAUDE.MD):**
+    ${settings.includeProjectContext ? claudeMdContent : 'Project context excluded by user preference'}
+    
+    **Project Dependencies and Configuration (package.json):**
+    ${settings.includeProjectContext ? packageJsonContent : 'Project context excluded by user preference'}
+    
+    ## Refinement Guidelines
+    
+    ### Style Instructions
+    ${styleInstructions[settings.refinementStyle]}
+    
+    ### Detail Level
+    ${detailInstructions[settings.technicalDetailLevel]}
+    
+    ### Length Constraint
+    Maximum ${settings.maxOutputLength} words.
+    
+    ### What to ADD (sparingly):
+    - Core technology mentions (e.g., "using Next.js server actions")
+    - Essential integration points (e.g., "authenticated via Clerk")
+    - Database/ORM if data persistence is clearly needed
+    - Validation approach if user input is involved
+    
+    ### What NOT to do:
+    - DO NOT add features or functionality not requested
+    - DO NOT specify implementation details (which icons, where buttons go, etc.)
+    - DO NOT assume specific UI/UX decisions
+    - DO NOT add "nice to have" features like notifications, caching, etc.
+    - DO NOT prescribe specific technical solutions when multiple options exist
+    - DO NOT make it longer than necessary
+    
+    ### Output Format
+    **CRITICAL**: Output ONLY a single paragraph (maximum ${settings.maxOutputLength} words). Keep it concise and focused.
+    
+    Based on the user request and project context provided, generate a refined feature request that will help subsequent analysis stages better understand what needs to be implemented and how it should integrate with the existing codebase.
+    
+    **REMEMBER**: Output ONLY the refined paragraph. No headers, no "Refined Request:" prefix, no analysis - just the single paragraph refinement.`;
+}
+
 function isResultMessage(message: QueryMessage): message is ResultMessage {
   return message.type === 'result';
 }
@@ -50,13 +138,211 @@ function isStreamEventMessage(message: QueryMessage): message is StreamEventMess
   return message.type === 'stream_event';
 }
 
+export const parallelRefineFeatureRequestAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.PARALLEL_REFINE_REQUEST,
+  })
+  .inputSchema(parallelRefinementRequestSchema)
+  .action(async ({ parsedInput }): Promise<ParallelRefinementResponse> => {
+    const { originalRequest, settings } = parsedInput;
+    const startTime = Date.now();
+
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
+      data: {
+        action: ACTION_NAMES.FEATURE_PLANNER.PARALLEL_REFINE_REQUEST,
+        agentCount: settings.agentCount,
+        requestLength: originalRequest.length,
+        settings,
+      },
+      level: SENTRY_LEVELS.INFO,
+      message: 'Starting parallel feature request refinement',
+    });
+
+    try {
+      const refinementPrompt = await buildRefinementPrompt(originalRequest, settings);
+      const results: RefinementResult[] = [];
+      const agentPromises: Promise<RefinementResult>[] = [];
+
+      // Create parallel agent executions
+      for (let i = 0; i < settings.agentCount; i++) {
+        const agentId = `agent-${i + 1}-${Date.now()}`;
+
+        agentPromises.push(
+          (async (): Promise<RefinementResult> => {
+            const agentStartTime = Date.now();
+
+            try {
+              console.log(`[${agentId}] Starting refinement...`);
+              let refinedRequest = '';
+              const abortController = new AbortController();
+
+              const timeoutId = setTimeout(() => {
+                console.log(`[${agentId}] Timeout reached (${settings.agentTimeoutMs}ms)`);
+                abortController.abort();
+              }, settings.agentTimeoutMs);
+
+              try {
+                console.log(`[${agentId}] Starting query with prompt length: ${refinementPrompt.length}`);
+                for await (const message of query({
+                  options: {
+                    allowedTools: [],
+                    includePartialMessages: false,
+                    maxTurns: 1,
+                    permissionMode: 'bypassPermissions',
+                  },
+                  prompt: refinementPrompt,
+                })) {
+                  if (abortController.signal.aborted) {
+                    console.log(`[${agentId}] Aborted due to timeout`);
+                    break;
+                  }
+
+                  const queryMessage = message as QueryMessage;
+                  console.log(`[${agentId}] Received message type: ${queryMessage.type}`);
+
+                  // Handle assistant messages with complete text content
+                  if (queryMessage.type === 'assistant') {
+                    const message = (queryMessage as any).message;
+                    if (message?.content && Array.isArray(message.content)) {
+                      for (const content of message.content) {
+                        if (content.type === 'text' && typeof content.text === 'string') {
+                          refinedRequest += content.text;
+                        }
+                      }
+                    }
+                  }
+
+                  if (isStreamEventMessage(queryMessage)) {
+                    const event = queryMessage.event;
+                    if (
+                      event?.type === 'content_block_delta' &&
+                      event.delta?.type === 'text_delta' &&
+                      typeof event.delta.text === 'string'
+                    ) {
+                      refinedRequest += event.delta.text;
+                    }
+                  }
+
+                  if (isResultMessage(queryMessage)) {
+                    if (queryMessage.subtype === 'success') {
+                      break;
+                    } else {
+                      throw new Error(`Refinement failed: ${queryMessage.subtype}`);
+                    }
+                  }
+                }
+              } finally {
+                clearTimeout(timeoutId);
+              }
+
+              if (!refinedRequest.trim()) {
+                throw new Error('No refinement response received');
+              }
+
+              // Clean and validate the response
+              const cleanedRequest = refinedRequest
+                .trim()
+                .replace(/^.*?refined.*?:/i, '') // remove any "refined:" prefixes
+                .replace(/^#+\s*.*?\n/, '') // remove markdown headers
+                .replace(/\n+/g, ' ') // normalize whitespace
+                .replace(/\s+/g, ' ')
+                .trim()
+                .substring(0, settings.maxOutputLength * 6); // reasonable character limit
+
+              const wordCount = cleanedRequest.split(/\s+/).length;
+              const executionTimeMs = Date.now() - agentStartTime;
+
+              return {
+                agentId,
+                executionTimeMs,
+                isSuccess: true,
+                refinedRequest: cleanedRequest,
+                wordCount,
+              };
+            } catch (error) {
+              const executionTimeMs = Date.now() - agentStartTime;
+              const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+              console.log(`[${agentId}] Error after ${executionTimeMs}ms: ${errorMessage}`);
+
+              Sentry.addBreadcrumb({
+                category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
+                data: { agentId, error: errorMessage, executionTimeMs },
+                level: SENTRY_LEVELS.WARNING,
+                message: `Agent ${agentId} failed`,
+              });
+
+              return {
+                agentId,
+                error: errorMessage,
+                executionTimeMs,
+                isSuccess: false,
+                refinedRequest: '',
+                wordCount: 0,
+              };
+            }
+          })(),
+        );
+      }
+
+      // Wait for all agents to complete
+      const agentResults = await Promise.all(agentPromises);
+      results.push(...agentResults);
+
+      const successCount = results.filter((r) => r.isSuccess).length;
+      const executionTimeMs = Date.now() - startTime;
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
+        data: {
+          executionTimeMs,
+          successCount,
+          totalAgents: settings.agentCount,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Parallel refinement completed',
+      });
+
+      return {
+        executionTimeMs,
+        isSuccess: successCount > 0,
+        results,
+        settings,
+        successCount,
+        totalAgents: settings.agentCount,
+      };
+    } catch (error) {
+      const executionTimeMs = Date.now() - startTime;
+      const errorMessage = error instanceof Error ? error.message : 'Unknown parallel refinement error';
+
+      Sentry.captureException(error, {
+        contexts: {
+          [SENTRY_CONTEXTS.ACTION_METADATA]: {
+            action: ACTION_NAMES.FEATURE_PLANNER.PARALLEL_REFINE_REQUEST,
+            executionTimeMs,
+            settings,
+          },
+        },
+      });
+
+      throw new ActionError(
+        ErrorType.EXTERNAL_SERVICE,
+        ERROR_CODES.FEATURE_PLANNER.REFINEMENT_FAILED,
+        errorMessage,
+        { operation: OPERATIONS.FEATURE_PLANNER.REFINE_REQUEST, parsedInput },
+        true,
+        500,
+      );
+    }
+  });
+
 export const refineFeatureRequestAction = publicActionClient
   .metadata({
     actionName: ACTION_NAMES.FEATURE_PLANNER.REFINE_REQUEST,
   })
   .inputSchema(featureRefinementRequestSchema)
-  .action(async ({ ctx, parsedInput }): Promise<FeatureRefinementResponse> => {
-    const { options, originalRequest } = featureRefinementRequestSchema.parse(ctx.sanitizedInput);
+  .action(async ({ parsedInput }): Promise<FeatureRefinementResponse> => {
+    const { options, originalRequest } = parsedInput;
 
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
