@@ -2,6 +2,7 @@
 
 import 'server-only';
 import { query } from '@anthropic-ai/claude-code';
+import { betaZodTool } from '@anthropic-ai/sdk/helpers';
 import * as Sentry from '@sentry/nextjs';
 
 import {
