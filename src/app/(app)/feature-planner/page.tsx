@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
+import { useCallback, useState } from 'react';
 
 import type {
   ParallelRefinementResponse,
   RefinementSettings as RefinementSettingsType,
+  StepData,
 } from '@/lib/validations/feature-planner.validation';
 
 import { ActionControls } from '@/app/(app)/feature-planner/components/action-controls';
@@ -19,30 +21,42 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { refineFeatureRequestAction } from '@/lib/actions/feature-planner/feature-planner.actions';
 
 export interface FeaturePlannerState {
-  currentStep: WorkflowStep;
   isSettingsExpanded: boolean;
   originalRequest: string;
   parallelResults: null | ParallelRefinementResponse;
   refinedRequest: null | string;
-  selectedAgentId: null | string;
   settings: RefinementSettingsType;
+  stepData: StepData;
 }
 
 export type WorkflowStep = 1 | 2 | 3;
 
+/**
+ * Enhanced feature planner with URL state management and modular step architecture
+ */
 export default function FeaturePlannerPage() {
+  // URL state management with nuqs
+  const [currentStep, setCurrentStep] = useQueryState(
+    'step',
+    parseAsInteger.withDefault(1).withOptions({ history: 'push' })
+  );
+  const [selectedAgentId, setSelectedAgentId] = useQueryState(
+    'agent',
+    parseAsString.withOptions({ history: 'push' })
+  );
+
+  // Local component state
   const [state, setState] = useState<FeaturePlannerState>({
-    currentStep: 1,
     isSettingsExpanded: false,
     originalRequest: '',
     parallelResults: null,
     refinedRequest: null,
-    selectedAgentId: null,
     settings: {
       agentCount: 3,
       includeProjectContext: true,
       maxOutputLength: 250,
     },
+    stepData: {},
   });
 
   const { executeAsync, isExecuting, result } = useServerAction(refineFeatureRequestAction, {
@@ -60,11 +74,14 @@ export default function FeaturePlannerPage() {
     },
   });
 
-  const updateState = (updates: Partial<FeaturePlannerState>) => {
+  /**
+   * Updates local state with partial updates
+   */
+  const updateState = useCallback((updates: Partial<FeaturePlannerState>) => {
     setState((prev) => ({ ...prev, ...updates }));
-  };
+  }, []);
 
-  const handleRefineRequest = async () => {
+  const handleRefineRequest = useCallback(async () => {
     await executeAsync({
       originalRequest: state.originalRequest,
       settings: {
@@ -73,14 +90,14 @@ export default function FeaturePlannerPage() {
         maxOutputLength: state.settings.maxOutputLength,
       },
     });
-  };
+  }, [executeAsync, state.originalRequest, state.settings]);
 
-  const handleParallelRefineRequest = async () => {
+  const handleParallelRefineRequest = useCallback(async () => {
     updateState({
       parallelResults: null,
       refinedRequest: null,
-      selectedAgentId: null,
     });
+    void setSelectedAgentId(null);
 
     await executeAsync({
       originalRequest: state.originalRequest,
@@ -90,50 +107,87 @@ export default function FeaturePlannerPage() {
         maxOutputLength: state.settings.maxOutputLength,
       },
     });
-  };
+  }, [executeAsync, state.originalRequest, state.settings, updateState, setSelectedAgentId]);
 
-  const handleSelectRefinement = (agentId: string) => {
+  /**
+   * Handles agent selection with URL state sync
+   */
+  const handleSelectRefinement = useCallback((agentId: string) => {
     const selectedResult = state.parallelResults?.results.find((r) => r.agentId === agentId);
     if (selectedResult && selectedResult.isSuccess) {
       updateState({
         refinedRequest: selectedResult.refinedRequest,
-        selectedAgentId: agentId,
+        stepData: {
+          ...state.stepData,
+          step1: {
+            originalRequest: state.originalRequest,
+            parallelResults: state.parallelResults || undefined,
+            refinedRequest: selectedResult.refinedRequest,
+            selectedAgentId: agentId,
+          },
+        },
       });
+      void setSelectedAgentId(agentId);
     }
-  };
+  }, [state.parallelResults, state.originalRequest, state.stepData, updateState, setSelectedAgentId]);
 
-  const handleUseOriginalFromComparison = () => {
+  const handleUseOriginalFromComparison = useCallback(() => {
     updateState({
       refinedRequest: null,
-      selectedAgentId: 'original',
+      stepData: {
+        ...state.stepData,
+        step1: {
+          originalRequest: state.originalRequest,
+          parallelResults: state.parallelResults || undefined,
+          refinedRequest: state.originalRequest,
+          selectedAgentId: 'original',
+        },
+      },
     });
-  };
+    void setSelectedAgentId('original');
+  }, [state.originalRequest, state.stepData, state.parallelResults, updateState, setSelectedAgentId]);
 
-  const handleSkipToFileDiscovery = () => {
-    updateState({ currentStep: 2 });
-  };
+  /**
+   * Handles step navigation with validation
+   */
+  const handleStepChange = useCallback((step: WorkflowStep) => {
+    // Validate step transition
+    if (step === 2 && !state.originalRequest) {
+      return; // Can't go to step 2 without a request
+    }
+    if (step === 3 && !state.stepData.step1) {
+      return; // Can't go to step 3 without completing step 1
+    }
 
-  const handleUseRefinedRequest = () => {
-    updateState({ currentStep: 2 });
-  };
+    void setCurrentStep(step);
+  }, [state.originalRequest, state.stepData.step1, setCurrentStep]);
 
-  const handleUseOriginalRequest = () => {
-    updateState({ currentStep: 2, refinedRequest: null });
-  };
+  const handleSkipToFileDiscovery = useCallback(() => {
+    handleStepChange(2);
+  }, [handleStepChange]);
 
-  const handleRefinedRequestChange = (refinedRequest: string) => {
+  const handleUseRefinedRequest = useCallback(() => {
+    handleStepChange(2);
+  }, [handleStepChange]);
+
+  const handleUseOriginalRequest = useCallback(() => {
+    updateState({ refinedRequest: null });
+    handleStepChange(2);
+  }, [handleStepChange, updateState]);
+
+  const handleRefinedRequestChange = useCallback((refinedRequest: string) => {
     updateState({ refinedRequest });
-  };
+  }, [updateState]);
 
-  const handleSettingsChange = (settings: RefinementSettingsType) => {
+  const handleSettingsChange = useCallback((settings: RefinementSettingsType) => {
     updateState({ settings });
-  };
+  }, [updateState]);
 
-  const handleToggleSettings = () => {
+  const handleToggleSettings = useCallback(() => {
     updateState({ isSettingsExpanded: !state.isSettingsExpanded });
-  };
+  }, [state.isSettingsExpanded, updateState]);
 
-  const shouldShowFullWidthParallelResults = state.currentStep === 1 && state.parallelResults;
+  const shouldShowFullWidthParallelResults = currentStep === 1 && state.parallelResults;
 
   return (
     <PageContent>
@@ -146,7 +200,7 @@ export default function FeaturePlannerPage() {
       </div>
 
       {/* Progress Indicator */}
-      <WorkflowProgress currentStep={state.currentStep} />
+      <WorkflowProgress currentStep={currentStep as WorkflowStep} />
 
       {/* Main Content Area */}
       <div className={'mt-8 space-y-8'}>
@@ -184,13 +238,13 @@ export default function FeaturePlannerPage() {
                 onUseOriginal={handleUseOriginalFromComparison}
                 originalRequest={state.originalRequest}
                 results={state.parallelResults?.results || []}
-                selectedAgentId={state.selectedAgentId}
+                selectedAgentId={selectedAgentId}
               />
             </Conditional>
 
             {/* Streaming Panel */}
             <StreamingPanel
-              currentStep={state.currentStep}
+              currentStep={currentStep as WorkflowStep}
               hasError={!!result.serverError}
               isActive={isExecuting}
               progress={[]}
@@ -200,7 +254,7 @@ export default function FeaturePlannerPage() {
             {/* Left Panel - Step Content */}
             <div className={'space-y-6'}>
               {/* Step 1 */}
-              <Conditional isCondition={state.currentStep === 1}>
+              <Conditional isCondition={currentStep === 1}>
                 <RequestInput
                   isRefining={isExecuting}
                   onChange={(value) => {
@@ -219,7 +273,7 @@ export default function FeaturePlannerPage() {
               </Conditional>
 
               {/* Step 2 */}
-              <Conditional isCondition={state.currentStep === 2}>
+              <Conditional isCondition={currentStep === 2}>
                 <div className={'rounded-lg border p-6'}>
                   <h2 className={'mb-4 text-xl font-semibold'}>Step 2: File Discovery</h2>
                   <p className={'text-muted-foreground'}>File discovery implementation coming in Phase 2</p>
@@ -227,7 +281,7 @@ export default function FeaturePlannerPage() {
               </Conditional>
 
               {/* Step 3 */}
-              <Conditional isCondition={state.currentStep === 3}>
+              <Conditional isCondition={currentStep === 3}>
                 <div className={'rounded-lg border p-6'}>
                   <h2 className={'mb-4 text-xl font-semibold'}>Step 3: Implementation Planning</h2>
                   <p className={'text-muted-foreground'}>Implementation planning coming in Phase 2</p>
@@ -238,7 +292,7 @@ export default function FeaturePlannerPage() {
             {/* Right Panel - Streaming Updates */}
             <div>
               <StreamingPanel
-                currentStep={state.currentStep}
+                currentStep={currentStep as WorkflowStep}
                 hasError={!!result.serverError}
                 isActive={isExecuting}
                 progress={[]}
@@ -251,10 +305,8 @@ export default function FeaturePlannerPage() {
       {/* Action Controls */}
       <ActionControls
         canProceed={state.originalRequest.length > 0}
-        currentStep={state.currentStep}
-        onStepChange={(step) => {
-          updateState({ currentStep: step });
-        }}
+        currentStep={currentStep as WorkflowStep}
+        onStepChange={handleStepChange}
       />
     </PageContent>
   );
