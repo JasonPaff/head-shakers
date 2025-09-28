@@ -42,7 +42,7 @@ interface StreamEventMessage {
   type: 'stream_event';
 }
 
-async function buildRefinementPrompt(originalRequest: string, settings: RefinementSettings): Promise<string> {
+async function buildRefinementPrompt(originalRequest: string, settings: RefinementSettings, agentVariant?: number): Promise<string> {
   // Read project context files
   let claudeMdContent = '';
   let packageJsonContent = '';
@@ -72,48 +72,89 @@ async function buildRefinementPrompt(originalRequest: string, settings: Refineme
     moderate: 'Include key technologies and integration points',
   };
 
+  // Different perspectives for variety in parallel agents
+  const agentPerspectives = [
+    {
+      considerations: 'Emphasize React components, form handling, state management, and user experience flows',
+      emphasis: 'Focus on UI/UX implementation aspects, component structure, and user interaction patterns',
+      role: 'Frontend-focused refinement specialist'
+    },
+    {
+      considerations: 'Emphasize server actions, database schema, validation, and business logic',
+      emphasis: 'Focus on server-side implementation, API design, and data persistence',
+      role: 'Backend-focused refinement specialist'
+    },
+    {
+      considerations: 'Emphasize how frontend and backend work together, authentication flows, and cross-cutting concerns',
+      emphasis: 'Focus on end-to-end data flow and system integration points',
+      role: 'Full-stack integration specialist'
+    },
+    {
+      considerations: 'Emphasize caching strategies, query optimization, lazy loading, and efficient data patterns',
+      emphasis: 'Focus on performance implications, optimization opportunities, and scalable architecture',
+      role: 'Performance and scalability specialist'
+    },
+    {
+      considerations: 'Emphasize authentication, authorization, input validation, and data privacy',
+      emphasis: 'Focus on security considerations, data protection, and compliance requirements',
+      role: 'Security and compliance specialist'
+    }
+  ];
+
+  const perspective = agentVariant !== undefined && agentVariant < agentPerspectives.length
+    ? agentPerspectives[agentVariant]!
+    : agentPerspectives[0]!;
+
   return `
-    You are a feature request refinement specialist. Your job is to take a user's feature request 
-    and add MINIMAL project context to make it clearer for subsequent analysis stages. 
+    You are a ${perspective.role}. Your job is to take a user's feature request
+    and add MINIMAL project context to make it clearer for subsequent analysis stages.
     Output ONLY the refined paragraph - no headers, sections, or analysis.
+
+    ## Your Perspective
+    ${perspective.emphasis}
+
+    ## Key Considerations for Your Refinement
+    ${perspective.considerations}
 
     ## Your Task
 
     Take the user's original feature request and refine it by:
-    
+
     1. Preserving the exact functionality requested - do not add features
     2. Mentioning key technologies that will be involved (from the project stack)
     3. Identifying which existing systems it will need to integrate with
     4. Keeping the scope exactly as the user specified
-    
+    5. **IMPORTANT**: Apply your specialist perspective to highlight relevant technical aspects
+
     ## Context Available
-    
+
     **User's Original Request:**
     ${originalRequest}
-    
+
     **Project Documentation (CLAUDE.MD):**
     ${settings.includeProjectContext ? claudeMdContent : 'Project context excluded by user preference'}
-    
+
     **Project Dependencies and Configuration (package.json):**
     ${settings.includeProjectContext ? packageJsonContent : 'Project context excluded by user preference'}
-    
+
     ## Refinement Guidelines
-    
+
     ### Style Instructions
     ${styleInstructions[settings.refinementStyle]}
-    
+
     ### Detail Level
     ${detailInstructions[settings.technicalDetailLevel]}
-    
+
     ### Length Constraint
     Maximum ${settings.maxOutputLength} words.
-    
-    ### What to ADD (sparingly):
-    - Core technology mentions (e.g., "using Next.js server actions")
-    - Essential integration points (e.g., "authenticated via Clerk")
-    - Database/ORM if data persistence is clearly needed
+
+    ### What to ADD (sparingly, with your perspective):
+    - Core technology mentions relevant to your specialization
+    - Essential integration points from your viewpoint
+    - Database/ORM considerations if data persistence is clearly needed
     - Validation approach if user input is involved
-    
+    - Security or performance considerations if relevant to your role
+
     ### What NOT to do:
     - DO NOT add features or functionality not requested
     - DO NOT specify implementation details (which icons, where buttons go, etc.)
@@ -121,13 +162,13 @@ async function buildRefinementPrompt(originalRequest: string, settings: Refineme
     - DO NOT add "nice to have" features like notifications, caching, etc.
     - DO NOT prescribe specific technical solutions when multiple options exist
     - DO NOT make it longer than necessary
-    
+
     ### Output Format
     **CRITICAL**: Output ONLY a single paragraph (maximum ${settings.maxOutputLength} words). Keep it concise and focused.
-    
-    Based on the user request and project context provided, generate a refined feature request that will help subsequent analysis stages better understand what needs to be implemented and how it should integrate with the existing codebase.
-    
-    **REMEMBER**: Output ONLY the refined paragraph. No headers, no "Refined Request:" prefix, no analysis - just the single paragraph refinement.`;
+
+    Based on the user request and project context provided, generate a refined feature request from your specialist perspective that will help subsequent analysis stages better understand what needs to be implemented and how it should integrate with the existing codebase.
+
+    **REMEMBER**: Output ONLY the refined paragraph. No headers, no "Refined Request:" prefix, no analysis - just the single paragraph refinement from your specialist viewpoint.`;
 }
 
 function isResultMessage(message: QueryMessage): message is ResultMessage {
@@ -160,20 +201,24 @@ export const parallelRefineFeatureRequestAction = publicActionClient
     });
 
     try {
-      const refinementPrompt = await buildRefinementPrompt(originalRequest, settings);
       const results: RefinementResult[] = [];
       const agentPromises: Promise<RefinementResult>[] = [];
 
       // Create parallel agent executions
       for (let i = 0; i < settings.agentCount; i++) {
         const agentId = `agent-${i + 1}-${Date.now()}`;
+        const agentVariant = i; // Pass the agent index to create different prompts
 
         agentPromises.push(
           (async (): Promise<RefinementResult> => {
             const agentStartTime = Date.now();
 
             try {
-              console.log(`[${agentId}] Starting refinement...`);
+              console.log(`[${agentId}] Starting refinement with variant ${agentVariant}...`);
+
+              // Build unique prompt for this agent
+              const refinementPrompt = await buildRefinementPrompt(originalRequest, settings, agentVariant);
+
               let refinedRequest = '';
               const abortController = new AbortController();
 
@@ -203,9 +248,9 @@ export const parallelRefineFeatureRequestAction = publicActionClient
 
                   // Handle assistant messages with complete text content
                   if (queryMessage.type === 'assistant') {
-                    const message = (queryMessage as any).message;
-                    if (message?.content && Array.isArray(message.content)) {
-                      for (const content of message.content) {
+                    const message = queryMessage as { message?: { content?: Array<{ text?: string; type: string; }> } };
+                    if (message.message?.content && Array.isArray(message.message.content)) {
+                      for (const content of message.message.content) {
                         if (content.type === 'text' && typeof content.text === 'string') {
                           refinedRequest += content.text;
                         }
@@ -383,32 +428,14 @@ Output only a single enhanced paragraph (100-250 words) that includes:
 - Implementation approach
 
 Enhanced request:`
-          : `You are a feature request refinement specialist working on the Head Shakers bobblehead collection platform. Your job is to take a user's feature request and add MINIMAL project context to make it clearer for subsequent analysis stages.
-
-## Project Context
-The Head Shakers platform is built with:
-- **Next.js 15.5.3** with App Router and TypeScript
-- **Authentication**: Clerk with themes support
-- **Database**: PostgreSQL with Neon serverless and Drizzle ORM
-- **UI**: Radix UI components with Tailwind CSS 4
-- **Forms**: TanStack React Form with Next-Safe-Action server actions
-- **Validation**: Zod schemas throughout the stack
-- **State**: TanStack Query for server state, Nuqs for URL state
-
-## Your Task
-Refine this user request by adding essential technical context while preserving the exact functionality requested:
-
-**Original Request:** ${originalRequest}
-
-## Refinement Guidelines
-- Preserve the exact functionality requested - do not add features
-- Mention relevant technologies from the project stack
-- Identify integration points with existing systems
-- Keep scope exactly as specified
-- Output ONLY a refined paragraph (100-250 words)
-- No headers, bullet points, or analysis - just the enhanced request
-
-Generate a refined feature request that helps subsequent analysis understand what needs to be implemented and how it integrates with the existing Head Shakers codebase.`;
+          : await buildRefinementPrompt(originalRequest, {
+              agentCount: 1,
+              agentTimeoutMs: 30000,
+              includeProjectContext: true,
+              maxOutputLength: 250,
+              refinementStyle: 'balanced',
+              technicalDetailLevel: 'moderate',
+            });
 
         let refinedRequest = '';
         const abortController = new AbortController();

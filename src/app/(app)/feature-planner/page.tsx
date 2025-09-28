@@ -129,11 +129,46 @@ export default function FeaturePlannerPage() {
           settings={state.settings}
         />
 
-        <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
-          {/* Left Panel - Step Content */}
+        {/* Conditional Layout: Full width when showing parallel results, two-column otherwise */}
+        {(() => {
+          const shouldShowFullWidthParallelResults = state.currentStep === 1 && state.parallelResults;
+          return shouldShowFullWidthParallelResults ? (
           <div className={'space-y-6'}>
-            {state.currentStep === 1 && (
-              <>
+            <RequestInput
+              isRefining={isRefining}
+              onChange={(value) => updateState({ originalRequest: value })}
+              onParallelRefineRequest={handleParallelRefineRequest}
+              onRefineRequest={handleRefineRequest}
+              onSkipToFileDiscovery={handleSkipToFileDiscovery}
+              onUseOriginalRequest={handleUseOriginalRequest}
+              onUseRefinedRequest={handleUseRefinedRequest}
+              refinedRequest={state.refinedRequest}
+              settings={state.settings}
+              value={state.originalRequest}
+            />
+
+            {/* Full Width Parallel Refinement Results */}
+            <RefinementComparison
+              onSelectRefinement={handleSelectRefinement}
+              onUseOriginal={handleUseOriginalFromComparison}
+              originalRequest={state.originalRequest}
+              results={state.parallelResults?.results || []}
+              selectedAgentId={state.selectedAgentId}
+            />
+
+            {/* Streaming Panel Below for Parallel Results */}
+            <StreamingPanel
+              currentStep={state.currentStep}
+              hasError={!!error}
+              isActive={isRefining}
+              progress={progress}
+            />
+          </div>
+        ) : (
+          <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
+            {/* Left Panel - Step Content */}
+            <div className={'space-y-6'}>
+              {state.currentStep === 1 && (
                 <RequestInput
                   isRefining={isRefining}
                   onChange={(value) => updateState({ originalRequest: value })}
@@ -146,45 +181,35 @@ export default function FeaturePlannerPage() {
                   settings={state.settings}
                   value={state.originalRequest}
                 />
+              )}
 
-                {/* Parallel Refinement Results */}
-                {state.parallelResults && (
-                  <RefinementComparison
-                    onSelectRefinement={handleSelectRefinement}
-                    onUseOriginal={handleUseOriginalFromComparison}
-                    originalRequest={state.originalRequest}
-                    results={state.parallelResults.results}
-                    selectedAgentId={state.selectedAgentId}
-                  />
-                )}
-              </>
-            )}
+              {state.currentStep === 2 && (
+                <div className={'rounded-lg border p-6'}>
+                  <h2 className={'mb-4 text-xl font-semibold'}>Step 2: File Discovery</h2>
+                  <p className={'text-muted-foreground'}>File discovery implementation coming in Phase 2</p>
+                </div>
+              )}
 
-            {state.currentStep === 2 && (
-              <div className={'rounded-lg border p-6'}>
-                <h2 className={'mb-4 text-xl font-semibold'}>Step 2: File Discovery</h2>
-                <p className={'text-muted-foreground'}>File discovery implementation coming in Phase 2</p>
-              </div>
-            )}
+              {state.currentStep === 3 && (
+                <div className={'rounded-lg border p-6'}>
+                  <h2 className={'mb-4 text-xl font-semibold'}>Step 3: Implementation Planning</h2>
+                  <p className={'text-muted-foreground'}>Implementation planning coming in Phase 2</p>
+                </div>
+              )}
+            </div>
 
-            {state.currentStep === 3 && (
-              <div className={'rounded-lg border p-6'}>
-                <h2 className={'mb-4 text-xl font-semibold'}>Step 3: Implementation Planning</h2>
-                <p className={'text-muted-foreground'}>Implementation planning coming in Phase 2</p>
-              </div>
-            )}
+            {/* Right Panel - Streaming Updates */}
+            <div>
+              <StreamingPanel
+                currentStep={state.currentStep}
+                hasError={!!error}
+                isActive={isRefining}
+                progress={progress}
+              />
+            </div>
           </div>
-
-          {/* Right Panel - Streaming Updates */}
-          <div>
-            <StreamingPanel
-              currentStep={state.currentStep}
-              hasError={!!error}
-              isActive={isRefining}
-              progress={progress}
-            />
-          </div>
-        </div>
+        );
+        })()}
       </div>
 
       {/* Action Controls */}

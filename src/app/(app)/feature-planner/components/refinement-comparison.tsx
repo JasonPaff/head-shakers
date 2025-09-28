@@ -87,6 +87,17 @@ export const RefinementComparison = ({
     return 'destructive';
   };
 
+  const getAgentTypeName = (index: number): string => {
+    const agentTypes = [
+      'Frontend',
+      'Backend',
+      'Full-stack',
+      'Performance',
+      'Security'
+    ];
+    return agentTypes[index] || `Agent ${index + 1}`;
+  };
+
   return (
     <div className={cn('space-y-6', className)} data-testid={comparisonTestId}>
       <Card>
@@ -131,9 +142,10 @@ export const RefinementComparison = ({
           <div className={'space-y-4'}>
             <Label className={'text-base font-medium'}>Choose the best refinement:</Label>
 
-            <div className={'space-y-3'}>
+            {/* Horizontal Layout for Refinements */}
+            <div className={'grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3'}>
               {/* Original Option */}
-              <Card className={cn('cursor-pointer transition-colors', {
+              <Card className={cn('h-fit cursor-pointer transition-colors', {
                 'border-primary ring-1 ring-primary': selectedAgentId === 'original',
               })} onClick={() => onSelectRefinement('original')}>
                 <CardContent className={'p-4'}>
@@ -141,10 +153,10 @@ export const RefinementComparison = ({
                     <Label className={'cursor-pointer font-medium'}>Original Request</Label>
                     <Badge variant={'outline'}>No processing</Badge>
                   </div>
-                  <p className={'mb-2 text-sm text-muted-foreground'}>
+                  <p className={'mb-2 text-xs text-muted-foreground'}>
                     Use the original request without any AI refinement.
                   </p>
-                  <div className={'rounded-md bg-muted p-3 text-sm'}>
+                  <div className={'min-h-[120px] overflow-auto rounded-md bg-muted p-3 text-sm'}>
                     {originalRequest}
                   </div>
                 </CardContent>
@@ -152,44 +164,45 @@ export const RefinementComparison = ({
 
               {/* Successful Results */}
               {successfulResults.map((result, index) => (
-                <Card className={cn('cursor-pointer transition-colors', {
-                  'border-primary ring-1 ring-primary': selectedAgentId === result.agentId || result === bestResult,
+                <Card className={cn('h-fit cursor-pointer transition-colors', {
+                  'border-primary ring-1 ring-primary': selectedAgentId === result.agentId,
+                  'border-yellow-500 ring-1 ring-yellow-500': result === bestResult && selectedAgentId !== result.agentId,
                 })} key={result.agentId} onClick={() => onSelectRefinement(result.agentId)}>
                   <CardContent className={'p-4'}>
                     <div className={'mb-2 flex items-center justify-between'}>
-                      <Label className={'cursor-pointer font-medium'}>
-                        Agent {index + 1}
+                      <Label className={'cursor-pointer text-sm font-medium'}>
+                        {getAgentTypeName(index)} ({index + 1})
                         <Conditional isCondition={result === bestResult}>
                           <TrophyIcon aria-hidden className={'ml-1 inline size-4 text-yellow-500'} />
                         </Conditional>
                       </Label>
-                      <div className={'flex gap-2'}>
-                        <Badge variant={getResultVariant(result)}>
+                      <div className={'flex gap-1'}>
+                        <Badge className={"px-1 py-0 text-xs"} variant={getResultVariant(result)}>
                           <CheckCircle2Icon aria-hidden className={'mr-1 size-3'} />
                           Success
                         </Badge>
                         <Conditional isCondition={result === bestResult}>
-                          <Badge variant={'default'}>Best Quality</Badge>
+                          <Badge className={"px-1 py-0 text-xs"} variant={'default'}>Best</Badge>
                         </Conditional>
                       </div>
                     </div>
 
                     {/* Metrics */}
-                    <div className={'mb-3 flex gap-3 text-xs'}>
-                      <Badge variant={'secondary'}>
-                        {result.wordCount} words
+                    <div className={'mb-3 flex flex-wrap gap-2 text-xs'}>
+                      <Badge className={"px-1 py-0 text-xs"} variant={'secondary'}>
+                        {result.wordCount}w
                       </Badge>
-                      <Badge variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}>
+                      <Badge className={"px-1 py-0 text-xs"} variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}>
                         <ClockIcon aria-hidden className={'mr-1 size-3'} />
                         {Math.round(result.executionTimeMs / 1000)}s
                       </Badge>
-                      <Badge variant={'outline'}>
-                        Score: {Math.round(getQualityScore(result))}
+                      <Badge className={"px-1 py-0 text-xs"} variant={'outline'}>
+                        {Math.round(getQualityScore(result))}
                       </Badge>
                     </div>
 
                     {/* Refined Content */}
-                    <div className={'rounded-md border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950'}>
+                    <div className={'min-h-[120px] overflow-auto rounded-md border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950'}>
                       {result.refinedRequest}
                     </div>
                   </CardContent>
@@ -198,26 +211,26 @@ export const RefinementComparison = ({
 
               {/* Failed Results */}
               {failedResults.map((result, index) => (
-                <Card className={'opacity-60'} key={result.agentId}>
+                <Card className={'h-fit opacity-60'} key={result.agentId}>
                   <CardContent className={'p-4'}>
                     <div className={'mb-2 flex items-center justify-between'}>
-                      <Label className={'font-medium text-muted-foreground'}>
-                        Agent {successfulResults.length + index + 1}
+                      <Label className={'text-sm font-medium text-muted-foreground'}>
+                        {getAgentTypeName(successfulResults.length + index)} ({successfulResults.length + index + 1})
                       </Label>
-                      <Badge variant={'destructive'}>
+                      <Badge className={"px-1 py-0 text-xs"} variant={'destructive'}>
                         <AlertCircleIcon aria-hidden className={'mr-1 size-3'} />
                         Failed
                       </Badge>
                     </div>
 
-                    <div className={'mb-3 flex gap-3 text-xs'}>
-                      <Badge variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}>
+                    <div className={'mb-3 flex gap-2 text-xs'}>
+                      <Badge className={"px-1 py-0 text-xs"} variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}>
                         <ClockIcon aria-hidden className={'mr-1 size-3'} />
                         {Math.round(result.executionTimeMs / 1000)}s
                       </Badge>
                     </div>
 
-                    <div className={'rounded-md border border-destructive bg-destructive/5 p-3 text-sm'}>
+                    <div className={'min-h-[120px] overflow-auto rounded-md border border-destructive bg-destructive/5 p-3 text-sm'}>
                       <span className={'font-medium text-destructive'}>Error:</span> {result.error}
                     </div>
                   </CardContent>
