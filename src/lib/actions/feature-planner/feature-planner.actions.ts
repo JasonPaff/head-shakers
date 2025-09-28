@@ -42,7 +42,11 @@ interface StreamEventMessage {
   type: 'stream_event';
 }
 
-async function buildRefinementPrompt(originalRequest: string, settings: RefinementSettings, agentVariant?: number): Promise<string> {
+async function buildRefinementPrompt(
+  originalRequest: string,
+  settings: RefinementSettings,
+  agentVariant?: number,
+): Promise<string> {
   // Read project context files
   let claudeMdContent = '';
   let packageJsonContent = '';
@@ -75,39 +79,45 @@ async function buildRefinementPrompt(originalRequest: string, settings: Refineme
   // Different perspectives for variety in parallel agents
   const agentPerspectives = [
     {
-      considerations: 'Provide balanced coverage of frontend components, backend logic, data flow, and integration points without overemphasizing any single aspect',
-      emphasis: 'Focus on creating a well-rounded refinement that considers both technical implementation and user experience in equal measure',
-      role: 'Balanced refinement specialist'
+      considerations:
+        'Provide balanced coverage of frontend components, backend logic, data flow, and integration points without overemphasizing any single aspect',
+      emphasis:
+        'Focus on creating a well-rounded refinement that considers both technical implementation and user experience in equal measure',
+      role: 'Balanced refinement specialist',
     },
     {
-      considerations: 'Emphasize React components, form handling, state management, and user experience flows',
+      considerations:
+        'Emphasize React components, form handling, state management, and user experience flows',
       emphasis: 'Focus on UI/UX implementation aspects, component structure, and user interaction patterns',
-      role: 'Frontend-focused refinement specialist'
+      role: 'Frontend-focused refinement specialist',
     },
     {
       considerations: 'Emphasize server actions, database schema, validation, and business logic',
       emphasis: 'Focus on server-side implementation, API design, and data persistence',
-      role: 'Backend-focused refinement specialist'
+      role: 'Backend-focused refinement specialist',
     },
     {
-      considerations: 'Emphasize how frontend and backend work together, authentication flows, and cross-cutting concerns',
+      considerations:
+        'Emphasize how frontend and backend work together, authentication flows, and cross-cutting concerns',
       emphasis: 'Focus on end-to-end data flow and system integration points',
-      role: 'Full-stack integration specialist'
+      role: 'Full-stack integration specialist',
     },
     {
-      considerations: 'Emphasize caching strategies, query optimization, lazy loading, and efficient data patterns',
+      considerations:
+        'Emphasize caching strategies, query optimization, lazy loading, and efficient data patterns',
       emphasis: 'Focus on performance implications, optimization opportunities, and scalable architecture',
-      role: 'Performance and scalability specialist'
+      role: 'Performance and scalability specialist',
     },
     {
       considerations: 'Emphasize authentication, authorization, input validation, and data privacy',
       emphasis: 'Focus on security considerations, data protection, and compliance requirements',
-      role: 'Security and compliance specialist'
-    }
+      role: 'Security and compliance specialist',
+    },
   ];
 
-  const perspective = agentVariant !== undefined && agentVariant < agentPerspectives.length
-    ? agentPerspectives[agentVariant]!
+  const perspective =
+    agentVariant !== undefined && agentVariant < agentPerspectives.length ?
+      agentPerspectives[agentVariant]!
     : agentPerspectives[0]!;
 
   return `
@@ -189,8 +199,8 @@ export const parallelRefineFeatureRequestAction = publicActionClient
     actionName: ACTION_NAMES.FEATURE_PLANNER.PARALLEL_REFINE_REQUEST,
   })
   .inputSchema(parallelRefinementRequestSchema)
-  .action(async ({ parsedInput }): Promise<ParallelRefinementResponse> => {
-    const { originalRequest, settings } = parsedInput;
+  .action(async ({ ctx, parsedInput }): Promise<ParallelRefinementResponse> => {
+    const { originalRequest, settings } = parallelRefinementRequestSchema.parse(ctx.sanitizedInput);
     const startTime = Date.now();
 
     Sentry.addBreadcrumb({
@@ -253,7 +263,9 @@ export const parallelRefineFeatureRequestAction = publicActionClient
 
                   // Handle assistant messages with complete text content
                   if (queryMessage.type === 'assistant') {
-                    const message = queryMessage as { message?: { content?: Array<{ text?: string; type: string; }> } };
+                    const message = queryMessage as {
+                      message?: { content?: Array<{ text?: string; type: string }> };
+                    };
                     if (message.message?.content && Array.isArray(message.message.content)) {
                       for (const content of message.message.content) {
                         if (content.type === 'text' && typeof content.text === 'string') {
@@ -391,8 +403,8 @@ export const refineFeatureRequestAction = publicActionClient
     actionName: ACTION_NAMES.FEATURE_PLANNER.REFINE_REQUEST,
   })
   .inputSchema(featureRefinementRequestSchema)
-  .action(async ({ parsedInput }): Promise<FeatureRefinementResponse> => {
-    const { options, originalRequest } = parsedInput;
+  .action(async ({ ctx, parsedInput }): Promise<FeatureRefinementResponse> => {
+    const { options, originalRequest } = featureRefinementRequestSchema.parse(ctx.sanitizedInput);
 
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
@@ -433,14 +445,18 @@ Output only a single enhanced paragraph (100-250 words) that includes:
 - Implementation approach
 
 Enhanced request:`
-          : await buildRefinementPrompt(originalRequest, {
-              agentCount: 1,
-              agentTimeoutMs: 30000,
-              includeProjectContext: true,
-              maxOutputLength: 250,
-              refinementStyle: 'balanced',
-              technicalDetailLevel: 'moderate',
-            }, 0); // Explicitly use the balanced perspective (agent 0)
+          : await buildRefinementPrompt(
+              originalRequest,
+              {
+                agentCount: 1,
+                agentTimeoutMs: 30000,
+                includeProjectContext: true,
+                maxOutputLength: 250,
+                refinementStyle: 'balanced',
+                technicalDetailLevel: 'moderate',
+              },
+              0,
+            ); // Explicitly use the balanced perspective (agent 0)
 
         let refinedRequest = '';
         const abortController = new AbortController();
