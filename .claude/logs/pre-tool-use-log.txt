@@ -1314,3 +1314,87 @@
 2025-09-28T16:12:29.104Z: Unknown command - No description
 2025-09-28T16:12:40.673Z: Unknown command - No description
 2025-09-28T16:12:45.700Z: Unknown command - No description
+2025-09-28T17:48:50.219Z: Unknown command - Refine feature request
+2025-09-28T18:05:44.241Z: Unknown command - Analyze favorites feature requirements
+2025-09-28T18:05:50.813Z: pwd - Get current working directory
+2025-09-28T18:05:56.021Z: Unknown command - No description
+2025-09-28T18:06:00.239Z: Unknown command - No description
+2025-09-28T18:06:06.879Z: Unknown command - No description
+2025-09-28T18:06:10.373Z: Unknown command - No description
+2025-09-28T18:06:14.836Z: Unknown command - No description
+2025-09-28T18:06:19.609Z: Unknown command - No description
+2025-09-28T18:06:23.659Z: Unknown command - No description
+2025-09-28T18:06:27.506Z: Unknown command - No description
+2025-09-28T18:06:31.758Z: Unknown command - No description
+2025-09-28T18:06:35.816Z: Unknown command - No description
+2025-09-28T18:06:40.216Z: Unknown command - No description
+2025-09-28T18:06:41.041Z: Unknown command - Discover relevant files for favorites feature
+2025-09-28T18:06:44.292Z: Unknown command - No description
+2025-09-28T18:06:46.266Z: find /c/Users/JasonPaff/dev/head-shakers -type f -name "*.ts" -o -name "*.tsx" | head -50 - Get initial overview of TypeScript files in the project
+2025-09-28T18:06:48.807Z: Unknown command - No description
+2025-09-28T18:06:51.158Z: find /c/Users/JasonPaff/dev/head-shakers/src -type f -name "*.ts" -o -name "*.tsx" | grep -E "(db|schema)" | head -20 - Find database and schema related files
+2025-09-28T18:07:00.279Z: ls -la /c/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/ - List all schema files
+2025-09-28T18:07:02.915Z: Unknown command - No description
+2025-09-28T18:07:07.527Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/social.schema.ts - Read social schema file contents
+2025-09-28T18:07:08.306Z: Unknown command - No description
+2025-09-28T18:07:13.147Z: Unknown command - No description
+2025-09-28T18:07:16.341Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/collections.schema.ts - Read collections schema file
+2025-09-28T18:07:17.468Z: Unknown command - No description
+2025-09-28T18:07:21.911Z: Unknown command - No description
+2025-09-28T18:07:23.666Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/bobbleheads.schema.ts - Read bobbleheads schema file
+2025-09-28T18:07:27.067Z: Unknown command - No description
+2025-09-28T18:07:29.630Z: find /c/Users/JasonPaff/dev/head-shakers/src -name "*constants*" -o -name "*enums*" | head -10 - Find constants and enums files
+2025-09-28T18:07:31.593Z: Unknown command - No description
+2025-09-28T18:07:33.958Z: ls -la /c/Users/JasonPaff/dev/head-shakers/src/lib/constants/ - List constants directory contents
+2025-09-28T18:07:35.944Z: Unknown command - No description
+2025-09-28T18:07:40.531Z: Unknown command - No description
+2025-09-28T18:07:42.246Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/constants/enums.ts - Read enums constants file
+2025-09-28T18:07:45.714Z: Unknown command - No description
+2025-09-28T18:07:48.387Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/actions -name "*.ts" | head -10 - Find action files
+2025-09-28T18:07:49.862Z: Unknown command - No description
+2025-09-28T18:07:53.074Z: Unknown command - No description
+2025-09-28T18:07:54.753Z: Unknown command - No description
+2025-09-28T18:08:00.655Z: Unknown command - No description
+2025-09-28T18:08:03.295Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/actions/social/social.actions.ts - Read social actions file
+2025-09-28T18:08:05.379Z: Unknown command - No description
+2025-09-28T18:08:08.698Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/facades -name "*social*" -o -name "*like*" - Find social facade files
+2025-09-28T18:08:10.575Z: Unknown command - No description
+2025-09-28T18:08:15.209Z: Unknown command - No description
+2025-09-28T18:08:16.457Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/facades/social/social.facade.ts - Read social facade file
+2025-09-28T18:08:21.075Z: find C:/Users/JasonPaff/dev/head-shakers/src -type f -name "*.tsx" -path "*/dashboard/*" | head -10 - Find dashboard-related TSX files
+2025-09-28T18:08:22.545Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/validations -name "*like*" -o -name "*social*" - Find validation schema files
+2025-09-28T18:08:27.604Z: Unknown command - No description
+2025-09-28T18:08:31.249Z: cat /c/Users/JasonPaff/dev/head-shakers/src/lib/validations/like.validation.ts - Read like validation file
+2025-09-28T18:08:33.880Z: Unknown command - No description
+2025-09-28T18:08:35.577Z: find /c/Users/JasonPaff/dev/head-shakers/src/components -name "*.tsx" | grep -E "(like|heart|favorite)" | head -10 - Find like-related component files
+2025-09-28T18:08:42.627Z: cat /c/Users/JasonPaff/dev/head-shakers/src/components/ui/like-button.tsx - Read like button component
+2025-09-28T18:08:47.881Z: find /c/Users/JasonPaff/dev/head-shakers -name "*use-like*" -o -name "*like*" | grep hook - Find like-related hooks
+2025-09-28T18:08:57.033Z: cat /c/Users/JasonPaff/dev/head-shakers/src/hooks/use-like.tsx - Read use-like hook
+2025-09-28T18:09:02.497Z: find /c/Users/JasonPaff/dev/head-shakers/src/components -type d | grep -E "(bobblehead|collection|feature)" | head -10 - Find component directories for features
+2025-09-28T18:09:06.753Z: ls -la /c/Users/JasonPaff/dev/head-shakers/src/components/feature/collections/ - List collection component files
+2025-09-28T18:09:10.628Z: ls -la /c/Users/JasonPaff/dev/head-shakers/src/components/feature/bobblehead/ - List bobblehead component files
+2025-09-28T18:09:15.055Z: ls -la /c/Users/JasonPaff/dev/head-shakers/src/components/feature/subcollections/ - List subcollection component files
+2025-09-28T18:09:23.649Z: cat /c/Users/JasonPaff/dev/head-shakers/src/components/feature/bobblehead/bobblehead-gallery-card.tsx - Read bobblehead gallery card component
+2025-09-28T18:09:31.131Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/queries -name "*.ts" | head -10 - Find query files
+2025-09-28T18:09:35.710Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/queries -name "*social*" - Find social query files
+2025-09-28T18:09:43.208Z: wc -l /c/Users/JasonPaff/dev/head-shakers/src/lib/queries/social/social.query.ts - Check file size of social query
+2025-09-28T18:09:50.984Z: head -100 /c/Users/JasonPaff/dev/head-shakers/src/lib/queries/social/social.query.ts - Read first 100 lines of social query
+2025-09-28T18:09:56.948Z: Unknown command - No description
+2025-09-28T18:10:02.393Z: Unknown command - No description
+2025-09-28T18:10:07.670Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/services -name "*.ts" - Find service files
+2025-09-28T18:10:13.815Z: Unknown command - No description
+2025-09-28T18:10:19.163Z: find /c/Users/JasonPaff/dev/head-shakers/src/lib/utils -name "*cache*" - Find cache utility files
+2025-09-28T18:10:26.652Z: Unknown command - No description
+2025-09-28T18:10:31.891Z: find /c/Users/JasonPaff/dev/head-shakers/src/app -name "page.tsx" | grep -E "(collection|bobblehead|user)" | head -10 - Find page files related to collections and bobbleheads
+2025-09-28T18:10:40.696Z: head -50 /c/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/relations.schema.ts - Read relations schema file
+2025-09-28T19:40:36.688Z: Unknown command - Refine favoriting feature request
+2025-09-28T19:51:52.471Z: Unknown command - Refine favoriting feature request
+2025-09-28T19:53:29.372Z: Unknown command - Refine favoriting feature request
+2025-09-28T19:55:14.124Z: Unknown command - Refine favorites feature request
+2025-09-28T20:00:39.500Z: Unknown command - Refine favoriting feature request
+2025-09-28T20:08:51.114Z: Unknown command - No description
+2025-09-28T20:09:11.215Z: Unknown command - No description
+2025-09-28T20:09:17.095Z: Unknown command - No description
+2025-09-28T20:09:35.553Z: Unknown command - No description
+2025-09-28T20:09:41.600Z: Unknown command - No description
+2025-09-28T20:20:50.159Z: Unknown command - Refine user favorites feature

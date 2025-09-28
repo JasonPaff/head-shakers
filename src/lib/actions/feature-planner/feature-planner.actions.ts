@@ -1,69 +1,56 @@
 'use server';
 
 import 'server-only';
-
-import type {
-  FeatureRefinementResponse,
-  ParallelRefinementResponse,
-} from '@/lib/validations/feature-planner.validation';
+import { query } from '@anthropic-ai/claude-code';
 
 import { ACTION_NAMES } from '@/lib/constants';
-import { publicActionClient } from '@/lib/utils/next-safe-action';
-import {
-  featureRefinementRequestSchema,
-  parallelRefinementRequestSchema,
-} from '@/lib/validations/feature-planner.validation';
+import { authActionClient } from '@/lib/utils/next-safe-action';
+import { parallelRefinementRequestSchema } from '@/lib/validations/feature-planner.validation';
 
-export const parallelRefineFeatureRequestAction = publicActionClient
+export const refineFeatureRequestAction = authActionClient
   .metadata({
     actionName: ACTION_NAMES.FEATURE_PLANNER.PARALLEL_REFINE_REQUEST,
   })
   .inputSchema(parallelRefinementRequestSchema)
-  .action(async ({ ctx }): Promise<ParallelRefinementResponse> => {
+  .action(async ({ ctx }) => {
     const { originalRequest, settings } = parallelRefinementRequestSchema.parse(ctx.sanitizedInput);
-    const startTime = Date.now();
 
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    let refinedRequest: string = '';
 
-    // Generate mock results for each agent
-    const results = Array.from({ length: settings.agentCount }, (_, i) => ({
-      agentId: `agent-${i + 1}-${Date.now()}`,
-      executionTimeMs: Math.floor(Math.random() * 3000) + 1000,
-      isSuccess: true,
-      refinedRequest: `${originalRequest} (This is a placeholder refinement from agent ${i + 1}. Real backend implementation needed.)`,
-      wordCount: originalRequest.split(/\s+/).length + 10,
-    }));
+    for await (const message of query({
+      options: {
+        abortController: new AbortController(),
+        allowedTools: ['Read'],
+        model: 'claude-sonnet-4-20250514',
+        permissionMode: 'bypassPermissions',
+      },
+      prompt: `Use the initial feature refinement agent to refine the following request: "${originalRequest}"
+          CRITICAL: Output ONLY the refined paragraph. No headers, no prefixes like "Refined Request:", 
+            no bullet points, no markdown formatting beyond the paragraph text. Just output the single 
+            refined paragraph that adds essential technical context from the Head Shakers project stack.`,
+    })) {
+      if (message.type === 'result' && message.subtype === 'success') {
+        console.log('Raw agent response:', message.result);
 
-    const executionTimeMs = Date.now() - startTime;
+        let cleaned = message.result.trim();
 
-    return {
-      executionTimeMs,
-      isSuccess: true,
-      results,
-      settings,
-      successCount: results.length,
-      totalAgents: settings.agentCount,
-    };
-  });
+        cleaned = cleaned
+          .replace(/^(Refined Request:|Here is the refined request:|The refined request is:)/i, '')
+          .trim();
 
-export const refineFeatureRequestAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.FEATURE_PLANNER.REFINE_REQUEST,
-  })
-  .inputSchema(featureRefinementRequestSchema)
-  .action(async ({ ctx }): Promise<FeatureRefinementResponse> => {
-    const { originalRequest } = featureRefinementRequestSchema.parse(ctx.sanitizedInput);
+        // remove any headers or Markdown formatting
+        cleaned = cleaned.replace(/^#+\s*/gm, '').trim();
+        // remove bullet points or numbered lists at the start
+        cleaned = cleaned.replace(/^[\-\*\d\.]\s*/gm, '').trim();
+        // take only the first paragraph if multiple paragraphs exist
+        const firstParagraph = cleaned.split('\n\n')[0] ?? '';
 
-    // Simulate processing delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // Return a simple placeholder refinement
-    const refinedRequest = `${originalRequest} (This is a placeholder refinement. Real backend implementation needed.)`;
+        refinedRequest = firstParagraph.trim();
+        console.log('Cleaned refined request:', refinedRequest);
+      }
+    }
 
     return {
-      isSuccess: true,
       refinedRequest,
-      retryCount: 0,
     };
   });

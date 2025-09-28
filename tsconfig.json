@@ -28,7 +28,7 @@
     ],
     "removeComments": true,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "strict": true,
     "strictNullChecks": true,
     "target": "ES2017"

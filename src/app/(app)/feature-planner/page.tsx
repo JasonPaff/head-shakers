@@ -13,8 +13,10 @@ import { RefinementSettings } from '@/app/(app)/feature-planner/components/refin
 import { RequestInput } from '@/app/(app)/feature-planner/components/request-input';
 import { StreamingPanel } from '@/app/(app)/feature-planner/components/streaming-panel';
 import { WorkflowProgress } from '@/app/(app)/feature-planner/components/workflow-progress';
-import { useFeatureRefinement } from '@/app/(app)/feature-planner/hooks/use-feature-refinement';
 import { PageContent } from '@/components/layout/page-content';
+import { Conditional } from '@/components/ui/conditional';
+import { useServerAction } from '@/hooks/use-server-action';
+import { refineFeatureRequestAction } from '@/lib/actions/feature-planner/feature-planner.actions';
 
 export interface FeaturePlannerState {
   currentStep: WorkflowStep;
@@ -38,39 +40,40 @@ export default function FeaturePlannerPage() {
     selectedAgentId: null,
     settings: {
       agentCount: 3,
-      agentTimeoutMs: 30000,
       includeProjectContext: true,
       maxOutputLength: 250,
-      refinementStyle: 'balanced',
-      technicalDetailLevel: 'moderate',
     },
   });
 
-  const { error, isRefining, parallelRefineFeatureRequest, progress, refineFeatureRequest } =
-    useFeatureRefinement();
+  const { executeAsync, isExecuting, result } = useServerAction(refineFeatureRequestAction, {
+    isDisableToast: true,
+    onSuccess: ({ data }) => {
+      updateState({
+        refinedRequest: data.refinedRequest,
+      });
+    },
+  });
 
   const updateState = (updates: Partial<FeaturePlannerState>) => {
     setState((prev) => ({ ...prev, ...updates }));
   };
 
   const handleRefineRequest = async () => {
-    const result = await refineFeatureRequest(state.originalRequest);
-
-    if (result.isSuccess) {
-      updateState({
-        refinedRequest: result.refinedRequest,
-      });
-    }
+    await executeAsync({
+      originalRequest: state.originalRequest,
+      settings: {
+        agentCount: 1,
+      },
+    });
   };
 
   const handleParallelRefineRequest = async () => {
-    const result = await parallelRefineFeatureRequest(state.originalRequest, state.settings);
-
-    if (result.isSuccess && result.response) {
-      updateState({
-        parallelResults: result.response,
-      });
-    }
+    await executeAsync({
+      originalRequest: state.originalRequest,
+      settings: {
+        agentCount: 5,
+      },
+    });
   };
 
   const handleSelectRefinement = (agentId: string) => {
@@ -143,8 +146,10 @@ export default function FeaturePlannerPage() {
         {shouldShowFullWidthParallelResults ?
           <div className={'space-y-6'}>
             <RequestInput
-              isRefining={isRefining}
-              onChange={(value) => updateState({ originalRequest: value })}
+              isRefining={isExecuting}
+              onChange={(value) => {
+                updateState({ originalRequest: value });
+              }}
               onParallelRefineRequest={handleParallelRefineRequest}
               onRefinedRequestChange={handleRefinedRequestChange}
               onRefineRequest={handleRefineRequest}
@@ -168,18 +173,21 @@ export default function FeaturePlannerPage() {
             {/* Streaming Panel */}
             <StreamingPanel
               currentStep={state.currentStep}
-              hasError={!!error}
-              isActive={isRefining}
-              progress={progress}
+              hasError={!!result.serverError}
+              isActive={isExecuting}
+              progress={[]}
             />
           </div>
         : <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
             {/* Left Panel - Step Content */}
             <div className={'space-y-6'}>
-              {state.currentStep === 1 && (
+              {/* Step 1 */}
+              <Conditional isCondition={state.currentStep === 1}>
                 <RequestInput
-                  isRefining={isRefining}
-                  onChange={(value) => updateState({ originalRequest: value })}
+                  isRefining={isExecuting}
+                  onChange={(value) => {
+                    updateState({ originalRequest: value });
+                  }}
                   onParallelRefineRequest={handleParallelRefineRequest}
                   onRefinedRequestChange={handleRefinedRequestChange}
                   onRefineRequest={handleRefineRequest}
@@ -190,30 +198,32 @@ export default function FeaturePlannerPage() {
                   settings={state.settings}
                   value={state.originalRequest}
                 />
-              )}
+              </Conditional>
 
-              {state.currentStep === 2 && (
+              {/* Step 2 */}
+              <Conditional isCondition={state.currentStep === 2}>
                 <div className={'rounded-lg border p-6'}>
                   <h2 className={'mb-4 text-xl font-semibold'}>Step 2: File Discovery</h2>
                   <p className={'text-muted-foreground'}>File discovery implementation coming in Phase 2</p>
                 </div>
-              )}
+              </Conditional>
 
-              {state.currentStep === 3 && (
+              {/* Step 3 */}
+              <Conditional isCondition={state.currentStep === 3}>
                 <div className={'rounded-lg border p-6'}>
                   <h2 className={'mb-4 text-xl font-semibold'}>Step 3: Implementation Planning</h2>
                   <p className={'text-muted-foreground'}>Implementation planning coming in Phase 2</p>
                 </div>
-              )}
+              </Conditional>
             </div>
 
             {/* Right Panel - Streaming Updates */}
             <div>
               <StreamingPanel
                 currentStep={state.currentStep}
-                hasError={!!error}
-                isActive={isRefining}
-                progress={progress}
+                hasError={!!result.serverError}
+                isActive={isExecuting}
+                progress={[]}
               />
             </div>
           </div>

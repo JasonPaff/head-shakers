@@ -123,18 +123,6 @@ export const StreamingPanel = ({
               </div>
             </Conditional>
           </div>
-
-          {/* Status Summary */}
-          <div className={'border-t pt-3 text-xs text-muted-foreground'}>
-            <Conditional isCondition={progress.length > 0}>
-              <p>
-                {progress.length} update{progress.length !== 1 ? 's' : ''} received
-              </p>
-            </Conditional>
-            <Conditional isCondition={isActive}>
-              <p>⚡ Streaming active - updates will appear in real-time</p>
-            </Conditional>
-          </div>
         </CardContent>
       </Card>
     </div>
