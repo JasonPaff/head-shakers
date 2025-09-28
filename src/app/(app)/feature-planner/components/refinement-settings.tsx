@@ -64,7 +64,7 @@ export const RefinementSettings = ({
         <PopoverContent align={'end'} className={'w-80'}>
           <div className={'space-y-4'}>
             <div>
-              <h4 className={'font-medium leading-none'}>Refinement Configuration</h4>
+              <h4 className={'leading-none font-medium'}>Refinement Configuration</h4>
               <p className={'text-sm text-muted-foreground'}>
                 Adjust settings for the refinement process
               </p>

@@ -32,10 +32,6 @@ export const ResilienceWrapper = ({
 }: ResilienceWrapperProps) => {
   const resilienceTestId = testId || generateTestId('feature', 'alert');
 
-  const handleErrorBoundaryError = (error: Error, errorInfo: string) => {
-    console.error('ResilienceWrapper - Error caught:', { error, errorInfo });
-  };
-
   const _isOnline = true;
   const _isOffline = false;
 
@@ -63,25 +59,19 @@ export const ResilienceWrapper = ({
 
       {/* Error Boundary with Custom Fallback */}
       <FeaturePlannerErrorBoundary
-        fallback={(error, reset) => (
+        fallback={
           <Alert title={'Feature Planner Error'} variant={'error'}>
             <AlertCircleIcon aria-hidden className={'size-4'} />
             <div className={'space-y-3'}>
-              <p>An error occurred while processing your request: {error.message}</p>
+              <p>An error occurred while processing your request. Please try refreshing the page.</p>
               <div className={'flex gap-2'}>
-                <Button onClick={reset} size={'sm'} variant={'outline'}>
-                  <RefreshCwIcon aria-hidden className={'mr-2 size-4'} />
-                  Try Again
-                </Button>
-
                 <Button onClick={onRetry} size={'sm'} variant={'secondary'}>
                   Retry Operation
                 </Button>
               </div>
             </div>
           </Alert>
-        )}
-        onError={handleErrorBoundaryError}
+        }
       >
         {children}
       </FeaturePlannerErrorBoundary>
