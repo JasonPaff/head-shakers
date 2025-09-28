@@ -56,6 +56,7 @@ The Feature Planner is a web-based application that provides an interactive inte
 **Discovery Interface:**
 - Streaming progress indicator showing AI analysis
 - Real-time file discovery results as they appear
+- Uses the existing file discovery agent
 - File categorization by priority (High/Medium/Low)
 - Interactive file list with checkboxes for removal
 - "Add File" button for manual additions
