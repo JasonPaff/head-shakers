@@ -2,7 +2,10 @@
 
 import { useState } from 'react';
 
-import type { ParallelRefinementResponse, RefinementSettings as RefinementSettingsType } from '@/lib/validations/feature-planner.validation';
+import type {
+  ParallelRefinementResponse,
+  RefinementSettings as RefinementSettingsType,
+} from '@/lib/validations/feature-planner.validation';
 
 import { ActionControls } from '@/app/(app)/feature-planner/components/action-controls';
 import { RefinementComparison } from '@/app/(app)/feature-planner/components/refinement-comparison';
@@ -43,7 +46,8 @@ export default function FeaturePlannerPage() {
     },
   });
 
-  const { error, isRefining, parallelRefineFeatureRequest, progress, refineFeatureRequest } = useFeatureRefinement();
+  const { error, isRefining, parallelRefineFeatureRequest, progress, refineFeatureRequest } =
+    useFeatureRefinement();
 
   const updateState = (updates: Partial<FeaturePlannerState>) => {
     setState((prev) => ({ ...prev, ...updates }));
@@ -110,6 +114,8 @@ export default function FeaturePlannerPage() {
     updateState({ isSettingsExpanded: !state.isSettingsExpanded });
   };
 
+  const shouldShowFullWidthParallelResults = state.currentStep === 1 && state.parallelResults;
+
   return (
     <PageContent>
       {/* Header */}
@@ -133,10 +139,8 @@ export default function FeaturePlannerPage() {
           settings={state.settings}
         />
 
-        {/* Conditional Layout: Full width when showing parallel results, two-column otherwise */}
-        {(() => {
-          const shouldShowFullWidthParallelResults = state.currentStep === 1 && state.parallelResults;
-          return shouldShowFullWidthParallelResults ? (
+        {/* Conditional Layout */}
+        {shouldShowFullWidthParallelResults ?
           <div className={'space-y-6'}>
             <RequestInput
               isRefining={isRefining}
@@ -152,7 +156,7 @@ export default function FeaturePlannerPage() {
               value={state.originalRequest}
             />
 
-            {/* Full Width Parallel Refinement Results */}
+            {/* Refinement Results */}
             <RefinementComparison
               onSelectRefinement={handleSelectRefinement}
               onUseOriginal={handleUseOriginalFromComparison}
@@ -161,7 +165,7 @@ export default function FeaturePlannerPage() {
               selectedAgentId={state.selectedAgentId}
             />
 
-            {/* Streaming Panel Below for Parallel Results */}
+            {/* Streaming Panel */}
             <StreamingPanel
               currentStep={state.currentStep}
               hasError={!!error}
@@ -169,8 +173,7 @@ export default function FeaturePlannerPage() {
               progress={progress}
             />
           </div>
-        ) : (
-          <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
+        : <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
             {/* Left Panel - Step Content */}
             <div className={'space-y-6'}>
               {state.currentStep === 1 && (
@@ -214,15 +217,16 @@ export default function FeaturePlannerPage() {
               />
             </div>
           </div>
-        );
-        })()}
+        }
       </div>
 
       {/* Action Controls */}
       <ActionControls
         canProceed={state.originalRequest.length > 0}
         currentStep={state.currentStep}
-        onStepChange={(step) => updateState({ currentStep: step })}
+        onStepChange={(step) => {
+          updateState({ currentStep: step });
+        }}
       />
     </PageContent>
   );

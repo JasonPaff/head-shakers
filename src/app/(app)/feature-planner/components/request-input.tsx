@@ -48,10 +48,11 @@ export const RequestInput = ({
   ...props
 }: RequestInputProps) => {
   const requestInputTestId = testId || generateTestId('feature', 'form');
-  const characterCount = value.length;
-  const isValidLength = characterCount >= 50 && characterCount <= 500;
+
   const canRefine = value.length > 0 && !isRefining;
   const canSkip = value.length > 0;
+  const characterCount = value.length;
+  const isValidLength = characterCount >= 50 && characterCount <= 500;
 
   return (
     <div className={cn('space-y-6', className)} data-testid={requestInputTestId} {...props}>

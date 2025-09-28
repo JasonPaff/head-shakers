@@ -1,6 +1,5 @@
 'use client';
 
-
 import { AlertCircleIcon, CheckCircle2Icon, ClockIcon, SparklesIcon, TrophyIcon } from 'lucide-react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -20,7 +19,7 @@ interface RefinementComparisonProps extends ComponentTestIdProps {
   onSelectRefinement: (agentId: string) => void;
   onUseOriginal: () => void;
   originalRequest: string;
-  results: RefinementResult[];
+  results: Array<RefinementResult>;
   selectedAgentId: null | string;
 }
 
@@ -41,7 +40,7 @@ export const RefinementComparison = ({
   const getBestResult = (): null | RefinementResult => {
     if (successfulResults.length === 0) return null;
 
-    // Sort by word count (closer to ideal range of 100-250 words gets higher score)
+    // sort by word count (closer to the ideal range of 100-250 words gets a higher score)
     return successfulResults.reduce((best, current) => {
       const currentScore = getQualityScore(current);
       const bestScore = getQualityScore(best);
@@ -54,7 +53,7 @@ export const RefinementComparison = ({
 
     let score = 100;
 
-    // Word count score (ideal range: 100-250 words)
+    // word count score (ideal range: 100-250 words)
     if (result.wordCount >= 100 && result.wordCount <= 250) {
       score += 50;
     } else if (result.wordCount < 100) {
@@ -63,11 +62,11 @@ export const RefinementComparison = ({
       score -= (result.wordCount - 250) * 0.3;
     }
 
-    // Execution time bonus (faster is better, but not too fast)
+    // execution time bonus (faster is better, but not too fast)
     if (result.executionTimeMs >= 5000 && result.executionTimeMs <= 20000) {
       score += 20;
     } else if (result.executionTimeMs < 5000) {
-      score -= 10; // Too fast might indicate poor quality
+      score -= 10; // too fast might indicate poor quality
     }
 
     return Math.max(0, score);
@@ -88,14 +87,7 @@ export const RefinementComparison = ({
   };
 
   const getAgentTypeName = (index: number): string => {
-    const agentTypes = [
-      'Balanced',
-      'Frontend',
-      'Backend',
-      'Full-stack',
-      'Performance',
-      'Security'
-    ];
+    const agentTypes = ['Balanced', 'Frontend', 'Backend', 'Full-stack', 'Performance', 'Security'];
     return agentTypes[index] || `Agent ${index + 1}`;
   };
 
@@ -121,17 +113,24 @@ export const RefinementComparison = ({
             </div>
             <div className={'text-center'}>
               <div className={'text-2xl font-bold'}>
-                {successfulResults.length > 0
-                  ? Math.round(successfulResults.reduce((sum, r) => sum + r.wordCount, 0) / successfulResults.length)
-                  : 0}
+                {successfulResults.length > 0 ?
+                  Math.round(
+                    successfulResults.reduce((sum, r) => sum + r.wordCount, 0) / successfulResults.length,
+                  )
+                : 0}
               </div>
               <div className={'text-sm text-muted-foreground'}>Avg Words</div>
             </div>
             <div className={'text-center'}>
               <div className={'text-2xl font-bold'}>
-                {successfulResults.length > 0
-                  ? Math.round(successfulResults.reduce((sum, r) => sum + r.executionTimeMs, 0) / successfulResults.length / 1000)
-                  : 0}s
+                {successfulResults.length > 0 ?
+                  Math.round(
+                    successfulResults.reduce((sum, r) => sum + r.executionTimeMs, 0) /
+                      successfulResults.length /
+                      1000,
+                  )
+                : 0}
+                s
               </div>
               <div className={'text-sm text-muted-foreground'}>Avg Time</div>
             </div>
@@ -146,9 +145,14 @@ export const RefinementComparison = ({
             {/* Horizontal Layout for Refinements */}
             <div className={'grid grid-cols-1 gap-4 xl:grid-cols-2 2xl:grid-cols-3'}>
               {/* Original Option */}
-              <Card className={cn('h-fit cursor-pointer transition-colors', {
-                'border-primary ring-1 ring-primary': selectedAgentId === 'original',
-              })} onClick={() => onSelectRefinement('original')}>
+              <Card
+                className={cn('h-fit cursor-pointer transition-colors', {
+                  'border-primary ring-1 ring-primary': selectedAgentId === 'original',
+                })}
+                onClick={() => {
+                  onSelectRefinement('original');
+                }}
+              >
                 <CardContent className={'p-4'}>
                   <div className={'mb-2 flex items-center justify-between'}>
                     <Label className={'cursor-pointer font-medium'}>Original Request</Label>
@@ -165,10 +169,17 @@ export const RefinementComparison = ({
 
               {/* Successful Results */}
               {successfulResults.map((result, index) => (
-                <Card className={cn('h-fit cursor-pointer transition-colors', {
-                  'border-primary ring-1 ring-primary': selectedAgentId === result.agentId,
-                  'border-yellow-500 ring-1 ring-yellow-500': result === bestResult && selectedAgentId !== result.agentId,
-                })} key={result.agentId} onClick={() => onSelectRefinement(result.agentId)}>
+                <Card
+                  className={cn('h-fit cursor-pointer transition-colors', {
+                    'border-primary ring-1 ring-primary': selectedAgentId === result.agentId,
+                    'border-yellow-500 ring-1 ring-yellow-500':
+                      result === bestResult && selectedAgentId !== result.agentId,
+                  })}
+                  key={result.agentId}
+                  onClick={() => {
+                    onSelectRefinement(result.agentId);
+                  }}
+                >
                   <CardContent className={'p-4'}>
                     <div className={'mb-2 flex items-center justify-between'}>
                       <Label className={'cursor-pointer text-sm font-medium'}>
@@ -178,32 +189,41 @@ export const RefinementComparison = ({
                         </Conditional>
                       </Label>
                       <div className={'flex gap-1'}>
-                        <Badge className={"px-1 py-0 text-xs"} variant={getResultVariant(result)}>
+                        <Badge className={'px-1 py-0 text-xs'} variant={getResultVariant(result)}>
                           <CheckCircle2Icon aria-hidden className={'mr-1 size-3'} />
                           Success
                         </Badge>
                         <Conditional isCondition={result === bestResult}>
-                          <Badge className={"px-1 py-0 text-xs"} variant={'default'}>Best</Badge>
+                          <Badge className={'px-1 py-0 text-xs'} variant={'default'}>
+                            Best
+                          </Badge>
                         </Conditional>
                       </div>
                     </div>
 
                     {/* Metrics */}
                     <div className={'mb-3 flex flex-wrap gap-2 text-xs'}>
-                      <Badge className={"px-1 py-0 text-xs"} variant={'secondary'}>
+                      <Badge className={'px-1 py-0 text-xs'} variant={'secondary'}>
                         {result.wordCount}w
                       </Badge>
-                      <Badge className={"px-1 py-0 text-xs"} variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}>
+                      <Badge
+                        className={'px-1 py-0 text-xs'}
+                        variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}
+                      >
                         <ClockIcon aria-hidden className={'mr-1 size-3'} />
                         {Math.round(result.executionTimeMs / 1000)}s
                       </Badge>
-                      <Badge className={"px-1 py-0 text-xs"} variant={'outline'}>
+                      <Badge className={'px-1 py-0 text-xs'} variant={'outline'}>
                         {Math.round(getQualityScore(result))}
                       </Badge>
                     </div>
 
                     {/* Refined Content */}
-                    <div className={'min-h-[120px] overflow-auto rounded-md border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950'}>
+                    <div
+                      className={
+                        'min-h-[120px] overflow-auto rounded-md border border-green-200 bg-green-50 p-3 text-sm dark:border-green-800 dark:bg-green-950'
+                      }
+                    >
                       {result.refinedRequest}
                     </div>
                   </CardContent>
@@ -216,22 +236,30 @@ export const RefinementComparison = ({
                   <CardContent className={'p-4'}>
                     <div className={'mb-2 flex items-center justify-between'}>
                       <Label className={'text-sm font-medium text-muted-foreground'}>
-                        {getAgentTypeName(successfulResults.length + index)} ({successfulResults.length + index + 1})
+                        {getAgentTypeName(successfulResults.length + index)} (
+                        {successfulResults.length + index + 1})
                       </Label>
-                      <Badge className={"px-1 py-0 text-xs"} variant={'destructive'}>
+                      <Badge className={'px-1 py-0 text-xs'} variant={'destructive'}>
                         <AlertCircleIcon aria-hidden className={'mr-1 size-3'} />
                         Failed
                       </Badge>
                     </div>
 
                     <div className={'mb-3 flex gap-2 text-xs'}>
-                      <Badge className={"px-1 py-0 text-xs"} variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}>
+                      <Badge
+                        className={'px-1 py-0 text-xs'}
+                        variant={getExecutionTimeBadgeVariant(result.executionTimeMs)}
+                      >
                         <ClockIcon aria-hidden className={'mr-1 size-3'} />
                         {Math.round(result.executionTimeMs / 1000)}s
                       </Badge>
                     </div>
 
-                    <div className={'min-h-[120px] overflow-auto rounded-md border border-destructive bg-destructive/5 p-3 text-sm'}>
+                    <div
+                      className={
+                        'min-h-[120px] overflow-auto rounded-md border border-destructive bg-destructive/5 p-3 text-sm'
+                      }
+                    >
                       <span className={'font-medium text-destructive'}>Error:</span> {result.error}
                     </div>
                   </CardContent>
