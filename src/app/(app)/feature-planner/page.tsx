@@ -1,7 +1,9 @@
 'use client';
 
+import { Realtime } from 'ably';
+import { AblyProvider } from 'ably/react';
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { ProgressEntry } from '@/app/(app)/feature-planner/types/streaming';
 import type {
@@ -35,9 +37,6 @@ export interface FeaturePlannerState {
   stepData: StepData;
 }
 
-/**
- * Enhanced feature planner with URL state management and modular step architecture
- */
 export default function FeaturePlannerPage() {
   const [currentStep, setCurrentStep] = useQueryState(
     'step',
@@ -47,6 +46,13 @@ export default function FeaturePlannerPage() {
     'agent',
     parseAsString.withOptions({ history: 'push' }),
   );
+
+  const sessionId = useMemo(
+    () => `feature-planner-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`,
+    [],
+  );
+
+  const ablyClient = useMemo(() => new Realtime({ key: process.env.NEXT_PUBLIC_ABLY_API_KEY || '' }), []);
 
   const [state, setState] = useState<FeaturePlannerState>({
     originalRequest: '',
@@ -76,20 +82,14 @@ export default function FeaturePlannerPage() {
     },
   });
 
-  /**
-   * Updates local state with partial updates
-   */
   const updateState = useCallback((updates: Partial<FeaturePlannerState>) => {
     setState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  /**
-   * Adds a progress entry to the stream
-   */
   const addProgressEntry = useCallback((entry: Omit<ProgressEntry, 'id' | 'timestamp'>) => {
     const newEntry: ProgressEntry = {
       ...entry,
-      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
       timestamp: new Date(),
     };
 
@@ -99,9 +99,6 @@ export default function FeaturePlannerPage() {
     }));
   }, []);
 
-  /**
-   * Clears progress entries
-   */
   const clearProgress = useCallback(() => {
     setState((prev) => ({ ...prev, progress: [] }));
   }, []);
@@ -163,13 +160,8 @@ export default function FeaturePlannerPage() {
     addProgressEntry,
   ]);
 
-  /**
-   * Handles retry operations from resilience wrapper
-   */
   const handleRetryOperation = useCallback(() => {
-    if (isExecuting) {
-      return; // Don't retry if already executing
-    }
+    if (isExecuting) return;
 
     addProgressEntry({
       message: 'Retrying refinement operation...',
@@ -179,9 +171,6 @@ export default function FeaturePlannerPage() {
     void handleParallelRefineRequest();
   }, [isExecuting, addProgressEntry, handleParallelRefineRequest]);
 
-  /**
-   * Handles agent selection with URL state sync
-   */
   const handleSelectRefinement = useCallback(
     (agentId: string) => {
       const selectedResult = state.parallelResults?.results.find((r) => r.agentId === agentId);
@@ -220,9 +209,6 @@ export default function FeaturePlannerPage() {
     void setSelectedAgentId('original');
   }, [state.originalRequest, state.stepData, state.parallelResults, updateState, setSelectedAgentId]);
 
-  /**
-   * Handles step navigation with validation
-   */
   const handleStepChange = useCallback(
     (step: WorkflowStep) => {
       // validate step transition
@@ -265,75 +251,33 @@ export default function FeaturePlannerPage() {
     [updateState],
   );
 
-
   const shouldShowFullWidthParallelResults = currentStep === 1 && state.parallelResults;
 
   return (
-    <PageContent>
-      {/* Header */}
-      <div className={'mb-8'}>
-        <h1 className={'text-3xl font-bold'}>Feature Planner</h1>
-        <p className={'mt-2 text-muted-foreground'}>
-          Interactive web interface for the sophisticated 3-step feature planning orchestration system
-        </p>
-      </div>
+    <AblyProvider client={ablyClient}>
+      <PageContent>
+        {/* Header */}
+        <div className={'mb-8'}>
+          <h1 className={'text-3xl font-bold'}>Feature Planner</h1>
+          <p className={'mt-2 text-muted-foreground'}>
+            Interactive web interface for the sophisticated 3-step feature planning orchestration system
+          </p>
+        </div>
 
-      {/* Progress Indicator */}
-      <WorkflowProgress currentStep={currentStep as WorkflowStep} />
+        {/* Progress Indicator */}
+        <WorkflowProgress currentStep={currentStep as WorkflowStep} />
 
-      {/* Resilience Wrapper for Error Boundaries and Connection Monitoring */}
-      <ResilienceWrapper onRetry={handleRetryOperation}>
-        {/* Main Content Area */}
-        <div className={'mt-8 space-y-8'}>
-          {/* Settings Panel */}
-          <RefinementSettings
-            onSettingsChange={handleSettingsChange}
-            settings={state.settings}
-          />
+        {/* Resilience Wrapper for Error Boundaries and Connection Monitoring */}
+        <ResilienceWrapper onRetry={handleRetryOperation}>
+          {/* Main Content Area */}
+          <div className={'mt-8 space-y-8'}>
+            {/* Settings Panel */}
+            <RefinementSettings onSettingsChange={handleSettingsChange} settings={state.settings} />
 
-          {/* Conditional Layout */}
-          {shouldShowFullWidthParallelResults ?
-            <div className={'space-y-6'}>
-              <RequestInput
-                isRefining={isExecuting}
-                onChange={(value) => {
-                  updateState({ originalRequest: value });
-                }}
-                onParallelRefineRequest={handleParallelRefineRequest}
-                onRefinedRequestChange={handleRefinedRequestChange}
-                onRefineRequest={handleRefineRequest}
-                onSkipToFileDiscovery={handleSkipToFileDiscovery}
-                onUseOriginalRequest={handleUseOriginalRequest}
-                onUseRefinedRequest={handleUseRefinedRequest}
-                refinedRequest={state.refinedRequest}
-                settings={state.settings}
-                value={state.originalRequest}
-              />
-
-              {/* Refinement Results */}
-              <Conditional isCondition={!!state.parallelResults}>
-                <RefinementComparison
-                  onSelectRefinement={handleSelectRefinement}
-                  onUseOriginal={handleUseOriginalFromComparison}
-                  originalRequest={state.originalRequest}
-                  results={state.parallelResults?.results || []}
-                  selectedAgentId={selectedAgentId}
-                />
-              </Conditional>
-
-              {/* Streaming Panel */}
-              <StreamingPanel
-                currentStep={currentStep as WorkflowStep}
-                hasError={!!result.serverError}
-                isActive={isExecuting}
-                progress={state.progress}
-              />
-            </div>
-          : <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
-              {/* Left Panel - Step Content */}
+            {/* Conditional Layout */}
+            {shouldShowFullWidthParallelResults ?
               <div className={'space-y-6'}>
-                <StepOrchestrator
-                  currentStep={currentStep as WorkflowStep}
+                <RequestInput
                   isRefining={isExecuting}
                   onChange={(value) => {
                     updateState({ originalRequest: value });
@@ -346,31 +290,73 @@ export default function FeaturePlannerPage() {
                   onUseRefinedRequest={handleUseRefinedRequest}
                   refinedRequest={state.refinedRequest}
                   settings={state.settings}
-                  stepData={state.stepData}
                   value={state.originalRequest}
                 />
-              </div>
 
-              {/* Right Panel - Streaming Updates */}
-              <div>
+                {/* Refinement Results */}
+                <Conditional isCondition={!!state.parallelResults}>
+                  <RefinementComparison
+                    onSelectRefinement={handleSelectRefinement}
+                    onUseOriginal={handleUseOriginalFromComparison}
+                    originalRequest={state.originalRequest}
+                    results={state.parallelResults?.results || []}
+                    selectedAgentId={selectedAgentId}
+                  />
+                </Conditional>
+
+                {/* Streaming Panel */}
                 <StreamingPanel
                   currentStep={currentStep as WorkflowStep}
                   hasError={!!result.serverError}
                   isActive={isExecuting}
                   progress={state.progress}
+                  sessionId={sessionId}
                 />
               </div>
-            </div>
-          }
-        </div>
+            : <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
+                {/* Left Panel - Step Content */}
+                <div className={'space-y-6'}>
+                  <StepOrchestrator
+                    currentStep={currentStep as WorkflowStep}
+                    isRefining={isExecuting}
+                    onChange={(value) => {
+                      updateState({ originalRequest: value });
+                    }}
+                    onParallelRefineRequest={handleParallelRefineRequest}
+                    onRefinedRequestChange={handleRefinedRequestChange}
+                    onRefineRequest={handleRefineRequest}
+                    onSkipToFileDiscovery={handleSkipToFileDiscovery}
+                    onUseOriginalRequest={handleUseOriginalRequest}
+                    onUseRefinedRequest={handleUseRefinedRequest}
+                    refinedRequest={state.refinedRequest}
+                    settings={state.settings}
+                    stepData={state.stepData}
+                    value={state.originalRequest}
+                  />
+                </div>
 
-        {/* Action Controls */}
-        <ActionControls
-          canProceed={state.originalRequest.length > 0}
-          currentStep={currentStep as WorkflowStep}
-          onStepChange={handleStepChange}
-        />
-      </ResilienceWrapper>
-    </PageContent>
+                {/* Right Panel - Streaming Updates */}
+                <div>
+                  <StreamingPanel
+                    currentStep={currentStep as WorkflowStep}
+                    hasError={!!result.serverError}
+                    isActive={isExecuting}
+                    progress={state.progress}
+                    sessionId={sessionId}
+                  />
+                </div>
+              </div>
+            }
+          </div>
+
+          {/* Action Controls */}
+          <ActionControls
+            canProceed={state.originalRequest.length > 0}
+            currentStep={currentStep as WorkflowStep}
+            onStepChange={handleStepChange}
+          />
+        </ResilienceWrapper>
+      </PageContent>
+    </AblyProvider>
   );
 }

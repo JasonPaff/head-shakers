@@ -1,9 +1,8 @@
 'use client';
 
-import type { Message } from 'ably';
-import type { ChannelResult } from 'ably/react';
+import type { Message, RealtimeChannel } from 'ably';
 
-import { useChannel, useConnectionStateListener } from 'ably/react';
+import { useAbly, useConnectionStateListener } from 'ably/react';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { AblyRefinementMessage, RealTimeProgressEntry } from '../types/streaming';
@@ -17,7 +16,7 @@ interface UseAblyRefinementOptions {
 }
 
 interface UseAblyRefinementReturn {
-  channel: ChannelResult['channel'];
+  channel: null | RealtimeChannel;
   clearMessages: () => void;
   connectionStatus: AblyChannelStatus;
   error: Error | null;
@@ -42,7 +41,9 @@ export function useAblyRefinement({
   const [messages, setMessages] = useState<Array<RealTimeProgressEntry>>([]);
   const [connectionStatus, setConnectionStatus] = useState<AblyChannelStatus>(AblyChannelStatus.CONNECTING);
   const [error, setError] = useState<Error | null>(null);
+  const [channel, setChannel] = useState<null | RealtimeChannel>(null);
 
+  const ably = useAbly();
   const channelName = `feature-planner:${sessionId}`;
 
   useConnectionStateListener('connected', () => {
@@ -71,37 +72,57 @@ export function useAblyRefinement({
     setConnectionStatus(AblyChannelStatus.CLOSED);
   });
 
-  const { channel } = useChannel(channelName, 'refinement-update', (message: Message) => {
-    try {
-      const ablyMessage = message.data as AblyRefinementMessage;
+  useEffect(() => {
+    if (!ably) return;
 
-      // convert the Ably message to RealTimeProgressEntry
-      const progressEntry: RealTimeProgressEntry = {
-        agentId: ablyMessage.agentId,
-        id: ablyMessage.messageId,
-        message: ablyMessage.content,
-        messageId: ablyMessage.messageId,
-        metadata: ablyMessage.metadata,
-        sessionId: ablyMessage.sessionId,
-        stage: ablyMessage.stage,
-        timestamp: new Date(ablyMessage.timestamp),
-        type:
-          ablyMessage.stage === AgentThinkingStage.ERROR ? 'error'
-          : ablyMessage.stage === AgentThinkingStage.COMPLETED ? 'success'
-          : 'info',
-      };
+    const ablyChannel = ably.channels.get(channelName);
+    setChannel(ablyChannel);
 
-      setMessages((prev) => [...prev, progressEntry]);
-      onMessage?.(progressEntry);
-    } catch (err) {
-      const parseError = err instanceof Error ? err : new Error('Failed to parse message');
-      setError(parseError);
-      onError?.(parseError);
-    }
-  });
+    const messageListener = (message: Message) => {
+      try {
+        const ablyMessage = message.data as AblyRefinementMessage;
+
+        // convert the Ably message to RealTimeProgressEntry
+        const progressEntry: RealTimeProgressEntry = {
+          agentId: ablyMessage.agentId,
+          id: ablyMessage.messageId,
+          message: ablyMessage.content,
+          messageId: ablyMessage.messageId,
+          metadata: ablyMessage.metadata,
+          sessionId: ablyMessage.sessionId,
+          stage: ablyMessage.stage,
+          timestamp: new Date(ablyMessage.timestamp),
+          type:
+            ablyMessage.stage === AgentThinkingStage.ERROR ? 'error'
+            : ablyMessage.stage === AgentThinkingStage.COMPLETED ? 'success'
+            : 'info',
+        };
+
+        setMessages((prev) => [...prev, progressEntry]);
+        onMessage?.(progressEntry);
+      } catch (err) {
+        const parseError = err instanceof Error ? err : new Error('Failed to parse message');
+        setError(parseError);
+        onError?.(parseError);
+      }
+    };
+
+    void ablyChannel.subscribe('refinement-update', messageListener);
+
+    return () => {
+      ablyChannel.unsubscribe('refinement-update', messageListener);
+    };
+  }, [ably, channelName, onMessage, onError]);
 
   const publishMessage = useCallback(
     async (content: string, stage: AgentThinkingStage, metadata?: Record<string, unknown>): Promise<void> => {
+      if (!channel) {
+        const channelError = new Error('Channel not available for publishing');
+        setError(channelError);
+        onError?.(channelError);
+        throw channelError;
+      }
+
       try {
         const message: AblyRefinementMessage = {
           agentId: 'feature-planner-agent',
