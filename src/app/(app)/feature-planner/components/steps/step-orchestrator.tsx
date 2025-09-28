@@ -65,11 +65,7 @@ export const StepOrchestrator = ({
 }: StepOrchestratorProps) => {
   const orchestratorTestId = testId || generateTestId('feature', 'form');
 
-  // Real-time progress coordination using Ably
-  const {
-    connectionStatus,
-    error: ablyError,
-  } = useAblyRefinement({
+  const { connectionStatus, error: ablyError } = useAblyRefinement({
     onError: (error) => {
       console.error('Ably connection error in step orchestrator:', error);
     },
@@ -77,9 +73,8 @@ export const StepOrchestrator = ({
     sessionId,
   });
 
-  // Enhanced error boundaries that include Ably connection failures
-  const hasRealTimeError = ablyError !== null;
-  const realTimeStatus = connectionStatus;
+  const _hasRealTimeError = ablyError !== null;
+  const _realTimeStatus = connectionStatus;
 
   return (
     <div className={cn('space-y-6', className)} data-testid={orchestratorTestId} {...props}>
@@ -87,27 +82,27 @@ export const StepOrchestrator = ({
       <Conditional isCondition={currentStep === 1}>
         <FeaturePlannerErrorBoundary
           fallback={
-            hasRealTimeError ? (
-              <div className={"rounded-lg border border-destructive bg-destructive/10 p-4"}>
-                <div className={"flex items-center gap-2 font-medium text-destructive"}>
+            _hasRealTimeError ?
+              <div className={'rounded-lg border border-destructive bg-destructive/10 p-4'}>
+                <div className={'flex items-center gap-2 font-medium text-destructive'}>
                   <span>Real-time connection failed</span>
-                  <span className={"text-sm"}>({realTimeStatus})</span>
+                  <span className={'text-sm'}>({_realTimeStatus})</span>
                 </div>
-                <p className={"mt-1 text-sm text-muted-foreground"}>
+                <p className={'mt-1 text-sm text-muted-foreground'}>
                   Refinement will continue in offline mode. Real-time updates are unavailable.
                 </p>
                 {ablyError && (
-                  <details className={"mt-2 text-xs"}>
-                    <summary className={"cursor-pointer"}>Error details</summary>
-                    <pre className={"mt-1 rounded bg-muted p-2 text-xs whitespace-pre-wrap"}>
+                  <details className={'mt-2 text-xs'}>
+                    <summary className={'cursor-pointer'}>Error details</summary>
+                    <pre className={'mt-1 rounded bg-muted p-2 text-xs whitespace-pre-wrap'}>
                       {ablyError.message}
                     </pre>
                   </details>
                 )}
               </div>
-            ) : undefined
+            : undefined
           }
-          section={"Step 1 - Real-time Refinement"}
+          section={'Step 1 - Real-time Refinement'}
         >
           <StepOne
             isRefining={isRefining}
@@ -130,7 +125,7 @@ export const StepOrchestrator = ({
 
       {/* Step 2: File Discovery */}
       <Conditional isCondition={currentStep === 2}>
-        <FeaturePlannerErrorBoundary section={"Step 2 - File Discovery"}>
+        <FeaturePlannerErrorBoundary section={'Step 2 - File Discovery'}>
           <StepTwo
             discoveredFiles={stepData.step2?.discoveredFiles}
             selectedFiles={stepData.step2?.selectedFiles}
@@ -140,7 +135,7 @@ export const StepOrchestrator = ({
 
       {/* Step 3: Implementation Planning */}
       <Conditional isCondition={currentStep === 3}>
-        <FeaturePlannerErrorBoundary section={"Step 3 - Implementation Planning"}>
+        <FeaturePlannerErrorBoundary section={'Step 3 - Implementation Planning'}>
           <StepThree
             implementationPlan={stepData.step3?.implementationPlan}
             validationCommands={stepData.step3?.validationCommands}
