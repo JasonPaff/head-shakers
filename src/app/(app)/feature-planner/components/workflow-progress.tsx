@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 
 import { CheckIcon } from 'lucide-react';
 
-import type { WorkflowStep } from '@/app/(app)/feature-planner/page';
+import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Conditional } from '@/components/ui/conditional';

@@ -49,7 +49,6 @@ interface AgentExecutionResult {
   wordCount: number;
 }
 
-
 /**
  * Executes a single agent with retry logic and enhanced error handling
  * @param originalRequest - The user's original feature request
@@ -60,7 +59,7 @@ interface AgentExecutionResult {
 async function executeAgentWithRetry(
   originalRequest: string,
   agentId: string,
-  config: AgentConfig = DEFAULT_AGENT_CONFIG
+  config: AgentConfig = DEFAULT_AGENT_CONFIG,
 ): Promise<AgentExecutionResult> {
   const agentStartTime = Date.now();
   let lastError: Error | null = null;
@@ -101,6 +100,8 @@ async function executeAgentWithRetry(
 
             Agent ID: ${agentId} - Provide a unique perspective while maintaining consistency with the project context.`,
         })) {
+          console.log(`${agentId} message:`, message.type, message);
+
           if (message.type === 'result' && message.subtype === 'success') {
             console.log(`Agent ${agentId} attempt ${attempt + 1} raw response:`, message.result);
             refinedRequest = validateAndCleanResponse(message.result, agentId);
@@ -163,7 +164,7 @@ async function executeAgentWithRetry(
 
       // Wait before retrying (exponential backoff)
       const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000);
-      await new Promise(resolve => setTimeout(resolve, backoffMs));
+      await new Promise((resolve) => setTimeout(resolve, backoffMs));
     }
   }
 
@@ -313,7 +314,7 @@ export const refineFeatureRequestAction = authActionClient
         Array.from({ length: settings.agentCount }, (_, index) => {
           const agentId = `agent-${index + 1}`;
           return executeAgentWithRetry(originalRequest, agentId, DEFAULT_AGENT_CONFIG);
-        })
+        }),
       );
 
       // Process results with enhanced error information
@@ -358,8 +359,8 @@ export const refineFeatureRequestAction = authActionClient
       if (successCount === 0) {
         // Collect all error messages for debugging
         const errors = processedResults
-          .filter(r => !r.isSuccess && r.error)
-          .map(r => `${r.agentId}: ${r.error}`)
+          .filter((r) => !r.isSuccess && r.error)
+          .map((r) => `${r.agentId}: ${r.error}`)
           .join('; ');
 
         throw new ActionError(

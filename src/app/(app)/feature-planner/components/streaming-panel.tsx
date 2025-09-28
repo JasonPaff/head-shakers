@@ -4,7 +4,8 @@ import type { ComponentProps } from 'react';
 
 import { ActivityIcon, AlertCircleIcon, CheckCircle2Icon, ClockIcon } from 'lucide-react';
 
-import type { WorkflowStep } from '@/app/(app)/feature-planner/page';
+import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
+import type { ProgressEntry } from '@/app/(app)/feature-planner/types/streaming';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Loader } from '@/components/ui/ai-elements/loader';
@@ -18,14 +19,14 @@ interface StreamingPanelProps extends ComponentProps<'div'>, ComponentTestIdProp
   currentStep: WorkflowStep;
   hasError: boolean;
   isActive: boolean;
-  progress: Array<string>;
+  progress: Array<ProgressEntry>;
 }
 
-const stepTitles = {
+const stepTitles: Record<WorkflowStep, string> = {
   1: 'Feature Refinement',
   2: 'File Discovery',
   3: 'Implementation Planning',
-} as const;
+};
 
 export const StreamingPanel = ({
   className,
@@ -95,21 +96,28 @@ export const StreamingPanel = ({
               </div>
             </Conditional>
 
-            {progress.map((message, index) => (
+            {progress.map((entry) => (
               <div
-                className={cn('rounded-md p-3 text-sm', 'border-l-2 border-l-primary bg-muted', {
-                  'border-l-destructive bg-destructive/5': message.toLowerCase().includes('error'),
-                  'border-l-green-500 bg-green-50 dark:bg-green-950': message
-                    .toLowerCase()
-                    .includes('complete'),
+                className={cn('rounded-md p-3 text-sm', 'border-l-2', {
+                  'border-l-destructive bg-destructive/5': entry.type === 'error',
+                  'border-l-green-500 bg-green-50 dark:bg-green-950': entry.type === 'success',
+                  'border-l-orange-500 bg-orange-50 dark:bg-orange-950': entry.type === 'warning',
+                  'border-l-primary bg-muted': entry.type === 'info',
                 })}
-                key={index}
+                key={entry.id}
               >
                 <div className={'flex items-start gap-2'}>
                   <span className={'mt-0.5 font-mono text-xs text-muted-foreground'}>
-                    {new Date().toLocaleTimeString()}
+                    {entry.timestamp.toLocaleTimeString()}
                   </span>
-                  <span className={'flex-1'}>{message}</span>
+                  <div className={'flex-1'}>
+                    <Conditional isCondition={!!entry.agentId}>
+                      <Badge className={'mb-1 text-xs'} variant={'outline'}>
+                        {entry.agentId}
+                      </Badge>
+                    </Conditional>
+                    <span>{entry.message}</span>
+                  </div>
                 </div>
               </div>
             ))}

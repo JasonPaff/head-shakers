@@ -3,6 +3,7 @@
 import { parseAsInteger, parseAsString, useQueryState } from 'nuqs';
 import { useCallback, useState } from 'react';
 
+import type { ProgressEntry } from '@/app/(app)/feature-planner/types/streaming';
 import type {
   ParallelRefinementResponse,
   RefinementSettings as RefinementSettingsType,
@@ -13,6 +14,11 @@ import { ActionControls } from '@/app/(app)/feature-planner/components/action-co
 import { RefinementComparison } from '@/app/(app)/feature-planner/components/refinement-comparison';
 import { RefinementSettings } from '@/app/(app)/feature-planner/components/refinement-settings';
 import { RequestInput } from '@/app/(app)/feature-planner/components/request-input';
+import { ResilienceWrapper } from '@/app/(app)/feature-planner/components/resilience-wrapper';
+import {
+  StepOrchestrator,
+  type WorkflowStep,
+} from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
 import { StreamingPanel } from '@/app/(app)/feature-planner/components/streaming-panel';
 import { WorkflowProgress } from '@/app/(app)/feature-planner/components/workflow-progress';
 import { PageContent } from '@/components/layout/page-content';
@@ -24,32 +30,30 @@ export interface FeaturePlannerState {
   isSettingsExpanded: boolean;
   originalRequest: string;
   parallelResults: null | ParallelRefinementResponse;
+  progress: Array<ProgressEntry>;
   refinedRequest: null | string;
   settings: RefinementSettingsType;
   stepData: StepData;
 }
 
-export type WorkflowStep = 1 | 2 | 3;
-
 /**
  * Enhanced feature planner with URL state management and modular step architecture
  */
 export default function FeaturePlannerPage() {
-  // URL state management with nuqs
   const [currentStep, setCurrentStep] = useQueryState(
     'step',
-    parseAsInteger.withDefault(1).withOptions({ history: 'push' })
+    parseAsInteger.withDefault(1).withOptions({ history: 'push' }),
   );
   const [selectedAgentId, setSelectedAgentId] = useQueryState(
     'agent',
-    parseAsString.withOptions({ history: 'push' })
+    parseAsString.withOptions({ history: 'push' }),
   );
 
-  // Local component state
   const [state, setState] = useState<FeaturePlannerState>({
     isSettingsExpanded: false,
     originalRequest: '',
     parallelResults: null,
+    progress: [],
     refinedRequest: null,
     settings: {
       agentCount: 3,
@@ -81,6 +85,29 @@ export default function FeaturePlannerPage() {
     setState((prev) => ({ ...prev, ...updates }));
   }, []);
 
+  /**
+   * Adds a progress entry to the stream
+   */
+  const addProgressEntry = useCallback((entry: Omit<ProgressEntry, 'id' | 'timestamp'>) => {
+    const newEntry: ProgressEntry = {
+      ...entry,
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date(),
+    };
+
+    setState((prev) => ({
+      ...prev,
+      progress: [...prev.progress, newEntry],
+    }));
+  }, []);
+
+  /**
+   * Clears progress entries
+   */
+  const clearProgress = useCallback(() => {
+    setState((prev) => ({ ...prev, progress: [] }));
+  }, []);
+
   const handleRefineRequest = useCallback(async () => {
     await executeAsync({
       originalRequest: state.originalRequest,
@@ -93,43 +120,91 @@ export default function FeaturePlannerPage() {
   }, [executeAsync, state.originalRequest, state.settings]);
 
   const handleParallelRefineRequest = useCallback(async () => {
+    // clear previous state and progress
     updateState({
       parallelResults: null,
       refinedRequest: null,
     });
+    clearProgress();
     void setSelectedAgentId(null);
 
-    await executeAsync({
-      originalRequest: state.originalRequest,
-      settings: {
-        agentCount: state.settings.agentCount,
-        includeProjectContext: state.settings.includeProjectContext,
-        maxOutputLength: state.settings.maxOutputLength,
-      },
+    // add initial progress entry
+    addProgressEntry({
+      message: `Starting parallel refinement with ${state.settings.agentCount} agents...`,
+      type: 'info',
     });
-  }, [executeAsync, state.originalRequest, state.settings, updateState, setSelectedAgentId]);
+
+    try {
+      await executeAsync({
+        originalRequest: state.originalRequest,
+        settings: {
+          agentCount: state.settings.agentCount,
+          includeProjectContext: state.settings.includeProjectContext,
+          maxOutputLength: state.settings.maxOutputLength,
+        },
+      });
+
+      addProgressEntry({
+        message: 'Parallel refinement completed successfully',
+        type: 'success',
+      });
+    } catch (error) {
+      addProgressEntry({
+        message: `Refinement failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        type: 'error',
+      });
+      throw error;
+    }
+  }, [
+    executeAsync,
+    state.originalRequest,
+    state.settings,
+    updateState,
+    setSelectedAgentId,
+    clearProgress,
+    addProgressEntry,
+  ]);
+
+  /**
+   * Handles retry operations from resilience wrapper
+   */
+  const handleRetryOperation = useCallback(() => {
+    if (isExecuting) {
+      return; // Don't retry if already executing
+    }
+
+    addProgressEntry({
+      message: 'Retrying refinement operation...',
+      type: 'info',
+    });
+
+    void handleParallelRefineRequest();
+  }, [isExecuting, addProgressEntry, handleParallelRefineRequest]);
 
   /**
    * Handles agent selection with URL state sync
    */
-  const handleSelectRefinement = useCallback((agentId: string) => {
-    const selectedResult = state.parallelResults?.results.find((r) => r.agentId === agentId);
-    if (selectedResult && selectedResult.isSuccess) {
-      updateState({
-        refinedRequest: selectedResult.refinedRequest,
-        stepData: {
-          ...state.stepData,
-          step1: {
-            originalRequest: state.originalRequest,
-            parallelResults: state.parallelResults || undefined,
-            refinedRequest: selectedResult.refinedRequest,
-            selectedAgentId: agentId,
+  const handleSelectRefinement = useCallback(
+    (agentId: string) => {
+      const selectedResult = state.parallelResults?.results.find((r) => r.agentId === agentId);
+      if (selectedResult && selectedResult.isSuccess) {
+        updateState({
+          refinedRequest: selectedResult.refinedRequest,
+          stepData: {
+            ...state.stepData,
+            step1: {
+              originalRequest: state.originalRequest,
+              parallelResults: state.parallelResults || undefined,
+              refinedRequest: selectedResult.refinedRequest,
+              selectedAgentId: agentId,
+            },
           },
-        },
-      });
-      void setSelectedAgentId(agentId);
-    }
-  }, [state.parallelResults, state.originalRequest, state.stepData, updateState, setSelectedAgentId]);
+        });
+        void setSelectedAgentId(agentId);
+      }
+    },
+    [state.parallelResults, state.originalRequest, state.stepData, updateState, setSelectedAgentId],
+  );
 
   const handleUseOriginalFromComparison = useCallback(() => {
     updateState({
@@ -150,17 +225,20 @@ export default function FeaturePlannerPage() {
   /**
    * Handles step navigation with validation
    */
-  const handleStepChange = useCallback((step: WorkflowStep) => {
-    // Validate step transition
-    if (step === 2 && !state.originalRequest) {
-      return; // Can't go to step 2 without a request
-    }
-    if (step === 3 && !state.stepData.step1) {
-      return; // Can't go to step 3 without completing step 1
-    }
+  const handleStepChange = useCallback(
+    (step: WorkflowStep) => {
+      // validate step transition
+      if (step === 2 && !state.originalRequest) {
+        return; // can't go to step 2 without a request
+      }
+      if (step === 3 && !state.stepData.step1) {
+        return; // can't go to step 3 without completing step 1
+      }
 
-    void setCurrentStep(step);
-  }, [state.originalRequest, state.stepData.step1, setCurrentStep]);
+      void setCurrentStep(step);
+    },
+    [state.originalRequest, state.stepData.step1, setCurrentStep],
+  );
 
   const handleSkipToFileDiscovery = useCallback(() => {
     handleStepChange(2);
@@ -175,13 +253,19 @@ export default function FeaturePlannerPage() {
     handleStepChange(2);
   }, [handleStepChange, updateState]);
 
-  const handleRefinedRequestChange = useCallback((refinedRequest: string) => {
-    updateState({ refinedRequest });
-  }, [updateState]);
+  const handleRefinedRequestChange = useCallback(
+    (refinedRequest: string) => {
+      updateState({ refinedRequest });
+    },
+    [updateState],
+  );
 
-  const handleSettingsChange = useCallback((settings: RefinementSettingsType) => {
-    updateState({ settings });
-  }, [updateState]);
+  const handleSettingsChange = useCallback(
+    (settings: RefinementSettingsType) => {
+      updateState({ settings });
+    },
+    [updateState],
+  );
 
   const handleToggleSettings = useCallback(() => {
     updateState({ isSettingsExpanded: !state.isSettingsExpanded });
@@ -202,60 +286,61 @@ export default function FeaturePlannerPage() {
       {/* Progress Indicator */}
       <WorkflowProgress currentStep={currentStep as WorkflowStep} />
 
-      {/* Main Content Area */}
-      <div className={'mt-8 space-y-8'}>
-        {/* Settings Panel */}
-        <RefinementSettings
-          isExpanded={state.isSettingsExpanded}
-          onSettingsChange={handleSettingsChange}
-          onToggleExpanded={handleToggleSettings}
-          settings={state.settings}
-        />
+      {/* Resilience Wrapper for Error Boundaries and Connection Monitoring */}
+      <ResilienceWrapper onRetry={handleRetryOperation}>
+        {/* Main Content Area */}
+        <div className={'mt-8 space-y-8'}>
+          {/* Settings Panel */}
+          <RefinementSettings
+            isExpanded={state.isSettingsExpanded}
+            onSettingsChange={handleSettingsChange}
+            onToggleExpanded={handleToggleSettings}
+            settings={state.settings}
+          />
 
-        {/* Conditional Layout */}
-        {shouldShowFullWidthParallelResults ?
-          <div className={'space-y-6'}>
-            <RequestInput
-              isRefining={isExecuting}
-              onChange={(value) => {
-                updateState({ originalRequest: value });
-              }}
-              onParallelRefineRequest={handleParallelRefineRequest}
-              onRefinedRequestChange={handleRefinedRequestChange}
-              onRefineRequest={handleRefineRequest}
-              onSkipToFileDiscovery={handleSkipToFileDiscovery}
-              onUseOriginalRequest={handleUseOriginalRequest}
-              onUseRefinedRequest={handleUseRefinedRequest}
-              refinedRequest={state.refinedRequest}
-              settings={state.settings}
-              value={state.originalRequest}
-            />
-
-            {/* Refinement Results */}
-            <Conditional isCondition={!!state.parallelResults}>
-              <RefinementComparison
-                onSelectRefinement={handleSelectRefinement}
-                onUseOriginal={handleUseOriginalFromComparison}
-                originalRequest={state.originalRequest}
-                results={state.parallelResults?.results || []}
-                selectedAgentId={selectedAgentId}
-              />
-            </Conditional>
-
-            {/* Streaming Panel */}
-            <StreamingPanel
-              currentStep={currentStep as WorkflowStep}
-              hasError={!!result.serverError}
-              isActive={isExecuting}
-              progress={[]}
-            />
-          </div>
-        : <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
-            {/* Left Panel - Step Content */}
+          {/* Conditional Layout */}
+          {shouldShowFullWidthParallelResults ?
             <div className={'space-y-6'}>
-              {/* Step 1 */}
-              <Conditional isCondition={currentStep === 1}>
-                <RequestInput
+              <RequestInput
+                isRefining={isExecuting}
+                onChange={(value) => {
+                  updateState({ originalRequest: value });
+                }}
+                onParallelRefineRequest={handleParallelRefineRequest}
+                onRefinedRequestChange={handleRefinedRequestChange}
+                onRefineRequest={handleRefineRequest}
+                onSkipToFileDiscovery={handleSkipToFileDiscovery}
+                onUseOriginalRequest={handleUseOriginalRequest}
+                onUseRefinedRequest={handleUseRefinedRequest}
+                refinedRequest={state.refinedRequest}
+                settings={state.settings}
+                value={state.originalRequest}
+              />
+
+              {/* Refinement Results */}
+              <Conditional isCondition={!!state.parallelResults}>
+                <RefinementComparison
+                  onSelectRefinement={handleSelectRefinement}
+                  onUseOriginal={handleUseOriginalFromComparison}
+                  originalRequest={state.originalRequest}
+                  results={state.parallelResults?.results || []}
+                  selectedAgentId={selectedAgentId}
+                />
+              </Conditional>
+
+              {/* Streaming Panel */}
+              <StreamingPanel
+                currentStep={currentStep as WorkflowStep}
+                hasError={!!result.serverError}
+                isActive={isExecuting}
+                progress={state.progress}
+              />
+            </div>
+          : <div className={'grid grid-cols-1 gap-8 lg:grid-cols-2'}>
+              {/* Left Panel - Step Content */}
+              <div className={'space-y-6'}>
+                <StepOrchestrator
+                  currentStep={currentStep as WorkflowStep}
                   isRefining={isExecuting}
                   onChange={(value) => {
                     updateState({ originalRequest: value });
@@ -268,46 +353,31 @@ export default function FeaturePlannerPage() {
                   onUseRefinedRequest={handleUseRefinedRequest}
                   refinedRequest={state.refinedRequest}
                   settings={state.settings}
+                  stepData={state.stepData}
                   value={state.originalRequest}
                 />
-              </Conditional>
+              </div>
 
-              {/* Step 2 */}
-              <Conditional isCondition={currentStep === 2}>
-                <div className={'rounded-lg border p-6'}>
-                  <h2 className={'mb-4 text-xl font-semibold'}>Step 2: File Discovery</h2>
-                  <p className={'text-muted-foreground'}>File discovery implementation coming in Phase 2</p>
-                </div>
-              </Conditional>
-
-              {/* Step 3 */}
-              <Conditional isCondition={currentStep === 3}>
-                <div className={'rounded-lg border p-6'}>
-                  <h2 className={'mb-4 text-xl font-semibold'}>Step 3: Implementation Planning</h2>
-                  <p className={'text-muted-foreground'}>Implementation planning coming in Phase 2</p>
-                </div>
-              </Conditional>
+              {/* Right Panel - Streaming Updates */}
+              <div>
+                <StreamingPanel
+                  currentStep={currentStep as WorkflowStep}
+                  hasError={!!result.serverError}
+                  isActive={isExecuting}
+                  progress={state.progress}
+                />
+              </div>
             </div>
+          }
+        </div>
 
-            {/* Right Panel - Streaming Updates */}
-            <div>
-              <StreamingPanel
-                currentStep={currentStep as WorkflowStep}
-                hasError={!!result.serverError}
-                isActive={isExecuting}
-                progress={[]}
-              />
-            </div>
-          </div>
-        }
-      </div>
-
-      {/* Action Controls */}
-      <ActionControls
-        canProceed={state.originalRequest.length > 0}
-        currentStep={currentStep as WorkflowStep}
-        onStepChange={handleStepChange}
-      />
+        {/* Action Controls */}
+        <ActionControls
+          canProceed={state.originalRequest.length > 0}
+          currentStep={currentStep as WorkflowStep}
+          onStepChange={handleStepChange}
+        />
+      </ResilienceWrapper>
     </PageContent>
   );
 }
