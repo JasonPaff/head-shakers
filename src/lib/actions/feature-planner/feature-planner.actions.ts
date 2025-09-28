@@ -3,7 +3,9 @@
 import 'server-only';
 import { query } from '@anthropic-ai/claude-code';
 import * as Sentry from '@sentry/nextjs';
+import { Realtime } from 'ably';
 
+import { type AblyRefinementMessage, AgentThinkingStage } from '@/app/(app)/feature-planner/types/streaming';
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -37,6 +39,11 @@ const DEFAULT_AGENT_CONFIG: AgentConfig = {
 };
 
 /**
+ * Ably client instance for server-side message publishing
+ */
+let ablyClient: null | Realtime = null;
+
+/**
  * Interface for agent execution result with retry information
  */
 interface AgentExecutionResult {
@@ -53,17 +60,27 @@ interface AgentExecutionResult {
  * Executes a single agent with retry logic and enhanced error handling
  * @param originalRequest - The user's original feature request
  * @param agentId - Unique identifier for the agent
+ * @param sessionId - Unique session identifier for real-time updates
  * @param config - Agent configuration including retry settings
  * @returns Promise resolving to agent execution result
  */
 async function executeAgentWithRetry(
   originalRequest: string,
   agentId: string,
+  sessionId: string,
   config: AgentConfig = DEFAULT_AGENT_CONFIG,
 ): Promise<AgentExecutionResult> {
   const agentStartTime = Date.now();
   let lastError: Error | null = null;
   let retryCount = 0;
+
+  await publishAgentThinking(
+    sessionId,
+    agentId,
+    AgentThinkingStage.INITIALIZING,
+    `Starting feature request refinement with ${agentId}`,
+    { progress: 0 },
+  );
 
   for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
     try {
@@ -76,6 +93,16 @@ async function executeAgentWithRetry(
         message: `${agentId} attempt ${attempt + 1}/${config.maxRetries + 1}`,
       });
 
+      if (attempt > 0) {
+        await publishAgentThinking(
+          sessionId,
+          agentId,
+          AgentThinkingStage.INITIALIZING,
+          `Retrying refinement (attempt ${attempt + 1}/${config.maxRetries + 1})`,
+          { progress: (attempt / (config.maxRetries + 1)) * 20 },
+        );
+      }
+
       const abortController = new AbortController();
       const timeoutId = setTimeout(() => {
         abortController.abort();
@@ -83,7 +110,16 @@ async function executeAgentWithRetry(
 
       let refinedRequest: string = '';
 
+      await publishAgentThinking(
+        sessionId,
+        agentId,
+        AgentThinkingStage.ANALYZING_REQUEST,
+        'Analyzing the feature request and identifying key requirements',
+        { progress: 25 },
+      );
+
       try {
+        let messageCount = 0;
         for await (const message of query({
           options: {
             abortController,
@@ -101,9 +137,45 @@ async function executeAgentWithRetry(
             Agent ID: ${agentId} - Provide a unique perspective while maintaining consistency with the project context.`,
         })) {
           console.log(`${agentId} message:`, message.type, message);
+          messageCount++;
+
+          if (messageCount === 1) {
+            await publishAgentThinking(
+              sessionId,
+              agentId,
+              AgentThinkingStage.IDENTIFYING_TECHNOLOGIES,
+              'Identifying relevant technologies from the Head Shakers project stack',
+              { progress: 40 },
+            );
+          } else if (messageCount === 2) {
+            await publishAgentThinking(
+              sessionId,
+              agentId,
+              AgentThinkingStage.FINDING_INTEGRATION_POINTS,
+              'Finding integration points and gathering project context',
+              { progress: 60 },
+            );
+          } else if (messageCount > 2) {
+            await publishAgentThinking(
+              sessionId,
+              agentId,
+              AgentThinkingStage.GENERATING_REFINEMENT,
+              'Generating refined feature request with technical context',
+              { progress: 70 + Math.min(messageCount * 5, 10) },
+            );
+          }
 
           if (message.type === 'result' && message.subtype === 'success') {
             console.log(`Agent ${agentId} attempt ${attempt + 1} raw response:`, message.result);
+
+            await publishAgentThinking(
+              sessionId,
+              agentId,
+              AgentThinkingStage.FINALIZING,
+              'Finalizing refined request and validating output',
+              { progress: 95 },
+            );
+
             refinedRequest = validateAndCleanResponse(message.result, agentId);
             console.log(`Agent ${agentId} attempt ${attempt + 1} cleaned request:`, refinedRequest);
             break;
@@ -119,6 +191,18 @@ async function executeAgentWithRetry(
 
       const executionTime = Date.now() - agentStartTime;
       const wordCount = refinedRequest.split(/\s+/).filter((word) => word.length > 0).length;
+
+      await publishAgentThinking(
+        sessionId,
+        agentId,
+        AgentThinkingStage.COMPLETED,
+        `Successfully refined feature request (${wordCount} words, ${executionTime}ms)`,
+        {
+          context: { attempt: attempt + 1, wordCount },
+          duration: executionTime,
+          progress: 100,
+        },
+      );
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
@@ -145,6 +229,21 @@ async function executeAgentWithRetry(
     } catch (error) {
       lastError = error instanceof Error ? error : new Error('Unknown error occurred');
 
+      await publishAgentThinking(
+        sessionId,
+        agentId,
+        AgentThinkingStage.ERROR,
+        `Error during refinement attempt ${attempt + 1}: ${lastError.message}${attempt < config.maxRetries ? ' - Will retry' : ''}`,
+        {
+          context: {
+            attempt: attempt + 1,
+            error: lastError.message,
+            willRetry: attempt < config.maxRetries,
+          },
+          progress: 0,
+        },
+      );
+
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
@@ -157,19 +256,32 @@ async function executeAgentWithRetry(
         message: `${agentId} failed on attempt ${attempt + 1}: ${lastError.message}`,
       });
 
-      // If this was the last attempt, break out of the loop
       if (attempt === config.maxRetries) {
         break;
       }
 
-      // Wait before retrying (exponential backoff)
+      // exponential backoff
       const backoffMs = Math.min(1000 * Math.pow(2, attempt), 10000);
       await new Promise((resolve) => setTimeout(resolve, backoffMs));
     }
   }
 
-  // All retries failed
   const executionTime = Date.now() - agentStartTime;
+
+  await publishAgentThinking(
+    sessionId,
+    agentId,
+    AgentThinkingStage.ERROR,
+    `All attempts failed for ${agentId}. Final error: ${lastError?.message || 'Unknown error occurred'}`,
+    {
+      context: {
+        finalError: lastError?.message || 'Unknown error occurred',
+        totalAttempts: config.maxRetries + 1,
+      },
+      duration: executionTime,
+      progress: 0,
+    },
+  );
 
   return {
     agentId,
@@ -180,6 +292,88 @@ async function executeAgentWithRetry(
     retryCount,
     wordCount: 0,
   };
+}
+
+/**
+ * Get or create an Ably client instance
+ */
+function getAblyClient(): null | Realtime {
+  if (!process.env.NEXT_PUBLIC_ABLY_API_KEY) {
+    console.warn('Ably API key not configured, real-time updates disabled');
+    return null;
+  }
+
+  if (!ablyClient) {
+    ablyClient = new Realtime({
+      clientId: 'feature-planner-server',
+      key: process.env.NEXT_PUBLIC_ABLY_API_KEY,
+    });
+  }
+
+  return ablyClient;
+}
+
+/**
+ * Publishes an agent thinking message to Ably channel
+ * @param sessionId - Unique session identifier for the refinement process
+ * @param agentId - Agent identifier
+ * @param stage - Current thinking stage
+ * @param content - Message content describing agent's current thinking
+ * @param metadata - Optional metadata (progress, duration, context)
+ */
+async function publishAgentThinking(
+  sessionId: string,
+  agentId: string,
+  stage: AgentThinkingStage,
+  content: string,
+  metadata?: AblyRefinementMessage['metadata'],
+): Promise<void> {
+  try {
+    const client = getAblyClient();
+    if (!client) {
+      // Graceful degradation - no Ably client available
+      return;
+    }
+
+    const channel = client.channels.get(`feature-planner:${sessionId}`);
+    const message: AblyRefinementMessage = {
+      agentId,
+      content,
+      messageId: `${agentId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      metadata,
+      sessionId,
+      stage,
+      timestamp: new Date(),
+    };
+
+    await channel.publish('agent-thinking', message);
+
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
+      data: {
+        agentId,
+        messageId: message.messageId,
+        sessionId,
+        stage,
+      },
+      level: SENTRY_LEVELS.DEBUG,
+      message: `Published agent thinking message: ${stage}`,
+    });
+  } catch (error) {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
+      data: {
+        agentId,
+        error: error instanceof Error ? error.message : 'Unknown error',
+        sessionId,
+        stage,
+      },
+      level: SENTRY_LEVELS.WARNING,
+      message: 'Failed to publish agent thinking message to Ably',
+    });
+
+    console.warn('Failed to publish agent thinking message:', error);
+  }
 }
 
 /**
@@ -199,14 +393,14 @@ function validateAndCleanResponse(rawResponse: string, agentId: string): string 
     throw new Error(`Empty response after trimming from ${agentId}`);
   }
 
-  // Remove common prefixes and formatting
+  // remove common prefixes and formatting
   cleaned = cleaned
     .replace(/^(Refined Request:|Here is the refined request:|The refined request is:)/i, '')
-    .replace(/^#+\s*/gm, '') // Remove headers
-    .replace(/^[-*\d.]\s*/gm, '') // Remove bullet points
+    .replace(/^#+\s*/gm, '') // remove headers
+    .replace(/^[-*\d.]\s*/gm, '') // remove bullet points
     .trim();
 
-  // Take only the first paragraph if multiple paragraphs exist
+  // take only the first paragraph if multiple paragraphs exist
   const firstParagraph = cleaned.split('\n\n')[0] ?? '';
   const result = firstParagraph.trim();
 
@@ -214,7 +408,7 @@ function validateAndCleanResponse(rawResponse: string, agentId: string): string 
     throw new Error(`No valid content found after cleaning response from ${agentId}`);
   }
 
-  // Validate minimum length
+  // validate minimum length
   if (result.length < 10) {
     throw new Error(`Response too short from ${agentId}: ${result.length} characters`);
   }
@@ -236,6 +430,7 @@ export const refineFeatureRequestAction = authActionClient
   .action(async ({ ctx }) => {
     const { originalRequest, settings } = parallelRefinementRequestSchema.parse(ctx.sanitizedInput);
     const startTime = Date.now();
+    const sessionId = `refinement-${ctx.userId}-${startTime}-${Math.random().toString(36).substr(2, 9)}`;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURE_REFINEMENT_DATA, {
       agentCount: settings.agentCount,
@@ -257,7 +452,7 @@ export const refineFeatureRequestAction = authActionClient
     });
 
     try {
-      // Single agent refinement with retry logic
+      // single agent refinement
       if (settings.agentCount === 1) {
         Sentry.addBreadcrumb({
           category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
@@ -265,7 +460,12 @@ export const refineFeatureRequestAction = authActionClient
           message: 'Starting single agent refinement with enhanced error handling',
         });
 
-        const result = await executeAgentWithRetry(originalRequest, 'agent-1', DEFAULT_AGENT_CONFIG);
+        const result = await executeAgentWithRetry(
+          originalRequest,
+          'agent-1',
+          sessionId,
+          DEFAULT_AGENT_CONFIG,
+        );
 
         if (!result.isSuccess) {
           throw new ActionError(
@@ -301,7 +501,7 @@ export const refineFeatureRequestAction = authActionClient
         };
       }
 
-      // Parallel agent refinement with enhanced retry logic
+      // parallel agent refinement
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
         data: { agentCount: settings.agentCount },
@@ -309,20 +509,17 @@ export const refineFeatureRequestAction = authActionClient
         message: `Starting parallel refinement with ${settings.agentCount} agents and retry logic`,
       });
 
-      // Execute all agents in parallel with individual retry logic
       const results = await Promise.allSettled(
         Array.from({ length: settings.agentCount }, (_, index) => {
           const agentId = `agent-${index + 1}`;
-          return executeAgentWithRetry(originalRequest, agentId, DEFAULT_AGENT_CONFIG);
+          return executeAgentWithRetry(originalRequest, agentId, sessionId, DEFAULT_AGENT_CONFIG);
         }),
       );
 
-      // Process results with enhanced error information
       const processedResults = results.map((result, index) => {
         if (result.status === 'fulfilled') {
           return result.value;
         } else {
-          // Fallback for promise rejection (shouldn't happen with our retry logic)
           return {
             agentId: `agent-${index + 1}`,
             error: result.reason instanceof Error ? result.reason.message : 'Promise execution failed',
@@ -355,9 +552,7 @@ export const refineFeatureRequestAction = authActionClient
         message: `Parallel refinement completed: ${successCount}/${settings.agentCount} agents succeeded with ${totalRetries} total retries`,
       });
 
-      // Even if some agents fail, return partial results if we have at least one success
       if (successCount === 0) {
-        // Collect all error messages for debugging
         const errors = processedResults
           .filter((r) => !r.isSuccess && r.error)
           .map((r) => `${r.agentId}: ${r.error}`)
