@@ -75,6 +75,11 @@ async function buildRefinementPrompt(originalRequest: string, settings: Refineme
   // Different perspectives for variety in parallel agents
   const agentPerspectives = [
     {
+      considerations: 'Provide balanced coverage of frontend components, backend logic, data flow, and integration points without overemphasizing any single aspect',
+      emphasis: 'Focus on creating a well-rounded refinement that considers both technical implementation and user experience in equal measure',
+      role: 'Balanced refinement specialist'
+    },
+    {
       considerations: 'Emphasize React components, form handling, state management, and user experience flows',
       emphasis: 'Focus on UI/UX implementation aspects, component structure, and user interaction patterns',
       role: 'Frontend-focused refinement specialist'
@@ -435,7 +440,7 @@ Enhanced request:`
               maxOutputLength: 250,
               refinementStyle: 'balanced',
               technicalDetailLevel: 'moderate',
-            });
+            }, 0); // Explicitly use the balanced perspective (agent 0)
 
         let refinedRequest = '';
         const abortController = new AbortController();

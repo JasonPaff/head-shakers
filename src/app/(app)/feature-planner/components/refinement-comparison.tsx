@@ -89,6 +89,7 @@ export const RefinementComparison = ({
 
   const getAgentTypeName = (index: number): string => {
     const agentTypes = [
+      'Balanced',
       'Frontend',
       'Backend',
       'Full-stack',
