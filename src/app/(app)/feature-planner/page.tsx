@@ -48,9 +48,15 @@ export default function FeaturePlannerPage() {
   const { executeAsync, isExecuting, result } = useServerAction(refineFeatureRequestAction, {
     isDisableToast: true,
     onSuccess: ({ data }) => {
-      updateState({
-        refinedRequest: data.refinedRequest,
-      });
+      if ('refinedRequest' in data) {
+        updateState({
+          refinedRequest: data.refinedRequest,
+        });
+      } else if ('results' in data) {
+        updateState({
+          parallelResults: data,
+        });
+      }
     },
   });
 
@@ -62,16 +68,26 @@ export default function FeaturePlannerPage() {
     await executeAsync({
       originalRequest: state.originalRequest,
       settings: {
-        agentCount: 1,
+        agentCount: state.settings.agentCount,
+        includeProjectContext: state.settings.includeProjectContext,
+        maxOutputLength: state.settings.maxOutputLength,
       },
     });
   };
 
   const handleParallelRefineRequest = async () => {
+    updateState({
+      parallelResults: null,
+      refinedRequest: null,
+      selectedAgentId: null,
+    });
+
     await executeAsync({
       originalRequest: state.originalRequest,
       settings: {
-        agentCount: 5,
+        agentCount: state.settings.agentCount,
+        includeProjectContext: state.settings.includeProjectContext,
+        maxOutputLength: state.settings.maxOutputLength,
       },
     });
   };
@@ -162,13 +178,15 @@ export default function FeaturePlannerPage() {
             />
 
             {/* Refinement Results */}
-            <RefinementComparison
-              onSelectRefinement={handleSelectRefinement}
-              onUseOriginal={handleUseOriginalFromComparison}
-              originalRequest={state.originalRequest}
-              results={state.parallelResults?.results || []}
-              selectedAgentId={state.selectedAgentId}
-            />
+            <Conditional isCondition={!!state.parallelResults}>
+              <RefinementComparison
+                onSelectRefinement={handleSelectRefinement}
+                onUseOriginal={handleUseOriginalFromComparison}
+                originalRequest={state.originalRequest}
+                results={state.parallelResults?.results || []}
+                selectedAgentId={state.selectedAgentId}
+              />
+            </Conditional>
 
             {/* Streaming Panel */}
             <StreamingPanel

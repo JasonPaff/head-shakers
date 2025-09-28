@@ -43,6 +43,7 @@ export const OPERATIONS = {
     UPDATE: 'update_collection',
   },
   FEATURE_PLANNER: {
+    PARALLEL_REFINE_REQUEST: 'parallel_refine_feature_request',
     REFINE_REQUEST: 'refine_feature_request',
   },
   FEATURED_CONTENT: {

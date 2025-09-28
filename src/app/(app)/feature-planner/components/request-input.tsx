@@ -150,9 +150,7 @@ export const RequestInput = ({
                   Enhanced Request (editable):
                 </Label>
                 <Textarea
-                  className={
-                    'mt-1 min-h-[120px] resize-none border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
-                  }
+                  className={'mt-1 min-h-[120px] resize-none border'}
                   id={'enhanced-request'}
                   onChange={(e) => {
                     onRefinedRequestChange(e.target.value);
