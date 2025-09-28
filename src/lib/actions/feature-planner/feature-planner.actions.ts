@@ -2,17 +2,21 @@
 
 import 'server-only';
 
+import type {
+  FeatureRefinementResponse,
+  ParallelRefinementResponse,
+} from '@/lib/validations/feature-planner.validation';
+
+import { ACTION_NAMES } from '@/lib/constants';
 import { publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   featureRefinementRequestSchema,
-  type FeatureRefinementResponse,
   parallelRefinementRequestSchema,
-  type ParallelRefinementResponse,
 } from '@/lib/validations/feature-planner.validation';
 
 export const parallelRefineFeatureRequestAction = publicActionClient
   .metadata({
-    actionName: 'FEATURE_PLANNER.PARALLEL_REFINE_REQUEST',
+    actionName: ACTION_NAMES.FEATURE_PLANNER.PARALLEL_REFINE_REQUEST,
   })
   .inputSchema(parallelRefinementRequestSchema)
   .action(async ({ ctx }): Promise<ParallelRefinementResponse> => {
@@ -20,7 +24,7 @@ export const parallelRefineFeatureRequestAction = publicActionClient
     const startTime = Date.now();
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Generate mock results for each agent
     const results = Array.from({ length: settings.agentCount }, (_, i) => ({
@@ -45,14 +49,14 @@ export const parallelRefineFeatureRequestAction = publicActionClient
 
 export const refineFeatureRequestAction = publicActionClient
   .metadata({
-    actionName: 'FEATURE_PLANNER.REFINE_REQUEST',
+    actionName: ACTION_NAMES.FEATURE_PLANNER.REFINE_REQUEST,
   })
   .inputSchema(featureRefinementRequestSchema)
   .action(async ({ ctx }): Promise<FeatureRefinementResponse> => {
     const { originalRequest } = featureRefinementRequestSchema.parse(ctx.sanitizedInput);
 
     // Simulate processing delay
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise((resolve) => setTimeout(resolve, 800));
 
     // Return a simple placeholder refinement
     const refinedRequest = `${originalRequest} (This is a placeholder refinement. Real backend implementation needed.)`;

@@ -52,12 +52,6 @@ export const RefinementSettings = ({
     return 'destructive';
   };
 
-  const getTimeoutBadgeVariant = () => {
-    if (settings.agentTimeoutMs <= 30000) return 'default';
-    if (settings.agentTimeoutMs <= 45000) return 'secondary';
-    return 'destructive';
-  };
-
   return (
     <div className={cn('space-y-4', className)} data-testid={settingsTestId} {...props}>
       {/* Settings Toggle */}
@@ -109,126 +103,6 @@ export const RefinementSettings = ({
               <p className={'text-xs text-muted-foreground'}>
                 More agents provide diverse refinement options but increase processing time and cost.
               </p>
-            </div>
-
-            <Separator />
-
-            {/* Timeout Settings */}
-            <div className={'space-y-3'}>
-              <div className={'flex items-center justify-between'}>
-                <Label htmlFor={'agent-timeout'}>Agent Timeout</Label>
-                <Badge variant={getTimeoutBadgeVariant()}>
-                  {Math.round(settings.agentTimeoutMs / 1000)}s
-                </Badge>
-              </div>
-              <Select
-                onValueChange={(value) => {
-                  updateSetting('agentTimeoutMs', parseInt(value, 10));
-                }}
-                value={settings.agentTimeoutMs.toString()}
-              >
-                <SelectTrigger id={'agent-timeout'}>
-                  <SelectValue placeholder={'Select timeout'} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={'15000'}>15s (Fast)</SelectItem>
-                  <SelectItem value={'30000'}>30s (Recommended)</SelectItem>
-                  <SelectItem value={'45000'}>45s (Patient)</SelectItem>
-                  <SelectItem value={'60000'}>60s (Maximum)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className={'text-xs text-muted-foreground'}>
-                Maximum time to wait for each agent response before timing out.
-              </p>
-            </div>
-
-            <Separator />
-
-            {/* Refinement Style */}
-            <div className={'space-y-3'}>
-              <Label htmlFor={'refinement-style'}>Refinement Style</Label>
-              <Select
-                onValueChange={(value) => {
-                  updateSetting('refinementStyle', value as RefinementSettingsType['refinementStyle']);
-                }}
-                value={settings.refinementStyle}
-              >
-                <SelectTrigger id={'refinement-style'}>
-                  <SelectValue placeholder={'Select refinement style'} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={'conservative'}>
-                    <div className={'space-y-1'}>
-                      <div className={'font-medium'}>Conservative</div>
-                      <div className={'text-xs text-muted-foreground'}>
-                        Minimal technical context, preserves original wording
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={'balanced'}>
-                    <div className={'space-y-1'}>
-                      <div className={'font-medium'}>Balanced</div>
-                      <div className={'text-xs text-muted-foreground'}>
-                        Moderate technical details following project patterns
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={'detailed'}>
-                    <div className={'space-y-1'}>
-                      <div className={'font-medium'}>Detailed</div>
-                      <div className={'text-xs text-muted-foreground'}>
-                        Comprehensive technical context and integration details
-                      </div>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <Separator />
-
-            {/* Technical Detail Level */}
-            <div className={'space-y-3'}>
-              <Label htmlFor={'detail-level'}>Technical Detail Level</Label>
-              <Select
-                onValueChange={(value) => {
-                  updateSetting(
-                    'technicalDetailLevel',
-                    value as RefinementSettingsType['technicalDetailLevel'],
-                  );
-                }}
-                value={settings.technicalDetailLevel}
-              >
-                <SelectTrigger id={'detail-level'}>
-                  <SelectValue placeholder={'Select detail level'} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={'minimal'}>
-                    <div className={'space-y-1'}>
-                      <div className={'font-medium'}>Minimal</div>
-                      <div className={'text-xs text-muted-foreground'}>
-                        Only essential technology mentions
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={'moderate'}>
-                    <div className={'space-y-1'}>
-                      <div className={'font-medium'}>Moderate</div>
-                      <div className={'text-xs text-muted-foreground'}>
-                        Key technologies and integration points
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value={'comprehensive'}>
-                    <div className={'space-y-1'}>
-                      <div className={'font-medium'}>Comprehensive</div>
-                      <div className={'text-xs text-muted-foreground'}>
-                        Detailed technology stack and architectural considerations
-                      </div>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
             </div>
 
             <Separator />

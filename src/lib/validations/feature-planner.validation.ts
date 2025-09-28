@@ -6,17 +6,14 @@ import { z } from 'zod';
 
 export const refinementSettingsSchema = z.object({
   agentCount: z.number().int().min(1).max(5).default(1),
-  agentTimeoutMs: z.number().int().min(15000).max(60000).default(30000),
   includeProjectContext: z.boolean().default(true),
   maxOutputLength: z.number().int().min(100).max(500).default(250),
-  refinementStyle: z.enum(['conservative', 'balanced', 'detailed']).default('balanced'),
-  technicalDetailLevel: z.enum(['minimal', 'moderate', 'comprehensive']).default('moderate'),
 });
 
 export const featureRefinementRequestSchema = z.object({
   options: z
     .object({
-      maxRetries: z.number().int().min(1).max(3).optional(),
+      maxRetries: z.number().int().min(1).max(5).optional(),
       shouldFallbackToSimplePrompt: z.boolean().optional(),
       timeoutMs: z.number().int().min(10000).max(45000).optional(),
     })
