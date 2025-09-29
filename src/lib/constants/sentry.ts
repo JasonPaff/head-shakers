@@ -24,7 +24,6 @@ export const SENTRY_CONTEXTS = {
   DATABASE_ERROR: 'database_error',
   ERROR_DETAILS: 'error_details',
   EXTERNAL_SERVICE: 'external_service',
-  FEATURE_REFINEMENT_DATA: 'feature_refinement_data',
   FEATURED_CONTENT_DATA: 'featured_content_data',
   INPUT_INFO: 'input_info',
   LIKE_DATA: 'like_data',

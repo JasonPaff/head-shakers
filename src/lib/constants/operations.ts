@@ -42,10 +42,6 @@ export const OPERATIONS = {
     GET_BY_USER: 'get_collections_by_user',
     UPDATE: 'update_collection',
   },
-  FEATURE_PLANNER: {
-    PARALLEL_REFINE_REQUEST: 'parallel_refine_feature_request',
-    REFINE_REQUEST: 'refine_feature_request',
-  },
   FEATURED_CONTENT: {
     CREATE: 'create_featured_content',
     DELETE: 'delete_featured_content',

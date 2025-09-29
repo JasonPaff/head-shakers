@@ -31,27 +31,26 @@ export const RefinementSettings = ({
 }: RefinementSettingsProps) => {
   const settingsTestId = testId || generateTestId('feature', 'card');
 
-  const updateSetting = <K extends keyof RefinementSettingsType>(
+  const handleUpdateSetting = <K extends keyof RefinementSettingsType>(
     key: K,
     value: RefinementSettingsType[K],
-  ): void => {
+  ) => {
     onSettingsChange({
       ...settings,
       [key]: value,
     });
   };
 
-  const getAgentCountBadgeVariant = () => {
-    if (settings.agentCount === 1) return 'secondary';
-    if (settings.agentCount <= 3) return 'default';
-    return 'destructive';
-  };
+  const _badgeVariant =
+    settings.agentCount === 1 ? 'secondary'
+    : settings.agentCount <= 3 ? 'default'
+    : 'destructive';
 
   return (
     <div className={cn('flex items-center gap-2', className)} data-testid={settingsTestId} {...props}>
       <SettingsIcon aria-hidden className={'size-4'} />
       <span className={'text-sm font-medium'}>Refinement Settings</span>
-      <Badge variant={getAgentCountBadgeVariant()}>
+      <Badge variant={_badgeVariant}>
         {settings.agentCount} Agent{settings.agentCount !== 1 ? 's' : ''}
       </Badge>
 
@@ -65,22 +64,20 @@ export const RefinementSettings = ({
           <div className={'space-y-4'}>
             <div>
               <h4 className={'leading-none font-medium'}>Refinement Configuration</h4>
-              <p className={'text-sm text-muted-foreground'}>
-                Adjust settings for the refinement process
-              </p>
+              <p className={'text-sm text-muted-foreground'}>Adjust settings for the refinement process</p>
             </div>
 
             {/* Agent Count */}
             <div className={'space-y-3'}>
               <div className={'flex items-center justify-between'}>
                 <Label htmlFor={'agent-count'}>Number of Parallel Agents</Label>
-                <Badge variant={getAgentCountBadgeVariant()}>
+                <Badge variant={_badgeVariant}>
                   {settings.agentCount} Agent{settings.agentCount !== 1 ? 's' : ''}
                 </Badge>
               </div>
               <Select
                 onValueChange={(value) => {
-                  updateSetting('agentCount', parseInt(value, 10));
+                  handleUpdateSetting('agentCount', parseInt(value, 10));
                 }}
                 value={settings.agentCount.toString()}
               >
@@ -110,7 +107,7 @@ export const RefinementSettings = ({
               </div>
               <Select
                 onValueChange={(value) => {
-                  updateSetting('maxOutputLength', parseInt(value, 10));
+                  handleUpdateSetting('maxOutputLength', parseInt(value, 10));
                 }}
                 value={settings.maxOutputLength.toString()}
               >
@@ -144,7 +141,7 @@ export const RefinementSettings = ({
                 checked={settings.includeProjectContext}
                 id={'include-context'}
                 onCheckedChange={(checked) => {
-                  updateSetting('includeProjectContext', checked);
+                  handleUpdateSetting('includeProjectContext', checked);
                 }}
               />
             </div>
