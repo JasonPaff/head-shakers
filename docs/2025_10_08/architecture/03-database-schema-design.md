@@ -12,6 +12,7 @@ This schema design enables the web-based feature planner to persist all workflow
 ### Core Tables
 
 #### 1. `feature_plans`
+
 Main table storing feature planning workflows.
 
 ```typescript
@@ -32,13 +33,13 @@ import { users } from '@/lib/db/schema/users.schema';
 
 // Enums
 export const planStatusEnum = pgEnum('plan_status', [
-  'draft',           // Initial state
-  'refining',        // Step 1 in progress
-  'discovering',     // Step 2 in progress
-  'planning',        // Step 3 in progress
-  'completed',       // All steps complete
-  'failed',          // Workflow failed
-  'cancelled'        // User cancelled
+  'draft', // Initial state
+  'refining', // Step 1 in progress
+  'discovering', // Step 2 in progress
+  'planning', // Step 3 in progress
+  'completed', // All steps complete
+  'failed', // Workflow failed
+  'cancelled', // User cancelled
 ]);
 
 export const complexityEnum = pgEnum('complexity', ['low', 'medium', 'high']);
@@ -86,7 +87,7 @@ export const featurePlans = pgTable(
     // Versioning support
     version: integer('version').default(1).notNull(),
     parentPlanId: uuid('parent_plan_id').references(() => featurePlans.id, {
-      onDelete: 'set null'
+      onDelete: 'set null',
     }),
   },
   (table) => [
@@ -100,10 +101,11 @@ export const featurePlans = pgTable(
     index('feature_plans_current_step_idx').on(table.currentStep),
 
     // Search
-    index('feature_plans_original_request_search_idx')
-      .using('gin', sql`${table.originalRequest} gin_trgm_ops`),
-    index('feature_plans_refined_request_search_idx')
-      .using('gin', sql`${table.refinedRequest} gin_trgm_ops`),
+    index('feature_plans_original_request_search_idx').using(
+      'gin',
+      sql`${table.originalRequest} gin_trgm_ops`,
+    ),
+    index('feature_plans_refined_request_search_idx').using('gin', sql`${table.refinedRequest} gin_trgm_ops`),
 
     // Versioning
     index('feature_plans_parent_id_idx').on(table.parentPlanId),
@@ -113,6 +115,7 @@ export const featurePlans = pgTable(
 ```
 
 #### 2. `feature_refinements`
+
 Stores individual refinement attempts (supports parallel refinement).
 
 ```typescript
@@ -120,7 +123,7 @@ export const refinementStatusEnum = pgEnum('refinement_status', [
   'pending',
   'processing',
   'completed',
-  'failed'
+  'failed',
 ]);
 
 export const featureRefinements = pgTable(
@@ -173,6 +176,7 @@ export const featureRefinements = pgTable(
 ```
 
 #### 3. `file_discovery_sessions`
+
 Stores file discovery execution details.
 
 ```typescript
@@ -180,7 +184,7 @@ export const discoveryStatusEnum = pgEnum('discovery_status', [
   'pending',
   'processing',
   'completed',
-  'failed'
+  'failed',
 ]);
 
 export const fileDiscoverySessions = pgTable(
@@ -226,6 +230,7 @@ export const fileDiscoverySessions = pgTable(
 ```
 
 #### 4. `discovered_files`
+
 Individual files discovered during file discovery.
 
 ```typescript
@@ -258,16 +263,14 @@ export const discoveredFiles = pgTable(
   (table) => [
     index('discovered_files_session_id_idx').on(table.discoverySessionId),
     index('discovered_files_priority_idx').on(table.priority),
-    index('discovered_files_session_priority_idx').on(
-      table.discoverySessionId,
-      table.priority
-    ),
+    index('discovered_files_session_priority_idx').on(table.discoverySessionId, table.priority),
     index('discovered_files_file_path_idx').on(table.filePath),
   ],
 );
 ```
 
 #### 5. `implementation_plan_generations`
+
 Stores implementation plan generation attempts.
 
 ```typescript
@@ -275,7 +278,7 @@ export const planGenerationStatusEnum = pgEnum('plan_generation_status', [
   'pending',
   'processing',
   'completed',
-  'failed'
+  'failed',
 ]);
 
 export const implementationPlanGenerations = pgTable(
@@ -328,14 +331,11 @@ export const implementationPlanGenerations = pgTable(
 ```
 
 #### 6. `plan_execution_logs`
+
 Complete audit trail of all agent executions.
 
 ```typescript
-export const executionStepEnum = pgEnum('execution_step', [
-  'refinement',
-  'discovery',
-  'planning'
-]);
+export const executionStepEnum = pgEnum('execution_step', ['refinement', 'discovery', 'planning']);
 
 export const planExecutionLogs = pgTable(
   'plan_execution_logs',
@@ -443,32 +443,38 @@ users (1) ──→ (N) feature_plans
 ## Key Features
 
 ### 1. **Parallel Refinement Support**
+
 - Multiple `feature_refinements` records per plan
 - Each refinement tracked independently
 - User selects best refinement via `selectedRefinementId`
 
 ### 2. **Complete Audit Trail**
+
 - `plan_execution_logs` captures every agent interaction
 - Full prompts and responses stored
 - Token usage tracked for cost analysis
 - Retry attempts logged
 
 ### 3. **Versioning & Iteration**
+
 - `parentPlanId` enables plan versioning
 - Can fork existing plans to try alternatives
 - Version number tracks iterations
 
 ### 4. **Step-by-Step Workflow**
+
 - `currentStep` tracks progress (0-3)
 - Status enum shows current state
 - Each step has dedicated result tables
 
 ### 5. **File Discovery Tracking**
+
 - Individual files stored in `discovered_files`
 - Priority and relevance scoring
 - User selection tracking (`isSelected`)
 
 ### 6. **Performance Analytics**
+
 - Execution time tracking at every level
 - Token usage metrics
 - Success/failure rates
@@ -477,6 +483,7 @@ users (1) ──→ (N) feature_plans
 ## Query Patterns
 
 ### Get User's Recent Plans
+
 ```typescript
 const recentPlans = await db
   .select()
@@ -487,6 +494,7 @@ const recentPlans = await db
 ```
 
 ### Get Plan with All Related Data
+
 ```typescript
 const planWithDetails = await db
   .select()
@@ -498,30 +506,27 @@ const planWithDetails = await db
 ```
 
 ### Get Parallel Refinements for Comparison
+
 ```typescript
 const refinements = await db
   .select()
   .from(featureRefinements)
-  .where(and(
-    eq(featureRefinements.planId, planId),
-    eq(featureRefinements.status, 'completed')
-  ))
+  .where(and(eq(featureRefinements.planId, planId), eq(featureRefinements.status, 'completed')))
   .orderBy(desc(featureRefinements.wordCount));
 ```
 
 ### Get Discovered Files by Priority
+
 ```typescript
 const highPriorityFiles = await db
   .select()
   .from(discoveredFiles)
-  .where(and(
-    eq(discoveredFiles.discoverySessionId, sessionId),
-    eq(discoveredFiles.priority, 'high')
-  ))
+  .where(and(eq(discoveredFiles.discoverySessionId, sessionId), eq(discoveredFiles.priority, 'high')))
   .orderBy(desc(discoveredFiles.relevanceScore));
 ```
 
 ### Get Complete Execution Log for Plan
+
 ```typescript
 const executionLog = await db
   .select()
@@ -533,19 +538,23 @@ const executionLog = await db
 ## Migration Strategy
 
 ### Phase 1: Core Tables
+
 1. Create enums
 2. Create `feature_plans` table
 3. Create `feature_refinements` table
 4. Create `plan_execution_logs` table
 
 ### Phase 2: File Discovery
+
 1. Create `file_discovery_sessions` table
 2. Create `discovered_files` table
 
 ### Phase 3: Implementation Planning
+
 1. Create `implementation_plan_generations` table
 
 ### Phase 4: Indexes & Optimization
+
 1. Add all indexes
 2. Add constraints
 3. Performance testing
@@ -553,11 +562,13 @@ const executionLog = await db
 ## Schema File Location
 
 Following project conventions, create:
+
 ```
 src/lib/db/schema/feature-planner.schema.ts
 ```
 
 Then export from:
+
 ```
 src/lib/db/schema/index.ts
 ```

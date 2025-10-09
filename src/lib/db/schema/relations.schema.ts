@@ -3,6 +3,16 @@ import { relations } from 'drizzle-orm';
 import { contentViews, searchQueries } from '@/lib/db/schema/analytics.schema';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads.schema';
 import { collections, subCollections } from '@/lib/db/schema/collections.schema';
+import {
+  discoveredFiles,
+  featurePlans,
+  featureRefinements,
+  fileDiscoverySessions,
+  implementationPlanGenerations,
+  planExecutionLogs,
+  planSteps,
+  planStepTemplates,
+} from '@/lib/db/schema/feature-planner.schema';
 import { contentReports } from '@/lib/db/schema/moderation.schema';
 import { comments, follows, likes } from '@/lib/db/schema/social.schema';
 import { featuredContent, notifications } from '@/lib/db/schema/system.schema';
@@ -25,16 +35,19 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   collections: many(collections),
   comments: many(comments),
   contentViews: many(contentViews),
+  featurePlans: many(featurePlans),
   followers: many(follows, { relationName: 'following' }),
   following: many(follows, { relationName: 'follower' }),
   likes: many(likes),
   loginHistory: many(loginHistory),
+  manuallyAddedFiles: many(discoveredFiles),
   moderatedReports: many(contentReports, { relationName: 'moderator' }),
   notifications: many(notifications),
   notificationSettings: one(notificationSettings, {
     fields: [users.id],
     references: [notificationSettings.userId],
   }),
+  planStepTemplates: many(planStepTemplates),
   reports: many(contentReports, { relationName: 'reporter' }),
   searchQueries: many(searchQueries),
   sessions: many(userSessions),
@@ -239,5 +252,91 @@ export const notificationSettingsRelations = relations(notificationSettings, ({ 
   user: one(users, {
     fields: [notificationSettings.userId],
     references: [users.id],
+  }),
+}));
+
+export const featurePlansRelations = relations(featurePlans, ({ many, one }) => ({
+  childPlans: many(featurePlans, { relationName: 'plan_versions' }),
+  discoverySessions: many(fileDiscoverySessions),
+  executionLogs: many(planExecutionLogs),
+  parentPlan: one(featurePlans, {
+    fields: [featurePlans.parentPlanId],
+    references: [featurePlans.id],
+    relationName: 'plan_versions',
+  }),
+  planGenerations: many(implementationPlanGenerations),
+  refinements: many(featureRefinements),
+  user: one(users, {
+    fields: [featurePlans.userId],
+    references: [users.id],
+  }),
+}));
+
+export const featureRefinementsRelations = relations(featureRefinements, ({ one }) => ({
+  plan: one(featurePlans, {
+    fields: [featureRefinements.planId],
+    references: [featurePlans.id],
+  }),
+}));
+
+export const fileDiscoverySessionsRelations = relations(fileDiscoverySessions, ({ many, one }) => ({
+  files: many(discoveredFiles),
+  plan: one(featurePlans, {
+    fields: [fileDiscoverySessions.planId],
+    references: [featurePlans.id],
+  }),
+}));
+
+export const discoveredFilesRelations = relations(discoveredFiles, ({ one }) => ({
+  addedByUser: one(users, {
+    fields: [discoveredFiles.addedByUserId],
+    references: [users.id],
+  }),
+  session: one(fileDiscoverySessions, {
+    fields: [discoveredFiles.discoverySessionId],
+    references: [fileDiscoverySessions.id],
+  }),
+}));
+
+export const implementationPlanGenerationsRelations = relations(
+  implementationPlanGenerations,
+  ({ many, one }) => ({
+    plan: one(featurePlans, {
+      fields: [implementationPlanGenerations.planId],
+      references: [featurePlans.id],
+    }),
+    steps: many(planSteps),
+  }),
+);
+
+export const planStepsRelations = relations(planSteps, ({ one }) => ({
+  planGeneration: one(implementationPlanGenerations, {
+    fields: [planSteps.planGenerationId],
+    references: [implementationPlanGenerations.id],
+  }),
+  template: one(planStepTemplates, {
+    fields: [planSteps.templateId],
+    references: [planStepTemplates.id],
+  }),
+}));
+
+export const planStepTemplatesRelations = relations(planStepTemplates, ({ many, one }) => ({
+  steps: many(planSteps),
+  user: one(users, {
+    fields: [planStepTemplates.userId],
+    references: [users.id],
+  }),
+}));
+
+export const planExecutionLogsRelations = relations(planExecutionLogs, ({ many, one }) => ({
+  childLogs: many(planExecutionLogs, { relationName: 'nested_logs' }),
+  parentLog: one(planExecutionLogs, {
+    fields: [planExecutionLogs.parentLogId],
+    references: [planExecutionLogs.id],
+    relationName: 'nested_logs',
+  }),
+  plan: one(featurePlans, {
+    fields: [planExecutionLogs.planId],
+    references: [featurePlans.id],
   }),
 }));

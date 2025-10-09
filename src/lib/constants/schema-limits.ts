@@ -43,10 +43,20 @@ export const SCHEMA_LIMITS = {
     REFERRER_URL: { MAX: 500 },
     USER_AGENT: { MAX: 1000, MIN: 1 },
   },
+  FEATURE_PLAN: {
+    ESTIMATED_DURATION: { MAX: 50 },
+    SESSION_ID: { MAX: 255 },
+  },
   FEATURED_CONTENT: {
     CURATOR_NOTES: { MAX: 2000 },
     DESCRIPTION: { MAX: 5000, MIN: 10 },
     TITLE: { MAX: 255, MIN: 10 },
+  },
+  FILE_DISCOVERY: {
+    FILE_PATH: { MAX: 500 },
+    FILE_TYPE: { MAX: 50 },
+    INTEGRATION_POINT: { MAX: 1000 },
+    ROLE: { MAX: 100 },
   },
   LOGIN_HISTORY: {
     FAILURE_REASON: { MAX: 255 },
@@ -56,8 +66,32 @@ export const SCHEMA_LIMITS = {
   NOTIFICATION: {
     TITLE: { MAX: 255, MIN: 1 },
   },
+  PLAN_EXECUTION: {
+    AGENT_MODEL: { MAX: 50 },
+    AGENT_TYPE: { MAX: 100 },
+    PARENT_TOOL_USE_ID: { MAX: 255 },
+    SESSION_ID: { MAX: 255 },
+  },
+  PLAN_STEP: {
+    CATEGORY: { MAX: 50 },
+    CONFIDENCE_LEVEL: { MAX: 20 },
+    ESTIMATED_DURATION: { MAX: 50 },
+    TITLE: { MAX: 255 },
+  },
+  PLAN_STEP_TEMPLATE: {
+    CATEGORY: { MAX: 50 },
+    CONFIDENCE_LEVEL: { MAX: 20 },
+    DESCRIPTION: { MAX: 1000 },
+    ESTIMATED_DURATION: { MAX: 50 },
+    NAME: { MAX: 100 },
+    TITLE: { MAX: 255 },
+  },
   PLATFORM_SETTING: {
     KEY: { MAX: 100, MIN: 1 },
+  },
+  REFINEMENT: {
+    AGENT_ID: { MAX: 100 },
+    AGENT_MODEL: { MAX: 50 },
   },
   SEARCH_QUERY: {
     IP_ADDRESS: { MAX: 50 },
@@ -100,20 +134,4 @@ export const SCHEMA_LIMITS = {
   },
 } as const;
 
-// helper type for accessing limits
 export type SchemaLimits = typeof SCHEMA_LIMITS;
-
-// helper functions for common validations
-export const getMinLength = (entity: keyof SchemaLimits, field: string): number => {
-  const limits = SCHEMA_LIMITS[entity];
-  // @ts-expect-error ignore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-  return limits[field]?.MIN || 0;
-};
-
-export const getMaxLength = (entity: keyof SchemaLimits, field: string): number => {
-  const limits = SCHEMA_LIMITS[entity];
-  // @ts-expect-error ignore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-  return limits[field]?.MAX || limits[field]?.LENGTH || 255;
-};

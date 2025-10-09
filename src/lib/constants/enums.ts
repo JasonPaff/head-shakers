@@ -30,12 +30,24 @@ export const ENUMS = {
   CONTENT_VIEWS: {
     TARGET_TYPE: ['bobblehead', 'collection', 'subcollection', 'profile'] as const,
   },
+  FEATURE_PLAN: {
+    COMPLEXITY: ['low', 'medium', 'high'] as const,
+    RISK_LEVEL: ['low', 'medium', 'high'] as const,
+    STATUS: ['draft', 'refining', 'discovering', 'planning', 'completed', 'failed', 'cancelled'] as const,
+  },
   FEATURED_CONTENT: {
     FEATURE_TYPE: ['homepage_banner', 'collection_of_week', 'trending', 'editor_pick'] as const,
     TYPE: ['bobblehead', 'collection', 'user'] as const,
   },
+  FILE_DISCOVERY: {
+    PRIORITY: ['critical', 'high', 'medium', 'low'] as const,
+    STATUS: ['pending', 'processing', 'completed', 'failed'] as const,
+  },
   FOLLOW: {
     TYPE: ['user', 'collection'] as const,
+  },
+  IMPLEMENTATION_PLAN: {
+    STATUS: ['pending', 'processing', 'completed', 'failed'] as const,
   },
   LIKE: {
     TARGET_TYPE: ['bobblehead', 'collection', 'subcollection'] as const,
@@ -47,8 +59,14 @@ export const ENUMS = {
     RELATED_TYPE: ['bobblehead', 'collection', 'subcollection', 'comment', 'user'] as const,
     TYPE: ['comment', 'like', 'follow', 'mention', 'system'] as const,
   },
+  PLAN_EXECUTION: {
+    STEP: ['refinement', 'discovery', 'planning'] as const,
+  },
   PLATFORM_SETTING: {
     VALUE_TYPE: ['string', 'number', 'boolean', 'json'] as const,
+  },
+  REFINEMENT: {
+    STATUS: ['pending', 'processing', 'completed', 'failed'] as const,
   },
   SEARCH: {
     RESULT_TYPE: ['bobblehead', 'collection', 'subcollection', 'user'] as const,
@@ -78,22 +96,17 @@ export type CommentTargetType = (typeof ENUMS.COMMENT.TARGET_TYPE)[number];
 export type ContentMetricType = (typeof ENUMS.CONTENT_METRIC.TYPE)[number];
 export type ContentReportReason = (typeof ENUMS.CONTENT_REPORT.REASON)[number];
 export type ContentReportStatus = (typeof ENUMS.CONTENT_REPORT.STATUS)[number];
+export type FeaturePlanComplexity = (typeof ENUMS.FEATURE_PLAN.COMPLEXITY)[number];
+export type FeaturePlanRiskLevel = (typeof ENUMS.FEATURE_PLAN.RISK_LEVEL)[number];
+export type FeaturePlanStatus = (typeof ENUMS.FEATURE_PLAN.STATUS)[number];
+export type FileDiscoveryPriority = (typeof ENUMS.FILE_DISCOVERY.PRIORITY)[number];
+export type FileDiscoveryStatus = (typeof ENUMS.FILE_DISCOVERY.STATUS)[number];
 export type FollowType = (typeof ENUMS.FOLLOW.TYPE)[number];
+export type ImplementationPlanStatus = (typeof ENUMS.IMPLEMENTATION_PLAN.STATUS)[number];
 export type LikeTargetType = (typeof ENUMS.LIKE.TARGET_TYPE)[number];
 export type NotificationType = (typeof ENUMS.NOTIFICATION.TYPE)[number];
+export type PlanExecutionStep = (typeof ENUMS.PLAN_EXECUTION.STEP)[number];
 export type PrivacyLevel = (typeof ENUMS.USER_SETTINGS.PRIVACY_LEVEL)[number];
+export type RefinementStatus = (typeof ENUMS.REFINEMENT.STATUS)[number];
 export type UserRole = (typeof ENUMS.USER.ROLE)[number];
 export type UserTheme = (typeof ENUMS.USER_SETTINGS.THEME)[number];
-
-// helper function to get enum values
-export const getEnumValues = <T extends keyof typeof ENUMS>(category: T): (typeof ENUMS)[T] => {
-  return ENUMS[category];
-};
-
-// helper function to check if value is valid enum
-export const isValidEnum = <T extends Readonly<Array<string>>>(
-  enumArray: T,
-  value: string,
-): value is T[number] => {
-  return enumArray.includes(value as T[number]);
-};

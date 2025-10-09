@@ -64,12 +64,14 @@ This document provides a comprehensive architecture plan for implementing a web-
 #### A. Pages (`/app/(app)/feature-planner/`)
 
 **Main Page:** `page.tsx`
+
 - Orchestrates the 3-step workflow
 - Manages state with `useState` and URL state (`nuqs`)
 - Controls step progression
 - Displays results and allows user interactions
 
 **Components:**
+
 ```
 /app/(app)/feature-planner/
 ├── page.tsx                     # Main orchestrator
@@ -88,16 +90,18 @@ This document provides a comprehensive architecture plan for implementing a web-
 #### B. State Management
 
 **URL State (nuqs):**
+
 ```typescript
 const [currentStep, setCurrentStep] = useQueryState(
   'step',
-  parseAsInteger.withDefault(1).withOptions({ history: 'push' })
+  parseAsInteger.withDefault(1).withOptions({ history: 'push' }),
 );
 
 const [planId, setPlanId] = useQueryState('planId');
 ```
 
 **Local State:**
+
 ```typescript
 interface FeaturePlannerState {
   planId: string | null;
@@ -148,24 +152,29 @@ interface FeaturePlannerState {
 #### B. API Route Examples
 
 **Create Plan:**
+
 ```typescript
 // POST /api/feature-planner/create
 export async function POST(request: Request) {
   const { featureRequest } = await request.json();
   const userId = await getCurrentUserId();
 
-  const plan = await db.insert(featurePlans).values({
-    userId,
-    originalRequest: featureRequest,
-    status: 'draft',
-    currentStep: 0,
-  }).returning();
+  const plan = await db
+    .insert(featurePlans)
+    .values({
+      userId,
+      originalRequest: featureRequest,
+      status: 'draft',
+      currentStep: 0,
+    })
+    .returning();
 
   return NextResponse.json({ planId: plan.id });
 }
 ```
 
 **Run Refinement (Parallel):**
+
 ```typescript
 // POST /api/feature-planner/refine
 import { query } from '@anthropic-ai/claude-agent-sdk';
@@ -174,33 +183,33 @@ export async function POST(request: Request) {
   const { planId, settings } = await request.json();
 
   // Update plan status
-  await db.update(featurePlans)
+  await db
+    .update(featurePlans)
     .set({ status: 'refining', currentStep: 1 })
     .where(eq(featurePlans.id, planId));
 
   // Run parallel refinements
   const refinements = await Promise.all(
     Array.from({ length: settings.agentCount }, (_, i) =>
-      refineWithAgent(planId, `agent-${i + 1}`, settings)
-    )
+      refineWithAgent(planId, `agent-${i + 1}`, settings),
+    ),
   );
 
   return NextResponse.json({ refinements });
 }
 
-async function refineWithAgent(
-  planId: string,
-  agentId: string,
-  settings: RefinementSettings
-) {
+async function refineWithAgent(planId: string, agentId: string, settings: RefinementSettings) {
   const startTime = Date.now();
 
   // Create refinement record
-  const [refinement] = await db.insert(featureRefinements).values({
-    planId,
-    agentId,
-    status: 'processing',
-  }).returning();
+  const [refinement] = await db
+    .insert(featureRefinements)
+    .values({
+      planId,
+      agentId,
+      status: 'processing',
+    })
+    .returning();
 
   try {
     let refinedRequest = '';
@@ -211,7 +220,7 @@ async function refineWithAgent(
         maxTurns: 1,
         settingSources: ['project'],
         allowedTools: ['Read'],
-      }
+      },
     })) {
       if (message.type === 'result') {
         refinedRequest = message.result;
@@ -219,7 +228,8 @@ async function refineWithAgent(
     }
 
     // Update refinement with result
-    await db.update(featureRefinements)
+    await db
+      .update(featureRefinements)
       .set({
         refinedRequest,
         status: 'completed',
@@ -230,7 +240,8 @@ async function refineWithAgent(
 
     return refinement;
   } catch (error) {
-    await db.update(featureRefinements)
+    await db
+      .update(featureRefinements)
       .set({ status: 'failed', errorMessage: error.message })
       .where(eq(featureRefinements.id, refinement.id));
 
@@ -240,12 +251,10 @@ async function refineWithAgent(
 ```
 
 **Server-Sent Events (Real-time):**
+
 ```typescript
 // GET /api/feature-planner/[planId]/stream
-export async function GET(
-  request: Request,
-  { params }: { params: { planId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { planId: string } }) {
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -253,21 +262,21 @@ export async function GET(
       // Stream refinement progress
       for await (const message of query({
         prompt: generateRefinementPrompt(planId),
-        options: { includePartialMessages: true }
+        options: { includePartialMessages: true },
       })) {
         const data = `data: ${JSON.stringify(message)}\n\n`;
         controller.enqueue(encoder.encode(data));
       }
 
       controller.close();
-    }
+    },
   });
 
   return new Response(stream, {
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
     },
   });
 }
@@ -289,12 +298,15 @@ export class FeaturePlannerService {
    * Create a new feature plan
    */
   async createPlan(userId: string, originalRequest: string) {
-    const [plan] = await db.insert(featurePlans).values({
-      userId,
-      originalRequest,
-      status: 'draft',
-      currentStep: 0,
-    }).returning();
+    const [plan] = await db
+      .insert(featurePlans)
+      .values({
+        userId,
+        originalRequest,
+        status: 'draft',
+        currentStep: 0,
+      })
+      .returning();
 
     return plan;
   }
@@ -302,26 +314,18 @@ export class FeaturePlannerService {
   /**
    * Run parallel refinements
    */
-  async runParallelRefinement(
-    planId: string,
-    settings: RefinementSettings
-  ) {
+  async runParallelRefinement(planId: string, settings: RefinementSettings) {
     const plan = await this.getPlan(planId);
 
     // Update plan status
-    await db.update(featurePlans)
+    await db
+      .update(featurePlans)
       .set({ status: 'refining', refinementSettings: settings })
       .where(eq(featurePlans.id, planId));
 
     // Run multiple agents in parallel
-    const refinementPromises = Array.from(
-      { length: settings.agentCount },
-      (_, i) => this.runSingleRefinement(
-        planId,
-        plan.originalRequest,
-        `agent-${i + 1}`,
-        settings
-      )
+    const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
+      this.runSingleRefinement(planId, plan.originalRequest, `agent-${i + 1}`, settings),
     );
 
     const refinements = await Promise.all(refinementPromises);
@@ -336,17 +340,20 @@ export class FeaturePlannerService {
     planId: string,
     originalRequest: string,
     agentId: string,
-    settings: RefinementSettings
+    settings: RefinementSettings,
   ) {
     const startTime = Date.now();
 
     // Create refinement record
-    const [refinement] = await db.insert(featureRefinements).values({
-      planId,
-      agentId,
-      inputRequest: originalRequest,
-      status: 'processing',
-    }).returning();
+    const [refinement] = await db
+      .insert(featureRefinements)
+      .values({
+        planId,
+        agentId,
+        inputRequest: originalRequest,
+        status: 'processing',
+      })
+      .returning();
 
     try {
       let refinedRequest = '';
@@ -360,7 +367,7 @@ export class FeaturePlannerService {
           settingSources: ['project'], // Load .claude/agents/
           allowedTools: ['Read', 'Grep', 'Glob'],
           model: 'claude-sonnet-4-5-20250929',
-        }
+        },
       })) {
         if (message.type === 'assistant') {
           refinedRequest = message.message.content[0].text;
@@ -378,7 +385,8 @@ export class FeaturePlannerService {
       // Validate and update
       const validation = this.validateRefinement(refinedRequest, originalRequest);
 
-      await db.update(featureRefinements)
+      await db
+        .update(featureRefinements)
         .set({
           refinedRequest,
           status: 'completed',
@@ -395,7 +403,8 @@ export class FeaturePlannerService {
 
       return refinement;
     } catch (error) {
-      await db.update(featureRefinements)
+      await db
+        .update(featureRefinements)
         .set({
           status: 'failed',
           errorMessage: error.message,
@@ -421,7 +430,7 @@ export class FeaturePlannerService {
   async generateImplementationPlan(
     planId: string,
     refinedRequest: string,
-    discoveredFiles: FileDiscoveryResult[]
+    discoveredFiles: FileDiscoveryResult[],
   ) {
     // Similar pattern to refinement
     // Uses implementation-planner subagent
@@ -430,12 +439,7 @@ export class FeaturePlannerService {
   /**
    * Log agent execution
    */
-  private async logExecution(
-    planId: string,
-    step: string,
-    stepNumber: number,
-    message: SDKMessage
-  ) {
+  private async logExecution(planId: string, step: string, stepNumber: number, message: SDKMessage) {
     await db.insert(planExecutionLogs).values({
       planId,
       step,
@@ -450,6 +454,7 @@ export class FeaturePlannerService {
 ### 4. Database Integration
 
 **Facade Pattern:**
+
 ```typescript
 // src/lib/facades/feature-planner.facade.ts
 
@@ -477,12 +482,12 @@ export class FeaturePlannerFacade {
         refinements: true,
         discoverySessions: {
           with: {
-            files: true
-          }
+            files: true,
+          },
         },
         planGenerations: true,
-        executionLogs: true
-      }
+        executionLogs: true,
+      },
     });
 
     return plan;
@@ -497,6 +502,7 @@ export class FeaturePlannerFacade {
 **Goal:** Basic 3-step workflow with database persistence
 
 **Tasks:**
+
 1. ✅ Design database schema
 2. Create schema file and migration
 3. Build service layer with SDK integration
@@ -506,6 +512,7 @@ export class FeaturePlannerFacade {
 7. Basic error handling
 
 **Deliverables:**
+
 - Working 3-step flow
 - Database persistence
 - Basic UI
@@ -515,6 +522,7 @@ export class FeaturePlannerFacade {
 **Goal:** Enable parallel refinement with comparison
 
 **Tasks:**
+
 1. Implement parallel refinement service
 2. Update UI to display multiple refinements
 3. Add refinement comparison interface
@@ -522,6 +530,7 @@ export class FeaturePlannerFacade {
 5. Add execution metrics display
 
 **Deliverables:**
+
 - Parallel refinement working
 - Comparison UI
 - Selection mechanism
@@ -531,6 +540,7 @@ export class FeaturePlannerFacade {
 **Goal:** Add real-time progress updates
 
 **Tasks:**
+
 1. Implement SSE endpoint for streaming
 2. Build streaming consumer in UI
 3. Add progress indicators
@@ -538,6 +548,7 @@ export class FeaturePlannerFacade {
 5. Partial message handling
 
 **Deliverables:**
+
 - Real-time progress updates
 - Live log streaming
 - Enhanced UX
@@ -547,6 +558,7 @@ export class FeaturePlannerFacade {
 **Goal:** Iteration, versioning, and polish
 
 **Tasks:**
+
 1. Implement plan versioning
 2. Add step re-run capability
 3. Build plan history view
@@ -556,6 +568,7 @@ export class FeaturePlannerFacade {
 7. Comprehensive testing
 
 **Deliverables:**
+
 - Complete feature set
 - Production-ready
 - Fully tested
@@ -578,14 +591,15 @@ const result = query({
         description: 'Custom refinement agent',
         prompt: customPrompt,
         tools: ['Read'],
-        model: 'opus'
-      }
-    }
-  }
+        model: 'opus',
+      },
+    },
+  },
 });
 ```
 
 **Rationale:**
+
 - Reuses existing `.claude/agents/*.md` files
 - Single source of truth with CLI
 - Flexibility for web-specific customization
@@ -596,16 +610,18 @@ const result = query({
 **Decision:** Start Single Message, Add Streaming Later
 
 **Phase 1 (MVP):** Single message input
+
 ```typescript
 for await (const message of query({
-  prompt: "Refine request",
-  options: { maxTurns: 1 }
+  prompt: 'Refine request',
+  options: { maxTurns: 1 },
 })) {
   // Simple, predictable
 }
 ```
 
 **Phase 3 (Streaming):** Streaming input
+
 ```typescript
 async function* generateMessages() {
   yield userMessage;
@@ -614,6 +630,7 @@ async function* generateMessages() {
 ```
 
 **Rationale:**
+
 - MVP is simpler with single message
 - Streaming adds complexity that's not needed initially
 - Can add streaming for real-time updates later
@@ -630,11 +647,12 @@ const [planId] = useQueryState('planId');
 // Server state via TanStack Query
 const { data: plan } = useQuery({
   queryKey: ['plan', planId],
-  queryFn: () => fetch(`/api/feature-planner/${planId}`).then(r => r.json())
+  queryFn: () => fetch(`/api/feature-planner/${planId}`).then((r) => r.json()),
 });
 ```
 
 **Rationale:**
+
 - URL state enables deep linking
 - Server state via React Query handles caching
 - Clean separation of concerns
@@ -666,11 +684,12 @@ try {
 const { mutate, error } = useMutation({
   onError: (error) => {
     toast.error(error.message);
-  }
+  },
 });
 ```
 
 **Rationale:**
+
 - Clear error boundaries
 - Proper logging at each layer
 - User-friendly error messages
@@ -678,23 +697,19 @@ const { mutate, error } = useMutation({
 ## Security Considerations
 
 ### 1. Authentication
+
 - All API routes require authentication
 - Use Clerk's `auth()` helper
 - Validate user owns the plan
 
 ### 2. Authorization
+
 ```typescript
-export async function GET(
-  request: Request,
-  { params }: { params: { planId: string } }
-) {
+export async function GET(request: Request, { params }: { params: { planId: string } }) {
   const { userId } = auth();
 
   const plan = await db.query.featurePlans.findFirst({
-    where: and(
-      eq(featurePlans.id, params.planId),
-      eq(featurePlans.userId, userId)
-    )
+    where: and(eq(featurePlans.id, params.planId), eq(featurePlans.userId, userId)),
   });
 
   if (!plan) {
@@ -706,11 +721,13 @@ export async function GET(
 ```
 
 ### 3. Rate Limiting
+
 - Implement rate limiting on expensive operations
 - Use Upstash Redis for rate limit tracking
 - Limit parallel refinement count
 
 ### 4. Input Validation
+
 - Validate all inputs with Zod
 - Sanitize user input before passing to agents
 - Check file path access restrictions
@@ -718,16 +735,19 @@ export async function GET(
 ## Performance Optimization
 
 ### 1. Database Queries
+
 - Use indexes on frequently queried fields
 - Implement query result caching
 - Use Drizzle's query builder efficiently
 
 ### 2. API Routes
+
 - Implement response caching where appropriate
 - Use streaming for large payloads
 - Optimize bundle size
 
 ### 3. SDK Usage
+
 - Reuse Claude sessions where possible
 - Implement prompt caching
 - Monitor token usage
@@ -735,6 +755,7 @@ export async function GET(
 ## Monitoring & Analytics
 
 ### 1. Metrics to Track
+
 - Execution time per step
 - Token usage per agent
 - Success/failure rates
@@ -742,11 +763,13 @@ export async function GET(
 - Cost per plan generation
 
 ### 2. Logging
+
 - All agent executions logged to `plan_execution_logs`
 - Error tracking with Sentry
 - Performance monitoring
 
 ### 3. Analytics Dashboard
+
 - User plan history
 - Success metrics
 - Cost analysis
@@ -755,21 +778,25 @@ export async function GET(
 ## Testing Strategy
 
 ### 1. Unit Tests
+
 - Service layer functions
 - Utility functions
 - Validation logic
 
 ### 2. Integration Tests
+
 - API routes
 - Database operations
 - SDK integration
 
 ### 3. E2E Tests
+
 - Full workflow (3 steps)
 - Error scenarios
 - Edge cases
 
 ### 4. Performance Tests
+
 - Load testing API routes
 - Database query performance
 - SDK response times
@@ -777,6 +804,7 @@ export async function GET(
 ## Deployment Considerations
 
 ### 1. Environment Variables
+
 ```env
 # Claude Agent SDK
 ANTHROPIC_API_KEY=sk-ant-...
@@ -789,12 +817,14 @@ NEXT_PUBLIC_APP_URL=https://...
 ```
 
 ### 2. Database Migrations
+
 ```bash
 npm run db:generate  # Generate migration
 npm run db:migrate   # Run migration
 ```
 
 ### 3. Feature Flags
+
 - Use feature flags for gradual rollout
 - Enable/disable streaming
 - Control parallel execution limits
@@ -802,23 +832,27 @@ npm run db:migrate   # Run migration
 ## Success Metrics
 
 ### 1. Functionality
+
 - ✅ All 3 steps working
 - ✅ Database persistence
 - ✅ Parallel execution
 - ✅ Real-time updates
 
 ### 2. Performance
+
 - Step 1 (Refinement): < 5 seconds
 - Step 2 (Discovery): < 10 seconds
 - Step 3 (Planning): < 15 seconds
 - Total workflow: < 30 seconds
 
 ### 3. Quality
+
 - 95%+ success rate for refinements
 - 90%+ valid implementation plans
 - < 1% error rate
 
 ### 4. User Experience
+
 - Clear progress indication
 - Helpful error messages
 - Responsive UI (< 100ms interactions)
@@ -826,21 +860,25 @@ npm run db:migrate   # Run migration
 ## Future Enhancements
 
 ### 1. AI Improvements
+
 - Fine-tuned models for specific tasks
 - Custom agent training
 - Improved prompt engineering
 
 ### 2. Collaboration
+
 - Share plans with team members
 - Collaborative editing
 - Plan templates
 
 ### 3. Integration
+
 - CI/CD integration
 - GitHub integration
 - Slack notifications
 
 ### 4. Advanced Features
+
 - Plan branching and merging
 - A/B testing different approaches
 - ML-powered plan optimization

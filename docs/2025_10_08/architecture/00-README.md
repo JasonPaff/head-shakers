@@ -11,9 +11,11 @@ This directory contains comprehensive architecture documentation for migrating t
 ## Documentation Index
 
 ### [01. Current CLI Workflow Analysis](./01-current-cli-workflow-analysis.md)
+
 **Purpose:** Understand the existing `/plan-feature` CLI implementation
 
 **Contents:**
+
 - Detailed analysis of the 3-step workflow (Refinement → Discovery → Planning)
 - Agent architecture and configuration
 - Data flow and logging mechanisms
@@ -22,15 +24,18 @@ This directory contains comprehensive architecture documentation for migrating t
 - Recommendations for web improvements
 
 **Key Insights:**
+
 - The CLI uses filesystem-based agents (`.claude/agents/*.md`)
 - Each step has comprehensive logging and validation
 - Quality gates ensure output meets requirements
 - Limited user control between steps is main limitation
 
 ### [02. Claude Agent SDK Capabilities](./02-claude-agent-sdk-capabilities.md)
+
 **Purpose:** Document SDK capabilities and integration patterns
 
 **Contents:**
+
 - SDK overview and core capabilities
 - Input modes (Single Message vs Streaming)
 - Agent definition strategies (Programmatic vs Filesystem)
@@ -40,6 +45,7 @@ This directory contains comprehensive architecture documentation for migrating t
 - Message types and event handling
 
 **Key Capabilities:**
+
 - `@anthropic-ai/claude-agent-sdk` v0.1.11 already installed
 - Supports both programmatic and filesystem-based agent definitions
 - Can reuse existing `.claude/agents/*.md` files
@@ -47,14 +53,17 @@ This directory contains comprehensive architecture documentation for migrating t
 - Built-in session management and context persistence
 
 **Recommended Approach:**
+
 - **Hybrid agent definition:** Load from filesystem + programmatic overrides
 - **Start with single message input** for MVP, add streaming later
 - **Step-by-step API routes** for granular control
 
 ### [03. Database Schema Design](./03-database-schema-design.md)
+
 **Purpose:** Complete database schema for persisting workflows
 
 **Contents:**
+
 - Core tables design (6 main tables)
 - Relationships and foreign keys
 - Indexes and performance optimization
@@ -63,6 +72,7 @@ This directory contains comprehensive architecture documentation for migrating t
 - Migration strategy
 
 **Core Tables:**
+
 1. **`feature_plans`** - Main workflow orchestration
 2. **`feature_refinements`** - Individual refinement attempts (parallel support)
 3. **`file_discovery_sessions`** - File discovery executions
@@ -71,6 +81,7 @@ This directory contains comprehensive architecture documentation for migrating t
 6. **`plan_execution_logs`** - Complete audit trail
 
 **Key Features:**
+
 - Parallel refinement support (multiple agents per plan)
 - Complete execution audit trail
 - Versioning and iteration support
@@ -78,9 +89,11 @@ This directory contains comprehensive architecture documentation for migrating t
 - File selection tracking
 
 ### [04. Comprehensive Architecture Plan](./04-comprehensive-architecture-plan.md)
+
 **Purpose:** Complete architectural blueprint for implementation
 
 **Contents:**
+
 - System architecture overview
 - Component architecture (Frontend, API, Service layers)
 - Implementation phases (4 phases over 8 weeks)
@@ -93,6 +106,7 @@ This directory contains comprehensive architecture documentation for migrating t
 - Future enhancements
 
 **Architecture Highlights:**
+
 ```
 Browser (React UI)
     ↓
@@ -106,6 +120,7 @@ Filesystem Agents + Claude API + PostgreSQL
 ```
 
 **Implementation Phases:**
+
 - **Phase 1 (Weeks 1-2):** MVP - Basic 3-step flow with DB persistence
 - **Phase 2 (Weeks 3-4):** Parallel execution and comparison
 - **Phase 3 (Weeks 5-6):** Real-time streaming and progress
@@ -115,17 +130,18 @@ Filesystem Agents + Claude API + PostgreSQL
 
 ### Key Decisions Summary
 
-| Aspect | Decision | Rationale |
-|--------|----------|-----------|
+| Aspect               | Decision                           | Rationale                                          |
+| -------------------- | ---------------------------------- | -------------------------------------------------- |
 | **Agent Invocation** | Hybrid (Filesystem + Programmatic) | Reuses `.claude/agents/*.md`, allows customization |
-| **Input Mode** | Single Message → Streaming | Simple MVP, add complexity later |
-| **State Management** | URL State + TanStack Query | Deep linking + server state caching |
-| **Database** | PostgreSQL + Drizzle ORM | Already in use, type-safe, powerful |
-| **Error Handling** | Multi-layer Strategy | Clear boundaries, proper logging |
+| **Input Mode**       | Single Message → Streaming         | Simple MVP, add complexity later                   |
+| **State Management** | URL State + TanStack Query         | Deep linking + server state caching                |
+| **Database**         | PostgreSQL + Drizzle ORM           | Already in use, type-safe, powerful                |
+| **Error Handling**   | Multi-layer Strategy               | Clear boundaries, proper logging                   |
 
 ### Key File Locations
 
 **Frontend:**
+
 ```
 /app/(app)/feature-planner/
 ├── page.tsx
@@ -136,6 +152,7 @@ Filesystem Agents + Claude API + PostgreSQL
 ```
 
 **API Routes:**
+
 ```
 /app/api/feature-planner/
 ├── create/route.ts
@@ -145,12 +162,14 @@ Filesystem Agents + Claude API + PostgreSQL
 ```
 
 **Service Layer:**
+
 ```
 /src/lib/services/
 └── feature-planner.service.ts
 ```
 
 **Database Schema:**
+
 ```
 /src/lib/db/schema/
 └── feature-planner.schema.ts
@@ -178,13 +197,16 @@ Filesystem Agents + Claude API + PostgreSQL
 ## Getting Started with Implementation
 
 ### Step 1: Review Documentation
+
 Read all 4 documents in order to understand:
+
 1. What the CLI does (Document 01)
 2. How the SDK works (Document 02)
 3. How to store data (Document 03)
 4. How to build it (Document 04)
 
 ### Step 2: Create Database Schema
+
 ```bash
 # Create schema file
 touch src/lib/db/schema/feature-planner.schema.ts
@@ -198,6 +220,7 @@ npm run db:migrate
 ```
 
 ### Step 3: Build Service Layer
+
 ```bash
 # Create service file
 touch src/lib/services/feature-planner.service.ts
@@ -206,6 +229,7 @@ touch src/lib/services/feature-planner.service.ts
 ```
 
 ### Step 4: Create API Routes
+
 ```bash
 # Create API route structure
 mkdir -p app/api/feature-planner/{create,refine,discover,plan}
@@ -214,6 +238,7 @@ mkdir -p app/api/feature-planner/{create,refine,discover,plan}
 ```
 
 ### Step 5: Build UI Components
+
 ```bash
 # Create component structure
 mkdir -p app/(app)/feature-planner/components/steps
@@ -224,6 +249,7 @@ mkdir -p app/(app)/feature-planner/components/steps
 ## Success Criteria
 
 **Functional Requirements:**
+
 - ✅ 3-step workflow operational
 - ✅ Database persistence working
 - ✅ Parallel refinement executing
@@ -231,12 +257,14 @@ mkdir -p app/(app)/feature-planner/components/steps
 - ✅ User control between steps
 
 **Performance Targets:**
+
 - Step 1 (Refinement): < 5 seconds
 - Step 2 (Discovery): < 10 seconds
 - Step 3 (Planning): < 15 seconds
 - Total workflow: < 30 seconds
 
 **Quality Metrics:**
+
 - 95%+ success rate for refinements
 - 90%+ valid implementation plans
 - < 1% error rate
@@ -244,12 +272,14 @@ mkdir -p app/(app)/feature-planner/components/steps
 ## Questions & Next Steps
 
 ### Immediate Questions
+
 1. Should we start with Phase 1 MVP or full implementation?
 2. Any specific UI/UX requirements or preferences?
 3. Performance budget and scaling considerations?
 4. Target launch date?
 
 ### Recommended Next Steps
+
 1. ✅ Review and approve architecture
 2. Create GitHub issues for Phase 1 tasks
 3. Set up project tracking (Linear/Jira/GitHub Projects)
@@ -263,6 +293,7 @@ mkdir -p app/(app)/feature-planner/components/steps
 ## Contact & Support
 
 For questions or clarifications about this architecture:
+
 - Review individual documents for detailed information
 - Refer to Claude Agent SDK docs: https://docs.claude.com/en/api/agent-sdk/overview
 - Check existing CLI implementation: `.claude/commands/plan-feature.md`

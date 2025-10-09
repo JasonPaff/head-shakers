@@ -34,14 +34,43 @@ export const DEFAULTS = {
   CONTENT_REPORT: {
     STATUS: 'pending',
   },
+  DISCOVERED_FILE: {
+    IS_FILE_EXISTS: true,
+    IS_MANUALLY_ADDED: false,
+    IS_SELECTED: false,
+    RELEVANCE_SCORE: 0,
+  },
+  FEATURE_PLAN: {
+    CURRENT_STEP: 0,
+    STATUS: 'draft',
+    TOTAL_EXECUTION_TIME_MS: 0,
+    VERSION: 1,
+  },
   FEATURED_CONTENT: {
     CONTENT_TYPE: ENUMS.FEATURED_CONTENT.TYPE[1],
     IS_ACTIVE: true,
     PRIORITY: 0,
     SORT_ORDER: 0,
   },
+  FILE_DISCOVERY: {
+    CRITICAL_PRIORITY_COUNT: 0,
+    HIGH_PRIORITY_COUNT: 0,
+    LOW_PRIORITY_COUNT: 0,
+    MEDIUM_PRIORITY_COUNT: 0,
+    STATUS: 'pending',
+    TOTAL_FILES_FOUND: 0,
+  },
   FOLLOW: {
     TYPE: 'user',
+  },
+  IMPLEMENTATION_PLAN: {
+    HAS_REQUIRED_SECTIONS: false,
+    IS_SELECTED: false,
+    IS_VALID_MARKDOWN: false,
+    PREREQUISITES_COUNT: 0,
+    QUALITY_GATES_COUNT: 0,
+    STATUS: 'pending',
+    TOTAL_STEPS: 0,
   },
   LOGIN_HISTORY: {
     LOGIN_METHOD: 'email',
@@ -70,9 +99,25 @@ export const DEFAULTS = {
     MAX_LIMIT: 100,
     OFFSET: 0,
   },
+  PLAN_EXECUTION: {
+    AGENT_LEVEL: 0,
+    IS_SUCCESS: true,
+    RETRY_ATTEMPT: 0,
+  },
+  PLAN_STEP_TEMPLATE: {
+    CONFIDENCE_LEVEL: 'high',
+    IS_PUBLIC: false,
+    USAGE_COUNT: 0,
+  },
   PLATFORM_SETTING: {
     IS_PUBLIC: false,
     VALUE_TYPE: 'string',
+  },
+  REFINEMENT: {
+    AGENT_MODEL: 'sonnet',
+    IS_VALID_FORMAT: false,
+    RETRY_COUNT: 0,
+    STATUS: 'pending',
   },
   SUB_COLLECTION: {
     IS_PUBLIC: true,
