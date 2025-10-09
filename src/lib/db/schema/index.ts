@@ -1,6 +1,7 @@
 export * from '@/lib/db/schema/analytics.schema';
 export * from '@/lib/db/schema/bobbleheads.schema';
 export * from '@/lib/db/schema/collections.schema';
+export * from '@/lib/db/schema/feature-planner.schema';
 export * from '@/lib/db/schema/moderation.schema';
 export * from '@/lib/db/schema/relations.schema';
 export * from '@/lib/db/schema/social.schema';

@@ -10,6 +10,7 @@
     "db:migrate": "npx drizzle-kit migrate",
     "db:reset": "npx tsx src/lib/db/scripts/reset-db.ts",
     "db:seed": "npx tsx src/lib/db/scripts/seed.ts",
+    "db:seed-templates": "npx tsx src/lib/db/scripts/seed-step-templates.ts",
     "dev": "next dev --turbopack",
     "format": "prettier --write .",
     "lint": "eslint src",
