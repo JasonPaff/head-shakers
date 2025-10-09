@@ -12,6 +12,7 @@ The Feature Planner is a web-based application that provides an interactive inte
 ## Project Integration
 
 ### Existing Foundation
+
 - **Command System**: Builds upon `/plan-feature` command in `.claude/commands/plan-feature.md`
 - **Agent Ecosystem**: Utilizes existing agents:
   - `initial-feature-refinement.md` (Step 1)
@@ -21,6 +22,7 @@ The Feature Planner is a web-based application that provides an interactive inte
 - **Documentation Structure**: Maintains `docs/{YYYY_MM_DD}/` organization pattern
 
 ### Technology Stack Integration
+
 - **Framework**: Next.js 15.5.3 with App Router (existing project stack)
 - **SDK**: Claude Code TypeScript SDK for agent communication
 - **Streaming**: Real-time updates using SDK streaming capabilities
@@ -31,6 +33,7 @@ The Feature Planner is a web-based application that provides an interactive inte
 ## Core User Experience
 
 ### Page Location
+
 - **Route**: `/feature-planner`
 - **Access**: Authenticated users via existing Clerk integration
 - **Layout**: Uses existing app layout with navigation
@@ -38,7 +41,9 @@ The Feature Planner is a web-based application that provides an interactive inte
 ### Workflow Steps
 
 #### Step 1: Feature Request Input
+
 **Initial Interface:**
+
 - Large textarea for feature request entry
 - Character counter (recommended 50-500 characters)
 - Two action buttons:
@@ -46,6 +51,7 @@ The Feature Planner is a web-based application that provides an interactive inte
   - "Skip to File Discovery" (secondary action)
 
 **Refinement Options:**
+
 - Agent count selector (1-5 parallel refinement agents)
 - Real-time streaming of refinement progress
 - Side-by-side comparison of refinement results
@@ -53,7 +59,9 @@ The Feature Planner is a web-based application that provides an interactive inte
 - "Use Original" option to bypass refinement
 
 #### Step 2: File Discovery
+
 **Discovery Interface:**
+
 - Streaming progress indicator showing AI analysis
 - Real-time file discovery results as they appear
 - Uses the existing file discovery agent
@@ -63,18 +71,22 @@ The Feature Planner is a web-based application that provides an interactive inte
 - File content preview on hover/click
 
 **Customization Options:**
+
 - Discovery scope settings (directory filters)
 - Minimum relevance threshold
 - File type filters (.tsx, .ts, .md, etc.)
 
 #### Step 3: Implementation Planning
+
 **Planning Interface:**
+
 - Streaming plan generation with section-by-section updates
 - Real-time markdown rendering of the plan
 - Customizable validation commands
 - Plan modification tools (edit sections, add steps)
 
 **Validation Customization:**
+
 - Toggle for mandatory lint/typecheck validation
 - Custom validation command builder
 - Additional quality gate configuration
@@ -83,7 +95,9 @@ The Feature Planner is a web-based application that provides an interactive inte
 ## Streaming and Real-Time Features
 
 ### SDK Integration
+
 **Streaming Implementation:**
+
 ```typescript
 // Conceptual implementation using Claude Code SDK
 for await (const message of query({
@@ -91,21 +105,23 @@ for await (const message of query({
   options: {
     maxTurns: 10,
     includePartialMessages: true,
-    allowedTools: ["Task", "Read", "Write"]
-  }
+    allowedTools: ['Task', 'Read', 'Write'],
+  },
 })) {
   // Handle streaming updates
-  if (message.type === "tool_use" && message.name === "Task") {
+  if (message.type === 'tool_use' && message.name === 'Task') {
     // Update UI with agent progress
   }
-  if (message.type === "stream_event") {
+  if (message.type === 'stream_event') {
     // Handle partial message updates
   }
 }
 ```
 
 ### Progress Visualization
+
 **Step Progress Indicators:**
+
 - Overall workflow progress (Step 1/3, 2/3, 3/3)
 - Individual step progress bars
 - Agent execution status (queued, running, completed)
@@ -113,6 +129,7 @@ for await (const message of query({
 - Execution timing information
 
 **Real-Time Updates:**
+
 - Streaming text updates as agents work
 - File discovery results appearing incrementally
 - Plan sections generating in real-time
@@ -122,6 +139,7 @@ for await (const message of query({
 ## User Interface Components
 
 ### Layout Structure
+
 ```
 ┌─ Feature Planner Header ─┐
 ├─ Progress Indicator ─────┤
@@ -134,7 +152,9 @@ for await (const message of query({
 ```
 
 ### Component Hierarchy
+
 **Main Components:**
+
 - `FeaturePlannerPage` - Main page container
 - `WorkflowProgress` - Overall progress tracking
 - `StepContainer` - Individual step wrapper
@@ -143,6 +163,7 @@ for await (const message of query({
 - `SettingsPanel` - Customization options
 
 **Step-Specific Components:**
+
 - `RequestInput` - Feature request textarea
 - `RefinementComparison` - Side-by-side refinement results
 - `FileDiscoveryGrid` - Interactive file list
@@ -152,26 +173,32 @@ for await (const message of query({
 ## Technical Implementation Details
 
 ### State Management
+
 **URL State (Nuqs):**
+
 - Current step (1, 2, 3)
 - Selected refinement option
 - File inclusion/exclusion lists
 - Validation settings
 
 **Server State (TanStack Query):**
+
 - Agent execution results
 - File discovery data
 - Generated plans
 - Validation results
 
 **Local State (React):**
+
 - Streaming message buffer
 - UI interaction states
 - Form data
 - Settings panel visibility
 
 ### Data Flow
+
 **Step 1 Flow:**
+
 1. User inputs feature request
 2. User selects refinement count (1-5)
 3. Parallel agent execution via SDK
@@ -179,6 +206,7 @@ for await (const message of query({
 5. User selects best refinement or original
 
 **Step 2 Flow:**
+
 1. Refined request passed to file discovery agent
 2. AI analysis streamed to UI
 3. Files appear incrementally with priority
@@ -186,6 +214,7 @@ for await (const message of query({
 5. Final file list confirmed
 
 **Step 3 Flow:**
+
 1. File list and refined request sent to planner
 2. Plan sections stream to UI
 3. Markdown rendered in real-time
@@ -193,19 +222,23 @@ for await (const message of query({
 5. Final plan generated and saved
 
 ### Error Handling
+
 **Agent Failures:**
+
 - Retry mechanisms with exponential backoff
 - Fallback strategies for each step
 - User notification of failures
 - Manual recovery options
 
 **Network Issues:**
+
 - Connection loss detection
 - Automatic reconnection
 - State persistence during disconnections
 - Resume capability
 
 **Validation Failures:**
+
 - Format validation with auto-correction
 - Template compliance checking
 - User-friendly error messages
@@ -214,39 +247,48 @@ for await (const message of query({
 ## Customization Options
 
 ### Step 1: Refinement Customization
+
 **Agent Configuration:**
+
 - Number of parallel agents (1-5)
 - Agent timeout settings
 - Refinement style preferences
 - Context inclusion options
 
 **Output Preferences:**
+
 - Length constraints (100-500 words)
 - Technical detail level
 - Integration focus areas
 - Scope preservation settings
 
 ### Step 2: Discovery Customization
+
 **Search Parameters:**
+
 - Directory inclusion/exclusion
 - File type filters
 - Relevance thresholds
 - Content analysis depth
 
 **Result Management:**
+
 - Auto-categorization settings
 - Manual file additions
 - Bulk operations (select all, clear all)
 - Priority override options
 
 ### Step 3: Planning Customization
+
 **Validation Commands:**
+
 - Custom command builder interface
 - Template selection (default, strict, custom)
 - Quality gate configuration
 - Risk assessment parameters
 
 **Plan Structure:**
+
 - Section inclusion/exclusion
 - Detail level settings
 - Confidence threshold requirements
@@ -255,20 +297,25 @@ for await (const message of query({
 ## Data Persistence
 
 ### Session Management
+
 **Current Session:**
+
 - Real-time state preservation
 - Step progress tracking
 - Agent execution history
 - Error and retry logs
 
 **Long-term Storage:**
+
 - Generated plans saved to `docs/{YYYY_MM_DD}/plans/`
 - Orchestration logs in `docs/{YYYY_MM_DD}/orchestration/{feature-name}/`
 - User preference storage
 - Historical execution metrics
 
 ### File Organization
+
 **Plan Storage:**
+
 ```
 docs/
 └── {YYYY_MM_DD}/
@@ -285,26 +332,32 @@ docs/
 ## Performance Considerations
 
 ### Streaming Optimization
+
 **Message Handling:**
+
 - Efficient message buffering
 - UI update throttling
 - Memory management for long streams
 - Progressive enhancement
 
 **Network Efficiency:**
+
 - Connection pooling
 - Retry strategy optimization
 - Bandwidth usage monitoring
 - Compression for large responses
 
 ### Scalability
+
 **Concurrent Users:**
+
 - Session isolation
 - Resource allocation
 - Queue management for agent execution
 - Load balancing considerations
 
 **Agent Execution:**
+
 - Parallel processing optimization
 - Resource usage monitoring
 - Timeout management
@@ -313,26 +366,32 @@ docs/
 ## Security and Privacy
 
 ### Data Protection
+
 **User Input:**
+
 - Feature request sanitization
 - Input validation and limits
 - XSS prevention
 - CSRF protection
 
 **Agent Communication:**
+
 - Secure SDK authentication
 - Token management
 - Rate limiting
 - Audit logging
 
 ### Access Control
+
 **Authentication:**
+
 - Clerk integration for user auth
 - Session management
 - Permission verification
 - Role-based access (if needed)
 
 **Data Access:**
+
 - User-scoped data isolation
 - Secure file access patterns
 - API endpoint protection
@@ -341,26 +400,32 @@ docs/
 ## Monitoring and Analytics
 
 ### Performance Metrics
+
 **Execution Tracking:**
+
 - Step completion times
 - Agent execution duration
 - Token usage per operation
 - Cost tracking per user/session
 
 **User Experience:**
+
 - Step abandonment rates
 - Refinement selection patterns
 - File discovery accuracy
 - Plan generation success rates
 
 ### Error Monitoring
+
 **System Health:**
+
 - Agent failure rates
 - Network timeout incidents
 - Validation error frequency
 - Recovery success rates
 
 **User Issues:**
+
 - Feature request complexity analysis
 - Common failure patterns
 - User behavior insights
@@ -369,26 +434,32 @@ docs/
 ## Future Extensibility
 
 ### Plugin Architecture
+
 **Custom Agents:**
+
 - User-defined refinement agents
 - Specialized discovery agents
 - Custom planning templates
 - Third-party integrations
 
 **Workflow Extensions:**
+
 - Additional orchestration steps
 - Custom validation phases
 - Integration with external tools
 - Collaborative planning features
 
 ### API Integration
+
 **External Services:**
+
 - GitHub issue integration
 - Project management tools
 - CI/CD pipeline integration
 - Code review platform connections
 
 **Data Export:**
+
 - Plan export formats (PDF, Word, etc.)
 - API endpoints for plan data
 - Webhook notifications
@@ -397,6 +468,7 @@ docs/
 ## Success Criteria
 
 ### Functional Requirements
+
 - [ ] All 3 steps of orchestration working with streaming
 - [ ] Real-time progress visualization
 - [ ] File discovery customization
@@ -405,6 +477,7 @@ docs/
 - [ ] Complete error handling and recovery
 
 ### Performance Requirements
+
 - [ ] Sub-second UI responsiveness
 - [ ] Streaming latency under 100ms
 - [ ] Agent execution completion within 2 minutes
@@ -412,6 +485,7 @@ docs/
 - [ ] 99.9% uptime for core functionality
 
 ### User Experience Requirements
+
 - [ ] Intuitive workflow progression
 - [ ] Clear progress indicators
 - [ ] Helpful error messages
@@ -422,24 +496,28 @@ docs/
 ## Implementation Phases
 
 ### Phase 1: Core Infrastructure
+
 - Basic page layout and navigation
 - SDK integration and streaming setup
 - Essential UI components
 - Step 1 implementation (basic refinement)
 
 ### Phase 2: Enhanced Features
+
 - Parallel agent execution
 - File discovery customization
 - Real-time progress visualization
 - Error handling and recovery
 
 ### Phase 3: Advanced Customization
+
 - Validation command builder
 - Plan editing capabilities
 - Advanced settings panel
 - Performance optimization
 
 ### Phase 4: Polish and Extension
+
 - Analytics integration
 - Advanced error reporting
 - Plugin architecture foundation

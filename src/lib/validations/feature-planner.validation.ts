@@ -53,3 +53,17 @@ export interface StepData {
     validationCommands: Array<string>;
   };
 }
+
+// API Request/Response Schemas
+export const refineRequestSchema = z.object({
+  featureRequest: z.string().min(1, 'Feature request is required').max(5000, 'Feature request is too long'),
+  settings: refinementSettingsSchema,
+});
+
+export const refineResponseSchema = z.object({
+  message: z.string(),
+  success: z.boolean(),
+});
+
+export type RefineRequest = z.infer<typeof refineRequestSchema>;
+export type RefineResponse = z.infer<typeof refineResponseSchema>;

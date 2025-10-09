@@ -2,10 +2,12 @@
 
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 
 import type {
   ParallelRefinementResponse,
   RefinementSettings as RefinementSettingsType,
+  RefineResponse,
   StepData,
 } from '@/lib/validations/feature-planner.validation';
 
@@ -52,7 +54,36 @@ export default function FeaturePlannerPage() {
 
   const handleRefineRequest = useCallback(async () => {}, []);
 
-  const handleParallelRefineRequest = useCallback(async () => {}, []);
+  const handleParallelRefineRequest = useCallback(async () => {
+    if (!state.originalRequest.trim()) {
+      toast.error('Please enter a feature request');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/feature-planner/refine', {
+        body: JSON.stringify({
+          featureRequest: state.originalRequest,
+          settings: state.settings,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+
+      const data = (await response.json()) as RefineResponse;
+
+      if (response.ok && data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message || 'Failed to refine feature request');
+      }
+    } catch (error) {
+      console.error('Error refining feature request:', error);
+      toast.error('An unexpected error occurred');
+    }
+  }, [state.originalRequest, state.settings]);
 
   const handleStepChange = useCallback(
     (step: WorkflowStep) => {

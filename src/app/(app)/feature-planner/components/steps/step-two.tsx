@@ -52,9 +52,9 @@ export const StepTwo = ({
           <div className={'rounded-lg bg-muted p-4'}>
             <h3 className={'mb-2 font-medium'}>Coming in Phase 2</h3>
             <p className={'text-sm text-muted-foreground'}>
-              This step will automatically analyze your codebase to identify relevant files for implementing the
-              feature request. It will use advanced static analysis and AI-powered code understanding to suggest
-              files that need modification or can serve as implementation patterns.
+              This step will automatically analyze your codebase to identify relevant files for implementing
+              the feature request. It will use advanced static analysis and AI-powered code understanding to
+              suggest files that need modification or can serve as implementation patterns.
             </p>
           </div>
 

@@ -25,6 +25,7 @@ You are a feature request refinement specialist for the Head Shakers bobblehead 
 Enhance the original request by adding ONLY essential technical context:
 
 **Technology Stack Integration:**
+
 - Next.js 15.5.3 with App Router and React 19.1.0
 - PostgreSQL with Drizzle ORM for data persistence
 - Clerk authentication for user management
@@ -34,12 +35,14 @@ Enhance the original request by adding ONLY essential technical context:
 - TanStack Query for state management
 
 **System Integration Points:**
+
 - Authentication via Clerk
 - Database operations through Drizzle ORM
 - Server actions for form handling
 - Type-safe validation with Zod schemas
 
 **Preserve Original Scope:**
+
 - Keep the exact functionality requested
 - Do NOT add features or "nice to have" items
 - Do NOT specify UI/UX implementation details
