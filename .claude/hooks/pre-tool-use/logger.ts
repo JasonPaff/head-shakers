@@ -1,30 +1,30 @@
 import * as fs from 'fs';
 
 interface ToolInput {
-  // Bash-specific
+  // bash-specific
   command?: string;
   description?: string;
 
-  // File operation tools
+  // file operation tools
   file_path?: string;
   pattern?: string;
 
-  // Edit tool
+  // edit tool
   old_string?: string;
   new_string?: string;
 
-  // Grep tool
+  // grep tool
   output_mode?: string;
 
-  // Web tools
+  // web tools
   url?: string;
   query?: string;
 
-  // Task tool
+  // task tool
   prompt?: string;
   subagent_type?: string;
 
-  // Other fields
+  // other fields
   [key: string]: unknown;
 }
 
@@ -44,7 +44,6 @@ process.stdin.on('end', () => {
 
     let logMessage: string;
 
-    // Format log message based on tool type
     switch (toolName) {
       case 'Bash':
         logMessage = `${toolName}: ${toolInput.command || 'no command'} - ${toolInput.description || 'No description'}`;
@@ -79,7 +78,7 @@ process.stdin.on('end', () => {
         break;
 
       default:
-        // For any other tools, show the tool name and first key-value pair
+        // for any other tools, show the tool name and first key-value pair
         const firstKey = Object.keys(toolInput)[0];
         const firstValue = firstKey ? toolInput[firstKey] : 'no params';
         logMessage = `${toolName}: ${firstKey || 'unknown'} = ${typeof firstValue === 'string' ? firstValue.slice(0, 50) : JSON.stringify(firstValue)?.slice(0, 50) || ''}`;
