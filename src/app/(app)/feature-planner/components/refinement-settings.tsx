@@ -4,7 +4,6 @@ import type { ComponentProps } from 'react';
 
 import { SettingsIcon } from 'lucide-react';
 
-import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { RefinementSettings as RefinementSettingsType } from '@/lib/validations/feature-planner.validation';
 
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +16,7 @@ import { Switch } from '@/components/ui/switch';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface RefinementSettingsProps extends ComponentProps<'div'>, ComponentTestIdProps {
+interface RefinementSettingsProps extends ComponentProps<'div'> {
   onSettingsChange: (settings: RefinementSettingsType) => void;
   settings: RefinementSettingsType;
 }
@@ -26,11 +25,8 @@ export const RefinementSettings = ({
   className,
   onSettingsChange,
   settings,
-  testId,
   ...props
 }: RefinementSettingsProps) => {
-  const settingsTestId = testId || generateTestId('feature', 'card');
-
   const handleUpdateSetting = <K extends keyof RefinementSettingsType>(
     key: K,
     value: RefinementSettingsType[K],
@@ -41,13 +37,15 @@ export const RefinementSettings = ({
     });
   };
 
+  const _settingsTestId = generateTestId('feature', 'card');
+
   const _badgeVariant =
     settings.agentCount === 1 ? 'secondary'
     : settings.agentCount <= 3 ? 'default'
     : 'destructive';
 
   return (
-    <div className={cn('flex items-center gap-2', className)} data-testid={settingsTestId} {...props}>
+    <div className={cn('flex items-center gap-2', className)} data-testid={_settingsTestId} {...props}>
       <SettingsIcon aria-hidden className={'size-4'} />
       <span className={'text-sm font-medium'}>Refinement Settings</span>
       <Badge variant={_badgeVariant}>

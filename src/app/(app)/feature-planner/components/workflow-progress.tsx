@@ -5,14 +5,13 @@ import type { ComponentProps } from 'react';
 import { CheckIcon } from 'lucide-react';
 
 import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
-import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Conditional } from '@/components/ui/conditional';
 import { Progress } from '@/components/ui/progress';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface WorkflowProgressProps extends ComponentProps<'div'>, ComponentTestIdProps {
+interface WorkflowProgressProps extends ComponentProps<'div'> {
   currentStep: WorkflowStep;
 }
 
@@ -22,8 +21,8 @@ const steps = [
   { description: 'Generate detailed implementation plan', id: 3, title: 'Implementation Planning' },
 ] as const;
 
-export const WorkflowProgress = ({ className, currentStep, testId, ...props }: WorkflowProgressProps) => {
-  const progressTestId = testId || generateTestId('feature', 'progress');
+export const WorkflowProgress = ({ className, currentStep, ...props }: WorkflowProgressProps) => {
+  const progressTestId = generateTestId('feature', 'progress');
   const progressPercentage = (currentStep / 3) * 100;
 
   return (

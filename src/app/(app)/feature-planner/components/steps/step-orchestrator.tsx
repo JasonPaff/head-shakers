@@ -2,7 +2,6 @@
 
 import type { ComponentProps } from 'react';
 
-import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { RefinementSettings, StepData } from '@/lib/validations/feature-planner.validation';
 
 import { StepOne } from '@/app/(app)/feature-planner/components/steps/step-one';
@@ -14,7 +13,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 export type WorkflowStep = 1 | 2 | 3;
 
-interface StepOrchestratorProps extends ComponentTestIdProps, Omit<ComponentProps<'div'>, 'onChange'> {
+interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> {
   currentStep: WorkflowStep;
   isRefining: boolean;
   onChange: (value: string) => void;
@@ -34,7 +33,6 @@ interface StepOrchestratorProps extends ComponentTestIdProps, Omit<ComponentProp
  * Step Orchestrator
  * Manages the rendering and state of individual workflow steps
  * Provides a clean separation between step logic and main page state
- * Integrates real-time progress coordination via Ably channels
  */
 export const StepOrchestrator = ({
   className,
@@ -50,11 +48,10 @@ export const StepOrchestrator = ({
   refinedRequest,
   settings,
   stepData,
-  testId,
   value,
   ...props
 }: StepOrchestratorProps) => {
-  const orchestratorTestId = testId || generateTestId('feature', 'form');
+  const orchestratorTestId = generateTestId('feature', 'form');
 
   return (
     <div className={cn('space-y-6', className)} data-testid={orchestratorTestId} {...props}>

@@ -5,7 +5,6 @@ import type { ComponentProps } from 'react';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
-import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -13,7 +12,20 @@ import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface ActionControlsProps extends ComponentProps<'div'>, ComponentTestIdProps {
+const getStepTitle = (step: WorkflowStep): string => {
+  switch (step) {
+    case 1:
+      return 'Feature Request Input';
+    case 2:
+      return 'File Discovery';
+    case 3:
+      return 'Implementation Planning';
+    default:
+      return 'Unknown Step';
+  }
+};
+
+interface ActionControlsProps extends ComponentProps<'div'> {
   canProceed: boolean;
   currentStep: WorkflowStep;
   onStepChange: (step: WorkflowStep) => void;
@@ -24,35 +36,19 @@ export const ActionControls = ({
   className,
   currentStep,
   onStepChange,
-  testId,
   ...props
 }: ActionControlsProps) => {
-  const getStepTitle = (step: WorkflowStep): string => {
-    switch (step) {
-      case 1:
-        return 'Feature Request Input';
-      case 2:
-        return 'File Discovery';
-      case 3:
-        return 'Implementation Planning';
-      default:
-        return 'Unknown Step';
-    }
+  const handlePrevious = (): void => {
+    if (!_canGoBack) return;
+    onStepChange((currentStep - 1) as WorkflowStep);
   };
 
-  const handlePrevious = () => {
-    if (_canGoBack) {
-      onStepChange((currentStep - 1) as WorkflowStep);
-    }
+  const handleNext = (): void => {
+    if (!_canGoForward) return;
+    onStepChange((currentStep + 1) as WorkflowStep);
   };
 
-  const handleNext = () => {
-    if (_canGoForward) {
-      onStepChange((currentStep + 1) as WorkflowStep);
-    }
-  };
-
-  const _actionControlsTestId = testId || generateTestId('feature', 'button');
+  const _actionControlsTestId = generateTestId('feature', 'button');
   const _canGoBack = currentStep > 1;
   const _canGoForward = currentStep < 3 && canProceed;
   const _shouldShowHelpText = !canProceed && currentStep === 1;

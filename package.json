@@ -37,7 +37,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@anthropic-ai/claude-code": "^1.0.123",
+    "@anthropic-ai/claude-agent-sdk": "^0.1.11",
     "@clerk/nextjs": "^6.31.4",
     "@clerk/themes": "^2.4.13",
     "@cloudinary/react": "^1.14.3",
@@ -80,7 +80,6 @@
     "@upstash/qstash": "^2.8.2",
     "@upstash/redis": "^1.35.3",
     "ably": "^2.11.0",
-    "ai": "^5.0.56",
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
@@ -93,7 +92,6 @@
     "embla-carousel-react": "^8.6.0",
     "isomorphic-dompurify": "^2.26.0",
     "lucide-react": "^0.544.0",
-    "nanoid": "^5.1.6",
     "next": "^15.5.3",
     "next-cloudinary": "^6.16.0",
     "next-safe-action": "^8.0.10",
