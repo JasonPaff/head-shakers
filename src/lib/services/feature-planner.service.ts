@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument */
 import { query } from '@anthropic-ai/claude-agent-sdk';
 
-import type {
-  FileDiscoveryResult,
-  RefinementSettings,
-} from '@/lib/db/schema/feature-planner.schema';
+import type { FileDiscoveryResult, RefinementSettings } from '@/lib/db/schema/feature-planner.schema';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
@@ -352,7 +349,9 @@ Return at least 5 relevant files, organized by priority.`;
     refinedRequest: string,
     discoveredFiles: FileDiscoveryResult[],
   ): string {
-    const filesList = discoveredFiles.map((f) => `- ${f.filePath} (${f.priority}): ${f.description}`).join('\n');
+    const filesList = discoveredFiles
+      .map((f) => `- ${f.filePath} (${f.priority}): ${f.description}`)
+      .join('\n');
 
     return `Create a detailed implementation plan for this feature.
 
@@ -405,28 +404,247 @@ Provide only the refined paragraph, nothing else.`;
   }
 
   /**
+   * Normalize complexity to valid enum value
+   */
+  private static normalizeComplexity(value?: string): 'high' | 'low' | 'medium' {
+    const normalized = value?.toLowerCase();
+    if (normalized === 'high' || normalized === 'medium' || normalized === 'low') {
+      return normalized;
+    }
+    return 'medium';
+  }
+
+  /**
+   * Normalize confidence level to valid enum value
+   */
+  private static normalizeConfidence(value?: string): 'high' | 'low' | 'medium' {
+    const normalized = value?.toLowerCase();
+    if (normalized === 'high' || normalized === 'medium' || normalized === 'low') {
+      return normalized;
+    }
+    return 'medium';
+  }
+
+  /**
+   * Normalize priority to valid enum value
+   */
+  private static normalizePriority(value?: string): 'critical' | 'high' | 'low' | 'medium' {
+    const normalized = value?.toLowerCase();
+    if (
+      normalized === 'critical' ||
+      normalized === 'high' ||
+      normalized === 'medium' ||
+      normalized === 'low'
+    ) {
+      return normalized;
+    }
+    return 'medium';
+  }
+
+  /**
+   * Normalize risk level to valid enum value
+   */
+  private static normalizeRisk(value?: string): 'high' | 'low' | 'medium' {
+    const normalized = value?.toLowerCase();
+    if (normalized === 'high' || normalized === 'medium' || normalized === 'low') {
+      return normalized;
+    }
+    return 'medium';
+  }
+
+  /**
+   * Normalize relevance score to 0-100 range
+   */
+  private static normalizeScore(value?: number | string): number {
+    const num = typeof value === 'string' ? parseInt(value, 10) : (value ?? 50);
+    return Math.max(0, Math.min(100, num));
+  }
+
+  /**
    * Parse file discovery response
-   * TODO: Implement robust parsing logic
+   * Extracts structured file data from agent response
    */
   private static parseFileDiscoveryResponse(response: string): FileDiscoveryResult[] {
-    // Placeholder implementation - will be enhanced in future iterations
-    console.log('File discovery response:', response);
-    return [];
+    const files: FileDiscoveryResult[] = [];
+
+    try {
+      // Try parsing as JSON first (if agent returns structured JSON)
+      const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[1]);
+        if (Array.isArray(parsed)) {
+          return parsed.map((file) => ({
+            description: file.description || '',
+            fileExists: file.fileExists ?? true,
+            filePath: file.filePath || file.path || '',
+            integrationPoint: file.integrationPoint,
+            isManuallyAdded: false,
+            priority: this.normalizePriority(file.priority),
+            reasoning: file.reasoning,
+            relevanceScore: this.normalizeScore(file.relevanceScore || file.score),
+            role: file.role,
+          }));
+        }
+      }
+
+      // Parse markdown-style format
+      const fileBlocks = response.split(/\n(?=\d+\.|\*|-)/);
+
+      for (const block of fileBlocks) {
+        const filePathMatch = block.match(/(?:path|file):\s*[`"]?([^`"\n]+)[`"]?/i);
+        const priorityMatch = block.match(/priority:\s*(\w+)/i);
+        const roleMatch = block.match(/role:\s*([^\n]+)/i);
+        const integrationMatch = block.match(/integration(?:\s+point)?:\s*([^\n]+)/i);
+        const reasoningMatch = block.match(/reasoning:\s*([^\n]+)/i);
+        const scoreMatch = block.match(/(?:relevance\s*)?score:\s*(\d+)/i);
+        const descriptionMatch = block.match(/description:\s*([^\n]+)/i);
+
+        if (filePathMatch && priorityMatch) {
+          files.push({
+            description: descriptionMatch?.[1]?.trim() || 'File discovered during analysis',
+            fileExists: true,
+            filePath: filePathMatch[1].trim(),
+            integrationPoint: integrationMatch?.[1]?.trim(),
+            isManuallyAdded: false,
+            priority: this.normalizePriority(priorityMatch[1]),
+            reasoning: reasoningMatch?.[1]?.trim(),
+            relevanceScore: this.normalizeScore(scoreMatch?.[1]),
+            role: roleMatch?.[1]?.trim(),
+          });
+        }
+      }
+
+      // If no structured format found, try to extract file paths with basic metadata
+      if (files.length === 0) {
+        const pathMatches = response.matchAll(/(?:src|lib|app|components)\/[^\s,;]+/g);
+        for (const match of pathMatches) {
+          files.push({
+            description: 'File discovered during analysis',
+            fileExists: true,
+            filePath: match[0],
+            isManuallyAdded: false,
+            priority: 'medium',
+            relevanceScore: 50,
+          });
+        }
+      }
+
+      return files;
+    } catch (error) {
+      console.error('Error parsing file discovery response:', error);
+      return [];
+    }
   }
 
   /**
    * Parse implementation plan response
-   * TODO: Implement robust parsing logic
+   * Extracts structured plan data from agent response
    */
   private static parseImplementationPlanResponse(response: string): ImplementationPlanResult {
-    // Placeholder implementation - will be enhanced in future iterations
-    console.log('Implementation plan response:', response);
-    return {
+    const result: ImplementationPlanResult = {
       complexity: 'medium',
-      estimatedDuration: '',
+      estimatedDuration: '1-2 hours',
       implementationPlan: response,
       riskLevel: 'medium',
       steps: [],
     };
+
+    try {
+      // Try parsing as JSON first
+      const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[1]);
+        if (parsed.steps && Array.isArray(parsed.steps)) {
+          result.steps = parsed.steps.map((step: Partial<PlanStep>, index: number) => ({
+            category: step.category || 'implementation',
+            commands: Array.isArray(step.commands) ? step.commands : [],
+            confidenceLevel: this.normalizeConfidence(step.confidenceLevel),
+            description: step.description || '',
+            estimatedDuration: step.estimatedDuration || '10-15 minutes',
+            stepNumber: step.stepNumber || index + 1,
+            title: step.title || `Step ${index + 1}`,
+            validationCommands: Array.isArray(step.validationCommands) ? step.validationCommands : [],
+          }));
+        }
+        if (parsed.complexity) result.complexity = this.normalizeComplexity(parsed.complexity);
+        if (parsed.riskLevel) result.riskLevel = this.normalizeRisk(parsed.riskLevel);
+        if (parsed.estimatedDuration) result.estimatedDuration = parsed.estimatedDuration;
+        return result;
+      }
+
+      // Extract metadata from markdown
+      const durationMatch = response.match(/(?:estimated\s+)?duration:\s*([^\n]+)/i);
+      const complexityMatch = response.match(/complexity:\s*(\w+)/i);
+      const riskMatch = response.match(/risk(?:\s+level)?:\s*(\w+)/i);
+
+      if (durationMatch) result.estimatedDuration = durationMatch[1].trim();
+      if (complexityMatch) result.complexity = this.normalizeComplexity(complexityMatch[1]);
+      if (riskMatch) result.riskLevel = this.normalizeRisk(riskMatch[1]);
+
+      // Extract steps from numbered list or headers
+      const stepPatterns = [
+        /(?:^|\n)(?:###?\s+)?(\d+)\.\s+([^\n]+)\n([\s\S]*?)(?=\n(?:###?\s+)?\d+\.|$)/g,
+        /(?:^|\n)(?:###?\s+)?Step\s+(\d+):\s+([^\n]+)\n([\s\S]*?)(?=\n(?:###?\s+)?Step\s+\d+:|$)/gi,
+      ];
+
+      for (const pattern of stepPatterns) {
+        const matches = [...response.matchAll(pattern)];
+        if (matches.length > 0) {
+          result.steps = matches.map((match) => {
+            const stepNumber = parseInt(match[1], 10);
+            const title = match[2].trim();
+            const content = match[3];
+
+            // Extract commands from code blocks
+            const commands: string[] = [];
+            const validationCommands: string[] = [];
+            const commandMatches = content.matchAll(/```(?:bash|sh)?\s*([\s\S]*?)```/g);
+
+            for (const cmdMatch of commandMatches) {
+              const cmd = cmdMatch[1].trim();
+              if (cmd.includes('lint') || cmd.includes('typecheck') || cmd.includes('test')) {
+                validationCommands.push(cmd);
+              } else {
+                commands.push(cmd);
+              }
+            }
+
+            // Extract metadata
+            const categoryMatch = content.match(/category:\s*([^\n]+)/i);
+            const durationMatch = content.match(/(?:estimated\s+)?duration:\s*([^\n]+)/i);
+            const confidenceMatch = content.match(/confidence(?:\s+level)?:\s*(\w+)/i);
+
+            // Clean description (remove metadata lines)
+            let description = content
+              .replace(/```[\s\S]*?```/g, '')
+              .replace(/category:\s*[^\n]+/gi, '')
+              .replace(/(?:estimated\s+)?duration:\s*[^\n]+/gi, '')
+              .replace(/confidence(?:\s+level)?:\s*\w+/gi, '')
+              .trim();
+
+            if (!description) {
+              description = title;
+            }
+
+            return {
+              category: categoryMatch?.[1]?.trim() || 'implementation',
+              commands,
+              confidenceLevel: this.normalizeConfidence(confidenceMatch?.[1]),
+              description,
+              estimatedDuration: durationMatch?.[1]?.trim() || '10-15 minutes',
+              stepNumber,
+              title,
+              validationCommands,
+            };
+          });
+          break;
+        }
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error parsing implementation plan response:', error);
+      return result;
+    }
   }
 }
