@@ -17,6 +17,8 @@ interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> 
   currentStep: WorkflowStep;
   isRefining: boolean;
   onChange: (value: string) => void;
+  onFileDiscovery: () => void;
+  onImplementationPlanning: () => void;
   onParallelRefineRequest: () => void;
   onRefinedRequestChange: (value: string) => void;
   onRefineRequest: () => void;
@@ -39,6 +41,8 @@ export const StepOrchestrator = ({
   currentStep,
   isRefining,
   onChange,
+  onFileDiscovery,
+  onImplementationPlanning,
   onParallelRefineRequest,
   onRefinedRequestChange,
   onRefineRequest,
@@ -77,6 +81,7 @@ export const StepOrchestrator = ({
         <StepTwo
           discoverySession={null}
           onFileAdded={() => {}}
+          onFileDiscovery={onFileDiscovery}
           onFileSelection={() => {}}
           selectedFiles={stepData.step2?.selectedFiles}
         />
@@ -86,6 +91,7 @@ export const StepOrchestrator = ({
       <Conditional isCondition={currentStep === 3}>
         <StepThree
           implementationPlan={stepData.step3?.implementationPlan}
+          onImplementationPlanning={onImplementationPlanning}
           validationCommands={stepData.step3?.validationCommands}
         />
       </Conditional>

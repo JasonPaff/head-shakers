@@ -13,7 +13,7 @@ import { cn } from '@/utils/tailwind-utils';
 interface StepThreeProps extends ComponentProps<'div'>, ComponentTestIdProps {
   // Future props for implementation planning functionality
   implementationPlan?: string;
-  onPlanGeneration?: () => void;
+  onImplementationPlanning?: () => void;
   validationCommands?: Array<string>;
 }
 
@@ -25,8 +25,7 @@ export const StepThree = ({
   className,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   implementationPlan: _implementationPlan,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  onPlanGeneration: _onPlanGeneration,
+  onImplementationPlanning,
   testId,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   validationCommands: _validationCommands = [],
@@ -46,11 +45,22 @@ export const StepThree = ({
         <CardContent className={'space-y-4'}>
           <div className={'rounded-lg bg-muted p-4'}>
             <h3 className={'mb-2 font-medium'}>Coming in Phase 2</h3>
-            <p className={'text-sm text-muted-foreground'}>
+            <p className={'mb-4 text-sm text-muted-foreground'}>
               This step will generate a comprehensive implementation plan based on the refined feature request
               and discovered files. It will provide step-by-step guidance, code snippets, and validation
               commands to ensure successful feature implementation.
             </p>
+            {onImplementationPlanning && (
+              <button
+                className={
+                  'rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+                }
+                onClick={onImplementationPlanning}
+                type={'button'}
+              >
+                Generate Implementation Plan
+              </button>
+            )}
           </div>
 
           <div className={'space-y-3'}>

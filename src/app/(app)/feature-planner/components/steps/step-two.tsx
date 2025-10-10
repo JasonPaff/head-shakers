@@ -21,6 +21,7 @@ interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
     filePath: string;
     priority: 'critical' | 'high' | 'low' | 'medium';
   }) => void;
+  onFileDiscovery?: () => void;
   onFileSelection?: (files: Array<string>) => void;
   selectedFiles?: Array<string>;
 }
@@ -33,6 +34,7 @@ export const StepTwo = ({
   className,
   discoverySession,
   onFileAdded,
+  onFileDiscovery,
   onFileSelection,
   selectedFiles = [],
   testId,
@@ -54,10 +56,21 @@ export const StepTwo = ({
           <CardContent className={'space-y-4'}>
             <div className={'rounded-lg bg-muted p-4'}>
               <h3 className={'mb-2 font-medium'}>Run File Discovery</h3>
-              <p className={'text-sm text-muted-foreground'}>
+              <p className={'mb-4 text-sm text-muted-foreground'}>
                 This step will automatically analyze your codebase to identify relevant files for implementing
-                the feature request. Click the button above to start file discovery.
+                the feature request.
               </p>
+              {onFileDiscovery && (
+                <button
+                  className={
+                    'rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+                  }
+                  onClick={onFileDiscovery}
+                  type={'button'}
+                >
+                  Start File Discovery
+                </button>
+              )}
             </div>
           </CardContent>
         </Card>

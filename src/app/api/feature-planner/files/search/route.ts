@@ -1,9 +1,6 @@
+import { glob } from 'glob';
 import { NextResponse } from 'next/server';
-import { exec } from 'node:child_process';
-import { promisify } from 'node:util';
 import { z } from 'zod';
-
-const execAsync = promisify(exec);
 
 const searchSchema = z.object({
   q: z.string().min(1).max(100),
@@ -11,7 +8,7 @@ const searchSchema = z.object({
 
 /**
  * GET /api/feature-planner/files/search
- * Search for files in the project using git ls-files
+ * Search for files in the project using glob
  */
 export async function GET(request: Request) {
   try {
@@ -27,16 +24,15 @@ export async function GET(request: Request) {
       );
     }
 
-    // Use git ls-files to get tracked files
-    const { stdout } = await execAsync('git ls-files', {
+    // Use glob to search for files, excluding common directories
+    const allFiles = await glob('**/*', {
       cwd: process.cwd(),
-      maxBuffer: 1024 * 1024 * 10, // 10MB buffer
+      ignore: ['node_modules/**', '.next/**', '.git/**', 'dist/**', 'build/**', '.playwright-mcp/**'],
+      nodir: true,
     });
 
-    // Filter files by query and limit results
-    const files = stdout
-      .split('\n')
-      .filter((f) => f.trim().length > 0)
+    // Filter files by query (case-insensitive) and limit results
+    const files = allFiles
       .filter((f) => f.toLowerCase().includes(query.toLowerCase()))
       .slice(0, 20); // Limit to 20 results for performance
 

@@ -75,6 +75,21 @@ export default function FeaturePlannerPage() {
 
       if (response.ok && data.isSuccess) {
         toast.success(data.message);
+        // Store the refinement data in state
+        if (data.data) {
+          const parallelData = data.data as ParallelRefinementResponse;
+          updateState({
+            parallelResults: parallelData,
+            stepData: {
+              ...state.stepData,
+              step1: {
+                originalRequest: state.originalRequest,
+                refinements: parallelData.refinements,
+                selectedRefinement: null,
+              },
+            },
+          });
+        }
       } else {
         toast.error(data.message || 'Failed to refine feature request');
       }
@@ -82,7 +97,7 @@ export default function FeaturePlannerPage() {
       console.error('Error refining feature request:', error);
       toast.error('An unexpected error occurred');
     }
-  }, [state.originalRequest, state.settings]);
+  }, [state.originalRequest, state.settings, state.stepData, updateState]);
 
   const handleStepChange = useCallback(
     (step: WorkflowStep) => {
@@ -94,17 +109,51 @@ export default function FeaturePlannerPage() {
   );
 
   const handleSkipToFileDiscovery = useCallback(() => {
+    // Mark step 1 as complete with original request
+    updateState({
+      stepData: {
+        ...state.stepData,
+        step1: {
+          originalRequest: state.originalRequest,
+          refinements: [],
+          selectedRefinement: null,
+        },
+      },
+    });
     handleStepChange(2);
-  }, [handleStepChange]);
+  }, [handleStepChange, state.originalRequest, state.stepData, updateState]);
 
   const handleUseRefinedRequest = useCallback(() => {
+    // Ensure step 1 is marked complete before moving to step 2
+    if (!state.stepData.step1) {
+      updateState({
+        stepData: {
+          ...state.stepData,
+          step1: {
+            originalRequest: state.originalRequest,
+            refinements: state.parallelResults?.refinements || [],
+            selectedRefinement: state.refinedRequest,
+          },
+        },
+      });
+    }
     handleStepChange(2);
-  }, [handleStepChange]);
+  }, [handleStepChange, state.originalRequest, state.parallelResults, state.refinedRequest, state.stepData, updateState]);
 
   const handleUseOriginalRequest = useCallback(() => {
-    updateState({ refinedRequest: null });
+    updateState({
+      refinedRequest: null,
+      stepData: {
+        ...state.stepData,
+        step1: {
+          originalRequest: state.originalRequest,
+          refinements: state.parallelResults?.refinements || [],
+          selectedRefinement: null,
+        },
+      },
+    });
     handleStepChange(2);
-  }, [handleStepChange, updateState]);
+  }, [handleStepChange, state.originalRequest, state.parallelResults, state.stepData, updateState]);
 
   const handleRefinedRequestChange = useCallback(
     (refinedRequest: string) => {
@@ -119,6 +168,46 @@ export default function FeaturePlannerPage() {
     },
     [updateState],
   );
+
+  const handleFileDiscovery = useCallback(() => {
+    if (!state.stepData.step1?.originalRequest) {
+      toast.error('Please complete step 1 first');
+      return;
+    }
+
+    try {
+      toast.info('File discovery will be implemented in Phase 3');
+      // TODO: Implement file discovery API call
+      // For now, just mark step 2 as complete so user can continue
+      updateState({
+        stepData: {
+          ...state.stepData,
+          step2: {
+            discoveredFiles: [],
+            selectedFiles: [],
+          },
+        },
+      });
+    } catch (error) {
+      console.error('File discovery error:', error);
+      toast.error('Failed to discover files');
+    }
+  }, [state.stepData, updateState]);
+
+  const handleImplementationPlanning = useCallback(() => {
+    if (!state.stepData.step2) {
+      toast.error('Please complete step 2 first');
+      return;
+    }
+
+    try {
+      toast.info('Implementation planning will be implemented in Phase 3');
+      // TODO: Implement planning API call
+    } catch (error) {
+      console.error('Implementation planning error:', error);
+      toast.error('Failed to generate implementation plan');
+    }
+  }, [state.stepData]);
 
   const _shouldShowFullWidthParallelResults = currentStep === 1 && !!state.parallelResults;
 
@@ -141,6 +230,8 @@ export default function FeaturePlannerPage() {
                   onChange={(value) => {
                     updateState({ originalRequest: value });
                   }}
+                  onFileDiscovery={handleFileDiscovery}
+                  onImplementationPlanning={handleImplementationPlanning}
                   onParallelRefineRequest={handleParallelRefineRequest}
                   onRefinedRequestChange={handleRefinedRequestChange}
                   onRefineRequest={handleRefineRequest}

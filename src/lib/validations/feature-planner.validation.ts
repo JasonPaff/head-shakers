@@ -285,6 +285,16 @@ export interface RefineResponse {
   message: string;
 }
 
+export interface Step1Data {
+  originalRequest: string;
+  refinements: Array<{
+    agentId: string;
+    id: string;
+    refinedRequest: string;
+  }>;
+  selectedRefinement: null | string;
+}
+
 export interface Step2Data {
   discoveredFiles?: Array<{
     description: string;
@@ -301,7 +311,7 @@ export interface Step3Data {
 }
 
 export interface StepData {
-  step1?: unknown;
+  step1?: Step1Data;
   step2?: Step2Data;
   step3?: Step3Data;
 }
