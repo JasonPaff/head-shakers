@@ -100,6 +100,33 @@ export const RefinementSettings = ({
             {/* Output Length */}
             <div className={'space-y-3'}>
               <div className={'flex items-center justify-between'}>
+                <Label htmlFor={'min-output-length'}>Minimum Output Length</Label>
+                <Badge variant={'secondary'}>{settings.minOutputLength} words</Badge>
+              </div>
+              <Select
+                onValueChange={(value) => {
+                  handleUpdateSetting('minOutputLength', parseInt(value, 10));
+                }}
+                value={settings.minOutputLength.toString()}
+              >
+                <SelectTrigger id={'min-output-length'}>
+                  <SelectValue placeholder={'Select min length'} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={'50'}>50 words (Very Brief)</SelectItem>
+                  <SelectItem value={'100'}>100 words (Brief)</SelectItem>
+                  <SelectItem value={'150'}>150 words (Recommended)</SelectItem>
+                  <SelectItem value={'200'}>200 words (Moderate)</SelectItem>
+                  <SelectItem value={'250'}>250 words (Detailed)</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className={'text-xs text-muted-foreground'}>
+                Minimum word count required for each refined request output.
+              </p>
+            </div>
+
+            <div className={'space-y-3'}>
+              <div className={'flex items-center justify-between'}>
                 <Label htmlFor={'max-output-length'}>Maximum Output Length</Label>
                 <Badge variant={'secondary'}>{settings.maxOutputLength} words</Badge>
               </div>
