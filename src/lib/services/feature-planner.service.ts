@@ -1,5 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-argument */
 import { query } from '@anthropic-ai/claude-agent-sdk';
+import { z } from 'zod';
 
 import type { FileDiscoveryResult, RefinementSettings } from '@/lib/db/schema/feature-planner.schema';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
@@ -7,6 +7,72 @@ import type { ServiceErrorContext } from '@/lib/utils/error-types';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
 import { withServiceRetry } from '@/lib/utils/retry';
+
+/**
+ * Zod schema for JSON file discovery response
+ */
+const fileDiscoveryJsonItemSchema = z.object({
+  description: z.string().optional(),
+  fileExists: z.boolean().optional(),
+  filePath: z.string().optional(),
+  integrationPoint: z.string().optional(),
+  path: z.string().optional(),
+  priority: z.string().optional(),
+  reasoning: z.string().optional(),
+  relevanceScore: z.union([z.number(), z.string()]).optional(),
+  role: z.string().optional(),
+  score: z.union([z.number(), z.string()]).optional(),
+});
+
+/**
+ * Zod schema for JSON plan step
+ */
+const planStepJsonSchema = z.object({
+  category: z.string().optional(),
+  commands: z.array(z.string()).optional(),
+  confidenceLevel: z.string().optional(),
+  description: z.string().optional(),
+  estimatedDuration: z.string().optional(),
+  stepNumber: z.number().optional(),
+  title: z.string().optional(),
+  validationCommands: z.array(z.string()).optional(),
+});
+
+/**
+ * Zod schema for JSON implementation plan response
+ */
+const implementationPlanJsonSchema = z.object({
+  complexity: z.string().optional(),
+  estimatedDuration: z.string().optional(),
+  riskLevel: z.string().optional(),
+  steps: z.array(planStepJsonSchema).optional(),
+});
+
+/**
+ * Zod schema for Claude SDK message content
+ */
+const sdkMessageContentSchema = z.object({
+  text: z.string(),
+  type: z.literal('text'),
+});
+
+/**
+ * Zod schema for Claude SDK usage stats
+ */
+const sdkUsageSchema = z.object({
+  cache_creation_input_tokens: z.number().optional(),
+  cache_read_input_tokens: z.number().optional(),
+  input_tokens: z.number().optional(),
+  output_tokens: z.number().optional(),
+});
+
+/**
+ * Zod schema for Claude SDK assistant message
+ */
+const sdkAssistantMessageSchema = z.object({
+  content: z.array(sdkMessageContentSchema),
+  usage: sdkUsageSchema.optional(),
+});
 
 /**
  * Agent execution result with metadata
@@ -91,16 +157,21 @@ export class FeaturePlannerService {
               prompt,
             })) {
               if (message.type === 'assistant') {
-                const content = message.message.content[0];
-                if (content?.type === 'text') {
-                  discoveredFiles = this.parseFileDiscoveryResponse(content.text);
-                }
+                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+                if (parseResult.success) {
+                  const validatedMessage = parseResult.data;
+                  const content = validatedMessage.content[0];
+                  if (content?.type === 'text') {
+                    discoveredFiles = this.parseFileDiscoveryResponse(content.text);
+                  }
 
-                if (message.message.usage) {
-                  tokenUsage.promptTokens = message.message.usage.input_tokens || 0;
-                  tokenUsage.completionTokens = message.message.usage.output_tokens || 0;
-                  tokenUsage.totalTokens =
-                    (message.message.usage.input_tokens || 0) + (message.message.usage.output_tokens || 0);
+                  if (validatedMessage.usage) {
+                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+                    tokenUsage.totalTokens =
+                      (validatedMessage.usage.input_tokens ?? 0) +
+                      (validatedMessage.usage.output_tokens ?? 0);
+                  }
                 }
               }
             }
@@ -182,16 +253,21 @@ export class FeaturePlannerService {
               prompt,
             })) {
               if (message.type === 'assistant') {
-                const content = message.message.content[0];
-                if (content?.type === 'text') {
-                  planResult = this.parseImplementationPlanResponse(content.text);
-                }
+                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+                if (parseResult.success) {
+                  const validatedMessage = parseResult.data;
+                  const content = validatedMessage.content[0];
+                  if (content?.type === 'text') {
+                    planResult = this.parseImplementationPlanResponse(content.text);
+                  }
 
-                if (message.message.usage) {
-                  tokenUsage.promptTokens = message.message.usage.input_tokens || 0;
-                  tokenUsage.completionTokens = message.message.usage.output_tokens || 0;
-                  tokenUsage.totalTokens =
-                    (message.message.usage.input_tokens || 0) + (message.message.usage.output_tokens || 0);
+                  if (validatedMessage.usage) {
+                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+                    tokenUsage.totalTokens =
+                      (validatedMessage.usage.input_tokens ?? 0) +
+                      (validatedMessage.usage.output_tokens ?? 0);
+                  }
                 }
               }
             }
@@ -273,19 +349,25 @@ export class FeaturePlannerService {
             })) {
               // Extract assistant response
               if (message.type === 'assistant') {
-                const content = message.message.content[0];
-                if (content?.type === 'text') {
-                  refinedText = content.text;
-                }
+                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+                if (parseResult.success) {
+                  const validatedMessage = parseResult.data;
+                  const content = validatedMessage.content[0];
+                  if (content?.type === 'text') {
+                    refinedText = content.text;
+                  }
 
-                // Track token usage
-                if (message.message.usage) {
-                  tokenUsage.promptTokens = message.message.usage.input_tokens || 0;
-                  tokenUsage.completionTokens = message.message.usage.output_tokens || 0;
-                  tokenUsage.totalTokens =
-                    (message.message.usage.input_tokens || 0) + (message.message.usage.output_tokens || 0);
-                  tokenUsage.cacheReadTokens = message.message.usage.cache_read_input_tokens;
-                  tokenUsage.cacheCreationTokens = message.message.usage.cache_creation_input_tokens;
+                  // Track token usage
+                  if (validatedMessage.usage) {
+                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+                    tokenUsage.totalTokens =
+                      (validatedMessage.usage.input_tokens ?? 0) +
+                      (validatedMessage.usage.output_tokens ?? 0);
+                    tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
+                    tokenUsage.cacheCreationTokens =
+                      validatedMessage.usage.cache_creation_input_tokens ?? 0;
+                  }
                 }
               }
             }
@@ -470,18 +552,21 @@ Provide only the refined paragraph, nothing else.`;
     try {
       // Try parsing as JSON first (if agent returns structured JSON)
       const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
-        if (Array.isArray(parsed)) {
-          return parsed.map((file) => ({
-            description: file.description || '',
+      if (jsonMatch?.[1]) {
+        const parsed: unknown = JSON.parse(jsonMatch[1]);
+        const fileArraySchema = z.array(fileDiscoveryJsonItemSchema);
+        const parseResult = fileArraySchema.safeParse(parsed);
+
+        if (parseResult.success) {
+          return parseResult.data.map((file) => ({
+            description: file.description ?? '',
             fileExists: file.fileExists ?? true,
-            filePath: file.filePath || file.path || '',
+            filePath: file.filePath ?? file.path ?? '',
             integrationPoint: file.integrationPoint,
             isManuallyAdded: false,
             priority: this.normalizePriority(file.priority),
             reasoning: file.reasoning,
-            relevanceScore: this.normalizeScore(file.relevanceScore || file.score),
+            relevanceScore: this.normalizeScore(file.relevanceScore ?? file.score),
             role: file.role,
           }));
         }
@@ -499,7 +584,7 @@ Provide only the refined paragraph, nothing else.`;
         const scoreMatch = block.match(/(?:relevance\s*)?score:\s*(\d+)/i);
         const descriptionMatch = block.match(/description:\s*([^\n]+)/i);
 
-        if (filePathMatch && priorityMatch) {
+        if (filePathMatch?.[1] && priorityMatch?.[1]) {
           files.push({
             description: descriptionMatch?.[1]?.trim() || 'File discovered during analysis',
             fileExists: true,
@@ -552,24 +637,38 @@ Provide only the refined paragraph, nothing else.`;
     try {
       // Try parsing as JSON first
       const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
-        if (parsed.steps && Array.isArray(parsed.steps)) {
-          result.steps = parsed.steps.map((step: Partial<PlanStep>, index: number) => ({
-            category: step.category || 'implementation',
-            commands: Array.isArray(step.commands) ? step.commands : [],
-            confidenceLevel: this.normalizeConfidence(step.confidenceLevel),
-            description: step.description || '',
-            estimatedDuration: step.estimatedDuration || '10-15 minutes',
-            stepNumber: step.stepNumber || index + 1,
-            title: step.title || `Step ${index + 1}`,
-            validationCommands: Array.isArray(step.validationCommands) ? step.validationCommands : [],
-          }));
+      if (jsonMatch?.[1]) {
+        const parsed: unknown = JSON.parse(jsonMatch[1]);
+        const parseResult = implementationPlanJsonSchema.safeParse(parsed);
+
+        if (parseResult.success) {
+          const validatedData = parseResult.data;
+
+          if (validatedData.steps) {
+            result.steps = validatedData.steps.map((step, index) => ({
+              category: step.category ?? 'implementation',
+              commands: step.commands ?? [],
+              confidenceLevel: this.normalizeConfidence(step.confidenceLevel),
+              description: step.description ?? '',
+              estimatedDuration: step.estimatedDuration ?? '10-15 minutes',
+              stepNumber: step.stepNumber ?? index + 1,
+              title: step.title ?? `Step ${index + 1}`,
+              validationCommands: step.validationCommands ?? [],
+            }));
+          }
+
+          if (validatedData.complexity) {
+            result.complexity = this.normalizeComplexity(validatedData.complexity);
+          }
+          if (validatedData.riskLevel) {
+            result.riskLevel = this.normalizeRisk(validatedData.riskLevel);
+          }
+          if (validatedData.estimatedDuration) {
+            result.estimatedDuration = validatedData.estimatedDuration;
+          }
+
+          return result;
         }
-        if (parsed.complexity) result.complexity = this.normalizeComplexity(parsed.complexity);
-        if (parsed.riskLevel) result.riskLevel = this.normalizeRisk(parsed.riskLevel);
-        if (parsed.estimatedDuration) result.estimatedDuration = parsed.estimatedDuration;
-        return result;
       }
 
       // Extract metadata from markdown
@@ -577,9 +676,9 @@ Provide only the refined paragraph, nothing else.`;
       const complexityMatch = response.match(/complexity:\s*(\w+)/i);
       const riskMatch = response.match(/risk(?:\s+level)?:\s*(\w+)/i);
 
-      if (durationMatch) result.estimatedDuration = durationMatch[1].trim();
-      if (complexityMatch) result.complexity = this.normalizeComplexity(complexityMatch[1]);
-      if (riskMatch) result.riskLevel = this.normalizeRisk(riskMatch[1]);
+      if (durationMatch?.[1]) result.estimatedDuration = durationMatch[1].trim();
+      if (complexityMatch?.[1]) result.complexity = this.normalizeComplexity(complexityMatch[1]);
+      if (riskMatch?.[1]) result.riskLevel = this.normalizeRisk(riskMatch[1]);
 
       // Extract steps from numbered list or headers
       const stepPatterns = [
@@ -591,9 +690,9 @@ Provide only the refined paragraph, nothing else.`;
         const matches = [...response.matchAll(pattern)];
         if (matches.length > 0) {
           result.steps = matches.map((match) => {
-            const stepNumber = parseInt(match[1], 10);
-            const title = match[2].trim();
-            const content = match[3];
+            const stepNumber = parseInt(match[1] ?? '1', 10);
+            const title = match[2]?.trim() ?? 'Untitled Step';
+            const content = match[3] ?? '';
 
             // Extract commands from code blocks
             const commands: string[] = [];
@@ -601,11 +700,13 @@ Provide only the refined paragraph, nothing else.`;
             const commandMatches = content.matchAll(/```(?:bash|sh)?\s*([\s\S]*?)```/g);
 
             for (const cmdMatch of commandMatches) {
-              const cmd = cmdMatch[1].trim();
-              if (cmd.includes('lint') || cmd.includes('typecheck') || cmd.includes('test')) {
-                validationCommands.push(cmd);
-              } else {
-                commands.push(cmd);
+              const cmd = cmdMatch[1]?.trim();
+              if (cmd) {
+                if (cmd.includes('lint') || cmd.includes('typecheck') || cmd.includes('test')) {
+                  validationCommands.push(cmd);
+                } else {
+                  commands.push(cmd);
+                }
               }
             }
 
