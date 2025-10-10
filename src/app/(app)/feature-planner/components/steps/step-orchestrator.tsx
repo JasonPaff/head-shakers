@@ -75,7 +75,9 @@ export const StepOrchestrator = ({
       {/* Step 2: File Discovery */}
       <Conditional isCondition={currentStep === 2}>
         <StepTwo
-          discoveredFiles={stepData.step2?.discoveredFiles}
+          discoverySession={null}
+          onFileAdded={() => {}}
+          onFileSelection={() => {}}
           selectedFiles={stepData.step2?.selectedFiles}
         />
       </Conditional>
