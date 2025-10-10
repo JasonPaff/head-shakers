@@ -45,6 +45,7 @@ export const SCHEMA_LIMITS = {
   },
   FEATURE_PLAN: {
     ESTIMATED_DURATION: { MAX: 50 },
+    ORIGINAL_REQUEST: { MAX: 5000, MIN: 10 },
     SESSION_ID: { MAX: 255 },
   },
   FEATURED_CONTENT: {
@@ -53,9 +54,11 @@ export const SCHEMA_LIMITS = {
     TITLE: { MAX: 255, MIN: 10 },
   },
   FILE_DISCOVERY: {
+    DESCRIPTION: { MAX: 5000 },
     FILE_PATH: { MAX: 500 },
     FILE_TYPE: { MAX: 50 },
     INTEGRATION_POINT: { MAX: 1000 },
+    REASONING: { MAX: 5000 },
     ROLE: { MAX: 100 },
   },
   LOGIN_HISTORY: {
@@ -92,6 +95,8 @@ export const SCHEMA_LIMITS = {
   REFINEMENT: {
     AGENT_ID: { MAX: 100 },
     AGENT_MODEL: { MAX: 50 },
+    MAX_OUTPUT_LENGTH: { MAX: 1000, MIN: 100 },
+    MIN_OUTPUT_LENGTH: { MAX: 500, MIN: 50 },
   },
   SEARCH_QUERY: {
     IP_ADDRESS: { MAX: 50 },

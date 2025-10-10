@@ -15,7 +15,7 @@ interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
   discoveredFiles?: Array<{
     description: string;
     filePath: string;
-    priority: 'high' | 'low' | 'medium';
+    priority: 'critical' | 'high' | 'low' | 'medium';
     relevanceScore: number;
   }>;
   onFileSelection?: (files: Array<string>) => void;

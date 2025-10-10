@@ -44,6 +44,7 @@ export default function FeaturePlannerPage() {
       agentCount: 3,
       includeProjectContext: true,
       maxOutputLength: 250,
+      minOutputLength: 150,
     },
     stepData: {},
   });
@@ -74,7 +75,7 @@ export default function FeaturePlannerPage() {
 
       const data = (await response.json()) as RefineResponse;
 
-      if (response.ok && data.success) {
+      if (response.ok && data.isSuccess) {
         toast.success(data.message);
       } else {
         toast.error(data.message || 'Failed to refine feature request');

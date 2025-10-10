@@ -66,6 +66,17 @@ export const ERROR_MESSAGES = {
     SERVICE_UNAVAILABLE: 'External service is unavailable',
     TIMEOUT: 'Request timeout',
   },
+  FEATURE_PLAN: {
+    CREATE_FAILED: 'Failed to create feature plan',
+    DELETE_FAILED: 'Failed to delete feature plan',
+    DISCOVERY_FAILED: 'Failed to discover files for feature',
+    NOT_FOUND: 'Feature plan not found',
+    PLANNING_FAILED: 'Failed to generate implementation plan',
+    REFINEMENT_FAILED: 'Failed to refine feature request',
+    REFINEMENT_TIMEOUT: 'Feature refinement timed out',
+    REFINEMENT_TOO_SHORT: 'Refined request is too short',
+    SDK_ERROR: 'Claude Code SDK error occurred',
+  },
   FEATURE_PLANNER: {
     REFINEMENT_FAILED: 'Failed to refine feature request',
     REFINEMENT_TIMEOUT: 'Feature refinement timed out',
