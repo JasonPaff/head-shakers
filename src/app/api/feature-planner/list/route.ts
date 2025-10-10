@@ -1,10 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
 import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-planner.facade';
 import { createServiceError } from '@/lib/utils/error-builders';
+import { getUserId } from '@/utils/user-utils';
 
 /**
  * GET /api/feature-planner/list
@@ -12,7 +12,7 @@ import { createServiceError } from '@/lib/utils/error-builders';
  */
 export async function GET(request: Request) {
   try {
-    const { userId } = await auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(

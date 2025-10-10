@@ -1,10 +1,10 @@
-import { auth } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
 import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-planner.facade';
 import { createServiceError } from '@/lib/utils/error-builders';
+import { getUserId } from '@/utils/user-utils';
 
 /**
  * DELETE /api/feature-planner/[planId]
@@ -12,7 +12,7 @@ import { createServiceError } from '@/lib/utils/error-builders';
  */
 export async function DELETE(_request: Request, { params }: { params: { planId: string } }) {
   try {
-    const { userId } = await auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
@@ -84,7 +84,7 @@ export async function DELETE(_request: Request, { params }: { params: { planId: 
  */
 export async function GET(_request: Request, { params }: { params: { planId: string } }) {
   try {
-    const { userId } = await auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json(
