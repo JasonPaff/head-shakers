@@ -4,6 +4,7 @@ import { parseAsInteger, useQueryState } from 'nuqs';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
+import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
 import type {
   ParallelRefinementResponse,
   RefinementSettings as RefinementSettingsType,
@@ -14,10 +15,7 @@ import type {
 import { ActionControls } from '@/app/(app)/feature-planner/components/action-controls';
 import { RefinementSettings } from '@/app/(app)/feature-planner/components/refinement-settings';
 import { RequestInput } from '@/app/(app)/feature-planner/components/request-input';
-import {
-  StepOrchestrator,
-  type WorkflowStep,
-} from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
+import { StepOrchestrator } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
 import { WorkflowProgress } from '@/app/(app)/feature-planner/components/workflow-progress';
 import { PageContent } from '@/components/layout/page-content';
 import { Conditional } from '@/components/ui/conditional';
