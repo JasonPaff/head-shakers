@@ -6,8 +6,6 @@ import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-plan
 import { createServiceError } from '@/lib/utils/error-builders';
 import { getUserId } from '@/utils/user-utils';
 
-export const maxDuration = 180;
-
 /**
  * POST /api/feature-planner/discover
  * Run file discovery for a feature plan
