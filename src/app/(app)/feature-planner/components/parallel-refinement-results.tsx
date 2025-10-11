@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle2, Sparkles } from 'lucide-react';
+import { CheckCircle2, Edit2, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 import type { FeatureRefinement } from '@/lib/db/schema/feature-planner.schema';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ParallelRefinementResultsProps {
@@ -26,6 +27,8 @@ export const ParallelRefinementResults = ({
 }: ParallelRefinementResultsProps) => {
   // eslint-disable-next-line react-snob/require-boolean-prefix-is
   const [activeTab, setActiveTab] = useState(refinements[0]?.agentId || '');
+  const [editedTexts, setEditedTexts] = useState<Record<string, string>>({});
+  const [editingRefinementId, setEditingRefinementId] = useState<null | string>(null);
 
   const completedRefinements = refinements.filter((r) => r.status === 'completed' && r.refinedRequest);
   const failedRefinements = refinements.filter((r) => r.status === 'failed');
@@ -80,6 +83,8 @@ export const ParallelRefinementResults = ({
               const _hasValidationErrors =
                 refinement.validationErrors && refinement.validationErrors.length > 0;
               const _isSelected = selectedRefinementId === refinement.id;
+              const _isEditing = editingRefinementId === refinement.id;
+              const _currentText = editedTexts[refinement.id] || refinement.refinedRequest || '';
 
               return (
                 <TabsContent className={'space-y-4'} key={refinement.id} value={refinement.agentId}>
@@ -100,12 +105,58 @@ export const ParallelRefinementResults = ({
                         Selected
                       </Badge>
                     )}
+                    {editedTexts[refinement.id] && (
+                      <Badge variant={'outline'}>
+                        <Edit2 className={'mr-1 size-3'} />
+                        Edited
+                      </Badge>
+                    )}
                   </div>
 
                   {/* Refined Request */}
-                  <div className={'rounded-lg border bg-muted/50 p-4'}>
-                    <p className={'text-sm leading-relaxed whitespace-pre-wrap'}>{refinement.refinedRequest}</p>
-                  </div>
+                  {_isEditing ?
+                    <div className={'space-y-2'}>
+                      <Textarea
+                        className={'min-h-[200px] font-mono text-sm'}
+                        onChange={(e) => {
+                          setEditedTexts((prev) => ({
+                            ...prev,
+                            [refinement.id]: e.target.value,
+                          }));
+                        }}
+                        placeholder={'Enter refined request...'}
+                        value={_currentText}
+                      />
+                      <div className={'flex gap-2'}>
+                        <Button
+                          onClick={() => {
+                            setEditingRefinementId(null);
+                          }}
+                          size={'sm'}
+                          variant={'outline'}
+                        >
+                          Done Editing
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setEditedTexts((prev) => {
+                              const updated = { ...prev };
+                              delete updated[refinement.id];
+                              return updated;
+                            });
+                            setEditingRefinementId(null);
+                          }}
+                          size={'sm'}
+                          variant={'ghost'}
+                        >
+                          Reset
+                        </Button>
+                      </div>
+                    </div>
+                  : <div className={'rounded-lg border bg-muted/50 p-4'}>
+                      <p className={'text-sm leading-relaxed whitespace-pre-wrap'}>{_currentText}</p>
+                    </div>
+                  }
 
                   {/* Validation Errors */}
                   {_hasValidationErrors && (
@@ -121,11 +172,30 @@ export const ParallelRefinementResults = ({
 
                   {/* Action Buttons */}
                   <div className={'flex gap-2'}>
+                    {!_isEditing && (
+                      <Button
+                        onClick={() => {
+                          if (!editedTexts[refinement.id]) {
+                            setEditedTexts((prev) => ({
+                              ...prev,
+                              [refinement.id]: refinement.refinedRequest || '',
+                            }));
+                          }
+                          setEditingRefinementId(refinement.id);
+                        }}
+                        size={'sm'}
+                        variant={'outline'}
+                      >
+                        <Edit2 className={'mr-1 size-4'} />
+                        Edit
+                      </Button>
+                    )}
                     <Button
                       className={cn(_isSelected && 'bg-green-600 hover:bg-green-700')}
+                      disabled={_isEditing}
                       onClick={() => {
-                        if (refinement.refinedRequest) {
-                          onSelectRefinement(refinement.id, refinement.refinedRequest);
+                        if (_currentText) {
+                          onSelectRefinement(refinement.id, _currentText);
                         }
                       }}
                       size={'sm'}

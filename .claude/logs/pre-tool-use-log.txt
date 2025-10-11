@@ -3173,3 +3173,252 @@
 2025-10-11T17:15:51.334Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\feature-planner.validation.ts
 2025-10-11T17:17:57.201Z: TodoWrite: updating todo list
 2025-10-11T17:18:04.589Z: BashOutput: bash_id = b1f5f4
+2025-10-11T17:27:50.038Z: BashOutput: bash_id = b1f5f4
+2025-10-11T17:27:50.371Z: mcp__playwright__browser_navigate: url = http://localhost:3000/feature-planner
+2025-10-11T17:28:05.342Z: Bash: npm run dev - Start development server
+2025-10-11T17:28:12.103Z: BashOutput: bash_id = 91caa9
+2025-10-11T17:28:12.475Z: mcp__playwright__browser_navigate: url = http://localhost:3000/feature-planner
+2025-10-11T17:28:27.797Z: TodoWrite: updating todo list
+2025-10-11T17:28:34.788Z: KillShell: shell_id = b1f5f4
+2025-10-11T17:28:35.069Z: mcp__playwright__browser_navigate: url = http://localhost:3001/feature-planner
+2025-10-11T17:28:51.627Z: TodoWrite: updating todo list
+2025-10-11T17:28:51.973Z: mcp__playwright__browser_type: element = Feature Description textbox
+2025-10-11T17:28:58.980Z: mcp__playwright__browser_snapshot: unknown = no params
+2025-10-11T17:29:14.456Z: TodoWrite: updating todo list
+2025-10-11T17:29:14.787Z: mcp__playwright__browser_click: element = Settings button
+2025-10-11T17:29:22.961Z: mcp__playwright__browser_click: element = Number of Parallel Agents combobox
+2025-10-11T17:29:29.796Z: mcp__playwright__browser_click: element = 5 Agents (Maximum) option
+2025-10-11T17:29:38.933Z: mcp__playwright__browser_press_key: key = Escape
+2025-10-11T17:29:50.779Z: TodoWrite: updating todo list
+2025-10-11T17:29:51.131Z: mcp__playwright__browser_click: element = Single Refine button
+2025-10-11T17:30:12.176Z: mcp__playwright__browser_wait_for: time = 10
+2025-10-11T17:30:12.197Z: BashOutput: bash_id = 91caa9
+2025-10-11T17:30:35.987Z: mcp__playwright__browser_console_messages: unknown = no params
+2025-10-11T17:30:35.991Z: mcp__playwright__browser_take_screenshot: filename = single-refinement-result.png
+2025-10-11T17:30:44.126Z: mcp__playwright__browser_snapshot: unknown = no params
+2025-10-11T17:30:53.884Z: BashOutput: bash_id = 91caa9
+2025-10-11T17:31:05.449Z: mcp__playwright__browser_network_requests: unknown = no params
+2025-10-11T17:31:19.755Z: Read: C:\Users\JasonPaff\dev\head-shakers\.playwright-mcp\single-refinement-result.png
+2025-10-11T17:31:45.174Z: TodoWrite: updating todo list
+2025-10-11T17:31:45.518Z: mcp__playwright__browser_evaluate: function = () => {
+  // Check if there are any error toasts o
+2025-10-11T17:32:04.861Z: TodoWrite: updating todo list
+2025-10-11T17:32:05.203Z: mcp__playwright__browser_click: element = Parallel Refine (5 Agents) button
+2025-10-11T17:32:27.577Z: mcp__playwright__browser_wait_for: time = 60
+2025-10-11T17:33:07.254Z: mcp__playwright__browser_take_screenshot: filename = parallel-refinement-result.png
+2025-10-11T17:33:07.260Z: BashOutput: bash_id = 91caa9
+2025-10-11T17:33:21.812Z: Read: C:\Users\JasonPaff\dev\head-shakers\.playwright-mcp\parallel-refinement-result.png
+2025-10-11T17:33:22.476Z: TodoWrite: updating todo list
+2025-10-11T17:37:31.450Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\page.tsx
+2025-10-11T17:37:43.238Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\feature-planner.validation.ts
+2025-10-11T17:37:49.491Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\refine\route.ts
+2025-10-11T17:38:06.845Z: TodoWrite: updating todo list
+2025-10-11T17:38:14.122Z: TodoWrite: updating todo list
+2025-10-11T17:38:19.198Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\feature-planner.validation.ts
+2025-10-11T17:38:25.613Z: TodoWrite: updating todo list
+2025-10-11T17:38:31.517Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\page.tsx
+2025-10-11T17:38:37.644Z: TodoWrite: updating todo list
+2025-10-11T17:38:43.339Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\page.tsx
+2025-10-11T17:38:49.359Z: TodoWrite: updating todo list
+2025-10-11T17:38:54.488Z: BashOutput: bash_id = b1f5f4
+2025-10-11T17:38:59.723Z: BashOutput: bash_id = 91caa9
+2025-10-11T17:39:05.579Z: Bash: npm run typecheck - Run TypeScript type checking
+2025-10-11T17:39:18.247Z: Bash: npm run dev - Start development server
+2025-10-11T17:39:24.381Z: Bash: timeout 30 bash -c 'until curl -s http://localhost:3000 > /dev/null 2>&1; do sleep 1; done && echo "Server ready!"' - Wait for dev server to be ready
+2025-10-11T17:46:46.577Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\page.tsx
+2025-10-11T17:47:04.042Z: BashOutput: bash_id = 3f86e8
+2025-10-11T17:47:12.571Z: Bash: curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/feature-planner - Test feature planner page load
+2025-10-11T17:47:23.996Z: BashOutput: bash_id = 3f86e8
+2025-10-11T17:47:33.968Z: TodoWrite: updating todo list
+2025-10-11T17:52:45.251Z: TodoWrite: updating todo list
+2025-10-11T17:52:50.795Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\components\parallel-refinement-results.tsx
+2025-10-11T17:52:57.501Z: Glob: **/select-refinement/route.ts 
+2025-10-11T17:53:03.105Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T17:53:10.819Z: BashOutput: bash_id = 3f86e8
+2025-10-11T17:53:21.401Z: TodoWrite: updating todo list
+2025-10-11T17:53:28.870Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T17:53:35.575Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T17:53:42.343Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T17:53:49.008Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T17:53:55.559Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T17:54:03.293Z: TodoWrite: updating todo list
+2025-10-11T17:54:19.053Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\components\parallel-refinement-results.tsx
+2025-10-11T17:54:46.170Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\components\parallel-refinement-results.tsx
+2025-10-11T17:54:56.177Z: TodoWrite: updating todo list
+2025-10-11T17:55:02.094Z: Bash: npm run typecheck - Run TypeScript type checking
+2025-10-11T17:55:13.458Z: BashOutput: bash_id = 3f86e8
+2025-10-11T17:55:20.157Z: Bash: curl -s -o /dev/null -w "%{http_code}" http://localhost:3002/feature-planner - Test feature planner page
+2025-10-11T17:55:54.482Z: TodoWrite: updating todo list
+2025-10-11T18:02:26.064Z: TodoWrite: updating todo list
+2025-10-11T18:02:31.792Z: BashOutput: bash_id = b1f5f4
+2025-10-11T18:02:37.156Z: BashOutput: bash_id = 91caa9
+2025-10-11T18:02:43.748Z: BashOutput: bash_id = 3f86e8
+2025-10-11T18:02:52.337Z: Glob: **/feature-planner.facade.ts 
+2025-10-11T18:02:59.602Z: Bash: grep -n "selectRefinementAsync" C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\feature-planner\feature-planner.facade.ts - Find selectRefinementAsync method
+2025-10-11T18:03:06.727Z: Grep: selectRefinementAsync 
+2025-10-11T18:03:13.253Z: Grep: selectRefinementAsync 
+2025-10-11T18:03:20.151Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\feature-planner\feature-planner.facade.ts
+2025-10-11T18:03:37.327Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\page.tsx
+2025-10-11T18:03:52.658Z: TodoWrite: updating todo list
+2025-10-11T18:04:01.827Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\feature-planner\page.tsx
+2025-10-11T18:04:10.741Z: TodoWrite: updating todo list
+2025-10-11T18:04:18.956Z: Grep: selectRefinementSchema 
+2025-10-11T18:04:26.040Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\feature-planner.validation.ts
+2025-10-11T18:04:34.030Z: TodoWrite: updating todo list
+2025-10-11T18:04:43.905Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:04:51.919Z: TodoWrite: updating todo list
+2025-10-11T18:05:07.433Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\feature-planner\feature-planner.facade.ts
+2025-10-11T18:05:16.038Z: TodoWrite: updating todo list
+2025-10-11T18:05:23.462Z: Bash: npm run typecheck - Run TypeScript type checking
+2025-10-11T18:05:40.613Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\feature-planner\feature-planner.facade.ts
+2025-10-11T18:05:48.696Z: Grep: selectRefinementAsync 
+2025-10-11T18:05:57.786Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\feature-planner\feature-planner.actions.ts
+2025-10-11T18:06:08.118Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\feature-planner\feature-planner.actions.ts
+2025-10-11T18:06:16.402Z: Bash: npm run typecheck - Run TypeScript type checking
+2025-10-11T18:06:31.387Z: TodoWrite: updating todo list
+2025-10-11T18:06:38.295Z: BashOutput: bash_id = 3f86e8
+2025-10-11T18:13:17.216Z: mcp__playwright__browser_navigate: url = http://localhost:3002/feature-planner
+2025-10-11T18:13:33.134Z: mcp__playwright__browser_type: element = Feature Description textarea
+2025-10-11T18:13:42.255Z: mcp__playwright__browser_snapshot: unknown = no params
+2025-10-11T18:13:52.392Z: mcp__playwright__browser_click: element = Parallel Refine (3 Agents) button
+2025-10-11T18:14:13.274Z: mcp__playwright__browser_wait_for: time = 20
+2025-10-11T18:14:46.821Z: mcp__playwright__browser_click: element = Edit button for refinement
+2025-10-11T18:15:00.722Z: mcp__playwright__browser_type: element = Textarea for editing refinement
+2025-10-11T18:15:08.072Z: mcp__playwright__browser_click: element = Done Editing button
+2025-10-11T18:15:20.193Z: mcp__playwright__browser_click: element = Use This Refinement button
+2025-10-11T18:15:32.035Z: BashOutput: bash_id = 3f86e8
+2025-10-11T18:16:00.273Z: TodoWrite: updating todo list
+2025-10-11T18:16:13.309Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:16:30.914Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\feature-planner\feature-planner.facade.ts
+2025-10-11T18:16:40.437Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:16:50.213Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\feature-planner\feature-planner.actions.ts
+2025-10-11T18:16:58.400Z: Bash: npm run typecheck - Run TypeScript type checking
+2025-10-11T18:17:11.184Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:17:20.650Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:17:27.933Z: Bash: npm run typecheck - Run TypeScript type checking
+2025-10-11T18:17:42.700Z: TodoWrite: updating todo list
+2025-10-11T18:17:49.920Z: mcp__playwright__browser_click: element = Use This Refinement button
+2025-10-11T18:18:00.219Z: BashOutput: bash_id = 3f86e8
+2025-10-11T18:24:19.181Z: Grep: getUserId 
+2025-10-11T18:24:19.187Z: Grep: function getUserId 
+2025-10-11T18:24:26.826Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\utils\user-utils.ts
+2025-10-11T18:24:26.832Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\refine\route.ts
+2025-10-11T18:24:44.022Z: Edit: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:24:53.716Z: TodoWrite: updating todo list
+2025-10-11T18:25:04.505Z: mcp__playwright__browser_navigate: url = http://localhost:3000/feature-planner
+2025-10-11T18:25:17.397Z: mcp__playwright__browser_type: element = Feature Description textbox
+2025-10-11T18:25:24.081Z: mcp__playwright__browser_snapshot: unknown = no params
+2025-10-11T18:25:32.552Z: mcp__playwright__browser_click: element = Parallel Refine (3 Agents) button
+2025-10-11T18:25:44.840Z: mcp__playwright__browser_wait_for: time = 20
+2025-10-11T18:26:11.607Z: BashOutput: bash_id = 3f86e8
+2025-10-11T18:26:24.924Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\api\feature-planner\[planId]\select-refinement\route.ts
+2025-10-11T18:26:36.421Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\utils\user-utils.ts
+2025-10-11T18:26:42.298Z: Task (file-discovery-agent): Find all relevant files for implementing a favorites feature...
+2025-10-11T18:26:47.585Z: KillShell: shell_id = 3f86e8
+2025-10-11T18:26:49.562Z: Glob: **/likes* 
+2025-10-11T18:26:49.604Z: Glob: **/schema*.ts 
+2025-10-11T18:26:49.610Z: Glob: **/*.actions.ts 
+2025-10-11T18:26:49.638Z: Glob: **/*.queries.ts 
+2025-10-11T18:26:49.641Z: Glob: **/collection*card*.tsx 
+2025-10-11T18:26:50.305Z: Glob: **/bobblehead*card*.tsx 
+2025-10-11T18:26:54.055Z: Bash: npm run dev - Start Next.js development server with fresh reload
+2025-10-11T18:27:00.437Z: Task (file-discovery-agent): Find all relevant files for implementing a favorites feature...
+2025-10-11T18:27:00.850Z: Grep: social|like|follow 
+2025-10-11T18:27:00.850Z: Glob: **/validation*.ts 
+2025-10-11T18:27:00.850Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\lib\db" -name "*.ts" -type f - Find all TypeScript files in db directory
+2025-10-11T18:27:00.881Z: Glob: **/dashboard/**/*.tsx 
+2025-10-11T18:27:01.575Z: mcp__playwright__browser_wait_for: time = 5
+2025-10-11T18:27:05.839Z: Glob: **/*.ts 
+2025-10-11T18:27:05.844Z: Glob: **/*.tsx 
+2025-10-11T18:27:05.851Z: Bash: find "C:/Users/JasonPaff/dev/head-shakers/src" -type d | head -50 - Explore source directory structure
+2025-10-11T18:27:08.619Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\lib\validations" -name "*.ts" -type f - Find all validation TypeScript files
+2025-10-11T18:27:09.407Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard" -name "*.tsx" -type f - Find all dashboard page/component files
+2025-10-11T18:27:10.785Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\lib\queries" -name "*.ts" -type f - Find all query files
+2025-10-11T18:27:14.833Z: Glob: src/**/*.ts 
+2025-10-11T18:27:14.841Z: Glob: src/**/*.tsx 
+2025-10-11T18:27:14.864Z: Grep: like 
+2025-10-11T18:27:14.871Z: Grep: like 
+2025-10-11T18:27:15.751Z: BashOutput: bash_id = 850c97
+2025-10-11T18:27:20.742Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\social\social.actions.ts
+2025-10-11T18:27:20.744Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\social.schema.ts
+2025-10-11T18:27:20.754Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\like.validation.ts
+2025-10-11T18:27:20.777Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\social\social.query.ts
+2025-10-11T18:27:25.115Z: mcp__playwright__browser_navigate: url = http://localhost:3000/feature-planner
+2025-10-11T18:27:25.631Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/social.schema.ts
+2025-10-11T18:27:25.638Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/validations/like.validation.ts
+2025-10-11T18:27:25.645Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/actions/social/social.actions.ts
+2025-10-11T18:27:25.676Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/hooks/use-like.tsx
+2025-10-11T18:27:25.687Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/queries/social/social.query.ts
+2025-10-11T18:27:27.062Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/facades/social/social.facade.ts
+2025-10-11T18:27:35.679Z: mcp__playwright__browser_type: element = Feature Description textbox
+2025-10-11T18:27:36.432Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\lib\facades" -name "*.ts" -type f - Find all facade TypeScript files
+2025-10-11T18:27:36.436Z: Glob: **/subcollection*card*.tsx 
+2025-10-11T18:27:36.445Z: Grep: LikeButton|like-button 
+2025-10-11T18:27:38.422Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard" -name "page.tsx" -o -name "layout.tsx" | head -20 - Find dashboard pages and layouts
+2025-10-11T18:27:42.402Z: Grep: card 
+2025-10-11T18:27:42.410Z: Bash: ls -R "C:/Users/JasonPaff/dev/head-shakers/src/components/feature" | head -100 - List feature components directory structure
+2025-10-11T18:27:42.418Z: Grep: collection.*card|bobblehead.*card|subcollection.*card 
+2025-10-11T18:27:43.473Z: mcp__playwright__browser_click: element = Parallel Refine (3 Agents) button
+2025-10-11T18:27:49.367Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\components\ui\like-button.tsx
+2025-10-11T18:27:49.369Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\social\social.facade.ts
+2025-10-11T18:27:49.383Z: Glob: **/constants*.ts 
+2025-10-11T18:27:51.138Z: Bash: ls "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard" - List dashboard directory contents
+2025-10-11T18:27:52.869Z: BashOutput: bash_id = b1f5f4
+2025-10-11T18:27:54.004Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/constants/index.ts
+2025-10-11T18:27:54.047Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/app/(app)/dashboard/collection/(collection)/components/collection-card.tsx
+2025-10-11T18:27:54.050Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/components/feature/bobblehead/bobblehead-gallery-card.tsx
+2025-10-11T18:27:54.070Z: Grep: dashboard.*favorites|favorites.*page 
+2025-10-11T18:28:05.045Z: Glob: **/constants.ts 
+2025-10-11T18:28:05.795Z: Bash: dir "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard" /B - List dashboard directory
+2025-10-11T18:28:06.829Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections\[collectionId]\(collection)\components\collection-header.tsx
+2025-10-11T18:28:06.830Z: Grep: use-like|useLike 
+2025-10-11T18:28:07.859Z: TodoWrite: updating todo list
+2025-10-11T18:28:09.313Z: Glob: src/lib/constants/*.ts 
+2025-10-11T18:28:09.327Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/constants/enums.ts
+2025-10-11T18:28:09.338Z: Grep: ably 
+2025-10-11T18:28:09.345Z: Grep: CacheRevalidationService 
+2025-10-11T18:28:14.590Z: mcp__playwright__browser_close: unknown = no params
+2025-10-11T18:28:18.242Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\hooks\use-like.tsx
+2025-10-11T18:28:18.247Z: Bash: ls "C:\Users\JasonPaff\dev\head-shakers\src\lib" | grep -i const - Find constants file in lib directory
+2025-10-11T18:28:18.270Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-header.tsx
+2025-10-11T18:28:18.276Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections\[collectionId]\subcollection\[subcollectionId]\components\subcollection-header.tsx
+2025-10-11T18:28:23.229Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/services/cache-revalidation.service.ts
+2025-10-11T18:28:23.237Z: Bash: ls "C:/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/" - List database schema files
+2025-10-11T18:28:23.245Z: Grep: follow 
+2025-10-11T18:28:23.266Z: Grep: follow 
+2025-10-11T18:28:32.996Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\lib\constants" -name "*.ts" -type f - Find all constants files
+2025-10-11T18:28:32.999Z: Glob: **/services/*.ts 
+2025-10-11T18:28:33.013Z: Glob: **/page.tsx 
+2025-10-11T18:28:33.025Z: Grep: Ably|ably|real-time|realtime 
+2025-10-11T18:28:37.746Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/collections.schema.ts
+2025-10-11T18:28:37.757Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/db/schema/bobbleheads.schema.ts
+2025-10-11T18:28:37.767Z: Bash: ls "C:/Users/JasonPaff/dev/head-shakers/src/app/api/" - List API route directories
+2025-10-11T18:28:37.779Z: Grep: LikeButton|like.*button 
+2025-10-11T18:28:46.033Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\enums.ts
+2025-10-11T18:28:46.035Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\services\cache-revalidation.service.ts
+2025-10-11T18:28:46.050Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\collections.schema.ts
+2025-10-11T18:28:46.062Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\bobbleheads.schema.ts
+2025-10-11T18:28:51.913Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/components/ui/like-button.tsx
+2025-10-11T18:28:53.067Z: Bash: ls "C:/Users/JasonPaff/dev/head-shakers/src/app/(app)/dashboard/" - List dashboard pages
+2025-10-11T18:28:54.512Z: Grep: profile.*page|user.*page 
+2025-10-11T18:28:54.516Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/validations/social.validation.ts
+2025-10-11T18:29:00.749Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\page.tsx
+2025-10-11T18:29:00.750Z: Glob: **/profile/**/*.tsx 
+2025-10-11T18:29:00.763Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\social.validation.ts
+2025-10-11T18:29:00.769Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\lib\utils" -name "*.ts" -type f | head -20 - Find utility files
+2025-10-11T18:29:08.262Z: Bash: ls "C:/Users/JasonPaff/dev/head-shakers/src/lib/facades/" - List facade directories
+2025-10-11T18:29:08.265Z: Bash: ls "C:/Users/JasonPaff/dev/head-shakers/src/lib/queries/" - List query directories
+2025-10-11T18:29:08.272Z: Read: C:/Users/JasonPaff/dev/head-shakers/src/lib/facades/collections/collections.facade.ts
+2025-10-11T18:29:08.284Z: Grep: subcollection 
+2025-10-11T18:29:13.464Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\utils\cache-tags.utils.ts
+2025-10-11T18:29:13.467Z: Glob: **/api/**/*.ts 
+2025-10-11T18:29:14.660Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections" -name "page.tsx" -type f - Find collection pages
+2025-10-11T18:29:15.830Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-gallery-card.tsx
+2025-10-11T18:29:29.671Z: Bash: ls "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections\[collectionId]\(collection)" - List collection page directory
+2025-10-11T18:29:30.788Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\collection-card.tsx
+2025-10-11T18:29:30.791Z: Grep: middleware 
+2025-10-11T18:29:30.803Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\index.ts
+2025-10-11T18:29:44.465Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\operations.ts
+2025-10-11T18:29:44.467Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\error-codes.ts
+2025-10-11T18:29:45.618Z: Bash: find "C:\Users\JasonPaff\dev\head-shakers\src\app\(app)" -type d -name "dashboard" | head -5 - Find dashboard directories
+2025-10-11T18:29:46.730Z: Read: C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\index.ts

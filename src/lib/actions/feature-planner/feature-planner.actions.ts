@@ -261,6 +261,7 @@ export const selectRefinementAction = authActionClient
         refinementId,
         userId,
         ctx.db,
+        undefined,
       );
 
       if (!updatedPlan) {

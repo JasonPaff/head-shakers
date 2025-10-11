@@ -88,7 +88,7 @@ export default function FeaturePlannerPage() {
 
       const data = (await response.json()) as RefineResponse;
 
-      if (response.ok && data.isSuccess) {
+      if (response.ok && data.success) {
         toast.success(data.message);
         // Store the refinement data in state
         if (data.data) {
@@ -150,7 +150,7 @@ export default function FeaturePlannerPage() {
 
       toast.dismiss('parallel-refine');
 
-      if (response.ok && data.isSuccess) {
+      if (response.ok && data.success) {
         toast.success(data.message);
         // Store the refinement data in state
         if (data.data) {
@@ -236,7 +236,7 @@ export default function FeaturePlannerPage() {
         toast.loading('Selecting refinement...', { id: 'select-refinement' });
 
         const response = await fetch(`/api/feature-planner/${state.planId}/select-refinement`, {
-          body: JSON.stringify({ refinementId }),
+          body: JSON.stringify({ refinedRequest, refinementId }),
           headers: {
             'Content-Type': 'application/json',
           },

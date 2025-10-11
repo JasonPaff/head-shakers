@@ -108,6 +108,7 @@ export const runRefinementSchema = z.object({
 
 export const selectRefinementSchema = z.object({
   planId: z.string().uuid(),
+  refinedRequest: z.string().optional(),
   refinementId: z.string().uuid(),
 });
 
@@ -281,7 +282,7 @@ export interface ParallelRefinementResponse {
 
 export interface RefineResponse {
   data?: unknown;
-  isSuccess: boolean;
+  success: boolean;
   message: string;
 }
 

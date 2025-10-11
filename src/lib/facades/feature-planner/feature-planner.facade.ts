@@ -490,23 +490,29 @@ export class FeaturePlannerFacade {
     refinementId: string,
     userId: string,
     dbInstance?: DatabaseExecutor,
+    refinedRequest?: string,
   ): Promise<FeaturePlan | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
-      // Get the refinement
-      const refinements = await FeaturePlannerQuery.getRefinementsByPlanAsync(planId, context);
-      const selectedRefinement = refinements.find((r) => r.id === refinementId);
+      // if the refinedRequest is not provided, get it from the database
+      let finalRefinedRequest = refinedRequest;
+      if (!finalRefinedRequest) {
+        const refinements = await FeaturePlannerQuery.getRefinementsByPlanAsync(planId, context);
+        const selectedRefinement = refinements.find((r) => r.id === refinementId);
 
-      if (!selectedRefinement) {
-        throw new Error('Refinement not found');
+        if (!selectedRefinement) {
+          throw new Error('Refinement not found');
+        }
+
+        finalRefinedRequest = selectedRefinement.refinedRequest || undefined;
       }
 
-      // Update plan with selected refinement
+      // update plan with selected refinement
       return await FeaturePlannerQuery.updatePlanAsync(
         planId,
         {
-          refinedRequest: selectedRefinement.refinedRequest,
+          refinedRequest: finalRefinedRequest,
           selectedRefinementId: refinementId,
         },
         userId,
@@ -514,7 +520,7 @@ export class FeaturePlannerFacade {
       );
     } catch (error) {
       const context: FacadeErrorContext = {
-        data: { planId, refinementId },
+        data: { planId, refinedRequest, refinementId },
         facade: facadeName,
         method: 'selectRefinementAsync',
         operation: OPERATIONS.FEATURE_PLANNER.SELECT_REFINEMENT,
