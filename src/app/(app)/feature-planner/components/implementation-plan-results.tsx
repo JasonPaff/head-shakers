@@ -75,7 +75,8 @@ export const ImplementationPlanResults = ({
           Implementation Plan
         </CardTitle>
         <CardDescription>
-          Generated in {generation.executionTimeMs ? `${Math.round(generation.executionTimeMs / 1000)}s` : 'N/A'}
+          Generated in{' '}
+          {generation.executionTimeMs ? `${Math.round(generation.executionTimeMs / 1000)}s` : 'N/A'}
         </CardDescription>
       </CardHeader>
       <CardContent className={'space-y-6'}>
@@ -151,17 +152,17 @@ export const ImplementationPlanResults = ({
           return (
             _hasValidationErrors && (
               <div className={'rounded-lg border border-yellow-200 bg-yellow-50 p-4'}>
-            <h4 className={'mb-2 flex items-center gap-2 font-medium text-yellow-900'}>
-              <AlertCircle className={'size-4'} />
-              Validation Issues
-            </h4>
-            <ul className={'list-inside list-disc space-y-1 text-sm text-yellow-800'}>
-              {generation.validationErrors!.map((error, index) => (
-                <li key={index}>
-                  {error.field}: {error.message}
-                </li>
-              ))}
-            </ul>
+                <h4 className={'mb-2 flex items-center gap-2 font-medium text-yellow-900'}>
+                  <AlertCircle className={'size-4'} />
+                  Validation Issues
+                </h4>
+                <ul className={'list-inside list-disc space-y-1 text-sm text-yellow-800'}>
+                  {generation.validationErrors!.map((error, index) => (
+                    <li key={index}>
+                      {error.field}: {error.message}
+                    </li>
+                  ))}
+                </ul>
               </div>
             )
           );

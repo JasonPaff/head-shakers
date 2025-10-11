@@ -180,7 +180,11 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Delete feature plan
    */
-  static async deletePlanAsync(planId: string, userId: string, context: QueryContext): Promise<FeaturePlan | null> {
+  static async deletePlanAsync(
+    planId: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<FeaturePlan | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -277,7 +281,10 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Get execution logs for a plan
    */
-  static async getExecutionLogsByPlanAsync(planId: string, context: QueryContext): Promise<PlanExecutionLog[]> {
+  static async getExecutionLogsByPlanAsync(
+    planId: string,
+    context: QueryContext,
+  ): Promise<PlanExecutionLog[]> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -343,7 +350,10 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Get plan steps for a generation
    */
-  static async getPlanStepsByGenerationAsync(generationId: string, context: QueryContext): Promise<PlanStep[]> {
+  static async getPlanStepsByGenerationAsync(
+    generationId: string,
+    context: QueryContext,
+  ): Promise<PlanStep[]> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance

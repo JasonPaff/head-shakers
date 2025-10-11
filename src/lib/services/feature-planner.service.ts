@@ -365,8 +365,7 @@ export class FeaturePlannerService {
                       (validatedMessage.usage.input_tokens ?? 0) +
                       (validatedMessage.usage.output_tokens ?? 0);
                     tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
-                    tokenUsage.cacheCreationTokens =
-                      validatedMessage.usage.cache_creation_input_tokens ?? 0;
+                    tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
                   }
                 }
               }

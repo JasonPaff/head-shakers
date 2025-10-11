@@ -46,9 +46,11 @@ The file discovery step has a solid backend (90% complete) but incomplete fronte
 ### Phase 1: Core Functionality (P0 - Critical)
 
 #### Task 1.1: Add Database Query Methods
+
 **File**: `src/lib/queries/feature-planner/feature-planner.query.ts`
 
 **Add Methods**:
+
 ```typescript
 /**
  * Add manually discovered file to session
@@ -87,6 +89,7 @@ static async updateFileSelectionAsync(
 ```
 
 **Acceptance Criteria**:
+
 - ✅ Methods return proper types
 - ✅ All operations use transactions
 - ✅ Proper error handling
@@ -95,9 +98,11 @@ static async updateFileSelectionAsync(
 ---
 
 #### Task 1.2: Add Facade Methods
+
 **File**: `src/lib/facades/feature-planner/feature-planner.facade.ts`
 
 **Add Methods**:
+
 ```typescript
 /**
  * Add manual file to discovery session
@@ -125,12 +130,14 @@ static async updateSelectedFilesAsync(
 ```
 
 **Implementation Details**:
+
 - Verify file exists using `fs.existsSync()`
 - Calculate relevance score (default: 75 for manual additions)
 - Update session file counts
 - Validate user owns the plan/session
 
 **Acceptance Criteria**:
+
 - ✅ File existence verification works
 - ✅ Session counts updated correctly
 - ✅ Proper error context propagation
@@ -145,6 +152,7 @@ static async updateSelectedFilesAsync(
 **File**: `src/app/api/feature-planner/[planId]/add-file/route.ts`
 
 **Request Body**:
+
 ```typescript
 {
   sessionId: string;
@@ -155,6 +163,7 @@ static async updateSelectedFilesAsync(
 ```
 
 **Response**:
+
 ```typescript
 {
   success: boolean;
@@ -167,6 +176,7 @@ static async updateSelectedFilesAsync(
 ```
 
 **Implementation**:
+
 - Validate user is authenticated
 - Validate plan belongs to user
 - Validate session belongs to plan
@@ -180,6 +190,7 @@ static async updateSelectedFilesAsync(
 **File**: `src/app/api/feature-planner/[planId]/select-files/route.ts`
 
 **Request Body**:
+
 ```typescript
 {
   selectedFiles: string[]; // Array of file paths or IDs
@@ -187,6 +198,7 @@ static async updateSelectedFilesAsync(
 ```
 
 **Response**:
+
 ```typescript
 {
   success: boolean;
@@ -198,12 +210,14 @@ static async updateSelectedFilesAsync(
 ```
 
 **Implementation**:
+
 - Validate user is authenticated
 - Validate plan belongs to user
 - Call `FeaturePlannerFacade.updateSelectedFilesAsync()`
 - Return updated plan
 
 **Acceptance Criteria**:
+
 - ✅ Proper authentication and authorization
 - ✅ Input validation with Zod schemas
 - ✅ Consistent error responses
@@ -212,9 +226,11 @@ static async updateSelectedFilesAsync(
 ---
 
 #### Task 1.4: Implement Page Handlers
+
 **File**: `src/app/(app)/feature-planner/page.tsx`
 
 **Add Handler 1**: `handleFileAdded`
+
 ```typescript
 const handleFileAdded = useCallback(
   async (file: {
@@ -265,11 +281,12 @@ const handleFileAdded = useCallback(
       toast.error('Failed to add file');
     }
   },
-  [state.planId, state.discoverySession, state.stepData, updateState]
+  [state.planId, state.discoverySession, state.stepData, updateState],
 );
 ```
 
 **Add Handler 2**: `handleFileSelection`
+
 ```typescript
 const handleFileSelection = useCallback(
   async (files: string[]) => {
@@ -308,11 +325,12 @@ const handleFileSelection = useCallback(
       // Silent failure for background persistence
     }
   },
-  [state.planId, state.stepData, updateState]
+  [state.planId, state.stepData, updateState],
 );
 ```
 
 **Acceptance Criteria**:
+
 - ✅ Handlers properly connected to state
 - ✅ Loading states shown during API calls
 - ✅ Error handling with user feedback
@@ -321,9 +339,11 @@ const handleFileSelection = useCallback(
 ---
 
 #### Task 1.5: Wire Up Handlers in Step Orchestrator
+
 **File**: `src/app/(app)/feature-planner/components/steps/step-orchestrator.tsx`
 
 **Changes**:
+
 ```typescript
 // Line 86-88: Replace stub handlers
 <StepTwo
@@ -336,6 +356,7 @@ const handleFileSelection = useCallback(
 ```
 
 **Add Props to StepOrchestratorProps**:
+
 ```typescript
 interface StepOrchestratorProps {
   // ... existing props
@@ -349,6 +370,7 @@ interface StepOrchestratorProps {
 ```
 
 **Acceptance Criteria**:
+
 - ✅ Props properly typed
 - ✅ Handlers passed through correctly
 - ✅ No TypeScript errors
@@ -356,9 +378,11 @@ interface StepOrchestratorProps {
 ---
 
 #### Task 1.6: Fix File Existence Verification
+
 **File**: `src/lib/facades/feature-planner/feature-planner.facade.ts`
 
 **Changes** (Line 281 in `runFileDiscoveryAsync`):
+
 ```typescript
 import { existsSync } from 'fs';
 import { join } from 'path';
@@ -371,7 +395,7 @@ const fileRecords = result.result.map((file) => {
   return {
     description: file.description,
     discoverySessionId: session.id,
-    fileExists: actuallyExists,  // ✅ Verify actual existence
+    fileExists: actuallyExists, // ✅ Verify actual existence
     filePath: file.filePath,
     integrationPoint: file.integrationPoint,
     isManuallyAdded: file.isManuallyAdded ?? false,
@@ -384,6 +408,7 @@ const fileRecords = result.result.map((file) => {
 ```
 
 **Acceptance Criteria**:
+
 - ✅ File existence check works on Windows and Unix
 - ✅ Handles relative and absolute paths
 - ✅ No performance issues with large file lists
@@ -391,9 +416,11 @@ const fileRecords = result.result.map((file) => {
 ---
 
 #### Task 1.7: Add Error State Handling
+
 **File**: `src/app/(app)/feature-planner/components/steps/step-two.tsx`
 
 **Changes** (After line 46):
+
 ```typescript
 // If discovery session failed, show error state
 if (discoverySession?.status === 'failed') {
@@ -432,6 +459,7 @@ if (discoverySession?.status === 'failed') {
 ```
 
 **Acceptance Criteria**:
+
 - ✅ Error state shows clear message
 - ✅ "Try Again" button works
 - ✅ Proper visual hierarchy
@@ -444,6 +472,7 @@ if (discoverySession?.status === 'failed') {
 #### Task 2.1: Manual Testing Checklist
 
 **Test Manual File Addition**:
+
 1. Navigate to `/feature-planner`
 2. Complete Step 1 (refinement or skip)
 3. Click "Start File Discovery" on Step 2
@@ -459,12 +488,14 @@ if (discoverySession?.status === 'failed') {
 13. Verify session counts updated
 
 **Expected Results**:
+
 - ✅ File appears immediately after adding
 - ✅ Priority counts update correctly
 - ✅ File has "manually added" indicator
 - ✅ Toast notification shows success
 
 **Test File Selection Persistence**:
+
 1. On Step 2 with discovered files
 2. Check 3-5 file checkboxes
 3. Verify selection count updates
@@ -476,11 +507,13 @@ if (discoverySession?.status === 'failed') {
 9. Verify all files unchecked
 
 **Expected Results**:
+
 - ✅ Selections persist across refreshes
 - ✅ Selection count accurate
 - ✅ No data loss on refresh
 
 **Test File Existence Verification**:
+
 1. Start file discovery
 2. Identify files with green checkmark
 3. Verify those files exist in filesystem
@@ -488,10 +521,12 @@ if (discoverySession?.status === 'failed') {
 5. Verify those files don't exist
 
 **Expected Results**:
+
 - ✅ Green checkmark only on existing files
 - ✅ No false positives
 
 **Test Error Handling**:
+
 1. Mock discovery failure (disconnect network)
 2. Start file discovery
 3. Wait for failure
@@ -500,6 +535,7 @@ if (discoverySession?.status === 'failed') {
 6. Verify retry works
 
 **Expected Results**:
+
 - ✅ Clear error message shown
 - ✅ Retry button functional
 - ✅ No crash or stuck state
@@ -558,6 +594,7 @@ describe('Step 2: File Discovery Integration', () => {
 ```
 
 **Acceptance Criteria**:
+
 - ✅ All integration tests pass
 - ✅ Tests cover happy path and error cases
 - ✅ Tests use real database (testcontainers)
@@ -568,13 +605,16 @@ describe('Step 2: File Discovery Integration', () => {
 ### Phase 3: Documentation and Polish (P1)
 
 #### Task 3.1: Update API Documentation
+
 **File**: `docs/2025_01_27/api/feature-planner-endpoints.md`
 
 Document the new endpoints:
+
 - POST `/api/feature-planner/[planId]/add-file`
 - PUT `/api/feature-planner/[planId]/select-files`
 
 Include:
+
 - Request/response schemas
 - Error codes and messages
 - Authentication requirements
@@ -585,6 +625,7 @@ Include:
 #### Task 3.2: Add JSDoc Comments
 
 Add comprehensive JSDoc comments to:
+
 - New facade methods
 - New query methods
 - New API endpoints
@@ -595,6 +636,7 @@ Add comprehensive JSDoc comments to:
 ## Success Criteria
 
 ### Functional Requirements
+
 - [x] Users can manually add files to discovery results
 - [x] Users can select/deselect discovered files
 - [x] File selections persist across page refreshes
@@ -603,6 +645,7 @@ Add comprehensive JSDoc comments to:
 - [x] All handlers properly connected
 
 ### Technical Requirements
+
 - [x] No TypeScript errors
 - [x] All API endpoints have proper authentication
 - [x] All database operations use transactions
@@ -611,6 +654,7 @@ Add comprehensive JSDoc comments to:
 - [x] Manual testing checklist complete
 
 ### User Experience Requirements
+
 - [x] Immediate feedback on all actions (loading states, toasts)
 - [x] No data loss on page refresh
 - [x] Clear error messages with recovery options
@@ -621,50 +665,57 @@ Add comprehensive JSDoc comments to:
 ## Risk Mitigation
 
 ### Risk: File path injection in manual file addition
+
 **Mitigation**: Validate file paths against project directory structure
 
 ### Risk: Large number of files causes UI lag
+
 **Mitigation**: Already limited to reasonable counts by agent
 
 ### Risk: Concurrent file additions cause race conditions
+
 **Mitigation**: Use database transactions and proper locking
 
 ### Risk: File selection state inconsistency
+
 **Mitigation**: Use file IDs (UUIDs) instead of array indices
 
 ---
 
 ## Timeline Estimate
 
-| Phase | Task | Estimated Time |
-|-------|------|----------------|
-| 1.1 | Database query methods | 2 hours |
-| 1.2 | Facade methods | 2 hours |
-| 1.3 | API endpoints | 3 hours |
-| 1.4 | Page handlers | 2 hours |
-| 1.5 | Wire up handlers | 30 minutes |
-| 1.6 | File existence check | 1 hour |
-| 1.7 | Error state handling | 1 hour |
-| 2.1 | Manual testing | 2 hours |
-| 2.2 | Integration tests | 3 hours |
-| 3.1 | Documentation | 1 hour |
-| 3.2 | JSDoc comments | 1 hour |
-| **Total** | | **18.5 hours (~3 days)** |
+| Phase     | Task                   | Estimated Time           |
+| --------- | ---------------------- | ------------------------ |
+| 1.1       | Database query methods | 2 hours                  |
+| 1.2       | Facade methods         | 2 hours                  |
+| 1.3       | API endpoints          | 3 hours                  |
+| 1.4       | Page handlers          | 2 hours                  |
+| 1.5       | Wire up handlers       | 30 minutes               |
+| 1.6       | File existence check   | 1 hour                   |
+| 1.7       | Error state handling   | 1 hour                   |
+| 2.1       | Manual testing         | 2 hours                  |
+| 2.2       | Integration tests      | 3 hours                  |
+| 3.1       | Documentation          | 1 hour                   |
+| 3.2       | JSDoc comments         | 1 hour                   |
+| **Total** |                        | **18.5 hours (~3 days)** |
 
 ---
 
 ## Dependencies
 
 ### Required Before Starting
+
 - [x] Code review completed
 - [x] Implementation plan approved
 - [x] Database schema finalized
 - [x] Dev environment running
 
 ### Blocked By
+
 - None (all dependencies met)
 
 ### Blocking
+
 - Step 3 implementation (needs selected files from Step 2)
 
 ---
@@ -672,6 +723,7 @@ Add comprehensive JSDoc comments to:
 ## Post-MVP Enhancements
 
 ### Phase 4: Advanced Features (P2)
+
 - File content preview modal
 - Discovery customization options
 - Streaming progress indicator
@@ -679,6 +731,7 @@ Add comprehensive JSDoc comments to:
 - Architecture insights parsing
 
 ### Phase 5: Polish (P3)
+
 - Accessibility improvements
 - Performance optimizations
 - Comprehensive test coverage

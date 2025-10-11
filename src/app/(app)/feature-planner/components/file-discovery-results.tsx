@@ -130,9 +130,10 @@ export const FileDiscoveryResults = ({
                               <Checkbox
                                 checked={isSelected}
                                 onCheckedChange={(checked) => {
-                                  const newSelection = checked ?
-                                    [...selectedFiles, fileKey]
-                                  : selectedFiles.filter((id) => id !== fileKey);
+                                  const newSelection =
+                                    checked ?
+                                      [...selectedFiles, fileKey]
+                                    : selectedFiles.filter((id) => id !== fileKey);
                                   onSelectFiles(newSelection);
                                 }}
                               />

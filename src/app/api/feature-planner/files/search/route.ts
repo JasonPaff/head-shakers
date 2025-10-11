@@ -32,9 +32,7 @@ export async function GET(request: Request) {
     });
 
     // Filter files by query (case-insensitive) and limit results
-    const files = allFiles
-      .filter((f) => f.toLowerCase().includes(query.toLowerCase()))
-      .slice(0, 20); // Limit to 20 results for performance
+    const files = allFiles.filter((f) => f.toLowerCase().includes(query.toLowerCase())).slice(0, 20); // Limit to 20 results for performance
 
     return NextResponse.json({ files }, { status: 200 });
   } catch (error) {

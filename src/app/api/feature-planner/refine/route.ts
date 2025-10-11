@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Unauthorized',
-          success: false,
+          isSuccess: false,
         },
         { status: 401 },
       );
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Feature request is required',
-          success: false,
+          isSuccess: false,
         },
         { status: 400 },
       );
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             error: 'Failed to create feature plan',
-            success: false,
+            isSuccess: false,
           },
           { status: 500 },
         );
@@ -79,8 +79,8 @@ export async function POST(request: Request) {
           planId: currentPlanId,
           refinements,
         },
+        isSuccess: true,
         message: `Successfully completed ${refinements.length} refinement${refinements.length > 1 ? 's' : ''}`,
-        success: true,
       },
       { status: 200 },
     );
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: serviceError.message,
-        success: false,
+        isSuccess: false,
       },
       { status: 500 },
     );

@@ -42,6 +42,7 @@ Services (External Services & Utilities)
 **Purpose:** Handle external service integrations (Cloudinary, Claude Agent SDK, etc.)
 
 **Key Characteristics:**
+
 - ✅ Static class methods (no instantiation)
 - ✅ Circuit breaker protection via `circuitBreakers.externalService()` or `circuitBreakers.upload()`
 - ✅ Retry logic via `withServiceRetry()` from `@/lib/utils/retry`
@@ -50,6 +51,7 @@ Services (External Services & Utilities)
 - ✅ Error creation via `createServiceError()`
 
 **Example Structure:**
+
 ```typescript
 export class CloudinaryService {
   static async deletePhotosByUrls(urls: string[]): Promise<Result> {
@@ -82,6 +84,7 @@ export class CloudinaryService {
 **Purpose:** Handle all database operations with permission filtering
 
 **Key Characteristics:**
+
 - ✅ Extends `BaseQuery` abstract class
 - ✅ Static class methods with `Async` suffix
 - ✅ All methods accept `QueryContext` parameter
@@ -92,12 +95,10 @@ export class CloudinaryService {
 - ✅ Returns `null` for not found, `[]` for empty lists
 
 **Example Structure:**
+
 ```typescript
 export class BobbleheadsQuery extends BaseQuery {
-  static async findByIdAsync(
-    id: string,
-    context: QueryContext
-  ): Promise<BobbleheadRecord | null> {
+  static async findByIdAsync(id: string, context: QueryContext): Promise<BobbleheadRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -106,12 +107,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
-          this.buildBaseFilters(
-            bobbleheads.isPublic,
-            bobbleheads.userId,
-            bobbleheads.isDeleted,
-            context
-          ),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
         ),
       )
       .limit(1);
@@ -126,6 +122,7 @@ export class BobbleheadsQuery extends BaseQuery {
 **Purpose:** Orchestrate business logic, combine queries/services, manage caching
 
 **Key Characteristics:**
+
 - ✅ Static class methods
 - ✅ Uses domain language (e.g., `getBobbleheadById` not `findById`)
 - ✅ Integrates `CacheService` for read operations
@@ -136,6 +133,7 @@ export class BobbleheadsQuery extends BaseQuery {
 - ✅ Error creation via `createFacadeError()`
 
 **Example Structure:**
+
 ```typescript
 const facadeName = 'BobbleheadsFacade';
 
@@ -147,8 +145,9 @@ export class BobbleheadsFacade {
   ): Promise<BobbleheadRecord | null> {
     return CacheService.bobbleheads.byId(
       () => {
-        const context = viewerUserId
-          ? createUserQueryContext(viewerUserId, { dbInstance })
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
         return BobbleheadsQuery.findByIdAsync(id, context);
       },
@@ -180,7 +179,7 @@ export class BobbleheadsFacade {
       // Cleanup external resources (non-blocking)
       if (photos?.length > 0) {
         try {
-          await CloudinaryService.deletePhotosByUrls(photos.map(p => p.url));
+          await CloudinaryService.deletePhotosByUrls(photos.map((p) => p.url));
         } catch (error) {
           console.error('Cloudinary cleanup failed:', error);
         }
@@ -215,6 +214,7 @@ export class BobbleheadsFacade {
 **Purpose:** Handle Claude Agent SDK operations
 
 **Responsibilities:**
+
 - Execute Claude Agent SDK queries
 - Manage agent invocation
 - Handle streaming responses
@@ -228,6 +228,7 @@ export class BobbleheadsFacade {
 **Purpose:** Handle all database operations for feature planning
 
 **Responsibilities:**
+
 - CRUD operations for all feature planner tables
 - Permission filtering
 - Transaction support
@@ -240,6 +241,7 @@ export class BobbleheadsFacade {
 **Purpose:** Orchestrate feature planning workflow
 
 **Responsibilities:**
+
 - Coordinate service and query layer
 - Manage caching strategies
 - Handle business logic
@@ -355,8 +357,8 @@ export class FeaturePlannerService {
                   tokenUsage = {
                     promptTokens: message.message.usage.input_tokens || 0,
                     completionTokens: message.message.usage.output_tokens || 0,
-                    totalTokens: (message.message.usage.input_tokens || 0) +
-                                (message.message.usage.output_tokens || 0),
+                    totalTokens:
+                      (message.message.usage.input_tokens || 0) + (message.message.usage.output_tokens || 0),
                     cacheReadTokens: message.message.usage.cache_read_input_tokens,
                     cacheCreationTokens: message.message.usage.cache_creation_input_tokens,
                   };
@@ -438,8 +440,8 @@ export class FeaturePlannerService {
                   tokenUsage = {
                     promptTokens: message.message.usage.input_tokens || 0,
                     completionTokens: message.message.usage.output_tokens || 0,
-                    totalTokens: (message.message.usage.input_tokens || 0) +
-                                (message.message.usage.output_tokens || 0),
+                    totalTokens:
+                      (message.message.usage.input_tokens || 0) + (message.message.usage.output_tokens || 0),
                   };
                 }
               }
@@ -526,8 +528,8 @@ export class FeaturePlannerService {
                   tokenUsage = {
                     promptTokens: message.message.usage.input_tokens || 0,
                     completionTokens: message.message.usage.output_tokens || 0,
-                    totalTokens: (message.message.usage.input_tokens || 0) +
-                                (message.message.usage.output_tokens || 0),
+                    totalTokens:
+                      (message.message.usage.input_tokens || 0) + (message.message.usage.output_tokens || 0),
                   };
                 }
               }
@@ -620,7 +622,7 @@ Return at least 5 relevant files, organized by priority.`;
     discoveredFiles: FileDiscoveryResult[],
   ): string {
     const filesList = discoveredFiles
-      .map(f => `- ${f.filePath} (${f.priority}): ${f.description}`)
+      .map((f) => `- ${f.filePath} (${f.priority}): ${f.description}`)
       .join('\n');
 
     return `Create a detailed implementation plan for this feature.
@@ -798,16 +800,10 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Create a new feature plan
    */
-  static async createPlanAsync(
-    data: NewFeaturePlan,
-    context: QueryContext,
-  ): Promise<FeaturePlan | null> {
+  static async createPlanAsync(data: NewFeaturePlan, context: QueryContext): Promise<FeaturePlan | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
-      .insert(featurePlans)
-      .values(data)
-      .returning();
+    const result = await dbInstance.insert(featurePlans).values(data).returning();
 
     return result[0] || null;
   }
@@ -815,10 +811,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Find feature plan by ID
    */
-  static async findPlanByIdAsync(
-    planId: string,
-    context: QueryContext,
-  ): Promise<FeaturePlan | null> {
+  static async findPlanByIdAsync(planId: string, context: QueryContext): Promise<FeaturePlan | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -877,12 +870,7 @@ export class FeaturePlannerQuery extends BaseQuery {
     const result = await dbInstance
       .update(featurePlans)
       .set({ ...data, updatedAt: new Date() })
-      .where(
-        and(
-          eq(featurePlans.id, planId),
-          eq(featurePlans.userId, userId),
-        ),
-      )
+      .where(and(eq(featurePlans.id, planId), eq(featurePlans.userId, userId)))
       .returning();
 
     return result[0] || null;
@@ -901,10 +889,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   ): Promise<FeatureRefinement | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
-      .insert(featureRefinements)
-      .values(data)
-      .returning();
+    const result = await dbInstance.insert(featureRefinements).values(data).returning();
 
     return result[0] || null;
   }
@@ -957,10 +942,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   ): Promise<FileDiscoverySession | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
-      .insert(fileDiscoverySessions)
-      .values(data)
-      .returning();
+    const result = await dbInstance.insert(fileDiscoverySessions).values(data).returning();
 
     return result[0] || null;
   }
@@ -994,10 +976,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   ): Promise<ImplementationPlanGeneration | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
-      .insert(implementationPlanGenerations)
-      .values(data)
-      .returning();
+    const result = await dbInstance.insert(implementationPlanGenerations).values(data).returning();
 
     return result[0] || null;
   }
@@ -1025,16 +1004,10 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Create plan step
    */
-  static async createPlanStepAsync(
-    data: NewPlanStep,
-    context: QueryContext,
-  ): Promise<PlanStep | null> {
+  static async createPlanStepAsync(data: NewPlanStep, context: QueryContext): Promise<PlanStep | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
-      .insert(planSteps)
-      .values(data)
-      .returning();
+    const result = await dbInstance.insert(planSteps).values(data).returning();
 
     return result[0] || null;
   }
@@ -1100,10 +1073,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Create execution log
    */
-  static async createExecutionLogAsync(
-    data: NewPlanExecutionLog,
-    context: QueryContext,
-  ): Promise<void> {
+  static async createExecutionLogAsync(data: NewPlanExecutionLog, context: QueryContext): Promise<void> {
     const dbInstance = this.getDbInstance(context);
 
     await dbInstance.insert(planExecutionLogs).values(data);
@@ -1112,10 +1082,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Get execution logs for a plan
    */
-  static async getExecutionLogsByPlanAsync(
-    planId: string,
-    context: QueryContext,
-  ) {
+  static async getExecutionLogsByPlanAsync(planId: string, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -1144,10 +1111,7 @@ import type {
 } from '@/lib/db/schema/feature-planner.schema';
 
 import { OPERATIONS } from '@/lib/constants';
-import {
-  createProtectedQueryContext,
-  createUserQueryContext,
-} from '@/lib/queries/base/query-context';
+import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturePlannerQuery } from '@/lib/queries/feature-planner/feature-planner.query';
 import { FeaturePlannerService } from '@/lib/services/feature-planner.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
@@ -1274,17 +1238,15 @@ export class FeaturePlannerFacade {
       );
 
       // Run refinements in parallel
-      const refinementPromises = Array.from(
-        { length: settings.agentCount },
-        (_, i) =>
-          this.runSingleRefinementAsync(
-            planId,
-            plan.originalRequest,
-            `agent-${i + 1}`,
-            settings,
-            userId,
-            dbInstance,
-          ),
+      const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
+        this.runSingleRefinementAsync(
+          planId,
+          plan.originalRequest,
+          `agent-${i + 1}`,
+          settings,
+          userId,
+          dbInstance,
+        ),
       );
 
       const refinements = await Promise.all(refinementPromises);
@@ -1402,11 +1364,7 @@ export const createFeaturePlanAction = authActionClient
     const userId = ctx.userId;
 
     try {
-      const plan = await FeaturePlannerFacade.createFeaturePlanAsync(
-        originalRequest,
-        userId,
-        ctx.tx,
-      );
+      const plan = await FeaturePlannerFacade.createFeaturePlanAsync(originalRequest, userId, ctx.tx);
 
       if (!plan) {
         throw new Error('Failed to create feature plan');
@@ -1439,14 +1397,11 @@ export const createFeaturePlanAction = authActionClient
 describe('FeaturePlannerService', () => {
   describe('executeRefinementAgent', () => {
     it('should refine feature request successfully', async () => {
-      const result = await FeaturePlannerService.executeRefinementAgent(
-        'Add user authentication',
-        {
-          minOutputLength: 150,
-          maxOutputLength: 300,
-          includeProjectContext: true,
-        },
-      );
+      const result = await FeaturePlannerService.executeRefinementAgent('Add user authentication', {
+        minOutputLength: 150,
+        maxOutputLength: 300,
+        includeProjectContext: true,
+      });
 
       expect(result.result).toBeDefined();
       expect(result.executionTimeMs).toBeGreaterThan(0);
@@ -1474,10 +1429,7 @@ describe('FeaturePlannerService', () => {
 describe('FeaturePlannerFacade', () => {
   describe('createFeaturePlanAsync', () => {
     it('should create plan and store in database', async () => {
-      const plan = await FeaturePlannerFacade.createFeaturePlanAsync(
-        'Add user authentication',
-        'user-123',
-      );
+      const plan = await FeaturePlannerFacade.createFeaturePlanAsync('Add user authentication', 'user-123');
 
       expect(plan).toBeDefined();
       expect(plan?.originalRequest).toBe('Add user authentication');
@@ -1487,21 +1439,14 @@ describe('FeaturePlannerFacade', () => {
 
   describe('runParallelRefinementAsync', () => {
     it('should run multiple refinements in parallel', async () => {
-      const plan = await FeaturePlannerFacade.createFeaturePlanAsync(
-        'Add user authentication',
-        'user-123',
-      );
+      const plan = await FeaturePlannerFacade.createFeaturePlanAsync('Add user authentication', 'user-123');
 
-      const refinements = await FeaturePlannerFacade.runParallelRefinementAsync(
-        plan!.id,
-        'user-123',
-        {
-          agentCount: 2,
-          minOutputLength: 150,
-          maxOutputLength: 300,
-          includeProjectContext: true,
-        },
-      );
+      const refinements = await FeaturePlannerFacade.runParallelRefinementAsync(plan!.id, 'user-123', {
+        agentCount: 2,
+        minOutputLength: 150,
+        maxOutputLength: 300,
+        includeProjectContext: true,
+      });
 
       expect(refinements).toHaveLength(2);
       expect(refinements[0].status).toBe('completed');

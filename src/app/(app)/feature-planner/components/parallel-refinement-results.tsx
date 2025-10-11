@@ -47,8 +47,7 @@ export const ParallelRefinementResults = ({
     );
   }
 
-  const _failureMessage =
-    failedRefinements.length > 0 ? ` (${failedRefinements.length} failed)` : '';
+  const _failureMessage = failedRefinements.length > 0 ? ` (${failedRefinements.length} failed)` : '';
 
   return (
     <Card>
@@ -94,7 +93,9 @@ export const ParallelRefinementResults = ({
                       {refinement.wordCount} word{refinement.wordCount !== 1 ? 's' : ''}
                     </Badge>
                     <Badge variant={'outline'}>
-                      {refinement.executionTimeMs ? `${Math.round(refinement.executionTimeMs / 1000)}s` : 'N/A'}
+                      {refinement.executionTimeMs ?
+                        `${Math.round(refinement.executionTimeMs / 1000)}s`
+                      : 'N/A'}
                     </Badge>
                     {refinement.totalTokens && (
                       <Badge variant={'outline'}>{refinement.totalTokens.toLocaleString()} tokens</Badge>

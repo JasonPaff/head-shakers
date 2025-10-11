@@ -74,7 +74,9 @@ export const updateFeaturePlanSchema = z.object({
   selectedFiles: z.array(z.string()).optional(),
   selectedPlanGenerationId: z.string().uuid().optional(),
   selectedRefinementId: z.string().uuid().optional(),
-  status: z.enum(['draft', 'refining', 'discovering', 'planning', 'completed', 'failed', 'cancelled']).optional(),
+  status: z
+    .enum(['draft', 'refining', 'discovering', 'planning', 'completed', 'failed', 'cancelled'])
+    .optional(),
 });
 
 export const deleteFeaturePlanSchema = z.object({
@@ -88,7 +90,9 @@ export const getFeaturePlanSchema = z.object({
 export const listFeaturePlansSchema = z.object({
   limit: z.number().int().min(1).max(100).optional(),
   offset: z.number().int().min(0).optional(),
-  status: z.enum(['draft', 'refining', 'discovering', 'planning', 'completed', 'failed', 'cancelled']).optional(),
+  status: z
+    .enum(['draft', 'refining', 'discovering', 'planning', 'completed', 'failed', 'cancelled'])
+    .optional(),
 });
 
 export type CreateFeaturePlanInput = z.infer<typeof createFeaturePlanSchema>;
@@ -282,7 +286,7 @@ export interface ParallelRefinementResponse {
 
 export interface RefineResponse {
   data?: unknown;
-  success: boolean;
+  isSuccess: boolean;
   message: string;
 }
 

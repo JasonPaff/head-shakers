@@ -22,12 +22,7 @@ interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> 
   onFileDiscovery: () => void;
   onImplementationPlanning: () => void;
   onParallelRefineRequest: () => void;
-  onRefinedRequestChange: (value: string) => void;
   onRefineRequest: () => void;
-  onSkipToFileDiscovery: () => void;
-  onUseOriginalRequest: () => void;
-  onUseRefinedRequest: () => void;
-  refinedRequest: null | string;
   settings: RefinementSettings;
   stepData: StepData;
   value: string;
@@ -47,12 +42,7 @@ export const StepOrchestrator = ({
   onFileDiscovery,
   onImplementationPlanning,
   onParallelRefineRequest,
-  onRefinedRequestChange,
   onRefineRequest,
-  onSkipToFileDiscovery,
-  onUseOriginalRequest,
-  onUseRefinedRequest,
-  refinedRequest,
   settings,
   stepData,
   value,
@@ -68,12 +58,7 @@ export const StepOrchestrator = ({
           isRefining={isRefining}
           onChange={onChange}
           onParallelRefineRequest={onParallelRefineRequest}
-          onRefinedRequestChange={onRefinedRequestChange}
           onRefineRequest={onRefineRequest}
-          onSkipToFileDiscovery={onSkipToFileDiscovery}
-          onUseOriginalRequest={onUseOriginalRequest}
-          onUseRefinedRequest={onUseRefinedRequest}
-          refinedRequest={refinedRequest}
           settings={settings}
           value={value}
         />

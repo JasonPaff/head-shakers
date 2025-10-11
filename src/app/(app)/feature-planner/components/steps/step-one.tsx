@@ -13,12 +13,7 @@ interface StepOneProps extends ComponentTestIdProps, Omit<ComponentProps<'div'>,
   isRefining: boolean;
   onChange: (value: string) => void;
   onParallelRefineRequest: () => void;
-  onRefinedRequestChange: (value: string) => void;
   onRefineRequest: () => void;
-  onSkipToFileDiscovery: () => void;
-  onUseOriginalRequest: () => void;
-  onUseRefinedRequest: () => void;
-  refinedRequest: null | string;
   settings: RefinementSettings;
   value: string;
 }
@@ -28,12 +23,7 @@ export const StepOne = ({
   isRefining,
   onChange,
   onParallelRefineRequest,
-  onRefinedRequestChange,
   onRefineRequest,
-  onSkipToFileDiscovery,
-  onUseOriginalRequest,
-  onUseRefinedRequest,
-  refinedRequest,
   settings,
   testId,
   value,
@@ -47,12 +37,7 @@ export const StepOne = ({
         isRefining={isRefining}
         onChange={onChange}
         onParallelRefineRequest={onParallelRefineRequest}
-        onRefinedRequestChange={onRefinedRequestChange}
         onRefineRequest={onRefineRequest}
-        onSkipToFileDiscovery={onSkipToFileDiscovery}
-        onUseOriginalRequest={onUseOriginalRequest}
-        onUseRefinedRequest={onUseRefinedRequest}
-        refinedRequest={refinedRequest}
         settings={settings}
         value={value}
       />

@@ -67,7 +67,14 @@ export const ExecutionMetrics = ({
         <CardTitle className={'text-sm font-medium'}>Execution Metrics</CardTitle>
         <CardDescription className={'flex items-center gap-2'}>
           Status:{' '}
-          <Badge variant={status === 'completed' ? 'default' : status === 'failed' ? 'destructive' : 'secondary'}>
+          <Badge
+            variant={
+              status === 'completed' ? 'default'
+              : status === 'failed' ?
+                'destructive'
+              : 'secondary'
+            }
+          >
             {status}
           </Badge>
           {retryCount > 0 && <Badge variant={'outline'}>{retryCount} retries</Badge>}

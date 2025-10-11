@@ -5,10 +5,7 @@ import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
-import type {
-  FeatureRefinement,
-  FileDiscoverySession,
-} from '@/lib/db/schema/feature-planner.schema';
+import type { FeatureRefinement, FileDiscoverySession } from '@/lib/db/schema/feature-planner.schema';
 import type {
   RefinementSettings as RefinementSettingsType,
   RefineResponse,
@@ -16,7 +13,7 @@ import type {
 } from '@/lib/validations/feature-planner.validation';
 
 import { ActionControls } from '@/app/(app)/feature-planner/components/action-controls';
-import { ParallelRefinementResults } from '@/app/(app)/feature-planner/components/parallel-refinement-results';
+import { RefinementResults } from '@/app/(app)/feature-planner/components/refinement-results';
 import { RefinementSettings } from '@/app/(app)/feature-planner/components/refinement-settings';
 import { StepOrchestrator } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
 import { WorkflowProgress } from '@/app/(app)/feature-planner/components/workflow-progress';
@@ -24,10 +21,11 @@ import { PageContent } from '@/components/layout/page-content';
 import { Conditional } from '@/components/ui/conditional';
 
 export interface FeaturePlannerState {
+  allRefinements: FeatureRefinement[] | null;
   discoverySession: FileDiscoverySession | null;
   isRefining: boolean;
+  isSelectingRefinement: boolean;
   originalRequest: string;
-  parallelResults: FeatureRefinement[] | null;
   planId: null | string;
   refinedRequest: null | string;
   selectedRefinementId: null | string;
@@ -42,10 +40,11 @@ export default function FeaturePlannerPage() {
   );
 
   const [state, setState] = useState<FeaturePlannerState>({
+    allRefinements: null,
     discoverySession: null,
     isRefining: false,
+    isSelectingRefinement: false,
     originalRequest: '',
-    parallelResults: null,
     planId: null,
     refinedRequest: null,
     selectedRefinementId: null,
@@ -69,6 +68,7 @@ export default function FeaturePlannerPage() {
     }
 
     updateState({ isRefining: true });
+    toast.loading('Refining feature request...', { id: 'single-refine' });
 
     try {
       const response = await fetch('/api/feature-planner/refine', {
@@ -88,7 +88,9 @@ export default function FeaturePlannerPage() {
 
       const data = (await response.json()) as RefineResponse;
 
-      if (response.ok && data.success) {
+      toast.dismiss('single-refine');
+
+      if (response.ok && data.isSuccess) {
         toast.success(data.message);
         // Store the refinement data in state
         if (data.data) {
@@ -100,12 +102,60 @@ export default function FeaturePlannerPage() {
           // For single refinement, automatically set as the refined request
           const refinement = responseData.refinements[0];
           if (refinement?.refinedRequest) {
-            updateState({
-              isRefining: false,
-              planId: responseData.planId,
-              refinedRequest: refinement.refinedRequest,
-              selectedRefinementId: refinement.id,
-            });
+            // Persist the selection to the backend
+            try {
+              toast.loading('Saving refinement...', { id: 'save-refinement' });
+
+              const selectResponse = await fetch(
+                `/api/feature-planner/${responseData.planId}/select-refinement`,
+                {
+                  body: JSON.stringify({
+                    refinedRequest: refinement.refinedRequest,
+                    refinementId: refinement.id,
+                  }),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                  method: 'POST',
+                },
+              );
+
+              const selectData = (await selectResponse.json()) as { isSuccess: boolean; message: string };
+
+              toast.dismiss('save-refinement');
+
+              if (selectResponse.ok && selectData.isSuccess) {
+                updateState({
+                  allRefinements: responseData.refinements,
+                  isRefining: false,
+                  planId: responseData.planId,
+                  refinedRequest: refinement.refinedRequest,
+                  selectedRefinementId: refinement.id,
+                  stepData: {
+                    ...state.stepData,
+                    step1: {
+                      originalRequest: state.originalRequest,
+                      refinements: [
+                        {
+                          agentId: refinement.agentId,
+                          id: refinement.id,
+                          refinedRequest: refinement.refinedRequest,
+                        },
+                      ],
+                      selectedRefinement: refinement.refinedRequest,
+                    },
+                  },
+                });
+              } else {
+                toast.error(selectData.message || 'Failed to save refinement');
+                updateState({ isRefining: false });
+              }
+            } catch (selectError) {
+              console.error('Error saving refinement:', selectError);
+              toast.dismiss('save-refinement');
+              toast.error('Failed to save refinement selection');
+              updateState({ isRefining: false });
+            }
           } else {
             toast.error('Refinement completed but no result received');
             updateState({ isRefining: false });
@@ -117,12 +167,15 @@ export default function FeaturePlannerPage() {
       }
     } catch (error) {
       console.error('Error in single refinement:', error);
+      toast.dismiss('single-refine');
       const errorMessage =
-        error instanceof Error ? `Refinement failed: ${error.message}` : 'An unexpected error occurred during refinement';
+        error instanceof Error ?
+          `Refinement failed: ${error.message}`
+        : 'An unexpected error occurred during refinement';
       toast.error(errorMessage);
       updateState({ isRefining: false });
     }
-  }, [state.originalRequest, state.planId, state.settings, updateState]);
+  }, [state.originalRequest, state.planId, state.settings, state.stepData, updateState]);
 
   const handleParallelRefineRequest = useCallback(async () => {
     if (!state.originalRequest.trim()) {
@@ -150,7 +203,7 @@ export default function FeaturePlannerPage() {
 
       toast.dismiss('parallel-refine');
 
-      if (response.ok && data.success) {
+      if (response.ok && data.isSuccess) {
         toast.success(data.message);
         // Store the refinement data in state
         if (data.data) {
@@ -167,8 +220,8 @@ export default function FeaturePlannerPage() {
           }
 
           updateState({
+            allRefinements: responseData.refinements,
             isRefining: false,
-            parallelResults: responseData.refinements,
             planId: responseData.planId,
             stepData: {
               ...state.stepData,
@@ -210,27 +263,14 @@ export default function FeaturePlannerPage() {
     [state.originalRequest, state.stepData.step1, setCurrentStep],
   );
 
-  const handleSkipToFileDiscovery = useCallback(() => {
-    // Mark step 1 as complete with original request
-    updateState({
-      stepData: {
-        ...state.stepData,
-        step1: {
-          originalRequest: state.originalRequest,
-          refinements: [],
-          selectedRefinement: null,
-        },
-      },
-    });
-    handleStepChange(2);
-  }, [handleStepChange, state.originalRequest, state.stepData, updateState]);
-
   const handleSelectRefinement = useCallback(
     async (refinementId: string, refinedRequest: string) => {
       if (!state.planId) {
         toast.error('Cannot select refinement: Plan ID is missing');
         return;
       }
+
+      updateState({ isSelectingRefinement: true });
 
       try {
         toast.loading('Selecting refinement...', { id: 'select-refinement' });
@@ -243,19 +283,21 @@ export default function FeaturePlannerPage() {
           method: 'POST',
         });
 
-        const data = (await response.json()) as { message: string; success: boolean };
+        const data = (await response.json()) as { isSuccess: boolean; message: string };
 
         toast.dismiss('select-refinement');
 
-        if (response.ok && data.success) {
+        if (response.ok && data.isSuccess) {
           toast.success('Refinement selected successfully');
           updateState({
+            isSelectingRefinement: false,
             refinedRequest,
             selectedRefinementId: refinementId,
           });
         } else {
           const errorMsg = data.message || 'Failed to select refinement';
           toast.error(errorMsg);
+          updateState({ isSelectingRefinement: false });
         }
       } catch (error) {
         console.error('Error selecting refinement:', error);
@@ -265,12 +307,13 @@ export default function FeaturePlannerPage() {
             `Failed to select refinement: ${error.message}`
           : 'An unexpected error occurred while selecting refinement';
         toast.error(errorMessage);
+        updateState({ isSelectingRefinement: false });
       }
     },
     [state.planId, updateState],
   );
 
-  const handleUseRefinedRequest = useCallback(() => {
+  const handleProceedWithRefinedRequest = useCallback(() => {
     if (!state.refinedRequest) {
       toast.error('Please select a refinement first');
       return;
@@ -283,7 +326,7 @@ export default function FeaturePlannerPage() {
         step1: {
           originalRequest: state.originalRequest,
           refinements:
-            state.parallelResults?.map((r) => ({
+            state.allRefinements?.map((r) => ({
               agentId: r.agentId,
               id: r.id,
               refinedRequest: r.refinedRequest || '',
@@ -293,7 +336,14 @@ export default function FeaturePlannerPage() {
       },
     });
     handleStepChange(2);
-  }, [handleStepChange, state.originalRequest, state.parallelResults, state.refinedRequest, state.stepData, updateState]);
+  }, [
+    handleStepChange,
+    state.allRefinements,
+    state.originalRequest,
+    state.refinedRequest,
+    state.stepData,
+    updateState,
+  ]);
 
   const handleUseOriginalRequest = useCallback(() => {
     updateState({
@@ -304,7 +354,7 @@ export default function FeaturePlannerPage() {
         step1: {
           originalRequest: state.originalRequest,
           refinements:
-            state.parallelResults?.map((r) => ({
+            state.allRefinements?.map((r) => ({
               agentId: r.agentId,
               id: r.id,
               refinedRequest: r.refinedRequest || '',
@@ -314,14 +364,7 @@ export default function FeaturePlannerPage() {
       },
     });
     handleStepChange(2);
-  }, [handleStepChange, state.originalRequest, state.parallelResults, state.stepData, updateState]);
-
-  const handleRefinedRequestChange = useCallback(
-    (refinedRequest: string) => {
-      updateState({ refinedRequest });
-    },
-    [updateState],
-  );
+  }, [handleStepChange, state.allRefinements, state.originalRequest, state.stepData, updateState]);
 
   const handleSettingsChange = useCallback(
     (settings: RefinementSettingsType) => {
@@ -357,11 +400,11 @@ export default function FeaturePlannerPage() {
 
       const data = (await response.json()) as {
         data?: FileDiscoverySession;
+        isSuccess: boolean;
         message: string;
-        success: boolean;
       };
 
-      if (response.ok && data.success) {
+      if (response.ok && data.isSuccess) {
         toast.success(data.message);
 
         if (data.data) {
@@ -420,11 +463,11 @@ export default function FeaturePlannerPage() {
             validationCommands: string[];
           }>;
         };
+        isSuccess: boolean;
         message: string;
-        success: boolean;
       };
 
-      if (response.ok && data.success) {
+      if (response.ok && data.isSuccess) {
         toast.success(data.message);
 
         if (data.data) {
@@ -450,8 +493,8 @@ export default function FeaturePlannerPage() {
     }
   }, [state.planId, state.settings.customModel, state.stepData, updateState]);
 
-  const _shouldShowParallelResults =
-    currentStep === 1 && !!state.parallelResults && state.parallelResults.length > 0;
+  const shouldShowRefinementResults =
+    currentStep === 1 && !!state.allRefinements && state.allRefinements.length > 0;
 
   return (
     <PageContent>
@@ -472,23 +515,21 @@ export default function FeaturePlannerPage() {
           onFileDiscovery={handleFileDiscovery}
           onImplementationPlanning={handleImplementationPlanning}
           onParallelRefineRequest={handleParallelRefineRequest}
-          onRefinedRequestChange={handleRefinedRequestChange}
           onRefineRequest={handleRefineRequest}
-          onSkipToFileDiscovery={handleSkipToFileDiscovery}
-          onUseOriginalRequest={handleUseOriginalRequest}
-          onUseRefinedRequest={handleUseRefinedRequest}
-          refinedRequest={state.refinedRequest}
           settings={state.settings}
           stepData={state.stepData}
           value={state.originalRequest}
         />
 
-        {/* Parallel Refinement Results */}
-        <Conditional isCondition={_shouldShowParallelResults}>
-          <ParallelRefinementResults
+        {/* Unified Refinement Results */}
+        <Conditional isCondition={shouldShowRefinementResults}>
+          <RefinementResults
+            isSelectingRefinement={state.isSelectingRefinement}
+            onProceedToNextStep={handleProceedWithRefinedRequest}
             onSelectRefinement={handleSelectRefinement}
             onUseOriginal={handleUseOriginalRequest}
-            refinements={state.parallelResults || []}
+            originalRequest={state.originalRequest}
+            refinements={state.allRefinements || []}
             selectedRefinementId={state.selectedRefinementId || undefined}
           />
         </Conditional>

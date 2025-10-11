@@ -12,7 +12,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ pla
   try {
     const userId = await getUserId();
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized', success: false }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized', isSuccess: false }, { status: 401 });
     }
 
     const { planId } = await params;
@@ -25,7 +25,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ pla
 
     if (!validation.success) {
       return NextResponse.json(
-        { error: 'Invalid request', message: validation.error.message, success: false },
+        { error: 'Invalid request', isSuccess: false, message: validation.error.message },
         { status: 400 },
       );
     }
@@ -41,19 +41,22 @@ export async function POST(request: Request, { params }: { params: Promise<{ pla
     );
 
     if (!plan) {
-      return NextResponse.json({ error: 'Plan not found or refinement failed', success: false }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Plan not found or refinement failed', isSuccess: false },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(
       {
+        isSuccess: true,
         message: 'Refinement selected successfully',
         plan,
-        success: true,
       },
       { status: 200 },
     );
   } catch (error) {
     console.error('Select refinement error:', error);
-    return NextResponse.json({ error: 'Failed to select refinement', success: false }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to select refinement', isSuccess: false }, { status: 500 });
   }
 }
