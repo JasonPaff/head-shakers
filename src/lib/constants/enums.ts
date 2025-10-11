@@ -66,7 +66,7 @@ export const ENUMS = {
     VALUE_TYPE: ['string', 'number', 'boolean', 'json'] as const,
   },
   REFINEMENT: {
-    STATUS: ['pending', 'processing', 'completed', 'failed'] as const,
+    STATUS: ['pending', 'processing', 'completed', 'failed', 'cancelled'] as const,
   },
   SEARCH: {
     RESULT_TYPE: ['bobblehead', 'collection', 'subcollection', 'user'] as const,

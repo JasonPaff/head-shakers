@@ -1,0 +1,1 @@
+ALTER TYPE "public"."refinement_status" ADD VALUE 'cancelled';
