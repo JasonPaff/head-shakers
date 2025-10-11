@@ -3,20 +3,6 @@ import type { SQL } from 'drizzle-orm';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 /**
- * permission levels for content access
- */
-export enum PermissionLevel {
-  /** all content (admin/system access) */
-  ALL = 'all',
-  /** only owner can access */
-  OWNER_ONLY = 'owner_only',
-  /** public content only */
-  PUBLIC_ONLY = 'public_only',
-  /** public content + owner's private content */
-  PUBLIC_OR_OWNER = 'public_or_owner',
-}
-
-/**
  * options for find operations
  */
 export interface FindOptions {
@@ -28,16 +14,6 @@ export interface FindOptions {
   orderBy?: Array<SQL>;
   /** search term for text-based filtering */
   search?: string;
-}
-
-/**
- * standard pagination options
- */
-export interface PaginationOptions {
-  /** page number (1-based) */
-  page?: number;
-  /** number of items per page */
-  pageSize?: number;
 }
 
 /**
@@ -55,18 +31,6 @@ export interface QueryContext {
   shouldIncludeDeleted?: boolean;
   /** current user ID (optional for public queries) */
   userId?: string;
-}
-
-/**
- * search options for text-based queries
- */
-export interface SearchOptions {
-  /** fields to search in */
-  fields?: Array<string>;
-  /** case-sensitive search */
-  isCaseSensitive?: boolean;
-  /** search term */
-  term: string;
 }
 
 /**

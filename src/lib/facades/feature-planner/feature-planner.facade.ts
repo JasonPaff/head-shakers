@@ -10,10 +10,7 @@ import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { OPERATIONS } from '@/lib/constants';
-import {
-  createProtectedQueryContext,
-  createUserQueryContext,
-} from '@/lib/queries/base/query-context';
+import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturePlannerQuery } from '@/lib/queries/feature-planner/feature-planner.query';
 import { FeaturePlannerService } from '@/lib/services/feature-planner.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
@@ -221,13 +218,13 @@ export class FeaturePlannerFacade {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
-      // Get the plan
+      // get the plan
       const plan = await FeaturePlannerQuery.findPlanByIdAsync(planId, context);
       if (!plan || !plan.refinedRequest) {
         throw new Error('Plan not found or not refined');
       }
 
-      // Update plan status
+      // update plan status
       await FeaturePlannerQuery.updatePlanAsync(
         planId,
         {
@@ -238,7 +235,7 @@ export class FeaturePlannerFacade {
         context,
       );
 
-      // Create file discovery session
+      // create a file discovery session
       const session = await FeaturePlannerQuery.createFileDiscoverySessionAsync(
         {
           agentId: `discovery-${Date.now()}`,
@@ -253,10 +250,10 @@ export class FeaturePlannerFacade {
         throw new Error('Failed to create discovery session');
       }
 
-      // Execute file discovery agent
+      // execute file discovery agent
       const result = await FeaturePlannerService.executeFileDiscoveryAgent(plan.refinedRequest, settings);
 
-      // Update session with results
+      // update session with results
       const updatedSession = await FeaturePlannerQuery.updateFileDiscoverySessionAsync(
         session.id,
         {
@@ -276,7 +273,7 @@ export class FeaturePlannerFacade {
         context,
       );
 
-      // Create individual discovered files records
+      // create individual discovered files records
       if (result.result.length > 0) {
         const fileRecords = result.result.map((file) => ({
           description: file.description,
