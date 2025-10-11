@@ -5,6 +5,7 @@ import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
+import type { FileDiscoverySession } from '@/lib/db/schema/feature-planner.schema';
 import type {
   ParallelRefinementResponse,
   RefinementSettings as RefinementSettingsType,
@@ -21,8 +22,10 @@ import { PageContent } from '@/components/layout/page-content';
 import { Conditional } from '@/components/ui/conditional';
 
 export interface FeaturePlannerState {
+  discoverySession: FileDiscoverySession | null;
   originalRequest: string;
   parallelResults: null | ParallelRefinementResponse;
+  planId: null | string;
   refinedRequest: null | string;
   settings: RefinementSettingsType;
   stepData: StepData;
@@ -35,8 +38,10 @@ export default function FeaturePlannerPage() {
   );
 
   const [state, setState] = useState<FeaturePlannerState>({
+    discoverySession: null,
     originalRequest: '',
     parallelResults: null,
+    planId: null,
     refinedRequest: null,
     settings: {
       agentCount: 3,
@@ -77,14 +82,22 @@ export default function FeaturePlannerPage() {
         toast.success(data.message);
         // Store the refinement data in state
         if (data.data) {
-          const parallelData = data.data as ParallelRefinementResponse;
+          const responseData = data.data as {
+            planId: string;
+            refinements: Array<{
+              agentId: string;
+              id: string;
+              refinedRequest: string;
+            }>;
+          };
           updateState({
-            parallelResults: parallelData,
+            parallelResults: { refinements: responseData.refinements },
+            planId: responseData.planId,
             stepData: {
               ...state.stepData,
               step1: {
                 originalRequest: state.originalRequest,
-                refinements: parallelData.refinements,
+                refinements: responseData.refinements,
                 selectedRefinement: null,
               },
             },
@@ -138,7 +151,14 @@ export default function FeaturePlannerPage() {
       });
     }
     handleStepChange(2);
-  }, [handleStepChange, state.originalRequest, state.parallelResults, state.refinedRequest, state.stepData, updateState]);
+  }, [
+    handleStepChange,
+    state.originalRequest,
+    state.parallelResults,
+    state.refinedRequest,
+    state.stepData,
+    updateState,
+  ]);
 
   const handleUseOriginalRequest = useCallback(() => {
     updateState({
@@ -169,45 +189,125 @@ export default function FeaturePlannerPage() {
     [updateState],
   );
 
-  const handleFileDiscovery = useCallback(() => {
+  const handleFileDiscovery = useCallback(async () => {
+    if (!state.planId) {
+      toast.error('Please complete step 1 first - plan ID is missing');
+      return;
+    }
+
     if (!state.stepData.step1?.originalRequest) {
       toast.error('Please complete step 1 first');
       return;
     }
 
     try {
-      toast.info('File discovery will be implemented in Phase 3');
-      // TODO: Implement file discovery API call
-      // For now, just mark step 2 as complete so user can continue
-      updateState({
-        stepData: {
-          ...state.stepData,
-          step2: {
-            discoveredFiles: [],
-            selectedFiles: [],
-          },
+      toast.info('Starting file discovery...');
+
+      const response = await fetch('/api/feature-planner/discover', {
+        body: JSON.stringify({
+          customModel: state.settings.customModel,
+          planId: state.planId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
         },
+        method: 'POST',
       });
+
+      const data = (await response.json()) as {
+        data?: FileDiscoverySession;
+        message: string;
+        success: boolean;
+      };
+
+      if (response.ok && data.success) {
+        toast.success(data.message);
+
+        if (data.data) {
+          updateState({
+            discoverySession: data.data,
+            stepData: {
+              ...state.stepData,
+              step2: {
+                discoveredFiles: data.data.discoveredFiles || [],
+                selectedFiles: [],
+              },
+            },
+          });
+        }
+      } else {
+        toast.error(data.message || 'Failed to discover files');
+      }
     } catch (error) {
       console.error('File discovery error:', error);
       toast.error('Failed to discover files');
     }
-  }, [state.stepData, updateState]);
+  }, [state.planId, state.settings.customModel, state.stepData, updateState]);
 
-  const handleImplementationPlanning = useCallback(() => {
+  const handleImplementationPlanning = useCallback(async () => {
+    if (!state.planId) {
+      toast.error('Please complete step 1 first - plan ID is missing');
+      return;
+    }
+
     if (!state.stepData.step2) {
       toast.error('Please complete step 2 first');
       return;
     }
 
     try {
-      toast.info('Implementation planning will be implemented in Phase 3');
-      // TODO: Implement planning API call
+      toast.info('Generating implementation plan...');
+
+      const response = await fetch('/api/feature-planner/plan', {
+        body: JSON.stringify({
+          customModel: state.settings.customModel,
+          planId: state.planId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+      });
+
+      const data = (await response.json()) as {
+        data?: {
+          implementationPlan?: string;
+          steps?: Array<{
+            commands: string[];
+            description: string;
+            title: string;
+            validationCommands: string[];
+          }>;
+        };
+        message: string;
+        success: boolean;
+      };
+
+      if (response.ok && data.success) {
+        toast.success(data.message);
+
+        if (data.data) {
+          const validationCommands =
+            data.data.steps?.flatMap((step) => step.validationCommands).filter(Boolean) || [];
+
+          updateState({
+            stepData: {
+              ...state.stepData,
+              step3: {
+                implementationPlan: data.data.implementationPlan || '',
+                validationCommands,
+              },
+            },
+          });
+        }
+      } else {
+        toast.error(data.message || 'Failed to generate implementation plan');
+      }
     } catch (error) {
       console.error('Implementation planning error:', error);
       toast.error('Failed to generate implementation plan');
     }
-  }, [state.stepData]);
+  }, [state.planId, state.settings.customModel, state.stepData, updateState]);
 
   const _shouldShowFullWidthParallelResults = currentStep === 1 && !!state.parallelResults;
 
@@ -226,6 +326,7 @@ export default function FeaturePlannerPage() {
               <div className={'space-y-6'}>
                 <StepOrchestrator
                   currentStep={currentStep as WorkflowStep}
+                  discoverySession={state.discoverySession}
                   isRefining={false}
                   onChange={(value) => {
                     updateState({ originalRequest: value });

@@ -3,6 +3,7 @@
 import type { ComponentProps } from 'react';
 
 import type { RefinementSettings, StepData } from '@/lib/validations/feature-planner.validation';
+import type { FileDiscoverySession } from '@/lib/db/schema/feature-planner.schema';
 
 import { StepOne } from '@/app/(app)/feature-planner/components/steps/step-one';
 import { StepThree } from '@/app/(app)/feature-planner/components/steps/step-three';
@@ -15,6 +16,7 @@ export type WorkflowStep = 1 | 2 | 3;
 
 interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> {
   currentStep: WorkflowStep;
+  discoverySession: FileDiscoverySession | null;
   isRefining: boolean;
   onChange: (value: string) => void;
   onFileDiscovery: () => void;
@@ -39,6 +41,7 @@ interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> 
 export const StepOrchestrator = ({
   className,
   currentStep,
+  discoverySession,
   isRefining,
   onChange,
   onFileDiscovery,
@@ -79,7 +82,7 @@ export const StepOrchestrator = ({
       {/* Step 2: File Discovery */}
       <Conditional isCondition={currentStep === 2}>
         <StepTwo
-          discoverySession={null}
+          discoverySession={discoverySession}
           onFileAdded={() => {}}
           onFileDiscovery={onFileDiscovery}
           onFileSelection={() => {}}
