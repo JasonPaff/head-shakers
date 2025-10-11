@@ -2,8 +2,8 @@
 
 import type { ComponentProps } from 'react';
 
-import type { RefinementSettings, StepData } from '@/lib/validations/feature-planner.validation';
 import type { FileDiscoverySession } from '@/lib/db/schema/feature-planner.schema';
+import type { RefinementSettings, StepData } from '@/lib/validations/feature-planner.validation';
 
 import { StepOne } from '@/app/(app)/feature-planner/components/steps/step-one';
 import { StepThree } from '@/app/(app)/feature-planner/components/steps/step-three';
