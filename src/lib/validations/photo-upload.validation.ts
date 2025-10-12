@@ -28,7 +28,7 @@ export const validatePhotosOnClient = (
 } => {
   const fileArray = Array.from(files);
   const valid: Array<File> = [];
-  const invalid: Array<{ errors: string[]; file: File }> = [];
+  const invalid: Array<{ errors: Array<string>; file: File }> = [];
 
   for (const file of fileArray) {
     const result = fileValidationSchema.safeParse({

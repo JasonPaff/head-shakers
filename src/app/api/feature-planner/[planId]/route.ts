@@ -137,7 +137,7 @@ export async function GET(_request: Request, { params }: { params: { planId: str
     }
 
     // Get plan steps if we have a plan generation
-    let planSteps: unknown[] = [];
+    let planSteps: Array<unknown> = [];
     if (planGeneration) {
       const context = createProtectedQueryContext(userId);
       planSteps = await FeaturePlannerQuery.getPlanStepsByGenerationAsync(planGeneration.id, context);

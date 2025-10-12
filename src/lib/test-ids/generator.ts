@@ -287,6 +287,6 @@ function isValidComponentTestId(component: string): component is ComponentTestId
  * Type guard to check if a string is a valid TestIdNamespace
  */
 function isValidTestIdNamespace(namespace: string): namespace is TestIdNamespace {
-  const validNamespaces: TestIdNamespace[] = ['feature', 'form', 'layout', 'ui'];
+  const validNamespaces: Array<TestIdNamespace> = ['feature', 'form', 'layout', 'ui'];
   return validNamespaces.includes(namespace as TestIdNamespace);
 }

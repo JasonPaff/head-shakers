@@ -98,7 +98,7 @@ export interface ImplementationPlanResult {
   estimatedDuration: string;
   implementationPlan: string;
   riskLevel: 'high' | 'low' | 'medium';
-  steps: PlanStep[];
+  steps: Array<PlanStep>;
 }
 
 /**
@@ -106,13 +106,13 @@ export interface ImplementationPlanResult {
  */
 export interface PlanStep {
   category: string;
-  commands: string[];
+  commands: Array<string>;
   confidenceLevel: 'high' | 'low' | 'medium';
   description: string;
   estimatedDuration: string;
   stepNumber: number;
   title: string;
-  validationCommands: string[];
+  validationCommands: Array<string>;
 }
 
 /**
@@ -122,7 +122,7 @@ interface SpecializedAgent {
   agentId: string;
   description: string;
   name: string;
-  searchPaths: string[];
+  searchPaths: Array<string>;
 }
 
 /**
@@ -133,7 +133,7 @@ export class FeaturePlannerService {
   /**
    * Define specialized agents for parallel file discovery
    */
-  private static readonly SPECIALIZED_AGENTS: SpecializedAgent[] = [
+  private static readonly SPECIALIZED_AGENTS: Array<SpecializedAgent> = [
     {
       agentId: 'database-schema-agent',
       description: 'Database schemas, migrations, and ORM models',
@@ -276,7 +276,7 @@ export class FeaturePlannerService {
   static async executeFileDiscoveryAgent(
     refinedRequest: string,
     settings: { customModel?: string },
-  ): Promise<AgentExecutionResult<FileDiscoveryResult[]>> {
+  ): Promise<AgentExecutionResult<Array<FileDiscoveryResult>>> {
     // Use 3-minute timeout for long-running agent operations
     const circuitBreaker = circuitBreakers.externalService('claude-agent-file-discovery', {
       timeoutMs: 620000, // 12 minutes
@@ -287,7 +287,7 @@ export class FeaturePlannerService {
       const result = await circuitBreaker.execute(async () => {
         const retryResult = await withServiceRetry(
           async () => {
-            let discoveredFiles: FileDiscoveryResult[] = [];
+            let discoveredFiles: Array<FileDiscoveryResult> = [];
             const tokenUsage = {
               completionTokens: 0,
               promptTokens: 0,
@@ -367,7 +367,7 @@ export class FeaturePlannerService {
    */
   static async executeImplementationPlanningAgent(
     refinedRequest: string,
-    discoveredFiles: FileDiscoveryResult[],
+    discoveredFiles: Array<FileDiscoveryResult>,
     settings: { customModel?: string },
   ): Promise<AgentExecutionResult<ImplementationPlanResult>> {
     // Use 3-minute timeout for long-running agent operations
@@ -466,7 +466,7 @@ export class FeaturePlannerService {
   static async executeParallelFileDiscoveryAgents(
     refinedRequest: string,
     settings: { customModel?: string },
-  ): Promise<AgentExecutionResult<FileDiscoveryResult[]>> {
+  ): Promise<AgentExecutionResult<Array<FileDiscoveryResult>>> {
     const circuitBreaker = circuitBreakers.externalService('claude-agent-parallel-file-discovery', {
       timeoutMs: 620000, // 12 minutes
     });
@@ -629,8 +629,8 @@ export class FeaturePlannerService {
    * @param files - Discovered files to analyze
    * @returns Architecture insights as markdown text
    */
-  static extractArchitectureInsights(files: FileDiscoveryResult[]): string {
-    const insights: string[] = [];
+  static extractArchitectureInsights(files: Array<FileDiscoveryResult>): string {
+    const insights: Array<string> = [];
 
     // Identify architectural patterns
     const patterns = new Set<string>();
@@ -698,7 +698,7 @@ export class FeaturePlannerService {
     }
 
     // Identify conventions based on file structure
-    const conventions: string[] = [];
+    const conventions: Array<string> = [];
     const hasSrcLib = files.some((f) => f.filePath.startsWith('src/lib/'));
     const hasSrcApp = files.some((f) => f.filePath.startsWith('src/app/'));
 
@@ -725,9 +725,9 @@ export class FeaturePlannerService {
   private static aggregateDiscoveredFiles(
     agentResults: Array<{
       agentId: string;
-      discoveredFiles: FileDiscoveryResult[];
+      discoveredFiles: Array<FileDiscoveryResult>;
     }>,
-  ): FileDiscoveryResult[] {
+  ): Array<FileDiscoveryResult> {
     const fileMap = new Map<string, FileDiscoveryResult>();
 
     for (const agentResult of agentResults) {
@@ -780,7 +780,7 @@ Return at least 5 relevant files, organized by priority.`;
    */
   private static buildImplementationPlanPrompt(
     refinedRequest: string,
-    discoveredFiles: FileDiscoveryResult[],
+    discoveredFiles: Array<FileDiscoveryResult>,
   ): string {
     const filesList = discoveredFiles
       .map((f) => `- ${f.filePath} (${f.priority}): ${f.description}`)
@@ -1026,7 +1026,7 @@ NO OTHER TEXT ALLOWED.
     settings: { customModel?: string },
   ): Promise<{
     agentId: string;
-    discoveredFiles: FileDiscoveryResult[];
+    discoveredFiles: Array<FileDiscoveryResult>;
     tokenUsage: { completionTokens: number; promptTokens: number; totalTokens: number };
   }> {
     const maxRetries = 1; // Allow one retry if format is invalid
@@ -1034,7 +1034,7 @@ NO OTHER TEXT ALLOWED.
 
     for (let attempt = 0; attempt <= maxRetries; attempt++) {
       try {
-        let discoveredFiles: FileDiscoveryResult[] = [];
+        let discoveredFiles: Array<FileDiscoveryResult> = [];
         const tokenUsage = {
           completionTokens: 0,
           promptTokens: 0,
@@ -1227,8 +1227,8 @@ WRONG format (what you returned):
    * Parse file discovery response
    * Extracts structured file data from agent response with improved error handling
    */
-  private static parseFileDiscoveryResponse(response: string): FileDiscoveryResult[] {
-    const files: FileDiscoveryResult[] = [];
+  private static parseFileDiscoveryResponse(response: string): Array<FileDiscoveryResult> {
+    const files: Array<FileDiscoveryResult> = [];
 
     try {
       // IMPROVEMENT 1: Strip any preamble text before JSON code block
@@ -1416,8 +1416,8 @@ WRONG format (what you returned):
             const content = match[3] ?? '';
 
             // Extract commands from code blocks
-            const commands: string[] = [];
-            const validationCommands: string[] = [];
+            const commands: Array<string> = [];
+            const validationCommands: Array<string> = [];
             const commandMatches = content.matchAll(/```(?:bash|sh)?\s*([\s\S]*?)```/g);
 
             for (const cmdMatch of commandMatches) {

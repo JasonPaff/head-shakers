@@ -1,6 +1,6 @@
 import { $path } from 'next-typesafe-url';
 import { redirect } from 'next/navigation';
-import { type ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
 import { getCurrentUserWithRole } from '@/lib/utils/admin.utils';
 
@@ -33,5 +33,5 @@ export const AdminRouteGuard = async ({
     redirect(fallbackPath);
   }
 
-  return <>{children}</>;
+  return <Fragment>{children}</Fragment>;
 };

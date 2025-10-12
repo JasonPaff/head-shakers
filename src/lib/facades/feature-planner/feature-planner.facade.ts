@@ -64,7 +64,7 @@ export class FeaturePlannerFacade {
   static async createPlanStepAsync(
     stepData: {
       category?: null | string;
-      commands?: string[];
+      commands?: Array<string>;
       confidenceLevel?: null | string;
       description: string;
       displayOrder: number;
@@ -72,7 +72,7 @@ export class FeaturePlannerFacade {
       planGenerationId: string;
       stepNumber: number;
       title: string;
-      validationCommands?: string[];
+      validationCommands?: Array<string>;
     },
     userId: string,
     dbInstance?: DatabaseExecutor,
@@ -176,7 +176,7 @@ export class FeaturePlannerFacade {
     planId: string,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<FileDiscoverySession[]> {
+  ): Promise<Array<FileDiscoverySession>> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
@@ -200,7 +200,7 @@ export class FeaturePlannerFacade {
     planId: string,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<ImplementationPlanGeneration[]> {
+  ): Promise<Array<ImplementationPlanGeneration>> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
@@ -228,7 +228,7 @@ export class FeaturePlannerFacade {
     planId: string,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<FeatureRefinement[]> {
+  ): Promise<Array<FeatureRefinement>> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
@@ -252,7 +252,7 @@ export class FeaturePlannerFacade {
     userId: string,
     options: FindOptions = {},
     dbInstance?: DatabaseExecutor,
-  ): Promise<FeaturePlan[]> {
+  ): Promise<Array<FeaturePlan>> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
@@ -454,7 +454,7 @@ export class FeaturePlannerFacade {
     userId: string,
     settings: RefinementSettings,
     dbInstance?: DatabaseExecutor,
-  ): Promise<FeatureRefinement[]> {
+  ): Promise<Array<FeatureRefinement>> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
@@ -675,14 +675,14 @@ export class FeaturePlannerFacade {
     stepId: string,
     updates: {
       category?: null | string;
-      commands?: string[];
+      commands?: Array<string>;
       confidenceLevel?: null | string;
       description?: string;
       displayOrder?: number;
       estimatedDuration?: null | string;
       stepNumber?: number;
       title?: string;
-      validationCommands?: string[];
+      validationCommands?: Array<string>;
     },
     userId: string,
     dbInstance?: DatabaseExecutor,

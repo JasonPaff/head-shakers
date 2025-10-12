@@ -4,7 +4,6 @@ import type { ComponentProps } from 'react';
 
 import { SparklesIcon, UsersIcon } from 'lucide-react';
 
-import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { RefinementSettings } from '@/lib/validations/feature-planner.validation';
 
 import { Badge } from '@/components/ui/badge';
@@ -16,7 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface RequestInputProps extends ComponentTestIdProps, Omit<ComponentProps<'div'>, 'onChange'> {
+interface RequestInputProps extends Omit<ComponentProps<'div'>, 'onChange'> {
   isRefining: boolean;
   onChange: (value: string) => void;
   onParallelRefineRequest: () => void;
@@ -32,11 +31,10 @@ export const RequestInput = ({
   onParallelRefineRequest,
   onRefineRequest,
   settings,
-  testId,
   value,
   ...props
 }: RequestInputProps) => {
-  const requestInputTestId = testId || generateTestId('feature', 'form');
+  const requestInputTestId = generateTestId('feature', 'form');
 
   const _isRefineEnabled = value.length > 0 && !isRefining;
   const _characterCount = value.length;

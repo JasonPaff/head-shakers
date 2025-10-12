@@ -307,7 +307,7 @@ export interface Step2Data {
     priority: 'critical' | 'high' | 'low' | 'medium';
     relevanceScore: number;
   }>;
-  selectedFiles?: string[];
+  selectedFiles?: Array<string>;
 }
 
 export interface Step3Data {
@@ -319,7 +319,7 @@ export interface Step3Data {
   promptTokens?: number;
   status?: string;
   totalTokens?: number;
-  validationCommands?: string[];
+  validationCommands?: Array<string>;
 }
 
 export interface StepData {

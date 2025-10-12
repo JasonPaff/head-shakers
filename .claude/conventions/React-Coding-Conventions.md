@@ -113,14 +113,14 @@ export const ExampleComponent = ({ onSubmit, isDisabled = false }: ExampleProps)
   return (
     <div>
       {/* Submit Section */}
-      <Conditional condition={_isDataReady}>
+      <Conditional isCondition={_isDataReady}>
         <Button onClick={handleSubmit} isDisabled={isDisabled}>
           Submit
         </Button>
       </Conditional>
 
       {/* Error Display */}
-      <Conditional condition={_hasErrors}>
+      <Conditional isCondition={_hasErrors}>
         <ErrorMessage error={query.error} />
       </Conditional>
     </div>
@@ -317,7 +317,7 @@ export const Form = ({ onSubmit }: FormProps) => {
 // ✅ Use Conditional component
 const _isDataReady = user && data && !isLoading && !error;
 
-<Conditional condition={_isDataReady}>
+<Conditional isCondition={_isDataReady}>
   <ComplexDashboard />
 </Conditional>;
 
@@ -341,11 +341,11 @@ const _shouldShowEmptyState = !isLoading && !error && data?.length === 0;
 
 return (
   <div>
-    <Conditional condition={_isDataReady}>
+    <Conditional isCondition={_isDataReady}>
       <DataDisplay data={data} />
     </Conditional>
 
-    <Conditional condition={_shouldShowEmptyState}>
+    <Conditional isCondition={_shouldShowEmptyState}>
       <EmptyState />
     </Conditional>
   </div>
@@ -354,11 +354,11 @@ return (
 // ❌ Incorrect
 return (
   <div>
-    <Conditional condition={user && data && !isLoading && !error}>
+    <Conditional isCondition={user && data && !isLoading && !error}>
       <DataDisplay data={data} />
     </Conditional>
 
-    <Conditional condition={!isLoading && !error && data?.length === 0}>
+    <Conditional isCondition={!isLoading && !error && data?.length === 0}>
       <EmptyState />
     </Conditional>
   </div>
@@ -464,7 +464,7 @@ return (
     </div>
 
     {/* Data Display */}
-    <Conditional condition={_hasData}>
+    <Conditional isCondition={_hasData}>
       <DataTable data={processedData} />
     </Conditional>
   </div>

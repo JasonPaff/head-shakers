@@ -82,7 +82,7 @@ export const featurePlans = pgTable(
     complexity: complexityEnum('complexity'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     currentStep: integer('current_step').default(DEFAULTS.FEATURE_PLAN.CURRENT_STEP).notNull(),
-    discoveredFiles: jsonb('discovered_files').$type<FileDiscoveryResult[]>(),
+    discoveredFiles: jsonb('discovered_files').$type<Array<FileDiscoveryResult>>(),
     estimatedDuration: varchar('estimated_duration', {
       length: SCHEMA_LIMITS.FEATURE_PLAN.ESTIMATED_DURATION.MAX,
     }),
@@ -94,7 +94,7 @@ export const featurePlans = pgTable(
     refinementSettings: jsonb('refinement_settings').$type<RefinementSettings>(),
     riskLevel: riskLevelEnum('risk_level'),
     selectedDiscoverySessionId: uuid('selected_discovery_session_id'),
-    selectedFiles: jsonb('selected_files').$type<string[]>(),
+    selectedFiles: jsonb('selected_files').$type<Array<string>>(),
     selectedPlanGenerationId: uuid('selected_plan_generation_id'),
     selectedRefinementId: uuid('selected_refinement_id'),
     sessionId: varchar('session_id', { length: SCHEMA_LIMITS.FEATURE_PLAN.SESSION_ID.MAX }),
@@ -171,7 +171,7 @@ export const featureRefinements = pgTable(
     retryCount: integer('retry_count').default(DEFAULTS.REFINEMENT.RETRY_COUNT).notNull(),
     status: refinementStatusEnum('status').default(DEFAULTS.REFINEMENT.STATUS).notNull(),
     totalTokens: integer('total_tokens'),
-    validationErrors: jsonb('validation_errors').$type<ValidationError[]>(),
+    validationErrors: jsonb('validation_errors').$type<Array<ValidationError>>(),
     wordCount: integer('word_count'),
   },
   (table) => [
@@ -224,7 +224,7 @@ export const fileDiscoverySessions = pgTable(
     criticalPriorityCount: integer('critical_priority_count')
       .default(DEFAULTS.FILE_DISCOVERY.CRITICAL_PRIORITY_COUNT)
       .notNull(),
-    discoveredFiles: jsonb('discovered_files').$type<FileDiscoveryResult[]>(),
+    discoveredFiles: jsonb('discovered_files').$type<Array<FileDiscoveryResult>>(),
     errorMessage: text('error_message'),
     executionTimeMs: integer('execution_time_ms'),
     highPriorityCount: integer('high_priority_count')
@@ -340,7 +340,7 @@ export const implementationPlanGenerations = pgTable(
     completionTokens: integer('completion_tokens'),
     complexity: complexityEnum('complexity'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    discoveredFiles: jsonb('discovered_files').$type<FileDiscoveryResult[]>(),
+    discoveredFiles: jsonb('discovered_files').$type<Array<FileDiscoveryResult>>(),
     errorMessage: text('error_message'),
     estimatedDuration: varchar('estimated_duration', {
       length: SCHEMA_LIMITS.FEATURE_PLAN.ESTIMATED_DURATION.MAX,
@@ -370,7 +370,7 @@ export const implementationPlanGenerations = pgTable(
     status: implementationPlanStatusEnum('status').default(DEFAULTS.IMPLEMENTATION_PLAN.STATUS).notNull(),
     totalSteps: integer('total_steps').default(DEFAULTS.IMPLEMENTATION_PLAN.TOTAL_STEPS).notNull(),
     totalTokens: integer('total_tokens'),
-    validationErrors: jsonb('validation_errors').$type<ValidationError[]>(),
+    validationErrors: jsonb('validation_errors').$type<Array<ValidationError>>(),
   },
   (table) => [
     // data validation constraints
@@ -404,7 +404,7 @@ export const planSteps = pgTable(
   'plan_steps',
   {
     category: varchar('category', { length: SCHEMA_LIMITS.PLAN_STEP.CATEGORY.MAX }),
-    commands: jsonb('commands').$type<string[]>(),
+    commands: jsonb('commands').$type<Array<string>>(),
     confidenceLevel: varchar('confidence_level', { length: SCHEMA_LIMITS.PLAN_STEP.CONFIDENCE_LEVEL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     description: text('description').notNull(),
@@ -421,7 +421,7 @@ export const planSteps = pgTable(
     templateId: uuid('template_id'),
     title: varchar('title', { length: SCHEMA_LIMITS.PLAN_STEP.TITLE.MAX }).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    validationCommands: jsonb('validation_commands').$type<string[]>(),
+    validationCommands: jsonb('validation_commands').$type<Array<string>>(),
   },
   (table) => [
     // data validation constraints
@@ -445,7 +445,7 @@ export const planStepTemplates = pgTable(
   'plan_step_templates',
   {
     category: varchar('category', { length: SCHEMA_LIMITS.PLAN_STEP_TEMPLATE.CATEGORY.MAX }).notNull(),
-    commands: jsonb('commands').$type<string[]>(),
+    commands: jsonb('commands').$type<Array<string>>(),
     confidenceLevel: varchar('confidence_level', {
       length: SCHEMA_LIMITS.PLAN_STEP_TEMPLATE.CONFIDENCE_LEVEL.MAX,
     })
@@ -468,7 +468,7 @@ export const planStepTemplates = pgTable(
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
       .notNull(),
-    validationCommands: jsonb('validation_commands').$type<string[]>(),
+    validationCommands: jsonb('validation_commands').$type<Array<string>>(),
   },
   (table) => [
     // data validation constraints

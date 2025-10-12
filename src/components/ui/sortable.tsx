@@ -73,7 +73,7 @@ interface SortableRootContextValue<T> {
   flatCursor: boolean;
   getItemValue: (item: T) => UniqueIdentifier;
   id: string;
-  items: UniqueIdentifier[];
+  items: Array<UniqueIdentifier>;
   modifiers: DndContextProps['modifiers'];
   setActiveId: (id: null | UniqueIdentifier) => void;
   strategy: SortableContextProps['strategy'];
@@ -94,10 +94,10 @@ type SortableRootProps<T> = DndContextProps &
   (T extends object ? GetItemValue<T> : Partial<GetItemValue<T>>) & {
     flatCursor?: boolean;
     onMove?: (event: DragEndEvent & { activeIndex: number; overIndex: number }) => void;
-    onValueChange?: (items: T[]) => void;
+    onValueChange?: (items: Array<T>) => void;
     orientation?: 'horizontal' | 'mixed' | 'vertical';
     strategy?: SortableContextProps['strategy'];
-    value: T[];
+    value: Array<T>;
   };
 
 function SortableRoot<T>(props: SortableRootProps<T>) {

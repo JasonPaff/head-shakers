@@ -31,7 +31,7 @@ export class ViewAggregationJob {
   /**
    * Process batch view aggregation from Redis queues
    */
-  static async processBatchAggregation(batchIds: Array<string>): Promise<ViewBatchResult[]> {
+  static async processBatchAggregation(batchIds: Array<string>): Promise<Array<ViewBatchResult>> {
     const results: Array<ViewBatchResult> = [];
     const errors: Array<string> = [];
 

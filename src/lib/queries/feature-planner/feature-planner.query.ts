@@ -42,9 +42,9 @@ export class FeaturePlannerQuery extends BaseQuery {
    * Batch create discovered files
    */
   static async batchCreateDiscoveredFilesAsync(
-    files: NewDiscoveredFile[],
+    files: Array<NewDiscoveredFile>,
     context: QueryContext,
-  ): Promise<DiscoveredFile[]> {
+  ): Promise<Array<DiscoveredFile>> {
     if (files.length === 0) return [];
 
     const dbInstance = this.getDbInstance(context);
@@ -55,7 +55,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Batch create plan steps
    */
-  static async batchCreatePlanStepsAsync(steps: NewPlanStep[], context: QueryContext): Promise<PlanStep[]> {
+  static async batchCreatePlanStepsAsync(steps: Array<NewPlanStep>, context: QueryContext): Promise<Array<PlanStep>> {
     if (steps.length === 0) return [];
 
     const dbInstance = this.getDbInstance(context);
@@ -237,7 +237,7 @@ export class FeaturePlannerQuery extends BaseQuery {
     userId: string,
     options: FindOptions = {},
     context: QueryContext,
-  ): Promise<FeaturePlan[]> {
+  ): Promise<Array<FeaturePlan>> {
     const dbInstance = this.getDbInstance(context);
     const pagination = this.applyPagination(options);
 
@@ -264,7 +264,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async getDiscoveredFilesBySessionAsync(
     sessionId: string,
     context: QueryContext,
-  ): Promise<DiscoveredFile[]> {
+  ): Promise<Array<DiscoveredFile>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -284,7 +284,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async getExecutionLogsByPlanAsync(
     planId: string,
     context: QueryContext,
-  ): Promise<PlanExecutionLog[]> {
+  ): Promise<Array<PlanExecutionLog>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -301,7 +301,7 @@ export class FeaturePlannerQuery extends BaseQuery {
     planId: string,
     stepNumber: number,
     context: QueryContext,
-  ): Promise<PlanExecutionLog[]> {
+  ): Promise<Array<PlanExecutionLog>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -317,7 +317,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async getFileDiscoverySessionsByPlanAsync(
     planId: string,
     context: QueryContext,
-  ): Promise<FileDiscoverySession[]> {
+  ): Promise<Array<FileDiscoverySession>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -337,7 +337,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async getPlanGenerationsByPlanAsync(
     planId: string,
     context: QueryContext,
-  ): Promise<ImplementationPlanGeneration[]> {
+  ): Promise<Array<ImplementationPlanGeneration>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -353,7 +353,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async getPlanStepsByGenerationAsync(
     generationId: string,
     context: QueryContext,
-  ): Promise<PlanStep[]> {
+  ): Promise<Array<PlanStep>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
@@ -369,7 +369,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async getRefinementsByPlanAsync(
     planId: string,
     context: QueryContext,
-  ): Promise<FeatureRefinement[]> {
+  ): Promise<Array<FeatureRefinement>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
