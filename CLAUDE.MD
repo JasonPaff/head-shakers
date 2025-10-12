@@ -150,8 +150,6 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 
 > **Important:** When creating a new file, ensure the directory exists or create it. Never default to the root directory for these files.
 
-## Project Agentic AI Rules (Important)
-
 ### Database Operations
 
 - **Neon DB Expert Subagent**: Always use the Neon DB Expert subagent for database access. Never connect directly to the database.
@@ -163,18 +161,4 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
   - **Production Protection**: Blocks sensitive operations on production branch (`br-dry-forest-adjaydda`)
 - **Operation Logging**: All database operations logged to `docs/{YYYY_MM_DD}/database/validation-log.md`
 
-### Database Workflow
 
-1. **Development Operations**: Use `/db` command for all database tasks
-2. **Schema Changes**: Always use subagent for migrations and schema modifications
-3. **Query Optimization**: Use subagent for performance analysis and slow query identification
-4. **Production Safety**: Production operations require explicit confirmation through subagent
-5. **Validation Hook**: Automatic parameter injection and safety checks via `.claude/hooks/neon-validator.py`
-
-### Available Database Commands
-
-- `/db list tables` - Show all database tables
-- `/db show schema [table]` - Display table schema
-- `/db run migration [description]` - Execute database migration
-- `/db optimize query [description]` - Analyze and optimize queries
-- `/db check performance` - Identify slow queries and performance issues

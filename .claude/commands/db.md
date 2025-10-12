@@ -1,3 +1,8 @@
+---
+description: Access the Neon Database Expert subagent for Head Shakers project database operations
+argument-hint: [operation description]
+---
+
 # Database Command (/db)
 
 Quick access to the Neon Database Expert subagent for Head Shakers project database operations.
