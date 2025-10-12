@@ -1,6 +1,5 @@
-import type { ComponentProps } from 'react';
+'use client';
 
-import { auth } from '@clerk/nextjs/server';
 import {
   AlertTriangleIcon,
   CheckCircle2Icon,
@@ -9,123 +8,82 @@ import {
   FileTextIcon,
   ListIcon,
 } from 'lucide-react';
-
-import type { ComponentTestIdProps } from '@/lib/test-ids';
+import { useEffect, useState } from 'react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { createProtectedQueryContext } from '@/lib/queries/base/query-context';
-import { FeaturePlannerQuery } from '@/lib/queries/feature-planner/feature-planner.query';
-import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface PlanViewerProps extends ComponentProps<'div'>, ComponentTestIdProps {
-  /**
-   * Either provide planId to show the latest/selected generation,
-   * or provide generationId to show a specific generation
-   */
-  generationId?: string;
-  planId?: string;
+interface PlanGeneration {
+  complexity: null | string;
+  estimatedDuration: null | string;
+  id: string;
+  refinedRequest: null | string;
+  riskLevel: null | string;
+  status: string;
+}
+
+interface PlanStep {
+  category: null | string;
+  commands: null | string[];
+  confidenceLevel: null | string;
+  description: null | string;
+  displayOrder: number;
+  estimatedDuration: null | string;
+  id: string;
+  stepNumber: number;
+  title: string;
+  validationCommands: null | string[];
+}
+
+interface PlanViewerClientProps {
+  planId: string;
 }
 
 /**
- * Plan Viewer Component
- * Displays generated implementation plans with metadata and steps
- * Server component that fetches data using facades
+ * Client-side Plan Viewer Component
+ * Fetches and displays generated implementation plans
  */
-export const PlanViewer = async ({ className, generationId, planId, testId, ...props }: PlanViewerProps) => {
-  const planViewerTestId = testId || generateTestId('ui', 'plan-viewer', 'container');
+export const PlanViewerClient = ({ planId }: PlanViewerClientProps) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<null | string>(null);
+  const [planGeneration, setPlanGeneration] = useState<null | PlanGeneration>(null);
+  const [planSteps, setPlanSteps] = useState<PlanStep[]>([]);
 
-  // Validate input
-  if (!planId && !generationId) {
-    return (
-      <Card className={cn('border-destructive', className)} data-testid={planViewerTestId} {...props}>
-        <CardHeader>
-          <CardTitle className={'text-destructive'}>Invalid Configuration</CardTitle>
-          <CardDescription>Either planId or generationId must be provided.</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
+  useEffect(() => {
+    const fetchPlan = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(`/api/feature-planner/${planId}`);
 
-  // Get user ID from Clerk
-  const { userId } = await auth();
-  if (!userId) {
-    return (
-      <Card className={cn('border-destructive', className)} data-testid={planViewerTestId} {...props}>
-        <CardHeader>
-          <CardTitle className={'text-destructive'}>Authentication Required</CardTitle>
-          <CardDescription>You must be logged in to view this plan.</CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
+        if (!response.ok) {
+          throw new Error('Failed to fetch plan');
+        }
 
-  // Create query context
-  const context = createProtectedQueryContext(userId);
+        const data = (await response.json()) as {
+          data?: {
+            planGeneration?: PlanGeneration;
+            planSteps?: PlanStep[];
+          };
+          success: boolean;
+        };
 
-  // Fetch plan generation data
-  let planGeneration;
-  let plan;
-  try {
-    if (planId) {
-      // Get plan to check for selected generation
-      plan = await FeaturePlannerQuery.findPlanByIdAsync(planId, context);
-      if (!plan) {
-        throw new Error('Plan not found');
+        if (data.data?.planGeneration) {
+          setPlanGeneration(data.data.planGeneration);
+        }
+
+        if (data.data?.planSteps) {
+          setPlanSteps(data.data.planSteps);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      // Get all generations for this plan
-      const generations = await FeaturePlannerQuery.getPlanGenerationsByPlanAsync(planId, context);
-
-      // Use selected generation if available, otherwise use the latest completed one
-      const selectedId = plan.selectedPlanGenerationId;
-      if (selectedId) {
-        planGeneration = generations.find((g) => g.id === selectedId);
-      }
-      if (!planGeneration) {
-        planGeneration = generations.find((g) => g.status === 'completed') || generations[0];
-      }
-    } else if (generationId) {
-      // Get generation by ID - need to get the plan first to get all generations
-      // Since we don't have a direct method to get generation by ID, we need to find the plan
-      // This is a limitation we might want to address later by adding a direct query method
-      throw new Error('Direct generation lookup by ID not yet implemented. Please provide planId instead.');
-    }
-  } catch (error) {
-    return (
-      <Card className={cn('border-destructive', className)} data-testid={planViewerTestId} {...props}>
-        <CardHeader>
-          <CardTitle className={'flex items-center gap-2 text-destructive'}>
-            <AlertTriangleIcon aria-hidden className={'size-5'} />
-            Error Loading Plan
-          </CardTitle>
-          <CardDescription>
-            {error instanceof Error ? error.message : 'Failed to load plan generation data'}
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
-  if (!planGeneration) {
-    return (
-      <Card className={cn('', className)} data-testid={planViewerTestId} {...props}>
-        <CardHeader>
-          <CardTitle className={'flex items-center gap-2'}>
-            <FileTextIcon aria-hidden className={'size-5 text-muted-foreground'} />
-            Plan Not Found
-          </CardTitle>
-          <CardDescription>
-            No plan generation found. Please generate an implementation plan first.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
-  // Fetch plan steps
-  const planSteps = await FeaturePlannerQuery.getPlanStepsByGenerationAsync(planGeneration.id, context);
+    void fetchPlan();
+  }, [planId]);
 
   // Determine complexity color
   const getComplexityColor = (complexity: null | string) => {
@@ -159,8 +117,59 @@ export const PlanViewer = async ({ className, generationId, planId, testId, ...p
     }
   };
 
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className={'flex items-center gap-2'}>
+            <FileTextIcon aria-hidden className={'size-5 text-primary'} />
+            Loading Implementation Plan...
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className={'flex items-center gap-3 py-4'}>
+            <div
+              className={'size-5 animate-spin rounded-full border-2 border-primary border-t-transparent'}
+            />
+            <p className={'text-sm text-muted-foreground'}>Loading plan details...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className={'border-destructive'}>
+        <CardHeader>
+          <CardTitle className={'flex items-center gap-2 text-destructive'}>
+            <AlertTriangleIcon aria-hidden className={'size-5'} />
+            Error Loading Plan
+          </CardTitle>
+          <CardDescription>{error}</CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
+  if (!planGeneration) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className={'flex items-center gap-2'}>
+            <FileTextIcon aria-hidden className={'size-5 text-muted-foreground'} />
+            Plan Not Found
+          </CardTitle>
+          <CardDescription>
+            No plan generation found. Please generate an implementation plan first.
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
-    <div className={cn('space-y-6', className)} data-testid={planViewerTestId} {...props}>
+    <div className={'space-y-6'}>
       {/* Plan Metadata Card */}
       <Card>
         <CardHeader>

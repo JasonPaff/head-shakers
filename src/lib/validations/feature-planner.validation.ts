@@ -311,7 +311,14 @@ export interface Step2Data {
 }
 
 export interface Step3Data {
+  completionTokens?: number;
+  estimatedDuration?: string;
+  executionTimeMs?: number;
+  generationId?: string;
   implementationPlan?: string;
+  promptTokens?: number;
+  status?: string;
+  totalTokens?: number;
   validationCommands?: string[];
 }
 

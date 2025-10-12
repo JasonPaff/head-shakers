@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
 import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-planner.facade';
+import { createProtectedQueryContext } from '@/lib/queries/base/query-context';
+import { FeaturePlannerQuery } from '@/lib/queries/feature-planner/feature-planner.query';
 import { createServiceError } from '@/lib/utils/error-builders';
 import { getUserId } from '@/utils/user-utils';
 
@@ -127,12 +129,28 @@ export async function GET(_request: Request, { params }: { params: { planId: str
       FeaturePlannerFacade.getPlanGenerationsByPlanAsync(planId, userId),
     ]);
 
+    // Get the selected or latest completed plan generation
+    const selectedId = plan.selectedPlanGenerationId;
+    let planGeneration = selectedId ? planGenerations.find((g) => g.id === selectedId) : null;
+    if (!planGeneration) {
+      planGeneration = planGenerations.find((g) => g.status === 'completed') || planGenerations[0];
+    }
+
+    // Get plan steps if we have a plan generation
+    let planSteps: unknown[] = [];
+    if (planGeneration) {
+      const context = createProtectedQueryContext(userId);
+      planSteps = await FeaturePlannerQuery.getPlanStepsByGenerationAsync(planGeneration.id, context);
+    }
+
     return NextResponse.json(
       {
         data: {
           discoverySessions,
           plan,
+          planGeneration,
           planGenerations,
+          planSteps,
           refinements,
         },
         success: true,

@@ -1,20 +1,32 @@
 'use client';
 
-import type { ComponentProps } from 'react';
-
 import { FileTextIcon } from 'lucide-react';
+import { type ComponentProps } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
+import { ExecutionMetrics } from '@/app/(app)/feature-planner/components/execution-metrics';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface StepThreeProps extends ComponentProps<'div'>, ComponentTestIdProps {
-  // Future props for implementation planning functionality
+interface GenerationData {
+  completionTokens?: number;
+  estimatedDuration?: string;
+  executionTimeMs?: number;
+  generationId?: string;
   implementationPlan?: string;
+  promptTokens?: number;
+  status?: string;
+  totalTokens?: number;
+  validationCommands?: string[];
+}
+
+interface StepThreeProps extends ComponentProps<'div'>, ComponentTestIdProps {
+  generationData?: GenerationData;
+  isGeneratingPlan: boolean;
   onImplementationPlanning?: () => void;
-  validationCommands?: Array<string>;
+  planId: null | string;
 }
 
 /**
@@ -23,16 +35,63 @@ interface StepThreeProps extends ComponentProps<'div'>, ComponentTestIdProps {
  */
 export const StepThree = ({
   className,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  implementationPlan: _implementationPlan,
+  generationData,
+  isGeneratingPlan,
   onImplementationPlanning,
+  planId,
   testId,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  validationCommands: _validationCommands = [],
   ...props
 }: StepThreeProps) => {
   const stepThreeTestId = testId || generateTestId('feature', 'card');
 
+  // If currently generating plan, show loading state
+  if (isGeneratingPlan) {
+    return (
+      <div className={cn('space-y-6', className)} data-testid={stepThreeTestId} {...props}>
+        <Card>
+          <CardHeader>
+            <CardTitle className={'flex items-center gap-2'}>
+              <FileTextIcon aria-hidden className={'size-5 text-primary'} />
+              Step 3: Implementation Planning
+            </CardTitle>
+          </CardHeader>
+          <CardContent className={'space-y-4'}>
+            <div className={'rounded-lg bg-muted p-6'}>
+              <div className={'flex items-center gap-3'}>
+                <div
+                  className={'size-5 animate-spin rounded-full border-2 border-primary border-t-transparent'}
+                />
+                <div>
+                  <h3 className={'font-medium'}>Generating implementation plan...</h3>
+                  <p className={'text-sm text-muted-foreground'}>
+                    Creating comprehensive plan with step-by-step guidance. This may take 1-2 minutes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // If plan has been generated, show metrics only (parent will render PlanViewer)
+  if (generationData && planId) {
+    return (
+      <div className={cn('space-y-6', className)} data-testid={stepThreeTestId} {...props}>
+        {/* Execution Metrics */}
+        <ExecutionMetrics
+          completionTokens={generationData.completionTokens ?? 0}
+          executionTimeMs={generationData.executionTimeMs ?? 0}
+          promptTokens={generationData.promptTokens ?? 0}
+          status={generationData.status ?? 'unknown'}
+          totalTokens={generationData.totalTokens ?? 0}
+        />
+      </div>
+    );
+  }
+
+  // Default state: show button to start plan generation
   return (
     <div className={cn('space-y-6', className)} data-testid={stepThreeTestId} {...props}>
       <Card>
@@ -44,6 +103,7 @@ export const StepThree = ({
         </CardHeader>
         <CardContent className={'space-y-4'}>
           <div className={'rounded-lg bg-muted p-4'}>
+            <h3 className={'mb-2 font-medium'}>Generate Implementation Plan</h3>
             <p className={'mb-4 text-sm text-muted-foreground'}>
               This step will generate a comprehensive implementation plan based on the refined feature request
               and discovered files. It will provide step-by-step guidance, code snippets, and validation

@@ -1,7 +1,7 @@
 'use client';
 
 import { parseAsInteger, useQueryState } from 'nuqs';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
@@ -17,6 +17,7 @@ import { RefinementResults } from '@/app/(app)/feature-planner/components/refine
 import { RefinementSettings } from '@/app/(app)/feature-planner/components/refinement-settings';
 import { StepOrchestrator } from '@/app/(app)/feature-planner/components/steps/step-orchestrator';
 import { WorkflowProgress } from '@/app/(app)/feature-planner/components/workflow-progress';
+import { PlanViewerClient } from '@/components/feature/feature-planner/plan-viewer-client';
 import { PageContent } from '@/components/layout/page-content';
 import { Conditional } from '@/components/ui/conditional';
 
@@ -24,6 +25,7 @@ export interface FeaturePlannerState {
   allRefinements: FeatureRefinement[] | null;
   discoverySession: FileDiscoverySession | null;
   isDiscoveringFiles: boolean;
+  isGeneratingPlan: boolean;
   isRefining: boolean;
   isSelectingRefinement: boolean;
   manualFiles: Array<{
@@ -49,6 +51,7 @@ export default function FeaturePlannerPage() {
     allRefinements: null,
     discoverySession: null,
     isDiscoveringFiles: false,
+    isGeneratingPlan: false,
     isRefining: false,
     isSelectingRefinement: false,
     manualFiles: [],
@@ -493,9 +496,10 @@ export default function FeaturePlannerPage() {
       return;
     }
 
-    try {
-      toast.info('Generating implementation plan...');
+    updateState({ isGeneratingPlan: true });
+    toast.loading('Generating implementation plan...', { id: 'plan-generation' });
 
+    try {
       const response = await fetch('/api/feature-planner/plan', {
         body: JSON.stringify({
           customModel: state.settings.customModel,
@@ -510,46 +514,97 @@ export default function FeaturePlannerPage() {
 
       const data = (await response.json()) as {
         data?: {
+          completionTokens?: number;
+          estimatedDuration?: string;
+          executionTimeMs?: number;
+          id?: string;
           implementationPlan?: string;
+          promptTokens?: number;
+          status?: string;
           steps?: Array<{
             commands: string[];
             description: string;
             title: string;
             validationCommands: string[];
           }>;
+          totalTokens?: number;
         };
-        isSuccess: boolean;
         message: string;
+        success: boolean;
       };
 
-      if (response.ok && data.isSuccess) {
+      console.log('[Plan Generation] Response received:', {
+        dataPresent: !!data.data,
+        generationId: data.data?.id,
+        planId: state.planId,
+        status: data.data?.status,
+        success: data.success,
+      });
+
+      toast.dismiss('plan-generation');
+
+      if (response.ok && data.success) {
         toast.success(data.message);
 
         if (data.data) {
           const validationCommands =
             data.data.steps?.flatMap((step) => step.validationCommands).filter(Boolean) || [];
 
+          const step3Data = {
+            completionTokens: data.data.completionTokens,
+            estimatedDuration: data.data.estimatedDuration,
+            executionTimeMs: data.data.executionTimeMs,
+            generationId: data.data.id,
+            implementationPlan: data.data.implementationPlan || '',
+            promptTokens: data.data.promptTokens,
+            status: data.data.status,
+            totalTokens: data.data.totalTokens,
+            validationCommands,
+          };
+
+          console.log('[Plan Generation] Updating state with step3 data:', step3Data);
+
           updateState({
+            isGeneratingPlan: false,
             stepData: {
               ...state.stepData,
-              step3: {
-                implementationPlan: data.data.implementationPlan || '',
-                validationCommands,
-              },
+              step3: step3Data,
             },
           });
+
+          console.log('[Plan Generation] State update complete');
+        } else {
+          console.error('[Plan Generation] No data in response');
+          updateState({ isGeneratingPlan: false });
         }
       } else {
+        console.error('[Plan Generation] Request failed:', data);
         toast.error(data.message || 'Failed to generate implementation plan');
+        updateState({ isGeneratingPlan: false });
       }
     } catch (error) {
-      console.error('Implementation planning error:', error);
+      console.error('[Plan Generation] Exception caught:', error);
+      toast.dismiss('plan-generation');
       toast.error('Failed to generate implementation plan');
+      updateState({ isGeneratingPlan: false });
     }
   }, [state.planId, state.settings.customModel, state.stepData, updateState]);
 
   const shouldShowRefinementResults =
     currentStep === 1 && !!state.allRefinements && state.allRefinements.length > 0;
+
+  const shouldShowPlanViewer =
+    currentStep === 3 && !!state.stepData.step3?.generationId && !!state.planId && !state.isGeneratingPlan;
+
+  // Debug logging for plan viewer condition
+  console.log('[Plan Viewer] Conditional check:', {
+    currentStep,
+    generationId: state.stepData.step3?.generationId,
+    isGeneratingPlan: state.isGeneratingPlan,
+    planId: state.planId,
+    shouldShowPlanViewer,
+    step3Data: state.stepData.step3,
+  });
 
   return (
     <PageContent>
@@ -564,6 +619,7 @@ export default function FeaturePlannerPage() {
           currentStep={currentStep as WorkflowStep}
           discoverySession={state.discoverySession}
           isDiscoveringFiles={state.isDiscoveringFiles}
+          isGeneratingPlan={state.isGeneratingPlan}
           isRefining={state.isRefining}
           manualFiles={state.manualFiles}
           onChange={(value) => {
@@ -576,6 +632,7 @@ export default function FeaturePlannerPage() {
           onParallelRefineRequest={handleParallelRefineRequest}
           onRefineRequest={handleRefineRequest}
           onRemoveManualFile={handleRemoveManualFile}
+          planId={state.planId}
           settings={state.settings}
           stepData={state.stepData}
           value={state.originalRequest}
@@ -592,6 +649,11 @@ export default function FeaturePlannerPage() {
             refinements={state.allRefinements || []}
             selectedRefinementId={state.selectedRefinementId || undefined}
           />
+        </Conditional>
+
+        {/* Plan Viewer (Step 3) - Client Component */}
+        <Conditional isCondition={shouldShowPlanViewer}>
+          <PlanViewerClient planId={state.planId!} />
         </Conditional>
       </div>
 
