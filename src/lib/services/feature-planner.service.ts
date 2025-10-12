@@ -156,7 +156,7 @@ export class FeaturePlannerService {
       agentId: 'facades-services-agent',
       description: 'Business logic facades and services',
       name: 'Facades & Services Agent',
-      searchPaths: ['src/lib/facades/', 'src/lib/services/'],
+      searchPaths: ['src/lib/facades/', 'src/lib/services/', 'src/services/'],
     },
     {
       agentId: 'ui-components-agent',
@@ -166,9 +166,17 @@ export class FeaturePlannerService {
     },
     {
       agentId: 'pages-agent',
-      description: 'Application pages and route layouts',
+      description: 'Application pages, route layouts, and root app files',
       name: 'Pages Agent',
-      searchPaths: ['src/app/(app)/', 'src/app/(public)/'],
+      searchPaths: [
+        'src/app/(app)/',
+        'src/app/(public)/',
+        'src/app/examples/',
+        'src/app/layout.tsx',
+        'src/app/global-error.tsx',
+        'src/app/loading.tsx',
+        'src/app/globals.css',
+      ],
     },
     {
       agentId: 'api-routes-agent',
@@ -183,6 +191,12 @@ export class FeaturePlannerService {
       searchPaths: ['src/hooks/'],
     },
     {
+      agentId: 'types-agent',
+      description: 'TypeScript type definitions and interfaces',
+      name: 'Types Agent',
+      searchPaths: ['src/types/'],
+    },
+    {
       agentId: 'validations-agent',
       description: 'Zod schemas and validation logic',
       name: 'Validations Agent',
@@ -190,9 +204,18 @@ export class FeaturePlannerService {
     },
     {
       agentId: 'utils-constants-agent',
-      description: 'Utility functions, constants, and helpers',
+      description: 'Utility functions, constants, middleware, and helpers',
       name: 'Utils & Constants Agent',
-      searchPaths: ['src/lib/utils/', 'src/lib/constants/', 'src/lib/middleware/'],
+      searchPaths: [
+        'src/lib/utils/',
+        'src/lib/constants/',
+        'src/lib/middleware/',
+        'src/utils/',
+        'src/constants/',
+        'src/middleware.ts',
+        'src/instrumentation.ts',
+        'src/instrumentation-client.ts',
+      ],
     },
   ];
 

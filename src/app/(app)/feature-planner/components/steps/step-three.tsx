@@ -44,7 +44,6 @@ export const StepThree = ({
         </CardHeader>
         <CardContent className={'space-y-4'}>
           <div className={'rounded-lg bg-muted p-4'}>
-            <h3 className={'mb-2 font-medium'}>Coming in Phase 2</h3>
             <p className={'mb-4 text-sm text-muted-foreground'}>
               This step will generate a comprehensive implementation plan based on the refined feature request
               and discovered files. It will provide step-by-step guidance, code snippets, and validation
@@ -61,18 +60,6 @@ export const StepThree = ({
                 Generate Implementation Plan
               </button>
             )}
-          </div>
-
-          <div className={'space-y-3'}>
-            <h4 className={'font-medium'}>Planned Features:</h4>
-            <ul className={'space-y-1 text-sm text-muted-foreground'}>
-              <li>• Detailed implementation roadmap</li>
-              <li>• Code snippets and examples</li>
-              <li>• Testing strategy and validation commands</li>
-              <li>• Risk assessment and mitigation strategies</li>
-              <li>• Integration with project standards and patterns</li>
-              <li>• Automated code generation suggestions</li>
-            </ul>
           </div>
         </CardContent>
       </Card>
