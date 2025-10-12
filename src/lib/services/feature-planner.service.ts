@@ -217,6 +217,52 @@ export class FeaturePlannerService {
         'src/instrumentation-client.ts',
       ],
     },
+    {
+      agentId: 'configuration-agent',
+      description: 'Configuration files for TypeScript, Next.js, Tailwind, environment variables',
+      name: 'Configuration Files Agent',
+      searchPaths: [
+        'tsconfig.json',
+        'next.config.ts',
+        'next.config.js',
+        'next.config.mjs',
+        'tailwind.config.ts',
+        'tailwind.config.js',
+        '.env.example',
+        '.env.local.example',
+        'postcss.config.js',
+        'postcss.config.mjs',
+      ],
+    },
+    {
+      agentId: 'test-files-agent',
+      description: 'Test files, specs, and testing utilities',
+      name: 'Test Files Agent',
+      searchPaths: [
+        'tests/',
+        'src/**/*.test.ts',
+        'src/**/*.test.tsx',
+        'src/**/*.spec.ts',
+        'src/**/*.spec.tsx',
+        'vitest.config.ts',
+        'playwright.config.ts',
+      ],
+    },
+    {
+      agentId: 'build-tooling-agent',
+      description: 'Build configuration, package management, and developer tooling',
+      name: 'Build & Tooling Agent',
+      searchPaths: [
+        'package.json',
+        'drizzle.config.ts',
+        '.eslintrc.json',
+        '.eslintrc.js',
+        '.prettierrc',
+        '.prettierrc.json',
+        'prettier.config.js',
+        'prettier.config.mjs',
+      ],
+    },
   ];
 
   /**
@@ -577,6 +623,90 @@ export class FeaturePlannerService {
   }
 
   /**
+   * Extract architecture insights from discovered files
+   * Analyzes patterns, conventions, and reusable components
+   *
+   * @param files - Discovered files to analyze
+   * @returns Architecture insights as markdown text
+   */
+  static extractArchitectureInsights(files: FileDiscoveryResult[]): string {
+    const insights: string[] = [];
+
+    // Identify architectural patterns
+    const patterns = new Set<string>();
+    const components = new Set<string>();
+    const utilities = new Set<string>();
+
+    for (const file of files) {
+      // Detect patterns from file paths
+      if (file.filePath.includes('/actions/')) {
+        patterns.add('Server actions using Next-Safe-Action');
+      }
+      if (file.filePath.includes('/queries/')) {
+        patterns.add('Database queries using Drizzle ORM');
+      }
+      if (file.filePath.includes('/facades/')) {
+        patterns.add('Business logic encapsulated in facades');
+      }
+      if (file.filePath.includes('/schema/')) {
+        patterns.add('Database schemas using Drizzle ORM');
+      }
+      if (file.filePath.includes('/validations/')) {
+        patterns.add('Form validation using Zod schemas');
+      }
+      if (file.filePath.includes('/components/ui/')) {
+        const componentName = file.filePath.split('/').pop()?.replace(/\.tsx?$/, '');
+        if (componentName) components.add(componentName);
+      }
+      if (file.filePath.includes('/lib/utils/') || file.filePath.includes('/utils/')) {
+        const utilityName = file.filePath.split('/').pop()?.replace(/\.tsx?$/, '');
+        if (utilityName) utilities.add(utilityName);
+      }
+    }
+
+    // Build insights
+    if (patterns.size > 0) {
+      insights.push(`**Architectural Patterns:**\n${Array.from(patterns).map((p) => `- ${p}`).join('\n')}`);
+    }
+
+    if (components.size > 0 && components.size <= 10) {
+      insights.push(
+        `**Reusable Components:**\n${Array.from(components)
+          .filter((c) => c)
+          .map((c) => `- ${c}`)
+          .join('\n')}`,
+      );
+    }
+
+    if (utilities.size > 0 && utilities.size <= 10) {
+      insights.push(
+        `**Utility Functions:**\n${Array.from(utilities)
+          .filter((u) => u)
+          .map((u) => `- ${u}`)
+          .join('\n')}`,
+      );
+    }
+
+    // Identify conventions based on file structure
+    const conventions: string[] = [];
+    const hasSrcLib = files.some((f) => f.filePath.startsWith('src/lib/'));
+    const hasSrcApp = files.some((f) => f.filePath.startsWith('src/app/'));
+
+    if (hasSrcLib) {
+      conventions.push('Business logic organized under src/lib/');
+    }
+    if (hasSrcApp) {
+      conventions.push('Next.js App Router structure with route groups');
+    }
+
+    if (conventions.length > 0) {
+      insights.push(`**Conventions:**\n${conventions.map((c) => `- ${c}`).join('\n')}`);
+    }
+
+    return insights.join('\n\n');
+  }
+
+  /**
    * Aggregate and deduplicate files from multiple agents
    *
    * @param agentResults - Results from all specialized agents
@@ -710,16 +840,20 @@ ${refinedRequest}
 YOUR TASK:
 1. Use Glob to search for files in: ${searchPathsStr}
 2. Use Grep to search file contents for relevant keywords
-3. Use Read to VERIFY each file exists before adding it to your results
-4. Mark fileExists: true ONLY if you successfully read the file
-5. Mark fileExists: false for files that don't exist but should be created
-6. Find at least 3 relevant files
+3. Use Glob to VERIFY file existence (more efficient than Read)
+4. Use Read ONLY when you need to understand file content for accurate descriptions
+5. Mark fileExists: true for files found by Glob
+6. Mark fileExists: false for files that don't exist but should be created
+7. Find at least 3 relevant files
 
 FILE VERIFICATION RULES:
-- ALWAYS attempt to Read each file path you discover
-- If Read succeeds → fileExists: true, write detailed description based on actual content
-- If Read fails (file not found) → fileExists: false, describe what the file should contain
-- DO NOT guess if a file exists - verify it
+- Use Glob with exact file paths to verify existence (fast and efficient)
+- Use Read ONLY when you need to analyze file contents for description/reasoning
+- If file is critical/high priority: Read to provide detailed description based on actual content
+- If file is medium/low priority: Glob for existence check, infer description from file path/name
+- If Glob finds file → fileExists: true
+- If Glob doesn't find file but should exist → fileExists: false, describe what should be created
+- DO NOT guess if a file exists - always verify with Glob at minimum
 
 DESCRIPTION REQUIREMENTS:
 - NO speculative language: avoid "may", "might", "potentially", "could", "should"
@@ -728,15 +862,30 @@ DESCRIPTION REQUIREMENTS:
 - For missing files: describe what WILL BE in the file (implementation requirements)
 - Be specific about file contents, not vague possibilities
 
-CRITICAL OUTPUT FORMAT:
-- Do NOT start your response with any explanatory text
-- Do NOT say "Here are the files" or similar phrases
-- Your FIRST character must be the backtick that starts the JSON code block
-- Start immediately with: \`\`\`json
+CRITICAL OUTPUT FORMAT REQUIREMENTS:
+IMPORTANT: Your response must be ONLY a JSON code block with NO additional text before or after.
+- Do NOT include ANY explanatory text, greetings, or commentary
+- Do NOT say "Here are the files", "I found", or similar phrases
+- The FIRST character of your response MUST be the backtick (\`) that starts the code block
+- The LAST character of your response MUST be the backtick (\`) that ends the code block
 
-EXAMPLE OUTPUT (use this exact format):
+CORRECT FORMAT (your response should look exactly like this):
+\`\`\`json
+[
+  {
+    "filePath": "path/to/file.ts",
+    "priority": "critical",
+    "role": "Brief role description",
+    "fileExists": true,
+    "description": "Definitive description of file contents or purpose.",
+    "reasoning": "Specific reason this file is relevant to the feature.",
+    "integrationPoint": "Concrete way this file will be modified or used.",
+    "relevanceScore": 95
+  }
+]
+\`\`\`
 
-Example 1 - EXISTING file (fileExists: true):
+EXAMPLE 1 - EXISTING file (fileExists: true):
 \`\`\`json
 [
   {
@@ -746,13 +895,13 @@ Example 1 - EXISTING file (fileExists: true):
     "fileExists": true,
     "description": "Defines social features schema with likes and follows tables using Drizzle ORM. Contains user references, timestamps, and entity relationship patterns that the favorites table will follow. Uses pgEnum for entity types and proper foreign key constraints.",
     "reasoning": "Core database schema that must be modified to add the favorites table with polymorphic entity support",
-    "integrationPoint": "New favorites table will be added to this file following the existing likes/follows pattern with userId foreign key and entityType discriminator",
+    "integrationPoint": "Add favorites table with columns: id, userId, entityType, entityId, createdAt. Follow existing likes/follows pattern with userId foreign key to users table. Requires database migration. Affects getFavoritesByUser query and toggleFavorite action.",
     "relevanceScore": 95
   }
 ]
 \`\`\`
 
-Example 2 - MISSING file (fileExists: false):
+EXAMPLE 2 - MISSING file (fileExists: false):
 \`\`\`json
 [
   {
@@ -762,26 +911,47 @@ Example 2 - MISSING file (fileExists: false):
     "fileExists": false,
     "description": "Custom hook that will provide useFavorite() and useUnfavorite() mutations using TanStack Query. Will handle optimistic updates, cache invalidation, and error handling for favorite operations across all entity types.",
     "reasoning": "Required new file for managing favorite state in React components with proper TypeScript types",
-    "integrationPoint": "Will be imported by CollectionCard, BobbleheadCard, and detail components to trigger favorite mutations",
+    "integrationPoint": "Create useFavorite() hook with toggleFavorite mutation. Will be imported and used by CollectionCard (src/components/collections/collection-card.tsx) and BobbleheadCard (src/components/bobbleheads/bobblehead-card.tsx) components (2 files). Provides optimistic UI updates before server confirmation.",
     "relevanceScore": 88
   }
 ]
 \`\`\`
 
+PRIORITY & SCORE GUIDELINES:
+- **critical** (90-100): MUST modify for feature to work (core logic, schema changes)
+- **high** (70-89): LIKELY modify for integration (API routes, UI components directly used)
+- **medium** (50-69): MAY modify for polish (styling, related features, type definitions)
+- **low** (30-49): Reference only (similar patterns, utility functions, examples)
+
+REQUIRED FIELDS:
+- filePath: Exact path from project root
+- priority: One of: "critical", "high", "medium", "low"
+- role: Brief description of file type/purpose
+- fileExists: Boolean - true if Read succeeded, false otherwise
+- description: 2-3 definitive sentences (no speculative language)
+- reasoning: Why this file is relevant (state facts)
+- integrationPoint: Structured integration details (see format below)
+- relevanceScore: Number 0-100
+
+INTEGRATION POINT FORMAT:
+Must include specific, actionable details about how the file connects to the feature.
+Include: modifications needed, affected components, and impact assessment.
+
+Examples:
+GOOD: "Add \`isFavorited\` boolean field to schema. Requires database migration. Affects FavoriteButton component and getFavorites query."
+GOOD: "Modify useFavorite() hook to add optimistic updates. Currently used by CollectionCard and BobbleheadCard components (2 files)."
+GOOD: "Create new toggleFavorite server action using Next-Safe-Action pattern. Will be called from client components via form submission."
+BAD: "May need updates"
+BAD: "Related to favorites"
+BAD: "Might be useful"
+
 RULES:
-- priority: "critical" (must modify) | "high" (likely modify) | "medium" (may modify) | "low" (reference only)
-- relevanceScore: 0-100 (90+ critical, 70-89 high, 50-69 medium, 30-49 low)
-- fileExists: REQUIRED - true if Read succeeds, false if file doesn't exist
-- description: 2-3 definitive sentences (no "may/might/could/should")
-- reasoning: Specific reason for including this file (state facts, not possibilities)
-- integrationPoint: Concrete connection to the feature (not "may need" but "will need")
 - ONLY include files scoring 30+
 - ONLY search in your assigned paths: ${searchPathsStr}
-- VERIFY every file with Read before including it
+- VERIFY every file with Glob (use Read only for critical/high priority files needing detailed descriptions)
+- Return ONLY the JSON code block, nothing else
 
-REMEMBER: Use Read tool on EVERY file path before adding to results!
-
-START YOUR RESPONSE WITH: \`\`\`json`;
+Remember: Start your response with \`\`\`json and end with \`\`\`. No other text.`;
   }
 
   /**

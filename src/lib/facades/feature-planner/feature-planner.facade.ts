@@ -1,3 +1,6 @@
+import { existsSync } from 'fs';
+import { join } from 'path';
+
 import type {
   FeaturePlan,
   FeatureRefinement,
@@ -257,10 +260,14 @@ export class FeaturePlannerFacade {
         settings,
       );
 
+      // extract architecture insights from discovered files
+      const architectureInsights = FeaturePlannerService.extractArchitectureInsights(result.result);
+
       // update session with results
       const updatedSession = await FeaturePlannerQuery.updateFileDiscoverySessionAsync(
         session.id,
         {
+          architectureInsights,
           completedAt: new Date(),
           completionTokens: result.tokenUsage.completionTokens,
           criticalPriorityCount: result.result.filter((f) => f.priority === 'critical').length,
@@ -280,18 +287,24 @@ export class FeaturePlannerFacade {
       // create individual discovered files records
       if (result.result.length > 0 && session) {
         const sessionId = session.id; // Type narrowing
-        const fileRecords = result.result.map((file) => ({
-          description: file.description,
-          discoverySessionId: sessionId,
-          fileExists: file.fileExists ?? true,
-          filePath: file.filePath,
-          integrationPoint: file.integrationPoint,
-          isManuallyAdded: file.isManuallyAdded ?? false,
-          priority: file.priority,
-          reasoning: file.reasoning,
-          relevanceScore: file.relevanceScore,
-          role: file.role,
-        }));
+        const fileRecords = result.result.map((file) => {
+          // Verify file existence on server side if agent didn't verify
+          const fileExists =
+            file.fileExists !== undefined ? file.fileExists : existsSync(join(process.cwd(), file.filePath));
+
+          return {
+            description: file.description,
+            discoverySessionId: sessionId,
+            fileExists,
+            filePath: file.filePath,
+            integrationPoint: file.integrationPoint,
+            isManuallyAdded: file.isManuallyAdded ?? false,
+            priority: file.priority,
+            reasoning: file.reasoning,
+            relevanceScore: file.relevanceScore,
+            role: file.role,
+          };
+        });
 
         await FeaturePlannerQuery.batchCreateDiscoveredFilesAsync(fileRecords, context);
       }
