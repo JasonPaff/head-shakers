@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Unauthorized',
-          success: false,
+          isSuccess: false,
         },
         { status: 401 },
       );
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Plan ID is required',
-          success: false,
+          isSuccess: false,
         },
         { status: 400 },
       );
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
       return NextResponse.json(
         {
           error: 'Failed to run file discovery',
-          success: false,
+          isSuccess: false,
         },
         { status: 500 },
       );
@@ -59,8 +59,8 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         data: session,
+        isSuccess: true,
         message: `File discovery completed: ${session.totalFilesFound} files found`,
-        success: true,
       },
       { status: 200 },
     );
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error: serviceError.message,
-        success: false,
+        isSuccess: false,
       },
       { status: 500 },
     );

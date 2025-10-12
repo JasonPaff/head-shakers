@@ -16,6 +16,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
   discoverySession?: FileDiscoverySession | null;
+  isDiscoveringFiles?: boolean;
   onFileAdded: (file: {
     description: string;
     filePath: string;
@@ -33,6 +34,7 @@ interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
 export const StepTwo = ({
   className,
   discoverySession,
+  isDiscoveringFiles = false,
   onFileAdded,
   onFileDiscovery,
   onFileSelection,
@@ -42,7 +44,36 @@ export const StepTwo = ({
 }: StepTwoProps) => {
   const stepTwoTestId = testId || generateTestId('feature', 'card');
 
-  // If no discovery session, show coming soon message
+  // If currently discovering files, show loading state
+  if (isDiscoveringFiles) {
+    return (
+      <div className={cn('space-y-6', className)} data-testid={stepTwoTestId} {...props}>
+        <Card>
+          <CardHeader>
+            <CardTitle className={'flex items-center gap-2'}>
+              <SearchIcon aria-hidden className={'size-5 text-primary'} />
+              Step 2: File Discovery
+            </CardTitle>
+          </CardHeader>
+          <CardContent className={'space-y-4'}>
+            <div className={'rounded-lg bg-muted p-6'}>
+              <div className={'flex items-center gap-3'}>
+                <div className={'size-5 animate-spin rounded-full border-2 border-primary border-t-transparent'} />
+                <div>
+                  <h3 className={'font-medium'}>Discovering files...</h3>
+                  <p className={'text-sm text-muted-foreground'}>
+                    Analyzing your codebase with specialized agents. This may take 30-60 seconds.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // If no discovery session, show start discovery message
   if (!discoverySession) {
     return (
       <div className={cn('space-y-6', className)} data-testid={stepTwoTestId} {...props}>

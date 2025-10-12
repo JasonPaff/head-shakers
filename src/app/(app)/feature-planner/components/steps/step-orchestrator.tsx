@@ -17,9 +17,11 @@ export type WorkflowStep = 1 | 2 | 3;
 interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> {
   currentStep: WorkflowStep;
   discoverySession: FileDiscoverySession | null;
+  isDiscoveringFiles: boolean;
   isRefining: boolean;
   onChange: (value: string) => void;
   onFileDiscovery: () => void;
+  onFileSelection: (selectedFiles: string[]) => void;
   onImplementationPlanning: () => void;
   onParallelRefineRequest: () => void;
   onRefineRequest: () => void;
@@ -37,9 +39,11 @@ export const StepOrchestrator = ({
   className,
   currentStep,
   discoverySession,
+  isDiscoveringFiles,
   isRefining,
   onChange,
   onFileDiscovery,
+  onFileSelection,
   onImplementationPlanning,
   onParallelRefineRequest,
   onRefineRequest,
@@ -68,9 +72,10 @@ export const StepOrchestrator = ({
       <Conditional isCondition={currentStep === 2}>
         <StepTwo
           discoverySession={discoverySession}
+          isDiscoveringFiles={isDiscoveringFiles}
           onFileAdded={() => {}}
           onFileDiscovery={onFileDiscovery}
-          onFileSelection={() => {}}
+          onFileSelection={onFileSelection}
           selectedFiles={stepData.step2?.selectedFiles}
         />
       </Conditional>

@@ -23,6 +23,7 @@ import { Conditional } from '@/components/ui/conditional';
 export interface FeaturePlannerState {
   allRefinements: FeatureRefinement[] | null;
   discoverySession: FileDiscoverySession | null;
+  isDiscoveringFiles: boolean;
   isRefining: boolean;
   isSelectingRefinement: boolean;
   originalRequest: string;
@@ -42,6 +43,7 @@ export default function FeaturePlannerPage() {
   const [state, setState] = useState<FeaturePlannerState>({
     allRefinements: null,
     discoverySession: null,
+    isDiscoveringFiles: false,
     isRefining: false,
     isSelectingRefinement: false,
     originalRequest: '',
@@ -384,9 +386,10 @@ export default function FeaturePlannerPage() {
       return;
     }
 
-    try {
-      toast.info('Starting file discovery...');
+    updateState({ isDiscoveringFiles: true });
+    toast.loading('Analyzing codebase and discovering relevant files...', { id: 'file-discovery' });
 
+    try {
       const response = await fetch('/api/feature-planner/discover', {
         body: JSON.stringify({
           customModel: state.settings.customModel,
@@ -405,12 +408,15 @@ export default function FeaturePlannerPage() {
         message: string;
       };
 
+      toast.dismiss('file-discovery');
+
       if (response.ok && data.isSuccess) {
         toast.success(data.message);
 
         if (data.data) {
           updateState({
             discoverySession: data.data,
+            isDiscoveringFiles: false,
             stepData: {
               ...state.stepData,
               step2: {
@@ -419,15 +425,36 @@ export default function FeaturePlannerPage() {
               },
             },
           });
+        } else {
+          updateState({ isDiscoveringFiles: false });
         }
       } else {
         toast.error(data.message || 'Failed to discover files');
+        updateState({ isDiscoveringFiles: false });
       }
     } catch (error) {
       console.error('File discovery error:', error);
+      toast.dismiss('file-discovery');
       toast.error('Failed to discover files');
+      updateState({ isDiscoveringFiles: false });
     }
   }, [state.planId, state.settings.customModel, state.stepData, updateState]);
+
+  const handleFileSelection = useCallback(
+    (selectedFiles: string[]) => {
+      updateState({
+        stepData: {
+          ...state.stepData,
+          step2: {
+            ...state.stepData.step2,
+            discoveredFiles: state.stepData.step2?.discoveredFiles || [],
+            selectedFiles,
+          },
+        },
+      });
+    },
+    [state.stepData, updateState],
+  );
 
   const handleImplementationPlanning = useCallback(async () => {
     if (!state.planId) {
@@ -510,11 +537,13 @@ export default function FeaturePlannerPage() {
         <StepOrchestrator
           currentStep={currentStep as WorkflowStep}
           discoverySession={state.discoverySession}
+          isDiscoveringFiles={state.isDiscoveringFiles}
           isRefining={state.isRefining}
           onChange={(value) => {
             updateState({ originalRequest: value });
           }}
           onFileDiscovery={handleFileDiscovery}
+          onFileSelection={handleFileSelection}
           onImplementationPlanning={handleImplementationPlanning}
           onParallelRefineRequest={handleParallelRefineRequest}
           onRefineRequest={handleRefineRequest}

@@ -160,9 +160,9 @@ export class FeaturePlannerService {
     },
     {
       agentId: 'react-ui-agent',
-      description: 'React components, pages, and UI elements',
+      description: 'React components, pages, hooks, and API routes',
       name: 'React UI Agent',
-      searchPaths: ['src/components/', 'src/app/'],
+      searchPaths: ['src/components/', 'src/app/', 'src/app/api', 'src/hooks/'],
     },
     {
       agentId: 'validations-agent',
@@ -658,10 +658,7 @@ Provide only the refined paragraph, nothing else.`;
   /**
    * Build specialized agent prompt with enhanced guidance
    */
-  private static buildSpecializedAgentPrompt(
-    refinedRequest: string,
-    agent: SpecializedAgent,
-  ): string {
+  private static buildSpecializedAgentPrompt(refinedRequest: string, agent: SpecializedAgent): string {
     const searchPathsStr = agent.searchPaths.join(', ');
 
     return `You are the ${agent.name}. Your job is to find relevant files in: ${searchPathsStr}
@@ -672,8 +669,22 @@ ${refinedRequest}
 YOUR TASK:
 1. Use Glob to search for files in: ${searchPathsStr}
 2. Use Grep to search file contents for relevant keywords
-3. Use Read to examine specific files if needed
-4. Find at least 3 relevant files (if they exist)
+3. Use Read to VERIFY each file exists before adding it to your results
+4. Mark fileExists: true ONLY if you successfully read the file
+5. Mark fileExists: false for files that don't exist but should be created
+
+FILE VERIFICATION RULES:
+- ALWAYS attempt to Read each file path you discover
+- If Read succeeds → fileExists: true, write detailed description based on actual content
+- If Read fails (file not found) → fileExists: false, describe what the file should contain
+- DO NOT guess if a file exists - verify it
+
+DESCRIPTION REQUIREMENTS:
+- NO speculative language: avoid "may", "might", "potentially", "could", "should"
+- State facts definitively: "Contains X" not "May contain X"
+- For existing files: describe what IS in the file based on Read results
+- For missing files: describe what WILL BE in the file (implementation requirements)
+- Be specific about file contents, not vague possibilities
 
 CRITICAL OUTPUT FORMAT:
 - Do NOT start your response with any explanatory text
@@ -682,25 +693,35 @@ CRITICAL OUTPUT FORMAT:
 - Start immediately with: \`\`\`json
 
 EXAMPLE OUTPUT (use this exact format):
+
+Example 1 - EXISTING file (fileExists: true):
 \`\`\`json
 [
   {
     "filePath": "src/lib/db/schema/social.schema.ts",
     "priority": "critical",
     "role": "Database schema definition",
-    "description": "Contains the social interactions schema including likes and follows. Needs to be extended with a favorites table that supports polymorphic relationships to collections, subcollections, and bobbleheads.",
-    "reasoning": "Core database schema that must be modified to add the favorites feature",
-    "integrationPoint": "New favorites table will reference this schema's user table and need polymorphic type field",
+    "fileExists": true,
+    "description": "Defines social features schema with likes and follows tables using Drizzle ORM. Contains user references, timestamps, and entity relationship patterns that the favorites table will follow. Uses pgEnum for entity types and proper foreign key constraints.",
+    "reasoning": "Core database schema that must be modified to add the favorites table with polymorphic entity support",
+    "integrationPoint": "New favorites table will be added to this file following the existing likes/follows pattern with userId foreign key and entityType discriminator",
     "relevanceScore": 95
-  },
+  }
+]
+\`\`\`
+
+Example 2 - MISSING file (fileExists: false):
+\`\`\`json
+[
   {
-    "filePath": "src/lib/actions/social/social.actions.ts",
+    "filePath": "src/hooks/use-favorite.ts",
     "priority": "high",
-    "role": "Server action for social features",
-    "description": "Handles server-side mutations for likes and follows. Will need new server actions for favoriting/unfavoriting items with optimistic updates.",
-    "reasoning": "Needs new functions: addFavorite, removeFavorite, getFavorites with Next-Safe-Action validation",
-    "integrationPoint": "Will integrate with new favorites schema and existing social patterns",
-    "relevanceScore": 85
+    "role": "React hook for favorite mutations",
+    "fileExists": false,
+    "description": "Custom hook that will provide useFavorite() and useUnfavorite() mutations using TanStack Query. Will handle optimistic updates, cache invalidation, and error handling for favorite operations across all entity types.",
+    "reasoning": "Required new file for managing favorite state in React components with proper TypeScript types",
+    "integrationPoint": "Will be imported by CollectionCard, BobbleheadCard, and detail components to trigger favorite mutations",
+    "relevanceScore": 88
   }
 ]
 \`\`\`
@@ -708,11 +729,15 @@ EXAMPLE OUTPUT (use this exact format):
 RULES:
 - priority: "critical" (must modify) | "high" (likely modify) | "medium" (may modify) | "low" (reference only)
 - relevanceScore: 0-100 (90+ critical, 70-89 high, 50-69 medium, 30-49 low)
-- description: 2-3 sentences explaining what the file does and why it matters
-- reasoning: Specific reason for including this file
-- integrationPoint: How it connects to the new feature
+- fileExists: REQUIRED - true if Read succeeds, false if file doesn't exist
+- description: 2-3 definitive sentences (no "may/might/could/should")
+- reasoning: Specific reason for including this file (state facts, not possibilities)
+- integrationPoint: Concrete connection to the feature (not "may need" but "will need")
 - ONLY include files scoring 30+
 - ONLY search in your assigned paths: ${searchPathsStr}
+- VERIFY every file with Read before including it
+
+REMEMBER: Use Read tool on EVERY file path before adding to results!
 
 START YOUR RESPONSE WITH: \`\`\`json`;
   }
