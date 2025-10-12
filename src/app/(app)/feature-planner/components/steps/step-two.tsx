@@ -66,7 +66,9 @@ export const StepTwo = ({
           <CardContent className={'space-y-4'}>
             <div className={'rounded-lg bg-muted p-6'}>
               <div className={'flex items-center gap-3'}>
-                <div className={'size-5 animate-spin rounded-full border-2 border-primary border-t-transparent'} />
+                <div
+                  className={'size-5 animate-spin rounded-full border-2 border-primary border-t-transparent'}
+                />
                 <div>
                   <h3 className={'font-medium'}>Discovering files...</h3>
                   <p className={'text-sm text-muted-foreground'}>

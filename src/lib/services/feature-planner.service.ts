@@ -655,18 +655,28 @@ export class FeaturePlannerService {
         patterns.add('Form validation using Zod schemas');
       }
       if (file.filePath.includes('/components/ui/')) {
-        const componentName = file.filePath.split('/').pop()?.replace(/\.tsx?$/, '');
+        const componentName = file.filePath
+          .split('/')
+          .pop()
+          ?.replace(/\.tsx?$/, '');
         if (componentName) components.add(componentName);
       }
       if (file.filePath.includes('/lib/utils/') || file.filePath.includes('/utils/')) {
-        const utilityName = file.filePath.split('/').pop()?.replace(/\.tsx?$/, '');
+        const utilityName = file.filePath
+          .split('/')
+          .pop()
+          ?.replace(/\.tsx?$/, '');
         if (utilityName) utilities.add(utilityName);
       }
     }
 
     // Build insights
     if (patterns.size > 0) {
-      insights.push(`**Architectural Patterns:**\n${Array.from(patterns).map((p) => `- ${p}`).join('\n')}`);
+      insights.push(
+        `**Architectural Patterns:**\n${Array.from(patterns)
+          .map((p) => `- ${p}`)
+          .join('\n')}`,
+      );
     }
 
     if (components.size > 0 && components.size <= 10) {
@@ -827,65 +837,99 @@ Provide only the refined paragraph, nothing else.`;
   }
 
   /**
-   * Build specialized agent prompt with enhanced guidance
+   * Build specialized agent prompt with enhanced guidance using XML structure
    */
   private static buildSpecializedAgentPrompt(refinedRequest: string, agent: SpecializedAgent): string {
     const searchPathsStr = agent.searchPaths.join(', ');
 
-    return `You are the ${agent.name}. Your job is to find relevant files in: ${searchPathsStr}
+    return `You are the ${agent.name}. Find relevant files in: ${searchPathsStr}
 
-FEATURE REQUEST:
+<feature_request>
 ${refinedRequest}
+</feature_request>
 
-YOUR TASK:
-1. Use Glob to search for files in: ${searchPathsStr}
+<instructions>
+<search_paths>
+${searchPathsStr}
+</search_paths>
+
+<task_steps>
+1. Use Glob to search for files in your assigned paths
 2. Use Grep to search file contents for relevant keywords
-3. Use Glob to VERIFY file existence (more efficient than Read)
-4. Use Read ONLY when you need to understand file content for accurate descriptions
+3. Use Glob to VERIFY file existence (efficient)
+4. Use Read ONLY for critical/high priority files where you need content details
 5. Mark fileExists: true for files found by Glob
 6. Mark fileExists: false for files that don't exist but should be created
 7. Find at least 3 relevant files
+</task_steps>
 
-FILE VERIFICATION RULES:
-- Use Glob with exact file paths to verify existence (fast and efficient)
-- Use Read ONLY when you need to analyze file contents for description/reasoning
-- If file is critical/high priority: Read to provide detailed description based on actual content
-- If file is medium/low priority: Glob for existence check, infer description from file path/name
+<file_verification_rules>
+- Use Glob with exact file paths to verify existence (fast)
+- Use Read ONLY when analyzing file contents for description/reasoning
+- If critical/high priority: Read to provide detailed description
+- If medium/low priority: Glob for existence, infer from file path
 - If Glob finds file → fileExists: true
-- If Glob doesn't find file but should exist → fileExists: false, describe what should be created
-- DO NOT guess if a file exists - always verify with Glob at minimum
+- If Glob doesn't find file → fileExists: false, describe what should be created
+- DO NOT guess - always verify with Glob at minimum
+</file_verification_rules>
 
-DESCRIPTION REQUIREMENTS:
+<description_requirements>
 - NO speculative language: avoid "may", "might", "potentially", "could", "should"
 - State facts definitively: "Contains X" not "May contain X"
-- For existing files: describe what IS in the file based on Read results
-- For missing files: describe what WILL BE in the file (implementation requirements)
-- Be specific about file contents, not vague possibilities
+- For existing files: describe what IS in the file
+- For missing files: describe what WILL BE in the file
+- Be specific about contents, not vague possibilities
+</description_requirements>
+</instructions>
 
-CRITICAL OUTPUT FORMAT REQUIREMENTS:
-IMPORTANT: Your response must be ONLY a JSON code block with NO additional text before or after.
-- Do NOT include ANY explanatory text, greetings, or commentary
-- Do NOT say "Here are the files", "I found", or similar phrases
-- The FIRST character of your response MUST be the backtick (\`) that starts the code block
-- The LAST character of your response MUST be the backtick (\`) that ends the code block
+<critical_output_format>
+<format_rules>
+ABSOLUTELY CRITICAL:
+- Your response MUST be ONLY a JSON code block
+- NO text before the opening \`\`\`json
+- NO text after the closing \`\`\`
+- NO greetings, explanations, or commentary
+- The FIRST THREE characters must be: \`\`\`
+- The LAST THREE characters must be: \`\`\`
+</format_rules>
 
-CORRECT FORMAT (your response should look exactly like this):
+<correct_format_example>
 \`\`\`json
 [
   {
-    "filePath": "path/to/file.ts",
+    "filePath": "src/lib/db/schema/social.schema.ts",
     "priority": "critical",
-    "role": "Brief role description",
+    "role": "Database schema definition",
     "fileExists": true,
-    "description": "Definitive description of file contents or purpose.",
-    "reasoning": "Specific reason this file is relevant to the feature.",
-    "integrationPoint": "Concrete way this file will be modified or used.",
+    "description": "Defines social features schema with likes and follows tables using Drizzle ORM.",
+    "reasoning": "Core database schema that must be modified to add the favorites table",
+    "integrationPoint": "Add favorites table with columns: id, userId, entityType, entityId, createdAt",
     "relevanceScore": 95
   }
 ]
 \`\`\`
+</correct_format_example>
 
-EXAMPLE 1 - EXISTING file (fileExists: true):
+<incorrect_format_examples>
+WRONG - Has preamble:
+"Here are the files I found:
+\`\`\`json
+[...]
+\`\`\`"
+
+WRONG - Has explanation after:
+"\`\`\`json
+[...]
+\`\`\`
+I've analyzed the codebase and found these relevant files."
+
+WRONG - No code block:
+"[{...}]"
+</incorrect_format_examples>
+</critical_output_format>
+
+<examples>
+<example_existing_file>
 \`\`\`json
 [
   {
@@ -900,8 +944,9 @@ EXAMPLE 1 - EXISTING file (fileExists: true):
   }
 ]
 \`\`\`
+</example_existing_file>
 
-EXAMPLE 2 - MISSING file (fileExists: false):
+<example_missing_file>
 \`\`\`json
 [
   {
@@ -916,46 +961,59 @@ EXAMPLE 2 - MISSING file (fileExists: false):
   }
 ]
 \`\`\`
+</example_missing_file>
+</examples>
 
-PRIORITY & SCORE GUIDELINES:
-- **critical** (90-100): MUST modify for feature to work (core logic, schema changes)
-- **high** (70-89): LIKELY modify for integration (API routes, UI components directly used)
-- **medium** (50-69): MAY modify for polish (styling, related features, type definitions)
-- **low** (30-49): Reference only (similar patterns, utility functions, examples)
+<priority_guidelines>
+- **critical** (90-100): MUST modify for feature to work (core logic, schema)
+- **high** (70-89): LIKELY modify for integration (API routes, UI components)
+- **medium** (50-69): MAY modify for polish (styling, types)
+- **low** (30-49): Reference only (examples, utilities)
+</priority_guidelines>
 
-REQUIRED FIELDS:
+<required_fields>
+All objects must include:
 - filePath: Exact path from project root
-- priority: One of: "critical", "high", "medium", "low"
-- role: Brief description of file type/purpose
-- fileExists: Boolean - true if Read succeeded, false otherwise
-- description: 2-3 definitive sentences (no speculative language)
-- reasoning: Why this file is relevant (state facts)
-- integrationPoint: Structured integration details (see format below)
-- relevanceScore: Number 0-100
+- priority: "critical" | "high" | "medium" | "low"
+- role: Brief file type/purpose
+- fileExists: boolean
+- description: 2-3 definitive sentences
+- reasoning: Why this file is relevant
+- integrationPoint: Specific modifications needed
+- relevanceScore: 0-100
+</required_fields>
 
-INTEGRATION POINT FORMAT:
+<integration_point_format>
 Must include specific, actionable details about how the file connects to the feature.
 Include: modifications needed, affected components, and impact assessment.
 
-Examples:
-GOOD: "Add \`isFavorited\` boolean field to schema. Requires database migration. Affects FavoriteButton component and getFavorites query."
-GOOD: "Modify useFavorite() hook to add optimistic updates. Currently used by CollectionCard and BobbleheadCard components (2 files)."
-GOOD: "Create new toggleFavorite server action using Next-Safe-Action pattern. Will be called from client components via form submission."
-BAD: "May need updates"
-BAD: "Related to favorites"
-BAD: "Might be useful"
+GOOD examples:
+- "Add isFavorited boolean field to schema. Requires database migration. Affects FavoriteButton component and getFavorites query."
+- "Modify useFavorite() hook to add optimistic updates. Currently used by CollectionCard and BobbleheadCard components (2 files)."
+- "Create new toggleFavorite server action using Next-Safe-Action pattern. Will be called from client components via form submission."
 
-RULES:
+BAD examples:
+- "May need updates"
+- "Related to favorites"
+- "Might be useful"
+</integration_point_format>
+
+<rules>
 - ONLY include files scoring 30+
 - ONLY search in your assigned paths: ${searchPathsStr}
-- VERIFY every file with Glob (use Read only for critical/high priority files needing detailed descriptions)
+- VERIFY every file with Glob (use Read only for critical/high priority files)
 - Return ONLY the JSON code block, nothing else
+</rules>
 
-Remember: Start your response with \`\`\`json and end with \`\`\`. No other text.`;
+<final_reminder>
+START YOUR RESPONSE WITH: \`\`\`json
+END YOUR RESPONSE WITH: \`\`\`
+NO OTHER TEXT ALLOWED.
+</final_reminder>`;
   }
 
   /**
-   * Execute a single specialized file discovery agent
+   * Execute a single specialized file discovery agent with retry logic
    *
    * @param refinedRequest - The refined feature request
    * @param agent - The specialized agent configuration
@@ -971,66 +1029,141 @@ Remember: Start your response with \`\`\`json and end with \`\`\`. No other text
     discoveredFiles: FileDiscoveryResult[];
     tokenUsage: { completionTokens: number; promptTokens: number; totalTokens: number };
   }> {
-    try {
-      let discoveredFiles: FileDiscoveryResult[] = [];
-      let lastResponse = '';
-      const tokenUsage = {
-        completionTokens: 0,
-        promptTokens: 0,
-        totalTokens: 0,
-      };
+    const maxRetries = 1; // Allow one retry if format is invalid
+    let lastResponse = '';
 
-      const prompt = this.buildSpecializedAgentPrompt(refinedRequest, agent);
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        let discoveredFiles: FileDiscoveryResult[] = [];
+        const tokenUsage = {
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
 
-      for await (const message of query({
-        options: {
-          allowedTools: ['Read', 'Grep', 'Glob'],
-          maxTurns: 10, // Fewer turns since each agent has a focused scope
-          model: settings.customModel || 'claude-sonnet-4-5-20250929',
-          settingSources: ['project'],
-        },
-        prompt,
-      })) {
-        if (message.type === 'assistant') {
-          const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-          if (parseResult.success) {
-            const validatedMessage = parseResult.data;
-            const content = validatedMessage.content[0];
-            if (content?.type === 'text') {
-              lastResponse = content.text;
-              discoveredFiles = this.parseFileDiscoveryResponse(content.text);
-            }
+        // Build prompt based on attempt number
+        const prompt =
+          attempt === 0 ?
+            this.buildSpecializedAgentPrompt(refinedRequest, agent)
+          : `Your previous response did not return the expected file discovery results.
 
-            if (validatedMessage.usage) {
-              tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-              tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-              tokenUsage.totalTokens =
-                (validatedMessage.usage.input_tokens ?? 0) + (validatedMessage.usage.output_tokens ?? 0);
+<feature_request>
+${refinedRequest}
+</feature_request>
+
+<your_task>
+You are the ${agent.name}. Find relevant files in: ${agent.searchPaths.join(', ')}
+</your_task>
+
+<previous_response_issue>
+Your previous response:
+${lastResponse.substring(0, 400)}
+
+This is incorrect. You returned a conversational response instead of file discovery results.
+</previous_response_issue>
+
+<required_format>
+Return ONLY a JSON code block containing an ARRAY of file objects (not an object with a "response" field).
+
+CORRECT format:
+\`\`\`json
+[
+  {
+    "filePath": "src/lib/db/schema/example.schema.ts",
+    "priority": "critical",
+    "role": "Database schema definition",
+    "fileExists": true,
+    "description": "Defines example schema using Drizzle ORM.",
+    "reasoning": "Core schema that must be modified",
+    "integrationPoint": "Add new table or modify existing schema",
+    "relevanceScore": 95
+  }
+]
+\`\`\`
+
+WRONG format (what you returned):
+\`\`\`json
+{
+  "response": "I understand..."
+}
+\`\`\`
+</required_format>
+
+<instructions>
+1. Use Glob/Grep to find relevant files in your assigned paths
+2. Return an ARRAY of file objects (minimum 3 files)
+3. Start with \`\`\`json and end with \`\`\`
+4. NO other text before or after the JSON code block
+</instructions>`;
+
+        for await (const message of query({
+          options: {
+            allowedTools: ['Read', 'Grep', 'Glob'],
+            maxTurns: 10, // Fewer turns since each agent has a focused scope
+            model: settings.customModel || 'claude-sonnet-4-5-20250929',
+            settingSources: ['project'],
+          },
+          prompt,
+        })) {
+          if (message.type === 'assistant') {
+            const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+            if (parseResult.success) {
+              const validatedMessage = parseResult.data;
+              const content = validatedMessage.content[0];
+              if (content?.type === 'text') {
+                lastResponse = content.text;
+                discoveredFiles = this.parseFileDiscoveryResponse(content.text);
+              }
+
+              if (validatedMessage.usage) {
+                tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+                tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+                tokenUsage.totalTokens =
+                  (validatedMessage.usage.input_tokens ?? 0) + (validatedMessage.usage.output_tokens ?? 0);
+              }
             }
           }
         }
-      }
 
-      // Log for debugging
-      console.log(`[${agent.agentId}] Found ${discoveredFiles.length} files`);
-      if (discoveredFiles.length === 0 && lastResponse) {
-        console.log(`[${agent.agentId}] Response preview:`, lastResponse.substring(0, 500));
-      }
+        // If we got valid results, return them
+        if (discoveredFiles.length > 0) {
+          console.log(`[${agent.agentId}] Found ${discoveredFiles.length} files (attempt ${attempt + 1})`);
+          return {
+            agentId: agent.agentId,
+            discoveredFiles,
+            tokenUsage,
+          };
+        }
 
-      return {
-        agentId: agent.agentId,
-        discoveredFiles,
-        tokenUsage,
-      };
-    } catch (error) {
-      console.error(`Error in ${agent.name}:`, error);
-      // Return empty results instead of failing the entire operation
-      return {
-        agentId: agent.agentId,
-        discoveredFiles: [],
-        tokenUsage: { completionTokens: 0, promptTokens: 0, totalTokens: 0 },
-      };
+        // If no files and we have retries left, try again
+        if (attempt < maxRetries) {
+          console.warn(
+            `[${agent.agentId}] No files found on attempt ${attempt + 1}, retrying with format correction...`,
+          );
+          console.warn(`[${agent.agentId}] Response preview:`, lastResponse.substring(0, 300));
+          continue;
+        }
+
+        // All attempts exhausted
+        console.error(`[${agent.agentId}] No valid files found after ${maxRetries + 1} attempts`);
+        if (lastResponse) {
+          console.error(`[${agent.agentId}] Final response preview:`, lastResponse.substring(0, 500));
+        }
+      } catch (error) {
+        if (attempt < maxRetries) {
+          console.warn(`[${agent.agentId}] Error on attempt ${attempt + 1}, retrying:`, error);
+          continue;
+        }
+        console.error(`Error in ${agent.name} after ${maxRetries + 1} attempts:`, error);
+      }
     }
+
+    // All attempts failed - return empty results instead of failing the entire operation
+    return {
+      agentId: agent.agentId,
+      discoveredFiles: [],
+      tokenUsage: { completionTokens: 0, promptTokens: 0, totalTokens: 0 },
+    };
   }
 
   /**
@@ -1092,32 +1225,72 @@ Remember: Start your response with \`\`\`json and end with \`\`\`. No other text
 
   /**
    * Parse file discovery response
-   * Extracts structured file data from agent response
+   * Extracts structured file data from agent response with improved error handling
    */
   private static parseFileDiscoveryResponse(response: string): FileDiscoveryResult[] {
     const files: FileDiscoveryResult[] = [];
 
     try {
-      // Try parsing as JSON first (if agent returns structured JSON)
-      const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
-      if (jsonMatch?.[1]) {
-        const parsed: unknown = JSON.parse(jsonMatch[1]);
-        const fileArraySchema = z.array(fileDiscoveryJsonItemSchema);
-        const parseResult = fileArraySchema.safeParse(parsed);
+      // IMPROVEMENT 1: Strip any preamble text before JSON code block
+      const jsonBlockMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
 
-        if (parseResult.success) {
-          return parseResult.data.map((file) => ({
-            description: file.description ?? '',
-            fileExists: file.fileExists ?? true,
-            filePath: file.filePath ?? file.path ?? '',
-            integrationPoint: file.integrationPoint,
-            isManuallyAdded: false,
-            priority: this.normalizePriority(file.priority),
-            reasoning: file.reasoning,
-            relevanceScore: this.normalizeScore(file.relevanceScore ?? file.score),
-            role: file.role,
-          }));
+      if (jsonBlockMatch?.[1]) {
+        const jsonContent = jsonBlockMatch[1].trim();
+
+        try {
+          const parsed: unknown = JSON.parse(jsonContent);
+          const fileArraySchema = z.array(fileDiscoveryJsonItemSchema);
+          const parseResult = fileArraySchema.safeParse(parsed);
+
+          if (parseResult.success) {
+            return parseResult.data.map((file) => ({
+              description: file.description ?? '',
+              fileExists: file.fileExists ?? true,
+              filePath: file.filePath ?? file.path ?? '',
+              integrationPoint: file.integrationPoint,
+              isManuallyAdded: false,
+              priority: this.normalizePriority(file.priority),
+              reasoning: file.reasoning,
+              relevanceScore: this.normalizeScore(file.relevanceScore ?? file.score),
+              role: file.role,
+            }));
+          } else {
+            // IMPROVEMENT 2: Log Zod validation errors for debugging
+            console.error(`[parseFileDiscoveryResponse] Zod validation failed:`, parseResult.error.issues);
+          }
+        } catch (parseError) {
+          // IMPROVEMENT 3: Better error logging
+          console.error(`[parseFileDiscoveryResponse] JSON parse error:`, parseError);
+          console.error(`[parseFileDiscoveryResponse] Problematic JSON:`, jsonContent.substring(0, 200));
         }
+      } else {
+        // IMPROVEMENT 4: Try to find JSON without code block markers
+        const jsonMatch = response.match(/\[[\s\S]*\]/);
+        if (jsonMatch) {
+          try {
+            const parsed: unknown = JSON.parse(jsonMatch[0]);
+            const fileArraySchema = z.array(fileDiscoveryJsonItemSchema);
+            const parseResult = fileArraySchema.safeParse(parsed);
+            if (parseResult.success) {
+              return parseResult.data.map((file) => ({
+                description: file.description ?? '',
+                fileExists: file.fileExists ?? true,
+                filePath: file.filePath ?? file.path ?? '',
+                integrationPoint: file.integrationPoint,
+                isManuallyAdded: false,
+                priority: this.normalizePriority(file.priority),
+                reasoning: file.reasoning,
+                relevanceScore: this.normalizeScore(file.relevanceScore ?? file.score),
+                role: file.role,
+              }));
+            }
+          } catch {
+            console.error('[parseFileDiscoveryResponse] Failed to parse JSON without code block');
+          }
+        }
+
+        console.error('[parseFileDiscoveryResponse] No JSON code block found in response');
+        console.error('[parseFileDiscoveryResponse] Response preview:', response.substring(0, 300));
       }
 
       // Parse markdown-style format

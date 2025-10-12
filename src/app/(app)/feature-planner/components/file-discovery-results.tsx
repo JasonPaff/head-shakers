@@ -82,9 +82,27 @@ export const FileDiscoveryResults = ({
   const manualLow = manualFiles.filter((f) => f.priority === 'low');
 
   const priorityGroups = [
-    { files: criticalFiles, label: 'Critical', manualFiles: manualCritical, sectionKey: 'critical', variant: 'destructive' as const },
-    { files: highFiles, label: 'High', manualFiles: manualHigh, sectionKey: 'high', variant: 'default' as const },
-    { files: mediumFiles, label: 'Medium', manualFiles: manualMedium, sectionKey: 'medium', variant: 'secondary' as const },
+    {
+      files: criticalFiles,
+      label: 'Critical',
+      manualFiles: manualCritical,
+      sectionKey: 'critical',
+      variant: 'destructive' as const,
+    },
+    {
+      files: highFiles,
+      label: 'High',
+      manualFiles: manualHigh,
+      sectionKey: 'high',
+      variant: 'default' as const,
+    },
+    {
+      files: mediumFiles,
+      label: 'Medium',
+      manualFiles: manualMedium,
+      sectionKey: 'medium',
+      variant: 'secondary' as const,
+    },
     { files: lowFiles, label: 'Low', manualFiles: manualLow, sectionKey: 'low', variant: 'outline' as const },
   ];
 
@@ -131,7 +149,8 @@ export const FileDiscoveryResults = ({
   const allSelected = allFileKeys.length > 0 && allFileKeys.every((key) => selectedFiles.includes(key));
   const hasManualFiles = manualFiles.length > 0;
   const canSelectFiles = onSelectFiles && allFileKeys.length > 0;
-  const manualFilesText = hasManualFiles ? ` + ${manualFiles.length} manual file${manualFiles.length !== 1 ? 's' : ''}` : '';
+  const manualFilesText =
+    hasManualFiles ? ` + ${manualFiles.length} manual file${manualFiles.length !== 1 ? 's' : ''}` : '';
 
   return (
     <Card>
@@ -237,14 +256,16 @@ export const FileDiscoveryResults = ({
                         {totalFiles} file{totalFiles !== 1 ? 's' : ''}
                       </Badge>
                       {groupManualFiles.length > 0 && (
-                        <Badge variant={'outline'}>
-                          {groupManualFiles.length} manual
-                        </Badge>
+                        <Badge variant={'outline'}>{groupManualFiles.length} manual</Badge>
                       )}
                     </div>
                     {onSelectFiles && !isCollapsed && (
                       <Button
-                        onClick={() => (groupAllSelected ? handleDeselectGroup(groupFileKeys) : handleSelectGroup(groupFileKeys))}
+                        onClick={() =>
+                          groupAllSelected ?
+                            handleDeselectGroup(groupFileKeys)
+                          : handleSelectGroup(groupFileKeys)
+                        }
                         size={'sm'}
                         variant={'ghost'}
                       >

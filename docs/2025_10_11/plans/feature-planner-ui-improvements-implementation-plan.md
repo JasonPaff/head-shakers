@@ -26,15 +26,18 @@ Transform the feature planner's third step from a basic display into a comprehen
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-header.tsx` - Plan overview section with metadata, duration, complexity, risk level
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-card.tsx` - Individual step card component with expandable details
 - `src/app/(app)/feature-planner/components/plan-display/plan-section.tsx` - Wrapper for plan sections (Overview, Prerequisites, Steps, Quality Gates)
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Container for sortable step list
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/implementation-plan-results.tsx` - Replace entire component to use new plan display architecture, integrate TanStack Query for data fetching
 
 **Changes:**
+
 - Add PlanHeader component rendering plan metadata fields from database
 - Add PlanStepCard component with Radix Collapsible for expandable step details
 - Add PlanSection component for consistent section styling using Tailwind
@@ -42,11 +45,13 @@ Transform the feature planner's third step from a basic display into a comprehen
 - Modify implementation-plan-results.tsx to compose these components and fetch plan data via TanStack Query
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Plan displays with all metadata fields from database schema
 - [ ] Steps render as expandable cards showing What/Why/Confidence/Files/Changes
 - [ ] All validation commands pass
@@ -61,15 +66,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/hooks/use-implementation-plan.ts` - Main hook for fetching complete plan with steps
 - `src/lib/hooks/use-plan-step-mutations.ts` - Mutations for creating, updating, deleting, reordering steps
 - `src/lib/hooks/use-plan-templates.ts` - Hook for fetching and managing step templates
 - `src/lib/hooks/use-plan-export.ts` - Hook for generating markdown exports
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Add useImplementationPlan hook using useQuery with plan ID parameter
 - Add usePlanStepMutations hook with useMutation for create/update/delete/reorder operations
 - Add usePlanTemplates hook for fetching available step templates from database
@@ -78,11 +86,13 @@ npm run lint:fix && npm run typecheck
 - Add optimistic updates for step reordering and inline edits
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All hooks properly typed with Drizzle schema types
 - [ ] Cache invalidation triggers on mutations
 - [ ] Optimistic updates work for reordering operations
@@ -97,9 +107,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add new server actions for step management
 
 **Changes:**
+
 - Add createPlanStepAction using insertPlanStepSchema validation and Drizzle insert
 - Add updatePlanStepAction using updatePlanStepSchema validation and Drizzle update
 - Add deletePlanStepAction with plan ownership verification
@@ -110,11 +122,13 @@ npm run lint:fix && npm run typecheck
 - Add proper error handling and success response types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All actions properly validated with Zod schemas from validations file
 - [ ] Database operations wrapped in transactions
 - [ ] Actions return typed success/error responses
@@ -129,13 +143,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-edit-form.tsx` - Inline edit form component with all step fields
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-view.tsx` - Read-only view of step details
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-card.tsx` - Add edit mode toggle between view and edit states
 
 **Changes:**
+
 - Add PlanStepEditForm component using TanStack React Form with updatePlanStepSchema
 - Add form fields for title, description, confidence, files, changes, validationCommands, successCriteria
 - Add PlanStepView component rendering read-only step details with formatting
@@ -145,11 +162,13 @@ npm run lint:fix && npm run typecheck
 - Add validation error display using form utilities
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Edit mode activates on step card click or edit button
 - [ ] Form validates using Zod schema from validations file
 - [ ] Changes save with optimistic updates via TanStack Query
@@ -165,9 +184,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Integrate sortable component and reordering logic
 
 **Changes:**
+
 - Import and configure Sortable component from `src/components/ui/sortable.tsx`
 - Add drag handle indicators to each step card
 - Implement onReorder callback updating step positions locally
@@ -177,11 +198,13 @@ npm run lint:fix && npm run typecheck
 - Handle reorder failures with rollback to previous order
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Steps reorder smoothly with drag-and-drop
 - [ ] Position changes persist to database via server action
 - [ ] Optimistic updates prevent UI lag
@@ -197,14 +220,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/templates/template-command-palette.tsx` - Command palette for searching and selecting templates
 - `src/app/(app)/feature-planner/components/templates/template-preview.tsx` - Preview panel showing template details before applying
 - `src/app/(app)/feature-planner/components/templates/template-list-item.tsx` - Individual template list item with metadata
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Add button to open template palette between steps
 
 **Changes:**
+
 - Add TemplateCommandPalette using Command component from `src/components/ui/command.tsx`
 - Add search and filter functionality for templates by category and name
 - Add TemplatePreview showing template fields and example usage
@@ -215,11 +241,13 @@ npm run lint:fix && npm run typecheck
 - Configure keyboard shortcuts for opening palette
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Command palette opens with keyboard shortcut and button click
 - [ ] Templates searchable and filterable by category
 - [ ] Preview shows complete template details
@@ -235,14 +263,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-create-form.tsx` - Form for creating new custom steps from scratch
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-delete-dialog.tsx` - Confirmation dialog for step deletion
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Add create step button
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-card.tsx` - Add delete button with confirmation
 
 **Changes:**
+
 - Add PlanStepCreateForm using TanStack React Form with insertPlanStepSchema validation
 - Add all required fields with sensible defaults for new steps
 - Add PlanStepDeleteDialog using Radix Dialog component with destructive styling
@@ -253,11 +284,13 @@ npm run lint:fix && npm run typecheck
 - Handle position recalculation after deletion
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New steps can be added at any position with custom content
 - [ ] Delete confirmation prevents accidental removals
 - [ ] Positions auto-adjust after deletion
@@ -273,13 +306,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-metadata-form.tsx` - Inline form for editing plan-level metadata
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-header.tsx` - Toggle between view and edit modes for metadata
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add updatePlanMetadataAction
 
 **Changes:**
+
 - Add PlanMetadataForm component with fields for estimatedDuration, complexity, riskLevel, quickSummary
 - Add validation using Zod schema for plan metadata fields
 - Modify PlanHeader to toggle between display and edit modes
@@ -289,11 +325,13 @@ npm run lint:fix && npm run typecheck
 - Add textarea for quickSummary with character count
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Metadata fields editable inline with proper validation
 - [ ] Changes save and update plan display immediately
 - [ ] Enum fields use proper select components
@@ -308,13 +346,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/utils/markdown-export.ts` - Utility functions for converting plan data to markdown format
 - `src/app/(app)/feature-planner/components/export/export-dialog.tsx` - Dialog for configuring and triggering export
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-header.tsx` - Add export button
 
 **Changes:**
+
 - Add markdown export utility functions formatting plan sections according to template structure
 - Add proper markdown formatting for lists, code blocks, headings, checkboxes
 - Add ExportDialog component with Radix Dialog for export options
@@ -326,11 +367,13 @@ npm run lint:fix && npm run typecheck
 - Add success notification with file path
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Exported markdown matches implementation plan template structure
 - [ ] Files save to correct `docs/{YYYY_MM_DD}/` location
 - [ ] Markdown properly formatted with all plan sections
@@ -346,13 +389,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/plan-display/prerequisites-section.tsx` - Editable checklist for prerequisites
 - `src/app/(app)/feature-planner/components/plan-display/quality-gates-section.tsx` - Editable checklist for quality gates
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/implementation-plan-results.tsx` - Integrate new sections into plan layout
 
 **Changes:**
+
 - Add PrerequisitesSection component rendering checkbox list from database
 - Add inline add/edit/delete for prerequisite items
 - Add QualityGatesSection component with similar checkbox list structure
@@ -362,11 +408,13 @@ npm run lint:fix && npm run typecheck
 - Add validation ensuring critical items not deleted
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Prerequisites and quality gates render as editable checklists
 - [ ] Items can be added, edited, deleted, and reordered
 - [ ] Changes persist to database arrays
@@ -382,15 +430,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/context/context-panel.tsx` - Collapsible side panel showing refinement and discovery data
 - `src/app/(app)/feature-planner/components/context/refinement-summary.tsx` - Display component for refined feature details
 - `src/app/(app)/feature-planner/components/context/file-list.tsx` - Display component for discovered files
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/implementation-plan-results.tsx` - Add context panel integration
 - `src/app/(app)/feature-planner/components/steps/step-three.tsx` - Pass refinement and discovery data as props
 
 **Changes:**
+
 - Add ContextPanel component using Radix Collapsible or Sheet for side panel
 - Add RefinementSummary displaying refined feature request text
 - Add FileList displaying discovered files with priority tags and descriptions
@@ -400,11 +451,13 @@ npm run lint:fix && npm run typecheck
 - Add visual indicators linking steps to discovered files
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Context panel displays alongside plan with refinement and file data
 - [ ] Users can reference previous step results while editing
 - [ ] File paths easily copied into step configurations
@@ -420,15 +473,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/history/version-history-panel.tsx` - Panel displaying plan version timeline
 - `src/app/(app)/feature-planner/components/history/version-diff-view.tsx` - Component showing differences between versions
 - `src/lib/utils/plan-diff.ts` - Utility for computing plan differences
 
 **Files to Modify:**
+
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add version snapshot logic to update actions
 - `src/app/(app)/feature-planner/components/plan-display/plan-header.tsx` - Add history button
 
 **Changes:**
+
 - Add version snapshot creation on significant plan modifications
 - Add VersionHistoryPanel displaying chronological version list with timestamps
 - Add version comparison logic showing added/modified/deleted steps
@@ -439,11 +495,13 @@ npm run lint:fix && npm run typecheck
 - Modify PlanHeader to add history button opening panel
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Versions automatically captured on significant changes
 - [ ] Version history displays with timestamps and change summaries
 - [ ] Diff view clearly shows modifications between versions
@@ -459,14 +517,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/search/plan-search-command.tsx` - Command palette for searching steps
 - `src/app/(app)/feature-planner/components/search/step-filter-menu.tsx` - Filter menu for confidence, status, file types
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Apply search and filter to displayed steps
 - `src/app/(app)/feature-planner/components/plan-display/plan-header.tsx` - Add search button
 
 **Changes:**
+
 - Add PlanSearchCommand using Command component for fuzzy searching step titles and descriptions
 - Add search highlighting in matching steps
 - Add StepFilterMenu with Radix Popover for filtering by confidence level
@@ -477,11 +538,13 @@ npm run lint:fix && npm run typecheck
 - Add empty states when no steps match filters
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Search finds steps by title, description, file paths
 - [ ] Filter menu allows filtering by confidence level
 - [ ] Active filters display as badges
@@ -497,12 +560,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/api/feature-planner/plans/[planId]/steps/route.ts` - GET list steps, POST create step endpoints
 - `src/app/api/feature-planner/plans/[planId]/steps/[stepId]/route.ts` - PATCH update step, DELETE remove step endpoints
 - `src/app/api/feature-planner/plans/[planId]/reorder/route.ts` - POST batch reorder endpoint
 - `src/app/api/feature-planner/plans/[planId]/export/route.ts` - GET markdown export endpoint
 
 **Changes:**
+
 - Add GET endpoint returning all steps for a plan with proper pagination
 - Add POST endpoint creating new steps with Zod validation
 - Add PATCH endpoint updating individual steps
@@ -513,11 +578,13 @@ npm run lint:fix && npm run typecheck
 - Add rate limiting middleware
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All endpoints properly authenticated with Clerk
 - [ ] Request/response bodies validated with Zod
 - [ ] Endpoints return consistent error formats
@@ -533,15 +600,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/batch/batch-action-toolbar.tsx` - Toolbar for batch operations when steps selected
 - `src/app/(app)/feature-planner/components/batch/step-selection-checkbox.tsx` - Checkbox for multi-select
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-card.tsx` - Add selection checkbox and duplicate button
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Track selected steps state
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add batch operations actions
 
 **Changes:**
+
 - Add step selection state management in PlanStepList
 - Add StepSelectionCheckbox component for multi-select UI
 - Add BatchActionToolbar appearing when steps selected
@@ -553,11 +623,13 @@ npm run lint:fix && npm run typecheck
 - Add confirmation dialogs for destructive batch operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Steps can be selected individually or in bulk
 - [ ] Batch operations work on all selected steps atomically
 - [ ] Duplicate creates exact copy at next position
@@ -573,15 +645,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/loading/plan-skeleton.tsx` - Skeleton loader for plan display
 - `src/app/(app)/feature-planner/components/loading/step-card-skeleton.tsx` - Skeleton for individual step cards
 - `src/app/(app)/feature-planner/components/error/plan-error-boundary.tsx` - Error boundary for plan display
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/implementation-plan-results.tsx` - Add loading and error states
 - `src/app/(app)/feature-planner/components/plan-display/plan-step-list.tsx` - Add loading states during mutations
 
 **Changes:**
+
 - Add PlanSkeleton component matching plan layout structure
 - Add StepCardSkeleton with animated shimmer effect using Tailwind
 - Add PlanErrorBoundary with retry and fallback UI
@@ -593,11 +668,13 @@ npm run lint:fix && npm run typecheck
 - Add suspense boundaries around data-fetching components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton loaders display during data fetching
 - [ ] Error boundaries catch and display errors gracefully
 - [ ] Loading states prevent multiple submissions
@@ -613,11 +690,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/implementation-plan-results.tsx` - Final integration of all subcomponents
 - `src/app/(app)/feature-planner/components/steps/step-three.tsx` - Final workflow integration
 - `src/app/(app)/feature-planner/page.tsx` - Ensure proper data flow between steps
 
 **Changes:**
+
 - Verify all components integrated correctly into implementation-plan-results.tsx
 - Add responsive breakpoints for mobile and tablet views
 - Add proper ARIA labels and keyboard navigation throughout
@@ -630,11 +709,13 @@ npm run lint:fix && npm run typecheck
 - Test complete workflow from plan generation through export
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All features work together seamlessly
 - [ ] Mobile experience functional and polished
 - [ ] Accessibility audit passes with no critical issues
@@ -664,29 +745,34 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Critical Assumptions:**
+
 - Database schema in `src/lib/db/schema/feature-planner.schema.ts` is complete and migrated
 - Existing query functions in `src/lib/queries/feature-planner/` work correctly
 - Validation schemas in `src/lib/validations/feature-planner.validation.ts` cover all operations
 - Backend plan generation service already returns structured plan steps
 
 **High-Risk Areas:**
+
 - **Step Reordering**: Batch position updates must maintain referential integrity; test thoroughly with edge cases
 - **Version History**: Storing complete plan snapshots could cause storage growth; consider retention policy
 - **Markdown Export**: File system writes from server actions need proper path validation and error handling
 - **Cache Management**: Complex relationships between plans, steps, and templates require careful invalidation strategy
 
 **Performance Considerations:**
+
 - Lazy load version history panel to avoid loading all versions upfront
 - Debounce search input to prevent excessive filtering operations
 - Use virtual scrolling if plans regularly exceed 50+ steps
 - Consider pagination for template list if template count grows large
 
 **Simplified Alternatives if Needed:**
+
 - Version history can be deferred to later phase if complexity too high (Low confidence)
 - Batch operations can start with duplicate-only before adding full batch editing
 - Export can initially support download-only before adding server-side file writes
 
 **Integration Points:**
+
 - Context panel must coordinate with step 1 and step 2 data fetching
 - Export functionality should align with existing documentation conventions in `docs/` folder
 - Template system should seed initial templates covering common operations (ESLint, TypeScript, Prettier, migrations, tests)
