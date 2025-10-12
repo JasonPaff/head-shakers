@@ -131,7 +131,10 @@ export class FeaturePlannerService {
     refinedRequest: string,
     settings: { customModel?: string },
   ): Promise<AgentExecutionResult<FileDiscoveryResult[]>> {
-    const circuitBreaker = circuitBreakers.externalService('claude-agent-file-discovery');
+    // Use 3-minute timeout for long-running agent operations
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-file-discovery', {
+      timeoutMs: 180000, // 3 minutes
+    });
     const startTime = Date.now();
 
     try {
@@ -221,7 +224,10 @@ export class FeaturePlannerService {
     discoveredFiles: FileDiscoveryResult[],
     settings: { customModel?: string },
   ): Promise<AgentExecutionResult<ImplementationPlanResult>> {
-    const circuitBreaker = circuitBreakers.externalService('claude-agent-implementation-planning');
+    // Use 3-minute timeout for long-running agent operations
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-implementation-planning', {
+      timeoutMs: 180000, // 3 minutes
+    });
     const startTime = Date.now();
 
     try {
@@ -318,7 +324,10 @@ export class FeaturePlannerService {
       'customModel' | 'includeProjectContext' | 'maxOutputLength' | 'minOutputLength'
     >,
   ): Promise<AgentExecutionResult<string>> {
-    const circuitBreaker = circuitBreakers.externalService('claude-agent-refinement');
+    // Use 3-minute timeout for long-running agent operations
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-refinement', {
+      timeoutMs: 180000, // 3 minutes
+    });
     const startTime = Date.now();
 
     try {
