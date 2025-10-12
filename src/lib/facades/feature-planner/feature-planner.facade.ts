@@ -215,9 +215,10 @@ export class FeaturePlannerFacade {
     settings: { customModel?: string },
     dbInstance?: DatabaseExecutor,
   ): Promise<FileDiscoverySession | null> {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
+    const context = createUserQueryContext(userId, { dbInstance });
+    let session: FileDiscoverySession | null = null;
 
+    try {
       // get the plan
       const plan = await FeaturePlannerQuery.findPlanByIdAsync(planId, context);
       if (!plan || !plan.refinedRequest) {
@@ -236,7 +237,7 @@ export class FeaturePlannerFacade {
       );
 
       // create a file discovery session
-      const session = await FeaturePlannerQuery.createFileDiscoverySessionAsync(
+      session = await FeaturePlannerQuery.createFileDiscoverySessionAsync(
         {
           agentId: `discovery-${Date.now()}`,
           planId,
@@ -274,10 +275,11 @@ export class FeaturePlannerFacade {
       );
 
       // create individual discovered files records
-      if (result.result.length > 0) {
+      if (result.result.length > 0 && session) {
+        const sessionId = session.id; // Type narrowing
         const fileRecords = result.result.map((file) => ({
           description: file.description,
-          discoverySessionId: session.id,
+          discoverySessionId: sessionId,
           fileExists: file.fileExists ?? true,
           filePath: file.filePath,
           integrationPoint: file.integrationPoint,
@@ -293,14 +295,46 @@ export class FeaturePlannerFacade {
 
       return updatedSession;
     } catch (error) {
-      const context: FacadeErrorContext = {
+      // Update session status to failed if it was created
+      if (session) {
+        try {
+          await FeaturePlannerQuery.updateFileDiscoverySessionAsync(
+            session.id,
+            {
+              completedAt: new Date(),
+              errorMessage: error instanceof Error ? error.message : 'Unknown error occurred',
+              status: 'failed',
+            },
+            context,
+          );
+        } catch (updateError) {
+          console.error('Failed to update session status to failed:', updateError);
+        }
+      }
+
+      // Revert plan status back to refining state
+      try {
+        await FeaturePlannerQuery.updatePlanAsync(
+          planId,
+          {
+            currentStep: 1,
+            status: 'refining',
+          },
+          userId,
+          context,
+        );
+      } catch (planUpdateError) {
+        console.error('Failed to revert plan status:', planUpdateError);
+      }
+
+      const errorContext: FacadeErrorContext = {
         data: { planId, settings },
         facade: facadeName,
         method: 'runFileDiscoveryAsync',
         operation: OPERATIONS.FEATURE_PLANNER.RUN_FILE_DISCOVERY,
         userId,
       };
-      throw createFacadeError(context, error);
+      throw createFacadeError(errorContext, error);
     }
   }
 

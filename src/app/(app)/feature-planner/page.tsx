@@ -396,6 +396,7 @@ export default function FeaturePlannerPage() {
           'Content-Type': 'application/json',
         },
         method: 'POST',
+        signal: AbortSignal.timeout(180000), // 3 minute timeout
       });
 
       const data = (await response.json()) as {
@@ -451,6 +452,7 @@ export default function FeaturePlannerPage() {
           'Content-Type': 'application/json',
         },
         method: 'POST',
+        signal: AbortSignal.timeout(180000), // 3 minute timeout
       });
 
       const data = (await response.json()) as {

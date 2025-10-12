@@ -6,6 +6,9 @@ import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-plan
 import { createServiceError } from '@/lib/utils/error-builders';
 import { getUserId } from '@/utils/user-utils';
 
+// Set API route timeout to 3 minutes for long-running agent operations
+export const maxDuration = 180;
+
 /**
  * POST /api/feature-planner/plan
  * Generate implementation plan for a feature
