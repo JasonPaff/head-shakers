@@ -57,12 +57,8 @@ export const PlanStepCard = ({
 
   const [editedTitle, setEditedTitle] = useState(step.title);
   const [editedDescription, setEditedDescription] = useState(step.description);
-  // String values, not booleans (linter false positive)
-   
   const [categoryText, setCategoryText] = useState(step.category || '');
-   
   const [confidenceLevelText, setConfidenceLevelText] = useState(step.confidenceLevel || '');
-   
   const [estimatedDurationText, setEstimatedDurationText] = useState(step.estimatedDuration || '');
 
   const stepCardTestId = testId || generateTestId('ui', 'plan-step-card', 'container');
@@ -81,7 +77,6 @@ export const PlanStepCard = ({
   };
 
   const handleCancelEdit = () => {
-    // Reset to original values
     setEditedTitle(step.title);
     setEditedDescription(step.description);
     setCategoryText(step.category || '');
@@ -90,7 +85,6 @@ export const PlanStepCard = ({
     setIsEditing.off();
   };
 
-  // Determine confidence level color
   const getConfidenceLevelColor = (level: null | string) => {
     switch (level?.toLowerCase()) {
       case 'high':

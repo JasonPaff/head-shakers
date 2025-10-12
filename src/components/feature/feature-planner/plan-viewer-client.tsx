@@ -248,106 +248,102 @@ export const PlanViewerClient = ({ planId }: PlanViewerClientProps) => {
               <p className={'text-sm text-muted-foreground'}>No steps found for this plan.</p>
             </div>
           : <div className={'space-y-3'}>
-              {planSteps.map((step, index) => (
-                <Collapsible key={step.id}>
-                  <Card className={'border'}>
-                    <CollapsibleTrigger className={'w-full'}>
-                      <CardHeader className={'pb-3'}>
-                        <div className={'flex items-start justify-between gap-4'}>
-                          <div className={'flex items-start gap-3'}>
-                            <div
+              {planSteps.map((step, index) => {
+                const hasCommands = Boolean(step.commands && step.commands.length > 0);
+                const hasValidationCommands = Boolean(
+                  step.validationCommands && step.validationCommands.length > 0,
+                );
+
+                return (
+                  <Collapsible key={step.id}>
+                    <Card className={'border'}>
+                      <CollapsibleTrigger className={'w-full'}>
+                        <CardHeader className={'pb-3'}>
+                          <div className={'flex items-start justify-between gap-4'}>
+                            <div className={'flex items-start gap-3'}>
+                              <div
+                                className={
+                                  'flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground'
+                                }
+                              >
+                                {index + 1}
+                              </div>
+                              <div className={'text-left'}>
+                                <CardTitle className={'text-base'}>{step.title}</CardTitle>
+                                {step.confidenceLevel && (
+                                  <p className={'mt-1 text-xs text-muted-foreground'}>
+                                    Confidence: <span className={'capitalize'}>{step.confidenceLevel}</span>
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <ChevronDownIcon
+                              aria-hidden
                               className={
-                                'flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground'
+                                'size-5 shrink-0 text-muted-foreground transition-transform duration-200'
                               }
-                            >
-                              {index + 1}
+                            />
+                          </div>
+                        </CardHeader>
+                      </CollapsibleTrigger>
+
+                      <CollapsibleContent>
+                        <CardContent className={'space-y-3 pt-0'}>
+                          {/* Description */}
+                          {step.description && (
+                            <div>
+                              <h4 className={'mb-1 text-sm font-medium'}>Description</h4>
+                              <p className={'text-sm whitespace-pre-wrap text-muted-foreground'}>
+                                {step.description}
+                              </p>
                             </div>
-                            <div className={'text-left'}>
-                              <CardTitle className={'text-base'}>{step.title}</CardTitle>
-                              {step.confidenceLevel && (
-                                <p className={'mt-1 text-xs text-muted-foreground'}>
-                                  Confidence: <span className={'capitalize'}>{step.confidenceLevel}</span>
-                                </p>
-                              )}
+                          )}
+
+                          {/* Category */}
+                          {step.category && (
+                            <div>
+                              <h4 className={'mb-1 text-sm font-medium'}>Category</h4>
+                              <p className={'text-sm text-muted-foreground capitalize'}>{step.category}</p>
                             </div>
-                          </div>
-                          <ChevronDownIcon
-                            aria-hidden
-                            className={
-                              'size-5 shrink-0 text-muted-foreground transition-transform duration-200'
-                            }
-                          />
-                        </div>
-                      </CardHeader>
-                    </CollapsibleTrigger>
+                          )}
 
-                    <CollapsibleContent>
-                      <CardContent className={'space-y-3 pt-0'}>
-                        {/* Description */}
-                        {step.description && (
-                          <div>
-                            <h4 className={'mb-1 text-sm font-medium'}>Description</h4>
-                            <p className={'text-sm whitespace-pre-wrap text-muted-foreground'}>
-                              {step.description}
-                            </p>
-                          </div>
-                        )}
+                          {/* Estimated Duration */}
+                          {step.estimatedDuration && (
+                            <div>
+                              <h4 className={'mb-1 text-sm font-medium'}>Estimated Duration</h4>
+                              <p className={'text-sm text-muted-foreground'}>{step.estimatedDuration}</p>
+                            </div>
+                          )}
 
-                        {/* Category */}
-                        {step.category && (
-                          <div>
-                            <h4 className={'mb-1 text-sm font-medium'}>Category</h4>
-                            <p className={'text-sm text-muted-foreground capitalize'}>{step.category}</p>
-                          </div>
-                        )}
+                          {/* Commands */}
+                          {hasCommands && (
+                            <div>
+                              <h4 className={'mb-1 text-sm font-medium'}>Commands</h4>
+                              <ul className={'list-inside list-disc space-y-1 text-sm text-muted-foreground'}>
+                                {step.commands?.map((command, cmdIndex) => (
+                                  <li key={cmdIndex}>{command}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
 
-                        {/* Estimated Duration */}
-                        {step.estimatedDuration && (
-                          <div>
-                            <h4 className={'mb-1 text-sm font-medium'}>Estimated Duration</h4>
-                            <p className={'text-sm text-muted-foreground'}>{step.estimatedDuration}</p>
-                          </div>
-                        )}
-
-                        {/* Commands */}
-                        {(() => {
-                          const hasCommands = step.commands && step.commands.length > 0;
-                          return hasCommands ?
-                              <div>
-                                <h4 className={'mb-1 text-sm font-medium'}>Commands</h4>
-                                <ul
-                                  className={'list-inside list-disc space-y-1 text-sm text-muted-foreground'}
-                                >
-                                  {step.commands?.map((command, cmdIndex) => (
-                                    <li key={cmdIndex}>{command}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            : null;
-                        })()}
-
-                        {/* Validation Commands */}
-                        {(() => {
-                          const hasValidationCommands =
-                            step.validationCommands && step.validationCommands.length > 0;
-                          return hasValidationCommands ?
-                              <div>
-                                <h4 className={'mb-1 text-sm font-medium'}>Validation Commands</h4>
-                                <ul
-                                  className={'list-inside list-disc space-y-1 text-sm text-muted-foreground'}
-                                >
-                                  {step.validationCommands?.map((command, cmdIndex) => (
-                                    <li key={cmdIndex}>{command}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            : null;
-                        })()}
-                      </CardContent>
-                    </CollapsibleContent>
-                  </Card>
-                </Collapsible>
-              ))}
+                          {/* Validation Commands */}
+                          {hasValidationCommands && (
+                            <div>
+                              <h4 className={'mb-1 text-sm font-medium'}>Validation Commands</h4>
+                              <ul className={'list-inside list-disc space-y-1 text-sm text-muted-foreground'}>
+                                {step.validationCommands?.map((command, cmdIndex) => (
+                                  <li key={cmdIndex}>{command}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </CardContent>
+                      </CollapsibleContent>
+                    </Card>
+                  </Collapsible>
+                );
+              })}
             </div>
           }
         </CardContent>

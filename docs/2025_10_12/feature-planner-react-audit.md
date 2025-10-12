@@ -14,12 +14,14 @@ This audit examines 14 React component files from the feature-planner route agai
 **Overall Grade: B+ (87%)**
 
 ### Key Strengths
+
 - Excellent use of TypeScript typing throughout
 - Consistent file naming (kebab-case)
 - Proper use of arrow function components
 - Good separation of concerns
 
 ### Areas Requiring Attention
+
 - Boolean naming inconsistencies (35 violations)
 - Missing derived variable prefixes (22 violations)
 - Quote usage violations (scattered)
@@ -38,6 +40,7 @@ This audit examines 14 React component files from the feature-planner route agai
 **Violations Found:**
 
 **`page.tsx` (lines 82, 105, 118, 136, etc.)**
+
 ```tsx
 // ❌ Incorrect
 toast.loading('Refining feature request...', { id: 'single-refine' });
@@ -56,14 +59,18 @@ toast.loading(`Starting ${state.settings.agentCount} parallel refinements...`, {
 ### 2. File Organization ✅
 
 #### File Naming ✅
+
 All files follow kebab-case convention correctly:
+
 - `action-controls.tsx`
 - `workflow-progress.tsx`
 - `refinement-settings.tsx`
 - `file-autocomplete.tsx`
 
 #### Folder Structure ✅
+
 Proper organization with feature-specific components:
+
 ```
 feature-planner/
   components/
@@ -74,7 +81,9 @@ feature-planner/
 ```
 
 #### Exports ✅
+
 All components use named exports correctly:
+
 ```tsx
 export const ActionControls = ({ ... }) => { ... };
 export const WorkflowProgress = ({ ... }) => { ... };
@@ -87,6 +96,7 @@ export const WorkflowProgress = ({ ... }) => { ... };
 ### 3. Component Architecture ⚠️
 
 #### Component Definition ✅
+
 All components use arrow functions with proper TypeScript typing:
 
 ```tsx
@@ -107,6 +117,7 @@ export const ActionControls = ({
 **Mixed Compliance** - Components generally follow the ordering but have some inconsistencies.
 
 **`action-controls.tsx` (lines 41-54) - Good Example:**
+
 ```tsx
 export const ActionControls = ({ ... }) => {
   // ✅ Correct order:
@@ -140,13 +151,14 @@ const shouldShowPlanViewer = ...; // Derived value at end
 ```
 
 **Recommendation:** Refactor `page.tsx` to follow strict ordering:
+
 1. All useState hooks
 2. Other hooks (useQueryState, custom hooks)
 3. useMemo hooks
 4. useEffect hooks
 5. Utility functions
 6. Event handlers
-7. Derived variables (all prefixed with _)
+7. Derived variables (all prefixed with \_)
 
 ---
 
@@ -159,6 +171,7 @@ const shouldShowPlanViewer = ...; // Derived value at end
 **Major Violations:**
 
 **`page.tsx` (line 29):**
+
 ```tsx
 // ❌ Incorrect
 isDiscoveringFiles: boolean;
@@ -166,9 +179,11 @@ isGeneratingPlan: boolean;
 isRefining: boolean;
 isSelectingRefinement: boolean;
 ```
+
 ✅ These are actually correct!
 
 **`page.tsx` (lines 29, 62, 593-598):**
+
 ```tsx
 // ❌ Incorrect - Props and state variables
 canProceed: boolean;  // Should be: isProceedEnabled or isAbleToProcess
@@ -183,6 +198,7 @@ const _isPlanViewerVisible = ...;
 ```
 
 **`action-controls.tsx` (line 29):**
+
 ```tsx
 // ❌ Incorrect
 canProceed: boolean;
@@ -194,6 +210,7 @@ isAbleToProcess: boolean;
 ```
 
 **`refinement-results.tsx` (lines 43-47):**
+
 ```tsx
 // ❌ Incorrect
 const hasCompletedRefinements = completedRefinements.length > 0;
@@ -209,12 +226,14 @@ const isSelectionMade = !!selectedRefinementId;
 ```
 
 **`file-autocomplete.tsx` (line 27):**
+
 ```tsx
 // ❌ Incorrect
 const [isSearching, setIsSearching] = useState(false); // ✅ Correct
 ```
 
 **`file-discovery-results.tsx` (lines 150-152):**
+
 ```tsx
 // ❌ Incorrect
 const hasManualFiles = manualFiles.length > 0;
@@ -226,6 +245,7 @@ const isFilesSelectable = onSelectFiles && allFileKeys.length > 0;
 ```
 
 **`parallel-refinement-results.tsx` (lines 33-37):**
+
 ```tsx
 // ❌ Incorrect - Multiple violations
 const _hasCompletedRefinements = completedRefinements.length > 0;
@@ -239,11 +259,13 @@ const _isAnyResultsPresent = _isRefinementsCompleted || _isRefinementsFailed;
 ```
 
 **`plan-viewer-client.tsx` (line 27):**
+
 ```tsx
 // ❌ Incorrect - eslint disable comment present
 // eslint-disable-next-line react-snob/require-boolean-prefix-is
 const [activeTab, setActiveTab] = useState(refinements[0]?.agentId || '');
 ```
+
 Note: This is actually a string, not a boolean, so the eslint disable is incorrectly applied.
 
 **Impact:** HIGH - Affects code readability and violates project standards
@@ -256,6 +278,7 @@ Note: This is actually a string, not a boolean, so the eslint disable is incorre
 **Violations:**
 
 **`page.tsx` (lines 593-597):**
+
 ```tsx
 // ❌ Incorrect - Missing _ prefix
 const shouldShowRefinementResults =
@@ -273,6 +296,7 @@ const _isPlanViewerVisible =
 ```
 
 **`refinement-results.tsx` (lines 43-47):**
+
 ```tsx
 // ❌ Incorrect - Missing _ prefix for ALL derived values
 const completedRefinements = refinements.filter((r) => r.status === 'completed' && r.refinedRequest);
@@ -285,6 +309,7 @@ const hasAnyResults = hasCompletedRefinements || hasFailedRefinements;
 ```
 
 **`request-input.tsx` (lines 41-43):**
+
 ```tsx
 // ❌ Incorrect - Missing _ prefix
 const canRefine = value.length > 0 && !isRefining;
@@ -298,6 +323,7 @@ const _isValidLength = _characterCount >= 50 && _characterCount <= 500;
 ```
 
 **`file-discovery-results.tsx` (lines 148-153):**
+
 ```tsx
 // ❌ Incorrect - Missing _ prefix
 const allFileKeys = getAllFileKeys();
@@ -313,7 +339,7 @@ const _isFilesSelectable = onSelectFiles && _allFileKeys.length > 0;
 ```
 
 **Impact:** MEDIUM - Reduces code clarity
-**Recommendation:** Add _ prefix to all variables used for conditional rendering
+**Recommendation:** Add \_ prefix to all variables used for conditional rendering
 
 #### Function Naming ✅
 
@@ -335,6 +361,7 @@ interface Props {
 ### 5. TypeScript Integration ✅
 
 #### Type Imports ✅
+
 Proper use of `type` imports:
 
 ```tsx
@@ -344,6 +371,7 @@ import type { WorkflowStep } from '@/app/(app)/feature-planner/components/steps/
 ```
 
 #### Props Interfaces ✅
+
 Consistent use of `ComponentNameProps` pattern:
 
 ```tsx
@@ -401,10 +429,13 @@ Consistent use of `useCallback` and proper event handling:
 
 ```tsx
 // ✅ Correct pattern throughout
-const handleFormSubmit = useCallback((e: FormEvent) => {
-  e.preventDefault();
-  onSubmit(formData);
-}, [formData, onSubmit]);
+const handleFormSubmit = useCallback(
+  (e: FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  },
+  [formData, onSubmit],
+);
 ```
 
 ---
@@ -416,6 +447,7 @@ const handleFormSubmit = useCallback((e: FormEvent) => {
 **Good Examples:**
 
 **`action-controls.tsx` (lines 64-67, 78-81):**
+
 ```tsx
 // ✅ Correct use of Conditional component
 <Conditional fallback={'Previous'} isCondition={_canGoBack}>
@@ -430,6 +462,7 @@ const handleFormSubmit = useCallback((e: FormEvent) => {
 **Violations:**
 
 **`page.tsx` (lines 642, 655):**
+
 ```tsx
 // ❌ Incorrect - Using isCondition instead of condition
 <Conditional isCondition={shouldShowRefinementResults}>
@@ -447,28 +480,26 @@ const handleFormSubmit = useCallback((e: FormEvent) => {
 ```
 
 **`execution-metrics.tsx` (line 102):**
+
 ```tsx
 // ❌ Using && operator instead of Conditional component
-{totalTokens > 0 && (
-  <div className={'space-y-2'}>
-    {/* Token Utilization */}
-  </div>
-)}
+{
+  totalTokens > 0 && <div className={'space-y-2'}>{/* Token Utilization */}</div>;
+}
 
 // ✅ Should be:
 <Conditional condition={totalTokens > 0}>
-  <div className={'space-y-2'}>
-    {/* Token Utilization */}
-  </div>
-</Conditional>
+  <div className={'space-y-2'}>{/* Token Utilization */}</div>
+</Conditional>;
 ```
 
 **`file-discovery-results.tsx` - Multiple inline conditions:**
+
 ```tsx
 // Lines 202, 223, 237, 262, 277, etc.
-{canSelectFiles && (
-  <div>...</div>
-)}
+{
+  canSelectFiles && <div>...</div>;
+}
 
 // Should use Conditional component for consistency
 ```
@@ -496,6 +527,7 @@ const _shouldShowHelpText = !canProceed && currentStep === 1;
 **Good Examples:**
 
 **`page.tsx` (lines 614-657):**
+
 ```tsx
 return (
   <PageContent>
@@ -522,6 +554,7 @@ return (
 ```
 
 **Missing in Many Components:**
+
 - `workflow-progress.tsx` - No block comments
 - `refinement-settings.tsx` - No block comments
 - `execution-metrics.tsx` - No block comments
@@ -589,20 +622,20 @@ className={cn('rounded-md', _hasNoResults && 'min-h-80 border-none')}
 
 ## Component-by-Component Scores
 
-| Component | Score | Critical Issues | Medium Issues | Low Issues |
-|-----------|-------|----------------|---------------|------------|
-| page.tsx | C+ (75%) | 12 boolean naming, 5 derived prefix | Organization, large state | Quote usage |
-| action-controls.tsx | A- (90%) | 1 boolean naming | - | - |
-| workflow-progress.tsx | A (95%) | - | Missing UI comments | - |
-| refinement-settings.tsx | A (95%) | - | Missing UI comments | - |
-| execution-metrics.tsx | B+ (88%) | - | Inline conditions, comments | - |
-| file-autocomplete.tsx | A- (92%) | - | Some missing comments | - |
-| parallel-refinement-results.tsx | B (85%) | 4 boolean naming | eslint disable | - |
-| request-input.tsx | B+ (87%) | 3 derived prefixes | - | - |
-| refinement-results.tsx | B (83%) | 5 boolean naming | Multiple issues | - |
-| file-discovery-results.tsx | B- (80%) | 6 boolean naming, 4 derived | Inline conditions | - |
-| plan-viewer-client.tsx | A- (90%) | - | - | - |
-| plan-viewer.tsx | A (95%) | - | - | - |
+| Component                       | Score    | Critical Issues                     | Medium Issues               | Low Issues  |
+| ------------------------------- | -------- | ----------------------------------- | --------------------------- | ----------- |
+| page.tsx                        | C+ (75%) | 12 boolean naming, 5 derived prefix | Organization, large state   | Quote usage |
+| action-controls.tsx             | A- (90%) | 1 boolean naming                    | -                           | -           |
+| workflow-progress.tsx           | A (95%)  | -                                   | Missing UI comments         | -           |
+| refinement-settings.tsx         | A (95%)  | -                                   | Missing UI comments         | -           |
+| execution-metrics.tsx           | B+ (88%) | -                                   | Inline conditions, comments | -           |
+| file-autocomplete.tsx           | A- (92%) | -                                   | Some missing comments       | -           |
+| parallel-refinement-results.tsx | B (85%)  | 4 boolean naming                    | eslint disable              | -           |
+| request-input.tsx               | B+ (87%) | 3 derived prefixes                  | -                           | -           |
+| refinement-results.tsx          | B (83%)  | 5 boolean naming                    | Multiple issues             | -           |
+| file-discovery-results.tsx      | B- (80%) | 6 boolean naming, 4 derived         | Inline conditions           | -           |
+| plan-viewer-client.tsx          | A- (90%) | -                                   | -                           | -           |
+| plan-viewer.tsx                 | A (95%)  | -                                   | -                           | -           |
 
 ---
 
@@ -658,6 +691,7 @@ These issues are relatively straightforward to fix and would significantly impro
 **Recommended Total Refactor Time:** 8-12 hours
 
 **Priority Order:**
+
 1. Boolean naming (highest impact on consistency)
 2. Derived variable prefixes (important for clarity)
 3. Conditional component standardization (pattern consistency)
@@ -686,6 +720,7 @@ These issues are relatively straightforward to fix and would significantly impro
 - [x] Type imports
 
 **Legend:**
+
 - [x] Fully compliant
 - [⚠️] Partially compliant
 - [❌] Non-compliant

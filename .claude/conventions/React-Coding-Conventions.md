@@ -12,12 +12,12 @@ A comprehensive guide for consistent, maintainable React development patterns an
 // ✅ Correct
 import { Component } from 'react';
 const message = 'Hello world';
-<Button className={'btn-primary'} />
+<Button className={'btn-primary'} />;
 
 // ❌ Incorrect
-import { Component } from "react";
-const message = "Hello world";
-<Button className="btn-primary" />
+import { Component } from 'react';
+const message = 'Hello world';
+<Button className='btn-primary' />;
 ```
 
 **Rule**: Single quotes for strings and imports. JSX attributes must use curly braces with single quotes.
@@ -67,12 +67,7 @@ interface ComponentProps {
   onSubmit?: (data: FormData) => void;
 }
 
-export const ComponentName = ({ 
-  title, 
-  isDisabled = false, 
-  onSubmit,
-  ...props 
-}: ComponentProps) => {
+export const ComponentName = ({ title, isDisabled = false, onSubmit, ...props }: ComponentProps) => {
   // component logic
 };
 ```
@@ -190,7 +185,7 @@ export const Component = ({ onSubmit, onInputChange }: ComponentProps) => {
   const handleInputValueChange = (e: ChangeEvent<HTMLInputElement>) => {
     onInputChange(e.target.value);
   };
-  
+
   // ...
 };
 ```
@@ -246,21 +241,30 @@ Extract logic into custom hooks when:
 ```tsx
 export const useToggle = (initialState = false, onChange?: (state: boolean) => void) => {
   const [state, setState] = useState(initialState);
-  
+
   const toggle = useCallback(() => {
-    setState(prev => {
+    setState((prev) => {
       const next = !prev;
       onChange?.(next);
       return next;
     });
   }, [onChange]);
-  
-  const actions = useMemo(() => ({
-    toggle,
-    on: () => { setState(true); onChange?.(true); },
-    off: () => { setState(false); onChange?.(false); }
-  }), [toggle, onChange]);
-  
+
+  const actions = useMemo(
+    () => ({
+      toggle,
+      on: () => {
+        setState(true);
+        onChange?.(true);
+      },
+      off: () => {
+        setState(false);
+        onChange?.(false);
+      },
+    }),
+    [toggle, onChange],
+  );
+
   return [state, actions] as const;
 };
 ```
@@ -275,20 +279,19 @@ export const useToggle = (initialState = false, onChange?: (state: boolean) => v
 export const Form = ({ onSubmit }: FormProps) => {
   const [formData, setFormData] = useState<FormData>({});
 
-  const handleFormSubmit = useCallback((e: FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
-  }, [formData, onSubmit]);
+  const handleFormSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      onSubmit(formData);
+    },
+    [formData, onSubmit],
+  );
 
   const handleInputChange = useCallback((field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
-  return (
-    <form onSubmit={handleFormSubmit}>
-      {/* form fields */}
-    </form>
-  );
+  return <form onSubmit={handleFormSubmit}>{/* form fields */}</form>;
 };
 ```
 
@@ -316,11 +319,15 @@ const _isDataReady = user && data && !isLoading && !error;
 
 <Conditional condition={_isDataReady}>
   <ComplexDashboard />
-</Conditional>
+</Conditional>;
 
 // ✅ Use ternary for simple cases
-{isLoading ? 'Loading...' : 'Ready'}
-{isLoading ? <LoadingSpinner /> : <Content />}
+{
+  isLoading ? 'Loading...' : 'Ready';
+}
+{
+  isLoading ? <LoadingSpinner /> : <Content />;
+}
 ```
 
 ### Complex Conditions
@@ -337,7 +344,7 @@ return (
     <Conditional condition={_isDataReady}>
       <DataDisplay data={data} />
     </Conditional>
-    
+
     <Conditional condition={_shouldShowEmptyState}>
       <EmptyState />
     </Conditional>
@@ -350,7 +357,7 @@ return (
     <Conditional condition={user && data && !isLoading && !error}>
       <DataDisplay data={data} />
     </Conditional>
-    
+
     <Conditional condition={!isLoading && !error && data?.length === 0}>
       <EmptyState />
     </Conditional>
@@ -369,11 +376,11 @@ Use array returns with `as const` for tuple typing:
 ```tsx
 export const useToggle = (initialState = false) => {
   const [state, setState] = useState(initialState);
-  
-  const toggle = useCallback(() => setState(prev => !prev), []);
+
+  const toggle = useCallback(() => setState((prev) => !prev), []);
   const setTrue = useCallback(() => setState(true), []);
   const setFalse = useCallback(() => setState(false), []);
-  
+
   return [state, { toggle, setTrue, setFalse }] as const;
 };
 ```
@@ -405,9 +412,12 @@ const processedData = useMemo(() => {
 }, [rawData]);
 
 // Use useCallback for event handlers passed to dependency arrays
-const handleItemClick = useCallback((id: string) => {
-  onItemSelect(id);
-}, [onItemSelect]);
+const handleItemClick = useCallback(
+  (id: string) => {
+    onItemSelect(id);
+  },
+  [onItemSelect],
+);
 ```
 
 ---
