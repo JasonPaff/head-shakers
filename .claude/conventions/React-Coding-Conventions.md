@@ -29,12 +29,10 @@ const message = "Hello world";
 ### File Naming
 
 - Use **kebab-case** for all files: `user-profile.tsx`
-- Co-locate related files in component folders
 
 ### Folder Structure
 
 ```
-components/
   user-profile/
     user-profile.tsx
     user-profile.stories.tsx
