@@ -60,8 +60,6 @@ export type ComponentTestId =
   | 'follow-button'
   | 'form'
   | 'form-description'
-
-  // Layout Components
   | 'form-error'
   | 'form-field'
   | 'form-label'
@@ -86,13 +84,14 @@ export type ComponentTestId =
   | 'label'
   | 'like-button'
   | 'loading'
-
-  // Feature Components
   | 'main-nav'
   | 'menubar'
   | 'mobile-nav'
   | 'navigation-menu'
   | 'pagination'
+  | 'plan-editor'
+  | 'plan-step-card'
+  | 'plan-viewer'
   | 'popover'
   | 'progress'
   | 'radio-group'
@@ -121,8 +120,6 @@ export type ComponentTestId =
   | 'toast'
   | 'toggle'
   | 'toggle-group'
-
-  // Form Components
   | 'tooltip'
   | 'user-avatar'
   | 'user-nav'

@@ -68,6 +68,7 @@ export const ERROR_MESSAGES = {
   },
   FEATURE_PLAN: {
     CREATE_FAILED: 'Failed to create feature plan',
+    CREATE_STEP_FAILED: 'Failed to create feature plan step',
     DELETE_FAILED: 'Failed to delete feature plan',
     DISCOVERY_FAILED: 'Failed to discover files for feature',
     NOT_FOUND: 'Feature plan not found',
@@ -76,6 +77,7 @@ export const ERROR_MESSAGES = {
     REFINEMENT_TIMEOUT: 'Feature refinement timed out',
     REFINEMENT_TOO_SHORT: 'Refined request is too short',
     SDK_ERROR: 'Claude Code SDK error occurred',
+    STEP_NOT_FOUND: 'Feature plan step not found',
   },
   FEATURE_PLANNER: {
     REFINEMENT_FAILED: 'Failed to refine feature request',

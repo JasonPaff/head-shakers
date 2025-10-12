@@ -18,13 +18,17 @@ import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 import {
   createFeaturePlanSchema,
+  createPlanStepSchema,
   deleteFeaturePlanSchema,
+  deletePlanStepSchema,
   getFeaturePlanSchema,
   listFeaturePlansSchema,
+  reorderPlanStepsSchema,
   runFileDiscoverySchema,
   runPlanGenerationSchema,
   runRefinementSchema,
   selectRefinementSchema,
+  updatePlanStepSchema,
 } from '@/lib/validations/feature-planner.validation';
 
 /**
@@ -488,6 +492,199 @@ export const getPlanGenerationsAction = authActionClient
         input: parsedInput,
         metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.GET_PLAN_GENERATIONS },
         operation: OPERATIONS.FEATURE_PLANNER.GET_PLAN_GENERATIONS,
+        userId,
+      });
+    }
+  });
+
+// ============================================================================
+// PLAN STEP CRUD OPERATIONS
+// ============================================================================
+
+/**
+ * Create a new plan step
+ */
+export const createPlanStepAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.CREATE_PLAN_STEP,
+    isTransactionRequired: false,
+  })
+  .inputSchema(createPlanStepSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const stepData = createPlanStepSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, { stepData });
+
+    try {
+      const step = await FeaturePlannerFacade.createPlanStepAsync(stepData, userId, ctx.db);
+
+      if (!step) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.FEATURE_PLANNER.CREATE_STEP_FAILED,
+          ERROR_MESSAGES.FEATURE_PLAN.CREATE_STEP_FAILED,
+          { ctx, operation: OPERATIONS.FEATURE_PLANNER.CREATE_PLAN_STEP },
+          false,
+          500,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: { stepId: step.id },
+        level: SENTRY_LEVELS.INFO,
+        message: `Created plan step: ${step.id}`,
+      });
+
+      return {
+        data: step,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.CREATE_PLAN_STEP },
+        operation: OPERATIONS.FEATURE_PLANNER.CREATE_PLAN_STEP,
+        userId,
+      });
+    }
+  });
+
+/**
+ * Update a plan step
+ */
+export const updatePlanStepAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.UPDATE_PLAN_STEP,
+    isTransactionRequired: false,
+  })
+  .inputSchema(updatePlanStepSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const { stepId, ...updates } = updatePlanStepSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, { stepId, updates });
+
+    try {
+      const step = await FeaturePlannerFacade.updatePlanStepAsync(stepId, updates, userId, ctx.db);
+
+      if (!step) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.FEATURE_PLANNER.STEP_NOT_FOUND,
+          ERROR_MESSAGES.FEATURE_PLAN.STEP_NOT_FOUND,
+          { operation: OPERATIONS.FEATURE_PLANNER.UPDATE_PLAN_STEP, stepId },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: { stepId },
+        level: SENTRY_LEVELS.INFO,
+        message: `Updated plan step: ${stepId}`,
+      });
+
+      return {
+        data: step,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.UPDATE_PLAN_STEP },
+        operation: OPERATIONS.FEATURE_PLANNER.UPDATE_PLAN_STEP,
+        userId,
+      });
+    }
+  });
+
+/**
+ * Delete a plan step
+ */
+export const deletePlanStepAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.DELETE_PLAN_STEP,
+    isTransactionRequired: false,
+  })
+  .inputSchema(deletePlanStepSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const { stepId } = deletePlanStepSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, { stepId });
+
+    try {
+      const deletedStep = await FeaturePlannerFacade.deletePlanStepAsync(stepId, userId, ctx.db);
+
+      if (!deletedStep) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.FEATURE_PLANNER.STEP_NOT_FOUND,
+          ERROR_MESSAGES.FEATURE_PLAN.STEP_NOT_FOUND,
+          { operation: OPERATIONS.FEATURE_PLANNER.DELETE_PLAN_STEP, stepId },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: { stepId },
+        level: SENTRY_LEVELS.INFO,
+        message: `Deleted plan step: ${stepId}`,
+      });
+
+      return {
+        data: null,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.DELETE_PLAN_STEP },
+        operation: OPERATIONS.FEATURE_PLANNER.DELETE_PLAN_STEP,
+        userId,
+      });
+    }
+  });
+
+/**
+ * Reorder plan steps
+ */
+export const reorderPlanStepsAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.REORDER_PLAN_STEPS,
+    isTransactionRequired: false,
+  })
+  .inputSchema(reorderPlanStepsSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const { updates } = reorderPlanStepsSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, { stepCount: updates.length });
+
+    try {
+      await FeaturePlannerFacade.reorderPlanStepsAsync(updates, userId, ctx.db);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: { stepCount: updates.length },
+        level: SENTRY_LEVELS.INFO,
+        message: `Reordered ${updates.length} plan steps`,
+      });
+
+      return {
+        data: null,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.REORDER_PLAN_STEPS },
+        operation: OPERATIONS.FEATURE_PLANNER.REORDER_PLAN_STEPS,
         userId,
       });
     }

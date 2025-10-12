@@ -6,6 +6,7 @@ import type {
   FeatureRefinement,
   FileDiscoverySession,
   ImplementationPlanGeneration,
+  PlanStep,
   RefinementSettings,
 } from '@/lib/db/schema/feature-planner.schema';
 import type { FindOptions } from '@/lib/queries/base/query-context';
@@ -58,6 +59,41 @@ export class FeaturePlannerFacade {
   }
 
   /**
+   * Create a new plan step
+   */
+  static async createPlanStepAsync(
+    stepData: {
+      category?: null | string;
+      commands?: string[];
+      confidenceLevel?: null | string;
+      description: string;
+      displayOrder: number;
+      estimatedDuration?: null | string;
+      planGenerationId: string;
+      stepNumber: number;
+      title: string;
+      validationCommands?: string[];
+    },
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | PlanStep> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.createPlanStepAsync(stepData, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { stepData },
+        facade: facadeName,
+        method: 'createPlanStepAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.CREATE_PLAN_STEP,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
    * Delete feature plan
    */
   static async deleteFeaturePlanAsync(
@@ -80,6 +116,34 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  /**
+   * Delete a plan step
+   */
+  static async deletePlanStepAsync(
+    stepId: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | PlanStep> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.deletePlanStepAsync(stepId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { stepId },
+        facade: facadeName,
+        method: 'deletePlanStepAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.DELETE_PLAN_STEP,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  // ============================================================================
+  // STEP 1: REFINEMENT
+  // ============================================================================
 
   /**
    * Get feature plan by ID
@@ -129,10 +193,6 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // STEP 1: REFINEMENT
-  // ============================================================================
-
   /**
    * Get plan generations for a plan
    */
@@ -156,6 +216,10 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ============================================================================
+  // STEP 2: FILE DISCOVERY
+  // ============================================================================
 
   /**
    * Get refinements for a plan
@@ -206,8 +270,32 @@ export class FeaturePlannerFacade {
   }
 
   // ============================================================================
-  // STEP 2: FILE DISCOVERY
+  // STEP 3: IMPLEMENTATION PLANNING
   // ============================================================================
+
+  /**
+   * Reorder plan steps
+   */
+  static async reorderPlanStepsAsync(
+    updates: Array<{ displayOrder: number; stepId: string }>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<void> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.batchUpdatePlanStepsAsync(updates, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { updates },
+        facade: facadeName,
+        method: 'reorderPlanStepsAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.REORDER_PLAN_STEPS,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
 
   /**
    * Run file discovery
@@ -354,6 +442,10 @@ export class FeaturePlannerFacade {
     }
   }
 
+  // ============================================================================
+  // PLAN STEP MANAGEMENT
+  // ============================================================================
+
   /**
    * Run parallel feature refinement
    */
@@ -410,10 +502,6 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
-
-  // ============================================================================
-  // STEP 3: IMPLEMENTATION PLANNING
-  // ============================================================================
 
   /**
    * Run implementation plan generation
@@ -574,6 +662,41 @@ export class FeaturePlannerFacade {
         facade: facadeName,
         method: 'selectRefinementAsync',
         operation: OPERATIONS.FEATURE_PLANNER.SELECT_REFINEMENT,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Update a plan step
+   */
+  static async updatePlanStepAsync(
+    stepId: string,
+    updates: {
+      category?: null | string;
+      commands?: string[];
+      confidenceLevel?: null | string;
+      description?: string;
+      displayOrder?: number;
+      estimatedDuration?: null | string;
+      stepNumber?: number;
+      title?: string;
+      validationCommands?: string[];
+    },
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | PlanStep> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.updatePlanStepAsync(stepId, updates, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { stepId, updates },
+        facade: facadeName,
+        method: 'updatePlanStepAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.UPDATE_PLAN_STEP,
         userId,
       };
       throw createFacadeError(context, error);
