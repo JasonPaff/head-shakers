@@ -116,13 +116,72 @@ export interface PlanStep {
 }
 
 /**
+ * Specialized agent configuration for parallel file discovery
+ */
+interface SpecializedAgent {
+  agentId: string;
+  description: string;
+  name: string;
+  searchPaths: string[];
+}
+
+/**
  * Feature Planner Service
  * Handles all Claude Agent SDK operations for feature planning
  */
 export class FeaturePlannerService {
   /**
-   * Execute file discovery agent
+   * Define specialized agents for parallel file discovery
+   */
+  private static readonly SPECIALIZED_AGENTS: SpecializedAgent[] = [
+    {
+      agentId: 'database-schema-agent',
+      description: 'Database schemas, migrations, and ORM models',
+      name: 'Database Schema Agent',
+      searchPaths: ['src/lib/db/schema/', 'src/lib/db/migrations/'],
+    },
+    {
+      agentId: 'server-actions-agent',
+      description: 'Server-side actions and mutations',
+      name: 'Server Actions Agent',
+      searchPaths: ['src/lib/actions/'],
+    },
+    {
+      agentId: 'queries-agent',
+      description: 'Database queries and data fetching logic',
+      name: 'Queries Agent',
+      searchPaths: ['src/lib/queries/'],
+    },
+    {
+      agentId: 'facades-services-agent',
+      description: 'Business logic facades and services',
+      name: 'Facades & Services Agent',
+      searchPaths: ['src/lib/facades/', 'src/lib/services/'],
+    },
+    {
+      agentId: 'react-ui-agent',
+      description: 'React components, pages, and UI elements',
+      name: 'React UI Agent',
+      searchPaths: ['src/components/', 'src/app/'],
+    },
+    {
+      agentId: 'validations-agent',
+      description: 'Zod schemas and validation logic',
+      name: 'Validations Agent',
+      searchPaths: ['src/lib/validations/'],
+    },
+    {
+      agentId: 'utils-constants-agent',
+      description: 'Utility functions, constants, and helpers',
+      name: 'Utils & Constants Agent',
+      searchPaths: ['src/lib/utils/', 'src/lib/constants/', 'src/lib/middleware/'],
+    },
+  ];
+
+  /**
+   * Execute file discovery agent (legacy single-agent version)
    *
+   * @deprecated Use executeParallelFileDiscoveryAgents instead
    * @param refinedRequest - The refined feature request
    * @param settings - Agent settings
    * @returns Discovered files with metadata
@@ -133,7 +192,7 @@ export class FeaturePlannerService {
   ): Promise<AgentExecutionResult<FileDiscoveryResult[]>> {
     // Use 3-minute timeout for long-running agent operations
     const circuitBreaker = circuitBreakers.externalService('claude-agent-file-discovery', {
-      timeoutMs: 180000, // 3 minutes
+      timeoutMs: 620000, // 12 minutes
     });
     const startTime = Date.now();
 
@@ -153,7 +212,7 @@ export class FeaturePlannerService {
             for await (const message of query({
               options: {
                 allowedTools: ['Read', 'Grep', 'Glob'],
-                maxTurns: 1,
+                maxTurns: 15, // Allow multiple turns for tool use + response
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'],
               },
@@ -226,7 +285,7 @@ export class FeaturePlannerService {
   ): Promise<AgentExecutionResult<ImplementationPlanResult>> {
     // Use 3-minute timeout for long-running agent operations
     const circuitBreaker = circuitBreakers.externalService('claude-agent-implementation-planning', {
-      timeoutMs: 180000, // 3 minutes
+      timeoutMs: 620000, // 3 minutes
     });
     const startTime = Date.now();
 
@@ -252,7 +311,7 @@ export class FeaturePlannerService {
             for await (const message of query({
               options: {
                 allowedTools: ['Read', 'Grep', 'Glob'],
-                maxTurns: 1,
+                maxTurns: 15, // Allow multiple turns for tool use + response
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'],
               },
@@ -311,6 +370,70 @@ export class FeaturePlannerService {
   }
 
   /**
+   * Execute parallel file discovery with specialized agents
+   *
+   * @param refinedRequest - The refined feature request
+   * @param settings - Agent settings
+   * @returns Discovered files with metadata from all agents
+   */
+  static async executeParallelFileDiscoveryAgents(
+    refinedRequest: string,
+    settings: { customModel?: string },
+  ): Promise<AgentExecutionResult<FileDiscoveryResult[]>> {
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-parallel-file-discovery', {
+      timeoutMs: 620000, // 12 minutes
+    });
+    const startTime = Date.now();
+
+    try {
+      const result = await circuitBreaker.execute(async () => {
+        // Execute all specialized agents in parallel
+        const agentPromises = this.SPECIALIZED_AGENTS.map((agent) =>
+          this.executeSingleFileDiscoveryAgent(refinedRequest, agent, settings),
+        );
+
+        const agentResults = await Promise.all(agentPromises);
+
+        // Aggregate results from all agents
+        const aggregatedFiles = this.aggregateDiscoveredFiles(agentResults);
+
+        // Calculate total token usage
+        const totalTokenUsage = agentResults.reduce(
+          (acc, agentResult) => ({
+            completionTokens: acc.completionTokens + agentResult.tokenUsage.completionTokens,
+            promptTokens: acc.promptTokens + agentResult.tokenUsage.promptTokens,
+            totalTokens: acc.totalTokens + agentResult.tokenUsage.totalTokens,
+          }),
+          { completionTokens: 0, promptTokens: 0, totalTokens: 0 },
+        );
+
+        return {
+          discoveredFiles: aggregatedFiles,
+          tokenUsage: totalTokenUsage,
+        };
+      });
+
+      const executionTimeMs = Date.now() - startTime;
+
+      return {
+        executionTimeMs,
+        result: result.result.discoveredFiles,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
+      };
+    } catch (error) {
+      const context: ServiceErrorContext = {
+        endpoint: 'query',
+        isRetryable: true,
+        method: 'executeParallelFileDiscoveryAgents',
+        operation: 'parallel-file-discovery',
+        service: 'claude-agent-sdk',
+      };
+      throw createServiceError(context, error);
+    }
+  }
+
+  /**
    * Execute feature refinement agent
    *
    * @param originalRequest - User's original feature request
@@ -326,7 +449,7 @@ export class FeaturePlannerService {
   ): Promise<AgentExecutionResult<string>> {
     // Use 3-minute timeout for long-running agent operations
     const circuitBreaker = circuitBreakers.externalService('claude-agent-refinement', {
-      timeoutMs: 180000, // 3 minutes
+      timeoutMs: 620000, // 12 minutes
     });
     const startTime = Date.now();
 
@@ -350,7 +473,7 @@ export class FeaturePlannerService {
             for await (const message of query({
               options: {
                 allowedTools: settings.includeProjectContext ? ['Read', 'Grep', 'Glob'] : [],
-                maxTurns: 1,
+                maxTurns: 10, // Allow multiple turns for tool use + response
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'], // Load .claude/agents/
               },
@@ -413,7 +536,46 @@ export class FeaturePlannerService {
   }
 
   /**
-   * Build file discovery prompt
+   * Aggregate and deduplicate files from multiple agents
+   *
+   * @param agentResults - Results from all specialized agents
+   * @returns Deduplicated list of discovered files
+   */
+  private static aggregateDiscoveredFiles(
+    agentResults: Array<{
+      agentId: string;
+      discoveredFiles: FileDiscoveryResult[];
+    }>,
+  ): FileDiscoveryResult[] {
+    const fileMap = new Map<string, FileDiscoveryResult>();
+
+    for (const agentResult of agentResults) {
+      for (const file of agentResult.discoveredFiles) {
+        const normalizedPath = file.filePath.trim().replace(/`\*\*/g, '');
+        const existing = fileMap.get(normalizedPath);
+
+        // Keep the file with the highest relevance score
+        if (!existing || file.relevanceScore > existing.relevanceScore) {
+          fileMap.set(normalizedPath, {
+            ...file,
+            filePath: normalizedPath,
+          });
+        }
+      }
+    }
+
+    // Sort by relevance score (descending) and then by priority
+    const priorityOrder = { critical: 0, high: 1, low: 3, medium: 2 };
+    return Array.from(fileMap.values()).sort((a, b) => {
+      if (b.relevanceScore !== a.relevanceScore) {
+        return b.relevanceScore - a.relevanceScore;
+      }
+      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    });
+  }
+
+  /**
+   * Build file discovery prompt (legacy version)
    */
   private static buildFileDiscoveryPrompt(refinedRequest: string): string {
     return `Find all relevant files for implementing this feature request.
@@ -491,6 +653,147 @@ ${settings.includeProjectContext ? '- Include project context from CLAUDE.md and
 
 OUTPUT:
 Provide only the refined paragraph, nothing else.`;
+  }
+
+  /**
+   * Build specialized agent prompt with enhanced guidance
+   */
+  private static buildSpecializedAgentPrompt(
+    refinedRequest: string,
+    agent: SpecializedAgent,
+  ): string {
+    const searchPathsStr = agent.searchPaths.join(', ');
+
+    return `You are the ${agent.name}. Your job is to find relevant files in: ${searchPathsStr}
+
+FEATURE REQUEST:
+${refinedRequest}
+
+YOUR TASK:
+1. Use Glob to search for files in: ${searchPathsStr}
+2. Use Grep to search file contents for relevant keywords
+3. Use Read to examine specific files if needed
+4. Find at least 3 relevant files (if they exist)
+
+CRITICAL OUTPUT FORMAT:
+- Do NOT start your response with any explanatory text
+- Do NOT say "Here are the files" or similar phrases
+- Your FIRST character must be the backtick that starts the JSON code block
+- Start immediately with: \`\`\`json
+
+EXAMPLE OUTPUT (use this exact format):
+\`\`\`json
+[
+  {
+    "filePath": "src/lib/db/schema/social.schema.ts",
+    "priority": "critical",
+    "role": "Database schema definition",
+    "description": "Contains the social interactions schema including likes and follows. Needs to be extended with a favorites table that supports polymorphic relationships to collections, subcollections, and bobbleheads.",
+    "reasoning": "Core database schema that must be modified to add the favorites feature",
+    "integrationPoint": "New favorites table will reference this schema's user table and need polymorphic type field",
+    "relevanceScore": 95
+  },
+  {
+    "filePath": "src/lib/actions/social/social.actions.ts",
+    "priority": "high",
+    "role": "Server action for social features",
+    "description": "Handles server-side mutations for likes and follows. Will need new server actions for favoriting/unfavoriting items with optimistic updates.",
+    "reasoning": "Needs new functions: addFavorite, removeFavorite, getFavorites with Next-Safe-Action validation",
+    "integrationPoint": "Will integrate with new favorites schema and existing social patterns",
+    "relevanceScore": 85
+  }
+]
+\`\`\`
+
+RULES:
+- priority: "critical" (must modify) | "high" (likely modify) | "medium" (may modify) | "low" (reference only)
+- relevanceScore: 0-100 (90+ critical, 70-89 high, 50-69 medium, 30-49 low)
+- description: 2-3 sentences explaining what the file does and why it matters
+- reasoning: Specific reason for including this file
+- integrationPoint: How it connects to the new feature
+- ONLY include files scoring 30+
+- ONLY search in your assigned paths: ${searchPathsStr}
+
+START YOUR RESPONSE WITH: \`\`\`json`;
+  }
+
+  /**
+   * Execute a single specialized file discovery agent
+   *
+   * @param refinedRequest - The refined feature request
+   * @param agent - The specialized agent configuration
+   * @param settings - Agent settings
+   * @returns Files discovered by this agent
+   */
+  private static async executeSingleFileDiscoveryAgent(
+    refinedRequest: string,
+    agent: SpecializedAgent,
+    settings: { customModel?: string },
+  ): Promise<{
+    agentId: string;
+    discoveredFiles: FileDiscoveryResult[];
+    tokenUsage: { completionTokens: number; promptTokens: number; totalTokens: number };
+  }> {
+    try {
+      let discoveredFiles: FileDiscoveryResult[] = [];
+      let lastResponse = '';
+      const tokenUsage = {
+        completionTokens: 0,
+        promptTokens: 0,
+        totalTokens: 0,
+      };
+
+      const prompt = this.buildSpecializedAgentPrompt(refinedRequest, agent);
+
+      for await (const message of query({
+        options: {
+          allowedTools: ['Read', 'Grep', 'Glob'],
+          maxTurns: 10, // Fewer turns since each agent has a focused scope
+          model: settings.customModel || 'claude-sonnet-4-5-20250929',
+          settingSources: ['project'],
+        },
+        prompt,
+      })) {
+        if (message.type === 'assistant') {
+          const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+          if (parseResult.success) {
+            const validatedMessage = parseResult.data;
+            const content = validatedMessage.content[0];
+            if (content?.type === 'text') {
+              lastResponse = content.text;
+              discoveredFiles = this.parseFileDiscoveryResponse(content.text);
+            }
+
+            if (validatedMessage.usage) {
+              tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (validatedMessage.usage.input_tokens ?? 0) + (validatedMessage.usage.output_tokens ?? 0);
+            }
+          }
+        }
+      }
+
+      // Log for debugging
+      console.log(`[${agent.agentId}] Found ${discoveredFiles.length} files`);
+      if (discoveredFiles.length === 0 && lastResponse) {
+        console.log(`[${agent.agentId}] Response preview:`, lastResponse.substring(0, 500));
+      }
+
+      return {
+        agentId: agent.agentId,
+        discoveredFiles,
+        tokenUsage,
+      };
+    } catch (error) {
+      console.error(`Error in ${agent.name}:`, error);
+      // Return empty results instead of failing the entire operation
+      return {
+        agentId: agent.agentId,
+        discoveredFiles: [],
+        tokenUsage: { completionTokens: 0, promptTokens: 0, totalTokens: 0 },
+      };
+    }
   }
 
   /**

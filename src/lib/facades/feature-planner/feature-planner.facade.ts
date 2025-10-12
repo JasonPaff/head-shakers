@@ -251,8 +251,11 @@ export class FeaturePlannerFacade {
         throw new Error('Failed to create discovery session');
       }
 
-      // execute file discovery agent
-      const result = await FeaturePlannerService.executeFileDiscoveryAgent(plan.refinedRequest, settings);
+      // execute parallel file discovery agents
+      const result = await FeaturePlannerService.executeParallelFileDiscoveryAgents(
+        plan.refinedRequest,
+        settings,
+      );
 
       // update session with results
       const updatedSession = await FeaturePlannerQuery.updateFileDiscoverySessionAsync(
