@@ -159,10 +159,28 @@ export class FeaturePlannerService {
       searchPaths: ['src/lib/facades/', 'src/lib/services/'],
     },
     {
-      agentId: 'react-ui-agent',
-      description: 'React components, pages, hooks, and API routes',
-      name: 'React UI Agent',
-      searchPaths: ['src/components/', 'src/app/', 'src/hooks/'],
+      agentId: 'ui-components-agent',
+      description: 'React UI components and design system',
+      name: 'UI Components Agent',
+      searchPaths: ['src/components/'],
+    },
+    {
+      agentId: 'pages-agent',
+      description: 'Application pages and route layouts',
+      name: 'Pages Agent',
+      searchPaths: ['src/app/(app)/', 'src/app/(public)/'],
+    },
+    {
+      agentId: 'api-routes-agent',
+      description: 'API endpoints and route handlers',
+      name: 'API Routes Agent',
+      searchPaths: ['src/app/api/'],
+    },
+    {
+      agentId: 'hooks-agent',
+      description: 'Custom React hooks and state management',
+      name: 'Hooks Agent',
+      searchPaths: ['src/hooks/'],
     },
     {
       agentId: 'validations-agent',
