@@ -17,6 +17,11 @@ import { cn } from '@/utils/tailwind-utils';
 interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
   discoverySession?: FileDiscoverySession | null;
   isDiscoveringFiles?: boolean;
+  manualFiles?: Array<{
+    description: string;
+    filePath: string;
+    priority: 'critical' | 'high' | 'low' | 'medium';
+  }>;
   onFileAdded: (file: {
     description: string;
     filePath: string;
@@ -24,6 +29,7 @@ interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
   }) => void;
   onFileDiscovery?: () => void;
   onFileSelection?: (files: Array<string>) => void;
+  onRemoveManualFile?: (filePath: string) => void;
   selectedFiles?: Array<string>;
 }
 
@@ -35,9 +41,11 @@ export const StepTwo = ({
   className,
   discoverySession,
   isDiscoveringFiles = false,
+  manualFiles = [],
   onFileAdded,
   onFileDiscovery,
   onFileSelection,
+  onRemoveManualFile,
   selectedFiles = [],
   testId,
   ...props
@@ -125,6 +133,8 @@ export const StepTwo = ({
       {/* File Discovery Results */}
       {discoveredFiles.length > 0 && (
         <FileDiscoveryResults
+          manualFiles={manualFiles}
+          onRemoveManualFile={onRemoveManualFile}
           onRunDiscovery={() => {}}
           onSelectFiles={onFileSelection}
           selectedFiles={selectedFiles}

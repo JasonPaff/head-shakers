@@ -162,7 +162,7 @@ export class FeaturePlannerService {
       agentId: 'react-ui-agent',
       description: 'React components, pages, hooks, and API routes',
       name: 'React UI Agent',
-      searchPaths: ['src/components/', 'src/app/', 'src/app/api', 'src/hooks/'],
+      searchPaths: ['src/components/', 'src/app/', 'src/hooks/'],
     },
     {
       agentId: 'validations-agent',
@@ -672,6 +672,7 @@ YOUR TASK:
 3. Use Read to VERIFY each file exists before adding it to your results
 4. Mark fileExists: true ONLY if you successfully read the file
 5. Mark fileExists: false for files that don't exist but should be created
+6. Find at least 3 relevant files
 
 FILE VERIFICATION RULES:
 - ALWAYS attempt to Read each file path you discover

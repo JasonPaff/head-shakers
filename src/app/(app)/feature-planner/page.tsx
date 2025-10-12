@@ -26,6 +26,11 @@ export interface FeaturePlannerState {
   isDiscoveringFiles: boolean;
   isRefining: boolean;
   isSelectingRefinement: boolean;
+  manualFiles: Array<{
+    description: string;
+    filePath: string;
+    priority: 'critical' | 'high' | 'low' | 'medium';
+  }>;
   originalRequest: string;
   planId: null | string;
   refinedRequest: null | string;
@@ -46,6 +51,7 @@ export default function FeaturePlannerPage() {
     isDiscoveringFiles: false,
     isRefining: false,
     isSelectingRefinement: false,
+    manualFiles: [],
     originalRequest: '',
     planId: null,
     refinedRequest: null,
@@ -399,7 +405,7 @@ export default function FeaturePlannerPage() {
           'Content-Type': 'application/json',
         },
         method: 'POST',
-        signal: AbortSignal.timeout(620000), // 12 minute timeout
+        signal: AbortSignal.timeout(620000), // 12-minute timeout
       });
 
       const data = (await response.json()) as {
@@ -454,6 +460,26 @@ export default function FeaturePlannerPage() {
       });
     },
     [state.stepData, updateState],
+  );
+
+  const handleFileAdded = useCallback(
+    (file: { description: string; filePath: string; priority: 'critical' | 'high' | 'low' | 'medium' }) => {
+      updateState({
+        manualFiles: [...state.manualFiles, file],
+      });
+      toast.success('File added manually');
+    },
+    [state.manualFiles, updateState],
+  );
+
+  const handleRemoveManualFile = useCallback(
+    (filePath: string) => {
+      updateState({
+        manualFiles: state.manualFiles.filter((f) => f.filePath !== filePath),
+      });
+      toast.success('File removed');
+    },
+    [state.manualFiles, updateState],
   );
 
   const handleImplementationPlanning = useCallback(async () => {
@@ -539,14 +565,17 @@ export default function FeaturePlannerPage() {
           discoverySession={state.discoverySession}
           isDiscoveringFiles={state.isDiscoveringFiles}
           isRefining={state.isRefining}
+          manualFiles={state.manualFiles}
           onChange={(value) => {
             updateState({ originalRequest: value });
           }}
+          onFileAdded={handleFileAdded}
           onFileDiscovery={handleFileDiscovery}
           onFileSelection={handleFileSelection}
           onImplementationPlanning={handleImplementationPlanning}
           onParallelRefineRequest={handleParallelRefineRequest}
           onRefineRequest={handleRefineRequest}
+          onRemoveManualFile={handleRemoveManualFile}
           settings={state.settings}
           stepData={state.stepData}
           value={state.originalRequest}

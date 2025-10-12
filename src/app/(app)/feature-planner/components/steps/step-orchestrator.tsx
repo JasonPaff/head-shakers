@@ -19,12 +19,23 @@ interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> 
   discoverySession: FileDiscoverySession | null;
   isDiscoveringFiles: boolean;
   isRefining: boolean;
+  manualFiles: Array<{
+    description: string;
+    filePath: string;
+    priority: 'critical' | 'high' | 'low' | 'medium';
+  }>;
   onChange: (value: string) => void;
+  onFileAdded: (file: {
+    description: string;
+    filePath: string;
+    priority: 'critical' | 'high' | 'low' | 'medium';
+  }) => void;
   onFileDiscovery: () => void;
   onFileSelection: (selectedFiles: string[]) => void;
   onImplementationPlanning: () => void;
   onParallelRefineRequest: () => void;
   onRefineRequest: () => void;
+  onRemoveManualFile: (filePath: string) => void;
   settings: RefinementSettings;
   stepData: StepData;
   value: string;
@@ -41,12 +52,15 @@ export const StepOrchestrator = ({
   discoverySession,
   isDiscoveringFiles,
   isRefining,
+  manualFiles,
   onChange,
+  onFileAdded,
   onFileDiscovery,
   onFileSelection,
   onImplementationPlanning,
   onParallelRefineRequest,
   onRefineRequest,
+  onRemoveManualFile,
   settings,
   stepData,
   value,
@@ -73,9 +87,11 @@ export const StepOrchestrator = ({
         <StepTwo
           discoverySession={discoverySession}
           isDiscoveringFiles={isDiscoveringFiles}
-          onFileAdded={() => {}}
+          manualFiles={manualFiles}
+          onFileAdded={onFileAdded}
           onFileDiscovery={onFileDiscovery}
           onFileSelection={onFileSelection}
+          onRemoveManualFile={onRemoveManualFile}
           selectedFiles={stepData.step2?.selectedFiles}
         />
       </Conditional>
