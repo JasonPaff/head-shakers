@@ -1,15 +1,18 @@
 'use client';
 
+import type { ElementType } from 'react';
+
 import { Activity, Clock, Coins, Zap } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { Progress } from '@/components/ui/progress';
 
 interface ExecutionMetric {
   completionTokens?: number;
   executionTimeMs?: number;
-  icon: React.ElementType;
+  icon: ElementType;
   label: string;
   promptTokens?: number;
   totalTokens?: number;
@@ -33,7 +36,7 @@ export const ExecutionMetrics = ({
   status = 'unknown',
   totalTokens = 0,
 }: ExecutionMetricsProps) => {
-  const metrics: ExecutionMetric[] = [
+  const metrics: Array<ExecutionMetric> = [
     {
       icon: Clock,
       label: 'Execution Time',
@@ -59,7 +62,7 @@ export const ExecutionMetrics = ({
     },
   ];
 
-  const tokenUtilization = totalTokens > 0 ? ((completionTokens / totalTokens) * 100).toFixed(1) : '0';
+  const _tokenUtilization = totalTokens > 0 ? ((completionTokens / totalTokens) * 100).toFixed(1) : '0';
 
   return (
     <Card>
@@ -87,7 +90,7 @@ export const ExecutionMetrics = ({
             return (
               <div className={'flex items-center gap-3'} key={metric.label}>
                 <div className={'flex size-8 items-center justify-center rounded-lg bg-primary/10'}>
-                  <Icon className={'size-4 text-primary'} />
+                  <Icon aria-hidden className={'size-4 text-primary'} />
                 </div>
                 <div className={'flex-1'}>
                   <p className={'text-xs text-muted-foreground'}>{metric.label}</p>
@@ -99,15 +102,15 @@ export const ExecutionMetrics = ({
         </div>
 
         {/* Token Utilization */}
-        {totalTokens > 0 && (
+        <Conditional isCondition={totalTokens > 0}>
           <div className={'space-y-2'}>
             <div className={'flex items-center justify-between text-xs'}>
               <span className={'text-muted-foreground'}>Token Utilization</span>
-              <span className={'font-medium'}>{tokenUtilization}% output</span>
+              <span className={'font-medium'}>{_tokenUtilization}% output</span>
             </div>
-            <Progress className={'h-2'} value={Number(tokenUtilization)} />
+            <Progress className={'h-2'} value={Number(_tokenUtilization)} />
           </div>
-        )}
+        </Conditional>
       </CardContent>
     </Card>
   );

@@ -25,18 +25,17 @@ export const ParallelRefinementResults = ({
   refinements,
   selectedRefinementId,
 }: ParallelRefinementResultsProps) => {
-  // eslint-disable-next-line react-snob/require-boolean-prefix-is
   const [activeTab, setActiveTab] = useState(refinements[0]?.agentId || '');
   const [editedTexts, setEditedTexts] = useState<Record<string, string>>({});
   const [editingRefinementId, setEditingRefinementId] = useState<null | string>(null);
 
-  const completedRefinements = refinements.filter((r) => r.status === 'completed' && r.refinedRequest);
-  const failedRefinements = refinements.filter((r) => r.status === 'failed');
-  const _hasCompletedRefinements = completedRefinements.length > 0;
-  const _hasFailedRefinements = failedRefinements.length > 0;
-  const _hasAnyResults = _hasCompletedRefinements || _hasFailedRefinements;
+  const _completedRefinements = refinements.filter((r) => r.status === 'completed' && r.refinedRequest);
+  const _failedRefinements = refinements.filter((r) => r.status === 'failed');
+  const _isRefinementsCompleted = _completedRefinements.length > 0;
+  const _isRefinementsFailed = _failedRefinements.length > 0;
+  const _isAnyResultsPresent = _isRefinementsCompleted || _isRefinementsFailed;
 
-  if (!_hasAnyResults) {
+  if (!_isAnyResultsPresent) {
     return (
       <Card>
         <CardHeader>
@@ -47,7 +46,7 @@ export const ParallelRefinementResults = ({
     );
   }
 
-  const _failureMessage = failedRefinements.length > 0 ? ` (${failedRefinements.length} failed)` : '';
+  const _failureMessage = _failedRefinements.length > 0 ? ` (${_failedRefinements.length} failed)` : '';
 
   return (
     <Card>
@@ -57,18 +56,18 @@ export const ParallelRefinementResults = ({
           Parallel Refinement Results
         </CardTitle>
         <CardDescription>
-          {completedRefinements.length} of {refinements.length} refinements completed successfully
+          {_completedRefinements.length} of {refinements.length} refinements completed successfully
           {_failureMessage}
         </CardDescription>
       </CardHeader>
       <CardContent className={'space-y-4'}>
-        {_hasCompletedRefinements && (
+        {_isRefinementsCompleted && (
           <Tabs onValueChange={setActiveTab} value={activeTab}>
             <TabsList
               className={'grid w-full'}
-              style={{ gridTemplateColumns: `repeat(${completedRefinements.length}, 1fr)` }}
+              style={{ gridTemplateColumns: `repeat(${_completedRefinements.length}, 1fr)` }}
             >
-              {completedRefinements.map((refinement) => (
+              {_completedRefinements.map((refinement) => (
                 <TabsTrigger key={refinement.id} value={refinement.agentId}>
                   {refinement.agentId}
                   {selectedRefinementId === refinement.id && (
@@ -78,8 +77,8 @@ export const ParallelRefinementResults = ({
               ))}
             </TabsList>
 
-            {completedRefinements.map((refinement) => {
-              const _hasValidationErrors =
+            {_completedRefinements.map((refinement) => {
+              const _isValidationErrors =
                 refinement.validationErrors && refinement.validationErrors.length > 0;
               const _isSelected = selectedRefinementId === refinement.id;
               const _isEditing = editingRefinementId === refinement.id;
@@ -160,7 +159,7 @@ export const ParallelRefinementResults = ({
                   }
 
                   {/* Validation Errors */}
-                  {_hasValidationErrors && (
+                  {_isValidationErrors && (
                     <div className={'rounded-lg border border-yellow-200 bg-yellow-50 p-3'}>
                       <p className={'text-sm font-medium text-yellow-900'}>Validation Issues:</p>
                       <ul className={'mt-1 list-inside list-disc text-sm text-yellow-800'}>
@@ -216,10 +215,10 @@ export const ParallelRefinementResults = ({
         )}
 
         {/* Failed Refinements */}
-        {_hasFailedRefinements && (
+        {_isRefinementsFailed && (
           <div className={'space-y-2'}>
             <p className={'text-sm font-medium text-destructive'}>Failed Refinements:</p>
-            {failedRefinements.map((refinement) => (
+            {_failedRefinements.map((refinement) => (
               <div className={'rounded-lg border border-red-200 bg-red-50 p-3'} key={refinement.id}>
                 <p className={'text-sm font-medium text-red-900'}>{refinement.agentId}</p>
                 <p className={'text-xs text-red-700'}>{refinement.errorMessage || 'Unknown error'}</p>

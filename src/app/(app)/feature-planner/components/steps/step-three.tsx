@@ -1,12 +1,12 @@
 'use client';
 
-import { FileTextIcon } from 'lucide-react';
-import { type ComponentProps } from 'react';
+import type { ComponentProps } from 'react';
 
-import type { ComponentTestIdProps } from '@/lib/test-ids';
+import { FileTextIcon } from 'lucide-react';
 
 import { ExecutionMetrics } from '@/app/(app)/feature-planner/components/execution-metrics';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -19,32 +19,27 @@ interface GenerationData {
   promptTokens?: number;
   status?: string;
   totalTokens?: number;
-  validationCommands?: string[];
+  validationCommands?: Array<string>;
 }
 
-interface StepThreeProps extends ComponentProps<'div'>, ComponentTestIdProps {
+interface StepThreeProps extends ComponentProps<'div'> {
   generationData?: GenerationData;
   isGeneratingPlan: boolean;
   onImplementationPlanning?: () => void;
   planId: null | string;
 }
 
-/**
- * Step 3: Implementation Planning
- * Generates comprehensive implementation plan with validation commands
- */
 export const StepThree = ({
   className,
   generationData,
   isGeneratingPlan,
   onImplementationPlanning,
   planId,
-  testId,
   ...props
 }: StepThreeProps) => {
-  const stepThreeTestId = testId || generateTestId('feature', 'card');
+  const stepThreeTestId = generateTestId('feature', 'card');
 
-  // If currently generating plan, show loading state
+  // if currently generating plan, show loading state
   if (isGeneratingPlan) {
     return (
       <div className={cn('space-y-6', className)} data-testid={stepThreeTestId} {...props}>
@@ -75,7 +70,7 @@ export const StepThree = ({
     );
   }
 
-  // If plan has been generated, show metrics only (parent will render PlanViewer)
+  // if a plan has been generated, show metrics only (parent will render PlanViewer)
   if (generationData && planId) {
     return (
       <div className={cn('space-y-6', className)} data-testid={stepThreeTestId} {...props}>
@@ -91,7 +86,7 @@ export const StepThree = ({
     );
   }
 
-  // Default state: show button to start plan generation
+  // default state: show a button to start plan generation
   return (
     <div className={cn('space-y-6', className)} data-testid={stepThreeTestId} {...props}>
       <Card>
@@ -109,7 +104,7 @@ export const StepThree = ({
               and discovered files. It will provide step-by-step guidance, code snippets, and validation
               commands to ensure successful feature implementation.
             </p>
-            {onImplementationPlanning && (
+            <Conditional isCondition={!!onImplementationPlanning}>
               <button
                 className={
                   'rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
@@ -119,7 +114,7 @@ export const StepThree = ({
               >
                 Generate Implementation Plan
               </button>
-            )}
+            </Conditional>
           </div>
         </CardContent>
       </Card>

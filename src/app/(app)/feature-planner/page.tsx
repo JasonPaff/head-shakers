@@ -590,10 +590,10 @@ export default function FeaturePlannerPage() {
     }
   }, [state.planId, state.settings.customModel, state.stepData, updateState]);
 
-  const shouldShowRefinementResults =
+  const _isRefinementResultsVisible =
     currentStep === 1 && !!state.allRefinements && state.allRefinements.length > 0;
 
-  const shouldShowPlanViewer =
+  const _isPlanViewerVisible =
     currentStep === 3 && !!state.stepData.step3?.generationId && !!state.planId && !state.isGeneratingPlan;
 
   // Debug logging for plan viewer condition
@@ -602,7 +602,7 @@ export default function FeaturePlannerPage() {
     generationId: state.stepData.step3?.generationId,
     isGeneratingPlan: state.isGeneratingPlan,
     planId: state.planId,
-    shouldShowPlanViewer,
+    shouldShowPlanViewer: _isPlanViewerVisible,
     step3Data: state.stepData.step3,
   });
 
@@ -639,7 +639,7 @@ export default function FeaturePlannerPage() {
         />
 
         {/* Unified Refinement Results */}
-        <Conditional isCondition={shouldShowRefinementResults}>
+        <Conditional isCondition={_isRefinementResultsVisible}>
           <RefinementResults
             isSelectingRefinement={state.isSelectingRefinement}
             onProceedToNextStep={handleProceedWithRefinedRequest}
@@ -652,15 +652,15 @@ export default function FeaturePlannerPage() {
         </Conditional>
 
         {/* Plan Viewer (Step 3) - Client Component */}
-        <Conditional isCondition={shouldShowPlanViewer}>
+        <Conditional isCondition={_isPlanViewerVisible}>
           <PlanViewerClient planId={state.planId!} />
         </Conditional>
       </div>
 
       {/* Action Controls */}
       <ActionControls
-        canProceed={state.originalRequest.length > 0}
         currentStep={currentStep as WorkflowStep}
+        isProceedable={state.originalRequest.length > 0}
         onStepChange={handleStepChange}
       />
     </PageContent>

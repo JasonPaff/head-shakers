@@ -26,15 +26,15 @@ const getStepTitle = (step: WorkflowStep): string => {
 };
 
 interface ActionControlsProps extends ComponentProps<'div'> {
-  canProceed: boolean;
   currentStep: WorkflowStep;
+  isProceedable: boolean;
   onStepChange: (step: WorkflowStep) => void;
 }
 
 export const ActionControls = ({
-  canProceed,
   className,
   currentStep,
+  isProceedable,
   onStepChange,
   ...props
 }: ActionControlsProps) => {
@@ -50,8 +50,8 @@ export const ActionControls = ({
 
   const _actionControlsTestId = generateTestId('feature', 'button');
   const _canGoBack = currentStep > 1;
-  const _canGoForward = currentStep < 3 && canProceed;
-  const _shouldShowHelpText = !canProceed && currentStep === 1;
+  const _canGoForward = currentStep < 3 && isProceedable;
+  const _shouldShowHelpText = !isProceedable && currentStep === 1;
 
   return (
     <div className={cn('mt-8', className)} data-testid={_actionControlsTestId} {...props}>

@@ -8,10 +8,12 @@ import { useDebouncedCallback } from 'use-debounce';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useToggle } from '@/hooks/use-toggle';
 
 interface FileAutocompleteProps {
   onFileAdded: (file: {
@@ -23,23 +25,22 @@ interface FileAutocompleteProps {
 
 export const FileAutocomplete = ({ onFileAdded }: FileAutocompleteProps) => {
   const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<Array<string>>([]);
+  const [isSearching, setIsSearching] = useToggle();
   const [selectedFile, setSelectedFile] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'critical' | 'high' | 'low' | 'medium'>('medium');
 
-  // Debounced search function
   const searchFiles = useDebouncedCallback(async (searchQuery: string) => {
     if (searchQuery.length < 2) {
       setSuggestions([]);
       return;
     }
 
-    setIsSearching(true);
+    setIsSearching.on();
     try {
       const response = await fetch(`/api/feature-planner/files/search?q=${encodeURIComponent(searchQuery)}`);
-      const data = (await response.json()) as { files: string[] };
+      const data = (await response.json()) as { files: Array<string> };
 
       if (response.ok) {
         setSuggestions(data.files || []);
@@ -52,7 +53,7 @@ export const FileAutocomplete = ({ onFileAdded }: FileAutocompleteProps) => {
       toast.error('An error occurred while searching');
       setSuggestions([]);
     } finally {
-      setIsSearching(false);
+      setIsSearching.off();
     }
   }, 300);
 
@@ -122,20 +123,20 @@ export const FileAutocomplete = ({ onFileAdded }: FileAutocompleteProps) => {
               placeholder={'Search for files (e.g., src/components)'}
               value={query}
             />
-            {selectedFile && (
+            <Conditional isCondition={!!selectedFile}>
               <Button
                 className={'absolute top-1/2 right-1 size-7 -translate-y-1/2'}
                 onClick={handleClearSelection}
                 size={'icon'}
                 variant={'ghost'}
               >
-                <X className={'size-4'} />
+                <X aria-hidden className={'size-4'} />
               </Button>
-            )}
+            </Conditional>
           </div>
 
           {/* Suggestions Dropdown */}
-          {suggestions.length > 0 && (
+          <Conditional isCondition={suggestions.length > 0}>
             <div className={'max-h-48 overflow-y-auto rounded-md border bg-popover'}>
               {suggestions.map((file) => (
                 <button
@@ -152,18 +153,20 @@ export const FileAutocomplete = ({ onFileAdded }: FileAutocompleteProps) => {
                 </button>
               ))}
             </div>
-          )}
+          </Conditional>
 
           {/* Loading State */}
-          {isSearching && <p className={'text-xs text-muted-foreground'}>Searching...</p>}
+          <Conditional isCondition={isSearching}>
+            <p className={'text-xs text-muted-foreground'}>Searching...</p>
+          </Conditional>
 
           {/* Selected File Badge */}
-          {selectedFile && (
+          <Conditional isCondition={!!selectedFile}>
             <Badge className={'gap-1'} variant={'secondary'}>
-              <FileCode className={'size-3'} />
+              <FileCode aria-hidden className={'size-3'} />
               {selectedFile}
             </Badge>
-          )}
+          </Conditional>
         </div>
 
         {/* Priority Selection */}
@@ -203,7 +206,7 @@ export const FileAutocomplete = ({ onFileAdded }: FileAutocompleteProps) => {
 
         {/* Add Button */}
         <Button className={'w-full'} disabled={!selectedFile || !description.trim()} onClick={handleAddFile}>
-          <Plus className={'mr-2 size-4'} />
+          <Plus aria-hidden className={'mr-2 size-4'} />
           Add File to Discovery
         </Button>
       </CardContent>

@@ -32,7 +32,7 @@ interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> 
     priority: 'critical' | 'high' | 'low' | 'medium';
   }) => void;
   onFileDiscovery: () => void;
-  onFileSelection: (selectedFiles: string[]) => void;
+  onFileSelection: (selectedFiles: Array<string>) => void;
   onImplementationPlanning: () => void;
   onParallelRefineRequest: () => void;
   onRefineRequest: () => void;
@@ -43,11 +43,6 @@ interface StepOrchestratorProps extends Omit<ComponentProps<'div'>, 'onChange'> 
   value: string;
 }
 
-/**
- * Step Orchestrator
- * Manages the rendering and state of individual workflow steps
- * Provides a clean separation between step logic and main page state
- */
 export const StepOrchestrator = ({
   className,
   currentStep,

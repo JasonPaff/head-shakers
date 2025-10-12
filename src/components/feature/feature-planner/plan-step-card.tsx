@@ -58,11 +58,11 @@ export const PlanStepCard = ({
   const [editedTitle, setEditedTitle] = useState(step.title);
   const [editedDescription, setEditedDescription] = useState(step.description);
   // String values, not booleans (linter false positive)
-  // eslint-disable-next-line react-snob/require-boolean-prefix-is
+   
   const [categoryText, setCategoryText] = useState(step.category || '');
-  // eslint-disable-next-line react-snob/require-boolean-prefix-is
+   
   const [confidenceLevelText, setConfidenceLevelText] = useState(step.confidenceLevel || '');
-  // eslint-disable-next-line react-snob/require-boolean-prefix-is
+   
   const [estimatedDurationText, setEstimatedDurationText] = useState(step.estimatedDuration || '');
 
   const stepCardTestId = testId || generateTestId('ui', 'plan-step-card', 'container');

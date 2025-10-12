@@ -5,16 +5,16 @@ import type { ComponentProps } from 'react';
 import { SearchIcon } from 'lucide-react';
 
 import type { FileDiscoverySession } from '@/lib/db/schema/feature-planner.schema';
-import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { ExecutionMetrics } from '@/app/(app)/feature-planner/components/execution-metrics';
 import { FileAutocomplete } from '@/app/(app)/feature-planner/components/file-autocomplete';
 import { FileDiscoveryResults } from '@/app/(app)/feature-planner/components/file-discovery-results';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
+interface StepTwoProps extends ComponentProps<'div'> {
   discoverySession?: FileDiscoverySession | null;
   isDiscoveringFiles?: boolean;
   manualFiles?: Array<{
@@ -33,10 +33,6 @@ interface StepTwoProps extends ComponentProps<'div'>, ComponentTestIdProps {
   selectedFiles?: Array<string>;
 }
 
-/**
- * Step 2: File Discovery
- * Analyzes codebase to identify relevant files for feature implementation
- */
 export const StepTwo = ({
   className,
   discoverySession,
@@ -47,12 +43,11 @@ export const StepTwo = ({
   onFileSelection,
   onRemoveManualFile,
   selectedFiles = [],
-  testId,
   ...props
 }: StepTwoProps) => {
-  const stepTwoTestId = testId || generateTestId('feature', 'card');
+  const stepTwoTestId = generateTestId('feature', 'card');
 
-  // If currently discovering files, show loading state
+  // if currently discovering files, show a loading state
   if (isDiscoveringFiles) {
     return (
       <div className={cn('space-y-6', className)} data-testid={stepTwoTestId} {...props}>
@@ -83,7 +78,7 @@ export const StepTwo = ({
     );
   }
 
-  // If no discovery session, show start discovery message
+  // if no discovery session, show start discovery message
   if (!discoverySession) {
     return (
       <div className={cn('space-y-6', className)} data-testid={stepTwoTestId} {...props}>
@@ -101,7 +96,7 @@ export const StepTwo = ({
                 This step will automatically analyze your codebase to identify relevant files for implementing
                 the feature request.
               </p>
-              {onFileDiscovery && (
+              <Conditional isCondition={!!onFileDiscovery}>
                 <button
                   className={
                     'rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
@@ -111,7 +106,7 @@ export const StepTwo = ({
                 >
                   Start File Discovery
                 </button>
-              )}
+              </Conditional>
             </div>
           </CardContent>
         </Card>
@@ -119,7 +114,7 @@ export const StepTwo = ({
     );
   }
 
-  const discoveredFiles = discoverySession.discoveredFiles || [];
+  const _hasDiscoveryFiles = (discoverySession.discoveredFiles || []).length > 0;
 
   return (
     <div className={cn('space-y-6', className)} data-testid={stepTwoTestId} {...props}>
@@ -133,7 +128,7 @@ export const StepTwo = ({
       />
 
       {/* File Discovery Results */}
-      {discoveredFiles.length > 0 && (
+      <Conditional isCondition={_hasDiscoveryFiles}>
         <FileDiscoveryResults
           manualFiles={manualFiles}
           onRemoveManualFile={onRemoveManualFile}
@@ -142,7 +137,7 @@ export const StepTwo = ({
           selectedFiles={selectedFiles}
           session={discoverySession}
         />
-      )}
+      </Conditional>
 
       {/* Manual File Addition */}
       <FileAutocomplete onFileAdded={onFileAdded} />

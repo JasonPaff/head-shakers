@@ -19,8 +19,8 @@ interface FileDiscoveryResultsProps {
   }>;
   onRemoveManualFile?: (filePath: string) => void;
   onRunDiscovery: () => void;
-  onSelectFiles?: (fileIds: string[]) => void;
-  selectedFiles?: string[];
+  onSelectFiles?: (fileIds: Array<string>) => void;
+  selectedFiles?: Array<string>;
   session: FileDiscoverySession | null;
 }
 
@@ -145,12 +145,12 @@ export const FileDiscoveryResults = ({
     }
   };
 
-  const allFileKeys = getAllFileKeys();
-  const allSelected = allFileKeys.length > 0 && allFileKeys.every((key) => selectedFiles.includes(key));
-  const hasManualFiles = manualFiles.length > 0;
-  const canSelectFiles = onSelectFiles && allFileKeys.length > 0;
-  const manualFilesText =
-    hasManualFiles ? ` + ${manualFiles.length} manual file${manualFiles.length !== 1 ? 's' : ''}` : '';
+  const _allFileKeys = getAllFileKeys();
+  const _isAllSelected = _allFileKeys.length > 0 && _allFileKeys.every((key) => selectedFiles.includes(key));
+  const _isManualFilesPresent = manualFiles.length > 0;
+  const _isFilesSelectable = onSelectFiles && _allFileKeys.length > 0;
+  const _manualFilesText =
+    _isManualFilesPresent ? ` + ${manualFiles.length} manual file${manualFiles.length !== 1 ? 's' : ''}` : '';
 
   return (
     <Card>
@@ -162,7 +162,7 @@ export const FileDiscoveryResults = ({
         <CardDescription>
           Found {session.totalFilesFound} relevant file{session.totalFilesFound !== 1 ? 's' : ''} in{' '}
           {session.executionTimeMs ? `${Math.round(session.executionTimeMs / 1000)}s` : 'N/A'}
-          {manualFilesText}
+          {_manualFilesText}
         </CardDescription>
       </CardHeader>
       <CardContent className={'space-y-6'}>
@@ -199,14 +199,14 @@ export const FileDiscoveryResults = ({
         </div>
 
         {/* Global Select/Deselect All */}
-        {canSelectFiles && (
+        {_isFilesSelectable && (
           <div className={'flex items-center gap-2'}>
             <Button
-              onClick={allSelected ? handleDeselectAll : handleSelectAll}
+              onClick={_isAllSelected ? handleDeselectAll : handleSelectAll}
               size={'sm'}
               variant={'outline'}
             >
-              {allSelected ? 'Deselect All' : 'Select All'}
+              {_isAllSelected ? 'Deselect All' : 'Select All'}
             </Button>
             {selectedFiles.length > 0 && (
               <div className={'flex items-center gap-2 rounded-lg border bg-primary/5 px-3 py-2'}>

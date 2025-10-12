@@ -32,21 +32,20 @@ export const RefinementResults = ({
   refinements,
   selectedRefinementId,
 }: RefinementResultsProps) => {
-  // eslint-disable-next-line react-snob/require-boolean-prefix-is
   const [activeTab, setActiveTab] = useState(refinements[0]?.agentId || '');
   const [editedTexts, setEditedTexts] = useState<Record<string, string>>({});
   const [editingRefinementId, setEditingRefinementId] = useState<null | string>(null);
   const [isOriginalCollapsed, setIsOriginalCollapsed] = useState(false);
 
-  const completedRefinements = refinements.filter((r) => r.status === 'completed' && r.refinedRequest);
-  const failedRefinements = refinements.filter((r) => r.status === 'failed');
-  const hasCompletedRefinements = completedRefinements.length > 0;
-  const hasFailedRefinements = failedRefinements.length > 0;
-  const hasAnyResults = hasCompletedRefinements || hasFailedRefinements;
-  const isSingleRefinement = completedRefinements.length === 1;
-  const hasSelection = !!selectedRefinementId;
+  const _completedRefinements = refinements.filter((r) => r.status === 'completed' && r.refinedRequest);
+  const _failedRefinements = refinements.filter((r) => r.status === 'failed');
+  const _isRefinementsCompleted = _completedRefinements.length > 0;
+  const _isRefinementsFailed = _failedRefinements.length > 0;
+  const _isAnyResultsPresent = _isRefinementsCompleted || _isRefinementsFailed;
+  const _isSingleRefinement = _completedRefinements.length === 1;
+  const _isSelectionMade = !!selectedRefinementId;
 
-  if (!hasAnyResults) {
+  if (!_isAnyResultsPresent) {
     return (
       <Card>
         <CardHeader>
@@ -57,19 +56,19 @@ export const RefinementResults = ({
     );
   }
 
-  const failureMessage = failedRefinements.length > 0 ? ` (${failedRefinements.length} failed)` : '';
+  const _failureMessage = _failedRefinements.length > 0 ? ` (${_failedRefinements.length} failed)` : '';
 
   return (
     <Card>
       <CardHeader>
         <CardTitle className={'flex items-center gap-2'}>
           <Sparkles className={'size-5'} />
-          {isSingleRefinement ? 'Refinement Complete' : 'Parallel Refinement Results'}
+          {_isSingleRefinement ? 'Refinement Complete' : 'Parallel Refinement Results'}
         </CardTitle>
         <CardDescription>
-          {completedRefinements.length} of {refinements.length} refinement
+          {_completedRefinements.length} of {refinements.length} refinement
           {refinements.length !== 1 ? 's' : ''} completed successfully
-          {failureMessage}
+          {_failureMessage}
         </CardDescription>
       </CardHeader>
       <CardContent className={'space-y-4'}>
@@ -97,16 +96,16 @@ export const RefinementResults = ({
         <Separator />
 
         {/* Refinement Results */}
-        {hasCompletedRefinements &&
-          (isSingleRefinement ?
+        {_isRefinementsCompleted &&
+          (_isSingleRefinement ?
             // Single refinement view (no tabs)
             (() => {
-              const refinement = completedRefinements[0]!;
-              const hasValidationErrors =
+              const refinement = _completedRefinements[0]!;
+              const _isValidationErrors =
                 refinement.validationErrors && refinement.validationErrors.length > 0;
-              const isSelected = selectedRefinementId === refinement.id;
-              const isEditing = editingRefinementId === refinement.id;
-              const currentText = editedTexts[refinement.id] || refinement.refinedRequest || '';
+              const _isSelected = selectedRefinementId === refinement.id;
+              const _isEditing = editingRefinementId === refinement.id;
+              const _currentText = editedTexts[refinement.id] || refinement.refinedRequest || '';
 
               return (
                 <div className={'space-y-4'} key={refinement.id}>
@@ -123,7 +122,7 @@ export const RefinementResults = ({
                     {refinement.totalTokens && (
                       <Badge variant={'outline'}>{refinement.totalTokens.toLocaleString()} tokens</Badge>
                     )}
-                    {isSelected && (
+                    {_isSelected && (
                       <Badge className={'bg-green-500'}>
                         <CheckCircle2 className={'mr-1 size-3'} />
                         Selected
@@ -138,7 +137,7 @@ export const RefinementResults = ({
                   </div>
 
                   {/* Refined Request */}
-                  {isEditing ?
+                  {_isEditing ?
                     <div className={'space-y-2'}>
                       <Textarea
                         className={'min-h-[200px] font-mono text-sm'}
@@ -149,7 +148,7 @@ export const RefinementResults = ({
                           }));
                         }}
                         placeholder={'Enter refined request...'}
-                        value={currentText}
+                        value={_currentText}
                       />
                       <div className={'flex gap-2'}>
                         <Button
@@ -178,12 +177,12 @@ export const RefinementResults = ({
                       </div>
                     </div>
                   : <div className={'rounded-lg border bg-muted/50 p-4'}>
-                      <p className={'text-sm leading-relaxed whitespace-pre-wrap'}>{currentText}</p>
+                      <p className={'text-sm leading-relaxed whitespace-pre-wrap'}>{_currentText}</p>
                     </div>
                   }
 
                   {/* Validation Errors */}
-                  {hasValidationErrors && (
+                  {_isValidationErrors && (
                     <div className={'rounded-lg border border-yellow-200 bg-yellow-50 p-3'}>
                       <p className={'text-sm font-medium text-yellow-900'}>Validation Issues:</p>
                       <ul className={'mt-1 list-inside list-disc text-sm text-yellow-800'}>
@@ -196,7 +195,7 @@ export const RefinementResults = ({
 
                   {/* Action Buttons */}
                   <div className={'flex gap-2'}>
-                    {!isEditing && (
+                    {!_isEditing && (
                       <Button
                         onClick={() => {
                           if (!editedTexts[refinement.id]) {
@@ -214,7 +213,7 @@ export const RefinementResults = ({
                         Edit
                       </Button>
                     )}
-                    {isSelected && !isEditing && (
+                    {_isSelected && !_isEditing && (
                       <Button disabled={isSelectingRefinement} onClick={onProceedToNextStep} size={'sm'}>
                         Proceed to File Discovery →
                       </Button>
@@ -227,9 +226,9 @@ export const RefinementResults = ({
           : <Tabs onValueChange={setActiveTab} value={activeTab}>
               <TabsList
                 className={'grid w-full'}
-                style={{ gridTemplateColumns: `repeat(${completedRefinements.length}, 1fr)` }}
+                style={{ gridTemplateColumns: `repeat(${_completedRefinements.length}, 1fr)` }}
               >
-                {completedRefinements.map((refinement) => (
+                {_completedRefinements.map((refinement) => (
                   <TabsTrigger key={refinement.id} value={refinement.agentId}>
                     {refinement.agentId}
                     {selectedRefinementId === refinement.id && (
@@ -239,12 +238,12 @@ export const RefinementResults = ({
                 ))}
               </TabsList>
 
-              {completedRefinements.map((refinement) => {
-                const hasValidationErrors =
+              {_completedRefinements.map((refinement) => {
+                const _isValidationErrors =
                   refinement.validationErrors && refinement.validationErrors.length > 0;
-                const isSelected = selectedRefinementId === refinement.id;
-                const isEditing = editingRefinementId === refinement.id;
-                const currentText = editedTexts[refinement.id] || refinement.refinedRequest || '';
+                const _isSelected = selectedRefinementId === refinement.id;
+                const _isEditing = editingRefinementId === refinement.id;
+                const _currentText = editedTexts[refinement.id] || refinement.refinedRequest || '';
 
                 return (
                   <TabsContent className={'space-y-4'} key={refinement.id} value={refinement.agentId}>
@@ -261,7 +260,7 @@ export const RefinementResults = ({
                       {refinement.totalTokens && (
                         <Badge variant={'outline'}>{refinement.totalTokens.toLocaleString()} tokens</Badge>
                       )}
-                      {isSelected && (
+                      {_isSelected && (
                         <Badge className={'bg-green-500'}>
                           <CheckCircle2 className={'mr-1 size-3'} />
                           Selected
@@ -276,7 +275,7 @@ export const RefinementResults = ({
                     </div>
 
                     {/* Refined Request */}
-                    {isEditing ?
+                    {_isEditing ?
                       <div className={'space-y-2'}>
                         <Textarea
                           className={'min-h-[200px] font-mono text-sm'}
@@ -287,7 +286,7 @@ export const RefinementResults = ({
                             }));
                           }}
                           placeholder={'Enter refined request...'}
-                          value={currentText}
+                          value={_currentText}
                         />
                         <div className={'flex gap-2'}>
                           <Button
@@ -316,12 +315,12 @@ export const RefinementResults = ({
                         </div>
                       </div>
                     : <div className={'rounded-lg border bg-muted/50 p-4'}>
-                        <p className={'text-sm leading-relaxed whitespace-pre-wrap'}>{currentText}</p>
+                        <p className={'text-sm leading-relaxed whitespace-pre-wrap'}>{_currentText}</p>
                       </div>
                     }
 
                     {/* Validation Errors */}
-                    {hasValidationErrors && (
+                    {_isValidationErrors && (
                       <div className={'rounded-lg border border-yellow-200 bg-yellow-50 p-3'}>
                         <p className={'text-sm font-medium text-yellow-900'}>Validation Issues:</p>
                         <ul className={'mt-1 list-inside list-disc text-sm text-yellow-800'}>
@@ -334,7 +333,7 @@ export const RefinementResults = ({
 
                     {/* Action Buttons */}
                     <div className={'flex gap-2'}>
-                      {!isEditing && (
+                      {!_isEditing && (
                         <Button
                           onClick={() => {
                             if (!editedTexts[refinement.id]) {
@@ -352,27 +351,27 @@ export const RefinementResults = ({
                           Edit
                         </Button>
                       )}
-                      {isSelected ?
+                      {_isSelected ?
                         <Button
-                          disabled={isEditing || isSelectingRefinement}
+                          disabled={_isEditing || isSelectingRefinement}
                           onClick={onProceedToNextStep}
                           size={'sm'}
                         >
                           Proceed to File Discovery →
                         </Button>
                       : <Button
-                          className={cn(isSelected && 'bg-green-600 hover:bg-green-700')}
-                          disabled={isEditing || isSelectingRefinement}
+                          className={cn(_isSelected && 'bg-green-600 hover:bg-green-700')}
+                          disabled={_isEditing || isSelectingRefinement}
                           onClick={() => {
-                            if (currentText) {
-                              onSelectRefinement(refinement.id, currentText);
+                            if (_currentText) {
+                              onSelectRefinement(refinement.id, _currentText);
                             }
                           }}
                           size={'sm'}
                         >
                           {isSelectingRefinement ?
                             'Selecting...'
-                          : isSelected ?
+                          : _isSelected ?
                             <>
                               <CheckCircle2 className={'mr-1 size-4'} />
                               Selected
@@ -387,10 +386,10 @@ export const RefinementResults = ({
             </Tabs>)}
 
         {/* Failed Refinements */}
-        {hasFailedRefinements && (
+        {_isRefinementsFailed && (
           <div className={'space-y-2'}>
             <p className={'text-sm font-medium text-destructive'}>Failed Refinements:</p>
-            {failedRefinements.map((refinement) => (
+            {_failedRefinements.map((refinement) => (
               <div className={'rounded-lg border border-red-200 bg-red-50 p-3'} key={refinement.id}>
                 <p className={'text-sm font-medium text-red-900'}>{refinement.agentId}</p>
                 <p className={'text-xs text-red-700'}>{refinement.errorMessage || 'Unknown error'}</p>
@@ -400,7 +399,7 @@ export const RefinementResults = ({
         )}
 
         {/* Use Original Option */}
-        {(hasSelection || !isSingleRefinement) && (
+        {(_isSelectionMade || !_isSingleRefinement) && (
           <div className={'border-t pt-4'}>
             <Button onClick={onUseOriginal} size={'sm'} variant={'outline'}>
               Use Original Request Instead
