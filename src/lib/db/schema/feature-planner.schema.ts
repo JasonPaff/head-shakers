@@ -5,8 +5,7 @@ import {
   index,
   integer,
   jsonb,
-  pgEnum,
-  pgTable,
+  pgSchema,
   text,
   timestamp,
   uuid,
@@ -18,23 +17,44 @@ import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { users } from '@/lib/db/schema/users.schema';
 
 // ============================================================================
+// SCHEMA
+// ============================================================================
+
+export const featurePlannerSchema = pgSchema('feature_planner');
+
+// ============================================================================
 // ENUMS
 // ============================================================================
 
-export const complexityEnum = pgEnum('complexity', ENUMS.FEATURE_PLAN.COMPLEXITY);
-export const confidenceLevelEnum = pgEnum('confidence_level', ['high', 'medium', 'low']);
-export const estimatedScopeEnum = pgEnum('estimated_scope', ['small', 'medium', 'large']);
-export const executionStepEnum = pgEnum('execution_step', ENUMS.PLAN_EXECUTION.STEP);
-export const fileDiscoveryStatusEnum = pgEnum('file_discovery_status', ENUMS.FILE_DISCOVERY.STATUS);
-export const filePriorityEnum = pgEnum('file_priority', ENUMS.FILE_DISCOVERY.PRIORITY);
-export const implementationPlanStatusEnum = pgEnum(
+export const complexityEnum = featurePlannerSchema.enum('complexity', ENUMS.FEATURE_PLAN.COMPLEXITY);
+export const confidenceLevelEnum = featurePlannerSchema.enum('confidence_level', [
+  'high',
+  'medium',
+  'low',
+]);
+export const estimatedScopeEnum = featurePlannerSchema.enum('estimated_scope', [
+  'small',
+  'medium',
+  'large',
+]);
+export const executionStepEnum = featurePlannerSchema.enum('execution_step', ENUMS.PLAN_EXECUTION.STEP);
+export const fileDiscoveryStatusEnum = featurePlannerSchema.enum(
+  'file_discovery_status',
+  ENUMS.FILE_DISCOVERY.STATUS,
+);
+export const filePriorityEnum = featurePlannerSchema.enum('file_priority', ENUMS.FILE_DISCOVERY.PRIORITY);
+export const implementationPlanStatusEnum = featurePlannerSchema.enum(
   'implementation_plan_status',
   ENUMS.IMPLEMENTATION_PLAN.STATUS,
 );
-export const planStatusEnum = pgEnum('plan_status', ENUMS.FEATURE_PLAN.STATUS);
-export const refinementStatusEnum = pgEnum('refinement_status', ENUMS.REFINEMENT.STATUS);
-export const riskLevelEnum = pgEnum('risk_level', ENUMS.FEATURE_PLAN.RISK_LEVEL);
-export const technicalComplexityEnum = pgEnum('technical_complexity', ['high', 'medium', 'low']);
+export const planStatusEnum = featurePlannerSchema.enum('plan_status', ENUMS.FEATURE_PLAN.STATUS);
+export const refinementStatusEnum = featurePlannerSchema.enum('refinement_status', ENUMS.REFINEMENT.STATUS);
+export const riskLevelEnum = featurePlannerSchema.enum('risk_level', ENUMS.FEATURE_PLAN.RISK_LEVEL);
+export const technicalComplexityEnum = featurePlannerSchema.enum('technical_complexity', [
+  'high',
+  'medium',
+  'low',
+]);
 
 // ============================================================================
 // ZOD SCHEMAS FOR JSONB TYPES
@@ -43,10 +63,12 @@ export const technicalComplexityEnum = pgEnum('technical_complexity', ['high', '
 export const refinementSettingsSchema = z.object({
   agentCount: z.number().int().positive(),
   customModel: z.string().optional(),
+  enableSynthesis: z.boolean().optional(),
   includeProjectContext: z.boolean(),
   maxOutputLength: z.number().int().positive(),
   minOutputLength: z.number().int().positive(),
   parallelExecution: z.boolean().optional(),
+  selectedAgentIds: z.array(z.string()).optional(),
 });
 export type RefinementSettings = z.infer<typeof refinementSettingsSchema>;
 
@@ -78,7 +100,7 @@ export type ExecutionMetadata = z.infer<typeof executionMetadataSchema>;
 // Main table storing feature planning workflows
 // ============================================================================
 
-export const featurePlans = pgTable(
+export const featurePlans = featurePlannerSchema.table(
   'feature_plans',
   {
     completedAt: timestamp('completed_at'),
@@ -149,7 +171,7 @@ export const featurePlans = pgTable(
 // Stores individual refinement attempts (supports parallel refinement)
 // ============================================================================
 
-export const featureRefinements = pgTable(
+export const featureRefinements = featurePlannerSchema.table(
   'feature_refinements',
   {
     agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull(),
@@ -225,7 +247,7 @@ export const featureRefinements = pgTable(
 // Stores file discovery execution details
 // ============================================================================
 
-export const fileDiscoverySessions = pgTable(
+export const fileDiscoverySessions = featurePlannerSchema.table(
   'file_discovery_sessions',
   {
     agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull(),
@@ -290,7 +312,7 @@ export const fileDiscoverySessions = pgTable(
 // Individual files discovered during file discovery
 // ============================================================================
 
-export const discoveredFiles = pgTable(
+export const discoveredFiles = featurePlannerSchema.table(
   'discovered_files',
   {
     addedByUserId: uuid('added_by_user_id').references(() => users.id),
@@ -344,7 +366,7 @@ export const discoveredFiles = pgTable(
 // Stores implementation plan generation attempts
 // ============================================================================
 
-export const implementationPlanGenerations = pgTable(
+export const implementationPlanGenerations = featurePlannerSchema.table(
   'implementation_plan_generations',
   {
     agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull(),
@@ -412,7 +434,7 @@ export const implementationPlanGenerations = pgTable(
 // Structured implementation plan steps (supports editing and reordering)
 // ============================================================================
 
-export const planSteps = pgTable(
+export const planSteps = featurePlannerSchema.table(
   'plan_steps',
   {
     category: varchar('category', { length: SCHEMA_LIMITS.PLAN_STEP.CATEGORY.MAX }),
@@ -453,7 +475,7 @@ export const planSteps = pgTable(
 // Reusable step templates library
 // ============================================================================
 
-export const planStepTemplates = pgTable(
+export const planStepTemplates = featurePlannerSchema.table(
   'plan_step_templates',
   {
     category: varchar('category', { length: SCHEMA_LIMITS.PLAN_STEP_TEMPLATE.CATEGORY.MAX }).notNull(),
@@ -499,7 +521,7 @@ export const planStepTemplates = pgTable(
 // Complete audit trail of all agent executions
 // ============================================================================
 
-export const planExecutionLogs = pgTable(
+export const planExecutionLogs = featurePlannerSchema.table(
   'plan_execution_logs',
   {
     agentLevel: integer('agent_level').default(DEFAULTS.PLAN_EXECUTION.AGENT_LEVEL).notNull(),

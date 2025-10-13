@@ -11,6 +11,7 @@ export default defineConfig({
   },
   strict: true,
   verbose: true,
+  schemaFilter: ['public', 'feature_planner'],
   migrations: {
     prefix: 'timestamp',
     table: '__drizzle_migrations__',
