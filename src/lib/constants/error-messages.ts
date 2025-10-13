@@ -67,6 +67,10 @@ export const ERROR_MESSAGES = {
     TIMEOUT: 'Request timeout',
   },
   FEATURE_PLAN: {
+    AGENT_CREATE_FAILED: 'Failed to create refinement agent',
+    AGENT_DELETE_FAILED: 'Failed to delete refinement agent',
+    AGENT_NOT_FOUND: 'Refinement agent not found',
+    AGENT_UPDATE_FAILED: 'Failed to update refinement agent',
     CREATE_FAILED: 'Failed to create feature plan',
     CREATE_STEP_FAILED: 'Failed to create feature plan step',
     DELETE_FAILED: 'Failed to delete feature plan',

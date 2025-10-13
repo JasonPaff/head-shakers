@@ -112,7 +112,10 @@ export const refinementAgents = featurePlannerSchema.table(
   },
   (table) => [
     // data validation constraints
-    check('refinement_agents_temperature_range', sql`${table.temperature} >= 0.0 AND ${table.temperature} <= 2.0`),
+    check(
+      'refinement_agents_temperature_range',
+      sql`${table.temperature} >= 0.0 AND ${table.temperature} <= 2.0`,
+    ),
     check('refinement_agents_agent_id_not_empty', sql`length(trim(${table.agentId})) > 0`),
     check('refinement_agents_name_not_empty', sql`length(trim(${table.name})) > 0`),
     check('refinement_agents_role_not_empty', sql`length(trim(${table.role})) > 0`),

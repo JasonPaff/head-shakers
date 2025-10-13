@@ -3,10 +3,12 @@ import { join } from 'path';
 
 import type { RefinementAgent } from '@/lib/config/refinement-agents';
 import type {
+  RefinementAgent as DbRefinementAgent,
   FeaturePlan,
   FeatureRefinement,
   FileDiscoverySession,
   ImplementationPlanGeneration,
+  NewRefinementAgent,
   PlanStep,
   RefinementSettings,
 } from '@/lib/db/schema/feature-planner.schema';
@@ -15,7 +17,6 @@ import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { getRefinementAgents, getRefinementAgentsByIds } from '@/lib/config/refinement-agents';
 import { OPERATIONS } from '@/lib/constants';
 import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturePlannerQuery } from '@/lib/queries/feature-planner/feature-planner.query';
@@ -26,7 +27,7 @@ const facadeName = 'FeaturePlannerFacade';
 
 export class FeaturePlannerFacade {
   // ============================================================================
-  // PLAN MANAGEMENT
+  // REFINEMENT AGENT MANAGEMENT
   // ============================================================================
 
   /**
@@ -97,6 +98,30 @@ export class FeaturePlannerFacade {
   }
 
   /**
+   * Create a new refinement agent
+   */
+  static async createRefinementAgentAsync(
+    agentData: NewRefinementAgent,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<DbRefinementAgent | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.createAgentAsync(agentData, context);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentData },
+        facade: facadeName,
+        method: 'createRefinementAgentAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.CREATE_PLAN,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
    * Delete feature plan
    */
   static async deleteFeaturePlanAsync(
@@ -144,9 +169,110 @@ export class FeaturePlannerFacade {
     }
   }
 
+  /**
+   * Delete a refinement agent (soft delete)
+   */
+  static async deleteRefinementAgentAsync(
+    agentId: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<DbRefinementAgent | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.deleteAgentAsync(agentId, userId, context);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentId },
+        facade: facadeName,
+        method: 'deleteRefinementAgentAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.DELETE_PLAN,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
   // ============================================================================
-  // STEP 1: REFINEMENT
+  // PLAN MANAGEMENT
   // ============================================================================
+
+  /**
+   * Get a single refinement agent by agentId
+   */
+  static async getAgentByIdAsync(
+    agentId: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | RefinementAgent> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      const dbAgent = await FeaturePlannerQuery.findAgentByIdAsync(agentId, context);
+
+      return dbAgent ? dbAgentToRefinementAgent(dbAgent) : null;
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentId },
+        facade: facadeName,
+        method: 'getAgentByIdAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.GET_PLAN,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
+   * Get multiple refinement agents by agentIds
+   */
+  static async getAgentsByIdsAsync(
+    agentIds: Array<string>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<RefinementAgent>> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      const dbAgents = await FeaturePlannerQuery.findAgentsByIdsAsync(agentIds, context);
+
+      return dbAgents.map(dbAgentToRefinementAgent);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentIds },
+        facade: facadeName,
+        method: 'getAgentsByIdsAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.LIST_PLANS,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
+   * Get all available refinement agents (default + user's custom agents)
+   */
+  static async getAvailableAgentsAsync(
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<RefinementAgent>> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      const dbAgents = await FeaturePlannerQuery.findAllActiveAgentsAsync(context);
+
+      return dbAgents.map(dbAgentToRefinementAgent);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: {},
+        facade: facadeName,
+        method: 'getAvailableAgentsAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.LIST_PLANS,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
 
   /**
    * Get feature plan by ID
@@ -171,6 +297,10 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ============================================================================
+  // STEP 1: REFINEMENT
+  // ============================================================================
 
   /**
    * Get file discovery sessions for a plan
@@ -220,10 +350,6 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // STEP 2: FILE DISCOVERY
-  // ============================================================================
-
   /**
    * Get refinements for a plan
    */
@@ -247,6 +373,10 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ============================================================================
+  // STEP 2: FILE DISCOVERY
+  // ============================================================================
 
   /**
    * Get user's feature plans
@@ -272,10 +402,6 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // STEP 3: IMPLEMENTATION PLANNING
-  // ============================================================================
-
   /**
    * Reorder plan steps
    */
@@ -299,6 +425,10 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ============================================================================
+  // STEP 3: IMPLEMENTATION PLANNING
+  // ============================================================================
 
   /**
    * Run file discovery
@@ -445,10 +575,6 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // PLAN STEP MANAGEMENT
-  // ============================================================================
-
   /**
    * Run parallel feature refinement
    */
@@ -479,12 +605,12 @@ export class FeaturePlannerFacade {
         context,
       );
 
-      // Get specialized agents for refinement
+      // Get specialized agents for refinement from database
       // Use selectedAgentIds if provided, otherwise fall back to agentCount
       const agents =
         settings.selectedAgentIds && settings.selectedAgentIds.length > 0 ?
-          getRefinementAgentsByIds(settings.selectedAgentIds)
-        : getRefinementAgents(settings.agentCount);
+          await this.getAgentsByIdsAsync(settings.selectedAgentIds, userId, dbInstance)
+        : (await this.getAvailableAgentsAsync(userId, dbInstance)).slice(0, settings.agentCount);
 
       // Run refinements in parallel with specialized agents
       const refinementPromises = agents.map((agent) =>
@@ -611,6 +737,10 @@ export class FeaturePlannerFacade {
     }
   }
 
+  // ============================================================================
+  // PLAN STEP MANAGEMENT
+  // ============================================================================
+
   /**
    * Run parallel feature refinement with streaming support
    */
@@ -644,11 +774,11 @@ export class FeaturePlannerFacade {
         context,
       );
 
-      // Get specialized agents for refinement
+      // Get specialized agents for refinement from database
       const agents =
         settings.selectedAgentIds && settings.selectedAgentIds.length > 0 ?
-          getRefinementAgentsByIds(settings.selectedAgentIds)
-        : getRefinementAgents(settings.agentCount);
+          await this.getAgentsByIdsAsync(settings.selectedAgentIds, userId, dbInstance)
+        : (await this.getAvailableAgentsAsync(userId, dbInstance)).slice(0, settings.agentCount);
 
       // Run refinements in parallel with streaming
       const refinementPromises = agents.map((agent) =>
@@ -980,6 +1110,31 @@ export class FeaturePlannerFacade {
     }
   }
 
+  /**
+   * Update a refinement agent
+   */
+  static async updateRefinementAgentAsync(
+    agentId: string,
+    updates: Partial<NewRefinementAgent>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<DbRefinementAgent | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.updateAgentAsync(agentId, updates, context);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentId, updates },
+        facade: facadeName,
+        method: 'updateRefinementAgentAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.UPDATE_PLAN_STEP,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
   // ============================================================================
   // PRIVATE HELPERS
   // ============================================================================
@@ -1204,4 +1359,19 @@ export class FeaturePlannerFacade {
       return null;
     }
   }
+}
+
+/**
+ * Convert database RefinementAgent to config RefinementAgent interface
+ */
+function dbAgentToRefinementAgent(dbAgent: DbRefinementAgent): RefinementAgent {
+  return {
+    agentId: dbAgent.agentId,
+    focus: dbAgent.focus,
+    name: dbAgent.name,
+    role: dbAgent.role,
+    systemPrompt: dbAgent.systemPrompt,
+    temperature: Number(dbAgent.temperature),
+    tools: dbAgent.tools,
+  };
 }

@@ -279,9 +279,73 @@ export const getExecutionLogsSchema = z.object({
 export type GetExecutionLogsInput = z.infer<typeof getExecutionLogsSchema>;
 
 // ============================================================================
-// RESPONSE TYPES FOR UI
+// REFINEMENT AGENTS
 // ============================================================================
 
+export const refinementAgentInputSchema = z.object({
+  agentId: z
+    .string()
+    .min(1)
+    .max(SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Agent ID cannot be empty or whitespace',
+    }),
+  focus: z.string().min(1),
+  name: z
+    .string()
+    .min(1)
+    .max(SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Agent name cannot be empty or whitespace',
+    }),
+  role: z
+    .string()
+    .min(1)
+    .max(SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Agent role cannot be empty or whitespace',
+    }),
+  systemPrompt: z.string().min(1),
+  temperature: z.number().min(0.0).max(2.0),
+  tools: z.array(z.string()).min(1),
+});
+
+export const updateRefinementAgentSchema = z.object({
+  agentId: z.string().min(1),
+  updates: z.object({
+    focus: z.string().min(1).optional(),
+    name: z
+      .string()
+      .min(1)
+      .max(SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX)
+      .refine((val) => val.trim().length > 0, {
+        message: 'Agent name cannot be empty or whitespace',
+      })
+      .optional(),
+    role: z
+      .string()
+      .min(1)
+      .max(SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX)
+      .refine((val) => val.trim().length > 0, {
+        message: 'Agent role cannot be empty or whitespace',
+      })
+      .optional(),
+    systemPrompt: z.string().min(1).optional(),
+    temperature: z.number().min(0.0).max(2.0).optional(),
+    tools: z.array(z.string()).min(1).optional(),
+  }),
+});
+
+export const deleteRefinementAgentSchema = z.object({
+  agentId: z.string().min(1),
+});
+
+export const getRefinementAgentsSchema = z.object({
+  includeInactive: z.boolean().optional().default(false),
+});
+
+export type DeleteRefinementAgentInput = z.infer<typeof deleteRefinementAgentSchema>;
+export type GetRefinementAgentsInput = z.infer<typeof getRefinementAgentsSchema>;
 export interface ParallelRefinementResponse {
   refinements: Array<{
     agentId: string;
@@ -289,6 +353,11 @@ export interface ParallelRefinementResponse {
     refinedRequest: string;
   }>;
 }
+export type RefinementAgentInput = z.infer<typeof refinementAgentInputSchema>;
+
+// ============================================================================
+// RESPONSE TYPES FOR UI
+// ============================================================================
 
 export interface RefineResponse {
   data?: unknown;
@@ -333,3 +402,5 @@ export interface StepData {
   step2?: Step2Data;
   step3?: Step3Data;
 }
+
+export type UpdateRefinementAgentInput = z.infer<typeof updateRefinementAgentSchema>;

@@ -17,6 +17,7 @@
 **Table**: `feature_planner.refinement_agents`
 
 **Columns**:
+
 - `agent_id` (TEXT, PRIMARY KEY)
 - `name` (TEXT, NOT NULL)
 - `role` (TEXT, NOT NULL)
@@ -31,6 +32,7 @@
 - `updated_at` (TIMESTAMP WITH TIME ZONE, DEFAULT CURRENT_TIMESTAMP)
 
 **Indexes**:
+
 - `idx_refinement_agents_user_id` on user_id
 - `idx_refinement_agents_is_active` on is_active
 - `idx_refinement_agents_is_default` on is_default

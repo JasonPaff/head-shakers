@@ -1,4 +1,4 @@
-import { and, desc, eq } from 'drizzle-orm';
+import { and, desc, eq, inArray, or } from 'drizzle-orm';
 
 import type {
   DiscoveredFile,
@@ -13,8 +13,10 @@ import type {
   NewImplementationPlanGeneration,
   NewPlanExecutionLog,
   NewPlanStep,
+  NewRefinementAgent,
   PlanExecutionLog,
   PlanStep,
+  RefinementAgent,
 } from '@/lib/db/schema/feature-planner.schema';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 
@@ -26,6 +28,7 @@ import {
   implementationPlanGenerations,
   planExecutionLogs,
   planSteps,
+  refinementAgents,
 } from '@/lib/db/schema/feature-planner.schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -86,6 +89,20 @@ export class FeaturePlannerQuery extends BaseQuery {
   }
 
   /**
+   * Create refinement agent
+   */
+  static async createAgentAsync(
+    data: NewRefinementAgent,
+    context: QueryContext,
+  ): Promise<null | RefinementAgent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance.insert(refinementAgents).values(data).returning();
+
+    return result[0] || null;
+  }
+
+  /**
    * Create discovered file
    */
   static async createDiscoveredFileAsync(
@@ -99,6 +116,10 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  // ============================================================================
+  // FEATURE REFINEMENTS
+  // ============================================================================
+
   /**
    * Create execution log
    */
@@ -107,10 +128,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     await dbInstance.insert(planExecutionLogs).values(data);
   }
-
-  // ============================================================================
-  // FEATURE REFINEMENTS
-  // ============================================================================
 
   /**
    * Create file discovery session
@@ -137,6 +154,10 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  // ============================================================================
+  // FILE DISCOVERY SESSIONS
+  // ============================================================================
+
   /**
    * Create implementation plan generation
    */
@@ -150,10 +171,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
-
-  // ============================================================================
-  // FILE DISCOVERY SESSIONS
-  // ============================================================================
 
   /**
    * Create plan step
@@ -180,6 +197,34 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  // ============================================================================
+  // DISCOVERED FILES
+  // ============================================================================
+
+  /**
+   * Delete refinement agent (soft delete - set isActive to false)
+   */
+  static async deleteAgentAsync(
+    agentId: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | RefinementAgent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(refinementAgents)
+      .set({ isActive: false, updatedAt: new Date() })
+      .where(
+        and(
+          eq(refinementAgents.agentId, agentId),
+          context.userId ? eq(refinementAgents.userId, userId) : undefined,
+        ),
+      )
+      .returning();
+
+    return result[0] || null;
+  }
+
   /**
    * Delete feature plan
    */
@@ -198,10 +243,6 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  // ============================================================================
-  // DISCOVERED FILES
-  // ============================================================================
-
   /**
    * Delete plan step
    */
@@ -211,6 +252,82 @@ export class FeaturePlannerQuery extends BaseQuery {
     const result = await dbInstance.delete(planSteps).where(eq(planSteps.id, stepId)).returning();
 
     return result[0] || null;
+  }
+
+  /**
+   * Find refinement agent by agentId
+   */
+  static async findAgentByIdAsync(agentId: string, context: QueryContext): Promise<null | RefinementAgent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select()
+      .from(refinementAgents)
+      .where(
+        this.combineFilters(
+          eq(refinementAgents.agentId, agentId),
+          eq(refinementAgents.isActive, true),
+          context.userId ?
+            // Include default agents OR user's custom agents
+            or(eq(refinementAgents.isDefault, true), eq(refinementAgents.userId, context.userId))
+          : eq(refinementAgents.isDefault, true),
+        ),
+      )
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  // ============================================================================
+  // IMPLEMENTATION PLAN GENERATIONS
+  // ============================================================================
+
+  /**
+   * Find refinement agents by multiple agentIds
+   */
+  static async findAgentsByIdsAsync(
+    agentIds: Array<string>,
+    context: QueryContext,
+  ): Promise<Array<RefinementAgent>> {
+    if (agentIds.length === 0) return [];
+
+    const dbInstance = this.getDbInstance(context);
+
+    return dbInstance
+      .select()
+      .from(refinementAgents)
+      .where(
+        this.combineFilters(
+          inArray(refinementAgents.agentId, agentIds),
+          eq(refinementAgents.isActive, true),
+          context.userId ?
+            // Include default agents OR user's custom agents
+            or(eq(refinementAgents.isDefault, true), eq(refinementAgents.userId, context.userId))
+          : eq(refinementAgents.isDefault, true),
+        ),
+      )
+      .orderBy(desc(refinementAgents.isDefault), refinementAgents.name);
+  }
+
+  /**
+   * Find all active refinement agents
+   */
+  static async findAllActiveAgentsAsync(context: QueryContext): Promise<Array<RefinementAgent>> {
+    const dbInstance = this.getDbInstance(context);
+
+    return dbInstance
+      .select()
+      .from(refinementAgents)
+      .where(
+        this.combineFilters(
+          eq(refinementAgents.isActive, true),
+          context.userId ?
+            // Include default agents OR user's custom agents
+            or(eq(refinementAgents.isDefault, true), eq(refinementAgents.userId, context.userId))
+          : eq(refinementAgents.isDefault, true),
+        ),
+      )
+      .orderBy(desc(refinementAgents.isDefault), refinementAgents.name);
   }
 
   /**
@@ -232,6 +349,10 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
+
+  // ============================================================================
+  // PLAN STEPS
+  // ============================================================================
 
   /**
    * Find feature plans by user
@@ -276,10 +397,6 @@ export class FeaturePlannerQuery extends BaseQuery {
       .where(eq(discoveredFiles.discoverySessionId, sessionId))
       .orderBy(desc(discoveredFiles.priority), desc(discoveredFiles.relevanceScore));
   }
-
-  // ============================================================================
-  // IMPLEMENTATION PLAN GENERATIONS
-  // ============================================================================
 
   /**
    * Get execution logs for a plan
@@ -330,10 +447,6 @@ export class FeaturePlannerQuery extends BaseQuery {
       .orderBy(desc(fileDiscoverySessions.createdAt));
   }
 
-  // ============================================================================
-  // PLAN STEPS
-  // ============================================================================
-
   /**
    * Get plan generations for a plan
    */
@@ -349,6 +462,10 @@ export class FeaturePlannerQuery extends BaseQuery {
       .where(eq(implementationPlanGenerations.planId, planId))
       .orderBy(desc(implementationPlanGenerations.createdAt));
   }
+
+  // ============================================================================
+  // EXECUTION LOGS
+  // ============================================================================
 
   /**
    * Get plan steps for a generation
@@ -381,6 +498,34 @@ export class FeaturePlannerQuery extends BaseQuery {
       .where(eq(featureRefinements.planId, planId))
       .orderBy(desc(featureRefinements.createdAt));
   }
+
+  /**
+   * Update refinement agent
+   */
+  static async updateAgentAsync(
+    agentId: string,
+    updates: Partial<NewRefinementAgent>,
+    context: QueryContext,
+  ): Promise<null | RefinementAgent> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(refinementAgents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(
+        and(
+          eq(refinementAgents.agentId, agentId),
+          context.userId ? eq(refinementAgents.userId, context.userId) : undefined,
+        ),
+      )
+      .returning();
+
+    return result[0] || null;
+  }
+
+  // ============================================================================
+  // REFINEMENT AGENTS
+  // ============================================================================
 
   /**
    * Update discovered file
@@ -439,10 +584,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
-
-  // ============================================================================
-  // EXECUTION LOGS
-  // ============================================================================
 
   /**
    * Update plan generation
