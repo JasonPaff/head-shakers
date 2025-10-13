@@ -130,6 +130,27 @@ export class FeaturePlannerQuery extends BaseQuery {
   }
 
   /**
+   * Create feature suggestion agent
+   * Creates a new agent with agentType set to 'feature-suggestion'
+   */
+  static async createFeatureSuggestionAgent(
+    agent: NewCustomAgent,
+    context: QueryContext,
+  ): Promise<CustomAgent | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    // Ensure agentType is set to 'feature-suggestion'
+    const agentData = {
+      ...agent,
+      agentType: 'feature-suggestion' as const,
+    };
+
+    const result = await dbInstance.insert(customAgents).values(agentData).returning();
+
+    return result[0] || null;
+  }
+
+  /**
    * Create file discovery session
    */
   static async createFileDiscoverySessionAsync(
@@ -143,6 +164,10 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  // ============================================================================
+  // FILE DISCOVERY SESSIONS
+  // ============================================================================
+
   /**
    * Create a new feature plan
    */
@@ -153,10 +178,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
-
-  // ============================================================================
-  // FILE DISCOVERY SESSIONS
-  // ============================================================================
 
   /**
    * Create implementation plan generation
@@ -183,6 +204,10 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  // ============================================================================
+  // DISCOVERED FILES
+  // ============================================================================
+
   /**
    * Create a refinement attempt
    */
@@ -196,10 +221,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
-
-  // ============================================================================
-  // DISCOVERED FILES
-  // ============================================================================
 
   /**
    * Delete refinement agent (soft delete - set isActive to false)
@@ -254,6 +275,10 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
+  // ============================================================================
+  // IMPLEMENTATION PLAN GENERATIONS
+  // ============================================================================
+
   /**
    * Find refinement agent by agentId
    */
@@ -277,10 +302,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
-
-  // ============================================================================
-  // IMPLEMENTATION PLAN GENERATIONS
-  // ============================================================================
 
   /**
    * Find refinement agents by multiple agentIds
@@ -330,6 +351,10 @@ export class FeaturePlannerQuery extends BaseQuery {
       .orderBy(desc(customAgents.isDefault), customAgents.name);
   }
 
+  // ============================================================================
+  // PLAN STEPS
+  // ============================================================================
+
   /**
    * Find feature plan by ID
    */
@@ -349,10 +374,6 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
-
-  // ============================================================================
-  // PLAN STEPS
-  // ============================================================================
 
   /**
    * Find feature plans by user
@@ -432,6 +453,35 @@ export class FeaturePlannerQuery extends BaseQuery {
   }
 
   /**
+   * Get feature suggestion agent by user ID
+   * Returns the active feature-suggestion agent for a specific user
+   */
+  static async getFeatureSuggestionAgentByUserId(
+    userId: string,
+    context: QueryContext,
+  ): Promise<CustomAgent | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select()
+      .from(customAgents)
+      .where(
+        this.combineFilters(
+          eq(customAgents.userId, userId),
+          eq(customAgents.agentType, 'feature-suggestion'),
+          eq(customAgents.isActive, true),
+        ),
+      )
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  // ============================================================================
+  // EXECUTION LOGS
+  // ============================================================================
+
+  /**
    * Get file discovery sessions for a plan
    */
   static async getFileDiscoverySessionsByPlanAsync(
@@ -463,10 +513,6 @@ export class FeaturePlannerQuery extends BaseQuery {
       .orderBy(desc(implementationPlanGenerations.createdAt));
   }
 
-  // ============================================================================
-  // EXECUTION LOGS
-  // ============================================================================
-
   /**
    * Get plan steps for a generation
    */
@@ -482,6 +528,10 @@ export class FeaturePlannerQuery extends BaseQuery {
       .where(eq(planSteps.planGenerationId, generationId))
       .orderBy(planSteps.displayOrder);
   }
+
+  // ============================================================================
+  // REFINEMENT AGENTS
+  // ============================================================================
 
   /**
    * Get refinements for a plan
@@ -523,10 +573,6 @@ export class FeaturePlannerQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  // ============================================================================
-  // REFINEMENT AGENTS
-  // ============================================================================
-
   /**
    * Update discovered file
    */
@@ -541,6 +587,32 @@ export class FeaturePlannerQuery extends BaseQuery {
       .update(discoveredFiles)
       .set(data)
       .where(eq(discoveredFiles.id, fileId))
+      .returning();
+
+    return result[0] || null;
+  }
+
+  /**
+   * Update feature suggestion agent
+   * Updates an existing feature-suggestion agent
+   */
+  static async updateFeatureSuggestionAgent(
+    agentId: string,
+    updates: Partial<NewCustomAgent>,
+    context: QueryContext,
+  ): Promise<CustomAgent | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(customAgents)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(
+        this.combineFilters(
+          eq(customAgents.agentId, agentId),
+          eq(customAgents.agentType, 'feature-suggestion'),
+          context.userId ? eq(customAgents.userId, context.userId) : undefined,
+        ),
+      )
       .returning();
 
     return result[0] || null;
@@ -584,6 +656,10 @@ export class FeaturePlannerQuery extends BaseQuery {
 
     return result[0] || null;
   }
+
+  // ============================================================================
+  // FEATURE SUGGESTION AGENTS
+  // ============================================================================
 
   /**
    * Update plan generation

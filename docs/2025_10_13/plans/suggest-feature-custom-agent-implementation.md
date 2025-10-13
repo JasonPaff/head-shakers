@@ -185,18 +185,16 @@ static async executeFeatureSuggestionAgent(
 
 **Implementation Changes**:
 
-1. **Conditional Prompt Building**:
+1. **Prompt Building**:
 ```typescript
-// If custom agent provided, use custom prompt
-const prompt = agent
-  ? this.buildCustomFeatureSuggestionPrompt(
+// use custom prompt
+const prompt = this.buildCustomFeatureSuggestionPrompt(
       pageOrComponent,
       featureType,
       priorityLevel,
       additionalContext,
       agent
     )
-  : `/suggest-feature ${pageOrComponent} ${featureType} ${priorityLevel}${contextStr}`; // Fallback to slash command
 ```
 
 2. **Agent-Specific Tools**:
@@ -204,7 +202,7 @@ const prompt = agent
 const allowedTools = agent ? agent.tools : ['Read', 'Grep', 'Glob'];
 ```
 
-3. **Agent-Specific Temperature** (Note: Claude SDK may not support this yet, prepare for future):
+3. **Agent-Specific Temperature** 
 ```typescript
 // Note: Temperature support may need to be added to SDK
 const options = {
@@ -212,7 +210,7 @@ const options = {
   maxTurns: 10,
   model: settings.customModel || 'claude-sonnet-4-5-20250929',
   settingSources: ['project'],
-  // temperature: agent?.temperature, // Future support
+  temperature: agent?.temperature,
 };
 ```
 
