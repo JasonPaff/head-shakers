@@ -20,45 +20,11 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
 
   const { agentId } = await params;
 
-  // Handle new agent creation
-  if (agentId === 'new') {
-    return (
-      <PageContent>
-        <div className={'space-y-6'}>
-          {/* Header Section */}
-          <div className={'flex items-center gap-4'}>
-            <Link href={'/feature-planner/agents'}>
-              <Button size={'sm'} variant={'ghost'}>
-                <ArrowLeft aria-hidden className={'mr-2 size-4'} />
-                Back to Agents
-              </Button>
-            </Link>
-          </div>
-
-          <div>
-            <h1 className={'text-3xl font-bold tracking-tight'}>Create New Agent</h1>
-            <p className={'mt-2 text-muted-foreground'}>
-              Define a new AI agent with a specialized role and perspective for feature refinement.
-            </p>
-          </div>
-
-          {/* Agent Form */}
-          <AgentFormClient mode={'create'} />
-        </div>
-      </PageContent>
-    );
-  }
-
-  // Handle existing agent edit
   let agent;
   let error = null;
 
   try {
     agent = await FeaturePlannerFacade.getAgentByIdAsync(agentId, userId);
-
-    if (!agent) {
-      notFound();
-    }
   } catch (err) {
     error = err instanceof Error ? err.message : 'Failed to load agent';
     agent = null;
@@ -80,7 +46,6 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
       </PageContent>
     );
   }
-
   if (!agent) {
     notFound();
   }

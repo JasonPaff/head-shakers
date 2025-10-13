@@ -2,7 +2,6 @@
 
 import { Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -16,7 +15,9 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import { Spinner } from '@/components/ui/spinner';
+import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { deleteRefinementAgentAction } from '@/lib/actions/feature-planner/manage-refinement-agents.action';
 
@@ -27,30 +28,25 @@ interface DeleteAgentDialogProps {
 
 export function DeleteAgentDialog({ agentId, agentName }: DeleteAgentDialogProps) {
   const [isOpen, setIsOpen] = useToggle();
-  const [isDeleting, setIsDeleting] = useToggle();
 
   const router = useRouter();
 
+  const { executeAsync, isPending } = useServerAction(deleteRefinementAgentAction, {
+    onSuccess: () => {
+      setIsOpen.off();
+      router.refresh();
+    },
+    toastMessages: {
+      error: 'Failed to delete agent. Please try again.',
+      loading: 'Adding the new agent...',
+      success: 'Agent added successfully! 🎉',
+    },
+  });
+
   const handleDelete = async () => {
-    setIsDeleting.on();
-
-    try {
-      const result = await deleteRefinementAgentAction({
-        agentId,
-      });
-
-      if (result.data?.success) {
-        toast.success('Agent deleted successfully');
-        setIsOpen.off();
-        router.refresh();
-      } else {
-        toast.error(typeof result.serverError === 'string' ? result.serverError : 'Failed to delete agent');
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'An unexpected error occurred');
-    } finally {
-      setIsDeleting.off();
-    }
+    await executeAsync({
+      agentId,
+    });
   };
 
   return (
@@ -70,9 +66,11 @@ export function DeleteAgentDialog({ agentId, agentName }: DeleteAgentDialogProps
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction disabled={isDeleting} onClick={handleDelete}>
-            {isDeleting && <Spinner className={'mr-2 size-4'} />}
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogAction disabled={isPending} onClick={handleDelete}>
+            <Conditional isCondition={isPending}>
+              <Spinner className={'mr-2 size-4'} />
+            </Conditional>
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

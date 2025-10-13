@@ -1,5 +1,7 @@
 'use client';
 
+import { SettingsIcon } from 'lucide-react';
+import Link from 'next/link';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import { useCallback, useState } from 'react';
 
@@ -21,6 +23,7 @@ import { useFileDiscovery } from '@/app/(app)/feature-planner/hooks/use-file-dis
 import { useImplementationPlan } from '@/app/(app)/feature-planner/hooks/use-implementation-plan';
 import { useRefinementFlow } from '@/app/(app)/feature-planner/hooks/use-refinement-flow';
 import { PageContent } from '@/components/layout/page-content';
+import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 
 interface FeaturePlannerClientProps {
@@ -138,6 +141,22 @@ export function FeaturePlannerClient({ agents }: FeaturePlannerClientProps) {
 
   return (
     <PageContent>
+      {/* Header Section */}
+      <div className={'mb-6 flex items-center justify-between'}>
+        <div>
+          <h1 className={'text-3xl font-bold tracking-tight'}>Feature Planner</h1>
+          <p className={'mt-2 text-muted-foreground'}>
+            AI-powered development workflow orchestration for planning software features
+          </p>
+        </div>
+        <Link href={'/feature-planner/agents'}>
+          <Button size={'sm'} variant={'outline'}>
+            <SettingsIcon aria-hidden className={'mr-2 size-4'} />
+            Manage Agents
+          </Button>
+        </Link>
+      </div>
+
       {/* Workflow Progress Section */}
       <WorkflowProgress currentStep={currentStep as WorkflowStep} />
 

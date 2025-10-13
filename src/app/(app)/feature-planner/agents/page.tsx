@@ -1,4 +1,5 @@
-import { PlusCircle } from 'lucide-react';
+import { ArrowLeftIcon, PlusCircle } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
 import type { RefinementAgent } from '@/lib/types/refinement-agent';
@@ -7,6 +8,7 @@ import { AgentList } from '@/app/(app)/feature-planner/agents/components/agent-l
 import { PageContent } from '@/components/layout/page-content';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-planner.facade';
 import { getUserId } from '@/utils/user-utils';
 
@@ -25,6 +27,15 @@ export default async function RefinementAgentsPage() {
   return (
     <PageContent>
       <div className={'space-y-6'}>
+        {/* Back Navigation */}
+        <Link
+          className={'inline-flex items-center text-sm text-muted-foreground hover:text-foreground'}
+          href={$path({ route: '/feature-planner' })}
+        >
+          <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
+          Back to Feature Planner
+        </Link>
+
         {/* Header Section */}
         <div className={'flex items-center justify-between'}>
           <div>
@@ -34,7 +45,7 @@ export default async function RefinementAgentsPage() {
               analyze your feature requests.
             </p>
           </div>
-          <Link href={'/feature-planner/agents/new'}>
+          <Link href={$path({ route: '/feature-planner/agents/new' })}>
             <Button size={'lg'}>
               <PlusCircle aria-hidden className={'mr-2 size-5'} />
               Create Agent
@@ -43,7 +54,9 @@ export default async function RefinementAgentsPage() {
         </div>
 
         {/* Error Alert */}
-        {error && <Alert variant={'error'}>{error}</Alert>}
+        <Conditional isCondition={!!error}>
+          <Alert variant={'error'}>{error}</Alert>
+        </Conditional>
 
         {/* Agent List */}
         <AgentList agents={agents} />

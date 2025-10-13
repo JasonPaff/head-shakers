@@ -2,6 +2,7 @@
 
 import type { FormEvent } from 'react';
 
+import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -15,6 +16,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
+import { useToggle } from '@/hooks/use-toggle';
 import {
   createRefinementAgentAction,
   updateRefinementAgentAction,
@@ -27,9 +29,8 @@ interface AgentFormClientProps {
 
 export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useToggle();
 
-  // Form state
   const [formData, setFormData] = useState({
     agentId: agent?.agentId || '',
     focus: agent?.focus || '',
@@ -42,7 +43,7 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsSubmitting.on();
 
     try {
       const toolsArray = formData.tools
@@ -63,7 +64,7 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
 
         if (result.data?.success) {
           toast.success('Agent created successfully');
-          router.push('/feature-planner/agents');
+          router.push($path({ route: '/feature-planner/agents' }));
           router.refresh();
         } else {
           toast.error(typeof result.serverError === 'string' ? result.serverError : 'Failed to create agent');
@@ -83,7 +84,7 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
 
         if (result.data?.success) {
           toast.success('Agent updated successfully');
-          router.push('/feature-planner/agents');
+          router.push($path({ route: '/feature-planner/agents' }));
           router.refresh();
         } else {
           toast.error(typeof result.serverError === 'string' ? result.serverError : 'Failed to update agent');
@@ -92,12 +93,12 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'An unexpected error occurred');
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting.off();
     }
   };
 
   const handleCancel = () => {
-    router.push('/feature-planner/agents');
+    router.push($path({ route: '/feature-planner/agents' }));
   };
 
   return (
@@ -125,7 +126,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
               <Input
                 disabled={mode === 'edit'}
                 id={'agentId'}
-                onChange={(e) => setFormData((prev) => ({ ...prev, agentId: e.target.value }))}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, agentId: e.target.value }));
+                }}
                 placeholder={'technical-architect'}
                 required
                 value={formData.agentId}
@@ -144,7 +147,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
               </Label>
               <Input
                 id={'name'}
-                onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, name: e.target.value }));
+                }}
                 placeholder={'Technical Architect'}
                 required
                 value={formData.name}
@@ -159,7 +164,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
               </Label>
               <Input
                 id={'role'}
-                onChange={(e) => setFormData((prev) => ({ ...prev, role: e.target.value }))}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, role: e.target.value }));
+                }}
                 placeholder={'Senior Technical Architect'}
                 required
                 value={formData.role}
@@ -174,7 +181,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
               </Label>
               <Textarea
                 id={'focus'}
-                onChange={(e) => setFormData((prev) => ({ ...prev, focus: e.target.value }))}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, focus: e.target.value }));
+                }}
                 placeholder={'Technical feasibility, architecture patterns, scalability considerations'}
                 required
                 rows={3}
@@ -199,9 +208,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
                 id={'temperature'}
                 max={2.0}
                 min={0.0}
-                onChange={(e) =>
-                  setFormData((prev) => ({ ...prev, temperature: parseFloat(e.target.value) }))
-                }
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, temperature: parseFloat(e.target.value) }));
+                }}
                 required
                 step={0.1}
                 type={'number'}
@@ -219,7 +228,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
               </Label>
               <Input
                 id={'tools'}
-                onChange={(e) => setFormData((prev) => ({ ...prev, tools: e.target.value }))}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, tools: e.target.value }));
+                }}
                 placeholder={'Read, Grep, Glob'}
                 required
                 value={formData.tools}
@@ -242,7 +253,9 @@ export function AgentFormClient({ agent, mode }: AgentFormClientProps) {
               </Label>
               <Textarea
                 id={'systemPrompt'}
-                onChange={(e) => setFormData((prev) => ({ ...prev, systemPrompt: e.target.value }))}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, systemPrompt: e.target.value }));
+                }}
                 placeholder={
                   'You are a senior technical architect. Analyze feature requests for technical feasibility...'
                 }

@@ -50,6 +50,7 @@ The `ui-ux-agent` will:
 ## Audit Report Location
 
 The agent will create a detailed audit report in:
+
 ```
 docs/{YYYY_MM_DD}/audits/ui-audit-{page-name}.md
 ```
@@ -66,6 +67,7 @@ docs/{YYYY_MM_DD}/audits/ui-audit-{page-name}.md
 ## Prerequisites
 
 Before running the audit:
+
 - Ensure the development server is running (`npm run dev`)
 - Database should be seeded with test data
 - Clerk authentication should be configured
@@ -86,13 +88,16 @@ You must invoke the `ui-ux-agent` subagent using the Task tool to perform a comp
 Provide the following context to the agent:
 
 ## Page Information
+
 - **Route**: {{$1}}
 - **Project**: Head Shakers - Bobblehead Collection Platform
 - **Base URL**: http://localhost:3000 (development server)
 - **Authentication**: Uses Clerk (agent may need to handle auth flow)
 
 ## Testing Scope
+
 The agent should test ALL user interactions including:
+
 - All forms and input validation
 - All buttons and their actions
 - Navigation elements and routing
@@ -105,7 +110,9 @@ The agent should test ALL user interactions including:
 - Responsive behavior (if applicable)
 
 ## Database Integration
+
 The agent MUST use the `/db` slash command to:
+
 - Query current database state before operations
 - Verify data persistence after operations
 - Test with different data scenarios
@@ -113,10 +120,12 @@ The agent MUST use the `/db` slash command to:
 - Validate authorization rules
 
 ## Output Requirements
+
 The agent must create a comprehensive audit report saved to:
 `docs/{YYYY_MM_DD}/audits/ui-audit-{sanitized-route-name}.md`
 
 The report should include:
+
 1. **Executive Summary** - Overview of page functionality and audit scope
 2. **User Flow Documentation** - Complete diagrams/descriptions of all user paths
 3. **Bugs & Issues** - Categorized by severity (Critical, High, Medium, Low)
@@ -127,6 +136,7 @@ The report should include:
 8. **Test Coverage Summary** - What was tested and what couldn't be tested
 
 ## Important Notes
+
 - The agent should start the browser using Playwright MCP tools
 - Use `browser_snapshot` to understand page structure before interacting
 - Take screenshots of any bugs or issues found
