@@ -156,7 +156,7 @@ export default function FeaturePlannerPage() {
           onFileDiscovery={fileDiscovery.onFileDiscovery}
           onFileSelection={fileDiscovery.onFileSelection}
           onImplementationPlanning={implementationPlan.onImplementationPlanning}
-          onParallelRefineRequest={refinementFlow.onParallelRefineRequest}
+          onParallelRefineRequest={refinementFlow.onParallelRefineRequestWithStreaming}
           onRefineRequest={refinementFlow.onRefineRequest}
           onRemoveManualFile={handleRemoveManualFile}
           planId={planId}
@@ -168,11 +168,14 @@ export default function FeaturePlannerPage() {
         {/* Refinement Results Section */}
         <Conditional isCondition={_isRefinementResultsVisible}>
           <RefinementResults
+            isRefining={refinementFlow.isRefining}
             isSelectingRefinement={refinementFlow.isSelectingRefinement}
+            onCancelRefinement={refinementFlow.cancelRefinement}
             onProceedToNextStep={handleProceedWithRefinedRequest}
             onSelectRefinement={refinementFlow.onSelectRefinement}
             onUseOriginal={handleUseOriginalRequest}
             originalRequest={originalRequest}
+            partialRefinements={refinementFlow.partialRefinements}
             refinements={refinementFlow.allRefinements || []}
             selectedRefinementId={refinementFlow.selectedRefinementId || undefined}
           />

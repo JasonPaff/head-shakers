@@ -612,6 +612,175 @@ export class FeaturePlannerFacade {
   }
 
   /**
+   * Run parallel feature refinement with streaming support
+   */
+  static async runParallelRefinementWithStreamingAsync(
+    planId: string,
+    userId: string,
+    settings: RefinementSettings,
+    onPartialUpdate: (agentId: string, partialText: string) => void,
+    onComplete: (agentId: string, refinement: FeatureRefinement | null) => void,
+    onError: (agentId: string, error: Error) => void,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<FeatureRefinement>> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      // Get the plan
+      const plan = await FeaturePlannerQuery.findPlanByIdAsync(planId, context);
+      if (!plan) {
+        throw new Error('Plan not found');
+      }
+
+      // Update plan status
+      await FeaturePlannerQuery.updatePlanAsync(
+        planId,
+        {
+          currentStep: 1,
+          refinementSettings: settings,
+          status: 'refining',
+        },
+        userId,
+        context,
+      );
+
+      // Get specialized agents for refinement
+      const agents =
+        settings.selectedAgentIds && settings.selectedAgentIds.length > 0 ?
+          getRefinementAgentsByIds(settings.selectedAgentIds)
+        : getRefinementAgents(settings.agentCount);
+
+      // Run refinements in parallel with streaming
+      const refinementPromises = agents.map((agent) =>
+        this.runSingleRefinementWithStreamingAsync(
+          planId,
+          plan.originalRequest,
+          agent.agentId,
+          settings,
+          userId,
+          dbInstance,
+          agent,
+          onPartialUpdate,
+          onComplete,
+          onError,
+        ),
+      );
+
+      const refinements = await Promise.all(refinementPromises);
+      const successfulRefinements = refinements.filter((r): r is FeatureRefinement => r !== null);
+
+      // Run synthesis agent if enabled and we have at least 2 successful refinements
+      if (settings.enableSynthesis && successfulRefinements.length >= 2) {
+        try {
+          // Extract RefinementOutput from successful refinements
+          const refinementOutputs: Array<RefinementOutput> = successfulRefinements
+            .map((r): null | RefinementOutput => {
+              // Check if this refinement has structured data
+              if (
+                r.focus &&
+                r.confidence &&
+                r.technicalComplexity &&
+                r.estimatedScope &&
+                r.keyRequirements &&
+                r.assumptions &&
+                r.risks &&
+                r.refinedRequest
+              ) {
+                return {
+                  assumptions: r.assumptions,
+                  confidence: r.confidence,
+                  estimatedScope: r.estimatedScope,
+                  focus: r.focus,
+                  keyRequirements: r.keyRequirements,
+                  refinedRequest: r.refinedRequest,
+                  risks: r.risks,
+                  technicalComplexity: r.technicalComplexity,
+                };
+              }
+              return null;
+            })
+            .filter((output): output is NonNullable<typeof output> => output !== null);
+
+          // Only run synthesis if we have at least 2 structured outputs
+          if (refinementOutputs.length >= 2) {
+            const synthesisResult = await FeaturePlannerService.executeSynthesisAgent(
+              plan.originalRequest,
+              refinementOutputs,
+              {
+                customModel: settings.customModel,
+                includeProjectContext: settings.includeProjectContext,
+                maxOutputLength: settings.maxOutputLength,
+                minOutputLength: settings.minOutputLength,
+              },
+            );
+
+            // Create a synthesis refinement record
+            const synthesisRefinement = await FeaturePlannerQuery.createRefinementAsync(
+              {
+                agentId: 'synthesis-agent',
+                inputRequest: plan.originalRequest,
+                planId,
+                status: 'processing',
+              },
+              context,
+            );
+
+            if (synthesisRefinement) {
+              const updateData: Parameters<typeof FeaturePlannerQuery.updateRefinementAsync>[1] = {
+                agentName: 'Synthesis Agent',
+                agentRole: 'Senior Technical Lead',
+                assumptions: synthesisResult.result.assumptions,
+                characterCount: synthesisResult.result.refinedRequest.length,
+                completedAt: new Date(),
+                completionTokens: synthesisResult.tokenUsage.completionTokens,
+                confidence: synthesisResult.result.confidence,
+                estimatedScope: synthesisResult.result.estimatedScope,
+                executionTimeMs: synthesisResult.executionTimeMs,
+                focus: synthesisResult.result.focus,
+                keyRequirements: synthesisResult.result.keyRequirements,
+                promptTokens: synthesisResult.tokenUsage.promptTokens,
+                refinedRequest: synthesisResult.result.refinedRequest,
+                retryCount: synthesisResult.retryCount,
+                risks: synthesisResult.result.risks,
+                status: 'completed',
+                technicalComplexity: synthesisResult.result.technicalComplexity,
+                totalTokens: synthesisResult.tokenUsage.totalTokens,
+                wordCount: synthesisResult.result.refinedRequest.split(/\s+/).length,
+              };
+
+              const updatedSynthesis = await FeaturePlannerQuery.updateRefinementAsync(
+                synthesisRefinement.id,
+                updateData,
+                context,
+              );
+
+              if (updatedSynthesis) {
+                successfulRefinements.push(updatedSynthesis);
+                onComplete('synthesis-agent', updatedSynthesis);
+              }
+            }
+          }
+        } catch (error) {
+          // Log synthesis error but don't fail the entire operation
+          console.error('Synthesis agent failed:', error);
+          onError('synthesis-agent', error instanceof Error ? error : new Error('Synthesis failed'));
+        }
+      }
+
+      return successfulRefinements;
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { planId, settings },
+        facade: facadeName,
+        method: 'runParallelRefinementWithStreamingAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.RUN_REFINEMENT,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
    * Run implementation plan generation
    */
   static async runPlanGenerationAsync(
@@ -911,6 +1080,127 @@ export class FeaturePlannerFacade {
     } catch (error) {
       // Log error but don't throw - parallel execution should continue
       console.error(`Refinement ${agentId} failed:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Run single refinement with streaming support (internal)
+   */
+  private static async runSingleRefinementWithStreamingAsync(
+    planId: string,
+    originalRequest: string,
+    agentId: string,
+    settings: RefinementSettings,
+    userId: string,
+    dbInstance: DatabaseExecutor | undefined,
+    agent: RefinementAgent | undefined,
+    onPartialUpdate: (agentId: string, partialText: string) => void,
+    onComplete: (agentId: string, refinement: FeatureRefinement | null) => void,
+    onError: (agentId: string, error: Error) => void,
+  ): Promise<FeatureRefinement | null> {
+    const context = createUserQueryContext(userId, { dbInstance });
+
+    try {
+      // Create refinement record
+      const refinement = await FeaturePlannerQuery.createRefinementAsync(
+        {
+          agentId,
+          inputRequest: originalRequest,
+          planId,
+          status: 'processing',
+        },
+        context,
+      );
+
+      if (!refinement) {
+        throw new Error('Failed to create refinement record');
+      }
+
+      // Track accumulated partial text for this agent
+      let accumulatedText = '';
+
+      // Execute agent with streaming callback
+      const result = await FeaturePlannerService.executeRefinementAgent(
+        originalRequest,
+        {
+          customModel: settings.customModel,
+          includeProjectContext: settings.includeProjectContext,
+          maxOutputLength: settings.maxOutputLength,
+          minOutputLength: settings.minOutputLength,
+        },
+        agent,
+        (partialText: string) => {
+          // Accumulate text and send updates
+          accumulatedText += partialText;
+          onPartialUpdate(agentId, accumulatedText);
+        },
+      );
+
+      // Extract refined text and metadata (supports both string and structured output)
+      let refinedText: string;
+      let structuredData: {
+        agentName?: string;
+        agentRole?: string;
+        assumptions?: Array<string>;
+        confidence?: 'high' | 'low' | 'medium';
+        estimatedScope?: 'large' | 'medium' | 'small';
+        focus?: string;
+        keyRequirements?: Array<string>;
+        risks?: Array<string>;
+        technicalComplexity?: 'high' | 'low' | 'medium';
+      } = {};
+
+      if (typeof result.result === 'string') {
+        refinedText = result.result;
+      } else {
+        // Structured output from specialized agent
+        refinedText = result.result.refinedRequest;
+        if (agent) {
+          structuredData = {
+            agentName: agent.name,
+            agentRole: agent.role,
+            assumptions: result.result.assumptions,
+            confidence: result.result.confidence,
+            estimatedScope: result.result.estimatedScope,
+            focus: result.result.focus,
+            keyRequirements: result.result.keyRequirements,
+            risks: result.result.risks,
+            technicalComplexity: result.result.technicalComplexity,
+          };
+        }
+      }
+
+      // Build update data with all fields
+      const updateData: Parameters<typeof FeaturePlannerQuery.updateRefinementAsync>[1] = {
+        characterCount: refinedText.length,
+        completedAt: new Date(),
+        completionTokens: result.tokenUsage.completionTokens,
+        executionTimeMs: result.executionTimeMs,
+        promptTokens: result.tokenUsage.promptTokens,
+        refinedRequest: refinedText,
+        retryCount: result.retryCount,
+        status: 'completed',
+        totalTokens: result.tokenUsage.totalTokens,
+        wordCount: refinedText.split(/\s+/).length,
+        ...structuredData,
+      };
+
+      // Update refinement with result
+      const updatedRefinement = await FeaturePlannerQuery.updateRefinementAsync(
+        refinement.id,
+        updateData,
+        context,
+      );
+
+      // Notify completion
+      onComplete(agentId, updatedRefinement);
+
+      return updatedRefinement;
+    } catch (error) {
+      // Log error and notify
+      console.error(`Refinement ${agentId} failed:`, error);
+      onError(agentId, error instanceof Error ? error : new Error('Refinement failed'));
       return null;
     }
   }

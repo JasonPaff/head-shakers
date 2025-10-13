@@ -20,11 +20,14 @@ interface UseRefinementFlowOptions {
 
 interface UseRefinementFlowReturn {
   allRefinements: Array<FeatureRefinement> | null;
+  cancelRefinement: () => void;
   isRefining: boolean;
   isSelectingRefinement: boolean;
   onParallelRefineRequest: () => Promise<void>;
+  onParallelRefineRequestWithStreaming: () => Promise<void>;
   onRefineRequest: () => Promise<void>;
   onSelectRefinement: (refinementId: string, refinedRequest: string) => Promise<void>;
+  partialRefinements: Map<string, string>;
   refinedRequest: null | string;
   selectedRefinementId: null | string;
   setAllRefinements: (refinements: Array<FeatureRefinement> | null) => void;
@@ -46,6 +49,8 @@ export const useRefinementFlow = ({
   const [selectedRefinementId, setSelectedRefinementId] = useState<null | string>(null);
   const [refinedRequest, setRefinedRequest] = useState<null | string>(null);
   const [currentPlanId, setCurrentPlanId] = useState<null | string>(planId);
+  const [partialRefinements, setPartialRefinements] = useState<Map<string, string>>(new Map());
+  const [abortController, setAbortController] = useState<AbortController | null>(null);
 
   // Event handlers
   const handleRefineRequest = useCallback(async () => {
@@ -235,6 +240,145 @@ export const useRefinementFlow = ({
     }
   }, [currentPlanId, onStepDataUpdate, originalRequest, settings]);
 
+  const handleParallelRefineRequestWithStreaming = useCallback(async () => {
+    if (!originalRequest.trim()) {
+      toast.error('Please enter a feature request');
+      return;
+    }
+
+    // Create abort controller for cancellation
+    const controller = new AbortController();
+    setAbortController(controller);
+    setIsRefining(true);
+    setPartialRefinements(new Map());
+
+    toast.loading(`Starting ${settings.agentCount} parallel refinements with streaming...`, {
+      id: 'streaming-refine',
+    });
+
+    try {
+      const response = await fetch('/api/feature-planner/refine-stream', {
+        body: JSON.stringify({
+          featureRequest: originalRequest,
+          planId: currentPlanId,
+          settings,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        method: 'POST',
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        const errorData = (await response.json()) as { error: string };
+        throw new Error(errorData.error || 'Failed to start streaming refinement');
+      }
+
+      if (!response.body) {
+        throw new Error('Response body is null');
+      }
+
+      // Process SSE stream
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      const refinements: Array<FeatureRefinement> = [];
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) break;
+
+        // Decode chunk and add to buffer
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process complete events (separated by double newlines)
+        const events = buffer.split('\n\n');
+        buffer = events.pop() || ''; // Keep incomplete event in buffer
+
+        for (const event of events) {
+          if (!event.trim() || !event.startsWith('data: ')) continue;
+
+          try {
+            const data = JSON.parse(event.slice(6)) as
+              | { agentId: string; data: FeatureRefinement; type: 'complete' }
+              | { agentId: string; data: string; type: 'partial' }
+              | { agentId: string; data: { error: string }; type: 'error' }
+              | {
+                  data: { planId: string; refinements: Array<FeatureRefinement> };
+                  type: 'done';
+                };
+
+            if (data.type === 'partial') {
+              // Update partial refinement text
+              setPartialRefinements((prev) => {
+                const updated = new Map(prev);
+                updated.set(data.agentId, data.data);
+                return updated;
+              });
+            } else if (data.type === 'complete') {
+              // Agent completed
+              refinements.push(data.data);
+              toast.success(`${data.agentId} completed`, { duration: 2000 });
+            } else if (data.type === 'error') {
+              // Agent failed
+              toast.error(`${data.agentId} failed: ${data.data.error}`, { duration: 3000 });
+            } else if (data.type === 'done') {
+              // All agents completed
+              toast.dismiss('streaming-refine');
+              toast.success(`Completed ${refinements.length} refinements`);
+
+              setAllRefinements(data.data.refinements);
+              setCurrentPlanId(data.data.planId);
+              setIsRefining(false);
+              setAbortController(null);
+
+              onStepDataUpdate({
+                step1: {
+                  originalRequest,
+                  refinements: data.data.refinements.map((r) => ({
+                    agentId: r.agentId,
+                    id: r.id,
+                    refinedRequest: r.refinedRequest || '',
+                  })),
+                  selectedRefinement: null,
+                },
+              });
+            }
+          } catch (parseError) {
+            console.error('Error parsing SSE event:', parseError);
+          }
+        }
+      }
+    } catch (error) {
+      if ((error as Error).name === 'AbortError') {
+        toast.dismiss('streaming-refine');
+        toast.info('Refinement cancelled');
+      } else {
+        console.error('Error in streaming refinement:', error);
+        toast.dismiss('streaming-refine');
+        const errorMessage =
+          error instanceof Error ?
+            `Streaming refinement failed: ${error.message}`
+          : 'An unexpected error occurred during streaming refinement';
+        toast.error(errorMessage);
+      }
+      setIsRefining(false);
+      setAbortController(null);
+    }
+  }, [currentPlanId, onStepDataUpdate, originalRequest, settings]);
+
+  const handleCancelRefinement = useCallback(() => {
+    if (abortController) {
+      abortController.abort();
+      setAbortController(null);
+      setIsRefining(false);
+      toast.info('Refinement cancelled');
+    }
+  }, [abortController]);
+
   const handleSelectRefinement = useCallback(
     async (refinementId: string, refinedRequest: string) => {
       if (!currentPlanId) {
@@ -285,11 +429,14 @@ export const useRefinementFlow = ({
 
   return {
     allRefinements,
+    cancelRefinement: handleCancelRefinement,
     isRefining,
     isSelectingRefinement,
     onParallelRefineRequest: handleParallelRefineRequest,
+    onParallelRefineRequestWithStreaming: handleParallelRefineRequestWithStreaming,
     onRefineRequest: handleRefineRequest,
     onSelectRefinement: handleSelectRefinement,
+    partialRefinements,
     refinedRequest,
     selectedRefinementId,
     setAllRefinements,

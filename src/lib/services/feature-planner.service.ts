@@ -532,6 +532,7 @@ export class FeaturePlannerService {
    * @param originalRequest - User's original feature request
    * @param settings - Refinement settings (length, context, etc.)
    * @param agent - Optional specialized agent configuration for role-based refinement
+   * @param onPartialUpdate - Optional callback for streaming partial text updates
    * @returns Refined feature request with metadata
    */
   static async executeRefinementAgent(
@@ -541,6 +542,7 @@ export class FeaturePlannerService {
       'customModel' | 'includeProjectContext' | 'maxOutputLength' | 'minOutputLength'
     >,
     agent?: RefinementAgent,
+    onPartialUpdate?: (partialText: string) => void,
   ): Promise<AgentExecutionResult<RefinementOutput | string>> {
     // Use 3-minute timeout for long-running agent operations
     const circuitBreaker = circuitBreakers.externalService('claude-agent-refinement', {
@@ -578,12 +580,37 @@ export class FeaturePlannerService {
             for await (const message of query({
               options: {
                 allowedTools,
+                includePartialMessages: !!onPartialUpdate, // Enable streaming if callback provided
                 maxTurns: 10, // Allow multiple turns for tool use + response
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'], // Load .claude/agents/
               },
               prompt,
             })) {
+              // Handle streaming updates
+              if (message.type === 'stream_event' && onPartialUpdate) {
+                try {
+                  // For stream events, the message itself contains the delta
+                  // Type assertion to access the stream event structure
+                  const streamEvent = message as unknown as {
+                    content?: Array<{ text?: string; type: string }>;
+                    delta?: { text?: string; type: string };
+                    type: 'stream_event';
+                  };
+
+                  // Handle content delta updates
+                  if (streamEvent.delta?.type === 'text_delta' && streamEvent.delta.text) {
+                    onPartialUpdate(streamEvent.delta.text);
+                  }
+                  // Handle full content updates
+                  else if (streamEvent.content?.[0]?.type === 'text' && streamEvent.content[0].text) {
+                    onPartialUpdate(streamEvent.content[0].text);
+                  }
+                } catch (streamError) {
+                  console.error('[executeRefinementAgent] Error processing stream event:', streamError);
+                }
+              }
+
               // Extract assistant response
               if (message.type === 'assistant') {
                 const parseResult = sdkAssistantMessageSchema.safeParse(message.message);

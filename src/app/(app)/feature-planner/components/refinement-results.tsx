@@ -13,21 +13,27 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface RefinementResultsProps {
+  isRefining?: boolean;
   isSelectingRefinement: boolean;
+  onCancelRefinement?: () => void;
   onProceedToNextStep: () => void;
   onSelectRefinement: (refinementId: string, refinedRequest: string) => void;
   onUseOriginal: () => void;
   originalRequest: string;
+  partialRefinements?: Map<string, string>;
   refinements: Array<FeatureRefinement>;
   selectedRefinementId?: string;
 }
 
 export const RefinementResults = ({
+  isRefining = false,
   isSelectingRefinement,
+  onCancelRefinement,
   onProceedToNextStep,
   onSelectRefinement,
   onUseOriginal,
   originalRequest,
+  partialRefinements = new Map(),
   refinements,
   selectedRefinementId,
 }: RefinementResultsProps) => {
@@ -65,6 +71,46 @@ export const RefinementResults = ({
   const _isSingleRefinement = _completedRefinements.length === 1;
   const _isSelectionMade = !!selectedRefinementId;
   const _failureMessage = _failedRefinements.length > 0 ? ` (${_failedRefinements.length} failed)` : '';
+
+  // Show streaming progress if refining
+  if (isRefining || (!_isAnyResultsPresent && partialRefinements.size > 0)) {
+    return (
+      <Card>
+        <CardHeader>
+          <div className={'flex items-center justify-between'}>
+            <div>
+              <CardTitle>Processing Refinements...</CardTitle>
+              <CardDescription>
+                {partialRefinements.size > 0 ?
+                  `${partialRefinements.size} agent${partialRefinements.size > 1 ? 's' : ''} working...`
+                : 'Initializing agents...'}
+              </CardDescription>
+            </div>
+            {onCancelRefinement && (
+              <Button onClick={onCancelRefinement} size={'sm'} variant={'outline'}>
+                Cancel
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        {partialRefinements.size > 0 && (
+          <CardContent className={'space-y-4'}>
+            {Array.from(partialRefinements.entries()).map(([agentId, partialText]) => (
+              <div className={'space-y-2'} key={agentId}>
+                <div className={'flex items-center gap-2'}>
+                  <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
+                  <p className={'text-sm font-medium'}>{agentId}</p>
+                </div>
+                <div className={'rounded-md bg-muted p-3'}>
+                  <p className={'text-sm text-muted-foreground'}>{partialText || 'Starting...'}</p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        )}
+      </Card>
+    );
+  }
 
   if (!_isAnyResultsPresent) {
     return (
