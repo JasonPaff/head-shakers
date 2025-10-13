@@ -52,7 +52,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 
 ### Real-time & Background Jobs
 
-- **Ably** for real-time features
+- **Ably** for real-time features (use very sparingly)
 - **Upstash QStash** for background job processing
 - **Upstash Redis** for caching
 
