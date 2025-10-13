@@ -82,6 +82,7 @@ export const ACTION_NAMES = {
     SELECT_FILES: 'selectFiles',
     SELECT_PLAN_GENERATION: 'selectPlanGeneration',
     SELECT_REFINEMENT: 'selectRefinement',
+    SUGGEST_FEATURE: 'suggestFeature',
     UPDATE: 'updateFeaturePlan',
     UPDATE_PLAN_STEP: 'updatePlanStep',
     UPDATE_REFINEMENT_AGENT: 'updateRefinementAgent',

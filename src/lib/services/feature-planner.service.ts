@@ -269,6 +269,128 @@ export class FeaturePlannerService {
   ];
 
   /**
+   * Execute feature suggestion using slash command
+   *
+   * @param pageOrComponent - Page or component name for context
+   * @param featureType - Type of feature (enhancement, new-capability, etc.)
+   * @param priorityLevel - Priority level (low, medium, high, critical)
+   * @param additionalContext - Optional additional context
+   * @param settings - Agent settings
+   * @returns Feature suggestions with metadata
+   */
+  static async executeFeatureSuggestionAgent(
+    pageOrComponent: string,
+    featureType: string,
+    priorityLevel: string,
+    additionalContext: string | undefined,
+    settings: { customModel?: string },
+  ): Promise<
+    AgentExecutionResult<{
+      context?: string;
+      suggestions: Array<{
+        description: string;
+        implementationConsiderations?: Array<string>;
+        rationale: string;
+        title: string;
+      }>;
+    }>
+  > {
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-feature-suggestion', {
+      timeoutMs: 620000, // 12 minutes
+    });
+    const startTime = Date.now();
+
+    try {
+      const result = await circuitBreaker.execute(async () => {
+        const retryResult = await withServiceRetry(
+          async () => {
+            let suggestionResult: {
+              context?: string;
+              suggestions: Array<{
+                description: string;
+                implementationConsiderations?: Array<string>;
+                rationale: string;
+                title: string;
+              }>;
+            } = {
+              suggestions: [],
+            };
+            const tokenUsage = {
+              cacheCreationTokens: 0,
+              cacheReadTokens: 0,
+              completionTokens: 0,
+              promptTokens: 0,
+              totalTokens: 0,
+            };
+
+            // Build prompt that invokes the slash command
+            const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
+            const prompt = `/suggest-feature ${pageOrComponent} ${featureType} ${priorityLevel}${contextStr}`;
+
+            for await (const message of query({
+              options: {
+                allowedTools: ['Read', 'Grep', 'Glob'],
+                maxTurns: 10,
+                model: settings.customModel || 'claude-sonnet-4-5-20250929',
+                settingSources: ['project'],
+              },
+              prompt,
+            })) {
+              if (message.type === 'assistant') {
+                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+                if (parseResult.success) {
+                  const validatedMessage = parseResult.data;
+                  const content = validatedMessage.content[0];
+                  if (content?.type === 'text') {
+                    suggestionResult = this.parseFeatureSuggestionResponse(content.text);
+                  }
+
+                  if (validatedMessage.usage) {
+                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+                    tokenUsage.totalTokens =
+                      (validatedMessage.usage.input_tokens ?? 0) +
+                      (validatedMessage.usage.output_tokens ?? 0);
+                    tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
+                    tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
+                  }
+                }
+              }
+            }
+
+            return { suggestionResult, tokenUsage };
+          },
+          'claude-agent',
+          {
+            maxAttempts: 2,
+            operationName: 'feature-suggestion',
+          },
+        );
+
+        return retryResult;
+      });
+
+      const executionTimeMs = Date.now() - startTime;
+
+      return {
+        executionTimeMs,
+        result: result.result.result.suggestionResult,
+        retryCount: result.result.attempts - 1,
+        tokenUsage: result.result.result.tokenUsage,
+      };
+    } catch (error) {
+      const context: ServiceErrorContext = {
+        endpoint: 'query',
+        isRetryable: true,
+        method: 'executeFeatureSuggestionAgent',
+        operation: 'feature-suggestion',
+        service: 'claude-agent-sdk',
+      };
+      throw createServiceError(context, error);
+    }
+  }
+
+  /**
    * Execute file discovery agent (legacy single-agent version)
    *
    * @deprecated Use executeParallelFileDiscoveryAgents instead
@@ -1534,6 +1656,115 @@ WRONG format (what you returned):
   private static normalizeScore(value?: number | string): number {
     const num = typeof value === 'string' ? parseInt(value, 10) : (value ?? 50);
     return Math.max(0, Math.min(100, num));
+  }
+
+  /**
+   * Parse feature suggestion response from agent
+   * Extracts structured suggestion data from agent response
+   */
+  private static parseFeatureSuggestionResponse(response: string): {
+    context?: string;
+    suggestions: Array<{
+      description: string;
+      implementationConsiderations?: Array<string>;
+      rationale: string;
+      title: string;
+    }>;
+  } {
+    const result: {
+      context?: string;
+      suggestions: Array<{
+        description: string;
+        implementationConsiderations?: Array<string>;
+        rationale: string;
+        title: string;
+      }>;
+    } = {
+      suggestions: [],
+    };
+
+    try {
+      // Try parsing as JSON first
+      const jsonMatch = response.match(/```json\s*([\s\S]*?)\s*```/);
+      if (jsonMatch?.[1]) {
+        try {
+          const parsed: unknown = JSON.parse(jsonMatch[1]);
+          if (typeof parsed === 'object' && parsed !== null && 'suggestions' in parsed) {
+            const suggestions = (parsed as { suggestions: unknown }).suggestions;
+            if (Array.isArray(suggestions)) {
+              result.suggestions = suggestions.map((s: unknown) => ({
+                description:
+                  (
+                    typeof s === 'object' &&
+                    s !== null &&
+                    'description' in s &&
+                    typeof s.description === 'string'
+                  ) ?
+                    s.description
+                  : '',
+                implementationConsiderations:
+                  (
+                    typeof s === 'object' &&
+                    s !== null &&
+                    'implementationConsiderations' in s &&
+                    Array.isArray(s.implementationConsiderations)
+                  ) ?
+                    s.implementationConsiderations.filter((c: unknown): c is string => typeof c === 'string')
+                  : undefined,
+                rationale:
+                  typeof s === 'object' && s !== null && 'rationale' in s && typeof s.rationale === 'string' ?
+                    s.rationale
+                  : '',
+                title:
+                  typeof s === 'object' && s !== null && 'title' in s && typeof s.title === 'string' ?
+                    s.title
+                  : '',
+              }));
+            }
+            if ('context' in parsed && typeof parsed.context === 'string') {
+              result.context = parsed.context;
+            }
+            return result;
+          }
+        } catch (parseError) {
+          console.error('[parseFeatureSuggestionResponse] JSON parse error:', parseError);
+        }
+      }
+
+      // Parse markdown-style format
+      const suggestionBlocks = response.split(/\n(?=#+\s+\w+|Suggestion\s+\d+)/i);
+
+      for (const block of suggestionBlocks) {
+        const titleMatch = block.match(/(?:^|\n)#+\s*([^\n]+)/);
+        const descriptionMatch = block.match(/Description:\s*([^\n]+)/i);
+        const rationaleMatch = block.match(/Rationale:\s*([^\n]+)/i);
+        const considerationsMatch = block.match(
+          /Implementation\s+Considerations?:\s*([\s\S]*?)(?=\n#|\n\n|$)/i,
+        );
+
+        if (titleMatch?.[1] && (descriptionMatch?.[1] || rationaleMatch?.[1])) {
+          const considerations: Array<string> = [];
+          if (considerationsMatch?.[1]) {
+            const items = considerationsMatch[1].matchAll(/[-*]\s*([^\n]+)/g);
+            for (const item of items) {
+              if (item[1]) considerations.push(item[1].trim());
+            }
+          }
+
+          result.suggestions.push({
+            description: descriptionMatch?.[1]?.trim() || titleMatch[1].trim(),
+            implementationConsiderations: considerations.length > 0 ? considerations : undefined,
+            rationale: rationaleMatch?.[1]?.trim() || 'Feature suggestion from AI analysis',
+            title: titleMatch[1].trim(),
+          });
+        }
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error parsing feature suggestion response:', error);
+      return result;
+    }
   }
 
   /**

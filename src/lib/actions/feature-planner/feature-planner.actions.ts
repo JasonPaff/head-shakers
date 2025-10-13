@@ -2,6 +2,7 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
+import { z } from 'zod';
 
 import {
   ACTION_NAMES,
@@ -13,6 +14,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { FeaturePlannerFacade } from '@/lib/facades/feature-planner/feature-planner.facade';
+import { FeaturePlannerService } from '@/lib/services/feature-planner.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
@@ -492,6 +494,82 @@ export const getPlanGenerationsAction = authActionClient
         input: parsedInput,
         metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.GET_PLAN_GENERATIONS },
         operation: OPERATIONS.FEATURE_PLANNER.GET_PLAN_GENERATIONS,
+        userId,
+      });
+    }
+  });
+
+// ============================================================================
+// FEATURE SUGGESTION
+// ============================================================================
+
+/**
+ * Suggest features using AI slash command
+ */
+export const suggestFeatureAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.SUGGEST_FEATURE,
+    isTransactionRequired: false,
+  })
+  .inputSchema(
+    z.object({
+      additionalContext: z.string().max(1000).optional(),
+      customModel: z.string().optional(),
+      featureType: z.enum(['enhancement', 'new-capability', 'optimization', 'ui-improvement', 'integration']),
+      pageOrComponent: z.string().min(1).max(200),
+      priorityLevel: z.enum(['low', 'medium', 'high', 'critical']),
+    }),
+  )
+  .action(async ({ ctx }) => {
+    const input = ctx.sanitizedInput as {
+      additionalContext?: string;
+      customModel?: string;
+      featureType: string;
+      pageOrComponent: string;
+      priorityLevel: string;
+    };
+    const { additionalContext, customModel, featureType, pageOrComponent, priorityLevel } = input;
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, {
+      featureType,
+      pageOrComponent,
+      priorityLevel,
+    });
+
+    try {
+      const result = await FeaturePlannerService.executeFeatureSuggestionAgent(
+        pageOrComponent,
+        featureType,
+        priorityLevel,
+        additionalContext,
+        { customModel },
+      );
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          pageOrComponent,
+          suggestionCount: result.result.suggestions.length,
+          tokenUsage: result.tokenUsage.totalTokens,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Generated ${result.result.suggestions.length} feature suggestions`,
+      });
+
+      return {
+        data: {
+          executionTimeMs: result.executionTimeMs,
+          retryCount: result.retryCount,
+          suggestions: result.result,
+          tokenUsage: result.tokenUsage,
+        },
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.SUGGEST_FEATURE },
+        operation: OPERATIONS.FEATURE_PLANNER.SUGGEST_FEATURE,
         userId,
       });
     }

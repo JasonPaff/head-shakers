@@ -404,3 +404,48 @@ export interface StepData {
 }
 
 export type UpdateRefinementAgentInput = z.infer<typeof updateRefinementAgentSchema>;
+
+// ============================================================================
+// FEATURE SUGGESTION
+// ============================================================================
+
+export const featureTypeEnum = z.enum([
+  'enhancement',
+  'new-capability',
+  'optimization',
+  'ui-improvement',
+  'integration',
+]);
+
+export const priorityLevelEnum = z.enum(['low', 'medium', 'high', 'critical']);
+
+export const suggestFeatureInputSchema = z.object({
+  additionalContext: z.string().max(1000).optional(),
+  featureType: featureTypeEnum,
+  pageOrComponent: z
+    .string()
+    .min(1)
+    .max(200)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Page or component name cannot be empty or whitespace',
+    }),
+  priorityLevel: priorityLevelEnum,
+});
+
+export const suggestionResultSchema = z.object({
+  description: z.string().min(1),
+  implementationConsiderations: z.array(z.string()).optional(),
+  rationale: z.string().min(1),
+  title: z.string().min(1),
+});
+
+export const suggestFeatureOutputSchema = z.object({
+  context: z.string().optional(),
+  suggestions: z.array(suggestionResultSchema),
+});
+
+export type FeatureType = z.infer<typeof featureTypeEnum>;
+export type PriorityLevel = z.infer<typeof priorityLevelEnum>;
+export type SuggestFeatureInput = z.infer<typeof suggestFeatureInputSchema>;
+export type SuggestFeatureOutput = z.infer<typeof suggestFeatureOutputSchema>;
+export type SuggestionResult = z.infer<typeof suggestionResultSchema>;
