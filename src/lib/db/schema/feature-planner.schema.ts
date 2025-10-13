@@ -22,6 +22,8 @@ import { users } from '@/lib/db/schema/users.schema';
 // ============================================================================
 
 export const complexityEnum = pgEnum('complexity', ENUMS.FEATURE_PLAN.COMPLEXITY);
+export const confidenceLevelEnum = pgEnum('confidence_level', ['high', 'medium', 'low']);
+export const estimatedScopeEnum = pgEnum('estimated_scope', ['small', 'medium', 'large']);
 export const executionStepEnum = pgEnum('execution_step', ENUMS.PLAN_EXECUTION.STEP);
 export const fileDiscoveryStatusEnum = pgEnum('file_discovery_status', ENUMS.FILE_DISCOVERY.STATUS);
 export const filePriorityEnum = pgEnum('file_priority', ENUMS.FILE_DISCOVERY.PRIORITY);
@@ -32,6 +34,7 @@ export const implementationPlanStatusEnum = pgEnum(
 export const planStatusEnum = pgEnum('plan_status', ENUMS.FEATURE_PLAN.STATUS);
 export const refinementStatusEnum = pgEnum('refinement_status', ENUMS.REFINEMENT.STATUS);
 export const riskLevelEnum = pgEnum('risk_level', ENUMS.FEATURE_PLAN.RISK_LEVEL);
+export const technicalComplexityEnum = pgEnum('technical_complexity', ['high', 'medium', 'low']);
 
 // ============================================================================
 // ZOD SCHEMAS FOR JSONB TYPES
@@ -153,23 +156,32 @@ export const featureRefinements = pgTable(
     agentModel: varchar('agent_model', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_MODEL.MAX })
       .default(DEFAULTS.REFINEMENT.AGENT_MODEL)
       .notNull(),
+    agentName: varchar('agent_name', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }),
+    agentRole: varchar('agent_role', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }),
+    assumptions: jsonb('assumptions').$type<Array<string>>(),
     characterCount: integer('character_count'),
     completedAt: timestamp('completed_at'),
     completionTokens: integer('completion_tokens'),
+    confidence: confidenceLevelEnum('confidence'),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     errorMessage: text('error_message'),
+    estimatedScope: estimatedScopeEnum('estimated_scope'),
     executionTimeMs: integer('execution_time_ms'),
     expansionRatio: integer('expansion_ratio'),
+    focus: text('focus'),
     id: uuid('id').primaryKey().defaultRandom(),
     inputRequest: text('input_request').notNull(),
     isValidFormat: boolean('is_valid_format').default(DEFAULTS.REFINEMENT.IS_VALID_FORMAT).notNull(),
+    keyRequirements: jsonb('key_requirements').$type<Array<string>>(),
     planId: uuid('plan_id')
       .references(() => featurePlans.id, { onDelete: 'cascade' })
       .notNull(),
     promptTokens: integer('prompt_tokens'),
     refinedRequest: text('refined_request'),
     retryCount: integer('retry_count').default(DEFAULTS.REFINEMENT.RETRY_COUNT).notNull(),
+    risks: jsonb('risks').$type<Array<string>>(),
     status: refinementStatusEnum('status').default(DEFAULTS.REFINEMENT.STATUS).notNull(),
+    technicalComplexity: technicalComplexityEnum('technical_complexity'),
     totalTokens: integer('total_tokens'),
     validationErrors: jsonb('validation_errors').$type<Array<ValidationError>>(),
     wordCount: integer('word_count'),

@@ -1,6 +1,7 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 
+import type { RefinementAgent } from '@/lib/config/refinement-agents';
 import type {
   FeaturePlan,
   FeatureRefinement,
@@ -13,6 +14,7 @@ import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
+import { getRefinementAgents } from '@/lib/config/refinement-agents';
 import { OPERATIONS } from '@/lib/constants';
 import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturePlannerQuery } from '@/lib/queries/feature-planner/feature-planner.query';
@@ -476,15 +478,19 @@ export class FeaturePlannerFacade {
         context,
       );
 
-      // Run refinements in parallel
-      const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
+      // Get specialized agents for refinement
+      const agents = getRefinementAgents(settings.agentCount);
+
+      // Run refinements in parallel with specialized agents
+      const refinementPromises = agents.map((agent) =>
         this.runSingleRefinementAsync(
           planId,
           plan.originalRequest,
-          `agent-${i + 1}`,
+          agent.agentId,
           settings,
           userId,
           dbInstance,
+          agent,
         ),
       );
 
@@ -717,6 +723,7 @@ export class FeaturePlannerFacade {
     settings: RefinementSettings,
     userId: string,
     dbInstance?: DatabaseExecutor,
+    agent?: RefinementAgent,
   ): Promise<FeatureRefinement | null> {
     const context = createUserQueryContext(userId, { dbInstance });
 
@@ -736,31 +743,69 @@ export class FeaturePlannerFacade {
         throw new Error('Failed to create refinement record');
       }
 
-      // Execute agent
-      const result = await FeaturePlannerService.executeRefinementAgent(originalRequest, {
-        customModel: settings.customModel,
-        includeProjectContext: settings.includeProjectContext,
-        maxOutputLength: settings.maxOutputLength,
-        minOutputLength: settings.minOutputLength,
-      });
+      // Execute agent (with specialized agent config if provided)
+      const result = await FeaturePlannerService.executeRefinementAgent(
+        originalRequest,
+        {
+          customModel: settings.customModel,
+          includeProjectContext: settings.includeProjectContext,
+          maxOutputLength: settings.maxOutputLength,
+          minOutputLength: settings.minOutputLength,
+        },
+        agent,
+      );
+
+      // Extract refined text and metadata (supports both string and structured output)
+      let refinedText: string;
+      let structuredData: {
+        agentName?: string;
+        agentRole?: string;
+        assumptions?: Array<string>;
+        confidence?: 'high' | 'low' | 'medium';
+        estimatedScope?: 'large' | 'medium' | 'small';
+        focus?: string;
+        keyRequirements?: Array<string>;
+        risks?: Array<string>;
+        technicalComplexity?: 'high' | 'low' | 'medium';
+      } = {};
+
+      if (typeof result.result === 'string') {
+        refinedText = result.result;
+      } else {
+        // Structured output from specialized agent
+        refinedText = result.result.refinedRequest;
+        if (agent) {
+          structuredData = {
+            agentName: agent.name,
+            agentRole: agent.role,
+            assumptions: result.result.assumptions,
+            confidence: result.result.confidence,
+            estimatedScope: result.result.estimatedScope,
+            focus: result.result.focus,
+            keyRequirements: result.result.keyRequirements,
+            risks: result.result.risks,
+            technicalComplexity: result.result.technicalComplexity,
+          };
+        }
+      }
+
+      // Build update data with all fields
+      const updateData: Parameters<typeof FeaturePlannerQuery.updateRefinementAsync>[1] = {
+        characterCount: refinedText.length,
+        completedAt: new Date(),
+        completionTokens: result.tokenUsage.completionTokens,
+        executionTimeMs: result.executionTimeMs,
+        promptTokens: result.tokenUsage.promptTokens,
+        refinedRequest: refinedText,
+        retryCount: result.retryCount,
+        status: 'completed',
+        totalTokens: result.tokenUsage.totalTokens,
+        wordCount: refinedText.split(/\s+/).length,
+        ...structuredData,
+      };
 
       // Update refinement with result
-      return await FeaturePlannerQuery.updateRefinementAsync(
-        refinement.id,
-        {
-          characterCount: result.result.length,
-          completedAt: new Date(),
-          completionTokens: result.tokenUsage.completionTokens,
-          executionTimeMs: result.executionTimeMs,
-          promptTokens: result.tokenUsage.promptTokens,
-          refinedRequest: result.result,
-          retryCount: result.retryCount,
-          status: 'completed',
-          totalTokens: result.tokenUsage.totalTokens,
-          wordCount: result.result.split(/\s+/).length,
-        },
-        context,
-      );
+      return await FeaturePlannerQuery.updateRefinementAsync(refinement.id, updateData, context);
     } catch (error) {
       // Log error but don't throw - parallel execution should continue
       console.error(`Refinement ${agentId} failed:`, error);

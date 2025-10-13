@@ -1,9 +1,15 @@
 import { query } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 
+import type { RefinementAgent } from '@/lib/config/refinement-agents';
 import type { FileDiscoveryResult, RefinementSettings } from '@/lib/db/schema/feature-planner.schema';
+import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
+import {
+  extractJsonFromMarkdown,
+  parseRefinementOutput,
+} from '@/lib/types/refinement-output';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
 import { withServiceRetry } from '@/lib/utils/retry';
@@ -525,6 +531,7 @@ export class FeaturePlannerService {
    *
    * @param originalRequest - User's original feature request
    * @param settings - Refinement settings (length, context, etc.)
+   * @param agent - Optional specialized agent configuration for role-based refinement
    * @returns Refined feature request with metadata
    */
   static async executeRefinementAgent(
@@ -533,7 +540,8 @@ export class FeaturePlannerService {
       RefinementSettings,
       'customModel' | 'includeProjectContext' | 'maxOutputLength' | 'minOutputLength'
     >,
-  ): Promise<AgentExecutionResult<string>> {
+    agent?: RefinementAgent,
+  ): Promise<AgentExecutionResult<RefinementOutput | string>> {
     // Use 3-minute timeout for long-running agent operations
     const circuitBreaker = circuitBreakers.externalService('claude-agent-refinement', {
       timeoutMs: 620000, // 12 minutes
@@ -545,6 +553,7 @@ export class FeaturePlannerService {
         const retryResult = await withServiceRetry(
           async () => {
             let refinedText = '';
+            let refinementOutput: null | RefinementOutput = null;
             const tokenUsage = {
               cacheCreationTokens: 0,
               cacheReadTokens: 0,
@@ -553,13 +562,22 @@ export class FeaturePlannerService {
               totalTokens: 0,
             };
 
-            // Build agent prompt
-            const prompt = this.buildRefinementPrompt(originalRequest, settings);
+            // Build agent prompt (role-based if agent provided, otherwise generic)
+            const prompt = agent ?
+                this.buildRoleBasedRefinementPrompt(originalRequest, agent, settings)
+              : this.buildRefinementPrompt(originalRequest, settings);
+
+            // Determine tools to use (agent-specific or setting-based)
+            const allowedTools = agent ?
+                agent.tools
+              : settings.includeProjectContext ? ['Read', 'Grep', 'Glob']
+              : [];
 
             // Execute agent with SDK
+            // Note: Temperature and model variations will be supported via agent-specific settings
             for await (const message of query({
               options: {
-                allowedTools: settings.includeProjectContext ? ['Read', 'Grep', 'Glob'] : [],
+                allowedTools,
                 maxTurns: 10, // Allow multiple turns for tool use + response
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'], // Load .claude/agents/
@@ -574,6 +592,21 @@ export class FeaturePlannerService {
                   const content = validatedMessage.content[0];
                   if (content?.type === 'text') {
                     refinedText = content.text;
+
+                    // If using role-based agent, parse structured JSON output
+                    if (agent) {
+                      try {
+                        const jsonString = extractJsonFromMarkdown(refinedText);
+                        refinementOutput = parseRefinementOutput(jsonString);
+                      } catch (error) {
+                        console.error(
+                          `[executeRefinementAgent] Failed to parse JSON from ${agent.agentId}:`,
+                          error,
+                        );
+                        // Fall back to plain text if JSON parsing fails
+                        refinementOutput = null;
+                      }
+                    }
                   }
 
                   // Track token usage
@@ -590,7 +623,11 @@ export class FeaturePlannerService {
               }
             }
 
-            return { refinedText, tokenUsage };
+            return {
+              refinedText,
+              refinementOutput,
+              tokenUsage,
+            };
           },
           'claude-agent',
           {
@@ -604,9 +641,13 @@ export class FeaturePlannerService {
 
       const executionTimeMs = Date.now() - startTime;
 
+      // Return structured output if available, otherwise fall back to plain text
+      const finalResult =
+        result.result.result.refinementOutput || result.result.result.refinedText;
+
       return {
         executionTimeMs,
-        result: result.result.result.refinedText,
+        result: finalResult,
         retryCount: result.result.attempts - 1,
         tokenUsage: result.result.result.tokenUsage,
       };
@@ -834,6 +875,56 @@ ${settings.includeProjectContext ? '- Include project context from CLAUDE.md and
 
 OUTPUT:
 Provide only the refined paragraph, nothing else.`;
+  }
+
+  /**
+   * Build role-based refinement prompt with structured JSON output
+   */
+  private static buildRoleBasedRefinementPrompt(
+    originalRequest: string,
+    agent: RefinementAgent,
+    settings: {
+      includeProjectContext: boolean;
+      maxOutputLength: number;
+      minOutputLength: number;
+    },
+  ): string {
+    return `${agent.systemPrompt}
+
+ORIGINAL FEATURE REQUEST:
+${originalRequest}
+
+YOUR TASK:
+Analyze this feature request from your perspective as a ${agent.role} and provide a structured refinement.
+
+REQUIREMENTS:
+- Output length: ${settings.minOutputLength}-${settings.maxOutputLength} words for refinedRequest field
+- Focus on your area of expertise: ${agent.focus}
+- Preserve original scope (do not add features beyond the request)
+- Add technical context relevant to your role
+${settings.includeProjectContext ? '- Use Read/Grep/Glob tools to analyze CLAUDE.md and relevant project files' : '- Do not read project files - analyze based on general knowledge'}
+
+OUTPUT FORMAT:
+You MUST return ONLY a JSON object (no markdown code blocks, no extra text) with this exact structure:
+
+{
+  "refinedRequest": "Clear, detailed description (${settings.minOutputLength}-${settings.maxOutputLength} words)",
+  "focus": "${agent.focus}",
+  "confidence": "high|medium|low",
+  "technicalComplexity": "high|medium|low",
+  "keyRequirements": ["requirement 1", "requirement 2", "requirement 3"],
+  "assumptions": ["assumption 1", "assumption 2"],
+  "risks": ["risk 1", "risk 2"],
+  "estimatedScope": "small|medium|large"
+}
+
+IMPORTANT:
+- Return ONLY the JSON object
+- Start your response with { and end with }
+- No markdown code blocks (\`\`\`json)
+- No explanatory text before or after the JSON
+- Ensure all strings are properly escaped
+- Arrays must contain at least 1 item`;
   }
 
   /**
