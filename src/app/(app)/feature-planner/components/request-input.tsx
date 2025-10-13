@@ -2,10 +2,12 @@
 
 import type { ComponentProps } from 'react';
 
-import { SparklesIcon, UsersIcon } from 'lucide-react';
+import { Lightbulb, SparklesIcon, UsersIcon } from 'lucide-react';
 
 import type { RefinementSettings } from '@/lib/validations/feature-planner.validation';
 
+import { FeatureSuggestionDialog } from '@/app/(app)/feature-planner/components/feature-suggestion-dialog';
+import { useSuggestFeature } from '@/app/(app)/feature-planner/hooks/use-suggest-feature';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,6 +37,9 @@ export const RequestInput = ({
   ...props
 }: RequestInputProps) => {
   const requestInputTestId = generateTestId('feature', 'form');
+
+  // Feature suggestion hook
+  const { closeDialog, isDialogOpen, isLoading, openDialog, suggestions } = useSuggestFeature();
 
   const _isRefineEnabled = value.length > 0 && !isRefining;
   const _characterCount = value.length;
@@ -100,9 +105,31 @@ export const RequestInput = ({
                 Single Refine
               </Button>
             </div>
+
+            {/* AI Feature Suggestion */}
+            <div className={'flex gap-3'}>
+              <Button
+                className={'flex-1'}
+                disabled={!_isRefineEnabled}
+                onClick={openDialog}
+                size={'lg'}
+                variant={'secondary'}
+              >
+                <Lightbulb aria-hidden className={'mr-2 size-4'} />
+                AI Suggest Feature
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Feature Suggestion Dialog */}
+      <FeatureSuggestionDialog
+        isLoading={isLoading}
+        isOpen={isDialogOpen}
+        onClose={closeDialog}
+        suggestions={suggestions}
+      />
     </div>
   );
 };
