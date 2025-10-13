@@ -2,6 +2,7 @@
 
 import {
   ActivityIcon,
+  BrainCircuitIcon,
   ChartSplineIcon,
   HeartIcon,
   LayoutDashboardIcon,
@@ -55,6 +56,12 @@ const navigationLinks: Array<NavigationLink> = [
         href: $path({ route: '/admin/users' }),
         icon: UsersIcon,
         title: 'Users',
+      },
+      {
+        description: 'AI-powered feature planning and implementation workflow',
+        href: $path({ route: '/feature-planner' }),
+        icon: BrainCircuitIcon,
+        title: 'Feature Planner',
       },
     ],
     label: 'Admin',
