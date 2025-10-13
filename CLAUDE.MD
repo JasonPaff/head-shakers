@@ -160,5 +160,3 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
   - **Branch Safety**: Defaults to development branch (`br-dark-forest-adf48tll`)
   - **Production Protection**: Blocks sensitive operations on production branch (`br-dry-forest-adjaydda`)
 - **Operation Logging**: All database operations logged to `docs/{YYYY_MM_DD}/database/validation-log.md`
-
-
