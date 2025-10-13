@@ -9,6 +9,7 @@ import { SCHEMA_LIMITS } from '@/lib/constants';
 export const refinementSettingsSchema = z.object({
   agentCount: z.number().int().min(1).max(5).default(1),
   customModel: z.string().optional(),
+  enableSynthesis: z.boolean().optional().default(false),
   includeProjectContext: z.boolean().default(true),
   maxOutputLength: z
     .number()
@@ -23,6 +24,11 @@ export const refinementSettingsSchema = z.object({
     .max(SCHEMA_LIMITS.REFINEMENT.MIN_OUTPUT_LENGTH.MAX)
     .default(150),
   parallelExecution: z.boolean().optional(),
+  selectedAgentIds: z
+    .array(z.string())
+    .min(1, 'At least one agent must be selected')
+    .max(5, 'Maximum 5 agents can be selected')
+    .optional(),
 });
 
 export type RefinementSettings = RefinementSettingsInput;

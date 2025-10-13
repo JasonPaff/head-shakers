@@ -146,3 +146,19 @@ export const getRefinementAgent = (agentId: string): RefinementAgent | undefined
 export const getRefinementAgents = (count: number): Array<RefinementAgent> => {
   return REFINEMENT_AGENTS.slice(0, Math.min(count, REFINEMENT_AGENTS.length));
 };
+
+/**
+ * Get refinement agents by their IDs
+ */
+export const getRefinementAgentsByIds = (agentIds: Array<string>): Array<RefinementAgent> => {
+  return agentIds
+    .map((id) => REFINEMENT_AGENTS.find((agent) => agent.agentId === id))
+    .filter((agent): agent is RefinementAgent => agent !== undefined);
+};
+
+/**
+ * Get all available refinement agents
+ */
+export const getAllRefinementAgents = (): Array<RefinementAgent> => {
+  return REFINEMENT_AGENTS;
+};

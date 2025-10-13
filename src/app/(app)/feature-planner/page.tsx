@@ -10,6 +10,7 @@ import type {
 } from '@/lib/validations/feature-planner.validation';
 
 import { ActionControls } from '@/app/(app)/feature-planner/components/action-controls';
+import { AgentSelection } from '@/app/(app)/feature-planner/components/agent-selection';
 import { PlanViewerClient } from '@/app/(app)/feature-planner/components/plan-viewer-client';
 import { RefinementResults } from '@/app/(app)/feature-planner/components/refinement-results';
 import { RefinementSettings } from '@/app/(app)/feature-planner/components/refinement-settings';
@@ -38,9 +39,11 @@ export default function FeaturePlannerPage() {
   >([]);
   const [settings, setSettings] = useState<RefinementSettingsType>({
     agentCount: 3,
+    enableSynthesis: false,
     includeProjectContext: true,
     maxOutputLength: 250,
     minOutputLength: 150,
+    selectedAgentIds: [],
   });
   const [stepData, setStepData] = useState<StepData>({});
   const [planId] = useState<null | string>(null);
@@ -135,7 +138,10 @@ export default function FeaturePlannerPage() {
 
       <div className={'mt-8 space-y-8'}>
         {/* Refinement Settings Section */}
-        <RefinementSettings onSettingsChange={handleSettingsChange} settings={settings} />
+        <div className={'flex items-center gap-4'}>
+          <AgentSelection onSettingsChange={handleSettingsChange} settings={settings} />
+          <RefinementSettings onSettingsChange={handleSettingsChange} settings={settings} />
+        </div>
 
         {/* Step Orchestrator Section */}
         <StepOrchestrator

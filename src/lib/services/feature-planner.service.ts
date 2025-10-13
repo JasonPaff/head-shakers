@@ -664,6 +664,118 @@ export class FeaturePlannerService {
   }
 
   /**
+   * Execute synthesis agent to combine multiple refinements
+   *
+   * @param originalRequest - User's original feature request
+   * @param refinements - Array of refinement outputs from specialized agents
+   * @param settings - Refinement settings (length, context, etc.)
+   * @returns Synthesized refinement combining best aspects from all agents
+   */
+  static async executeSynthesisAgent(
+    originalRequest: string,
+    refinements: Array<RefinementOutput>,
+    settings: Pick<
+      RefinementSettings,
+      'customModel' | 'includeProjectContext' | 'maxOutputLength' | 'minOutputLength'
+    >,
+  ): Promise<AgentExecutionResult<RefinementOutput>> {
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-synthesis', {
+      timeoutMs: 620000, // 12 minutes
+    });
+    const startTime = Date.now();
+
+    try {
+      const result = await circuitBreaker.execute(async () => {
+        const retryResult = await withServiceRetry(
+          async () => {
+            let refinementOutput: null | RefinementOutput = null;
+            const tokenUsage = {
+              cacheCreationTokens: 0,
+              cacheReadTokens: 0,
+              completionTokens: 0,
+              promptTokens: 0,
+              totalTokens: 0,
+            };
+
+            const prompt = this.buildSynthesisPrompt(originalRequest, refinements, settings);
+
+            for await (const message of query({
+              options: {
+                allowedTools: [], // Synthesis doesn't need to read files
+                maxTurns: 5,
+                model: settings.customModel || 'claude-sonnet-4-5-20250929',
+                settingSources: ['project'],
+              },
+              prompt,
+            })) {
+              if (message.type === 'assistant') {
+                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
+                if (parseResult.success) {
+                  const validatedMessage = parseResult.data;
+                  const content = validatedMessage.content[0];
+                  if (content?.type === 'text') {
+                    try {
+                      const jsonString = extractJsonFromMarkdown(content.text);
+                      refinementOutput = parseRefinementOutput(jsonString);
+                    } catch (error) {
+                      console.error('[executeSynthesisAgent] Failed to parse synthesis output:', error);
+                      throw new Error('Failed to parse synthesis agent response as JSON');
+                    }
+                  }
+
+                  if (validatedMessage.usage) {
+                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
+                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
+                    tokenUsage.totalTokens =
+                      (validatedMessage.usage.input_tokens ?? 0) +
+                      (validatedMessage.usage.output_tokens ?? 0);
+                    tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
+                    tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
+                  }
+                }
+              }
+            }
+
+            if (!refinementOutput) {
+              throw new Error('Synthesis agent did not return a valid refinement output');
+            }
+
+            return {
+              refinementOutput,
+              tokenUsage,
+            };
+          },
+          'claude-agent',
+          {
+            maxAttempts: 2,
+            operationName: 'refinement-synthesis',
+          },
+        );
+
+        return retryResult;
+      });
+
+      const executionTimeMs = Date.now() - startTime;
+
+      return {
+        executionTimeMs,
+        result: result.result.result.refinementOutput,
+        retryCount: result.result.attempts - 1,
+        tokenUsage: result.result.result.tokenUsage,
+      };
+    } catch (error) {
+      const context: ServiceErrorContext = {
+        endpoint: 'query',
+        isRetryable: true,
+        method: 'executeSynthesisAgent',
+        operation: 'refinement-synthesis',
+        service: 'claude-agent-sdk',
+      };
+      throw createServiceError(context, error);
+    }
+  }
+
+  /**
    * Extract architecture insights from discovered files
    * Analyzes patterns, conventions, and reusable components
    *
@@ -1107,6 +1219,86 @@ START YOUR RESPONSE WITH: \`\`\`json
 END YOUR RESPONSE WITH: \`\`\`
 NO OTHER TEXT ALLOWED.
 </final_reminder>`;
+  }
+
+  /**
+   * Build synthesis prompt for aggregating multiple refinements
+   */
+  private static buildSynthesisPrompt(
+    originalRequest: string,
+    refinements: Array<RefinementOutput>,
+    settings: {
+      includeProjectContext: boolean;
+      maxOutputLength: number;
+      minOutputLength: number;
+    },
+  ): string {
+    const refinementsText = refinements
+      .map(
+        (r, i) => `
+### Refinement ${i + 1}: ${r.focus}
+**Confidence:** ${r.confidence} | **Complexity:** ${r.technicalComplexity} | **Scope:** ${r.estimatedScope}
+
+**Refined Request:**
+${r.refinedRequest}
+
+**Key Requirements:**
+${r.keyRequirements.map((req) => `- ${req}`).join('\n')}
+
+**Assumptions:**
+${r.assumptions.map((assumption) => `- ${assumption}`).join('\n')}
+
+**Risks:**
+${r.risks.map((risk) => `- ${risk}`).join('\n')}
+`,
+      )
+      .join('\n---\n');
+
+    return `You are a senior technical lead synthesizing multiple expert perspectives on a feature request.
+
+ORIGINAL FEATURE REQUEST:
+${originalRequest}
+
+EXPERT REFINEMENTS:
+${refinementsText}
+
+YOUR TASK:
+Synthesize these ${refinements.length} expert refinements into a single comprehensive refinement that:
+1. Combines the best insights from all perspectives
+2. Resolves any contradictions or conflicts
+3. Creates a complete, actionable feature specification
+4. Maintains the original scope (do not add features beyond the request)
+5. Captures cross-functional considerations
+
+SYNTHESIS GUIDELINES:
+- Integrate technical, product, UX, security, and testing perspectives
+- Balance different confidence levels and complexity assessments
+- Merge key requirements without duplication
+- Combine assumptions and identify the most critical ones
+- Consolidate risks and prioritize them by severity
+- Preserve the best technical context from each refinement
+
+OUTPUT FORMAT:
+Return ONLY a JSON object (no markdown code blocks, no extra text) with this structure:
+
+{
+  "refinedRequest": "Comprehensive synthesis (${settings.minOutputLength}-${settings.maxOutputLength} words)",
+  "focus": "Multi-perspective comprehensive analysis",
+  "confidence": "high|medium|low",
+  "technicalComplexity": "high|medium|low",
+  "keyRequirements": ["requirement 1", "requirement 2", "requirement 3"],
+  "assumptions": ["assumption 1", "assumption 2"],
+  "risks": ["risk 1", "risk 2"],
+  "estimatedScope": "small|medium|large"
+}
+
+CRITICAL OUTPUT RULES:
+- Return ONLY the JSON object
+- Start with { and end with }
+- No markdown code blocks (\`\`\`json)
+- No explanatory text
+- Ensure all strings are properly escaped
+- Arrays must contain at least 1 item`;
   }
 
   /**
