@@ -139,7 +139,7 @@ export const RefinementResults = ({
               >
                 {_completedRefinements.map((refinement) => (
                   <TabsTrigger key={refinement.id} value={refinement.agentId}>
-                    {refinement.agentId}
+                    {refinement.agentName || refinement.agentId}
                     {selectedRefinementId === refinement.id && (
                       <CheckCircle2 aria-hidden className={'ml-1 size-3 text-green-500'} />
                     )}

@@ -895,7 +895,7 @@ ORIGINAL FEATURE REQUEST:
 ${originalRequest}
 
 YOUR TASK:
-Analyze this feature request from your perspective as a ${agent.role} and provide a structured refinement.
+Refine this feature request from your ${agent.role} perspective. Return ONLY the JSON object - no preamble, no analysis commentary, no "I will analyze" statements.
 
 REQUIREMENTS:
 - Output length: ${settings.minOutputLength}-${settings.maxOutputLength} words for refinedRequest field
@@ -903,6 +903,12 @@ REQUIREMENTS:
 - Preserve original scope (do not add features beyond the request)
 - Add technical context relevant to your role
 ${settings.includeProjectContext ? '- Use Read/Grep/Glob tools to analyze CLAUDE.md and relevant project files' : '- Do not read project files - analyze based on general knowledge'}
+
+CRITICAL OUTPUT RULES:
+- DO NOT write "I will analyze..." or "I'll provide..." or any meta-commentary
+- DO NOT explain what you're about to do
+- DO NOT write conversational responses
+- IMMEDIATELY return the JSON object as your first and only output
 
 OUTPUT FORMAT:
 You MUST return ONLY a JSON object (no markdown code blocks, no extra text) with this exact structure:

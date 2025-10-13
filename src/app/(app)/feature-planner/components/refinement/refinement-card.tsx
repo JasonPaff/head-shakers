@@ -6,6 +6,7 @@ import { Fragment, useCallback } from 'react';
 import type { FeatureRefinement } from '@/lib/db/schema/feature-planner.schema';
 
 import { RefinementContent } from '@/app/(app)/feature-planner/components/refinement/refinement-content';
+import { RefinementInsights } from '@/app/(app)/feature-planner/components/refinement/refinement-insights';
 import { RefinementMetadata } from '@/app/(app)/feature-planner/components/refinement/refinement-metadata';
 import { ValidationErrorsDisplay } from '@/app/(app)/feature-planner/components/refinement/validation-errors-display';
 import { Button } from '@/components/ui/button';
@@ -80,9 +81,14 @@ export const RefinementCard = ({
     <div className={'space-y-4'}>
       {/* Metadata Section */}
       <RefinementMetadata
+        agentName={refinement.agentName}
+        agentRole={refinement.agentRole}
+        confidence={refinement.confidence}
+        estimatedScope={refinement.estimatedScope}
         executionTimeMs={refinement.executionTimeMs}
         isEdited={_isEdited}
         isSelected={_isSelected}
+        technicalComplexity={refinement.technicalComplexity}
         totalTokens={refinement.totalTokens}
         wordCount={refinement.wordCount}
       />
@@ -94,6 +100,14 @@ export const RefinementCard = ({
         onReset={handleReset}
         onTextChange={handleTextChange}
         text={_currentText}
+      />
+
+      {/* Structured Insights Section */}
+      <RefinementInsights
+        assumptions={refinement.assumptions}
+        focus={refinement.focus}
+        keyRequirements={refinement.keyRequirements}
+        risks={refinement.risks}
       />
 
       {/* Validation Errors Section */}
