@@ -89,14 +89,15 @@ export const executionMetadataSchema = z.record(z.string(), z.unknown());
 export type ExecutionMetadata = z.infer<typeof executionMetadataSchema>;
 
 // ============================================================================
-// TABLE: refinement_agents
-// Stores refinement agent configurations
+// TABLE: custom_agents
+// Stores custom agent configurations (refinement, feature-suggestion, etc.)
 // ============================================================================
 
-export const refinementAgents = featurePlannerSchema.table(
-  'refinement_agents',
+export const customAgents = featurePlannerSchema.table(
+  'custom_agents',
   {
     agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).primaryKey(),
+    agentType: varchar('agent_type', { length: 50 }).default('refinement').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     focus: text('focus').notNull(),
     isActive: boolean('is_active').default(true).notNull(),
@@ -112,21 +113,24 @@ export const refinementAgents = featurePlannerSchema.table(
   (table) => [
     // data validation constraints
     check(
-      'refinement_agents_temperature_range',
+      'custom_agents_temperature_range',
       sql`${table.temperature} >= 0.0 AND ${table.temperature} <= 2.0`,
     ),
-    check('refinement_agents_agent_id_not_empty', sql`length(trim(${table.agentId})) > 0`),
-    check('refinement_agents_name_not_empty', sql`length(trim(${table.name})) > 0`),
-    check('refinement_agents_role_not_empty', sql`length(trim(${table.role})) > 0`),
+    check('custom_agents_agent_id_not_empty', sql`length(trim(${table.agentId})) > 0`),
+    check('custom_agents_name_not_empty', sql`length(trim(${table.name})) > 0`),
+    check('custom_agents_role_not_empty', sql`length(trim(${table.role})) > 0`),
+    check('custom_agents_agent_type_valid', sql`${table.agentType} IN ('refinement', 'feature-suggestion')`),
 
     // single column indexes
-    index('refinement_agents_agent_id_idx').on(table.agentId),
-    index('refinement_agents_is_active_idx').on(table.isActive),
-    index('refinement_agents_is_default_idx').on(table.isDefault),
-    index('refinement_agents_user_id_idx').on(table.userId),
+    index('custom_agents_agent_id_idx').on(table.agentId),
+    index('custom_agents_agent_type_idx').on(table.agentType),
+    index('custom_agents_is_active_idx').on(table.isActive),
+    index('custom_agents_is_default_idx').on(table.isDefault),
+    index('custom_agents_user_id_idx').on(table.userId),
 
     // composite indexes
-    index('refinement_agents_user_active_idx').on(table.userId, table.isActive),
+    index('custom_agents_user_active_idx').on(table.userId, table.isActive),
+    index('custom_agents_user_type_idx').on(table.userId, table.agentType),
   ],
 );
 
@@ -623,11 +627,13 @@ export const planExecutionLogs = featurePlannerSchema.table(
 // TYPE EXPORTS
 // ============================================================================
 
+export type CustomAgent = typeof customAgents.$inferSelect;
 export type DiscoveredFile = typeof discoveredFiles.$inferSelect;
 export type FeaturePlan = typeof featurePlans.$inferSelect;
 export type FeatureRefinement = typeof featureRefinements.$inferSelect;
 export type FileDiscoverySession = typeof fileDiscoverySessions.$inferSelect;
 export type ImplementationPlanGeneration = typeof implementationPlanGenerations.$inferSelect;
+export type NewCustomAgent = typeof customAgents.$inferInsert;
 export type NewDiscoveredFile = typeof discoveredFiles.$inferInsert;
 export type NewFeaturePlan = typeof featurePlans.$inferInsert;
 export type NewFeatureRefinement = typeof featureRefinements.$inferInsert;
@@ -636,8 +642,6 @@ export type NewImplementationPlanGeneration = typeof implementationPlanGeneratio
 export type NewPlanExecutionLog = typeof planExecutionLogs.$inferInsert;
 export type NewPlanStep = typeof planSteps.$inferInsert;
 export type NewPlanStepTemplate = typeof planStepTemplates.$inferInsert;
-export type NewRefinementAgent = typeof refinementAgents.$inferInsert;
 export type PlanExecutionLog = typeof planExecutionLogs.$inferSelect;
 export type PlanStep = typeof planSteps.$inferSelect;
 export type PlanStepTemplate = typeof planStepTemplates.$inferSelect;
-export type RefinementAgent = typeof refinementAgents.$inferSelect;

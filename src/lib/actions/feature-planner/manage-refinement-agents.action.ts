@@ -60,9 +60,9 @@ export const createRefinementAgentAction = authActionClient
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: { agentId: agent.id },
+        data: { agentId: agent.agentId },
         level: SENTRY_LEVELS.INFO,
-        message: `Created refinement agent: ${agent.id}`,
+        message: `Created refinement agent: ${agent.agentId}`,
       });
 
       return {

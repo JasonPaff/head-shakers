@@ -1,11 +1,13 @@
 import { and, desc, eq, inArray, or } from 'drizzle-orm';
 
 import type {
+  CustomAgent,
   DiscoveredFile,
   FeaturePlan,
   FeatureRefinement,
   FileDiscoverySession,
   ImplementationPlanGeneration,
+  NewCustomAgent,
   NewDiscoveredFile,
   NewFeaturePlan,
   NewFeatureRefinement,
@@ -13,14 +15,13 @@ import type {
   NewImplementationPlanGeneration,
   NewPlanExecutionLog,
   NewPlanStep,
-  NewRefinementAgent,
   PlanExecutionLog,
   PlanStep,
-  RefinementAgent,
 } from '@/lib/db/schema/feature-planner.schema';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 
 import {
+  customAgents,
   discoveredFiles,
   featurePlans,
   featureRefinements,
@@ -28,7 +29,6 @@ import {
   implementationPlanGenerations,
   planExecutionLogs,
   planSteps,
-  refinementAgents,
 } from '@/lib/db/schema/feature-planner.schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -92,12 +92,12 @@ export class FeaturePlannerQuery extends BaseQuery {
    * Create refinement agent
    */
   static async createAgentAsync(
-    data: NewRefinementAgent,
+    data: NewCustomAgent,
     context: QueryContext,
-  ): Promise<null | RefinementAgent> {
+  ): Promise<CustomAgent | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance.insert(refinementAgents).values(data).returning();
+    const result = await dbInstance.insert(customAgents).values(data).returning();
 
     return result[0] || null;
   }
@@ -208,16 +208,16 @@ export class FeaturePlannerQuery extends BaseQuery {
     agentId: string,
     userId: string,
     context: QueryContext,
-  ): Promise<null | RefinementAgent> {
+  ): Promise<CustomAgent | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
-      .update(refinementAgents)
+      .update(customAgents)
       .set({ isActive: false, updatedAt: new Date() })
       .where(
         and(
-          eq(refinementAgents.agentId, agentId),
-          context.userId ? eq(refinementAgents.userId, userId) : undefined,
+          eq(customAgents.agentId, agentId),
+          context.userId ? eq(customAgents.userId, userId) : undefined,
         ),
       )
       .returning();
@@ -257,20 +257,20 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Find refinement agent by agentId
    */
-  static async findAgentByIdAsync(agentId: string, context: QueryContext): Promise<null | RefinementAgent> {
+  static async findAgentByIdAsync(agentId: string, context: QueryContext): Promise<CustomAgent | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
       .select()
-      .from(refinementAgents)
+      .from(customAgents)
       .where(
         this.combineFilters(
-          eq(refinementAgents.agentId, agentId),
-          eq(refinementAgents.isActive, true),
+          eq(customAgents.agentId, agentId),
+          eq(customAgents.isActive, true),
           context.userId ?
             // Include default agents OR user's custom agents
-            or(eq(refinementAgents.isDefault, true), eq(refinementAgents.userId, context.userId))
-          : eq(refinementAgents.isDefault, true),
+            or(eq(customAgents.isDefault, true), eq(customAgents.userId, context.userId))
+          : eq(customAgents.isDefault, true),
         ),
       )
       .limit(1);
@@ -288,46 +288,46 @@ export class FeaturePlannerQuery extends BaseQuery {
   static async findAgentsByIdsAsync(
     agentIds: Array<string>,
     context: QueryContext,
-  ): Promise<Array<RefinementAgent>> {
+  ): Promise<Array<CustomAgent>> {
     if (agentIds.length === 0) return [];
 
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
       .select()
-      .from(refinementAgents)
+      .from(customAgents)
       .where(
         this.combineFilters(
-          inArray(refinementAgents.agentId, agentIds),
-          eq(refinementAgents.isActive, true),
+          inArray(customAgents.agentId, agentIds),
+          eq(customAgents.isActive, true),
           context.userId ?
             // Include default agents OR user's custom agents
-            or(eq(refinementAgents.isDefault, true), eq(refinementAgents.userId, context.userId))
-          : eq(refinementAgents.isDefault, true),
+            or(eq(customAgents.isDefault, true), eq(customAgents.userId, context.userId))
+          : eq(customAgents.isDefault, true),
         ),
       )
-      .orderBy(desc(refinementAgents.isDefault), refinementAgents.name);
+      .orderBy(desc(customAgents.isDefault), customAgents.name);
   }
 
   /**
    * Find all active refinement agents
    */
-  static async findAllActiveAgentsAsync(context: QueryContext): Promise<Array<RefinementAgent>> {
+  static async findAllActiveAgentsAsync(context: QueryContext): Promise<Array<CustomAgent>> {
     const dbInstance = this.getDbInstance(context);
 
     return dbInstance
       .select()
-      .from(refinementAgents)
+      .from(customAgents)
       .where(
         this.combineFilters(
-          eq(refinementAgents.isActive, true),
+          eq(customAgents.isActive, true),
           context.userId ?
             // Include default agents OR user's custom agents
-            or(eq(refinementAgents.isDefault, true), eq(refinementAgents.userId, context.userId))
-          : eq(refinementAgents.isDefault, true),
+            or(eq(customAgents.isDefault, true), eq(customAgents.userId, context.userId))
+          : eq(customAgents.isDefault, true),
         ),
       )
-      .orderBy(desc(refinementAgents.isDefault), refinementAgents.name);
+      .orderBy(desc(customAgents.isDefault), customAgents.name);
   }
 
   /**
@@ -504,18 +504,18 @@ export class FeaturePlannerQuery extends BaseQuery {
    */
   static async updateAgentAsync(
     agentId: string,
-    updates: Partial<NewRefinementAgent>,
+    updates: Partial<NewCustomAgent>,
     context: QueryContext,
-  ): Promise<null | RefinementAgent> {
+  ): Promise<CustomAgent | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
-      .update(refinementAgents)
+      .update(customAgents)
       .set({ ...updates, updatedAt: new Date() })
       .where(
         and(
-          eq(refinementAgents.agentId, agentId),
-          context.userId ? eq(refinementAgents.userId, context.userId) : undefined,
+          eq(customAgents.agentId, agentId),
+          context.userId ? eq(customAgents.userId, context.userId) : undefined,
         ),
       )
       .returning();

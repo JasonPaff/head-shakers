@@ -2,12 +2,12 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 
 import type {
-  RefinementAgent as DbRefinementAgent,
+  CustomAgent as DbCustomAgent,
   FeaturePlan,
   FeatureRefinement,
   FileDiscoverySession,
   ImplementationPlanGeneration,
-  NewRefinementAgent,
+  NewCustomAgent,
   PlanStep,
   RefinementSettings,
 } from '@/lib/db/schema/feature-planner.schema';
@@ -101,10 +101,10 @@ export class FeaturePlannerFacade {
    * Create a new refinement agent
    */
   static async createRefinementAgentAsync(
-    agentData: NewRefinementAgent,
+    agentData: NewCustomAgent,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<DbRefinementAgent | null> {
+  ): Promise<DbCustomAgent | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
@@ -176,7 +176,7 @@ export class FeaturePlannerFacade {
     agentId: string,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<DbRefinementAgent | null> {
+  ): Promise<DbCustomAgent | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
@@ -1115,10 +1115,10 @@ export class FeaturePlannerFacade {
    */
   static async updateRefinementAgentAsync(
     agentId: string,
-    updates: Partial<NewRefinementAgent>,
+    updates: Partial<NewCustomAgent>,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<DbRefinementAgent | null> {
+  ): Promise<DbCustomAgent | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
@@ -1362,9 +1362,9 @@ export class FeaturePlannerFacade {
 }
 
 /**
- * Convert database RefinementAgent to config RefinementAgent interface
+ * Convert database CustomAgent to config RefinementAgent interface
  */
-function dbAgentToRefinementAgent(dbAgent: DbRefinementAgent): RefinementAgent {
+function dbAgentToRefinementAgent(dbAgent: DbCustomAgent): RefinementAgent {
   return {
     agentId: dbAgent.agentId,
     focus: dbAgent.focus,
