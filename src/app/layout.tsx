@@ -55,7 +55,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   enableSystem
                 >
                   <TanstackQueryProvider>{children}</TanstackQueryProvider>
-                  <Toaster closeButton duration={2500} position={'top-right'} richColors />
+                  <Toaster closeButton duration={2500} expand position={'top-right'} richColors />
                 </ThemeProvider>
               </NuqsAdapter>
             </TooltipProvider>

@@ -5,25 +5,13 @@ import { z } from 'zod';
  */
 export const refinementOutputSchema = z.object({
   assumptions: z.array(z.string()).describe('Assumptions made during refinement'),
-  confidence: z
-    .enum(['high', 'medium', 'low'])
-    .describe('Confidence level in the refinement quality'),
-  estimatedScope: z
-    .enum(['small', 'medium', 'large'])
-    .describe('Estimated scope of the feature'),
+  confidence: z.enum(['high', 'medium', 'low']).describe('Confidence level in the refinement quality'),
+  estimatedScope: z.enum(['small', 'medium', 'large']).describe('Estimated scope of the feature'),
   focus: z.string().describe('Primary focus area of this refinement'),
-  keyRequirements: z
-    .array(z.string())
-    .min(1)
-    .describe('List of key requirements identified'),
-  refinedRequest: z
-    .string()
-    .min(50)
-    .describe('Clear, detailed description of the feature request'),
+  keyRequirements: z.array(z.string()).min(1).describe('List of key requirements identified'),
+  refinedRequest: z.string().min(50).describe('Clear, detailed description of the feature request'),
   risks: z.array(z.string()).describe('Potential risks or concerns identified'),
-  technicalComplexity: z
-    .enum(['high', 'medium', 'low'])
-    .describe('Estimated technical complexity'),
+  technicalComplexity: z.enum(['high', 'medium', 'low']).describe('Estimated technical complexity'),
 });
 
 export type RefinementOutput = z.infer<typeof refinementOutputSchema>;

@@ -54,7 +54,9 @@ export const RefinementSettings = ({
           <div className={'space-y-4'}>
             <div>
               <h4 className={'leading-none font-medium'}>Refinement Configuration</h4>
-              <p className={'text-sm text-muted-foreground'}>Adjust output settings for the refinement process</p>
+              <p className={'text-sm text-muted-foreground'}>
+                Adjust output settings for the refinement process
+              </p>
             </div>
 
             {/* Output Length */}

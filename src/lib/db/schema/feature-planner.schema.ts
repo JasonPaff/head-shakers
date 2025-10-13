@@ -27,16 +27,8 @@ export const featurePlannerSchema = pgSchema('feature_planner');
 // ============================================================================
 
 export const complexityEnum = featurePlannerSchema.enum('complexity', ENUMS.FEATURE_PLAN.COMPLEXITY);
-export const confidenceLevelEnum = featurePlannerSchema.enum('confidence_level', [
-  'high',
-  'medium',
-  'low',
-]);
-export const estimatedScopeEnum = featurePlannerSchema.enum('estimated_scope', [
-  'small',
-  'medium',
-  'large',
-]);
+export const confidenceLevelEnum = featurePlannerSchema.enum('confidence_level', ['high', 'medium', 'low']);
+export const estimatedScopeEnum = featurePlannerSchema.enum('estimated_scope', ['small', 'medium', 'large']);
 export const executionStepEnum = featurePlannerSchema.enum('execution_step', ENUMS.PLAN_EXECUTION.STEP);
 export const fileDiscoveryStatusEnum = featurePlannerSchema.enum(
   'file_discovery_status',

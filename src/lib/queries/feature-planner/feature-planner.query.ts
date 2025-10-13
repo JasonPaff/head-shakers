@@ -55,7 +55,10 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Batch create plan steps
    */
-  static async batchCreatePlanStepsAsync(steps: Array<NewPlanStep>, context: QueryContext): Promise<Array<PlanStep>> {
+  static async batchCreatePlanStepsAsync(
+    steps: Array<NewPlanStep>,
+    context: QueryContext,
+  ): Promise<Array<PlanStep>> {
     if (steps.length === 0) return [];
 
     const dbInstance = this.getDbInstance(context);

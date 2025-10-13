@@ -10,19 +10,22 @@
 
 The current parallel refinement implementation executes 1-5 identical agents simultaneously using `Promise.all` with proper error handling and database persistence. However, **the agents are not truly specialized** - they all run the same prompt with identical settings, producing similar outputs. This limits the value of parallel execution compared to the sophisticated file discovery system which uses 14 specialized agents with distinct roles.
 
-**Key Finding:** The current implementation achieves *parallel execution* but not *diversity*. All agents are functionally identical, just labeled differently ("agent-1", "agent-2", etc.).
+**Key Finding:** The current implementation achieves _parallel execution_ but not _diversity_. All agents are functionally identical, just labeled differently ("agent-1", "agent-2", etc.).
 
 ---
 
 ## Current Architecture
 
 ### 1. UI Layer
+
 **Files:**
+
 - `src/app/(app)/feature-planner/page.tsx`
 - `src/app/(app)/feature-planner/components/refinement-settings.tsx`
 - `src/app/(app)/feature-planner/components/refinement-results.tsx`
 
 **Capabilities:**
+
 - Settings popover with agent count selector (1-5 agents)
 - Output length controls (min/max word count)
 - Project context toggle (includes CLAUDE.md and package.json)
@@ -31,16 +34,19 @@ The current parallel refinement implementation executes 1-5 identical agents sim
 - Agent selection mechanism with visual indicators
 
 ### 2. Hook Layer
+
 **File:** `src/app/(app)/feature-planner/hooks/use-refinement-flow.ts`
 
 **Key Functions:**
+
 ```typescript
-onRefineRequest()          // Single agent refinement
-onParallelRefineRequest()  // Parallel multi-agent refinement
-onSelectRefinement()       // User selection handler
+onRefineRequest(); // Single agent refinement
+onParallelRefineRequest(); // Parallel multi-agent refinement
+onSelectRefinement(); // User selection handler
 ```
 
 **State Management:**
+
 - `isRefining` - Loading state
 - `allRefinements` - All refinement results
 - `selectedRefinementId` - User's choice
@@ -48,6 +54,7 @@ onSelectRefinement()       // User selection handler
 - `currentPlanId` - Plan tracking
 
 **Flow:**
+
 1. Validates input
 2. Makes POST to `/api/feature-planner/refine`
 3. Updates state with results
@@ -55,9 +62,11 @@ onSelectRefinement()       // User selection handler
 5. Shows success/failure toasts
 
 ### 3. API Layer
+
 **File:** `src/app/api/feature-planner/refine/route.ts`
 
 **Responsibilities:**
+
 - Authentication check
 - Input validation using Zod
 - Plan creation (if new) or retrieval
@@ -65,18 +74,20 @@ onSelectRefinement()       // User selection handler
 - Returns structured JSON response
 
 ### 4. Facade Layer
+
 **File:** `src/lib/facades/feature-planner/feature-planner.facade.ts`
 
 **Method:** `runParallelRefinementAsync`
 
 **Execution Pattern:**
+
 ```typescript
 // Line 480-489: Creates N promises
 const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
   this.runSingleRefinementAsync(
     planId,
     plan.originalRequest,
-    `agent-${i + 1}`,  // Only difference between agents!
+    `agent-${i + 1}`, // Only difference between agents!
     settings,
     userId,
     dbInstance,
@@ -87,6 +98,7 @@ const refinements = await Promise.all(refinementPromises);
 ```
 
 **Per-Agent Execution (`runSingleRefinementAsync`):**
+
 1. Creates database record (status: 'processing')
 2. Calls service layer
 3. Updates record with result or error
@@ -94,11 +106,13 @@ const refinements = await Promise.all(refinementPromises);
 5. Calculates metadata (word count, character count)
 
 ### 5. Service Layer
+
 **File:** `src/lib/services/feature-planner.service.ts`
 
 **Method:** `executeRefinementAgent` (Lines 530-623)
 
 **Implementation Details:**
+
 ```typescript
 // Circuit breaker with 12-minute timeout
 const circuitBreaker = circuitBreakers.externalService('claude-agent-refinement', {
@@ -125,6 +139,7 @@ for await (const message of query({
 ```
 
 **Prompt Construction (Lines 815-837):**
+
 ```typescript
 private static buildRefinementPrompt(
   originalRequest: string,
@@ -148,6 +163,7 @@ Provide only the refined paragraph, nothing else.`;
 ```
 
 **Token Tracking:**
+
 - Prompt tokens
 - Completion tokens
 - Cache creation tokens
@@ -197,14 +213,15 @@ Provide only the refined paragraph, nothing else.`;
 **Problem:** All agents are functionally identical. The only difference is the `agentId` label.
 
 **Evidence:**
+
 ```typescript
 // Facade layer - Line 480
 const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
   this.runSingleRefinementAsync(
     planId,
     plan.originalRequest,
-    `agent-${i + 1}`,      // ← ONLY DIFFERENCE
-    settings,              // ← SAME SETTINGS
+    `agent-${i + 1}`, // ← ONLY DIFFERENCE
+    settings, // ← SAME SETTINGS
     userId,
     dbInstance,
   ),
@@ -212,6 +229,7 @@ const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
 ```
 
 All agents:
+
 - Run the **same prompt**
 - Use the **same model**
 - Have the **same allowedTools**
@@ -224,16 +242,17 @@ All agents:
 
 **Comparison with File Discovery:**
 
-| Feature | File Discovery | Feature Refinement |
-|---------|---------------|-------------------|
-| Agent Count | 14 specialized | 1-5 identical |
-| Specialization | Unique search paths per agent | None |
-| Agent Roles | database, UI, API, hooks, types, etc. | Generic "agent-1", "agent-2" |
-| Output Format | Structured JSON with validation | Plain text |
-| Retry Logic | Format correction on failure | Generic retry |
-| Aggregation | Deduplication + score-based merge | Side-by-side display only |
+| Feature        | File Discovery                        | Feature Refinement           |
+| -------------- | ------------------------------------- | ---------------------------- |
+| Agent Count    | 14 specialized                        | 1-5 identical                |
+| Specialization | Unique search paths per agent         | None                         |
+| Agent Roles    | database, UI, API, hooks, types, etc. | Generic "agent-1", "agent-2" |
+| Output Format  | Structured JSON with validation       | Plain text                   |
+| Retry Logic    | Format correction on failure          | Generic retry                |
+| Aggregation    | Deduplication + score-based merge     | Side-by-side display only    |
 
 **Missing Diversity Techniques:**
+
 - ❌ No temperature variations
 - ❌ No role-based prompts
 - ❌ No perspective variations (e.g., security vs UX focus)
@@ -244,6 +263,7 @@ All agents:
 #### 3. **Simple Prompt Design**
 
 **Current Prompt:**
+
 - Single paragraph format
 - Basic requirements list
 - No chain-of-thought reasoning
@@ -252,6 +272,7 @@ All agents:
 - No confidence scoring
 
 **Advanced Techniques Not Used:**
+
 - Chain of thought ("think step by step")
 - Multi-step reasoning
 - Self-evaluation
@@ -262,6 +283,7 @@ All agents:
 #### 4. **No Result Aggregation**
 
 **Current Behavior:**
+
 - Results displayed in tabs
 - User manually compares
 - User manually selects one
@@ -270,6 +292,7 @@ All agents:
 - No intelligent merging
 
 **Opportunities:**
+
 - Meta-agent to synthesize best aspects
 - Automated quality scoring
 - Confidence-weighted combination
@@ -282,9 +305,9 @@ All agents:
 ```typescript
 // Available but NOT USED:
 interface Options {
-  agents?: Record<string, AgentDefinition>;  // ← Programmatic subagents!
-  maxThinkingTokens?: number;                // ← Extended reasoning
-  includePartialMessages?: boolean;          // ← Streaming updates
+  agents?: Record<string, AgentDefinition>; // ← Programmatic subagents!
+  maxThinkingTokens?: number; // ← Extended reasoning
+  includePartialMessages?: boolean; // ← Streaming updates
   hooks?: Record<HookEvent, HookCallback[]>; // ← Lifecycle hooks
 }
 
@@ -297,6 +320,7 @@ type AgentDefinition = {
 ```
 
 **Example of What's Possible:**
+
 ```typescript
 // This is NOT in the current code but COULD BE:
 const result = query({
@@ -306,25 +330,25 @@ const result = query({
         description: 'Technical architecture and implementation focus',
         prompt: 'You are a senior software architect. Focus on technical feasibility...',
         model: 'opus',
-        tools: ['Read', 'Grep', 'Glob']
+        tools: ['Read', 'Grep', 'Glob'],
       },
       'product-manager': {
         description: 'User experience and business value focus',
         prompt: 'You are a product manager. Focus on user value and requirements...',
         model: 'sonnet',
-        tools: []
+        tools: [],
       },
       'security-expert': {
         description: 'Security and compliance focus',
         prompt: 'You are a security engineer. Focus on threats and mitigation...',
         model: 'sonnet',
-        tools: ['Read']
-      }
+        tools: ['Read'],
+      },
     },
-    maxThinkingTokens: 5000,        // Enable extended reasoning
-    includePartialMessages: true    // Stream results as they arrive
+    maxThinkingTokens: 5000, // Enable extended reasoning
+    includePartialMessages: true, // Stream results as they arrive
   },
-  prompt: originalRequest
+  prompt: originalRequest,
 });
 ```
 
@@ -333,6 +357,7 @@ const result = query({
 ## Comparison: File Discovery vs Feature Refinement
 
 ### File Discovery Architecture (Step 2)
+
 ```typescript
 // Service layer defines 14 specialized agents
 private static readonly SPECIALIZED_AGENTS: Array<SpecializedAgent> = [
@@ -369,6 +394,7 @@ private static buildSpecializedAgentPrompt(
 **Result:** Each agent has a clear role, distinct search space, and specialized instructions.
 
 ### Feature Refinement Architecture (Step 1)
+
 ```typescript
 // Facade creates N identical agents
 const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
@@ -399,10 +425,12 @@ private static buildRefinementPrompt(
 ## Token Usage & Performance
 
 ### Current Metrics (from CLAUDE.md)
+
 - Step 1 (Refinement): Working well, low token usage
 - Step 2 (File Discovery): 10K+ tokens (99.5% completion tokens)
 
 ### Refinement Token Breakdown
+
 ```typescript
 // Service tracks:
 tokenUsage: {
@@ -415,6 +443,7 @@ tokenUsage: {
 ```
 
 **Current Cost Pattern:**
+
 - 3 agents × ~1K tokens each = ~3K tokens per refinement
 - Relatively efficient due to:
   - Simple prompt
@@ -422,6 +451,7 @@ tokenUsage: {
   - Prompt caching enabled (settingSources: ['project'])
 
 **Cost vs Value Trade-off:**
+
 - ✅ Parallel execution is fast (all agents run simultaneously)
 - ❌ Similar outputs reduce value
 - ❌ User still has to manually compare/select
@@ -452,52 +482,52 @@ const REFINEMENT_AGENTS: RefinementAgent[] = [
     name: 'Technical Architecture Agent',
     role: 'Senior Software Architect',
     focus: 'Technical feasibility, system design, implementation patterns',
-    temperature: 0.7,  // More focused
+    temperature: 0.7, // More focused
     tools: ['Read', 'Grep', 'Glob'],
     prompt: `You are a senior software architect. Refine this feature request focusing on:
 - Technical implementation details
 - System architecture implications
 - Integration points with existing codebase
-- Performance and scalability considerations`
+- Performance and scalability considerations`,
   },
   {
     agentId: 'product-manager',
     name: 'Product Management Agent',
     role: 'Senior Product Manager',
     focus: 'User value, requirements clarity, acceptance criteria',
-    temperature: 1.0,  // Balanced
-    tools: [],  // No code access needed
+    temperature: 1.0, // Balanced
+    tools: [], // No code access needed
     prompt: `You are a senior product manager. Refine this feature request focusing on:
 - User value and business impact
 - Clear functional requirements
 - Acceptance criteria
-- Edge cases and error scenarios`
+- Edge cases and error scenarios`,
   },
   {
     agentId: 'ux-designer',
     name: 'UX Design Agent',
     role: 'Senior UX Designer',
     focus: 'User experience, interactions, accessibility',
-    temperature: 1.2,  // More creative
-    tools: ['Read'],  // Can check UI patterns
+    temperature: 1.2, // More creative
+    tools: ['Read'], // Can check UI patterns
     prompt: `You are a senior UX designer. Refine this feature request focusing on:
 - User interactions and workflows
 - UI/UX patterns and conventions
 - Accessibility requirements (ARIA, keyboard navigation)
-- Responsive design considerations`
+- Responsive design considerations`,
   },
   {
     agentId: 'security-engineer',
     name: 'Security Agent',
     role: 'Security Engineer',
     focus: 'Security, authentication, data protection',
-    temperature: 0.5,  // Very focused
+    temperature: 0.5, // Very focused
     tools: ['Read', 'Grep'],
     prompt: `You are a security engineer. Refine this feature request focusing on:
 - Security implications and threats
 - Authentication and authorization requirements
 - Data protection and privacy concerns
-- Input validation and sanitization needs`
+- Input validation and sanitization needs`,
   },
   {
     agentId: 'test-engineer',
@@ -510,12 +540,13 @@ const REFINEMENT_AGENTS: RefinementAgent[] = [
 - Testability and test coverage
 - Edge cases and error conditions
 - Quality gates and acceptance criteria
-- Integration and E2E test scenarios`
-  }
+- Integration and E2E test scenarios`,
+  },
 ];
 ```
 
 **Benefits:**
+
 - Each agent provides a unique perspective
 - Diverse outputs with different technical focuses
 - User can select based on project priorities
@@ -539,6 +570,7 @@ interface RefinementOutput {
 ```
 
 **Prompt Format:**
+
 ```typescript
 const prompt = `${rolePrompt}
 
@@ -561,6 +593,7 @@ OUTPUT FORMAT (JSON only):
 ```
 
 **Benefits:**
+
 - Consistent parsing
 - Rich metadata for UI
 - Enables automated quality scoring
@@ -605,6 +638,7 @@ OUTPUT: Same JSON format as individual agents.`;
 ```
 
 **Benefits:**
+
 - Best-of-all-worlds refinement
 - Reduces user decision burden
 - Captures cross-functional insights
@@ -617,13 +651,13 @@ OUTPUT: Same JSON format as individual agents.`;
 ```typescript
 async function progressiveRefinement(
   originalRequest: string,
-  settings: RefinementSettings
+  settings: RefinementSettings,
 ): Promise<ProgressiveRefinementResult> {
   // Stage 1: Quick parallel refinements (5 agents, short output)
   const stage1 = await runParallelRefinements(originalRequest, {
     ...settings,
     agentCount: 5,
-    maxOutputLength: 150  // Quick iterations
+    maxOutputLength: 150, // Quick iterations
   });
 
   // Stage 2: User or auto-select best 2-3
@@ -631,13 +665,13 @@ async function progressiveRefinement(
 
   // Stage 3: Deep refinement of selected candidates
   const stage2 = await Promise.all(
-    selected.map(refinement =>
+    selected.map((refinement) =>
       deepRefineWithCritique(refinement, {
-        maxOutputLength: 350,  // More detailed
-        maxThinkingTokens: 5000,  // Enable reasoning
-        includeProjectContext: true
-      })
-    )
+        maxOutputLength: 350, // More detailed
+        maxThinkingTokens: 5000, // Enable reasoning
+        includeProjectContext: true,
+      }),
+    ),
   );
 
   // Stage 4: Final synthesis
@@ -648,6 +682,7 @@ async function progressiveRefinement(
 ```
 
 **Benefits:**
+
 - Iterative improvement
 - Balances breadth and depth
 - Can show progressive evolution
@@ -662,14 +697,14 @@ async function progressiveRefinement(
 async function executeRefinementAgentStreaming(
   originalRequest: string,
   settings: RefinementSettings,
-  onUpdate: (agentId: string, partialText: string) => void
+  onUpdate: (agentId: string, partialText: string) => void,
 ): Promise<AgentExecutionResult<string>> {
   for await (const message of query({
     options: {
       ...options,
-      includePartialMessages: true  // ← Enable streaming
+      includePartialMessages: true, // ← Enable streaming
     },
-    prompt
+    prompt,
   })) {
     if (message.type === 'stream_event') {
       // Send partial updates to UI
@@ -685,6 +720,7 @@ async function executeRefinementAgentStreaming(
 ```
 
 **UI Benefits:**
+
 - Real-time progress
 - User sees refinements as they generate
 - Reduced perceived latency
@@ -698,35 +734,36 @@ async function executeRefinementAgentStreaming(
 const AGENT_VARIATIONS = [
   {
     agentId: 'focused-agent-1',
-    temperature: 0.5,  // Very focused
-    model: 'claude-sonnet-4-5-20250929'
+    temperature: 0.5, // Very focused
+    model: 'claude-sonnet-4-5-20250929',
   },
   {
     agentId: 'balanced-agent-1',
-    temperature: 1.0,  // Balanced
-    model: 'claude-sonnet-4-5-20250929'
+    temperature: 1.0, // Balanced
+    model: 'claude-sonnet-4-5-20250929',
   },
   {
     agentId: 'creative-agent-1',
-    temperature: 1.3,  // More creative
-    model: 'claude-opus-4-5-20250929'  // More powerful model
+    temperature: 1.3, // More creative
+    model: 'claude-opus-4-5-20250929', // More powerful model
   },
   {
     agentId: 'reasoning-agent-1',
     temperature: 0.8,
     model: 'claude-sonnet-4-5-20250929',
-    maxThinkingTokens: 10000  // Extended reasoning
+    maxThinkingTokens: 10000, // Extended reasoning
   },
   {
     agentId: 'concise-agent-1',
     temperature: 0.6,
-    model: 'claude-haiku-4-20250929',  // Faster, more concise
-    maxOutputLength: 150
-  }
+    model: 'claude-haiku-4-20250929', // Faster, more concise
+    maxOutputLength: 150,
+  },
 ];
 ```
 
 **Benefits:**
+
 - Output diversity from same prompt
 - Different quality/cost trade-offs
 - Can A/B test approaches
@@ -775,6 +812,7 @@ OUTPUT: Improved version incorporating the best insights.`,
 ```
 
 **Benefits:**
+
 - Self-improving system
 - Captures overlooked aspects
 - Builds consensus
@@ -785,6 +823,7 @@ OUTPUT: Improved version incorporating the best insights.`,
 ## Recommended Implementation Priorities
 
 ### Phase 1: Quick Wins (1-2 days)
+
 1. **Add 5 specialized role-based agents**
    - Technical, Product, UX, Security, Testing
    - Unique prompts per role
@@ -801,6 +840,7 @@ OUTPUT: Improved version incorporating the best insights.`,
    - Better comparison view
 
 ### Phase 2: Advanced Features (3-5 days)
+
 1. **Result aggregation agent**
    - Synthesize best aspects
    - Automated quality ranking
@@ -817,6 +857,7 @@ OUTPUT: Improved version incorporating the best insights.`,
    - Quality gates
 
 ### Phase 3: Experimental (5-7 days)
+
 1. **Debate pattern**
    - Agent critique rounds
    - Self-improvement
@@ -837,14 +878,15 @@ OUTPUT: Improved version incorporating the best insights.`,
 ## Code Examples
 
 ### Current Implementation
+
 ```typescript
 // src/lib/facades/feature-planner/feature-planner.facade.ts:480-489
 const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
   this.runSingleRefinementAsync(
     planId,
     plan.originalRequest,
-    `agent-${i + 1}`,        // ← Generic label
-    settings,                // ← Same settings
+    `agent-${i + 1}`, // ← Generic label
+    settings, // ← Same settings
     userId,
     dbInstance,
   ),
@@ -852,6 +894,7 @@ const refinementPromises = Array.from({ length: settings.agentCount }, (_, i) =>
 ```
 
 ### Proposed Implementation (Phase 1)
+
 ```typescript
 // New: src/lib/services/feature-planner-agents.ts
 export const REFINEMENT_AGENTS = [
@@ -861,19 +904,18 @@ export const REFINEMENT_AGENTS = [
     role: 'Senior Software Architect',
     temperature: 0.7,
     tools: ['Read', 'Grep', 'Glob'],
-    systemPrompt: 'You are a senior software architect...'
+    systemPrompt: 'You are a senior software architect...',
   },
   // ... 4 more specialized agents
 ];
 
 // Modified facade
-const refinementPromises = REFINEMENT_AGENTS
-  .slice(0, settings.agentCount)  // Use N agents based on settings
-  .map(agent =>
+const refinementPromises = REFINEMENT_AGENTS.slice(0, settings.agentCount) // Use N agents based on settings
+  .map((agent) =>
     this.runSingleRefinementAsync(
       planId,
       plan.originalRequest,
-      agent,                  // ← Pass full agent config
+      agent, // ← Pass full agent config
       settings,
       userId,
       dbInstance,
@@ -882,6 +924,7 @@ const refinementPromises = REFINEMENT_AGENTS
 ```
 
 ### Proposed Service Layer (Phase 1)
+
 ```typescript
 // Modified: executeRefinementAgent
 static async executeRefinementAgent(
@@ -915,6 +958,7 @@ static async executeRefinementAgent(
 ## Testing Strategy
 
 ### Unit Tests
+
 ```typescript
 describe('FeaturePlannerService', () => {
   describe('executeRefinementAgent', () => {
@@ -942,6 +986,7 @@ describe('FeaturePlannerService', () => {
 ```
 
 ### Integration Tests
+
 ```typescript
 describe('Parallel Refinement Integration', () => {
   it('should generate diverse refinements from specialized agents', async () => {
@@ -970,12 +1015,14 @@ describe('Parallel Refinement Integration', () => {
 ## Performance Considerations
 
 ### Current Performance
+
 - ✅ Parallel execution (all agents start simultaneously)
 - ✅ Fast overall (N agents ≈ time of 1 agent)
 - ⚠️ Token usage scales linearly with agent count
 - ⚠️ Cost increases with specialized agents (more context)
 
 ### Optimization Strategies
+
 1. **Prompt Caching** (already enabled)
    - `settingSources: ['project']` enables caching
    - Reduces prompt tokens on repeated requests
@@ -1000,12 +1047,14 @@ describe('Parallel Refinement Integration', () => {
 ## Migration Path
 
 ### Step 1: Add Agent Definitions (No Breaking Changes)
+
 ```typescript
 // New file: src/lib/config/refinement-agents.ts
 export const REFINEMENT_AGENTS = [...];
 ```
 
 ### Step 2: Update Service Layer (Backward Compatible)
+
 ```typescript
 // Overload executeRefinementAgent
 static async executeRefinementAgent(
@@ -1019,6 +1068,7 @@ static async executeRefinementAgent(
 ```
 
 ### Step 3: Update Facade (Backward Compatible)
+
 ```typescript
 static async runParallelRefinementAsync(...) {
   // Use REFINEMENT_AGENTS if available, fallback to old behavior
@@ -1028,6 +1078,7 @@ static async runParallelRefinementAsync(...) {
 ```
 
 ### Step 4: Update UI (Additive)
+
 ```typescript
 // Show agent role in tabs
 <TabsTrigger>
@@ -1038,6 +1089,7 @@ static async runParallelRefinementAsync(...) {
 ```
 
 ### Step 5: Database Migration (Non-Breaking)
+
 ```sql
 -- Add new columns to feature_refinements table
 ALTER TABLE feature_refinements
@@ -1050,7 +1102,7 @@ ADD COLUMN refinement_metadata JSONB;
 
 ## Conclusion
 
-The current parallel refinement implementation is **architecturally sound** with proper error handling, database persistence, and clean separation of concerns. However, it achieves *parallel execution* without *diversity*.
+The current parallel refinement implementation is **architecturally sound** with proper error handling, database persistence, and clean separation of concerns. However, it achieves _parallel execution_ without _diversity_.
 
 **The Key Gap:** All agents run the same prompt with the same settings, producing similar outputs. This contrasts sharply with the sophisticated file discovery system, which uses 14 specialized agents with distinct roles.
 
@@ -1063,6 +1115,7 @@ The current parallel refinement implementation is **architecturally sound** with
 ## References
 
 **Files Analyzed:**
+
 - `src/app/(app)/feature-planner/page.tsx` - Main page component
 - `src/app/(app)/feature-planner/hooks/use-refinement-flow.ts` - React hook layer
 - `src/app/(app)/feature-planner/components/refinement-settings.tsx` - Settings UI
@@ -1073,6 +1126,7 @@ The current parallel refinement implementation is **architecturally sound** with
 - `docs/claude-typescript-sdk.md` - SDK documentation
 
 **Key SDK Features Referenced:**
+
 - `query()` function (Lines 17-38)
 - `Options` interface (Lines 84-118)
 - `AgentDefinition` type (Lines 137-156)

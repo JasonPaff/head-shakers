@@ -6,10 +6,7 @@ import type { FileDiscoveryResult, RefinementSettings } from '@/lib/db/schema/fe
 import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
-import {
-  extractJsonFromMarkdown,
-  parseRefinementOutput,
-} from '@/lib/types/refinement-output';
+import { extractJsonFromMarkdown, parseRefinementOutput } from '@/lib/types/refinement-output';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
 import { withServiceRetry } from '@/lib/utils/retry';
@@ -565,13 +562,14 @@ export class FeaturePlannerService {
             };
 
             // Build agent prompt (role-based if agent provided, otherwise generic)
-            const prompt = agent ?
+            const prompt =
+              agent ?
                 this.buildRoleBasedRefinementPrompt(originalRequest, agent, settings)
               : this.buildRefinementPrompt(originalRequest, settings);
 
             // Determine tools to use (agent-specific or setting-based)
-            const allowedTools = agent ?
-                agent.tools
+            const allowedTools =
+              agent ? agent.tools
               : settings.includeProjectContext ? ['Read', 'Grep', 'Glob']
               : [];
 
@@ -669,8 +667,7 @@ export class FeaturePlannerService {
       const executionTimeMs = Date.now() - startTime;
 
       // Return structured output if available, otherwise fall back to plain text
-      const finalResult =
-        result.result.result.refinementOutput || result.result.result.refinedText;
+      const finalResult = result.result.result.refinementOutput || result.result.result.refinedText;
 
       return {
         executionTimeMs,

@@ -22,6 +22,7 @@ The feature-planner components have several violations of the React Coding Conve
 **File**: `.claude/conventions/React-Coding-Conventions.md` vs `src/components/ui/conditional.tsx`
 
 **Issue**: The conventions document shows using `condition` prop:
+
 ```tsx
 <Conditional condition={_isDataReady}>
   <ComplexDashboard />
@@ -29,6 +30,7 @@ The feature-planner components have several violations of the React Coding Conve
 ```
 
 But the actual `Conditional` component uses `isCondition`:
+
 ```tsx
 interface ConditionalRenderProps {
   isCondition: (() => boolean | null | undefined) | boolean | null | undefined;
@@ -56,6 +58,7 @@ interface ConditionalRenderProps {
    - Too many responsibilities
 
 2. **State Management Pattern** (Lines 50-69)
+
    ```tsx
    const [state, setState] = useState<FeaturePlannerState>({
      allRefinements: null,
@@ -64,9 +67,11 @@ interface ConditionalRenderProps {
      // ... 15+ properties
    });
    ```
+
    **Violation**: Conventions recommend multiple `useState` calls for separate concerns
 
    **Should be**:
+
    ```tsx
    const [isDiscoveringFiles, setIsDiscoveringFiles] = useState(false);
    const [isGeneratingPlan, setIsGeneratingPlan] = useState(false);
@@ -146,6 +151,7 @@ interface ConditionalRenderProps {
 **Extract the following components:**
 
 1. **RefinementCard** - Reusable card for displaying a single refinement
+
    ```tsx
    interface RefinementCardProps {
      refinement: FeatureRefinement;
@@ -159,6 +165,7 @@ interface ConditionalRenderProps {
    ```
 
 2. **RefinementMetadata** - Badges display
+
    ```tsx
    interface RefinementMetadataProps {
      wordCount: number;
@@ -170,6 +177,7 @@ interface ConditionalRenderProps {
    ```
 
 3. **RefinementContent** - Text display/editing
+
    ```tsx
    interface RefinementContentProps {
      text: string;
@@ -217,6 +225,7 @@ interface ConditionalRenderProps {
 **Extract the following components:**
 
 1. **PriorityStatsGrid** (Lines 170-199)
+
    ```tsx
    interface PriorityStatsGridProps {
      criticalCount: number;
@@ -233,6 +242,7 @@ interface ConditionalRenderProps {
    ```
 
 2. **FileSelectionControls** (Lines 202-220)
+
    ```tsx
    interface FileSelectionControlsProps {
      isAllSelected: boolean;
@@ -243,6 +253,7 @@ interface ConditionalRenderProps {
    ```
 
 3. **PriorityGroup** (Lines 232-402)
+
    ```tsx
    interface PriorityGroupProps {
      label: string;
@@ -256,6 +267,7 @@ interface ConditionalRenderProps {
    ```
 
 4. **DiscoveredFileItem**
+
    ```tsx
    interface DiscoveredFileItemProps {
      file: DiscoveredFile;
@@ -290,10 +302,16 @@ interface ConditionalRenderProps {
    - Better than others but still could be smaller
 
 2. **Utility Functions Not Memoized** (Lines 89-118)
+
    ```tsx
-   const getComplexityColor = (complexity: null | string) => { /* ... */ };
-   const getRiskLevelColor = (riskLevel: null | string) => { /* ... */ };
+   const getComplexityColor = (complexity: null | string) => {
+     /* ... */
+   };
+   const getRiskLevelColor = (riskLevel: null | string) => {
+     /* ... */
+   };
    ```
+
    - Should use `useCallback` since they're used in render
    - Or move outside component if they don't need props/state
 
@@ -362,17 +380,17 @@ interface ConditionalRenderProps {
 
 ## Pattern Compliance Summary
 
-| Component | Size | Duplication | Organization | Comments | Overall |
-|-----------|------|-------------|--------------|----------|---------|
-| page.tsx | ❌ 668 | ✅ None | ❌ Poor | ⚠️ Minimal | ❌ Needs Major Refactor |
-| refinement-results.tsx | ❌ 413 | ❌ High | ⚠️ Fair | ❌ None | ❌ Needs Major Refactor |
-| file-discovery-results.tsx | ❌ 411 | ✅ None | ⚠️ Fair | ❌ None | ⚠️ Needs Refactor |
-| plan-viewer-client.tsx | ⚠️ 354 | ✅ None | ✅ Good | ⚠️ Minimal | ⚠️ Needs Minor Refactor |
-| step-two.tsx | ✅ 147 | ✅ None | ✅ Good | ⚠️ Minimal | ✅ Minor Improvements |
-| request-input.tsx | ✅ 111 | ✅ None | ✅ Good | ⚠️ Minimal | ✅ Minor Improvements |
-| step-orchestrator.tsx | ✅ 110 | ✅ None | ✅ Good | ✅ Present | ✅ Good |
-| step-one.tsx | ✅ 45 | ✅ None | ✅ Good | ✅ Present | ✅ Good |
-| step-three.tsx | ✅ 124 | ✅ None | ✅ Good | ✅ Present | ✅ Good |
+| Component                  | Size   | Duplication | Organization | Comments   | Overall                 |
+| -------------------------- | ------ | ----------- | ------------ | ---------- | ----------------------- |
+| page.tsx                   | ❌ 668 | ✅ None     | ❌ Poor      | ⚠️ Minimal | ❌ Needs Major Refactor |
+| refinement-results.tsx     | ❌ 413 | ❌ High     | ⚠️ Fair      | ❌ None    | ❌ Needs Major Refactor |
+| file-discovery-results.tsx | ❌ 411 | ✅ None     | ⚠️ Fair      | ❌ None    | ⚠️ Needs Refactor       |
+| plan-viewer-client.tsx     | ⚠️ 354 | ✅ None     | ✅ Good      | ⚠️ Minimal | ⚠️ Needs Minor Refactor |
+| step-two.tsx               | ✅ 147 | ✅ None     | ✅ Good      | ⚠️ Minimal | ✅ Minor Improvements   |
+| request-input.tsx          | ✅ 111 | ✅ None     | ✅ Good      | ⚠️ Minimal | ✅ Minor Improvements   |
+| step-orchestrator.tsx      | ✅ 110 | ✅ None     | ✅ Good      | ✅ Present | ✅ Good                 |
+| step-one.tsx               | ✅ 45  | ✅ None     | ✅ Good      | ✅ Present | ✅ Good                 |
+| step-three.tsx             | ✅ 124 | ✅ None     | ✅ Good      | ✅ Present | ✅ Good                 |
 
 ---
 
@@ -405,6 +423,7 @@ return (
 **Convention**: Components should ideally be under 300 lines
 
 **Current state**:
+
 - page.tsx: 668 lines (223% over)
 - refinement-results.tsx: 413 lines (138% over)
 - file-discovery-results.tsx: 411 lines (137% over)
@@ -441,12 +460,14 @@ return (
 ## Estimated Impact
 
 **Before Refactoring:**
+
 - Total lines: ~2,300
 - Average component size: 256 lines
 - Components > 300 lines: 4
 - Duplicated code: ~186 lines
 
 **After Refactoring:**
+
 - Total lines: ~2,400 (slight increase due to component interfaces)
 - Average component size: ~120 lines
 - Components > 300 lines: 0
@@ -454,6 +475,7 @@ return (
 - New reusable components: 15+
 
 **Benefits:**
+
 - ✅ Better maintainability
 - ✅ Easier testing
 - ✅ Better code reusability

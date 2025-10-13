@@ -85,7 +85,7 @@ export const featurePlans = pgTable(
   },
   (table) => [
     // indexes and constraints
-  ]
+  ],
 );
 
 // After
@@ -99,11 +99,12 @@ export const featurePlans = pgTable(
   ],
   {
     schema: 'feature_planner',
-  }
+  },
 );
 ```
 
 **Apply to all 8 tables**:
+
 - `featurePlans` (line 81)
 - `featureRefinements` (line 152)
 - `fileDiscoverySessions` (line 228)
@@ -457,6 +458,7 @@ ORDER BY fp.created_at DESC;
 #### 6.1 Query Files
 
 Check `src/lib/queries/feature-planner/feature-planner.query.ts`:
+
 - All imports work correctly
 - Queries execute successfully
 - Results are properly typed
@@ -464,17 +466,20 @@ Check `src/lib/queries/feature-planner/feature-planner.query.ts`:
 #### 6.2 Facade Files
 
 Check `src/lib/facades/feature-planner/feature-planner.facade.ts`:
+
 - All database operations work
 - Transactions span schemas correctly
 
 #### 6.3 Action Files
 
 Check `src/lib/actions/feature-planner/feature-planner.actions.ts`:
+
 - Server actions execute successfully
 
 #### 6.4 API Routes
 
 Check all routes in `src/app/api/feature-planner/`:
+
 - All endpoints return correct data
 - Error handling works
 
@@ -541,19 +546,19 @@ git checkout HEAD -- src/lib/db/schema/feature-planner.schema.ts
 
 ## Timeline Estimate
 
-| Phase | Task | Duration |
-|-------|------|----------|
-| 1 | Schema definition updates | 30 min |
-| 2 | Generate migration | 5 min |
-| 3 | Review generated migration | 15 min |
-| 4 | Manual migration adjustments (if needed) | 30-60 min |
-| 5.1 | Pre-migration verification | 10 min |
-| 5.2 | Run migration on dev branch | 5 min |
-| 5.3 | Post-migration verification | 15 min |
-| 5.4 | Application testing | 20 min |
-| 5.5 | Query performance verification | 10 min |
-| 6 | Application code verification | 10 min |
-| **Total** | | **2h 30m - 3h 30m** |
+| Phase     | Task                                     | Duration            |
+| --------- | ---------------------------------------- | ------------------- |
+| 1         | Schema definition updates                | 30 min              |
+| 2         | Generate migration                       | 5 min               |
+| 3         | Review generated migration               | 15 min              |
+| 4         | Manual migration adjustments (if needed) | 30-60 min           |
+| 5.1       | Pre-migration verification               | 10 min              |
+| 5.2       | Run migration on dev branch              | 5 min               |
+| 5.3       | Post-migration verification              | 15 min              |
+| 5.4       | Application testing                      | 20 min              |
+| 5.5       | Query performance verification           | 10 min              |
+| 6         | Application code verification            | 10 min              |
+| **Total** |                                          | **2h 30m - 3h 30m** |
 
 ## Success Criteria
 

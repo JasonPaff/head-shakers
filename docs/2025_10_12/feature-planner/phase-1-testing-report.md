@@ -47,19 +47,20 @@ The Phase 1 implementation of role-based refinement agents has **critical databa
 
 ```typescript
 structuredData = {
-  agentName: agent.name,           // ❌ Column doesn't exist
-  agentRole: agent.role,           // ❌ Column doesn't exist
-  focus: result.result.focus,      // ❌ Column doesn't exist
+  agentName: agent.name, // ❌ Column doesn't exist
+  agentRole: agent.role, // ❌ Column doesn't exist
+  focus: result.result.focus, // ❌ Column doesn't exist
   assumptions: result.result.assumptions,
   confidence: result.result.confidence,
   estimatedScope: result.result.estimatedScope,
   keyRequirements: result.result.keyRequirements,
   risks: result.result.risks,
   technicalComplexity: result.result.technicalComplexity,
-}
+};
 ```
 
 **Database Reality:** The `feature_refinements` table only has:
+
 - `agent_id` (exists)
 - `agent_model` (exists)
 - NO `agent_role` column
@@ -73,15 +74,16 @@ structuredData = {
 
 **Test Case:** "Add a dark mode toggle to the user profile settings page with smooth animations"
 
-| Agent | Status | Error |
-|-------|--------|-------|
+| Agent               | Status    | Error                      |
+| ------------------- | --------- | -------------------------- |
 | technical-architect | ❌ Failed | No database record created |
-| product-manager | ❌ Failed | No database record created |
-| ux-designer | ❌ Failed | No database record created |
+| product-manager     | ❌ Failed | No database record created |
+| ux-designer         | ❌ Failed | No database record created |
 
 **UI Notification:** "Successfully completed 0 refinement"
 
 **Database Query Results:**
+
 ```sql
 SELECT * FROM feature_refinements
 WHERE plan_id = '344defc9-695c-48a5-b6cb-e5534bb48650';
@@ -183,7 +185,7 @@ const updateData = {
   // ... existing fields ...
   agentName: structuredData.agentName,
   agentRole: structuredData.agentRole,
-  agentFocus: structuredData.focus,  // Map 'focus' to 'agentFocus'
+  agentFocus: structuredData.focus, // Map 'focus' to 'agentFocus'
   refinementMetadata: {
     confidence: structuredData.confidence,
     technicalComplexity: structuredData.technicalComplexity,
@@ -202,6 +204,7 @@ Once the database migration is complete, update the UI to display agent metadata
 **File:** `src/app/(app)/feature-planner/components/refinement-results.tsx`
 
 Add badges showing:
+
 - Agent role (e.g., "Technical Architect")
 - Confidence level
 - Technical complexity
@@ -210,6 +213,7 @@ Add badges showing:
 **File:** `src/app/(app)/feature-planner/components/refinement/refinement-card.tsx`
 
 Display structured metadata:
+
 - Key requirements (bullet list)
 - Assumptions (if any)
 - Risks (if any)
@@ -219,21 +223,25 @@ Display structured metadata:
 ## Migration Execution Plan
 
 ### Step 1: Create Migration
+
 ```bash
 npm run db:generate
 # Or manually create: src/lib/db/migrations/XXXX_add_refinement_agent_metadata.sql
 ```
 
 ### Step 2: Update Drizzle Schema
+
 Edit `src/lib/db/schema/feature-planner.schema.ts` as shown above
 
 ### Step 3: Run Migration on Dev Branch
+
 ```bash
 npm run db:migrate
 # Targets: br-dark-forest-adf48tll (dev branch)
 ```
 
 ### Step 4: Verify Migration
+
 ```sql
 -- Check new columns exist
 SELECT column_name, data_type
@@ -243,6 +251,7 @@ AND column_name IN ('agent_role', 'agent_focus', 'agent_name', 'refinement_metad
 ```
 
 ### Step 5: Re-test Feature
+
 1. Navigate to http://localhost:3000/feature-planner
 2. Enter feature request: "Add dark mode toggle to user profile settings"
 3. Click "Parallel Refine (3 Agents)"
@@ -250,7 +259,9 @@ AND column_name IN ('agent_role', 'agent_focus', 'agent_name', 'refinement_metad
 5. Check database for populated agent metadata
 
 ### Step 6: Migrate to Production
+
 Once verified on dev branch:
+
 ```bash
 # Create production migration PR
 # Run migration on br-dry-forest-adjaydda (production branch)

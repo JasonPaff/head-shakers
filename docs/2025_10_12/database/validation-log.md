@@ -340,14 +340,14 @@
 "projectId": "misty-boat-49919732",
 "branchId": "br-dark-forest-adf48tll",
 "databaseName": "head-shakers",
-"sql": "SELECT 'Step 1 Refinement' as step, AVG(execution_time_ms) as avg_time_ms, MAX(execution_time_ms) as max_time_ms, MIN(execution_time_ms) as min_time_ms, COUNT(_) as count FROM feature_refinements WHERE created_at > NOW() - INTERVAL '30 minutes' UNION ALL SELECT 'Step 2 Discovery', AVG(execution_time_ms), MAX(execution_time_ms), MIN(execution_time_ms), COUNT(_) FROM file_discovery_sessions WHERE created_at > NOW() - INTERVAL '30 minutes';"
+"sql": "SELECT 'Step 1 Refinement' as step, AVG(execution*time_ms) as avg_time_ms, MAX(execution_time_ms) as max_time_ms, MIN(execution_time_ms) as min_time_ms, COUNT(*) as count FROM feature*refinements WHERE created_at > NOW() - INTERVAL '30 minutes' UNION ALL SELECT 'Step 2 Discovery', AVG(execution_time_ms), MAX(execution_time_ms), MIN(execution_time_ms), COUNT(*) FROM file*discovery_sessions WHERE created_at > NOW() - INTERVAL '30 minutes';"
 }
 } - **Modified Params**: {
 "params": {
 "projectId": "misty-boat-49919732",
 "branchId": "br-dark-forest-adf48tll",
 "databaseName": "head-shakers",
-"sql": "SELECT 'Step 1 Refinement' as step, AVG(execution_time_ms) as avg_time_ms, MAX(execution_time_ms) as max_time_ms, MIN(execution_time_ms) as min_time_ms, COUNT(_) as count FROM feature_refinements WHERE created_at > NOW() - INTERVAL '30 minutes' UNION ALL SELECT 'Step 2 Discovery', AVG(execution_time_ms), MAX(execution_time_ms), MIN(execution_time_ms), COUNT(_) FROM file_discovery_sessions WHERE created_at > NOW() - INTERVAL '30 minutes';"
+"sql": "SELECT 'Step 1 Refinement' as step, AVG(execution_time_ms) as avg_time_ms, MAX(execution_time_ms) as max_time_ms, MIN(execution_time_ms) as min_time_ms, COUNT(*) as count FROM feature*refinements WHERE created_at > NOW() - INTERVAL '30 minutes' UNION ALL SELECT 'Step 2 Discovery', AVG(execution_time_ms), MAX(execution_time_ms), MIN(execution_time_ms), COUNT(*) FROM file_discovery_sessions WHERE created_at > NOW() - INTERVAL '30 minutes';"
 },
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",

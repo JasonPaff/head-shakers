@@ -96,7 +96,9 @@ export const PlanStepItem = ({ index, step }: PlanStepItemProps) => {
               <div>
                 <h4 className={'mb-1 text-sm font-medium'}>Commands</h4>
                 <ul className={'list-inside list-disc space-y-1 text-sm text-muted-foreground'}>
-                  {step.commands?.map((command, cmdIndex) => <li key={cmdIndex}>{command}</li>)}
+                  {step.commands?.map((command, cmdIndex) => (
+                    <li key={cmdIndex}>{command}</li>
+                  ))}
                 </ul>
               </div>
             </Conditional>
@@ -106,7 +108,9 @@ export const PlanStepItem = ({ index, step }: PlanStepItemProps) => {
               <div>
                 <h4 className={'mb-1 text-sm font-medium'}>Validation Commands</h4>
                 <ul className={'list-inside list-disc space-y-1 text-sm text-muted-foreground'}>
-                  {step.validationCommands?.map((command, cmdIndex) => <li key={cmdIndex}>{command}</li>)}
+                  {step.validationCommands?.map((command, cmdIndex) => (
+                    <li key={cmdIndex}>{command}</li>
+                  ))}
                 </ul>
               </div>
             </Conditional>

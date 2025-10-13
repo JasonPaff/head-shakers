@@ -43,7 +43,7 @@ export default function FeaturePlannerPage() {
     includeProjectContext: true,
     maxOutputLength: 250,
     minOutputLength: 150,
-    selectedAgentIds: [],
+    selectedAgentIds: ['technical-architect', 'product-manager', 'ux-designer'],
   });
   const [stepData, setStepData] = useState<StepData>({});
   const [planId] = useState<null | string>(null);

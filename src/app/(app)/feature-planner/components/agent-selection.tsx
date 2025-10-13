@@ -26,7 +26,9 @@ export const AgentSelection = ({ className, onSettingsChange, settings, ...props
   const _selectedCount = _selectedAgentIds.length || settings.agentCount;
 
   const _badgeVariant =
-    _selectedCount === 1 ? 'secondary' : _selectedCount <= 3 ? 'default' : 'destructive';
+    _selectedCount === 1 ? 'secondary'
+    : _selectedCount <= 3 ? 'default'
+    : 'destructive';
 
   const handleToggleAgent = (agentId: string) => {
     const currentSelected = settings.selectedAgentIds || [];
@@ -84,7 +86,10 @@ export const AgentSelection = ({ className, onSettingsChange, settings, ...props
                       }}
                     />
                     <div className={'flex-1 space-y-1'}>
-                      <Label className={'cursor-pointer text-sm leading-none font-medium'} htmlFor={agent.agentId}>
+                      <Label
+                        className={'cursor-pointer text-sm leading-none font-medium'}
+                        htmlFor={agent.agentId}
+                      >
                         {agent.name}
                       </Label>
                       <p className={'text-xs text-muted-foreground'}>{agent.role}</p>
@@ -95,8 +100,8 @@ export const AgentSelection = ({ className, onSettingsChange, settings, ...props
               })}
             </div>
             <p className={'text-xs text-muted-foreground'}>
-              Select multiple agents for diverse perspectives. Each agent provides unique insights based on their
-              expertise.
+              Select multiple agents for diverse perspectives. Each agent provides unique insights based on
+              their expertise.
             </p>
           </div>
         </PopoverContent>
