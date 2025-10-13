@@ -16,6 +16,7 @@ The feature planner pages need to integrate the `suggest-feature.md` Claude Code
 ## File Analysis Used as Input
 
 **High Priority Files (12):**
+
 - .claude/commands/suggest-feature.md
 - .claude/commands/suggest-feature-simple.md
 - src/app/(app)/feature-planner/page.tsx
@@ -30,6 +31,7 @@ The feature planner pages need to integrate the `suggest-feature.md` Claude Code
 - src/components/ui/dialog.tsx
 
 **Key Integration Points:**
+
 1. Request Input Component - Add button
 2. Slash Command Invocation - Claude SDK query()
 3. Results Display - Dialog component
@@ -84,6 +86,7 @@ The agent generated a comprehensive 12-step implementation plan in proper markdo
 ### Validation Commands Compliance
 
 All 12 steps include appropriate validation commands:
+
 - ✅ All JS/TS/TSX steps include: `npm run lint:fix && npm run typecheck`
 - ✅ Database steps include: `npm run db:generate` and `npm run db:migrate`
 - ✅ Test step includes: `npm run test`
@@ -107,6 +110,7 @@ All 12 steps include appropriate validation commands:
 ### Content Quality Assessment
 
 **Strengths:**
+
 - Comprehensive 12-step plan covering all aspects of integration
 - Clear separation between MVP (steps 1-7) and enhancements (steps 8-9)
 - Follows existing codebase patterns (3-layer architecture, TanStack Query, etc.)
@@ -116,6 +120,7 @@ All 12 steps include appropriate validation commands:
 - Integration tests included in plan
 
 **Architecture Decisions:**
+
 - Three-layer architecture (Actions → Facades → Queries)
 - TanStack Query for state management
 - Radix UI Dialog for results display
@@ -123,6 +128,7 @@ All 12 steps include appropriate validation commands:
 - Circuit breaker and retry patterns from existing service
 
 **Risk Mitigation:**
+
 - Claude API rate limits - mitigated by client-side rate limiting
 - Variable response format - mitigated by robust parsing
 - Dialog performance - mitigated by pagination if needed
@@ -138,6 +144,7 @@ All 12 steps include appropriate validation commands:
 ### Estimated Duration: 2-3 days
 
 **Time Breakdown:**
+
 - Core MVP (Steps 1-7): 1.5-2 days
 - Persistence & History (Steps 8-9): 0.5-1 day (optional)
 - Polish & Testing (Steps 10-12): 0.5 day
@@ -145,6 +152,7 @@ All 12 steps include appropriate validation commands:
 ### Complexity: Medium
 
 **Complexity Factors:**
+
 - Integration with existing Claude SDK patterns: Medium
 - UI component creation: Low-Medium
 - State management with hooks: Medium
@@ -154,6 +162,7 @@ All 12 steps include appropriate validation commands:
 ### Risk Level: Medium
 
 **Risk Factors:**
+
 - Slash command invocation pattern needs verification
 - Claude API response format may vary
 - Rate limiting considerations for production use
@@ -161,18 +170,21 @@ All 12 steps include appropriate validation commands:
 ## Quality Gate Results
 
 ### Format Validation
+
 - ✅ Output is markdown format (not XML)
 - ✅ Proper heading hierarchy (##, ###)
 - ✅ Code blocks properly formatted with language tags
 - ✅ Lists properly formatted (bullets and numbered)
 
 ### Template Validation
+
 - ✅ All required sections present
 - ✅ Each implementation step follows template structure
 - ✅ Success criteria provided as checklists
 - ✅ Validation commands specified for each step
 
 ### Content Validation
+
 - ✅ Plan addresses refined feature request completely
 - ✅ Discovered files properly referenced
 - ✅ Existing patterns followed (3-layer architecture, TanStack Query)
@@ -180,6 +192,7 @@ All 12 steps include appropriate validation commands:
 - ✅ Authentication and permissions considered
 
 ### Actionability Validation
+
 - ✅ Steps are concrete and actionable
 - ✅ Files to create/modify clearly specified
 - ✅ Changes described in sufficient detail
@@ -191,6 +204,7 @@ All 12 steps include appropriate validation commands:
 The implementation-planner agent successfully generated a comprehensive, actionable plan in proper markdown format. The plan follows the existing codebase architecture patterns and provides clear guidance for implementation. The 12-step approach breaks down the feature into manageable pieces with appropriate validation at each stage.
 
 **Key Highlights:**
+
 - Core MVP can be completed in 1.5-2 days (steps 1-7)
 - Optional enhancements (persistence, history) can be deferred
 - All steps include proper validation commands

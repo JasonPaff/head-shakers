@@ -2,13 +2,18 @@
 
 import type { ComponentProps } from 'react';
 
-import { ClipboardCopyIcon, Lightbulb, Loader2Icon, XIcon } from 'lucide-react';
+import { ArrowLeftIcon, ClipboardCopyIcon, Lightbulb, Loader2Icon, XIcon } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Fragment } from 'react';
 import { toast } from 'sonner';
 
-import type { SuggestionResult } from '@/lib/validations/feature-planner.validation';
+import type {
+  FeatureType,
+  PriorityLevel,
+  SuggestionResult,
+} from '@/lib/validations/feature-planner.validation';
 
+import { FeatureSuggestionForm } from '@/app/(app)/feature-planner/components/feature-suggestion-form';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,31 +30,77 @@ import { Separator } from '@/components/ui/separator';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-interface FeatureSuggestionDialogProps extends Omit<ComponentProps<'div'>, 'onError'> {
+interface FeatureSuggestionDialogProps extends Omit<ComponentProps<'div'>, 'onError' | 'onSubmit'> {
   error?: null | string;
+  initialPageOrComponent?: string;
   isLoading: boolean;
   isOpen: boolean;
+  onBackToForm: () => void;
   onClose: () => void;
+  onSubmit: (params: {
+    additionalContext?: string;
+    featureType: FeatureType;
+    pageOrComponent: string;
+    priorityLevel: PriorityLevel;
+  }) => Promise<unknown>;
   suggestions: Array<SuggestionResult> | null;
 }
+
+type FlowStage = 'form-input' | 'loading' | 'results-display';
 
 export const FeatureSuggestionDialog = ({
   className,
   error,
+  initialPageOrComponent = '',
   isLoading,
   isOpen,
+  onBackToForm,
   onClose,
+  onSubmit,
   suggestions,
   ...props
 }: FeatureSuggestionDialogProps) => {
   const dialogTestId = generateTestId('feature', 'dialog');
   const [copiedIndex, setCopiedIndex] = useState<null | number>(null);
 
+  // Determine current flow stage based on state
+  const currentStage: FlowStage =
+    isLoading ? 'loading'
+    : suggestions && suggestions.length > 0 ? 'results-display'
+    : error ? 'results-display'
+    : 'form-input';
+
   // Derived state for conditional rendering
   const _hasSuggestions = !isLoading && !error && suggestions && suggestions.length > 0;
   const _hasImplementationConsiderations = (suggestion: SuggestionResult) =>
     !!suggestion.implementationConsiderations && suggestion.implementationConsiderations.length > 0;
   const _hasNoSuggestions = !isLoading && !error && (!suggestions || suggestions.length === 0);
+  const _isShowForm = currentStage === 'form-input';
+  const _isShowResults = currentStage === 'results-display' || currentStage === 'loading';
+
+  // Handle form submission
+  const handleFormSubmit = useCallback(
+    async (params: {
+      additionalContext?: string;
+      featureType: FeatureType;
+      pageOrComponent: string;
+      priorityLevel: PriorityLevel;
+    }) => {
+      await onSubmit(params);
+    },
+    [onSubmit],
+  );
+
+  // Handle back to form (by clearing results and errors)
+  const handleBackToForm = useCallback(() => {
+    onBackToForm();
+  }, [onBackToForm]);
+
+  // Handle dialog close with state reset
+  const handleClose = useCallback(() => {
+    setCopiedIndex(null);
+    onClose();
+  }, [onClose]);
 
   const handleCopyToClipboard = useCallback(async (suggestion: SuggestionResult, index: number) => {
     const formattedText = `
@@ -118,7 +169,7 @@ ${suggestion.implementationConsiderations.map((item, i) => `${i + 1}. ${item}`).
   }, [suggestions]);
 
   return (
-    <Dialog onOpenChange={onClose} open={isOpen}>
+    <Dialog onOpenChange={handleClose} open={isOpen}>
       <DialogContent
         className={cn('flex max-h-[90vh] max-w-4xl flex-col', className)}
         data-testid={dialogTestId}
@@ -130,166 +181,201 @@ ${suggestion.implementationConsiderations.map((item, i) => `${i + 1}. ${item}`).
             AI Feature Suggestions
           </DialogTitle>
           <DialogDescription>
-            AI-generated feature ideas based on your context. Review and use these suggestions to enhance your
-            planning.
+            {_isShowForm ?
+              'Configure parameters to generate AI-powered feature suggestions tailored to your needs.'
+            : 'AI-generated feature ideas based on your context. Review and use these suggestions to enhance your planning.'
+            }
           </DialogDescription>
         </DialogHeader>
 
         <div className={'flex-1 space-y-4 overflow-y-auto'}>
-          {/* Loading State */}
-          <Conditional isCondition={isLoading}>
-            <Card>
-              <CardHeader>
-                <CardTitle className={'flex items-center gap-2'}>
-                  <Loader2Icon aria-hidden className={'size-5 animate-spin text-primary'} />
-                  Generating Suggestions...
-                </CardTitle>
-                <CardDescription>
-                  AI is analyzing your request and generating feature suggestions. This may take a moment.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className={'space-y-3'}>
-                  <div className={'flex items-center gap-2'}>
-                    <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
-                    <p className={'text-sm text-muted-foreground'}>Analyzing context...</p>
-                  </div>
-                  <div className={'flex items-center gap-2'}>
-                    <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
-                    <p className={'text-sm text-muted-foreground'}>Generating suggestions...</p>
-                  </div>
-                  <div className={'flex items-center gap-2'}>
-                    <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
-                    <p className={'text-sm text-muted-foreground'}>Processing results...</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Form Input Stage */}
+          <Conditional isCondition={_isShowForm}>
+            <FeatureSuggestionForm
+              initialPageOrComponent={initialPageOrComponent}
+              isSubmitting={isLoading}
+              onCancel={handleClose}
+              onSubmit={handleFormSubmit}
+            />
           </Conditional>
 
-          {/* Error State */}
-          <Conditional isCondition={!isLoading && !!error}>
-            <Card className={'border-red-200 bg-red-50'}>
-              <CardHeader>
-                <CardTitle className={'text-red-900'}>Error Generating Suggestions</CardTitle>
-                <CardDescription className={'text-red-700'}>
-                  {error || 'An unexpected error occurred while generating suggestions.'}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={onClose} size={'sm'} variant={'outline'}>
-                  Close
-                </Button>
-              </CardContent>
-            </Card>
-          </Conditional>
+          {/* Results Display Stage */}
+          <Conditional isCondition={_isShowResults}>
+            {/* Loading State */}
+            <Conditional isCondition={isLoading}>
+              <Card>
+                <CardHeader>
+                  <CardTitle className={'flex items-center gap-2'}>
+                    <Loader2Icon aria-hidden className={'size-5 animate-spin text-primary'} />
+                    Generating Suggestions...
+                  </CardTitle>
+                  <CardDescription>
+                    AI is analyzing your request and generating feature suggestions. This may take a moment.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className={'space-y-3'}>
+                    <div className={'flex items-center gap-2'}>
+                      <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
+                      <p className={'text-sm text-muted-foreground'}>Analyzing context...</p>
+                    </div>
+                    <div className={'flex items-center gap-2'}>
+                      <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
+                      <p className={'text-sm text-muted-foreground'}>Generating suggestions...</p>
+                    </div>
+                    <div className={'flex items-center gap-2'}>
+                      <div className={'size-2 animate-pulse rounded-full bg-blue-500'} />
+                      <p className={'text-sm text-muted-foreground'}>Processing results...</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </Conditional>
 
-          {/* Success State with Suggestions */}
-          <Conditional isCondition={_hasSuggestions}>
-            <div className={'space-y-4'}>
-              <div className={'flex items-center justify-between'}>
-                <div className={'flex items-center gap-2'}>
-                  <Badge className={'text-xs'} variant={'secondary'}>
-                    {suggestions?.length || 0} {suggestions?.length === 1 ? 'Suggestion' : 'Suggestions'}
-                  </Badge>
+            {/* Error State */}
+            <Conditional isCondition={!isLoading && !!error}>
+              <Card className={'border-red-200 bg-red-50'}>
+                <CardHeader>
+                  <CardTitle className={'text-red-900'}>Error Generating Suggestions</CardTitle>
+                  <CardDescription className={'text-red-700'}>
+                    {error || 'An unexpected error occurred while generating suggestions.'}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className={'flex gap-2'}>
+                    <Button onClick={handleBackToForm} size={'sm'} variant={'outline'}>
+                      <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
+                      Try Again
+                    </Button>
+                    <Button onClick={handleClose} size={'sm'} variant={'outline'}>
+                      Close
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Conditional>
+
+            {/* Success State with Suggestions */}
+            <Conditional isCondition={_hasSuggestions}>
+              <div className={'space-y-4'}>
+                <div className={'flex items-center justify-between'}>
+                  <div className={'flex items-center gap-2'}>
+                    <Badge className={'text-xs'} variant={'secondary'}>
+                      {suggestions?.length || 0} {suggestions?.length === 1 ? 'Suggestion' : 'Suggestions'}
+                    </Badge>
+                  </div>
+                  <Button onClick={handleCopyAll} size={'sm'} variant={'outline'}>
+                    <ClipboardCopyIcon aria-hidden className={'mr-2 size-4'} />
+                    Copy All
+                  </Button>
                 </div>
-                <Button onClick={handleCopyAll} size={'sm'} variant={'outline'}>
-                  <ClipboardCopyIcon aria-hidden className={'mr-2 size-4'} />
-                  Copy All
-                </Button>
-              </div>
 
-              <Separator />
+                <Separator />
 
-              {suggestions?.map((suggestion, index) => (
-                <Card className={'relative'} key={index}>
-                  <CardHeader>
-                    <div className={'flex items-start justify-between gap-4'}>
-                      <div className={'flex-1'}>
-                        <CardTitle className={'text-lg'}>
-                          <span className={'text-muted-foreground'}>#{index + 1}</span> {suggestion.title}
-                        </CardTitle>
+                {suggestions?.map((suggestion, index) => (
+                  <Card className={'relative'} key={index}>
+                    <CardHeader>
+                      <div className={'flex items-start justify-between gap-4'}>
+                        <div className={'flex-1'}>
+                          <CardTitle className={'text-lg'}>
+                            <span className={'text-muted-foreground'}>#{index + 1}</span> {suggestion.title}
+                          </CardTitle>
+                        </div>
+                        <Button
+                          onClick={() => {
+                            void handleCopyToClipboard(suggestion, index);
+                          }}
+                          size={'sm'}
+                          variant={copiedIndex === index ? 'secondary' : 'ghost'}
+                        >
+                          {copiedIndex === index ?
+                            <Fragment>
+                              <ClipboardCopyIcon aria-hidden className={'mr-2 size-4'} />
+                              Copied!
+                            </Fragment>
+                          : <Fragment>
+                              <ClipboardCopyIcon aria-hidden className={'mr-2 size-4'} />
+                              Copy
+                            </Fragment>
+                          }
+                        </Button>
                       </div>
-                      <Button
-                        onClick={() => {
-                          void handleCopyToClipboard(suggestion, index);
-                        }}
-                        size={'sm'}
-                        variant={copiedIndex === index ? 'secondary' : 'ghost'}
-                      >
-                        {copiedIndex === index ?
-                          <Fragment>
-                            <ClipboardCopyIcon aria-hidden className={'mr-2 size-4'} />
-                            Copied!
-                          </Fragment>
-                        : <Fragment>
-                            <ClipboardCopyIcon aria-hidden className={'mr-2 size-4'} />
-                            Copy
-                          </Fragment>
-                        }
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent className={'space-y-4'}>
-                    {/* Rationale */}
-                    <div className={'space-y-2'}>
-                      <h4 className={'text-sm font-semibold text-muted-foreground'}>Rationale</h4>
-                      <p className={'text-sm leading-relaxed'}>{suggestion.rationale}</p>
-                    </div>
-
-                    <Separator />
-
-                    {/* Description */}
-                    <div className={'space-y-2'}>
-                      <h4 className={'text-sm font-semibold text-muted-foreground'}>Description</h4>
-                      <p className={'text-sm leading-relaxed'}>{suggestion.description}</p>
-                    </div>
-
-                    {/* Implementation Considerations */}
-                    <Conditional isCondition={_hasImplementationConsiderations(suggestion)}>
-                      <Separator />
+                    </CardHeader>
+                    <CardContent className={'space-y-4'}>
+                      {/* Rationale */}
                       <div className={'space-y-2'}>
-                        <h4 className={'text-sm font-semibold text-muted-foreground'}>
-                          Implementation Considerations
-                        </h4>
-                        <ul className={'space-y-2 pl-4'}>
-                          {suggestion.implementationConsiderations?.map((consideration, idx) => (
-                            <li className={'list-disc text-sm leading-relaxed'} key={idx}>
-                              {consideration}
-                            </li>
-                          ))}
-                        </ul>
+                        <h4 className={'text-sm font-semibold text-muted-foreground'}>Rationale</h4>
+                        <p className={'text-sm leading-relaxed'}>{suggestion.rationale}</p>
                       </div>
-                    </Conditional>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Conditional>
 
-          {/* Empty State */}
-          <Conditional isCondition={_hasNoSuggestions}>
-            <Card>
-              <CardHeader>
-                <CardTitle>No Suggestions Available</CardTitle>
-                <CardDescription>
-                  No feature suggestions were generated. Try adjusting your parameters and try again.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Button onClick={onClose} size={'sm'} variant={'outline'}>
-                  Close
-                </Button>
-              </CardContent>
-            </Card>
+                      <Separator />
+
+                      {/* Description */}
+                      <div className={'space-y-2'}>
+                        <h4 className={'text-sm font-semibold text-muted-foreground'}>Description</h4>
+                        <p className={'text-sm leading-relaxed'}>{suggestion.description}</p>
+                      </div>
+
+                      {/* Implementation Considerations */}
+                      <Conditional isCondition={_hasImplementationConsiderations(suggestion)}>
+                        <Separator />
+                        <div className={'space-y-2'}>
+                          <h4 className={'text-sm font-semibold text-muted-foreground'}>
+                            Implementation Considerations
+                          </h4>
+                          <ul className={'space-y-2 pl-4'}>
+                            {suggestion.implementationConsiderations?.map((consideration, idx) => (
+                              <li className={'list-disc text-sm leading-relaxed'} key={idx}>
+                                {consideration}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </Conditional>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </Conditional>
+
+            {/* Empty State */}
+            <Conditional isCondition={_hasNoSuggestions}>
+              <Card>
+                <CardHeader>
+                  <CardTitle>No Suggestions Available</CardTitle>
+                  <CardDescription>
+                    No feature suggestions were generated. Try adjusting your parameters and try again.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className={'flex gap-2'}>
+                    <Button onClick={handleBackToForm} size={'sm'} variant={'outline'}>
+                      <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
+                      Try Again
+                    </Button>
+                    <Button onClick={handleClose} size={'sm'} variant={'outline'}>
+                      Close
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </Conditional>
           </Conditional>
         </div>
 
         <DialogFooter>
-          <Button onClick={onClose} size={'sm'} variant={'outline'}>
-            <XIcon aria-hidden className={'mr-2 size-4'} />
-            Close
-          </Button>
+          <Conditional isCondition={_isShowResults && _hasSuggestions}>
+            <Button onClick={handleBackToForm} size={'sm'} variant={'outline'}>
+              <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
+              Back to Form
+            </Button>
+          </Conditional>
+          <Conditional isCondition={!_isShowForm}>
+            <Button onClick={handleClose} size={'sm'} variant={'outline'}>
+              <XIcon aria-hidden className={'mr-2 size-4'} />
+              Close
+            </Button>
+          </Conditional>
         </DialogFooter>
       </DialogContent>
     </Dialog>

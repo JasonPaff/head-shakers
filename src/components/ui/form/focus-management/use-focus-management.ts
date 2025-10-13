@@ -67,7 +67,7 @@ export const useFocusManagement = () => {
       if (fieldErrors[field.name]) {
         // focus the field
         field.element.focus();
-        // scroll into view with some padding
+        // scroll into view
         field.element.scrollIntoView({
           behavior: 'smooth',
           block: 'center',

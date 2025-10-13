@@ -191,11 +191,7 @@ The file-discovery-agent performed comprehensive analysis:
     - **AI Insight**: Contains `getUserId()` function used in page.tsx
     - **Validation**: ✅ Exists
 
-22-25. **Type Definition Files** (inferred, may exist):
-    - `src/lib/types/refinement-agent.ts`
-    - `src/lib/types/refinement-output.ts`
-    - Related type definition files
-    - **AI Insight**: Would inform suggestion-related type definitions
+22-25. **Type Definition Files** (inferred, may exist): - `src/lib/types/refinement-agent.ts` - `src/lib/types/refinement-output.ts` - Related type definition files - **AI Insight**: Would inform suggestion-related type definitions
 
 ## File Path Validation Results
 
@@ -277,6 +273,7 @@ Total: 25 files across all architectural layers
 ### Claude SDK Integration Pattern
 
 From `feature-planner.service.ts`:
+
 - Uses `query()` from `@anthropic-ai/claude-agent-sdk`
 - Circuit breaker pattern for resilience
 - Retry logic (2 attempts)
@@ -287,6 +284,7 @@ From `feature-planner.service.ts`:
 ### Slash Command Structure
 
 From `.claude/commands/suggest-feature.md`:
+
 - Frontmatter metadata (description, argument-hint, tools)
 - Simple prompt template with `$ARGUMENTS`
 - Auto-discovered from `.claude/commands/` directory
@@ -311,6 +309,7 @@ From `.claude/commands/suggest-feature.md`:
 5. Optionally add persistence later via new action/schema
 
 **This approach:**
+
 - Minimizes changes to existing code
 - Follows established patterns
 - Can be incrementally enhanced

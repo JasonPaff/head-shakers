@@ -39,7 +39,16 @@ export const RequestInput = ({
   const requestInputTestId = generateTestId('feature', 'form');
 
   // Feature suggestion hook
-  const { closeDialog, isDialogOpen, isLoading, openDialog, suggestions } = useSuggestFeature();
+  const {
+    clearResults,
+    closeDialog,
+    error,
+    invokeSuggestion,
+    isDialogOpen,
+    isLoading,
+    openDialog,
+    suggestions,
+  } = useSuggestFeature();
 
   const _isRefineEnabled = value.length > 0 && !isRefining;
   const _characterCount = value.length;
@@ -108,13 +117,7 @@ export const RequestInput = ({
 
             {/* AI Feature Suggestion */}
             <div className={'flex gap-3'}>
-              <Button
-                className={'flex-1'}
-                disabled={!_isRefineEnabled}
-                onClick={openDialog}
-                size={'lg'}
-                variant={'secondary'}
-              >
+              <Button className={'flex-1'} onClick={openDialog} size={'lg'} variant={'secondary'}>
                 <Lightbulb aria-hidden className={'mr-2 size-4'} />
                 AI Suggest Feature
               </Button>
@@ -125,9 +128,13 @@ export const RequestInput = ({
 
       {/* Feature Suggestion Dialog */}
       <FeatureSuggestionDialog
+        error={error}
+        initialPageOrComponent={''}
         isLoading={isLoading}
         isOpen={isDialogOpen}
+        onBackToForm={clearResults}
         onClose={closeDialog}
+        onSubmit={invokeSuggestion}
         suggestions={suggestions}
       />
     </div>

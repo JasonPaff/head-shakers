@@ -17,6 +17,7 @@ the feature planner pages needs to integrate the `suggest-feature.md` claude cod
 ## Context Provided
 
 ### Project Context (from CLAUDE.md)
+
 - Tech Stack: Next.js 15.5.3 with App Router, React 19.1.0, TypeScript, Tailwind CSS 4
 - State Management: TanStack Query for server state, Nuqs for URL state
 - Database: PostgreSQL with Neon serverless, Drizzle ORM

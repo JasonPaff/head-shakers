@@ -69,20 +69,24 @@ Integrate the `/suggest-feature` Claude Code slash command into the feature plan
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/hooks/use-suggest-feature.ts` - React hook for managing suggestion flow state, loading, errors, and results
 
 **Changes:**
+
 - Create hook with state for: isLoading, error, suggestions, isDialogOpen
 - Implement invokeSuggestion function that calls server action
 - Add dialog control functions: openDialog, closeDialog, resetState
 - Return typed interface matching existing hook patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook exports clean TypeScript interface
 - [ ] State management follows React 19 patterns (no forwardRef)
 - [ ] All validation commands pass
@@ -97,9 +101,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add new server action for feature suggestion
 
 **Changes:**
+
 - Add suggestFeatureAction using authActionClient
 - Accept parameters: pageOrComponent (string), featureType (enum), priorityLevel (enum), additionalContext (optional string)
 - Use feature-planner.service.ts query() method as reference for Claude SDK invocation
@@ -108,11 +114,13 @@ npm run lint:fix && npm run typecheck
 - Apply circuit breaker and retry patterns from existing service methods
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action properly typed with Zod schema validation
 - [ ] Claude SDK invocation follows service patterns
 - [ ] Error handling includes circuit breaker
@@ -128,9 +136,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/feature-planner.validation.ts` - Add suggestion-related schemas
 
 **Changes:**
+
 - Add featureTypeEnum schema with values: enhancement, new-capability, optimization, ui-improvement, integration
 - Add priorityLevelEnum schema with values: low, medium, high, critical
 - Add suggestFeatureInputSchema with fields: pageOrComponent, featureType, priorityLevel, additionalContext
@@ -139,11 +149,13 @@ npm run lint:fix && npm run typecheck
 - Export all schemas with proper TypeScript types using z.infer
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schemas properly typed and exported
 - [ ] Enums match slash command requirements
 - [ ] All validation commands pass
@@ -158,9 +170,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/feature-suggestion-dialog.tsx` - Dialog component for displaying suggestions
 
 **Changes:**
+
 - Use existing Dialog component from src/components/ui/dialog.tsx
 - Accept props: isOpen, onClose, suggestions array, isLoading, error
 - Display loading state with spinner when isLoading is true
@@ -171,11 +185,13 @@ npm run lint:fix && npm run typecheck
 - Make dialog scrollable for long suggestion lists
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog renders without errors
 - [ ] Loading and error states display correctly
 - [ ] Suggestions formatted in readable structure
@@ -191,9 +207,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/request-input.tsx` - Add suggestion trigger button
 
 **Changes:**
+
 - Import use-suggest-feature hook and feature-suggestion-dialog component
 - Add "AI Suggest Feature" button in button layout section (lines 88-103)
 - Position button between existing action buttons with consistent styling
@@ -204,11 +222,13 @@ npm run lint:fix && npm run typecheck
 - Ensure button is disabled when user lacks permissions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Button renders in appropriate location
 - [ ] Button styling matches existing buttons
 - [ ] onClick handler properly wired to hook
@@ -224,9 +244,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/feature-suggestion-form.tsx` - Form component for suggestion parameters
 
 **Changes:**
+
 - Use TanStack Form for form handling
 - Add fields: pageOrComponent (text input), featureType (select), priorityLevel (select), additionalContext (textarea)
 - Use validation schemas from step 3
@@ -237,11 +259,13 @@ npm run lint:fix && npm run typecheck
 - Include helpful placeholder text for each field
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form validates input using Zod schemas
 - [ ] All fields render with proper styling
 - [ ] Submit triggers suggestion action correctly
@@ -257,9 +281,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/request-input.tsx` - Update to integrate form and dialog flow
 
 **Changes:**
+
 - Import feature-suggestion-form component
 - Modify dialog to show form in first step, results in second step
 - Add state to track flow stage: form-input, loading, results-display
@@ -269,11 +295,13 @@ npm run lint:fix && npm run typecheck
 - Ensure dialog closes properly and resets state on close
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Flow transitions correctly between stages
 - [ ] Form submission triggers loading state
 - [ ] Results display after successful response
@@ -289,12 +317,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/db/schema/feature-planner.schema.ts` - Add feature suggestions table
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add save suggestion action
 - `src/lib/queries/feature-planner/feature-planner.query.ts` - Add query functions for suggestions
 - `src/lib/facades/feature-planner/feature-planner.facade.ts` - Add business logic for suggestions
 
 **Changes:**
+
 - Create featureSuggestions table in schema with fields: id, requestId (optional FK), userId, pageOrComponent, featureType, priorityLevel, suggestionText, rawResponse, createdAt
 - Add indexes on userId and createdAt for query performance
 - Generate and run database migration
@@ -304,6 +334,7 @@ npm run lint:fix && npm run typecheck
 - Implement proper error handling and validation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run db:generate
@@ -311,6 +342,7 @@ npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Schema change generates clean migration
 - [ ] Migration runs successfully on development branch
 - [ ] Server actions properly save suggestions
@@ -327,9 +359,11 @@ npm run db:migrate
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/(app)/feature-planner/components/suggestion-history.tsx` - Component for displaying suggestion history
 
 **Changes:**
+
 - Use TanStack Query to fetch user's suggestion history
 - Display suggestions in table or card layout using TanStack React Table
 - Show key fields: date, page/component, feature type, priority, preview of suggestion
@@ -340,11 +374,13 @@ npm run db:migrate
 - Show empty state when no suggestions exist
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] History loads and displays correctly
 - [ ] TanStack Query manages data fetching
 - [ ] Filters and sorting work properly
@@ -360,11 +396,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/feature-planner/feature-planner.actions.ts` - Add permission checks to suggestion actions
 - `src/app/(app)/feature-planner/components/feature-suggestion-dialog.tsx` - Enhance error display
 - `src/app/(app)/feature-planner/hooks/use-suggest-feature.ts` - Add error handling logic
 
 **Changes:**
+
 - Add Clerk permission check in suggestFeatureAction using getUserId()
 - Verify user has feature planner access role
 - Add rate limiting for suggestion requests (use existing patterns)
@@ -375,11 +413,13 @@ npm run lint:fix && npm run typecheck
 - Add fallback for when slash command is unavailable
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Unauthorized users cannot invoke suggestions
 - [ ] Rate limiting prevents abuse
 - [ ] Errors display helpful messages
@@ -395,11 +435,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/feature-planner/components/feature-suggestion-form.tsx` - Add form submission loading state
 - `src/app/(app)/feature-planner/components/feature-suggestion-dialog.tsx` - Add loading animations
 - `src/app/(app)/feature-planner/hooks/use-suggest-feature.ts` - Track loading stages
 
 **Changes:**
+
 - Add loading spinner to form submit button when processing
 - Disable form inputs during submission
 - Show progress indicator in dialog during AI generation (use existing workflow-progress patterns)
@@ -410,11 +452,13 @@ npm run lint:fix && npm run typecheck
 - Add timeout handling for long-running requests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Loading states display at appropriate times
 - [ ] Progress indicators show current stage
 - [ ] UI remains responsive during loading
@@ -430,9 +474,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `tests/integration/feature-planner/suggest-feature.test.tsx` - Integration tests for suggestion feature
 
 **Changes:**
+
 - Test complete flow: button click, form submission, dialog display, results rendering
 - Mock Claude SDK responses using MSW
 - Test error scenarios: auth failure, API errors, network errors
@@ -444,12 +490,14 @@ npm run lint:fix && npm run typecheck
 - Follow existing test patterns from feature planner tests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All tests pass successfully
 - [ ] Test coverage includes happy path and error cases
 - [ ] Tests follow existing patterns
@@ -511,12 +559,14 @@ npm run test
 ## Orchestration Details
 
 **Orchestration Logs**: `docs/2025_10_13/orchestration/suggest-feature-integration/`
+
 - `00-orchestration-index.md` - Workflow overview and navigation
 - `01-feature-refinement.md` - Detailed refinement log with AI analysis
 - `02-file-discovery.md` - Comprehensive file discovery with 25 files identified
 - `03-implementation-planning.md` - Planning step log with validation results
 
 **Total Execution Time**: ~6 minutes (360 seconds)
+
 - Step 1 (Refinement): 90 seconds
 - Step 2 (File Discovery): 135 seconds
 - Step 3 (Planning): 150 seconds
