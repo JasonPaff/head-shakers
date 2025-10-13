@@ -8,6 +8,16 @@
 
 This document outlines the implementation plan for updating the "Suggest Feature" component in the feature planner to use a customizable agent with editable prompts and settings that persist to the database, similar to how the feature request refinement uses custom agents.
 
+### Key Decision: Table Rename
+
+As part of this implementation, we're renaming the `refinement_agents` table to `custom_agents` to better reflect its purpose:
+- **Rationale**: The table now stores user-configured agents for multiple purposes (refinement, feature-suggestion, and potentially more in the future)
+- **Benefits**:
+  - More semantically accurate naming
+  - Future-proof for additional agent types
+  - Clearer code semantics around customization
+- **Impact**: Requires migration of database table and updates to all code references
+
 ## Current State Analysis
 
 ### Existing Implementation
@@ -27,9 +37,9 @@ This document outlines the implementation plan for updating the "Suggest Feature
 - Hardcoded to use Claude SDK's `query()` function with fixed settings
 - Does NOT support custom agent configuration
 
-**Refinement Agents** (Comparison):
-- Database table: `feature_planner.refinement_agents`
-- Fields: `agentId`, `name`, `role`, `focus`, `systemPrompt`, `temperature`, `tools`, `userId`, `isActive`, `isDefault`
+**Custom Agents** (Comparison):
+- Database table: `feature_planner.custom_agents` (stores all agent types: refinement, feature-suggestion)
+- Fields: `agentId`, `agentType`, `name`, `role`, `focus`, `systemPrompt`, `temperature`, `tools`, `userId`, `isActive`, `isDefault`
 - Service method: `executeRefinementAgent` accepts optional `agent` parameter
 - Uses `buildRoleBasedRefinementPrompt` when agent is provided
 - CRUD operations: `manage-refinement-agents.action.ts`
@@ -54,7 +64,6 @@ This document outlines the implementation plan for updating the "Suggest Feature
    - Tools (Read, Grep, Glob)
 3. **Persistence**: Agent configuration persists to database per user
 4. **UI Access**: Agent settings accessible from feature planner page
-5. **Backward Compatibility**: Feature continues to work if no custom agent configured
 
 ### Technical Requirements
 
@@ -70,26 +79,20 @@ This document outlines the implementation plan for updating the "Suggest Feature
 
 **File**: `src/lib/db/schema/feature-planner.schema.ts`
 
-**Option A - Reuse Existing Table** (Recommended):
-- Add `agentType` field to `refinement_agents` table
+**Decision**: Rename existing `refinement_agents` table to `custom_agents`
+- Rationale: The table stores user-configured agents for multiple purposes (refinement, feature-suggestion, future types)
+- `custom_agents` is more semantically accurate and future-proof
+- Add `agentType` field to distinguish agent purposes
 - Values: `'refinement' | 'feature-suggestion'`
 - Constraint: Only ONE active agent per user per type
-- Migration: `ALTER TABLE feature_planner.refinement_agents ADD COLUMN agent_type VARCHAR(50) DEFAULT 'refinement'`
 
-**Option B - New Table**:
-- Create `feature_suggestion_agents` table
-- Similar structure to `refinement_agents`
-- Constraint: Only ONE active agent per user
-
-**Recommendation**: Option A (reuse table) for consistency and to avoid duplication
-
-**Schema Changes** (Option A):
+**Schema Changes**:
 ```typescript
-export const refinementAgents = featurePlannerSchema.table(
-  'refinement_agents',
+export const customAgents = featurePlannerSchema.table(
+  'custom_agents',
   {
     agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).primaryKey(),
-    agentType: varchar('agent_type', { length: 50 }).default('refinement').notNull(), // NEW
+    agentType: varchar('agent_type', { length: 50 }).default('refinement').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     focus: text('focus').notNull(),
     isActive: boolean('is_active').default(true).notNull(),
@@ -104,16 +107,16 @@ export const refinementAgents = featurePlannerSchema.table(
   },
   (table) => [
     // ... existing checks ...
-    check('refinement_agents_agent_type_valid', sql`${table.agentType} IN ('refinement', 'feature-suggestion')`),
+    check('custom_agents_agent_type_valid', sql`${table.agentType} IN ('refinement', 'feature-suggestion')`),
 
     // ... existing indexes ...
-    index('refinement_agents_agent_type_idx').on(table.agentType),
-    index('refinement_agents_user_type_idx').on(table.userId, table.agentType),
+    index('custom_agents_agent_type_idx').on(table.agentType),
+    index('custom_agents_user_type_idx').on(table.userId, table.agentType),
   ],
 );
 ```
 
-**Migration Script**: `src/lib/db/migrations/0XXX_add_agent_type_to_refinement_agents.sql`
+**Migration Script**: `src/lib/db/migrations/0XXX_rename_refinement_agents_to_custom_agents.sql`
 
 ### Phase 2: Type Definitions
 
@@ -145,9 +148,11 @@ export type FeatureSuggestionAgent = z.infer<typeof featureSuggestionAgentSchema
 **File**: `src/lib/queries/feature-planner/feature-planner.query.ts`
 
 Add methods:
-- `getFeatureSuggestionAgentByUserId(userId: string)`
-- `createFeatureSuggestionAgent(agent: NewRefinementAgent)`
-- `updateFeatureSuggestionAgent(agentId: string, updates: Partial<NewRefinementAgent>)`
+- `getFeatureSuggestionAgentByUserId(userId: string)` - Queries `custom_agents` with `agent_type = 'feature-suggestion'`
+- `createFeatureSuggestionAgent(agent: NewCustomAgent)` - Inserts into `custom_agents` with type
+- `updateFeatureSuggestionAgent(agentId: string, updates: Partial<NewCustomAgent>)` - Updates existing agent
+
+Note: Type `NewCustomAgent` is the insert type from Drizzle schema for `custom_agents` table
 
 ### Phase 4: Service Layer Updates
 
@@ -268,9 +273,9 @@ IMPORTANT:
 **File**: `src/lib/facades/feature-planner/feature-planner.facade.ts`
 
 Add methods:
-- `getFeatureSuggestionAgentAsync(userId: string, db: Database)`
-- `createFeatureSuggestionAgentAsync(agent: NewRefinementAgent, userId: string, db: Database)`
-- `updateFeatureSuggestionAgentAsync(agentId: string, updates: Partial<NewRefinementAgent>, userId: string, db: Database)`
+- `getFeatureSuggestionAgentAsync(userId: string, db: Database)` - Fetches from `custom_agents` table
+- `createFeatureSuggestionAgentAsync(agent: NewCustomAgent, userId: string, db: Database)` - Creates in `custom_agents`
+- `updateFeatureSuggestionAgentAsync(agentId: string, updates: Partial<NewCustomAgent>, userId: string, db: Database)` - Updates in `custom_agents`
 
 ### Phase 6: Server Actions
 
@@ -491,24 +496,54 @@ export const ERROR_MESSAGES = {
 
 ### Step 1: Database Migration
 ```sql
--- Add agent_type column with default
+-- Rename table from refinement_agents to custom_agents
 ALTER TABLE feature_planner.refinement_agents
+RENAME TO custom_agents;
+
+-- Rename indexes
+ALTER INDEX IF EXISTS refinement_agents_pkey
+RENAME TO custom_agents_pkey;
+
+-- Add agent_type column with default
+ALTER TABLE feature_planner.custom_agents
 ADD COLUMN agent_type VARCHAR(50) DEFAULT 'refinement' NOT NULL;
 
 -- Add check constraint
-ALTER TABLE feature_planner.refinement_agents
-ADD CONSTRAINT refinement_agents_agent_type_valid
+ALTER TABLE feature_planner.custom_agents
+ADD CONSTRAINT custom_agents_agent_type_valid
 CHECK (agent_type IN ('refinement', 'feature-suggestion'));
 
 -- Add indexes
-CREATE INDEX refinement_agents_agent_type_idx
-ON feature_planner.refinement_agents(agent_type);
+CREATE INDEX custom_agents_agent_type_idx
+ON feature_planner.custom_agents(agent_type);
 
-CREATE INDEX refinement_agents_user_type_idx
-ON feature_planner.refinement_agents(user_id, agent_type);
+CREATE INDEX custom_agents_user_type_idx
+ON feature_planner.custom_agents(user_id, agent_type);
 ```
 
-### Step 2: Default Agent Seeding
+### Step 2: Update Code References
+
+After renaming the database table, update all code references:
+
+**Schema Definition**:
+- Rename `refinementAgents` export to `customAgents` in `src/lib/db/schema/feature-planner.schema.ts`
+- Update Drizzle types: `RefinementAgent` → `CustomAgent`, `NewRefinementAgent` → `NewCustomAgent`
+
+**Query Files**:
+- Update all imports and references in `src/lib/queries/feature-planner/feature-planner.query.ts`
+- Update query methods that reference the old table name
+
+**Action Files**:
+- Update `src/lib/actions/feature-planner/manage-refinement-agents.action.ts` to use new schema name
+- Update type imports and references
+
+**Facade Files**:
+- Update `src/lib/facades/feature-planner/feature-planner.facade.ts` with new table references
+
+**Service Files**:
+- Update `src/lib/services/feature-planner.service.ts` type imports
+
+### Step 3: Default Agent Seeding
 
 Create default suggestion agent for existing users (optional):
 ```typescript
@@ -546,7 +581,7 @@ const defaultAgent = {
 
 ## Timeline Estimate
 
-- **Phase 1-2** (Database & Types): 2-3 hours
+- **Phase 1-2** (Database Schema Rename & Types): 3-4 hours (includes table rename)
 - **Phase 3** (Queries): 1-2 hours
 - **Phase 4** (Service): 3-4 hours
 - **Phase 5** (Facade): 1-2 hours
@@ -554,10 +589,11 @@ const defaultAgent = {
 - **Phase 7** (Validation): 1 hour
 - **Phase 8** (UI): 4-6 hours
 - **Phase 9** (Constants): 30 minutes
+- **Code Updates** (updating all references to renamed table): 2-3 hours
 - **Testing**: 3-4 hours
-- **Migration**: 1-2 hours
+- **Migration & Deployment**: 2-3 hours
 
-**Total**: 18-27 hours (2.5-3.5 days)
+**Total**: 22-32 hours (3-4 days)
 
 ## Success Criteria
 
@@ -571,14 +607,29 @@ const defaultAgent = {
 ## Next Steps
 
 1. Review and approve implementation plan
-2. Create database migration
-3. Implement backend changes (service → facade → actions)
-4. Implement UI components
-5. Deploy and verify
+2. **Execute table rename**: Rename `refinement_agents` to `custom_agents` and update all code references
+3. Create database migration for `agent_type` column
+4. Implement backend changes (service → facade → actions)
+5. Implement UI components
+6. Testing and validation
+7. Deploy and verify
 
 ## References
 
-- **Refinement Agents Implementation**: `src/lib/actions/feature-planner/manage-refinement-agents.action.ts`
+- **Custom Agents Implementation**: `src/lib/actions/feature-planner/manage-refinement-agents.action.ts` (will be updated to use `custom_agents` table)
 - **Feature Planner Service**: `src/lib/services/feature-planner.service.ts`
-- **Database Schema**: `src/lib/db/schema/feature-planner.schema.ts`
+- **Database Schema**: `src/lib/db/schema/feature-planner.schema.ts` (table: `custom_agents`, formerly `refinement_agents`)
 - **Feature Planner Agents UI**: `src/app/(app)/feature-planner/agents/`
+
+## Notes on Implementation
+
+### Table Rename Impact
+The rename from `refinement_agents` to `custom_agents` affects:
+1. **Schema definition**: Export name changes from `refinementAgents` to `customAgents`
+2. **Types**: `RefinementAgent` → `CustomAgent`, `NewRefinementAgent` → `NewCustomAgent`
+3. **All query functions**: Must use new table reference
+4. **All action files**: Must import new types
+5. **Database constraints and indexes**: Must be renamed in migration
+6. **Documentation**: Update all references to reflect new naming
+
+This rename is done **once** as part of this feature implementation, ensuring all future agent types use the correct, semantic table name.
