@@ -96,10 +96,9 @@ export type ExecutionMetadata = z.infer<typeof executionMetadataSchema>;
 export const refinementAgents = featurePlannerSchema.table(
   'refinement_agents',
   {
-    agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull().unique(),
+    agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).primaryKey(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     focus: text('focus').notNull(),
-    id: uuid('id').primaryKey().defaultRandom(),
     isActive: boolean('is_active').default(true).notNull(),
     isDefault: boolean('is_default').default(false).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull(),
