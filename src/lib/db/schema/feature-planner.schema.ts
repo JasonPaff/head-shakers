@@ -5,6 +5,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgSchema,
   text,
   timestamp,
@@ -86,6 +87,46 @@ export type ValidationError = z.infer<typeof validationErrorSchema>;
 
 export const executionMetadataSchema = z.record(z.string(), z.unknown());
 export type ExecutionMetadata = z.infer<typeof executionMetadataSchema>;
+
+// ============================================================================
+// TABLE: refinement_agents
+// Stores refinement agent configurations
+// ============================================================================
+
+export const refinementAgents = featurePlannerSchema.table(
+  'refinement_agents',
+  {
+    agentId: varchar('agent_id', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    focus: text('focus').notNull(),
+    id: uuid('id').primaryKey().defaultRandom(),
+    isActive: boolean('is_active').default(true).notNull(),
+    isDefault: boolean('is_default').default(false).notNull(),
+    name: varchar('name', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull(),
+    role: varchar('role', { length: SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX }).notNull(),
+    systemPrompt: text('system_prompt').notNull(),
+    temperature: numeric('temperature', { precision: 3, scale: 2 }).notNull(),
+    tools: jsonb('tools').$type<Array<string>>().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  },
+  (table) => [
+    // data validation constraints
+    check('refinement_agents_temperature_range', sql`${table.temperature} >= 0.0 AND ${table.temperature} <= 2.0`),
+    check('refinement_agents_agent_id_not_empty', sql`length(trim(${table.agentId})) > 0`),
+    check('refinement_agents_name_not_empty', sql`length(trim(${table.name})) > 0`),
+    check('refinement_agents_role_not_empty', sql`length(trim(${table.role})) > 0`),
+
+    // single column indexes
+    index('refinement_agents_agent_id_idx').on(table.agentId),
+    index('refinement_agents_is_active_idx').on(table.isActive),
+    index('refinement_agents_is_default_idx').on(table.isDefault),
+    index('refinement_agents_user_id_idx').on(table.userId),
+
+    // composite indexes
+    index('refinement_agents_user_active_idx').on(table.userId, table.isActive),
+  ],
+);
 
 // ============================================================================
 // TABLE: feature_plans
@@ -593,6 +634,8 @@ export type NewImplementationPlanGeneration = typeof implementationPlanGeneratio
 export type NewPlanExecutionLog = typeof planExecutionLogs.$inferInsert;
 export type NewPlanStep = typeof planSteps.$inferInsert;
 export type NewPlanStepTemplate = typeof planStepTemplates.$inferInsert;
+export type NewRefinementAgent = typeof refinementAgents.$inferInsert;
 export type PlanExecutionLog = typeof planExecutionLogs.$inferSelect;
 export type PlanStep = typeof planSteps.$inferSelect;
 export type PlanStepTemplate = typeof planStepTemplates.$inferSelect;
+export type RefinementAgent = typeof refinementAgents.$inferSelect;
