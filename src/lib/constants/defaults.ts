@@ -119,6 +119,10 @@ export const DEFAULTS = {
     RETRY_COUNT: 0,
     STATUS: 'pending',
   },
+  REFINEMENT_AGENT: {
+    AVAILABLE_TOOLS: ['Read', 'Grep', 'Glob'],
+    TEMPERATURE: 1.0,
+  },
   SUB_COLLECTION: {
     IS_PUBLIC: true,
     ITEM_COUNT: 0,

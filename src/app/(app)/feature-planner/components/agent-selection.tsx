@@ -4,6 +4,7 @@ import type { ComponentProps } from 'react';
 
 import { Users } from 'lucide-react';
 
+import type { RefinementAgent } from '@/lib/types/refinement-agent';
 import type { RefinementSettings as RefinementSettingsType } from '@/lib/validations/feature-planner.validation';
 
 import { Badge } from '@/components/ui/badge';
@@ -11,17 +12,22 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { getAllRefinementAgents } from '@/lib/config/refinement-agents';
 import { cn } from '@/utils/tailwind-utils';
 
 interface AgentSelectionProps extends ComponentProps<'div'> {
+  agents: Array<RefinementAgent>;
   onSettingsChange: (settings: RefinementSettingsType) => void;
   settings: RefinementSettingsType;
 }
 
-export const AgentSelection = ({ className, onSettingsChange, settings, ...props }: AgentSelectionProps) => {
+export const AgentSelection = ({
+  agents,
+  className,
+  onSettingsChange,
+  settings,
+  ...props
+}: AgentSelectionProps) => {
   const _agentSelectionTestId = 'feature-agent-selection';
-  const _allAgents = getAllRefinementAgents();
   const _selectedAgentIds = settings.selectedAgentIds || [];
   const _selectedCount = _selectedAgentIds.length || settings.agentCount;
 
@@ -74,7 +80,7 @@ export const AgentSelection = ({ className, onSettingsChange, settings, ...props
 
             {/* Agent Selection */}
             <div className={'space-y-3'}>
-              {_allAgents.map((agent) => {
+              {agents.map((agent) => {
                 const isSelected = _selectedAgentIds.includes(agent.agentId);
                 return (
                   <div className={'flex items-start space-x-3 rounded-md border p-3'} key={agent.agentId}>
@@ -94,6 +100,9 @@ export const AgentSelection = ({ className, onSettingsChange, settings, ...props
                       </Label>
                       <p className={'text-xs text-muted-foreground'}>{agent.role}</p>
                       <p className={'text-xs text-muted-foreground'}>Focus: {agent.focus}</p>
+                      <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
+                        <span>Temperature: {agent.temperature}</span>
+                      </div>
                     </div>
                   </div>
                 );

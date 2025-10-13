@@ -1,8 +1,8 @@
 import { query } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 
-import type { RefinementAgent } from '@/lib/config/refinement-agents';
 import type { FileDiscoveryResult, RefinementSettings } from '@/lib/db/schema/feature-planner.schema';
+import type { RefinementAgent } from '@/lib/types/refinement-agent';
 import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 

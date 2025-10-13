@@ -1,7 +1,6 @@
 import { existsSync } from 'fs';
 import { join } from 'path';
 
-import type { RefinementAgent } from '@/lib/config/refinement-agents';
 import type {
   RefinementAgent as DbRefinementAgent,
   FeaturePlan,
@@ -13,6 +12,7 @@ import type {
   RefinementSettings,
 } from '@/lib/db/schema/feature-planner.schema';
 import type { FindOptions } from '@/lib/queries/base/query-context';
+import type { RefinementAgent } from '@/lib/types/refinement-agent';
 import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -114,7 +114,7 @@ export class FeaturePlannerFacade {
         data: { agentData },
         facade: facadeName,
         method: 'createRefinementAgentAsync',
-        operation: OPERATIONS.FEATURE_PLANNER.CREATE_PLAN,
+        operation: OPERATIONS.FEATURE_PLANNER.CREATE_REFINEMENT_AGENT,
         userId,
       };
       throw createFacadeError(errorContext, error);
@@ -186,7 +186,7 @@ export class FeaturePlannerFacade {
         data: { agentId },
         facade: facadeName,
         method: 'deleteRefinementAgentAsync',
-        operation: OPERATIONS.FEATURE_PLANNER.DELETE_PLAN,
+        operation: OPERATIONS.FEATURE_PLANNER.DELETE_REFINEMENT_AGENT,
         userId,
       };
       throw createFacadeError(errorContext, error);
@@ -216,7 +216,7 @@ export class FeaturePlannerFacade {
         data: { agentId },
         facade: facadeName,
         method: 'getAgentByIdAsync',
-        operation: OPERATIONS.FEATURE_PLANNER.GET_PLAN,
+        operation: OPERATIONS.FEATURE_PLANNER.GET_REFINEMENT_AGENTS,
         userId,
       };
       throw createFacadeError(errorContext, error);
@@ -242,7 +242,7 @@ export class FeaturePlannerFacade {
         data: { agentIds },
         facade: facadeName,
         method: 'getAgentsByIdsAsync',
-        operation: OPERATIONS.FEATURE_PLANNER.LIST_PLANS,
+        operation: OPERATIONS.FEATURE_PLANNER.GET_REFINEMENT_AGENTS,
         userId,
       };
       throw createFacadeError(errorContext, error);
@@ -267,7 +267,7 @@ export class FeaturePlannerFacade {
         data: {},
         facade: facadeName,
         method: 'getAvailableAgentsAsync',
-        operation: OPERATIONS.FEATURE_PLANNER.LIST_PLANS,
+        operation: OPERATIONS.FEATURE_PLANNER.GET_REFINEMENT_AGENTS,
         userId,
       };
       throw createFacadeError(errorContext, error);
@@ -1128,7 +1128,7 @@ export class FeaturePlannerFacade {
         data: { agentId, updates },
         facade: facadeName,
         method: 'updateRefinementAgentAsync',
-        operation: OPERATIONS.FEATURE_PLANNER.UPDATE_PLAN_STEP,
+        operation: OPERATIONS.FEATURE_PLANNER.UPDATE_REFINEMENT_AGENT,
         userId,
       };
       throw createFacadeError(errorContext, error);
