@@ -2,6 +2,7 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
+import { randomUUID } from 'crypto';
 import { z } from 'zod';
 
 import {
@@ -9,6 +10,8 @@ import {
   ERROR_CODES,
   ERROR_MESSAGES,
   OPERATIONS,
+  REDIS_KEYS,
+  REDIS_TTL,
   SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_CONTEXTS,
   SENTRY_LEVELS,
@@ -18,12 +21,14 @@ import { FeaturePlannerService } from '@/lib/services/feature-planner.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
+import { RedisOperations } from '@/lib/utils/redis-client';
 import {
   createFeaturePlanSchema,
   createPlanStepSchema,
   deleteFeaturePlanSchema,
   deletePlanStepSchema,
   getFeaturePlanSchema,
+  jobInputSchema,
   listFeaturePlansSchema,
   reorderPlanStepsSchema,
   runFileDiscoverySchema,
@@ -593,6 +598,87 @@ export const suggestFeatureAction = authActionClient
       return handleActionError(error, {
         metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.SUGGEST_FEATURE },
         operation: OPERATIONS.FEATURE_PLANNER.SUGGEST_FEATURE,
+        userId,
+      });
+    }
+  });
+
+/**
+ * Start a feature suggestion job (Phase 1 of two-phase streaming)
+ * Creates an ephemeral job and returns jobId immediately for SSE connection
+ */
+export const startFeatureSuggestionAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.FEATURE_PLANNER.START_FEATURE_SUGGESTION,
+    isTransactionRequired: false,
+  })
+  .inputSchema(jobInputSchema)
+  .action(async ({ ctx }) => {
+    const input = jobInputSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, {
+      featureType: input.featureType,
+      pageOrComponent: input.pageOrComponent,
+      priorityLevel: input.priorityLevel,
+    });
+
+    try {
+      // Generate unique job ID
+      const jobId = randomUUID();
+      const now = Date.now();
+
+      // Create job metadata
+      const jobMetadata = {
+        createdAt: now,
+        input: {
+          additionalContext: input.additionalContext,
+          customModel: input.customModel,
+          featureType: input.featureType,
+          pageOrComponent: input.pageOrComponent,
+          priorityLevel: input.priorityLevel,
+        },
+        status: 'pending' as const,
+        userId,
+      };
+
+      // Store job metadata in Redis with TTL
+      const redisKey = REDIS_KEYS.JOBS.FEATURE_SUGGESTION(jobId);
+      const stored = await RedisOperations.set(
+        redisKey,
+        JSON.stringify(jobMetadata),
+        REDIS_TTL.JOBS.SUGGESTION,
+      );
+
+      if (!stored) {
+        throw new ActionError(
+          ErrorType.INTERNAL,
+          ERROR_CODES.FEATURE_PLANNER.CREATE_FAILED,
+          'Failed to create feature suggestion job',
+          { ctx, jobId, operation: OPERATIONS.FEATURE_PLANNER.START_FEATURE_SUGGESTION },
+          false,
+          500,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          jobId,
+          pageOrComponent: input.pageOrComponent,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Created feature suggestion job: ${jobId}`,
+      });
+
+      return {
+        data: { jobId },
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.START_FEATURE_SUGGESTION },
+        operation: OPERATIONS.FEATURE_PLANNER.START_FEATURE_SUGGESTION,
         userId,
       });
     }

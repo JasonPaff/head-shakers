@@ -17,6 +17,9 @@ export const REDIS_KEYS = {
     USER_COLLECTIONS: (userId: string) => `cache:user_collections:${userId}`,
     USER_PROFILE: (userId: string) => `cache:user:${userId}`,
   },
+  JOBS: {
+    FEATURE_SUGGESTION: (jobId: string) => `jobs:suggestion:${jobId}`,
+  },
   LOCKS: {
     AGGREGATE_UPDATE: (type: string, id: string) => `lock:aggregate:${type}:${id}`,
     BOBBLEHEAD_UPDATE: (bobbleheadId: string) => `lock:bobblehead_update:${bobbleheadId}`,
@@ -71,6 +74,9 @@ export const REDIS_TTL = {
     LONG: 3600, // 1 hour
     MEDIUM: 1800, // 30 minutes
     SHORT: 300, // 5 minutes
+  },
+  JOBS: {
+    SUGGESTION: 600, // 10 minutes
   },
   LOCK: 30, // 30 seconds
   RATE_LIMIT: 60, // 1 minute

@@ -39,13 +39,15 @@ export const RequestInput = ({
   const requestInputTestId = generateTestId('feature', 'form');
 
   const {
-    clearResults,
     closeDialog,
     error,
     invokeSuggestion,
     isDialogOpen,
-    isLoading,
     openDialog,
+    partialText,
+    progress,
+    resetState,
+    status,
     suggestions,
   } = useSuggestFeature();
 
@@ -129,11 +131,13 @@ export const RequestInput = ({
       <FeatureSuggestionDialog
         error={error}
         initialPageOrComponent={''}
-        isLoading={isLoading}
         isOpen={isDialogOpen}
-        onBackToForm={clearResults}
         onClose={closeDialog}
+        onRetry={resetState}
         onSubmit={invokeSuggestion}
+        partialText={partialText}
+        progress={progress}
+        status={status}
         suggestions={suggestions}
       />
     </div>

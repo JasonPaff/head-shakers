@@ -68,6 +68,7 @@ export const OPERATIONS = {
     SELECT_FILES: 'select_discovered_files',
     SELECT_PLAN_GENERATION: 'select_plan_generation',
     SELECT_REFINEMENT: 'select_feature_refinement',
+    START_FEATURE_SUGGESTION: 'start_feature_suggestion',
     SUGGEST_FEATURE: 'suggest_feature',
     UPDATE_PLAN: 'update_feature_plan',
     UPDATE_PLAN_STEP: 'update_plan_step',

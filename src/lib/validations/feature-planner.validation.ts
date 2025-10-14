@@ -516,3 +516,61 @@ export type PriorityLevel = z.infer<typeof priorityLevelEnum>;
 export type SuggestFeatureInput = z.infer<typeof suggestFeatureInputSchema>;
 export type SuggestFeatureOutput = z.infer<typeof suggestFeatureOutputSchema>;
 export type SuggestionResult = z.infer<typeof suggestionResultSchema>;
+
+// ============================================================================
+// JOB METADATA
+// ============================================================================
+
+export const jobStatusEnum = z.enum(['pending', 'in_progress', 'completed', 'failed']);
+
+export const jobInputSchema = z.object({
+  additionalContext: z.string().max(1000).optional(),
+  customModel: z.string().optional(),
+  featureType: featureTypeEnum,
+  pageOrComponent: z.string().min(1).max(200),
+  priorityLevel: priorityLevelEnum,
+});
+
+export const jobMetadataSchema = z.object({
+  createdAt: z.number(),
+  error: z.string().optional(),
+  input: jobInputSchema,
+  status: jobStatusEnum,
+  userId: z.string().min(1),
+});
+
+export type JobInput = z.infer<typeof jobInputSchema>;
+export type JobMetadata = z.infer<typeof jobMetadataSchema>;
+export type JobStatus = z.infer<typeof jobStatusEnum>;
+
+// ============================================================================
+// SSE EVENT SCHEMAS
+// ============================================================================
+
+export const sseConnectedEventSchema = z.object({
+  jobId: z.string().uuid(),
+  timestamp: z.number(),
+});
+
+export const sseDeltaEventSchema = z.object({
+  text: z.string(),
+  totalLength: z.number().int().min(0),
+});
+
+export const sseCompleteEventSchema = z.object({
+  suggestions: z.array(suggestionResultSchema),
+  tokenUsage: z.object({
+    inputTokens: z.number().int().min(0),
+    outputTokens: z.number().int().min(0),
+    totalTokens: z.number().int().min(0),
+  }),
+});
+
+export const sseErrorEventSchema = z.object({
+  error: z.string().min(1),
+});
+
+export type SSECompleteEvent = z.infer<typeof sseCompleteEventSchema>;
+export type SSEConnectedEvent = z.infer<typeof sseConnectedEventSchema>;
+export type SSEDeltaEvent = z.infer<typeof sseDeltaEventSchema>;
+export type SSEErrorEvent = z.infer<typeof sseErrorEventSchema>;

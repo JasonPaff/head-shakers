@@ -477,6 +477,226 @@ export class FeaturePlannerService {
   }
 
   /**
+   * Execute feature suggestion with streaming support
+   * Same as executeFeatureSuggestionAgent but with streaming callback
+   *
+   * @param pageOrComponent - Page or component name for context
+   * @param featureType - Type of feature (enhancement, new-capability, etc.)
+   * @param priorityLevel - Priority level (low, medium, high, critical)
+   * @param additionalContext - Optional additional context
+   * @param settings - Agent settings
+   * @param agent - Optional custom agent configuration for feature suggestions
+   * @param onUpdate - Optional callback for streaming text updates
+   * @returns Feature suggestions with metadata
+   */
+  static async executeFeatureSuggestionAgentWithStreaming(
+    pageOrComponent: string,
+    featureType: string,
+    priorityLevel: string,
+    additionalContext: string | undefined,
+    settings: { customModel?: string },
+    agent?: FeatureSuggestionAgent,
+    onUpdate?: (text: string) => void,
+  ): Promise<
+    AgentExecutionResult<{
+      context?: string;
+      suggestions: Array<{
+        description: string;
+        implementationConsiderations?: Array<string>;
+        rationale: string;
+        title: string;
+      }>;
+    }>
+  > {
+    const circuitBreaker = circuitBreakers.externalService('claude-agent-feature-suggestion', {
+      timeoutMs: 620000, // 12 minutes
+    });
+    const startTime = Date.now();
+
+    try {
+      const result = await circuitBreaker.execute(async () => {
+        let suggestionResult: {
+          context?: string;
+          suggestions: Array<{
+            description: string;
+            implementationConsiderations?: Array<string>;
+            rationale: string;
+            title: string;
+          }>;
+        } = {
+          suggestions: [],
+        };
+        const tokenUsage = {
+          cacheCreationTokens: 0,
+          cacheReadTokens: 0,
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
+
+        // Build prompt - use custom prompt if agent provided, otherwise use direct prompt
+        const prompt =
+          agent ?
+            this.buildCustomFeatureSuggestionPrompt(
+              pageOrComponent,
+              featureType,
+              priorityLevel,
+              additionalContext,
+              agent,
+            )
+          : this.buildDefaultFeatureSuggestionPrompt(
+              pageOrComponent,
+              featureType,
+              priorityLevel,
+              additionalContext,
+            );
+
+        // Use agent-specific tools if agent provided, otherwise limit tools for faster execution
+        const allowedTools = agent ? agent.tools : ['Read', 'Glob'];
+
+        console.log('[executeFeatureSuggestionAgentWithStreaming] Starting query with:', {
+          allowedTools,
+          hasStreamingCallback: !!onUpdate,
+          maxTurns: agent ? 10 : 5,
+          model: settings.customModel || 'claude-sonnet-4-5-20250929',
+          promptLength: prompt.length,
+        });
+
+        let messageCount = 0;
+        let assistantMessageCount = 0;
+
+        const systemPrompt =
+          agent?.systemPrompt ?
+            {
+              append: agent.systemPrompt,
+              preset: 'claude_code' as const,
+              type: 'preset' as const,
+            }
+          : {
+              preset: 'claude_code' as const,
+              type: 'preset' as const,
+            };
+
+        for await (const message of query({
+          options: {
+            ...BASE_SDK_OPTIONS,
+            allowedTools,
+            fallbackModel: FALLBACK_MODEL,
+            includePartialMessages: !!onUpdate, // Enable streaming if callback provided
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.FEATURE_SUGGESTION,
+            maxTurns: TURN_LIMITS.FEATURE_SUGGESTION,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt,
+          },
+          prompt,
+        })) {
+          // Handle streaming updates
+          if (message.type === 'stream_event' && onUpdate) {
+            try {
+              // Use SDK's built-in stream event structure
+              const streamEvent = message.event as unknown as {
+                content_block?: { text?: string; type: string };
+                delta?: { text?: string; type: string };
+                type: string;
+              };
+
+              // Check for text delta events from streaming API
+              if (streamEvent.delta?.text && typeof streamEvent.delta.text === 'string') {
+                onUpdate(streamEvent.delta.text);
+              }
+              // Check for content block events
+              else if (
+                streamEvent.content_block?.text &&
+                typeof streamEvent.content_block.text === 'string'
+              ) {
+                onUpdate(streamEvent.content_block.text);
+              }
+            } catch (streamError) {
+              console.error(
+                '[executeFeatureSuggestionAgentWithStreaming] Error processing stream event:',
+                streamError,
+              );
+            }
+          }
+
+          messageCount++;
+          console.log(`[executeFeatureSuggestionAgentWithStreaming] Message #${messageCount}:`, {
+            hasMessage: !!message,
+            type: message.type,
+          });
+
+          if (message.type === 'assistant') {
+            assistantMessageCount++;
+            console.log(
+              `[executeFeatureSuggestionAgentWithStreaming] Assistant message #${assistantMessageCount}`,
+            );
+
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
+
+            console.log('[executeFeatureSuggestionAgentWithStreaming] Parsed message:', {
+              contentBlocks: assistantMessage.content.length,
+              contentTypes: assistantMessage.content.map((c) => c.type).join(', '),
+              hasTextContent: !!textContent,
+              hasUsage: !!assistantMessage.usage,
+            });
+
+            if (textContent) {
+              console.log(
+                '[executeFeatureSuggestionAgentWithStreaming] Response text preview:',
+                textContent.text.substring(0, 500),
+              );
+              suggestionResult = this.parseFeatureSuggestionResponse(textContent.text);
+              console.log('[executeFeatureSuggestionAgentWithStreaming] Parsed suggestions:', {
+                count: suggestionResult.suggestions.length,
+                hasContext: !!suggestionResult.context,
+              });
+            }
+
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+              tokenUsage.cacheReadTokens = assistantMessage.usage.cache_read_input_tokens ?? 0;
+              tokenUsage.cacheCreationTokens = assistantMessage.usage.cache_creation_input_tokens ?? 0;
+
+              console.log('[executeFeatureSuggestionAgentWithStreaming] Token usage:', tokenUsage);
+            }
+          }
+        }
+
+        console.log('[executeFeatureSuggestionAgentWithStreaming] Query loop completed:', {
+          assistantMessages: assistantMessageCount,
+          suggestionsFound: suggestionResult.suggestions.length,
+          totalMessages: messageCount,
+        });
+
+        return { suggestionResult, tokenUsage };
+      });
+
+      const executionTimeMs = Date.now() - startTime;
+
+      return {
+        executionTimeMs,
+        result: result.result.suggestionResult,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
+      };
+    } catch (error) {
+      const context: ServiceErrorContext = {
+        endpoint: 'query',
+        isRetryable: true,
+        method: 'executeFeatureSuggestionAgentWithStreaming',
+        operation: 'feature-suggestion-streaming',
+        service: 'claude-agent-sdk',
+      };
+      throw createServiceError(context, error);
+    }
+  }
+
+  /**
    * Execute file discovery agent (legacy single-agent version)
    *
    * @deprecated Use executeParallelFileDiscoveryAgents instead
