@@ -8,15 +8,45 @@ import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
 import { DEFAULT_FEATURE_PLANNER_MODEL, FALLBACK_MODEL } from '@/lib/constants/claude-models';
-import {
-  BASE_SDK_OPTIONS,
-  THINKING_TOKEN_LIMITS,
-  TURN_LIMITS,
-} from '@/lib/constants/claude-sdk-config';
+import { BASE_SDK_OPTIONS, THINKING_TOKEN_LIMITS, TURN_LIMITS } from '@/lib/constants/claude-sdk-config';
 import { extractJsonFromMarkdown, parseRefinementOutput } from '@/lib/types/refinement-output';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
-import { withServiceRetry } from '@/lib/utils/retry';
+
+/**
+ * SDK assistant message structure
+ */
+interface SDKAssistantMessage {
+  content: Array<SDKMessageContent>;
+  usage?: SDKUsage;
+}
+
+type SDKMessageContent = SDKTextContent | SDKToolUseContent;
+
+/**
+ * SDK message content types
+ */
+interface SDKTextContent {
+  text: string;
+  type: 'text';
+}
+
+interface SDKToolUseContent {
+  id: string;
+  input: Record<string, unknown>;
+  name: string;
+  type: 'tool_use';
+}
+
+/**
+ * SDK usage statistics
+ */
+interface SDKUsage {
+  cache_creation_input_tokens?: number;
+  cache_read_input_tokens?: number;
+  input_tokens?: number;
+  output_tokens?: number;
+}
 
 /**
  * Zod schema for JSON file discovery response
@@ -56,47 +86,6 @@ const implementationPlanJsonSchema = z.object({
   estimatedDuration: z.string().optional(),
   riskLevel: z.string().optional(),
   steps: z.array(planStepJsonSchema).optional(),
-});
-
-/**
- * Zod schema for Claude SDK text content
- */
-const sdkTextContentSchema = z.object({
-  text: z.string(),
-  type: z.literal('text'),
-});
-
-/**
- * Zod schema for Claude SDK tool use content
- */
-const sdkToolUseContentSchema = z.object({
-  id: z.string(),
-  input: z.record(z.string(), z.unknown()),
-  name: z.string(),
-  type: z.literal('tool_use'),
-});
-
-/**
- * Zod schema for Claude SDK message content (text or tool use)
- */
-const sdkMessageContentSchema = z.discriminatedUnion('type', [sdkTextContentSchema, sdkToolUseContentSchema]);
-
-/**
- * Zod schema for Claude SDK usage stats
- */
-const sdkUsageSchema = z.object({
-  cache_creation_input_tokens: z.number().optional(),
-  cache_read_input_tokens: z.number().optional(),
-  input_tokens: z.number().optional(),
-  output_tokens: z.number().optional(),
-});
-
-/**
- * Zod schema for Claude SDK assistant message
- */
-const sdkAssistantMessageSchema = z.object({
-  content: z.array(sdkMessageContentSchema),
-  usage: sdkUsageSchema.optional(),
 });
 
 /**
@@ -326,172 +315,154 @@ export class FeaturePlannerService {
 
     try {
       const result = await circuitBreaker.execute(async () => {
-        const retryResult = await withServiceRetry(
-          async () => {
-            let suggestionResult: {
-              context?: string;
-              suggestions: Array<{
-                description: string;
-                implementationConsiderations?: Array<string>;
-                rationale: string;
-                title: string;
-              }>;
-            } = {
-              suggestions: [],
+        let suggestionResult: {
+          context?: string;
+          suggestions: Array<{
+            description: string;
+            implementationConsiderations?: Array<string>;
+            rationale: string;
+            title: string;
+          }>;
+        } = {
+          suggestions: [],
+        };
+        const tokenUsage = {
+          cacheCreationTokens: 0,
+          cacheReadTokens: 0,
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
+
+        // Build prompt - use custom prompt if agent provided, otherwise use direct prompt
+        const prompt =
+          agent ?
+            this.buildCustomFeatureSuggestionPrompt(
+              pageOrComponent,
+              featureType,
+              priorityLevel,
+              additionalContext,
+              agent,
+            )
+          : this.buildDefaultFeatureSuggestionPrompt(
+              pageOrComponent,
+              featureType,
+              priorityLevel,
+              additionalContext,
+            );
+
+        // Use agent-specific tools if agent provided, otherwise limit tools for faster execution
+        const allowedTools = agent ? agent.tools : ['Read', 'Glob'];
+
+        console.log('[executeFeatureSuggestionAgent] Starting query with:', {
+          allowedTools,
+          maxTurns: agent ? 10 : 5,
+          model: settings.customModel || 'claude-sonnet-4-5-20250929',
+          promptLength: prompt.length,
+        });
+
+        let messageCount = 0;
+        let assistantMessageCount = 0;
+
+        const systemPrompt =
+          agent?.systemPrompt ?
+            {
+              append: agent.systemPrompt,
+              preset: 'claude_code' as const,
+              type: 'preset' as const,
+            }
+          : {
+              preset: 'claude_code' as const,
+              type: 'preset' as const,
             };
-            const tokenUsage = {
-              cacheCreationTokens: 0,
-              cacheReadTokens: 0,
-              completionTokens: 0,
-              promptTokens: 0,
-              totalTokens: 0,
-            };
 
-            // Build prompt - use custom prompt if agent provided, otherwise use direct prompt
-            const prompt =
-              agent ?
-                this.buildCustomFeatureSuggestionPrompt(
-                  pageOrComponent,
-                  featureType,
-                  priorityLevel,
-                  additionalContext,
-                  agent,
-                )
-              : this.buildDefaultFeatureSuggestionPrompt(
-                  pageOrComponent,
-                  featureType,
-                  priorityLevel,
-                  additionalContext,
-                );
+        for await (const message of query({
+          options: {
+            ...BASE_SDK_OPTIONS,
+            allowedTools,
+            fallbackModel: FALLBACK_MODEL,
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.FEATURE_SUGGESTION,
+            maxTurns: TURN_LIMITS.FEATURE_SUGGESTION,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt,
+            /**
+             * Temperature Configuration (Future Enhancement)
+             *
+             * Temperature control is defined in TEMPERATURE_CONFIG constants but not yet
+             * applied due to SDK API limitations. When the SDK adds temperature support:
+             *
+             * 1. Uncomment temperature option in query() calls
+             * 2. Use: temperature: agent?.temperature ?? TEMPERATURE_CONFIG.FEATURE_SUGGESTION
+             * 3. Verify temperature values are respected in API responses
+             *
+             * Tracking: See TEMPERATURE_CONFIG in src/lib/constants/claude-sdk-config.ts
+             */
+            // temperature: agent?.temperature ?? TEMPERATURE_CONFIG.FEATURE_SUGGESTION,
+          },
+          prompt,
+        })) {
+          messageCount++;
+          console.log(`[executeFeatureSuggestionAgent] Message #${messageCount}:`, {
+            hasMessage: !!message,
+            type: message.type,
+          });
 
-            // Use agent-specific tools if agent provided, otherwise limit tools for faster execution
-            const allowedTools = agent ? agent.tools : ['Read', 'Glob'];
+          if (message.type === 'assistant') {
+            assistantMessageCount++;
+            console.log(`[executeFeatureSuggestionAgent] Assistant message #${assistantMessageCount}`);
 
-            console.log('[executeFeatureSuggestionAgent] Starting query with:', {
-              allowedTools,
-              maxTurns: agent ? 10 : 5,
-              model: settings.customModel || 'claude-sonnet-4-5-20250929',
-              promptLength: prompt.length,
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
+
+            console.log('[executeFeatureSuggestionAgent] Parsed message:', {
+              contentBlocks: assistantMessage.content.length,
+              contentTypes: assistantMessage.content.map((c) => c.type).join(', '),
+              hasTextContent: !!textContent,
+              hasUsage: !!assistantMessage.usage,
             });
 
-            let messageCount = 0;
-            let assistantMessageCount = 0;
-
-            const systemPrompt =
-              agent?.systemPrompt ?
-                {
-                  append: agent.systemPrompt,
-                  preset: 'claude_code' as const,
-                  type: 'preset' as const,
-                }
-              : undefined;
-
-            for await (const message of query({
-              options: {
-                ...BASE_SDK_OPTIONS,
-                allowedTools,
-                fallbackModel: FALLBACK_MODEL,
-                maxThinkingTokens: THINKING_TOKEN_LIMITS.FEATURE_SUGGESTION,
-                maxTurns: TURN_LIMITS.FEATURE_SUGGESTION,
-                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
-                systemPrompt,
-                /**
-                 * Temperature Configuration (Future Enhancement)
-                 *
-                 * Temperature control is defined in TEMPERATURE_CONFIG constants but not yet
-                 * applied due to SDK API limitations. When the SDK adds temperature support:
-                 *
-                 * 1. Uncomment temperature option in query() calls
-                 * 2. Use: temperature: agent?.temperature ?? TEMPERATURE_CONFIG.FEATURE_SUGGESTION
-                 * 3. Verify temperature values are respected in API responses
-                 *
-                 * Tracking: See TEMPERATURE_CONFIG in src/lib/constants/claude-sdk-config.ts
-                 */
-                // temperature: agent?.temperature ?? TEMPERATURE_CONFIG.FEATURE_SUGGESTION,
-              },
-              prompt,
-            })) {
-              messageCount++;
-              console.log(`[executeFeatureSuggestionAgent] Message #${messageCount}:`, {
-                hasMessage: !!message,
-                type: message.type,
+            if (textContent) {
+              console.log(
+                '[executeFeatureSuggestionAgent] Response text preview:',
+                textContent.text.substring(0, 500),
+              );
+              suggestionResult = this.parseFeatureSuggestionResponse(textContent.text);
+              console.log('[executeFeatureSuggestionAgent] Parsed suggestions:', {
+                count: suggestionResult.suggestions.length,
+                hasContext: !!suggestionResult.context,
               });
-
-              if (message.type === 'assistant') {
-                assistantMessageCount++;
-                console.log(`[executeFeatureSuggestionAgent] Assistant message #${assistantMessageCount}`);
-
-                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-                if (parseResult.success) {
-                  const validatedMessage = parseResult.data;
-
-                  // Find text content block (may not be the first item if agent uses tools)
-                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
-
-                  console.log('[executeFeatureSuggestionAgent] Parsed message:', {
-                    contentBlocks: validatedMessage.content.length,
-                    contentTypes: validatedMessage.content.map((c) => c.type).join(', '),
-                    hasTextContent: !!textContent,
-                    hasUsage: !!validatedMessage.usage,
-                  });
-
-                  if (textContent?.type === 'text') {
-                    console.log(
-                      '[executeFeatureSuggestionAgent] Response text preview:',
-                      textContent.text.substring(0, 500),
-                    );
-                    suggestionResult = this.parseFeatureSuggestionResponse(textContent.text);
-                    console.log('[executeFeatureSuggestionAgent] Parsed suggestions:', {
-                      count: suggestionResult.suggestions.length,
-                      hasContext: !!suggestionResult.context,
-                    });
-                  }
-
-                  if (validatedMessage.usage) {
-                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-                    tokenUsage.totalTokens =
-                      (validatedMessage.usage.input_tokens ?? 0) +
-                      (validatedMessage.usage.output_tokens ?? 0);
-                    tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
-                    tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
-
-                    console.log('[executeFeatureSuggestionAgent] Token usage:', tokenUsage);
-                  }
-                } else {
-                  console.error('[executeFeatureSuggestionAgent] Schema validation failed:', {
-                    errors: parseResult.error,
-                    message: JSON.stringify(message.message).substring(0, 500),
-                  });
-                }
-              }
             }
 
-            console.log('[executeFeatureSuggestionAgent] Query loop completed:', {
-              assistantMessages: assistantMessageCount,
-              suggestionsFound: suggestionResult.suggestions.length,
-              totalMessages: messageCount,
-            });
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+              tokenUsage.cacheReadTokens = assistantMessage.usage.cache_read_input_tokens ?? 0;
+              tokenUsage.cacheCreationTokens = assistantMessage.usage.cache_creation_input_tokens ?? 0;
 
-            return { suggestionResult, tokenUsage };
-          },
-          'claude-agent',
-          {
-            maxAttempts: 2,
-            operationName: 'feature-suggestion',
-          },
-        );
+              console.log('[executeFeatureSuggestionAgent] Token usage:', tokenUsage);
+            }
+          }
+        }
 
-        return retryResult;
+        console.log('[executeFeatureSuggestionAgent] Query loop completed:', {
+          assistantMessages: assistantMessageCount,
+          suggestionsFound: suggestionResult.suggestions.length,
+          totalMessages: messageCount,
+        });
+
+        return { suggestionResult, tokenUsage };
       });
 
       const executionTimeMs = Date.now() - startTime;
 
       return {
         executionTimeMs,
-        result: result.result.result.suggestionResult,
-        retryCount: result.result.attempts - 1,
-        tokenUsage: result.result.result.tokenUsage,
+        result: result.result.suggestionResult,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
       };
     } catch (error) {
       const context: ServiceErrorContext = {
@@ -525,73 +496,58 @@ export class FeaturePlannerService {
 
     try {
       const result = await circuitBreaker.execute(async () => {
-        const retryResult = await withServiceRetry(
-          async () => {
-            let discoveredFiles: Array<FileDiscoveryResult> = [];
-            const tokenUsage = {
-              completionTokens: 0,
-              promptTokens: 0,
-              totalTokens: 0,
-            };
+        let discoveredFiles: Array<FileDiscoveryResult> = [];
+        const tokenUsage = {
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
 
-            const prompt = this.buildFileDiscoveryPrompt(refinedRequest);
+        const prompt = this.buildFileDiscoveryPrompt(refinedRequest);
 
-            for await (const message of query({
-              options: {
-                ...BASE_SDK_OPTIONS,
-                allowedTools: ['Read', 'Grep', 'Glob'],
-                fallbackModel: FALLBACK_MODEL,
-                maxThinkingTokens: THINKING_TOKEN_LIMITS.FILE_DISCOVERY,
-                maxTurns: TURN_LIMITS.FILE_DISCOVERY_LEGACY,
-                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
-                systemPrompt: {
-                  preset: 'claude_code',
-                  type: 'preset',
-                },
-              },
-              prompt,
-            })) {
-              if (message.type === 'assistant') {
-                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-                if (parseResult.success) {
-                  const validatedMessage = parseResult.data;
-                  // Find text content block (may not be the first item if agent uses tools)
-                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+        for await (const message of query({
+          options: {
+            ...BASE_SDK_OPTIONS,
+            allowedTools: ['Read', 'Grep', 'Glob'],
+            fallbackModel: FALLBACK_MODEL,
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.FILE_DISCOVERY,
+            maxTurns: TURN_LIMITS.FILE_DISCOVERY_LEGACY,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt: {
+              preset: 'claude_code',
+              type: 'preset',
+            },
+          },
+          prompt,
+        })) {
+          if (message.type === 'assistant') {
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
 
-                  if (textContent?.type === 'text') {
-                    discoveredFiles = this.parseFileDiscoveryResponse(textContent.text);
-                  }
-
-                  if (validatedMessage.usage) {
-                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-                    tokenUsage.totalTokens =
-                      (validatedMessage.usage.input_tokens ?? 0) +
-                      (validatedMessage.usage.output_tokens ?? 0);
-                  }
-                }
-              }
+            if (textContent) {
+              discoveredFiles = this.parseFileDiscoveryResponse(textContent.text);
             }
 
-            return { discoveredFiles, tokenUsage };
-          },
-          'claude-agent',
-          {
-            maxAttempts: 2,
-            operationName: 'file-discovery',
-          },
-        );
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+            }
+          }
+        }
 
-        return retryResult;
+        return { discoveredFiles, tokenUsage };
       });
 
       const executionTimeMs = Date.now() - startTime;
 
       return {
         executionTimeMs,
-        result: result.result.result.discoveredFiles,
-        retryCount: result.result.attempts - 1,
-        tokenUsage: result.result.result.tokenUsage,
+        result: result.result.discoveredFiles,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
       };
     } catch (error) {
       const context: ServiceErrorContext = {
@@ -626,79 +582,64 @@ export class FeaturePlannerService {
 
     try {
       const result = await circuitBreaker.execute(async () => {
-        const retryResult = await withServiceRetry(
-          async () => {
-            let planResult: ImplementationPlanResult = {
-              complexity: 'medium',
-              estimatedDuration: '',
-              implementationPlan: '',
-              riskLevel: 'medium',
-              steps: [],
-            };
-            const tokenUsage = {
-              completionTokens: 0,
-              promptTokens: 0,
-              totalTokens: 0,
-            };
+        let planResult: ImplementationPlanResult = {
+          complexity: 'medium',
+          estimatedDuration: '',
+          implementationPlan: '',
+          riskLevel: 'medium',
+          steps: [],
+        };
+        const tokenUsage = {
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
 
-            const prompt = this.buildImplementationPlanPrompt(refinedRequest, discoveredFiles);
+        const prompt = this.buildImplementationPlanPrompt(refinedRequest, discoveredFiles);
 
-            for await (const message of query({
-              options: {
-                ...BASE_SDK_OPTIONS,
-                allowedTools: ['Read', 'Grep', 'Glob'],
-                fallbackModel: FALLBACK_MODEL,
-                maxThinkingTokens: THINKING_TOKEN_LIMITS.IMPLEMENTATION_PLANNING,
-                maxTurns: TURN_LIMITS.IMPLEMENTATION_PLANNING,
-                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
-                systemPrompt: {
-                  preset: 'claude_code',
-                  type: 'preset',
-                },
-              },
-              prompt,
-            })) {
-              if (message.type === 'assistant') {
-                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-                if (parseResult.success) {
-                  const validatedMessage = parseResult.data;
-                  // Find text content block (may not be the first item if agent uses tools)
-                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+        for await (const message of query({
+          options: {
+            ...BASE_SDK_OPTIONS,
+            allowedTools: ['Read', 'Grep', 'Glob'],
+            fallbackModel: FALLBACK_MODEL,
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.IMPLEMENTATION_PLANNING,
+            maxTurns: TURN_LIMITS.IMPLEMENTATION_PLANNING,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt: {
+              preset: 'claude_code',
+              type: 'preset',
+            },
+          },
+          prompt,
+        })) {
+          if (message.type === 'assistant') {
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
 
-                  if (textContent?.type === 'text') {
-                    planResult = this.parseImplementationPlanResponse(textContent.text);
-                  }
-
-                  if (validatedMessage.usage) {
-                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-                    tokenUsage.totalTokens =
-                      (validatedMessage.usage.input_tokens ?? 0) +
-                      (validatedMessage.usage.output_tokens ?? 0);
-                  }
-                }
-              }
+            if (textContent) {
+              planResult = this.parseImplementationPlanResponse(textContent.text);
             }
 
-            return { planResult, tokenUsage };
-          },
-          'claude-agent',
-          {
-            maxAttempts: 2,
-            operationName: 'implementation-planning',
-          },
-        );
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+            }
+          }
+        }
 
-        return retryResult;
+        return { planResult, tokenUsage };
       });
 
       const executionTimeMs = Date.now() - startTime;
 
       return {
         executionTimeMs,
-        result: result.result.result.planResult,
-        retryCount: result.result.attempts - 1,
-        tokenUsage: result.result.result.tokenUsage,
+        result: result.result.planResult,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
       };
     } catch (error) {
       const context: ServiceErrorContext = {
@@ -802,163 +743,148 @@ export class FeaturePlannerService {
 
     try {
       const result = await circuitBreaker.execute(async () => {
-        const retryResult = await withServiceRetry(
-          async () => {
-            let refinedText = '';
-            let refinementOutput: null | RefinementOutput = null;
-            const tokenUsage = {
-              cacheCreationTokens: 0,
-              cacheReadTokens: 0,
-              completionTokens: 0,
-              promptTokens: 0,
-              totalTokens: 0,
+        let refinedText = '';
+        let refinementOutput: null | RefinementOutput = null;
+        const tokenUsage = {
+          cacheCreationTokens: 0,
+          cacheReadTokens: 0,
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
+
+        // Build agent prompt (role-based if agent provided, otherwise generic)
+        const prompt =
+          agent ?
+            this.buildRoleBasedRefinementPrompt(originalRequest, agent, settings)
+          : this.buildRefinementPrompt(originalRequest, settings);
+
+        // Determine tools to use (agent-specific or setting-based)
+        const allowedTools =
+          agent ? agent.tools
+          : settings.includeProjectContext ? ['Read', 'Grep', 'Glob']
+          : [];
+
+        const systemPrompt =
+          agent ?
+            {
+              append: agent.systemPrompt,
+              preset: 'claude_code' as const,
+              type: 'preset' as const,
+            }
+          : {
+              preset: 'claude_code' as const,
+              type: 'preset' as const,
             };
 
-            // Build agent prompt (role-based if agent provided, otherwise generic)
-            const prompt =
-              agent ?
-                this.buildRoleBasedRefinementPrompt(originalRequest, agent, settings)
-              : this.buildRefinementPrompt(originalRequest, settings);
+        // Execute agent with SDK
+        for await (const message of query({
+          options: {
+            ...BASE_SDK_OPTIONS,
+            allowedTools,
+            fallbackModel: FALLBACK_MODEL,
+            includePartialMessages: !!onPartialUpdate, // Enable streaming if callback provided
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.REFINEMENT,
+            maxTurns: TURN_LIMITS.REFINEMENT,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt,
+            /**
+             * Temperature Configuration (Future Enhancement)
+             *
+             * Temperature control is defined in TEMPERATURE_CONFIG constants but not yet
+             * applied due to SDK API limitations. When the SDK adds temperature support:
+             *
+             * 1. Uncomment temperature option in query() calls
+             * 2. Use: temperature: agent?.temperature ?? TEMPERATURE_CONFIG.REFINEMENT
+             * 3. Verify temperature values are respected in API responses
+             *
+             * Tracking: See TEMPERATURE_CONFIG in src/lib/constants/claude-sdk-config.ts
+             */
+            // temperature: agent?.temperature ?? TEMPERATURE_CONFIG.REFINEMENT,
+          },
+          prompt,
+        })) {
+          // Handle streaming updates
+          if (message.type === 'stream_event' && onPartialUpdate) {
+            try {
+              // Use SDK's built-in stream event structure
+              // Type cast to work around SDK typing limitations
+              const streamEvent = message.event as unknown as {
+                content_block?: { text?: string; type: string };
+                delta?: { text?: string; type: string };
+                type: string;
+              };
 
-            // Determine tools to use (agent-specific or setting-based)
-            const allowedTools =
-              agent ? agent.tools
-              : settings.includeProjectContext ? ['Read', 'Grep', 'Glob']
-              : [];
-
-            const systemPrompt =
-              agent ?
-                {
-                  append: agent.systemPrompt,
-                  preset: 'claude_code' as const,
-                  type: 'preset' as const,
-                }
-              : {
-                  preset: 'claude_code' as const,
-                  type: 'preset' as const,
-                };
-
-            // Execute agent with SDK
-            for await (const message of query({
-              options: {
-                ...BASE_SDK_OPTIONS,
-                allowedTools,
-                fallbackModel: FALLBACK_MODEL,
-                includePartialMessages: !!onPartialUpdate, // Enable streaming if callback provided
-                maxThinkingTokens: THINKING_TOKEN_LIMITS.REFINEMENT,
-                maxTurns: TURN_LIMITS.REFINEMENT,
-                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
-                systemPrompt,
-                /**
-                 * Temperature Configuration (Future Enhancement)
-                 *
-                 * Temperature control is defined in TEMPERATURE_CONFIG constants but not yet
-                 * applied due to SDK API limitations. When the SDK adds temperature support:
-                 *
-                 * 1. Uncomment temperature option in query() calls
-                 * 2. Use: temperature: agent?.temperature ?? TEMPERATURE_CONFIG.REFINEMENT
-                 * 3. Verify temperature values are respected in API responses
-                 *
-                 * Tracking: See TEMPERATURE_CONFIG in src/lib/constants/claude-sdk-config.ts
-                 */
-                // temperature: agent?.temperature ?? TEMPERATURE_CONFIG.REFINEMENT,
-              },
-              prompt,
-            })) {
-              // Handle streaming updates
-              if (message.type === 'stream_event' && onPartialUpdate) {
-                try {
-                  // Use SDK's built-in stream event structure
-                  // Type cast to work around SDK typing limitations
-                  const streamEvent = message.event as unknown as {
-                    content_block?: { text?: string; type: string };
-                    delta?: { text?: string; type: string };
-                    type: string;
-                  };
-
-                  // Check for text delta events from streaming API
-                  if (streamEvent.delta?.text && typeof streamEvent.delta.text === 'string') {
-                    onPartialUpdate(streamEvent.delta.text);
-                  }
-                  // Check for content block events
-                  else if (
-                    streamEvent.content_block?.text &&
-                    typeof streamEvent.content_block.text === 'string'
-                  ) {
-                    onPartialUpdate(streamEvent.content_block.text);
-                  }
-                } catch (streamError) {
-                  console.error('[executeRefinementAgent] Error processing stream event:', streamError);
-                }
+              // Check for text delta events from streaming API
+              if (streamEvent.delta?.text && typeof streamEvent.delta.text === 'string') {
+                onPartialUpdate(streamEvent.delta.text);
               }
+              // Check for content block events
+              else if (
+                streamEvent.content_block?.text &&
+                typeof streamEvent.content_block.text === 'string'
+              ) {
+                onPartialUpdate(streamEvent.content_block.text);
+              }
+            } catch (streamError) {
+              console.error('[executeRefinementAgent] Error processing stream event:', streamError);
+            }
+          }
 
-              // Extract assistant response
-              if (message.type === 'assistant') {
-                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-                if (parseResult.success) {
-                  const validatedMessage = parseResult.data;
-                  // Find text content block (may not be the first item if agent uses tools)
-                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+          // Extract assistant response
+          if (message.type === 'assistant') {
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
 
-                  if (textContent?.type === 'text') {
-                    refinedText = textContent.text;
+            if (textContent) {
+              refinedText = textContent.text;
 
-                    // If using role-based agent, parse structured JSON output
-                    if (agent) {
-                      try {
-                        const jsonString = extractJsonFromMarkdown(refinedText);
-                        refinementOutput = parseRefinementOutput(jsonString);
-                      } catch (error) {
-                        console.error(
-                          `[executeRefinementAgent] Failed to parse JSON from ${agent.agentId}:`,
-                          error,
-                        );
-                        // Fall back to plain text if JSON parsing fails
-                        refinementOutput = null;
-                      }
-                    }
-                  }
-
-                  // Track token usage
-                  if (validatedMessage.usage) {
-                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-                    tokenUsage.totalTokens =
-                      (validatedMessage.usage.input_tokens ?? 0) +
-                      (validatedMessage.usage.output_tokens ?? 0);
-                    tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
-                    tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
-                  }
+              // If using role-based agent, parse structured JSON output
+              if (agent) {
+                try {
+                  const jsonString = extractJsonFromMarkdown(refinedText);
+                  refinementOutput = parseRefinementOutput(jsonString);
+                } catch (error) {
+                  console.error(
+                    `[executeRefinementAgent] Failed to parse JSON from ${agent.agentId}:`,
+                    error,
+                  );
+                  // Fall back to plain text if JSON parsing fails
+                  refinementOutput = null;
                 }
               }
             }
 
-            return {
-              refinedText,
-              refinementOutput,
-              tokenUsage,
-            };
-          },
-          'claude-agent',
-          {
-            maxAttempts: 2,
-            operationName: 'feature-refinement',
-          },
-        );
+            // Track token usage
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+              tokenUsage.cacheReadTokens = assistantMessage.usage.cache_read_input_tokens ?? 0;
+              tokenUsage.cacheCreationTokens = assistantMessage.usage.cache_creation_input_tokens ?? 0;
+            }
+          }
+        }
 
-        return retryResult;
+        return {
+          refinedText,
+          refinementOutput,
+          tokenUsage,
+        };
       });
 
       const executionTimeMs = Date.now() - startTime;
 
       // Return structured output if available, otherwise fall back to plain text
-      const finalResult = result.result.result.refinementOutput || result.result.result.refinedText;
+      const finalResult = result.result.refinementOutput || result.result.refinedText;
 
       return {
         executionTimeMs,
         result: finalResult,
-        retryCount: result.result.attempts - 1,
-        tokenUsage: result.result.result.tokenUsage,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
       };
     } catch (error) {
       const context: ServiceErrorContext = {
@@ -995,90 +921,75 @@ export class FeaturePlannerService {
 
     try {
       const result = await circuitBreaker.execute(async () => {
-        const retryResult = await withServiceRetry(
-          async () => {
-            let refinementOutput: null | RefinementOutput = null;
-            const tokenUsage = {
-              cacheCreationTokens: 0,
-              cacheReadTokens: 0,
-              completionTokens: 0,
-              promptTokens: 0,
-              totalTokens: 0,
-            };
+        let refinementOutput: null | RefinementOutput = null;
+        const tokenUsage = {
+          cacheCreationTokens: 0,
+          cacheReadTokens: 0,
+          completionTokens: 0,
+          promptTokens: 0,
+          totalTokens: 0,
+        };
 
-            const prompt = this.buildSynthesisPrompt(originalRequest, refinements, settings);
+        const prompt = this.buildSynthesisPrompt(originalRequest, refinements, settings);
 
-            for await (const message of query({
-              options: {
-                ...BASE_SDK_OPTIONS,
-                allowedTools: [], // Synthesis doesn't need to read files
-                fallbackModel: FALLBACK_MODEL,
-                maxThinkingTokens: THINKING_TOKEN_LIMITS.SYNTHESIS,
-                maxTurns: TURN_LIMITS.SYNTHESIS,
-                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
-                systemPrompt: {
-                  preset: 'claude_code',
-                  type: 'preset',
-                },
-              },
-              prompt,
-            })) {
-              if (message.type === 'assistant') {
-                const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-                if (parseResult.success) {
-                  const validatedMessage = parseResult.data;
-                  // Find text content block (may not be the first item if agent uses tools)
-                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+        for await (const message of query({
+          options: {
+            ...BASE_SDK_OPTIONS,
+            allowedTools: [], // Synthesis doesn't need to read files
+            fallbackModel: FALLBACK_MODEL,
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.SYNTHESIS,
+            maxTurns: TURN_LIMITS.SYNTHESIS,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt: {
+              preset: 'claude_code',
+              type: 'preset',
+            },
+          },
+          prompt,
+        })) {
+          if (message.type === 'assistant') {
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
 
-                  if (textContent?.type === 'text') {
-                    try {
-                      const jsonString = extractJsonFromMarkdown(textContent.text);
-                      refinementOutput = parseRefinementOutput(jsonString);
-                    } catch (error) {
-                      console.error('[executeSynthesisAgent] Failed to parse synthesis output:', error);
-                      throw new Error('Failed to parse synthesis agent response as JSON');
-                    }
-                  }
-
-                  if (validatedMessage.usage) {
-                    tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-                    tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-                    tokenUsage.totalTokens =
-                      (validatedMessage.usage.input_tokens ?? 0) +
-                      (validatedMessage.usage.output_tokens ?? 0);
-                    tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
-                    tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
-                  }
-                }
+            if (textContent) {
+              try {
+                const jsonString = extractJsonFromMarkdown(textContent.text);
+                refinementOutput = parseRefinementOutput(jsonString);
+              } catch (error) {
+                console.error('[executeSynthesisAgent] Failed to parse synthesis output:', error);
+                throw new Error('Failed to parse synthesis agent response as JSON');
               }
             }
 
-            if (!refinementOutput) {
-              throw new Error('Synthesis agent did not return a valid refinement output');
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+              tokenUsage.cacheReadTokens = assistantMessage.usage.cache_read_input_tokens ?? 0;
+              tokenUsage.cacheCreationTokens = assistantMessage.usage.cache_creation_input_tokens ?? 0;
             }
+          }
+        }
 
-            return {
-              refinementOutput,
-              tokenUsage,
-            };
-          },
-          'claude-agent',
-          {
-            maxAttempts: 2,
-            operationName: 'refinement-synthesis',
-          },
-        );
+        if (!refinementOutput) {
+          throw new Error('Synthesis agent did not return a valid refinement output');
+        }
 
-        return retryResult;
+        return {
+          refinementOutput,
+          tokenUsage,
+        };
       });
 
       const executionTimeMs = Date.now() - startTime;
 
       return {
         executionTimeMs,
-        result: result.result.result.refinementOutput,
-        retryCount: result.result.attempts - 1,
-        tokenUsage: result.result.result.tokenUsage,
+        result: result.result.refinementOutput,
+        retryCount: 0,
+        tokenUsage: result.result.tokenUsage,
       };
     } catch (error) {
       const context: ServiceErrorContext = {
@@ -1830,23 +1741,20 @@ WRONG format (what you returned):
           prompt,
         })) {
           if (message.type === 'assistant') {
-            const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
-            if (parseResult.success) {
-              const validatedMessage = parseResult.data;
-              // Find text content block (may not be the first item if agent uses tools)
-              const textContent = validatedMessage.content.find((c) => c.type === 'text');
+            // Trust SDK types - use type assertion for safety
+            const assistantMessage = message.message as SDKAssistantMessage;
+            const textContent = assistantMessage.content.find((c): c is SDKTextContent => c.type === 'text');
 
-              if (textContent?.type === 'text') {
-                lastResponse = textContent.text;
-                discoveredFiles = this.parseFileDiscoveryResponse(textContent.text);
-              }
+            if (textContent) {
+              lastResponse = textContent.text;
+              discoveredFiles = this.parseFileDiscoveryResponse(textContent.text);
+            }
 
-              if (validatedMessage.usage) {
-                tokenUsage.promptTokens = validatedMessage.usage.input_tokens ?? 0;
-                tokenUsage.completionTokens = validatedMessage.usage.output_tokens ?? 0;
-                tokenUsage.totalTokens =
-                  (validatedMessage.usage.input_tokens ?? 0) + (validatedMessage.usage.output_tokens ?? 0);
-              }
+            if (assistantMessage.usage) {
+              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens =
+                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
             }
           }
         }
