@@ -79,7 +79,7 @@ export const AgentSelection = ({
             </div>
 
             {/* Agent Selection */}
-            <div className={'space-y-3'}>
+            <div className={'max-h-96 space-y-3 overflow-y-auto'}>
               {agents.map((agent) => {
                 const isSelected = _selectedAgentIds.includes(agent.agentId);
                 return (
