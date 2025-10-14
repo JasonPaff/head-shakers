@@ -171,7 +171,7 @@ ${suggestion.implementationConsiderations.map((item, i) => `${i + 1}. ${item}`).
   return (
     <Dialog onOpenChange={handleClose} open={isOpen}>
       <DialogContent
-        className={cn('flex max-h-[90vh] max-w-4xl flex-col', className)}
+        className={cn('flex max-h-[90vh] flex-col sm:max-w-4xl', className)}
         data-testid={dialogTestId}
         {...props}
       >

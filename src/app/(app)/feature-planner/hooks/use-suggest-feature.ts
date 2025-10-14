@@ -9,6 +9,7 @@ import type {
 } from '@/lib/validations/feature-planner.validation';
 
 import { useServerAction } from '@/hooks/use-server-action';
+import { useToggle } from '@/hooks/use-toggle';
 import { suggestFeatureAction } from '@/lib/actions/feature-planner/feature-planner.actions';
 
 interface UseSuggestFeatureReturn {
@@ -31,17 +32,17 @@ interface UseSuggestFeatureReturn {
 
 export const useSuggestFeature = (): UseSuggestFeatureReturn => {
   const [suggestions, setSuggestions] = useState<Array<SuggestionResult> | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useToggle();
   const [error, setError] = useState<null | string>(null);
 
   const openDialog = useCallback(() => {
-    setIsDialogOpen(true);
+    setIsDialogOpen.on();
     setError(null);
     setSuggestions(null);
   }, []);
 
   const closeDialog = useCallback(() => {
-    setIsDialogOpen(false);
+    setIsDialogOpen.off();
   }, []);
 
   const clearResults = useCallback(() => {
@@ -52,7 +53,7 @@ export const useSuggestFeature = (): UseSuggestFeatureReturn => {
   const resetState = useCallback(() => {
     setSuggestions(null);
     setError(null);
-    setIsDialogOpen(false);
+    setIsDialogOpen.off();
   }, []);
 
   const { executeAsync, isExecuting } = useServerAction(suggestFeatureAction, {

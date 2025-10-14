@@ -388,7 +388,7 @@ export const featureSuggestionAgentInputSchema = z.object({
 });
 
 export const updateFeatureSuggestionAgentSchema = z.object({
-  agentId: z.string().uuid(),
+  agentId: z.string(),
   updates: z.object({
     focus: z.string().min(10).max(500).optional(),
     name: z

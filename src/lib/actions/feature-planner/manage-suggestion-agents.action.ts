@@ -18,37 +18,8 @@ import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 import {
   featureSuggestionAgentInputSchema,
-  getFeatureSuggestionAgentSchema,
   updateFeatureSuggestionAgentSchema,
 } from '@/lib/validations/feature-planner.validation';
-
-/**
- * Get the user's feature suggestion agent
- */
-export const getFeatureSuggestionAgentAction = authActionClient
-  .metadata({
-    actionName: ACTION_NAMES.FEATURE_PLANNER.GET_SUGGESTION_AGENT,
-  })
-  .inputSchema(getFeatureSuggestionAgentSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const userId = ctx.userId;
-
-    try {
-      const agent = await FeaturePlannerFacade.getFeatureSuggestionAgentAsync(userId, ctx.db);
-
-      return {
-        data: agent,
-        success: true,
-      };
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: { actionName: ACTION_NAMES.FEATURE_PLANNER.GET_SUGGESTION_AGENT },
-        operation: OPERATIONS.FEATURE_PLANNER.GET_SUGGESTION_AGENT,
-        userId,
-      });
-    }
-  });
 
 /**
  * Create a new feature suggestion agent
@@ -66,7 +37,6 @@ export const createFeatureSuggestionAgentAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, { agentData });
 
     try {
-      // Convert temperature to string for database storage
       const agentDataForDb = {
         ...agentData,
         agentType: 'feature-suggestion' as const,
@@ -123,13 +93,13 @@ export const updateFeatureSuggestionAgentAction = authActionClient
   })
   .inputSchema(updateFeatureSuggestionAgentSchema)
   .action(async ({ ctx, parsedInput }) => {
+    console.log('Update Feature Suggestion Agent Action - Parsed Input:', parsedInput);
     const { agentId, updates } = updateFeatureSuggestionAgentSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURE_PLAN_DATA, { agentId, updates });
 
     try {
-      // Convert temperature to string for database storage if provided
       const updatesForDb = {
         ...(updates.focus !== undefined && { focus: updates.focus }),
         ...(updates.name !== undefined && { name: updates.name }),
@@ -138,6 +108,8 @@ export const updateFeatureSuggestionAgentAction = authActionClient
         ...(updates.tools !== undefined && { tools: updates.tools }),
         ...(updates.temperature !== undefined && { temperature: updates.temperature.toString() }),
       };
+
+      console.log('Updates for DB:', updatesForDb);
 
       const agent = await FeaturePlannerFacade.updateFeatureSuggestionAgentAsync(
         agentId,
