@@ -538,10 +538,8 @@ export const suggestFeatureAction = authActionClient
     });
 
     try {
-      // Fetch custom suggestion agent (if exists)
       const dbAgent = await FeaturePlannerFacade.getFeatureSuggestionAgentAsync(userId, ctx.db);
 
-      // Convert database agent to service agent type if present
       const customAgent =
         dbAgent ?
           {

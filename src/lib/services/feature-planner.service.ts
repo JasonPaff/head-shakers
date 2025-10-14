@@ -53,12 +53,27 @@ const implementationPlanJsonSchema = z.object({
 });
 
 /**
- * Zod schema for Claude SDK message content
+ * Zod schema for Claude SDK text content
  */
-const sdkMessageContentSchema = z.object({
+const sdkTextContentSchema = z.object({
   text: z.string(),
   type: z.literal('text'),
 });
+
+/**
+ * Zod schema for Claude SDK tool use content
+ */
+const sdkToolUseContentSchema = z.object({
+  id: z.string(),
+  input: z.record(z.string(), z.unknown()),
+  name: z.string(),
+  type: z.literal('tool_use'),
+});
+
+/**
+ * Zod schema for Claude SDK message content (text or tool use)
+ */
+const sdkMessageContentSchema = z.discriminatedUnion('type', [sdkTextContentSchema, sdkToolUseContentSchema]);
 
 /**
  * Zod schema for Claude SDK usage stats
@@ -346,24 +361,61 @@ export class FeaturePlannerService {
             // Use agent-specific tools if agent provided, otherwise limit tools for faster execution
             const allowedTools = agent ? agent.tools : ['Read', 'Glob'];
 
+            console.log('[executeFeatureSuggestionAgent] Starting query with:', {
+              allowedTools,
+              maxTurns: agent ? 10 : 5,
+              model: settings.customModel || 'claude-sonnet-4-5-20250929',
+              promptLength: prompt.length,
+            });
+
+            let messageCount = 0;
+            let assistantMessageCount = 0;
+
             // Note: Temperature support is not yet available in the Claude SDK
             // Will be added when SDK supports it: temperature: agent?.temperature
             for await (const message of query({
               options: {
                 allowedTools,
-                maxTurns: agent ? 10 : 5, // Limit turns for default prompt to speed up execution
+                maxTurns: agent ? 15 : 15, // Increased turns to allow agent to complete analysis and generate suggestions
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'],
               },
               prompt,
             })) {
+              messageCount++;
+              console.log(`[executeFeatureSuggestionAgent] Message #${messageCount}:`, {
+                hasMessage: !!message,
+                type: message.type,
+              });
+
               if (message.type === 'assistant') {
+                assistantMessageCount++;
+                console.log(`[executeFeatureSuggestionAgent] Assistant message #${assistantMessageCount}`);
+
                 const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
                 if (parseResult.success) {
                   const validatedMessage = parseResult.data;
-                  const content = validatedMessage.content[0];
-                  if (content?.type === 'text') {
-                    suggestionResult = this.parseFeatureSuggestionResponse(content.text);
+
+                  // Find text content block (may not be the first item if agent uses tools)
+                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+
+                  console.log('[executeFeatureSuggestionAgent] Parsed message:', {
+                    contentBlocks: validatedMessage.content.length,
+                    contentTypes: validatedMessage.content.map((c) => c.type).join(', '),
+                    hasTextContent: !!textContent,
+                    hasUsage: !!validatedMessage.usage,
+                  });
+
+                  if (textContent?.type === 'text') {
+                    console.log(
+                      '[executeFeatureSuggestionAgent] Response text preview:',
+                      textContent.text.substring(0, 500),
+                    );
+                    suggestionResult = this.parseFeatureSuggestionResponse(textContent.text);
+                    console.log('[executeFeatureSuggestionAgent] Parsed suggestions:', {
+                      count: suggestionResult.suggestions.length,
+                      hasContext: !!suggestionResult.context,
+                    });
                   }
 
                   if (validatedMessage.usage) {
@@ -374,10 +426,23 @@ export class FeaturePlannerService {
                       (validatedMessage.usage.output_tokens ?? 0);
                     tokenUsage.cacheReadTokens = validatedMessage.usage.cache_read_input_tokens ?? 0;
                     tokenUsage.cacheCreationTokens = validatedMessage.usage.cache_creation_input_tokens ?? 0;
+
+                    console.log('[executeFeatureSuggestionAgent] Token usage:', tokenUsage);
                   }
+                } else {
+                  console.error('[executeFeatureSuggestionAgent] Schema validation failed:', {
+                    errors: parseResult.error,
+                    message: JSON.stringify(message.message).substring(0, 500),
+                  });
                 }
               }
             }
+
+            console.log('[executeFeatureSuggestionAgent] Query loop completed:', {
+              assistantMessages: assistantMessageCount,
+              suggestionsFound: suggestionResult.suggestions.length,
+              totalMessages: messageCount,
+            });
 
             return { suggestionResult, tokenUsage };
           },
@@ -455,9 +520,11 @@ export class FeaturePlannerService {
                 const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
                 if (parseResult.success) {
                   const validatedMessage = parseResult.data;
-                  const content = validatedMessage.content[0];
-                  if (content?.type === 'text') {
-                    discoveredFiles = this.parseFileDiscoveryResponse(content.text);
+                  // Find text content block (may not be the first item if agent uses tools)
+                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+
+                  if (textContent?.type === 'text') {
+                    discoveredFiles = this.parseFileDiscoveryResponse(textContent.text);
                   }
 
                   if (validatedMessage.usage) {
@@ -554,9 +621,11 @@ export class FeaturePlannerService {
                 const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
                 if (parseResult.success) {
                   const validatedMessage = parseResult.data;
-                  const content = validatedMessage.content[0];
-                  if (content?.type === 'text') {
-                    planResult = this.parseImplementationPlanResponse(content.text);
+                  // Find text content block (may not be the first item if agent uses tools)
+                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+
+                  if (textContent?.type === 'text') {
+                    planResult = this.parseImplementationPlanResponse(textContent.text);
                   }
 
                   if (validatedMessage.usage) {
@@ -757,9 +826,11 @@ export class FeaturePlannerService {
                 const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
                 if (parseResult.success) {
                   const validatedMessage = parseResult.data;
-                  const content = validatedMessage.content[0];
-                  if (content?.type === 'text') {
-                    refinedText = content.text;
+                  // Find text content block (may not be the first item if agent uses tools)
+                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+
+                  if (textContent?.type === 'text') {
+                    refinedText = textContent.text;
 
                     // If using role-based agent, parse structured JSON output
                     if (agent) {
@@ -879,10 +950,12 @@ export class FeaturePlannerService {
                 const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
                 if (parseResult.success) {
                   const validatedMessage = parseResult.data;
-                  const content = validatedMessage.content[0];
-                  if (content?.type === 'text') {
+                  // Find text content block (may not be the first item if agent uses tools)
+                  const textContent = validatedMessage.content.find((c) => c.type === 'text');
+
+                  if (textContent?.type === 'text') {
                     try {
-                      const jsonString = extractJsonFromMarkdown(content.text);
+                      const jsonString = extractJsonFromMarkdown(textContent.text);
                       refinementOutput = parseRefinementOutput(jsonString);
                     } catch (error) {
                       console.error('[executeSynthesisAgent] Failed to parse synthesis output:', error);
@@ -1076,60 +1149,6 @@ export class FeaturePlannerService {
   }
 
   /**
-   * Build default feature suggestion prompt (when no custom agent provided)
-   */
-  private static buildDefaultFeatureSuggestionPrompt(
-    pageOrComponent: string,
-    featureType: string,
-    priorityLevel: string,
-    additionalContext: string | undefined,
-  ): string {
-    const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
-
-    return `You are a product strategist helping to generate feature suggestions for a web application.
-
-FEATURE SUGGESTION REQUEST:
-- Target Area: ${pageOrComponent}
-- Feature Type: ${featureType} (enhancement, new-capability, optimization, ui-improvement, integration)
-- Priority Level: ${priorityLevel} (low, medium, high, critical)${contextStr}
-
-YOUR TASK:
-Generate 3-5 strategic feature suggestions for the target area that match the specified feature type and priority level.
-
-GUIDELINES:
-- Use Read and Glob tools to quickly scan CLAUDE.md and relevant files in the target area
-- Focus on practical, implementable features that add clear value
-- Consider the existing architecture and patterns in the codebase
-- Each suggestion should be distinct and address different aspects
-- Keep analysis efficient - avoid reading too many files
-
-OUTPUT FORMAT:
-Return ONLY a JSON object in this exact structure (no markdown code blocks):
-
-{
-  "context": "Brief 1-2 sentence analysis of the target area based on files reviewed",
-  "suggestions": [
-    {
-      "title": "Feature name (be specific and descriptive)",
-      "rationale": "Why this feature is valuable (1-2 sentences)",
-      "description": "What the feature does and how it benefits users (2-3 sentences)",
-      "implementationConsiderations": ["consideration 1", "consideration 2", "consideration 3"]
-    }
-  ]
-}
-
-CRITICAL REQUIREMENTS:
-- Return ONLY the JSON object
-- Start with { and end with }
-- NO markdown code blocks (no \`\`\`json)
-- NO explanatory text before or after
-- Generate exactly 3-5 suggestions
-- Ensure all JSON strings are properly escaped
-- Each suggestion must have all 4 required fields: title, rationale, description, implementationConsiderations
-- implementationConsiderations must be an array with at least 2 items`;
-  }
-
-  /**
    * Build custom feature suggestion prompt with agent configuration
    */
   private static buildCustomFeatureSuggestionPrompt(
@@ -1142,7 +1161,7 @@ CRITICAL REQUIREMENTS:
     const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
 
     return `${agent.systemPrompt}
-
+ 
 FEATURE SUGGESTION CONTEXT:
 - Target Area: ${pageOrComponent}
 - Feature Type: ${featureType} (e.g., enhancement, new-capability, optimization, ui-improvement, integration)
@@ -1178,6 +1197,67 @@ IMPORTANT:
 - No markdown code blocks
 - No explanatory text
 - Ensure all strings are properly escaped`;
+  }
+
+  /**
+   * Build default feature suggestion prompt (when no custom agent provided)
+   */
+  private static buildDefaultFeatureSuggestionPrompt(
+    pageOrComponent: string,
+    featureType: string,
+    priorityLevel: string,
+    additionalContext: string | undefined,
+  ): string {
+    const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
+
+    return `You are a product strategist helping to generate feature suggestions for a web application.
+
+FEATURE SUGGESTION REQUEST:
+- Target Area: ${pageOrComponent}
+- Feature Type: ${featureType} (enhancement, new-capability, optimization, ui-improvement, integration)
+- Priority Level: ${priorityLevel} (low, medium, high, critical)${contextStr}
+
+YOUR TASK:
+Generate 3-5 strategic feature suggestions for the target area that match the specified feature type and priority level.
+
+TOOL USAGE CONSTRAINTS (CRITICAL):
+- Read CLAUDE.md first to understand project context
+- Use Glob to find 1-2 relevant files for the target area
+- Read at most 2 additional files (choose the most relevant)
+- DO NOT read more than 3 files total (including CLAUDE.md)
+- After reading files, IMMEDIATELY generate suggestions - DO NOT use additional tools
+- Focus on speed: complete analysis within 8-10 turns maximum
+
+GUIDELINES:
+- Focus on practical, implementable features that add clear value
+- Consider the existing architecture and patterns from the files you read
+- Each suggestion should be distinct and address different aspects
+- Base suggestions on actual codebase context, not speculation
+
+OUTPUT FORMAT:
+Return your response as a JSON code block in this exact structure:
+
+\`\`\`json
+{
+  "context": "Brief 1-2 sentence analysis of the target area based on files reviewed",
+  "suggestions": [
+    {
+      "title": "Feature name (be specific and descriptive)",
+      "rationale": "Why this feature is valuable (1-2 sentences)",
+      "description": "What the feature does and how it benefits users (2-3 sentences)",
+      "implementationConsiderations": ["consideration 1", "consideration 2", "consideration 3"]
+    }
+  ]
+}
+\`\`\`
+
+CRITICAL REQUIREMENTS:
+- Return ONLY the JSON code block (start with \`\`\`json and end with \`\`\`)
+- NO explanatory text before or after the code block
+- Generate exactly 3-5 suggestions
+- Ensure all JSON strings are properly escaped
+- Each suggestion must have all 4 required fields: title, rationale, description, implementationConsiderations
+- implementationConsiderations must be an array with at least 2 items`;
   }
 
   /**
@@ -1362,7 +1442,7 @@ ${searchPathsStr}
 - Be specific about contents, not vague possibilities
 </description_requirements>
 </instructions>
-
+ 
 <critical_output_format>
 <format_rules>
 ABSOLUTELY CRITICAL:
@@ -1670,10 +1750,12 @@ WRONG format (what you returned):
             const parseResult = sdkAssistantMessageSchema.safeParse(message.message);
             if (parseResult.success) {
               const validatedMessage = parseResult.data;
-              const content = validatedMessage.content[0];
-              if (content?.type === 'text') {
-                lastResponse = content.text;
-                discoveredFiles = this.parseFileDiscoveryResponse(content.text);
+              // Find text content block (may not be the first item if agent uses tools)
+              const textContent = validatedMessage.content.find((c) => c.type === 'text');
+
+              if (textContent?.type === 'text') {
+                lastResponse = textContent.text;
+                discoveredFiles = this.parseFileDiscoveryResponse(textContent.text);
               }
 
               if (validatedMessage.usage) {

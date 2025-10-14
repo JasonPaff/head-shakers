@@ -9,7 +9,6 @@ import { AppHeaderNotifications } from '@/components/layout/app-header/component
 import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
 import { generateTestId } from '@/lib/test-ids';
-import { cn } from '@/utils/tailwind-utils';
 
 export const AppHeader = () => {
   return (
@@ -28,15 +27,6 @@ export const AppHeader = () => {
             data-testid={generateTestId('layout', 'app-header', 'logo-link')}
             href={'/'}
           >
-            <div
-              className={cn(
-                'flex aspect-square size-8 items-center justify-center',
-                'rounded-lg bg-primary text-primary-foreground',
-              )}
-              data-testid={generateTestId('layout', 'app-header', 'logo-icon')}
-            >
-              HS
-            </div>
             Head Shakers
           </Link>
         </div>

@@ -38,7 +38,6 @@ export const RequestInput = ({
 }: RequestInputProps) => {
   const requestInputTestId = generateTestId('feature', 'form');
 
-  // Feature suggestion hook
   const {
     clearResults,
     closeDialog,
