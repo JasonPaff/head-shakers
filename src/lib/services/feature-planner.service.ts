@@ -326,7 +326,7 @@ export class FeaturePlannerService {
               totalTokens: 0,
             };
 
-            // Build prompt - use custom prompt if agent provided, otherwise use slash command
+            // Build prompt - use custom prompt if agent provided, otherwise use direct prompt
             const prompt =
               agent ?
                 this.buildCustomFeatureSuggestionPrompt(
@@ -336,20 +336,22 @@ export class FeaturePlannerService {
                   additionalContext,
                   agent,
                 )
-              : (() => {
-                  const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
-                  return `/suggest-feature ${pageOrComponent} ${featureType} ${priorityLevel}${contextStr}`;
-                })();
+              : this.buildDefaultFeatureSuggestionPrompt(
+                  pageOrComponent,
+                  featureType,
+                  priorityLevel,
+                  additionalContext,
+                );
 
-            // Use agent-specific tools if agent provided, otherwise use default tools
-            const allowedTools = agent ? agent.tools : ['Read', 'Grep', 'Glob'];
+            // Use agent-specific tools if agent provided, otherwise limit tools for faster execution
+            const allowedTools = agent ? agent.tools : ['Read', 'Glob'];
 
             // Note: Temperature support is not yet available in the Claude SDK
             // Will be added when SDK supports it: temperature: agent?.temperature
             for await (const message of query({
               options: {
                 allowedTools,
-                maxTurns: 10,
+                maxTurns: agent ? 10 : 5, // Limit turns for default prompt to speed up execution
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'],
               },
@@ -1071,6 +1073,60 @@ export class FeaturePlannerService {
       }
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
+  }
+
+  /**
+   * Build default feature suggestion prompt (when no custom agent provided)
+   */
+  private static buildDefaultFeatureSuggestionPrompt(
+    pageOrComponent: string,
+    featureType: string,
+    priorityLevel: string,
+    additionalContext: string | undefined,
+  ): string {
+    const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
+
+    return `You are a product strategist helping to generate feature suggestions for a web application.
+
+FEATURE SUGGESTION REQUEST:
+- Target Area: ${pageOrComponent}
+- Feature Type: ${featureType} (enhancement, new-capability, optimization, ui-improvement, integration)
+- Priority Level: ${priorityLevel} (low, medium, high, critical)${contextStr}
+
+YOUR TASK:
+Generate 3-5 strategic feature suggestions for the target area that match the specified feature type and priority level.
+
+GUIDELINES:
+- Use Read and Glob tools to quickly scan CLAUDE.md and relevant files in the target area
+- Focus on practical, implementable features that add clear value
+- Consider the existing architecture and patterns in the codebase
+- Each suggestion should be distinct and address different aspects
+- Keep analysis efficient - avoid reading too many files
+
+OUTPUT FORMAT:
+Return ONLY a JSON object in this exact structure (no markdown code blocks):
+
+{
+  "context": "Brief 1-2 sentence analysis of the target area based on files reviewed",
+  "suggestions": [
+    {
+      "title": "Feature name (be specific and descriptive)",
+      "rationale": "Why this feature is valuable (1-2 sentences)",
+      "description": "What the feature does and how it benefits users (2-3 sentences)",
+      "implementationConsiderations": ["consideration 1", "consideration 2", "consideration 3"]
+    }
+  ]
+}
+
+CRITICAL REQUIREMENTS:
+- Return ONLY the JSON object
+- Start with { and end with }
+- NO markdown code blocks (no \`\`\`json)
+- NO explanatory text before or after
+- Generate exactly 3-5 suggestions
+- Ensure all JSON strings are properly escaped
+- Each suggestion must have all 4 required fields: title, rationale, description, implementationConsiderations
+- implementationConsiderations must be an array with at least 2 items`;
   }
 
   /**

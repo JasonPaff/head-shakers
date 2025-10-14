@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, or } from 'drizzle-orm';
+import { and, desc, eq, inArray, isNull, or } from 'drizzle-orm';
 
 import type {
   CustomAgent,
@@ -449,6 +449,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Get feature suggestion agent by user ID
    * Returns the active feature-suggestion agent for a specific user
+   * Falls back to global agents (user_id IS NULL) if no user-specific agent exists
    */
   static async getFeatureSuggestionAgentByUserId(
     userId: string,
@@ -461,11 +462,12 @@ export class FeaturePlannerQuery extends BaseQuery {
       .from(customAgents)
       .where(
         this.combineFilters(
-          eq(customAgents.userId, userId),
+          or(eq(customAgents.userId, userId), isNull(customAgents.userId)),
           eq(customAgents.agentType, 'feature-suggestion'),
           eq(customAgents.isActive, true),
         ),
       )
+      .orderBy(desc(customAgents.userId))
       .limit(1);
 
     return result[0] || null;
@@ -589,6 +591,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Update feature suggestion agent
    * Updates an existing feature-suggestion agent
+   * Supports updating both user-specific agents (where userId matches) and global agents (where userId IS NULL)
    */
   static async updateFeatureSuggestionAgent(
     agentId: string,
@@ -604,7 +607,10 @@ export class FeaturePlannerQuery extends BaseQuery {
         this.combineFilters(
           eq(customAgents.agentId, agentId),
           eq(customAgents.agentType, 'feature-suggestion'),
-          context.userId ? eq(customAgents.userId, context.userId) : undefined,
+          eq(customAgents.isActive, true),
+          context.userId ?
+            or(eq(customAgents.userId, context.userId), isNull(customAgents.userId))
+          : undefined,
         ),
       )
       .returning();
