@@ -204,7 +204,7 @@ export class FeaturePlannerFacade {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
 
-      return await FeaturePlannerQuery.deleteAgentAsync(agentId, userId, context);
+      return await FeaturePlannerQuery.deleteAgentAsync(agentId, context);
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { agentId },
@@ -323,8 +323,8 @@ export class FeaturePlannerFacade {
   }
 
   /**
-   * Get feature suggestion agent by user ID
-   * Retrieves the active feature-suggestion agent for a specific user
+   * Get feature suggestion agent
+   * Retrieves the active feature-suggestion agent
    */
   static async getFeatureSuggestionAgentAsync(
     userId: string,
@@ -333,7 +333,7 @@ export class FeaturePlannerFacade {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
-      return await FeaturePlannerQuery.getFeatureSuggestionAgentByUserId(userId, context);
+      return await FeaturePlannerQuery.getFeatureSuggestionAgent(context);
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { userId },

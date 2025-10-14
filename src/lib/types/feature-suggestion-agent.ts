@@ -12,7 +12,6 @@ export const featureSuggestionAgentSchema = z.object({
   temperature: z.number().min(0).max(2),
   tools: z.array(z.enum(['Read', 'Grep', 'Glob'])),
   updatedAt: z.date(),
-  userId: z.string(),
 });
 
 export type FeatureSuggestionAgent = z.infer<typeof featureSuggestionAgentSchema>;

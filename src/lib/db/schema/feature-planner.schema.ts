@@ -108,7 +108,6 @@ export const customAgents = featurePlannerSchema.table(
     temperature: numeric('temperature', { precision: 3, scale: 2 }).notNull(),
     tools: jsonb('tools').$type<Array<string>>().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   },
   (table) => [
     // data validation constraints
@@ -126,11 +125,6 @@ export const customAgents = featurePlannerSchema.table(
     index('custom_agents_agent_type_idx').on(table.agentType),
     index('custom_agents_is_active_idx').on(table.isActive),
     index('custom_agents_is_default_idx').on(table.isDefault),
-    index('custom_agents_user_id_idx').on(table.userId),
-
-    // composite indexes
-    index('custom_agents_user_active_idx').on(table.userId, table.isActive),
-    index('custom_agents_user_type_idx').on(table.userId, table.agentType),
   ],
 );
 

@@ -34,7 +34,6 @@ export default async function SuggestionAgentPage() {
         temperature: parseFloat(dbAgent.temperature),
         tools: dbAgent.tools as Array<'Glob' | 'Grep' | 'Read'>,
         updatedAt: dbAgent.updatedAt,
-        userId: dbAgent.userId!,
       };
     }
   } catch (err) {
