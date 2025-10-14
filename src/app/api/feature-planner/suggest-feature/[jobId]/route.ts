@@ -189,12 +189,19 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
           }
 
           // Send completion event
+          // Map field names to match client schema:
+          // - tokenUsage: promptTokens -> inputTokens, completionTokens -> outputTokens
+          // - suggestions: extract array from result object
           controller.enqueue(
             encoder.encode(
               sendEvent('complete', {
                 executionTimeMs: result.executionTimeMs,
-                suggestions: result.result,
-                tokenUsage: result.tokenUsage,
+                suggestions: result.result.suggestions,
+                tokenUsage: {
+                  inputTokens: result.tokenUsage.promptTokens,
+                  outputTokens: result.tokenUsage.completionTokens,
+                  totalTokens: result.tokenUsage.totalTokens,
+                },
               }),
             ),
           );

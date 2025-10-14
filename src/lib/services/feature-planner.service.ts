@@ -24,6 +24,28 @@ interface SDKAssistantMessage {
 type SDKMessageContent = SDKTextContent | SDKToolUseContent;
 
 /**
+ * SDK result message structure (final output)
+ */
+interface SDKResultMessage {
+  duration_api_ms: number;
+  duration_ms: number;
+  isError: boolean; // Renamed from is_error to follow project conventions
+  num_turns: number;
+  permission_denials: Array<unknown>;
+  result?: string; // Final text output (present in success subtype)
+  session_id: string;
+  subtype: 'error_during_execution' | 'error_max_turns' | 'success';
+  total_cost_usd: number;
+  usage: {
+    cache_creation_input_tokens: number;
+    cache_read_input_tokens: number;
+    input_tokens: number;
+    output_tokens: number;
+  };
+  uuid: string;
+}
+
+/**
  * SDK message content types
  */
 interface SDKTextContent {
@@ -655,14 +677,53 @@ export class FeaturePlannerService {
             }
 
             if (assistantMessage.usage) {
-              tokenUsage.promptTokens = assistantMessage.usage.input_tokens ?? 0;
-              tokenUsage.completionTokens = assistantMessage.usage.output_tokens ?? 0;
-              tokenUsage.totalTokens =
-                (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
-              tokenUsage.cacheReadTokens = assistantMessage.usage.cache_read_input_tokens ?? 0;
-              tokenUsage.cacheCreationTokens = assistantMessage.usage.cache_creation_input_tokens ?? 0;
+              // Accumulate token usage from assistant messages
+              tokenUsage.promptTokens += assistantMessage.usage.input_tokens ?? 0;
+              tokenUsage.completionTokens += assistantMessage.usage.output_tokens ?? 0;
+              tokenUsage.totalTokens += (assistantMessage.usage.input_tokens ?? 0) + (assistantMessage.usage.output_tokens ?? 0);
+              tokenUsage.cacheReadTokens += assistantMessage.usage.cache_read_input_tokens ?? 0;
+              tokenUsage.cacheCreationTokens += assistantMessage.usage.cache_creation_input_tokens ?? 0;
 
-              console.log('[executeFeatureSuggestionAgentWithStreaming] Token usage:', tokenUsage);
+              console.log('[executeFeatureSuggestionAgentWithStreaming] Accumulated token usage:', tokenUsage);
+            }
+          }
+
+          // Handle result message (final output from SDK)
+          if (message.type === 'result') {
+            console.log('[executeFeatureSuggestionAgentWithStreaming] Result message received');
+
+            const resultMessage = message as unknown as SDKResultMessage;
+
+            console.log('[executeFeatureSuggestionAgentWithStreaming] Result details:', {
+              hasResult: !!resultMessage.result,
+              hasUsage: !!resultMessage.usage,
+              isError: resultMessage.isError,
+              subtype: resultMessage.subtype,
+            });
+
+            // Extract final result text if available
+            if (resultMessage.result && resultMessage.subtype === 'success') {
+              console.log(
+                '[executeFeatureSuggestionAgentWithStreaming] Final result text preview:',
+                resultMessage.result.substring(0, 500),
+              );
+
+              suggestionResult = this.parseFeatureSuggestionResponse(resultMessage.result);
+              console.log('[executeFeatureSuggestionAgentWithStreaming] Parsed suggestions from result:', {
+                count: suggestionResult.suggestions.length,
+                hasContext: !!suggestionResult.context,
+              });
+            }
+
+            // Use final token usage from result message (most accurate)
+            if (resultMessage.usage) {
+              tokenUsage.promptTokens = resultMessage.usage.input_tokens;
+              tokenUsage.completionTokens = resultMessage.usage.output_tokens;
+              tokenUsage.totalTokens = resultMessage.usage.input_tokens + resultMessage.usage.output_tokens;
+              tokenUsage.cacheReadTokens = resultMessage.usage.cache_read_input_tokens;
+              tokenUsage.cacheCreationTokens = resultMessage.usage.cache_creation_input_tokens;
+
+              console.log('[executeFeatureSuggestionAgentWithStreaming] Final token usage from result:', tokenUsage);
             }
           }
         }
