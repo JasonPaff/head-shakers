@@ -39,11 +39,11 @@ export const useSuggestFeature = (): UseSuggestFeatureReturn => {
     setIsDialogOpen.on();
     setError(null);
     setSuggestions(null);
-  }, []);
+  }, [setIsDialogOpen]);
 
   const closeDialog = useCallback(() => {
     setIsDialogOpen.off();
-  }, []);
+  }, [setIsDialogOpen]);
 
   const clearResults = useCallback(() => {
     setSuggestions(null);
@@ -54,7 +54,7 @@ export const useSuggestFeature = (): UseSuggestFeatureReturn => {
     setSuggestions(null);
     setError(null);
     setIsDialogOpen.off();
-  }, []);
+  }, [setIsDialogOpen]);
 
   const { executeAsync, isExecuting } = useServerAction(suggestFeatureAction, {
     onError: ({ error }) => {

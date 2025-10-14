@@ -7,6 +7,12 @@ import type { RefinementAgent } from '@/lib/types/refinement-agent';
 import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
 
+import { DEFAULT_FEATURE_PLANNER_MODEL, FALLBACK_MODEL } from '@/lib/constants/claude-models';
+import {
+  BASE_SDK_OPTIONS,
+  THINKING_TOKEN_LIMITS,
+  TURN_LIMITS,
+} from '@/lib/constants/claude-sdk-config';
 import { extractJsonFromMarkdown, parseRefinementOutput } from '@/lib/types/refinement-output';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { createServiceError } from '@/lib/utils/error-builders';
@@ -371,14 +377,37 @@ export class FeaturePlannerService {
             let messageCount = 0;
             let assistantMessageCount = 0;
 
-            // Note: Temperature support is not yet available in the Claude SDK
-            // Will be added when SDK supports it: temperature: agent?.temperature
+            const systemPrompt =
+              agent?.systemPrompt ?
+                {
+                  append: agent.systemPrompt,
+                  preset: 'claude_code' as const,
+                  type: 'preset' as const,
+                }
+              : undefined;
+
             for await (const message of query({
               options: {
+                ...BASE_SDK_OPTIONS,
                 allowedTools,
-                maxTurns: agent ? 15 : 15, // Increased turns to allow agent to complete analysis and generate suggestions
-                model: settings.customModel || 'claude-sonnet-4-5-20250929',
-                settingSources: ['project'],
+                fallbackModel: FALLBACK_MODEL,
+                maxThinkingTokens: THINKING_TOKEN_LIMITS.FEATURE_SUGGESTION,
+                maxTurns: TURN_LIMITS.FEATURE_SUGGESTION,
+                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+                systemPrompt,
+                /**
+                 * Temperature Configuration (Future Enhancement)
+                 *
+                 * Temperature control is defined in TEMPERATURE_CONFIG constants but not yet
+                 * applied due to SDK API limitations. When the SDK adds temperature support:
+                 *
+                 * 1. Uncomment temperature option in query() calls
+                 * 2. Use: temperature: agent?.temperature ?? TEMPERATURE_CONFIG.FEATURE_SUGGESTION
+                 * 3. Verify temperature values are respected in API responses
+                 *
+                 * Tracking: See TEMPERATURE_CONFIG in src/lib/constants/claude-sdk-config.ts
+                 */
+                // temperature: agent?.temperature ?? TEMPERATURE_CONFIG.FEATURE_SUGGESTION,
               },
               prompt,
             })) {
@@ -509,10 +538,16 @@ export class FeaturePlannerService {
 
             for await (const message of query({
               options: {
+                ...BASE_SDK_OPTIONS,
                 allowedTools: ['Read', 'Grep', 'Glob'],
-                maxTurns: 15, // Allow multiple turns for tool use + response
-                model: settings.customModel || 'claude-sonnet-4-5-20250929',
-                settingSources: ['project'],
+                fallbackModel: FALLBACK_MODEL,
+                maxThinkingTokens: THINKING_TOKEN_LIMITS.FILE_DISCOVERY,
+                maxTurns: TURN_LIMITS.FILE_DISCOVERY_LEGACY,
+                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+                systemPrompt: {
+                  preset: 'claude_code',
+                  type: 'preset',
+                },
               },
               prompt,
             })) {
@@ -610,10 +645,16 @@ export class FeaturePlannerService {
 
             for await (const message of query({
               options: {
+                ...BASE_SDK_OPTIONS,
                 allowedTools: ['Read', 'Grep', 'Glob'],
-                maxTurns: 15, // Allow multiple turns for tool use + response
-                model: settings.customModel || 'claude-sonnet-4-5-20250929',
-                settingSources: ['project'],
+                fallbackModel: FALLBACK_MODEL,
+                maxThinkingTokens: THINKING_TOKEN_LIMITS.IMPLEMENTATION_PLANNING,
+                maxTurns: TURN_LIMITS.IMPLEMENTATION_PLANNING,
+                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+                systemPrompt: {
+                  preset: 'claude_code',
+                  type: 'preset',
+                },
               },
               prompt,
             })) {
@@ -785,36 +826,66 @@ export class FeaturePlannerService {
               : settings.includeProjectContext ? ['Read', 'Grep', 'Glob']
               : [];
 
+            const systemPrompt =
+              agent ?
+                {
+                  append: agent.systemPrompt,
+                  preset: 'claude_code' as const,
+                  type: 'preset' as const,
+                }
+              : {
+                  preset: 'claude_code' as const,
+                  type: 'preset' as const,
+                };
+
             // Execute agent with SDK
-            // Note: Temperature and model variations will be supported via agent-specific settings
             for await (const message of query({
               options: {
+                ...BASE_SDK_OPTIONS,
                 allowedTools,
+                fallbackModel: FALLBACK_MODEL,
                 includePartialMessages: !!onPartialUpdate, // Enable streaming if callback provided
-                maxTurns: 10, // Allow multiple turns for tool use + response
-                model: settings.customModel || 'claude-sonnet-4-5-20250929',
-                settingSources: ['project'], // Load .claude/agents/
+                maxThinkingTokens: THINKING_TOKEN_LIMITS.REFINEMENT,
+                maxTurns: TURN_LIMITS.REFINEMENT,
+                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+                systemPrompt,
+                /**
+                 * Temperature Configuration (Future Enhancement)
+                 *
+                 * Temperature control is defined in TEMPERATURE_CONFIG constants but not yet
+                 * applied due to SDK API limitations. When the SDK adds temperature support:
+                 *
+                 * 1. Uncomment temperature option in query() calls
+                 * 2. Use: temperature: agent?.temperature ?? TEMPERATURE_CONFIG.REFINEMENT
+                 * 3. Verify temperature values are respected in API responses
+                 *
+                 * Tracking: See TEMPERATURE_CONFIG in src/lib/constants/claude-sdk-config.ts
+                 */
+                // temperature: agent?.temperature ?? TEMPERATURE_CONFIG.REFINEMENT,
               },
               prompt,
             })) {
               // Handle streaming updates
               if (message.type === 'stream_event' && onPartialUpdate) {
                 try {
-                  // For stream events, the message itself contains the delta
-                  // Type assertion to access the stream event structure
-                  const streamEvent = message as unknown as {
-                    content?: Array<{ text?: string; type: string }>;
+                  // Use SDK's built-in stream event structure
+                  // Type cast to work around SDK typing limitations
+                  const streamEvent = message.event as unknown as {
+                    content_block?: { text?: string; type: string };
                     delta?: { text?: string; type: string };
-                    type: 'stream_event';
+                    type: string;
                   };
 
-                  // Handle content delta updates
-                  if (streamEvent.delta?.type === 'text_delta' && streamEvent.delta.text) {
+                  // Check for text delta events from streaming API
+                  if (streamEvent.delta?.text && typeof streamEvent.delta.text === 'string') {
                     onPartialUpdate(streamEvent.delta.text);
                   }
-                  // Handle full content updates
-                  else if (streamEvent.content?.[0]?.type === 'text' && streamEvent.content[0].text) {
-                    onPartialUpdate(streamEvent.content[0].text);
+                  // Check for content block events
+                  else if (
+                    streamEvent.content_block?.text &&
+                    typeof streamEvent.content_block.text === 'string'
+                  ) {
+                    onPartialUpdate(streamEvent.content_block.text);
                   }
                 } catch (streamError) {
                   console.error('[executeRefinementAgent] Error processing stream event:', streamError);
@@ -939,10 +1010,16 @@ export class FeaturePlannerService {
 
             for await (const message of query({
               options: {
+                ...BASE_SDK_OPTIONS,
                 allowedTools: [], // Synthesis doesn't need to read files
-                maxTurns: 5,
-                model: settings.customModel || 'claude-sonnet-4-5-20250929',
-                settingSources: ['project'],
+                fallbackModel: FALLBACK_MODEL,
+                maxThinkingTokens: THINKING_TOKEN_LIMITS.SYNTHESIS,
+                maxTurns: TURN_LIMITS.SYNTHESIS,
+                model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+                systemPrompt: {
+                  preset: 'claude_code',
+                  type: 'preset',
+                },
               },
               prompt,
             })) {
@@ -1739,10 +1816,16 @@ WRONG format (what you returned):
 
         for await (const message of query({
           options: {
+            ...BASE_SDK_OPTIONS,
             allowedTools: ['Read', 'Grep', 'Glob'],
-            maxTurns: 10, // Fewer turns since each agent has a focused scope
-            model: settings.customModel || 'claude-sonnet-4-5-20250929',
-            settingSources: ['project'],
+            fallbackModel: FALLBACK_MODEL,
+            maxThinkingTokens: THINKING_TOKEN_LIMITS.FILE_DISCOVERY,
+            maxTurns: TURN_LIMITS.FILE_DISCOVERY_SPECIALIZED,
+            model: settings.customModel || DEFAULT_FEATURE_PLANNER_MODEL,
+            systemPrompt: {
+              preset: 'claude_code',
+              type: 'preset',
+            },
           },
           prompt,
         })) {
