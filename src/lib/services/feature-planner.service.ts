@@ -2,6 +2,7 @@ import { query } from '@anthropic-ai/claude-agent-sdk';
 import { z } from 'zod';
 
 import type { FileDiscoveryResult, RefinementSettings } from '@/lib/db/schema/feature-planner.schema';
+import type { FeatureSuggestionAgent } from '@/lib/types/feature-suggestion-agent';
 import type { RefinementAgent } from '@/lib/types/refinement-agent';
 import type { RefinementOutput } from '@/lib/types/refinement-output';
 import type { ServiceErrorContext } from '@/lib/utils/error-types';
@@ -269,13 +270,14 @@ export class FeaturePlannerService {
   ];
 
   /**
-   * Execute feature suggestion using slash command
+   * Execute feature suggestion using slash command or custom agent
    *
    * @param pageOrComponent - Page or component name for context
    * @param featureType - Type of feature (enhancement, new-capability, etc.)
    * @param priorityLevel - Priority level (low, medium, high, critical)
    * @param additionalContext - Optional additional context
    * @param settings - Agent settings
+   * @param agent - Optional custom agent configuration for feature suggestions
    * @returns Feature suggestions with metadata
    */
   static async executeFeatureSuggestionAgent(
@@ -284,6 +286,7 @@ export class FeaturePlannerService {
     priorityLevel: string,
     additionalContext: string | undefined,
     settings: { customModel?: string },
+    agent?: FeatureSuggestionAgent,
   ): Promise<
     AgentExecutionResult<{
       context?: string;
@@ -323,13 +326,29 @@ export class FeaturePlannerService {
               totalTokens: 0,
             };
 
-            // Build prompt that invokes the slash command
-            const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
-            const prompt = `/suggest-feature ${pageOrComponent} ${featureType} ${priorityLevel}${contextStr}`;
+            // Build prompt - use custom prompt if agent provided, otherwise use slash command
+            const prompt =
+              agent ?
+                this.buildCustomFeatureSuggestionPrompt(
+                  pageOrComponent,
+                  featureType,
+                  priorityLevel,
+                  additionalContext,
+                  agent,
+                )
+              : (() => {
+                  const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
+                  return `/suggest-feature ${pageOrComponent} ${featureType} ${priorityLevel}${contextStr}`;
+                })();
 
+            // Use agent-specific tools if agent provided, otherwise use default tools
+            const allowedTools = agent ? agent.tools : ['Read', 'Grep', 'Glob'];
+
+            // Note: Temperature support is not yet available in the Claude SDK
+            // Will be added when SDK supports it: temperature: agent?.temperature
             for await (const message of query({
               options: {
-                allowedTools: ['Read', 'Grep', 'Glob'],
+                allowedTools,
                 maxTurns: 10,
                 model: settings.customModel || 'claude-sonnet-4-5-20250929',
                 settingSources: ['project'],
@@ -1052,6 +1071,57 @@ export class FeaturePlannerService {
       }
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
+  }
+
+  /**
+   * Build custom feature suggestion prompt with agent configuration
+   */
+  private static buildCustomFeatureSuggestionPrompt(
+    pageOrComponent: string,
+    featureType: string,
+    priorityLevel: string,
+    additionalContext: string | undefined,
+    agent: FeatureSuggestionAgent,
+  ): string {
+    const contextStr = additionalContext ? `\n\nAdditional Context: ${additionalContext}` : '';
+
+    return `${agent.systemPrompt}
+
+FEATURE SUGGESTION CONTEXT:
+- Target Area: ${pageOrComponent}
+- Feature Type: ${featureType} (e.g., enhancement, new-capability, optimization, ui-improvement, integration)
+- Priority Level: ${priorityLevel} (low, medium, high, critical)${contextStr}
+
+YOUR TASK:
+As a ${agent.role} with focus on ${agent.focus}, analyze the target area and generate 3-5 strategic feature suggestions.
+
+REQUIREMENTS:
+- Each suggestion must include: title, rationale, description, implementationConsiderations
+- Consider the specified feature type and priority level
+- Use Read/Grep/Glob tools to analyze relevant project files
+- Base suggestions on actual codebase patterns and conventions
+
+OUTPUT FORMAT:
+Return ONLY a JSON object (no markdown code blocks) with this structure:
+
+{
+  "context": "Brief analysis of the target area (optional)",
+  "suggestions": [
+    {
+      "title": "Feature name",
+      "rationale": "Why this feature is valuable",
+      "description": "What the feature does",
+      "implementationConsiderations": ["consideration 1", "consideration 2"]
+    }
+  ]
+}
+
+IMPORTANT:
+- Return ONLY the JSON object
+- Start with { and end with }
+- No markdown code blocks
+- No explanatory text
+- Ensure all strings are properly escaped`;
   }
 
   /**

@@ -11,6 +11,7 @@ This document outlines the implementation plan for updating the "Suggest Feature
 ### Key Decision: Table Rename
 
 As part of this implementation, we're renaming the `refinement_agents` table to `custom_agents` to better reflect its purpose:
+
 - **Rationale**: The table now stores user-configured agents for multiple purposes (refinement, feature-suggestion, and potentially more in the future)
 - **Benefits**:
   - More semantically accurate naming
@@ -23,21 +24,25 @@ As part of this implementation, we're renaming the `refinement_agents` table to 
 ### Existing Implementation
 
 **Suggest Feature Dialog** (`src/app/(app)/feature-planner/components/feature-suggestion-dialog.tsx`):
+
 - Modal dialog with form for inputting feature suggestion parameters
 - Displays AI-generated suggestions with title, rationale, description, and implementation considerations
 - Currently calls `suggestFeatureAction` server action
 
 **Suggest Feature Hook** (`src/app/(app)/feature-planner/hooks/use-suggest-feature.ts`):
+
 - Manages dialog state and suggestion results
 - Calls `suggestFeatureAction` with parameters: `pageOrComponent`, `featureType`, `priorityLevel`, `additionalContext`
 
 **Backend Service** (`src/lib/services/feature-planner.service.ts:281-391`):
+
 - `executeFeatureSuggestionAgent` method
 - **Current approach**: Builds a simple prompt invoking `/suggest-feature` slash command
 - Hardcoded to use Claude SDK's `query()` function with fixed settings
 - Does NOT support custom agent configuration
 
 **Custom Agents** (Comparison):
+
 - Database table: `feature_planner.custom_agents` (stores all agent types: refinement, feature-suggestion)
 - Fields: `agentId`, `agentType`, `name`, `role`, `focus`, `systemPrompt`, `temperature`, `tools`, `userId`, `isActive`, `isDefault`
 - Service method: `executeRefinementAgent` accepts optional `agent` parameter
@@ -80,6 +85,7 @@ As part of this implementation, we're renaming the `refinement_agents` table to 
 **File**: `src/lib/db/schema/feature-planner.schema.ts`
 
 **Decision**: Rename existing `refinement_agents` table to `custom_agents`
+
 - Rationale: The table stores user-configured agents for multiple purposes (refinement, feature-suggestion, future types)
 - `custom_agents` is more semantically accurate and future-proof
 - Add `agentType` field to distinguish agent purposes
@@ -87,6 +93,7 @@ As part of this implementation, we're renaming the `refinement_agents` table to 
 - Constraint: Only ONE active agent per user per type
 
 **Schema Changes**:
+
 ```typescript
 export const customAgents = featurePlannerSchema.table(
   'custom_agents',
@@ -148,6 +155,7 @@ export type FeatureSuggestionAgent = z.infer<typeof featureSuggestionAgentSchema
 **File**: `src/lib/queries/feature-planner/feature-planner.query.ts`
 
 Add methods:
+
 - `getFeatureSuggestionAgentByUserId(userId: string)` - Queries `custom_agents` with `agent_type = 'feature-suggestion'`
 - `createFeatureSuggestionAgent(agent: NewCustomAgent)` - Inserts into `custom_agents` with type
 - `updateFeatureSuggestionAgent(agentId: string, updates: Partial<NewCustomAgent>)` - Updates existing agent
@@ -161,6 +169,7 @@ Note: Type `NewCustomAgent` is the insert type from Drizzle schema for `custom_a
 **Update Method**: `executeFeatureSuggestionAgent`
 
 **Current Signature**:
+
 ```typescript
 static async executeFeatureSuggestionAgent(
   pageOrComponent: string,
@@ -172,6 +181,7 @@ static async executeFeatureSuggestionAgent(
 ```
 
 **New Signature**:
+
 ```typescript
 static async executeFeatureSuggestionAgent(
   pageOrComponent: string,
@@ -186,23 +196,26 @@ static async executeFeatureSuggestionAgent(
 **Implementation Changes**:
 
 1. **Prompt Building**:
+
 ```typescript
 // use custom prompt
 const prompt = this.buildCustomFeatureSuggestionPrompt(
-      pageOrComponent,
-      featureType,
-      priorityLevel,
-      additionalContext,
-      agent
-    )
+  pageOrComponent,
+  featureType,
+  priorityLevel,
+  additionalContext,
+  agent,
+);
 ```
 
 2. **Agent-Specific Tools**:
+
 ```typescript
 const allowedTools = agent ? agent.tools : ['Read', 'Grep', 'Glob'];
 ```
 
-3. **Agent-Specific Temperature** 
+3. **Agent-Specific Temperature**
+
 ```typescript
 // Note: Temperature support may need to be added to SDK
 const options = {
@@ -271,6 +284,7 @@ IMPORTANT:
 **File**: `src/lib/facades/feature-planner/feature-planner.facade.ts`
 
 Add methods:
+
 - `getFeatureSuggestionAgentAsync(userId: string, db: Database)` - Fetches from `custom_agents` table
 - `createFeatureSuggestionAgentAsync(agent: NewCustomAgent, userId: string, db: Database)` - Creates in `custom_agents`
 - `updateFeatureSuggestionAgentAsync(agentId: string, updates: Partial<NewCustomAgent>, userId: string, db: Database)` - Updates in `custom_agents`
@@ -280,6 +294,7 @@ Add methods:
 **File**: `src/lib/actions/feature-planner/manage-suggestion-agents.action.ts` (new)
 
 Create actions:
+
 ```typescript
 export const getFeatureSuggestionAgentAction = authActionClient
   .metadata({ actionName: ACTION_NAMES.FEATURE_PLANNER.GET_SUGGESTION_AGENT })
@@ -293,7 +308,11 @@ export const createFeatureSuggestionAgentAction = authActionClient
   .metadata({ actionName: ACTION_NAMES.FEATURE_PLANNER.CREATE_SUGGESTION_AGENT })
   .inputSchema(featureSuggestionAgentInputSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const agent = await FeaturePlannerFacade.createFeatureSuggestionAgentAsync(parsedInput, ctx.userId, ctx.db);
+    const agent = await FeaturePlannerFacade.createFeatureSuggestionAgentAsync(
+      parsedInput,
+      ctx.userId,
+      ctx.db,
+    );
     return { data: agent, success: true };
   });
 
@@ -302,7 +321,12 @@ export const updateFeatureSuggestionAgentAction = authActionClient
   .inputSchema(updateFeatureSuggestionAgentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { agentId, updates } = parsedInput;
-    const agent = await FeaturePlannerFacade.updateFeatureSuggestionAgentAsync(agentId, updates, ctx.userId, ctx.db);
+    const agent = await FeaturePlannerFacade.updateFeatureSuggestionAgentAsync(
+      agentId,
+      updates,
+      ctx.userId,
+      ctx.db,
+    );
     return { data: agent, success: true };
   });
 ```
@@ -310,12 +334,15 @@ export const updateFeatureSuggestionAgentAction = authActionClient
 **Update**: `src/lib/actions/feature-planner/feature-planner.actions.ts`
 
 Modify `suggestFeatureAction` to:
+
 1. Fetch user's custom agent (if exists)
 2. Pass agent to `executeFeatureSuggestionAgent`
 
 ```typescript
 export const suggestFeatureAction = authActionClient
-  .metadata({ /* ... */ })
+  .metadata({
+    /* ... */
+  })
   .inputSchema(/* ... */)
   .action(async ({ ctx }) => {
     const input = ctx.sanitizedInput;
@@ -344,7 +371,9 @@ export const suggestFeatureAction = authActionClient
         success: true,
       };
     } catch (error) {
-      return handleActionError(error, { /* ... */ });
+      return handleActionError(error, {
+        /* ... */
+      });
     }
   });
 ```
@@ -354,6 +383,7 @@ export const suggestFeatureAction = authActionClient
 **File**: `src/lib/validations/feature-planner.validation.ts`
 
 Add schemas:
+
 ```typescript
 export const featureSuggestionAgentInputSchema = z.object({
   focus: z.string().min(10).max(500),
@@ -372,7 +402,10 @@ export const updateFeatureSuggestionAgentSchema = z.object({
     role: z.string().min(5).max(100).optional(),
     systemPrompt: z.string().min(50).max(5000).optional(),
     temperature: z.number().min(0).max(2).optional(),
-    tools: z.array(z.enum(['Read', 'Grep', 'Glob'])).min(1).optional(),
+    tools: z
+      .array(z.enum(['Read', 'Grep', 'Glob']))
+      .min(1)
+      .optional(),
   }),
 });
 
@@ -404,6 +437,7 @@ export default async function SuggestionAgentPage() {
 **File**: `src/app/(app)/feature-planner/suggestion-agent/components/suggestion-agent-form.tsx` (new)
 
 Form fields:
+
 - Name (text input)
 - Role (text input)
 - Focus (textarea)
@@ -416,10 +450,11 @@ Form fields:
 **File**: `src/app/(app)/feature-planner/components/request-input.tsx` (or relevant component)
 
 Add link/button to manage suggestion agent:
+
 ```tsx
-<Button variant="ghost" size="sm" asChild>
-  <Link href="/feature-planner/suggestion-agent">
-    <Settings className="mr-2 h-4 w-4" />
+<Button variant='ghost' size='sm' asChild>
+  <Link href='/feature-planner/suggestion-agent'>
+    <Settings className='mr-2 h-4 w-4' />
     Configure Suggestion Agent
   </Link>
 </Button>
@@ -430,6 +465,7 @@ Add link/button to manage suggestion agent:
 **File**: `src/lib/constants/index.ts`
 
 Add action names:
+
 ```typescript
 export const ACTION_NAMES = {
   FEATURE_PLANNER: {
@@ -442,6 +478,7 @@ export const ACTION_NAMES = {
 ```
 
 Add error codes and messages:
+
 ```typescript
 export const ERROR_CODES = {
   FEATURE_PLANNER: {
@@ -493,6 +530,7 @@ export const ERROR_MESSAGES = {
 ## Migration Path
 
 ### Step 1: Database Migration
+
 ```sql
 -- Rename table from refinement_agents to custom_agents
 ALTER TABLE feature_planner.refinement_agents
@@ -524,26 +562,32 @@ ON feature_planner.custom_agents(user_id, agent_type);
 After renaming the database table, update all code references:
 
 **Schema Definition**:
+
 - Rename `refinementAgents` export to `customAgents` in `src/lib/db/schema/feature-planner.schema.ts`
 - Update Drizzle types: `RefinementAgent` → `CustomAgent`, `NewRefinementAgent` → `NewCustomAgent`
 
 **Query Files**:
+
 - Update all imports and references in `src/lib/queries/feature-planner/feature-planner.query.ts`
 - Update query methods that reference the old table name
 
 **Action Files**:
+
 - Update `src/lib/actions/feature-planner/manage-refinement-agents.action.ts` to use new schema name
 - Update type imports and references
 
 **Facade Files**:
+
 - Update `src/lib/facades/feature-planner/feature-planner.facade.ts` with new table references
 
 **Service Files**:
+
 - Update `src/lib/services/feature-planner.service.ts` type imports
 
 ### Step 3: Default Agent Seeding
 
 Create default suggestion agent for existing users (optional):
+
 ```typescript
 // Migration script to create default agents
 const defaultAgent = {
@@ -563,17 +607,23 @@ const defaultAgent = {
 ## Risks & Mitigation
 
 ### Risk 1: Breaking Changes
+
 **Mitigation**:
+
 - Do not maintain any backwards compatible approach, all code should use the new approach
 
 ### Risk 2: Prompt Quality
+
 **Mitigation**:
+
 - Provide default agent with well-tested system prompt
 - Add examples in UI for guidance
 - Validate prompt length and structure
 
 ### Risk 3: Database Constraints
+
 **Mitigation**:
+
 - Add unique constraint on (user_id, agent_type, is_active) to prevent multiple active agents
 - Handle edge cases in queries
 
@@ -622,7 +672,9 @@ const defaultAgent = {
 ## Notes on Implementation
 
 ### Table Rename Impact
+
 The rename from `refinement_agents` to `custom_agents` affects:
+
 1. **Schema definition**: Export name changes from `refinementAgents` to `customAgents`
 2. **Types**: `RefinementAgent` → `CustomAgent`, `NewRefinementAgent` → `NewCustomAgent`
 3. **All query functions**: Must use new table reference

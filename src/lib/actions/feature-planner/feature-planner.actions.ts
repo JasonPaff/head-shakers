@@ -504,7 +504,7 @@ export const getPlanGenerationsAction = authActionClient
 // ============================================================================
 
 /**
- * Suggest features using AI slash command
+ * Suggest features using AI slash command or custom agent
  */
 export const suggestFeatureAction = authActionClient
   .metadata({
@@ -538,17 +538,43 @@ export const suggestFeatureAction = authActionClient
     });
 
     try {
+      // Fetch user's custom suggestion agent (if exists)
+      const dbAgent = await FeaturePlannerFacade.getFeatureSuggestionAgentAsync(userId, ctx.db);
+
+      // Convert database agent to service agent type if present
+      const customAgent =
+        dbAgent && dbAgent.userId ?
+          {
+            agentId: dbAgent.agentId,
+            agentType: 'feature-suggestion' as const,
+            createdAt: dbAgent.createdAt,
+            focus: dbAgent.focus,
+            isActive: dbAgent.isActive,
+            name: dbAgent.name,
+            role: dbAgent.role,
+            systemPrompt: dbAgent.systemPrompt,
+            temperature: Number(dbAgent.temperature),
+            tools: dbAgent.tools.filter((tool): tool is 'Glob' | 'Grep' | 'Read' =>
+              ['Glob', 'Grep', 'Read'].includes(tool),
+            ),
+            updatedAt: dbAgent.updatedAt,
+            userId: dbAgent.userId,
+          }
+        : undefined;
+
       const result = await FeaturePlannerService.executeFeatureSuggestionAgent(
         pageOrComponent,
         featureType,
         priorityLevel,
         additionalContext,
         { customModel },
+        customAgent,
       );
 
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
+          customAgentUsed: !!customAgent,
           pageOrComponent,
           suggestionCount: result.result.suggestions.length,
           tokenUsage: result.tokenUsage.totalTokens,

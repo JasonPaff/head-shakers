@@ -356,14 +356,79 @@ export interface ParallelRefinementResponse {
 export type RefinementAgentInput = z.infer<typeof refinementAgentInputSchema>;
 
 // ============================================================================
-// RESPONSE TYPES FOR UI
+// FEATURE SUGGESTION AGENTS
 // ============================================================================
 
+export const featureSuggestionAgentInputSchema = z.object({
+  agentId: z
+    .string()
+    .min(1)
+    .max(SCHEMA_LIMITS.REFINEMENT.AGENT_ID.MAX)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Agent ID cannot be empty or whitespace',
+    }),
+  focus: z.string().min(10).max(500),
+  name: z
+    .string()
+    .min(3)
+    .max(100)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Agent name cannot be empty or whitespace',
+    }),
+  role: z
+    .string()
+    .min(5)
+    .max(100)
+    .refine((val) => val.trim().length > 0, {
+      message: 'Agent role cannot be empty or whitespace',
+    }),
+  systemPrompt: z.string().min(50).max(5000),
+  temperature: z.number().min(0).max(2),
+  tools: z.array(z.enum(['Read', 'Grep', 'Glob'])).min(1),
+});
+
+export const updateFeatureSuggestionAgentSchema = z.object({
+  agentId: z.string().uuid(),
+  updates: z.object({
+    focus: z.string().min(10).max(500).optional(),
+    name: z
+      .string()
+      .min(3)
+      .max(100)
+      .refine((val) => val.trim().length > 0, {
+        message: 'Agent name cannot be empty or whitespace',
+      })
+      .optional(),
+    role: z
+      .string()
+      .min(5)
+      .max(100)
+      .refine((val) => val.trim().length > 0, {
+        message: 'Agent role cannot be empty or whitespace',
+      })
+      .optional(),
+    systemPrompt: z.string().min(50).max(5000).optional(),
+    temperature: z.number().min(0).max(2).optional(),
+    tools: z
+      .array(z.enum(['Read', 'Grep', 'Glob']))
+      .min(1)
+      .optional(),
+  }),
+});
+
+export const getFeatureSuggestionAgentSchema = z.object({});
+
+export type FeatureSuggestionAgentInput = z.infer<typeof featureSuggestionAgentInputSchema>;
+export type GetFeatureSuggestionAgentInput = z.infer<typeof getFeatureSuggestionAgentSchema>;
 export interface RefineResponse {
   data?: unknown;
   isSuccess: boolean;
   message: string;
 }
+
+// ============================================================================
+// RESPONSE TYPES FOR UI
+// ============================================================================
 
 export interface Step1Data {
   originalRequest: string;
@@ -402,6 +467,8 @@ export interface StepData {
   step2?: Step2Data;
   step3?: Step3Data;
 }
+
+export type UpdateFeatureSuggestionAgentInput = z.infer<typeof updateFeatureSuggestionAgentSchema>;
 
 export type UpdateRefinementAgentInput = z.infer<typeof updateRefinementAgentSchema>;
 

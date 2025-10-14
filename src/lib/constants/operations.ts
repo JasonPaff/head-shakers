@@ -48,6 +48,7 @@ export const OPERATIONS = {
     CREATE_PLAN_STEP: 'create_plan_step',
     CREATE_REFINEMENT_AGENT: 'create_refinement_agent',
     CREATE_STEP_TEMPLATE: 'create_step_template',
+    CREATE_SUGGESTION_AGENT: 'create_suggestion_agent',
     DELETE_PLAN: 'delete_feature_plan',
     DELETE_PLAN_STEP: 'delete_plan_step',
     DELETE_REFINEMENT_AGENT: 'delete_refinement_agent',
@@ -58,6 +59,7 @@ export const OPERATIONS = {
     GET_REFINEMENT_AGENTS: 'get_refinement_agents',
     GET_REFINEMENTS: 'get_feature_refinements',
     GET_STEP_TEMPLATES: 'get_step_templates',
+    GET_SUGGESTION_AGENT: 'get_suggestion_agent',
     LIST_PLANS: 'list_feature_plans',
     REORDER_PLAN_STEPS: 'reorder_plan_steps',
     RUN_FILE_DISCOVERY: 'run_file_discovery',
@@ -70,6 +72,7 @@ export const OPERATIONS = {
     UPDATE_PLAN: 'update_feature_plan',
     UPDATE_PLAN_STEP: 'update_plan_step',
     UPDATE_REFINEMENT_AGENT: 'update_refinement_agent',
+    UPDATE_SUGGESTION_AGENT: 'update_suggestion_agent',
     USE_STEP_TEMPLATE: 'use_step_template',
   },
   FEATURED_CONTENT: {

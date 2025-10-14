@@ -63,6 +63,30 @@ export class FeaturePlannerFacade {
   }
 
   /**
+   * Create a new feature suggestion agent
+   */
+  static async createFeatureSuggestionAgentAsync(
+    agentData: NewCustomAgent,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<DbCustomAgent | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.createFeatureSuggestionAgent(agentData, context);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentData },
+        facade: facadeName,
+        method: 'createFeatureSuggestionAgentAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.CREATE_SUGGESTION_AGENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
    * Create a new plan step
    */
   static async createPlanStepAsync(
@@ -193,10 +217,6 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // PLAN MANAGEMENT
-  // ============================================================================
-
   /**
    * Get a single refinement agent by agentId
    */
@@ -249,6 +269,10 @@ export class FeaturePlannerFacade {
     }
   }
 
+  // ============================================================================
+  // PLAN MANAGEMENT
+  // ============================================================================
+
   /**
    * Get all available refinement agents (default + user's custom agents)
    */
@@ -298,9 +322,29 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // STEP 1: REFINEMENT
-  // ============================================================================
+  /**
+   * Get feature suggestion agent by user ID
+   * Retrieves the active feature-suggestion agent for a specific user
+   */
+  static async getFeatureSuggestionAgentAsync(
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<DbCustomAgent | null> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.getFeatureSuggestionAgentByUserId(userId, context);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { userId },
+        facade: facadeName,
+        method: 'getFeatureSuggestionAgentAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.GET_SUGGESTION_AGENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
 
   /**
    * Get file discovery sessions for a plan
@@ -325,6 +369,10 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ============================================================================
+  // STEP 1: REFINEMENT
+  // ============================================================================
 
   /**
    * Get plan generations for a plan
@@ -374,10 +422,6 @@ export class FeaturePlannerFacade {
     }
   }
 
-  // ============================================================================
-  // STEP 2: FILE DISCOVERY
-  // ============================================================================
-
   /**
    * Get user's feature plans
    */
@@ -402,6 +446,10 @@ export class FeaturePlannerFacade {
     }
   }
 
+  // ============================================================================
+  // STEP 2: FILE DISCOVERY
+  // ============================================================================
+
   /**
    * Reorder plan steps
    */
@@ -425,10 +473,6 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
-
-  // ============================================================================
-  // STEP 3: IMPLEMENTATION PLANNING
-  // ============================================================================
 
   /**
    * Run file discovery
@@ -574,6 +618,10 @@ export class FeaturePlannerFacade {
       throw createFacadeError(errorContext, error);
     }
   }
+
+  // ============================================================================
+  // STEP 3: IMPLEMENTATION PLANNING
+  // ============================================================================
 
   /**
    * Run parallel feature refinement
@@ -736,10 +784,6 @@ export class FeaturePlannerFacade {
       throw createFacadeError(context, error);
     }
   }
-
-  // ============================================================================
-  // PLAN STEP MANAGEMENT
-  // ============================================================================
 
   /**
    * Run parallel feature refinement with streaming support
@@ -910,6 +954,10 @@ export class FeaturePlannerFacade {
     }
   }
 
+  // ============================================================================
+  // PLAN STEP MANAGEMENT
+  // ============================================================================
+
   /**
    * Run implementation plan generation
    */
@@ -1072,6 +1120,31 @@ export class FeaturePlannerFacade {
         userId,
       };
       throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Update a feature suggestion agent
+   */
+  static async updateFeatureSuggestionAgentAsync(
+    agentId: string,
+    updates: Partial<NewCustomAgent>,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<DbCustomAgent | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      return await FeaturePlannerQuery.updateFeatureSuggestionAgent(agentId, updates, context);
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { agentId, updates },
+        facade: facadeName,
+        method: 'updateFeatureSuggestionAgentAsync',
+        operation: OPERATIONS.FEATURE_PLANNER.UPDATE_SUGGESTION_AGENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
     }
   }
 

@@ -40,6 +40,7 @@ declare module "@@@next-typesafe-url" {
     "/feature-planner/agents": StaticRoute;
     "/feature-planner/agents/[agentId]": StaticRoute;
     "/feature-planner": StaticRoute;
+    "/feature-planner/suggestion-agent": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;

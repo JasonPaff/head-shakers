@@ -2,7 +2,9 @@
 
 import type { ComponentProps } from 'react';
 
-import { Sparkles } from 'lucide-react';
+import { Settings2Icon, Sparkles } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import type { FeatureType, PriorityLevel } from '@/lib/validations/feature-planner.validation';
 
@@ -91,13 +93,23 @@ export const FeatureSuggestionForm = withFocusManagement(
       >
         <Card>
           <CardHeader>
-            <CardTitle className={'flex items-center gap-2'}>
-              <Sparkles aria-hidden className={'size-5 text-primary'} />
-              Configure Feature Suggestion
-            </CardTitle>
-            <CardDescription>
-              Provide context for AI to generate relevant feature suggestions tailored to your needs.
-            </CardDescription>
+            <div className={'flex items-start justify-between gap-4'}>
+              <div className={'flex-1'}>
+                <CardTitle className={'flex items-center gap-2'}>
+                  <Sparkles aria-hidden className={'size-5 text-primary'} />
+                  Configure Feature Suggestion
+                </CardTitle>
+                <CardDescription>
+                  Provide context for AI to generate relevant feature suggestions tailored to your needs.
+                </CardDescription>
+              </div>
+              <Link href={$path({ route: '/feature-planner/suggestion-agent' })}>
+                <Button size={'sm'} type={'button'} variant={'ghost'}>
+                  <Settings2Icon aria-hidden className={'mr-2 size-4'} />
+                  Agent Settings
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
 
           <CardContent className={'space-y-6'}>

@@ -91,10 +91,7 @@ export class FeaturePlannerQuery extends BaseQuery {
   /**
    * Create refinement agent
    */
-  static async createAgentAsync(
-    data: NewCustomAgent,
-    context: QueryContext,
-  ): Promise<CustomAgent | null> {
+  static async createAgentAsync(data: NewCustomAgent, context: QueryContext): Promise<CustomAgent | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.insert(customAgents).values(data).returning();
@@ -236,10 +233,7 @@ export class FeaturePlannerQuery extends BaseQuery {
       .update(customAgents)
       .set({ isActive: false, updatedAt: new Date() })
       .where(
-        and(
-          eq(customAgents.agentId, agentId),
-          context.userId ? eq(customAgents.userId, userId) : undefined,
-        ),
+        and(eq(customAgents.agentId, agentId), context.userId ? eq(customAgents.userId, userId) : undefined),
       )
       .returning();
 

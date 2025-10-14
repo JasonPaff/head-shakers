@@ -62,6 +62,7 @@ export const ACTION_NAMES = {
     CREATE_PLAN_STEP: 'createPlanStep',
     CREATE_REFINEMENT_AGENT: 'createRefinementAgent',
     CREATE_STEP_TEMPLATE: 'createStepTemplate',
+    CREATE_SUGGESTION_AGENT: 'createSuggestionAgent',
     DELETE: 'deleteFeaturePlan',
     DELETE_PLAN_STEP: 'deletePlanStep',
     DELETE_REFINEMENT_AGENT: 'deleteRefinementAgent',
@@ -74,6 +75,7 @@ export const ACTION_NAMES = {
     GET_REFINEMENT_AGENTS: 'getRefinementAgents',
     GET_REFINEMENTS: 'getRefinements',
     GET_STEP_TEMPLATES: 'getStepTemplates',
+    GET_SUGGESTION_AGENT: 'getSuggestionAgent',
     GET_USER_PLANS: 'getUserFeaturePlans',
     REORDER_PLAN_STEPS: 'reorderPlanSteps',
     RUN_FILE_DISCOVERY: 'runFileDiscovery',
@@ -86,6 +88,7 @@ export const ACTION_NAMES = {
     UPDATE: 'updateFeaturePlan',
     UPDATE_PLAN_STEP: 'updatePlanStep',
     UPDATE_REFINEMENT_AGENT: 'updateRefinementAgent',
+    UPDATE_SUGGESTION_AGENT: 'updateSuggestionAgent',
     USE_STEP_TEMPLATE: 'useStepTemplate',
   },
   MODERATION: {
