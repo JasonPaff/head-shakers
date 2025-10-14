@@ -644,11 +644,17 @@ export const startFeatureSuggestionAction = authActionClient
 
       // Store job metadata in Redis with TTL
       const redisKey = REDIS_KEYS.JOBS.FEATURE_SUGGESTION(jobId);
+      console.log(`[Phase 1] Creating job ${jobId} with key: ${redisKey}`);
+      console.log(`[Phase 1] Job metadata:`, jobMetadata);
+      console.log(`[Phase 1] TTL: ${REDIS_TTL.JOBS.SUGGESTION}`);
+
       const stored = await RedisOperations.set(
         redisKey,
         JSON.stringify(jobMetadata),
         REDIS_TTL.JOBS.SUGGESTION,
       );
+
+      console.log(`[Phase 1] Redis SET result:`, stored);
 
       if (!stored) {
         throw new ActionError(

@@ -74,7 +74,19 @@ export class RedisOperations {
   static async get(key: string): Promise<null | string> {
     try {
       const value = await this.client.get(key);
-      return typeof value === 'string' ? value : null;
+      console.log('[Redis GET] Key:', key);
+      console.log('[Redis GET] Raw value:', value);
+      console.log('[Redis GET] Value type:', typeof value);
+
+      // Handle null/undefined
+      if (value === null || value === undefined) return null;
+
+      // If it's already a string, return it
+      if (typeof value === 'string') return value;
+
+      // Upstash auto-deserializes JSON, so re-stringify if needed
+      console.log('[Redis GET] Re-stringifying object');
+      return JSON.stringify(value);
     } catch (error) {
       console.error(`Redis GET error for key ${key}:`, error);
       return null;

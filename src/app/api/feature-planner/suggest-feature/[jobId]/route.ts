@@ -27,20 +27,31 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ jobId: string }> }) {
   const { jobId } = await params;
-
+  console.log(`[SSE] Incoming connection for jobId: ${jobId}`);
+  console.log(`[SSE] JobId length: ${jobId.length} (expected 36 for UUID)`);
   try {
     // ========================================================================
     // AUTHENTICATION & AUTHORIZATION
     // ========================================================================
 
     // Check user authentication
-    const userId: string = await getUserId();
+    const userId = await getUserId();
+    console.log(`[Phase 2] User authenticated: ${userId}`);
 
     // Retrieve job metadata from Redis
     const redisKey = REDIS_KEYS.JOBS.FEATURE_SUGGESTION(jobId);
+    console.log('[Phase 2] Step 1: Generated redisKey');
+    console.log('[Phase 2] redisKey value:', JSON.stringify(redisKey));
+    console.log('[Phase 2] redisKey type:', typeof redisKey);
+    console.log('[Phase 2] redisKey length:', redisKey?.length);
+
+    console.log('[Phase 2] Step 2: About to call RedisOperations.get()');
     const jobDataStr = await RedisOperations.get(redisKey);
+    console.log('[Phase 2] Step 3: RedisOperations.get() returned');
+    console.log('[Phase 2] jobDataStr:', jobDataStr);
 
     if (!jobDataStr) {
+      console.log(`[Phase 2] Job not found in Redis for key: ${redisKey}`);
       return new NextResponse('Job not found or expired', { status: 404 });
     }
 
