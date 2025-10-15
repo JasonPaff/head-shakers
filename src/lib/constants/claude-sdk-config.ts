@@ -5,7 +5,7 @@ import type { Options } from '@anthropic-ai/claude-agent-sdk';
  * Lower values = faster execution and lower costs
  */
 export const TURN_LIMITS = {
-  FEATURE_SUGGESTION: 8,
+  FEATURE_SUGGESTION: 50, // Increased to accommodate file reading + response generation
   FILE_DISCOVERY_LEGACY: 12,
   FILE_DISCOVERY_SPECIALIZED: 6,
   IMPLEMENTATION_PLANNING: 10,

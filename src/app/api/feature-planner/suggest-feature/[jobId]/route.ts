@@ -198,9 +198,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
                 executionTimeMs: result.executionTimeMs,
                 suggestions: result.result.suggestions,
                 tokenUsage: {
-                  inputTokens: result.tokenUsage.promptTokens,
-                  outputTokens: result.tokenUsage.completionTokens,
-                  totalTokens: result.tokenUsage.totalTokens,
+                  inputTokens: result.tokenUsage.promptTokens ?? 0,
+                  outputTokens: result.tokenUsage.completionTokens ?? 0,
+                  totalTokens: result.tokenUsage.totalTokens ?? 0,
                 },
               }),
             ),

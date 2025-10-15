@@ -647,6 +647,11 @@ export class FeaturePlannerService {
             type: message.type,
           });
 
+          // DIAGNOSTIC: Check if message type is 'result'
+          if (message.type === 'result') {
+            console.log('[executeFeatureSuggestionAgentWithStreaming] ⚠️ RESULT MESSAGE DETECTED - about to process');
+          }
+
           if (message.type === 'assistant') {
             assistantMessageCount++;
             console.log(
@@ -690,14 +695,38 @@ export class FeaturePlannerService {
 
           // Handle result message (final output from SDK)
           if (message.type === 'result') {
-            console.log('[executeFeatureSuggestionAgentWithStreaming] Result message received');
+            console.log('[executeFeatureSuggestionAgentWithStreaming] ✅ Result message received - processing now');
 
             const resultMessage = message as unknown as SDKResultMessage;
+
+            // Log turn count to help diagnose max turn issues
+            const turnCount = resultMessage.num_turns;
+            const turnLimit = TURN_LIMITS.FEATURE_SUGGESTION;
+
+            console.log('[executeFeatureSuggestionAgentWithStreaming] Turn usage:', {
+              turnsUsed: turnCount,
+              turnLimit,
+              percentUsed: Math.round((turnCount / turnLimit) * 100),
+              turnsRemaining: turnLimit - turnCount,
+            });
+
+            // Warn if approaching or exceeding turn limit
+            if (turnCount >= turnLimit) {
+              console.error(
+                `[executeFeatureSuggestionAgentWithStreaming] ⚠️ TURN LIMIT REACHED: Used ${turnCount}/${turnLimit} turns - likely hit error_max_turns`,
+              );
+            } else if (turnCount >= turnLimit * 0.8) {
+              console.warn(
+                `[executeFeatureSuggestionAgentWithStreaming] ⚠️ HIGH TURN USAGE: Used ${turnCount}/${turnLimit} turns (${Math.round((turnCount / turnLimit) * 100)}%)`,
+              );
+            }
 
             console.log('[executeFeatureSuggestionAgentWithStreaming] Result details:', {
               hasResult: !!resultMessage.result,
               hasUsage: !!resultMessage.usage,
               isError: resultMessage.isError,
+              numTurns: turnCount,
+              resultLength: resultMessage.result?.length,
               subtype: resultMessage.subtype,
             });
 
@@ -712,6 +741,12 @@ export class FeaturePlannerService {
               console.log('[executeFeatureSuggestionAgentWithStreaming] Parsed suggestions from result:', {
                 count: suggestionResult.suggestions.length,
                 hasContext: !!suggestionResult.context,
+                suggestions: suggestionResult.suggestions.map((s) => ({ title: s.title })),
+              });
+            } else {
+              console.warn('[executeFeatureSuggestionAgentWithStreaming] ⚠️ Result message has no result text or not success:', {
+                hasResult: !!resultMessage.result,
+                subtype: resultMessage.subtype,
               });
             }
 
@@ -724,6 +759,8 @@ export class FeaturePlannerService {
               tokenUsage.cacheCreationTokens = resultMessage.usage.cache_creation_input_tokens;
 
               console.log('[executeFeatureSuggestionAgentWithStreaming] Final token usage from result:', tokenUsage);
+            } else {
+              console.warn('[executeFeatureSuggestionAgentWithStreaming] ⚠️ Result message has no usage data');
             }
           }
         }
@@ -1489,13 +1526,32 @@ FEATURE SUGGESTION REQUEST:
 YOUR TASK:
 Generate 3-5 strategic feature suggestions for the target area that match the specified feature type and priority level.
 
-TOOL USAGE CONSTRAINTS (CRITICAL):
-- Read CLAUDE.md first to understand project context
-- Use Glob to find 1-2 relevant files for the target area
-- Read at most 2 additional files (choose the most relevant)
-- DO NOT read more than 3 files total (including CLAUDE.md)
-- After reading files, IMMEDIATELY generate suggestions - DO NOT use additional tools
-- Focus on speed: complete analysis within 8-10 turns maximum
+TOOL USAGE CONSTRAINTS (CRITICAL - MAXIMUM 15 TURNS):
+⚠️ WARNING: You have a HARD LIMIT of 15 conversation turns. After 15 turns, execution stops and suggestions are lost.
+
+STRICT FILE READING RULES (FOLLOW EXACTLY):
+1. Read CLAUDE.md ONLY (1 file, 1 turn)
+2. Use Glob to find 1-2 relevant files (1 turn)
+3. Read MAXIMUM 2 additional files (2 turns max)
+4. STOP using tools after 5-6 turns
+5. Generate JSON response immediately
+
+PROHIBITED:
+- Reading more than 3 files total (CLAUDE.md + 2 others)
+- Using Grep (use Glob instead for faster file discovery)
+- Making multiple Read calls beyond the 3-file limit
+- Any tool use after reading your 3 files
+
+CONSEQUENCES OF EXCEEDING LIMITS:
+- Turn 15+ → Execution terminated, zero suggestions returned
+- No second chances, no retries
+- User sees "0 suggestions" as final result
+
+REQUIRED WORKFLOW:
+Turn 1: Read CLAUDE.md
+Turn 2: Glob for relevant files
+Turn 3-4: Read 2 most relevant files
+Turn 5+: Generate JSON response (NO MORE TOOLS)
 
 GUIDELINES:
 - Focus on practical, implementable features that add clear value
