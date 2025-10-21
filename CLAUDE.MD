@@ -134,8 +134,9 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **No Any Type**: Avoid using `any` type in TypeScript. Use proper types, generics, or unknown with type narrowing.
 - **No forwardRef()**: Do not use `forwardRef` in React 19, pass refs directly through props.
 - **Never use Eslint disable comments**: Always fix the underlying issue instead of disabling lint rules. If you cannot fix it, discuss with the team.
-- **Never use TS-ignore comments**: Always fix type errors instead of ignoring them. If you cannot fix it, use a TypeScript pro subagent to fix it.
+- **Never use TS-ignore comments**: Always fix type errors instead of ignoring them.
 - **No Barrel Files**: Do not use `index.ts` files for re-exports. Always import directly from the file path.
+- **Real Time Notifications**: Use Ably for all real-time features. Use very sparingly and only when truly necessary for the feature.
 
 ## Project Documentation Conventions (Important)
 
