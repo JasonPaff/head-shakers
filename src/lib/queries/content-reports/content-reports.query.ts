@@ -133,6 +133,7 @@ export class ContentReportsQuery extends BaseQuery {
   ): Promise<SelectContentReport> {
     return this.executeWithRetry(async () => {
       const dbInstance = this.getDbInstance(context);
+
       const [newReport] = await dbInstance
         .insert(contentReports)
         .values({

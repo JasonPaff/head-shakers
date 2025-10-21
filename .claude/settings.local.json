@@ -55,12 +55,18 @@
       "mcp__Neon__describe_branch",
       "Bash(npm run test:e2e:*)",
       "Bash(head:*)",
-      "mcp__playwright__browser_type"
+      "mcp__playwright__browser_type",
+      "Bash(set:*)",
+      "Bash(python:*)",
+      "Bash(chcp:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["shared-server"],
+  "enabledMcpjsonServers": [
+    "shared-server"
+  ],
   "outputStyle": "default"
 }
