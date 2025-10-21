@@ -44,10 +44,10 @@ Perform a thorough UI/UX audit of the specified page by:
    ```
 
 3. **Identify Interactive Elements**
-    - List ALL buttons, links, forms, inputs
-    - Note navigation elements
-    - Identify data tables, modals, dialogs
-    - Map out all clickable elements
+   - List ALL buttons, links, forms, inputs
+   - Note navigation elements
+   - Identify data tables, modals, dialogs
+   - Map out all clickable elements
 
 ### Phase 2: Authentication & Access (IF NEEDED)
 
@@ -165,15 +165,15 @@ For EACH user flow you identify:
    ```
 
 2. **Test the Flow End-to-End**
-    - Execute each step
-    - Verify each result
-    - Confirm database state at each step
-    - Document any issues
+   - Execute each step
+   - Verify each result
+   - Confirm database state at each step
+   - Document any issues
 
 3. **Screenshot Critical Steps**
-    - Use `mcp__playwright__browser_take_screenshot` for important states
-    - Save screenshots to `.playwright-mcp/` directory
-    - Reference in audit report
+   - Use `mcp__playwright__browser_take_screenshot` for important states
+   - Save screenshots to `.playwright-mcp/` directory
+   - Reference in audit report
 
 ## Database Verification Protocol
 
@@ -335,9 +335,9 @@ Create a comprehensive report at `docs/{YYYY_MM_DD}/audits/ui-audit-{page-name}.
 - **Location**: [Specific element/component]
 - **Description**: [Detailed description]
 - **Steps to Reproduce**:
-    1. Step 1
-    2. Step 2
-    3. ...
+  1. Step 1
+  2. Step 2
+  3. ...
 - **Expected**: [What should happen]
 - **Actual**: [What actually happens]
 - **Database Impact**: [Any data issues]
@@ -375,16 +375,16 @@ Create a comprehensive report at `docs/{YYYY_MM_DD}/audits/ui-audit-{page-name}.
 ### Immediate Improvements
 
 1. **[Recommendation]**
-    - **Why**: [Reasoning]
-    - **Impact**: [Expected improvement]
-    - **Effort**: [Low/Medium/High]
+   - **Why**: [Reasoning]
+   - **Impact**: [Expected improvement]
+   - **Effort**: [Low/Medium/High]
 
 ### Future Enhancements
 
 1. **[Recommendation]**
-    - **Why**: [Reasoning]
-    - **Impact**: [Expected improvement]
-    - **Effort**: [Low/Medium/High]
+   - **Why**: [Reasoning]
+   - **Impact**: [Expected improvement]
+   - **Effort**: [Low/Medium/High]
 
 ---
 

@@ -16,10 +16,10 @@ When invoked, you analyze codebases to identify high-value feature opportunities
 ### 1. Foundation First
 
 - Read CLAUDE.md or project documentation to understand:
-    - Product vision and goals
-    - Target users and use cases
-    - Technical constraints
-    - Coding standards
+  - Product vision and goals
+  - Target users and use cases
+  - Technical constraints
+  - Coding standards
 
 ### 2. Deep Code Analysis
 

@@ -32,6 +32,7 @@ Read references/React-Coding-Conventions.md
 ```
 
 This reference contains the authoritative coding standards including:
+
 - Code style & formatting rules
 - File organization patterns
 - Component architecture guidelines
@@ -48,12 +49,14 @@ This reference contains the authoritative coding standards including:
 When writing React code, ensure strict adherence to all conventions:
 
 **Code Style**:
+
 - Single quotes for all strings and imports
 - JSX attributes must use curly braces with single quotes: `className={'btn-primary'}`
 - Kebab-case for file names: `user-profile.tsx`
 - Named exports only (no default exports)
 
 **Component Structure**:
+
 - Arrow function components with TypeScript interfaces
 - Specific internal organization order:
   1. useState hooks
@@ -65,18 +68,21 @@ When writing React code, ensure strict adherence to all conventions:
   7. Derived variables for conditional rendering (prefixed with `_`)
 
 **Naming Conventions**:
+
 - All boolean values must start with `is`: `isLoading`, `isVisible`, `isDisabled`
 - Derived conditional variables must use `_` prefix: `_isDataReady`, `_hasNoResults`
 - Event handlers use `handle` prefix: `handleSubmit`, `handleInputChange`
 - Callback props use `on` prefix: `onSubmit`, `onInputChange`
 
 **Conditional Rendering**:
+
 - Use `<Conditional>` component for complex boolean conditions or multiple elements
 - Use ternary operators for simple string values or single component swaps
 - Extract complex conditions to meaningful `_` prefixed variable names
 - Add UI block comments: `{/* Section Name */}`
 
 **TypeScript**:
+
 - Use `type` imports: `import type { ComponentProps } from 'react'`
 - Props interfaces follow `ComponentNameProps` pattern
 - Extend `ComponentPropsWithRef<'element'>` when appropriate

@@ -28,24 +28,24 @@ The `ui-ux-agent` will:
 
 1. **Navigate to the page** using Playwright MCP tools
 2. **Test all user interactions** including:
-    - Forms and input fields
-    - Buttons and clickable elements
-    - Navigation and routing
-    - Modals and dialogs
-    - Data tables and lists
-    - Search and filtering
-    - CRUD operations
+   - Forms and input fields
+   - Buttons and clickable elements
+   - Navigation and routing
+   - Modals and dialogs
+   - Data tables and lists
+   - Search and filtering
+   - CRUD operations
 3. **Use `/db` command** to:
-    - Query database state before/after operations
-    - Verify data persistence
-    - Check data integrity
-    - Test with different user scenarios
+   - Query database state before/after operations
+   - Verify data persistence
+   - Check data integrity
+   - Test with different user scenarios
 4. **Document findings** in a structured audit report including:
-    - Complete user flow diagrams
-    - Identified bugs and issues
-    - UX/UI improvement recommendations
-    - Accessibility concerns
-    - Performance observations
+   - Complete user flow diagrams
+   - Identified bugs and issues
+   - UX/UI improvement recommendations
+   - Accessibility concerns
+   - Performance observations
 
 ## Audit Report Location
 

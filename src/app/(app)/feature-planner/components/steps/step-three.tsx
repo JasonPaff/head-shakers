@@ -47,9 +47,9 @@ export const StepThree = ({
           <div className={'rounded-lg bg-muted p-4'}>
             <h3 className={'mb-2 font-medium'}>Coming in Phase 2</h3>
             <p className={'text-sm text-muted-foreground'}>
-              This step will generate a comprehensive implementation plan based on the refined feature request and
-              discovered files. It will provide step-by-step guidance, code snippets, and validation commands to
-              ensure successful feature implementation.
+              This step will generate a comprehensive implementation plan based on the refined feature request
+              and discovered files. It will provide step-by-step guidance, code snippets, and validation
+              commands to ensure successful feature implementation.
             </p>
           </div>
 

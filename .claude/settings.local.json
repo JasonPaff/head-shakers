@@ -65,8 +65,6 @@
     "ask": []
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "shared-server"
-  ],
+  "enabledMcpjsonServers": ["shared-server"],
   "outputStyle": "default"
 }

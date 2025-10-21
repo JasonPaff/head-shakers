@@ -25,6 +25,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
+import { useAdminRole } from '@/hooks/use-admin-role';
 import { generateTestId } from '@/lib/test-ids';
 
 const navigationLinks: Array<NavigationLink> = [
@@ -105,13 +106,25 @@ const navigationLinks: Array<NavigationLink> = [
 ];
 
 export const AppHeaderAuthNavMenu = () => {
+  const { isAdmin, isLoading, isModerator } = useAdminRole();
+
+  // filter navigation links based on user role
+  const filteredNavigationLinks = navigationLinks.filter((link) => {
+    // if admin required, check if user has moderator or admin role
+    if (link.isAdminRequired) {
+      return !isLoading && (isModerator || isAdmin);
+    }
+    // show non-admin links to all authenticated users
+    return true;
+  });
+
   return (
     <NavigationMenu
       className={'max-md:hidden'}
       data-testid={generateTestId('layout', 'app-header', 'auth-section')}
     >
       <NavigationMenuList className={'gap-2'}>
-        {navigationLinks.map((link, index) => {
+        {filteredNavigationLinks.map((link, index) => {
           return (
             <AuthContent key={index}>
               <NavigationMenuItem>

@@ -8,6 +8,8 @@ import { AppHeaderNavMenu } from '@/components/layout/app-header/components/app-
 import { AppHeaderNotifications } from '@/components/layout/app-header/components/app-header-notifications';
 import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
+import { AuthContent } from '@/components/ui/auth';
+import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -59,7 +61,9 @@ export const AppHeader = () => {
           </div>
 
           {/* Auth Nav Menus */}
-          <AppHeaderAuthNavMenu />
+          <AuthContent loadingSkeleton={<Skeleton className={'h-[35px] w-7'} />}>
+            <AppHeaderAuthNavMenu />
+          </AuthContent>
         </div>
 
         {/* Notifications */}
