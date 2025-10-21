@@ -62,7 +62,7 @@ export class ContentReportsFacade {
     bulkUpdateData: AdminBulkUpdateReportsInput,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<SelectContentReport[]> {
+  ): Promise<Array<SelectContentReport>> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 
@@ -300,7 +300,7 @@ export class ContentReportsFacade {
     filterOptions: AdminReportsFilterInput,
     userId: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<{ reports: SelectContentReport[]; stats: ReportsStatsResult }> {
+  ): Promise<{ reports: Array<SelectContentReport>; stats: ReportsStatsResult }> {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
 

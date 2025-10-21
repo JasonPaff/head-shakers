@@ -30,7 +30,7 @@ type ChartType = 'area' | 'bar' | 'line';
 type MetricType = 'all' | 'duration' | 'viewers' | 'views';
 interface ViewChartsProps {
   className?: string;
-  data: ChartDataPoint[];
+  data: Array<ChartDataPoint>;
   timeRange: string;
 }
 
@@ -281,7 +281,7 @@ export const ViewCharts = ({ className, data, timeRange }: ViewChartsProps) => {
           <div className={'flex items-center gap-2'}>
             <span className={'text-sm font-medium'}>Chart Type:</span>
             <div className={'flex rounded-lg border'}>
-              {(['line', 'area', 'bar'] as ChartType[]).map((type) => (
+              {(['line', 'area', 'bar'] as Array<ChartType>).map((type) => (
                 <Button
                   className={'h-8 px-3 text-xs capitalize'}
                   key={type}

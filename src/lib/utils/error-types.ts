@@ -142,7 +142,7 @@ export interface EnhancedErrorInfo {
   /** recovery information */
   recovery?: ErrorRecoveryInfo;
   /** related errors in the same operation */
-  relatedErrors?: ActionError[];
+  relatedErrors?: Array<ActionError>;
 }
 
 /**

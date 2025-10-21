@@ -11,7 +11,7 @@ import { Conditional } from '@/components/ui/conditional';
 interface CollectionSubcollectionsListProps {
   collectionId: string;
   isOwner: boolean;
-  subcollections: SubcollectionForList[];
+  subcollections: Array<SubcollectionForList>;
 }
 
 interface SubcollectionForList {

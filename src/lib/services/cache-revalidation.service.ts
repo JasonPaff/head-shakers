@@ -27,7 +27,7 @@ export interface RevalidationResult {
   context?: RevalidationContext;
   error?: string;
   isSuccess: boolean;
-  tagsInvalidated: string[];
+  tagsInvalidated: Array<string>;
 }
 
 /**

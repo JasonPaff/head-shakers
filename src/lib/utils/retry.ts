@@ -260,7 +260,7 @@ export async function withRetry<T>(
  * const result = await retryableDbQuery('user-123');
  * ```
  */
-export function withRetryDecorator<TArgs extends unknown[], TReturn>(options: RetryOptions = {}) {
+export function withRetryDecorator<TArgs extends Array<unknown>, TReturn>(options: RetryOptions = {}) {
   return function decorator(
     fn: (...args: TArgs) => Promise<TReturn>,
   ): (...args: TArgs) => Promise<RetryResult<TReturn>> {

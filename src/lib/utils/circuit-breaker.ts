@@ -390,7 +390,7 @@ export function getCircuitHealth(circuitBreaker: CircuitBreaker): CircuitHealthS
  * const user = await protectedApiCall('user-123');
  * ```
  */
-export function withCircuitBreaker<TArgs extends unknown[], TReturn>(
+export function withCircuitBreaker<TArgs extends Array<unknown>, TReturn>(
   name: string,
   operation: (...args: TArgs) => Promise<TReturn>,
   options?: CircuitBreakerOptions,

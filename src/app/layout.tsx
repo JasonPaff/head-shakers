@@ -9,7 +9,6 @@ import { $path } from 'next-typesafe-url';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 
-import { TanstackQueryProvider } from '@/components/feature/tanstack-query/tanstack-query-provider';
 import { AblyProvider } from '@/components/layout/ably-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -54,7 +53,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   disableTransitionOnChange
                   enableSystem
                 >
-                  <TanstackQueryProvider>{children}</TanstackQueryProvider>
+                  {children}
                   <Toaster closeButton duration={2500} position={'top-right'} richColors />
                 </ThemeProvider>
               </NuqsAdapter>

@@ -154,7 +154,7 @@ export class CacheTagBuilder {
   /**
    * build the final tag array
    */
-  build(): string[] {
+  build(): Array<string> {
     return Array.from(this.tags);
   }
 
