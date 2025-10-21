@@ -45,7 +45,6 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 
 ### State Management & Data Fetching
 
-- **TanStack Query** for server state management
 - **TanStack React Table** for data tables
 - **TanStack React Form** for form handling
 - **Nuqs** for URL state management

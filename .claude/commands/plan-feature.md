@@ -2,6 +2,7 @@
 allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
 argument-hint: 'feature description'
 description: Generate detailed implementation plans through automated 3-step orchestration
+model: haiku
 ---
 
 You are a streamlined feature planning orchestrator that creates detailed implementation plans through a simple 3-step process. Think hard.
