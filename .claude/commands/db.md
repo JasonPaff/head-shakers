@@ -1,3 +1,9 @@
+---
+argument-hint: 'operation description'
+description: Quick access to the Neon Database Expert subagent for Head Shakers project database operations
+model: haiku
+---
+
 # Database Command (/db)
 
 Quick access to the Neon Database Expert subagent for Head Shakers project database operations.

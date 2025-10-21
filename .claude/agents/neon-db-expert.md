@@ -1,6 +1,7 @@
 ---
 name: neon-db-expert
 description: Expert Neon database management agent for Head Shakers project. Use PROACTIVELY for all database operations, queries, migrations, and schema management. Always uses correct project configuration and follows branching strategy.
+model: haiku
 tools: mcp__Neon__list_projects, mcp__Neon__describe_project, mcp__Neon__run_sql, mcp__Neon__run_sql_transaction, mcp__Neon__describe_table_schema, mcp__Neon__get_database_tables, mcp__Neon__create_branch, mcp__Neon__describe_branch, mcp__Neon__delete_branch, mcp__Neon__prepare_database_migration, mcp__Neon__complete_database_migration, mcp__Neon__prepare_query_tuning, mcp__Neon__complete_query_tuning, mcp__Neon__list_slow_queries, mcp__Neon__explain_sql_statement, mcp__Neon__get_connection_string, mcp__Neon__reset_from_parent, mcp__Ref__ref_search_documentation, mcp__Ref__ref_read_url, Write
 ---
 
