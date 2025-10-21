@@ -1,6 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
+import { NextResponse } from 'next/server';
+
+import { isAuthorizedAdmin } from '@/lib/utils/production-gate';
 
 const isPublicRoute = createRouteMatcher([
   // homepage - anyone can view
@@ -10,6 +13,9 @@ const isPublicRoute = createRouteMatcher([
   '/about(.*)',
   '/privacy(.*)',
   '/terms(.*)',
+
+  // coming soon page - always accessible
+  '/coming-soon(.*)',
 
   // public browsing - anyone can view
   '/browse(.*)',
@@ -68,6 +74,17 @@ export default clerkMiddleware(async (auth, req) => {
     userAgent: req.headers.get('user-agent'),
   });
 
+  // production gate: only allow authorized admins to access the site
+  // skip this check if already on the coming-soon page to prevent redirect loops
+  const isComingSoonPage = req.nextUrl.pathname.startsWith('/coming-soon');
+  if (!isComingSoonPage) {
+    const isAuthorized = await isAuthorizedAdmin();
+    if (!isAuthorized) {
+      const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
+      return NextResponse.redirect(comingSoonUrl);
+    }
+  }
+
   // public routes, no auth required
   if (isPublicRoute(req)) {
     return;
@@ -90,6 +107,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   // for any other routes, protect by default (fail-safe)
   await auth.protect({ unauthenticatedUrl: homeUrl });
+  return;
 });
 
 export const config = {
