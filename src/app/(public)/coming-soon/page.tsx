@@ -128,15 +128,17 @@ export default async function ComingSoonPage() {
               }
               isCondition={!!userId}
             >
-              <SignOutButton>
-                <Button size={'sm'} variant={'outline'}>
-                  <LogOutIcon aria-hidden className={'mr-2 size-4'} />
-                  Sign Out
-                </Button>
+              <div className={'flex gap-x-2'}>
+                <SignOutButton>
+                  <Button size={'sm'} variant={'outline'}>
+                    <LogOutIcon aria-hidden className={'mr-2 size-4'} />
+                    Sign Out
+                  </Button>
+                </SignOutButton>
                 <Button asChild size={'sm'} variant={'link'}>
                   <Link href={$path({ route: '/' })}>Home Page</Link>
                 </Button>
-              </SignOutButton>
+              </div>
             </Conditional>
           </div>
         </div>
