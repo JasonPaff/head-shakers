@@ -76,12 +76,8 @@ export default clerkMiddleware(async (auth, req) => {
 
   // production gate: only allow authorized admins to access the site
   // only apply in production environment
-  const isProduction = process.env.NODE_ENV === 'production';
   const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));
-  const isClerkRoute =
-    req.nextUrl.pathname.startsWith('/sso-callback') || req.nextUrl.pathname.startsWith('/api/auth');
-
-  if (isProduction && !isComingSoonPage && !isClerkRoute) {
+  if (!isComingSoonPage) {
     const isAuthorized = await isAuthorizedAdmin();
     if (!isAuthorized) {
       const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
