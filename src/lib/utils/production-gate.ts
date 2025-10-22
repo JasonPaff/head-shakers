@@ -16,11 +16,7 @@ export const isAuthorizedAdmin = async (): Promise<boolean> => {
     const user = await UsersFacade.getUserByClerkId(clerkUserId);
     if (!user) return false;
 
-    // get authorized admin email from environment variable
-    const authorizedEmail = process.env.AUTHORIZED_ADMIN_EMAIL || 'jasonpaff@gmail.com';
-
-    // check if a user's email matches the authorized admin email
-    return user?.email === authorizedEmail;
+    return user?.role === 'admin';
   } catch {
     // if anything fails, deny access
     return false;
