@@ -15,7 +15,7 @@ import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
 
 export default async function ComingSoonPage() {
-  const { userId } = await auth();
+  const { isAuthenticated } = await auth();
 
   return (
     <div className={'container mx-auto min-h-screen px-4 py-12'}>
@@ -126,7 +126,7 @@ export default async function ComingSoonPage() {
                   </Button>
                 </SignInButton>
               }
-              isCondition={!!userId}
+              isCondition={isAuthenticated}
             >
               <div className={'flex gap-x-2'}>
                 <SignOutButton>
