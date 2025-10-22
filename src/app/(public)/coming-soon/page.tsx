@@ -11,7 +11,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 export default function ComingSoonPage() {
   return (
-    <div className={'container mx-auto min-h-screen px-4 py-12'}>
+    <div className={'container mx-auto min-h-screen px-4 pb-4'}>
       {/* Hero Section */}
       <section className={'flex min-h-[80vh] flex-col items-center justify-center py-12 text-center'}>
         {/* Animated Badge */}
