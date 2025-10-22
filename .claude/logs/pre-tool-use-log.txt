@@ -2720,3 +2720,14 @@ Input:
   }
 }
 ================================================================================
+
+================================================================================
+2025-10-22T16:21:49.151Z
+Tool: Task
+Input:
+{
+  "description": "UI/UX audit for /coming-soon",
+  "prompt": "Perform a comprehensive UI/UX audit of the `/coming-soon` page for the Head Shakers platform.\n\n## Page Information\n\n- **Route**: /coming-soon\n- **Project**: Head Shakers - Bobblehead Collection Platform\n- **Base URL**: http://localhost:3000 (development server)\n- **Authentication**: Uses Clerk (handle auth flow if needed)\n\n## Testing Scope\n\nTest ALL user interactions on the /coming-soon page including:\n\n- All forms and input validation\n- All buttons and their actions\n- Navigation elements and routing\n- Modals, dialogs, and overlays\n- Data display and formatting\n- Search, filter, and sort functionality\n- CRUD operations (Create, Read, Update, Delete)\n- Error states and edge cases\n- Loading states and async operations\n- Responsive behavior (if applicable)\n- Visual design and layout\n- Content accuracy and messaging\n\n## Database Integration\n\nUse the `/db` slash command to:\n\n- Query current database state before operations\n- Verify data persistence after operations\n- Test with different data scenarios\n- Check data integrity and relationships\n- Validate authorization rules\n\n## Output Requirements\n\nCreate a comprehensive audit report saved to:\n`docs/2025_10_22/audits/ui-audit-coming-soon.md`\n\nThe report must include:\n\n1. **Executive Summary** - Overview of page functionality and audit scope\n2. **User Flow Documentation** - Complete diagrams/descriptions of all user paths\n3. **Bugs & Issues** - Categorized by severity (Critical, High, Medium, Low)\n4. **UX/UI Recommendations** - Suggested improvements for user experience\n5. **Accessibility Concerns** - WCAG compliance issues\n6. **Performance Observations** - Loading times, responsiveness issues\n7. **Database Verification** - Results of data integrity checks (if applicable)\n8. **Test Coverage Summary** - What was tested and what couldn't be tested\n\n## Testing Instructions\n\n1. Start by navigating to http://localhost:3000/coming-soon\n2. Use `browser_snapshot` to understand the page structure\n3. Test every interactive element systematically\n4. Take screenshots of any bugs or issues found\n5. Use `/db` command to verify any data operations\n6. Document all findings with clear reproduction steps\n7. Focus on the user perspective - what would a real user experience?\n\nBegin the audit now.",
+  "subagent_type": "ui-ux-agent"
+}
+================================================================================
