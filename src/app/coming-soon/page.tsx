@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
 
-import { SignInButton } from '@clerk/nextjs';
-import { HeartIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
+import { SignInButton, SignOutButton } from '@clerk/nextjs';
+import { HeartIcon, LogOutIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/utils/tailwind-utils';
+import { getUserId } from '@/utils/user-utils';
 
-export default function ComingSoonPage() {
+export default async function ComingSoonPage() {
+  const userId = await getUserId();
+
   return (
     <div className={'container mx-auto min-h-screen px-4 py-12'}>
       {/* Hero Section */}
@@ -107,13 +110,37 @@ export default function ComingSoonPage() {
               hello@headshakers.com
             </a>
           </p>
-          {/* Admin Access */}
+
+          {/* Admin Access / Auth Status */}
           <div className={'border-t pt-4'}>
-            <SignInButton mode={'modal'}>
-              <Button size={'sm'} variant={'ghost'}>
-                Admin Access
-              </Button>
-            </SignInButton>
+            {
+              userId ?
+                // user is signed in - show status
+                <div className={'space-y-3'}>
+                  <div
+                    className={
+                      'rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950'
+                    }
+                  >
+                    <p className={'mb-2 text-sm font-semibold text-amber-900 dark:text-amber-100'}>
+                      You&apos;re signed in
+                    </p>
+                  </div>
+                  <SignOutButton>
+                    <Button size={'sm'} variant={'outline'}>
+                      <LogOutIcon className={'mr-2 size-4'} />
+                      Sign Out
+                    </Button>
+                  </SignOutButton>
+                </div>
+                // user is not signed in - show sign in button
+              : <SignInButton mode={'modal'}>
+                  <Button size={'sm'} variant={'ghost'}>
+                    Admin Access
+                  </Button>
+                </SignInButton>
+
+            }
           </div>
         </div>
       </section>
