@@ -3,8 +3,6 @@ import * as Sentry from '@sentry/nextjs';
 import { $path } from 'next-typesafe-url';
 import { NextResponse } from 'next/server';
 
-import { isAuthorizedAdmin } from '@/lib/utils/production-gate';
-
 const isPublicRoute = createRouteMatcher([
   // homepage - anyone can view
   '/',
@@ -78,7 +76,7 @@ export default clerkMiddleware(async (auth, req) => {
   // only apply in production environment
   const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));
   if (!isComingSoonPage) {
-    const isAuthorized = await isAuthorizedAdmin();
+    const isAuthorized = userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH';
     if (!isAuthorized) {
       const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
       return NextResponse.redirect(comingSoonUrl);
