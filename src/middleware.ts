@@ -74,13 +74,15 @@ export default clerkMiddleware(async (auth, req) => {
 
   // production gate: only allow authorized admins to access the site
   // only apply in production environment
-  const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));
-  if (!isComingSoonPage) {
-    const isAuthorized =
-      userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';
-    if (!isAuthorized) {
-      const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
-      return NextResponse.redirect(comingSoonUrl);
+  if (process.env.NODE_ENV === 'production') {
+    const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));
+    if (!isComingSoonPage) {
+      const isAuthorized =
+        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';
+      if (!isAuthorized) {
+        const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
+        return NextResponse.redirect(comingSoonUrl);
+      }
     }
   }
 
