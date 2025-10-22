@@ -2,21 +2,14 @@ import 'server-only';
 
 import type { Metadata } from 'next';
 
-import { SignInButton, SignOutButton } from '@clerk/nextjs';
-import { auth } from '@clerk/nextjs/server';
-import { HeartIcon, LogOutIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import Link from 'next/link';
+import { HeartIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
+import { AdminAccess } from '@/app/(public)/coming-soon/admin-access';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
 
-export default async function ComingSoonPage() {
-  const { isAuthenticated } = await auth();
-
+export default function ComingSoonPage() {
   return (
     <div className={'container mx-auto min-h-screen px-4 py-12'}>
       {/* Hero Section */}
@@ -118,28 +111,7 @@ export default async function ComingSoonPage() {
 
           {/* Admin Access / Auth Status */}
           <div className={'border-t pt-4'}>
-            <Conditional
-              fallback={
-                <SignInButton mode={'modal'}>
-                  <Button size={'sm'} variant={'ghost'}>
-                    Admin Access
-                  </Button>
-                </SignInButton>
-              }
-              isCondition={isAuthenticated}
-            >
-              <div className={'flex gap-x-2'}>
-                <SignOutButton>
-                  <Button size={'sm'} variant={'outline'}>
-                    <LogOutIcon aria-hidden className={'mr-2 size-4'} />
-                    Sign Out
-                  </Button>
-                </SignOutButton>
-                <Button asChild size={'sm'} variant={'link'}>
-                  <Link href={$path({ route: '/' })}>Home Page</Link>
-                </Button>
-              </div>
-            </Conditional>
+            <AdminAccess />
           </div>
         </div>
       </section>
