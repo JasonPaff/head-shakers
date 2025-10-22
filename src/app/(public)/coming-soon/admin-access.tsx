@@ -22,14 +22,14 @@ export const AdminAccess = () => {
       }
       isCondition={isSignedIn}
     >
-      <div className={'flex gap-x-2'}>
+      <div className={'flex w-full items-center justify-center gap-x-2'}>
         <SignOutButton>
           <Button size={'sm'} variant={'outline'}>
             <LogOutIcon aria-hidden className={'mr-2 size-4'} />
             Sign Out
           </Button>
         </SignOutButton>
-        <Button asChild size={'sm'} variant={'link'}>
+        <Button asChild size={'sm'} variant={'outline'}>
           <Link href={$path({ route: '/' })}>Home Page</Link>
         </Button>
       </div>
