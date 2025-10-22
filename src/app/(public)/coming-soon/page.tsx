@@ -1,6 +1,9 @@
+import 'server-only';
+
 import type { Metadata } from 'next';
 
 import { SignInButton, SignOutButton } from '@clerk/nextjs';
+import { auth } from '@clerk/nextjs/server';
 import { HeartIcon, LogOutIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
@@ -8,10 +11,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
-import { getUserId } from '@/utils/user-utils';
 
 export default async function ComingSoonPage() {
-  const userId = await getUserId();
+  const { userId } = await auth();
 
   return (
     <div className={'container mx-auto min-h-screen px-4 py-12'}>
