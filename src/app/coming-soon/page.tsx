@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 
+import { SignInButton } from '@clerk/nextjs';
 import { HeartIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -14,7 +16,7 @@ export default function ComingSoonPage() {
         {/* Animated Badge */}
         <div className={'mb-6 animate-pulse'}>
           <Badge className={'text-sm font-semibold'} variant={'outline'}>
-            <SparklesIcon className={'mr-2 size-4'} />
+            <SparklesIcon aria-hidden className={'mr-2 size-4'} />
             Coming Soon
           </Badge>
         </div>
@@ -38,7 +40,7 @@ export default function ComingSoonPage() {
         {/* Launch Info */}
         <div className={'mb-12 rounded-2xl border border-primary/20 bg-primary/5 p-6'}>
           <div className={'mb-2 flex items-center justify-center gap-2'}>
-            <RocketIcon className={'size-5 text-primary'} />
+            <RocketIcon aria-hidden className={'size-5 text-primary'} />
             <h2 className={'text-xl font-semibold'}>Launching Soon</h2>
           </div>
           <p className={'text-muted-foreground'}>
@@ -53,7 +55,7 @@ export default function ComingSoonPage() {
               <div
                 className={'mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10'}
               >
-                <UsersIcon className={'size-6 text-primary'} />
+                <UsersIcon aria-hidden className={'size-6 text-primary'} />
               </div>
               <CardTitle className={'text-center'}>Connect</CardTitle>
             </CardHeader>
@@ -69,7 +71,7 @@ export default function ComingSoonPage() {
               <div
                 className={'mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10'}
               >
-                <HeartIcon className={'size-6 text-primary'} />
+                <HeartIcon aria-hidden className={'size-6 text-primary'} />
               </div>
               <CardTitle className={'text-center'}>Showcase</CardTitle>
             </CardHeader>
@@ -85,7 +87,7 @@ export default function ComingSoonPage() {
               <div
                 className={'mx-auto mb-2 flex size-12 items-center justify-center rounded-full bg-primary/10'}
               >
-                <SparklesIcon className={'size-6 text-primary'} />
+                <SparklesIcon aria-hidden className={'size-6 text-primary'} />
               </div>
               <CardTitle className={'text-center'}>Discover</CardTitle>
             </CardHeader>
@@ -98,13 +100,21 @@ export default function ComingSoonPage() {
         </div>
 
         {/* Footer Message */}
-        <div className={'mt-16'}>
+        <div className={'mt-16 space-y-4'}>
           <p className={'text-sm text-muted-foreground'}>
             Questions? Reach out to us at{' '}
             <a className={'font-semibold text-primary hover:underline'} href={'mailto:hello@headshakers.com'}>
               hello@headshakers.com
             </a>
           </p>
+          {/* Admin Access */}
+          <div className={'border-t pt-4'}>
+            <SignInButton mode={'modal'}>
+              <Button size={'sm'} variant={'ghost'}>
+                Admin Access
+              </Button>
+            </SignInButton>
+          </div>
         </div>
       </section>
 
