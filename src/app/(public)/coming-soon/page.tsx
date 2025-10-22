@@ -2,10 +2,11 @@ import 'server-only';
 
 import type { Metadata } from 'next';
 
-import { SignInButton, SignOutButton } from '@clerk/nextjs';
+import { SignInButton } from '@clerk/nextjs';
 import { auth } from '@clerk/nextjs/server';
-import { HeartIcon, LogOutIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
+import { HeartIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
+import { AdminSignOut } from '@/app/(public)/coming-soon/admin-sign-out';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -126,12 +127,7 @@ export default async function ComingSoonPage() {
               }
               isCondition={!!userId}
             >
-              <SignOutButton>
-                <Button size={'sm'} variant={'outline'}>
-                  <LogOutIcon className={'mr-2 size-4'} />
-                  Sign Out
-                </Button>
-              </SignOutButton>
+              <AdminSignOut />
             </Conditional>
           </div>
         </div>
