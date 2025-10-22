@@ -2560,3 +2560,124 @@
 2025-10-22T01:34:23.770Z: Unknown command - No description
 2025-10-22T01:34:46.945Z: Unknown command - No description
 2025-10-22T01:40:34.242Z: Unknown command - No description
+2025-10-22T15:47:22.655Z: Unknown command - Query bobbleheads count and names
+2025-10-22T15:47:24.903Z: Unknown command - No description
+2025-10-22T15:47:28.081Z: Unknown command - No description
+2025-10-22T15:47:32.470Z: Unknown command - No description
+2025-10-22T15:47:32.899Z: Unknown command - No description
+2025-10-22T15:49:37.334Z: Unknown command - No description
+
+================================================================================
+2025-10-22T15:54:59.539Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.claude\\commands\\db.md",
+  "old_string": "# Database Command (/db)\n\nQuick access to the Neon Database Expert subagent for Head Shakers project database operations.\n\n## Usage\n\n```\n/db [operation description]\n```\n\n## Examples\n\n```\n/db list all tables\n/db show schema for bobbleheads table\n/db run migration for new collection_views table\n/db check slow queries\n/db optimize query performance for user dashboard\n```\n\n## Features\n\n- **Automatic validation**: All database operations use validated Head Shakers project configuration\n- **Branch safety**: Defaults to development branch with production protection\n- **Comprehensive logging**: All operations logged to `docs/{date}/database/validation-log.md`\n- **Expert guidance**: Specialized subagent for complex database operations\n\n## Safety Features\n\n- ✅ **Project isolation**: Enforces correct Head Shakers project ID (`misty-boat-49919732`)\n- ✅ **Database defaults**: Auto-applies `head-shakers` database name\n- ✅ **Branch protection**: Blocks sensitive operations on production branch\n- ✅ **Operation logging**: Full audit trail of all database interactions\n\n## Supported Operations\n\n- Database schema management\n- Query optimization and tuning\n- Migration planning and execution\n- Performance analysis\n- Table structure analysis\n- Slow query identification\n- Connection management\n- Branch operations (development/production)",
+  "new_string": "You must invoke the **neon-db-expert** subagent using the Task tool to handle this database operation.\n\n**User's Request:** {{$input}}\n\n**Instructions:**\n1. Use the Task tool with `subagent_type: \"neon-db-expert\"`\n2. Pass the user's complete request to the agent\n3. The agent will automatically:\n   - Validate project ID (`misty-boat-49919732`)\n   - Apply database name (`head-shakers`)\n   - Use development branch by default (`br-dark-forest-adf48tll`)\n   - Protect production branch from unsafe operations\n   - Log all operations to `docs/{YYYY_MM_DD}/database/validation-log.md`\n\n**Important:** Do not attempt to handle database operations directly. Always delegate to the neon-db-expert subagent."
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:33.714Z
+Tool: Task
+Input:
+{
+  "description": "Query bobbleheads in database",
+  "prompt": "Get the total count of bobbleheads in the database and list all their names. Use a query like:\nSELECT COUNT(*) as total FROM bobbleheads;\nSELECT name FROM bobbleheads ORDER BY name;\n\nProvide both the total count and a complete list of all bobblehead names in the database.",
+  "subagent_type": "neon-db-expert"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:35.643Z
+Tool: mcp__Ref__ref_search_documentation
+Input:
+{
+  "query": "Neon PostgreSQL query execute SQL statement"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:39.899Z
+Tool: mcp__Ref__ref_search_documentation
+Input:
+{
+  "query": "Drizzle ORM PostgreSQL query select data ref_src=private"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:43.804Z
+Tool: mcp__Ref__ref_read_url
+Input:
+{
+  "url": "https://github.com/JasonPaff/head-shakers/blob/main/src/lib/db/schema/bobbleheads.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:47.467Z
+Tool: mcp__Ref__ref_read_url
+Input:
+{
+  "url": "https://github.com/JasonPaff/head-shakers/blob/main/src/lib/queries/bobbleheads/bobbleheads-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:53.101Z
+Tool: mcp__Ref__ref_search_documentation
+Input:
+{
+  "query": "head shakers database script seed migration ref_src=private"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:00:56.288Z
+Tool: mcp__Ref__ref_read_url
+Input:
+{
+  "url": "https://github.com/JasonPaff/head-shakers/blob/main/src/lib/db/index.ts"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:02:03.385Z
+Tool: Task
+Input:
+{
+  "description": "Query bobblehead count and names",
+  "prompt": "The user wants to know:\n1. How many bobbleheads are in the database\n2. What are the names of all the bobbleheads\n\nPlease:\n1. Query the bobbleheads table to get the count\n2. Retrieve all bobblehead names\n3. Return the results in a clear format\n\nUse the Head Shakers project (ID: misty-boat-49919732) and head-shakers database. Use the development branch by default.",
+  "subagent_type": "neon-db-expert"
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:02:06.367Z
+Tool: mcp__Neon__run_sql
+Input:
+{
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT COUNT(*) as total_count FROM bobbleheads;"
+  }
+}
+================================================================================
+
+================================================================================
+2025-10-22T16:02:07.485Z
+Tool: mcp__Neon__run_sql
+Input:
+{
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT id, name FROM bobbleheads ORDER BY name ASC;"
+  }
+}
+================================================================================

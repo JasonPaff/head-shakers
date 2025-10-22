@@ -4,47 +4,18 @@ description: Quick access to the Neon Database Expert subagent for Head Shakers 
 model: haiku
 ---
 
-# Database Command (/db)
+You must invoke the **neon-db-expert** subagent using the Task tool to handle this database operation.
 
-Quick access to the Neon Database Expert subagent for Head Shakers project database operations.
+**User's Request:** {{$input}}
 
-## Usage
+**Instructions:**
+1. Use the Task tool with `subagent_type: "neon-db-expert"`
+2. Pass the user's complete request to the agent
+3. The agent will automatically:
+   - Validate project ID (`misty-boat-49919732`)
+   - Apply database name (`head-shakers`)
+   - Use development branch by default (`br-dark-forest-adf48tll`)
+   - Protect production branch from unsafe operations
+   - Log all operations to `docs/{YYYY_MM_DD}/database/validation-log.md`
 
-```
-/db [operation description]
-```
-
-## Examples
-
-```
-/db list all tables
-/db show schema for bobbleheads table
-/db run migration for new collection_views table
-/db check slow queries
-/db optimize query performance for user dashboard
-```
-
-## Features
-
-- **Automatic validation**: All database operations use validated Head Shakers project configuration
-- **Branch safety**: Defaults to development branch with production protection
-- **Comprehensive logging**: All operations logged to `docs/{date}/database/validation-log.md`
-- **Expert guidance**: Specialized subagent for complex database operations
-
-## Safety Features
-
-- ✅ **Project isolation**: Enforces correct Head Shakers project ID (`misty-boat-49919732`)
-- ✅ **Database defaults**: Auto-applies `head-shakers` database name
-- ✅ **Branch protection**: Blocks sensitive operations on production branch
-- ✅ **Operation logging**: Full audit trail of all database interactions
-
-## Supported Operations
-
-- Database schema management
-- Query optimization and tuning
-- Migration planning and execution
-- Performance analysis
-- Table structure analysis
-- Slow query identification
-- Connection management
-- Branch operations (development/production)
+**Important:** Do not attempt to handle database operations directly. Always delegate to the neon-db-expert subagent.
