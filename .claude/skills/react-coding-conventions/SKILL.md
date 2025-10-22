@@ -1,9 +1,9 @@
 ---
-name: react-conventions
+name: react-coding-conventions
 description: Enforces Head Shakers React coding conventions automatically when creating or modifying React components. This skill should be used proactively whenever working with .tsx/.jsx files to ensure consistent code style, naming conventions, component structure, and TypeScript patterns across the codebase.
 ---
 
-# React Conventions Enforcer
+# React Coding Conventions Enforcer
 
 ## Purpose
 
