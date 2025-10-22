@@ -6,6 +6,7 @@ import { HeartIcon, LogOutIcon, RocketIcon, SparklesIcon, UsersIcon } from 'luci
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Conditional } from '@/components/ui/conditional';
 import { cn } from '@/utils/tailwind-utils';
 import { getUserId } from '@/utils/user-utils';
 
@@ -113,34 +114,23 @@ export default async function ComingSoonPage() {
 
           {/* Admin Access / Auth Status */}
           <div className={'border-t pt-4'}>
-            {
-              userId ?
-                // user is signed in - show status
-                <div className={'space-y-3'}>
-                  <div
-                    className={
-                      'rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950'
-                    }
-                  >
-                    <p className={'mb-2 text-sm font-semibold text-amber-900 dark:text-amber-100'}>
-                      You&apos;re signed in
-                    </p>
-                  </div>
-                  <SignOutButton>
-                    <Button size={'sm'} variant={'outline'}>
-                      <LogOutIcon className={'mr-2 size-4'} />
-                      Sign Out
-                    </Button>
-                  </SignOutButton>
-                </div>
-                // user is not signed in - show sign in button
-              : <SignInButton mode={'modal'}>
+            <Conditional
+              fallback={
+                <SignInButton mode={'modal'}>
                   <Button size={'sm'} variant={'ghost'}>
                     Admin Access
                   </Button>
                 </SignInButton>
-
-            }
+              }
+              isCondition={!!userId}
+            >
+              <SignOutButton>
+                <Button size={'sm'} variant={'outline'}>
+                  <LogOutIcon className={'mr-2 size-4'} />
+                  Sign Out
+                </Button>
+              </SignOutButton>
+            </Conditional>
           </div>
         </div>
       </section>
