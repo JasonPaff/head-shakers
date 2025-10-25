@@ -1,5 +1,5 @@
 import 'server-only';
-import { ArrowLeftIcon, CalendarIcon, EditIcon, HeartIcon, ShareIcon } from 'lucide-react';
+import { ArrowLeftIcon, CalendarIcon, HeartIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment, Suspense } from 'react';
@@ -8,6 +8,7 @@ import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
 import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header-delete';
+import { BobbleheadHeaderEdit } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header-edit';
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
@@ -17,6 +18,7 @@ import { LikeIconButton } from '@/components/ui/like-button';
 
 interface BobbleheadHeaderProps {
   bobblehead: BobbleheadWithRelations;
+  collections: Array<{ id: string; name: string }>;
   currentUserId: null | string;
   isOwner?: boolean;
   likeData: ContentLikeData;
@@ -24,6 +26,7 @@ interface BobbleheadHeaderProps {
 
 export const BobbleheadHeader = ({
   bobblehead,
+  collections,
   currentUserId,
   isOwner = false,
   likeData,
@@ -73,10 +76,7 @@ export const BobbleheadHeader = ({
           <Conditional isCondition={isOwner}>
             <Fragment>
               {/* Edit Bobblehead Button */}
-              <Button size={'sm'} variant={'outline'}>
-                <EditIcon aria-hidden className={'mr-2 size-4'} />
-                Edit
-              </Button>
+              <BobbleheadHeaderEdit bobblehead={bobblehead} collections={collections} />
 
               {/* Delete Bobblehead Button */}
               <BobbleheadHeaderDelete

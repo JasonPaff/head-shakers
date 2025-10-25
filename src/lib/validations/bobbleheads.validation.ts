@@ -24,7 +24,9 @@ export type InsertBobbleheadTag = z.infer<typeof insertBobbleheadTagSchema>;
 export type SelectBobblehead = z.infer<typeof selectBobbleheadSchema>;
 export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
 export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
+export type UpdateBobblehead = z.infer<typeof updateBobbleheadSchema>;
 export type UpdateBobbleheadPhoto = z.infer<typeof updateBobbleheadPhotoSchema>;
+export type UpdateBobbleheadWithPhotos = z.infer<typeof updateBobbleheadWithPhotosSchema>;
 
 export const selectBobbleheadPhotoSchema = createSelectSchema(bobbleheadPhotos);
 export const insertBobbleheadPhotoSchema = createInsertSchema(bobbleheadPhotos, {
@@ -124,6 +126,15 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   viewCount: true,
 });
 export const createBobbleheadWithPhotosSchema = insertBobbleheadSchema.extend({
+  photos: cloudinaryPhotosValidationSchema.default([]),
+  tags: z.array(z.string()).default([]).optional(),
+});
+
+export const updateBobbleheadSchema = insertBobbleheadSchema.extend({
+  id: z.uuid({ error: 'Bobblehead ID is required' }),
+});
+
+export const updateBobbleheadWithPhotosSchema = updateBobbleheadSchema.extend({
   photos: cloudinaryPhotosValidationSchema.default([]),
   tags: z.array(z.string()).default([]).optional(),
 });

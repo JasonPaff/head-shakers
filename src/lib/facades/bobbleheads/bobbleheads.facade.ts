@@ -6,6 +6,7 @@ import type {
   DeleteBobblehead,
   InsertBobblehead,
   InsertBobbleheadPhoto,
+  UpdateBobblehead,
 } from '@/lib/validations/bobbleheads.validation';
 
 import { OPERATIONS } from '@/lib/constants';
@@ -520,6 +521,26 @@ export class BobbleheadsFacade {
         method: 'searchBobbleheads',
         operation: OPERATIONS.BOBBLEHEADS.SEARCH,
         userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async updateAsync(
+    data: UpdateBobblehead,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadRecord | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      return BobbleheadsQuery.updateAsync(data, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { id: data.id, name: data.name },
+        facade: facadeName,
+        method: 'updateAsync',
+        operation: OPERATIONS.BOBBLEHEADS.UPDATE,
+        userId,
       };
       throw createFacadeError(context, error);
     }

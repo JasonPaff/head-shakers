@@ -15,6 +15,7 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
@@ -42,6 +43,16 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
     currentUserId || undefined,
   );
 
+  let collections: Array<{ id: string; name: string }> = [];
+  if (isOwner && currentUserId) {
+    const userCollections =
+      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
+    collections = userCollections.map((collection) => ({
+      id: collection.id,
+      name: collection.name,
+    }));
+  }
+
   const hasMultiplePhotos = bobblehead.photos.length > 1;
 
   return (
@@ -51,6 +62,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
         <ContentLayout>
           <BobbleheadHeader
             bobblehead={bobblehead}
+            collections={collections}
             currentUserId={currentUserId}
             isOwner={isOwner}
             likeData={likeData}

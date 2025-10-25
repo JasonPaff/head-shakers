@@ -5,6 +5,7 @@ import type {
   DeleteBobblehead,
   InsertBobblehead,
   InsertBobbleheadPhoto,
+  UpdateBobblehead,
 } from '@/lib/validations/bobbleheads.validation';
 
 import {
@@ -328,5 +329,26 @@ export class BobbleheadsQuery extends BaseQuery {
     }
 
     return query;
+  }
+
+  /**
+   * update an existing bobblehead
+   */
+  static async updateAsync(
+    data: UpdateBobblehead,
+    userId: string,
+    context: QueryContext,
+  ): Promise<BobbleheadRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const { id, ...updateData } = data;
+
+    const result = await dbInstance
+      .update(bobbleheads)
+      .set(updateData)
+      .where(and(eq(bobbleheads.id, id), eq(bobbleheads.userId, userId)))
+      .returning();
+
+    return result?.[0] || null;
   }
 }
