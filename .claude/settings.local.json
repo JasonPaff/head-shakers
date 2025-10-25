@@ -64,7 +64,5 @@
     "deny": [],
     "ask": []
   },
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["shared-server"],
   "outputStyle": "default"
 }
