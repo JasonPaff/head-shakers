@@ -149,8 +149,12 @@ export const BobbleheadEditDialog = withFocusManagement(
         }}
         open={isOpen}
       >
-        <DialogContent className={'max-h-[90vh] sm:max-w-[700px]'} testId={dialogTestId}>
+        <DialogContent
+          className={'flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[700px]'}
+          testId={dialogTestId}
+        >
           <form
+            className={'flex min-h-0 flex-1 flex-col'}
             data-testid={formTestId}
             onSubmit={(e) => {
               e.preventDefault();
@@ -167,7 +171,7 @@ export const BobbleheadEditDialog = withFocusManagement(
             </DialogHeader>
 
             {/* Form Fields - Scrollable */}
-            <ScrollArea className={'max-h-[calc(90vh-200px)] pr-4'}>
+            <ScrollArea className={'h-full min-h-0 flex-1 pr-4'}>
               <div className={'space-y-6 py-4'}>
                 {/*
                   Note: Form sections are typed for addItemFormOptions but work with updateBobbleheadWithPhotosSchema

@@ -3147,3 +3147,625 @@ Input:
   "ref": "e80"
 }
 ================================================================================
+
+================================================================================
+2025-10-26T00:44:07.600Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "edit-dialog-full.png",
+  "fullPage": true
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:44:16.785Z
+Tool: mcp__playwright__browser_evaluate
+Input:
+{
+  "function": "() => window.scrollBy(0, 400)"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:44:31.416Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Identify the visual issue with edit bobblehead dialog",
+      "status": "completed",
+      "activeForm": "Identifying the visual issue with edit bobblehead dialog"
+    },
+    {
+      "content": "Read the edit dialog component file to understand the structure",
+      "status": "in_progress",
+      "activeForm": "Reading the edit dialog component file to understand the structure"
+    },
+    {
+      "content": "Fix the z-index/overlay issue causing the Like button to bleed through",
+      "status": "pending",
+      "activeForm": "Fixing the z-index/overlay issue causing the Like button to bleed through"
+    },
+    {
+      "content": "Test the fix with Playwright",
+      "status": "pending",
+      "activeForm": "Testing the fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:44:37.634Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-edit-dialog.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:44:44.676Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\dialog.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:44:55.634Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*bobblehead*details*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:00.201Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:05.889Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\async\\bobblehead-feature-card-async.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:10.423Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:22.532Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Identify the visual issue with edit bobblehead dialog",
+      "status": "completed",
+      "activeForm": "Identifying the visual issue with edit bobblehead dialog"
+    },
+    {
+      "content": "Read the edit dialog component file to understand the structure",
+      "status": "completed",
+      "activeForm": "Reading the edit dialog component file to understand the structure"
+    },
+    {
+      "content": "Read LikeTextButton component to check for z-index issues",
+      "status": "in_progress",
+      "activeForm": "Reading LikeTextButton component to check for z-index issues"
+    },
+    {
+      "content": "Fix the z-index/overlay issue causing the Like button to bleed through",
+      "status": "pending",
+      "activeForm": "Fixing the z-index/overlay issue causing the Like button to bleed through"
+    },
+    {
+      "content": "Test the fix with Playwright",
+      "status": "pending",
+      "activeForm": "Testing the fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:25.982Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/like-button.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:30.463Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\like-button.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:45:50.050Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Identify the visual issue with edit bobblehead dialog",
+      "status": "completed",
+      "activeForm": "Identifying the visual issue with edit bobblehead dialog"
+    },
+    {
+      "content": "Read the edit dialog component file to understand the structure",
+      "status": "completed",
+      "activeForm": "Reading the edit dialog component file to understand the structure"
+    },
+    {
+      "content": "Read LikeTextButton component to check for z-index issues",
+      "status": "completed",
+      "activeForm": "Reading LikeTextButton component to check for z-index issues"
+    },
+    {
+      "content": "Fix the z-index/overlay issue by increasing dialog z-index values",
+      "status": "in_progress",
+      "activeForm": "Fixing the z-index/overlay issue by increasing dialog z-index values"
+    },
+    {
+      "content": "Test the fix with Playwright",
+      "status": "pending",
+      "activeForm": "Testing the fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:01.900Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\dialog.tsx",
+  "old_string": "      <DialogPrimitive.Content\n        className={cn(\n          'fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]',\n          'translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6',\n          'shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0',\n          'data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0',\n          'data-[state=open]:zoom-in-95 sm:max-w-lg',\n          className,\n        )}\n        data-slot={'dialog-content'}\n        data-testid={dialogContentTestId}\n        {...props}\n      >",
+  "new_string": "      <DialogPrimitive.Content\n        className={cn(\n          'fixed top-[50%] left-[50%] z-[110] grid w-full max-w-[calc(100%-2rem)]',\n          'translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border bg-background p-6',\n          'shadow-lg duration-200 data-[state=closed]:animate-out data-[state=closed]:fade-out-0',\n          'data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0',\n          'data-[state=open]:zoom-in-95 sm:max-w-lg',\n          className,\n        )}\n        data-slot={'dialog-content'}\n        data-testid={dialogContentTestId}\n        {...props}\n      >"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:09.114Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\dialog.tsx",
+  "old_string": "  return (\n    <DialogPrimitive.Overlay\n      className={cn(\n        'fixed inset-0 z-50 bg-black/50',\n        'data-[state=closed]:animate-out',\n        'data-[state=closed]:fade-out-0',\n        'data-[state=open]:animate-in',\n        'data-[state=open]:fade-in-0',\n        className,\n      )}\n      data-slot={'dialog-overlay'}\n      data-testid={dialogOverlayTestId}\n      {...props}\n    >\n      {children}\n    </DialogPrimitive.Overlay>\n  );",
+  "new_string": "  return (\n    <DialogPrimitive.Overlay\n      className={cn(\n        'fixed inset-0 z-[100] bg-black/50',\n        'data-[state=closed]:animate-out',\n        'data-[state=closed]:fade-out-0',\n        'data-[state=open]:animate-in',\n        'data-[state=open]:fade-in-0',\n        className,\n      )}\n      data-slot={'dialog-overlay'}\n      data-testid={dialogOverlayTestId}\n      {...props}\n    >\n      {children}\n    </DialogPrimitive.Overlay>\n  );"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:18.836Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Identify the visual issue with edit bobblehead dialog",
+      "status": "completed",
+      "activeForm": "Identifying the visual issue with edit bobblehead dialog"
+    },
+    {
+      "content": "Read the edit dialog component file to understand the structure",
+      "status": "completed",
+      "activeForm": "Reading the edit dialog component file to understand the structure"
+    },
+    {
+      "content": "Read LikeTextButton component to check for z-index issues",
+      "status": "completed",
+      "activeForm": "Reading LikeTextButton component to check for z-index issues"
+    },
+    {
+      "content": "Fix the z-index/overlay issue by increasing dialog z-index values",
+      "status": "completed",
+      "activeForm": "Fixing the z-index/overlay issue by increasing dialog z-index values"
+    },
+    {
+      "content": "Test the fix with Playwright",
+      "status": "in_progress",
+      "activeForm": "Testing the fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:24.890Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/bobbleheads/68e44e9f-340b-4e13-ae28-f591ccc24069"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:34.199Z
+Tool: mcp__playwright__browser_click
+Input:
+{
+  "element": "Edit button",
+  "ref": "e72"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:43.144Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "edit-dialog-fixed.png",
+  "fullPage": true
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:55.451Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Identify the visual issue with edit bobblehead dialog",
+      "status": "completed",
+      "activeForm": "Identifying the visual issue with edit bobblehead dialog"
+    },
+    {
+      "content": "Read the edit dialog component file to understand the structure",
+      "status": "completed",
+      "activeForm": "Reading the edit dialog component file to understand the structure"
+    },
+    {
+      "content": "Read LikeTextButton component to check for z-index issues",
+      "status": "completed",
+      "activeForm": "Reading LikeTextButton component to check for z-index issues"
+    },
+    {
+      "content": "Fix the z-index/overlay issue by increasing dialog z-index values",
+      "status": "completed",
+      "activeForm": "Fixing the z-index/overlay issue by increasing dialog z-index values"
+    },
+    {
+      "content": "Test the fix with Playwright",
+      "status": "completed",
+      "activeForm": "Testing the fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:46:59.331Z
+Tool: mcp__playwright__browser_close
+Input:
+{}
+================================================================================
+
+================================================================================
+2025-10-26T00:48:41.786Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Fix the dialog overflow issue - content should scroll within the dialog",
+      "status": "in_progress",
+      "activeForm": "Fixing the dialog overflow issue - content should scroll within the dialog"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:48:51.584Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-edit-dialog.tsx",
+  "offset": 144,
+  "limit": 70
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:00.472Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-edit-dialog.tsx",
+  "old_string": "        <DialogContent className={'max-h-[90vh] sm:max-w-[700px]'} testId={dialogTestId}>\n          <form\n            data-testid={formTestId}\n            onSubmit={(e) => {\n              e.preventDefault();\n              e.stopPropagation();\n              void form.handleSubmit();\n            }}\n          >",
+  "new_string": "        <DialogContent className={'flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[700px]'} testId={dialogTestId}>\n          <form\n            className={'flex min-h-0 flex-1 flex-col'}\n            data-testid={formTestId}\n            onSubmit={(e) => {\n              e.preventDefault();\n              e.stopPropagation();\n              void form.handleSubmit();\n            }}\n          >"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:07.630Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-edit-dialog.tsx",
+  "old_string": "            {/* Form Fields - Scrollable */}\n            <ScrollArea className={'max-h-[calc(90vh-200px)] pr-4'}>\n              <div className={'space-y-6 py-4'}>",
+  "new_string": "            {/* Form Fields - Scrollable */}\n            <ScrollArea className={'min-h-0 flex-1 pr-4'}>\n              <div className={'space-y-6 py-4'}>"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:15.087Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Fix the dialog overflow issue - content should scroll within the dialog",
+      "status": "completed",
+      "activeForm": "Fixing the dialog overflow issue - content should scroll within the dialog"
+    },
+    {
+      "content": "Test the scrolling fix with Playwright",
+      "status": "in_progress",
+      "activeForm": "Testing the scrolling fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:20.360Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/bobbleheads/68e44e9f-340b-4e13-ae28-f591ccc24069"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:29.858Z
+Tool: mcp__playwright__browser_wait_for
+Input:
+{
+  "time": 2
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:37.634Z
+Tool: mcp__playwright__browser_click
+Input:
+{
+  "element": "Edit button",
+  "ref": "e331"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:45.776Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "edit-dialog-scrolling-fixed.png",
+  "fullPage": false
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:49:53.364Z
+Tool: mcp__playwright__browser_evaluate
+Input:
+{
+  "function": "() => {\n  const scrollArea = document.querySelector('[role=\"dialog\"] [data-radix-scroll-area-viewport]');\n  if (scrollArea) {\n    scrollArea.scrollTop = 400;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:50:00.318Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "edit-dialog-scrolled.png",
+  "fullPage": false
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:50:08.809Z
+Tool: mcp__playwright__browser_evaluate
+Input:
+{
+  "function": "() => {\n  const scrollArea = document.querySelector('[role=\"dialog\"] [data-radix-scroll-area-viewport]');\n  if (scrollArea) {\n    scrollArea.scrollTop = 2000;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:50:19.690Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "edit-dialog-bottom.png",
+  "fullPage": false
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:50:28.727Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Fix the dialog overflow issue - content should scroll within the dialog",
+      "status": "completed",
+      "activeForm": "Fixing the dialog overflow issue - content should scroll within the dialog"
+    },
+    {
+      "content": "Test the scrolling fix with Playwright",
+      "status": "completed",
+      "activeForm": "Testing the scrolling fix with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:50:35.362Z
+Tool: mcp__playwright__browser_close
+Input:
+{}
+================================================================================
+
+================================================================================
+2025-10-26T00:52:08.152Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add visible scrollbar to the dialog form",
+      "status": "in_progress",
+      "activeForm": "Adding visible scrollbar to the dialog form"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:52:14.628Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/scroll-area.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:52:20.998Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\scroll-area.tsx"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:52:34.666Z
+Tool: Grep
+Input:
+{
+  "pattern": "ScrollArea className",
+  "output_mode": "content",
+  "-n": true,
+  "head_limit": 20
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:52:47.664Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-edit-dialog.tsx",
+  "old_string": "            {/* Form Fields - Scrollable */}\n            <ScrollArea className={'min-h-0 flex-1 pr-4'}>\n              <div className={'space-y-6 py-4'}>",
+  "new_string": "            {/* Form Fields - Scrollable */}\n            <ScrollArea className={'h-full min-h-0 flex-1 pr-4'}>\n              <div className={'space-y-6 py-4'}>"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:52:55.968Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add visible scrollbar to the dialog form",
+      "status": "completed",
+      "activeForm": "Adding visible scrollbar to the dialog form"
+    },
+    {
+      "content": "Test the scrollbar visibility with Playwright",
+      "status": "in_progress",
+      "activeForm": "Testing the scrollbar visibility with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:53:02.917Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/bobbleheads/68e44e9f-340b-4e13-ae28-f591ccc24069"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:53:15.502Z
+Tool: mcp__playwright__browser_click
+Input:
+{
+  "element": "Edit button",
+  "ref": "e72"
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:53:25.033Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "edit-dialog-with-scrollbar.png",
+  "fullPage": false
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:53:34.677Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add visible scrollbar to the dialog form",
+      "status": "completed",
+      "activeForm": "Adding visible scrollbar to the dialog form"
+    },
+    {
+      "content": "Test the scrollbar visibility with Playwright",
+      "status": "completed",
+      "activeForm": "Testing the scrollbar visibility with Playwright"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T00:53:42.696Z
+Tool: mcp__playwright__browser_close
+Input:
+{}
+================================================================================
