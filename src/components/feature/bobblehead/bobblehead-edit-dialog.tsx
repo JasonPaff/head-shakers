@@ -28,7 +28,6 @@ import {
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { DEFAULTS } from '@/lib/constants';
@@ -150,61 +149,65 @@ export const BobbleheadEditDialog = withFocusManagement(
         open={isOpen}
       >
         <DialogContent
-          className={'flex max-h-[90vh] flex-col overflow-hidden sm:max-w-[700px]'}
+          className={'flex max-h-[90vh] !grid-cols-1 flex-col overflow-hidden sm:max-w-[700px]'}
           testId={dialogTestId}
         >
-          <form
-            className={'flex min-h-0 flex-1 flex-col'}
-            data-testid={formTestId}
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void form.handleSubmit();
-            }}
-          >
-            {/* Header */}
-            <DialogHeader>
-              <DialogTitle>Edit Bobblehead Details</DialogTitle>
-              <DialogDescription>
-                Update the details of your bobblehead below. Add photos, update information, and manage tags.
-              </DialogDescription>
-            </DialogHeader>
+          {/* Header */}
+          <DialogHeader className={'shrink-0'}>
+            <DialogTitle>Edit Bobblehead Details</DialogTitle>
+            <DialogDescription>
+              Update the details of your bobblehead below. Add photos, update information, and manage tags.
+            </DialogDescription>
+          </DialogHeader>
 
-            {/* Form Fields - Scrollable */}
-            <ScrollArea className={'h-full min-h-0 flex-1 pr-4'}>
-              <div className={'space-y-6 py-4'}>
-                {/*
-                  Note: Form sections are typed for addItemFormOptions but work with updateBobbleheadWithPhotosSchema
-                  because both schemas have compatible field structures. Using 'as never' to bypass the type check
-                  since the forms are structurally compatible at runtime.
-                */}
-                <BasicInformation form={form as never} />
-                <CollectionAssignment collections={collections} form={form as never} />
-                <ItemPhotos form={form as never} />
-                <PhysicalAttributes form={form as never} />
-                <AcquisitionDetails form={form as never} />
-                <ItemTags form={form as never} />
-                <CustomFields form={form as never} />
-                <ItemSettings form={form as never} />
-              </div>
-            </ScrollArea>
+          {/* Form Fields - Scrollable */}
+          <div className={'min-h-0 flex-1 overflow-y-auto pr-4'}>
+            <form
+              className={'space-y-6 py-4'}
+              data-testid={formTestId}
+              id={'edit-bobblehead-form'}
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                void form.handleSubmit();
+              }}
+            >
+              {/*
+                Note: Form sections are typed for addItemFormOptions but work with updateBobbleheadWithPhotosSchema
+                because both schemas have compatible field structures. Using 'as never' to bypass the type check
+                since the forms are structurally compatible at runtime.
+              */}
+              <BasicInformation form={form as never} />
+              <CollectionAssignment collections={collections} form={form as never} />
+              <ItemPhotos form={form as never} />
+              <PhysicalAttributes form={form as never} />
+              <AcquisitionDetails form={form as never} />
+              <ItemTags form={form as never} />
+              <CustomFields form={form as never} />
+              <ItemSettings form={form as never} />
+            </form>
+          </div>
 
-            {/* Action Buttons */}
-            <DialogFooter>
-              <Button
-                disabled={isExecuting}
-                onClick={handleClose}
-                testId={cancelButtonTestId}
-                type={'button'}
-                variant={'outline'}
-              >
-                Cancel
-              </Button>
-              <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>
-                {isExecuting ? 'Updating...' : 'Update Bobblehead'}
-              </Button>
-            </DialogFooter>
-          </form>
+          {/* Action Buttons */}
+          <DialogFooter className={'shrink-0'}>
+            <Button
+              disabled={isExecuting}
+              onClick={handleClose}
+              testId={cancelButtonTestId}
+              type={'button'}
+              variant={'outline'}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isExecuting}
+              form={'edit-bobblehead-form'}
+              testId={submitButtonTestId}
+              type={'submit'}
+            >
+              {isExecuting ? 'Updating...' : 'Update Bobblehead'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     );
