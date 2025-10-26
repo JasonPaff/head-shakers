@@ -3,8 +3,10 @@
 import type { z } from 'zod';
 
 import { revalidateLogic } from '@tanstack/form-core';
+import { useRouter } from 'next/navigation';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { AcquisitionDetails } from '@/app/(app)/bobbleheads/add/components/acquisition-details';
 import { BasicInformation } from '@/app/(app)/bobbleheads/add/components/basic-information';
@@ -30,9 +32,10 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { DEFAULTS } from '@/lib/constants';
+import { generateTestId } from '@/lib/test-ids';
 import { updateBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
-interface BobbleheadEditDialogProps {
+interface BobbleheadEditDialogProps extends ComponentTestIdProps {
   bobblehead: BobbleheadForEdit;
   collections: Array<ComboboxItem>;
   isOpen: boolean;
@@ -67,18 +70,25 @@ interface BobbleheadForEdit {
 }
 
 export const BobbleheadEditDialog = withFocusManagement(
-  ({ bobblehead, collections, isOpen, onClose, onSuccess }: BobbleheadEditDialogProps) => {
+  ({ bobblehead, collections, isOpen, onClose, onSuccess, testId }: BobbleheadEditDialogProps) => {
+    const dialogTestId = testId || generateTestId('feature', 'bobblehead-edit-dialog');
+    const formTestId = generateTestId('feature', 'bobblehead-edit-form');
+    const cancelButtonTestId = generateTestId('feature', 'bobblehead-edit-cancel');
+    const submitButtonTestId = generateTestId('feature', 'bobblehead-edit-submit');
+
+    const router = useRouter();
     const { focusFirstError } = useFocusContext();
 
     const { executeAsync, isExecuting } = useServerAction(updateBobbleheadWithPhotosAction, {
       onAfterSuccess: () => {
+        router.refresh();
         handleClose();
         onSuccess?.();
       },
       toastMessages: {
         error: 'Failed to update bobblehead. Please try again.',
         loading: 'Updating bobblehead...',
-        success: 'Bobblehead updated successfully! 🎉',
+        success: 'Bobblehead updated successfully!',
       },
     });
 
@@ -118,7 +128,7 @@ export const BobbleheadEditDialog = withFocusManagement(
         focusFirstError(formApi);
       },
       validationLogic: revalidateLogic({
-        mode: 'blur',
+        mode: 'submit',
         modeAfterSubmission: 'change',
       }),
       validators: {
@@ -139,8 +149,9 @@ export const BobbleheadEditDialog = withFocusManagement(
         }}
         open={isOpen}
       >
-        <DialogContent className={'max-h-[90vh] sm:max-w-[700px]'}>
+        <DialogContent className={'max-h-[90vh] sm:max-w-[700px]'} testId={dialogTestId}>
           <form
+            data-testid={formTestId}
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -158,38 +169,34 @@ export const BobbleheadEditDialog = withFocusManagement(
             {/* Form Fields - Scrollable */}
             <ScrollArea className={'max-h-[calc(90vh-200px)] pr-4'}>
               <div className={'space-y-6 py-4'}>
-                {/* Basic Information */}
+                {/*
+                  Note: Form sections are typed for addItemFormOptions but work with updateBobbleheadWithPhotosSchema
+                  because both schemas have compatible field structures. Using 'as never' to bypass the type check
+                  since the forms are structurally compatible at runtime.
+                */}
                 <BasicInformation form={form as never} />
-
-                {/* Collection Assignment */}
                 <CollectionAssignment collections={collections} form={form as never} />
-
-                {/* Photos */}
                 <ItemPhotos form={form as never} />
-
-                {/* Physical Attributes */}
                 <PhysicalAttributes form={form as never} />
-
-                {/* Acquisition Details */}
                 <AcquisitionDetails form={form as never} />
-
-                {/* Tags */}
                 <ItemTags form={form as never} />
-
-                {/* Custom Fields */}
                 <CustomFields form={form as never} />
-
-                {/* Settings */}
                 <ItemSettings form={form as never} />
               </div>
             </ScrollArea>
 
             {/* Action Buttons */}
             <DialogFooter>
-              <Button disabled={isExecuting} onClick={handleClose} type={'button'} variant={'outline'}>
+              <Button
+                disabled={isExecuting}
+                onClick={handleClose}
+                testId={cancelButtonTestId}
+                type={'button'}
+                variant={'outline'}
+              >
                 Cancel
               </Button>
-              <Button disabled={isExecuting} type={'submit'}>
+              <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>
                 {isExecuting ? 'Updating...' : 'Update Bobblehead'}
               </Button>
             </DialogFooter>

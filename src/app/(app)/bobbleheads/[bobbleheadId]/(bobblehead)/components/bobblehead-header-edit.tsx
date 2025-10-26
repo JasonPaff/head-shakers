@@ -1,6 +1,7 @@
 'use client';
 
 import { EditIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
@@ -16,9 +17,12 @@ interface BobbleheadHeaderEditProps {
 }
 
 export const BobbleheadHeaderEdit = ({ bobblehead, collections }: BobbleheadHeaderEditProps) => {
+  const router = useRouter();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
-  const handleEditSuccess = () => {};
+  const handleEditSuccess = () => {
+    router.refresh();
+  };
 
   return (
     <Fragment>
