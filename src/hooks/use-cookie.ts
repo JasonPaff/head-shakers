@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import type { CookieKey, CookieValue } from '@/constants/cookies';
 
@@ -23,12 +23,12 @@ export function useCookie<T extends CookieKey>(key: T) {
   }, [key]);
 
   // sync with the actual cookie value on mount (handles SSR hydration)
-  useEffect(() => {
+  const [prevKey, setPrevKey] = useState(key);
+  if (prevKey !== key) {
+    setPrevKey(key);
     const currentValue = CookieService.get(key);
-    if (currentValue !== value) {
-      setValue(currentValue);
-    }
-  }, [key, value]);
+    if (currentValue !== value) setValue(currentValue);
+  }
 
   return {
     deleteCookie,

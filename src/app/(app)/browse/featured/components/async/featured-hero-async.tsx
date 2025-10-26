@@ -10,6 +10,48 @@ export interface FeaturedHeroAsyncProps {
 }
 
 export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }: FeaturedHeroAsyncProps) {
+  let transformedData: {
+    collection_of_week: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+    homepage_banner: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+  } = {
+    collection_of_week: [],
+    homepage_banner: [],
+  };
+
   try {
     const [homepageBanner, collectionOfWeek] = await Promise.all([
       FeaturedContentFacade.getHomepageBanner(),
@@ -69,21 +111,20 @@ export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }:
       };
     };
 
-    const transformedData = {
+    transformedData = {
       collection_of_week: collectionOfWeek.map(transformContentWithLikeData),
       homepage_banner: homepageBanner.map(transformContentWithLikeData),
     };
-
-    return (
-      <FeaturedHeroDisplay
-        heroData={transformedData}
-        onViewContent={isTrackViews ? incrementViewCountAction : undefined}
-      />
-    );
   } catch (error) {
     console.error('Failed to fetch hero content:', error);
-    return <FeaturedHeroDisplay heroData={{ collection_of_week: [], homepage_banner: [] }} />;
   }
+
+  return (
+    <FeaturedHeroDisplay
+      heroData={transformedData}
+      onViewContent={isTrackViews ? incrementViewCountAction : undefined}
+    />
+  );
 }
 
 async function incrementViewCountAction(contentId: string) {

@@ -20,6 +20,8 @@ export async function ViewCountAsync({
   targetId,
   targetType,
 }: ViewCountAsyncProps) {
+  let formattedCount = '--';
+
   try {
     const currentUserId = (await getOptionalUserId()) || undefined;
 
@@ -30,10 +32,10 @@ export async function ViewCountAsync({
       currentUserId,
     );
 
-    const formattedCount = viewCount.toLocaleString();
-    return <span>{isShowingLabel ? `${formattedCount} views` : formattedCount}</span>;
+    formattedCount = viewCount.toLocaleString();
   } catch (error) {
     console.warn('Failed to fetch view count:', error);
-    return <span>{isShowingLabel ? '-- views' : '--'}</span>;
   }
+
+  return <span>{isShowingLabel ? `${formattedCount} views` : formattedCount}</span>;
 }

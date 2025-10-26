@@ -13,6 +13,48 @@ export async function FeaturedTabbedContentAsync({
   currentUserId,
   isTrackViews = false,
 }: FeaturedTabbedContentAsyncProps) {
+  let transformedData: {
+    editor_pick: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+    trending: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+  } = {
+    editor_pick: [],
+    trending: [],
+  };
+
   try {
     const [editorPicks, trending] = await Promise.all([
       FeaturedContentFacade.getEditorPicks(),
@@ -72,21 +114,20 @@ export async function FeaturedTabbedContentAsync({
       };
     };
 
-    const transformedData = {
+    transformedData = {
       editor_pick: editorPicks.map(transformContentWithLikeData),
       trending: trending.map(transformContentWithLikeData),
     };
-
-    return (
-      <FeaturedTabbedContentDisplay
-        onViewContent={isTrackViews ? incrementViewCountAction : undefined}
-        tabbedData={transformedData}
-      />
-    );
   } catch (error) {
     console.error('Failed to fetch tabbed content:', error);
-    return <FeaturedTabbedContentDisplay tabbedData={{ editor_pick: [], trending: [] }} />;
   }
+
+  return (
+    <FeaturedTabbedContentDisplay
+      onViewContent={isTrackViews ? incrementViewCountAction : undefined}
+      tabbedData={transformedData}
+    />
+  );
 }
 
 async function incrementViewCountAction(contentId: string) {

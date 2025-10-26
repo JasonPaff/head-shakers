@@ -90,7 +90,9 @@ export const Carousel = ({
 
   useEffect(() => {
     if (!api) return;
-    handleSelect(api);
+
+    queueMicrotask(() => handleSelect(api));
+
     api.on('reInit', handleSelect);
     api.on('select', handleSelect);
 
@@ -185,7 +187,7 @@ export const CarouselNext = ({
       variant={variant}
       {...props}
     >
-      <ArrowRight />
+      <ArrowRight aria-hidden />
       <span className={'sr-only'}>Next slide</span>
     </Button>
   );
@@ -217,7 +219,7 @@ export const CarouselPrevious = ({
       variant={variant}
       {...props}
     >
-      <ArrowLeft />
+      <ArrowLeft aria-hidden />
       <span className={'sr-only'}>Previous slide</span>
     </Button>
   );

@@ -10,6 +10,86 @@ export interface FeaturedContentServerProps {
 }
 
 export async function FeaturedContentServer({ isTrackViews = false }: FeaturedContentServerProps) {
+  let featuredContentData: {
+    collection_of_week: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+    editor_pick: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+    homepage_banner: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+    trending: Array<{
+      comments: number;
+      contentId: string;
+      contentType: 'bobblehead' | 'collection' | 'user';
+      description: string;
+      endDate: null | string;
+      id: string;
+      imageUrl: null | string;
+      isLiked: boolean;
+      likeId: null | string;
+      likes: number;
+      owner: string;
+      ownerDisplayName: string;
+      priority: number;
+      startDate: string;
+      title: string;
+      viewCount: number;
+    }>;
+  } = {
+    collection_of_week: [],
+    editor_pick: [],
+    homepage_banner: [],
+    trending: [],
+  };
+
   try {
     console.log('FeaturedContentServer: Fetching featured content data');
 
@@ -86,32 +166,22 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     };
 
     // transform data to match the expected format
-    const featuredContentData = {
+    featuredContentData = {
       collection_of_week: collectionOfWeek.map(transformContentWithLikeData),
       editor_pick: editorPicks.map(transformContentWithLikeData),
       homepage_banner: homepageBanner.map(transformContentWithLikeData),
       trending: trending.map(transformContentWithLikeData),
     };
-
-    return (
-      <FeaturedContentDisplay
-        featuredContentData={featuredContentData}
-        onViewContent={isTrackViews ? incrementViewCountAction : undefined}
-      />
-    );
   } catch (error) {
     console.error('Failed to fetch featured content:', error);
-
-    // fallback to empty data structure
-    const emptyData = {
-      collection_of_week: [],
-      editor_pick: [],
-      homepage_banner: [],
-      trending: [],
-    };
-
-    return <FeaturedContentDisplay featuredContentData={emptyData} />;
   }
+
+  return (
+    <FeaturedContentDisplay
+      featuredContentData={featuredContentData}
+      onViewContent={isTrackViews ? incrementViewCountAction : undefined}
+    />
+  );
 }
 
 async function incrementViewCountAction(contentId: string) {

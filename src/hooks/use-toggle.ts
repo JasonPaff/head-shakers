@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 export type UseToggle = {
   off: () => void;
@@ -16,9 +16,12 @@ const isFunction = (value: unknown) => typeof value === 'function';
 
 export const useToggle = (isInitialToggled = false, onChange?: UseToggleOnChange) => {
   const [state, setState] = useState(isInitialToggled);
+
   const onChangeRef = useRef(onChange);
 
-  onChangeRef.current = onChange;
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   const update: UseToggleUpdate = useCallback((value) => {
     setState((currentState) => {

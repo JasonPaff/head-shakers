@@ -1,9 +1,9 @@
 import type { VariantProps } from 'class-variance-authority';
+import type { LucideIcon } from 'lucide-react';
 import type { ComponentProps } from 'react';
 
 import { cva } from 'class-variance-authority';
 import { CircleAlertIcon, CircleCheckIcon, InfoIcon, TriangleAlertIcon } from 'lucide-react';
-import { useMemo } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -22,25 +22,17 @@ const style = cva('me-3 -mt-0.5 inline-flex size-5', {
   },
 });
 
-const getIcon = (variant: VariantProps<typeof style>['variant']) => {
-  switch (variant) {
-    case 'error':
-      return CircleAlertIcon;
-    case 'info':
-      return InfoIcon;
-    case 'success':
-      return CircleCheckIcon;
-    case 'warning':
-      return TriangleAlertIcon;
-    default:
-      return TriangleAlertIcon;
-  }
+const VARIANT_ICONS: Record<string, LucideIcon> = {
+  error: CircleAlertIcon,
+  info: InfoIcon,
+  success: CircleCheckIcon,
+  warning: TriangleAlertIcon,
 };
 
 type AlertProps = ComponentProps<'div'> & ComponentTestIdProps & VariantProps<typeof style>;
 
 export const Alert = ({ children, className, testId, variant, ...props }: AlertProps) => {
-  const Icon = useMemo(() => getIcon(variant), [variant]);
+  const Icon = VARIANT_ICONS[variant || 'info'] ?? TriangleAlertIcon;
   const alertTestId = testId || generateTestId('ui', 'alert');
 
   return (

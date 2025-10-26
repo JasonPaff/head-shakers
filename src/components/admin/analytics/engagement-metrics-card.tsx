@@ -1,5 +1,7 @@
 'use client';
 
+import type { LucideIcon } from 'lucide-react';
+
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -22,6 +24,13 @@ interface EngagementMetricsCardProps {
   title: string;
   value: number;
 }
+
+const METRIC_ICONS: Record<string, LucideIcon> = {
+  'avg view duration': ClockIcon,
+  'bounce rate': CalendarIcon,
+  'total views': BarChart3Icon,
+  'unique viewers': TrendingUpIcon,
+};
 
 export const EngagementMetricsCard = ({
   change,
@@ -53,32 +62,12 @@ export const EngagementMetricsCard = ({
     }
   };
 
-  const getIcon = () => {
-    switch (title.toLowerCase()) {
-      case 'avg view duration':
-        return ClockIcon;
-      case 'bounce rate':
-        return CalendarIcon;
-      case 'total views':
-        return BarChart3Icon;
-      case 'unique viewers':
-        return TrendingUpIcon;
-      default:
-        return BarChart3Icon;
-    }
-  };
-
   const getChangeColor = () => {
     const isPositiveChange = change > 0;
     const isGoodChange = isInverseGood ? !isPositiveChange : isPositiveChange;
 
     if (change === 0) return 'text-muted-foreground';
     return isGoodChange ? 'text-green-600' : 'text-red-600';
-  };
-
-  const getChangeIcon = () => {
-    if (change === 0) return null;
-    return change > 0 ? ArrowUpIcon : ArrowDownIcon;
   };
 
   const getTimeRangeText = () => {
@@ -98,23 +87,24 @@ export const EngagementMetricsCard = ({
     }
   };
 
-  const IconComponent = getIcon();
-  const ChangeIcon = getChangeIcon();
+  const Icon = METRIC_ICONS[title.toLowerCase()] ?? BarChart3Icon;
 
   return (
     <Card className={className}>
       <CardHeader className={'flex flex-row items-center justify-between space-y-0 pb-2'}>
         <CardTitle className={'text-sm font-medium text-muted-foreground'}>{title}</CardTitle>
-        <IconComponent aria-hidden className={'size-4 text-muted-foreground'} />
+        <Icon aria-hidden className={'size-4 text-muted-foreground'} />
       </CardHeader>
       <CardContent>
         <div className={'space-y-1'}>
           <div className={'text-2xl font-bold tracking-tight'}>{formatValue(value, format)}</div>
 
           <div className={'flex items-center text-xs'}>
-            <Conditional isCondition={!!ChangeIcon}>
+            <Conditional isCondition={change !== 0}>
               <div className={cn('flex items-center gap-1', getChangeColor())}>
-                {ChangeIcon && <ChangeIcon aria-hidden className={'size-3'} />}
+                {change > 0 ?
+                  <ArrowUpIcon aria-hidden className={'size-3'} />
+                : <ArrowDownIcon aria-hidden className={'size-3'} />}
                 <span className={'font-medium'}>{Math.abs(change).toFixed(1)}%</span>
               </div>
             </Conditional>

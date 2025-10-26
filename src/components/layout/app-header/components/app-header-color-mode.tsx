@@ -2,7 +2,7 @@
 
 import { MoonIcon, SunIcon } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -13,14 +13,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToggle } from '@/hooks/use-toggle';
 
 export const AppHeaderColorMode = () => {
   const { resolvedTheme, setTheme } = useTheme();
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useToggle();
 
   useEffect(() => {
-    setIsMounted(true);
-  }, []);
+    queueMicrotask(setIsMounted.on);
+  }, [setIsMounted]);
 
   const handleDarkMode = () => {
     setTheme('dark');
@@ -36,9 +37,8 @@ export const AppHeaderColorMode = () => {
 
   const _isDarkMode = isMounted && resolvedTheme === 'dark';
 
-  // Prevent hydration mismatch by showing skeleton until mounted
   if (!isMounted) {
-    return <Skeleton className={'h-9 w-9 rounded-md'} />;
+    return <Skeleton className={'size-9 rounded-md'} />;
   }
 
   return (

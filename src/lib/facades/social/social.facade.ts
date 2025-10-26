@@ -130,7 +130,7 @@ export class SocialFacade {
 
       // get like count and user status in parallel
       const [likeCount, userStatus] = await Promise.all([
-        await SocialFacade.getLikeCount(targetId, targetType, dbInstance),
+        SocialFacade.getLikeCount(targetId, targetType, dbInstance),
         viewerUserId ?
           SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
         : Promise.resolve({ isLiked: false, likeId: null, targetId, targetType } as UserLikeStatus),

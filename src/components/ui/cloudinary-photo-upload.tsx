@@ -298,7 +298,7 @@ export const CloudinaryPhotoUpload = ({
             showPoweredBy: false,
             showSkipCropButton: true,
             sources: ['local', 'camera', 'url'],
-            tags: ['bobblehead', userId ?? 'unknown', Date.now().toString()],
+            tags: ['bobblehead', userId ?? 'unknown', `upload-${crypto.randomUUID()}`],
           }}
           signatureEndpoint={'/api/upload/sign'}
         >

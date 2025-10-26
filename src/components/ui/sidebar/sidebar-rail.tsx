@@ -3,13 +3,12 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { cva } from 'class-variance-authority';
-import { useMemo } from 'react';
+import { useEffect } from 'react';
 
 import type { Button } from '@/components/ui/button';
 
 import { useSidebar } from '@/components/ui/sidebar/sidebar-provider/use-sidebar';
 import { useSidebarResize } from '@/components/ui/sidebar/use-sidebar-resize';
-import { mergeButtonRefs } from '@/utils/ref-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 const sidebarRailVariants = cva([
@@ -43,9 +42,13 @@ export const SidebarRail = ({ children, className, isDragEnabled, ref, ...props 
     setIsDraggingRail,
   });
 
-  const combinedRef = useMemo(() => {
-    if (!ref) return dragRef;
-    return mergeButtonRefs([ref, dragRef]);
+  // sync the forwarded ref with dragRef in an effect
+  useEffect(() => {
+    if (!dragRef.current) return;
+
+    // set the forwarded ref
+    if (typeof ref === 'function') ref(dragRef.current);
+    else if (ref) ref.current = dragRef.current;
   }, [ref, dragRef]);
 
   return (
@@ -57,7 +60,7 @@ export const SidebarRail = ({ children, className, isDragEnabled, ref, ...props 
       onMouseDown={(e) => {
         handleMouseDown(e);
       }}
-      ref={combinedRef}
+      ref={dragRef}
       tabIndex={-1}
       title={'Toggle Sidebar'}
       {...props}

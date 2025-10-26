@@ -2,7 +2,7 @@
 
 import type { ComponentPropsWithRef, CSSProperties } from 'react';
 
-import { useMemo } from 'react';
+import { useState } from 'react';
 
 import { Conditional } from '@/components/ui/conditional';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -17,9 +17,7 @@ export const SidebarMenuSkeleton = ({
   isShowIcon = false,
   ...props
 }: SidebarMenuSkeletonProps) => {
-  const width = useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`;
-  }, []);
+  const [width] = useState(() => `${Math.floor(Math.random() * 40) + 50}%`);
 
   return (
     <div

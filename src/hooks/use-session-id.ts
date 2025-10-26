@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { getOrCreateSessionId } from '@/utils/session-utils';
 
@@ -10,16 +10,13 @@ import { getOrCreateSessionId } from '@/utils/session-utils';
  * @returns The effective session ID (provided or internally generated)
  */
 export function useSessionId(providedSessionId?: string): null | string {
-  const [sessionId, setSessionId] = useState<null | string>(null);
-
-  useEffect(() => {
+  const [sessionId] = useState<null | string>(() => {
     // only generate on the client-side to avoid SSR issues
     if (typeof window !== 'undefined' && !providedSessionId) {
-      setSessionId(getOrCreateSessionId());
-    } else {
-      setSessionId(`fallback_${Date.now()}`);
+      return getOrCreateSessionId();
     }
-  }, [providedSessionId]);
+    return null;
+  });
 
   return providedSessionId || sessionId;
 }

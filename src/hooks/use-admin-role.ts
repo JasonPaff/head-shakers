@@ -1,7 +1,6 @@
 'use client';
 
 import { useUser } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
 
 export interface AdminRoleInfo {
   isAdmin: boolean;
@@ -18,36 +17,31 @@ type Role = 'admin' | 'moderator' | 'user' | null;
 export const useAdminRole = (): AdminRoleInfo => {
   const { isLoaded, user } = useUser();
 
-  const [roleInfo, setRoleInfo] = useState<AdminRoleInfo>({
-    isAdmin: false,
-    isLoading: true,
-    isModerator: false,
-    role: null,
-  });
+  if (!isLoaded) {
+    return {
+      isAdmin: false,
+      isLoading: true,
+      isModerator: false,
+      role: null,
+    };
+  }
 
-  useEffect(() => {
-    if (!isLoaded) return;
-
-    if (!user) {
-      setRoleInfo({
-        isAdmin: false,
-        isLoading: false,
-        isModerator: false,
-        role: null,
-      });
-      return;
-    }
-
-    // check user's public metadata for role information
-    const role = user.publicMetadata?.role as Role;
-
-    setRoleInfo({
-      isAdmin: role === 'admin',
+  if (!user) {
+    return {
+      isAdmin: false,
       isLoading: false,
-      isModerator: role === 'moderator',
-      role: role || 'user',
-    });
-  }, [user, isLoaded]);
+      isModerator: false,
+      role: null,
+    };
+  }
 
-  return roleInfo;
+  // check user's public metadata for role information
+  const role = user.publicMetadata?.role as Role;
+
+  return {
+    isAdmin: role === 'admin',
+    isLoading: false,
+    isModerator: role === 'moderator',
+    role: role || 'user',
+  };
 };
