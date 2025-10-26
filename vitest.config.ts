@@ -13,11 +13,11 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: true, // for database tests
-      },
-    },
+    // poolOptions: {
+    //   threads: {
+    //     singleThread: true, // for database tests
+    //   },
+    // },
     // Exclude E2E tests from Vitest - these should be run with Playwright
     exclude: [
       '**/node_modules/**',

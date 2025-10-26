@@ -9,6 +9,8 @@ interface AnalyticsDashboardAsyncProps {
   timeRange?: 'day' | 'month' | 'week';
 }
 
+const randomInt = Math.random() * 50;
+
 export const AnalyticsDashboardAsync = async ({
   isIncludeAnonymous = true,
   targetType,
@@ -49,7 +51,7 @@ export const AnalyticsDashboardAsync = async ({
       title: `Bobblehead ${item.targetId}`, // this would be replaced with actual titles from content lookup
       totalViews: item.totalViews,
       trendDirection: 'up' as const, // this would be calculated based on recent vs. historical data
-      trendPercentage: Math.random() * 50, // mock percentage - would be calculated from real data
+      trendPercentage: randomInt, // mock percentage - would be calculated from real data
       uniqueViewers: item.uniqueViewers,
     })),
     ...trendingCollections.map((item) => ({
@@ -60,7 +62,7 @@ export const AnalyticsDashboardAsync = async ({
       title: `Collection ${item.targetId}`, // this would be replaced with actual titles from content lookup
       totalViews: item.totalViews,
       trendDirection: 'up' as const, // this would be calculated based on recent vs. historical data
-      trendPercentage: Math.random() * 50, // Mock percentage - would be calculated from real data
+      trendPercentage: randomInt, // Mock percentage - would be calculated from real data
       uniqueViewers: item.uniqueViewers,
     })),
     ...trendingProfiles.map((item) => ({
@@ -71,7 +73,7 @@ export const AnalyticsDashboardAsync = async ({
       title: `Profile ${item.targetId}`, // this would be replaced with actual profile names from user lookup
       totalViews: item.totalViews,
       trendDirection: 'up' as const, // this would be calculated based on recent vs historical data
-      trendPercentage: Math.random() * 50, // mock percentage - would be calculated from real data
+      trendPercentage: randomInt, // mock percentage - would be calculated from real data
       uniqueViewers: item.uniqueViewers,
     })),
   ];

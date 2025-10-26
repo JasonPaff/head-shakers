@@ -430,7 +430,7 @@ export class CacheRevalidationService {
 
       // revalidate each tag
       for (const tag of tags) {
-        revalidateTag(tag);
+        revalidateTag(tag, 'profile=max');
       }
 
       this.stats.successfulRevalidations++;
