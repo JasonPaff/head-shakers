@@ -3,13 +3,12 @@
 import {
   ActivityIcon,
   ChartSplineIcon,
-  HeartIcon,
   LayoutDashboardIcon,
+  PackageIcon,
   PackagePlusIcon,
   ShieldHalfIcon,
   SparklesIcon,
   TriangleAlertIcon,
-  UserIcon,
   UsersIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
@@ -61,27 +60,9 @@ const navigationLinks: Array<NavigationLink> = [
     label: 'Admin',
   },
   {
-    icon: UserIcon,
+    icon: PackageIcon,
     isAuthRequired: true,
     items: [
-      {
-        description: 'Activity updates from collectors you follow',
-        href: $path({ route: '/dashboard/feed' }),
-        icon: ActivityIcon,
-        title: 'My Feed',
-      },
-      {
-        description: 'Manage your following and followers',
-        href: $path({ route: '/dashboard/feed' }),
-        icon: UsersIcon,
-        title: 'Following',
-      },
-      {
-        description: 'Likes, comments, and social notifications',
-        href: $path({ route: '/dashboard/notifications' }),
-        icon: HeartIcon,
-        title: 'Notifications',
-      },
       {
         description: 'Overview of your collection and recent activity',
         href: $path({ route: '/dashboard/collection' }),
@@ -95,13 +76,13 @@ const navigationLinks: Array<NavigationLink> = [
         title: 'Add Bobblehead',
       },
       {
-        description: 'Your public collector profile and social presence',
-        href: $path({ route: '/settings/profile' }),
-        icon: UserIcon,
-        title: 'Profile',
+        description: 'Activity updates from collectors you follow',
+        href: $path({ route: '/dashboard/feed' }),
+        icon: ActivityIcon,
+        title: 'My Feed',
       },
     ],
-    label: 'My Hub',
+    label: 'My Collection',
   },
 ];
 

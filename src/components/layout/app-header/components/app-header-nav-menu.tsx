@@ -3,14 +3,11 @@
 import type { LucideIcon } from 'lucide-react';
 
 import {
-  CompassIcon,
   EarthIcon,
   GridIcon,
-  SearchIcon,
   StarIcon,
   TrendingUpIcon,
   TrophyIcon,
-  UsersIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
@@ -38,76 +35,34 @@ export interface NavigationLink {
 
 const navigationLinks: Array<NavigationLink> = [
   {
-    icon: CompassIcon,
-    items: [
-      {
-        description: 'Most popular bobbleheads and collections right now',
-        href: $path({ route: '/browse/trending' }),
-        icon: TrendingUpIcon,
-        title: 'Trending Now',
-      },
-      {
-        description: 'Curated collections and collector spotlights',
-        href: $path({ route: '/browse/featured' }),
-        icon: StarIcon,
-        title: 'Featured Collections',
-      },
-      {
-        description: 'Advanced search with detailed filters and options',
-        href: $path({ route: '/browse/search' }),
-        icon: SearchIcon,
-        title: 'Advanced Search',
-      },
-    ],
-    label: 'Discover',
-  },
-  {
     icon: GridIcon,
     items: [
       {
         description: 'Browse all public collections in the community',
         href: $path({ route: '/browse' }),
         icon: EarthIcon,
-        title: 'Browse All',
+        title: 'All Collections',
+      },
+      {
+        description: 'Curated collections and collector spotlights',
+        href: $path({ route: '/browse/featured' }),
+        icon: StarIcon,
+        title: 'Featured',
+      },
+      {
+        description: 'Most popular bobbleheads and collections right now',
+        href: $path({ route: '/browse/trending' }),
+        icon: TrendingUpIcon,
+        title: 'Trending',
       },
       {
         description: 'Browse by category - sports, entertainment, vintage and more',
         href: $path({ route: '/browse/categories' }),
         icon: TrophyIcon,
-        title: 'By Category',
-      },
-      {
-        description: 'Discover the most respected collectors in the community',
-        href: $path({ route: '/browse/featured' }),
-        icon: UsersIcon,
-        title: 'Top Collectors',
+        title: 'Categories',
       },
     ],
-    label: 'Collections',
-  },
-  {
-    icon: GridIcon,
-    items: [
-      {
-        description: 'Coming soon - additional features and tools',
-        href: $path({ route: '/browse' }),
-        icon: CompassIcon,
-        title: 'Feature One',
-      },
-      {
-        description: 'Coming soon - more collector utilities',
-        href: $path({ route: '/browse' }),
-        icon: StarIcon,
-        title: 'Feature Two',
-      },
-      {
-        description: 'Coming soon - enhanced platform tools',
-        href: $path({ route: '/browse' }),
-        icon: TrendingUpIcon,
-        title: 'Feature Three',
-      },
-    ],
-    label: 'More',
+    label: 'Browse',
   },
 ];
 
