@@ -1,15 +1,20 @@
+import * as Sentry from '@sentry/nextjs';
+
+import type { bobbleheadPhotos } from '@/lib/db/schema';
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type {
   DeleteBobblehead,
+  DeleteBobbleheadPhoto,
   InsertBobblehead,
   InsertBobbleheadPhoto,
+  ReorderBobbleheadPhotos,
   UpdateBobblehead,
 } from '@/lib/validations/bobbleheads.validation';
 
-import { OPERATIONS } from '@/lib/constants';
+import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import {
@@ -18,6 +23,7 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
@@ -88,20 +94,28 @@ export class BobbleheadsFacade {
           const failedDeletions = deletionResults.filter((result) => !result.success);
 
           if (successfulDeletions > 0) {
-            console.log(
-              `Successfully deleted ${successfulDeletions} photos from Cloudinary for bobblehead ${bobblehead.id}`,
-            );
+            Sentry.addBreadcrumb({
+              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+              data: { bobbleheadId: bobblehead.id, count: successfulDeletions },
+              level: SENTRY_LEVELS.INFO,
+              message: `Successfully deleted ${successfulDeletions} photos from Cloudinary`,
+            });
           }
 
           if (failedDeletions.length > 0) {
-            console.warn(
-              `Failed to delete ${failedDeletions.length} photos from Cloudinary for bobblehead ${bobblehead.id}:`,
-              failedDeletions,
-            );
+            Sentry.addBreadcrumb({
+              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+              data: { bobbleheadId: bobblehead.id, count: failedDeletions.length, failures: failedDeletions },
+              level: SENTRY_LEVELS.WARNING,
+              message: `Failed to delete ${failedDeletions.length} photos from Cloudinary`,
+            });
           }
         } catch (error) {
           // don't fail the entire operation if Cloudinary cleanup fails
-          console.error(`Cloudinary cleanup failed for bobblehead ${bobblehead.id}:`, error);
+          Sentry.captureException(error, {
+            extra: { bobbleheadId: bobblehead.id, operation: 'cloudinary-cleanup' },
+            level: 'warning',
+          });
         }
       }
 
@@ -109,7 +123,12 @@ export class BobbleheadsFacade {
       const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobblehead(bobblehead.id, userId);
 
       if (!wasTagRemovalSuccessful) {
-        console.warn(`Failed to remove tags from bobblehead ${bobblehead.id} during deletion`);
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: { bobbleheadId: bobblehead.id },
+          level: SENTRY_LEVELS.WARNING,
+          message: 'Failed to remove tags during bobblehead deletion',
+        });
       }
 
       return bobblehead;
@@ -119,6 +138,61 @@ export class BobbleheadsFacade {
         facade: facadeName,
         method: 'deleteAsync',
         operation: OPERATIONS.BOBBLEHEADS.DELETE,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * delete a photo from database and Cloudinary
+   */
+  static async deletePhotoAsync(
+    data: DeleteBobbleheadPhoto,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      // delete from database first
+      const deletedPhoto = await BobbleheadsQuery.deletePhotoAsync(data, userId, context);
+
+      if (!deletedPhoto) {
+        return null;
+      }
+
+      // attempt to clean up photo from Cloudinary (non-blocking)
+      try {
+        const deletionResults = await CloudinaryService.deletePhotosByUrls([deletedPhoto.url]);
+        const failedDeletions = deletionResults.filter((result) => !result.success);
+
+        if (failedDeletions.length > 0) {
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { failures: failedDeletions, photoId: deletedPhoto.id },
+            level: SENTRY_LEVELS.WARNING,
+            message: 'Failed to delete photo from Cloudinary',
+          });
+        }
+      } catch (error) {
+        // don't fail the entire operation if Cloudinary cleanup fails
+        Sentry.captureException(error, {
+          extra: { operation: 'cloudinary-cleanup', photoId: deletedPhoto.id },
+          level: 'warning',
+        });
+      }
+
+      // invalidate caches
+      CacheRevalidationService.bobbleheads.onPhotoChange(data.bobbleheadId, userId, 'delete');
+
+      return deletedPhoto;
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId: data.bobbleheadId, photoId: data.photoId },
+        facade: facadeName,
+        method: 'deletePhotoAsync',
+        operation: OPERATIONS.BOBBLEHEADS.DELETE_PHOTO,
         userId,
       };
       throw createFacadeError(context, error);
@@ -473,6 +547,36 @@ export class BobbleheadsFacade {
         method: 'recordBobbleheadViewAsync',
         operation: 'recordView',
         userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * reorder photos by updating their sortOrder values
+   */
+  static async reorderPhotosAsync(
+    data: ReorderBobbleheadPhotos,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<typeof bobbleheadPhotos.$inferSelect>> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      // batch update all photo sortOrder values
+      const updatedPhotos = await BobbleheadsQuery.batchUpdatePhotoSortOrderAsync(data, userId, context);
+
+      // invalidate caches
+      CacheRevalidationService.bobbleheads.onPhotoChange(data.bobbleheadId, userId, 'reorder');
+
+      return updatedPhotos;
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId: data.bobbleheadId, photoCount: data.photoOrder.length },
+        facade: facadeName,
+        method: 'reorderPhotosAsync',
+        operation: OPERATIONS.BOBBLEHEADS.REORDER_PHOTOS,
+        userId,
       };
       throw createFacadeError(context, error);
     }

@@ -25,7 +25,9 @@ import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   createBobbleheadWithPhotosSchema,
+  deleteBobbleheadPhotoSchema,
   deleteBobbleheadSchema,
+  reorderBobbleheadPhotosSchema,
   updateBobbleheadWithPhotosSchema,
 } from '@/lib/validations/bobbleheads.validation';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
@@ -427,7 +429,11 @@ export const updateBobbleheadWithPhotosAction = authActionClient
         message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos and ${updatedTags.length} tags`,
       });
 
-      CacheRevalidationService.bobbleheads.onUpdate(updatedBobblehead.id, userId, updatedBobblehead.collectionId);
+      CacheRevalidationService.bobbleheads.onUpdate(
+        updatedBobblehead.id,
+        userId,
+        updatedBobblehead.collectionId,
+      );
 
       return {
         data: {
@@ -472,6 +478,119 @@ export const getBobbleheadPhotosAction = publicActionClient
         input: parsedInput,
         metadata: { actionName: 'getBobbleheadPhotos' },
         operation: OPERATIONS.BOBBLEHEADS.GET_PHOTOS,
+        userId,
+      });
+    }
+  });
+
+export const deleteBobbleheadPhotoAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_PHOTO,
+    isTransactionRequired: true,
+  })
+  .inputSchema(deleteBobbleheadPhotoSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const photoData = deleteBobbleheadPhotoSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, photoData);
+
+    try {
+      const deletedPhoto = await BobbleheadsFacade.deletePhotoAsync(photoData, userId, ctx.tx);
+
+      if (!deletedPhoto) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.BOBBLEHEADS.DELETE_FAILED,
+          ERROR_MESSAGES.BOBBLEHEAD.DELETE_FAILED,
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.DELETE_PHOTO },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          bobbleheadId: photoData.bobbleheadId,
+          photoId: deletedPhoto.id,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Deleted photo ${deletedPhoto.id} from bobblehead ${photoData.bobbleheadId}`,
+      });
+
+      CacheRevalidationService.bobbleheads.onPhotoChange(photoData.bobbleheadId, userId, 'delete');
+
+      return {
+        data: deletedPhoto,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.DELETE_PHOTO },
+        operation: OPERATIONS.BOBBLEHEADS.DELETE_PHOTO,
+        userId,
+      });
+    }
+  });
+
+export const reorderBobbleheadPhotosAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.REORDER_PHOTOS,
+    isTransactionRequired: true,
+  })
+  .use(
+    createRateLimitMiddleware(
+      CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_REORDER.REQUESTS,
+      CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_REORDER.WINDOW,
+    ),
+  )
+  .inputSchema(reorderBobbleheadPhotosSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const reorderData = reorderBobbleheadPhotosSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
+      bobbleheadId: reorderData.bobbleheadId,
+      photoCount: reorderData.photoOrder.length,
+    });
+
+    try {
+      const updatedPhotos = await BobbleheadsFacade.reorderPhotosAsync(reorderData, userId, ctx.tx);
+
+      if (updatedPhotos.length === 0) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.BOBBLEHEADS.UPDATE_FAILED,
+          ERROR_MESSAGES.BOBBLEHEAD.UPDATE_FAILED,
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.REORDER_PHOTOS },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          bobbleheadId: reorderData.bobbleheadId,
+          photosReordered: updatedPhotos.length,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Reordered ${updatedPhotos.length} photos for bobblehead ${reorderData.bobbleheadId}`,
+      });
+
+      CacheRevalidationService.bobbleheads.onPhotoChange(reorderData.bobbleheadId, userId, 'reorder');
+
+      return {
+        data: updatedPhotos,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.REORDER_PHOTOS },
+        operation: OPERATIONS.BOBBLEHEADS.REORDER_PHOTOS,
         userId,
       });
     }

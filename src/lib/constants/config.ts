@@ -72,6 +72,7 @@ export const CONFIG = {
     MAX_FILES_PER_BOBBLEHEAD: 10,
     MAX_SIZE: 10 * 1024 * 1024, // 10MB
     MEDIUM_SIZE: { height: 600, width: 800 },
+    PHOTO_REORDER_DEBOUNCE_MS: 1000, // 1 second debounce for photo reordering
     THUMBNAIL_SIZE: { height: 300, width: 300 },
   },
   PAGINATION: {
@@ -104,6 +105,7 @@ export const CONFIG = {
       COMMENT: { REQUESTS: 20, WINDOW: 300 }, // 20 comments per 5 minutes
       LIKE: { REQUESTS: 50, WINDOW: 300 }, // 50 likes per 5 minutes
       PHOTO_DELETE: { REQUESTS: 10, WINDOW: 60 }, // 10 photo deletes per minute
+      PHOTO_REORDER: { REQUESTS: 20, WINDOW: 60 }, // 20 photo reorders per minute
       PHOTO_SET_PRIMARY: { REQUESTS: 10, WINDOW: 60 }, // 10 photo primary sets per minute
       PHOTO_UPLOAD: { REQUESTS: 5, WINDOW: 60 }, // 5 photo uploads per minute
       SEARCH: { REQUESTS: 100, WINDOW: 3600 }, // 100 searches per hour

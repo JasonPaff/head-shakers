@@ -18,9 +18,11 @@ export const customFieldsSchema = z.record(z.string(), z.string());
 export type AddBobbleheadFormSchema = z.input<typeof createBobbleheadWithPhotosSchema>;
 export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
+export type DeleteBobbleheadPhoto = z.infer<typeof deleteBobbleheadPhotoSchema>;
 export type InsertBobblehead = z.infer<typeof insertBobbleheadSchema>;
 export type InsertBobbleheadPhoto = z.infer<typeof insertBobbleheadPhotoSchema>;
 export type InsertBobbleheadTag = z.infer<typeof insertBobbleheadTagSchema>;
+export type ReorderBobbleheadPhotos = z.infer<typeof reorderBobbleheadPhotosSchema>;
 export type SelectBobblehead = z.infer<typeof selectBobbleheadSchema>;
 export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
 export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
@@ -141,4 +143,21 @@ export const updateBobbleheadWithPhotosSchema = updateBobbleheadSchema.extend({
 
 export const getBobbleheadByIdSchema = z.object({
   id: z.uuid(),
+});
+
+export const deleteBobbleheadPhotoSchema = z.object({
+  bobbleheadId: z.uuid({ message: 'Bobblehead ID is required' }),
+  photoId: z.uuid({ message: 'Photo ID is required' }),
+});
+
+export const reorderBobbleheadPhotosSchema = z.object({
+  bobbleheadId: z.uuid({ message: 'Bobblehead ID is required' }),
+  photoOrder: z
+    .array(
+      z.object({
+        id: z.uuid({ message: 'Photo ID is required' }),
+        sortOrder: z.number().min(0, { message: 'Sort order must be non-negative' }),
+      }),
+    )
+    .min(1, { message: 'At least one photo is required for reordering' }),
 });

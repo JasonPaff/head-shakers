@@ -2,21 +2,38 @@
 
 import type { z } from 'zod';
 
+import * as Sentry from '@sentry/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
+import { type AnyFormApi, useStore } from '@tanstack/react-form';
+import { CameraIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+import type { bobbleheadPhotos } from '@/lib/db/schema';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
+import type { CloudinaryPhoto } from '@/types/cloudinary.types';
+
+interface BobbleheadEditDialogProps extends ComponentTestIdProps {
+  bobblehead: BobbleheadForEdit;
+  collections: Array<ComboboxItem>;
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: () => void;
+}
 
 import { AcquisitionDetails } from '@/app/(app)/bobbleheads/add/components/acquisition-details';
+import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { BasicInformation } from '@/app/(app)/bobbleheads/add/components/basic-information';
 import { CollectionAssignment } from '@/app/(app)/bobbleheads/add/components/collection-assignment';
 import { CustomFields } from '@/app/(app)/bobbleheads/add/components/custom-fields';
-import { ItemPhotos } from '@/app/(app)/bobbleheads/add/components/item-photos';
 import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settings';
 import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
+import { Conditional } from '@/components/ui/conditional';
 import {
   Dialog,
   DialogContent,
@@ -29,18 +46,17 @@ import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
-import { updateBobbleheadWithPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
+import {
+  getBobbleheadPhotosAction,
+  updateBobbleheadWithPhotosAction,
+} from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { DEFAULTS } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
+import {
+  extractFormatFromCloudinaryUrl,
+  extractPublicIdFromCloudinaryUrl,
+} from '@/lib/utils/cloudinary.utils';
 import { updateBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
-
-interface BobbleheadEditDialogProps extends ComponentTestIdProps {
-  bobblehead: BobbleheadForEdit;
-  collections: Array<ComboboxItem>;
-  isOpen: boolean;
-  onClose: () => void;
-  onSuccess?: () => void;
-}
 
 interface BobbleheadForEdit {
   acquisitionDate: Date | null;
@@ -68,6 +84,70 @@ interface BobbleheadForEdit {
   year: null | number;
 }
 
+type BobbleheadPhoto = typeof bobbleheadPhotos.$inferSelect;
+
+// Custom ItemPhotos component for editing with bobblehead support
+interface ItemPhotosEditProps {
+  bobbleheadId: string;
+  form: AnyFormApi;
+}
+
+function ItemPhotosEditComponent({ bobbleheadId, form }: ItemPhotosEditProps) {
+  const photos =
+    (useStore(form.store, (state) => (state.values as { photos?: Array<CloudinaryPhoto> }).photos)) || [];
+
+  const handlePhotosChange = (
+    updatedPhotos: ((prevPhotos: Array<CloudinaryPhoto>) => Array<CloudinaryPhoto>) | Array<CloudinaryPhoto>,
+  ) => {
+    if (typeof updatedPhotos === 'function') {
+      const currentPhotos = (form.getFieldValue('photos') as Array<CloudinaryPhoto>) || [];
+      form.setFieldValue('photos', updatedPhotos(currentPhotos));
+    } else {
+      form.setFieldValue('photos', updatedPhotos);
+    }
+  };
+
+  const shouldShowMessage = photos.length > 0;
+
+  return (
+    <Card aria-labelledby={'photos-section-title'} role={'region'}>
+      <CardHeader className={'relative'}>
+        <div className={'flex items-center gap-3'}>
+          <div className={'flex size-10 items-center justify-center rounded-xl bg-green-500 shadow-sm'}>
+            <CameraIcon aria-hidden className={'size-5 text-white'} />
+          </div>
+          <div>
+            <CardTitle className={'text-xl font-semibold text-foreground'}>Photos</CardTitle>
+            <CardDescription className={'text-muted-foreground'}>
+              Manage your bobblehead photos - delete, reorder, or add new ones
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className={'relative space-y-6'} role={'main'}>
+        <div aria-label={'Photo upload area'} className={'relative'} role={'region'}>
+          <CloudinaryPhotoUpload
+            bobbleheadId={bobbleheadId}
+            maxPhotos={8}
+            onPhotosChange={handlePhotosChange}
+            photos={photos}
+          />
+        </div>
+
+        <AnimatedMotivationalMessage className={'bg-green-100 dark:bg-green-900/40'} shouldShow={shouldShowMessage}>
+          <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
+            <div className={'size-2 rounded-full bg-green-500'} />
+            <Conditional fallback={`${photos.length}/8 photos - drag to reorder`} isCondition={photos.length === 0}>
+              <span>Add photos to make your bobblehead stand out!</span>
+            </Conditional>
+          </div>
+        </AnimatedMotivationalMessage>
+      </CardContent>
+    </Card>
+  );
+}
+
 export const BobbleheadEditDialog = withFocusManagement(
   ({ bobblehead, collections, isOpen, onClose, onSuccess, testId }: BobbleheadEditDialogProps) => {
     const dialogTestId = testId || generateTestId('feature', 'bobblehead-edit-dialog');
@@ -77,6 +157,9 @@ export const BobbleheadEditDialog = withFocusManagement(
 
     const router = useRouter();
     const { focusFirstError } = useFocusContext();
+
+    const [, setIsLoadingPhotos] = useState(false);
+    const photosFetchedRef = useRef(false);
 
     const { executeAsync, isExecuting } = useServerAction(updateBobbleheadWithPhotosAction, {
       onAfterSuccess: () => {
@@ -136,9 +219,61 @@ export const BobbleheadEditDialog = withFocusManagement(
     });
 
     const handleClose = () => {
+      photosFetchedRef.current = false;
       setTimeout(() => form.reset(), 300);
       onClose();
     };
+
+    // fetch existing photos when dialog opens
+    useEffect(() => {
+      if (!isOpen || !bobblehead.id || photosFetchedRef.current) return;
+
+      const fetchPhotos = async () => {
+        photosFetchedRef.current = true;
+        setIsLoadingPhotos(true);
+        try {
+          const result = await getBobbleheadPhotosAction({ bobbleheadId: bobblehead.id });
+
+          if (result?.data && Array.isArray(result.data)) {
+            // transform database photos to CloudinaryPhoto format
+            const transformedPhotos: Array<CloudinaryPhoto> = (result.data as Array<BobbleheadPhoto>).map(
+              (photo) => {
+                const publicId = extractPublicIdFromCloudinaryUrl(photo.url);
+                const format = extractFormatFromCloudinaryUrl(photo.url);
+
+                return {
+                  altText: photo.altText || '',
+                  bytes: photo.fileSize || 0,
+                  caption: photo.caption || '',
+                  format: format as 'heic' | 'jpeg' | 'jpg' | 'png' | 'webp',
+                  height: photo.height || 0,
+                  id: photo.id,
+                  isPrimary: photo.isPrimary,
+                  originalFilename: '',
+                  publicId: publicId || photo.url,
+                  sortOrder: photo.sortOrder,
+                  uploadedAt: photo.uploadedAt.toISOString(),
+                  url: photo.url,
+                  width: photo.width || 0,
+                };
+              },
+            );
+
+            // update form field with existing photos
+            form.setFieldValue('photos', transformedPhotos);
+          }
+        } catch (error) {
+          Sentry.captureException(error, {
+            extra: { bobbleheadId: bobblehead.id, operation: 'fetch-photos' },
+            level: 'error',
+          });
+        } finally {
+          setIsLoadingPhotos(false);
+        }
+      };
+
+      void fetchPhotos();
+    }, [isOpen, bobblehead.id, form]);
 
     return (
       <Dialog
@@ -179,7 +314,7 @@ export const BobbleheadEditDialog = withFocusManagement(
               */}
               <BasicInformation form={form as never} />
               <CollectionAssignment collections={collections} form={form as never} />
-              <ItemPhotos form={form as never} />
+              <ItemPhotosEditComponent bobbleheadId={bobblehead.id} form={form} />
               <PhysicalAttributes form={form as never} />
               <AcquisitionDetails form={form as never} />
               <ItemTags form={form as never} />

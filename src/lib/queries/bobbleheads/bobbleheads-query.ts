@@ -3,8 +3,10 @@ import { and, desc, eq, like, or } from 'drizzle-orm';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
   DeleteBobblehead,
+  DeleteBobbleheadPhoto,
   InsertBobblehead,
   InsertBobbleheadPhoto,
+  ReorderBobbleheadPhotos,
   UpdateBobblehead,
 } from '@/lib/validations/bobbleheads.validation';
 
@@ -52,6 +54,41 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
+   * batch update photo sortOrder values in a transaction
+   */
+  static async batchUpdatePhotoSortOrderAsync(
+    data: ReorderBobbleheadPhotos,
+    userId: string,
+    context: QueryContext,
+  ): Promise<Array<typeof bobbleheadPhotos.$inferSelect>> {
+    const dbInstance = this.getDbInstance(context);
+
+    // verify ownership of the bobblehead first
+    const bobblehead = await dbInstance
+      .select()
+      .from(bobbleheads)
+      .where(and(eq(bobbleheads.id, data.bobbleheadId), eq(bobbleheads.userId, userId)))
+      .limit(1);
+
+    if (!bobblehead[0]) {
+      return [];
+    }
+
+    // update each photo's sortOrder
+    const updatePromises = data.photoOrder.map((photoUpdate) =>
+      dbInstance
+        .update(bobbleheadPhotos)
+        .set({ sortOrder: photoUpdate.sortOrder })
+        .where(and(eq(bobbleheadPhotos.id, photoUpdate.id), eq(bobbleheadPhotos.bobbleheadId, data.bobbleheadId)))
+        .returning(),
+    );
+
+    const results = await Promise.all(updatePromises);
+
+    return results.map((result) => result[0]).filter((photo): photo is typeof bobbleheadPhotos.$inferSelect => photo !== undefined);
+  }
+
+  /**
    * create a new bobblehead
    */
   static async createAsync(
@@ -94,6 +131,32 @@ export class BobbleheadsQuery extends BaseQuery {
       bobblehead: deletedBobblehead,
       photos,
     };
+  }
+
+  /**
+   * delete a photo with ownership validation
+   */
+  static async deletePhotoAsync(
+    data: DeleteBobbleheadPhoto,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
+    const dbInstance = this.getDbInstance(context);
+
+    // verify ownership before deletion
+    const photo = await this.getPhotoByIdAsync(data.photoId, data.bobbleheadId, userId, context);
+
+    if (!photo) {
+      return null;
+    }
+
+    // delete the photo
+    const result = await dbInstance
+      .delete(bobbleheadPhotos)
+      .where(and(eq(bobbleheadPhotos.id, data.photoId), eq(bobbleheadPhotos.bobbleheadId, data.bobbleheadId)))
+      .returning();
+
+    return result?.[0] || null;
   }
 
   /**
@@ -252,6 +315,34 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
+   * get a photo by id with ownership validation
+   */
+  static async getPhotoByIdAsync(
+    photoId: string,
+    bobbleheadId: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
+    const dbInstance = this.getDbInstance(context);
+
+    // join with bobbleheads to validate ownership
+    const result = await dbInstance
+      .select({ photo: bobbleheadPhotos })
+      .from(bobbleheadPhotos)
+      .innerJoin(bobbleheads, eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id))
+      .where(
+        and(
+          eq(bobbleheadPhotos.id, photoId),
+          eq(bobbleheadPhotos.bobbleheadId, bobbleheadId),
+          eq(bobbleheads.userId, userId),
+        ),
+      )
+      .limit(1);
+
+    return result[0]?.photo || null;
+  }
+
+  /**
    * get photos for a bobblehead
    */
   static async getPhotosAsync(
@@ -347,6 +438,36 @@ export class BobbleheadsQuery extends BaseQuery {
       .update(bobbleheads)
       .set(updateData)
       .where(and(eq(bobbleheads.id, id), eq(bobbleheads.userId, userId)))
+      .returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * update sortOrder for a single photo
+   */
+  static async updatePhotoSortOrderAsync(
+    photoId: string,
+    bobbleheadId: string,
+    sortOrder: number,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
+    const dbInstance = this.getDbInstance(context);
+
+    // verify ownership via join
+    const result = await dbInstance
+      .update(bobbleheadPhotos)
+      .set({ sortOrder })
+      .from(bobbleheads)
+      .where(
+        and(
+          eq(bobbleheadPhotos.id, photoId),
+          eq(bobbleheadPhotos.bobbleheadId, bobbleheadId),
+          eq(bobbleheads.id, bobbleheadId),
+          eq(bobbleheads.userId, userId),
+        ),
+      )
       .returning();
 
     return result?.[0] || null;
