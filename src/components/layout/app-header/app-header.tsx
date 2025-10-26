@@ -64,7 +64,7 @@ export const AppHeader = () => {
             className={'flex flex-1 items-center gap-2 px-2 md:hidden lg:flex lg:gap-4 lg:px-4'}
             data-testid={generateTestId('layout', 'app-header', 'search-section')}
           >
-            <div className={'w-full max-w-[200px] min-w-0 lg:max-w-md'}>
+            <div className={'w-full min-w-0'}>
               <AppHeaderSearch />
             </div>
 
