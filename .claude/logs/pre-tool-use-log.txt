@@ -11621,3 +11621,280 @@ Input:
   "description": "Install missing @floating-ui/react dependency"
 }
 ================================================================================
+
+================================================================================
+2025-10-26T19:16:05.973Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/middleware.{ts,js}"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:06.016Z
+Tool: Bash
+Input:
+{
+  "command": "git log --oneline --since=\"1 week ago\" -- src/middleware.ts",
+  "description": "Check recent middleware changes"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:11.493Z
+Tool: Glob
+Input:
+{
+  "pattern": "middleware.{ts,js}"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:11.533Z
+Tool: Bash
+Input:
+{
+  "command": "git log --oneline --since=\"1 week ago\" -- middleware.ts middleware.js",
+  "description": "Check recent middleware changes"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:21.389Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\next.config.ts"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:21.388Z
+Tool: Bash
+Input:
+{
+  "command": "git log --oneline --all --full-history -- \"**/middleware.ts\" \"**/middleware.js\"",
+  "description": "Check middleware file history"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:21.409Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\package.json"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:28.675Z
+Tool: Bash
+Input:
+{
+  "command": "git show HEAD:middleware.ts",
+  "description": "Show current middleware content"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:16:33.106Z
+Tool: Bash
+Input:
+{
+  "command": "git show HEAD:src/middleware.ts",
+  "description": "Show middleware in src directory"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:05.942Z
+Tool: mcp__Ref__ref_search_documentation
+Input:
+{
+  "query": "Next.js 16 proxy middleware configuration"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:05.963Z
+Tool: Bash
+Input:
+{
+  "command": "ls -la | grep -E \"(middleware|proxy)\"",
+  "description": "List files with middleware or proxy"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:12.728Z
+Tool: mcp__Ref__ref_read_url
+Input:
+{
+  "url": "https://nextjs.org/docs/app/getting-started/route-handlers-and-middleware#middleware-js"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:12.739Z
+Tool: mcp__Ref__ref_search_documentation
+Input:
+{
+  "query": "Next.js 16 proxy.ts file configuration migration"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:20.360Z
+Tool: mcp__Ref__ref_search_documentation
+Input:
+{
+  "query": "Next.js 16 proxy.ts file rename middleware breaking changes"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:20.361Z
+Tool: WebSearch
+Input:
+{
+  "query": "Next.js 16 middleware proxy rename breaking change 2025"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:20.550Z
+Tool: Bash
+Input:
+{
+  "command": "find . -maxdepth 2 -name \"proxy.*\" -o -name \"middleware.*\" | grep -v node_modules",
+  "description": "Find proxy or middleware files"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:44.599Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\proxy.ts"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:17:45.310Z
+Tool: mcp__Ref__ref_read_url
+Input:
+{
+  "url": "https://nextjs.org/docs/messages/middleware-to-proxy"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:18:04.403Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update proxy.ts to export a proxy function for Next.js 16",
+      "status": "in_progress",
+      "activeForm": "Updating proxy.ts to export a proxy function"
+    },
+    {
+      "content": "Test the deployment to verify the fix",
+      "status": "pending",
+      "activeForm": "Testing the deployment"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:18:16.862Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\proxy.ts",
+  "old_string": "export default clerkMiddleware(async (auth, req) => {\n  const { userId } = await auth();\n\n  // add user context\n  if (userId) Sentry.setUser({ id: userId });\n  Sentry.setContext('request', {\n    method: req.method,\n    url: req.url,\n    userAgent: req.headers.get('user-agent'),\n  });\n\n  // production gate: only allow authorized admins to access the site\n  // only apply in production environment\n  if (process.env.NODE_ENV === 'production') {\n    const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));\n    if (!isComingSoonPage) {\n      const isAuthorized =\n        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';\n      if (!isAuthorized) {\n        const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);\n        return NextResponse.redirect(comingSoonUrl);\n      }\n    }\n  }\n\n  // public routes, no auth required\n  if (isPublicRoute(req)) {\n    return;\n  }\n\n  // construct absolute URL for homepage\n  const homeUrl = new URL($path({ route: '/' }), req.url).toString();\n\n  // admin routes - require authentication (role checking done at component level)\n  if (isAdminRoute(req)) {\n    await auth.protect({ unauthenticatedUrl: homeUrl });\n    return;\n  }\n\n  // protected routes\n  if (isProtectedRoute(req)) {\n    await auth.protect({ unauthenticatedUrl: homeUrl });\n    return;\n  }\n\n  // for any other routes, protect by default (fail-safe)\n  await auth.protect({ unauthenticatedUrl: homeUrl });\n  return;\n});",
+  "new_string": "export const proxy = clerkMiddleware(async (auth, req) => {\n  const { userId } = await auth();\n\n  // add user context\n  if (userId) Sentry.setUser({ id: userId });\n  Sentry.setContext('request', {\n    method: req.method,\n    url: req.url,\n    userAgent: req.headers.get('user-agent'),\n  });\n\n  // production gate: only allow authorized admins to access the site\n  // only apply in production environment\n  if (process.env.NODE_ENV === 'production') {\n    const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));\n    if (!isComingSoonPage) {\n      const isAuthorized =\n        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';\n      if (!isAuthorized) {\n        const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);\n        return NextResponse.redirect(comingSoonUrl);\n      }\n    }\n  }\n\n  // public routes, no auth required\n  if (isPublicRoute(req)) {\n    return;\n  }\n\n  // construct absolute URL for homepage\n  const homeUrl = new URL($path({ route: '/' }), req.url).toString();\n\n  // admin routes - require authentication (role checking done at component level)\n  if (isAdminRoute(req)) {\n    await auth.protect({ unauthenticatedUrl: homeUrl });\n    return;\n  }\n\n  // protected routes\n  if (isProtectedRoute(req)) {\n    await auth.protect({ unauthenticatedUrl: homeUrl });\n    return;\n  }\n\n  // for any other routes, protect by default (fail-safe)\n  await auth.protect({ unauthenticatedUrl: homeUrl });\n  return;\n});\n\nexport default proxy;"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:18:24.001Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update proxy.ts to export a proxy function for Next.js 16",
+      "status": "completed",
+      "activeForm": "Updating proxy.ts to export a proxy function"
+    },
+    {
+      "content": "Run typecheck to verify no type errors",
+      "status": "in_progress",
+      "activeForm": "Running typecheck"
+    },
+    {
+      "content": "Test the deployment to verify the fix",
+      "status": "pending",
+      "activeForm": "Testing the deployment"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:18:24.243Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Check for TypeScript errors"
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:18:42.651Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update proxy.ts to export a proxy function for Next.js 16",
+      "status": "completed",
+      "activeForm": "Updating proxy.ts to export a proxy function"
+    },
+    {
+      "content": "Run typecheck to verify no type errors",
+      "status": "completed",
+      "activeForm": "Running typecheck"
+    },
+    {
+      "content": "Run linter to ensure code quality",
+      "status": "in_progress",
+      "activeForm": "Running linter"
+    },
+    {
+      "content": "Test the deployment to verify the fix",
+      "status": "pending",
+      "activeForm": "Testing the deployment"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-10-26T19:18:42.904Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Fix any linting issues"
+}
+================================================================================
