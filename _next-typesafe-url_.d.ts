@@ -36,7 +36,6 @@ declare module "@@@next-typesafe-url" {
     "/collections/[collectionId]/share": StaticRoute;
     "/dashboard/feed": StaticRoute;
     "/dashboard/notifications": StaticRoute;
-    "/feature-planner": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;
@@ -48,9 +47,9 @@ declare module "@@@next-typesafe-url" {
     "/users/[userId]/followers": StaticRoute;
     "/users/[userId]/following": StaticRoute;
     "/about": StaticRoute;
+    "/coming-soon": StaticRoute;
     "/privacy": StaticRoute;
     "/terms": StaticRoute;
-    "/coming-soon": StaticRoute;
     "/examples/ably": StaticRoute;
     "/examples/sentry": StaticRoute;
   }
