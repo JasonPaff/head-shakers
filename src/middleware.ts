@@ -61,7 +61,7 @@ const isAdminRoute = createRouteMatcher([
   '/feature-planner(.*)',
 ]);
 
-export const proxy = clerkMiddleware(async (auth, req) => {
+const middleware = clerkMiddleware(async (auth, req) => {
   const { userId } = await auth();
 
   // add user context
@@ -110,6 +110,8 @@ export const proxy = clerkMiddleware(async (auth, req) => {
   await auth.protect({ unauthenticatedUrl: homeUrl });
   return;
 });
+
+export default middleware;
 
 export const config = {
   matcher: [
