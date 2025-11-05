@@ -3,7 +3,6 @@
 import type { ChangeEvent, ComponentProps, KeyboardEvent } from 'react';
 
 import { ArrowRightIcon, SearchIcon } from 'lucide-react';
-import { useAction } from 'next-safe-action/hooks';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -12,8 +11,10 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 import { SearchResultItem } from '@/components/feature/search/search-result-item';
 import { Conditional } from '@/components/ui/conditional';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useServerAction } from '@/hooks/use-server-action';
+import { useToggle } from '@/hooks/use-toggle';
 import { getPublicSearchDropdownAction } from '@/lib/actions/content-search/content-search.actions';
 import { CONFIG } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
@@ -23,12 +24,12 @@ type SearchDropdownProps = ComponentProps<'div'> & ComponentTestIdProps;
 
 export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownProps) => {
   // 1. useState hooks
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useToggle();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   // 2. Other hooks (useContext, useQuery, etc.)
-  const { execute, isExecuting, result } = useAction(getPublicSearchDropdownAction);
+  const { execute, isExecuting, result } = useServerAction(getPublicSearchDropdownAction);
 
   // 3. useMemo hooks
   const searchResultsData = useMemo(() => result?.data, [result?.data]);
@@ -50,6 +51,15 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
     }
   }, [debouncedQuery, execute]);
 
+  // open popover when the search executes or has results (after debouncing)
+  useEffect(() => {
+    if (debouncedQuery.length >= CONFIG.SEARCH.MIN_QUERY_LENGTH && (isExecuting || result)) {
+      setIsOpen.on();
+    } else if (debouncedQuery.length < CONFIG.SEARCH.MIN_QUERY_LENGTH) {
+      setIsOpen.off();
+    }
+  }, [debouncedQuery, isExecuting, result, setIsOpen]);
+
   // 5. Utility functions
   const getViewAllUrl = (searchQuery: string): string => {
     return `/search?q=${encodeURIComponent(searchQuery)}`;
@@ -59,41 +69,37 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
   const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-
-    if (value.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
   }, []);
 
   const handleInputFocus = useCallback(() => {
-    if (query.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH) {
-      setIsOpen(true);
+    if (debouncedQuery.length >= CONFIG.SEARCH.MIN_QUERY_LENGTH) {
+      setIsOpen.on();
     }
-  }, [query]);
+  }, [debouncedQuery, setIsOpen]);
 
   const handleInputClear = useCallback(() => {
     setQuery('');
     setDebouncedQuery('');
-    setIsOpen(false);
-  }, []);
+    setIsOpen.off();
+  }, [setIsOpen]);
 
   const handleResultClick = useCallback(() => {
-    setIsOpen(false);
-  }, []);
+    setIsOpen.off();
+  }, [setIsOpen]);
 
-  const handleInputKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      setIsOpen(false);
-    }
-  }, []);
+  const handleInputKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Escape') setIsOpen.off();
+    },
+    [setIsOpen],
+  );
 
-  const handleOpenChange = useCallback((open: boolean) => {
-    if (!open) {
-      setIsOpen(false);
-    }
-  }, []);
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (!open) setIsOpen.off();
+    },
+    [setIsOpen],
+  );
 
   // 7. Derived variables for conditional rendering
   const _isQueryValid = query.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH;
@@ -119,7 +125,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
       {...props}
     >
       <Popover onOpenChange={handleOpenChange} open={isOpen}>
-        <PopoverTrigger asChild>
+        <PopoverAnchor asChild>
           <div className={'relative w-full'}>
             <SearchIcon
               aria-hidden
@@ -139,15 +145,10 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
               value={query}
             />
           </div>
-        </PopoverTrigger>
+        </PopoverAnchor>
 
         <Conditional isCondition={isOpen && _isQueryValid}>
-          <PopoverContent
-            align={'start'}
-            className={'w-[var(--radix-popover-trigger-width)] p-2'}
-            sideOffset={8}
-            testId={popoverContentTestId}
-          >
+          <PopoverContent align={'start'} className={'w-96 p-2'} sideOffset={8} testId={popoverContentTestId}>
             {/* Loading State */}
             <Conditional isCondition={_isLoading}>
               <div className={'flex flex-col gap-2'}>

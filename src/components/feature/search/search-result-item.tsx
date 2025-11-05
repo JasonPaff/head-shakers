@@ -1,5 +1,6 @@
 'use client';
 
+import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -33,9 +34,17 @@ export const SearchResultItem = ({
 
   // Determine entity URL based on type
   const entityUrl =
-    entityType === 'collection' ? `/collections/${result.id}`
-    : entityType === 'subcollection' ? `/subcollections/${result.id}`
-    : `/bobbleheads/${result.id}`;
+    entityType === 'collection' ?
+      $path({ route: '/collections/[collectionId]', routeParams: { collectionId: result.id } })
+    : entityType === 'subcollection' ?
+      $path({
+        route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+        routeParams: {
+          collectionId: (result as SubcollectionSearchResult).collectionId,
+          subcollectionId: result.id,
+        },
+      })
+    : $path({ route: '/bobbleheads/[bobbleheadId]', routeParams: { bobbleheadId: result.id } });
 
   // Get entity-specific display data
   const displayName =
