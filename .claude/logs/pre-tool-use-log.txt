@@ -17058,3 +17058,479 @@ Input:
   "description": "Run ESLint to check code quality"
 }
 ================================================================================
+
+================================================================================
+2025-11-05T17:56:43.201Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:58:21.809Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing cache.service.ts to understand patterns",
+      "status": "in_progress",
+      "activeForm": "Reading existing cache.service.ts to understand patterns"
+    },
+    {
+      "content": "Add search-specific caching methods (cacheSearchResults, getSearchResultsFromCache, invalidateSearchCache)",
+      "status": "pending",
+      "activeForm": "Adding search-specific caching methods"
+    },
+    {
+      "content": "Implement cache key namespacing and hashing",
+      "status": "pending",
+      "activeForm": "Implementing cache key namespacing and hashing"
+    },
+    {
+      "content": "Add cache hit/miss logging for monitoring",
+      "status": "pending",
+      "activeForm": "Adding cache hit/miss logging for monitoring"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:58:26.438Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:58:38.835Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cache.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:58:53.688Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing cache.service.ts to understand patterns",
+      "status": "completed",
+      "activeForm": "Reading existing cache.service.ts to understand patterns"
+    },
+    {
+      "content": "Check for existing hash utility functions",
+      "status": "in_progress",
+      "activeForm": "Checking for existing hash utility functions"
+    },
+    {
+      "content": "Add search-specific caching methods (cacheSearchResults, getSearchResultsFromCache, invalidateSearchCache)",
+      "status": "pending",
+      "activeForm": "Adding search-specific caching methods"
+    },
+    {
+      "content": "Implement cache key namespacing and hashing",
+      "status": "pending",
+      "activeForm": "Implementing cache key namespacing and hashing"
+    },
+    {
+      "content": "Add cache hit/miss logging for monitoring",
+      "status": "pending",
+      "activeForm": "Adding cache hit/miss logging for monitoring"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:00.041Z
+Tool: Grep
+Input:
+{
+  "pattern": "createHash|hash\\(|hashCode|generateHash",
+  "glob": "src/lib/utils/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:05.635Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\cache.utils.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:21.351Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing cache.service.ts to understand patterns",
+      "status": "completed",
+      "activeForm": "Reading existing cache.service.ts to understand patterns"
+    },
+    {
+      "content": "Check for existing hash utility functions",
+      "status": "completed",
+      "activeForm": "Checking for existing hash utility functions"
+    },
+    {
+      "content": "Add public search cache keys to cache.ts constants",
+      "status": "in_progress",
+      "activeForm": "Adding public search cache keys to cache.ts constants"
+    },
+    {
+      "content": "Add search-specific caching methods for public search",
+      "status": "pending",
+      "activeForm": "Adding search-specific caching methods for public search"
+    },
+    {
+      "content": "Update cache key generation for public search",
+      "status": "pending",
+      "activeForm": "Updating cache key generation for public search"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:31.362Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cache.ts",
+  "old_string": "  /**\n   * search-related cache keys\n   */\n  SEARCH: {\n    POPULAR: (timeframe: string) => `${CACHE_CONFIG.NAMESPACES.SEARCH}:popular:${timeframe}`,\n    RESULTS: (query: string, type: string, filters: string) =>\n      `${CACHE_CONFIG.NAMESPACES.SEARCH}:${type}:${query}:${filters}`,\n    SUGGESTIONS: (prefix: string, type: string) =>\n      `${CACHE_CONFIG.NAMESPACES.SEARCH}:suggestions:${type}:${prefix}`,\n  },",
+  "new_string": "  /**\n   * search-related cache keys\n   */\n  SEARCH: {\n    POPULAR: (timeframe: string) => `${CACHE_CONFIG.NAMESPACES.SEARCH}:popular:${timeframe}`,\n    PUBLIC_DROPDOWN: (queryHash: string) => `${CACHE_CONFIG.NAMESPACES.SEARCH}:public:dropdown:${queryHash}`,\n    PUBLIC_PAGE: (queryHash: string, filtersHash: string) =>\n      `${CACHE_CONFIG.NAMESPACES.SEARCH}:public:page:${queryHash}:${filtersHash}`,\n    RESULTS: (query: string, type: string, filters: string) =>\n      `${CACHE_CONFIG.NAMESPACES.SEARCH}:${type}:${query}:${filters}`,\n    SUGGESTIONS: (prefix: string, type: string) =>\n      `${CACHE_CONFIG.NAMESPACES.SEARCH}:suggestions:${type}:${prefix}`,\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:39.537Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cache.ts",
+  "old_string": "    // feature-based tags\n    FEATURED_CONTENT: 'featured-content',\n    GLOBAL_STATS: 'global-stats',\n    POPULAR_CONTENT: 'popular-content',\n    PUBLIC_CONTENT: 'public-content',\n\n    SEARCH_RESULTS: 'search-results',",
+  "new_string": "    // feature-based tags\n    FEATURED_CONTENT: 'featured-content',\n    GLOBAL_STATS: 'global-stats',\n    POPULAR_CONTENT: 'popular-content',\n    PUBLIC_CONTENT: 'public-content',\n    PUBLIC_SEARCH: 'public-search',\n\n    SEARCH_RESULTS: 'search-results',"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:49.143Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cache.ts",
+  "old_string": "  /**\n   * cache TTL configurations (in seconds)\n   */\n  TTL: {\n    // daily cache for aggregated data\n    DAILY: 86400, // 24 hours\n\n    // extended cache for rarely changing data\n    EXTENDED: 14400, // 4 hours\n\n    // long cache for relatively stable data\n    LONG: 3600, // 1 hour\n\n    // medium cache for semi-static data\n    MEDIUM: 1800, // 30 minutes\n\n    // ultra-short cache for frequently changing data\n    REALTIME: 30, // 30 seconds\n\n    // short cache for user-specific data\n    SHORT: 300, // 5 minutes\n\n    // weekly cache for statistical data\n    WEEKLY: 604800, // 7 days\n  },",
+  "new_string": "  /**\n   * cache TTL configurations (in seconds)\n   */\n  TTL: {\n    // daily cache for aggregated data\n    DAILY: 86400, // 24 hours\n\n    // extended cache for rarely changing data\n    EXTENDED: 14400, // 4 hours\n\n    // long cache for relatively stable data\n    LONG: 3600, // 1 hour\n\n    // medium cache for semi-static data\n    MEDIUM: 1800, // 30 minutes\n\n    // public search results cache (balance between freshness and performance)\n    PUBLIC_SEARCH: 600, // 10 minutes\n\n    // ultra-short cache for frequently changing data\n    REALTIME: 30, // 30 seconds\n\n    // short cache for user-specific data\n    SHORT: 300, // 5 minutes\n\n    // weekly cache for statistical data\n    WEEKLY: 604800, // 7 days\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:59:55.516Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing cache.service.ts to understand patterns",
+      "status": "completed",
+      "activeForm": "Reading existing cache.service.ts to understand patterns"
+    },
+    {
+      "content": "Check for existing hash utility functions",
+      "status": "completed",
+      "activeForm": "Checking for existing hash utility functions"
+    },
+    {
+      "content": "Add public search cache keys to cache.ts constants",
+      "status": "completed",
+      "activeForm": "Adding public search cache keys to cache.ts constants"
+    },
+    {
+      "content": "Add public search methods to CacheService",
+      "status": "in_progress",
+      "activeForm": "Adding public search methods to CacheService"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:00:21.141Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "  /**\n   * Search cache utilities\n   */\n  static readonly search = {\n    /**\n     * cache popular searches\n     */\n    popular: async <T>(fn: () => Promise<T>, timeframe: string, options: Omit<CacheOptions, 'tags'> = {}) => {\n      const key = CACHE_KEYS.SEARCH.POPULAR(timeframe);\n      const tags = CacheTagGenerators.search.popular();\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: { ...options.context, entityType: 'search', operation: 'search:popular' },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,\n      });\n    },\n\n    /**\n     * cache search results\n     */\n    results: async <T>(\n      fn: () => Promise<T>,\n      query: string,\n      type: string,\n      filtersHash: string,\n      options: Omit<CacheOptions, 'tags'> = {},\n    ) => {\n      const key = CACHE_KEYS.SEARCH.RESULTS(query, type, filtersHash);\n      const tags = CacheTagGenerators.search.results(query, type);\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: { ...options.context, entityType: 'search', operation: 'search:results' },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,\n      });\n    },\n  };",
+  "new_string": "  /**\n   * Search cache utilities\n   */\n  static readonly search = {\n    /**\n     * cache popular searches\n     */\n    popular: async <T>(fn: () => Promise<T>, timeframe: string, options: Omit<CacheOptions, 'tags'> = {}) => {\n      const key = CACHE_KEYS.SEARCH.POPULAR(timeframe);\n      const tags = CacheTagGenerators.search.popular();\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: { ...options.context, entityType: 'search', operation: 'search:popular' },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,\n      });\n    },\n\n    /**\n     * cache public search dropdown results\n     *\n     * Caches consolidated search results for the header dropdown (top 5 results across all entity types).\n     * Uses a 10-minute TTL to balance freshness with performance for frequently searched terms.\n     *\n     * @template T - The return type of the search function\n     * @param fn - The async function that performs the search query\n     * @param queryHash - Hashed search query for cache key generation\n     * @param options - Cache options (TTL defaults to 10 minutes)\n     * @returns Promise resolving to the cached or fresh search results\n     *\n     * @example\n     * ```typescript\n     * const results = await CacheService.search.publicDropdown(\n     *   () => searchPublicConsolidated(query),\n     *   createHashFromObject(query)\n     * );\n     * ```\n     *\n     * @remarks\n     * Cache keys follow the pattern: search:public:dropdown:{queryHash}\n     * Tagged with 'public-search' for bulk invalidation if needed\n     * Logs cache hits/misses for monitoring popular search terms\n     */\n    publicDropdown: async <T>(\n      fn: () => Promise<T>,\n      queryHash: string,\n      options: Omit<CacheOptions, 'tags'> = {},\n    ) => {\n      const key = CACHE_KEYS.SEARCH.PUBLIC_DROPDOWN(queryHash);\n      const tags = [CACHE_CONFIG.TAGS.PUBLIC_SEARCH, CACHE_CONFIG.TAGS.SEARCH_RESULTS];\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: {\n          ...options.context,\n          entityType: 'search',\n          operation: 'search:public-dropdown',\n        },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.PUBLIC_SEARCH,\n      });\n    },\n\n    /**\n     * cache public search page results\n     *\n     * Caches paginated search results for the full search results page with advanced filtering.\n     * Uses a 10-minute TTL to optimize performance for frequently accessed search combinations.\n     *\n     * @template T - The return type of the search function\n     * @param fn - The async function that performs the search query\n     * @param queryHash - Hashed search query for cache key generation\n     * @param filtersHash - Hashed filter parameters (entity types, tags, sort, pagination)\n     * @param options - Cache options (TTL defaults to 10 minutes)\n     * @returns Promise resolving to the cached or fresh search results\n     *\n     * @example\n     * ```typescript\n     * const results = await CacheService.search.publicPage(\n     *   () => searchPublicWithFilters(query, filters),\n     *   createHashFromObject(query),\n     *   createHashFromObject(filters)\n     * );\n     * ```\n     *\n     * @remarks\n     * Cache keys follow the pattern: search:public:page:{queryHash}:{filtersHash}\n     * Tagged with 'public-search' for bulk invalidation if needed\n     * Separate caching from dropdown results allows independent TTL management\n     * Logs cache hits/misses for monitoring search performance\n     */\n    publicPage: async <T>(\n      fn: () => Promise<T>,\n      queryHash: string,\n      filtersHash: string,\n      options: Omit<CacheOptions, 'tags'> = {},\n    ) => {\n      const key = CACHE_KEYS.SEARCH.PUBLIC_PAGE(queryHash, filtersHash);\n      const tags = [CACHE_CONFIG.TAGS.PUBLIC_SEARCH, CACHE_CONFIG.TAGS.SEARCH_RESULTS];\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: {\n          ...options.context,\n          entityType: 'search',\n          operation: 'search:public-page',\n        },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.PUBLIC_SEARCH,\n      });\n    },\n\n    /**\n     * cache search results\n     */\n    results: async <T>(\n      fn: () => Promise<T>,\n      query: string,\n      type: string,\n      filtersHash: string,\n      options: Omit<CacheOptions, 'tags'> = {},\n    ) => {\n      const key = CACHE_KEYS.SEARCH.RESULTS(query, type, filtersHash);\n      const tags = CacheTagGenerators.search.results(query, type);\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: { ...options.context, entityType: 'search', operation: 'search:results' },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,\n      });\n    },\n  };"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:00:32.307Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "import { unstable_cache } from 'next/cache';\n\nimport {\n  CACHE_CONFIG,\n  CACHE_KEYS,\n  getEnvironmentTTL,\n  isCacheEnabled,\n  isCacheLoggingEnabled,\n} from '@/lib/constants/cache';\nimport { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';",
+  "new_string": "import { revalidateTag, unstable_cache } from 'next/cache';\n\nimport {\n  CACHE_CONFIG,\n  CACHE_KEYS,\n  getEnvironmentTTL,\n  isCacheEnabled,\n  isCacheLoggingEnabled,\n} from '@/lib/constants/cache';\nimport { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:00:46.195Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "  /**\n   * get cache statistics\n   */\n  static getStats(): CacheStats {\n    return { ...this.stats };\n  }\n\n  /**\n   * reset cache statistics\n   */\n  static resetStats() {\n    this.stats = {\n      errors: 0,\n      hitRate: 0,\n      hits: 0,\n      misses: 0,\n      totalOperations: 0,\n    };\n  }",
+  "new_string": "  /**\n   * get cache statistics\n   */\n  static getStats(): CacheStats {\n    return { ...this.stats };\n  }\n\n  /**\n   * invalidate cache by tag\n   *\n   * Revalidates all cache entries associated with a specific tag, forcing fresh data\n   * on the next request. Useful for manual cache clearing when content is updated.\n   *\n   * @param tag - The cache tag to invalidate (e.g., 'public-search', 'search-results')\n   *\n   * @example\n   * ```typescript\n   * // Invalidate all public search results\n   * await CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);\n   *\n   * // Invalidate all search results\n   * await CacheService.invalidateByTag(CACHE_CONFIG.TAGS.SEARCH_RESULTS);\n   * ```\n   *\n   * @remarks\n   * This method uses Next.js revalidateTag() to invalidate cache entries.\n   * Can be called from Server Actions or API routes when content changes.\n   * Logs invalidation operations for monitoring in development.\n   */\n  static async invalidateByTag(tag: string): Promise<void> {\n    if (!isCacheEnabled()) {\n      this.logCacheOperation('bypass', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n      return;\n    }\n\n    try {\n      revalidateTag(tag);\n      this.logCacheOperation('force-refresh', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n    } catch (error) {\n      this.stats.errors++;\n      this.logCacheOperation('error', `invalidate:${tag}`, { operation: 'cache:invalidate' }, error);\n      throw error;\n    }\n  }\n\n  /**\n   * reset cache statistics\n   */\n  static resetStats() {\n    this.stats = {\n      errors: 0,\n      hitRate: 0,\n      hits: 0,\n      misses: 0,\n      totalOperations: 0,\n    };\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:00:58.938Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "    /**\n     * cache search results\n     */\n    results: async <T>(\n      fn: () => Promise<T>,\n      query: string,\n      type: string,\n      filtersHash: string,\n      options: Omit<CacheOptions, 'tags'> = {},\n    ) => {\n      const key = CACHE_KEYS.SEARCH.RESULTS(query, type, filtersHash);\n      const tags = CacheTagGenerators.search.results(query, type);\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: { ...options.context, entityType: 'search', operation: 'search:results' },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,\n      });\n    },\n  };",
+  "new_string": "    /**\n     * invalidate all public search cache\n     *\n     * Clears all cached public search results (both dropdown and page results).\n     * Use this when content is updated that would affect public search results.\n     *\n     * @example\n     * ```typescript\n     * // After updating a collection, bobblehead, or subcollection\n     * await CacheService.search.invalidatePublic();\n     * ```\n     *\n     * @remarks\n     * Invalidates all cache entries tagged with 'public-search'\n     * This affects both dropdown and full page search results\n     * Should be called sparingly as it clears all public search cache\n     */\n    invalidatePublic: async (): Promise<void> => {\n      return CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);\n    },\n\n    /**\n     * cache search results\n     */\n    results: async <T>(\n      fn: () => Promise<T>,\n      query: string,\n      type: string,\n      filtersHash: string,\n      options: Omit<CacheOptions, 'tags'> = {},\n    ) => {\n      const key = CACHE_KEYS.SEARCH.RESULTS(query, type, filtersHash);\n      const tags = CacheTagGenerators.search.results(query, type);\n\n      return CacheService.cached(fn, key, {\n        ...options,\n        context: { ...options.context, entityType: 'search', operation: 'search:results' },\n        tags,\n        ttl: options.ttl || CACHE_CONFIG.TTL.SHORT,\n      });\n    },\n  };"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:01:10.432Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing cache.service.ts to understand patterns",
+      "status": "completed",
+      "activeForm": "Reading existing cache.service.ts to understand patterns"
+    },
+    {
+      "content": "Check for existing hash utility functions",
+      "status": "completed",
+      "activeForm": "Checking for existing hash utility functions"
+    },
+    {
+      "content": "Add public search cache keys to cache.ts constants",
+      "status": "completed",
+      "activeForm": "Adding public search cache keys to cache.ts constants"
+    },
+    {
+      "content": "Add public search methods to CacheService",
+      "status": "completed",
+      "activeForm": "Adding public search methods to CacheService"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:01:14.940Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint:fix and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:02:23.119Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "  /**\n   * invalidate cache by tag\n   *\n   * Revalidates all cache entries associated with a specific tag, forcing fresh data\n   * on the next request. Useful for manual cache clearing when content is updated.\n   *\n   * @param tag - The cache tag to invalidate (e.g., 'public-search', 'search-results')\n   *\n   * @example\n   * ```typescript\n   * // Invalidate all public search results\n   * await CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);\n   *\n   * // Invalidate all search results\n   * await CacheService.invalidateByTag(CACHE_CONFIG.TAGS.SEARCH_RESULTS);\n   * ```\n   *\n   * @remarks\n   * This method uses Next.js revalidateTag() to invalidate cache entries.\n   * Can be called from Server Actions or API routes when content changes.\n   * Logs invalidation operations for monitoring in development.\n   */\n  static async invalidateByTag(tag: string): Promise<void> {\n    if (!isCacheEnabled()) {\n      this.logCacheOperation('bypass', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n      return;\n    }\n\n    try {\n      revalidateTag(tag);\n      this.logCacheOperation('force-refresh', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n    } catch (error) {\n      this.stats.errors++;\n      this.logCacheOperation('error', `invalidate:${tag}`, { operation: 'cache:invalidate' }, error);\n      throw error;\n    }\n  }",
+  "new_string": "  /**\n   * invalidate cache by tag\n   *\n   * Revalidates all cache entries associated with a specific tag, forcing fresh data\n   * on the next request. Useful for manual cache clearing when content is updated.\n   *\n   * @param tag - The cache tag to invalidate (e.g., 'public-search', 'search-results')\n   *\n   * @example\n   * ```typescript\n   * // Invalidate all public search results\n   * CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);\n   *\n   * // Invalidate all search results\n   * CacheService.invalidateByTag(CACHE_CONFIG.TAGS.SEARCH_RESULTS);\n   * ```\n   *\n   * @remarks\n   * This method uses Next.js revalidateTag() to invalidate cache entries.\n   * Can be called from Server Actions or API routes when content changes.\n   * Logs invalidation operations for monitoring in development.\n   */\n  static invalidateByTag(tag: string): void {\n    if (!isCacheEnabled()) {\n      this.logCacheOperation('bypass', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n      return;\n    }\n\n    try {\n      revalidateTag(tag);\n      this.logCacheOperation('force-refresh', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n    } catch (error) {\n      this.stats.errors++;\n      this.logCacheOperation('error', `invalidate:${tag}`, { operation: 'cache:invalidate' }, error);\n      throw error;\n    }\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:02:32.171Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "    /**\n     * invalidate all public search cache\n     *\n     * Clears all cached public search results (both dropdown and page results).\n     * Use this when content is updated that would affect public search results.\n     *\n     * @example\n     * ```typescript\n     * // After updating a collection, bobblehead, or subcollection\n     * await CacheService.search.invalidatePublic();\n     * ```\n     *\n     * @remarks\n     * Invalidates all cache entries tagged with 'public-search'\n     * This affects both dropdown and full page search results\n     * Should be called sparingly as it clears all public search cache\n     */\n    invalidatePublic: async (): Promise<void> => {\n      return CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);\n    },",
+  "new_string": "    /**\n     * invalidate all public search cache\n     *\n     * Clears all cached public search results (both dropdown and page results).\n     * Use this when content is updated that would affect public search results.\n     *\n     * @example\n     * ```typescript\n     * // After updating a collection, bobblehead, or subcollection\n     * CacheService.search.invalidatePublic();\n     * ```\n     *\n     * @remarks\n     * Invalidates all cache entries tagged with 'public-search'\n     * This affects both dropdown and full page search results\n     * Should be called sparingly as it clears all public search cache\n     */\n    invalidatePublic: (): void => {\n      return CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);\n    },"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:02:37.411Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint:fix and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:03:43.211Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "offset": 875,
+  "limit": 20
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:03:50.544Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "offset": 905,
+  "limit": 40
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:04:02.608Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 60000,
+  "description": "Run typecheck only to see error"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:04:11.791Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "offset": 870,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:04:19.849Z
+Tool: Grep
+Input:
+{
+  "pattern": "revalidateTag",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:04:25.628Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache-revalidation.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:04:38.330Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "old_string": "    try {\n      revalidateTag(tag);\n      this.logCacheOperation('force-refresh', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n    } catch (error) {\n      this.stats.errors++;\n      this.logCacheOperation('error', `invalidate:${tag}`, { operation: 'cache:invalidate' }, error);\n      throw error;\n    }",
+  "new_string": "    try {\n      revalidateTag(tag, 'max');\n      this.logCacheOperation('force-refresh', `invalidate:${tag}`, {\n        operation: 'cache:invalidate',\n      });\n    } catch (error) {\n      this.stats.errors++;\n      this.logCacheOperation('error', `invalidate:${tag}`, { operation: 'cache:invalidate' }, error);\n      throw error;\n    }"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:04:45.315Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint:fix and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T18:05:46.381Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing cache.service.ts to understand patterns",
+      "status": "completed",
+      "activeForm": "Reading existing cache.service.ts to understand patterns"
+    },
+    {
+      "content": "Check for existing hash utility functions",
+      "status": "completed",
+      "activeForm": "Checking for existing hash utility functions"
+    },
+    {
+      "content": "Add public search cache keys to cache.ts constants",
+      "status": "completed",
+      "activeForm": "Adding public search cache keys to cache.ts constants"
+    },
+    {
+      "content": "Add public search methods to CacheService",
+      "status": "completed",
+      "activeForm": "Adding public search methods to CacheService"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================

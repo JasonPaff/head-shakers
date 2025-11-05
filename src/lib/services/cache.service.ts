@@ -1,4 +1,4 @@
-import { unstable_cache } from 'next/cache';
+import { revalidateTag, unstable_cache } from 'next/cache';
 
 import {
   CACHE_CONFIG,
@@ -563,6 +563,27 @@ export class CacheService {
    */
   static readonly search = {
     /**
+     * invalidate all public search cache
+     *
+     * Clears all cached public search results (both dropdown and page results).
+     * Use this when content is updated that would affect public search results.
+     *
+     * @example
+     * ```typescript
+     * // After updating a collection, bobblehead, or subcollection
+     * CacheService.search.invalidatePublic();
+     * ```
+     *
+     * @remarks
+     * Invalidates all cache entries tagged with 'public-search'
+     * This affects both dropdown and full page search results
+     * Should be called sparingly as it clears all public search cache
+     */
+    invalidatePublic: (): void => {
+      return CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);
+    },
+
+    /**
      * cache popular searches
      */
     popular: async <T>(fn: () => Promise<T>, timeframe: string, options: Omit<CacheOptions, 'tags'> = {}) => {
@@ -574,6 +595,100 @@ export class CacheService {
         context: { ...options.context, entityType: 'search', operation: 'search:popular' },
         tags,
         ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
+      });
+    },
+
+    /**
+     * cache public search dropdown results
+     *
+     * Caches consolidated search results for the header dropdown (top 5 results across all entity types).
+     * Uses a 10-minute TTL to balance freshness with performance for frequently searched terms.
+     *
+     * @template T - The return type of the search function
+     * @param fn - The async function that performs the search query
+     * @param queryHash - Hashed search query for cache key generation
+     * @param options - Cache options (TTL defaults to 10 minutes)
+     * @returns Promise resolving to the cached or fresh search results
+     *
+     * @example
+     * ```typescript
+     * const results = await CacheService.search.publicDropdown(
+     *   () => searchPublicConsolidated(query),
+     *   createHashFromObject(query)
+     * );
+     * ```
+     *
+     * @remarks
+     * Cache keys follow the pattern: search:public:dropdown:{queryHash}
+     * Tagged with 'public-search' for bulk invalidation if needed
+     * Logs cache hits/misses for monitoring popular search terms
+     */
+    publicDropdown: async <T>(
+      fn: () => Promise<T>,
+      queryHash: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.SEARCH.PUBLIC_DROPDOWN(queryHash);
+      const tags = [CACHE_CONFIG.TAGS.PUBLIC_SEARCH, CACHE_CONFIG.TAGS.SEARCH_RESULTS];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'search',
+          operation: 'search:public-dropdown',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.PUBLIC_SEARCH,
+      });
+    },
+
+    /**
+     * cache public search page results
+     *
+     * Caches paginated search results for the full search results page with advanced filtering.
+     * Uses a 10-minute TTL to optimize performance for frequently accessed search combinations.
+     *
+     * @template T - The return type of the search function
+     * @param fn - The async function that performs the search query
+     * @param queryHash - Hashed search query for cache key generation
+     * @param filtersHash - Hashed filter parameters (entity types, tags, sort, pagination)
+     * @param options - Cache options (TTL defaults to 10 minutes)
+     * @returns Promise resolving to the cached or fresh search results
+     *
+     * @example
+     * ```typescript
+     * const results = await CacheService.search.publicPage(
+     *   () => searchPublicWithFilters(query, filters),
+     *   createHashFromObject(query),
+     *   createHashFromObject(filters)
+     * );
+     * ```
+     *
+     * @remarks
+     * Cache keys follow the pattern: search:public:page:{queryHash}:{filtersHash}
+     * Tagged with 'public-search' for bulk invalidation if needed
+     * Separate caching from dropdown results allows independent TTL management
+     * Logs cache hits/misses for monitoring search performance
+     */
+    publicPage: async <T>(
+      fn: () => Promise<T>,
+      queryHash: string,
+      filtersHash: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.SEARCH.PUBLIC_PAGE(queryHash, filtersHash);
+      const tags = [CACHE_CONFIG.TAGS.PUBLIC_SEARCH, CACHE_CONFIG.TAGS.SEARCH_RESULTS];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'search',
+          operation: 'search:public-page',
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.PUBLIC_SEARCH,
       });
     },
 
@@ -732,6 +847,48 @@ export class CacheService {
    */
   static getStats(): CacheStats {
     return { ...this.stats };
+  }
+
+  /**
+   * invalidate cache by tag
+   *
+   * Revalidates all cache entries associated with a specific tag, forcing fresh data
+   * on the next request. Useful for manual cache clearing when content is updated.
+   *
+   * @param tag - The cache tag to invalidate (e.g., 'public-search', 'search-results')
+   *
+   * @example
+   * ```typescript
+   * // Invalidate all public search results
+   * CacheService.invalidateByTag(CACHE_CONFIG.TAGS.PUBLIC_SEARCH);
+   *
+   * // Invalidate all search results
+   * CacheService.invalidateByTag(CACHE_CONFIG.TAGS.SEARCH_RESULTS);
+   * ```
+   *
+   * @remarks
+   * This method uses Next.js revalidateTag() to invalidate cache entries.
+   * Can be called from Server Actions or API routes when content changes.
+   * Logs invalidation operations for monitoring in development.
+   */
+  static invalidateByTag(tag: string): void {
+    if (!isCacheEnabled()) {
+      this.logCacheOperation('bypass', `invalidate:${tag}`, {
+        operation: 'cache:invalidate',
+      });
+      return;
+    }
+
+    try {
+      revalidateTag(tag, 'max');
+      this.logCacheOperation('force-refresh', `invalidate:${tag}`, {
+        operation: 'cache:invalidate',
+      });
+    } catch (error) {
+      this.stats.errors++;
+      this.logCacheOperation('error', `invalidate:${tag}`, { operation: 'cache:invalidate' }, error);
+      throw error;
+    }
   }
 
   /**

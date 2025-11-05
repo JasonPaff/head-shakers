@@ -57,6 +57,7 @@ export const CACHE_CONFIG = {
     GLOBAL_STATS: 'global-stats',
     POPULAR_CONTENT: 'popular-content',
     PUBLIC_CONTENT: 'public-content',
+    PUBLIC_SEARCH: 'public-search',
 
     SEARCH_RESULTS: 'search-results',
     TAG: (id: string) => `tag:${id}`,
@@ -85,6 +86,9 @@ export const CACHE_CONFIG = {
 
     // medium cache for semi-static data
     MEDIUM: 1800, // 30 minutes
+
+    // public search results cache (balance between freshness and performance)
+    PUBLIC_SEARCH: 600, // 10 minutes
 
     // ultra-short cache for frequently changing data
     REALTIME: 30, // 30 seconds
@@ -169,6 +173,9 @@ export const CACHE_KEYS = {
    */
   SEARCH: {
     POPULAR: (timeframe: string) => `${CACHE_CONFIG.NAMESPACES.SEARCH}:popular:${timeframe}`,
+    PUBLIC_DROPDOWN: (queryHash: string) => `${CACHE_CONFIG.NAMESPACES.SEARCH}:public:dropdown:${queryHash}`,
+    PUBLIC_PAGE: (queryHash: string, filtersHash: string) =>
+      `${CACHE_CONFIG.NAMESPACES.SEARCH}:public:page:${queryHash}:${filtersHash}`,
     RESULTS: (query: string, type: string, filters: string) =>
       `${CACHE_CONFIG.NAMESPACES.SEARCH}:${type}:${query}:${filters}`,
     SUGGESTIONS: (prefix: string, type: string) =>
