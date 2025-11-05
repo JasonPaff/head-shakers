@@ -2,12 +2,17 @@ import type {
   BobbleheadPhoto,
   BobbleheadSearchResult,
   CollectionSearchResult,
+  ConsolidatedSearchResults,
+  PublicSearchCounts,
+  SubcollectionSearchResult,
   UserSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
+import type { TagRecord } from '@/lib/queries/tags/tags-query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { PublicSearchInput } from '@/lib/validations/public-search.validation';
 
-import { ERROR_MESSAGES } from '@/lib/constants';
-import { createAdminQueryContext } from '@/lib/queries/base/query-context';
+import { CACHE_CONFIG, ERROR_MESSAGES } from '@/lib/constants';
+import { createAdminQueryContext, createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { ContentSearchQuery } from '@/lib/queries/content-search/content-search.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
@@ -33,6 +38,35 @@ export interface BobbleheadSearchResultWithPhotos extends BobbleheadSearchResult
 export interface CollectionSearchResponse {
   collections: Array<CollectionSearchResult>;
   message: string;
+}
+
+/**
+ * Consolidated public search results for dropdown (top 5 total)
+ */
+export interface PublicSearchDropdownResponse {
+  bobbleheads: Array<BobbleheadSearchResult>;
+  collections: Array<CollectionSearchResult>;
+  message: string;
+  subcollections: Array<SubcollectionSearchResult>;
+  totalResults: number;
+}
+
+/**
+ * Full public search results for search page with pagination
+ */
+export interface PublicSearchPageResponse {
+  bobbleheads: Array<BobbleheadSearchResult>;
+  collections: Array<CollectionSearchResult>;
+  counts: PublicSearchCounts;
+  message: string;
+  pagination: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    page: number;
+    pageSize: number;
+    totalPages: number;
+  };
+  subcollections: Array<SubcollectionSearchResult>;
 }
 
 /**
@@ -127,6 +161,191 @@ export class ContentSearchFacade {
           facade: 'ContentSearchFacade',
           operation: 'getCollectionForFeaturing',
         },
+      },
+    );
+  }
+
+  /**
+   * Search across all public entity types for dropdown (unauthenticated access)
+   * Returns top 5 consolidated results across collections, subcollections, and bobbleheads
+   * Implements Redis caching with 10-minute TTL for performance optimization
+   *
+   * @param query - Search text to match across entity types
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Consolidated search results with up to 5 total items
+   */
+  static async getPublicSearchDropdownResults(
+    query: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<PublicSearchDropdownResponse> {
+    // Generate cache key from query only (no filters for dropdown)
+    const cacheKey = `dropdown:${query}`;
+
+    return CacheService.search.results(
+      async () => {
+        const context = createPublicQueryContext({ dbInstance });
+
+        // Get top 2 results per entity type (total max 6, but we'll limit to 5)
+        const limitPerType = 2;
+        const consolidated = await ContentSearchQuery.searchPublicConsolidated(query, limitPerType, context);
+
+        // Enrich results with tags
+        const enrichedResults = await this.enrichPublicSearchResults(consolidated, context);
+
+        // Calculate total results
+        const totalResults =
+          enrichedResults.collections.length +
+          enrichedResults.subcollections.length +
+          enrichedResults.bobbleheads.length;
+
+        // Limit to maximum 5 total results if needed
+        let collections = enrichedResults.collections;
+        let subcollections = enrichedResults.subcollections;
+        let bobbleheads = enrichedResults.bobbleheads;
+
+        if (totalResults > 5) {
+          // Distribute the 5 slots proportionally
+          const collectionsCount = Math.min(collections.length, 2);
+          const subcollectionsCount = Math.min(subcollections.length, 2);
+          const bobbleheadsCount = Math.min(bobbleheads.length, 5 - collectionsCount - subcollectionsCount);
+
+          collections = collections.slice(0, collectionsCount);
+          subcollections = subcollections.slice(0, subcollectionsCount);
+          bobbleheads = bobbleheads.slice(0, bobbleheadsCount);
+        }
+
+        const resultCount = collections.length + subcollections.length + bobbleheads.length;
+
+        return {
+          bobbleheads,
+          collections,
+          message:
+            resultCount > 0 ?
+              `Found ${resultCount} result${resultCount !== 1 ? 's' : ''} for "${query}"`
+            : `No results found for "${query}"`,
+          subcollections,
+          totalResults: resultCount,
+        };
+      },
+      query,
+      'public-dropdown',
+      cacheKey,
+      {
+        context: {
+          entityType: 'search',
+          facade: 'ContentSearchFacade',
+          operation: 'getPublicSearchDropdownResults',
+        },
+        ttl: CACHE_CONFIG.TTL.MEDIUM, // 10 minutes
+      },
+    );
+  }
+
+  /**
+   * Search public content with full pagination and filtering (unauthenticated access)
+   * Returns paginated results with complete filtering options
+   * Implements Redis caching with 10-minute TTL for frequently searched terms
+   *
+   * @param input - Search input with query, filters, and pagination
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Paginated search results with counts and metadata
+   */
+  static async getPublicSearchPageResults(
+    input: PublicSearchInput,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<PublicSearchPageResponse> {
+    const { filters, pagination, query } = input;
+    const page = pagination?.page || 1;
+    const pageSize = pagination?.pageSize || 20;
+    const offset = (page - 1) * pageSize;
+
+    // Generate cache key from all parameters
+    const filtersHash = createHashFromObject({ filters, pagination });
+
+    return CacheService.search.results(
+      async () => {
+        const context = createPublicQueryContext({ dbInstance });
+
+        // Get total counts for all entity types
+        const counts = await ContentSearchQuery.getSearchResultCounts(
+          query,
+          context,
+          filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
+        );
+
+        // Determine which entity types to search based on filters
+        const entityTypes = filters?.entityTypes || ['collection', 'subcollection', 'bobblehead'];
+
+        // Execute searches for requested entity types with pagination
+        const [collections, subcollections, bobbleheads] = await Promise.all([
+          entityTypes.includes('collection') ?
+            ContentSearchQuery.searchPublicCollections(
+              query,
+              pageSize,
+              context,
+              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
+              offset,
+            )
+          : Promise.resolve([]),
+          entityTypes.includes('subcollection') ?
+            ContentSearchQuery.searchPublicSubcollections(
+              query,
+              pageSize,
+              context,
+              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
+              offset,
+            )
+          : Promise.resolve([]),
+          entityTypes.includes('bobblehead') ?
+            ContentSearchQuery.searchPublicBobbleheads(
+              query,
+              pageSize,
+              context,
+              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
+              offset,
+            )
+          : Promise.resolve([]),
+        ]);
+
+        // Enrich results with tags
+        const enrichedResults = await this.enrichPublicSearchResults(
+          { bobbleheads, collections, subcollections },
+          context,
+        );
+
+        // Calculate pagination metadata
+        const totalPages = Math.ceil(counts.total / pageSize);
+        const hasNextPage = page < totalPages;
+        const hasPreviousPage = page > 1;
+
+        return {
+          bobbleheads: enrichedResults.bobbleheads,
+          collections: enrichedResults.collections,
+          counts,
+          message:
+            counts.total > 0 ?
+              `Found ${counts.total} result${counts.total !== 1 ? 's' : ''} for "${query}"`
+            : `No results found for "${query}"`,
+          pagination: {
+            hasNextPage,
+            hasPreviousPage,
+            page,
+            pageSize,
+            totalPages,
+          },
+          subcollections: enrichedResults.subcollections,
+        };
+      },
+      query,
+      'public-page',
+      filtersHash,
+      {
+        context: {
+          entityType: 'search',
+          facade: 'ContentSearchFacade',
+          operation: 'getPublicSearchPageResults',
+        },
+        ttl: CACHE_CONFIG.TTL.MEDIUM, // 10 minutes
       },
     );
   }
@@ -312,6 +531,62 @@ export class ContentSearchFacade {
         },
       },
     );
+  }
+
+  /**
+   * Enrich public search results with tags
+   * Fetches and attaches tags to collections and bobbleheads
+   *
+   * @param results - Consolidated search results to enrich
+   * @param context - Query context with database instance
+   * @returns Enriched results with tags attached
+   */
+  private static async enrichPublicSearchResults(
+    results: ConsolidatedSearchResults,
+    context: ReturnType<typeof createPublicQueryContext>,
+  ): Promise<ConsolidatedSearchResults> {
+    // Get all IDs for tag enrichment
+    const collectionIds = results.collections.map((c) => c.id);
+    const bobbleheadIds = results.bobbleheads.map((b) => b.id);
+
+    // Fetch tags for collections and bobbleheads in parallel
+    const [collectionTags, bobbleheadTags] = await Promise.all([
+      collectionIds.length > 0 ?
+        ContentSearchQuery.getCollectionTagsAsync(collectionIds, context)
+      : Promise.resolve(new Map()),
+      bobbleheadIds.length > 0 ?
+        ContentSearchQuery.getBobbleheadTagsAsync(bobbleheadIds, context)
+      : Promise.resolve(new Map()),
+    ]);
+
+    // Attach tags to results
+    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(
+      (collection): CollectionSearchResult => {
+        const collectionTagsList: Array<TagRecord> =
+          (collectionTags.get(collection.id) as Array<TagRecord> | undefined) ?? [];
+        return {
+          ...collection,
+          tags: collectionTagsList,
+        };
+      },
+    );
+
+    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(
+      (bobblehead): BobbleheadSearchResult => {
+        const bobbleheadTagsList: Array<TagRecord> =
+          (bobbleheadTags.get(bobblehead.id) as Array<TagRecord> | undefined) ?? [];
+        return {
+          ...bobblehead,
+          tags: bobbleheadTagsList,
+        };
+      },
+    );
+
+    return {
+      bobbleheads: enrichedBobbleheads,
+      collections: enrichedCollections,
+      subcollections: results.subcollections,
+    };
   }
 
   /**

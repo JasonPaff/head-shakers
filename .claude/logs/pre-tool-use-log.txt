@@ -14819,3 +14819,355 @@ Input:
   "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\cloudinary.utils.ts"
 }
 ================================================================================
+
+================================================================================
+2025-11-05T17:00:38.867Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\base\\query-context.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:51.188Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Implement searchPublicContent method with Redis caching",
+      "status": "in_progress",
+      "activeForm": "Implementing searchPublicContent method with Redis caching"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownResults method (limit 5)",
+      "status": "pending",
+      "activeForm": "Implementing getPublicSearchDropdownResults method"
+    },
+    {
+      "content": "Implement getPublicSearchPageResults method with pagination",
+      "status": "pending",
+      "activeForm": "Implementing getPublicSearchPageResults method with pagination"
+    },
+    {
+      "content": "Run lint:fix and typecheck validation",
+      "status": "pending",
+      "activeForm": "Running lint:fix and typecheck validation"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:01:02.597Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "import type {\n  BobbleheadPhoto,\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  UserSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { ERROR_MESSAGES } from '@/lib/constants';\nimport { createAdminQueryContext } from '@/lib/queries/base/query-context';\nimport { ContentSearchQuery } from '@/lib/queries/content-search/content-search.query';\nimport { CacheService } from '@/lib/services/cache.service';\nimport { createHashFromObject } from '@/lib/utils/cache.utils';",
+  "new_string": "import type {\n  BobbleheadPhoto,\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  ConsolidatedSearchResults,\n  PublicSearchCounts,\n  SubcollectionSearchResult,\n  UserSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { PublicSearchInput, SearchFilters } from '@/lib/validations/public-search.validation';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { CACHE_CONFIG, ERROR_MESSAGES } from '@/lib/constants';\nimport { createAdminQueryContext, createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { ContentSearchQuery } from '@/lib/queries/content-search/content-search.query';\nimport { CacheService } from '@/lib/services/cache.service';\nimport { createHashFromObject } from '@/lib/utils/cache.utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:01:11.526Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "/**\n * search results response for users\n */\nexport interface UserSearchResponse {\n  message: string;\n  users: Array<UserSearchResult>;\n}",
+  "new_string": "/**\n * search results response for users\n */\nexport interface UserSearchResponse {\n  message: string;\n  users: Array<UserSearchResult>;\n}\n\n/**\n * Consolidated public search results for dropdown (top 5 total)\n */\nexport interface PublicSearchDropdownResponse {\n  bobbleheads: Array<BobbleheadSearchResult>;\n  collections: Array<CollectionSearchResult>;\n  message: string;\n  subcollections: Array<SubcollectionSearchResult>;\n  totalResults: number;\n}\n\n/**\n * Full public search results for search page with pagination\n */\nexport interface PublicSearchPageResponse {\n  bobbleheads: Array<BobbleheadSearchResult>;\n  collections: Array<CollectionSearchResult>;\n  counts: PublicSearchCounts;\n  message: string;\n  pagination: {\n    hasNextPage: boolean;\n    hasPreviousPage: boolean;\n    page: number;\n    pageSize: number;\n    totalPages: number;\n  };\n  subcollections: Array<SubcollectionSearchResult>;\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:01:48.251Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "  /**\n   * group photos by bobblehead ID for efficient lookup\n   */\n  private static groupPhotosByBobblehead(\n    photos: Array<BobbleheadPhoto>,\n  ): Map<string, Array<BobbleheadPhoto>> {\n    const photosByBobblehead = new Map<string, Array<BobbleheadPhoto>>();\n\n    photos.forEach((photo) => {\n      if (!photosByBobblehead.has(photo.bobbleheadId)) {\n        photosByBobblehead.set(photo.bobbleheadId, []);\n      }\n      photosByBobblehead.get(photo.bobbleheadId)?.push(photo);\n    });\n\n    return photosByBobblehead;\n  }\n}",
+  "new_string": "  /**\n   * Search across all public entity types for dropdown (unauthenticated access)\n   * Returns top 5 consolidated results across collections, subcollections, and bobbleheads\n   * Implements Redis caching with 10-minute TTL for performance optimization\n   *\n   * @param query - Search text to match across entity types\n   * @param dbInstance - Optional database instance for transactions\n   * @returns Consolidated search results with up to 5 total items\n   */\n  static async getPublicSearchDropdownResults(\n    query: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<PublicSearchDropdownResponse> {\n    // Generate cache key from query only (no filters for dropdown)\n    const cacheKey = `dropdown:${query}`;\n\n    return CacheService.search.results(\n      async () => {\n        const context = createPublicQueryContext({ dbInstance });\n\n        // Get top 2 results per entity type (total max 6, but we'll limit to 5)\n        const limitPerType = 2;\n        const consolidated = await ContentSearchQuery.searchPublicConsolidated(query, limitPerType, context);\n\n        // Enrich results with tags\n        const enrichedResults = await this.enrichPublicSearchResults(consolidated, context);\n\n        // Calculate total results\n        const totalResults =\n          enrichedResults.collections.length +\n          enrichedResults.subcollections.length +\n          enrichedResults.bobbleheads.length;\n\n        // Limit to maximum 5 total results if needed\n        let collections = enrichedResults.collections;\n        let subcollections = enrichedResults.subcollections;\n        let bobbleheads = enrichedResults.bobbleheads;\n\n        if (totalResults > 5) {\n          // Distribute the 5 slots proportionally\n          const collectionsCount = Math.min(collections.length, 2);\n          const subcollectionsCount = Math.min(subcollections.length, 2);\n          const bobbleheadsCount = Math.min(bobbleheads.length, 5 - collectionsCount - subcollectionsCount);\n\n          collections = collections.slice(0, collectionsCount);\n          subcollections = subcollections.slice(0, subcollectionsCount);\n          bobbleheads = bobbleheads.slice(0, bobbleheadsCount);\n        }\n\n        const resultCount = collections.length + subcollections.length + bobbleheads.length;\n\n        return {\n          bobbleheads,\n          collections,\n          message:\n            resultCount > 0 ?\n              `Found ${resultCount} result${resultCount !== 1 ? 's' : ''} for \"${query}\"`\n            : `No results found for \"${query}\"`,\n          subcollections,\n          totalResults: resultCount,\n        };\n      },\n      query,\n      'public-dropdown',\n      cacheKey,\n      {\n        context: {\n          entityType: 'search',\n          facade: 'ContentSearchFacade',\n          operation: 'getPublicSearchDropdownResults',\n        },\n        ttl: CACHE_CONFIG.TTL.MEDIUM, // 10 minutes\n      },\n    );\n  }\n\n  /**\n   * Search public content with full pagination and filtering (unauthenticated access)\n   * Returns paginated results with complete filtering options\n   * Implements Redis caching with 10-minute TTL for frequently searched terms\n   *\n   * @param input - Search input with query, filters, and pagination\n   * @param dbInstance - Optional database instance for transactions\n   * @returns Paginated search results with counts and metadata\n   */\n  static async getPublicSearchPageResults(\n    input: PublicSearchInput,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<PublicSearchPageResponse> {\n    const { query, filters, pagination } = input;\n    const page = pagination?.page || 1;\n    const pageSize = pagination?.pageSize || 20;\n    const offset = (page - 1) * pageSize;\n\n    // Generate cache key from all parameters\n    const filtersHash = createHashFromObject({ filters, pagination });\n\n    return CacheService.search.results(\n      async () => {\n        const context = createPublicQueryContext({ dbInstance });\n\n        // Get total counts for all entity types\n        const counts = await ContentSearchQuery.getSearchResultCounts(\n          query,\n          context,\n          filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,\n        );\n\n        // Determine which entity types to search based on filters\n        const entityTypes = filters?.entityTypes || ['collection', 'subcollection', 'bobblehead'];\n\n        // Execute searches for requested entity types with pagination\n        const [collections, subcollections, bobbleheads] = await Promise.all([\n          entityTypes.includes('collection') ?\n            ContentSearchQuery.searchPublicCollections(\n              query,\n              pageSize,\n              context,\n              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,\n              offset,\n            )\n          : Promise.resolve([]),\n          entityTypes.includes('subcollection') ?\n            ContentSearchQuery.searchPublicSubcollections(\n              query,\n              pageSize,\n              context,\n              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,\n              offset,\n            )\n          : Promise.resolve([]),\n          entityTypes.includes('bobblehead') ?\n            ContentSearchQuery.searchPublicBobbleheads(\n              query,\n              pageSize,\n              context,\n              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,\n              offset,\n            )\n          : Promise.resolve([]),\n        ]);\n\n        // Enrich results with tags\n        const enrichedResults = await this.enrichPublicSearchResults(\n          { bobbleheads, collections, subcollections },\n          context,\n        );\n\n        // Calculate pagination metadata\n        const totalPages = Math.ceil(counts.total / pageSize);\n        const hasNextPage = page < totalPages;\n        const hasPreviousPage = page > 1;\n\n        const resultCount =\n          enrichedResults.collections.length +\n          enrichedResults.subcollections.length +\n          enrichedResults.bobbleheads.length;\n\n        return {\n          bobbleheads: enrichedResults.bobbleheads,\n          collections: enrichedResults.collections,\n          counts,\n          message:\n            counts.total > 0 ?\n              `Found ${counts.total} result${counts.total !== 1 ? 's' : ''} for \"${query}\"`\n            : `No results found for \"${query}\"`,\n          pagination: {\n            hasNextPage,\n            hasPreviousPage,\n            page,\n            pageSize,\n            totalPages,\n          },\n          subcollections: enrichedResults.subcollections,\n        };\n      },\n      query,\n      'public-page',\n      filtersHash,\n      {\n        context: {\n          entityType: 'search',\n          facade: 'ContentSearchFacade',\n          operation: 'getPublicSearchPageResults',\n        },\n        ttl: CACHE_CONFIG.TTL.MEDIUM, // 10 minutes\n      },\n    );\n  }\n\n  /**\n   * Enrich public search results with tags\n   * Fetches and attaches tags to collections and bobbleheads\n   *\n   * @param results - Consolidated search results to enrich\n   * @param context - Query context with database instance\n   * @returns Enriched results with tags attached\n   */\n  private static async enrichPublicSearchResults(\n    results: ConsolidatedSearchResults,\n    context: ReturnType<typeof createPublicQueryContext>,\n  ): Promise<ConsolidatedSearchResults> {\n    // Get all IDs for tag enrichment\n    const collectionIds = results.collections.map((c) => c.id);\n    const bobbleheadIds = results.bobbleheads.map((b) => b.id);\n\n    // Fetch tags for collections and bobbleheads in parallel\n    const [collectionTags, bobbleheadTags] = await Promise.all([\n      collectionIds.length > 0 ?\n        ContentSearchQuery.getCollectionTagsAsync(collectionIds, context)\n      : Promise.resolve(new Map()),\n      bobbleheadIds.length > 0 ?\n        ContentSearchQuery.getBobbleheadTagsAsync(bobbleheadIds, context)\n      : Promise.resolve(new Map()),\n    ]);\n\n    // Attach tags to results\n    const enrichedCollections = results.collections.map((collection) => ({\n      ...collection,\n      tags: collectionTags.get(collection.id) || [],\n    }));\n\n    const enrichedBobbleheads = results.bobbleheads.map((bobblehead) => ({\n      ...bobblehead,\n      tags: bobbleheadTags.get(bobblehead.id) || [],\n    }));\n\n    return {\n      bobbleheads: enrichedBobbleheads,\n      collections: enrichedCollections,\n      subcollections: results.subcollections,\n    };\n  }\n\n  /**\n   * group photos by bobblehead ID for efficient lookup\n   */\n  private static groupPhotosByBobblehead(\n    photos: Array<BobbleheadPhoto>,\n  ): Map<string, Array<BobbleheadPhoto>> {\n    const photosByBobblehead = new Map<string, Array<BobbleheadPhoto>>();\n\n    photos.forEach((photo) => {\n      if (!photosByBobblehead.has(photo.bobbleheadId)) {\n        photosByBobblehead.set(photo.bobbleheadId, []);\n      }\n      photosByBobblehead.get(photo.bobbleheadId)?.push(photo);\n    });\n\n    return photosByBobblehead;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:02:00.087Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Implement searchPublicContent method with Redis caching",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicContent method with Redis caching"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownResults method (limit 5)",
+      "status": "completed",
+      "activeForm": "Implementing getPublicSearchDropdownResults method"
+    },
+    {
+      "content": "Implement getPublicSearchPageResults method with pagination",
+      "status": "completed",
+      "activeForm": "Implementing getPublicSearchPageResults method with pagination"
+    },
+    {
+      "content": "Run lint:fix and typecheck validation",
+      "status": "in_progress",
+      "activeForm": "Running lint:fix and typecheck validation"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:02:00.390Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:02:56.737Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "offset": 1,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:03:04.500Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "offset": 310,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:03:04.506Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "offset": 560,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:03:20.857Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "import type {\n  BobbleheadPhoto,\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  ConsolidatedSearchResults,\n  PublicSearchCounts,\n  SubcollectionSearchResult,\n  UserSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type { PublicSearchInput, SearchFilters } from '@/lib/validations/public-search.validation';",
+  "new_string": "import type {\n  BobbleheadPhoto,\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  ConsolidatedSearchResults,\n  PublicSearchCounts,\n  SubcollectionSearchResult,\n  UserSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type { PublicSearchInput } from '@/lib/validations/public-search.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:03:21.891Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "        // Calculate pagination metadata\n        const totalPages = Math.ceil(counts.total / pageSize);\n        const hasNextPage = page < totalPages;\n        const hasPreviousPage = page > 1;\n\n        const resultCount =\n          enrichedResults.collections.length +\n          enrichedResults.subcollections.length +\n          enrichedResults.bobbleheads.length;\n\n        return {",
+  "new_string": "        // Calculate pagination metadata\n        const totalPages = Math.ceil(counts.total / pageSize);\n        const hasNextPage = page < totalPages;\n        const hasPreviousPage = page > 1;\n\n        return {"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:03:22.968Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "    ]);\n\n    // Attach tags to results\n    const enrichedCollections = results.collections.map((collection) => ({\n      ...collection,\n      tags: collectionTags.get(collection.id) || [],\n    }));\n\n    const enrichedBobbleheads = results.bobbleheads.map((bobblehead) => ({\n      ...bobblehead,\n      tags: bobbleheadTags.get(bobblehead.id) || [],\n    }));\n\n    return {\n      bobbleheads: enrichedBobbleheads,\n      collections: enrichedCollections,\n      subcollections: results.subcollections,\n    };\n  }",
+  "new_string": "    ]);\n\n    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map((collection) => ({\n      ...collection,\n      tags: collectionTags.get(collection.id) || [],\n    }));\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map((bobblehead) => ({\n      ...bobblehead,\n      tags: bobbleheadTags.get(bobblehead.id) || [],\n    }));\n\n    return {\n      bobbleheads: enrichedBobbleheads,\n      collections: enrichedCollections,\n      subcollections: results.subcollections,\n    };\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:03:29.332Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation after fixes"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:04:22.430Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map((collection) => ({\n      ...collection,\n      tags: collectionTags.get(collection.id) || [],\n    }));\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map((bobblehead) => ({\n      ...bobblehead,\n      tags: bobbleheadTags.get(bobblehead.id) || [],\n    }));",
+  "new_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => ({\n        ...collection,\n        tags: collectionTags.get(collection.id) || [],\n      }),\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => ({\n        ...bobblehead,\n        tags: bobbleheadTags.get(bobblehead.id) || [],\n      }),\n    );"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:04:28.067Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation after type assertion fixes"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:05:26.645Z
+Tool: Grep
+Input:
+{
+  "pattern": "export type TagRecord",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:05:35.965Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => ({\n        ...collection,\n        tags: collectionTags.get(collection.id) || [],\n      }),\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => ({\n        ...bobblehead,\n        tags: bobbleheadTags.get(bobblehead.id) || [],\n      }),\n    );",
+  "new_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList = collectionTags.get(collection.id);\n        return {\n          ...collection,\n          tags: collectionTagsList || [],\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList = bobbleheadTags.get(bobblehead.id);\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList || [],\n        };\n      },\n    );"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:05:46.401Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList = collectionTags.get(collection.id);\n        return {\n          ...collection,\n          tags: collectionTagsList || [],\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList = bobbleheadTags.get(bobblehead.id);\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList || [],\n        };\n      },\n    );",
+  "new_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList = collectionTags.get(collection.id) ?? [];\n        return {\n          ...collection,\n          tags: collectionTagsList,\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList = bobbleheadTags.get(bobblehead.id) ?? [];\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList,\n        };\n      },\n    );"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:05:51.825Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation with nullish coalescing"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:06:45.197Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\tags\\tags-query.ts",
+  "offset": 1,
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:06:59.109Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "import type {\n  BobbleheadPhoto,\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  ConsolidatedSearchResults,\n  PublicSearchCounts,\n  SubcollectionSearchResult,\n  UserSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type { PublicSearchInput } from '@/lib/validations/public-search.validation';",
+  "new_string": "import type {\n  BobbleheadPhoto,\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  ConsolidatedSearchResults,\n  PublicSearchCounts,\n  SubcollectionSearchResult,\n  UserSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { TagRecord } from '@/lib/queries/tags/tags-query';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type { PublicSearchInput } from '@/lib/validations/public-search.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:07:00.177Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList = collectionTags.get(collection.id) ?? [];\n        return {\n          ...collection,\n          tags: collectionTagsList,\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList = bobbleheadTags.get(bobblehead.id) ?? [];\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList,\n        };\n      },\n    );",
+  "new_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList: Array<TagRecord> = collectionTags.get(collection.id) ?? [];\n        return {\n          ...collection,\n          tags: collectionTagsList,\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList: Array<TagRecord> = bobbleheadTags.get(bobblehead.id) ?? [];\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList,\n        };\n      },\n    );"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:07:07.572Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation with TagRecord type"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:08:03.501Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "old_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList: Array<TagRecord> = collectionTags.get(collection.id) ?? [];\n        return {\n          ...collection,\n          tags: collectionTagsList,\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList: Array<TagRecord> = bobbleheadTags.get(bobblehead.id) ?? [];\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList,\n        };\n      },\n    );",
+  "new_string": "    // Attach tags to results\n    const enrichedCollections: Array<CollectionSearchResult> = results.collections.map(\n      (collection): CollectionSearchResult => {\n        const collectionTagsList: Array<TagRecord> =\n          (collectionTags.get(collection.id) as Array<TagRecord> | undefined) ?? [];\n        return {\n          ...collection,\n          tags: collectionTagsList,\n        };\n      },\n    );\n\n    const enrichedBobbleheads: Array<BobbleheadSearchResult> = results.bobbleheads.map(\n      (bobblehead): BobbleheadSearchResult => {\n        const bobbleheadTagsList: Array<TagRecord> =\n          (bobbleheadTags.get(bobblehead.id) as Array<TagRecord> | undefined) ?? [];\n        return {\n          ...bobblehead,\n          tags: bobbleheadTagsList,\n        };\n      },\n    );"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:08:08.986Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation with type assertion"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:09:11.885Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Implement searchPublicContent method with Redis caching",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicContent method with Redis caching"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownResults method (limit 5)",
+      "status": "completed",
+      "activeForm": "Implementing getPublicSearchDropdownResults method"
+    },
+    {
+      "content": "Implement getPublicSearchPageResults method with pagination",
+      "status": "completed",
+      "activeForm": "Implementing getPublicSearchPageResults method with pagination"
+    },
+    {
+      "content": "Run lint:fix and typecheck validation",
+      "status": "completed",
+      "activeForm": "Running lint:fix and typecheck validation"
+    }
+  ]
+}
+================================================================================
