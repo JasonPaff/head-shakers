@@ -5,7 +5,7 @@ description: Generate detailed implementation plans through automated 3-step orc
 model: sonnet
 ---
 
-You are a streamlined feature planning orchestrator that creates detailed implementation plans through a simple 3-step process. Think hard.
+You are a streamlined feature planning orchestrator that creates detailed implementation plans through a simple 3-step process.
 
 @CLAUDE.MD
 @package.json
@@ -81,7 +81,8 @@ When the user runs this command, execute this simple 3-step workflow:
 **Process**:
 
 1. Record step start time with ISO timestamp
-2. **AI-Powered Discovery**: Use integrated Claude API for intelligent file analysis:
+2. Use Task tool with `subagent_type: "file-discovery-agent"`:
+3. **AI-Powered Discovery**: Use integrated Claude API for intelligent file analysis:
    - **Context-Aware Analysis**: AI examines the refined feature request and understands implementation requirements
    - **Codebase Structure Analysis**: AI analyzes the Head Shakers project architecture and patterns
    - **Content-Based Discovery**: AI reads and analyzes file contents for relevance (not just filenames)
@@ -93,14 +94,14 @@ When the user runs this command, execute this simple 3-step workflow:
    - **RETRY STRATEGY**: Maximum 2 attempts with fallback strategies
    - **MINIMUM REQUIREMENT**: Must discover at least 3 relevant files through AI analysis
    - **LOG REQUIREMENT**: Capture complete AI prompt and full analysis response
-3. **Enhanced File Validation**:
+4. **Enhanced File Validation**:
    - Validate all AI-discovered file paths exist using file system checks
    - Check file permissions and accessibility
    - Log any missing or inaccessible files discovered by AI
    - Flag files that may need creation vs modification
    - Cross-reference AI analysis with actual file contents
-4. Record step end time and validation results
-5. **SAVE STEP 2 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/02-file-discovery.md` with:
+5. Record step end time and validation results
+6. **SAVE STEP 2 LOG**: Create `docs/{YYYY_MM_DD}/orchestration/{feature-name}/02-file-discovery.md` with:
    - Step metadata (timestamps, duration, status)
    - Refined request used as input
    - Complete AI prompt sent and analysis received
@@ -108,9 +109,9 @@ When the user runs this command, execute this simple 3-step workflow:
    - Discovered files list with AI-generated categorization and priorities
    - File path validation results and existence checks
    - AI analysis metrics (API cost, duration, tokens used)
-   - Discovery statistics and coverage analysis
-6. **UPDATE INDEX**: Append Step 2 summary to orchestration index
-7. **CHECKPOINT**: Step 2 markdown log now available for review/debugging
+   - Discovery statistics and coverage analysis7
+7. **UPDATE INDEX**: Append Step 2 summary to orchestration index
+8. **CHECKPOINT**: Step 2 markdown log now available for review/debugging
 
 ### Step 3: Implementation Planning
 
