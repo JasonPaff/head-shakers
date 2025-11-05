@@ -16209,3 +16209,852 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-05T17:37:15.493Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "in_progress",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "pending",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "pending",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "pending",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "pending",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Integrate all components and test URL state management",
+      "status": "pending",
+      "activeForm": "Integrating all components and testing URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:23.324Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:23.325Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/components/ui/**/*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:23.325Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*search*.{tsx,ts}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:35.772Z
+Tool: Bash
+Input:
+{
+  "command": "ls \"src/app/(app)\"",
+  "description": "List app routes directory structure"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:37.058Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:37.057Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:37.058Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\content-search\\content-search.actions.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:50.098Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/components/ui/{button,card,badge,input,select,empty-state,skeleton}.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:50.099Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:37:59.443Z
+Tool: Bash
+Input:
+{
+  "command": "ls \"src/app/(app)/bobbleheads\"",
+  "description": "List bobbleheads directory structure"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:00.662Z
+Tool: Grep
+Input:
+{
+  "pattern": "SEARCH|PAGINATION",
+  "path": "src/lib/constants",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:07.563Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:07.564Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\config.ts",
+  "limit": 150
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:07.565Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\enums.ts",
+  "limit": 150
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:18.399Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "completed",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "in_progress",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "pending",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "pending",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "pending",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Integrate all components and test URL state management",
+      "status": "pending",
+      "activeForm": "Integrating all components and testing URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:26.788Z
+Tool: Grep
+Input:
+{
+  "pattern": "from ['\"]nuqs['\"']|from ['\"]next-usequerystate['\"]|useQueryState",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:26.789Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/actions/tags/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:26.789Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\tags\\tags-query.ts",
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:37.282Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\dashboard\\collection\\(collection)\\components\\dashboard-tabs-client.tsx",
+  "limit": 80
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:37.287Z
+Tool: Grep
+Input:
+{
+  "pattern": "getAllTags|getPublicTags|getAllPublic",
+  "path": "src/lib",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:46.702Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\tags\\tags-query.ts",
+  "offset": 100,
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:46.706Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\tags\\tags.actions.ts",
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:38:57.104Z
+Tool: Skill
+Input:
+{
+  "command": "react-coding-conventions"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:39:06.550Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.claude\\skills\\react-coding-conventions\\references\\React-Coding-Conventions.md"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:39:24.353Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\search\\page.tsx",
+  "content": "import type { Metadata } from 'next';\n\nimport { Suspense } from 'react';\n\nimport { SearchPageContent } from '@/components/feature/search/search-page-content';\nimport { Skeleton } from '@/components/ui/skeleton';\n\ninterface SearchPageProps {\n  searchParams: Promise<{\n    entityTypes?: string;\n    page?: string;\n    pageSize?: string;\n    q?: string;\n    sortBy?: string;\n    sortOrder?: string;\n    tagIds?: string;\n  }>;\n}\n\nexport default async function SearchPage({ searchParams }: SearchPageProps) {\n  const params = await searchParams;\n\n  return (\n    <div className={'container mx-auto px-4 py-8'}>\n      {/* Page Header */}\n      <div className={'mb-8'}>\n        <h1 className={'text-3xl font-bold tracking-tight'}>Search Results</h1>\n        <p className={'mt-2 text-muted-foreground'}>\n          Find collections, subcollections, and bobbleheads\n        </p>\n      </div>\n\n      {/* Search Content */}\n      <Suspense\n        fallback={\n          <div className={'space-y-8'}>\n            <Skeleton className={'h-24 w-full'} />\n            <div className={'grid gap-6 sm:grid-cols-2 lg:grid-cols-3'}>\n              {Array.from({ length: 6 }).map((_, i) => (\n                <Skeleton key={i} className={'h-64 w-full'} />\n              ))}\n            </div>\n          </div>\n        }\n      >\n        <SearchPageContent searchParams={params} />\n      </Suspense>\n    </div>\n  );\n}\n\nexport function generateMetadata({ searchParams }: SearchPageProps): Metadata {\n  return {\n    description: 'Search for collections, subcollections, and bobbleheads in the Head Shakers community',\n    title: 'Search',\n  };\n}\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:39:50.560Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "content": "'use client';\n\nimport { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';\nimport { useEffect, useState, useTransition } from 'react';\n\nimport type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';\n\nimport { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';\nimport { CONFIG, ENUMS } from '@/lib/constants';\nimport { SearchFilters } from '@/components/feature/search/search-filters';\nimport { SearchPagination } from '@/components/feature/search/search-pagination';\nimport { SearchResultsGrid } from '@/components/feature/search/search-results-grid';\nimport { EmptyState } from '@/components/ui/empty-state';\nimport { Spinner } from '@/components/ui/spinner';\n\ninterface SearchPageContentProps {\n  searchParams: {\n    entityTypes?: string;\n    page?: string;\n    pageSize?: string;\n    q?: string;\n    sortBy?: string;\n    sortOrder?: string;\n    tagIds?: string;\n  };\n}\n\nexport const SearchPageContent = ({ searchParams }: SearchPageContentProps) => {\n  // useState hooks\n  const [searchResults, setSearchResults] = useState<PublicSearchPageResponse | null>(null);\n  const [error, setError] = useState<string | null>(null);\n\n  // Other hooks\n  const [isPending, startTransition] = useTransition();\n\n  const [queryParams, setQueryParams] = useQueryStates(\n    {\n      entityTypes: parseAsArrayOf(\n        parseAsStringEnum(['collection', 'subcollection', 'bobblehead'] as const),\n      ).withDefault(['collection', 'subcollection', 'bobblehead']),\n      page: parseAsInteger.withDefault(1),\n      pageSize: parseAsInteger.withDefault(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),\n      q: parseAsString.withDefault(''),\n      sortBy: parseAsStringEnum(ENUMS.SEARCH.SORT_BY).withDefault('relevance'),\n      sortOrder: parseAsStringEnum(ENUMS.SEARCH.SORT_ORDER).withDefault('desc'),\n      tagIds: parseAsArrayOf(parseAsString).withDefault([]),\n    },\n    {\n      clearOnDefault: true,\n      history: 'push',\n    },\n  );\n\n  // useEffect hooks\n  useEffect(() => {\n    const executeSearch = async () => {\n      // Don't search if query is empty or too short\n      if (!queryParams.q || queryParams.q.length < CONFIG.SEARCH.MIN_QUERY_LENGTH) {\n        setSearchResults(null);\n        setError(null);\n        return;\n      }\n\n      startTransition(async () => {\n        try {\n          const result = await searchPublicContentAction({\n            filters: {\n              entityTypes: queryParams.entityTypes,\n              sortBy: queryParams.sortBy,\n              sortOrder: queryParams.sortOrder,\n              tagIds: queryParams.tagIds,\n            },\n            pagination: {\n              page: queryParams.page,\n              pageSize: queryParams.pageSize,\n            },\n            query: queryParams.q,\n          });\n\n          if (result?.data) {\n            setSearchResults(result.data);\n            setError(null);\n          } else if (result?.serverError) {\n            setError(result.serverError);\n            setSearchResults(null);\n          }\n        } catch (err) {\n          setError('An unexpected error occurred while searching');\n          setSearchResults(null);\n        }\n      });\n    };\n\n    void executeSearch();\n  }, [\n    queryParams.q,\n    queryParams.entityTypes,\n    queryParams.tagIds,\n    queryParams.sortBy,\n    queryParams.sortOrder,\n    queryParams.page,\n    queryParams.pageSize,\n  ]);\n\n  // Event handlers\n  const handleQueryChange = (query: string) => {\n    void setQueryParams({ page: 1, q: query });\n  };\n\n  const handleFiltersChange = (filters: {\n    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;\n    sortBy?: 'date' | 'popularity' | 'price' | 'relevance';\n    sortOrder?: 'asc' | 'desc';\n    tagIds?: Array<string>;\n  }) => {\n    void setQueryParams({ ...filters, page: 1 });\n  };\n\n  const handlePageChange = (page: number) => {\n    void setQueryParams({ page });\n  };\n\n  // Derived variables for conditional rendering\n  const _hasQuery = queryParams.q.length >= CONFIG.SEARCH.MIN_QUERY_LENGTH;\n  const _isLoading = isPending;\n  const _hasError = !!error;\n  const _hasResults = searchResults && searchResults.counts.total > 0;\n  const _hasNoResults = searchResults && searchResults.counts.total === 0;\n  const _showEmptyState = !_hasQuery && !_isLoading && !searchResults;\n\n  return (\n    <div className={'space-y-6'}>\n      {/* Search Filters */}\n      <SearchFilters\n        entityTypes={queryParams.entityTypes}\n        onFiltersChange={handleFiltersChange}\n        onQueryChange={handleQueryChange}\n        query={queryParams.q}\n        sortBy={queryParams.sortBy}\n        sortOrder={queryParams.sortOrder}\n        tagIds={queryParams.tagIds}\n      />\n\n      {/* Loading State */}\n      {_isLoading && (\n        <div className={'flex min-h-[400px] items-center justify-center'}>\n          <Spinner size={'lg'} />\n        </div>\n      )}\n\n      {/* Error State */}\n      {_hasError && !_isLoading && (\n        <EmptyState\n          description={error || 'Please try again'}\n          iconName={'AlertCircle'}\n          title={'Search Error'}\n        />\n      )}\n\n      {/* Empty State - No Query */}\n      {_showEmptyState && (\n        <EmptyState\n          description={'Enter a search query to find collections, subcollections, and bobbleheads'}\n          iconName={'Search'}\n          title={'Start Searching'}\n        />\n      )}\n\n      {/* No Results State */}\n      {_hasNoResults && !_isLoading && (\n        <EmptyState\n          description={'Try different keywords or adjust your filters'}\n          iconName={'Search'}\n          title={'No Results Found'}\n        />\n      )}\n\n      {/* Search Results */}\n      {_hasResults && !_isLoading && searchResults && (\n        <>\n          {/* Results Grid */}\n          <SearchResultsGrid\n            bobbleheads={searchResults.bobbleheads}\n            collections={searchResults.collections}\n            counts={searchResults.counts}\n            subcollections={searchResults.subcollections}\n          />\n\n          {/* Pagination */}\n          <SearchPagination\n            hasNextPage={searchResults.pagination.hasNextPage}\n            hasPreviousPage={searchResults.pagination.hasPreviousPage}\n            onPageChange={handlePageChange}\n            page={searchResults.pagination.page}\n            totalPages={searchResults.pagination.totalPages}\n          />\n        </>\n      )}\n    </div>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:39:59.042Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "completed",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "completed",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "in_progress",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "pending",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "pending",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Integrate all components and test URL state management",
+      "status": "pending",
+      "activeForm": "Integrating all components and testing URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:40:30.844Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-filters.tsx",
+  "content": "'use client';\n\nimport { useEffect, useState } from 'react';\n\nimport type { TagRecord } from '@/lib/queries/tags/tags-query';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card } from '@/components/ui/card';\nimport { Checkbox } from '@/components/ui/checkbox';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Input } from '@/components/ui/input';\nimport { Label } from '@/components/ui/label';\nimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\nimport { CONFIG, ENUMS } from '@/lib/constants';\nimport { cn } from '@/utils/tailwind-utils';\n\ninterface SearchFiltersProps {\n  entityTypes: Array<'bobblehead' | 'collection' | 'subcollection'>;\n  onFiltersChange: (filters: {\n    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;\n    sortBy?: 'date' | 'popularity' | 'price' | 'relevance';\n    sortOrder?: 'asc' | 'desc';\n    tagIds?: Array<string>;\n  }) => void;\n  onQueryChange: (query: string) => void;\n  query: string;\n  sortBy: 'date' | 'popularity' | 'price' | 'relevance';\n  sortOrder: 'asc' | 'desc';\n  tagIds: Array<string>;\n}\n\nexport const SearchFilters = ({\n  entityTypes,\n  onFiltersChange,\n  onQueryChange,\n  query,\n  sortBy,\n  sortOrder,\n  tagIds,\n}: SearchFiltersProps) => {\n  // useState hooks\n  const [searchInput, setSearchInput] = useState(query);\n  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);\n\n  // useEffect hooks\n  useEffect(() => {\n    setSearchInput(query);\n  }, [query]);\n\n  useEffect(() => {\n    const timeoutId = setTimeout(() => {\n      if (searchInput !== query) {\n        onQueryChange(searchInput);\n      }\n    }, CONFIG.SEARCH.DEBOUNCE_MS);\n\n    return () => clearTimeout(timeoutId);\n  }, [searchInput, query, onQueryChange]);\n\n  // Event handlers\n  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {\n    setSearchInput(e.target.value);\n  };\n\n  const handleEntityTypeToggle = (entityType: 'bobblehead' | 'collection' | 'subcollection') => {\n    const _isSelected = entityTypes.includes(entityType);\n    const newEntityTypes = _isSelected ?\n      entityTypes.filter((type) => type !== entityType)\n    : [...entityTypes, entityType];\n\n    // Ensure at least one entity type is selected\n    if (newEntityTypes.length > 0) {\n      onFiltersChange({ entityTypes: newEntityTypes });\n    }\n  };\n\n  const handleSortByChange = (value: string) => {\n    onFiltersChange({\n      sortBy: value as 'date' | 'popularity' | 'price' | 'relevance',\n    });\n  };\n\n  const handleSortOrderChange = (value: string) => {\n    onFiltersChange({\n      sortOrder: value as 'asc' | 'desc',\n    });\n  };\n\n  const handleClearFilters = () => {\n    onFiltersChange({\n      entityTypes: ['collection', 'subcollection', 'bobblehead'],\n      sortBy: 'relevance',\n      sortOrder: 'desc',\n      tagIds: [],\n    });\n  };\n\n  const handleFiltersToggle = () => {\n    setIsFiltersExpanded((prev) => !prev);\n  };\n\n  // Derived variables for conditional rendering\n  const _hasActiveFilters =\n    entityTypes.length < 3 || sortBy !== 'relevance' || sortOrder !== 'desc' || tagIds.length > 0;\n\n  return (\n    <div className={'space-y-4'}>\n      {/* Search Input */}\n      <div className={'flex gap-2'}>\n        <Input\n          className={'flex-1'}\n          onChange={handleSearchInputChange}\n          placeholder={'Search for collections, subcollections, or bobbleheads...'}\n          type={'search'}\n          value={searchInput}\n        />\n        <Button onClick={handleFiltersToggle} variant={'outline'}>\n          {isFiltersExpanded ? 'Hide Filters' : 'Show Filters'}\n        </Button>\n      </div>\n\n      {/* Advanced Filters */}\n      <Conditional isCondition={isFiltersExpanded}>\n        <Card className={'p-6'}>\n          <div className={'space-y-6'}>\n            {/* Filter Header */}\n            <div className={'flex items-center justify-between'}>\n              <h3 className={'text-lg font-semibold'}>Filters</h3>\n              <Conditional isCondition={_hasActiveFilters}>\n                <Button onClick={handleClearFilters} size={'sm'} variant={'ghost'}>\n                  Clear All\n                </Button>\n              </Conditional>\n            </div>\n\n            {/* Entity Type Filters */}\n            <div className={'space-y-3'}>\n              <Label className={'text-sm font-medium'}>Content Type</Label>\n              <div className={'flex flex-wrap gap-4'}>\n                <div className={'flex items-center space-x-2'}>\n                  <Checkbox\n                    checked={entityTypes.includes('collection')}\n                    id={'filter-collection'}\n                    onCheckedChange={() => handleEntityTypeToggle('collection')}\n                  />\n                  <Label className={'cursor-pointer text-sm font-normal'} htmlFor={'filter-collection'}>\n                    Collections\n                  </Label>\n                </div>\n                <div className={'flex items-center space-x-2'}>\n                  <Checkbox\n                    checked={entityTypes.includes('subcollection')}\n                    id={'filter-subcollection'}\n                    onCheckedChange={() => handleEntityTypeToggle('subcollection')}\n                  />\n                  <Label\n                    className={'cursor-pointer text-sm font-normal'}\n                    htmlFor={'filter-subcollection'}\n                  >\n                    Subcollections\n                  </Label>\n                </div>\n                <div className={'flex items-center space-x-2'}>\n                  <Checkbox\n                    checked={entityTypes.includes('bobblehead')}\n                    id={'filter-bobblehead'}\n                    onCheckedChange={() => handleEntityTypeToggle('bobblehead')}\n                  />\n                  <Label className={'cursor-pointer text-sm font-normal'} htmlFor={'filter-bobblehead'}>\n                    Bobbleheads\n                  </Label>\n                </div>\n              </div>\n            </div>\n\n            {/* Sort Options */}\n            <div className={'grid gap-4 sm:grid-cols-2'}>\n              <div className={'space-y-2'}>\n                <Label className={'text-sm font-medium'} htmlFor={'sort-by'}>\n                  Sort By\n                </Label>\n                <Select onValueChange={handleSortByChange} value={sortBy}>\n                  <SelectTrigger id={'sort-by'}>\n                    <SelectValue placeholder={'Select sort option'} />\n                  </SelectTrigger>\n                  <SelectContent>\n                    {ENUMS.SEARCH.SORT_BY.map((option) => (\n                      <SelectItem key={option} value={option}>\n                        {option.charAt(0).toUpperCase() + option.slice(1)}\n                      </SelectItem>\n                    ))}\n                  </SelectContent>\n                </Select>\n              </div>\n\n              <div className={'space-y-2'}>\n                <Label className={'text-sm font-medium'} htmlFor={'sort-order'}>\n                  Sort Order\n                </Label>\n                <Select onValueChange={handleSortOrderChange} value={sortOrder}>\n                  <SelectTrigger id={'sort-order'}>\n                    <SelectValue placeholder={'Select order'} />\n                  </SelectTrigger>\n                  <SelectContent>\n                    <SelectItem value={'asc'}>Ascending</SelectItem>\n                    <SelectItem value={'desc'}>Descending</SelectItem>\n                  </SelectContent>\n                </Select>\n              </div>\n            </div>\n\n            {/* Active Filters Summary */}\n            <Conditional isCondition={_hasActiveFilters}>\n              <div className={'space-y-2'}>\n                <Label className={'text-sm font-medium'}>Active Filters</Label>\n                <div className={'flex flex-wrap gap-2'}>\n                  {entityTypes.length < 3 && (\n                    <Badge variant={'secondary'}>\n                      {entityTypes.length} {entityTypes.length === 1 ? 'type' : 'types'} selected\n                    </Badge>\n                  )}\n                  {sortBy !== 'relevance' && <Badge variant={'secondary'}>Sort: {sortBy}</Badge>}\n                  {sortOrder !== 'desc' && <Badge variant={'secondary'}>Order: {sortOrder}</Badge>}\n                  {tagIds.length > 0 && (\n                    <Badge variant={'secondary'}>{tagIds.length} tags selected</Badge>\n                  )}\n                </div>\n              </div>\n            </Conditional>\n          </div>\n        </Card>\n      </Conditional>\n    </div>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:40:40.712Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "completed",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "completed",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "completed",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "in_progress",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "pending",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Integrate all components and test URL state management",
+      "status": "pending",
+      "activeForm": "Integrating all components and testing URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:40:57.590Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-results-grid.tsx",
+  "content": "'use client';\n\nimport type {\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  PublicSearchCounts,\n  SubcollectionSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\n\nimport { SearchResultItem } from '@/components/feature/search/search-result-item';\nimport { Badge } from '@/components/ui/badge';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Separator } from '@/components/ui/separator';\n\ninterface SearchResultsGridProps {\n  bobbleheads: Array<BobbleheadSearchResult>;\n  collections: Array<CollectionSearchResult>;\n  counts: PublicSearchCounts;\n  subcollections: Array<SubcollectionSearchResult>;\n}\n\nexport const SearchResultsGrid = ({\n  bobbleheads,\n  collections,\n  counts,\n  subcollections,\n}: SearchResultsGridProps) => {\n  // Derived variables for conditional rendering\n  const _hasCollections = collections.length > 0;\n  const _hasSubcollections = subcollections.length > 0;\n  const _hasBobbleheads = bobbleheads.length > 0;\n  const _totalResults = counts.total;\n\n  return (\n    <div className={'space-y-8'}>\n      {/* Results Summary */}\n      <div className={'flex items-center justify-between'}>\n        <div className={'flex items-center gap-2'}>\n          <h2 className={'text-xl font-semibold'}>\n            {_totalResults} {_totalResults === 1 ? 'Result' : 'Results'} Found\n          </h2>\n        </div>\n        <div className={'flex gap-2'}>\n          <Conditional isCondition={counts.collections > 0}>\n            <Badge variant={'outline'}>{counts.collections} Collections</Badge>\n          </Conditional>\n          <Conditional isCondition={counts.subcollections > 0}>\n            <Badge variant={'outline'}>{counts.subcollections} Subcollections</Badge>\n          </Conditional>\n          <Conditional isCondition={counts.bobbleheads > 0}>\n            <Badge variant={'outline'}>{counts.bobbleheads} Bobbleheads</Badge>\n          </Conditional>\n        </div>\n      </div>\n\n      {/* Collections Section */}\n      <Conditional isCondition={_hasCollections}>\n        <div className={'space-y-4'}>\n          <div className={'flex items-center gap-2'}>\n            <h3 className={'text-lg font-semibold'}>Collections</h3>\n            <Badge variant={'secondary'}>{collections.length}</Badge>\n          </div>\n          <div className={'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>\n            {collections.map((collection) => (\n              <SearchResultItem\n                key={collection.id}\n                entityType={'collection'}\n                result={collection}\n              />\n            ))}\n          </div>\n        </div>\n      </Conditional>\n\n      {/* Separator between sections */}\n      <Conditional isCondition={_hasCollections && (_hasSubcollections || _hasBobbleheads)}>\n        <Separator />\n      </Conditional>\n\n      {/* Subcollections Section */}\n      <Conditional isCondition={_hasSubcollections}>\n        <div className={'space-y-4'}>\n          <div className={'flex items-center gap-2'}>\n            <h3 className={'text-lg font-semibold'}>Subcollections</h3>\n            <Badge variant={'secondary'}>{subcollections.length}</Badge>\n          </div>\n          <div className={'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>\n            {subcollections.map((subcollection) => (\n              <SearchResultItem\n                key={subcollection.id}\n                entityType={'subcollection'}\n                result={subcollection}\n              />\n            ))}\n          </div>\n        </div>\n      </Conditional>\n\n      {/* Separator between sections */}\n      <Conditional isCondition={_hasSubcollections && _hasBobbleheads}>\n        <Separator />\n      </Conditional>\n\n      {/* Bobbleheads Section */}\n      <Conditional isCondition={_hasBobbleheads}>\n        <div className={'space-y-4'}>\n          <div className={'flex items-center gap-2'}>\n            <h3 className={'text-lg font-semibold'}>Bobbleheads</h3>\n            <Badge variant={'secondary'}>{bobbleheads.length}</Badge>\n          </div>\n          <div className={'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>\n            {bobbleheads.map((bobblehead) => (\n              <SearchResultItem\n                key={bobblehead.id}\n                entityType={'bobblehead'}\n                result={bobblehead}\n              />\n            ))}\n          </div>\n        </div>\n      </Conditional>\n    </div>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:41:07.877Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "completed",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "completed",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "completed",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "completed",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "in_progress",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Integrate all components and test URL state management",
+      "status": "pending",
+      "activeForm": "Integrating all components and testing URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:41:26.097Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-pagination.tsx",
+  "content": "'use client';\n\nimport { ChevronLeft, ChevronRight } from 'lucide-react';\n\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { cn } from '@/utils/tailwind-utils';\n\ninterface SearchPaginationProps {\n  hasNextPage: boolean;\n  hasPreviousPage: boolean;\n  onPageChange: (page: number) => void;\n  page: number;\n  totalPages: number;\n}\n\nexport const SearchPagination = ({\n  hasNextPage,\n  hasPreviousPage,\n  onPageChange,\n  page,\n  totalPages,\n}: SearchPaginationProps) => {\n  // Event handlers\n  const handlePreviousPage = () => {\n    if (hasPreviousPage) {\n      onPageChange(page - 1);\n    }\n  };\n\n  const handleNextPage = () => {\n    if (hasNextPage) {\n      onPageChange(page + 1);\n    }\n  };\n\n  const handlePageClick = (pageNumber: number) => {\n    onPageChange(pageNumber);\n  };\n\n  // Utility functions\n  const generatePageNumbers = (): Array<number | string> => {\n    const pages: Array<number | string> = [];\n    const maxPagesToShow = 7;\n\n    if (totalPages <= maxPagesToShow) {\n      // Show all pages if total is small\n      for (let i = 1; i <= totalPages; i++) {\n        pages.push(i);\n      }\n    } else {\n      // Always show first page\n      pages.push(1);\n\n      if (page > 3) {\n        pages.push('...');\n      }\n\n      // Show pages around current page\n      const startPage = Math.max(2, page - 1);\n      const endPage = Math.min(totalPages - 1, page + 1);\n\n      for (let i = startPage; i <= endPage; i++) {\n        pages.push(i);\n      }\n\n      if (page < totalPages - 2) {\n        pages.push('...');\n      }\n\n      // Always show last page\n      pages.push(totalPages);\n    }\n\n    return pages;\n  };\n\n  // Derived variables for conditional rendering\n  const _showPagination = totalPages > 1;\n  const _pageNumbers = generatePageNumbers();\n\n  return (\n    <Conditional isCondition={_showPagination}>\n      <div className={'flex items-center justify-center gap-2'}>\n        {/* Previous Button */}\n        <Button\n          disabled={!hasPreviousPage}\n          onClick={handlePreviousPage}\n          size={'sm'}\n          variant={'outline'}\n        >\n          <ChevronLeft className={'size-4'} />\n          <span className={'sr-only'}>Previous page</span>\n        </Button>\n\n        {/* Page Numbers */}\n        <div className={'flex items-center gap-1'}>\n          {_pageNumbers.map((pageNumber, index) =>\n            pageNumber === '...' ?\n              <span key={`ellipsis-${index}`} className={'px-2 text-sm text-muted-foreground'}>\n                {pageNumber}\n              </span>\n            : <Button\n                key={pageNumber}\n                className={cn(\n                  'size-9',\n                  pageNumber === page && 'bg-primary text-primary-foreground',\n                )}\n                onClick={() => handlePageClick(pageNumber as number)}\n                size={'sm'}\n                variant={pageNumber === page ? 'default' : 'outline'}\n              >\n                {pageNumber}\n              </Button>\n            ,\n          )}\n        </div>\n\n        {/* Next Button */}\n        <Button disabled={!hasNextPage} onClick={handleNextPage} size={'sm'} variant={'outline'}>\n          <ChevronRight className={'size-4'} />\n          <span className={'sr-only'}>Next page</span>\n        </Button>\n      </div>\n    </Conditional>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:41:36.302Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "completed",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "completed",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "completed",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "completed",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "completed",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Integrate all components and test URL state management",
+      "status": "completed",
+      "activeForm": "Integrating all components and testing URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:41:41.539Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint with auto-fix"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:20.543Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\search\\page.tsx",
+  "old_string": "export function generateMetadata({ searchParams }: SearchPageProps): Metadata {\n  return {\n    description: 'Search for collections, subcollections, and bobbleheads in the Head Shakers community',\n    title: 'Search',\n  };\n}",
+  "new_string": "export function generateMetadata(): Metadata {\n  return {\n    description: 'Search for collections, subcollections, and bobbleheads in the Head Shakers community',\n    title: 'Search',\n  };\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:21.632Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-filters.tsx",
+  "old_string": "import type { TagRecord } from '@/lib/queries/tags/tags-query';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card } from '@/components/ui/card';\nimport { Checkbox } from '@/components/ui/checkbox';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Input } from '@/components/ui/input';\nimport { Label } from '@/components/ui/label';\nimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\nimport { CONFIG, ENUMS } from '@/lib/constants';\nimport { cn } from '@/utils/tailwind-utils';",
+  "new_string": "import { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card } from '@/components/ui/card';\nimport { Checkbox } from '@/components/ui/checkbox';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Input } from '@/components/ui/input';\nimport { Label } from '@/components/ui/label';\nimport { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';\nimport { CONFIG, ENUMS } from '@/lib/constants';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:22.831Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "import { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';\nimport { useEffect, useState, useTransition } from 'react';\n\nimport type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';\n\nimport { SearchFilters } from '@/components/feature/search/search-filters';\nimport { SearchPagination } from '@/components/feature/search/search-pagination';\nimport { SearchResultsGrid } from '@/components/feature/search/search-results-grid';\nimport { EmptyState } from '@/components/ui/empty-state';\nimport { Spinner } from '@/components/ui/spinner';\nimport { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';\nimport { CONFIG, ENUMS } from '@/lib/constants';\n\ninterface SearchPageContentProps {\n  searchParams: {\n    entityTypes?: string;\n    page?: string;\n    pageSize?: string;\n    q?: string;\n    sortBy?: string;\n    sortOrder?: string;\n    tagIds?: string;\n  };\n}\n\nexport const SearchPageContent = ({ searchParams }: SearchPageContentProps) => {",
+  "new_string": "import { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';\nimport { Fragment, useEffect, useState, useTransition } from 'react';\n\nimport type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';\n\nimport { SearchFilters } from '@/components/feature/search/search-filters';\nimport { SearchPagination } from '@/components/feature/search/search-pagination';\nimport { SearchResultsGrid } from '@/components/feature/search/search-results-grid';\nimport { EmptyState } from '@/components/ui/empty-state';\nimport { Spinner } from '@/components/ui/spinner';\nimport { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';\nimport { CONFIG, ENUMS } from '@/lib/constants';\n\nexport const SearchPageContent = () => {"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:24.171Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "  // useEffect hooks\n  useEffect(() => {\n    const executeSearch = async () => {\n      // Don't search if query is empty or too short\n      if (!queryParams.q || queryParams.q.length < CONFIG.SEARCH.MIN_QUERY_LENGTH) {\n        setSearchResults(null);\n        setError(null);\n        return;\n      }\n\n      startTransition(async () => {\n        try {\n          const result = await searchPublicContentAction({\n            filters: {\n              entityTypes: queryParams.entityTypes,\n              sortBy: queryParams.sortBy,\n              sortOrder: queryParams.sortOrder,\n              tagIds: queryParams.tagIds,\n            },\n            pagination: {\n              page: queryParams.page,\n              pageSize: queryParams.pageSize,\n            },\n            query: queryParams.q,\n          });\n\n          if (result?.data) {\n            setSearchResults(result.data);\n            setError(null);\n          } else if (result?.serverError) {\n            setError(result.serverError);\n            setSearchResults(null);\n          }\n        } catch (err) {\n          setError('An unexpected error occurred while searching');\n          setSearchResults(null);\n        }\n      });\n    };\n\n    void executeSearch();\n  }, [\n    queryParams.q,\n    queryParams.entityTypes,\n    queryParams.tagIds,\n    queryParams.sortBy,\n    queryParams.sortOrder,\n    queryParams.page,\n    queryParams.pageSize,\n  ]);",
+  "new_string": "  // useEffect hooks\n  useEffect(() => {\n    const executeSearch = () => {\n      // Don't search if query is empty or too short\n      if (!queryParams.q || queryParams.q.length < CONFIG.SEARCH.MIN_QUERY_LENGTH) {\n        setSearchResults(null);\n        setError(null);\n        return;\n      }\n\n      startTransition(async () => {\n        try {\n          const result = await searchPublicContentAction({\n            filters: {\n              entityTypes: queryParams.entityTypes,\n              sortBy: queryParams.sortBy,\n              sortOrder: queryParams.sortOrder,\n              tagIds: queryParams.tagIds,\n            },\n            pagination: {\n              page: queryParams.page,\n              pageSize: queryParams.pageSize,\n            },\n            query: queryParams.q,\n          });\n\n          if (result?.data) {\n            setSearchResults(result.data);\n            setError(null);\n          } else if (result?.serverError) {\n            setError(result.serverError);\n            setSearchResults(null);\n          }\n        } catch {\n          setError('An unexpected error occurred while searching');\n          setSearchResults(null);\n        }\n      });\n    };\n\n    executeSearch();\n  }, [\n    queryParams.q,\n    queryParams.entityTypes,\n    queryParams.tagIds,\n    queryParams.sortBy,\n    queryParams.sortOrder,\n    queryParams.page,\n    queryParams.pageSize,\n  ]);"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:25.632Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "  // Derived variables for conditional rendering\n  const _hasQuery = queryParams.q.length >= CONFIG.SEARCH.MIN_QUERY_LENGTH;\n  const _isLoading = isPending;\n  const _hasError = !!error;\n  const _hasResults = searchResults && searchResults.counts.total > 0;\n  const _hasNoResults = searchResults && searchResults.counts.total === 0;\n  const _showEmptyState = !_hasQuery && !_isLoading && !searchResults;",
+  "new_string": "  // Derived variables for conditional rendering\n  const _hasQuery = queryParams.q.length >= CONFIG.SEARCH.MIN_QUERY_LENGTH;\n  const _isLoading = isPending;\n  const _hasError = !!error;\n  const _hasResults = searchResults && searchResults.counts.total > 0;\n  const _hasNoResults = searchResults && searchResults.counts.total === 0;\n  const _isShowEmptyState = !_hasQuery && !_isLoading && !searchResults;\n  const _isShowResultsWithPagination = _hasResults && !_isLoading && searchResults;"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:27.121Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "      {/* Empty State - No Query */}\n      {_showEmptyState && (\n        <EmptyState\n          description={'Enter a search query to find collections, subcollections, and bobbleheads'}\n          iconName={'Search'}\n          title={'Start Searching'}\n        />\n      )}\n\n      {/* No Results State */}\n      {_hasNoResults && !_isLoading && (\n        <EmptyState\n          description={'Try different keywords or adjust your filters'}\n          iconName={'Search'}\n          title={'No Results Found'}\n        />\n      )}\n\n      {/* Search Results */}\n      {_hasResults && !_isLoading && searchResults && (\n        <>\n          {/* Results Grid */}\n          <SearchResultsGrid\n            bobbleheads={searchResults.bobbleheads}\n            collections={searchResults.collections}\n            counts={searchResults.counts}\n            subcollections={searchResults.subcollections}\n          />\n\n          {/* Pagination */}\n          <SearchPagination\n            hasNextPage={searchResults.pagination.hasNextPage}\n            hasPreviousPage={searchResults.pagination.hasPreviousPage}\n            onPageChange={handlePageChange}\n            page={searchResults.pagination.page}\n            totalPages={searchResults.pagination.totalPages}\n          />\n        </>\n      )}",
+  "new_string": "      {/* Empty State - No Query */}\n      {_isShowEmptyState && (\n        <EmptyState\n          description={'Enter a search query to find collections, subcollections, and bobbleheads'}\n          iconName={'Search'}\n          title={'Start Searching'}\n        />\n      )}\n\n      {/* No Results State */}\n      {_hasNoResults && !_isLoading && (\n        <EmptyState\n          description={'Try different keywords or adjust your filters'}\n          iconName={'Search'}\n          title={'No Results Found'}\n        />\n      )}\n\n      {/* Search Results */}\n      {_isShowResultsWithPagination && (\n        <Fragment>\n          {/* Results Grid */}\n          <SearchResultsGrid\n            bobbleheads={searchResults.bobbleheads}\n            collections={searchResults.collections}\n            counts={searchResults.counts}\n            subcollections={searchResults.subcollections}\n          />\n\n          {/* Pagination */}\n          <SearchPagination\n            hasNextPage={searchResults.pagination.hasNextPage}\n            hasPreviousPage={searchResults.pagination.hasPreviousPage}\n            onPageChange={handlePageChange}\n            page={searchResults.pagination.page}\n            totalPages={searchResults.pagination.totalPages}\n          />\n        </Fragment>\n      )}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:28.592Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-pagination.tsx",
+  "old_string": "  // Derived variables for conditional rendering\n  const _showPagination = totalPages > 1;\n  const _pageNumbers = generatePageNumbers();\n\n  return (\n    <Conditional isCondition={_showPagination}>",
+  "new_string": "  // Derived variables for conditional rendering\n  const _isPaginationVisible = totalPages > 1;\n  const _pageNumbers = generatePageNumbers();\n\n  return (\n    <Conditional isCondition={_isPaginationVisible}>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:46.991Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\search\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:43:55.976Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\search\\page.tsx",
+  "content": "import type { Metadata } from 'next';\n\nimport { Suspense } from 'react';\n\nimport { SearchPageContent } from '@/components/feature/search/search-page-content';\nimport { Skeleton } from '@/components/ui/skeleton';\n\nexport function generateMetadata(): Metadata {\n  return {\n    description: 'Search for collections, subcollections, and bobbleheads in the Head Shakers community',\n    title: 'Search',\n  };\n}\n\nexport default function SearchPage() {\n  return (\n    <div className={'container mx-auto px-4 py-8'}>\n      {/* Page Header */}\n      <div className={'mb-8'}>\n        <h1 className={'text-3xl font-bold tracking-tight'}>Search Results</h1>\n        <p className={'mt-2 text-muted-foreground'}>\n          Find collections, subcollections, and bobbleheads\n        </p>\n      </div>\n\n      {/* Search Content */}\n      <Suspense\n        fallback={\n          <div className={'space-y-8'}>\n            <Skeleton className={'h-24 w-full'} />\n            <div className={'grid gap-6 sm:grid-cols-2 lg:grid-cols-3'}>\n              {Array.from({ length: 6 }).map((_, i) => (\n                <Skeleton className={'h-64 w-full'} key={i} />\n              ))}\n            </div>\n          </div>\n        }\n      >\n        <SearchPageContent />\n      </Suspense>\n    </div>\n  );\n}\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:44:02.358Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint with auto-fix"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:44:53.743Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:10.066Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\empty-state.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:10.067Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\spinner.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:41.460Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "'use client';\n\nimport { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';\nimport { Fragment, useEffect, useState, useTransition } from 'react';\n\nimport type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';\n\nimport { SearchFilters } from '@/components/feature/search/search-filters';\nimport { SearchPagination } from '@/components/feature/search/search-pagination';\nimport { SearchResultsGrid } from '@/components/feature/search/search-results-grid';\nimport { EmptyState } from '@/components/ui/empty-state';\nimport { Spinner } from '@/components/ui/spinner';\nimport { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';\nimport { CONFIG, ENUMS } from '@/lib/constants';",
+  "new_string": "'use client';\n\nimport { AlertCircle, Search } from 'lucide-react';\nimport { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';\nimport { Fragment, useEffect, useState, useTransition } from 'react';\n\nimport type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';\n\nimport { SearchFilters } from '@/components/feature/search/search-filters';\nimport { SearchPagination } from '@/components/feature/search/search-pagination';\nimport { SearchResultsGrid } from '@/components/feature/search/search-results-grid';\nimport { EmptyState } from '@/components/ui/empty-state';\nimport { Spinner } from '@/components/ui/spinner';\nimport { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';\nimport { CONFIG, ENUMS } from '@/lib/constants';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:42.552Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "  const [queryParams, setQueryParams] = useQueryStates(\n    {\n      entityTypes: parseAsArrayOf(\n        parseAsStringEnum(['collection', 'subcollection', 'bobblehead'] as const),\n      ).withDefault(['collection', 'subcollection', 'bobblehead']),\n      page: parseAsInteger.withDefault(1),\n      pageSize: parseAsInteger.withDefault(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),\n      q: parseAsString.withDefault(''),\n      sortBy: parseAsStringEnum(ENUMS.SEARCH.SORT_BY).withDefault('relevance'),\n      sortOrder: parseAsStringEnum(ENUMS.SEARCH.SORT_ORDER).withDefault('desc'),\n      tagIds: parseAsArrayOf(parseAsString).withDefault([]),\n    },\n    {\n      clearOnDefault: true,\n      history: 'push',\n    },\n  );",
+  "new_string": "  const [queryParams, setQueryParams] = useQueryStates(\n    {\n      entityTypes: parseAsArrayOf(\n        parseAsStringEnum(['collection', 'subcollection', 'bobblehead'] as const),\n      ).withDefault(['collection', 'subcollection', 'bobblehead']),\n      page: parseAsInteger.withDefault(1),\n      pageSize: parseAsInteger.withDefault(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),\n      q: parseAsString.withDefault(''),\n      sortBy: parseAsStringEnum([...ENUMS.SEARCH.SORT_BY]).withDefault('relevance'),\n      sortOrder: parseAsStringEnum([...ENUMS.SEARCH.SORT_ORDER]).withDefault('desc'),\n      tagIds: parseAsArrayOf(parseAsString).withDefault([]),\n    },\n    {\n      clearOnDefault: true,\n      history: 'push',\n    },\n  );"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:43.683Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "  const handleFiltersChange = (filters: {\n    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;\n    sortBy?: 'date' | 'popularity' | 'price' | 'relevance';\n    sortOrder?: 'asc' | 'desc';\n    tagIds?: Array<string>;\n  }) => {\n    void setQueryParams({ ...filters, page: 1 });\n  };",
+  "new_string": "  const handleFiltersChange = (filters: {\n    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;\n    sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];\n    sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];\n    tagIds?: Array<string>;\n  }) => {\n    void setQueryParams({ ...filters, page: 1 });\n  };"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:44.918Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-page-content.tsx",
+  "old_string": "      {/* Loading State */}\n      {_isLoading && (\n        <div className={'flex min-h-[400px] items-center justify-center'}>\n          <Spinner size={'lg'} />\n        </div>\n      )}\n\n      {/* Error State */}\n      {_hasError && !_isLoading && (\n        <EmptyState\n          description={error || 'Please try again'}\n          iconName={'AlertCircle'}\n          title={'Search Error'}\n        />\n      )}\n\n      {/* Empty State - No Query */}\n      {_isShowEmptyState && (\n        <EmptyState\n          description={'Enter a search query to find collections, subcollections, and bobbleheads'}\n          iconName={'Search'}\n          title={'Start Searching'}\n        />\n      )}\n\n      {/* No Results State */}\n      {_hasNoResults && !_isLoading && (\n        <EmptyState\n          description={'Try different keywords or adjust your filters'}\n          iconName={'Search'}\n          title={'No Results Found'}\n        />\n      )}",
+  "new_string": "      {/* Loading State */}\n      {_isLoading && (\n        <div className={'flex min-h-[400px] items-center justify-center'}>\n          <Spinner className={'size-16'} />\n        </div>\n      )}\n\n      {/* Error State */}\n      {_hasError && !_isLoading && (\n        <EmptyState\n          description={error || 'Please try again'}\n          icon={AlertCircle}\n          title={'Search Error'}\n        />\n      )}\n\n      {/* Empty State - No Query */}\n      {_isShowEmptyState && (\n        <EmptyState\n          description={'Enter a search query to find collections, subcollections, and bobbleheads'}\n          icon={Search}\n          title={'Start Searching'}\n        />\n      )}\n\n      {/* No Results State */}\n      {_hasNoResults && !_isLoading && (\n        <EmptyState\n          description={'Try different keywords or adjust your filters'}\n          icon={Search}\n          title={'No Results Found'}\n        />\n      )}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:45:55.664Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-filters.tsx",
+  "old_string": "interface SearchFiltersProps {\n  entityTypes: Array<'bobblehead' | 'collection' | 'subcollection'>;\n  onFiltersChange: (filters: {\n    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;\n    sortBy?: 'date' | 'popularity' | 'price' | 'relevance';\n    sortOrder?: 'asc' | 'desc';\n    tagIds?: Array<string>;\n  }) => void;\n  onQueryChange: (query: string) => void;\n  query: string;\n  sortBy: 'date' | 'popularity' | 'price' | 'relevance';\n  sortOrder: 'asc' | 'desc';\n  tagIds: Array<string>;\n}",
+  "new_string": "interface SearchFiltersProps {\n  entityTypes: Array<'bobblehead' | 'collection' | 'subcollection'>;\n  onFiltersChange: (filters: {\n    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;\n    sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];\n    sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];\n    tagIds?: Array<string>;\n  }) => void;\n  onQueryChange: (query: string) => void;\n  query: string;\n  sortBy: (typeof ENUMS.SEARCH.SORT_BY)[number];\n  sortOrder: (typeof ENUMS.SEARCH.SORT_ORDER)[number];\n  tagIds: Array<string>;\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:46:05.271Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-filters.tsx",
+  "old_string": "  const handleSortByChange = (value: string) => {\n    onFiltersChange({\n      sortBy: value as 'date' | 'popularity' | 'price' | 'relevance',\n    });\n  };\n\n  const handleSortOrderChange = (value: string) => {\n    onFiltersChange({\n      sortOrder: value as 'asc' | 'desc',\n    });\n  };",
+  "new_string": "  const handleSortByChange = (value: string) => {\n    onFiltersChange({\n      sortBy: value as (typeof ENUMS.SEARCH.SORT_BY)[number],\n    });\n  };\n\n  const handleSortOrderChange = (value: string) => {\n    onFiltersChange({\n      sortOrder: value as (typeof ENUMS.SEARCH.SORT_ORDER)[number],\n    });\n  };"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:46:12.424Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:46:26.244Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Explore existing search implementation and UI components",
+      "status": "completed",
+      "activeForm": "Exploring existing search implementation and UI components"
+    },
+    {
+      "content": "Create main search page Server Component at /search",
+      "status": "completed",
+      "activeForm": "Creating main search page Server Component at /search"
+    },
+    {
+      "content": "Create SearchFilters component with entity toggles and tag selection",
+      "status": "completed",
+      "activeForm": "Creating SearchFilters component with entity toggles and tag selection"
+    },
+    {
+      "content": "Create SearchResultsGrid component with responsive layout",
+      "status": "completed",
+      "activeForm": "Creating SearchResultsGrid component with responsive layout"
+    },
+    {
+      "content": "Create SearchPagination component with navigation controls",
+      "status": "completed",
+      "activeForm": "Creating SearchPagination component with navigation controls"
+    },
+    {
+      "content": "Create all components and integrate URL state management",
+      "status": "completed",
+      "activeForm": "Creating all components and integrating URL state management"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands (lint:fix && typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:55:33.648Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\app-header\\components\\app-header-search.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:55:33.648Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-dropdown.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:55:33.660Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\app-header\\app-header.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:55:50.680Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint to check code quality"
+}
+================================================================================
