@@ -15171,3 +15171,273 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-05T17:11:45.268Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:11:45.268Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\content-search\\content-search.actions.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:11:45.268Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:11:53.247Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/next-safe-action.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:11:58.198Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\next-safe-action.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:05.261Z
+Tool: Grep
+Input:
+{
+  "pattern": "SEARCH_COLLECTIONS|SEARCH_BOBBLEHEADS|SEARCH_USERS",
+  "path": "src/lib/constants",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:12.229Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\action-names.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:22.736Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add PUBLIC action names to constants/action-names.ts",
+      "status": "pending",
+      "activeForm": "Adding PUBLIC action names to constants"
+    },
+    {
+      "content": "Implement searchPublicContentAction in content-search.actions.ts",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicContentAction"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownAction in content-search.actions.ts",
+      "status": "pending",
+      "activeForm": "Implementing getPublicSearchDropdownAction"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:28.953Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add PUBLIC action names to constants/action-names.ts",
+      "status": "in_progress",
+      "activeForm": "Adding PUBLIC action names to constants"
+    },
+    {
+      "content": "Implement searchPublicContentAction in content-search.actions.ts",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicContentAction"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownAction in content-search.actions.ts",
+      "status": "pending",
+      "activeForm": "Implementing getPublicSearchDropdownAction"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:35.211Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\action-names.ts",
+  "old_string": "  PHOTO: {\n    GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',\n  },",
+  "new_string": "  PHOTO: {\n    GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',\n  },\n  PUBLIC: {\n    GET_SEARCH_DROPDOWN_RESULTS: 'getPublicSearchDropdownResults',\n    SEARCH_CONTENT: 'searchPublicContent',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:41.203Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add PUBLIC action names to constants/action-names.ts",
+      "status": "completed",
+      "activeForm": "Adding PUBLIC action names to constants"
+    },
+    {
+      "content": "Implement searchPublicContentAction in content-search.actions.ts",
+      "status": "in_progress",
+      "activeForm": "Implementing searchPublicContentAction"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownAction in content-search.actions.ts",
+      "status": "pending",
+      "activeForm": "Implementing getPublicSearchDropdownAction"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:12:54.394Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\content-search\\content-search.actions.ts",
+  "old_string": "import { handleActionError } from '@/lib/utils/action-error-handler';\nimport { adminActionClient } from '@/lib/utils/next-safe-action';",
+  "new_string": "import { handleActionError } from '@/lib/utils/action-error-handler';\nimport { adminActionClient, publicActionClient } from '@/lib/utils/next-safe-action';\nimport {\n  publicSearchInputSchema,\n  searchDropdownInputSchema,\n} from '@/lib/validations/public-search.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:13:25.697Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\content-search\\content-search.actions.ts",
+  "old_string": "/**\n * Get a specific user by ID for featuring (admin/moderator only)\n */\nexport const getUserForFeaturingAction = adminActionClient\n  .metadata({\n    actionName: ACTION_NAMES.ADMIN.GET_USER_FOR_FEATURING,\n    isTransactionRequired: false,\n  })\n  .inputSchema(getCollectionSchema)\n  .action(async ({ ctx, parsedInput }) => {\n    const input = getCollectionSchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { id: input.id });\n\n    try {\n      const result = await ContentSearchFacade.getUserForFeaturing(input.id, ctx.userId, dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          user: result.user,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `Retrieved user for featuring: ${result.user.displayName || result.user.username}`,\n      });\n\n      return result;\n    } catch (error) {\n      return handleActionError(error, {\n        input: parsedInput,\n        metadata: { actionName: ACTION_NAMES.ADMIN.GET_USER_FOR_FEATURING },\n        operation: OPERATIONS.SEARCH.USERS,\n        userId: ctx.userId,\n      });\n    }\n  });",
+  "new_string": "/**\n * Get a specific user by ID for featuring (admin/moderator only)\n */\nexport const getUserForFeaturingAction = adminActionClient\n  .metadata({\n    actionName: ACTION_NAMES.ADMIN.GET_USER_FOR_FEATURING,\n    isTransactionRequired: false,\n  })\n  .inputSchema(getCollectionSchema)\n  .action(async ({ ctx, parsedInput }) => {\n    const input = getCollectionSchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { id: input.id });\n\n    try {\n      const result = await ContentSearchFacade.getUserForFeaturing(input.id, ctx.userId, dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          user: result.user,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `Retrieved user for featuring: ${result.user.displayName || result.user.username}`,\n      });\n\n      return result;\n    } catch (error) {\n      return handleActionError(error, {\n        input: parsedInput,\n        metadata: { actionName: ACTION_NAMES.ADMIN.GET_USER_FOR_FEATURING },\n        operation: OPERATIONS.SEARCH.USERS,\n        userId: ctx.userId,\n      });\n    }\n  });\n\n/**\n * Search public content with full pagination and filtering (unauthenticated access)\n *\n * Returns paginated search results across collections, subcollections, and bobbleheads\n * with advanced filtering options including entity types, tag filtering, and sorting.\n * Results are cached in Redis with 10-minute TTL for performance optimization.\n *\n * @param input - Search parameters including query, filters, and pagination\n * @returns Paginated search results with counts and metadata\n *\n * @example\n * const result = await searchPublicContentAction({\n *   query: \"baseball\",\n *   filters: {\n *     entityTypes: [\"bobblehead\"],\n *     tagIds: [\"tag-uuid\"],\n *     sortBy: \"relevance\",\n *     sortOrder: \"desc\"\n *   },\n *   pagination: { page: 1, pageSize: 20 }\n * });\n *\n * @public\n * @note Rate limiting should be implemented for public search endpoints to prevent abuse\n */\nexport const searchPublicContentAction = publicActionClient\n  .metadata({\n    actionName: ACTION_NAMES.PUBLIC.SEARCH_CONTENT,\n    isTransactionRequired: false,\n  })\n  .inputSchema(publicSearchInputSchema)\n  .action(async ({ ctx, parsedInput }) => {\n    const input = publicSearchInputSchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {\n      entityTypes: input.filters?.entityTypes,\n      page: input.pagination?.page,\n      pageSize: input.pagination?.pageSize,\n      query: input.query,\n      sortBy: input.filters?.sortBy,\n      sortOrder: input.filters?.sortOrder,\n      tagIds: input.filters?.tagIds,\n      type: 'public-search',\n    });\n\n    try {\n      // TODO: Consider implementing rate limiting for public search endpoints\n      // to prevent abuse and ensure fair usage across all users\n      const result = await ContentSearchFacade.getPublicSearchPageResults(input, dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          counts: result.counts,\n          entityTypes: input.filters?.entityTypes,\n          page: input.pagination?.page,\n          pageSize: input.pagination?.pageSize,\n          query: input.query,\n          totalResults: result.counts.total,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `Public search executed: \"${input.query}\" - ${result.counts.total} results`,\n      });\n\n      return result;\n    } catch (error) {\n      return handleActionError(error, {\n        input: parsedInput,\n        metadata: { actionName: ACTION_NAMES.PUBLIC.SEARCH_CONTENT },\n        operation: OPERATIONS.SEARCH.COLLECTIONS,\n      });\n    }\n  });\n\n/**\n * Get public search dropdown results for header search (unauthenticated access)\n *\n * Returns top 5 consolidated search results across collections, subcollections,\n * and bobbleheads for instant search feedback in the application header.\n * Results are cached in Redis with 10-minute TTL for optimal performance.\n *\n * @param query - Search text to match across entity types\n * @returns Consolidated dropdown results with up to 5 total items\n *\n * @example\n * const result = await getPublicSearchDropdownAction({ query: \"baseball\" });\n * // Returns: { collections: [...], subcollections: [...], bobbleheads: [...], totalResults: 5 }\n *\n * @public\n * @note Rate limiting should be implemented for dropdown search to prevent abuse\n */\nexport const getPublicSearchDropdownAction = publicActionClient\n  .metadata({\n    actionName: ACTION_NAMES.PUBLIC.GET_SEARCH_DROPDOWN_RESULTS,\n    isTransactionRequired: false,\n  })\n  .inputSchema(searchDropdownInputSchema)\n  .action(async ({ ctx, parsedInput }) => {\n    const input = searchDropdownInputSchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {\n      query: input.query,\n      type: 'dropdown-search',\n    });\n\n    try {\n      // TODO: Consider implementing rate limiting for dropdown search to prevent\n      // excessive requests during rapid typing (debouncing on client side should help)\n      const result = await ContentSearchFacade.getPublicSearchDropdownResults(input.query, dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          bobbleheadsCount: result.bobbleheads.length,\n          collectionsCount: result.collections.length,\n          query: input.query,\n          subcollectionsCount: result.subcollections.length,\n          totalResults: result.totalResults,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `Dropdown search executed: \"${input.query}\" - ${result.totalResults} results`,\n      });\n\n      return result;\n    } catch (error) {\n      return handleActionError(error, {\n        input: parsedInput,\n        metadata: { actionName: ACTION_NAMES.PUBLIC.GET_SEARCH_DROPDOWN_RESULTS },\n        operation: OPERATIONS.SEARCH.COLLECTIONS,\n      });\n    }\n  });"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:13:34.855Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add PUBLIC action names to constants/action-names.ts",
+      "status": "completed",
+      "activeForm": "Adding PUBLIC action names to constants"
+    },
+    {
+      "content": "Implement searchPublicContentAction in content-search.actions.ts",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicContentAction"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownAction in content-search.actions.ts",
+      "status": "completed",
+      "activeForm": "Implementing getPublicSearchDropdownAction"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:13:39.412Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint to check for code quality issues"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:14:35.968Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:14:51.898Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add PUBLIC action names to constants/action-names.ts",
+      "status": "completed",
+      "activeForm": "Adding PUBLIC action names to constants"
+    },
+    {
+      "content": "Implement searchPublicContentAction in content-search.actions.ts",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicContentAction"
+    },
+    {
+      "content": "Implement getPublicSearchDropdownAction in content-search.actions.ts",
+      "status": "completed",
+      "activeForm": "Implementing getPublicSearchDropdownAction"
+    },
+    {
+      "content": "Run validation commands (lint:fix && typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================

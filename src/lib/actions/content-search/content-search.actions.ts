@@ -14,7 +14,11 @@ import {
 } from '@/lib/constants';
 import { ContentSearchFacade } from '@/lib/facades/content-search/content-search.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
-import { adminActionClient } from '@/lib/utils/next-safe-action';
+import { adminActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import {
+  publicSearchInputSchema,
+  searchDropdownInputSchema,
+} from '@/lib/validations/public-search.validation';
 
 const searchContentSchema = z.object({
   excludeTags: z.array(z.string().uuid()).optional(),
@@ -296,6 +300,141 @@ export const getUserForFeaturingAction = adminActionClient
         metadata: { actionName: ACTION_NAMES.ADMIN.GET_USER_FOR_FEATURING },
         operation: OPERATIONS.SEARCH.USERS,
         userId: ctx.userId,
+      });
+    }
+  });
+
+/**
+ * Search public content with full pagination and filtering (unauthenticated access)
+ *
+ * Returns paginated search results across collections, subcollections, and bobbleheads
+ * with advanced filtering options including entity types, tag filtering, and sorting.
+ * Results are cached in Redis with 10-minute TTL for performance optimization.
+ *
+ * @param input - Search parameters including query, filters, and pagination
+ * @returns Paginated search results with counts and metadata
+ *
+ * @example
+ * const result = await searchPublicContentAction({
+ *   query: "baseball",
+ *   filters: {
+ *     entityTypes: ["bobblehead"],
+ *     tagIds: ["tag-uuid"],
+ *     sortBy: "relevance",
+ *     sortOrder: "desc"
+ *   },
+ *   pagination: { page: 1, pageSize: 20 }
+ * });
+ *
+ * @public
+ * @note Rate limiting should be implemented for public search endpoints to prevent abuse
+ */
+export const searchPublicContentAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.PUBLIC.SEARCH_CONTENT,
+    isTransactionRequired: false,
+  })
+  .inputSchema(publicSearchInputSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const input = publicSearchInputSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      entityTypes: input.filters?.entityTypes,
+      page: input.pagination?.page,
+      pageSize: input.pagination?.pageSize,
+      query: input.query,
+      sortBy: input.filters?.sortBy,
+      sortOrder: input.filters?.sortOrder,
+      tagIds: input.filters?.tagIds,
+      type: 'public-search',
+    });
+
+    try {
+      // TODO: Consider implementing rate limiting for public search endpoints
+      // to prevent abuse and ensure fair usage across all users
+      const result = await ContentSearchFacade.getPublicSearchPageResults(input, dbInstance);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          counts: result.counts,
+          entityTypes: input.filters?.entityTypes,
+          page: input.pagination?.page,
+          pageSize: input.pagination?.pageSize,
+          query: input.query,
+          totalResults: result.counts.total,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Public search executed: "${input.query}" - ${result.counts.total} results`,
+      });
+
+      return result;
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.PUBLIC.SEARCH_CONTENT },
+        operation: OPERATIONS.SEARCH.COLLECTIONS,
+      });
+    }
+  });
+
+/**
+ * Get public search dropdown results for header search (unauthenticated access)
+ *
+ * Returns top 5 consolidated search results across collections, subcollections,
+ * and bobbleheads for instant search feedback in the application header.
+ * Results are cached in Redis with 10-minute TTL for optimal performance.
+ *
+ * @param query - Search text to match across entity types
+ * @returns Consolidated dropdown results with up to 5 total items
+ *
+ * @example
+ * const result = await getPublicSearchDropdownAction({ query: "baseball" });
+ * // Returns: { collections: [...], subcollections: [...], bobbleheads: [...], totalResults: 5 }
+ *
+ * @public
+ * @note Rate limiting should be implemented for dropdown search to prevent abuse
+ */
+export const getPublicSearchDropdownAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.PUBLIC.GET_SEARCH_DROPDOWN_RESULTS,
+    isTransactionRequired: false,
+  })
+  .inputSchema(searchDropdownInputSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const input = searchDropdownInputSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      query: input.query,
+      type: 'dropdown-search',
+    });
+
+    try {
+      // TODO: Consider implementing rate limiting for dropdown search to prevent
+      // excessive requests during rapid typing (debouncing on client side should help)
+      const result = await ContentSearchFacade.getPublicSearchDropdownResults(input.query, dbInstance);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          bobbleheadsCount: result.bobbleheads.length,
+          collectionsCount: result.collections.length,
+          query: input.query,
+          subcollectionsCount: result.subcollections.length,
+          totalResults: result.totalResults,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Dropdown search executed: "${input.query}" - ${result.totalResults} results`,
+      });
+
+      return result;
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.PUBLIC.GET_SEARCH_DROPDOWN_RESULTS },
+        operation: OPERATIONS.SEARCH.COLLECTIONS,
       });
     }
   });

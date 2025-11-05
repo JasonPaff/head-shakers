@@ -65,6 +65,10 @@ export const ACTION_NAMES = {
   PHOTO: {
     GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',
   },
+  PUBLIC: {
+    GET_SEARCH_DROPDOWN_RESULTS: 'getPublicSearchDropdownResults',
+    SEARCH_CONTENT: 'searchPublicContent',
+  },
   SOCIAL: {
     BLOCK_USER: 'blockUser',
     CREATE_COMMENT: 'createComment',
