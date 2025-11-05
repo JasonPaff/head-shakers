@@ -15441,3 +15441,34 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-05T17:21:18.348Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\middleware.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:21:32.546Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\middleware.ts",
+  "old_string": "const isPublicRoute = createRouteMatcher([\n  // homepage - anyone can view\n  '/',\n\n  // static pages (route group)\n  '/about(.*)',\n  '/privacy(.*)',\n  '/terms(.*)',\n\n  // coming soon page - always accessible\n  '/coming-soon(.*)',\n\n  // public browsing - anyone can view\n  '/browse(.*)',\n\n  // public collection views (read-only)\n  '/collections/:id', // matches /collections/[id]\n  '/collections/:id/subcollection(.*)', // matches subcollection routes\n  '/collections/:id/share(.*)', // sharing routes\n\n  // public bobblehead views (read-only)\n  '/bobbleheads/:id', // matches /bobbleheads/[id]\n  '/bobbleheads/:id/share(.*)', // sharing routes\n\n  // public user profiles (read-only)\n  '/users/:username',\n  '/users/:username/collections(.*)',\n  '/users/:username/following(.*)',\n]);",
+  "new_string": "const isPublicRoute = createRouteMatcher([\n  // homepage - anyone can view\n  '/',\n\n  // static pages (route group)\n  '/about(.*)',\n  '/privacy(.*)',\n  '/terms(.*)',\n\n  // coming soon page - always accessible\n  '/coming-soon(.*)',\n\n  // public browsing - anyone can view\n  '/browse(.*)',\n\n  // public search - anyone can search content\n  // allows unauthenticated users to discover collections, subcollections, and bobbleheads\n  // search functionality uses publicActionClient with rate limiting to prevent abuse\n  '/search(.*)',\n\n  // public collection views (read-only)\n  '/collections/:id', // matches /collections/[id]\n  '/collections/:id/subcollection(.*)', // matches subcollection routes\n  '/collections/:id/share(.*)', // sharing routes\n\n  // public bobblehead views (read-only)\n  '/bobbleheads/:id', // matches /bobbleheads/[id]\n  '/bobbleheads/:id/share(.*)', // sharing routes\n\n  // public user profiles (read-only)\n  '/users/:username',\n  '/users/:username/collections(.*)',\n  '/users/:username/following(.*)',\n]);"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:21:41.078Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint to fix any linting issues"
+}
+================================================================================
