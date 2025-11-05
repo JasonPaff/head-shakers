@@ -14043,3 +14043,779 @@ Input:
   "new_string": "## Status\n\n- [x] Step 1: Feature Refinement ✅\n- [x] Step 2: File Discovery ✅\n- [x] Step 3: Implementation Planning ✅\n\n**Completed:** 2025-11-05T00:05:00Z\n**Total Duration:** ~5 minutes\n\n---\n\n## Results Summary\n\n### Step 1: Feature Refinement\n- **Duration:** ~60 seconds\n- **Output:** 332-word refined feature request with project context\n- **Status:** ✅ Success\n\n### Step 2: File Discovery\n- **Duration:** ~120 seconds\n- **Files Discovered:** 42 relevant files\n- **Coverage:** All architectural layers (validation, queries, facades, actions, UI, middleware)\n- **Status:** ✅ Success\n\n### Step 3: Implementation Planning\n- **Duration:** ~120 seconds\n- **Steps Generated:** 11 implementation steps\n- **Estimated Duration:** 3-4 days\n- **Complexity:** High\n- **Risk Level:** Medium\n- **Status:** ✅ Success\n\n---\n\n## Final Deliverable\n\n📄 **Implementation Plan:** [public-search-functionality-implementation-plan.md](../../plans/public-search-functionality-implementation-plan.md)\n\nThis comprehensive plan includes:\n- 11 detailed implementation steps\n- Validation commands for each step\n- Success criteria and quality gates\n- Prerequisites and assumptions\n- Risk mitigation strategies\n- Testing requirements"
 }
 ================================================================================
+
+================================================================================
+2025-11-05T16:40:29.591Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Examine existing validation schemas to understand project patterns",
+      "status": "in_progress",
+      "activeForm": "Examining existing validation schemas"
+    },
+    {
+      "content": "Create PublicSearchQuerySchema with length validation and trimming",
+      "status": "pending",
+      "activeForm": "Creating PublicSearchQuerySchema"
+    },
+    {
+      "content": "Create SearchFiltersSchema for entity types, tags, and sort options",
+      "status": "pending",
+      "activeForm": "Creating SearchFiltersSchema"
+    },
+    {
+      "content": "Create SearchPaginationSchema with page and size validation",
+      "status": "pending",
+      "activeForm": "Creating SearchPaginationSchema"
+    },
+    {
+      "content": "Create combined PublicSearchInputSchema",
+      "status": "pending",
+      "activeForm": "Creating combined PublicSearchInputSchema"
+    },
+    {
+      "content": "Create SearchDropdownInputSchema for header dropdown",
+      "status": "pending",
+      "activeForm": "Creating SearchDropdownInputSchema"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:34.279Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/validations/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:39.243Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\collections.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:40.165Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\tags.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:47.853Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\zod.utils.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:47.868Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\index.ts",
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:54.168Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\schema-limits.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:40:54.179Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\config.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:41:05.483Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Examine existing validation schemas to understand project patterns",
+      "status": "completed",
+      "activeForm": "Examining existing validation schemas"
+    },
+    {
+      "content": "Create PublicSearchQuerySchema with length validation and trimming",
+      "status": "in_progress",
+      "activeForm": "Creating PublicSearchQuerySchema"
+    },
+    {
+      "content": "Create SearchFiltersSchema for entity types, tags, and sort options",
+      "status": "pending",
+      "activeForm": "Creating SearchFiltersSchema"
+    },
+    {
+      "content": "Create SearchPaginationSchema with page and size validation",
+      "status": "pending",
+      "activeForm": "Creating SearchPaginationSchema"
+    },
+    {
+      "content": "Create combined PublicSearchInputSchema",
+      "status": "pending",
+      "activeForm": "Creating combined PublicSearchInputSchema"
+    },
+    {
+      "content": "Create SearchDropdownInputSchema for header dropdown",
+      "status": "pending",
+      "activeForm": "Creating SearchDropdownInputSchema"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:41:10.578Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\enums.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:41:31.409Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts",
+  "content": "import { z } from 'zod';\n\nimport { CONFIG, ENUMS } from '@/lib/constants';\n\n/**\n * Public Search Validation Schemas\n * Validation schemas for public-facing search functionality accessible to unauthenticated users\n */\n\n// Entity types that can be searched (excluding user from ENUMS.SEARCH.RESULT_TYPE)\nconst SEARCHABLE_ENTITY_TYPES = ['collection', 'subcollection', 'bobblehead'] as const;\n\n/**\n * Schema for search query text validation\n * Validates query string with minimum/maximum length and trimming\n */\nexport const publicSearchQuerySchema = z\n  .string()\n  .trim()\n  .min(CONFIG.SEARCH.MIN_QUERY_LENGTH, `Search query must be at least ${CONFIG.SEARCH.MIN_QUERY_LENGTH} characters`)\n  .max(CONFIG.SEARCH.MAX_QUERY_LENGTH, `Search query must be ${CONFIG.SEARCH.MAX_QUERY_LENGTH} characters or less`);\n\n/**\n * Schema for search filters (entity types, tags, sort options)\n * All filters are optional to support flexible search queries\n */\nexport const searchFiltersSchema = z.object({\n  // Entity type toggles - array of entity types to include in search\n  entityTypes: z\n    .array(z.enum(SEARCHABLE_ENTITY_TYPES))\n    .optional()\n    .default(SEARCHABLE_ENTITY_TYPES as unknown as ['collection', 'subcollection', 'bobblehead'])\n    .refine((types) => types.length > 0, 'At least one entity type must be selected'),\n\n  // Tag filtering - array of tag IDs to filter by (include only logic)\n  tagIds: z\n    .array(z.string().uuid('Invalid tag ID'))\n    .max(CONFIG.CONTENT.MAX_TAGS_PER_BOBBLEHEAD, `Maximum ${CONFIG.CONTENT.MAX_TAGS_PER_BOBBLEHEAD} tags allowed`)\n    .optional()\n    .default([]),\n\n  // Sort options\n  sortBy: z.enum(ENUMS.SEARCH.SORT_BY).optional().default('relevance'),\n  sortOrder: z.enum(ENUMS.SEARCH.SORT_ORDER).optional().default('desc'),\n});\n\n/**\n * Schema for pagination parameters\n * Validates page number and page size with maximum limits\n */\nexport const searchPaginationSchema = z.object({\n  page: z.coerce.number().int().positive().default(1),\n  pageSize: z.coerce\n    .number()\n    .int()\n    .positive()\n    .max(CONFIG.PAGINATION.SEARCH_RESULTS.MAX, `Maximum page size is ${CONFIG.PAGINATION.SEARCH_RESULTS.MAX}`)\n    .default(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),\n});\n\n/**\n * Combined schema for full public search input\n * Merges query, filters, and pagination for complete search functionality\n */\nexport const publicSearchInputSchema = z.object({\n  query: publicSearchQuerySchema,\n  filters: searchFiltersSchema.optional().default({}),\n  pagination: searchPaginationSchema.optional().default({}),\n});\n\n/**\n * Schema for header search dropdown (query only, no pagination)\n * Used for instant search feedback in header with limited results (top 5)\n */\nexport const searchDropdownInputSchema = z.object({\n  query: publicSearchQuerySchema,\n});\n\n// Type exports using z.infer for type-safe schema usage\nexport type PublicSearchQuery = z.infer<typeof publicSearchQuerySchema>;\nexport type SearchFilters = z.infer<typeof searchFiltersSchema>;\nexport type SearchPagination = z.infer<typeof searchPaginationSchema>;\nexport type PublicSearchInput = z.infer<typeof publicSearchInputSchema>;\nexport type SearchDropdownInput = z.infer<typeof searchDropdownInputSchema>;\n\n// Helper type for searchable entity types\nexport type SearchableEntityType = (typeof SEARCHABLE_ENTITY_TYPES)[number];\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:41:38.031Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Examine existing validation schemas to understand project patterns",
+      "status": "completed",
+      "activeForm": "Examining existing validation schemas"
+    },
+    {
+      "content": "Create PublicSearchQuerySchema with length validation and trimming",
+      "status": "completed",
+      "activeForm": "Creating PublicSearchQuerySchema"
+    },
+    {
+      "content": "Create SearchFiltersSchema for entity types, tags, and sort options",
+      "status": "completed",
+      "activeForm": "Creating SearchFiltersSchema"
+    },
+    {
+      "content": "Create SearchPaginationSchema with page and size validation",
+      "status": "completed",
+      "activeForm": "Creating SearchPaginationSchema"
+    },
+    {
+      "content": "Create combined PublicSearchInputSchema",
+      "status": "completed",
+      "activeForm": "Creating combined PublicSearchInputSchema"
+    },
+    {
+      "content": "Create SearchDropdownInputSchema for header dropdown",
+      "status": "completed",
+      "activeForm": "Creating SearchDropdownInputSchema"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:41:42.311Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:43:10.469Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:43:19.706Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts",
+  "old_string": "export const publicSearchInputSchema = z.object({\n  filters: searchFiltersSchema.optional().default({}),\n  pagination: searchPaginationSchema.optional().default({}),\n  query: publicSearchQuerySchema,\n});",
+  "new_string": "export const publicSearchInputSchema = z.object({\n  query: publicSearchQuerySchema,\n  filters: searchFiltersSchema.optional(),\n  pagination: searchPaginationSchema.optional(),\n});"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:43:25.171Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:44:28.007Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Examine existing validation schemas to understand project patterns",
+      "status": "completed",
+      "activeForm": "Examining existing validation schemas"
+    },
+    {
+      "content": "Create PublicSearchQuerySchema with length validation and trimming",
+      "status": "completed",
+      "activeForm": "Creating PublicSearchQuerySchema"
+    },
+    {
+      "content": "Create SearchFiltersSchema for entity types, tags, and sort options",
+      "status": "completed",
+      "activeForm": "Creating SearchFiltersSchema"
+    },
+    {
+      "content": "Create SearchPaginationSchema with page and size validation",
+      "status": "completed",
+      "activeForm": "Creating SearchPaginationSchema"
+    },
+    {
+      "content": "Create combined PublicSearchInputSchema",
+      "status": "completed",
+      "activeForm": "Creating combined PublicSearchInputSchema"
+    },
+    {
+      "content": "Create SearchDropdownInputSchema for header dropdown",
+      "status": "completed",
+      "activeForm": "Creating SearchDropdownInputSchema"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:47:37.118Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing content-search.query.ts to understand current structure",
+      "status": "in_progress",
+      "activeForm": "Reading existing content-search.query.ts"
+    },
+    {
+      "content": "Review database schemas for collections, subcollections, and bobbleheads",
+      "status": "pending",
+      "activeForm": "Reviewing database schemas"
+    },
+    {
+      "content": "Implement searchPublicCollections query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicCollections query function"
+    },
+    {
+      "content": "Implement searchPublicSubcollections query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicSubcollections query function"
+    },
+    {
+      "content": "Implement searchPublicBobbleheads query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicBobbleheads query function"
+    },
+    {
+      "content": "Implement searchPublicConsolidated query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicConsolidated query function"
+    },
+    {
+      "content": "Implement getSearchResultCounts query function",
+      "status": "pending",
+      "activeForm": "Implementing getSearchResultCounts query function"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:47:41.682Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:47:41.699Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/db/schema/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:47:50.920Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\collections.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:47:50.922Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\bobbleheads.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:47:50.931Z
+Tool: Grep
+Input:
+{
+  "pattern": "subcollection",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:48:01.767Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:48:02.740Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\index.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:48:16.575Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing content-search.query.ts to understand current structure",
+      "status": "completed",
+      "activeForm": "Reading existing content-search.query.ts"
+    },
+    {
+      "content": "Review database schemas for collections, subcollections, and bobbleheads",
+      "status": "completed",
+      "activeForm": "Reviewing database schemas"
+    },
+    {
+      "content": "Implement searchPublicCollections query function",
+      "status": "in_progress",
+      "activeForm": "Implementing searchPublicCollections query function"
+    },
+    {
+      "content": "Implement searchPublicSubcollections query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicSubcollections query function"
+    },
+    {
+      "content": "Implement searchPublicBobbleheads query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicBobbleheads query function"
+    },
+    {
+      "content": "Implement searchPublicConsolidated query function",
+      "status": "pending",
+      "activeForm": "Implementing searchPublicConsolidated query function"
+    },
+    {
+      "content": "Implement getSearchResultCounts query function",
+      "status": "pending",
+      "activeForm": "Implementing getSearchResultCounts query function"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:48:27.017Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "old_string": "export type UserSearchResult = {\n  avatarUrl: null | string;\n  bio: null | string;\n  displayName: null | string;\n  id: string;\n  isVerified: boolean;\n  location: null | string;\n  memberSince: Date;\n  username: null | string;\n};",
+  "new_string": "export type UserSearchResult = {\n  avatarUrl: null | string;\n  bio: null | string;\n  displayName: null | string;\n  id: string;\n  isVerified: boolean;\n  location: null | string;\n  memberSince: Date;\n  username: null | string;\n};\n\nexport type SubcollectionSearchResult = {\n  collectionId: string;\n  collectionName: null | string;\n  coverImageUrl: null | string;\n  description: null | string;\n  id: string;\n  isPublic: boolean;\n  itemCount: null | number;\n  name: string;\n  ownerName: null | string;\n  ownerUsername: null | string;\n};\n\nexport type PublicSearchCounts = {\n  bobbleheads: number;\n  collections: number;\n  subcollections: number;\n  total: number;\n};\n\nexport type ConsolidatedSearchResults = {\n  bobbleheads: Array<BobbleheadSearchResult>;\n  collections: Array<CollectionSearchResult>;\n  subcollections: Array<SubcollectionSearchResult>;\n};"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:48:35.069Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "old_string": "import { DEFAULTS } from '@/lib/constants';\nimport { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';\nimport { BaseQuery } from '@/lib/queries/base/base-query';",
+  "new_string": "import { DEFAULTS } from '@/lib/constants';\nimport {\n  bobbleheadPhotos,\n  bobbleheads,\n  bobbleheadTags,\n  collections,\n  subCollections,\n  tags,\n  users,\n} from '@/lib/db/schema';\nimport { BaseQuery } from '@/lib/queries/base/base-query';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:49:32.793Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "old_string": "  /**\n   * search users for featuring\n   */\n  static async searchUsersAsync(\n    query: string,\n    limit: number,\n    context: QueryContext,\n  ): Promise<Array<UserSearchResult>> {\n    const dbInstance = this.getDbInstance(context);\n\n    return dbInstance\n      .select({\n        avatarUrl: users.avatarUrl,\n        bio: users.bio,\n        displayName: users.displayName,\n        id: users.id,\n        isVerified: users.isVerified,\n        location: users.location,\n        memberSince: users.memberSince,\n        username: users.username,\n      })\n      .from(users)\n      .where(\n        and(\n          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n          or(\n            ilike(users.displayName, `%${query}%`),\n            ilike(users.username, `%${query}%`),\n            ilike(users.bio, `%${query}%`),\n            ilike(users.location, `%${query}%`),\n          ),\n        ),\n      )\n      .limit(limit);\n  }\n}",
+  "new_string": "  /**\n   * search users for featuring\n   */\n  static async searchUsersAsync(\n    query: string,\n    limit: number,\n    context: QueryContext,\n  ): Promise<Array<UserSearchResult>> {\n    const dbInstance = this.getDbInstance(context);\n\n    return dbInstance\n      .select({\n        avatarUrl: users.avatarUrl,\n        bio: users.bio,\n        displayName: users.displayName,\n        id: users.id,\n        isVerified: users.isVerified,\n        location: users.location,\n        memberSince: users.memberSince,\n        username: users.username,\n      })\n      .from(users)\n      .where(\n        and(\n          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n          or(\n            ilike(users.displayName, `%${query}%`),\n            ilike(users.username, `%${query}%`),\n            ilike(users.bio, `%${query}%`),\n            ilike(users.location, `%${query}%`),\n          ),\n        ),\n      )\n      .limit(limit);\n  }\n\n  /**\n   * Search public collections for unauthenticated users\n   * Uses GIN indexes on name/description fields for efficient text search\n   * Supports tag filtering via joins with bobblehead tags\n   *\n   * @param query - Search text to match against name, description, and owner information\n   * @param limit - Maximum number of results to return\n   * @param context - Query context with database instance\n   * @param tagIds - Optional array of tag IDs to filter by (include only logic)\n   * @param offset - Optional offset for pagination\n   */\n  static async searchPublicCollections(\n    query: string,\n    limit: number,\n    context: QueryContext,\n    tagIds?: Array<string>,\n    offset?: number,\n  ): Promise<Array<CollectionSearchResult>> {\n    const dbInstance = this.getDbInstance(context);\n\n    // Build where conditions - only public collections from non-deleted users\n    const conditions: Array<SQL> = [\n      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),\n      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n    ];\n\n    // Add text search conditions if query is provided\n    // Leverages GIN indexes: collections_name_search_idx, collections_description_search_idx\n    if (query && query.trim()) {\n      const textSearchCondition = or(\n        ilike(collections.name, `%${query}%`),\n        ilike(collections.description, `%${query}%`),\n        ilike(users.displayName, `%${query}%`),\n        ilike(users.username, `%${query}%`),\n      );\n      if (textSearchCondition) {\n        conditions.push(textSearchCondition);\n      }\n    }\n\n    const queryBuilder = dbInstance\n      .select({\n        coverImageUrl: collections.coverImageUrl,\n        description: collections.description,\n        id: collections.id,\n        isPublic: collections.isPublic,\n        name: collections.name,\n        ownerName: users.displayName,\n        ownerUsername: users.username,\n        totalItems: collections.totalItems,\n      })\n      .from(collections)\n      .innerJoin(users, eq(collections.userId, users.id));\n\n    // Tag filtering: find collections containing bobbleheads with ALL specified tags\n    if (tagIds && tagIds.length > 0) {\n      for (const tagId of tagIds) {\n        conditions.push(\n          inArray(\n            collections.id,\n            dbInstance\n              .select({ collectionId: bobbleheads.collectionId })\n              .from(bobbleheads)\n              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))\n              .where(\n                and(\n                  eq(bobbleheadTags.tagId, tagId),\n                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),\n                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n                ),\n              ),\n          ),\n        );\n      }\n    }\n\n    let finalQuery = queryBuilder.where(and(...conditions)).limit(limit);\n\n    if (offset !== undefined && offset > 0) {\n      finalQuery = finalQuery.offset(offset);\n    }\n\n    return finalQuery;\n  }\n\n  /**\n   * Search public subcollections for unauthenticated users\n   * Filters by parent collection visibility (both subcollection and parent must be public)\n   * Supports tag filtering via bobblehead tags within the subcollection\n   *\n   * @param query - Search text to match against name, description, collection name, and owner information\n   * @param limit - Maximum number of results to return\n   * @param context - Query context with database instance\n   * @param tagIds - Optional array of tag IDs to filter by (include only logic)\n   * @param offset - Optional offset for pagination\n   */\n  static async searchPublicSubcollections(\n    query: string,\n    limit: number,\n    context: QueryContext,\n    tagIds?: Array<string>,\n    offset?: number,\n  ): Promise<Array<SubcollectionSearchResult>> {\n    const dbInstance = this.getDbInstance(context);\n\n    // Build where conditions - both subcollection and parent collection must be public\n    const conditions: Array<SQL> = [\n      eq(subCollections.isPublic, DEFAULTS.SUB_COLLECTION.IS_PUBLIC),\n      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),\n      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n    ];\n\n    // Add text search conditions if query is provided\n    if (query && query.trim()) {\n      const textSearchCondition = or(\n        ilike(subCollections.name, `%${query}%`),\n        ilike(subCollections.description, `%${query}%`),\n        ilike(collections.name, `%${query}%`),\n        ilike(users.displayName, `%${query}%`),\n        ilike(users.username, `%${query}%`),\n      );\n      if (textSearchCondition) {\n        conditions.push(textSearchCondition);\n      }\n    }\n\n    const queryBuilder = dbInstance\n      .select({\n        collectionId: subCollections.collectionId,\n        collectionName: collections.name,\n        coverImageUrl: subCollections.coverImageUrl,\n        description: subCollections.description,\n        id: subCollections.id,\n        isPublic: subCollections.isPublic,\n        itemCount: subCollections.itemCount,\n        name: subCollections.name,\n        ownerName: users.displayName,\n        ownerUsername: users.username,\n      })\n      .from(subCollections)\n      .innerJoin(collections, eq(subCollections.collectionId, collections.id))\n      .innerJoin(users, eq(collections.userId, users.id));\n\n    // Tag filtering: find subcollections containing bobbleheads with ALL specified tags\n    if (tagIds && tagIds.length > 0) {\n      for (const tagId of tagIds) {\n        conditions.push(\n          inArray(\n            subCollections.id,\n            dbInstance\n              .select({ subcollectionId: bobbleheads.subcollectionId })\n              .from(bobbleheads)\n              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))\n              .where(\n                and(\n                  eq(bobbleheadTags.tagId, tagId),\n                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),\n                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n                ),\n              ),\n          ),\n        );\n      }\n    }\n\n    let finalQuery = queryBuilder.where(and(...conditions)).limit(limit);\n\n    if (offset !== undefined && offset > 0) {\n      finalQuery = finalQuery.offset(offset);\n    }\n\n    return finalQuery;\n  }\n\n  /**\n   * Search public bobbleheads for unauthenticated users\n   * Uses GIN indexes on name/description fields for efficient text search\n   * Searches across multiple fields including manufacturer, series, character name\n   * Supports tag filtering\n   *\n   * @param query - Search text to match against multiple bobblehead fields\n   * @param limit - Maximum number of results to return\n   * @param context - Query context with database instance\n   * @param tagIds - Optional array of tag IDs to filter by (include only logic)\n   * @param offset - Optional offset for pagination\n   */\n  static async searchPublicBobbleheads(\n    query: string,\n    limit: number,\n    context: QueryContext,\n    tagIds?: Array<string>,\n    offset?: number,\n  ): Promise<Array<BobbleheadSearchResult>> {\n    const dbInstance = this.getDbInstance(context);\n\n    // Build where conditions - only public, non-deleted bobbleheads\n    const conditions: Array<SQL> = [\n      eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),\n      eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n    ];\n\n    // Add text search conditions if query is provided\n    // Leverages GIN indexes: bobbleheads_name_search_idx, bobbleheads_description_search_idx\n    if (query && query.trim()) {\n      const textSearchCondition = or(\n        ilike(bobbleheads.name, `%${query}%`),\n        ilike(bobbleheads.description, `%${query}%`),\n        ilike(bobbleheads.characterName, `%${query}%`),\n        ilike(bobbleheads.manufacturer, `%${query}%`),\n        ilike(bobbleheads.series, `%${query}%`),\n        ilike(bobbleheads.category, `%${query}%`),\n        ilike(users.displayName, `%${query}%`),\n        ilike(users.username, `%${query}%`),\n        ilike(collections.name, `%${query}%`),\n      );\n      if (textSearchCondition) {\n        conditions.push(textSearchCondition);\n      }\n    }\n\n    const queryBuilder = dbInstance\n      .select({\n        category: bobbleheads.category,\n        characterName: bobbleheads.characterName,\n        collectionName: collections.name,\n        description: bobbleheads.description,\n        id: bobbleheads.id,\n        isPublic: bobbleheads.isPublic,\n        manufacturer: bobbleheads.manufacturer,\n        name: bobbleheads.name,\n        ownerName: users.displayName,\n        ownerUsername: users.username,\n        primaryPhotoUrl: bobbleheadPhotos.url,\n        series: bobbleheads.series,\n        year: bobbleheads.year,\n      })\n      .from(bobbleheads)\n      .innerJoin(users, eq(bobbleheads.userId, users.id))\n      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))\n      .leftJoin(\n        bobbleheadPhotos,\n        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),\n      );\n\n    // Tag filtering: find bobbleheads with ALL specified tags\n    if (tagIds && tagIds.length > 0) {\n      for (const tagId of tagIds) {\n        conditions.push(\n          inArray(\n            bobbleheads.id,\n            dbInstance\n              .select({ bobbleheadId: bobbleheadTags.bobbleheadId })\n              .from(bobbleheadTags)\n              .where(eq(bobbleheadTags.tagId, tagId)),\n          ),\n        );\n      }\n    }\n\n    let finalQuery = queryBuilder.where(and(...conditions)).limit(limit);\n\n    if (offset !== undefined && offset > 0) {\n      finalQuery = finalQuery.offset(offset);\n    }\n\n    return finalQuery;\n  }\n\n  /**\n   * Search across all public entity types (collections, subcollections, bobbleheads)\n   * Returns consolidated results with top N from each entity type\n   * Used for header dropdown instant search with limited results\n   *\n   * @param query - Search text to match across all entity types\n   * @param limitPerType - Maximum number of results per entity type\n   * @param context - Query context with database instance\n   */\n  static async searchPublicConsolidated(\n    query: string,\n    limitPerType: number,\n    context: QueryContext,\n  ): Promise<ConsolidatedSearchResults> {\n    // Execute all three searches in parallel for optimal performance\n    const [collections, subcollections, bobbleheads] = await Promise.all([\n      this.searchPublicCollections(query, limitPerType, context),\n      this.searchPublicSubcollections(query, limitPerType, context),\n      this.searchPublicBobbleheads(query, limitPerType, context),\n    ]);\n\n    return {\n      bobbleheads,\n      collections,\n      subcollections,\n    };\n  }\n\n  /**\n   * Get total result counts for each entity type\n   * Used for pagination and displaying total available results\n   * Does not return actual results, only counts for performance\n   *\n   * @param query - Search text to match across all entity types\n   * @param context - Query context with database instance\n   * @param tagIds - Optional array of tag IDs to filter by\n   */\n  static async getSearchResultCounts(\n    query: string,\n    context: QueryContext,\n    tagIds?: Array<string>,\n  ): Promise<PublicSearchCounts> {\n    const dbInstance = this.getDbInstance(context);\n\n    // Build collection count query\n    const collectionConditions: Array<SQL> = [\n      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),\n      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n    ];\n\n    if (query && query.trim()) {\n      const textSearch = or(\n        ilike(collections.name, `%${query}%`),\n        ilike(collections.description, `%${query}%`),\n        ilike(users.displayName, `%${query}%`),\n        ilike(users.username, `%${query}%`),\n      );\n      if (textSearch) collectionConditions.push(textSearch);\n    }\n\n    if (tagIds && tagIds.length > 0) {\n      for (const tagId of tagIds) {\n        collectionConditions.push(\n          inArray(\n            collections.id,\n            dbInstance\n              .select({ collectionId: bobbleheads.collectionId })\n              .from(bobbleheads)\n              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))\n              .where(\n                and(\n                  eq(bobbleheadTags.tagId, tagId),\n                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),\n                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n                ),\n              ),\n          ),\n        );\n      }\n    }\n\n    // Build subcollection count query\n    const subcollectionConditions: Array<SQL> = [\n      eq(subCollections.isPublic, DEFAULTS.SUB_COLLECTION.IS_PUBLIC),\n      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),\n      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n    ];\n\n    if (query && query.trim()) {\n      const textSearch = or(\n        ilike(subCollections.name, `%${query}%`),\n        ilike(subCollections.description, `%${query}%`),\n        ilike(collections.name, `%${query}%`),\n        ilike(users.displayName, `%${query}%`),\n        ilike(users.username, `%${query}%`),\n      );\n      if (textSearch) subcollectionConditions.push(textSearch);\n    }\n\n    if (tagIds && tagIds.length > 0) {\n      for (const tagId of tagIds) {\n        subcollectionConditions.push(\n          inArray(\n            subCollections.id,\n            dbInstance\n              .select({ subcollectionId: bobbleheads.subcollectionId })\n              .from(bobbleheads)\n              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))\n              .where(\n                and(\n                  eq(bobbleheadTags.tagId, tagId),\n                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),\n                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n                ),\n              ),\n          ),\n        );\n      }\n    }\n\n    // Build bobblehead count query\n    const bobbleheadConditions: Array<SQL> = [\n      eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),\n      eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),\n    ];\n\n    if (query && query.trim()) {\n      const textSearch = or(\n        ilike(bobbleheads.name, `%${query}%`),\n        ilike(bobbleheads.description, `%${query}%`),\n        ilike(bobbleheads.characterName, `%${query}%`),\n        ilike(bobbleheads.manufacturer, `%${query}%`),\n        ilike(bobbleheads.series, `%${query}%`),\n        ilike(bobbleheads.category, `%${query}%`),\n        ilike(users.displayName, `%${query}%`),\n        ilike(users.username, `%${query}%`),\n        ilike(collections.name, `%${query}%`),\n      );\n      if (textSearch) bobbleheadConditions.push(textSearch);\n    }\n\n    if (tagIds && tagIds.length > 0) {\n      for (const tagId of tagIds) {\n        bobbleheadConditions.push(\n          inArray(\n            bobbleheads.id,\n            dbInstance\n              .select({ bobbleheadId: bobbleheadTags.bobbleheadId })\n              .from(bobbleheadTags)\n              .where(eq(bobbleheadTags.tagId, tagId)),\n          ),\n        );\n      }\n    }\n\n    // Execute count queries in parallel\n    const [collectionsCountResult, subcollectionsCountResult, bobbleheadsCountResult] = await Promise.all([\n      dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(collections)\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(and(...collectionConditions)),\n\n      dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(subCollections)\n        .innerJoin(collections, eq(subCollections.collectionId, collections.id))\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(and(...subcollectionConditions)),\n\n      dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(bobbleheads)\n        .innerJoin(users, eq(bobbleheads.userId, users.id))\n        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))\n        .where(and(...bobbleheadConditions)),\n    ]);\n\n    const collectionsCount = collectionsCountResult[0]?.count || 0;\n    const subcollectionsCount = subcollectionsCountResult[0]?.count || 0;\n    const bobbleheadsCount = bobbleheadsCountResult[0]?.count || 0;\n\n    return {\n      bobbleheads: bobbleheadsCount,\n      collections: collectionsCount,\n      subcollections: subcollectionsCount,\n      total: collectionsCount + subcollectionsCount + bobbleheadsCount,\n    };\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:49:44.733Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing content-search.query.ts to understand current structure",
+      "status": "completed",
+      "activeForm": "Reading existing content-search.query.ts"
+    },
+    {
+      "content": "Review database schemas for collections, subcollections, and bobbleheads",
+      "status": "completed",
+      "activeForm": "Reviewing database schemas"
+    },
+    {
+      "content": "Implement searchPublicCollections query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicCollections query function"
+    },
+    {
+      "content": "Implement searchPublicSubcollections query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicSubcollections query function"
+    },
+    {
+      "content": "Implement searchPublicBobbleheads query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicBobbleheads query function"
+    },
+    {
+      "content": "Implement searchPublicConsolidated query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicConsolidated query function"
+    },
+    {
+      "content": "Implement getSearchResultCounts query function",
+      "status": "completed",
+      "activeForm": "Implementing getSearchResultCounts query function"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:49:51.280Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint fix and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:50:50.995Z
+Tool: Grep
+Input:
+{
+  "pattern": "sql.*count\\(\\*\\)",
+  "output_mode": "content",
+  "head_limit": 10
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:50:58.057Z
+Tool: Grep
+Input:
+{
+  "pattern": "count\\(\\*\\)",
+  "output_mode": "content",
+  "type": "ts",
+  "head_limit": 15
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:51:02.887Z
+Tool: Grep
+Input:
+{
+  "pattern": "from 'drizzle-orm'",
+  "output_mode": "content",
+  "head_limit": 5
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:51:08.483Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\tags\\tags-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:51:20.669Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "old_string": "import { and, eq, ilike, inArray, not, or, type SQL } from 'drizzle-orm';",
+  "new_string": "import { and, count, eq, ilike, inArray, not, or, type SQL } from 'drizzle-orm';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:51:32.281Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "old_string": "    // Execute count queries in parallel\n    const [collectionsCountResult, subcollectionsCountResult, bobbleheadsCountResult] = await Promise.all([\n      dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(collections)\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(and(...collectionConditions)),\n\n      dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(subCollections)\n        .innerJoin(collections, eq(subCollections.collectionId, collections.id))\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(and(...subcollectionConditions)),\n\n      dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(bobbleheads)\n        .innerJoin(users, eq(bobbleheads.userId, users.id))\n        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))\n        .where(and(...bobbleheadConditions)),\n    ]);\n\n    const collectionsCount = collectionsCountResult[0]?.count || 0;\n    const subcollectionsCount = subcollectionsCountResult[0]?.count || 0;\n    const bobbleheadsCount = bobbleheadsCountResult[0]?.count || 0;",
+  "new_string": "    // Execute count queries in parallel\n    const [collectionsCountResult, subcollectionsCountResult, bobbleheadsCountResult] = await Promise.all([\n      dbInstance\n        .select({ count: count() })\n        .from(collections)\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(and(...collectionConditions)),\n\n      dbInstance\n        .select({ count: count() })\n        .from(subCollections)\n        .innerJoin(collections, eq(subCollections.collectionId, collections.id))\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(and(...subcollectionConditions)),\n\n      dbInstance\n        .select({ count: count() })\n        .from(bobbleheads)\n        .innerJoin(users, eq(bobbleheads.userId, users.id))\n        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))\n        .where(and(...bobbleheadConditions)),\n    ]);\n\n    const collectionsCount = Number(collectionsCountResult[0]?.count) || 0;\n    const subcollectionsCount = Number(subcollectionsCountResult[0]?.count) || 0;\n    const bobbleheadsCount = Number(bobbleheadsCountResult[0]?.count) || 0;"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:51:38.154Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint fix and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:52:45.875Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "old_string": "    let finalQuery = queryBuilder.where(and(...conditions)).limit(limit);\n\n    if (offset !== undefined && offset > 0) {\n      finalQuery = finalQuery.offset(offset);\n    }\n\n    return finalQuery;",
+  "new_string": "    const baseQuery = queryBuilder.where(and(...conditions)).limit(limit);\n\n    if (offset !== undefined && offset > 0) {\n      return baseQuery.offset(offset);\n    }\n\n    return baseQuery;",
+  "replace_all": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:52:50.950Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint fix and typecheck validation"
+}
+================================================================================
+
+================================================================================
+2025-11-05T16:53:50.676Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read existing content-search.query.ts to understand current structure",
+      "status": "completed",
+      "activeForm": "Reading existing content-search.query.ts"
+    },
+    {
+      "content": "Review database schemas for collections, subcollections, and bobbleheads",
+      "status": "completed",
+      "activeForm": "Reviewing database schemas"
+    },
+    {
+      "content": "Implement searchPublicCollections query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicCollections query function"
+    },
+    {
+      "content": "Implement searchPublicSubcollections query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicSubcollections query function"
+    },
+    {
+      "content": "Implement searchPublicBobbleheads query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicBobbleheads query function"
+    },
+    {
+      "content": "Implement searchPublicConsolidated query function",
+      "status": "completed",
+      "activeForm": "Implementing searchPublicConsolidated query function"
+    },
+    {
+      "content": "Implement getSearchResultCounts query function",
+      "status": "completed",
+      "activeForm": "Implementing getSearchResultCounts query function"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:02.905Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:02.909Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:02.910Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:02.915Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:18.664Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*cloudinary*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:18.666Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\index.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:00:25.810Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\cloudinary.utils.ts"
+}
+================================================================================
