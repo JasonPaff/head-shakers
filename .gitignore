@@ -51,3 +51,7 @@ next-env.d.ts
 # playwright auth state
 playwright/.clerk
 /nul
+
+# docs
+/docs
+/docs/*
