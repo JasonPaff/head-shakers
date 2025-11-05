@@ -20488,3 +20488,786 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-05T22:18:48.633Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/browse/featured"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:06.441Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "featured-page-full.png",
+  "fullPage": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:06.486Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "featured-page-viewport.png"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:19.936Z
+Tool: Task
+Input:
+{
+  "description": "Investigate featured card components",
+  "prompt": "I need to investigate the card components used on the /browse/featured page to understand how the images are being displayed. \n\nPlease find:\n1. The featured page component file (likely in src/app/(app)/browse/featured/)\n2. The card component(s) used to display bobbleheads and collections\n3. How images are being rendered (look for img tags, Image components, aspect ratios, object-fit styles)\n4. Any relevant styling files or className definitions\n\nFocus on understanding the current implementation so I can propose fixes for the image cropping issues.",
+  "subagent_type": "Plan"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:24.644Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/browse/featured/**/*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:24.647Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/browse/featured/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:24.646Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/components/**/*card*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:33.710Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\featured-content-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:33.710Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:33.716Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:33.728Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:43.863Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/bobblehead-gallery-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:43.863Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:43.871Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/dashboard/collection/**/*card*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:50.601Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-gallery-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:50.605Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\dashboard\\collection\\(collection)\\components\\collection-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:57.928Z
+Tool: Grep
+Input:
+{
+  "pattern": "object-cover",
+  "glob": "**/*.tsx",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:19:57.931Z
+Tool: Grep
+Input:
+{
+  "pattern": "aspect-ratio",
+  "glob": "**/*.tsx",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:20:05.005Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:20:05.004Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:21:01.961Z
+Tool: AskUserQuestion
+Input:
+{
+  "questions": [
+    {
+      "question": "Which approach would you prefer for displaying the bobblehead images on the featured page?",
+      "header": "Image Style",
+      "options": [
+        {
+          "label": "Show full images (no cropping)",
+          "description": "Use object-contain to show complete bobbleheads. May have letterboxing (background padding) but shows entire image. Best for ensuring nothing is cut off."
+        },
+        {
+          "label": "Better aspect ratios with some cropping",
+          "description": "Use wider aspect ratios (16:9 or 21:9) with object-cover. Shows more of the image but may still crop slightly. More cinematic look."
+        },
+        {
+          "label": "Next.js Image optimization",
+          "description": "Migrate to Next.js Image component with object-contain. Better performance, lazy loading, and optimization. Shows full images with no cropping."
+        },
+        {
+          "label": "Mixed approach",
+          "description": "Use object-contain for bobbleheads (show full figure) but keep object-cover for collections (more flexibility with collection photos)."
+        }
+      ],
+      "multiSelect": false
+    },
+    {
+      "question": "What aspect ratio should the card images use?",
+      "header": "Aspect Ratio",
+      "options": [
+        {
+          "label": "4:3 (Standard)",
+          "description": "Traditional photo aspect ratio. Good balance between vertical and horizontal space. Works well for most bobblehead photos."
+        },
+        {
+          "label": "16:9 (Widescreen)",
+          "description": "Wider format, more horizontal space. Good for displaying full bobbleheads in their environment/context."
+        },
+        {
+          "label": "3:4 (Portrait)",
+          "description": "Vertical orientation, similar to phone photos. Emphasizes the height of bobbleheads."
+        }
+      ],
+      "multiSelect": false
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:32.212Z
+Tool: Task
+Input:
+{
+  "description": "Research Cloudinary Image usage",
+  "prompt": "I need to understand how the Cloudinary Image component is used in this codebase.\n\nPlease find:\n1. Examples of CldImage component usage in the codebase (search for \"CldImage\" imports and usage)\n2. The next.config.js file to see if Cloudinary domains are configured\n3. Any existing imports from \"next-cloudinary\" package\n4. How images are being handled in other components that might use Cloudinary\n\nThis will help me understand the current pattern and ensure I implement the solution consistently with the rest of the codebase.",
+  "subagent_type": "Plan"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:39.247Z
+Tool: Grep
+Input:
+{
+  "pattern": "CldImage",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:39.250Z
+Tool: Grep
+Input:
+{
+  "pattern": "from ['\"]next-cloudinary['\"]",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:39.264Z
+Tool: Glob
+Input:
+{
+  "pattern": "next.config.*"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:39.274Z
+Tool: Grep
+Input:
+{
+  "pattern": "cloudinary",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:48.669Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\next.config.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:48.672Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\cloudinary-photo-upload.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:48.678Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\cloudinary.utils.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:31:48.686Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\types\\cloudinary.types.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:01.574Z
+Tool: Grep
+Input:
+{
+  "pattern": "\\bImage\\b.*from ['\"]next/image['\"]",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:01.576Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\config.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:01.591Z
+Tool: Grep
+Input:
+{
+  "pattern": "env\\.NEXT_PUBLIC_CLOUDINARY",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:08.492Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:08.492Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cloudinary.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:53.105Z
+Tool: Task
+Input:
+{
+  "description": "Check featured content data structure",
+  "prompt": "I need to understand the data structure for featured content to know if we have Cloudinary publicIds or full URLs.\n\nPlease find:\n1. The types/interfaces for featured content (look for FeaturedContent, FeaturedBobblehead, FeaturedCollection types)\n2. The queries/actions that fetch featured content data (likely in src/lib/queries/ or src/lib/actions/)\n3. Check what image fields are available (imageUrl, publicId, mainPhoto, etc.)\n4. Look at the database schema for featured items to see what's stored\n\nI need to know if the featured content has:\n- Just URLs (imageUrl field)\n- Cloudinary publicIds\n- Photo objects with both publicId and url\n\nThis will determine whether I need to use extractPublicIdFromCloudinaryUrl utility or if we already have the publicId available.",
+  "subagent_type": "Plan"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:58.922Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*featured*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:58.926Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/types/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:58.933Z
+Tool: Grep
+Input:
+{
+  "pattern": "FeaturedContent|FeaturedBobblehead|FeaturedCollection",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:32:58.941Z
+Tool: Grep
+Input:
+{
+  "pattern": "interface.*Featured|type.*Featured",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:08.048Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\featured-content\\featured-content-transformer.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:08.048Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\featured-content\\featured-content-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:08.056Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\system.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:15.793Z
+Tool: Grep
+Input:
+{
+  "pattern": "featuredContent.*=.*pgTable|export const featuredContent",
+  "output_mode": "content",
+  "-A": 30
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:20.832Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\system.schema.ts",
+  "offset": 50,
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:27.549Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:27.549Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:37.207Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/cloudinary*.ts",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:37.209Z
+Tool: Grep
+Input:
+{
+  "pattern": "extractPublicId|publicId|cloudinary.*url",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:42.612Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\cloudinary.utils.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:48.886Z
+Tool: Grep
+Input:
+{
+  "pattern": "from 'next-cloudinary'|CldImage",
+  "output_mode": "files_with_matches",
+  "head_limit": 5
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:33:54.255Z
+Tool: Grep
+Input:
+{
+  "pattern": "CldImage",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src",
+  "output_mode": "content",
+  "-B": 2,
+  "-A": 10,
+  "head_limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:34:34.736Z
+Tool: ExitPlanMode
+Input:
+{
+  "plan": "## Plan: Fix Image Cropping on Featured Page\n\n### Problem\nThe featured page cards are cropping bobblehead images on the sides, cutting off important parts of the figures.\n\n### Root Cause\nUsing `object-cover` with fixed heights forces images to fill containers, cropping content that doesn't match the aspect ratio.\n\n### Solution\nMigrate from native `<img>` tags to Cloudinary's `CldImage` component with:\n- **4:3 aspect ratio** containers for consistent card sizing\n- **object-contain** to show full images without cropping\n- **Cloudinary optimizations** for better performance (auto format, quality, lazy loading)\n\n### Files to Modify\n\n1. **`src/app/(app)/browse/featured/components/display/featured-hero-display.tsx`** (lines 107-111)\n   - Import `CldImage` from 'next-cloudinary'\n   - Import `extractPublicIdFromCloudinaryUrl` utility\n   - Replace `<img>` with aspect ratio container + `CldImage`\n   - Use object-contain with 4:3 aspect ratio\n   - Handle placeholder images\n\n2. **`src/app/(app)/browse/featured/components/display/featured-tabbed-content-display.tsx`** (lines 107-111)\n   - Same changes as above\n   - Ensure consistent implementation\n\n### Implementation Details\n\n- **Aspect Ratio**: Use `aspect-[4/3]` Tailwind class for 4:3 ratio\n- **Object Fit**: Change from `object-cover` to `object-contain`\n- **Background**: Add `bg-muted` to fill letterboxing areas\n- **PublicId Extraction**: Use existing `extractPublicIdFromCloudinaryUrl()` utility\n- **Placeholder Handling**: Fallback to regular `<img>` for `/placeholder.jpg`\n- **Cloudinary Props**: \n  - `format=\"auto\"` for optimal format\n  - `quality=\"auto:good\"` for balanced quality/size\n  - `gravity=\"auto\"` for smart cropping if needed\n  - Appropriate width/height values\n\n### Benefits\n✅ Shows complete bobbleheads without cropping\n✅ Automatic format optimization (WebP/AVIF)\n✅ Better loading performance\n✅ Consistent card layouts\n✅ Maintains existing data structure"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:35:36.201Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update featured-hero-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "in_progress",
+      "activeForm": "Updating featured-hero-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Update featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "pending",
+      "activeForm": "Updating featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Test the changes and verify images are not cropped",
+      "status": "pending",
+      "activeForm": "Testing the changes and verifying images are not cropped"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:35:36.471Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:36:04.415Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx",
+  "old_string": "'use client';\n\nimport {\n  CalendarIcon,\n  EyeIcon,\n  HeartIcon,\n  MessageCircleIcon,\n  StarIcon,\n  TrendingUpIcon,\n  UserIcon,\n} from 'lucide-react';\nimport Link from 'next/link';\nimport { Fragment } from 'react';\n\nimport type { LikeTargetType } from '@/lib/constants';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeCompactButton } from '@/components/ui/like-button';\nimport { ENUMS } from '@/lib/constants';",
+  "new_string": "'use client';\n\nimport {\n  CalendarIcon,\n  EyeIcon,\n  HeartIcon,\n  MessageCircleIcon,\n  StarIcon,\n  TrendingUpIcon,\n  UserIcon,\n} from 'lucide-react';\nimport Link from 'next/link';\nimport { CldImage } from 'next-cloudinary';\nimport { Fragment } from 'react';\n\nimport type { LikeTargetType } from '@/lib/constants';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeCompactButton } from '@/components/ui/like-button';\nimport { ENUMS } from '@/lib/constants';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:36:18.987Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx",
+  "old_string": "      <Card className={cardClasses} key={content.id}>\n        <div className={'relative'}>\n          <img\n            alt={content.title}\n            className={`w-full rounded-t-lg object-cover ${isHero ? 'h-64 lg:h-80' : 'h-48'}`}\n            src={content.imageUrl ?? '/placeholder.jpg'}\n          />\n          <div className={'absolute top-4 left-4 flex gap-2'}>\n            <Badge className={getContentTypeColor(content.contentType)}>\n              {getContentTypeIcon(content.contentType)}\n              {getContentTypeLabel(content.contentType)}\n            </Badge>\n            <Conditional isCondition={isHero}>\n              <Badge className={'bg-yellow-100 text-yellow-800'} variant={'secondary'}>\n                <StarIcon aria-hidden className={'mr-1 size-3'} />\n                Featured\n              </Badge>\n            </Conditional>\n          </div>\n        </div>",
+  "new_string": "      <Card className={cardClasses} key={content.id}>\n        <div className={'relative'}>\n          {content.imageUrl && content.imageUrl !== '/placeholder.jpg' ? (\n            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <CldImage\n                alt={content.title}\n                className={'size-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                gravity={'auto'}\n                height={isHero ? 600 : 400}\n                quality={'auto:good'}\n                src={extractPublicIdFromCloudinaryUrl(content.imageUrl)}\n                width={isHero ? 800 : 533}\n              />\n            </div>\n          ) : (\n            <div className={'aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <img\n                alt={content.title}\n                className={'size-full object-contain'}\n                src={'/placeholder.jpg'}\n              />\n            </div>\n          )}\n          <div className={'absolute top-4 left-4 flex gap-2'}>\n            <Badge className={getContentTypeColor(content.contentType)}>\n              {getContentTypeIcon(content.contentType)}\n              {getContentTypeLabel(content.contentType)}\n            </Badge>\n            <Conditional isCondition={isHero}>\n              <Badge className={'bg-yellow-100 text-yellow-800'} variant={'secondary'}>\n                <StarIcon aria-hidden className={'mr-1 size-3'} />\n                Featured\n              </Badge>\n            </Conditional>\n          </div>\n        </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:36:27.686Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update featured-hero-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "completed",
+      "activeForm": "Updating featured-hero-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Update featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "in_progress",
+      "activeForm": "Updating featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Test the changes and verify images are not cropped",
+      "status": "pending",
+      "activeForm": "Testing the changes and verifying images are not cropped"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:36:27.970Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:36:41.793Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx",
+  "old_string": "'use client';\n\nimport {\n  CalendarIcon,\n  EyeIcon,\n  HeartIcon,\n  MessageCircleIcon,\n  StarIcon,\n  TrendingUpIcon,\n  UserIcon,\n} from 'lucide-react';\nimport Link from 'next/link';\nimport { Fragment, useState } from 'react';\n\nimport type { LikeTargetType } from '@/lib/constants';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeCompactButton } from '@/components/ui/like-button';\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';\nimport { ENUMS } from '@/lib/constants';",
+  "new_string": "'use client';\n\nimport {\n  CalendarIcon,\n  EyeIcon,\n  HeartIcon,\n  MessageCircleIcon,\n  StarIcon,\n  TrendingUpIcon,\n  UserIcon,\n} from 'lucide-react';\nimport Link from 'next/link';\nimport { CldImage } from 'next-cloudinary';\nimport { Fragment, useState } from 'react';\n\nimport type { LikeTargetType } from '@/lib/constants';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeCompactButton } from '@/components/ui/like-button';\nimport { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';\nimport { ENUMS } from '@/lib/constants';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:36:55.873Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx",
+  "old_string": "      <Card className={cardClasses} key={content.id}>\n        <div className={'relative'}>\n          <img\n            alt={content.title}\n            className={`w-full rounded-t-lg object-cover ${isHero ? 'h-64 lg:h-80' : 'h-48'}`}\n            src={content.imageUrl ?? '/placeholder.jpg'}\n          />\n          <div className={'absolute top-4 left-4 flex gap-2'}>\n            <Badge className={getContentTypeColor(content.contentType)}>\n              {getContentTypeIcon(content.contentType)}\n              {getContentTypeLabel(content.contentType)}\n            </Badge>\n            <Conditional isCondition={isHero}>\n              <Badge className={'bg-yellow-100 text-yellow-800'} variant={'secondary'}>\n                <StarIcon aria-hidden className={'mr-1 size-3'} />\n                Featured\n              </Badge>\n            </Conditional>\n          </div>\n        </div>",
+  "new_string": "      <Card className={cardClasses} key={content.id}>\n        <div className={'relative'}>\n          {content.imageUrl && content.imageUrl !== '/placeholder.jpg' ? (\n            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <CldImage\n                alt={content.title}\n                className={'size-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                gravity={'auto'}\n                height={isHero ? 600 : 400}\n                quality={'auto:good'}\n                src={extractPublicIdFromCloudinaryUrl(content.imageUrl)}\n                width={isHero ? 800 : 533}\n              />\n            </div>\n          ) : (\n            <div className={'aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <img\n                alt={content.title}\n                className={'size-full object-contain'}\n                src={'/placeholder.jpg'}\n              />\n            </div>\n          )}\n          <div className={'absolute top-4 left-4 flex gap-2'}>\n            <Badge className={getContentTypeColor(content.contentType)}>\n              {getContentTypeIcon(content.contentType)}\n              {getContentTypeLabel(content.contentType)}\n            </Badge>\n            <Conditional isCondition={isHero}>\n              <Badge className={'bg-yellow-100 text-yellow-800'} variant={'secondary'}>\n                <StarIcon aria-hidden className={'mr-1 size-3'} />\n                Featured\n              </Badge>\n            </Conditional>\n          </div>\n        </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:05.923Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update featured-hero-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "completed",
+      "activeForm": "Updating featured-hero-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Update featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "completed",
+      "activeForm": "Updating featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Test the changes and verify images are not cropped",
+      "status": "in_progress",
+      "activeForm": "Testing the changes and verifying images are not cropped"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:06.240Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/browse/featured"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:17.811Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "featured-page-after-fix-full.png",
+  "fullPage": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:17.815Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "featured-page-after-fix-viewport.png"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:36.233Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx",
+  "old_string": "            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <CldImage\n                alt={content.title}\n                className={'size-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                gravity={'auto'}\n                height={isHero ? 600 : 400}\n                quality={'auto:good'}\n                src={extractPublicIdFromCloudinaryUrl(content.imageUrl)}\n                width={isHero ? 800 : 533}\n              />\n            </div>",
+  "new_string": "            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <CldImage\n                alt={content.title}\n                className={'size-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                height={isHero ? 600 : 400}\n                quality={'auto:good'}\n                src={extractPublicIdFromCloudinaryUrl(content.imageUrl)}\n                width={isHero ? 800 : 533}\n              />\n            </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:37.331Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx",
+  "old_string": "            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <CldImage\n                alt={content.title}\n                className={'size-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                gravity={'auto'}\n                height={isHero ? 600 : 400}\n                quality={'auto:good'}\n                src={extractPublicIdFromCloudinaryUrl(content.imageUrl)}\n                width={isHero ? 800 : 533}\n              />\n            </div>",
+  "new_string": "            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>\n              <CldImage\n                alt={content.title}\n                className={'size-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                height={isHero ? 600 : 400}\n                quality={'auto:good'}\n                src={extractPublicIdFromCloudinaryUrl(content.imageUrl)}\n                width={isHero ? 800 : 533}\n              />\n            </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:45.834Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/browse/featured"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:59.077Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "featured-page-final.png"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:37:59.690Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update featured-hero-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "completed",
+      "activeForm": "Updating featured-hero-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Update featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio",
+      "status": "completed",
+      "activeForm": "Updating featured-tabbed-content-display.tsx to use CldImage with 4:3 aspect ratio"
+    },
+    {
+      "content": "Test the changes and verify images are not cropped",
+      "status": "completed",
+      "activeForm": "Testing the changes and verifying images are not cropped"
+    }
+  ]
+}
+================================================================================

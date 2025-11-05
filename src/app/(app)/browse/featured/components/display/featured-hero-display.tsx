@@ -9,6 +9,7 @@ import {
   TrendingUpIcon,
   UserIcon,
 } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
@@ -20,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import { ENUMS } from '@/lib/constants';
+import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 
 export interface FeaturedContentItem {
   comments: number;
@@ -100,15 +102,28 @@ export const FeaturedHeroDisplay = ({ heroData, onViewContent }: FeaturedHeroDis
 
   const renderFeaturedCard = (content: FeaturedContentItem, isHero = false) => {
     const cardClasses = isHero ? 'col-span-full lg:col-span-2' : 'col-span-1';
+    const hasImage = content.imageUrl && content.imageUrl !== '/placeholder.jpg';
 
     return (
       <Card className={cardClasses} key={content.id}>
         <div className={'relative'}>
-          <img
-            alt={content.title}
-            className={`w-full rounded-t-lg object-cover ${isHero ? 'h-64 lg:h-80' : 'h-48'}`}
-            src={content.imageUrl ?? '/placeholder.jpg'}
-          />
+          {hasImage ?
+            <div className={'relative aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>
+              <CldImage
+                alt={content.title}
+                className={'size-full object-contain'}
+                crop={'pad'}
+                format={'auto'}
+                height={isHero ? 600 : 400}
+                quality={'auto:good'}
+                src={extractPublicIdFromCloudinaryUrl(content?.imageUrl ?? '')}
+                width={isHero ? 800 : 533}
+              />
+            </div>
+          : <div className={'aspect-[4/3] w-full overflow-hidden rounded-t-lg bg-muted'}>
+              <img alt={content.title} className={'size-full object-contain'} src={'/placeholder.jpg'} />
+            </div>
+          }
           <div className={'absolute top-4 left-4 flex gap-2'}>
             <Badge className={getContentTypeColor(content.contentType)}>
               {getContentTypeIcon(content.contentType)}
