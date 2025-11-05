@@ -15472,3 +15472,740 @@ Input:
   "description": "Run ESLint to fix any linting issues"
 }
 ================================================================================
+
+================================================================================
+2025-11-05T17:22:39.078Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:22:49.386Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\middleware.ts",
+  "offset": 6,
+  "limit": 35
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:23:43.796Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "in_progress",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "pending",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "pending",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "pending",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "pending",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "pending",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:23:47.718Z
+Tool: Skill
+Input:
+{
+  "command": "react-coding-conventions"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:23:56.298Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\app-header\\components\\app-header-search.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:23:56.299Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.claude\\skills\\react-coding-conventions\\references\\React-Coding-Conventions.md"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:23:56.299Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\popover.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:10.771Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "in_progress",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "pending",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "pending",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "pending",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "pending",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:11.322Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\badge.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:11.321Z
+Tool: Grep
+Input:
+{
+  "pattern": "debounce",
+  "glob": "**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:11.322Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\content-search\\content-search.actions.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:11.322Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\input.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:23.422Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\config.ts",
+  "offset": 0,
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:23.423Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*conditional*"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:23.423Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\skeleton.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:23.423Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:36.339Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\conditional.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:36.340Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\config.ts",
+  "offset": 100,
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:36.340Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\content-search\\content-search.facade.ts",
+  "offset": 0,
+  "limit": 150
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:49.130Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "completed",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "in_progress",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "pending",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "pending",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "pending",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:49.518Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/link*.tsx",
+  "path": "src/components/ui"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:49.518Z
+Tool: Grep
+Input:
+{
+  "pattern": "RESULT_TYPE|SEARCH",
+  "glob": "**/enums.ts",
+  "output_mode": "content",
+  "-C": 3
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:58.385Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\content-search\\content-search.query.ts",
+  "offset": 0,
+  "limit": 80
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:24:58.385Z
+Tool: Grep
+Input:
+{
+  "pattern": "from 'next/link'",
+  "glob": "**/*.tsx",
+  "output_mode": "content",
+  "head_limit": 5
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:25:11.046Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "completed",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "completed",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "in_progress",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "pending",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "pending",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:25:11.377Z
+Tool: Bash
+Input:
+{
+  "command": "mkdir -p \"src/components/feature/search\"",
+  "description": "Create search feature directory"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:25:33.121Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "content": "'use client';\n\nimport type { ComponentProps } from 'react';\n\nimport Image from 'next/image';\nimport Link from 'next/link';\n\nimport type { ComponentTestIdProps } from '@/lib/test-ids';\nimport type {\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  SubcollectionSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Conditional } from '@/components/ui/conditional';\nimport { generateTestId } from '@/lib/test-ids';\nimport { cn } from '@/utils/tailwind-utils';\n\ntype SearchResultItemProps = ComponentProps<'div'> &\n  ComponentTestIdProps & {\n    entityType: 'bobblehead' | 'collection' | 'subcollection';\n    result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;\n  };\n\nexport const SearchResultItem = ({ className, entityType, result, testId, ...props }: SearchResultItemProps) => {\n  const searchResultItemTestId = testId || generateTestId('feature', 'search', 'result-item');\n\n  // Determine entity URL based on type\n  const entityUrl =\n    entityType === 'collection'\n      ? `/collections/${result.id}`\n      : entityType === 'subcollection'\n        ? `/subcollections/${result.id}`\n        : `/bobbleheads/${result.id}`;\n\n  // Get entity-specific display data\n  const displayName =\n    'name' in result && result.name\n      ? result.name\n      : 'characterName' in result && result.characterName\n        ? result.characterName\n        : 'Unknown';\n\n  const displayDescription =\n    'description' in result && result.description\n      ? result.description\n      : 'collectionName' in result && result.collectionName\n        ? `From collection: ${result.collectionName}`\n        : '';\n\n  const displayImageUrl =\n    'primaryPhotoUrl' in result && result.primaryPhotoUrl\n      ? result.primaryPhotoUrl\n      : 'coverImageUrl' in result && result.coverImageUrl\n        ? result.coverImageUrl\n        : null;\n\n  const displayOwner =\n    'ownerName' in result && result.ownerName\n      ? result.ownerName\n      : 'ownerUsername' in result && result.ownerUsername\n        ? result.ownerUsername\n        : 'Unknown';\n\n  // Entity type badge variant\n  const badgeVariant = entityType === 'collection' ? 'default' : entityType === 'subcollection' ? 'secondary' : 'outline';\n\n  // Derived conditional variables\n  const _hasImage = !!displayImageUrl;\n  const _hasDescription = !!displayDescription;\n\n  return (\n    <Link\n      className={cn(\n        'flex items-start gap-3 rounded-md p-2 transition-colors',\n        'hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',\n        className,\n      )}\n      data-slot={'search-result-item'}\n      data-testid={searchResultItemTestId}\n      href={entityUrl}\n      {...props}\n    >\n      {/* Result Image */}\n      <Conditional fallback={<div className={'size-12 shrink-0 rounded-md bg-muted'} />} isCondition={_hasImage}>\n        <div className={'relative size-12 shrink-0 overflow-hidden rounded-md bg-muted'}>\n          <Image\n            alt={displayName}\n            className={'object-cover'}\n            fill\n            sizes={'48px'}\n            src={displayImageUrl || ''}\n          />\n        </div>\n      </Conditional>\n\n      {/* Result Content */}\n      <div className={'flex min-w-0 flex-1 flex-col gap-1'}>\n        {/* Entity Type Badge */}\n        <Badge className={'w-fit text-xs'} variant={badgeVariant}>\n          {entityType === 'collection' ? 'Collection' : entityType === 'subcollection' ? 'Subcollection' : 'Bobblehead'}\n        </Badge>\n\n        {/* Result Name */}\n        <p className={'truncate text-sm font-medium text-foreground'}>{displayName}</p>\n\n        {/* Result Description */}\n        <Conditional isCondition={_hasDescription}>\n          <p className={'line-clamp-2 text-xs text-muted-foreground'}>{displayDescription}</p>\n        </Conditional>\n\n        {/* Owner Info */}\n        <p className={'truncate text-xs text-muted-foreground'}>By {displayOwner}</p>\n      </div>\n    </Link>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:26:07.859Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "completed",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "completed",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "completed",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "in_progress",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "pending",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:26:08.205Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-dropdown.tsx",
+  "content": "'use client';\n\nimport type { ChangeEvent, ComponentProps, KeyboardEvent } from 'react';\n\nimport { useCallback, useEffect, useMemo, useState } from 'react';\nimport Link from 'next/link';\nimport { ArrowRightIcon, SearchIcon } from 'lucide-react';\nimport { useAction } from 'next-safe-action/hooks';\n\nimport type { ComponentTestIdProps } from '@/lib/test-ids';\n\nimport { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';\nimport { Input } from '@/components/ui/input';\nimport { Skeleton } from '@/components/ui/skeleton';\nimport { Conditional } from '@/components/ui/conditional';\nimport { SearchResultItem } from '@/components/feature/search/search-result-item';\nimport { getPublicSearchDropdownAction } from '@/lib/actions/content-search/content-search.actions';\nimport { CONFIG } from '@/lib/constants';\nimport { generateTestId } from '@/lib/test-ids';\nimport { cn } from '@/utils/tailwind-utils';\n\ntype SearchDropdownProps = ComponentProps<'div'> & ComponentTestIdProps;\n\nexport const SearchDropdown = ({ className, testId, ...props }: SearchDropdownProps) => {\n  // 1. useState hooks\n  const [isOpen, setIsOpen] = useState(false);\n  const [query, setQuery] = useState('');\n  const [debouncedQuery, setDebouncedQuery] = useState('');\n\n  // 2. Other hooks (useContext, useQuery, etc.)\n  const { execute, isExecuting, result } = useAction(getPublicSearchDropdownAction);\n\n  // 3. useMemo hooks\n  const searchResultsData = useMemo(() => result?.data, [result?.data]);\n\n  // 4. useEffect hooks\n  useEffect(() => {\n    const handler = setTimeout(() => {\n      setDebouncedQuery(query.trim());\n    }, CONFIG.SEARCH.DEBOUNCE_MS);\n\n    return () => {\n      clearTimeout(handler);\n    };\n  }, [query]);\n\n  useEffect(() => {\n    if (debouncedQuery.length >= CONFIG.SEARCH.MIN_QUERY_LENGTH) {\n      execute({ query: debouncedQuery });\n    }\n  }, [debouncedQuery, execute]);\n\n  // 5. Utility functions\n  const getViewAllUrl = (searchQuery: string): string => {\n    return `/search?q=${encodeURIComponent(searchQuery)}`;\n  };\n\n  // 6. Event handlers\n  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {\n    const value = e.target.value;\n    setQuery(value);\n\n    if (value.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH) {\n      setIsOpen(true);\n    } else {\n      setIsOpen(false);\n    }\n  }, []);\n\n  const handleInputFocus = useCallback(() => {\n    if (query.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH) {\n      setIsOpen(true);\n    }\n  }, [query]);\n\n  const handleInputClear = useCallback(() => {\n    setQuery('');\n    setDebouncedQuery('');\n    setIsOpen(false);\n  }, []);\n\n  const handleResultClick = useCallback(() => {\n    setIsOpen(false);\n  }, []);\n\n  const handleInputKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {\n    if (e.key === 'Escape') {\n      setIsOpen(false);\n    }\n  }, []);\n\n  const handleOpenChange = useCallback((open: boolean) => {\n    if (!open) {\n      setIsOpen(false);\n    }\n  }, []);\n\n  // 7. Derived variables for conditional rendering\n  const _isQueryValid = query.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH;\n  const _isLoading = isExecuting;\n  const _hasResults =\n    searchResultsData &&\n    (searchResultsData.collections.length > 0 ||\n      searchResultsData.subcollections.length > 0 ||\n      searchResultsData.bobbleheads.length > 0);\n  const _shouldShowEmptyState = !_isLoading && _isQueryValid && !_hasResults;\n  const _shouldShowResults = !_isLoading && _hasResults;\n\n  const searchDropdownTestId = testId || generateTestId('feature', 'search', 'dropdown');\n  const inputTestId = generateTestId('feature', 'search', 'input');\n  const popoverContentTestId = generateTestId('feature', 'search', 'popover-content');\n  const viewAllLinkTestId = generateTestId('feature', 'search', 'view-all-link');\n\n  return (\n    <div\n      className={cn('relative w-full', className)}\n      data-slot={'search-dropdown'}\n      data-testid={searchDropdownTestId}\n      {...props}\n    >\n      <Popover onOpenChange={handleOpenChange} open={isOpen}>\n        <PopoverTrigger asChild>\n          <div className={'relative w-full'}>\n            <SearchIcon\n              aria-hidden\n              className={'absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'}\n            />\n            <Input\n              aria-label={'Search collections, subcollections, and bobbleheads'}\n              className={'w-full pr-4 pl-9'}\n              isClearable\n              onChange={handleInputChange}\n              onClear={handleInputClear}\n              onFocus={handleInputFocus}\n              onKeyDown={handleInputKeyDown}\n              placeholder={'Search...'}\n              testId={inputTestId}\n              type={'search'}\n              value={query}\n            />\n          </div>\n        </PopoverTrigger>\n\n        <Conditional isCondition={isOpen && _isQueryValid}>\n          <PopoverContent\n            align={'start'}\n            className={'w-[var(--radix-popover-trigger-width)] p-2'}\n            sideOffset={8}\n            testId={popoverContentTestId}\n          >\n            {/* Loading State */}\n            <Conditional isCondition={_isLoading}>\n              <div className={'flex flex-col gap-2'}>\n                <Skeleton className={'h-16 w-full'} />\n                <Skeleton className={'h-16 w-full'} />\n                <Skeleton className={'h-16 w-full'} />\n              </div>\n            </Conditional>\n\n            {/* Search Results */}\n            <Conditional isCondition={_shouldShowResults}>\n              <div className={'flex flex-col'}>\n                {/* Collections Section */}\n                <Conditional isCondition={!!searchResultsData && searchResultsData.collections.length > 0}>\n                  {searchResultsData?.collections.map((collection) => (\n                    <SearchResultItem\n                      entityType={'collection'}\n                      key={collection.id}\n                      onClick={handleResultClick}\n                      result={collection}\n                    />\n                  ))}\n                </Conditional>\n\n                {/* Subcollections Section */}\n                <Conditional isCondition={!!searchResultsData && searchResultsData.subcollections.length > 0}>\n                  {searchResultsData?.subcollections.map((subcollection) => (\n                    <SearchResultItem\n                      entityType={'subcollection'}\n                      key={subcollection.id}\n                      onClick={handleResultClick}\n                      result={subcollection}\n                    />\n                  ))}\n                </Conditional>\n\n                {/* Bobbleheads Section */}\n                <Conditional isCondition={!!searchResultsData && searchResultsData.bobbleheads.length > 0}>\n                  {searchResultsData?.bobbleheads.map((bobblehead) => (\n                    <SearchResultItem\n                      entityType={'bobblehead'}\n                      key={bobblehead.id}\n                      onClick={handleResultClick}\n                      result={bobblehead}\n                    />\n                  ))}\n                </Conditional>\n\n                {/* View All Results Link */}\n                <Link\n                  className={cn(\n                    'mt-2 flex items-center justify-center gap-2 rounded-md border-t p-2 pt-3',\n                    'text-sm font-medium text-primary transition-colors',\n                    'hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',\n                  )}\n                  data-testid={viewAllLinkTestId}\n                  href={getViewAllUrl(query)}\n                  onClick={handleResultClick}\n                >\n                  View All Results\n                  <ArrowRightIcon aria-hidden className={'size-4'} />\n                </Link>\n              </div>\n            </Conditional>\n\n            {/* Empty State */}\n            <Conditional isCondition={_shouldShowEmptyState}>\n              <div className={'flex flex-col items-center justify-center py-8 text-center'}>\n                <SearchIcon aria-hidden className={'mb-2 size-8 text-muted-foreground'} />\n                <p className={'text-sm font-medium text-foreground'}>No results found</p>\n                <p className={'mt-1 text-xs text-muted-foreground'}>Try adjusting your search query</p>\n              </div>\n            </Conditional>\n          </PopoverContent>\n        </Conditional>\n      </Popover>\n    </div>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:26:18.597Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "completed",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "completed",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "completed",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "completed",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "in_progress",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:26:18.917Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\app-header\\components\\app-header-search.tsx",
+  "old_string": "'use client';\n\nimport { SearchIcon } from 'lucide-react';\n\nimport { Input } from '@/components/ui/input';\n\nexport const AppHeaderSearch = () => {\n  return (\n    <div className={'relative w-full'}>\n      <SearchIcon\n        aria-hidden\n        className={'absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-muted-foreground'}\n      />\n      <Input className={'w-full pr-4 pl-10'} placeholder={'Search...'} type={'search'} />\n    </div>\n  );\n};",
+  "new_string": "'use client';\n\nimport { SearchDropdown } from '@/components/feature/search/search-dropdown';\n\nexport const AppHeaderSearch = () => {\n  return <SearchDropdown />;\n};"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:26:26.845Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "completed",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "completed",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "completed",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "completed",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "completed",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:26:27.192Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint with auto-fix"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:27:24.832Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:27:41.072Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/test-ids*"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:27:47.867Z
+Tool: Grep
+Input:
+{
+  "pattern": "export.*generateTestId",
+  "glob": "**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:27:53.611Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\test-ids\\generator.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:27:53.611Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\test-ids\\index.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:13.692Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-dropdown.tsx",
+  "old_string": "  const searchDropdownTestId = testId || generateTestId('feature', 'search', 'dropdown');\n  const inputTestId = generateTestId('feature', 'search', 'input');\n  const popoverContentTestId = generateTestId('feature', 'search', 'popover-content');\n  const viewAllLinkTestId = generateTestId('feature', 'search', 'view-all-link');",
+  "new_string": "  const searchDropdownTestId = testId || generateTestId('feature', 'search-command', 'dropdown');\n  const inputTestId = generateTestId('feature', 'search-command', 'input');\n  const popoverContentTestId = generateTestId('feature', 'search-command', 'popover-content');\n  const viewAllLinkTestId = generateTestId('feature', 'search-command', 'view-all-link');"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:14.774Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "old_string": "type SearchResultItemProps = ComponentProps<'div'> &\n  ComponentTestIdProps & {\n    entityType: 'bobblehead' | 'collection' | 'subcollection';\n    result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;\n  };\n\nexport const SearchResultItem = ({ className, entityType, result, testId, ...props }: SearchResultItemProps) => {\n  const searchResultItemTestId = testId || generateTestId('feature', 'search', 'result-item');",
+  "new_string": "type SearchResultItemProps = ComponentTestIdProps & {\n  className?: string;\n  entityType: 'bobblehead' | 'collection' | 'subcollection';\n  onClick?: () => void;\n  result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;\n};\n\nexport const SearchResultItem = ({ className, entityType, onClick, result, testId }: SearchResultItemProps) => {\n  const searchResultItemTestId = testId || generateTestId('feature', 'search-results', 'result-item');"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:16.015Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "old_string": "  return (\n    <Link\n      className={cn(\n        'flex items-start gap-3 rounded-md p-2 transition-colors',\n        'hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',\n        className,\n      )}\n      data-slot={'search-result-item'}\n      data-testid={searchResultItemTestId}\n      href={entityUrl}\n      {...props}\n    >",
+  "new_string": "  return (\n    <Link\n      className={cn(\n        'flex items-start gap-3 rounded-md p-2 transition-colors',\n        'hover:bg-accent focus-visible:bg-accent focus-visible:outline-none',\n        className,\n      )}\n      data-slot={'search-result-item'}\n      data-testid={searchResultItemTestId}\n      href={entityUrl}\n      onClick={onClick}\n    >"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:22.044Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:33.580Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "old_string": "'use client';\n\nimport type { ComponentProps } from 'react';\n\nimport Image from 'next/image';",
+  "new_string": "'use client';\n\nimport Image from 'next/image';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:34.638Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-05T17:28:46.552Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Invoke React coding conventions skill",
+      "status": "completed",
+      "activeForm": "Invoking React coding conventions skill"
+    },
+    {
+      "content": "Examine existing UI components and utilities",
+      "status": "completed",
+      "activeForm": "Examining existing UI components and utilities"
+    },
+    {
+      "content": "Review server actions and data types from previous steps",
+      "status": "completed",
+      "activeForm": "Reviewing server actions and data types"
+    },
+    {
+      "content": "Create SearchResultItem component",
+      "status": "completed",
+      "activeForm": "Creating SearchResultItem component"
+    },
+    {
+      "content": "Create SearchDropdown component with debouncing",
+      "status": "completed",
+      "activeForm": "Creating SearchDropdown component"
+    },
+    {
+      "content": "Update app-header-search.tsx integration",
+      "status": "completed",
+      "activeForm": "Updating app-header-search.tsx integration"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
