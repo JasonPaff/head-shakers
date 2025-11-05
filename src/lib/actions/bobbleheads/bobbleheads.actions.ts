@@ -279,7 +279,9 @@ export const updateBobbleheadWithPhotosAction = authActionClient
   )
   .inputSchema(updateBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { id, photos, tags, ...bobbleheadData } = updateBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
+    const { id, photos, tags, ...bobbleheadData } = updateBobbleheadWithPhotosSchema.parse(
+      ctx.sanitizedInput,
+    );
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { ...bobbleheadData, id });

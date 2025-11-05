@@ -9,6 +9,7 @@ You must invoke the **neon-db-expert** subagent using the Task tool to handle th
 **User's Request:** {{$input}}
 
 **Instructions:**
+
 1. Use the Task tool with `subagent_type: "neon-db-expert"`
 2. Pass the user's complete request to the agent
 3. The agent will automatically:

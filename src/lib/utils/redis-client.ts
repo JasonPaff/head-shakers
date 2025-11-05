@@ -70,11 +70,12 @@ export class RedisOperations {
 
   /**
    * Get a value from Redis
+   * Note: Upstash client auto-deserializes JSON, so this may return objects or strings
    */
-  static async get(key: string): Promise<null | string> {
+  static async get<T = string>(key: string): Promise<null | T> {
     try {
-      const value = await this.client.get(key);
-      return typeof value === 'string' ? value : null;
+      const value = await this.client.get<T>(key);
+      return value === null || value === undefined ? null : value;
     } catch (error) {
       console.error(`Redis GET error for key ${key}:`, error);
       return null;
@@ -135,8 +136,9 @@ export class RedisOperations {
 
   /**
    * Set a value in Redis with optional TTL
+   * Note: Upstash client auto-serializes, so you can pass objects or strings
    */
-  static async set(key: string, value: string, ttlSeconds?: number): Promise<boolean> {
+  static async set<T = string>(key: string, value: T, ttlSeconds?: number): Promise<boolean> {
     try {
       if (ttlSeconds) {
         const result = await this.client.set(key, value, { ex: ttlSeconds });

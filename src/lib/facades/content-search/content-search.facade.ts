@@ -178,10 +178,10 @@ export class ContentSearchFacade {
     query: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<PublicSearchDropdownResponse> {
-    // Generate cache key from query only (no filters for dropdown)
-    const cacheKey = `dropdown:${query}`;
+    // Generate cache key hash from query only (no filters for dropdown)
+    const queryHash = createHashFromObject({ query });
 
-    return CacheService.search.results(
+    return CacheService.redisSearch.publicDropdown(
       async () => {
         const context = createPublicQueryContext({ dbInstance });
 
@@ -227,16 +227,14 @@ export class ContentSearchFacade {
           totalResults: resultCount,
         };
       },
-      query,
-      'public-dropdown',
-      cacheKey,
+      queryHash,
       {
         context: {
           entityType: 'search',
           facade: 'ContentSearchFacade',
           operation: 'getPublicSearchDropdownResults',
         },
-        ttl: CACHE_CONFIG.TTL.MEDIUM, // 10 minutes
+        ttl: CACHE_CONFIG.TTL.PUBLIC_SEARCH, // 10 minutes
       },
     );
   }
@@ -259,10 +257,11 @@ export class ContentSearchFacade {
     const pageSize = pagination?.pageSize || 20;
     const offset = (page - 1) * pageSize;
 
-    // Generate cache key from all parameters
+    // Generate cache key hashes from query and filter parameters
+    const queryHash = createHashFromObject({ query });
     const filtersHash = createHashFromObject({ filters, pagination });
 
-    return CacheService.search.results(
+    return CacheService.redisSearch.publicPage(
       async () => {
         const context = createPublicQueryContext({ dbInstance });
 
@@ -336,8 +335,7 @@ export class ContentSearchFacade {
           subcollections: enrichedResults.subcollections,
         };
       },
-      query,
-      'public-page',
+      queryHash,
       filtersHash,
       {
         context: {
@@ -345,7 +343,7 @@ export class ContentSearchFacade {
           facade: 'ContentSearchFacade',
           operation: 'getPublicSearchPageResults',
         },
-        ttl: CACHE_CONFIG.TTL.MEDIUM, // 10 minutes
+        ttl: CACHE_CONFIG.TTL.PUBLIC_SEARCH, // 10 minutes
       },
     );
   }

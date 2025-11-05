@@ -62,9 +62,8 @@ export const SearchFilters = ({
 
   const handleEntityTypeToggle = (entityType: 'bobblehead' | 'collection' | 'subcollection') => {
     const _isSelected = entityTypes.includes(entityType);
-    const newEntityTypes = _isSelected ?
-      entityTypes.filter((type) => type !== entityType)
-    : [...entityTypes, entityType];
+    const newEntityTypes =
+      _isSelected ? entityTypes.filter((type) => type !== entityType) : [...entityTypes, entityType];
 
     // Ensure at least one entity type is selected
     if (newEntityTypes.length > 0) {
@@ -151,10 +150,7 @@ export const SearchFilters = ({
                     id={'filter-subcollection'}
                     onCheckedChange={() => handleEntityTypeToggle('subcollection')}
                   />
-                  <Label
-                    className={'cursor-pointer text-sm font-normal'}
-                    htmlFor={'filter-subcollection'}
-                  >
+                  <Label className={'cursor-pointer text-sm font-normal'} htmlFor={'filter-subcollection'}>
                     Subcollections
                   </Label>
                 </div>
@@ -219,9 +215,7 @@ export const SearchFilters = ({
                   )}
                   {sortBy !== 'relevance' && <Badge variant={'secondary'}>Sort: {sortBy}</Badge>}
                   {sortOrder !== 'desc' && <Badge variant={'secondary'}>Order: {sortOrder}</Badge>}
-                  {tagIds.length > 0 && (
-                    <Badge variant={'secondary'}>{tagIds.length} tags selected</Badge>
-                  )}
+                  {tagIds.length > 0 && <Badge variant={'secondary'}>{tagIds.length} tags selected</Badge>}
                 </div>
               </div>
             </Conditional>

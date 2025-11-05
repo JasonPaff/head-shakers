@@ -83,12 +83,7 @@ export const SearchPagination = ({
     <Conditional isCondition={_isPaginationVisible}>
       <div className={'flex items-center justify-center gap-2'}>
         {/* Previous Button */}
-        <Button
-          disabled={!hasPreviousPage}
-          onClick={handlePreviousPage}
-          size={'sm'}
-          variant={'outline'}
-        >
+        <Button disabled={!hasPreviousPage} onClick={handlePreviousPage} size={'sm'} variant={'outline'}>
           <ChevronLeft className={'size-4'} />
           <span className={'sr-only'}>Previous page</span>
         </Button>
@@ -101,18 +96,14 @@ export const SearchPagination = ({
                 {pageNumber}
               </span>
             : <Button
-                className={cn(
-                  'size-9',
-                  pageNumber === page && 'bg-primary text-primary-foreground',
-                )}
+                className={cn('size-9', pageNumber === page && 'bg-primary text-primary-foreground')}
                 key={pageNumber}
                 onClick={() => handlePageClick(pageNumber as number)}
                 size={'sm'}
                 variant={pageNumber === page ? 'default' : 'outline'}
               >
                 {pageNumber}
-              </Button>
-            ,
+              </Button>,
           )}
         </div>
 

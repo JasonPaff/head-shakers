@@ -62,11 +62,7 @@ export const SearchResultsGrid = ({
           </div>
           <div className={'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>
             {collections.map((collection) => (
-              <SearchResultItem
-                entityType={'collection'}
-                key={collection.id}
-                result={collection}
-              />
+              <SearchResultItem entityType={'collection'} key={collection.id} result={collection} />
             ))}
           </div>
         </div>
@@ -86,11 +82,7 @@ export const SearchResultsGrid = ({
           </div>
           <div className={'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>
             {subcollections.map((subcollection) => (
-              <SearchResultItem
-                entityType={'subcollection'}
-                key={subcollection.id}
-                result={subcollection}
-              />
+              <SearchResultItem entityType={'subcollection'} key={subcollection.id} result={subcollection} />
             ))}
           </div>
         </div>
@@ -110,11 +102,7 @@ export const SearchResultsGrid = ({
           </div>
           <div className={'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'}>
             {bobbleheads.map((bobblehead) => (
-              <SearchResultItem
-                entityType={'bobblehead'}
-                key={bobblehead.id}
-                result={bobblehead}
-              />
+              <SearchResultItem entityType={'bobblehead'} key={bobblehead.id} result={bobblehead} />
             ))}
           </div>
         </div>

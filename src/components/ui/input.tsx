@@ -19,7 +19,16 @@ type InputProps = ComponentProps<'input'> &
     onClear?: () => void;
   };
 
-export const Input = ({ className, isClearable, isSearch, onClear, testId, type, ...props }: InputProps) => {
+export const Input = ({
+  className,
+  isClearable,
+  isSearch,
+  onClear,
+  ref,
+  testId,
+  type,
+  ...props
+}: InputProps) => {
   const inputTestId = testId || generateTestId('ui', 'input');
   const clearButtonTestId = generateTestId('ui', 'button', 'clear');
 
@@ -47,6 +56,7 @@ export const Input = ({ className, isClearable, isSearch, onClear, testId, type,
         )}
         data-slot={'input'}
         data-testid={inputTestId}
+        ref={ref}
         type={type}
         {...props}
       />

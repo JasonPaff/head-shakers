@@ -4,7 +4,7 @@ import type { ChangeEvent, ComponentProps, KeyboardEvent } from 'react';
 
 import { ArrowRightIcon, SearchIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -29,6 +29,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
   // 2. Other hooks (useContext, useQuery, etc.)
+  const inputRef = useRef<HTMLInputElement>(null);
   const { execute, isExecuting, result } = useServerAction(getPublicSearchDropdownAction);
 
   // 3. useMemo hooks
@@ -140,15 +141,26 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
               onFocus={handleInputFocus}
               onKeyDown={handleInputKeyDown}
               placeholder={'Search...'}
+              ref={inputRef}
               testId={inputTestId}
-              type={'search'}
               value={query}
             />
           </div>
         </PopoverAnchor>
 
         <Conditional isCondition={isOpen && _isQueryValid}>
-          <PopoverContent align={'start'} className={'w-96 p-2'} sideOffset={8} testId={popoverContentTestId}>
+          <PopoverContent
+            align={'start'}
+            className={'w-96 p-2'}
+            onOpenAutoFocus={(e) => {
+              // Prevent popover from stealing focus from the search input
+              e.preventDefault();
+              // Refocus the input to ensure it stays focused
+              inputRef.current?.focus();
+            }}
+            sideOffset={8}
+            testId={popoverContentTestId}
+          >
             {/* Loading State */}
             <Conditional isCondition={_isLoading}>
               <div className={'flex flex-col gap-2'}>

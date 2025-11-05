@@ -27,7 +27,8 @@ export const BobbleheadHeaderAsync = async ({ bobbleheadId }: BobbleheadHeaderAs
   // Fetch user collections for edit dialog (only if owner)
   let collections: Array<{ id: string; name: string }> = [];
   if (isOwner && currentUserId) {
-    const userCollections = (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
+    const userCollections =
+      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
     collections = userCollections.map((collection) => ({
       id: collection.id,
       name: collection.name,

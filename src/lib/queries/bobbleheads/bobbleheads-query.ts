@@ -79,13 +79,17 @@ export class BobbleheadsQuery extends BaseQuery {
       dbInstance
         .update(bobbleheadPhotos)
         .set({ sortOrder: photoUpdate.sortOrder })
-        .where(and(eq(bobbleheadPhotos.id, photoUpdate.id), eq(bobbleheadPhotos.bobbleheadId, data.bobbleheadId)))
+        .where(
+          and(eq(bobbleheadPhotos.id, photoUpdate.id), eq(bobbleheadPhotos.bobbleheadId, data.bobbleheadId)),
+        )
         .returning(),
     );
 
     const results = await Promise.all(updatePromises);
 
-    return results.map((result) => result[0]).filter((photo): photo is typeof bobbleheadPhotos.$inferSelect => photo !== undefined);
+    return results
+      .map((result) => result[0])
+      .filter((photo): photo is typeof bobbleheadPhotos.$inferSelect => photo !== undefined);
   }
 
   /**

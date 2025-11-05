@@ -2,21 +2,11 @@
   "mcpServers": {
     "Neon": {
       "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "-y",
-        "mcp-remote@latest",
-        "https://mcp.neon.tech/mcp"
-      ]
+      "args": ["/c", "npx", "-y", "mcp-remote@latest", "https://mcp.neon.tech/mcp"]
     },
     "Playwright": {
       "command": "cmd",
-      "args": [
-        "/c",
-        "npx",
-        "@playwright/mcp@latest"
-      ]
+      "args": ["/c", "npx", "@playwright/mcp@latest"]
     },
     "Ref": {
       "type": "http",
@@ -24,6 +14,16 @@
       "headers": {
         "x-ref-api-key": "ref-ba62007b3c4bffdb546a"
       }
+    },
+    "Upstash": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/mcp-server",
+        "run",
+        "jasonpaff@gmail.com",
+        "6d6e56de-c964-4c1f-a9c3-5099468f9266"
+      ]
     }
   }
 }

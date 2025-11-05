@@ -53,5 +53,5 @@ playwright/.clerk
 /nul
 
 # docs
-# /docs
-# /docs/*
+/docs
+/docs/*

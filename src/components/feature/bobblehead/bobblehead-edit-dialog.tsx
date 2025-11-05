@@ -94,7 +94,7 @@ interface ItemPhotosEditProps {
 
 function ItemPhotosEditComponent({ bobbleheadId, form }: ItemPhotosEditProps) {
   const photos =
-    (useStore(form.store, (state) => (state.values as { photos?: Array<CloudinaryPhoto> }).photos)) || [];
+    useStore(form.store, (state) => (state.values as { photos?: Array<CloudinaryPhoto> }).photos) || [];
 
   const handlePhotosChange = (
     updatedPhotos: ((prevPhotos: Array<CloudinaryPhoto>) => Array<CloudinaryPhoto>) | Array<CloudinaryPhoto>,
@@ -135,10 +135,16 @@ function ItemPhotosEditComponent({ bobbleheadId, form }: ItemPhotosEditProps) {
           />
         </div>
 
-        <AnimatedMotivationalMessage className={'bg-green-100 dark:bg-green-900/40'} shouldShow={shouldShowMessage}>
+        <AnimatedMotivationalMessage
+          className={'bg-green-100 dark:bg-green-900/40'}
+          shouldShow={shouldShowMessage}
+        >
           <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
             <div className={'size-2 rounded-full bg-green-500'} />
-            <Conditional fallback={`${photos.length}/8 photos - drag to reorder`} isCondition={photos.length === 0}>
+            <Conditional
+              fallback={`${photos.length}/8 photos - drag to reorder`}
+              isCondition={photos.length === 0}
+            >
               <span>Add photos to make your bobblehead stand out!</span>
             </Conditional>
           </div>

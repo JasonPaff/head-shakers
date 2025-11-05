@@ -38,6 +38,7 @@ export const PopoverContent = ({
   align = 'center',
   children,
   className,
+  onOpenAutoFocus,
   sideOffset = 4,
   testId,
   ...props
@@ -60,6 +61,7 @@ export const PopoverContent = ({
         )}
         data-slot={'popover-content'}
         data-testid={popoverContentTestId}
+        onOpenAutoFocus={onOpenAutoFocus}
         sideOffset={sideOffset}
         {...props}
       >

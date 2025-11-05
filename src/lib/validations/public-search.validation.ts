@@ -17,8 +17,14 @@ const SEARCHABLE_ENTITY_TYPES = ['collection', 'subcollection', 'bobblehead'] as
 export const publicSearchQuerySchema = z
   .string()
   .trim()
-  .min(CONFIG.SEARCH.MIN_QUERY_LENGTH, `Search query must be at least ${CONFIG.SEARCH.MIN_QUERY_LENGTH} characters`)
-  .max(CONFIG.SEARCH.MAX_QUERY_LENGTH, `Search query must be ${CONFIG.SEARCH.MAX_QUERY_LENGTH} characters or less`);
+  .min(
+    CONFIG.SEARCH.MIN_QUERY_LENGTH,
+    `Search query must be at least ${CONFIG.SEARCH.MIN_QUERY_LENGTH} characters`,
+  )
+  .max(
+    CONFIG.SEARCH.MAX_QUERY_LENGTH,
+    `Search query must be ${CONFIG.SEARCH.MAX_QUERY_LENGTH} characters or less`,
+  );
 
 /**
  * Schema for search filters (entity types, tags, sort options)
@@ -39,7 +45,10 @@ export const searchFiltersSchema = z.object({
   // Tag filtering - array of tag IDs to filter by (include only logic)
   tagIds: z
     .array(z.string().uuid('Invalid tag ID'))
-    .max(CONFIG.CONTENT.MAX_TAGS_PER_BOBBLEHEAD, `Maximum ${CONFIG.CONTENT.MAX_TAGS_PER_BOBBLEHEAD} tags allowed`)
+    .max(
+      CONFIG.CONTENT.MAX_TAGS_PER_BOBBLEHEAD,
+      `Maximum ${CONFIG.CONTENT.MAX_TAGS_PER_BOBBLEHEAD} tags allowed`,
+    )
     .optional()
     .default([]),
 });

@@ -8,6 +8,7 @@ import {
   isCacheLoggingEnabled,
 } from '@/lib/constants/cache';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
+import { RedisOperations } from '@/lib/utils/redis-client';
 
 /**
  * cache operation context for consistent tracking
@@ -559,6 +560,104 @@ export class CacheService {
   };
 
   /**
+   * Redis-based search cache utilities for public search
+   *
+   * Provides distributed caching via Redis for high-traffic public search queries.
+   * Separate from the regular search cache to enable Redis-specific optimizations
+   * while keeping other searches on Next.js unstable_cache.
+   */
+  static readonly redisSearch = {
+    /**
+     * Cache public search dropdown results in Redis
+     *
+     * Caches consolidated dropdown results (top 5 items across all entity types)
+     * using Redis for distributed caching and better performance.
+     *
+     * @template T - The return type of the search function
+     * @param fn - The async function that performs the search query
+     * @param queryHash - Hashed search query for cache key generation
+     * @param options - Cache options (TTL defaults to 10 minutes)
+     * @returns Promise resolving to the cached or fresh search results
+     *
+     * @example
+     * ```typescript
+     * const results = await CacheService.redisSearch.publicDropdown(
+     *   () => searchPublicConsolidated(query),
+     *   createHashFromObject({ query })
+     * );
+     * ```
+     *
+     * @remarks
+     * - Uses Redis for distributed cache across server instances
+     * - Cache keys follow pattern: search:public:dropdown:{queryHash}
+     * - Falls back to unstable_cache if Redis is unavailable
+     * - Logs cache hits/misses for monitoring
+     */
+    publicDropdown: async <T>(
+      fn: () => Promise<T>,
+      queryHash: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.SEARCH.PUBLIC_DROPDOWN(queryHash);
+      return CacheService.cachedWithRedis(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'search',
+          operation: 'search:redis-public-dropdown',
+        },
+        ttl: options.ttl || CACHE_CONFIG.TTL.PUBLIC_SEARCH,
+      });
+    },
+
+    /**
+     * Cache public search page results in Redis
+     *
+     * Caches paginated search results for the full search results page
+     * with advanced filtering using Redis for distributed caching.
+     *
+     * @template T - The return type of the search function
+     * @param fn - The async function that performs the search query
+     * @param queryHash - Hashed search query for cache key generation
+     * @param filtersHash - Hashed filter parameters (entity types, tags, sort, pagination)
+     * @param options - Cache options (TTL defaults to 10 minutes)
+     * @returns Promise resolving to the cached or fresh search results
+     *
+     * @example
+     * ```typescript
+     * const results = await CacheService.redisSearch.publicPage(
+     *   () => searchPublicWithFilters(query, filters),
+     *   createHashFromObject({ query }),
+     *   createHashFromObject({ filters, pagination })
+     * );
+     * ```
+     *
+     * @remarks
+     * - Uses Redis for distributed cache across server instances
+     * - Cache keys follow pattern: search:public:page:{queryHash}:{filtersHash}
+     * - Falls back to unstable_cache if Redis is unavailable
+     * - Separate caching from dropdown allows independent TTL management
+     */
+    publicPage: async <T>(
+      fn: () => Promise<T>,
+      queryHash: string,
+      filtersHash: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.SEARCH.PUBLIC_PAGE(queryHash, filtersHash);
+      return CacheService.cachedWithRedis(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'search',
+          operation: 'search:redis-public-page',
+        },
+        ttl: options.ttl || CACHE_CONFIG.TTL.PUBLIC_SEARCH,
+      });
+    },
+  };
+
+  /**
    * Search cache utilities
    */
   static readonly search = {
@@ -902,6 +1001,125 @@ export class CacheService {
       misses: 0,
       totalOperations: 0,
     };
+  }
+
+  /**
+   * Redis-based cache wrapper for search results
+   *
+   * Provides distributed caching using Redis for high-traffic public search queries.
+   * Falls back to unstable_cache if Redis is unavailable.
+   *
+   * @template T - The return type of the cached function
+   * @param fn - The async function to cache
+   * @param key - Unique cache key for this operation
+   * @param options - Cache options including TTL and context
+   * @returns Promise resolving to the cached or fresh result
+   *
+   * @example
+   * ```typescript
+   * const result = await CacheService.cachedWithRedis(
+   *   () => searchPublicContent(query),
+   *   'search:public:dropdown:hash123',
+   *   { ttl: CACHE_CONFIG.TTL.PUBLIC_SEARCH }
+   * );
+   * ```
+   *
+   * @remarks
+   * - Uses Upstash Redis REST API via RedisOperations
+   * - Stores JSON-serialized data with explicit TTL
+   * - Gracefully falls back to unstable_cache on Redis failure
+   * - Includes comprehensive error handling and logging
+   */
+  private static async cachedWithRedis<T>(
+    fn: () => Promise<T>,
+    key: string,
+    options: CacheOptions = {},
+  ): Promise<T> {
+    // check if caching is enabled
+    if (!isCacheEnabled() || options.isBypassCache) {
+      this.logCacheOperation('bypass', key, options.context);
+      return fn();
+    }
+
+    try {
+      const ttl = options.ttl ? getEnvironmentTTL(options.ttl) : getEnvironmentTTL(CACHE_CONFIG.TTL.MEDIUM);
+
+      this.stats.totalOperations++;
+
+      // force refresh bypasses cache but still populates it
+      if (options.isForceRefresh) {
+        this.logCacheOperation('force-refresh', key, options.context);
+        const result = await fn();
+
+        // try to cache the fresh result in Redis
+        // Note: Upstash client auto-serializes, so we pass the object directly
+        try {
+          await RedisOperations.set(key, result, ttl);
+        } catch (cacheError) {
+          this.stats.errors++;
+          this.logCacheOperation('error', key, options.context, cacheError);
+          // continue - we have the result even if caching fails
+        }
+
+        return result;
+      }
+
+      // try to get from Redis first
+      // Note: Upstash client auto-deserializes, so we get the object directly
+      const cached = await RedisOperations.get<T>(key);
+
+      if (cached) {
+        this.stats.hits++;
+        this.updateHitRate();
+        this.logCacheOperation('hit', key, options.context);
+        return cached;
+      }
+
+      // cache miss - fetch fresh data
+      this.stats.misses++;
+      this.updateHitRate();
+      this.logCacheOperation('miss', key, options.context);
+
+      const result = await fn();
+
+      // store in Redis asynchronously (non-blocking)
+      // Note: Upstash client auto-serializes, so we pass the object directly
+      try {
+        const setResult = await RedisOperations.set(key, result, ttl);
+        if (isCacheLoggingEnabled()) {
+          console.log('[Redis Debug] SET result:', {
+            key,
+            success: setResult,
+            ttl,
+          });
+        }
+      } catch (cacheError) {
+        this.stats.errors++;
+        this.logCacheOperation('error', key, options.context, cacheError);
+        // continue - we have the result even if caching fails
+      }
+
+      return result;
+    } catch (error) {
+      this.stats.errors++;
+      this.stats.misses++;
+      this.updateHitRate();
+      this.logCacheOperation('error', key, options.context, error);
+
+      // fallback to unstable_cache on Redis failure
+      try {
+        const cachedFn = unstable_cache(fn, [key], {
+          revalidate:
+            options.ttl ? getEnvironmentTTL(options.ttl) : getEnvironmentTTL(CACHE_CONFIG.TTL.MEDIUM),
+          tags: options.tags || [],
+        });
+        return await cachedFn();
+      } catch (fallbackError) {
+        this.logCacheOperation('error', key, options.context, fallbackError);
+        // final fallback - direct function call
+        return fn();
+      }
+    }
   }
 
   /**

@@ -2,13 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-import {
-  EarthIcon,
-  GridIcon,
-  StarIcon,
-  TrendingUpIcon,
-  TrophyIcon,
-} from 'lucide-react';
+import { EarthIcon, GridIcon, StarIcon, TrendingUpIcon, TrophyIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
 import { AppHeaderNavMenuLink } from '@/components/layout/app-header/components/app-header-nav-menu-link';

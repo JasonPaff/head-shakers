@@ -140,11 +140,7 @@ export const SearchPageContent = () => {
 
       {/* Error State */}
       {_hasError && !_isLoading && (
-        <EmptyState
-          description={error || 'Please try again'}
-          icon={AlertCircle}
-          title={'Search Error'}
-        />
+        <EmptyState description={error || 'Please try again'} icon={AlertCircle} title={'Search Error'} />
       )}
 
       {/* Empty State - No Query */}
