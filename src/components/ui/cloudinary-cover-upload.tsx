@@ -6,7 +6,7 @@ import type { CloudinaryUploadWidgetError, CloudinaryUploadWidgetResults } from 
 import * as Sentry from '@sentry/nextjs';
 import { ImagePlusIcon, XIcon } from 'lucide-react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   AlertDialog,
@@ -42,6 +42,17 @@ export const CloudinaryCoverUpload = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [uploadError, setUploadError] = useState<string | undefined>(undefined);
   const [isWidgetMounted, setIsWidgetMounted] = useState(false);
+
+  // Track if we should auto-open the widget on first render
+  const shouldAutoOpenRef = useRef(false);
+  const hasAutoOpenedRef = useRef(false);
+
+  // Reset auto-open flag when widget unmounts
+  useEffect(() => {
+    if (!isWidgetMounted) {
+      hasAutoOpenedRef.current = false;
+    }
+  }, [isWidgetMounted]);
 
   // Event handlers
   const handleSuccess = useCallback(
@@ -82,6 +93,11 @@ export const CloudinaryCoverUpload = ({
     setIsDeleteDialogOpen(false);
   }, [onRemove]);
 
+  const handleInitialButtonClick = useCallback(() => {
+    shouldAutoOpenRef.current = true;
+    setIsWidgetMounted(true);
+  }, []);
+
   // Derived variables
   const _hasCoverImage = !!currentImageUrl;
   const _canUpload = !isDisabled && !isUploading;
@@ -93,20 +109,18 @@ export const CloudinaryCoverUpload = ({
         <Button
           className={'h-32 w-full border-dashed'}
           disabled={isDisabled}
-          onClick={() => {
-            setIsWidgetMounted(true);
-          }}
+          onClick={handleInitialButtonClick}
           type={'button'}
           variant={'outline'}
         >
           <div className={'flex flex-col items-center gap-2'}>
             <ImagePlusIcon aria-hidden className={'size-8'} />
-            <span>Add Cover Photo</span>
+            <span>Upload Cover Photo</span>
           </div>
         </Button>
       </Conditional>
 
-      {/* Upload Widget - Only mounts when user clicks to add photo */}
+      {/* Upload Widget */}
       <Conditional isCondition={!_hasCoverImage && isWidgetMounted}>
         <CldUploadWidget
           onError={handleError}
@@ -150,22 +164,32 @@ export const CloudinaryCoverUpload = ({
           }}
           signatureEndpoint={'/api/upload/sign'}
         >
-          {({ open }) => (
-            <Button
-              className={'h-32 w-full border-dashed'}
-              disabled={!_canUpload}
-              onClick={() => {
+          {({ open }) => {
+            if (shouldAutoOpenRef.current && !hasAutoOpenedRef.current) {
+              hasAutoOpenedRef.current = true;
+              shouldAutoOpenRef.current = false;
+              setTimeout(() => {
                 open();
-              }}
-              type={'button'}
-              variant={'outline'}
-            >
-              <div className={'flex flex-col items-center gap-2'}>
-                <ImagePlusIcon aria-hidden className={'size-8'} />
-                <span>{isUploading ? 'Uploading...' : 'Upload Cover Photo'}</span>
-              </div>
-            </Button>
-          )}
+              }, 0);
+            }
+
+            return (
+              <Button
+                className={'h-32 w-full border-dashed'}
+                disabled={!_canUpload}
+                onClick={() => {
+                  open();
+                }}
+                type={'button'}
+                variant={'outline'}
+              >
+                <div className={'flex flex-col items-center gap-2'}>
+                  <ImagePlusIcon aria-hidden className={'size-8'} />
+                  <span>{isUploading ? 'Uploading...' : 'Upload Cover Photo'}</span>
+                </div>
+              </Button>
+            );
+          }}
         </CldUploadWidget>
       </Conditional>
 
