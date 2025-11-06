@@ -21,6 +21,7 @@ import {
 } from '@/lib/queries/base/query-context';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { CacheService } from '@/lib/services/cache.service';
+import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
@@ -150,7 +151,22 @@ export class CollectionsFacade {
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return await CollectionsQuery.deleteAsync(data, userId, context);
+      const deletedCollection = await CollectionsQuery.deleteAsync(data, userId, context);
+
+      // cleanup cover photo from Cloudinary if it exists
+      if (deletedCollection?.coverImageUrl) {
+        try {
+          const publicId = CloudinaryService.extractPublicIdFromUrl(deletedCollection.coverImageUrl);
+          if (publicId) {
+            await CloudinaryService.deletePhotosFromCloudinary([publicId]);
+          }
+        } catch (cloudinaryError) {
+          // log the error but don't fail the deletion operation
+          console.error('Failed to delete collection cover photo from Cloudinary:', cloudinaryError);
+        }
+      }
+
+      return deletedCollection;
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId },

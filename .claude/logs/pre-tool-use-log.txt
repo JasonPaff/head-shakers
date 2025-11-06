@@ -27625,3 +27625,362 @@ Input:
   "description": "Run lint to verify changes"
 }
 ================================================================================
+
+================================================================================
+2025-11-06T02:57:31.424Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read collections and subcollections facades to understand current deletion logic",
+      "status": "in_progress",
+      "activeForm": "Reading collections and subcollections facades to understand current deletion logic"
+    },
+    {
+      "content": "Read cloudinary service to understand image deletion methods",
+      "status": "pending",
+      "activeForm": "Reading cloudinary service to understand image deletion methods"
+    },
+    {
+      "content": "Implement cover photo cleanup in collections facade",
+      "status": "pending",
+      "activeForm": "Implementing cover photo cleanup in collections facade"
+    },
+    {
+      "content": "Implement cover photo cleanup in subcollections facade",
+      "status": "pending",
+      "activeForm": "Implementing cover photo cleanup in subcollections facade"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint and typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:57:31.860Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cloudinary.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:57:31.861Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:57:31.861Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:57:51.770Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read collections and subcollections facades to understand current deletion logic",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections facades to understand current deletion logic"
+    },
+    {
+      "content": "Read cloudinary service to understand image deletion methods",
+      "status": "completed",
+      "activeForm": "Reading cloudinary service to understand image deletion methods"
+    },
+    {
+      "content": "Read collections and subcollections query files to understand deletion flow",
+      "status": "in_progress",
+      "activeForm": "Reading collections and subcollections query files to understand deletion flow"
+    },
+    {
+      "content": "Implement cover photo cleanup in collections facade",
+      "status": "pending",
+      "activeForm": "Implementing cover photo cleanup in collections facade"
+    },
+    {
+      "content": "Implement cover photo cleanup in subcollections facade",
+      "status": "pending",
+      "activeForm": "Implementing cover photo cleanup in subcollections facade"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint and typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:57:52.126Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "offset": 0,
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:57:52.126Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "offset": 0,
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:06.111Z
+Tool: Grep
+Input:
+{
+  "pattern": "coverImageUrl",
+  "path": "src/lib/db/schema",
+  "output_mode": "content",
+  "-C": 2
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:21.148Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read collections and subcollections facades to understand current deletion logic",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections facades to understand current deletion logic"
+    },
+    {
+      "content": "Read cloudinary service to understand image deletion methods",
+      "status": "completed",
+      "activeForm": "Reading cloudinary service to understand image deletion methods"
+    },
+    {
+      "content": "Read collections and subcollections query files to understand deletion flow",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections query files to understand deletion flow"
+    },
+    {
+      "content": "Implement cover photo cleanup in collections facade",
+      "status": "in_progress",
+      "activeForm": "Implementing cover photo cleanup in collections facade"
+    },
+    {
+      "content": "Implement cover photo cleanup in subcollections facade",
+      "status": "pending",
+      "activeForm": "Implementing cover photo cleanup in subcollections facade"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint and typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:21.464Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';\nimport { SocialFacade } from '@/lib/facades/social/social.facade';\nimport {\n  createProtectedQueryContext,\n  createPublicQueryContext,\n  createUserQueryContext,\n} from '@/lib/queries/base/query-context';\nimport { CollectionsQuery } from '@/lib/queries/collections/collections.query';\nimport { CacheService } from '@/lib/services/cache.service';\nimport { createHashFromObject } from '@/lib/utils/cache.utils';\nimport { createFacadeError } from '@/lib/utils/error-builders';",
+  "new_string": "import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';\nimport { SocialFacade } from '@/lib/facades/social/social.facade';\nimport {\n  createProtectedQueryContext,\n  createPublicQueryContext,\n  createUserQueryContext,\n} from '@/lib/queries/base/query-context';\nimport { CollectionsQuery } from '@/lib/queries/collections/collections.query';\nimport { CacheService } from '@/lib/services/cache.service';\nimport { CloudinaryService } from '@/lib/services/cloudinary.service';\nimport { createHashFromObject } from '@/lib/utils/cache.utils';\nimport { createFacadeError } from '@/lib/utils/error-builders';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:32.603Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "  static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {\n    try {\n      const context = createUserQueryContext(userId, { dbInstance });\n      return await CollectionsQuery.deleteAsync(data, userId, context);\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { collectionId: data.collectionId },\n        facade: 'CollectionsFacade',\n        method: 'deleteAsync',\n        operation: 'delete',\n        userId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }",
+  "new_string": "  static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {\n    try {\n      const context = createUserQueryContext(userId, { dbInstance });\n      const deletedCollection = await CollectionsQuery.deleteAsync(data, userId, context);\n\n      // cleanup cover photo from Cloudinary if it exists\n      if (deletedCollection?.coverImageUrl) {\n        try {\n          const publicId = CloudinaryService.extractPublicIdFromUrl(deletedCollection.coverImageUrl);\n          if (publicId) {\n            await CloudinaryService.deletePhotosFromCloudinary([publicId]);\n          }\n        } catch (cloudinaryError) {\n          // log the error but don't fail the deletion operation\n          console.error('Failed to delete collection cover photo from Cloudinary:', cloudinaryError);\n        }\n      }\n\n      return deletedCollection;\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { collectionId: data.collectionId },\n        facade: 'CollectionsFacade',\n        method: 'deleteAsync',\n        operation: 'delete',\n        userId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:42.360Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read collections and subcollections facades to understand current deletion logic",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections facades to understand current deletion logic"
+    },
+    {
+      "content": "Read cloudinary service to understand image deletion methods",
+      "status": "completed",
+      "activeForm": "Reading cloudinary service to understand image deletion methods"
+    },
+    {
+      "content": "Read collections and subcollections query files to understand deletion flow",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections query files to understand deletion flow"
+    },
+    {
+      "content": "Implement cover photo cleanup in collections facade",
+      "status": "completed",
+      "activeForm": "Implementing cover photo cleanup in collections facade"
+    },
+    {
+      "content": "Implement cover photo cleanup in subcollections facade",
+      "status": "in_progress",
+      "activeForm": "Implementing cover photo cleanup in subcollections facade"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint and typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:42.672Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "old_string": "import { db } from '@/lib/db';\nimport { SocialFacade } from '@/lib/facades/social/social.facade';\nimport {\n  createProtectedQueryContext,\n  createPublicQueryContext,\n  createUserQueryContext,\n} from '@/lib/queries/base/query-context';\nimport { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';\nimport { createFacadeError } from '@/lib/utils/error-builders';",
+  "new_string": "import { db } from '@/lib/db';\nimport { SocialFacade } from '@/lib/facades/social/social.facade';\nimport {\n  createProtectedQueryContext,\n  createPublicQueryContext,\n  createUserQueryContext,\n} from '@/lib/queries/base/query-context';\nimport { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';\nimport { CloudinaryService } from '@/lib/services/cloudinary.service';\nimport { createFacadeError } from '@/lib/utils/error-builders';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:58:52.444Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "old_string": "  /**\n   * delete a subcollection\n   */\n  static async deleteAsync(data: DeleteSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {\n    try {\n      const context = createProtectedQueryContext(userId, { dbInstance });\n      return await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, context);\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { subcollectionId: data.subcollectionId },\n        facade: 'SubcollectionsFacade',\n        method: 'deleteAsync',\n        operation: 'delete',\n        userId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }",
+  "new_string": "  /**\n   * delete a subcollection\n   */\n  static async deleteAsync(data: DeleteSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {\n    try {\n      const context = createProtectedQueryContext(userId, { dbInstance });\n      const deletedSubcollection = await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, context);\n\n      // cleanup cover photo from Cloudinary if it exists\n      if (deletedSubcollection?.coverImageUrl) {\n        try {\n          const publicId = CloudinaryService.extractPublicIdFromUrl(deletedSubcollection.coverImageUrl);\n          if (publicId) {\n            await CloudinaryService.deletePhotosFromCloudinary([publicId]);\n          }\n        } catch (cloudinaryError) {\n          // log the error but don't fail the deletion operation\n          console.error('Failed to delete subcollection cover photo from Cloudinary:', cloudinaryError);\n        }\n      }\n\n      return deletedSubcollection;\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { subcollectionId: data.subcollectionId },\n        facade: 'SubcollectionsFacade',\n        method: 'deleteAsync',\n        operation: 'delete',\n        userId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:59:01.214Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read collections and subcollections facades to understand current deletion logic",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections facades to understand current deletion logic"
+    },
+    {
+      "content": "Read cloudinary service to understand image deletion methods",
+      "status": "completed",
+      "activeForm": "Reading cloudinary service to understand image deletion methods"
+    },
+    {
+      "content": "Read collections and subcollections query files to understand deletion flow",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections query files to understand deletion flow"
+    },
+    {
+      "content": "Implement cover photo cleanup in collections facade",
+      "status": "completed",
+      "activeForm": "Implementing cover photo cleanup in collections facade"
+    },
+    {
+      "content": "Implement cover photo cleanup in subcollections facade",
+      "status": "completed",
+      "activeForm": "Implementing cover photo cleanup in subcollections facade"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands (lint and typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:59:01.513Z
+Tool: BashOutput
+Input:
+{
+  "bash_id": "7568b3"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:59:06.577Z
+Tool: Bash
+Input:
+{
+  "command": "timeout 120 npm run typecheck",
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-06T02:59:20.812Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read collections and subcollections facades to understand current deletion logic",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections facades to understand current deletion logic"
+    },
+    {
+      "content": "Read cloudinary service to understand image deletion methods",
+      "status": "completed",
+      "activeForm": "Reading cloudinary service to understand image deletion methods"
+    },
+    {
+      "content": "Read collections and subcollections query files to understand deletion flow",
+      "status": "completed",
+      "activeForm": "Reading collections and subcollections query files to understand deletion flow"
+    },
+    {
+      "content": "Implement cover photo cleanup in collections facade",
+      "status": "completed",
+      "activeForm": "Implementing cover photo cleanup in collections facade"
+    },
+    {
+      "content": "Implement cover photo cleanup in subcollections facade",
+      "status": "completed",
+      "activeForm": "Implementing cover photo cleanup in subcollections facade"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands (lint and typecheck)"
+    }
+  ]
+}
+================================================================================

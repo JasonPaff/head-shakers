@@ -15,6 +15,7 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
+import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 export type PublicSubcollection = Awaited<
@@ -49,7 +50,22 @@ export class SubcollectionsFacade {
   static async deleteAsync(data: DeleteSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
-      return await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, context);
+      const deletedSubcollection = await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, context);
+
+      // cleanup cover photo from Cloudinary if it exists
+      if (deletedSubcollection?.coverImageUrl) {
+        try {
+          const publicId = CloudinaryService.extractPublicIdFromUrl(deletedSubcollection.coverImageUrl);
+          if (publicId) {
+            await CloudinaryService.deletePhotosFromCloudinary([publicId]);
+          }
+        } catch (cloudinaryError) {
+          // log the error but don't fail the deletion operation
+          console.error('Failed to delete subcollection cover photo from Cloudinary:', cloudinaryError);
+        }
+      }
+
+      return deletedSubcollection;
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { subcollectionId: data.subcollectionId },
