@@ -50,7 +50,11 @@ export class SubcollectionsFacade {
   static async deleteAsync(data: DeleteSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
-      const deletedSubcollection = await SubcollectionsQuery.deleteAsync(data.subcollectionId, userId, context);
+      const deletedSubcollection = await SubcollectionsQuery.deleteAsync(
+        data.subcollectionId,
+        userId,
+        context,
+      );
 
       // cleanup cover photo from Cloudinary if it exists
       if (deletedSubcollection?.coverImageUrl) {

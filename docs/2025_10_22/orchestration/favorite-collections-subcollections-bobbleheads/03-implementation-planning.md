@@ -94,6 +94,7 @@ Generate the complete implementation plan now.
 ### Validation Commands Coverage
 
 All 22 steps include appropriate validation commands:
+
 - Steps touching code files: Include `npm run lint:fix && npm run typecheck`
 - Database migration steps: Include `npm run db:generate` and `/db` commands
 - Test steps: Include `npm run test [test-file]`
@@ -148,6 +149,7 @@ All 22 steps include appropriate validation commands:
 ## Time Estimates
 
 Based on the 3-4 day estimate:
+
 - Day 1: Database setup and backend logic (Steps 1-6)
 - Day 2: Frontend components and entity integration (Steps 7-12)
 - Day 3: Advanced features, optimization, testing (Steps 13-20)
@@ -156,12 +158,14 @@ Based on the 3-4 day estimate:
 ## Risk Assessment
 
 **Medium Risk Level** due to:
+
 - Integration with existing social features pattern (mitigates risk through proven patterns)
 - Denormalized count maintenance requiring transaction consistency
 - Cache invalidation complexity across multiple entity types
 - Performance optimization requirements for large datasets
 
 **Risk Mitigation Strategies**:
+
 - Step-by-step approach with validation at each stage
 - Following proven patterns from likes, follows, comments
 - Comprehensive testing strategy

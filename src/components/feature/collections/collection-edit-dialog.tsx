@@ -49,9 +49,7 @@ export const CollectionEditDialog = withFocusManagement(
     const submitButtonTestId = generateTestId('feature', 'collection-edit-submit');
 
     // useState hooks
-    const [coverImageUrl, setCoverImageUrl] = useState<null | string | undefined>(
-      collection.coverImageUrl,
-    );
+    const [coverImageUrl, setCoverImageUrl] = useState<null | string | undefined>(collection.coverImageUrl);
 
     const { focusFirstError } = useFocusContext();
     const { userId } = useAuth();

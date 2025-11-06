@@ -15,7 +15,8 @@ export const CLOUDINARY_PATHS = {
     COLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/cover',
     COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',
     PROFILE_PHOTOS: 'users/{userId}/profile',
-    SUBCOLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',
+    SUBCOLLECTION_COVER_PHOTOS:
+      'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',
     TEMP_UPLOADS: 'temp/uploads/{userId}',
     USER_ROOT: 'users/{userId}',
   },

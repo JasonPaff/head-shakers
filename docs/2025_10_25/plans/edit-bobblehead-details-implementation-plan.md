@@ -27,6 +27,7 @@ Implement a bobblehead details editing feature that enables authenticated users 
 ### CRITICAL Files (12 files - Must Modify)
 
 **Backend Layer:**
+
 1. `src/lib/validations/bobbleheads.validation.ts` - Add update schemas
 2. `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Add updateAsync method
 3. `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Add update business logic
@@ -35,20 +36,18 @@ Implement a bobblehead details editing feature that enables authenticated users 
 6. `src/lib/constants/operations.ts` - Complete BOBBLEHEADS.UPDATE constant
 7. `src/lib/services/cache-revalidation.service.ts` - Add onUpdate method
 
-**Frontend Layer:**
-8. `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - **CREATE** edit dialog
-9. `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header.tsx` - Wire edit button
-10. `src/app/(app)/bobbleheads/[bobbleheadId]/edit/page.tsx` - Edit page (placeholder, optional)
-11. `src/app/(app)/bobbleheads/[bobbleheadId]/edit/loading.tsx` - Loading state
+**Frontend Layer:** 8. `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - **CREATE** edit dialog 9. `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header.tsx` - Wire edit button 10. `src/app/(app)/bobbleheads/[bobbleheadId]/edit/page.tsx` - Edit page (placeholder, optional) 11. `src/app/(app)/bobbleheads/[bobbleheadId]/edit/loading.tsx` - Loading state
 
 ### HIGH Priority References (15 files)
 
 **Form Pattern References:**
+
 - `src/app/(app)/bobbleheads/add/components/add-item-form-client.tsx` - Complete form pattern
 - `src/app/(app)/bobbleheads/add/components/*.tsx` - Reusable form sections
 - `src/components/feature/collections/collection-edit-dialog.tsx` - Edit dialog pattern
 
 **Implementation Patterns:**
+
 - `src/lib/actions/collections/collections.actions.ts` - Update action pattern
 - `src/lib/constants/schema-limits.ts` - Validation limits
 
@@ -85,20 +84,24 @@ Implement a comprehensive bobblehead editing feature following the existing coll
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/bobbleheads.validation.ts` - Add update schemas
 
 **Changes:**
+
 - Add `updateBobbleheadSchema` extending `insertBobbleheadSchema` with required `id` field
 - Add `updateBobbleheadWithPhotosSchema` combining update schema with photos array
 - Ensure schema reuses existing field validations for consistency
 - Export new schemas for use in actions and facades
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `updateBobbleheadSchema` properly typed with id as required field
 - [ ] `updateBobbleheadWithPhotosSchema` includes photos array validation
 - [ ] All validation commands pass
@@ -113,9 +116,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Add update method
 
 **Changes:**
+
 - Add `updateAsync` method accepting bobblehead ID and update data
 - Implement database update using Drizzle ORM with proper where clause
 - Return updated bobblehead record with all fields
@@ -123,11 +128,13 @@ npm run lint:fix && npm run typecheck
 - Include transaction support for data integrity
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `updateAsync` method properly typed with Drizzle schema types
 - [ ] Method returns updated bobblehead or throws appropriate error
 - [ ] Transaction handling implemented correctly
@@ -142,9 +149,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Add update business logic
 
 **Changes:**
+
 - Add `updateAsync` method accepting user ID, bobblehead ID, and update data
 - Implement ownership verification by checking bobblehead.userId matches authenticated user
 - Call query layer `updateAsync` only after authorization passes
@@ -153,11 +162,13 @@ npm run lint:fix && npm run typecheck
 - Return updated bobblehead with success status
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Ownership validation prevents unauthorized updates
 - [ ] Photo management integrates with CloudinaryService correctly
 - [ ] Method properly orchestrates query layer and external services
@@ -172,9 +183,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Add update action
 
 **Changes:**
+
 - Create `updateBobbleheadWithPhotosAction` using `authActionClient`
 - Bind action to `updateBobbleheadWithPhotosSchema` for automatic validation
 - Extract authenticated user ID from Clerk context
@@ -183,11 +196,13 @@ npm run lint:fix && npm run typecheck
 - Return action result with proper error handling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action properly authenticated with authActionClient
 - [ ] Schema validation applied automatically
 - [ ] Cache invalidation triggered on successful update
@@ -203,21 +218,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/action-names.ts` - Complete BOBBLEHEADS.UPDATE placeholder
 - `src/lib/constants/operations.ts` - Complete BOBBLEHEADS.UPDATE placeholder
 
 **Changes:**
+
 - Define `BOBBLEHEADS.UPDATE` action name constant
 - Define `BOBBLEHEADS.UPDATE` operation constant for cache invalidation
 - Ensure naming follows existing patterns in both files
 - Verify constants are exported for use in actions and services
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] UPDATE constants defined in both files
 - [ ] Constants follow existing naming conventions
 - [ ] TypeScript types resolve correctly
@@ -232,9 +251,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Add onUpdate method
 
 **Changes:**
+
 - Add `onUpdate` method to bobbleheads section of CacheRevalidationService
 - Invalidate bobblehead detail page cache using bobblehead ID
 - Invalidate user's collection list cache
@@ -242,11 +263,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing revalidation patterns from onCreate method
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `onUpdate` method properly invalidates all relevant cache paths
 - [ ] Method signature matches other revalidation methods
 - [ ] TypeScript types resolve correctly
@@ -261,9 +284,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Edit dialog component
 
 **Changes:**
+
 - Create dialog component accepting bobblehead data and open/close handlers as props
 - Implement TanStack Form with `useAppForm` hook for form state management
 - Configure form options with `updateBobbleheadWithPhotosAction` server action
@@ -277,11 +302,13 @@ npm run lint:fix && npm run typecheck
 - Style with Tailwind CSS matching existing design system
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens/closes with proper animation
 - [ ] Form pre-populates with current bobblehead data
 - [ ] Real-time validation displays field errors
@@ -299,9 +326,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header.tsx` - Add edit button
 
 **Changes:**
+
 - Add edit button to header toolbar
 - Implement `isOwner` check comparing authenticated user ID with bobblehead.userId
 - Conditionally render edit button only when user owns bobblehead
@@ -312,11 +341,13 @@ npm run lint:fix && npm run typecheck
 - Position button appropriately in header layout
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Edit button only visible to bobblehead owner
 - [ ] Button click opens edit dialog with pre-populated data
 - [ ] Dialog closes properly after cancel or successful submit
@@ -332,10 +363,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Add success handling
 - `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header.tsx` - Coordinate refetch
 
 **Changes:**
+
 - Add success callback in edit dialog to trigger TanStack Query cache invalidation
 - Implement optimistic update to show changes before server confirmation
 - Coordinate query refetch in parent component on dialog close
@@ -343,11 +376,13 @@ npm run lint:fix && npm run typecheck
 - Handle race conditions between optimistic and server updates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Optimistic updates display immediately in UI
 - [ ] Query refetch triggered on successful submit
 - [ ] Cache invalidation refreshes related queries
@@ -363,11 +398,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Add error handling
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Add error cases
 - `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Add error responses
 
 **Changes:**
+
 - Handle unauthorized edit attempts with clear error messages
 - Catch network failures during photo upload
 - Display validation errors for each form field
@@ -377,11 +414,13 @@ npm run lint:fix && npm run typecheck
 - Show user-friendly error messages in toast notifications
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Unauthorized edits blocked with appropriate message
 - [ ] Network failures display retry options
 - [ ] Field validation errors shown inline
@@ -398,10 +437,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Add photo management UI
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Handle photo transitions
 
 **Changes:**
+
 - Add photo gallery component within edit dialog
 - Support photo reordering with drag-and-drop
 - Implement photo deletion with Cloudinary cleanup
@@ -412,11 +453,13 @@ npm run lint:fix && npm run typecheck
 - Update photo metadata in database
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Users can add new photos during edit
 - [ ] Users can delete existing photos
 - [ ] Users can reorder photos
@@ -433,10 +476,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Modify:**
+
 - Collection list view components - Add edit action
 - Bobblehead card components - Add edit button
 
 **Changes:**
+
 - Identify collection management view components
 - Add edit button to bobblehead cards in user's collections
 - Wire buttons to open edit dialog with appropriate bobblehead data
@@ -444,11 +489,13 @@ npm run lint:fix && npm run typecheck
 - Maintain consistent authorization checks across all entry points
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Edit accessible from collection management views
 - [ ] Dialog behavior consistent across entry points
 - [ ] Authorization checks applied uniformly
@@ -494,6 +541,7 @@ npm run lint:fix && npm run typecheck
 ### Testing Strategy
 
 **Manual Testing:**
+
 - Edit owned vs non-owned bobbleheads
 - Photo flow: Add, delete, reorder photos during edit
 - Error scenarios: Network failures, validation errors, unauthorized attempts

@@ -223,17 +223,19 @@ Useful context but minimal changes needed:
 
 All file paths validated for existence and accessibility:
 
-| Status | Count | Description |
-|--------|-------|-------------|
-| ✅ Exists | 43 | Files confirmed to exist in codebase |
-| 📝 Create | 2 | New files needed for implementation |
-| ⚠️ Placeholder | 1 | Exists but needs implementation (edit page) |
+| Status         | Count | Description                                 |
+| -------------- | ----- | ------------------------------------------- |
+| ✅ Exists      | 43    | Files confirmed to exist in codebase        |
+| 📝 Create      | 2     | New files needed for implementation         |
+| ⚠️ Placeholder | 1     | Exists but needs implementation (edit page) |
 
 **Files Requiring Creation:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx`
 - `src/components/feature/bobblehead/edit-item-form-options.ts`
 
 **Files Requiring Implementation:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadId]/edit/page.tsx` (currently placeholder)
 
 ## Architecture Analysis
@@ -294,11 +296,13 @@ UI Components (React/TanStack Form)
 ## Implementation Approaches
 
 ### Option A: Full Page Edit
+
 - Uses existing `/edit` route
 - More space for complex form
 - Implement `bobbleheads/[bobbleheadId]/edit/page.tsx`
 
 ### Option B: Modal Dialog Edit ⭐ **RECOMMENDED**
+
 - Faster UX, no navigation
 - Matches collection edit pattern
 - Create `bobblehead-edit-dialog.tsx`
@@ -320,14 +324,14 @@ This plan provides additional context and can be referenced for implementation d
 
 ## Validation Results
 
-| Check | Status | Notes |
-|-------|--------|-------|
-| Minimum Files (5+) | ✅ Pass | Discovered 45 files |
-| Path Validation | ✅ Pass | All existing files confirmed |
-| Categorization | ✅ Pass | 4 priority levels assigned |
-| Architecture Coverage | ✅ Pass | All layers represented |
-| Pattern Recognition | ✅ Pass | Update patterns identified |
-| Integration Points | ✅ Pass | 6 integration points found |
+| Check                 | Status  | Notes                        |
+| --------------------- | ------- | ---------------------------- |
+| Minimum Files (5+)    | ✅ Pass | Discovered 45 files          |
+| Path Validation       | ✅ Pass | All existing files confirmed |
+| Categorization        | ✅ Pass | 4 priority levels assigned   |
+| Architecture Coverage | ✅ Pass | All layers represented       |
+| Pattern Recognition   | ✅ Pass | Update patterns identified   |
+| Integration Points    | ✅ Pass | 6 integration points found   |
 
 ## Next Steps
 

@@ -92,19 +92,23 @@ Implement photo deletion and drag-and-drop reordering functionality in the bobbl
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/lib/validations/bobbleheads.validation.ts` - Add new validation schemas
 
 **Changes:**
+
 - Add `deleteBobbleheadPhotoSchema` with `bobbleheadId` and `photoId` UUID fields
 - Add `reorderBobbleheadPhotosSchema` with `bobbleheadId` UUID and `photoOrder` array containing id and sortOrder
 - Export `DeleteBobbleheadPhoto` and `ReorderBobbleheadPhotos` type aliases
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `deleteBobbleheadPhotoSchema` validates bobbleheadId and photoId as UUIDs
 - [ ] `reorderBobbleheadPhotosSchema` validates bobbleheadId and array of photo order objects
 - [ ] All validation commands pass
@@ -120,20 +124,24 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Add photo operation methods
 
 **Changes:**
+
 - Add `deletePhotoAsync` method that deletes from bobbleheadPhotos table by id and bobbleheadId with userId check
 - Add `updatePhotoSortOrderAsync` method that updates sortOrder for a single photo
 - Add `batchUpdatePhotoSortOrderAsync` method that updates multiple photos in a transaction
 - Add `getPhotoByIdAsync` method that retrieves a single photo with ownership validation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `deletePhotoAsync` returns deleted photo record or null
 - [ ] `batchUpdatePhotoSortOrderAsync` updates all photos atomically
 - [ ] Proper error handling and ownership validation included
@@ -150,20 +158,24 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Add photo management methods
 
 **Changes:**
+
 - Add `deletePhotoAsync` method that deletes photo from database and calls `CloudinaryService.deletePhotosByUrls` with error handling
 - Add `reorderPhotosAsync` method that validates ownership and calls `batchUpdatePhotoSortOrderAsync`
 - Include proper error context and Sentry logging for both operations
 - Add cache invalidation calls after successful operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `deletePhotoAsync` deletes from database and Cloudinary with non-blocking cleanup
 - [ ] `reorderPhotosAsync` updates all photo sortOrder values in transaction
 - [ ] Proper error handling with `createFacadeError` pattern
@@ -180,11 +192,13 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Add new server actions
 - `src/lib/constants/action-names.ts` - Add action name constants
 - `src/lib/constants/operations.ts` - Add operation name constants
 
 **Changes:**
+
 - Add `deleteBobbleheadPhotoAction` with `authActionClient`, rate limiting, and transaction support
 - Add `reorderBobbleheadPhotosAction` with `authActionClient` and transaction support
 - Use `ctx.sanitizedInput` parsed through validation schemas
@@ -193,11 +207,13 @@ npm run lint:fix && npm run typecheck
 - Add `DELETE_PHOTO` and `REORDER_PHOTOS` to `OPERATIONS.BOBBLEHEADS`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `deleteBobbleheadPhotoAction` deletes photo and returns success response
 - [ ] `reorderBobbleheadPhotosAction` updates photo order and returns success response
 - [ ] Proper error handling with `handleActionError` pattern
@@ -214,9 +230,11 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add delete functionality
 
 **Changes:**
+
 - Add state for tracking photo to delete and confirmation dialog visibility
 - Modify `removePhoto` callback to open confirmation dialog instead of immediate deletion
 - Add `ConfirmDeleteAlertDialog` component rendered conditionally
@@ -225,11 +243,13 @@ npm run lint:fix && npm run typecheck
 - Add loading state during deletion with optimistic UI updates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Clicking delete button shows confirmation dialog
 - [ ] Confirmation triggers appropriate deletion logic (local vs server)
 - [ ] Optimistic UI update removes photo immediately with rollback on error
@@ -246,9 +266,11 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add sortable functionality
 
 **Changes:**
+
 - Import Sortable components from `sortable.tsx` (Root, Content, Item, ItemHandle, Overlay)
 - Wrap photo grid with `Sortable.Root` passing photos array and `onValueChange` callback
 - Wrap grid container with `Sortable.Content` component
@@ -259,11 +281,13 @@ npm run lint:fix && npm run typecheck
 - Update sortOrder values when photos array changes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Photos can be reordered via drag-and-drop with visual feedback
 - [ ] Reordering updates sortOrder in database after debounced delay
 - [ ] First photo in order automatically becomes primary photo
@@ -281,9 +305,11 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Add photo loading
 
 **Changes:**
+
 - Update `BobbleheadForEdit` interface to include photos array
 - Call `getBobbleheadPhotosAction` when dialog opens to fetch existing photos
 - Transform fetched photos to `CloudinaryPhoto` format for photo upload component
@@ -292,11 +318,13 @@ npm run lint:fix && npm run typecheck
 - Merge existing photos with newly uploaded photos in form state
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Existing photos load when edit dialog opens
 - [ ] Photos display in correct sortOrder with primary indicator
 - [ ] Newly uploaded photos append to existing photos
@@ -314,10 +342,12 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Update form submission
 - `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Update `updateBobbleheadWithPhotosAction`
 
 **Changes:**
+
 - Track deleted photo IDs in component state during editing session
 - Track reordered photos in component state during editing session
 - Execute photo deletions before updating bobblehead in `updateBobbleheadWithPhotosAction`
@@ -326,11 +356,13 @@ npm run lint:fix && npm run typecheck
 - Clear deleted and reordered tracking after successful submission
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Photo deletions persist when form is submitted
 - [ ] Photo reorderings persist when form is submitted
 - [ ] Errors during photo operations provide clear user feedback
@@ -348,9 +380,11 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add optimistic updates
 
 **Changes:**
+
 - Store previous photo state before delete or reorder operations
 - Update UI immediately when user initiates delete or reorder
 - On server action success, clear previous state
@@ -359,11 +393,13 @@ npm run lint:fix && npm run typecheck
 - Disable drag-and-drop during pending server operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] UI updates immediately when user deletes or reorders photos
 - [ ] Failed operations rollback to previous state with error message
 - [ ] Loading states prevent conflicting operations
@@ -381,21 +417,25 @@ npm run lint:fix && npm run typecheck
 **Files to Create:** None
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Add photo cache methods
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Call cache invalidation
 
 **Changes:**
+
 - Add `onPhotoDelete` method to `CacheRevalidationService.bobbleheads` that invalidates bobblehead photos cache
 - Add `onPhotoReorder` method to `CacheRevalidationService.bobbleheads` that invalidates bobblehead photos cache
 - Call cache invalidation methods after successful photo operations in facade
 - Include bobbleheadId, userId, and collectionId in cache keys for targeted invalidation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Photo deletions invalidate bobblehead photos cache
 - [ ] Photo reorderings invalidate bobblehead photos cache
 - [ ] Cache invalidation targets correct cache keys

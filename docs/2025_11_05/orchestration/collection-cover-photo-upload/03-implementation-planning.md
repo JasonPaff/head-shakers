@@ -12,6 +12,7 @@
 **Refined Feature Request**: Cover photo upload functionality for collections/subcollections leveraging existing Cloudinary integration, Server Actions, TanStack React Form, and Zod validation.
 
 **Key File Discovery Insights**:
+
 - Database field `coverImageUrl` already exists (no migration needed)
 - Validation schemas already include `coverImageUrl: z.url().optional()`
 - Complete Cloudinary infrastructure exists
@@ -50,11 +51,13 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 ## Template Compliance Results
 
 ### Overview Section
+
 - ✅ Estimated Duration: 2-3 days
 - ✅ Complexity: Medium
 - ✅ Risk Level: Low
 
 ### Implementation Steps Analysis
+
 - **Total Steps**: 15
 - **Critical Steps**: 2 (Cloudinary paths, cover upload component)
 - **Form Integration Steps**: 4 (create/edit dialogs for collections/subcollections)
@@ -63,7 +66,9 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 - **Infrastructure Steps**: 2 (placeholders, upload preset)
 
 ### Step Structure Validation
+
 Each step includes:
+
 - ✅ **What**: Clear description of the task
 - ✅ **Why**: Rationale for the change
 - ✅ **Confidence**: Risk assessment (High/Medium)
@@ -75,11 +80,13 @@ Each step includes:
 ## Complexity Assessment
 
 **Overall Complexity**: Medium
+
 - **Low-Risk Elements**: Database field exists, validation exists, Cloudinary infrastructure exists
 - **Medium-Risk Elements**: UI component creation, form integration, display implementation
 - **High-Risk Elements**: None identified
 
 **Time Estimate**: 2-3 days
+
 - **Day 1**: Steps 1-6 (Infrastructure and form integration)
 - **Day 2**: Steps 7-13 (Cleanup and display components)
 - **Day 3**: Steps 14-15 + Testing (Placeholders, presets, validation)
@@ -87,6 +94,7 @@ Each step includes:
 ## Quality Gate Results
 
 The implementation plan includes comprehensive quality gates:
+
 - ✅ TypeScript type checking for all files
 - ✅ ESLint validation for all files
 - ✅ Upload functionality validation
@@ -102,6 +110,7 @@ The implementation plan includes comprehensive quality gates:
 ## Plan Highlights
 
 ### Key Advantages Identified
+
 1. Database field already exists (no migration)
 2. Validation schemas already support coverImageUrl
 3. Cloudinary infrastructure fully operational
@@ -109,6 +118,7 @@ The implementation plan includes comprehensive quality gates:
 5. Reference implementation exists (bobblehead gallery)
 
 ### Implementation Approach
+
 1. **Infrastructure First**: Add Cloudinary paths and create upload component
 2. **Form Integration**: Add to all create/edit dialogs
 3. **Cleanup Logic**: Ensure proper Cloudinary cleanup on deletion
@@ -116,6 +126,7 @@ The implementation plan includes comprehensive quality gates:
 5. **Polish**: Add placeholders and upload presets
 
 ### Critical Considerations
+
 - Cover photos are optional (graceful handling required)
 - Cloudinary cleanup on deletion/replacement is critical
 - Upload preset may require Cloudinary dashboard access

@@ -181,6 +181,6 @@ body {
 }
 
 /* fix Cloudinary upload widget iframe to allow pointer events */
-iframe[data-test="uw-iframe"] {
+iframe[data-test='uw-iframe'] {
   pointer-events: auto !important;
 }

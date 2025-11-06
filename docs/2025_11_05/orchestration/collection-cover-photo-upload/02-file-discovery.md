@@ -65,6 +65,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
 ### HIGH PRIORITY (13 files)
 
 #### Validation Layer (3 files)
+
 3. **src/lib/validations/collections.validation.ts**
    - **Priority**: High
    - **Reason**: Contains `coverImageUrl: z.url().optional()` in schema
@@ -83,6 +84,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
    - **Role**: Reference pattern for creating cover photo validation schema
 
 #### Server Actions (2 files)
+
 6. **src/lib/actions/collections/collections.actions.ts**
    - **Priority**: High
    - **Reason**: Handles createCollectionAction, updateCollectionAction
@@ -94,6 +96,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
    - **Role**: Will pass coverImageUrl through to facade layer
 
 #### Business Logic (2 files)
+
 8. **src/lib/facades/collections/collections.facade.ts**
    - **Priority**: High
    - **Reason**: Orchestrates collection operations and cache invalidation
@@ -105,6 +108,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
    - **Role**: May need cover photo cleanup
 
 #### Database Queries (2 files)
+
 10. **src/lib/queries/collections/collections.query.ts**
     - **Priority**: High
     - **Reason**: Contains all database queries for collections
@@ -116,6 +120,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
     - **Role**: Already handles coverImageUrl field via Drizzle
 
 #### Cloudinary Integration (4 files)
+
 12. **src/lib/services/cloudinary.service.ts**
     - **Priority**: High
     - **Reason**: Core Cloudinary service with upload/delete functionality
@@ -149,6 +154,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
 ### MEDIUM PRIORITY (19 files)
 
 #### Collection Create/Edit Forms (4 files)
+
 18. **src/components/feature/collections/collection-create-dialog.tsx**
     - **Priority**: Medium
     - **Reason**: Dialog form for creating collections
@@ -170,6 +176,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
     - **Role**: Add cover photo upload/replace/remove functionality
 
 #### Display Components (10 files)
+
 22. **src/app/(app)/collections/[collectionId]/(collection)/components/collection-header.tsx**
     - **Priority**: Medium
     - **Reason**: Server component displaying collection header
@@ -211,6 +218,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
     - **Role**: May need to trigger cover photo edit dialog
 
 #### Reference Components (3 files)
+
 30. **src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-photo-gallery.tsx**
     - **Priority**: Medium
     - **Reason**: Production gallery component using CldImage
@@ -222,6 +230,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
     - **Role**: Reference for creating simplified cover photo uploader
 
 #### Already Supporting Cover Photos (2 files - informational)
+
 32. **src/lib/queries/content-search/content-search.query.ts**
     - **Priority**: Medium (informational)
     - **Reason**: Already includes coverImageUrl in search results (lines 47, 74, 156, 641, 838, 954)
@@ -240,6 +249,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
 ### LOW PRIORITY (8 files)
 
 #### Supporting Infrastructure (2 files)
+
 35. **src/lib/services/cache-revalidation.service.ts**
     - **Priority**: Low
     - **Reason**: Handles cache invalidation
@@ -251,6 +261,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
     - **Role**: Existing cache invalidation will handle cover photos
 
 #### Constants & Configuration (2 files)
+
 37. **src/lib/constants/config.ts**
     - **Priority**: Low
     - **Reason**: Application configuration constants
@@ -264,6 +275,7 @@ As a user, I would like to be able to upload and set a custom cover photo for my
 ## File Path Validation
 
 All 42 discovered file paths were validated:
+
 - ✅ All critical and high priority files exist and are accessible
 - ✅ All medium priority files exist and are accessible
 - ✅ All low priority files exist and are accessible
@@ -274,6 +286,7 @@ All 42 discovered file paths were validated:
 ### Critical Discovery: Database Field Already Exists
 
 **Major Finding**: The `coverImageUrl` field already exists in both the `collections` and `subCollections` database tables with a 500 character limit. This means:
+
 - ✅ No database migration required
 - ✅ No schema changes needed
 - ✅ Field is ready for immediate use
@@ -281,6 +294,7 @@ All 42 discovered file paths were validated:
 ### Critical Discovery: Validation Already Implemented
 
 **Major Finding**: Zod validation schemas in both `collections.validation.ts` and `subcollections.validation.ts` already include `coverImageUrl: z.url().optional()`. This means:
+
 - ✅ No validation schema changes required
 - ✅ URL validation already in place
 - ✅ Optional field handling already configured
@@ -288,6 +302,7 @@ All 42 discovered file paths were validated:
 ### Existing Cloudinary Infrastructure
 
 The application has a complete Cloudinary integration:
+
 - ✅ Upload signature generation endpoint (`/api/upload/sign`)
 - ✅ CloudinaryService with upload, delete, and folder management
 - ✅ Production-ready CldUploadWidget component (494 lines)
@@ -297,6 +312,7 @@ The application has a complete Cloudinary integration:
 ### Search Already Supports Cover Photos
 
 **Important Finding**: The content search functionality already includes `coverImageUrl` in queries and displays it in search results. This means:
+
 - ✅ No search query changes needed
 - ✅ Search results already display cover photos
 - ✅ Admin interface already supports cover photos
@@ -304,26 +320,31 @@ The application has a complete Cloudinary integration:
 ## Integration Points Identified
 
 ### Upload Flow
+
 ```
 User → CldUploadWidget → /api/upload/sign → CloudinaryService.generateUploadSignature → Store URL in DB
 ```
 
 ### Deletion Flow
+
 ```
 User action → Server action → Facade → CloudinaryService.deletePhotosByUrls → DB update
 ```
 
 ### Display Flow
+
 ```
 Query layer → Facade → Component → CldImage with responsive optimization
 ```
 
 ### Cache Invalidation Flow
+
 ```
 Collection update → CacheRevalidationService.collections.onUpdate → Automatic cache invalidation
 ```
 
 ### Form Integration Flow
+
 ```
 TanStack React Form → Zod validation → Server action → Facade → Query layer → Database
 ```

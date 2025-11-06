@@ -19,6 +19,7 @@
 ## File Discovery Results
 
 ### Critical Priority Files (6)
+
 1. `src\components\layout\app-header\components\app-header-search.tsx` - Rebuild required
 2. `src\lib\actions\content-search\content-search.actions.ts` - Extend with public actions
 3. `src\lib\facades\content-search\content-search.facade.ts` - Add public methods
@@ -27,12 +28,14 @@
 6. `src\app\(app)\search\page.tsx` - NEW: Full search results page
 
 ### High Priority Files (13)
+
 - Database schemas: collections, bobbleheads, subcollections, tags, users
 - Configuration: config.ts, next-safe-action.ts, middleware.ts
 - Constants: action-names.ts, operations.ts, error-messages.ts
 - Queries: tags-query.ts, tags.actions.ts
 
 ### Medium Priority Files (19)
+
 - UI Components: popover, input, card, badge, skeleton, empty-state, spinner
 - Reference: content-search.tsx, tag-filter.tsx
 - Services: cache.service.ts, cache.utils.ts, cache-tags.utils.ts
@@ -41,6 +44,7 @@
 - Middleware: sanitization, database
 
 ### Low Priority Files (4)
+
 - Supporting infrastructure: transaction.middleware.ts, redis-client.ts, sentry.ts
 - Integration: app-header.tsx
 
@@ -79,9 +83,11 @@ Implement a comprehensive public search feature accessible to unauthenticated us
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/public-search.validation.ts` - Public search validation schemas
 
 **Changes:**
+
 - Create `PublicSearchQuerySchema` with minimum query length (2-3 characters), maximum length (100 characters), trimming
 - Create `SearchFiltersSchema` for entity type toggles (collections, subcollections, bobbleheads), tag array filtering, sort options
 - Create `SearchPaginationSchema` for page number, page size (max 50 items), offset calculation
@@ -90,11 +96,13 @@ Implement a comprehensive public search feature accessible to unauthenticated us
 - Export all schemas with proper TypeScript types using `z.infer`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All schemas include comprehensive validation rules
 - [ ] TypeScript types are properly inferred from schemas
 - [ ] Schemas follow existing project validation patterns
@@ -111,9 +119,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-search.query.ts` - Extend with public search queries
 
 **Changes:**
+
 - Add `searchPublicCollections` function using Drizzle's `ilike` for name/description search with tag filtering via joins
 - Add `searchPublicSubcollections` function with similar pattern, filtering by parent collection visibility
 - Add `searchPublicBobbleheads` function including manufacturer/series search fields
@@ -124,11 +134,13 @@ npm run lint:fix && npm run typecheck
 - Use parameterized queries with Drizzle's type-safe query builder to prevent SQL injection
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Queries leverage existing GIN indexes on name/description fields
 - [ ] All queries return properly typed results matching schema expectations
 - [ ] Tag filtering uses efficient join patterns
@@ -146,9 +158,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/content-search.facade.ts` - Add public search facade methods
 
 **Changes:**
+
 - Add `searchPublicContent` method orchestrating multi-entity search with cache lookup
 - Add `getPublicSearchDropdownResults` method for header dropdown (limit 5 total results)
 - Add `getPublicSearchPageResults` method for full results page with pagination
@@ -160,11 +174,13 @@ npm run lint:fix && npm run typecheck
 - Add result enrichment with primary photo URL resolution
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Caching strategy reduces redundant database queries for popular searches
 - [ ] Cache keys are properly namespaced and collision-free
 - [ ] Photo URLs are correctly resolved from Cloudinary integration
@@ -182,9 +198,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/content-search.actions.ts` - Add public search actions
 
 **Changes:**
+
 - Add `searchPublicContentAction` using publicActionClient with PublicSearchInputSchema validation
 - Add `getPublicSearchDropdownAction` for header dropdown with SearchDropdownInputSchema
 - Import and use public search facades from Step 3
@@ -194,11 +212,13 @@ npm run lint:fix && npm run typecheck
 - Add JSDoc comments documenting action purpose, parameters, and return types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Actions properly use publicActionClient for unauthenticated access
 - [ ] Input validation catches invalid queries before database access
 - [ ] Error responses are consistent with existing action patterns
@@ -216,9 +236,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/middleware.ts` - Add public search routes to allowed paths
 
 **Changes:**
+
 - Add `/search` route to public routes list (if pattern-based matching exists)
 - Ensure search API routes are accessible without authentication
 - Verify existing rate limiting applies to search endpoints
@@ -226,11 +248,13 @@ npm run lint:fix && npm run typecheck
 - Confirm no unintended side effects on other route protections
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Search routes are accessible to unauthenticated users
 - [ ] Existing protected routes remain properly secured
 - [ ] Rate limiting is active for search endpoints
@@ -248,13 +272,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/search/search-dropdown.tsx` - Search dropdown component
 - `src/components/feature/search/search-result-item.tsx` - Individual result item component
 
 **Files to Modify:**
+
 - `src/components/layout/app-header-search.tsx` - Replace existing implementation with new SearchDropdown
 
 **Changes:**
+
 - Create SearchDropdown component using Radix UI Popover primitive
 - Implement useDebounce hook or use existing debounce utility (300-500ms delay)
 - Add loading skeleton states while searching
@@ -268,11 +295,13 @@ npm run lint:fix && npm run typecheck
 - Create SearchResultItem component for consistent result display
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dropdown opens on input focus with smooth animation
 - [ ] Debouncing reduces unnecessary server requests
 - [ ] Loading states provide clear user feedback
@@ -291,12 +320,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/search/page.tsx` - Main search results page Server Component
 - `src/components/feature/search/search-filters.tsx` - Filter controls component
 - `src/components/feature/search/search-results-grid.tsx` - Results display grid
 - `src/components/feature/search/search-pagination.tsx` - Pagination controls
 
 **Changes:**
+
 - Create search page Server Component accepting searchParams from URL
 - Use Nuqs for URL state management (query, filters, page number)
 - Implement SearchFilters component with entity type toggles, tag multi-select, sort dropdown
@@ -310,11 +341,13 @@ npm run lint:fix && npm run typecheck
 - Implement responsive grid layout (1 column mobile, 2-3 columns desktop)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] URL state properly syncs with search parameters using Nuqs
 - [ ] Pagination works correctly with server-side rendering
 - [ ] Filters update results without full page reload
@@ -333,9 +366,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/layout/app-header-search.tsx` - Integrate SearchDropdown component
 
 **Changes:**
+
 - Import and render SearchDropdown component from Step 6
 - Remove any existing placeholder search implementation
 - Add proper spacing and styling to match header design
@@ -345,11 +380,13 @@ npm run lint:fix && npm run typecheck
 - Connect to searchPublicContentAction from Step 4
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Search dropdown appears correctly in header on all screen sizes
 - [ ] Input focus behavior works intuitively
 - [ ] Component integrates seamlessly with existing header layout
@@ -367,9 +404,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/services/cache.service.ts` - Add search-specific caching methods
 
 **Changes:**
+
 - Add `cacheSearchResults` method with configurable TTL (default 10 minutes)
 - Add `getSearchResultsFromCache` method with proper deserialization
 - Add `invalidateSearchCache` method for manual cache clearing if needed
@@ -379,11 +418,13 @@ npm run lint:fix && npm run typecheck
 - Document caching strategy in code comments
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cache methods integrate with existing CacheService patterns
 - [ ] TTL configuration is appropriate for search use case
 - [ ] Cache keys are properly namespaced and unique
@@ -401,6 +442,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `tests/lib/validations/public-search.validation.test.ts` - Schema validation tests
 - `tests/lib/queries/content-search.query.test.ts` - Database query tests
 - `tests/lib/facades/content-search.facade.test.ts` - Facade logic tests
@@ -409,6 +451,7 @@ npm run lint:fix && npm run typecheck
 - `tests/app/search/page.test.tsx` - Search page integration tests
 
 **Changes:**
+
 - Write validation tests covering valid/invalid inputs, edge cases (empty query, special characters)
 - Create database query tests using Testcontainers with seeded test data
 - Add facade tests mocking query layer and verifying caching logic
@@ -419,11 +462,13 @@ npm run lint:fix && npm run typecheck
 - Achieve minimum 80% code coverage for new search functionality
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All validation schema edge cases are tested
 - [ ] Database queries return expected results with test data
 - [ ] Caching logic correctly stores and retrieves results
@@ -442,9 +487,11 @@ npm run lint:fix && npm run typecheck && npm run test
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - Multiple files from previous steps for optimization refinements
 
 **Changes:**
+
 - Verify GIN indexes are utilized by running EXPLAIN ANALYZE on search queries
 - Optimize Cloudinary image loading with appropriate transformations and lazy loading
 - Add performance monitoring comments for future Sentry integration
@@ -457,11 +504,13 @@ npm run lint:fix && npm run typecheck && npm run test
 - Confirm no console errors or warnings in browser
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test && npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] Search queries execute within 500ms for cached results, 2s for uncached
 - [ ] Database query plans show index usage
 - [ ] Images load efficiently with proper optimization
@@ -516,6 +565,7 @@ npm run lint:fix && npm run typecheck && npm run test && npm run build
 ## Orchestration Logs
 
 For detailed logs of the planning process, see:
+
 - [Feature Refinement](../orchestration/public-search-functionality/01-feature-refinement.md)
 - [File Discovery](../orchestration/public-search-functionality/02-file-discovery.md)
 - [Implementation Planning](../orchestration/public-search-functionality/03-implementation-planning.md)

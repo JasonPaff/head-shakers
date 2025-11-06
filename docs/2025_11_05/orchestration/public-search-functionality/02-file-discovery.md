@@ -20,15 +20,19 @@
 ## Files by Priority
 
 ### Critical Priority: 6 files
+
 - Core implementation files requiring creation or major modification
 
 ### High Priority: 13 files
+
 - Database schemas, configuration, and core infrastructure
 
 ### Medium Priority: 19 files
+
 - UI components, supporting services, and utilities
 
 ### Low Priority: 4 files
+
 - Supporting infrastructure and error handling
 
 ## Complete File Listing
@@ -189,7 +193,7 @@
    - publicActionClient exists for unauthenticated access
 
 2. **Admin Search Reference**
-   - Comprehensive implementation in content-search.* files
+   - Comprehensive implementation in content-search.\* files
    - Uses debouncing (300ms), tag filtering, caching
    - Sentry tracking and error monitoring
 

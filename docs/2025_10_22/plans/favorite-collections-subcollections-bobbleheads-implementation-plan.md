@@ -40,13 +40,16 @@ Implement a comprehensive favoriting system allowing authenticated users to mark
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/db/schema/favorites.ts` - Drizzle schema definition for favorites table
 
 **Files to Modify:**
+
 - `src/lib/db/schema/index.ts` - Export the new favorites schema
 - `src/lib/db/schema/relations.ts` - Add relations between favorites and collections/subcollections/bobbleheads tables
 
 **Changes:**
+
 - Define favorites table with columns: id (uuid), userId (text from Clerk), entityType (enum: collection/subcollection/bobblehead), entityId (uuid), createdAt (timestamp)
 - Add composite unique constraint on (userId, entityType, entityId) to prevent duplicate favorites
 - Create indexes on userId for user favorites queries, entityType and entityId for entity favorites count queries
@@ -55,12 +58,14 @@ Implement a comprehensive favoriting system allowing authenticated users to mark
 - Define one-to-many relations from collections/subcollections/bobbleheads to favorites in relations file
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Favorites schema compiles without TypeScript errors
 - [ ] Migration file generated successfully in migrations folder
 - [ ] Schema includes all required columns with proper types
@@ -83,17 +88,20 @@ None
 None
 
 **Changes:**
+
 - Execute migration using `/db run migration` command to create favorites table
 - Verify table creation and constraints via `/db show schema favorites`
 - Confirm indexes are properly created
 
 **Validation Commands:**
+
 ```bash
 /db show schema favorites
 /db list tables
 ```
 
 **Success Criteria:**
+
 - [ ] Migration executes without errors
 - [ ] Favorites table exists in database
 - [ ] All columns, constraints, and indexes are properly created
@@ -108,12 +116,14 @@ None
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/favorites.ts` - Zod schemas for favorites operations
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Import favorites schema from database schema
 - Use createInsertSchema and createSelectSchema from drizzle-zod
 - Define toggleFavoriteSchema with pick for userId, entityType, entityId
@@ -122,11 +132,13 @@ None
 - Export all schemas for use in actions and queries
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Validation schemas compile without errors
 - [ ] Schemas properly infer types from Drizzle schema
 - [ ] All required fields are included in operation schemas
@@ -142,12 +154,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/queries/favorites.ts` - Database queries for favorites operations
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Create getFavoritesByUserId query with joins to collections, subcollections, bobbleheads tables
 - Implement getFavoriteStatus query to check if specific entity is favorited by user
 - Add getFavoritesCountByEntity query for displaying favorite counts on entity cards
@@ -158,11 +172,13 @@ None
 - Add error handling with try-catch blocks
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All query functions properly typed with Drizzle inference
 - [ ] Queries use efficient joins to fetch related entity data
 - [ ] Pagination implemented correctly
@@ -179,12 +195,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/facades/favorites.ts` - Business logic for favorites operations
 
 **Files to Modify:**
+
 - `src/lib/cache/tags.ts` - Add favorites-specific cache tags
 
 **Changes:**
+
 - Create addFavorite facade function calling database insert with conflict handling
 - Implement removeFavorite facade function with delete operation
 - Add toggleFavorite facade that checks current status and adds/removes accordingly
@@ -196,11 +215,13 @@ npm run lint:fix && npm run typecheck
 - Include proper error handling and logging
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All facade functions properly typed
 - [ ] Cache tags defined and exported from cache/tags.ts
 - [ ] Cache invalidation triggers on all mutation operations
@@ -217,12 +238,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/favorites.ts` - Server actions for favorites operations
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Create toggleFavoriteAction using action from next-safe-action
 - Bind toggleFavoriteSchema from validations layer
 - Implement handler calling toggleFavorite facade with Clerk userId from auth
@@ -233,11 +256,13 @@ None
 - Add proper TypeScript typing for action inputs and outputs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Actions properly integrated with next-safe-action
 - [ ] Validation schemas correctly bound to actions
 - [ ] Authentication checks prevent unauthorized access
@@ -254,12 +279,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/lib/hooks/use-optimistic-favorite.ts` - Hook for optimistic favorite updates
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Create useOptimisticFavorite hook using React useOptimistic
 - Accept initial favorite status and entity information as parameters
 - Integrate with toggleFavoriteAction using useAction from next-safe-action
@@ -270,11 +297,13 @@ None
 - Add proper TypeScript generics for entity types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook properly typed with TypeScript
 - [ ] Optimistic updates work immediately on user interaction
 - [ ] Server action integration functions correctly
@@ -291,12 +320,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/ui/favorite-button.tsx` - Reusable favorite button component
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Create FavoriteButton component accepting entityType, entityId, initialFavorited as props
 - Integrate useOptimisticFavorite hook for state management
 - Use Lucide React Heart icon with filled/unfilled states
@@ -309,11 +340,13 @@ None
 - Support variant props for different sizes and styles
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders correctly in all states
 - [ ] Icon toggles between filled and unfilled appropriately
 - [ ] Loading state displays during action
@@ -334,11 +367,13 @@ npm run lint:fix && npm run typecheck
 None
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[id]/page.tsx` - Collection detail page
 - `src/app/(app)/collections/[collectionId]/subcollections/[subcollectionId]/page.tsx` - Subcollection detail page
 - `src/app/(app)/bobbleheads/[id]/page.tsx` - Bobblehead detail page
 
 **Changes:**
+
 - Import FavoriteButton component into each detail page
 - Fetch current favorite status for the authenticated user in server component
 - Pass entityType, entityId, and initialFavorited props to FavoriteButton
@@ -348,11 +383,13 @@ None
 - Include proper error boundaries for button failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] FavoriteButton appears on all three entity detail pages
 - [ ] Button positioned consistently across pages
 - [ ] Initial favorite status correctly loaded from database
@@ -372,12 +409,14 @@ npm run lint:fix && npm run typecheck
 None
 
 **Files to Modify:**
+
 - `src/components/feature/collections/collection-card.tsx` - Collection card component
 - `src/components/feature/subcollections/subcollection-card.tsx` - Subcollection card component
 - `src/components/feature/bobbleheads/bobblehead-card.tsx` - Bobblehead card component
 - Database schema files to add denormalized favoritesCount columns (collections.ts, subcollections.ts, bobbleheads.ts)
 
 **Changes:**
+
 - Add favoritesCount column to collections, subcollections, and bobbleheads tables in schema
 - Generate and run migration to add denormalized count columns with default value 0
 - Create database triggers or update facades to maintain accurate counts on favorite add/remove
@@ -388,12 +427,14 @@ None
 - Update queries to include favoritesCount in card data fetching
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] favoritesCount columns added to all entity tables
 - [ ] Migration executed successfully
 - [ ] Counts display correctly on all card types
@@ -410,14 +451,17 @@ npm run db:generate
 **Confidence**: Medium-High
 
 **Files to Create:**
+
 - `src/app/(app)/dashboard/favorites/page.tsx` - Favorites dashboard page component
 - `src/components/feature/favorites/favorites-table.tsx` - Table component for favorites display
 - `src/components/feature/favorites/favorites-filters.tsx` - Filter controls component
 
 **Files to Modify:**
+
 - Navigation components to add link to favorites page
 
 **Changes:**
+
 - Create server component page fetching user favorites with pagination
 - Implement FavoritesTable using TanStack React Table with columns for entity type, name, image, date favorited
 - Add entity type filter using Nuqs for URL state management
@@ -431,11 +475,13 @@ npm run db:generate
 - Add loading states using Suspense boundaries
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Favorites page renders with proper layout
 - [ ] Table displays all favorited items correctly
 - [ ] Filtering by entity type works via URL parameters
@@ -457,10 +503,12 @@ npm run lint:fix && npm run typecheck
 None
 
 **Files to Modify:**
+
 - `src/components/layout/dashboard-nav.tsx` - Dashboard navigation component
 - `src/components/layout/mobile-nav.tsx` - Mobile navigation component (if exists)
 
 **Changes:**
+
 - Import Heart icon from Lucide React
 - Add favorites nav item with icon, label, and route to /dashboard/favorites
 - Position near other dashboard sections like collections, bobbleheads
@@ -470,11 +518,13 @@ None
 - Add proper aria-labels for accessibility
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Favorites link appears in dashboard navigation
 - [ ] Link routes correctly to favorites page
 - [ ] Active state highlights properly
@@ -494,10 +544,12 @@ npm run lint:fix && npm run typecheck
 None
 
 **Files to Modify:**
+
 - `src/lib/queries/favorites.ts` - Add bulk status query (from Step 4 if not already included)
 - Collection, subcollection, and bobblehead listing page components
 
 **Changes:**
+
 - Ensure getBulkFavoriteStatus query exists accepting array of entity IDs and type
 - Update listing pages to fetch favorite statuses for all displayed entities in single query
 - Pass favorite status to card components as prop
@@ -507,11 +559,13 @@ None
 - Cache favorite status data appropriately
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bulk query fetches all statuses in single database call
 - [ ] Listing pages show favorite indicators on cards
 - [ ] No N+1 query issues in database logs
@@ -531,10 +585,12 @@ npm run lint:fix && npm run typecheck
 None
 
 **Files to Modify:**
+
 - `src/lib/facades/favorites.ts` - Update with cache invalidation (from Step 5)
 - `src/lib/cache/tags.ts` - Ensure all tags defined (from Step 5)
 
 **Changes:**
+
 - Add revalidateTag calls in facades for FAVORITES_BY_USER tag on any user favorite change
 - Invalidate FAVORITES_BY_ENTITY tag for specific entity when favorites change
 - Invalidate FAVORITES_COUNT tag to update denormalized counts
@@ -545,11 +601,13 @@ None
 - Verify counts update across all views
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All relevant cache tags invalidated on mutations
 - [ ] UI updates across different pages after favorite changes
 - [ ] Counts reflect accurate values after revalidation
@@ -569,9 +627,11 @@ npm run lint:fix && npm run typecheck
 None
 
 **Files to Modify:**
+
 - `src/lib/db/schema/favorites.ts` - Add any missing indexes (should be from Step 1)
 
 **Changes:**
+
 - Verify index on userId for getUserFavorites query
 - Confirm composite index on (entityType, entityId) for favorites count queries
 - Add index on createdAt if sorting by date is common
@@ -581,6 +641,7 @@ None
 - Test query performance with significant data volume
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run db:generate
@@ -588,6 +649,7 @@ npm run db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] All necessary indexes created in database
 - [ ] EXPLAIN ANALYZE shows index usage for queries
 - [ ] Query performance acceptable under load
@@ -607,11 +669,13 @@ npm run db:generate
 None
 
 **Files to Modify:**
+
 - `src/lib/actions/favorites.ts` - Enhance error handling
 - `src/components/ui/favorite-button.tsx` - Add error displays
 - `src/app/(app)/dashboard/favorites/page.tsx` - Add error boundaries
 
 **Changes:**
+
 - Add authentication error handling in server actions with appropriate error messages
 - Implement authorization checks preventing users from favoriting non-public entities
 - Handle database constraint violations gracefully (duplicate favorites)
@@ -623,11 +687,13 @@ None
 - Test error scenarios: unauthenticated, unauthorized, network failures, database errors
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Authentication errors handled with redirect to sign-in
 - [ ] Duplicate favorite attempts handled gracefully
 - [ ] User receives clear error messages
@@ -644,12 +710,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/types/favorites.ts` - Type definitions for favorites feature
 
 **Files to Modify:**
+
 - `src/lib/types/index.ts` - Export favorites types if barrel file exists (though project avoids barrel files)
 
 **Changes:**
+
 - Define EntityType enum or union type for collection/subcollection/bobblehead
 - Create Favorite type inferred from Drizzle schema
 - Define FavoriteWithEntity type including joined entity data
@@ -661,11 +730,13 @@ npm run lint:fix && npm run typecheck
 - Verify type inference works correctly in all components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All types properly defined and documented
 - [ ] Type inference works in IDE
 - [ ] No any types used anywhere in favorites feature
@@ -682,6 +753,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `tests/lib/queries/favorites.test.ts` - Unit tests for favorites queries
 - `tests/lib/facades/favorites.test.ts` - Unit tests for favorites facades
 
@@ -689,6 +761,7 @@ npm run lint:fix && npm run typecheck
 None
 
 **Changes:**
+
 - Set up test database with Testcontainers for integration tests
 - Write tests for getFavoritesByUserId with various filters
 - Test getFavoriteStatus for all entity types
@@ -701,6 +774,7 @@ None
 - Achieve high code coverage on queries and facades
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test tests/lib/queries/favorites.test.ts
@@ -708,6 +782,7 @@ npm run test tests/lib/facades/favorites.test.ts
 ```
 
 **Success Criteria:**
+
 - [ ] All query functions have test coverage
 - [ ] All facade functions tested including error paths
 - [ ] Tests pass consistently
@@ -724,12 +799,14 @@ npm run test tests/lib/facades/favorites.test.ts
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `tests/lib/actions/favorites.test.ts` - Integration tests for favorites actions
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Mock Clerk authentication in test environment
 - Test toggleFavoriteAction with authenticated user
 - Verify action rejects unauthenticated requests
@@ -742,12 +819,14 @@ None
 - Test authorization for private entities
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test tests/lib/actions/favorites.test.ts
 ```
 
 **Success Criteria:**
+
 - [ ] Server actions tested with mocked authentication
 - [ ] Validation schema enforcement verified
 - [ ] Database changes verified after actions
@@ -764,12 +843,14 @@ npm run test tests/lib/actions/favorites.test.ts
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `tests/components/ui/favorite-button.test.tsx` - Component tests for FavoriteButton
 
 **Files to Modify:**
 None
 
 **Changes:**
+
 - Set up Testing Library with React 19 compatibility
 - Mock useOptimisticFavorite hook
 - Test button renders in favorited and unfavorited states
@@ -782,12 +863,14 @@ None
 - Test keyboard navigation and interaction
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test tests/components/ui/favorite-button.test.tsx
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders correctly in all states
 - [ ] User interactions trigger expected behavior
 - [ ] Loading states tested
@@ -804,13 +887,16 @@ npm run test tests/components/ui/favorite-button.test.tsx
 **Confidence**: High
 
 **Files to Create:**
+
 - `docs/2025_10_22/specs/FavoritesFeature.md` - Feature specification and implementation notes
 - `docs/2025_10_22/database/favorites-schema.md` - Database schema documentation
 
 **Files to Modify:**
+
 - `CLAUDE.md` - Add favorites feature to key features list if appropriate
 
 **Changes:**
+
 - Document database schema design with entity-relationship diagram
 - List all API endpoints and server actions for favorites
 - Document cache invalidation strategy
@@ -823,11 +909,13 @@ npm run test tests/components/ui/favorite-button.test.tsx
 - Update main project documentation with favorites feature
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix
 ```
 
 **Success Criteria:**
+
 - [ ] All documentation files created in correct docs folder
 - [ ] Schema and API documented comprehensively
 - [ ] Usage examples clear and accurate
@@ -847,9 +935,11 @@ npm run lint:fix
 None
 
 **Files to Modify:**
+
 - Database schema or queries if optimization needed based on testing results
 
 **Changes:**
+
 - Use `/db check performance` to identify slow queries related to favorites
 - Test getUserFavorites query with large datasets (1000+ favorites)
 - Verify bulk favorite status query performance on listing pages
@@ -862,6 +952,7 @@ None
 - Document performance characteristics and limits
 
 **Validation Commands:**
+
 ```bash
 /db check performance
 /db optimize query [identified slow query]
@@ -869,6 +960,7 @@ npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All favorites queries perform under acceptable thresholds
 - [ ] No slow queries identified by database monitoring
 - [ ] Index usage verified for all common queries

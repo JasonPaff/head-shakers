@@ -14,6 +14,7 @@
 ### Discovery Method
 
 Used file-discovery-agent with comprehensive codebase analysis:
+
 - Explored 15+ directories across database schema, actions, queries, facades, validations, components, and app routes
 - Examined 50+ candidate files
 - Content-based discovery (not just filename matching)
@@ -229,7 +230,7 @@ Return your complete analysis with:
 
 34. **`src/middleware.ts`** - REFERENCE
     - Reasoning: Already handles authentication for protected routes
-    - No change: Favorites dashboard automatically protected under /dashboard/*
+    - No change: Favorites dashboard automatically protected under /dashboard/\*
 
 **Base Query Utilities:**
 

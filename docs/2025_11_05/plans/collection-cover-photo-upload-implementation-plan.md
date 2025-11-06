@@ -54,19 +54,23 @@ Implement cover photo upload functionality for collections and subcollections by
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\cloudinary-paths.ts` - Add cover photo folder constants
 
 **Changes:**
+
 - Add `COLLECTION_COVER_PHOTOS` constant with folder path pattern
 - Add `SUBCOLLECTION_COVER_PHOTOS` constant with folder path pattern
 - Ensure naming convention aligns with existing `BOBBLEHEAD_PHOTOS` pattern
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo folder constants added to cloudinary-paths.ts
 - [ ] Constants follow existing naming and structure patterns
 - [ ] All validation commands pass
@@ -80,9 +84,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-cover-upload.tsx` - Single image upload component
 
 **Changes:**
+
 - Create component accepting `onUploadComplete`, `onRemove`, `currentImageUrl`, `uploaderKey` props
 - Implement CldUploadWidget integration for single image upload
 - Add image preview with CldImage when cover photo exists
@@ -92,11 +98,13 @@ npm run lint:fix && npm run typecheck
 - Style consistently with existing cloudinary-photo-upload component
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component created with proper TypeScript types
 - [ ] Handles single image upload with preview
 - [ ] Includes remove functionality with confirmation
@@ -112,9 +120,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\collections\collection-create-dialog.tsx` - Add cover upload field
 
 **Changes:**
+
 - Import CloudinaryCoverUpload component
 - Add cover photo upload field to form layout after name/description fields
 - Wire up form state for coverImageUrl field
@@ -123,11 +133,13 @@ npm run lint:fix && npm run typecheck
 - Maintain existing form submission flow with createCollectionAction
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo field added to creation form
 - [ ] Upload updates form state correctly
 - [ ] Form submission includes coverImageUrl when provided
@@ -143,9 +155,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\collections\collection-edit-dialog.tsx` - Add cover management
 
 **Changes:**
+
 - Import CloudinaryCoverUpload component
 - Add cover photo section to edit form
 - Display current cover photo if exists using CldImage
@@ -155,11 +169,13 @@ npm run lint:fix && npm run typecheck
 - Ensure updateCollectionAction receives coverImageUrl updates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Current cover photo displayed when exists
 - [ ] Upload replaces existing cover photo
 - [ ] Remove functionality clears cover photo
@@ -175,9 +191,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\subcollections\subcollection-create-dialog.tsx` - Add cover upload
 
 **Changes:**
+
 - Import CloudinaryCoverUpload component
 - Add cover photo upload field to form layout
 - Wire up form state for coverImageUrl field
@@ -186,11 +204,13 @@ npm run lint:fix && npm run typecheck
 - Maintain existing parent collection context
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo field added to subcollection creation
 - [ ] Upload updates form state correctly
 - [ ] Form submission includes coverImageUrl
@@ -206,9 +226,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\subcollections\subcollection-edit-dialog.tsx` - Add cover management
 
 **Changes:**
+
 - Import CloudinaryCoverUpload component
 - Add cover photo section to edit form
 - Display current cover photo if exists
@@ -218,11 +240,13 @@ npm run lint:fix && npm run typecheck
 - Ensure updateSubcollectionAction receives updates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Current cover photo displayed when exists
 - [ ] Upload/replace functionality works
 - [ ] Remove clears cover photo
@@ -238,9 +262,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\collections\collections.facade.ts` - Add cleanup logic
 
 **Changes:**
+
 - Locate deleteCollection method in collections facade
 - Add cover photo deletion logic using cloudinary.service deleteImage
 - Extract public ID from coverImageUrl before deletion
@@ -249,11 +275,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for Cloudinary deletion failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo deleted from Cloudinary on collection deletion
 - [ ] Deletion integrated into existing transaction flow
 - [ ] Error handling prevents deletion blocking
@@ -269,9 +297,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\collections\subcollections.facade.ts` - Add cleanup logic
 
 **Changes:**
+
 - Locate deleteSubcollection method in subcollections facade
 - Add cover photo deletion using cloudinary.service deleteImage
 - Extract public ID from coverImageUrl before deletion
@@ -280,11 +310,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for Cloudinary failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo deleted from Cloudinary on subcollection deletion
 - [ ] Integrated into transaction flow
 - [ ] Error handling implemented
@@ -300,9 +332,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections\[collectionId]\(collection)\components\collection-header.tsx` - Add cover display
 
 **Changes:**
+
 - Import CldImage from next-cloudinary
 - Add cover photo section at top of header component
 - Display cover photo using CldImage with optimization when coverImageUrl exists
@@ -312,11 +346,13 @@ npm run lint:fix && npm run typecheck
 - Ensure cover photo doesn't interfere with existing header elements
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo displayed prominently in collection header
 - [ ] CldImage optimization applied
 - [ ] Responsive sizing works across viewports
@@ -332,9 +368,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\collection-card.tsx` - Add cover display
 
 **Changes:**
+
 - Import CldImage from next-cloudinary
 - Add cover photo section to card layout
 - Display cover using CldImage with thumbnail optimization
@@ -344,11 +382,13 @@ npm run lint:fix && npm run typecheck
 - Maintain existing card hover and interaction states
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo displayed in collection cards
 - [ ] Thumbnail optimization applied
 - [ ] Consistent card layout maintained
@@ -364,9 +404,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections\[collectionId]\subcollection\[subcollectionId]\components\subcollection-header.tsx` - Add cover display
 
 **Changes:**
+
 - Import CldImage from next-cloudinary
 - Add cover photo section to subcollection header
 - Display cover using CldImage with optimization
@@ -376,11 +418,13 @@ npm run lint:fix && npm run typecheck
 - Ensure header hierarchy remains clear
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photo displayed in subcollection header
 - [ ] Styling consistent with collection headers
 - [ ] Responsive sizing implemented
@@ -396,9 +440,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\collections\[collectionId]\(collection)\components\collection-subcollections-list.tsx` - Add cover displays
 
 **Changes:**
+
 - Import CldImage from next-cloudinary
 - Add cover photo to each subcollection list item
 - Display covers using CldImage with small thumbnail optimization
@@ -408,11 +454,13 @@ npm run lint:fix && npm run typecheck
 - Maintain existing subcollection metadata display
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photos shown in subcollections list
 - [ ] Thumbnail optimization applied
 - [ ] Consistent list item layout
@@ -428,9 +476,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\(home)\components\display\featured-collections-display.tsx` - Add cover displays
 
 **Changes:**
+
 - Import CldImage from next-cloudinary
 - Add cover photo display to featured collection cards
 - Implement optimized image loading for hero section
@@ -440,11 +490,13 @@ npm run lint:fix && npm run typecheck
 - Test performance impact of multiple cover images
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover photos displayed in featured collections
 - [ ] Image optimization maintains page performance
 - [ ] Visual hierarchy preserved
@@ -460,13 +512,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\public\images\collection-cover-placeholder.png` - Collection default
 - `C:\Users\JasonPaff\dev\head-shakers\public\images\subcollection-cover-placeholder.png` - Subcollection default
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\cloudinary-paths.ts` - Add placeholder constants
 
 **Changes:**
+
 - Create or obtain collection placeholder image with appropriate branding
 - Create or obtain subcollection placeholder image
 - Add placeholder image paths as constants in cloudinary-paths
@@ -475,11 +530,13 @@ npm run lint:fix && npm run typecheck
 - Export placeholder constants for use across components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Placeholder images added to public folder
 - [ ] Placeholder constants defined
 - [ ] Images optimized for web
@@ -495,9 +552,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\services\cloudinary.service.ts` - Add cover photo preset config
 
 **Changes:**
+
 - Document required Cloudinary upload preset settings for cover photos
 - Add preset name constant for cover photo uploads
 - Define acceptable image formats (JPEG, PNG, WebP)
@@ -507,11 +566,13 @@ npm run lint:fix && npm run typecheck
 - Update CloudinaryCoverUpload component to use preset
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Upload preset configuration documented
 - [ ] Preset constant added to service
 - [ ] Format and size constraints defined
@@ -573,10 +634,12 @@ npm run lint:fix && npm run typecheck
 ## File Discovery Results
 
 ### Critical Priority (2 files)
+
 - src/lib/db/schema/collections.schema.ts - Database schema with coverImageUrl field
 - src/lib/constants/schema-limits.ts - Field constraints and validation limits
 
 ### High Priority (15 files)
+
 - src/lib/validations/collections.validation.ts - Zod validation
 - src/lib/validations/subcollections.validation.ts - Zod validation
 - src/lib/validations/photo-upload.validation.ts - Reference pattern
@@ -594,12 +657,14 @@ npm run lint:fix && npm run typecheck
 - src/lib/constants/cloudinary-paths.ts - Cloudinary folder paths
 
 ### Medium Priority (19 files)
+
 - Form components (collection/subcollection create/edit dialogs)
 - Display components (headers, cards, lists, featured collections)
 - Reference components (bobblehead gallery, photo upload)
 - Supporting components (search, admin)
 
 ### Low Priority (6 files)
+
 - Cache services, configuration, defaults
 
 **Total Files Discovered**: 42 highly relevant files across all architectural layers

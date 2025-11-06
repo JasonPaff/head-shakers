@@ -467,15 +467,24 @@ const BobbleheadSearchResult = ({
 
   if (contentType !== 'bobblehead') {
     return (
-      <Card
-        className={cn(
-          'cursor-pointer transition-colors hover:bg-muted/50',
-          selectedContentId === result.id && 'ring-2 ring-primary',
-        )}
-      >
+      <Card className={cn('transition-colors', selectedContentId === result.id && 'ring-2 ring-primary')}>
         <CardContent className={'p-3'}>
-          <div className={'flex items-start justify-between'}>
-            <div className={'flex-1'}>
+          <div className={'flex items-start gap-3'}>
+            {/* Cover Image Preview */}
+            <div className={'flex-shrink-0'}>
+              <div
+                className={
+                  'relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-md bg-muted'
+                }
+              >
+                {result.imageUrl ?
+                  <img alt={result.name} className={'object-cover'} sizes={'64px'} src={result.imageUrl} />
+                : <ImageIcon className={'size-6 text-muted-foreground'} />}
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className={'min-w-0 flex-1'}>
               <CardTitle className={'text-sm font-medium'}>{result.name}</CardTitle>
               <Conditional isCondition={!!result.description}>
                 <CardDescription className={'mt-1 line-clamp-2 text-xs'}>
@@ -496,15 +505,19 @@ const BobbleheadSearchResult = ({
                 </div>
               </Conditional>
             </div>
-            <Button
-              onClick={() => {
-                handleSelect();
-              }}
-              size={'sm'}
-              variant={selectedContentId === result.id ? 'default' : 'outline'}
-            >
-              {selectedContentId === result.id ? 'Selected' : 'Select'}
-            </Button>
+
+            {/* Actions */}
+            <div className={'flex flex-col'}>
+              <Button
+                onClick={() => {
+                  handleSelect();
+                }}
+                size={'sm'}
+                variant={selectedContentId === result.id ? 'default' : 'outline'}
+              >
+                {selectedContentId === result.id ? 'Selected' : 'Select'}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

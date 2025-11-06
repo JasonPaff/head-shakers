@@ -204,17 +204,11 @@ Return your complete analysis with detailed reasoning for each file.
     - **Action**: REFERENCE
     - **Relevance**: Example of nuqs usage with parseAsString, parseAsStringEnum, useQueryStates for URL state
 
-24-28. **UI Components** (card.tsx, badge.tsx, tag-badge.tsx, skeleton.tsx, empty-state.tsx)
-    - **Priority**: MEDIUM
-    - **Action**: REFERENCE
-    - **Relevance**: Supporting UI components for search results display
+24-28. **UI Components** (card.tsx, badge.tsx, tag-badge.tsx, skeleton.tsx, empty-state.tsx) - **Priority**: MEDIUM - **Action**: REFERENCE - **Relevance**: Supporting UI components for search results display
 
 ### Low Priority Files (Context and Reference)
 
-29-43. **Supporting Files** (constants, utilities, schemas, query patterns)
-    - **Priority**: LOW
-    - **Action**: REFERENCE
-    - **Relevance**: Context files for patterns, error codes, cache configuration, Sentry tracking, etc.
+29-43. **Supporting Files** (constants, utilities, schemas, query patterns) - **Priority**: LOW - **Action**: REFERENCE - **Relevance**: Context files for patterns, error codes, cache configuration, Sentry tracking, etc.
 
 ## File Validation Results
 
@@ -229,6 +223,7 @@ Return your complete analysis with detailed reasoning for each file.
 ### Existing Similar Functionality
 
 **Admin Content Search Infrastructure**:
+
 - Full-text search using PostgreSQL ILIKE with GIN indexes
 - Tag-based filtering (include/exclude)
 - Photo aggregation for bobbleheads
@@ -253,21 +248,25 @@ Return your complete analysis with detailed reasoning for each file.
 ## Recommended Approach
 
 ### Phase 1 - Query Layer
+
 - Extend `ContentSearchQuery` to add `searchSubcollectionsAsync` method
 - Create unified search method that queries all three types
 - Add permission filtering for user context
 
 ### Phase 2 - Facade & Actions
+
 - Extend `ContentSearchFacade` with user-facing search methods
 - Create new actions in `content-search.actions.ts` using `actionClient`
 - Add validation schema for search input (query, filters, pagination)
 
 ### Phase 3 - UI Components
+
 - Create reusable search result card components
 - Build search page with tabs and filters
 - Make header search bar functional with navigation
 
 ### Phase 4 - Optimization
+
 - Add GIN indexes to subcollections if needed
 - Implement TanStack Query for client-side caching
 - Add keyboard shortcuts and quick search

@@ -122,6 +122,7 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 ### Step Format Validation
 
 Each step validates for:
+
 - ✅ **What**: Clear description of the task
 - ✅ **Why**: Explanation of the purpose
 - ✅ **Confidence**: High/Medium/Low rating
