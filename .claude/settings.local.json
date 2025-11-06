@@ -59,7 +59,10 @@
       "Bash(set:*)",
       "Bash(python:*)",
       "Bash(chcp:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "WebSearch",
+      "WebFetch(domain:cloudinary.com)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "ask": []

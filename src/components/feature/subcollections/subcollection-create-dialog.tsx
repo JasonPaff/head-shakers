@@ -2,7 +2,7 @@
 
 import { useAuth } from '@clerk/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { InsertSubCollectionInput } from '@/lib/validations/subcollections.validation';
@@ -103,6 +103,8 @@ export const SubcollectionCreateDialog = withFocusManagement(
       setCoverImageUrl(undefined);
     };
 
+    const nameRef = useRef<HTMLInputElement>(null);
+
     return (
       <Dialog onOpenChange={handleOpenChange} open={isOpen}>
         <DialogContent className={'sm:max-w-[425px]'}>
@@ -127,7 +129,12 @@ export const SubcollectionCreateDialog = withFocusManagement(
               {/* Name */}
               <form.AppField name={'name'}>
                 {(field) => (
-                  <field.TextField isRequired label={'Name'} placeholder={'Enter subcollection name'} />
+                  <field.TextField
+                    focusRef={nameRef}
+                    isRequired
+                    label={'Name'}
+                    placeholder={'Enter subcollection name'}
+                  />
                 )}
               </form.AppField>
 

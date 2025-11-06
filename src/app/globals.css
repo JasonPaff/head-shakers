@@ -179,3 +179,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* fix Cloudinary upload widget iframe to allow pointer events */
+iframe[data-test="uw-iframe"] {
+  pointer-events: auto !important;
+}

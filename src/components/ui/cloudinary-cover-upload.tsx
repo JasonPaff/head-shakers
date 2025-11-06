@@ -41,6 +41,7 @@ export const CloudinaryCoverUpload = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [uploadError, setUploadError] = useState<string | undefined>(undefined);
+  const [isWidgetMounted, setIsWidgetMounted] = useState(false);
 
   // Event handlers
   const handleSuccess = useCallback(
@@ -87,8 +88,26 @@ export const CloudinaryCoverUpload = ({
 
   return (
     <div className={'space-y-4'}>
-      {/* Upload Widget */}
-      <Conditional isCondition={!_hasCoverImage}>
+      {/* Initial Button - Shows before widget is mounted */}
+      <Conditional isCondition={!_hasCoverImage && !isWidgetMounted}>
+        <Button
+          className={'h-32 w-full border-dashed'}
+          disabled={isDisabled}
+          onClick={() => {
+            setIsWidgetMounted(true);
+          }}
+          type={'button'}
+          variant={'outline'}
+        >
+          <div className={'flex flex-col items-center gap-2'}>
+            <ImagePlusIcon aria-hidden className={'size-8'} />
+            <span>Add Cover Photo</span>
+          </div>
+        </Button>
+      </Conditional>
+
+      {/* Upload Widget - Only mounts when user clicks to add photo */}
+      <Conditional isCondition={!_hasCoverImage && isWidgetMounted}>
         <CldUploadWidget
           onError={handleError}
           onQueuesEnd={handleUploadEnd}
@@ -108,6 +127,26 @@ export const CloudinaryCoverUpload = ({
             showPoweredBy: false,
             showSkipCropButton: false,
             sources: ['local', 'camera', 'url'],
+            styles: {
+              frame: {
+                background: 'rgba(0, 0, 0, 0.5)',
+              },
+              palette: {
+                action: '#FF620C',
+                complete: '#20B832',
+                error: '#F44235',
+                inactiveTabIcon: '#0E2F5A',
+                inProgress: '#0078FF',
+                link: '#0078FF',
+                menuIcons: '#5A616A',
+                sourceBg: '#E4EBF1',
+                tabIcon: '#0078FF',
+                textDark: '#000000',
+                textLight: '#FFFFFF',
+                window: '#FFFFFF',
+                windowBorder: '#90A0B3',
+              },
+            },
           }}
           signatureEndpoint={'/api/upload/sign'}
         >
