@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { SignUpButton } from '@clerk/nextjs';
-import { ArrowRightIcon, HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { ArrowRightIcon, HeartIcon, SearchIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -39,7 +39,7 @@ export default async function HomePage() {
           from around the world.
         </p>
         {/* Collections */}{' '}
-        <div className={'flex justify-center gap-4'}>
+        <div className={'flex flex-wrap justify-center gap-4'}>
           <AuthContent
             fallback={
               <Button asChild size={'lg'}>
@@ -55,6 +55,12 @@ export default async function HomePage() {
           <Button asChild size={'lg'} variant={'outline'}>
             <Link href={$path({ route: '/browse' })}>Browse Collections</Link>
           </Button>
+          <Button asChild size={'lg'} variant={'outline'}>
+            <Link href={$path({ route: '/browse/search' })}>
+              <SearchIcon className={'mr-2 size-5'} />
+              Search
+            </Link>
+          </Button>
         </div>
       </section>
 
@@ -69,12 +75,10 @@ export default async function HomePage() {
 
         {/* View All Featured Link */}
         <div className={'mt-8 flex justify-center'}>
-          <Button asChild size={'lg'} variant={'outline'} className={'group'}>
+          <Button asChild className={'group'} size={'lg'} variant={'outline'}>
             <Link href={$path({ route: '/browse/featured' })}>
               View All Featured Content
-              <ArrowRightIcon
-                className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
-              />
+              <ArrowRightIcon className={'ml-2 size-5 transition-transform group-hover:translate-x-1'} />
             </Link>
           </Button>
         </div>
