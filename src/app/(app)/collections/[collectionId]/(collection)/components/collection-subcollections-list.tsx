@@ -1,13 +1,15 @@
 'use client';
 
-import { ChevronRightIcon, FolderIcon } from 'lucide-react';
+import { ChevronRightIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';
 import { Badge } from '@/components/ui/badge';
 import { Conditional } from '@/components/ui/conditional';
+import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 
 interface CollectionSubcollectionsListProps {
   collectionId: string;
@@ -50,21 +52,25 @@ export const CollectionSubcollectionsList = ({
                 },
               })}
             >
-              {/* Cover Photo or Folder Icon */}
-              <div className={'flex-shrink-0'}>
+              {/* Cover Photo or Placeholder */}
+              <div className={'relative size-12 flex-shrink-0 overflow-hidden rounded-md bg-muted'}>
                 <Conditional isCondition={!!subcollection.coverImageUrl}>
-                  <div className={'relative size-12 overflow-hidden rounded-md bg-muted'}>
-                    <CldImage
-                      alt={`${subcollection.name} cover`}
-                      className={'object-cover'}
-                      fill
-                      sizes={'48px'}
-                      src={subcollection.coverImageUrl ?? ''}
-                    />
-                  </div>
+                  <CldImage
+                    alt={`${subcollection.name} cover`}
+                    className={'object-cover'}
+                    fill
+                    sizes={'48px'}
+                    src={subcollection.coverImageUrl ?? ''}
+                  />
                 </Conditional>
                 <Conditional isCondition={!subcollection.coverImageUrl}>
-                  <FolderIcon aria-hidden className={'size-5 text-primary'} />
+                  <Image
+                    alt={'Subcollection placeholder'}
+                    className={'object-cover'}
+                    fill
+                    sizes={'48px'}
+                    src={CLOUDINARY_PATHS.PLACEHOLDERS.SUBCOLLECTION_COVER}
+                  />
                 </Conditional>
               </div>
 

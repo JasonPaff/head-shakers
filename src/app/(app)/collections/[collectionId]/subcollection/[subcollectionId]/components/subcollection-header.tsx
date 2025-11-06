@@ -1,12 +1,12 @@
 import 'server-only';
 import { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';
-import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
 
 import type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';
 
+import { SubCollectionCoverPhoto } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-cover-photo';
 import { SubcollectionEditSection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-edit-section';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { SubcollectionDelete } from '@/components/feature/subcollections/subcollection-delete';
@@ -75,18 +75,7 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
       </div>
 
       {/* Cover Photo */}
-      <Conditional isCondition={!!subcollection.coverImageUrl}>
-        <div className={'relative mb-6 aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted'}>
-          <CldImage
-            alt={`${subcollection.name} cover photo`}
-            className={'object-cover'}
-            fill
-            preload
-            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px'}
-            src={subcollection.coverImageUrl ?? ''}
-          />
-        </div>
-      </Conditional>
+      <SubCollectionCoverPhoto subcollection={subcollection} />
 
       <div className={'flex flex-col gap-6'}>
         {/* Subcollection Info */}

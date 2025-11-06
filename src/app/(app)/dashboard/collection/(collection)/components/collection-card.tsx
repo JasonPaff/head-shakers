@@ -3,6 +3,7 @@
 import { ChevronDownIcon, ChevronRightIcon, EyeIcon, LockIcon, PlusIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
@@ -15,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
+import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 
 interface CollectionCardProps {
   collection: CollectionDashboardData;
@@ -29,8 +31,8 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
   return (
     <Card className={'relative flex flex-col'}>
       {/* Cover Photo */}
-      <Conditional isCondition={!!collection.coverImageUrl}>
-        <div className={'relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted'}>
+      <div className={'relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted'}>
+        <Conditional isCondition={!!collection.coverImageUrl}>
           <CldImage
             alt={`${collection.name} cover photo`}
             className={'object-cover'}
@@ -38,8 +40,17 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
             sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
             src={collection.coverImageUrl ?? ''}
           />
-        </div>
-      </Conditional>
+        </Conditional>
+        <Conditional isCondition={!collection.coverImageUrl}>
+          <Image
+            alt={'Collection placeholder'}
+            className={'object-cover'}
+            fill
+            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
+            src={CLOUDINARY_PATHS.PLACEHOLDERS.COLLECTION_COVER}
+          />
+        </Conditional>
+      </div>
 
       <CardHeader className={'pb-3'}>
         {/* Title and Privacy Status */}

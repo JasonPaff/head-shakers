@@ -29,6 +29,7 @@ export interface FeaturedContentData {
 export interface RawFeaturedContentData {
   bobbleheadLikes: null | number;
   bobbleheadOwner: null | string;
+  collectionCoverImageUrl: null | string;
   collectionOwner: null | string;
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
@@ -103,7 +104,7 @@ export class FeaturedContentTransformer {
       endDate: row.endDate,
       featureType: row.featureType,
       id: row.id,
-      imageUrl: row.imageUrl,
+      imageUrl: row.imageUrl || (row.contentType === 'collection' ? row.collectionCoverImageUrl : null),
       isActive: row.isActive,
       likes: row.bobbleheadLikes || 0,
       owner: this.determineContentOwner(row),

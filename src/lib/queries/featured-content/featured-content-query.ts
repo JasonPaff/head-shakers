@@ -81,6 +81,7 @@ export class FeaturedContentQuery extends BaseQuery {
       .select({
         bobbleheadLikes: bobbleheads.likeCount,
         bobbleheadOwner: bobbleheads.userId,
+        collectionCoverImageUrl: collections.coverImageUrl,
         collectionOwner: collections.userId,
         contentId: featuredContent.contentId,
         contentType: featuredContent.contentType,

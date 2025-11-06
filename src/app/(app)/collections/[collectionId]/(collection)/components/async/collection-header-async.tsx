@@ -13,6 +13,7 @@ interface CollectionHeaderAsyncProps {
 
 export const CollectionHeaderAsync = async ({ collectionId }: CollectionHeaderAsyncProps) => {
   const currentUserId = await getOptionalUserId();
+
   const [collection, likeData] = await Promise.all([
     CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined),
     SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId || undefined),
