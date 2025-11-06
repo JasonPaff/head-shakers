@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { SignUpButton } from '@clerk/nextjs';
-import { HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { ArrowRightIcon, HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -67,6 +67,21 @@ export default async function HomePage() {
           </Suspense>
         </FeaturedCollectionsErrorBoundary>
 
+        {/* View All Featured Link */}
+        <div className={'mt-8 flex justify-center'}>
+          <Button asChild size={'lg'} variant={'outline'} className={'group'}>
+            <Link href={$path({ route: '/browse/featured' })}>
+              View All Featured Content
+              <ArrowRightIcon
+                className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
+              />
+            </Link>
+          </Button>
+        </div>
+      </section>
+
+      {/* Join the Community */}
+      <section className={'py-12'}>
         {/* Call to Action */}
         <div className={'mt-8 rounded-2xl bg-primary/10 p-8'}>
           <div className={'mb-8 text-center'}>

@@ -24145,3 +24145,176 @@ Input:
   "description": "Run type checking and linting"
 }
 ================================================================================
+
+================================================================================
+2025-11-06T01:16:52.389Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/page.tsx",
+  "path": "src/app/(app)"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:16:52.405Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/page.tsx",
+  "path": "src/app"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:16:58.904Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\(home)\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:17:11.885Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\(home)\\page.tsx",
+  "old_string": "import type { Metadata } from 'next';\n\nimport { SignUpButton } from '@clerk/nextjs';\nimport { HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\nimport { Suspense } from 'react';",
+  "new_string": "import type { Metadata } from 'next';\n\nimport { SignUpButton } from '@clerk/nextjs';\nimport { ArrowRightIcon, HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\nimport { Suspense } from 'react';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:17:21.500Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\(home)\\page.tsx",
+  "old_string": "      {/* Featured Collections */}\n      <section className={'py-12'}>\n        <h2 className={'mb-8 text-center text-3xl font-bold'}>Featured Collections</h2>\n        <FeaturedCollectionsErrorBoundary>\n          <Suspense fallback={<FeaturedCollectionsSkeleton />}>\n            <FeaturedCollectionsAsync currentUserId={currentUserId} />\n          </Suspense>\n        </FeaturedCollectionsErrorBoundary>\n\n        {/* Call to Action */}",
+  "new_string": "      {/* Featured Collections */}\n      <section className={'py-12'}>\n        <h2 className={'mb-8 text-center text-3xl font-bold'}>Featured Collections</h2>\n        <FeaturedCollectionsErrorBoundary>\n          <Suspense fallback={<FeaturedCollectionsSkeleton />}>\n            <FeaturedCollectionsAsync currentUserId={currentUserId} />\n          </Suspense>\n        </FeaturedCollectionsErrorBoundary>\n\n        {/* View All Featured Link */}\n        <div className={'mt-8 flex justify-center'}>\n          <Button asChild size={'lg'} variant={'outline'} className={'group'}>\n            <Link href={$path({ route: '/browse/featured' })}>\n              View All Featured Content\n              <ArrowRightIcon\n                className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}\n              />\n            </Link>\n          </Button>\n        </div>\n      </section>\n\n      {/* Join the Community */}\n      <section className={'py-12'}>\n        {/* Call to Action */}"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:18:35.984Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Step 1: Add Cloudinary folder constants for cover photos",
+      "status": "pending",
+      "activeForm": "Adding Cloudinary folder constants for cover photos"
+    },
+    {
+      "content": "Step 2: Create cover photo upload component",
+      "status": "pending",
+      "activeForm": "Creating cover photo upload component"
+    },
+    {
+      "content": "Step 3: Integrate cover upload in collection create dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in collection create dialog"
+    },
+    {
+      "content": "Step 4: Integrate cover upload in collection edit dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in collection edit dialog"
+    },
+    {
+      "content": "Step 5: Integrate cover upload in subcollection create dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in subcollection create dialog"
+    },
+    {
+      "content": "Step 6: Integrate cover upload in subcollection edit dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in subcollection edit dialog"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:18:43.374Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cloudinary-paths.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:18:44.417Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Step 1: Add Cloudinary folder constants for cover photos",
+      "status": "in_progress",
+      "activeForm": "Adding Cloudinary folder constants for cover photos"
+    },
+    {
+      "content": "Step 2: Create cover photo upload component",
+      "status": "pending",
+      "activeForm": "Creating cover photo upload component"
+    },
+    {
+      "content": "Step 3: Integrate cover upload in collection create dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in collection create dialog"
+    },
+    {
+      "content": "Step 4: Integrate cover upload in collection edit dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in collection edit dialog"
+    },
+    {
+      "content": "Step 5: Integrate cover upload in subcollection create dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in subcollection create dialog"
+    },
+    {
+      "content": "Step 6: Integrate cover upload in subcollection edit dialog",
+      "status": "pending",
+      "activeForm": "Integrating cover upload in subcollection edit dialog"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:18:54.129Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cloudinary-paths.ts",
+  "old_string": "  PATTERNS: {\n    BOBBLEHEAD_ROOT: 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}',\n    COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',\n    PROFILE_PHOTOS: 'users/{userId}/profile',\n    TEMP_UPLOADS: 'temp/uploads/{userId}',\n    USER_ROOT: 'users/{userId}',\n  },",
+  "new_string": "  PATTERNS: {\n    BOBBLEHEAD_ROOT: 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}',\n    COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',\n    COLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/cover',\n    SUBCOLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',\n    PROFILE_PHOTOS: 'users/{userId}/profile',\n    TEMP_UPLOADS: 'temp/uploads/{userId}',\n    USER_ROOT: 'users/{userId}',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:19:01.819Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cloudinary-paths.ts",
+  "old_string": "  /**\n   * build a path for collection photos\n   */\n  collectionPath: (userId: string, collectionId: string): string => {\n    return `users/${userId}/collections/${collectionId}`;\n  },\n\n  /**\n   * build a path for user profile photos\n   */\n  profilePath: (userId: string): string => {\n    return `users/${userId}/profile`;\n  },",
+  "new_string": "  /**\n   * build a path for collection photos\n   */\n  collectionPath: (userId: string, collectionId: string): string => {\n    return `users/${userId}/collections/${collectionId}`;\n  },\n\n  /**\n   * build a path for collection cover photos\n   */\n  collectionCoverPath: (userId: string, collectionId: string): string => {\n    return `users/${userId}/collections/${collectionId}/cover`;\n  },\n\n  /**\n   * build a path for subcollection cover photos\n   */\n  subcollectionCoverPath: (userId: string, collectionId: string, subcollectionId: string): string => {\n    return `users/${userId}/collections/${collectionId}/subcollections/${subcollectionId}/cover`;\n  },\n\n  /**\n   * build a path for user profile photos\n   */\n  profilePath: (userId: string): string => {\n    return `users/${userId}/profile`;\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-06T01:19:07.782Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run lint and typecheck validation"
+}
+================================================================================
