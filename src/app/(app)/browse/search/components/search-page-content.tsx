@@ -6,9 +6,9 @@ import { Fragment, useEffect, useState, useTransition } from 'react';
 
 import type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';
 
-import { SearchFilters } from '@/components/feature/search/search-filters';
-import { SearchPagination } from '@/components/feature/search/search-pagination';
-import { SearchResultsGrid } from '@/components/feature/search/search-results-grid';
+import { SearchFilters } from '@/app/(app)/browse/search/components/search-filters';
+import { SearchPagination } from '@/app/(app)/browse/search/components/search-pagination';
+import { SearchResultsGrid } from '@/app/(app)/browse/search/components/search-results-grid';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Spinner } from '@/components/ui/spinner';
 import { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';
