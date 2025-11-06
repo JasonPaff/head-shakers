@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
-import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 
 export interface FeaturedCollection {
   comments: number;
@@ -57,7 +56,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
                     gravity={'auto'}
                     height={400}
                     quality={'auto:good'}
-                    src={extractPublicIdFromCloudinaryUrl(collection.imageUrl ?? '')}
+                    src={collection.imageUrl ?? ''}
                     width={533}
                   />
                 : <Image
