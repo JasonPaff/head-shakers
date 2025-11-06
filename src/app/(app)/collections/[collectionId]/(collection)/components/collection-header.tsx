@@ -1,5 +1,6 @@
 import 'server-only';
 import { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -70,6 +71,20 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
           </Conditional>
         </div>
       </div>
+
+      {/* Cover Photo */}
+      <Conditional isCondition={!!collection.coverImageUrl}>
+        <div className={'relative mb-6 aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted'}>
+          <CldImage
+            alt={`${collection.name} cover photo`}
+            className={'object-cover'}
+            fill
+            preload
+            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px'}
+            src={collection.coverImageUrl ?? ''}
+          />
+        </div>
+      </Conditional>
 
       <div className={'flex flex-col gap-6'}>
         {/* Collection Info */}

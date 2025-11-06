@@ -27984,3 +27984,990 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-06T03:03:11.987Z
+Tool: BashOutput
+Input:
+{
+  "bash_id": "7568b3"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:03:12.249Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "pending",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:03:19.723Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "in_progress",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "pending",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:03:20.003Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-header.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:03:37.312Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-header.tsx",
+  "old_string": "import 'server-only';\nimport { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\nimport { Fragment } from 'react';\n\nimport type { PublicCollection } from '@/lib/facades/collections/collections.facade';\n\nimport { CollectionEditSection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-edit-section';\nimport { CollectionDelete } from '@/components/feature/collections/collection-delete';\nimport { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';\nimport { ReportButton } from '@/components/feature/content-reports/report-button';\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeIconButton } from '@/components/ui/like-button';\nimport { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';",
+  "new_string": "import 'server-only';\nimport { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport { CldImage } from 'next-cloudinary';\nimport Link from 'next/link';\nimport { Fragment } from 'react';\n\nimport type { PublicCollection } from '@/lib/facades/collections/collections.facade';\n\nimport { CollectionEditSection } from '@/app/(app)/collections/[collectionId]/(collection)/components/collection-edit-section';\nimport { CollectionDelete } from '@/components/feature/collections/collection-delete';\nimport { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';\nimport { ReportButton } from '@/components/feature/content-reports/report-button';\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeIconButton } from '@/components/ui/like-button';\nimport { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:03:47.511Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-header.tsx",
+  "old_string": "      </div>\n\n      <div className={'flex flex-col gap-6'}>\n        {/* Collection Info */}\n        <div>\n          <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{collection.name}</h1>\n          <p className={'text-lg text-pretty text-muted-foreground'}>{collection.description}</p>\n        </div>",
+  "new_string": "      </div>\n\n      {/* Cover Photo */}\n      <Conditional isCondition={!!collection.coverImageUrl}>\n        <div className={'relative mb-6 aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted'}>\n          <CldImage\n            alt={`${collection.name} cover photo`}\n            className={'object-cover'}\n            fill\n            priority\n            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px'}\n            src={collection.coverImageUrl ?? ''}\n          />\n        </div>\n      </Conditional>\n\n      <div className={'flex flex-col gap-6'}>\n        {/* Collection Info */}\n        <div>\n          <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{collection.name}</h1>\n          <p className={'text-lg text-pretty text-muted-foreground'}>{collection.description}</p>\n        </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:03:57.995Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:03.745Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "in_progress",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "pending",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:04.043Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\dashboard\\collection\\(collection)\\components\\collection-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:11.207Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:19.692Z
+Tool: Grep
+Input:
+{
+  "pattern": "getCollectionForPublicView",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:24.220Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "offset": 389,
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:31.965Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "    return {\n      createdAt: collection.createdAt,\n      description: collection.description,\n      id: collection.id,\n      isPublic: collection.isPublic,\n      lastUpdatedAt: metrics.lastUpdated,\n      name: collection.name,\n      subCollectionCount: collection.subCollections.length,\n      totalBobbleheadCount: metrics.totalBobbleheads,\n      userId: collection.userId,\n    };",
+  "new_string": "    return {\n      coverImageUrl: collection.coverImageUrl,\n      createdAt: collection.createdAt,\n      description: collection.description,\n      id: collection.id,\n      isPublic: collection.isPublic,\n      lastUpdatedAt: metrics.lastUpdated,\n      name: collection.name,\n      subCollectionCount: collection.subCollections.length,\n      totalBobbleheadCount: metrics.totalBobbleheads,\n      userId: collection.userId,\n    };"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:39.239Z
+Tool: Grep
+Input:
+{
+  "pattern": "CollectionDashboardData",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "output_mode": "content",
+  "-C": 3,
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:44.665Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "offset": 624,
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:54.788Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "export interface CollectionDashboardData {\n  description: null | string;\n  id: string;\n  isPublic: boolean;\n  metrics: CollectionMetrics;\n  name: string;\n  subCollections: Array<{\n    bobbleheadCount: number;\n    description: null | string;\n    id: string;\n    name: string;\n  }>;\n}",
+  "new_string": "export interface CollectionDashboardData {\n  coverImageUrl: null | string;\n  description: null | string;\n  id: string;\n  isPublic: boolean;\n  metrics: CollectionMetrics;\n  name: string;\n  subCollections: Array<{\n    bobbleheadCount: number;\n    description: null | string;\n    id: string;\n    name: string;\n  }>;\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:04:55.797Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "  static transformForDashboard(collection: CollectionWithRelations): CollectionDashboardData {\n    const metrics = this.computeMetrics(collection);\n\n    return {\n      description: collection.description,\n      id: collection.id,\n      isPublic: collection.isPublic,\n      metrics,\n      name: collection.name,\n      subCollections: collection.subCollections.map((sub) => ({\n        bobbleheadCount: sub.bobbleheads.length,\n        description: sub.description,\n        id: sub.id,\n        name: sub.name,\n      })),\n    };\n  }",
+  "new_string": "  static transformForDashboard(collection: CollectionWithRelations): CollectionDashboardData {\n    const metrics = this.computeMetrics(collection);\n\n    return {\n      coverImageUrl: collection.coverImageUrl,\n      description: collection.description,\n      id: collection.id,\n      isPublic: collection.isPublic,\n      metrics,\n      name: collection.name,\n      subCollections: collection.subCollections.map((sub) => ({\n        bobbleheadCount: sub.bobbleheads.length,\n        description: sub.description,\n        id: sub.id,\n        name: sub.name,\n      })),\n    };\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:01.912Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:19.963Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\dashboard\\collection\\(collection)\\components\\collection-card.tsx",
+  "old_string": "'use client';\n\nimport { ChevronDownIcon, ChevronRightIcon, EyeIcon, LockIcon, PlusIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\n\nimport type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';\n\nimport { CollectionActions } from '@/app/(app)/dashboard/collection/(collection)/components/collection-actions';\nimport { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';\nimport { Conditional } from '@/components/ui/conditional';\nimport { useToggle } from '@/hooks/use-toggle';",
+  "new_string": "'use client';\n\nimport { ChevronDownIcon, ChevronRightIcon, EyeIcon, LockIcon, PlusIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport { CldImage } from 'next-cloudinary';\nimport Link from 'next/link';\n\nimport type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';\n\nimport { CollectionActions } from '@/app/(app)/dashboard/collection/(collection)/components/collection-actions';\nimport { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';\nimport { Conditional } from '@/components/ui/conditional';\nimport { useToggle } from '@/hooks/use-toggle';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:27.993Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\dashboard\\collection\\(collection)\\components\\collection-card.tsx",
+  "old_string": "  return (\n    <Card className={'relative flex flex-col'}>\n      <CardHeader className={'pb-3'}>",
+  "new_string": "  return (\n    <Card className={'relative flex flex-col'}>\n      {/* Cover Photo */}\n      <Conditional isCondition={!!collection.coverImageUrl}>\n        <div className={'relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted'}>\n          <CldImage\n            alt={`${collection.name} cover photo`}\n            className={'object-cover'}\n            fill\n            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}\n            src={collection.coverImageUrl ?? ''}\n          />\n        </div>\n      </Conditional>\n\n      <CardHeader className={'pb-3'}>"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:39.817Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:44.925Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "in_progress",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "pending",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:45.255Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\subcollection\\[subcollectionId]\\components\\subcollection-header.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:53.817Z
+Tool: Grep
+Input:
+{
+  "pattern": "export type PublicSubcollection",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "output_mode": "content",
+  "-C": 3,
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:05:59.119Z
+Tool: Grep
+Input:
+{
+  "pattern": "getSubCollectionForPublicView",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:04.042Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "offset": 140,
+  "limit": 40
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:12.509Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "old_string": "  static async getSubCollectionForPublicView(\n    collectionId: string,\n    subcollectionId: string,\n    viewerUserId?: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<null | {\n    bobbleheadCount: number;\n    collectionId: string;\n    collectionName: string;\n    createdAt: Date;\n    description: null | string;\n    featuredBobbleheadCount: number;\n    featurePhoto: null | string;\n    id: string;\n    lastUpdatedAt: Date;\n    name: string;\n    userId?: string;\n  }> {",
+  "new_string": "  static async getSubCollectionForPublicView(\n    collectionId: string,\n    subcollectionId: string,\n    viewerUserId?: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<null | {\n    bobbleheadCount: number;\n    collectionId: string;\n    collectionName: string;\n    coverImageUrl: null | string;\n    createdAt: Date;\n    description: null | string;\n    featuredBobbleheadCount: number;\n    featurePhoto: null | string;\n    id: string;\n    lastUpdatedAt: Date;\n    name: string;\n    userId?: string;\n  }> {"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:20.118Z
+Tool: Grep
+Input:
+{
+  "pattern": "getSubCollectionForPublicViewAsync",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:25.505Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "offset": 97,
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:32.360Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "offset": 146,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:45.128Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "old_string": "  static async getSubCollectionForPublicViewAsync(\n    collectionId: string,\n    subcollectionId: string,\n    context: QueryContext,\n  ): Promise<null | {\n    bobbleheadCount: number;\n    collectionId: string;\n    collectionName: string;\n    createdAt: Date;\n    description: null | string;\n    featuredBobbleheadCount: number;\n    featurePhoto: null | string;\n    id: string;\n    lastUpdatedAt: Date;\n    name: string;\n    userId?: string;\n  }> {",
+  "new_string": "  static async getSubCollectionForPublicViewAsync(\n    collectionId: string,\n    subcollectionId: string,\n    context: QueryContext,\n  ): Promise<null | {\n    bobbleheadCount: number;\n    collectionId: string;\n    collectionName: string;\n    coverImageUrl: null | string;\n    createdAt: Date;\n    description: null | string;\n    featuredBobbleheadCount: number;\n    featurePhoto: null | string;\n    id: string;\n    lastUpdatedAt: Date;\n    name: string;\n    userId?: string;\n  }> {"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:06:46.179Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "old_string": "    return {\n      bobbleheadCount: subCollection.bobbleheads.length,\n      collectionId: subCollection.collectionId,\n      collectionName: collection.name,\n      createdAt: subCollection.createdAt,\n      description: subCollection.description,\n      featuredBobbleheadCount,\n      featurePhoto: subCollection.coverImageUrl,\n      id: subCollection.id,\n      lastUpdatedAt: subCollection.updatedAt,\n      name: subCollection.name,\n      userId: collection.user?.id,\n    };",
+  "new_string": "    return {\n      bobbleheadCount: subCollection.bobbleheads.length,\n      collectionId: subCollection.collectionId,\n      collectionName: collection.name,\n      coverImageUrl: subCollection.coverImageUrl,\n      createdAt: subCollection.createdAt,\n      description: subCollection.description,\n      featuredBobbleheadCount,\n      featurePhoto: subCollection.coverImageUrl,\n      id: subCollection.id,\n      lastUpdatedAt: subCollection.updatedAt,\n      name: subCollection.name,\n      userId: collection.user?.id,\n    };"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:04.630Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\subcollection\\[subcollectionId]\\components\\subcollection-header.tsx",
+  "old_string": "import 'server-only';\nimport { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\nimport { Fragment } from 'react';\n\nimport type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';\n\nimport { SubcollectionEditSection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-edit-section';\nimport { ReportButton } from '@/components/feature/content-reports/report-button';\nimport { SubcollectionDelete } from '@/components/feature/subcollections/subcollection-delete';\nimport { SubcollectionShareMenu } from '@/components/feature/subcollections/subcollection-share-menu';\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeIconButton } from '@/components/ui/like-button';\nimport { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';",
+  "new_string": "import 'server-only';\nimport { ArrowLeftIcon, CalendarIcon, ShareIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport { CldImage } from 'next-cloudinary';\nimport Link from 'next/link';\nimport { Fragment } from 'react';\n\nimport type { PublicSubcollection } from '@/lib/facades/collections/subcollections.facade';\n\nimport { SubcollectionEditSection } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-edit-section';\nimport { ReportButton } from '@/components/feature/content-reports/report-button';\nimport { SubcollectionDelete } from '@/components/feature/subcollections/subcollection-delete';\nimport { SubcollectionShareMenu } from '@/components/feature/subcollections/subcollection-share-menu';\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { LikeIconButton } from '@/components/ui/like-button';\nimport { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:06.033Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\subcollection\\[subcollectionId]\\components\\subcollection-header.tsx",
+  "old_string": "      </div>\n\n      <div className={'flex flex-col gap-6'}>\n        {/* Subcollection Info */}\n        <div>\n          <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{subcollection.name}</h1>\n          <p className={'text-lg text-pretty text-muted-foreground'}>{subcollection.description}</p>\n        </div>",
+  "new_string": "      </div>\n\n      {/* Cover Photo */}\n      <Conditional isCondition={!!subcollection.coverImageUrl}>\n        <div className={'relative mb-6 aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted'}>\n          <CldImage\n            alt={`${subcollection.name} cover photo`}\n            className={'object-cover'}\n            fill\n            priority\n            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px'}\n            src={subcollection.coverImageUrl ?? ''}\n          />\n        </div>\n      </Conditional>\n\n      <div className={'flex flex-col gap-6'}>\n        {/* Subcollection Info */}\n        <div>\n          <h1 className={'mb-3 text-4xl font-bold text-balance text-primary'}>{subcollection.name}</h1>\n          <p className={'text-lg text-pretty text-muted-foreground'}>{subcollection.description}</p>\n        </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:15.796Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:24.624Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "in_progress",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "pending",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "pending",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:25.057Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-subcollections-list.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:39.128Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-subcollections-list.tsx",
+  "old_string": "'use client';\n\nimport { ChevronRightIcon, FolderIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\n\nimport { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';\nimport { Badge } from '@/components/ui/badge';\nimport { Conditional } from '@/components/ui/conditional';",
+  "new_string": "'use client';\n\nimport { ChevronRightIcon, FolderIcon } from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport { CldImage } from 'next-cloudinary';\nimport Link from 'next/link';\n\nimport { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';\nimport { Badge } from '@/components/ui/badge';\nimport { Conditional } from '@/components/ui/conditional';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:40.339Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-subcollections-list.tsx",
+  "old_string": "interface SubcollectionForList {\n  bobbleheadCount: number;\n  description: null | string;\n  id: string;\n  name: string;\n}",
+  "new_string": "interface SubcollectionForList {\n  bobbleheadCount: number;\n  coverImageUrl?: null | string;\n  description: null | string;\n  id: string;\n  name: string;\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:50.164Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-subcollections-list.tsx",
+  "old_string": "            >\n              {/* Folder Icon */}\n              <div className={'flex-shrink-0'}>\n                <FolderIcon aria-hidden className={'size-5 text-primary'} />\n              </div>\n\n              {/* Content */}\n              <div className={'min-w-0 flex-1 overflow-hidden'}>",
+  "new_string": "            >\n              {/* Cover Photo or Folder Icon */}\n              <div className={'flex-shrink-0'}>\n                <Conditional isCondition={!!subcollection.coverImageUrl}>\n                  <div className={'relative size-12 overflow-hidden rounded-md bg-muted'}>\n                    <CldImage\n                      alt={`${subcollection.name} cover`}\n                      className={'object-cover'}\n                      fill\n                      sizes={'48px'}\n                      src={subcollection.coverImageUrl ?? ''}\n                    />\n                  </div>\n                </Conditional>\n                <Conditional isCondition={!subcollection.coverImageUrl}>\n                  <FolderIcon aria-hidden className={'size-5 text-primary'} />\n                </Conditional>\n              </div>\n\n              {/* Content */}\n              <div className={'min-w-0 flex-1 overflow-hidden'}>"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:07:56.873Z
+Tool: Grep
+Input:
+{
+  "pattern": "CollectionSubcollectionsList",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:03.982Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-sidebar-subcollections.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:10.917Z
+Tool: Grep
+Input:
+{
+  "pattern": "getSubCollectionsForPublicView",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\subcollections.facade.ts",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:16.909Z
+Tool: Grep
+Input:
+{
+  "pattern": "getSubCollectionsForPublicViewAsync",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:22.654Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "offset": 205,
+  "limit": 80
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:36.834Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "old_string": "  static async getSubCollectionsForPublicViewAsync(\n    collectionId: string,\n    context: QueryContext,\n  ): Promise<null | {\n    subCollections: Array<{\n      bobbleheadCount: number;\n      description: null | string;\n      featurePhoto: null | string;\n      id: string;\n      name: string;\n    }>;\n    userId?: string;\n  }> {",
+  "new_string": "  static async getSubCollectionsForPublicViewAsync(\n    collectionId: string,\n    context: QueryContext,\n  ): Promise<null | {\n    subCollections: Array<{\n      bobbleheadCount: number;\n      coverImageUrl: null | string;\n      description: null | string;\n      featurePhoto: null | string;\n      id: string;\n      name: string;\n    }>;\n    userId?: string;\n  }> {"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:37.900Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\subcollections.query.ts",
+  "old_string": "    return {\n      subCollections: subCollectionData.map((subCollection) => ({\n        bobbleheadCount: subCollection.bobbleheads.length,\n        description: subCollection.description,\n        featurePhoto: subCollection.coverImageUrl,\n        id: subCollection.id,\n        name: subCollection.name,\n      })),\n      userId: collection.user?.id,\n    };",
+  "new_string": "    return {\n      subCollections: subCollectionData.map((subCollection) => ({\n        bobbleheadCount: subCollection.bobbleheads.length,\n        coverImageUrl: subCollection.coverImageUrl,\n        description: subCollection.description,\n        featurePhoto: subCollection.coverImageUrl,\n        id: subCollection.id,\n        name: subCollection.name,\n      })),\n      userId: collection.user?.id,\n    };"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:48.066Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:54.983Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "in_progress",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "pending",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:08:55.341Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\(home)\\components\\display\\featured-collections-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:07.341Z
+Tool: Grep
+Input:
+{
+  "pattern": "FeaturedCollectionsDisplay",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:13.308Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\(home)\\components\\async\\featured-collections-async.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:20.997Z
+Tool: Grep
+Input:
+{
+  "pattern": "getActiveFeaturedContent",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\featured-content",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:26.223Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\featured-content\\featured-content.facade.ts",
+  "offset": 68,
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:33.209Z
+Tool: Grep
+Input:
+{
+  "pattern": "transformFeaturedContent",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\featured-content",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:38.744Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*transformer*",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\featured-content"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:44.348Z
+Tool: Grep
+Input:
+{
+  "pattern": "FeaturedContentTransformer",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\featured-content\\featured-content.facade.ts",
+  "output_mode": "content",
+  "-C": 5,
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:49.263Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\featured-content\\featured-content-transformer.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:09:57.792Z
+Tool: Grep
+Input:
+{
+  "pattern": "findActiveFeaturedContentAsync",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\featured-content",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:10:04.535Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\featured-content\\featured-content-query.ts",
+  "offset": 76,
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:10:22.561Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "completed",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "in_progress",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:10:22.994Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cloudinary-paths.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:10:37.924Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\cloudinary-paths.ts",
+  "old_string": "/**\n * cloudinary folder path patterns and utilities\n */\nexport const CLOUDINARY_PATHS = {\n  FOLDERS: {\n    BOBBLEHEADS: 'bobbleheads',\n    COLLECTIONS: 'collections',\n    PROFILE: 'profile',\n    TEMP: 'temp',\n    UPLOADS: 'uploads',\n    USERS: 'users',\n  },\n  PATTERNS: {\n    BOBBLEHEAD_ROOT: 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}',\n    COLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/cover',\n    COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',\n    PROFILE_PHOTOS: 'users/{userId}/profile',\n    SUBCOLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',\n    TEMP_UPLOADS: 'temp/uploads/{userId}',\n    USER_ROOT: 'users/{userId}',\n  },\n} as const;",
+  "new_string": "/**\n * cloudinary folder path patterns and utilities\n */\nexport const CLOUDINARY_PATHS = {\n  FOLDERS: {\n    BOBBLEHEADS: 'bobbleheads',\n    COLLECTIONS: 'collections',\n    PROFILE: 'profile',\n    TEMP: 'temp',\n    UPLOADS: 'uploads',\n    USERS: 'users',\n  },\n  PATTERNS: {\n    BOBBLEHEAD_ROOT: 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}',\n    COLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/cover',\n    COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',\n    PROFILE_PHOTOS: 'users/{userId}/profile',\n    SUBCOLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',\n    TEMP_UPLOADS: 'temp/uploads/{userId}',\n    USER_ROOT: 'users/{userId}',\n  },\n  PLACEHOLDERS: {\n    COLLECTION_COVER: '/images/placeholders/collection-cover-placeholder.png',\n    SUBCOLLECTION_COVER: '/images/placeholders/subcollection-cover-placeholder.png',\n  },\n} as const;"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:10:46.043Z
+Tool: Bash
+Input:
+{
+  "command": "ls public/images",
+  "description": "List public images directory"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:10:51.871Z
+Tool: Bash
+Input:
+{
+  "command": "ls public",
+  "description": "List public directory"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:11:01.934Z
+Tool: Bash
+Input:
+{
+  "command": "mkdir -p public/images/placeholders",
+  "description": "Create placeholders directory"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:11:03.824Z
+Tool: Bash
+Input:
+{
+  "command": "cp public/placeholder.jpg public/images/placeholders/collection-cover-placeholder.png && cp public/placeholder.jpg public/images/placeholders/subcollection-cover-placeholder.png",
+  "description": "Copy placeholder to new locations"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:11:16.659Z
+Tool: Bash
+Input:
+{
+  "command": "ls public/images/placeholders",
+  "description": "Verify placeholder files created"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:11:17.937Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck && npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run final validation"
+}
+================================================================================
+
+================================================================================
+2025-11-06T03:12:28.675Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Display Cover Photo in Collection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection header"
+    },
+    {
+      "content": "Display Cover Photo in Collection Card Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to collection card"
+    },
+    {
+      "content": "Display Cover Photo in Subcollection Header Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo display to subcollection header"
+    },
+    {
+      "content": "Display Cover Photos in Subcollections List Component",
+      "status": "completed",
+      "activeForm": "Adding cover photo displays to subcollections list"
+    },
+    {
+      "content": "Display Cover Photos in Featured Collections Display",
+      "status": "completed",
+      "activeForm": "Adding cover photo displays to featured collections"
+    },
+    {
+      "content": "Create Default Placeholder Cover Images",
+      "status": "completed",
+      "activeForm": "Creating default placeholder cover images"
+    }
+  ]
+}
+================================================================================

@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronRightIcon, FolderIcon } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
@@ -16,6 +17,7 @@ interface CollectionSubcollectionsListProps {
 
 interface SubcollectionForList {
   bobbleheadCount: number;
+  coverImageUrl?: null | string;
   description: null | string;
   id: string;
   name: string;
@@ -48,9 +50,22 @@ export const CollectionSubcollectionsList = ({
                 },
               })}
             >
-              {/* Folder Icon */}
+              {/* Cover Photo or Folder Icon */}
               <div className={'flex-shrink-0'}>
-                <FolderIcon aria-hidden className={'size-5 text-primary'} />
+                <Conditional isCondition={!!subcollection.coverImageUrl}>
+                  <div className={'relative size-12 overflow-hidden rounded-md bg-muted'}>
+                    <CldImage
+                      alt={`${subcollection.name} cover`}
+                      className={'object-cover'}
+                      fill
+                      sizes={'48px'}
+                      src={subcollection.coverImageUrl ?? ''}
+                    />
+                  </div>
+                </Conditional>
+                <Conditional isCondition={!subcollection.coverImageUrl}>
+                  <FolderIcon aria-hidden className={'size-5 text-primary'} />
+                </Conditional>
               </div>
 
               {/* Content */}

@@ -146,6 +146,7 @@ export class SubcollectionsFacade {
     bobbleheadCount: number;
     collectionId: string;
     collectionName: string;
+    coverImageUrl: null | string;
     createdAt: Date;
     description: null | string;
     featuredBobbleheadCount: number;

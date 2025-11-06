@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronDownIcon, ChevronRightIcon, EyeIcon, LockIcon, PlusIcon } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
@@ -27,6 +28,19 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
 
   return (
     <Card className={'relative flex flex-col'}>
+      {/* Cover Photo */}
+      <Conditional isCondition={!!collection.coverImageUrl}>
+        <div className={'relative aspect-video w-full overflow-hidden rounded-t-lg bg-muted'}>
+          <CldImage
+            alt={`${collection.name} cover photo`}
+            className={'object-cover'}
+            fill
+            sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
+            src={collection.coverImageUrl ?? ''}
+          />
+        </div>
+      </Conditional>
+
       <CardHeader className={'pb-3'}>
         {/* Title and Privacy Status */}
         <div className={'flex items-start justify-between'}>

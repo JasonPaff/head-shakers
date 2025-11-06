@@ -102,6 +102,7 @@ export class SubcollectionsQuery extends BaseQuery {
     bobbleheadCount: number;
     collectionId: string;
     collectionName: string;
+    coverImageUrl: null | string;
     createdAt: Date;
     description: null | string;
     featuredBobbleheadCount: number;
@@ -158,6 +159,7 @@ export class SubcollectionsQuery extends BaseQuery {
       bobbleheadCount: subCollection.bobbleheads.length,
       collectionId: subCollection.collectionId,
       collectionName: collection.name,
+      coverImageUrl: subCollection.coverImageUrl,
       createdAt: subCollection.createdAt,
       description: subCollection.description,
       featuredBobbleheadCount,
@@ -206,6 +208,7 @@ export class SubcollectionsQuery extends BaseQuery {
   ): Promise<null | {
     subCollections: Array<{
       bobbleheadCount: number;
+      coverImageUrl: null | string;
       description: null | string;
       featurePhoto: null | string;
       id: string;
@@ -252,6 +255,7 @@ export class SubcollectionsQuery extends BaseQuery {
     return {
       subCollections: subCollectionData.map((subCollection) => ({
         bobbleheadCount: subCollection.bobbleheads.length,
+        coverImageUrl: subCollection.coverImageUrl,
         description: subCollection.description,
         featurePhoto: subCollection.coverImageUrl,
         id: subCollection.id,

@@ -26,6 +26,7 @@ import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 export interface CollectionDashboardData {
+  coverImageUrl: null | string;
   description: null | string;
   id: string;
   isPublic: boolean;
@@ -396,6 +397,7 @@ export class CollectionsFacade {
     const metrics = this.computeMetrics(collection);
 
     return {
+      coverImageUrl: collection.coverImageUrl,
       createdAt: collection.createdAt,
       description: collection.description,
       id: collection.id,
@@ -624,6 +626,7 @@ export class CollectionsFacade {
     const metrics = this.computeMetrics(collection);
 
     return {
+      coverImageUrl: collection.coverImageUrl,
       description: collection.description,
       id: collection.id,
       isPublic: collection.isPublic,

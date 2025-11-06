@@ -19,6 +19,10 @@ export const CLOUDINARY_PATHS = {
     TEMP_UPLOADS: 'temp/uploads/{userId}',
     USER_ROOT: 'users/{userId}',
   },
+  PLACEHOLDERS: {
+    COLLECTION_COVER: '/images/placeholders/collection-cover-placeholder.png',
+    SUBCOLLECTION_COVER: '/images/placeholders/subcollection-cover-placeholder.png',
+  },
 } as const;
 
 /**
