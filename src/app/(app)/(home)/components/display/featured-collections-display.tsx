@@ -1,11 +1,13 @@
 'use client';
 
 import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LikeCompactButton } from '@/components/ui/like-button';
+import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 
 export interface FeaturedCollection {
@@ -58,13 +60,13 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
                     src={extractPublicIdFromCloudinaryUrl(collection.imageUrl ?? '')}
                     width={533}
                   />
-                : <div
-                    className={
-                      'flex size-full items-center justify-center bg-gradient-to-br from-muted to-muted-foreground/20'
-                    }
-                  >
-                    <span className={'text-4xl text-muted-foreground/40'}>📦</span>
-                  </div>
+                : <Image
+                    alt={'Collection placeholder'}
+                    className={'size-full object-cover'}
+                    height={400}
+                    src={CLOUDINARY_PATHS.PLACEHOLDERS.COLLECTION_COVER}
+                    width={533}
+                  />
                 }
               </div>
             </Link>
