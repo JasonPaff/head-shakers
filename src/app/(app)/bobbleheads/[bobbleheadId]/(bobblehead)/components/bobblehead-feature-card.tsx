@@ -3,6 +3,7 @@
 import type { KeyboardEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { useState } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
@@ -15,6 +16,7 @@ import { Conditional } from '@/components/ui/conditional';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LikeTextButton } from '@/components/ui/like-button';
 import { useToggle } from '@/hooks/use-toggle';
+import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 const getPrimaryPhotoIndex = (photos: BobbleheadWithRelations['photos']) => {
@@ -74,6 +76,8 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
   const _hasMoreThanThreeTags = bobblehead.tags.length > 3;
   const _topThreeTags = bobblehead.tags.slice(0, 3);
   const _hasMultiplePhotos = bobblehead.photos.length > 1;
+  const _hasImage = _currentMainPhoto?.url && _currentMainPhoto.url !== '/placeholder.jpg';
+  const _hasModalImage = _currentModalPhoto?.url && _currentModalPhoto.url !== '/placeholder.jpg';
 
   return (
     <Card className={'overflow-hidden'}>
@@ -93,11 +97,18 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
           tabIndex={0}
         >
           {/* Featured Image */}
-          <img
-            alt={_currentMainPhoto?.altText ?? bobblehead.name}
-            className={'size-full object-cover'}
-            src={_currentMainPhoto?.url || '/placeholder.jpg'}
-          />
+          {_hasImage ?
+            <CldImage
+              alt={_currentMainPhoto?.altText ?? bobblehead.name}
+              className={'size-full object-cover'}
+              crop={'fill'}
+              format={'auto'}
+              height={800}
+              quality={'auto:good'}
+              src={extractPublicIdFromCloudinaryUrl(_currentMainPhoto.url)}
+              width={600}
+            />
+          : <img alt={bobblehead.name} className={'size-full object-cover'} src={'/placeholder.jpg'} />}
 
           {/* Navigation Arrows  */}
           <Conditional isCondition={_hasMultiplePhotos && isHoveringImage}>
@@ -264,11 +275,23 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
 
             {/* Main image */}
             <div className={'flex max-h-[80vh] w-full items-center justify-center'}>
-              <img
-                alt={_currentModalPhoto?.altText ?? bobblehead.name}
-                className={'max-h-full max-w-full object-contain'}
-                src={_currentModalPhoto?.url || '/placeholder.svg'}
-              />
+              {_hasModalImage ?
+                <CldImage
+                  alt={_currentModalPhoto?.altText ?? bobblehead.name}
+                  className={'max-h-full max-w-full object-contain'}
+                  crop={'pad'}
+                  format={'auto'}
+                  height={1200}
+                  quality={'auto:best'}
+                  src={extractPublicIdFromCloudinaryUrl(_currentModalPhoto.url)}
+                  width={1200}
+                />
+              : <img
+                  alt={bobblehead.name}
+                  className={'max-h-full max-w-full object-contain'}
+                  src={'/placeholder.jpg'}
+                />
+              }
             </div>
 
             {/* Next button */}

@@ -1,7 +1,7 @@
 'use client';
 
+import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
-import Image from 'next/image';
 import Link from 'next/link';
 
 import type {
@@ -14,6 +14,7 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 import { Badge } from '@/components/ui/badge';
 import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
+import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type SearchResultItemProps = ComponentTestIdProps & {
@@ -32,7 +33,7 @@ export const SearchResultItem = ({
 }: SearchResultItemProps) => {
   const searchResultItemTestId = testId || generateTestId('feature', 'search-results', 'result-item');
 
-  // Determine entity URL based on type
+  // determine entity URL based on type
   const entityUrl =
     entityType === 'collection' ?
       $path({ route: '/collections/[collectionId]', routeParams: { collectionId: result.id } })
@@ -76,6 +77,7 @@ export const SearchResultItem = ({
   // Derived conditional variables
   const _hasImage = !!displayImageUrl;
   const _hasDescription = !!displayDescription;
+  const _hasDisplayImage = displayImageUrl && displayImageUrl !== '/placeholder.jpg';
 
   return (
     <Link
@@ -95,13 +97,21 @@ export const SearchResultItem = ({
         isCondition={_hasImage}
       >
         <div className={'relative size-12 shrink-0 overflow-hidden rounded-md bg-muted'}>
-          <Image
-            alt={displayName}
-            className={'object-cover'}
-            fill
-            sizes={'48px'}
-            src={displayImageUrl || ''}
-          />
+          {_hasDisplayImage ?
+            <CldImage
+              alt={displayName}
+              className={'size-full object-cover'}
+              crop={'fill'}
+              format={'auto'}
+              height={48}
+              quality={'auto:good'}
+              src={extractPublicIdFromCloudinaryUrl(displayImageUrl)}
+              width={48}
+            />
+          : <div className={'flex size-full items-center justify-center bg-muted'}>
+              <span className={'text-xs text-muted-foreground'}>No Image</span>
+            </div>
+          }
         </div>
       </Conditional>
 

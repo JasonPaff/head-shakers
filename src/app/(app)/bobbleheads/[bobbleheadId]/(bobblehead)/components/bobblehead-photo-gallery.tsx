@@ -3,6 +3,7 @@
 import type { KeyboardEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { useState } from 'react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
@@ -12,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useToggle } from '@/hooks/use-toggle';
+import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 interface BobbleheadPhotoGalleryCardProps {
@@ -70,11 +72,24 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
                   role={'button'}
                   tabIndex={0}
                 >
-                  <img
-                    alt={altText}
-                    className={'size-full object-cover transition-transform group-hover:scale-105'}
-                    src={photo.url || '/placeholder.svg'}
-                  />
+                  {photo.url && photo.url !== '/placeholder.svg' ? (
+                    <CldImage
+                      alt={altText}
+                      className={'size-full object-cover transition-transform group-hover:scale-105'}
+                      crop={'fill'}
+                      format={'auto'}
+                      height={400}
+                      quality={'auto:good'}
+                      src={extractPublicIdFromCloudinaryUrl(photo.url)}
+                      width={400}
+                    />
+                  ) : (
+                    <img
+                      alt={altText}
+                      className={'size-full object-cover'}
+                      src={'/placeholder.svg'}
+                    />
+                  )}
                   <div className={'absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10'} />
                 </div>
               );
@@ -115,11 +130,24 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
 
             {/* Main image */}
             <div className={'flex max-h-[80vh] w-full items-center justify-center'}>
-              <img
-                alt={_altText}
-                className={'max-h-full max-w-full object-contain'}
-                src={_currentPhoto?.url || '/placeholder.svg'}
-              />
+              {_currentPhoto?.url && _currentPhoto.url !== '/placeholder.svg' ? (
+                <CldImage
+                  alt={_altText}
+                  className={'max-h-full max-w-full object-contain'}
+                  crop={'pad'}
+                  format={'auto'}
+                  height={1200}
+                  quality={'auto:best'}
+                  src={extractPublicIdFromCloudinaryUrl(_currentPhoto.url)}
+                  width={1200}
+                />
+              ) : (
+                <img
+                  alt={_altText}
+                  className={'max-h-full max-w-full object-contain'}
+                  src={'/placeholder.svg'}
+                />
+              )}
             </div>
 
             {/* Next button */}

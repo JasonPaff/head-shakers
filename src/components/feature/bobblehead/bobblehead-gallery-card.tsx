@@ -13,6 +13,7 @@ import {
   ShareIcon,
   TrashIcon,
 } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useMemo } from 'react';
@@ -38,6 +39,7 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { generateTestId } from '@/lib/test-ids';
+import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadCommentsDialog } from './bobblehead-comments-dialog';
@@ -181,6 +183,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
   const hasActualPhotos =
     validPhotos.length > 0 && validPhotos.some((photo) => photo.url !== '/placeholder.jpg');
   const shouldShowGalleryOverlay = hasActualPhotos && isShowPhotoControls;
+  const hasImage = currentPhoto && currentPhoto !== '/placeholder.jpg';
 
   return (
     <Card
@@ -226,16 +229,31 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
         title={'Click to view in gallery'}
       >
         {/* Photo */}
-        <img
-          alt={bobblehead.name || 'Bobblehead'}
-          className={cn(
-            'size-full object-cover transition-all duration-300 group-hover:scale-105',
-            !isCurrentImageLoaded && 'opacity-50',
-          )}
-          onLoad={handleImageLoad}
-          sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
-          src={currentPhoto ?? '/placeholder.jpg'}
-        />
+        {hasImage ?
+          <CldImage
+            alt={bobblehead.name || 'Bobblehead'}
+            className={cn(
+              'size-full object-cover transition-all duration-300 group-hover:scale-105',
+              !isCurrentImageLoaded && 'opacity-50',
+            )}
+            crop={'fill'}
+            format={'auto'}
+            height={400}
+            onLoad={handleImageLoad}
+            quality={'auto:good'}
+            src={extractPublicIdFromCloudinaryUrl(currentPhoto)}
+            width={400}
+          />
+        : <img
+            alt={bobblehead.name || 'Bobblehead'}
+            className={cn(
+              'size-full object-cover transition-all duration-300',
+              !isCurrentImageLoaded && 'opacity-50',
+            )}
+            onLoad={handleImageLoad}
+            src={'/placeholder.jpg'}
+          />
+        }
 
         {/* Overlay */}
         <Conditional isCondition={shouldShowGalleryOverlay}>

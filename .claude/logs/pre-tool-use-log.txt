@@ -21271,3 +21271,808 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-05T22:55:26.039Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "in_progress",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Review and update card components to use CldImage where needed",
+      "status": "pending",
+      "activeForm": "Reviewing and updating card components to use CldImage where needed"
+    },
+    {
+      "content": "Test updated cards to ensure they look great",
+      "status": "pending",
+      "activeForm": "Testing updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:26.486Z
+Tool: Task
+Input:
+{
+  "description": "Find all card components",
+  "prompt": "I need to find all card components used for displaying bobbleheads, collections, and subcollections throughout the app.\n\nPlease search for:\n1. All card components in src/components/feature/ directories (bobblehead, collection, subcollection)\n2. Components that render images for these entities\n3. Check which ones are using native img tags vs CldImage\n4. Look for patterns like \"card\", \"gallery\", \"grid\", \"list\", \"item\" in filenames\n5. Identify components that might need updating to use Cloudinary images\n\nReturn a comprehensive list of all card component files with:\n- File path\n- Current image implementation (img tag, CldImage, Next Image)\n- Current styling approach (object-cover, object-contain, aspect ratios)\n- Whether they need updating or not",
+  "subagent_type": "Explore"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:29.615Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/components/feature/**/*.{tsx,ts}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:29.622Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/components/ui/**/*.{tsx,ts}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:29.631Z
+Tool: Grep
+Input:
+{
+  "pattern": "card|gallery|grid|list|item",
+  "output_mode": "files_with_matches",
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:36.201Z
+Tool: Grep
+Input:
+{
+  "pattern": "CldImage|<img|Image from",
+  "path": "src/components/feature",
+  "output_mode": "files_with_matches",
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:36.203Z
+Tool: Bash
+Input:
+{
+  "command": "find \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\" -type f -name \"*card*\" -o -name \"*gallery*\" -o -name \"*grid*\" -o -name \"*list*\" -o -name \"*item*\" | head -30"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:36.206Z
+Tool: Grep
+Input:
+{
+  "pattern": "bobblehead.*card|collection.*card|card.*bobblehead|card.*collection",
+  "output_mode": "files_with_matches",
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:43.998Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:44.001Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-gallery-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:44.016Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-results-grid.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:45.138Z
+Tool: Grep
+Input:
+{
+  "pattern": "CldImage|<img|from \"next/image\"",
+  "path": "src/components/feature",
+  "output_mode": "content",
+  "-B": 3,
+  "-A": 3,
+  "-n": true,
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:52.034Z
+Tool: Bash
+Input:
+{
+  "command": "grep -r \"CldImage\\|<img\\|from 'next/image'\" \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\" --include=\"*.tsx\" --include=\"*.ts\" | head -50"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:53.134Z
+Tool: Bash
+Input:
+{
+  "command": "find \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\" -type f \\( -name \"*bobblehead*\" -o -name \"*collection*\" -o -name \"*subcollection*\" \\) | sort"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:57.214Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:57.214Z
+Tool: Bash
+Input:
+{
+  "command": "find \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\" -type f -name \"*page.tsx\" | xargs grep -l \"CldImage\\|<img\\|Image\" | head -20"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:55:57.222Z
+Tool: Bash
+Input:
+{
+  "command": "grep -r \"CldImage\" \"C:\\Users\\JasonPaff\\dev\\head-shakers\" --include=\"*.tsx\" --include=\"*.ts\" | head -20"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:30.552Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-hero-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:30.553Z
+Tool: Bash
+Input:
+{
+  "command": "find \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\" -type f -name \"*.tsx\" | xargs grep -l \"BobbleheadGalleryCard\\|SearchResultItem\" | head -20"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:30.554Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\browse\\featured\\components\\display\\featured-tabbed-content-display.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:38.794Z
+Tool: Bash
+Input:
+{
+  "command": "find \"/c/Users/JasonPaff/dev/head-shakers/src/app\" -type f -name \"*.tsx\" | xargs grep -l \"BobbleheadGalleryCard\\|SearchResultItem\" 2>/dev/null | head -20"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:38.795Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/app/**/*collection*card*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:38.800Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/app/**/*bobblehead*card*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:44.612Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\(collection)\\components\\collection-bobbleheads.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:44.617Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\dashboard\\collection\\(collection)\\components\\collection-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:44.620Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:50.691Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\collections\\[collectionId]\\subcollection\\[subcollectionId]\\components\\subcollection-bobbleheads.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:50.695Z
+Tool: Bash
+Input:
+{
+  "command": "find \"/c/Users/JasonPaff/dev/head-shakers/src\" -type f -name \"*.tsx\" | xargs grep -l \"object-cover\\|object-contain\" 2>/dev/null | head -20"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:57:57.315Z
+Tool: Bash
+Input:
+{
+  "command": "find \"/c/Users/JasonPaff/dev/head-shakers/src/app\" -name \"*featured*\" -type f 2>/dev/null | head -20"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:58:01.439Z
+Tool: Bash
+Input:
+{
+  "command": "wc -l \"/c/Users/JasonPaff/dev/head-shakers/src/components/feature/bobblehead/bobblehead-gallery-card.tsx\""
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:58:01.438Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\admin\\featured-content\\components\\featured-content-list-item.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:58:37.024Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "completed",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Update BobbleheadGalleryCard to use CldImage",
+      "status": "in_progress",
+      "activeForm": "Updating BobbleheadGalleryCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadFeatureCard to use CldImage",
+      "status": "pending",
+      "activeForm": "Updating BobbleheadFeatureCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadPhotoGalleryModal to use CldImage",
+      "status": "pending",
+      "activeForm": "Updating BobbleheadPhotoGalleryModal to use CldImage"
+    },
+    {
+      "content": "Update SearchResultItem to use CldImage",
+      "status": "pending",
+      "activeForm": "Updating SearchResultItem to use CldImage"
+    },
+    {
+      "content": "Test all updated cards to ensure they look great",
+      "status": "pending",
+      "activeForm": "Testing all updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:58:37.278Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-gallery-card.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:58:50.764Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-gallery-card.tsx",
+  "old_string": "import { VisuallyHidden } from '@radix-ui/react-visually-hidden';\nimport {\n  ChevronLeftIcon,\n  ChevronRightIcon,\n  FolderIcon,\n  MessageCircleIcon,\n  MoreVerticalIcon,\n  PencilIcon,\n  ShareIcon,\n  TrashIcon,\n} from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport Link from 'next/link';\nimport { useMemo } from 'react';\nimport { useState } from 'react';",
+  "new_string": "import { VisuallyHidden } from '@radix-ui/react-visually-hidden';\nimport {\n  ChevronLeftIcon,\n  ChevronRightIcon,\n  FolderIcon,\n  MessageCircleIcon,\n  MoreVerticalIcon,\n  PencilIcon,\n  ShareIcon,\n  TrashIcon,\n} from 'lucide-react';\nimport { $path } from 'next-typesafe-url';\nimport { CldImage } from 'next-cloudinary';\nimport Link from 'next/link';\nimport { useMemo } from 'react';\nimport { useState } from 'react';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:58:59.833Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-gallery-card.tsx",
+  "old_string": "import { useServerAction } from '@/hooks/use-server-action';\nimport { useToggle } from '@/hooks/use-toggle';\nimport { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';\nimport { generateTestId } from '@/lib/test-ids';\nimport { cn } from '@/utils/tailwind-utils';",
+  "new_string": "import { useServerAction } from '@/hooks/use-server-action';\nimport { useToggle } from '@/hooks/use-toggle';\nimport { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';\nimport { generateTestId } from '@/lib/test-ids';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';\nimport { cn } from '@/utils/tailwind-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:59:13.075Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-gallery-card.tsx",
+  "old_string": "      >\n        {/* Photo */}\n        <img\n          alt={bobblehead.name || 'Bobblehead'}\n          className={cn(\n            'size-full object-cover transition-all duration-300 group-hover:scale-105',\n            !isCurrentImageLoaded && 'opacity-50',\n          )}\n          onLoad={handleImageLoad}\n          sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}\n          src={currentPhoto ?? '/placeholder.jpg'}\n        />",
+  "new_string": "      >\n        {/* Photo */}\n        {currentPhoto && currentPhoto !== '/placeholder.jpg' ? (\n          <CldImage\n            alt={bobblehead.name || 'Bobblehead'}\n            className={cn(\n              'size-full object-cover transition-all duration-300 group-hover:scale-105',\n              !isCurrentImageLoaded && 'opacity-50',\n            )}\n            crop={'fill'}\n            format={'auto'}\n            height={400}\n            onLoad={handleImageLoad}\n            quality={'auto:good'}\n            src={extractPublicIdFromCloudinaryUrl(currentPhoto)}\n            width={400}\n          />\n        ) : (\n          <img\n            alt={bobblehead.name || 'Bobblehead'}\n            className={cn(\n              'size-full object-cover transition-all duration-300',\n              !isCurrentImageLoaded && 'opacity-50',\n            )}\n            onLoad={handleImageLoad}\n            src={'/placeholder.jpg'}\n          />\n        )}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:59:24.509Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "completed",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Update BobbleheadGalleryCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadGalleryCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadFeatureCard to use CldImage",
+      "status": "in_progress",
+      "activeForm": "Updating BobbleheadFeatureCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadPhotoGalleryModal to use CldImage",
+      "status": "pending",
+      "activeForm": "Updating BobbleheadPhotoGalleryModal to use CldImage"
+    },
+    {
+      "content": "Update SearchResultItem to use CldImage",
+      "status": "pending",
+      "activeForm": "Updating SearchResultItem to use CldImage"
+    },
+    {
+      "content": "Test all updated cards to ensure they look great",
+      "status": "pending",
+      "activeForm": "Testing all updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:59:24.767Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx",
+  "limit": 150
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:59:34.147Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx",
+  "offset": 150
+}
+================================================================================
+
+================================================================================
+2025-11-05T22:59:49.708Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx",
+  "old_string": "import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';\nimport { useState } from 'react';\n\nimport type { ContentLikeData } from '@/lib/facades/social/social.facade';\nimport type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';\nimport { LikeTextButton } from '@/components/ui/like-button';\nimport { useToggle } from '@/hooks/use-toggle';\nimport { cn } from '@/utils/tailwind-utils';",
+  "new_string": "import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';\nimport { CldImage } from 'next-cloudinary';\nimport { useState } from 'react';\n\nimport type { ContentLikeData } from '@/lib/facades/social/social.facade';\nimport type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Button } from '@/components/ui/button';\nimport { Card } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';\nimport { LikeTextButton } from '@/components/ui/like-button';\nimport { useToggle } from '@/hooks/use-toggle';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';\nimport { cn } from '@/utils/tailwind-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:00.366Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx",
+  "old_string": "          tabIndex={0}\n        >\n          {/* Featured Image */}\n          <img\n            alt={_currentMainPhoto?.altText ?? bobblehead.name}\n            className={'size-full object-cover'}\n            src={_currentMainPhoto?.url || '/placeholder.jpg'}\n          />",
+  "new_string": "          tabIndex={0}\n        >\n          {/* Featured Image */}\n          {_currentMainPhoto?.url && _currentMainPhoto.url !== '/placeholder.jpg' ? (\n            <CldImage\n              alt={_currentMainPhoto?.altText ?? bobblehead.name}\n              className={'size-full object-cover'}\n              crop={'fill'}\n              format={'auto'}\n              height={800}\n              quality={'auto:good'}\n              src={extractPublicIdFromCloudinaryUrl(_currentMainPhoto.url)}\n              width={600}\n            />\n          ) : (\n            <img\n              alt={bobblehead.name}\n              className={'size-full object-cover'}\n              src={'/placeholder.jpg'}\n            />\n          )}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:10.316Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-feature-card.tsx",
+  "old_string": "            {/* Main image */}\n            <div className={'flex max-h-[80vh] w-full items-center justify-center'}>\n              <img\n                alt={_currentModalPhoto?.altText ?? bobblehead.name}\n                className={'max-h-full max-w-full object-contain'}\n                src={_currentModalPhoto?.url || '/placeholder.svg'}\n              />\n            </div>",
+  "new_string": "            {/* Main image */}\n            <div className={'flex max-h-[80vh] w-full items-center justify-center'}>\n              {_currentModalPhoto?.url && _currentModalPhoto.url !== '/placeholder.jpg' ? (\n                <CldImage\n                  alt={_currentModalPhoto?.altText ?? bobblehead.name}\n                  className={'max-h-full max-w-full object-contain'}\n                  crop={'pad'}\n                  format={'auto'}\n                  height={1200}\n                  quality={'auto:best'}\n                  src={extractPublicIdFromCloudinaryUrl(_currentModalPhoto.url)}\n                  width={1200}\n                />\n              ) : (\n                <img\n                  alt={bobblehead.name}\n                  className={'max-h-full max-w-full object-contain'}\n                  src={'/placeholder.jpg'}\n                />\n              )}\n            </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:19.996Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "completed",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Update BobbleheadGalleryCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadGalleryCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadFeatureCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadFeatureCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadPhotoGalleryModal to use CldImage",
+      "status": "in_progress",
+      "activeForm": "Updating BobbleheadPhotoGalleryModal to use CldImage"
+    },
+    {
+      "content": "Update SearchResultItem to use CldImage",
+      "status": "pending",
+      "activeForm": "Updating SearchResultItem to use CldImage"
+    },
+    {
+      "content": "Test all updated cards to ensure they look great",
+      "status": "pending",
+      "activeForm": "Testing all updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:20.308Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:32.407Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx",
+  "old_string": "import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';\nimport { useCallback, useEffect } from 'react';\n\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent } from '@/components/ui/dialog';\nimport { cn } from '@/utils/tailwind-utils';",
+  "new_string": "import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';\nimport { CldImage } from 'next-cloudinary';\nimport { useCallback, useEffect } from 'react';\n\nimport { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent } from '@/components/ui/dialog';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';\nimport { cn } from '@/utils/tailwind-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:44.432Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx",
+  "old_string": "          {/* Main photo area */}\n          <div className={'relative flex flex-1 items-center justify-center bg-black'}>\n            <img\n              alt={currentPhoto.altText || bobbleheadName || 'Bobblehead photo'}\n              className={'max-h-full max-w-full object-contain'}\n              src={currentPhoto.url}\n            />",
+  "new_string": "          {/* Main photo area */}\n          <div className={'relative flex flex-1 items-center justify-center bg-black'}>\n            {currentPhoto.url && currentPhoto.url !== '/placeholder.jpg' ? (\n              <CldImage\n                alt={currentPhoto.altText || bobbleheadName || 'Bobblehead photo'}\n                className={'max-h-full max-w-full object-contain'}\n                crop={'pad'}\n                format={'auto'}\n                height={1200}\n                quality={'auto:best'}\n                src={extractPublicIdFromCloudinaryUrl(currentPhoto.url)}\n                width={1200}\n              />\n            ) : (\n              <img\n                alt={bobbleheadName || 'Bobblehead photo'}\n                className={'max-h-full max-w-full object-contain'}\n                src={'/placeholder.jpg'}\n              />\n            )}"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:57.362Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "completed",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Update BobbleheadGalleryCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadGalleryCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadFeatureCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadFeatureCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadPhotoGalleryModal to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadPhotoGalleryModal to use CldImage"
+    },
+    {
+      "content": "Update SearchResultItem to use CldImage",
+      "status": "in_progress",
+      "activeForm": "Updating SearchResultItem to use CldImage"
+    },
+    {
+      "content": "Test all updated cards to ensure they look great",
+      "status": "pending",
+      "activeForm": "Testing all updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:00:57.693Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "offset": 85,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:05.842Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:16.350Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "old_string": "import { $path } from 'next-typesafe-url';\nimport Image from 'next/image';\nimport Link from 'next/link';\n\nimport type {\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  SubcollectionSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { ComponentTestIdProps } from '@/lib/test-ids';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Conditional } from '@/components/ui/conditional';\nimport { generateTestId } from '@/lib/test-ids';\nimport { cn } from '@/utils/tailwind-utils';",
+  "new_string": "import { $path } from 'next-typesafe-url';\nimport { CldImage } from 'next-cloudinary';\nimport Link from 'next/link';\n\nimport type {\n  BobbleheadSearchResult,\n  CollectionSearchResult,\n  SubcollectionSearchResult,\n} from '@/lib/queries/content-search/content-search.query';\nimport type { ComponentTestIdProps } from '@/lib/test-ids';\n\nimport { Badge } from '@/components/ui/badge';\nimport { Conditional } from '@/components/ui/conditional';\nimport { generateTestId } from '@/lib/test-ids';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';\nimport { cn } from '@/utils/tailwind-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:27.083Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\search\\search-result-item.tsx",
+  "old_string": "      >\n        <div className={'relative size-12 shrink-0 overflow-hidden rounded-md bg-muted'}>\n          <Image\n            alt={displayName}\n            className={'object-cover'}\n            fill\n            sizes={'48px'}\n            src={displayImageUrl || ''}\n          />\n        </div>\n      </Conditional>",
+  "new_string": "      >\n        <div className={'relative size-12 shrink-0 overflow-hidden rounded-md bg-muted'}>\n          {displayImageUrl && displayImageUrl !== '/placeholder.jpg' ? (\n            <CldImage\n              alt={displayName}\n              className={'size-full object-cover'}\n              crop={'fill'}\n              format={'auto'}\n              height={48}\n              quality={'auto:good'}\n              src={extractPublicIdFromCloudinaryUrl(displayImageUrl)}\n              width={48}\n            />\n          ) : (\n            <div className={'flex size-full items-center justify-center bg-muted'}>\n              <span className={'text-xs text-muted-foreground'}>No Image</span>\n            </div>\n          )}\n        </div>\n      </Conditional>"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:39.475Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "completed",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Update BobbleheadGalleryCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadGalleryCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadFeatureCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadFeatureCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadPhotoGalleryModal to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadPhotoGalleryModal to use CldImage"
+    },
+    {
+      "content": "Update SearchResultItem to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating SearchResultItem to use CldImage"
+    },
+    {
+      "content": "Test all updated cards to ensure they look great",
+      "status": "in_progress",
+      "activeForm": "Testing all updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:39.830Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/browse/featured"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:48.959Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "featured-after-all-updates.png"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:01:49.636Z
+Tool: mcp__playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/collections/7ce6e293-f529-47ac-8223-07eb4c5ea0f8"
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:02:02.146Z
+Tool: mcp__playwright__browser_wait_for
+Input:
+{
+  "time": 3
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:02:02.146Z
+Tool: mcp__playwright__browser_take_screenshot
+Input:
+{
+  "filename": "collection-page-gallery-cards.png",
+  "fullPage": true
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:02:17.617Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Find all bobblehead, collection, and subcollection card components",
+      "status": "completed",
+      "activeForm": "Finding all bobblehead, collection, and subcollection card components"
+    },
+    {
+      "content": "Update BobbleheadGalleryCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadGalleryCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadFeatureCard to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadFeatureCard to use CldImage"
+    },
+    {
+      "content": "Update BobbleheadPhotoGalleryModal to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating BobbleheadPhotoGalleryModal to use CldImage"
+    },
+    {
+      "content": "Update SearchResultItem to use CldImage",
+      "status": "completed",
+      "activeForm": "Updating SearchResultItem to use CldImage"
+    },
+    {
+      "content": "Test all updated cards to ensure they look great",
+      "status": "completed",
+      "activeForm": "Testing all updated cards to ensure they look great"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-05T23:02:23.766Z
+Tool: mcp__playwright__browser_close
+Input:
+{}
+================================================================================
+
+================================================================================
+2025-11-06T00:02:22.897Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-photo-gallery.tsx",
+  "old_string": "import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';\nimport { useState } from 'react';\n\nimport type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';\n\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent } from '@/components/ui/dialog';\nimport { useToggle } from '@/hooks/use-toggle';\nimport { cn } from '@/utils/tailwind-utils';",
+  "new_string": "import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';\nimport { CldImage } from 'next-cloudinary';\nimport { useState } from 'react';\n\nimport type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';\n\nimport { Button } from '@/components/ui/button';\nimport { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent } from '@/components/ui/dialog';\nimport { useToggle } from '@/hooks/use-toggle';\nimport { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';\nimport { cn } from '@/utils/tailwind-utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-06T00:02:36.443Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-photo-gallery.tsx",
+  "old_string": "                  role={'button'}\n                  tabIndex={0}\n                >\n                  <img\n                    alt={altText}\n                    className={'size-full object-cover transition-transform group-hover:scale-105'}\n                    src={photo.url || '/placeholder.svg'}\n                  />\n                  <div className={'absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10'} />\n                </div>",
+  "new_string": "                  role={'button'}\n                  tabIndex={0}\n                >\n                  {photo.url && photo.url !== '/placeholder.svg' ? (\n                    <CldImage\n                      alt={altText}\n                      className={'size-full object-cover transition-transform group-hover:scale-105'}\n                      crop={'fill'}\n                      format={'auto'}\n                      height={400}\n                      quality={'auto:good'}\n                      src={extractPublicIdFromCloudinaryUrl(photo.url)}\n                      width={400}\n                    />\n                  ) : (\n                    <img\n                      alt={altText}\n                      className={'size-full object-cover'}\n                      src={'/placeholder.svg'}\n                    />\n                  )}\n                  <div className={'absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10'} />\n                </div>"
+}
+================================================================================
+
+================================================================================
+2025-11-06T00:02:47.985Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-photo-gallery.tsx",
+  "old_string": "            {/* Main image */}\n            <div className={'flex max-h-[80vh] w-full items-center justify-center'}>\n              <img\n                alt={_altText}\n                className={'max-h-full max-w-full object-contain'}\n                src={_currentPhoto?.url || '/placeholder.svg'}\n              />\n            </div>",
+  "new_string": "            {/* Main image */}\n            <div className={'flex max-h-[80vh] w-full items-center justify-center'}>\n              {_currentPhoto?.url && _currentPhoto.url !== '/placeholder.svg' ? (\n                <CldImage\n                  alt={_altText}\n                  className={'max-h-full max-w-full object-contain'}\n                  crop={'pad'}\n                  format={'auto'}\n                  height={1200}\n                  quality={'auto:best'}\n                  src={extractPublicIdFromCloudinaryUrl(_currentPhoto.url)}\n                  width={1200}\n                />\n              ) : (\n                <img\n                  alt={_altText}\n                  className={'max-h-full max-w-full object-contain'}\n                  src={'/placeholder.svg'}\n                />\n              )}\n            </div>"
+}
+================================================================================

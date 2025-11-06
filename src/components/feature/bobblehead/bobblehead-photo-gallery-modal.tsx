@@ -1,11 +1,13 @@
 'use client';
 
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
+import { CldImage } from 'next-cloudinary';
 import { useCallback, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 interface BobbleheadPhotoGalleryModalProps {
@@ -68,6 +70,8 @@ export const BobbleheadPhotoGalleryModal = ({
 
   if (!currentPhoto) return null;
 
+  const _hasPhoto = currentPhoto.url && currentPhoto.url !== '/placeholder.jpg';
+
   return (
     <Dialog onOpenChange={(open) => !open && onClose()} open={isOpen}>
       <DialogContent className={'h-[80vh] max-w-4xl border-0 bg-black p-0'} isShowCloseButton={false}>
@@ -91,11 +95,23 @@ export const BobbleheadPhotoGalleryModal = ({
 
           {/* Main photo area */}
           <div className={'relative flex flex-1 items-center justify-center bg-black'}>
-            <img
-              alt={currentPhoto.altText || bobbleheadName || 'Bobblehead photo'}
-              className={'max-h-full max-w-full object-contain'}
-              src={currentPhoto.url}
-            />
+            {_hasPhoto ?
+              <CldImage
+                alt={currentPhoto.altText || bobbleheadName || 'Bobblehead photo'}
+                className={'max-h-full max-w-full object-contain'}
+                crop={'pad'}
+                format={'auto'}
+                height={1200}
+                quality={'auto:best'}
+                src={extractPublicIdFromCloudinaryUrl(currentPhoto.url)}
+                width={1200}
+              />
+            : <img
+                alt={bobbleheadName || 'Bobblehead photo'}
+                className={'max-h-full max-w-full object-contain'}
+                src={'/placeholder.jpg'}
+              />
+            }
 
             {/* Navigation arrows */}
             <Conditional isCondition={hasMultiplePhotos}>
