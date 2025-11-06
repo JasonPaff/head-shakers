@@ -22,7 +22,6 @@ import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ENUMS } from '@/lib/constants';
-import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 
 export interface FeaturedContentItem {
   comments: number;
@@ -126,7 +125,7 @@ export const FeaturedTabbedContentDisplay = ({
                 format={'auto'}
                 height={isHero ? 600 : 400}
                 quality={'auto:good'}
-                src={extractPublicIdFromCloudinaryUrl(content?.imageUrl ?? '')}
+                src={content?.imageUrl ?? ''}
                 width={isHero ? 800 : 533}
               />
             </div>

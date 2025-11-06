@@ -21,7 +21,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import { ENUMS } from '@/lib/constants';
-import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 
 export interface FeaturedContentItem {
   comments: number;
@@ -116,7 +115,7 @@ export const FeaturedHeroDisplay = ({ heroData, onViewContent }: FeaturedHeroDis
                 format={'auto'}
                 height={isHero ? 600 : 400}
                 quality={'auto:good'}
-                src={extractPublicIdFromCloudinaryUrl(content?.imageUrl ?? '')}
+                src={content?.imageUrl ?? ''}
                 width={isHero ? 800 : 533}
               />
             </div>
