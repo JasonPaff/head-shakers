@@ -453,7 +453,9 @@ const BobbleheadSearchResult = ({
     return result.photos?.find((p) => p.isPrimary) || result.photos?.[0];
   }, [result.photos]);
 
-  const [selectedImageUrl, setSelectedImageUrl] = useState<string>(primaryPhoto?.url ?? '/placeholder.jpg');
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string>(
+    primaryPhoto?.url ?? result.imageUrl ?? '/placeholder.jpg',
+  );
 
   const handleSelect = (imageUrl?: string) => {
     onSelect(result.id, result.name, imageUrl || selectedImageUrl);
@@ -510,7 +512,7 @@ const BobbleheadSearchResult = ({
             <div className={'flex flex-col'}>
               <Button
                 onClick={() => {
-                  handleSelect();
+                  handleSelect(result.imageUrl || '/placeholder.jpg');
                 }}
                 size={'sm'}
                 variant={selectedContentId === result.id ? 'default' : 'outline'}
