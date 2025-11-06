@@ -115,7 +115,9 @@ export const CloudinaryCoverUpload = ({
             <Button
               className={'h-32 w-full border-dashed'}
               disabled={!_canUpload}
-              onClick={() => open()}
+              onClick={() => {
+                open();
+              }}
               type={'button'}
               variant={'outline'}
             >
@@ -130,9 +132,7 @@ export const CloudinaryCoverUpload = ({
 
       {/* Upload Error */}
       <Conditional isCondition={!!uploadError}>
-        <div className={'rounded-md bg-red-50 p-3 text-sm text-destructive'}>
-          Upload error: {uploadError}
-        </div>
+        <div className={'rounded-md bg-red-50 p-3 text-sm text-destructive'}>Upload error: {uploadError}</div>
       </Conditional>
 
       {/* Cover Photo Preview */}
@@ -156,9 +156,7 @@ export const CloudinaryCoverUpload = ({
 
                 {/* Controls Overlay */}
                 <div
-                  className={
-                    'absolute inset-0 bg-black/50 opacity-0 transition-opacity hover:opacity-100'
-                  }
+                  className={'absolute inset-0 bg-black/50 opacity-0 transition-opacity hover:opacity-100'}
                 >
                   <div className={'flex h-full w-full items-center justify-center'}>
                     <Button
