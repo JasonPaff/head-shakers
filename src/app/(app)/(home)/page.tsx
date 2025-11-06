@@ -4,22 +4,29 @@ import { SignUpButton } from '@clerk/nextjs';
 import { HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
+import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/featured-collections-async';
+import { FeaturedCollectionsErrorBoundary } from '@/app/(app)/(home)/components/featured-collections-error-boundary';
+import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
 import { AuthContent } from '@/components/ui/auth';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn } from '@/utils/tailwind-utils';
+import { getOptionalUserId } from '@/utils/optional-auth-utils';
+
+export const revalidate = 300;
 
 export function generateMetadata(): Metadata {
   return {
-    description: '',
+    description:
+      'Build your digital bobblehead collection, connect with other collectors, and discover rare finds from around the world.',
     title: 'Home',
   };
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const currentUserId = await getOptionalUserId();
+
   return (
     <div className={'container mx-auto px-4 py-8'}>
       {/* Hero */}
@@ -54,68 +61,11 @@ export default function HomePage() {
       {/* Featured Collections */}
       <section className={'py-12'}>
         <h2 className={'mb-8 text-center text-3xl font-bold'}>Featured Collections</h2>
-        <div className={'grid grid-cols-1 gap-6 md:grid-cols-3'}>
-          <Card className={'transition-shadow hover:shadow-lg'}>
-            <CardHeader>
-              <CardTitle>Sports Legends</CardTitle>
-              <CardDescription>Classic sports bobbleheads from the golden era</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div
-                className={cn(
-                  'mb-4 flex aspect-video items-center justify-center rounded-md',
-                  'bg-gradient-to-br from-blue-100 to-blue-200',
-                )}
-              >
-                <span className={'text-4xl'}>⚾</span>
-              </div>
-              <div className={'flex items-center justify-between'}>
-                <p className={'text-sm text-muted-foreground'}>245 items • 12 collectors</p>
-                <Badge variant={'secondary'}>Popular</Badge>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={'transition-shadow hover:shadow-lg'}>
-            <CardHeader>
-              <CardTitle>Movie Characters</CardTitle>
-              <CardDescription>Iconic characters from beloved films</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div
-                className={cn(
-                  'mb-4 flex aspect-video items-center justify-center rounded-md',
-                  'bg-gradient-to-br from-purple-100 to-purple-200',
-                )}
-              >
-                <span className={'text-4xl'}>🎬</span>
-              </div>
-              <div className={'flex items-center justify-between'}>
-                <p className={'text-sm text-muted-foreground'}>189 items • 8 collectors</p>
-                <Badge variant={'secondary'}>Trending</Badge>
-              </div>
-            </CardContent>
-          </Card>
-          <Card className={'transition-shadow hover:shadow-lg'}>
-            <CardHeader>
-              <CardTitle>Vintage Finds</CardTitle>
-              <CardDescription>Rare and unique vintage bobbleheads</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div
-                className={cn(
-                  'mb-4 flex aspect-video items-center justify-center rounded-md',
-                  'bg-gradient-to-br from-amber-100 to-amber-200',
-                )}
-              >
-                <span className={'text-4xl'}>🏆</span>
-              </div>
-              <div className={'flex items-center justify-between'}>
-                <p className={'text-sm text-muted-foreground'}>67 items • 15 collectors</p>
-                <Badge variant={'secondary'}>Rare</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        <FeaturedCollectionsErrorBoundary>
+          <Suspense fallback={<FeaturedCollectionsSkeleton />}>
+            <FeaturedCollectionsAsync currentUserId={currentUserId} />
+          </Suspense>
+        </FeaturedCollectionsErrorBoundary>
 
         {/* Call to Action */}
         <div className={'mt-8 rounded-2xl bg-primary/10 p-8'}>

@@ -49,6 +49,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
 
   const _currentPhoto = bobblehead.photos[currentPhotoIndex];
   const _altText = _currentPhoto?.altText ?? `${bobblehead.name} photo ${currentPhotoIndex + 1}`;
+  const _hasValidCurrentPhoto = _currentPhoto?.url && _currentPhoto.url !== '/placeholder.svg';
 
   return (
     <Conditional isCondition={bobblehead.photos.length !== 0}>
@@ -60,6 +61,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
           <div className={'grid grid-cols-2 gap-4 md:grid-cols-4'}>
             {bobblehead.photos.map((photo, index) => {
               const altText = photo.altText ?? `${bobblehead.name} photo ${index + 1}`;
+              const _hasValidPhoto = photo.url && photo.url !== '/placeholder.svg';
               return (
                 <div
                   className={cn(
@@ -72,7 +74,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
                   role={'button'}
                   tabIndex={0}
                 >
-                  {photo.url && photo.url !== '/placeholder.svg' ? (
+                  {_hasValidPhoto ?
                     <CldImage
                       alt={altText}
                       className={'size-full object-cover transition-transform group-hover:scale-105'}
@@ -83,13 +85,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
                       src={extractPublicIdFromCloudinaryUrl(photo.url)}
                       width={400}
                     />
-                  ) : (
-                    <img
-                      alt={altText}
-                      className={'size-full object-cover'}
-                      src={'/placeholder.svg'}
-                    />
-                  )}
+                  : <img alt={altText} className={'size-full object-cover'} src={'/placeholder.svg'} />}
                   <div className={'absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/10'} />
                 </div>
               );
@@ -130,7 +126,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
 
             {/* Main image */}
             <div className={'flex max-h-[80vh] w-full items-center justify-center'}>
-              {_currentPhoto?.url && _currentPhoto.url !== '/placeholder.svg' ? (
+              {_hasValidCurrentPhoto ?
                 <CldImage
                   alt={_altText}
                   className={'max-h-full max-w-full object-contain'}
@@ -141,13 +137,12 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
                   src={extractPublicIdFromCloudinaryUrl(_currentPhoto.url)}
                   width={1200}
                 />
-              ) : (
-                <img
+              : <img
                   alt={_altText}
                   className={'max-h-full max-w-full object-contain'}
                   src={'/placeholder.svg'}
                 />
-              )}
+              }
             </div>
 
             {/* Next button */}
