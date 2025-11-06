@@ -1,10 +1,13 @@
 'use client';
 
+import { useAuth } from '@clerk/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
+import { useState } from 'react';
 
 import type { UpdateSubCollectionInput } from '@/lib/validations/subcollections.validation';
 
 import { Button } from '@/components/ui/button';
+import { CloudinaryCoverUpload } from '@/components/ui/cloudinary-cover-upload';
 import {
   Dialog,
   DialogContent,
@@ -16,14 +19,17 @@ import {
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
+import { Label } from '@/components/ui/label';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateSubCollectionAction } from '@/lib/actions/collections/subcollections.actions';
+import { CloudinaryPathBuilder } from '@/lib/constants/cloudinary-paths';
 import { updateSubCollectionSchema } from '@/lib/validations/subcollections.validation';
 
 interface SubcollectionEditDialogProps {
   isOpen: boolean;
   onClose: () => void;
   subcollection: {
+    coverImageUrl?: null | string;
     description: null | string;
     id: string;
     name: string;
@@ -32,7 +38,13 @@ interface SubcollectionEditDialogProps {
 
 export const SubcollectionEditDialog = withFocusManagement(
   ({ isOpen, onClose, subcollection }: SubcollectionEditDialogProps) => {
+    // useState hooks
+    const [coverImageUrl, setCoverImageUrl] = useState<null | string | undefined>(
+      subcollection.coverImageUrl,
+    );
+
     const { focusFirstError } = useFocusContext();
+    const { userId } = useAuth();
 
     const { executeAsync, isExecuting } = useServerAction(updateSubCollectionAction, {
       onAfterSuccess: () => {
@@ -47,12 +59,13 @@ export const SubcollectionEditDialog = withFocusManagement(
 
     const form = useAppForm({
       defaultValues: {
+        coverImageUrl: subcollection.coverImageUrl || undefined,
         description: subcollection.description || '',
         name: subcollection.name,
         subcollectionId: subcollection.id,
       } as UpdateSubCollectionInput,
       onSubmit: async ({ value }) => {
-        await executeAsync(value);
+        await executeAsync({ ...value, coverImageUrl: coverImageUrl || undefined });
       },
       onSubmitInvalid: ({ formApi }) => {
         focusFirstError(formApi);
@@ -66,9 +79,18 @@ export const SubcollectionEditDialog = withFocusManagement(
       },
     });
 
+    // Event handlers
     const handleClose = () => {
       setTimeout(() => form.reset(), 300);
       onClose();
+    };
+
+    const handleUploadComplete = (_publicId: string, secureUrl: string) => {
+      setCoverImageUrl(secureUrl);
+    };
+
+    const handleRemoveCover = () => {
+      setCoverImageUrl(null);
     };
 
     return (
@@ -113,6 +135,20 @@ export const SubcollectionEditDialog = withFocusManagement(
                   />
                 )}
               </form.AppField>
+
+              {/* Cover Photo */}
+              {userId && (
+                <div className={'space-y-2'}>
+                  <Label>Cover Photo (Optional)</Label>
+                  <CloudinaryCoverUpload
+                    currentImageUrl={coverImageUrl || undefined}
+                    isDisabled={isExecuting}
+                    onRemove={handleRemoveCover}
+                    onUploadComplete={handleUploadComplete}
+                    uploadFolder={CloudinaryPathBuilder.tempPath(userId)}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Action Buttons */}

@@ -1,11 +1,14 @@
 'use client';
 
+import { useAuth } from '@clerk/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
+import { useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { InsertSubCollectionInput } from '@/lib/validations/subcollections.validation';
 
 import { Button } from '@/components/ui/button';
+import { CloudinaryCoverUpload } from '@/components/ui/cloudinary-cover-upload';
 import {
   Dialog,
   DialogContent,
@@ -17,9 +20,11 @@ import {
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
+import { Label } from '@/components/ui/label';
 import { useServerAction } from '@/hooks/use-server-action';
 import { createSubCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 import { DEFAULTS } from '@/lib/constants';
+import { CloudinaryPathBuilder } from '@/lib/constants/cloudinary-paths';
 import { insertSubCollectionSchema } from '@/lib/validations/subcollections.validation';
 
 interface SubcollectionCreateDialogProps {
@@ -31,7 +36,11 @@ interface SubcollectionCreateDialogProps {
 
 export const SubcollectionCreateDialog = withFocusManagement(
   ({ collectionId, isOpen, onClose, onSubCollectionCreated }: SubcollectionCreateDialogProps) => {
+    // useState hooks
+    const [coverImageUrl, setCoverImageUrl] = useState<string | undefined>(undefined);
+
     const { focusFirstError } = useFocusContext();
+    const { userId } = useAuth();
 
     const { executeAsync, isExecuting } = useServerAction(createSubCollectionAction, {
       onSuccess: ({ data }) => {
@@ -51,13 +60,14 @@ export const SubcollectionCreateDialog = withFocusManagement(
     const form = useAppForm({
       defaultValues: {
         collectionId,
+        coverImageUrl: undefined,
         description: '',
         isPublic: DEFAULTS.SUB_COLLECTION.IS_PUBLIC,
         name: '',
         sortOrder: DEFAULTS.SUB_COLLECTION.SORT_ORDER,
       } as InsertSubCollectionInput,
       onSubmit: async ({ value }) => {
-        await executeAsync(value);
+        await executeAsync({ ...value, coverImageUrl });
       },
       onSubmitInvalid: ({ formApi }) => {
         focusFirstError(formApi);
@@ -71,14 +81,26 @@ export const SubcollectionCreateDialog = withFocusManagement(
       },
     });
 
+    // Event handlers
     const handleOpenChange = (isOpen: boolean) => {
       if (isOpen) return;
       handleClose();
     };
 
     const handleClose = () => {
-      setTimeout(() => form.reset(), 300);
+      setTimeout(() => {
+        form.reset();
+        setCoverImageUrl(undefined);
+      }, 300);
       onClose();
+    };
+
+    const handleUploadComplete = (_publicId: string, secureUrl: string) => {
+      setCoverImageUrl(secureUrl);
+    };
+
+    const handleRemoveCover = () => {
+      setCoverImageUrl(undefined);
     };
 
     return (
@@ -118,6 +140,20 @@ export const SubcollectionCreateDialog = withFocusManagement(
                   />
                 )}
               </form.AppField>
+
+              {/* Cover Photo */}
+              {userId && (
+                <div className={'space-y-2'}>
+                  <Label>Cover Photo (Optional)</Label>
+                  <CloudinaryCoverUpload
+                    currentImageUrl={coverImageUrl}
+                    isDisabled={isExecuting}
+                    onRemove={handleRemoveCover}
+                    onUploadComplete={handleUploadComplete}
+                    uploadFolder={CloudinaryPathBuilder.tempPath(userId)}
+                  />
+                </div>
+              )}
 
               {/* Visibility */}
               <form.AppField name={'isPublic'}>

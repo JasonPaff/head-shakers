@@ -69,8 +69,12 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
                     'rounded-lg bg-muted transition-all hover:opacity-90 hover:shadow-md',
                   )}
                   key={photo.id}
-                  onClick={() => handlePhotoClick(index)}
-                  onKeyDown={(e) => e.key === 'Enter' && handlePhotoClick(index)}
+                  onClick={() => {
+                    handlePhotoClick(index);
+                  }}
+                  onKeyDown={(e) => {
+                    return e.key === 'Enter' && handlePhotoClick(index);
+                  }}
                   role={'button'}
                   tabIndex={0}
                 >

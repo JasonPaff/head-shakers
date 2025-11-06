@@ -12,8 +12,10 @@ export const CLOUDINARY_PATHS = {
   },
   PATTERNS: {
     BOBBLEHEAD_ROOT: 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}',
+    COLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/cover',
     COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',
     PROFILE_PHOTOS: 'users/{userId}/profile',
+    SUBCOLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',
     TEMP_UPLOADS: 'temp/uploads/{userId}',
     USER_ROOT: 'users/{userId}',
   },
@@ -31,6 +33,13 @@ export const CloudinaryPathBuilder = {
   },
 
   /**
+   * build a path for collection cover photos
+   */
+  collectionCoverPath: (userId: string, collectionId: string): string => {
+    return `users/${userId}/collections/${collectionId}/cover`;
+  },
+
+  /**
    * build a path for collection photos
    */
   collectionPath: (userId: string, collectionId: string): string => {
@@ -42,6 +51,13 @@ export const CloudinaryPathBuilder = {
    */
   profilePath: (userId: string): string => {
     return `users/${userId}/profile`;
+  },
+
+  /**
+   * build a path for subcollection cover photos
+   */
+  subcollectionCoverPath: (userId: string, collectionId: string, subcollectionId: string): string => {
+    return `users/${userId}/collections/${collectionId}/subcollections/${subcollectionId}/cover`;
   },
 
   /**
