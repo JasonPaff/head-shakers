@@ -36,6 +36,9 @@ const isPublicRoute = createRouteMatcher([
   '/users/:username',
   '/users/:username/collections(.*)',
   '/users/:username/following(.*)',
+
+  // webhooks - external services (Clerk)
+  '/api/webhooks/clerk',
 ]);
 
 const isProtectedRoute = createRouteMatcher([
