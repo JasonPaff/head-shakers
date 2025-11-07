@@ -31638,3 +31638,34 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-07T01:11:31.313Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\middleware.ts",
+  "limit": 95
+}
+================================================================================
+
+================================================================================
+2025-11-07T01:11:43.645Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\middleware.ts",
+  "old_string": "  // production gate: only allow authorized admins to access the site\n  // only apply in production environment\n  if (process.env.NODE_ENV === 'production') {\n    const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));\n    if (!isComingSoonPage) {\n      const isAuthorized =\n        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';\n      if (!isAuthorized) {\n        const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);\n        return NextResponse.redirect(comingSoonUrl);\n      }\n    }\n  }",
+  "new_string": "  // production gate: only allow authorized admins to access the site\n  // only apply in production environment\n  // skip production gate for webhooks (external services)\n  if (process.env.NODE_ENV === 'production') {\n    const isWebhook = req.nextUrl.pathname.startsWith('/api/webhooks');\n    const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));\n\n    if (!isComingSoonPage && !isWebhook) {\n      const isAuthorized =\n        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';\n      if (!isAuthorized) {\n        const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);\n        return NextResponse.redirect(comingSoonUrl);\n      }\n    }\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-07T01:11:50.472Z
+Tool: Bash
+Input:
+{
+  "command": "npm run format",
+  "description": "Format code with Prettier"
+}
+================================================================================

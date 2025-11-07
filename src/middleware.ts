@@ -82,9 +82,12 @@ const middleware = clerkMiddleware(async (auth, req) => {
 
   // production gate: only allow authorized admins to access the site
   // only apply in production environment
+  // skip production gate for webhooks (external services)
   if (process.env.NODE_ENV === 'production') {
+    const isWebhook = req.nextUrl.pathname.startsWith('/api/webhooks');
     const isComingSoonPage = req.nextUrl.pathname.startsWith($path({ route: '/coming-soon' }));
-    if (!isComingSoonPage) {
+
+    if (!isComingSoonPage && !isWebhook) {
       const isAuthorized =
         userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';
       if (!isAuthorized) {
