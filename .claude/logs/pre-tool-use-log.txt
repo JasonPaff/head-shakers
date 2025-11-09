@@ -41867,3 +41867,644 @@ Tool: mcp__Playwright__browser_close
 Input:
 {}
 ================================================================================
+
+================================================================================
+2025-11-09T22:45:21.979Z
+Tool: Task
+Input:
+{
+  "description": "Investigate like feature bug",
+  "prompt": "Research the like feature implementation to understand why likes are rolling back after optimistic updates. \n\nThe bug behavior:\n- User clicks to unlike (already liked, count is 2, heart is red/filled)\n- UI immediately updates (count becomes 1, heart becomes unfilled)\n- Then immediately rolls back (count back to 2, heart becomes filled again)\n- After page refresh, shows correct state (count is 1, heart is unfilled)\n\nThis suggests an optimistic update that's being reverted. I need to find:\n\n1. The like button component and how it handles clicks\n2. The server action that processes likes/unlikes\n3. The state management/cache invalidation logic\n4. Any queries that might be refetching and overwriting the optimistic update\n\nFocus on:\n- Like button components (search for like-related components)\n- Server actions for liking (in lib/actions)\n- Any optimistic update logic\n- Cache invalidation or revalidation issues\n- Query hooks that might be refetching\n\nProvide detailed analysis of the code flow and identify the specific cause of the rollback.",
+  "subagent_type": "Plan"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:27.698Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*like*.{ts,tsx}"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:27.701Z
+Tool: Grep
+Input:
+{
+  "pattern": "(like|unlike)",
+  "output_mode": "files_with_matches",
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:27.704Z
+Tool: Grep
+Input:
+{
+  "pattern": "optimistic",
+  "output_mode": "files_with_matches",
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:34.831Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-like.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:34.835Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\like-button.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:34.840Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\like.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:43.500Z
+Tool: Grep
+Input:
+{
+  "pattern": "toggleLikeAction",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:43.503Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/social.actions.{ts,tsx}"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:50.502Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\social\\social.actions.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:57.002Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/cache-revalidation.service.{ts,tsx}"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:45:57.002Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/social.facade.{ts,tsx}"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:05.370Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\social\\social.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:05.370Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache-revalidation.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:14.367Z
+Tool: Grep
+Input:
+{
+  "pattern": "LikeIconButton|LikeTextButton|LikeCompactButton",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:14.366Z
+Tool: Grep
+Input:
+{
+  "pattern": "useQuery.*like|useQuery.*Like",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:22.291Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\bobblehead-header.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:31.197Z
+Tool: Grep
+Input:
+{
+  "pattern": "getContentLikeData|getBatchContentLikeData",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:31.197Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/bobbleheads/[bobbleheadId]/(bobblehead)/page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:39.868Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\bobbleheads\\[bobbleheadId]\\(bobblehead)\\components\\async\\bobblehead-header-async.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:46.533Z
+Tool: Bash
+Input:
+{
+  "command": "grep -A2 \"next-safe-action\" C:\\Users\\JasonPaff\\dev\\head-shakers\\package.json",
+  "description": "Check next-safe-action version"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:51.608Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\package.json",
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:46:57.953Z
+Tool: Grep
+Input:
+{
+  "pattern": "next-safe-action",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\package.json",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:47:04.485Z
+Tool: Grep
+Input:
+{
+  "pattern": "useOptimisticAction.*onSuccess|onSuccess.*useOptimistic",
+  "output_mode": "content",
+  "type": "tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:48:06.305Z
+Tool: ExitPlanMode
+Input:
+{
+  "plan": "## Fix Like Button Rollback Bug\n\n### Root Cause\nThe `useLike` hook has redundant state calculations and gets reinitialized with stale props after the server responds but before cache revalidation completes, causing the optimistic update to roll back.\n\n### Changes\n\n**1. Fix `src/hooks/use-like.tsx`** (Primary Fix)\n   - Remove redundant state calculation in `toggleLike` callback (lines 51-55)\n   - Simplify the callback to just call `executeToggle`\n   - Let `updateFn` handle all state calculations (it already does this correctly)\n   - Add proper dependency array to prevent stale closures\n\n**2. Verify `src/lib/actions/social/social.actions.ts`**\n   - Ensure cache revalidation is working correctly\n   - Check that the correct tags are being invalidated\n\n### Testing Plan\nAfter the fix:\n1. Test liking/unliking multiple times in quick succession\n2. Verify optimistic updates don't roll back\n3. Verify final state matches database after server response\n4. Test with slow network conditions (throttling)\n5. Verify counts stay accurate across multiple rapid clicks"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:48:59.244Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read and analyze useLike hook implementation",
+      "status": "in_progress",
+      "activeForm": "Reading and analyzing useLike hook implementation"
+    },
+    {
+      "content": "Fix redundant state calculation in toggleLike callback",
+      "status": "pending",
+      "activeForm": "Fixing redundant state calculation in toggleLike callback"
+    },
+    {
+      "content": "Verify cache revalidation in social actions",
+      "status": "pending",
+      "activeForm": "Verifying cache revalidation in social actions"
+    },
+    {
+      "content": "Test like/unlike functionality in browser",
+      "status": "pending",
+      "activeForm": "Testing like/unlike functionality in browser"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:49:03.767Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-like.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:17.815Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read and analyze useLike hook implementation",
+      "status": "completed",
+      "activeForm": "Reading and analyzing useLike hook implementation"
+    },
+    {
+      "content": "Fix redundant state calculation in toggleLike callback",
+      "status": "in_progress",
+      "activeForm": "Fixing redundant state calculation in toggleLike callback"
+    },
+    {
+      "content": "Verify cache revalidation in social actions",
+      "status": "pending",
+      "activeForm": "Verifying cache revalidation in social actions"
+    },
+    {
+      "content": "Test like/unlike functionality in browser",
+      "status": "pending",
+      "activeForm": "Testing like/unlike functionality in browser"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:29.003Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-like.tsx",
+  "old_string": "  const toggleLike = useCallback(() => {\n    if (isPending || !isSignedIn) return;\n\n    const isNewLiked = !optimisticState.isLiked;\n    const newLikeCount =\n      isNewLiked ? optimisticState.likeCount + 1 : Math.max(0, optimisticState.likeCount - 1);\n\n    onLikeChange?.(isNewLiked, newLikeCount);\n\n    executeToggle({\n      targetId,\n      targetType,\n    });\n  }, [\n    isPending,\n    isSignedIn,\n    optimisticState.isLiked,\n    optimisticState.likeCount,\n    onLikeChange,\n    executeToggle,\n    targetId,\n    targetType,\n  ]);",
+  "new_string": "  const toggleLike = useCallback(() => {\n    if (isPending || !isSignedIn) return;\n\n    executeToggle({\n      targetId,\n      targetType,\n    });\n  }, [isPending, isSignedIn, executeToggle, targetId, targetType]);"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:35.026Z
+Tool: Grep
+Input:
+{
+  "pattern": "onLikeChange",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:39.772Z
+Tool: Grep
+Input:
+{
+  "pattern": "onLikeChange",
+  "glob": "src/components/ui/like-button.tsx",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:45.196Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\like-button.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:53.040Z
+Tool: Grep
+Input:
+{
+  "pattern": "LikeIconButton|LikeTextButton|LikeCompactButton|CustomLikeButton",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:50:59.428Z
+Tool: Grep
+Input:
+{
+  "pattern": "onLikeChange",
+  "path": "src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:08.404Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read and analyze useLike hook implementation",
+      "status": "completed",
+      "activeForm": "Reading and analyzing useLike hook implementation"
+    },
+    {
+      "content": "Fix redundant state calculation in toggleLike callback",
+      "status": "completed",
+      "activeForm": "Fixing redundant state calculation in toggleLike callback"
+    },
+    {
+      "content": "Verify cache revalidation in social actions",
+      "status": "in_progress",
+      "activeForm": "Verifying cache revalidation in social actions"
+    },
+    {
+      "content": "Test like/unlike functionality in browser",
+      "status": "pending",
+      "activeForm": "Testing like/unlike functionality in browser"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:14.138Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\social\\social.actions.ts",
+  "offset": 70,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:22.949Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read and analyze useLike hook implementation",
+      "status": "completed",
+      "activeForm": "Reading and analyzing useLike hook implementation"
+    },
+    {
+      "content": "Fix redundant state calculation in toggleLike callback",
+      "status": "completed",
+      "activeForm": "Fixing redundant state calculation in toggleLike callback"
+    },
+    {
+      "content": "Verify cache revalidation in social actions",
+      "status": "completed",
+      "activeForm": "Verifying cache revalidation in social actions"
+    },
+    {
+      "content": "Test like/unlike functionality in browser",
+      "status": "in_progress",
+      "activeForm": "Testing like/unlike functionality in browser"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:27.730Z
+Tool: BashOutput
+Input:
+{
+  "bash_id": "9aabf4"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:34.692Z
+Tool: BashOutput
+Input:
+{
+  "bash_id": "0ab674"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:39.192Z
+Tool: Bash
+Input:
+{
+  "command": "npm run dev",
+  "timeout": 600000,
+  "description": "Start development server",
+  "run_in_background": true
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:51:45.425Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Read and analyze useLike hook implementation",
+      "status": "completed",
+      "activeForm": "Reading and analyzing useLike hook implementation"
+    },
+    {
+      "content": "Fix redundant state calculation in toggleLike callback",
+      "status": "completed",
+      "activeForm": "Fixing redundant state calculation in toggleLike callback"
+    },
+    {
+      "content": "Verify cache revalidation in social actions",
+      "status": "completed",
+      "activeForm": "Verifying cache revalidation in social actions"
+    },
+    {
+      "content": "Test like/unlike functionality in browser",
+      "status": "completed",
+      "activeForm": "Testing like/unlike functionality in browser"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:53:31.396Z
+Tool: BashOutput
+Input:
+{
+  "bash_id": "57d527"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:53:38.535Z
+Tool: mcp__Playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/collections/7ce6e293-f529-47ac-8223-07eb4c5ea0f8"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:53:51.027Z
+Tool: mcp__Playwright__browser_click
+Input:
+{
+  "element": "Like button for collection",
+  "ref": "e58"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:53:54.604Z
+Tool: mcp__Playwright__browser_snapshot
+Input:
+{}
+================================================================================
+
+================================================================================
+2025-11-09T22:54:01.175Z
+Tool: mcp__Playwright__browser_click
+Input:
+{
+  "element": "Unlike button for collection (currently liked)",
+  "ref": "e345"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:54:09.767Z
+Tool: mcp__Playwright__browser_wait_for
+Input:
+{
+  "time": 2
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:54:16.114Z
+Tool: mcp__Playwright__browser_snapshot
+Input:
+{}
+================================================================================
+
+================================================================================
+2025-11-09T22:54:25.317Z
+Tool: BashOutput
+Input:
+{
+  "bash_id": "57d527",
+  "filter": "POST /collections|toggleLike|CacheRevalidation"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:54:33.807Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-like.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:54:54.341Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\social\\social.actions.ts",
+  "offset": 80,
+  "limit": 20
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:55:14.957Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-like.tsx",
+  "old_string": "import { useAuth } from '@clerk/nextjs';\nimport { useOptimisticAction } from 'next-safe-action/hooks';\nimport { useCallback, useMemo } from 'react';\n\nimport type { LikeTargetType } from '@/lib/constants';\n\nimport { toggleLikeAction } from '@/lib/actions/social/social.actions';\n\ninterface UseLikeOptions {\n  initialLikeCount: number;\n  isInitiallyLiked: boolean;\n  onLikeChange?: (isLiked: boolean, likeCount: number) => void;\n  targetId: string;\n  targetType: LikeTargetType;\n}\n\nexport const useLike = ({\n  initialLikeCount,\n  isInitiallyLiked,\n  onLikeChange,\n  targetId,\n  targetType,\n}: UseLikeOptions) => {\n  const { isSignedIn } = useAuth();\n\n  const {\n    execute: executeToggle,\n    isPending,\n    optimisticState,\n  } = useOptimisticAction(toggleLikeAction, {\n    currentState: {\n      isLiked: isInitiallyLiked,\n      likeCount: initialLikeCount,\n    },\n    updateFn: (currentState) => {\n      const isNewLiked = !currentState.isLiked;\n      const newLikeCount = isNewLiked ? currentState.likeCount + 1 : Math.max(0, currentState.likeCount - 1);\n\n      return {\n        isLiked: isNewLiked,\n        likeCount: newLikeCount,\n      };\n    },\n  });",
+  "new_string": "import { useAuth } from '@clerk/nextjs';\nimport { useOptimisticAction } from 'next-safe-action/hooks';\nimport { useCallback, useMemo } from 'react';\n\nimport type { LikeTargetType } from '@/lib/constants';\n\nimport { toggleLikeAction } from '@/lib/actions/social/social.actions';\n\ninterface UseLikeOptions {\n  initialLikeCount: number;\n  isInitiallyLiked: boolean;\n  onLikeChange?: (isLiked: boolean, likeCount: number) => void;\n  targetId: string;\n  targetType: LikeTargetType;\n}\n\nexport const useLike = ({\n  initialLikeCount,\n  isInitiallyLiked,\n  onLikeChange,\n  targetId,\n  targetType,\n}: UseLikeOptions) => {\n  const { isSignedIn } = useAuth();\n\n  const initialState = useMemo(\n    () => ({\n      isLiked: isInitiallyLiked,\n      likeCount: initialLikeCount,\n    }),\n    [isInitiallyLiked, initialLikeCount],\n  );\n\n  const {\n    execute: executeToggle,\n    isPending,\n    optimisticState,\n  } = useOptimisticAction(toggleLikeAction, {\n    currentState: initialState,\n    updateFn: (currentState) => {\n      const isNewLiked = !currentState.isLiked;\n      const newLikeCount = isNewLiked ? currentState.likeCount + 1 : Math.max(0, currentState.likeCount - 1);\n\n      return {\n        isLiked: isNewLiked,\n        likeCount: newLikeCount,\n      };\n    },\n  });"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:55:31.986Z
+Tool: mcp__Playwright__browser_navigate
+Input:
+{
+  "url": "http://localhost:3000/collections/7ce6e293-f529-47ac-8223-07eb4c5ea0f8"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:55:42.665Z
+Tool: mcp__Playwright__browser_click
+Input:
+{
+  "element": "Like button for collection (currently unliked)",
+  "ref": "e82"
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:55:52.398Z
+Tool: mcp__Playwright__browser_wait_for
+Input:
+{
+  "time": 2
+}
+================================================================================
+
+================================================================================
+2025-11-09T22:55:58.053Z
+Tool: mcp__Playwright__browser_snapshot
+Input:
+{}
+================================================================================

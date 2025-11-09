@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 
 import { SignUpButton } from '@clerk/nextjs';
 import NumberFlow from '@number-flow/react';
@@ -219,47 +219,4 @@ export const LikeCompactButton = ({
   }
 
   return buttonElement;
-};
-
-interface CustomLikeButtonProps extends Omit<LikeButtonBaseProps, 'children'> {
-  children: (props: {
-    isLiked: boolean;
-    isPending: boolean;
-    isSignedIn: boolean;
-    likeCount: number;
-    testId: string;
-    toggleLike: () => void;
-  }) => ReactNode;
-}
-
-export const CustomLikeButton = ({
-  children,
-  initialLikeCount,
-  isInitiallyLiked,
-  onLikeChange,
-  targetId,
-  targetType,
-  testId,
-}: CustomLikeButtonProps) => {
-  const likeProps = useLike({
-    initialLikeCount,
-    isInitiallyLiked,
-    onLikeChange,
-    targetId,
-    targetType,
-  });
-
-  const likeButtonTestId = testId || generateTestId('ui', 'like-button', 'custom');
-
-  const childElement = children({
-    ...likeProps,
-    isSignedIn: likeProps.isSignedIn ?? false,
-    testId: likeButtonTestId,
-  });
-
-  if (!likeProps.isSignedIn) {
-    return <SignUpButton mode={'modal'}>{childElement}</SignUpButton>;
-  }
-
-  return <Fragment>{childElement}</Fragment>;
 };
