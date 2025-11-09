@@ -2,11 +2,9 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
-import { z } from 'zod';
 
 import {
   ACTION_NAMES,
-  ENUMS,
   ERROR_CODES,
   ERROR_MESSAGES,
   OPERATIONS,
@@ -18,19 +16,13 @@ import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import { authActionClient } from '@/lib/utils/next-safe-action';
 import {
   createCommentSchema,
   deleteCommentSchema,
-  getCommentByIdSchema,
-  getCommentsSchema,
   updateCommentSchema,
 } from '@/lib/validations/comment.validation';
-import {
-  getBatchLikeDataSchema,
-  getLikeStatusSchema,
-  toggleLikeSchema,
-} from '@/lib/validations/like.validation';
+import { toggleLikeSchema } from '@/lib/validations/like.validation';
 
 export const toggleLikeAction = authActionClient
   .metadata({
@@ -108,162 +100,6 @@ export const toggleLikeAction = authActionClient
         },
         operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
         userId: ctx.userId,
-      });
-    }
-  });
-
-export const getContentLikeDataAction = authActionClient
-  .metadata({
-    actionName: ACTION_NAMES.SOCIAL.LIKE,
-  })
-  .inputSchema(getLikeStatusSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const likeData = getLikeStatusSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
-
-    try {
-      const result = await SocialFacade.getContentLikeData(
-        likeData.targetId,
-        likeData.targetType,
-        ctx.userId,
-        dbInstance,
-      );
-
-      return {
-        data: result,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.SOCIAL.LIKE,
-        },
-        operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
-        userId: ctx.userId,
-      });
-    }
-  });
-
-export const getBatchContentLikeDataAction = authActionClient
-  .metadata({
-    actionName: ACTION_NAMES.SOCIAL.LIKE,
-  })
-  .inputSchema(getBatchLikeDataSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const batchData = getBatchLikeDataSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
-
-    try {
-      const results = await SocialFacade.getBatchContentLikeData(batchData.targets, ctx.userId, dbInstance);
-
-      return {
-        data: results,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.SOCIAL.LIKE,
-        },
-        operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
-        userId: ctx.userId,
-      });
-    }
-  });
-
-export const getPublicLikeCountAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.SOCIAL.LIKE,
-  })
-  .inputSchema(getLikeStatusSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const likeData = getLikeStatusSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
-
-    try {
-      const likeCount = await SocialFacade.getLikeCount(likeData.targetId, likeData.targetType, dbInstance);
-
-      return {
-        data: {
-          likeCount,
-          targetId: likeData.targetId,
-          targetType: likeData.targetType,
-        },
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.SOCIAL.LIKE,
-        },
-        operation: OPERATIONS.SOCIAL.GET_LIKE_COUNT,
-      });
-    }
-  });
-
-export const getPublicBatchLikeCountsAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.SOCIAL.LIKE,
-  })
-  .inputSchema(getBatchLikeDataSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const batchData = getBatchLikeDataSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
-
-    try {
-      const results = await SocialFacade.getBatchContentLikeData(batchData.targets, undefined, dbInstance);
-
-      return {
-        data: results,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.SOCIAL.LIKE,
-        },
-        operation: OPERATIONS.SOCIAL.GET_LIKE_COUNTS,
-      });
-    }
-  });
-
-export const getTrendingContentAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.SOCIAL.LIKE,
-  })
-  .inputSchema(
-    z.object({
-      limit: z.number().min(1).max(50).default(10),
-      targetType: z.enum(ENUMS.LIKE.TARGET_TYPE),
-    }),
-  )
-  .action(async ({ ctx, parsedInput }) => {
-    const trendingData = parsedInput;
-    const dbInstance = ctx.db;
-
-    try {
-      const results = await SocialFacade.getTrendingContent(
-        trendingData.targetType,
-        { limit: trendingData.limit },
-        undefined,
-        dbInstance,
-      );
-
-      return {
-        data: results,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.SOCIAL.LIKE,
-        },
-        operation: OPERATIONS.SOCIAL.GET_TRENDING_CONTENT,
       });
     }
   });
@@ -476,82 +312,6 @@ export const deleteCommentAction = authActionClient
           actionName: ACTION_NAMES.COMMENTS.DELETE,
         },
         operation: OPERATIONS.COMMENTS.DELETE_COMMENT,
-        userId: ctx.userId,
-      });
-    }
-  });
-
-export const getCommentsAction = authActionClient
-  .metadata({
-    actionName: ACTION_NAMES.COMMENTS.GET_LIST,
-  })
-  .inputSchema(getCommentsSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const queryData = getCommentsSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
-
-    try {
-      const result = await SocialFacade.getComments(
-        queryData.targetId,
-        queryData.targetType,
-        {
-          limit: queryData.pagination.limit,
-          offset: queryData.pagination.offset,
-        },
-        ctx.userId,
-        dbInstance,
-      );
-
-      return {
-        data: result,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COMMENTS.GET_LIST,
-        },
-        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
-        userId: ctx.userId,
-      });
-    }
-  });
-
-export const getCommentByIdAction = authActionClient
-  .metadata({
-    actionName: ACTION_NAMES.COMMENTS.GET_BY_ID,
-  })
-  .inputSchema(getCommentByIdSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const queryData = getCommentByIdSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
-
-    try {
-      const result = await SocialFacade.getCommentById(queryData.commentId, ctx.userId, dbInstance);
-
-      if (!result) {
-        throw new ActionError(
-          ErrorType.NOT_FOUND,
-          ERROR_CODES.COMMENTS.COMMENT_NOT_FOUND,
-          ERROR_MESSAGES.COMMENTS.COMMENT_NOT_FOUND,
-          { ctx, operation: OPERATIONS.COMMENTS.GET_COMMENTS },
-          true, // recoverable
-          404,
-        );
-      }
-
-      return {
-        data: result,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COMMENTS.GET_BY_ID,
-        },
-        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
         userId: ctx.userId,
       });
     }

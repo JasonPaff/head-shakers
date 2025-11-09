@@ -219,7 +219,7 @@ export class SocialQuery extends BaseQuery {
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(users, eq(comments.userId, users.id))
+      .leftJoin(users, and(eq(comments.userId, users.id), eq(users.isDeleted, false)))
       .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
       .limit(1);
 
@@ -276,7 +276,7 @@ export class SocialQuery extends BaseQuery {
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(users, eq(comments.userId, users.id))
+      .leftJoin(users, and(eq(comments.userId, users.id), eq(users.isDeleted, false)))
       .where(
         and(
           eq(comments.targetId, targetId),
@@ -438,7 +438,7 @@ export class SocialQuery extends BaseQuery {
         userId: likes.userId,
       })
       .from(likes)
-      .leftJoin(sql`users`, eq(likes.userId, sql`users.id`))
+      .leftJoin(sql`users`, and(eq(likes.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
       .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType)))
       .orderBy(desc(likes.createdAt));
 

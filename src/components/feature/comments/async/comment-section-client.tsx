@@ -2,7 +2,6 @@
 
 import type { ComponentProps } from 'react';
 
-import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import type { CommentWithUser } from '@/components/feature/comments/comment-item';
@@ -39,8 +38,6 @@ export const CommentSectionClient = ({
   targetType,
   ...props
 }: CommentSectionClientProps) => {
-  const router = useRouter();
-
   const handleCommentCreate = useCallback(
     async (content: string) => {
       const result = await createCommentAction({
@@ -49,46 +46,34 @@ export const CommentSectionClient = ({
         targetType,
       });
 
-      if (result?.data) {
-        // Refresh the page to show new comment
-        router.refresh();
-      } else if (result?.serverError) {
+      if (result?.serverError) {
         throw new Error(result.serverError);
       }
+      // Page will automatically revalidate via revalidatePath() in the server action
     },
-    [targetId, targetType, router],
+    [targetId, targetType],
   );
 
-  const handleCommentUpdate = useCallback(
-    async (commentId: string, content: string) => {
-      const result = await updateCommentAction({
-        commentId,
-        content,
-      });
+  const handleCommentUpdate = useCallback(async (commentId: string, content: string) => {
+    const result = await updateCommentAction({
+      commentId,
+      content,
+    });
 
-      if (result?.data) {
-        // Refresh the page to show updated comment
-        router.refresh();
-      } else if (result?.serverError) {
-        throw new Error(result.serverError);
-      }
-    },
-    [router],
-  );
+    if (result?.serverError) {
+      throw new Error(result.serverError);
+    }
+    // Page will automatically revalidate via revalidatePath() in the server action
+  }, []);
 
-  const handleCommentDelete = useCallback(
-    async (commentId: string) => {
-      const result = await deleteCommentAction({ commentId });
+  const handleCommentDelete = useCallback(async (commentId: string) => {
+    const result = await deleteCommentAction({ commentId });
 
-      if (result?.data) {
-        // Refresh the page to remove deleted comment
-        router.refresh();
-      } else if (result?.serverError) {
-        throw new Error(result.serverError);
-      }
-    },
-    [router],
-  );
+    if (result?.serverError) {
+      throw new Error(result.serverError);
+    }
+    // Page will automatically revalidate via revalidatePath() in the server action
+  }, []);
 
   return (
     <CommentSection
@@ -100,8 +85,6 @@ export const CommentSectionClient = ({
       onCommentCreate={handleCommentCreate}
       onCommentDelete={handleCommentDelete}
       onCommentUpdate={handleCommentUpdate}
-      targetId={targetId}
-      targetType={targetType}
       {...props}
     />
   );

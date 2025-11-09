@@ -6,7 +6,6 @@ import { MessageSquareTextIcon } from 'lucide-react';
 import { useState } from 'react';
 
 import type { CommentWithUser } from '@/components/feature/comments/comment-item';
-import type { CommentTargetType } from '@/lib/constants';
 
 import { CommentDeleteDialog } from '@/components/feature/comments/comment-delete-dialog';
 import { CommentEditDialog } from '@/components/feature/comments/comment-edit-dialog';
@@ -27,8 +26,6 @@ interface CommentSectionProps extends ComponentProps<'div'> {
   onCommentDelete?: (commentId: string) => Promise<void> | void;
   onCommentUpdate?: (commentId: string, content: string) => Promise<void> | void;
   onLoadMore?: () => void;
-  targetId: string;
-  targetType: CommentTargetType;
 }
 
 /**
@@ -48,8 +45,6 @@ export const CommentSection = ({
   onCommentDelete,
   onCommentUpdate,
   onLoadMore,
-  targetId,
-  targetType,
   ...props
 }: CommentSectionProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

@@ -13,7 +13,7 @@ export type CacheAggregateType = 'global-stats' | 'trending' | 'user-stats';
 /**
  * valid entity types for cache operations
  */
-export type CacheEntityType = 'bobblehead' | 'collection' | 'tag' | 'user';
+export type CacheEntityType = 'bobblehead' | 'collection' | 'subcollection' | 'tag' | 'user';
 
 /**
  * valid feature types for cache operations

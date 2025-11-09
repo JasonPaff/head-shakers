@@ -11,7 +11,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useToggle } from '@/hooks/use-toggle';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
@@ -100,6 +100,7 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
 
       <Dialog onOpenChange={setIsModalOpen.update} open={isModalOpen}>
         <DialogContent className={'max-w-6xl p-0'} isShowCloseButton={false} onKeyDown={handleKeyDown}>
+          <DialogTitle className={'sr-only'}>{_altText}</DialogTitle>
           <div className={'relative flex items-center justify-center bg-black'}>
             {/* Close button */}
             <Button

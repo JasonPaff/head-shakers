@@ -178,3 +178,225 @@
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll"
 }
+
+            ## 2025-11-09 21:38:55 - MODIFICATION
+            - **Tool**: mcp__Neon__get_database_tables
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers"
+}
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:39:00 - MODIFICATION
+            - **Tool**: mcp__Neon__describe_table_schema
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"tableName": "collections"
+}
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"tableName": "collections"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:39:00 - MODIFICATION
+            - **Tool**: mcp__Neon__describe_table_schema
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"tableName": "sub_collections"
+}
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"tableName": "sub_collections"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:53:21 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.collection_id, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.collection_id, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:53:28 - MODIFICATION
+            - **Tool**: mcp__Neon__describe_table_schema
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "tableName": "comments"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "tableName": "comments"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:53:35 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:53:40 - MODIFICATION
+            - **Tool**: mcp__Neon__describe_table_schema
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "tableName": "users"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "tableName": "users"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:53:48 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.display_name, u.avatar_url, u.is_deleted as user_is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.display_name, u.avatar_url, u.is_deleted as user_is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 21:56:29 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.user_id, u.id as actual_user_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = '090bbdde-9b77-4dbe-8d09-4ca1dc27253b';"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.user_id, u.id as actual_user_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = '090bbdde-9b77-4dbe-8d09-4ca1dc27253b';"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 22:00:02 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.created_at, u.id as user_table_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.target_id = '5ea0a782-fb9c-485b-bf20-97374c1df603' ORDER BY c.created_at DESC LIMIT 2;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id, c.content, c.user_id, c.created_at, u.id as user_table_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.target_id = '5ea0a782-fb9c-485b-bf20-97374c1df603' ORDER BY c.created_at DESC LIMIT 2;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}

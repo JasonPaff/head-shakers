@@ -3,7 +3,7 @@
  * provides enterprise-grade cache invalidation patterns using revalidateTag
  */
 
-import { revalidateTag } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { isCacheEnabled, isCacheLoggingEnabled } from '@/lib/constants/cache';
 import { type CacheEntityType, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
@@ -308,6 +308,29 @@ export class CacheRevalidationService {
       operation: 'add' | 'delete' | 'update',
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);
+
+      // Revalidate the specific page path where comments are displayed
+      if (isCacheEnabled()) {
+        try {
+          switch (entityType) {
+            case 'bobblehead':
+              revalidatePath(`/bobbleheads/${entityId}`, 'page');
+              break;
+            case 'collection':
+              revalidatePath(`/collections/${entityId}`, 'page');
+              break;
+            case 'subcollection':
+              // For subcollections, we need to revalidate the subcollection page
+              // The path pattern is /collections/[collectionId]/subcollection/[subcollectionId]
+              // Since we don't have collectionId here, we'll use a layout revalidation
+              revalidatePath(`/collections`, 'layout');
+              break;
+          }
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId,
         entityType,
