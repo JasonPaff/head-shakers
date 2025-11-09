@@ -21,6 +21,7 @@ export const DEFAULTS = {
     SORT_ORDER: 0,
   },
   COLLECTION: {
+    COMMENT_COUNT: 0,
     IS_PUBLIC: true,
     LIKE_COUNT: 0,
     TOTAL_ITEMS: 0,
@@ -75,6 +76,7 @@ export const DEFAULTS = {
     VALUE_TYPE: 'string',
   },
   SUB_COLLECTION: {
+    COMMENT_COUNT: 0,
     IS_PUBLIC: true,
     ITEM_COUNT: 0,
     LIKE_COUNT: 0,

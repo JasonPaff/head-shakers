@@ -42,6 +42,13 @@ export const OPERATIONS = {
     GET_BY_USER: 'get_collections_by_user',
     UPDATE: 'update_collection',
   },
+  COMMENTS: {
+    CREATE_COMMENT: 'create_comment',
+    DELETE_COMMENT: 'delete_comment',
+    GET_COMMENT_COUNT: 'get_comment_count',
+    GET_COMMENTS: 'get_comments',
+    UPDATE_COMMENT: 'update_comment',
+  },
   FEATURED_CONTENT: {
     CREATE: 'create_featured_content',
     DELETE: 'delete_featured_content',

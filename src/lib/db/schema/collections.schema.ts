@@ -17,6 +17,7 @@ import { users } from '@/lib/db/schema/users.schema';
 export const collections = pgTable(
   'collections',
   {
+    commentCount: integer('comment_count').default(DEFAULTS.COLLECTION.COMMENT_COUNT).notNull(),
     coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     description: varchar('description', { length: SCHEMA_LIMITS.COLLECTION.DESCRIPTION.MAX }),
@@ -58,6 +59,7 @@ export const collections = pgTable(
     check('collections_total_items_non_negative', sql`${table.totalItems} >= 0`),
     check('collections_total_value_non_negative', sql`${table.totalValue} >= 0`),
     check('collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
+    check('collections_comment_count_non_negative', sql`${table.commentCount} >= 0`),
   ],
 );
 
@@ -67,6 +69,7 @@ export const subCollections = pgTable(
     collectionId: uuid('collection_id')
       .references(() => collections.id, { onDelete: 'cascade' })
       .notNull(),
+    commentCount: integer('comment_count').default(DEFAULTS.SUB_COLLECTION.COMMENT_COUNT).notNull(),
     coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     description: varchar('description', { length: SCHEMA_LIMITS.SUB_COLLECTION.DESCRIPTION.MAX }),
@@ -90,6 +93,7 @@ export const subCollections = pgTable(
     // constraints
     check('sub_collections_item_count_non_negative', sql`${table.itemCount} >= 0`),
     check('sub_collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
+    check('sub_collections_comment_count_non_negative', sql`${table.commentCount} >= 0`),
     check(
       'sub_collections_name_length',
       sql`length(${table.name}) <= ${SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX}`,

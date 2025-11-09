@@ -42,6 +42,13 @@ export const ERROR_MESSAGES = {
     SUB_COLLECTION_UPDATE_FAILED: 'Failed to update sub-collection',
     UPDATE_FAILED: 'Failed to update collection',
   },
+  COMMENTS: {
+    COMMENT_DELETE_FAILED: 'Failed to delete comment',
+    COMMENT_FAILED: 'Failed to process comment',
+    COMMENT_NOT_FOUND: 'Comment not found',
+    COMMENT_UPDATE_FAILED: 'Failed to update comment',
+    UNAUTHORIZED_COMMENT_ACCESS: 'You do not have permission to modify this comment',
+  },
   CONTENT_REPORTS: {
     CREATE_FAILED: 'Failed to create content report',
     DUPLICATE_REPORT: 'You have already reported this content',
