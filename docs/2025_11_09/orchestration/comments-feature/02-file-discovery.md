@@ -33,6 +33,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 ### CRITICAL - Database Schema (Already Exists!)
 
 ✅ **src/lib/db/schema/social.schema.ts** (Lines 97-153)
+
 - **AI Reasoning**: Contains complete comments table schema with all required fields
 - **Priority**: CRITICAL - Foundation for entire feature
 - **Key Findings**:
@@ -45,16 +46,19 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Status**: ✅ COMPLETE - No changes needed
 
 ✅ **src/lib/db/schema/relations.schema.ts** (Lines 149+)
+
 - **AI Reasoning**: Database relations linking comments to users, likes, parent comments
 - **Priority**: CRITICAL - Required for proper data relationships
 - **Status**: ✅ COMPLETE - Already integrated
 
 ✅ **src/lib/db/migrations/20250906001344_spicy_jean_grey.sql** (Lines 150-166)
+
 - **AI Reasoning**: Initial migration creating comments table
 - **Priority**: CRITICAL - Historical context for schema evolution
 - **Status**: ✅ COMPLETE - Already applied
 
 ✅ **src/lib/db/migrations/20250909115800_friendly_solo.sql** (Line 4)
+
 - **AI Reasoning**: Added subcollection support to comment_target_type enum
 - **Priority**: CRITICAL - Enabled three-entity commenting
 - **Status**: ✅ COMPLETE - Already applied
@@ -64,6 +68,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Validation Layer
 
 ✅ **src/lib/validations/social.validation.ts** (Lines 28-54)
+
 - **AI Reasoning**: Complete comment validation schemas already implemented
 - **Priority**: HIGH - Required for type-safe comment operations
 - **Key Findings**:
@@ -75,6 +80,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 📋 **src/lib/validations/like.validation.ts**
+
 - **AI Reasoning**: Pattern reference for polymorphic operations
 - **Priority**: HIGH - Shows validation patterns to follow
 - **Usage**: Reference for targetId + targetType validation patterns
@@ -83,6 +89,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Actions Layer (TO BE CREATED)
 
 📋 **src/lib/actions/social/social.actions.ts** (Lines 1-263)
+
 - **AI Reasoning**: Existing social actions showing required patterns
 - **Priority**: HIGH - Must add comment actions here
 - **Patterns Identified**:
@@ -102,6 +109,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Query Layer (TO BE CREATED)
 
 📋 **src/lib/queries/social/social.query.ts** (Lines 1-388)
+
 - **AI Reasoning**: Existing social query patterns to follow
 - **Priority**: HIGH - Core data fetching logic
 - **Patterns Identified**:
@@ -122,6 +130,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Facade Layer (TO BE CREATED)
 
 📋 **src/lib/facades/social/social.facade.ts** (Lines 1-366)
+
 - **AI Reasoning**: Business logic layer between actions and queries
 - **Priority**: HIGH - Coordinates complex operations
 - **Patterns Identified**:
@@ -143,6 +152,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Existing Comment Component
 
 📋 **src/components/feature/bobblehead/bobblehead-comments-dialog.tsx** (Lines 1-29)
+
 - **AI Reasoning**: Placeholder component showing "coming soon"
 - **Priority**: HIGH - Needs full implementation
 - **Current State**: Shows dialog with placeholder message
@@ -152,16 +162,19 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Pattern Reference Components
 
 📋 **src/components/ui/dialog.tsx** (Lines 1-80)
+
 - **AI Reasoning**: Radix Dialog usage patterns
 - **Priority**: HIGH - Use for comment dialogs/modals
 - **Validation**: File exists and accessible
 
 📋 **src/components/ui/form/field-components/textarea-field.tsx** (Lines 1-66)
+
 - **AI Reasoning**: TanStack Form + Textarea integration
 - **Priority**: HIGH - Use for comment input fields
 - **Validation**: File exists and accessible
 
 📋 **src/components/ui/avatar.tsx** (Lines 1-41)
+
 - **AI Reasoning**: Radix Avatar for user profile pictures
 - **Priority**: HIGH - Use in comment author display
 - **Validation**: File exists and accessible
@@ -169,6 +182,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Components to Create
 
 🆕 **src/components/feature/comments/comment-list.tsx** (NEW)
+
 - **AI Reasoning**: Display paginated comments for target entity
 - **Priority**: HIGH - Core comment display
 - **Requirements**:
@@ -178,6 +192,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: N/A - To be created
 
 🆕 **src/components/feature/comments/comment-form.tsx** (NEW)
+
 - **AI Reasoning**: Client Component for comment submission
 - **Priority**: HIGH - Core comment creation
 - **Requirements**:
@@ -188,6 +203,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: N/A - To be created
 
 🆕 **src/components/feature/comments/comment-item.tsx** (NEW)
+
 - **AI Reasoning**: Single comment display with actions
 - **Priority**: HIGH - Core comment display
 - **Requirements**:
@@ -197,6 +213,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: N/A - To be created
 
 🆕 **src/components/feature/comments/comment-section.tsx** (NEW)
+
 - **AI Reasoning**: Wrapper combining form + list
 - **Priority**: HIGH - Main entry point
 - **Requirements**:
@@ -208,6 +225,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 ### HIGH PRIORITY - Page Integration
 
 📋 **src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/page.tsx** (Lines 48-117)
+
 - **AI Reasoning**: Bobblehead detail page needing comment section
 - **Priority**: HIGH - Primary integration point
 - **Integration Point**: After line 114 (after secondary cards)
@@ -215,12 +233,14 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 📋 **src/app/(app)/collections/[collectionId]/(collection)/page.tsx** (Lines 50-99)
+
 - **AI Reasoning**: Collection detail page needing comment section
 - **Priority**: HIGH - Primary integration point
 - **Integration Point**: In sidebar or after bobbleheads section
 - **Validation**: File exists and accessible
 
 📋 **src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/page.tsx** (Lines 49-96)
+
 - **AI Reasoning**: Subcollection detail page needing comment section
 - **Priority**: HIGH - Primary integration point
 - **Integration Point**: In sidebar or after bobbleheads
@@ -231,6 +251,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Constants and Configuration
 
 ✅ **src/lib/constants/enums.ts** (Lines 10-12, 46-48, 61-63)
+
 - **AI Reasoning**: Enum definitions for comment system
 - **Priority**: MEDIUM - Configuration values
 - **Key Findings**:
@@ -241,6 +262,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 ✅ **src/lib/constants/defaults.ts** (Lines 29-33)
+
 - **AI Reasoning**: Default values for comment fields
 - **Priority**: MEDIUM - Configuration values
 - **Key Findings**: All comment defaults defined (IS_DELETED, IS_EDITED, LIKE_COUNT)
@@ -248,6 +270,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 ✅ **src/lib/constants/schema-limits.ts** (Lines 33-35)
+
 - **AI Reasoning**: Field length limits for validation
 - **Priority**: MEDIUM - Validation configuration
 - **Key Findings**: COMMENT.CONTENT limits defined (MIN: 1, MAX: 5000)
@@ -255,24 +278,28 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 📋 **src/lib/constants/operations.ts** (Lines 1-115)
+
 - **AI Reasoning**: Operation names for error tracking
 - **Priority**: MEDIUM - Error tracking configuration
 - **Action Needed**: Add COMMENTS section with operation names
 - **Validation**: File exists and accessible
 
 📋 **src/lib/constants/action-names.ts** (Lines 72-81)
+
 - **AI Reasoning**: Action names for Next-Safe-Action
 - **Priority**: MEDIUM - Action configuration
 - **Status**: ✅ COMPLETE - Comment action names already in SOCIAL section
 - **Validation**: File exists and accessible
 
 📋 **src/lib/constants/error-codes.ts** (Lines 1-100)
+
 - **AI Reasoning**: Error codes for domain
 - **Priority**: MEDIUM - Error handling configuration
 - **Action Needed**: Add COMMENTS section with error codes
 - **Validation**: File exists and accessible
 
 📋 **src/lib/constants/error-messages.ts** (Lines 1-100)
+
 - **AI Reasoning**: User-facing error messages
 - **Priority**: MEDIUM - Error handling configuration
 - **Action Needed**: Add COMMENTS section with messages
@@ -281,12 +308,14 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Cache and Revalidation
 
 📋 **src/lib/services/cache-revalidation.service.ts**
+
 - **AI Reasoning**: Cache invalidation patterns
 - **Priority**: MEDIUM - Performance optimization
 - **Action Needed**: Add comment-specific revalidation strategies
 - **Validation**: File exists and accessible
 
 📋 **src/lib/utils/cache-tags.utils.ts**
+
 - **AI Reasoning**: Cache tag generation utilities
 - **Priority**: MEDIUM - Caching infrastructure
 - **Action Needed**: Add comment cache tag generators
@@ -295,36 +324,42 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 #### Utilities and Middleware
 
 📋 **src/lib/utils/next-safe-action.ts**
+
 - **AI Reasoning**: Action client setup with middleware
 - **Priority**: MEDIUM - Action infrastructure
 - **Usage**: Use `authActionClient` for comment actions
 - **Validation**: File exists and accessible
 
 📋 **src/lib/middleware/sanitization.middleware.ts** (Lines 1-58)
+
 - **AI Reasoning**: DOMPurify sanitization for inputs
 - **Priority**: MEDIUM - Security
 - **Status**: ✅ AUTOMATIC - Applies via action middleware
 - **Validation**: File exists and accessible
 
 📋 **src/lib/queries/base/base-query.ts**
+
 - **AI Reasoning**: Base query class with common patterns
 - **Priority**: MEDIUM - Query infrastructure
 - **Usage**: Extend or use patterns for CommentQuery
 - **Validation**: File exists and accessible
 
 📋 **src/lib/queries/base/query-context.ts** (Lines 1-122)
+
 - **AI Reasoning**: Query context creation functions
 - **Priority**: MEDIUM - Query infrastructure
 - **Usage**: Use for authenticated/public contexts
 - **Validation**: File exists and accessible
 
 📋 **src/utils/optional-auth-utils.ts** (Lines 1-28)
+
 - **AI Reasoning**: Optional authentication utilities
 - **Priority**: MEDIUM - Authorization
 - **Usage**: Check comment ownership for edit/delete
 - **Validation**: File exists and accessible
 
 📋 **src/utils/user-utils.ts** (Lines 1-17)
+
 - **AI Reasoning**: User utilities for required auth
 - **Priority**: MEDIUM - Authentication
 - **Usage**: Get current user ID for comment creation
@@ -333,6 +368,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 ### MEDIUM PRIORITY - Related Entity Updates
 
 ⚠️ **src/lib/db/schema/bobbleheads.schema.ts** (Line 35)
+
 - **AI Reasoning**: Bobblehead schema with commentCount field
 - **Priority**: MEDIUM - Entity updates
 - **Status**: ✅ COMPLETE - commentCount field exists
@@ -340,6 +376,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 ⚠️ **src/lib/db/schema/collections.schema.ts** (Line 26)
+
 - **AI Reasoning**: Collection schema missing commentCount
 - **Priority**: MEDIUM - Entity updates
 - **Status**: ⚠️ MISSING FIELD - Has likeCount but NO commentCount
@@ -347,6 +384,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 ⚠️ **src/lib/db/schema/collections.schema.ts** (subcollections)
+
 - **AI Reasoning**: Subcollection schema missing commentCount
 - **Priority**: MEDIUM - Entity updates
 - **Status**: ⚠️ MISSING FIELD - Needs commentCount field
@@ -354,18 +392,21 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 - **Validation**: File exists and accessible
 
 📋 **src/lib/queries/bobbleheads/bobbleheads-query.ts**
+
 - **AI Reasoning**: Bobblehead query methods
 - **Priority**: MEDIUM - Entity queries
 - **Action**: May need comment count update methods
 - **Validation**: File exists and accessible
 
 📋 **src/lib/queries/collections/collections.query.ts**
+
 - **AI Reasoning**: Collection query methods
 - **Priority**: MEDIUM - Entity queries
 - **Action Needed**: Add comment count methods
 - **Validation**: File exists and accessible
 
 📋 **src/lib/queries/collections/subcollections.query.ts**
+
 - **AI Reasoning**: Subcollection query methods
 - **Priority**: MEDIUM - Entity queries
 - **Action Needed**: Add comment count methods
@@ -374,12 +415,14 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 ### LOW PRIORITY - Testing and Documentation
 
 📋 **src/lib/validations/moderation.validation.ts**
+
 - **AI Reasoning**: Reference for moderation patterns
 - **Priority**: LOW - Optional enhancement
 - **Usage**: Comment moderation/reporting
 - **Validation**: File exists and accessible
 
 📋 **src/lib/actions/content-reports/content-reports.actions.ts**
+
 - **AI Reasoning**: Content reporting system
 - **Priority**: LOW - Optional enhancement
 - **Status**: ✅ Already supports comment reports (ENUMS includes 'comment')
@@ -388,6 +431,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 ## File Path Validation Results
 
 ✅ **All discovered files validated**
+
 - Total files checked: 62
 - Existing files: 54
 - Files to create: 8
@@ -405,17 +449,17 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 
 ### Coverage Analysis
 
-| Layer | Files Found | Status |
-|-------|-------------|--------|
-| Database Schema | 4 | ✅ Complete |
-| Validations | 2 | ✅ Mostly Complete |
-| Actions | 1 | 📋 Needs Extension |
-| Queries | 1 | 📋 Needs Extension |
-| Facades | 1 | 📋 Needs Extension |
-| Components | 8 | 🆕 Needs Creation |
-| Pages | 3 | 📋 Needs Integration |
-| Constants | 7 | ⚠️ Partially Complete |
-| Utilities | 8 | ✅ Available |
+| Layer           | Files Found | Status                |
+| --------------- | ----------- | --------------------- |
+| Database Schema | 4           | ✅ Complete           |
+| Validations     | 2           | ✅ Mostly Complete    |
+| Actions         | 1           | 📋 Needs Extension    |
+| Queries         | 1           | 📋 Needs Extension    |
+| Facades         | 1           | 📋 Needs Extension    |
+| Components      | 8           | 🆕 Needs Creation     |
+| Pages           | 3           | 📋 Needs Integration  |
+| Constants       | 7           | ⚠️ Partially Complete |
+| Utilities       | 8           | ✅ Available          |
 
 ### Priority Distribution
 
@@ -429,6 +473,7 @@ The file-discovery-agent performed comprehensive AI-powered analysis across mult
 ### ✅ Major Win: Schema Already Exists!
 
 The AI discovered that the comments database infrastructure is FULLY IMPLEMENTED:
+
 - Complete table schema with all fields
 - Polymorphic support for all three entity types
 - Soft delete and edit tracking
@@ -442,6 +487,7 @@ AI identified missing `commentCount` fields on collections and subcollections ta
 ### 📋 Implementation Scope Clarified
 
 AI analysis shows the work is primarily:
+
 1. Adding query/facade/action methods (extending existing files)
 2. Creating UI components (new files)
 3. Integrating into detail pages (minor modifications)
@@ -478,8 +524,8 @@ src/lib/
 ### Cache Strategy Required
 
 ```typescript
-CACHE_KEYS.SOCIAL.COMMENTS(targetType, targetId)
-CACHE_KEYS.SOCIAL.COMMENT(commentId)
+CACHE_KEYS.SOCIAL.COMMENTS(targetType, targetId);
+CACHE_KEYS.SOCIAL.COMMENT(commentId);
 ```
 
 ---

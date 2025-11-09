@@ -49,10 +49,7 @@ export const CommentList = ({
   };
 
   return (
-    <div
-      className={cn('space-y-4', className)}
-      {...props}
-    >
+    <div className={cn('space-y-4', className)} {...props}>
       {/* Comment List */}
       <Conditional isCondition={_hasComments}>
         <div className={'space-y-3'}>
@@ -74,9 +71,7 @@ export const CommentList = ({
         <div className={'flex flex-col items-center justify-center py-12 text-center'}>
           <MessageSquareIcon aria-hidden className={'mb-4 size-12 text-muted-foreground/50'} />
           <h3 className={'mb-1 text-lg font-semibold'}>No comments yet</h3>
-          <p className={'text-sm text-muted-foreground'}>
-            Be the first to share your thoughts!
-          </p>
+          <p className={'text-sm text-muted-foreground'}>Be the first to share your thoughts!</p>
         </div>
       </Conditional>
 
@@ -84,10 +79,7 @@ export const CommentList = ({
       <Conditional isCondition={isLoading}>
         <div className={'space-y-3'}>
           {Array.from({ length: 3 }).map((_, index) => (
-            <div
-              className={'animate-pulse rounded-lg border bg-card p-4'}
-              key={index}
-            >
+            <div className={'animate-pulse rounded-lg border bg-card p-4'} key={index}>
               <div className={'mb-3 flex items-center gap-3'}>
                 <div className={'size-8 rounded-full bg-muted'} />
                 <div className={'flex-1 space-y-2'}>
@@ -107,10 +99,7 @@ export const CommentList = ({
       {/* Load More Button */}
       <Conditional isCondition={_shouldShowLoadMore}>
         <div className={'flex justify-center pt-4'}>
-          <Button
-            onClick={handleLoadMoreClick}
-            variant={'outline'}
-          >
+          <Button onClick={handleLoadMoreClick} variant={'outline'}>
             Load More Comments
           </Button>
         </div>

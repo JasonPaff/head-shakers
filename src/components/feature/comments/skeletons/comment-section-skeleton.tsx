@@ -29,16 +29,10 @@ export const CommentSectionSkeleton = ({
   ...props
 }: CommentSectionSkeletonProps) => {
   return (
-    <div
-      className={cn('space-y-6', className)}
-      {...props}
-    >
+    <div className={cn('space-y-6', className)} {...props}>
       {/* Section Header Skeleton */}
       <div className={'flex items-center gap-2'}>
-        <MessageSquareTextIcon
-          aria-hidden
-          className={'size-5 text-muted-foreground'}
-        />
+        <MessageSquareTextIcon aria-hidden className={'size-5 text-muted-foreground'} />
         <div className={'flex items-baseline gap-2'}>
           <Skeleton className={'h-7 w-28'} />
           <Skeleton className={'h-5 w-12'} />

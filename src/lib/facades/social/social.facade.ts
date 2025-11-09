@@ -1,9 +1,5 @@
 import type { FindOptions } from '@/lib/queries/base/query-context';
-import type {
-  CommentTargetType,
-  CommentWithUser,
-  UserLikeStatus,
-} from '@/lib/queries/social/social.query';
+import type { CommentTargetType, CommentWithUser, UserLikeStatus } from '@/lib/queries/social/social.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';

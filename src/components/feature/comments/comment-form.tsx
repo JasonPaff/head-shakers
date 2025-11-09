@@ -38,7 +38,8 @@ export const CommentForm = ({
 }: CommentFormProps) => {
   const [content, setContent] = useState(initialContent);
 
-  const _isContentValid = content.trim().length >= SCHEMA_LIMITS.COMMENT.CONTENT.MIN &&
+  const _isContentValid =
+    content.trim().length >= SCHEMA_LIMITS.COMMENT.CONTENT.MIN &&
     content.length <= SCHEMA_LIMITS.COMMENT.CONTENT.MAX;
   const _isSubmitDisabled = !_isContentValid || isSubmitting || isDisabled;
   const _shouldShowCancel = !!onCancel;
@@ -67,11 +68,7 @@ export const CommentForm = ({
   };
 
   return (
-    <form
-      className={cn('space-y-3', className)}
-      onSubmit={handleSubmit}
-      {...props}
-    >
+    <form className={cn('space-y-3', className)} onSubmit={handleSubmit} {...props}>
       {/* Comment Input Section */}
       <div className={'relative'}>
         <Textarea
@@ -93,9 +90,9 @@ export const CommentForm = ({
         <div
           className={cn(
             'absolute right-2 bottom-2 text-xs',
-            _isOverLimit ? 'text-destructive' :
-            _isNearLimit ? 'text-orange-600' :
-            'text-muted-foreground',
+            _isOverLimit ? 'text-destructive'
+            : _isNearLimit ? 'text-orange-600'
+            : 'text-muted-foreground',
           )}
           id={'comment-character-count'}
         >
@@ -106,22 +103,12 @@ export const CommentForm = ({
       {/* Form Actions */}
       <div className={'flex justify-end gap-2'}>
         <Conditional isCondition={_shouldShowCancel}>
-          <Button
-            disabled={isSubmitting}
-            onClick={handleCancelClick}
-            type={'button'}
-            variant={'outline'}
-          >
+          <Button disabled={isSubmitting} onClick={handleCancelClick} type={'button'} variant={'outline'}>
             Cancel
           </Button>
         </Conditional>
 
-        <Button
-          aria-busy={isSubmitting}
-          disabled={_isSubmitDisabled}
-          type={'submit'}
-          variant={'default'}
-        >
+        <Button aria-busy={isSubmitting} disabled={_isSubmitDisabled} type={'submit'} variant={'default'}>
           <Conditional isCondition={isSubmitting}>
             <LoaderIcon aria-hidden className={'mr-2 size-4 animate-spin'} />
           </Conditional>

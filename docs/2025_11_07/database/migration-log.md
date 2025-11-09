@@ -14,6 +14,7 @@
 Clerk's OAuth image proxy URLs (especially for Google, GitHub, and other OAuth providers) are typically 150-200 characters long, which exceeded the previous 100-character limit. This was causing webhook user creation to fail with "value too long for type character varying(100)" errors.
 
 **Migration SQL:**
+
 ```sql
 ALTER TABLE "users" ALTER COLUMN "avatar_url" TYPE varchar(500);
 ```
@@ -21,6 +22,7 @@ ALTER TABLE "users" ALTER COLUMN "avatar_url" TYPE varchar(500);
 **Status:** COMPLETED SUCCESSFULLY
 
 **Verification:**
+
 - Migration file created: `20251107014102_increase_avatar_url_size.sql`
 - Migration executed: `npm run db:migrate` completed successfully
 - Schema regenerated: `npm run db:generate` confirmed the change
@@ -28,16 +30,19 @@ ALTER TABLE "users" ALTER COLUMN "avatar_url" TYPE varchar(500);
 - `users` table: 19 columns (avatar_url type updated)
 
 **Code Changes:**
+
 - Schema constant `SCHEMA_LIMITS.USER.AVATAR_URL.MAX` already set to 500 in `src/lib/constants/schema-limits.ts` (line 75)
 - User sync service updated to handle longer URLs in `src/lib/services/user-sync.service.ts`
 
 **Notes:**
+
 - This is a safe, backward-compatible schema change
 - No data loss or truncation occurred
 - Temporary workaround (setting URLs longer than 100 characters to NULL) can now be removed
 - The Clerk webhook integration will now successfully store full OAuth image proxy URLs
 
 **Next Steps:**
+
 - Remove the NULL workaround in user sync service if present
 - Test Clerk webhook user creation with full avatar URLs
 - Deploy to production after verification

@@ -99,10 +99,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
           <ContentLayout>
             <SubcollectionErrorBoundary section={'comments'}>
               <Suspense fallback={<CommentSectionSkeleton />}>
-                <CommentSectionAsync
-                  targetId={subcollectionId}
-                  targetType={'subcollection'}
-                />
+                <CommentSectionAsync targetId={subcollectionId} targetType={'subcollection'} />
               </Suspense>
             </SubcollectionErrorBoundary>
           </ContentLayout>

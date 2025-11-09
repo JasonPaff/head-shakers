@@ -63,11 +63,7 @@ export const CommentDeleteDialog = ({
   };
 
   return (
-    <AlertDialog
-      onOpenChange={handleOpenChange}
-      open={_isDialogOpen}
-      {...props}
-    >
+    <AlertDialog onOpenChange={handleOpenChange} open={_isDialogOpen} {...props}>
       <AlertDialogContent>
         {/* Dialog Header */}
         <AlertDialogHeader>
@@ -76,16 +72,14 @@ export const CommentDeleteDialog = ({
             <AlertDialogTitle>Delete Comment</AlertDialogTitle>
           </div>
           <AlertDialogDescription>
-            Are you sure you want to delete this comment? This action cannot be undone and the comment
-            will be permanently removed.
+            Are you sure you want to delete this comment? This action cannot be undone and the comment will be
+            permanently removed.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         {/* Dialog Footer */}
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={_isLoading}>
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={_isLoading}>Cancel</AlertDialogCancel>
           <AlertDialogAction
             aria-busy={_isLoading}
             className={'bg-destructive hover:bg-destructive/90'}

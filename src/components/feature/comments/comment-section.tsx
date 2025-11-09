@@ -48,6 +48,8 @@ export const CommentSection = ({
   onCommentDelete,
   onCommentUpdate,
   onLoadMore,
+  targetId,
+  targetType,
   ...props
 }: CommentSectionProps) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -122,18 +124,13 @@ export const CommentSection = ({
   };
 
   return (
-    <div
-      className={cn('space-y-6', className)}
-      {...props}
-    >
+    <div className={cn('space-y-6', className)} {...props}>
       {/* Section Header */}
       <div className={'flex items-center gap-2'}>
         <MessageSquareTextIcon aria-hidden className={'size-5 text-muted-foreground'} />
         <h2 className={'text-xl font-semibold'}>
           Comments
-          <span className={'ml-2 text-sm font-normal text-muted-foreground'}>
-            ({_commentCount})
-          </span>
+          <span className={'ml-2 text-sm font-normal text-muted-foreground'}>({_commentCount})</span>
         </h2>
       </div>
 

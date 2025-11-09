@@ -102,10 +102,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
           <ContentLayout>
             <CollectionErrorBoundary section={'comments'}>
               <Suspense fallback={<CommentSectionSkeleton />}>
-                <CommentSectionAsync
-                  targetId={collectionId}
-                  targetType={'collection'}
-                />
+                <CommentSectionAsync targetId={collectionId} targetType={'collection'} />
               </Suspense>
             </CollectionErrorBoundary>
           </ContentLayout>

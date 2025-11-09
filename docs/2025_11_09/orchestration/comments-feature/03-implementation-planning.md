@@ -15,6 +15,7 @@
 
 ```markdown
 Generate an implementation plan in MARKDOWN format (NOT XML) following your defined template with these sections:
+
 - ## Overview (with Estimated Duration, Complexity, Risk Level)
 - ## Quick Summary
 - ## Prerequisites
@@ -43,6 +44,7 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 
 ✅ **Format Check**: Output is markdown (not XML)
 ✅ **Template Compliance**: Includes all required sections
+
 - ✅ Overview section with duration, complexity, risk
 - ✅ Quick Summary section
 - ✅ Prerequisites section with checklist
@@ -51,6 +53,7 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 - ✅ Notes section
 
 ✅ **Section Validation**: All sections contain appropriate content
+
 - ✅ Each step includes What/Why/Confidence
 - ✅ Each step includes Files to Modify/Create
 - ✅ Each step includes Changes description
@@ -58,11 +61,13 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 - ✅ Each step includes Success Criteria
 
 ✅ **Command Validation**: All steps include validation commands
+
 - ✅ All TypeScript steps include `npm run lint:fix && npm run typecheck`
 - ✅ Migration steps include `npm run db:migrate`
 - ✅ Validation commands are appropriate for each step type
 
 ✅ **Content Quality**: Plan meets quality standards
+
 - ✅ No code examples included (instruction followed)
 - ✅ All steps are actionable and concrete
 - ✅ Steps follow logical dependency order
@@ -73,12 +78,14 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 ### Phase Breakdown
 
 **Phase 1: Database Foundation** (Steps 1-4)
+
 - Add commentCount fields to collections/subcollections
 - Update TypeScript schema definitions
 - Update constants for defaults
 - Add comment operations to constants
 
 **Phase 2: Backend Infrastructure** (Steps 5-10)
+
 - Create validation schemas
 - Extend query layer (6 methods)
 - Extend facade layer (5 methods)
@@ -86,29 +93,34 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 - Update cache services
 
 **Phase 3: UI Components** (Steps 11-18)
+
 - Create core components (8 components)
 - Comment display components
 - Comment form components
 - Async wrappers and skeletons
 
 **Phase 4: Page Integration** (Steps 19-21)
+
 - Bobblehead detail page
 - Collection detail page
 - Subcollection detail page
 
 **Phase 5: Supporting Constants** (Steps 22-23)
+
 - Action name constants
 - Sentry context constants
 
 ### Dependency Analysis
 
 **Critical Path**:
+
 1. Database migration (Step 1) → Schema updates (Step 2) → Constants (Step 3)
 2. Query layer (Step 6) → Facade layer (Step 7) → Actions (Step 8)
 3. Core components (Steps 11-15) → Section wrapper (Step 16) → Async wrapper (Step 17)
 4. All backend complete → Page integration (Steps 19-21)
 
 **Parallel Opportunities**:
+
 - Steps 4-5 (Constants, Validations) can be done in parallel
 - Steps 9-10 (Cache services) can be done in parallel with Steps 11-15 (Components)
 - Steps 19-21 (Page integrations) can be done in parallel
@@ -119,12 +131,14 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 ### Overall Complexity: Medium
 
 **Factors Reducing Complexity**:
+
 - Database schema already exists (major reduction)
 - Validation schemas already exist
 - Clear patterns to follow from existing social features
 - Well-defined component structure
 
 **Factors Maintaining Complexity**:
+
 - 23 implementation steps across multiple layers
 - Multiple entity types (bobblehead, collection, subcollection)
 - Complex authorization logic (ownership checks)
@@ -134,12 +148,14 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 ### Time Estimate Analysis
 
 **3-4 Day Timeline Breakdown**:
+
 - Day 1: Database migration + Backend infrastructure (Steps 1-10)
 - Day 2: UI Components (Steps 11-18)
 - Day 3: Page integration + Testing (Steps 19-23)
 - Day 4: Polish, bug fixes, final validation
 
 **Estimate Confidence**: High
+
 - Plan leverages existing infrastructure extensively
 - Clear patterns reduce implementation uncertainty
 - Well-defined validation gates reduce rework risk
@@ -149,6 +165,7 @@ The implementation-planner agent generated a comprehensive 23-step implementatio
 ### Manual Testing Coverage
 
 The plan includes 10 quality gates:
+
 1. TypeScript validation (automated)
 2. ESLint validation (automated)
 3. Database migration validation (automated)
@@ -163,6 +180,7 @@ The plan includes 10 quality gates:
 ### Testing Recommendations
 
 The plan notes:
+
 - Integration tests for CRUD operations recommended
 - E2E tests for UI flows recommended
 - Uses existing Vitest and Testing Library setup
@@ -172,12 +190,14 @@ The plan notes:
 ### 🎯 Major Discovery Impact
 
 **Pre-existing Infrastructure**:
+
 - Complete database schema exists (social.schema.ts)
 - Validation schemas exist (social.validation.ts)
 - Migrations already applied (2 migrations found)
 - Constants already defined (enums, defaults, limits)
 
 **Impact on Implementation**:
+
 - ~40% reduction in implementation scope
 - Significantly reduced risk of schema design errors
 - Faster implementation timeline
@@ -186,11 +206,13 @@ The plan notes:
 ### ⚠️ Critical Gap Identified
 
 **Missing commentCount Fields**:
+
 - Collections table lacks commentCount field
 - Subcollections table lacks commentCount field
 - Bobbleheads table already has field
 
 **Mitigation**:
+
 - Step 1 addresses gap with migration
 - Must complete before other steps
 - Clear dependency management in plan
@@ -198,12 +220,14 @@ The plan notes:
 ### 📐 Architecture Alignment
 
 **Pattern Consistency**:
+
 - Follows existing social feature patterns (likes, follows)
 - Uses established query/facade/action structure
 - Matches existing component organization
 - Aligns with project's type safety requirements
 
 **Project Rules Compliance**:
+
 - No `any` types in plan
 - No `forwardRef()` (React 19)
 - No ESLint disable comments
@@ -214,15 +238,15 @@ The plan notes:
 
 ✅ **All Validation Checks Passed**
 
-| Validation Category | Status | Details |
-|---------------------|--------|---------|
-| Format Compliance | ✅ Pass | Markdown format (not XML) |
-| Template Adherence | ✅ Pass | All required sections present |
-| Step Structure | ✅ Pass | 23 steps with complete metadata |
+| Validation Category | Status  | Details                                |
+| ------------------- | ------- | -------------------------------------- |
+| Format Compliance   | ✅ Pass | Markdown format (not XML)              |
+| Template Adherence  | ✅ Pass | All required sections present          |
+| Step Structure      | ✅ Pass | 23 steps with complete metadata        |
 | Validation Commands | ✅ Pass | All steps include appropriate commands |
-| Content Quality | ✅ Pass | Actionable, concrete, no code examples |
-| Dependency Order | ✅ Pass | Logical step progression |
-| Completeness | ✅ Pass | Addresses entire feature request |
+| Content Quality     | ✅ Pass | Actionable, concrete, no code examples |
+| Dependency Order    | ✅ Pass | Logical step progression               |
+| Completeness        | ✅ Pass | Addresses entire feature request       |
 
 ## Agent Analysis Metrics
 

@@ -237,7 +237,11 @@ export class SocialQuery extends BaseQuery {
       .select({ count: count() })
       .from(comments)
       .where(
-        and(eq(comments.targetId, targetId), eq(comments.targetType, targetType), eq(comments.isDeleted, false)),
+        and(
+          eq(comments.targetId, targetId),
+          eq(comments.targetType, targetType),
+          eq(comments.isDeleted, false),
+        ),
       );
 
     return result[0]?.count || 0;

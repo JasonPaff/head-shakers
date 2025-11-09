@@ -7,13 +7,7 @@ import { useState } from 'react';
 import type { CommentWithUser } from '@/components/feature/comments/comment-item';
 
 import { CommentForm } from '@/components/feature/comments/comment-form';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface CommentEditDialogProps extends ComponentProps<typeof Dialog> {
   comment: CommentWithUser | null;
@@ -61,11 +55,7 @@ export const CommentEditDialog = ({
   };
 
   return (
-    <Dialog
-      onOpenChange={handleOpenChange}
-      open={_isDialogOpen}
-      {...props}
-    >
+    <Dialog onOpenChange={handleOpenChange} open={_isDialogOpen} {...props}>
       <DialogContent className={'sm:max-w-[600px]'}>
         {/* Dialog Header */}
         <DialogHeader>

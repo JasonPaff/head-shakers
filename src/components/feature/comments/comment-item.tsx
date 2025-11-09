@@ -24,11 +24,21 @@ interface CommentItemProps extends Omit<ComponentProps<'div'>, 'content'> {
 }
 
 /**
- * Formats a date as relative time (e.g., "2 hours ago")
+ * Safely converts a date-like value to a Date object
+ * Handles both Date objects and ISO date strings (from cache)
  */
-const getRelativeTime = (date: Date) => {
+const toDate = (value: Date | string): Date => {
+  return value instanceof Date ? value : new Date(value);
+};
+
+/**
+ * Formats a date as relative time (e.g., "2 hours ago")
+ * Handles both Date objects and date strings for cache compatibility
+ */
+const getRelativeTime = (date: Date | string) => {
+  const dateObj = toDate(date);
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const diffInSeconds = Math.floor((now.getTime() - dateObj.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
     return 'Just now';
@@ -94,7 +104,10 @@ export const CommentItem = ({
 
   return (
     <div
-      className={cn('group relative rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50', className)}
+      className={cn(
+        'group relative rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50',
+        className,
+      )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       {...props}
@@ -125,20 +138,10 @@ export const CommentItem = ({
         {/* Action Buttons */}
         <Conditional isCondition={_shouldShowActions}>
           <div className={'flex gap-1'}>
-            <Button
-              aria-label={'Edit comment'}
-              onClick={handleEditClick}
-              size={'sm'}
-              variant={'ghost'}
-            >
+            <Button aria-label={'Edit comment'} onClick={handleEditClick} size={'sm'} variant={'ghost'}>
               <EditIcon aria-hidden className={'size-4'} />
             </Button>
-            <Button
-              aria-label={'Delete comment'}
-              onClick={handleDeleteClick}
-              size={'sm'}
-              variant={'ghost'}
-            >
+            <Button aria-label={'Delete comment'} onClick={handleDeleteClick} size={'sm'} variant={'ghost'}>
               <TrashIcon aria-hidden className={'size-4'} />
             </Button>
           </div>
@@ -150,9 +153,7 @@ export const CommentItem = ({
 
       {/* Comment Footer */}
       <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
-        <time dateTime={comment.createdAt.toISOString()}>
-          {getRelativeTime(comment.createdAt)}
-        </time>
+        <time dateTime={toDate(comment.createdAt).toISOString()}>{getRelativeTime(comment.createdAt)}</time>
 
         <Conditional isCondition={_hasEditedIndicator}>
           <span className={'text-xs text-muted-foreground'}>• edited</span>

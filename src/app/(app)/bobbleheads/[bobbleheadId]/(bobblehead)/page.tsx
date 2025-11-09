@@ -120,10 +120,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
           <ContentLayout>
             <BobbleheadErrorBoundary section={'comments'}>
               <Suspense fallback={<CommentSectionSkeleton />}>
-                <CommentSectionAsync
-                  targetId={bobbleheadId}
-                  targetType={'bobblehead'}
-                />
+                <CommentSectionAsync targetId={bobbleheadId} targetType={'bobblehead'} />
               </Suspense>
             </BobbleheadErrorBoundary>
           </ContentLayout>

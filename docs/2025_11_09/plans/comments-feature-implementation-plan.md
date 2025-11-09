@@ -39,20 +39,24 @@ Implement a commenting feature for bobbleheads, collections, and subcollections 
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\lib\db\migrations\[timestamp]_add_comment_count_to_collections.sql` - SQL migration adding commentCount fields with defaults and constraints
 
 **Changes:**
+
 - Add commentCount integer field to collections table with default 0 and non-negative constraint
 - Add commentCount integer field to sub_collections table with default 0 and non-negative constraint
 - Update existing records to set commentCount = 0
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file created with proper SQL syntax
 - [ ] Database migration runs successfully
 - [ ] Both tables have commentCount fields with proper defaults and constraints
@@ -67,19 +71,23 @@ npm run db:migrate
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\db\schema\collections.schema.ts` - Add commentCount field definitions to both tables
 
 **Changes:**
+
 - Add `commentCount: integer('comment_count').default(DEFAULTS.COLLECTION.COMMENT_COUNT).notNull()` to collections table definition
 - Add `commentCount: integer('comment_count').default(DEFAULTS.SUB_COLLECTION.COMMENT_COUNT).notNull()` to subCollections table definition
 - Add check constraint for commentCount non-negative validation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema definitions include commentCount fields
 - [ ] Type checking passes without errors
 - [ ] Drizzle introspection matches database schema
@@ -94,18 +102,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\constants\defaults.ts` - Add COMMENT_COUNT to collection defaults
 
 **Changes:**
+
 - Add `COMMENT_COUNT: 0` to DEFAULTS.COLLECTION object
 - Add `COMMENT_COUNT: 0` to DEFAULTS.SUB_COLLECTION object
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constants added to defaults
 - [ ] No type errors in files importing DEFAULTS
 - [ ] All validation commands pass
@@ -119,21 +131,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\constants\operations.ts` - Add COMMENTS section with operation names
 - `src\lib\constants\error-codes.ts` - Add COMMENTS section with error codes
 - `src\lib\constants\error-messages.ts` - Add COMMENTS section with error messages
 
 **Changes:**
+
 - Add COMMENTS object to OPERATIONS with operations: CREATE_COMMENT, UPDATE_COMMENT, DELETE_COMMENT, GET_COMMENTS, GET_COMMENT_COUNT
 - Add COMMENTS error codes: COMMENT_FAILED, COMMENT_NOT_FOUND, COMMENT_UPDATE_FAILED, COMMENT_DELETE_FAILED, UNAUTHORIZED_COMMENT_ACCESS
 - Add corresponding error messages with clear user-facing text
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All comment operations defined in OPERATIONS
 - [ ] All error codes and messages added
 - [ ] Type inference works correctly
@@ -148,9 +164,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\lib\validations\comment.validation.ts` - Comment-specific validation schemas
 
 **Changes:**
+
 - Create createCommentSchema extending insertCommentSchema with required fields
 - Create updateCommentSchema for content updates
 - Create deleteCommentSchema with commentId validation
@@ -158,11 +176,13 @@ npm run lint:fix && npm run typecheck
 - Export all schemas and type inference helpers
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All validation schemas created with proper Zod patterns
 - [ ] Schemas properly extend base social validation schemas
 - [ ] Type exports work correctly
@@ -177,9 +197,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\queries\social\social.query.ts` - Add comment query methods
 
 **Changes:**
+
 - Add `createCommentAsync` method for comment creation with user reference
 - Add `updateCommentAsync` method for updating comment content with editedAt timestamp
 - Add `deleteCommentAsync` method for soft-deleting comments
@@ -189,11 +211,13 @@ npm run lint:fix && npm run typecheck
 - Add `decrementCommentCountAsync` method for reducing target entity comment counts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All six query methods implemented following existing patterns
 - [ ] Methods support bobblehead, collection, and subcollection target types
 - [ ] Pagination and filtering work correctly
@@ -208,9 +232,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\facades\social\social.facade.ts` - Add comment facade methods
 
 **Changes:**
+
 - Add `createComment` method with ownership validation and transaction support
 - Add `updateComment` method with authorization checks
 - Add `deleteComment` method with soft-delete logic and authorization
@@ -220,11 +246,13 @@ npm run lint:fix && npm run typecheck
 - Include cache integration following existing like patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All facade methods follow existing patterns in the file
 - [ ] Proper authorization checks for ownership validation
 - [ ] Cache integration matches like functionality patterns
@@ -240,9 +268,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\actions\social\social.actions.ts` - Add comment action handlers
 
 **Changes:**
+
 - Add `createCommentAction` using authActionClient with transaction support
 - Add `updateCommentAction` with ownership validation
 - Add `deleteCommentAction` with authorization checks
@@ -252,11 +282,13 @@ npm run lint:fix && npm run typecheck
 - Add cache revalidation calls after mutations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All actions follow Next-Safe-Action patterns
 - [ ] Authentication handled correctly via authActionClient/publicActionClient
 - [ ] Sentry breadcrumbs and contexts added
@@ -272,19 +304,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src\lib\services\cache-revalidation.service.ts` - Extend social.onCommentChange method usage
 
 **Changes:**
+
 - Verify existing `social.onCommentChange` method handles all three entity types
 - Update method signature if needed to support comment-specific operations
 - Ensure proper tag generation for comment cache invalidation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment operations properly invalidate entity caches
 - [ ] Cache tags include entity-specific and user-specific tags
 - [ ] Follows existing cache invalidation patterns
@@ -299,19 +335,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src\lib\utils\cache-tags.utils.ts` - Add comment tag generators
 
 **Changes:**
+
 - Add comment tag generation to CacheTagGenerators.social if not already present
 - Ensure tags support bobblehead, collection, and subcollection entity types
 - Follow existing tag naming conventions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment tags follow existing patterns
 - [ ] Tags support all three entity types
 - [ ] Tag generation is consistent with likes/follows
@@ -326,9 +366,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\comment-item.tsx` - Individual comment component
 
 **Changes:**
+
 - Create component displaying comment content, author, timestamp
 - Include edit/delete buttons with ownership checks
 - Add Radix UI Avatar for user profile display
@@ -337,11 +379,13 @@ npm run lint:fix && npm run typecheck
 - Use Tailwind CSS for styling following project patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders comment data correctly
 - [ ] Ownership-based UI elements show conditionally
 - [ ] Timestamps formatted properly
@@ -357,9 +401,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\comment-form.tsx` - Comment form component
 
 **Changes:**
+
 - Create form using TanStack React Form for state management
 - Include Radix UI textarea field component
 - Add validation using Zod schema from validations
@@ -369,11 +415,13 @@ npm run lint:fix && npm run typecheck
 - Include proper error handling and display
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form validates input using Zod schemas
 - [ ] Character count updates in real-time
 - [ ] Loading states prevent double submission
@@ -389,9 +437,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\comment-list.tsx` - Comment list component
 
 **Changes:**
+
 - Create component rendering array of CommentItem components
 - Implement pagination using Nuqs for URL state management
 - Add empty state when no comments exist
@@ -400,11 +450,13 @@ npm run lint:fix && npm run typecheck
 - Handle real-time updates if using Ably (otherwise use standard polling)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comments render in correct order
 - [ ] Pagination works with URL state
 - [ ] Empty states display appropriately
@@ -420,9 +472,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\comment-edit-dialog.tsx` - Edit dialog component
 
 **Changes:**
+
 - Create Radix UI Dialog wrapper for edit interface
 - Include CommentForm in edit mode
 - Add cancel and save actions
@@ -430,11 +484,13 @@ npm run lint:fix && npm run typecheck
 - Include proper accessibility attributes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog opens and closes correctly
 - [ ] Form pre-populates with existing comment content
 - [ ] Save action updates comment
@@ -450,9 +506,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\comment-delete-dialog.tsx` - Delete confirmation dialog
 
 **Changes:**
+
 - Create Radix UI AlertDialog for delete confirmation
 - Include warning message about permanent action
 - Add cancel and confirm delete buttons
@@ -460,11 +518,13 @@ npm run lint:fix && npm run typecheck
 - Close dialog on successful deletion
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog shows clear warning message
 - [ ] Cancel button dismisses dialog
 - [ ] Confirm button triggers delete action
@@ -480,9 +540,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\comment-section.tsx` - Main comment section component
 
 **Changes:**
+
 - Create component accepting targetId and targetType props
 - Include CommentForm for new comments
 - Include CommentList for displaying existing comments
@@ -491,11 +553,13 @@ npm run lint:fix && npm run typecheck
 - Support both authenticated and public viewing
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component integrates form and list correctly
 - [ ] Comment count displays accurately
 - [ ] Authenticated users see form
@@ -511,9 +575,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\async\comment-section-async.tsx` - Async comment section
 
 **Changes:**
+
 - Create async Server Component fetching initial comment data
 - Use SocialFacade methods for data retrieval
 - Pass data to client CommentSection component
@@ -521,11 +587,13 @@ npm run lint:fix && npm run typecheck
 - Support optional authentication context
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component fetches data server-side
 - [ ] Data passes correctly to client component
 - [ ] Error handling works appropriately
@@ -541,9 +609,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src\components\feature\comments\skeletons\comment-section-skeleton.tsx` - Skeleton component
 
 **Changes:**
+
 - Create skeleton matching CommentSection layout
 - Include skeleton for form area
 - Include skeleton for comment list items
@@ -551,11 +621,13 @@ npm run lint:fix && npm run typecheck
 - Match dimensions of actual components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton matches actual component layout
 - [ ] Animation provides visual feedback
 - [ ] Dimensions closely match real components
@@ -570,9 +642,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\page.tsx` - Add comment section
 
 **Changes:**
+
 - Import CommentSectionAsync and CommentSectionSkeleton components
 - Add new section after existing secondary cards section
 - Wrap in Suspense with skeleton fallback
@@ -580,11 +654,13 @@ npm run lint:fix && npm run typecheck
 - Pass bobbleheadId as targetId and 'bobblehead' as targetType
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment section renders on bobblehead page
 - [ ] Suspense boundary works correctly
 - [ ] Error boundary catches component errors
@@ -600,9 +676,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\app\(app)\collections\[collectionId]\(collection)\page.tsx` - Add comment section
 
 **Changes:**
+
 - Import CommentSectionAsync and CommentSectionSkeleton components
 - Add new section in appropriate location within page layout
 - Wrap in Suspense with skeleton fallback
@@ -610,11 +688,13 @@ npm run lint:fix && npm run typecheck
 - Pass collectionId as targetId and 'collection' as targetType
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment section renders on collection page
 - [ ] Layout integrates smoothly with existing sections
 - [ ] Suspense and error boundaries work
@@ -630,9 +710,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\app\(app)\collections\[collectionId]\subcollection\[subcollectionId]\page.tsx` - Add comment section
 
 **Changes:**
+
 - Import CommentSectionAsync and CommentSectionSkeleton components
 - Add new section in appropriate location within page layout
 - Wrap in Suspense with skeleton fallback
@@ -640,11 +722,13 @@ npm run lint:fix && npm run typecheck
 - Pass subcollectionId as targetId and 'subcollection' as targetType
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment section renders on subcollection page
 - [ ] Layout integrates smoothly with existing sections
 - [ ] Suspense and error boundaries work
@@ -660,19 +744,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src\lib\constants\action-names.ts` - Add COMMENTS section
 
 **Changes:**
+
 - Add COMMENTS object to ACTION_NAMES constant
 - Include CREATE, UPDATE, DELETE, GET_LIST, GET_BY_ID action names
 - Follow existing naming patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action names added to constants
 - [ ] Names follow existing patterns
 - [ ] Type inference works correctly
@@ -687,18 +775,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src\lib\constants\sentry.ts` - Add COMMENT_DATA context
 
 **Changes:**
+
 - Add COMMENT_DATA to SENTRY_CONTEXTS constant
 - Follow existing context naming patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sentry context constant added
 - [ ] Follows existing patterns
 - [ ] All validation commands pass
@@ -753,6 +845,7 @@ All steps maintain strict TypeScript type safety without using `any` types, foll
 ### Testing Recommendation
 
 After implementation, consider adding:
+
 - Integration tests for comment CRUD operations
 - E2E tests for the comment UI flows using the existing Vitest and Testing Library setup
 
@@ -764,6 +857,7 @@ For detailed file discovery analysis, see:
 `docs/2025_11_09/orchestration/comments-feature/02-file-discovery.md`
 
 **Summary**: 62 relevant files discovered across 12 directories
+
 - **CRITICAL - Already Complete**: 6 files (schema, validations, constants)
 - **HIGH PRIORITY - Extend**: 3 files (actions, queries, facades)
 - **HIGH PRIORITY - Create**: 8 files (UI components)

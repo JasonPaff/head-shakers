@@ -455,7 +455,9 @@ export const deleteCommentAction = authActionClient
 
       if (commentResult?.comment) {
         CacheRevalidationService.social.onCommentChange(
-          commentResult.comment.targetType === 'subcollection' ? 'collection' : commentResult.comment.targetType,
+          commentResult.comment.targetType === 'subcollection' ?
+            'collection'
+          : commentResult.comment.targetType,
           commentResult.comment.targetId,
           ctx.userId,
           'delete',
