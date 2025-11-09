@@ -72,7 +72,7 @@ export const SCHEMA_LIMITS = {
     NAME: { MAX: 50, MIN: 1 },
   },
   USER: {
-    AVATAR_URL: { MAX: 100 },
+    AVATAR_URL: { MAX: 500 },
     BIO: { MAX: 500 },
     CLERK_ID: { MAX: 255 },
     DISPLAY_NAME: { MAX: 100, MIN: 1 },
@@ -99,21 +99,3 @@ export const SCHEMA_LIMITS = {
     TIMEZONE: { MAX: 50, MIN: 3 },
   },
 } as const;
-
-// helper type for accessing limits
-export type SchemaLimits = typeof SCHEMA_LIMITS;
-
-// helper functions for common validations
-export const getMinLength = (entity: keyof SchemaLimits, field: string): number => {
-  const limits = SCHEMA_LIMITS[entity];
-  // @ts-expect-error ignore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-  return limits[field]?.MIN || 0;
-};
-
-export const getMaxLength = (entity: keyof SchemaLimits, field: string): number => {
-  const limits = SCHEMA_LIMITS[entity];
-  // @ts-expect-error ignore
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-member-access
-  return limits[field]?.MAX || limits[field]?.LENGTH || 255;
-};

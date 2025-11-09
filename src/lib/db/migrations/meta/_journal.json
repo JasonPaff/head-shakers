@@ -36,6 +36,20 @@
       "when": 1757714165407,
       "tag": "20250912215605_small_mandarin",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1731002462000,
+      "tag": "20251107014102_increase_avatar_url_size",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1762481058390,
+      "tag": "20251107020418_regular_captain_stacy",
+      "breakpoints": true
     }
   ]
 }

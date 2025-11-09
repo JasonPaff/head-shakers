@@ -104,11 +104,15 @@ export class UserSyncService {
 
       // perform transaction: create user + settings
       const result = await dbInstance.transaction(async (tx) => {
+        // get avatar URL and handle length constraints
+        const rawAvatarUrl = getImageUrl(clerkUser);
+        const avatarUrl = rawAvatarUrl && rawAvatarUrl.length <= 100 ? rawAvatarUrl : null;
+
         // insert user record
         const [newUser] = await tx
           .insert(users)
           .values({
-            avatarUrl: getImageUrl(clerkUser) || null,
+            avatarUrl,
             clerkId: clerkUser.id,
             displayName,
             email,
@@ -218,11 +222,17 @@ export class UserSyncService {
       const displayName =
         firstName && lastName ? `${firstName} ${lastName}`.trim() : firstName || lastName || null;
 
+      // get avatar URL and handle length constraints
+      const rawAvatarUrl = getImageUrl(clerkUser);
+      // temporarily set to null if URL exceeds database limit (100 chars)
+      // TODO: increase avatar_url column size to 500 in migration
+      const avatarUrl = rawAvatarUrl && rawAvatarUrl.length <= 100 ? rawAvatarUrl : null;
+
       // update user record
       const [updatedUser] = await dbInstance
         .update(users)
         .set({
-          avatarUrl: getImageUrl(clerkUser) || null,
+          avatarUrl,
           displayName: displayName || undefined,
           email,
           isVerified,
