@@ -12,7 +12,7 @@ import type {
 } from '@/lib/validations/social.validation';
 
 import { ENUMS } from '@/lib/constants';
-import { bobbleheads, collections, comments, likes, subCollections, users } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, likes, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type CommentRecord = SelectComment;
@@ -211,15 +211,15 @@ export class SocialQuery extends BaseQuery {
         targetId: comments.targetId,
         targetType: comments.targetType,
         user: {
-          avatarUrl: users.avatarUrl,
-          displayName: users.displayName,
-          id: users.id,
-          username: users.username,
+          avatarUrl: sql<null | string>`users.avatar_url`,
+          displayName: sql<null | string>`users.display_name`,
+          id: sql<string>`users.id`,
+          username: sql<null | string>`users.username`,
         },
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(users, and(eq(comments.userId, users.id), eq(users.isDeleted, false)))
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
       .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
       .limit(1);
 
@@ -268,15 +268,15 @@ export class SocialQuery extends BaseQuery {
         targetId: comments.targetId,
         targetType: comments.targetType,
         user: {
-          avatarUrl: users.avatarUrl,
-          displayName: users.displayName,
-          id: users.id,
-          username: users.username,
+          avatarUrl: sql<null | string>`users.avatar_url`,
+          displayName: sql<null | string>`users.display_name`,
+          id: sql<string>`users.id`,
+          username: sql<null | string>`users.username`,
         },
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(users, and(eq(comments.userId, users.id), eq(users.isDeleted, false)))
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
       .where(
         and(
           eq(comments.targetId, targetId),

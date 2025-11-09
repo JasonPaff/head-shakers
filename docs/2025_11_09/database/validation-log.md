@@ -400,3 +400,95 @@
   "databaseName": "head-shakers",
   "branchId": "br-dark-forest-adf48tll"
 }
+
+            ## 2025-11-09 22:36:41 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT id, user_id, content FROM comments LIMIT 1;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT id, user_id, content FROM comments LIMIT 1;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 22:36:44 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name IN ('comments', 'users') AND column_name IN ('id', 'user_id') ORDER BY table_name, column_name;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name IN ('comments', 'users') AND column_name IN ('id', 'user_id') ORDER BY table_name, column_name;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 22:36:45 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id as comment_id, c.user_id, u.id as user_id, u.username, CASE WHEN c.user_id = u.id THEN 'MATCH' ELSE 'NO MATCH' END as join_status, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id LIMIT 5;"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT c.id as comment_id, c.user_id, u.id as user_id, u.username, CASE WHEN c.user_id = u.id THEN 'MATCH' ELSE 'NO MATCH' END as join_status, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id LIMIT 5;"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
+
+            ## 2025-11-09 22:36:49 - MODIFICATION
+            - **Tool**: mcp__Neon__run_sql
+            - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
+            - **Original Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT id, username, display_name, is_deleted FROM users WHERE id = '7b929672-4764-4613-9ddf-24613c803253';"
+  }
+}
+            - **Modified Params**: {
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT id, username, display_name, is_deleted FROM users WHERE id = '7b929672-4764-4613-9ddf-24613c803253';"
+  },
+  "projectId": "misty-boat-49919732",
+  "databaseName": "head-shakers",
+  "branchId": "br-dark-forest-adf48tll"
+}
