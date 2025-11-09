@@ -62,10 +62,11 @@
       "Bash(cp:*)",
       "WebSearch",
       "WebFetch(domain:cloudinary.com)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:next-safe-action.dev)"
     ],
     "deny": [],
     "ask": []
   },
-  "outputStyle": "Explanatory"
+  "outputStyle": "default"
 }
