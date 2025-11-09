@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { DEFAULTS, ENUMS } from '@/lib/constants';
+import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { insertCommentSchema } from '@/lib/validations/social.validation';
 
 /**
@@ -10,24 +10,22 @@ import { insertCommentSchema } from '@/lib/validations/social.validation';
 
 /**
  * Schema for creating a new comment
- * Extends the base insert schema with required fields for comment creation
+ * Uses the base insert schema which validates content, targetId, and targetType
+ * Note: userId is passed separately via auth context
  */
-export const createCommentSchema = insertCommentSchema.extend({
-  content: z.string().min(1, 'Comment content is required').max(1000, 'Comment is too long').trim(),
-  targetId: z.string().uuid('Invalid target ID'),
-  targetType: z.enum(ENUMS.COMMENT.TARGET_TYPE, {
-    message: 'Target must be a bobblehead, collection, or subcollection',
-  }),
-  userId: z.string().uuid('Invalid user ID'),
-});
+export const createCommentSchema = insertCommentSchema;
 
 /**
  * Schema for updating an existing comment
- * Extends the base update schema with commentId requirement
+ * Requires comment ID and updated content with proper length validation
  */
 export const updateCommentSchema = z.object({
   commentId: z.string().uuid('Invalid comment ID'),
-  content: z.string().min(1, 'Comment content is required').max(1000, 'Comment is too long').trim(),
+  content: z
+    .string()
+    .min(SCHEMA_LIMITS.COMMENT.CONTENT.MIN, 'Comment content is required')
+    .max(SCHEMA_LIMITS.COMMENT.CONTENT.MAX, 'Comment is too long')
+    .trim(),
 });
 
 /**
@@ -89,8 +87,8 @@ export const getCommentCountSchema = z.object({
   }),
 });
 
-export type CommentPagination = z.infer<typeof commentPaginationSchema>;
 // Type exports using z.infer for type-safe schema usage
+export type CommentPagination = z.infer<typeof commentPaginationSchema>;
 export type CreateComment = z.infer<typeof createCommentSchema>;
 export type DeleteComment = z.infer<typeof deleteCommentSchema>;
 export type GetCommentById = z.infer<typeof getCommentByIdSchema>;

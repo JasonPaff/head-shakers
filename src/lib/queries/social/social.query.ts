@@ -2,11 +2,31 @@ import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
 
 import type { LikeTargetType } from '@/lib/constants';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
-import type { InsertLike, PublicLike, SelectLike } from '@/lib/validations/social.validation';
+import type {
+  InsertComment,
+  InsertLike,
+  PublicComment,
+  PublicLike,
+  SelectComment,
+  SelectLike,
+} from '@/lib/validations/social.validation';
 
 import { ENUMS } from '@/lib/constants';
-import { bobbleheads, collections, likes, subCollections } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, likes, subCollections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+
+export type CommentRecord = SelectComment;
+
+export type CommentTargetType = (typeof ENUMS.COMMENT.TARGET_TYPE)[number];
+
+export type CommentWithUser = PublicComment & {
+  user: null | {
+    avatarUrl: null | string;
+    displayName: null | string;
+    id: string;
+    username: null | string;
+  };
+};
 
 export type LikeCountByTarget = {
   likeCount: number;
@@ -24,6 +44,21 @@ export type UserLikeStatus = {
 };
 
 export class SocialQuery extends BaseQuery {
+  static async createCommentAsync(
+    data: InsertComment,
+    userId: string,
+    context: QueryContext,
+  ): Promise<CommentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .insert(comments)
+      .values({ ...data, userId })
+      .returning();
+
+    return result?.[0] || null;
+  }
+
   static async createLikeAsync(
     data: InsertLike,
     userId: string,
@@ -51,6 +86,37 @@ export class SocialQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
+  }
+
+  static async decrementCommentCountAsync(
+    targetId: string,
+    targetType: CommentTargetType,
+    context: QueryContext,
+  ): Promise<void> {
+    const dbInstance = this.getDbInstance(context);
+
+    switch (targetType) {
+      case ENUMS.COMMENT.TARGET_TYPE[0]:
+        await dbInstance
+          .update(bobbleheads)
+          .set({ commentCount: sql`GREATEST(0, ${bobbleheads.commentCount} - 1)` })
+          .where(eq(bobbleheads.id, targetId));
+        break;
+      case ENUMS.COMMENT.TARGET_TYPE[1]:
+        await dbInstance
+          .update(collections)
+          .set({ commentCount: sql`GREATEST(0, ${collections.commentCount} - 1)` })
+          .where(eq(collections.id, targetId));
+        break;
+      case ENUMS.COMMENT.TARGET_TYPE[2]:
+        await dbInstance
+          .update(subCollections)
+          .set({ commentCount: sql`GREATEST(0, ${subCollections.commentCount} - 1)` })
+          .where(eq(subCollections.id, targetId));
+        break;
+      default:
+        throw new Error(`Unknown target type: ${targetType as string}`);
+    }
   }
 
   static async decrementLikeCountAsync(
@@ -84,6 +150,21 @@ export class SocialQuery extends BaseQuery {
     }
   }
 
+  static async deleteCommentAsync(commentId: string, context: QueryContext): Promise<CommentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(comments)
+      .set({
+        deletedAt: new Date(),
+        isDeleted: true,
+      })
+      .where(eq(comments.id, commentId))
+      .returning();
+
+    return result?.[0] || null;
+  }
+
   static async deleteLikeAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -98,6 +179,118 @@ export class SocialQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
+  }
+
+  static async getCommentByIdAsync(commentId: string, context: QueryContext): Promise<CommentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select()
+      .from(comments)
+      .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
+      .limit(1);
+
+    return result?.[0] || null;
+  }
+
+  static async getCommentByIdWithUserAsync(
+    commentId: string,
+    context: QueryContext,
+  ): Promise<CommentWithUser | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        content: comments.content,
+        createdAt: comments.createdAt,
+        editedAt: comments.editedAt,
+        id: comments.id,
+        isEdited: comments.isEdited,
+        likeCount: comments.likeCount,
+        parentCommentId: comments.parentCommentId,
+        targetId: comments.targetId,
+        targetType: comments.targetType,
+        user: {
+          avatarUrl: users.avatarUrl,
+          displayName: users.displayName,
+          id: users.id,
+          username: users.username,
+        },
+        userId: comments.userId,
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
+      .limit(1);
+
+    return result?.[0] || null;
+  }
+
+  static async getCommentCountAsync(
+    targetId: string,
+    targetType: CommentTargetType,
+    context: QueryContext,
+  ): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(comments)
+      .where(
+        and(eq(comments.targetId, targetId), eq(comments.targetType, targetType), eq(comments.isDeleted, false)),
+      );
+
+    return result[0]?.count || 0;
+  }
+
+  static async getCommentsAsync(
+    targetId: string,
+    targetType: CommentTargetType,
+    options: FindOptions = {},
+    context: QueryContext,
+  ): Promise<Array<CommentWithUser>> {
+    const dbInstance = this.getDbInstance(context);
+    const pagination = this.applyPagination(options);
+
+    const query = dbInstance
+      .select({
+        content: comments.content,
+        createdAt: comments.createdAt,
+        editedAt: comments.editedAt,
+        id: comments.id,
+        isEdited: comments.isEdited,
+        likeCount: comments.likeCount,
+        parentCommentId: comments.parentCommentId,
+        targetId: comments.targetId,
+        targetType: comments.targetType,
+        user: {
+          avatarUrl: users.avatarUrl,
+          displayName: users.displayName,
+          id: users.id,
+          username: users.username,
+        },
+        userId: comments.userId,
+      })
+      .from(comments)
+      .leftJoin(users, eq(comments.userId, users.id))
+      .where(
+        and(
+          eq(comments.targetId, targetId),
+          eq(comments.targetType, targetType),
+          eq(comments.isDeleted, false),
+        ),
+      )
+      .orderBy(desc(comments.createdAt));
+
+    if (pagination.limit) {
+      query.limit(pagination.limit);
+    }
+
+    if (pagination.offset) {
+      query.offset(pagination.offset);
+    }
+
+    return query;
   }
 
   static async getLikeCountAsync(
@@ -157,6 +350,8 @@ export class SocialQuery extends BaseQuery {
       };
     });
   }
+
+  // ==================== Comment Methods ====================
 
   static async getLikesForMultipleContentItemsAsync(
     contentIds: Array<string>,
@@ -355,6 +550,37 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
+  static async incrementCommentCountAsync(
+    targetId: string,
+    targetType: CommentTargetType,
+    context: QueryContext,
+  ): Promise<void> {
+    const dbInstance = this.getDbInstance(context);
+
+    switch (targetType) {
+      case ENUMS.COMMENT.TARGET_TYPE[0]:
+        await dbInstance
+          .update(bobbleheads)
+          .set({ commentCount: sql`${bobbleheads.commentCount} + 1` })
+          .where(eq(bobbleheads.id, targetId));
+        break;
+      case ENUMS.COMMENT.TARGET_TYPE[1]:
+        await dbInstance
+          .update(collections)
+          .set({ commentCount: sql`${collections.commentCount} + 1` })
+          .where(eq(collections.id, targetId));
+        break;
+      case ENUMS.COMMENT.TARGET_TYPE[2]:
+        await dbInstance
+          .update(subCollections)
+          .set({ commentCount: sql`${subCollections.commentCount} + 1` })
+          .where(eq(subCollections.id, targetId));
+        break;
+      default:
+        throw new Error(`Unknown target type: ${targetType as string}`);
+    }
+  }
+
   static async incrementLikeCountAsync(
     targetId: string,
     targetType: LikeTargetType,
@@ -384,5 +610,25 @@ export class SocialQuery extends BaseQuery {
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);
     }
+  }
+
+  static async updateCommentAsync(
+    commentId: string,
+    content: string,
+    context: QueryContext,
+  ): Promise<CommentRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .update(comments)
+      .set({
+        content,
+        editedAt: new Date(),
+        isEdited: true,
+      })
+      .where(eq(comments.id, commentId))
+      .returning();
+
+    return result?.[0] || null;
   }
 }

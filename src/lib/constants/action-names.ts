@@ -56,6 +56,13 @@ export const ACTION_NAMES = {
     UPDATE: 'updateCollection',
     UPDATE_SUB: 'updateSubCollection',
   },
+  COMMENTS: {
+    CREATE: 'createComment',
+    DELETE: 'deleteComment',
+    GET_BY_ID: 'getCommentById',
+    GET_LIST: 'getComments',
+    UPDATE: 'updateComment',
+  },
   MODERATION: {
     CHECK_REPORT_STATUS: 'checkContentReportStatus',
     CREATE_REPORT: 'createContentReport',

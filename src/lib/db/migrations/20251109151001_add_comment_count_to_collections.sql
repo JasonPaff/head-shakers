@@ -8,4 +8,12 @@ ALTER TABLE "sub_collections" ADD COLUMN "comment_count" integer DEFAULT 0 NOT N
 ALTER TABLE "collections" ADD CONSTRAINT "collections_comment_count_non_negative" CHECK ("comment_count" >= 0);--> statement-breakpoint
 
 -- Add check constraint for non-negative comment count on sub_collections
-ALTER TABLE "sub_collections" ADD CONSTRAINT "sub_collections_comment_count_non_negative" CHECK ("comment_count" >= 0);
+ALTER TABLE "sub_collections" ADD CONSTRAINT "sub_collections_comment_count_non_negative" CHECK ("comment_count" >= 0);--> statement-breakpoint
+
+-- Add performance indexes for comment count on collections
+CREATE INDEX "collections_comment_count_desc_idx" ON "collections" ("comment_count" DESC);--> statement-breakpoint
+CREATE INDEX "collections_public_comment_count_idx" ON "collections" ("is_public", "comment_count" DESC);--> statement-breakpoint
+
+-- Add performance indexes for comment count on sub_collections
+CREATE INDEX "sub_collections_comment_count_desc_idx" ON "sub_collections" ("comment_count" DESC);--> statement-breakpoint
+CREATE INDEX "sub_collections_public_comment_count_idx" ON "sub_collections" ("is_public", "comment_count" DESC);

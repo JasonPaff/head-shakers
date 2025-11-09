@@ -1,8 +1,12 @@
 import type { FindOptions } from '@/lib/queries/base/query-context';
-import type { UserLikeStatus } from '@/lib/queries/social/social.query';
+import type {
+  CommentTargetType,
+  CommentWithUser,
+  UserLikeStatus,
+} from '@/lib/queries/social/social.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type { InsertLike } from '@/lib/validations/social.validation';
+import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';
 
 import { type LikeTargetType, OPERATIONS } from '@/lib/constants';
 import { CACHE_KEYS } from '@/lib/constants/cache';
@@ -16,6 +20,22 @@ import { SocialQuery } from '@/lib/queries/social/social.query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+
+export interface CommentData {
+  comment: CommentWithUser;
+  isOwner: boolean;
+}
+
+export interface CommentListData {
+  comments: Array<CommentWithUser>;
+  hasMore: boolean;
+  total: number;
+}
+
+export interface CommentMutationResult {
+  comment: CommentWithUser | null;
+  isSuccessful: boolean;
+}
 
 export interface ContentLikeData {
   isLiked: boolean;
@@ -52,6 +72,92 @@ export interface TrendingContent {
 }
 
 export class SocialFacade {
+  static async createComment(
+    data: InsertComment,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CommentMutationResult> {
+    try {
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+        // create the comment
+        const newComment = await SocialQuery.createCommentAsync(data, userId, context);
+
+        if (newComment) {
+          // increment comment count on the target entity
+          await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
+
+          // fetch the comment with user data using efficient method
+          const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(newComment.id, context);
+
+          return {
+            comment: commentWithUser,
+            isSuccessful: !!commentWithUser,
+          };
+        }
+
+        return {
+          comment: null,
+          isSuccessful: false,
+        };
+      });
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { commentData: data },
+        facade: 'SocialFacade',
+        method: 'createComment',
+        operation: OPERATIONS.COMMENTS.CREATE_COMMENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  static async deleteComment(
+    commentId: string,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<boolean> {
+    try {
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+        // verify comment exists and user is the owner
+        const existingComment = await SocialQuery.getCommentByIdAsync(commentId, context);
+
+        if (!existingComment || existingComment.userId !== userId) {
+          return false;
+        }
+
+        // soft delete the comment
+        const deletedComment = await SocialQuery.deleteCommentAsync(commentId, context);
+
+        if (deletedComment) {
+          // decrement comment count on the target entity
+          await SocialQuery.decrementCommentCountAsync(
+            deletedComment.targetId,
+            deletedComment.targetType,
+            context,
+          );
+
+          return true;
+        }
+
+        return false;
+      });
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { commentId },
+        facade: 'SocialFacade',
+        method: 'deleteComment',
+        operation: OPERATIONS.COMMENTS.DELETE_COMMENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
   static async getBatchContentLikeData(
     targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     viewerUserId?: string,
@@ -113,6 +219,118 @@ export class SocialFacade {
         userId: viewerUserId,
       };
       throw createFacadeError(context, error);
+    }
+  }
+
+  static async getCommentById(
+    commentId: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CommentData | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      // fetch the comment with user data using efficient method
+      const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(commentId, context);
+
+      if (!commentWithUser) {
+        return null;
+      }
+
+      // Now that we have the comment data, we can generate proper cache tags
+      // Cache with tags based on the target entity (not the comment ID)
+      return CacheService.cached(
+        () =>
+          Promise.resolve({
+            comment: commentWithUser,
+            isOwner: commentWithUser.userId === userId,
+          }),
+        CACHE_KEYS.SOCIAL.COMMENTS('comment', commentId),
+        {
+          context: {
+            entityId: commentWithUser.targetId,
+            entityType: 'social',
+            facade: 'SocialFacade',
+            operation: 'getCommentById',
+          },
+          tags: CacheTagGenerators.social.comment(
+            commentWithUser.targetType === 'subcollection' ? 'collection' : commentWithUser.targetType,
+            commentWithUser.targetId,
+            userId,
+          ),
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { commentId },
+        facade: 'SocialFacade',
+        method: 'getCommentById',
+        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  static async getComments(
+    targetId: string,
+    targetType: CommentTargetType,
+    options: FindOptions = {},
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CommentListData> {
+    try {
+      // Create cache key with pagination parameters for proper cache segmentation
+      const limit = options.limit || 10;
+      const offset = options.offset || 0;
+      const cacheKey = `${CACHE_KEYS.SOCIAL.COMMENTS(targetType, targetId)}:list:${limit}:${offset}:${viewerUserId || 'public'}`;
+
+      return CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          // fetch comments with pagination
+          const comments = await SocialQuery.getCommentsAsync(targetId, targetType, options, context);
+
+          // get total count
+          const total = await SocialQuery.getCommentCountAsync(targetId, targetType, context);
+
+          // determine if there are more comments
+          const hasMore = offset + comments.length < total;
+
+          return {
+            comments,
+            hasMore,
+            total,
+          };
+        },
+        cacheKey,
+        {
+          context: {
+            entityId: targetId,
+            entityType: 'social',
+            facade: 'SocialFacade',
+            operation: 'getComments',
+          },
+          tags: CacheTagGenerators.social.comment(
+            targetType === 'subcollection' ? 'collection' : targetType,
+            targetId,
+            viewerUserId || 'public',
+          ),
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { options, targetId, targetType },
+        facade: 'SocialFacade',
+        method: 'getComments',
+        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(errorContext, error);
     }
   }
 
@@ -216,6 +434,8 @@ export class SocialFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ==================== Comment Methods ====================
 
   static async getRecentLikeActivity(
     targetId: string,
@@ -361,6 +581,63 @@ export class SocialFacade {
         userId,
       };
       throw createFacadeError(context, error);
+    }
+  }
+
+  static async updateComment(
+    commentId: string,
+    content: string,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CommentMutationResult> {
+    try {
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+        // verify comment exists and user is the owner
+        const existingComment = await SocialQuery.getCommentByIdAsync(commentId, context);
+
+        if (!existingComment) {
+          return {
+            comment: null,
+            isSuccessful: false,
+          };
+        }
+
+        if (existingComment.userId !== userId) {
+          return {
+            comment: null,
+            isSuccessful: false,
+          };
+        }
+
+        // update the comment
+        const updatedComment = await SocialQuery.updateCommentAsync(commentId, content, context);
+
+        if (updatedComment) {
+          // fetch the comment with user data using efficient method
+          const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(updatedComment.id, context);
+
+          return {
+            comment: commentWithUser,
+            isSuccessful: !!commentWithUser,
+          };
+        }
+
+        return {
+          comment: null,
+          isSuccessful: false,
+        };
+      });
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { commentId, content },
+        facade: 'SocialFacade',
+        method: 'updateComment',
+        operation: OPERATIONS.COMMENTS.UPDATE_COMMENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
     }
   }
 }

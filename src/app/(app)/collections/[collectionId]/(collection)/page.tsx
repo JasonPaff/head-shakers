@@ -17,6 +17,8 @@ import { CollectionStatsSkeleton } from '@/app/(app)/collections/[collectionId]/
 import { SubcollectionsSkeleton } from '@/app/(app)/collections/[collectionId]/(collection)/components/skeletons/subcollections-skeleton';
 import { Route } from '@/app/(app)/collections/[collectionId]/(collection)/route-type';
 import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
+import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
+import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
@@ -92,6 +94,20 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
                 </CollectionErrorBoundary>
               </aside>
             </div>
+          </ContentLayout>
+        </div>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <CollectionErrorBoundary section={'comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync
+                  targetId={collectionId}
+                  targetType={'collection'}
+                />
+              </Suspense>
+            </CollectionErrorBoundary>
           </ContentLayout>
         </div>
       </div>

@@ -43,6 +43,7 @@ export const insertCommentSchema = createInsertSchema(comments, {
   isEdited: true,
   likeCount: true,
   updatedAt: true,
+  userId: true,
 });
 export const updateCommentSchema = insertCommentSchema
   .pick({

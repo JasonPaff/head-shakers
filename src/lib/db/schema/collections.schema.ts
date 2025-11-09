@@ -52,6 +52,8 @@ export const collections = pgTable(
     index('collections_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
     index('collections_public_created_desc_idx').on(table.isPublic, sql`${table.createdAt} DESC`),
     index('collections_total_value_desc_idx').on(sql`${table.totalValue} DESC NULLS LAST`),
+    index('collections_comment_count_desc_idx').on(sql`${table.commentCount} DESC`),
+    index('collections_public_comment_count_idx').on(table.isPublic, sql`${table.commentCount} DESC`),
 
     // constraints
     check('collections_name_length', sql`length(${table.name}) <= ${SCHEMA_LIMITS.COLLECTION.NAME.MAX}`),
@@ -89,6 +91,10 @@ export const subCollections = pgTable(
     // composite indexes
     index('sub_collections_collection_public_idx').on(table.collectionId, table.isPublic),
     index('sub_collections_collection_sort_idx').on(table.collectionId, table.sortOrder),
+
+    // performance indexes
+    index('sub_collections_comment_count_desc_idx').on(sql`${table.commentCount} DESC`),
+    index('sub_collections_public_comment_count_idx').on(table.isPublic, sql`${table.commentCount} DESC`),
 
     // constraints
     check('sub_collections_item_count_non_negative', sql`${table.itemCount} >= 0`),

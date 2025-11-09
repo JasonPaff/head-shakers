@@ -15,6 +15,8 @@ import { SubcollectionMetricsSkeleton } from '@/app/(app)/collections/[collectio
 import { SubcollectionErrorBoundary } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/components/subcollection-error-boundary';
 import { Route } from '@/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type';
 import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
+import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
+import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
@@ -89,6 +91,20 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
                 </SubcollectionErrorBoundary>
               </aside>
             </div>
+          </ContentLayout>
+        </div>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <SubcollectionErrorBoundary section={'comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync
+                  targetId={subcollectionId}
+                  targetType={'subcollection'}
+                />
+              </Suspense>
+            </SubcollectionErrorBoundary>
           </ContentLayout>
         </div>
       </div>

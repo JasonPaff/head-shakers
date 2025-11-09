@@ -21,6 +21,8 @@ import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleh
 import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { Route } from '@/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/route-type';
 import { BobbleheadViewTracker } from '@/components/analytics/bobblehead-view-tracker';
+import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
+import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
@@ -112,6 +114,20 @@ async function ItemPage({ routeParams }: ItemPageProps) {
             </Suspense>
           </BobbleheadErrorBoundary>
         </ContentLayout>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <BobbleheadErrorBoundary section={'comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync
+                  targetId={bobbleheadId}
+                  targetType={'bobblehead'}
+                />
+              </Suspense>
+            </BobbleheadErrorBoundary>
+          </ContentLayout>
+        </div>
       </div>
     </BobbleheadViewTracker>
   );
