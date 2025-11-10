@@ -105,7 +105,7 @@ export const SearchFilters = ({
       {/* Search Input */}
       <div className={'flex gap-2'}>
         <Input
-          className={'flex-1'}
+          className={'w-72 sm:w-96'}
           onChange={handleSearchInputChange}
           placeholder={'Search for collections, subcollections, or bobbleheads...'}
           type={'search'}
