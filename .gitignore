@@ -55,3 +55,4 @@ playwright/.clerk
 # docs
 # /docs
 # /docs/*
+.claude/logs/pre-tool-use-log.txt

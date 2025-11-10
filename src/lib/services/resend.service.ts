@@ -37,7 +37,7 @@ export class ResendService {
           this.sendEmailWithRetry(
             async () => {
               return resend.emails.send({
-                from: 'Head Shakers <noreply@headshakers.com>',
+                from: 'Head Shakers <noreply@head-shakers.com>',
                 html: this.getLaunchEmailHtml(),
                 subject: 'Head Shakers is now live! 🎉',
                 to: email,
@@ -83,7 +83,7 @@ export class ResendService {
     return this.sendEmailWithRetry(
       async () => {
         return resend.emails.send({
-          from: 'Head Shakers <noreply@headshakers.com>',
+          from: 'Head Shakers <noreply@head-shakers.com>',
           html: this.getConfirmationEmailHtml(),
           subject: "You're on the Head Shakers launch list!",
           to: email,

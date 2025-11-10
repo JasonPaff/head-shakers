@@ -24,7 +24,7 @@ const sampleUsers = [
     bio: 'Collecting bobbleheads since 1995. Over 500 items in my collection!',
     clerkId: 'user_seed_admin',
     displayName: 'The Ultimate Collector',
-    email: 'admin@headshakers.com',
+    email: 'admin@head-shakers.com',
     isVerified: true,
     location: 'San Francisco, CA',
     username: 'bobblehead_collector',

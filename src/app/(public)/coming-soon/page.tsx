@@ -111,8 +111,11 @@ export default function ComingSoonPage() {
         <div className={'mt-16 space-y-4'}>
           <p className={'text-sm text-muted-foreground'}>
             Questions? Reach out to us at{' '}
-            <a className={'font-semibold text-primary hover:underline'} href={'mailto:hello@headshakers.com'}>
-              hello@headshakers.com
+            <a
+              className={'font-semibold text-primary hover:underline'}
+              href={'mailto:hello@head-shakers.com'}
+            >
+              hello@head-shakers.com
             </a>
           </p>
 
