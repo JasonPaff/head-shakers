@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -81,7 +81,9 @@ export const BobbleheadPhotoGalleryModal = ({
             className={'absolute top-0 right-0 left-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4'}
           >
             <div className={'flex items-center justify-between text-white'}>
-              <h2 className={'truncate text-lg font-semibold'}>{bobbleheadName || 'Bobblehead Photos'}</h2>
+              <DialogTitle className={'truncate text-lg font-semibold text-white'}>
+                {bobbleheadName || 'Bobblehead Photos'}
+              </DialogTitle>
               <Button
                 className={'text-white hover:bg-white/20'}
                 onClick={onClose}

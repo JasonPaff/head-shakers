@@ -58429,3 +58429,43 @@ Tool: mcp__Playwright__browser_close
 Input:
 {}
 ================================================================================
+
+================================================================================
+2025-11-10T16:09:11.868Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T16:09:11.869Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\dialog.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T16:09:27.022Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx",
+  "old_string": "import { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent } from '@/components/ui/dialog';",
+  "new_string": "import { Button } from '@/components/ui/button';\nimport { Conditional } from '@/components/ui/conditional';\nimport { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T16:09:36.336Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\feature\\bobblehead\\bobblehead-photo-gallery-modal.tsx",
+  "old_string": "          <div\n            className={'absolute top-0 right-0 left-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4'}\n          >\n            <div className={'flex items-center justify-between text-white'}>\n              <h2 className={'truncate text-lg font-semibold'}>{bobbleheadName || 'Bobblehead Photos'}</h2>\n              <Button\n                className={'text-white hover:bg-white/20'}\n                onClick={onClose}\n                size={'icon'}\n                variant={'ghost'}\n              >\n                <XIcon aria-hidden className={'size-5'} />\n              </Button>\n            </div>\n          </div>",
+  "new_string": "          <div\n            className={'absolute top-0 right-0 left-0 z-10 bg-gradient-to-b from-black/50 to-transparent p-4'}\n          >\n            <div className={'flex items-center justify-between text-white'}>\n              <DialogTitle className={'truncate text-lg font-semibold text-white'}>\n                {bobbleheadName || 'Bobblehead Photos'}\n              </DialogTitle>\n              <Button\n                className={'text-white hover:bg-white/20'}\n                onClick={onClose}\n                size={'icon'}\n                variant={'ghost'}\n              >\n                <XIcon aria-hidden className={'size-5'} />\n              </Button>\n            </div>\n          </div>"
+}
+================================================================================

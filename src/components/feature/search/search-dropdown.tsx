@@ -63,7 +63,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
 
   // 5. Utility functions
   const getViewAllUrl = (searchQuery: string): string => {
-    return `/search?q=${encodeURIComponent(searchQuery)}`;
+    return `browse/search?q=${encodeURIComponent(searchQuery)}`;
   };
 
   // 6. Event handlers
