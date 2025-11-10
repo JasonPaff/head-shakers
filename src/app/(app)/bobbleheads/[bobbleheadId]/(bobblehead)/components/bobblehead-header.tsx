@@ -65,7 +65,7 @@ export const BobbleheadHeader = ({
         {/* Action Buttons */}
         <div className={'flex items-center gap-2'}>
           {/* Share Menu */}
-          <BobbleheadShareMenu>
+          <BobbleheadShareMenu bobbleheadId={bobblehead.id}>
             <Button size={'sm'} variant={'outline'}>
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share

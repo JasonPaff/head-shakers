@@ -47,7 +47,7 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
         {/* Share, Edit Collection Button and Delete Button */}
         <div className={'flex items-center gap-2'}>
           {/* Share Collection Button */}
-          <CollectionShareMenu>
+          <CollectionShareMenu collectionId={collection.id}>
             <Button size={'sm'} variant={'outline'}>
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share

@@ -355,7 +355,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
           </BobbleheadCommentsDialog>
 
           {/* Share */}
-          <BobbleheadShareMenu>
+          <BobbleheadShareMenu bobbleheadId={bobblehead.id}>
             <Button
               className={'h-8 px-2'}
               onClick={(e) => {
