@@ -3,14 +3,19 @@
 import { Search, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import type { CategoryRecord } from '@/lib/queries/collections/collections.query';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CONFIG } from '@/lib/constants';
 
 interface BrowseCollectionsFiltersProps {
+  categories?: Array<CategoryRecord>;
   categoryId?: string;
   dateFrom?: string;
   dateTo?: string;
+  onCategoryChange?: (category: string) => void;
   onClearFilters: () => void;
   onFiltersChange: (filters: {
     categoryId?: string;
@@ -24,6 +29,9 @@ interface BrowseCollectionsFiltersProps {
 }
 
 export function BrowseCollectionsFilters({
+  categories,
+  categoryId,
+  onCategoryChange,
   onClearFilters,
   onSearchChange,
   searchQuery,
@@ -46,7 +54,8 @@ export function BrowseCollectionsFilters({
     setLocalSearch(searchQuery);
   }, [searchQuery]);
 
-  const hasFilters = searchQuery.length > 0;
+  const hasFilters = searchQuery.length > 0 || !!categoryId;
+  const shouldShowCategoryDropdown = categories && categories.length > 0 && onCategoryChange;
 
   return (
     <div className={'space-y-4'}>
@@ -73,6 +82,23 @@ export function BrowseCollectionsFilters({
             </button>
           )}
         </div>
+
+        {/* Category Dropdown - Only show if categories prop is provided */}
+        {shouldShowCategoryDropdown && (
+          <Select onValueChange={onCategoryChange} value={categoryId || undefined}>
+            <SelectTrigger className={'w-full sm:w-[200px]'}>
+              <SelectValue placeholder={'All Categories'} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={'all'}>All Categories</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.name} value={category.name}>
+                  {category.name} ({category.collectionCount})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
 
         {/* Clear Filters Button */}
         {hasFilters && (
