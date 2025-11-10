@@ -1,0 +1,1 @@
+CREATE INDEX "collections_public_like_count_idx" ON "collections" USING btree ("is_public","like_count" DESC);

@@ -1,11 +1,27 @@
 import type { Metadata } from 'next';
 
+import * as Sentry from '@sentry/nextjs';
 import { Suspense } from 'react';
 
 import { BrowseCollectionsContent } from '@/app/(app)/browse/components/browse-collections-content';
 import { Spinner } from '@/components/ui/spinner';
 
 export default function BrowsePage() {
+  // Set Sentry context for this page
+  Sentry.setContext('browse_page', {
+    page: 'browse-collections',
+    version: '1.0',
+  });
+
+  Sentry.addBreadcrumb({
+    category: 'page-load',
+    data: {
+      page: 'browse-collections',
+    },
+    level: 'info',
+    message: 'Browse collections page loaded',
+  });
+
   return (
     <div className={'container mx-auto space-y-6 py-8'}>
       {/* Page Header */}

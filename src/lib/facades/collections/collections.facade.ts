@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/nextjs';
+
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type {
   BobbleheadListRecord,
@@ -70,16 +72,73 @@ export class CollectionsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BrowseCollectionsResult> {
+    const startTime = performance.now();
+
+    // Track filter usage patterns
+    const activeFilters: Array<string> = [];
+    if (input.filters?.query) activeFilters.push('search');
+    if (input.filters?.categoryId) activeFilters.push('category');
+    if (input.filters?.ownerId) activeFilters.push('owner');
+    if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');
+
+    Sentry.addBreadcrumb({
+      category: 'browse_filters',
+      data: {
+        activeFilters,
+        categoryId: input.filters?.categoryId ? 'set' : 'unset',
+        dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
+        dateTo: input.filters?.dateTo ? 'set' : 'unset',
+        ownerId: input.filters?.ownerId ? 'set' : 'unset',
+        query: input.filters?.query ? `"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}"` : 'empty',
+      },
+      level: 'info',
+      message: `Browse with filters: ${activeFilters.join(', ') || 'none'}`,
+    });
+
+    Sentry.addBreadcrumb({
+      category: 'browse_pagination',
+      data: {
+        page: input.pagination?.page,
+        pageSize: input.pagination?.pageSize,
+      },
+      level: 'info',
+      message: `Browse pagination: page ${input.pagination?.page}, size ${input.pagination?.pageSize}`,
+    });
+
     try {
       const inputHash = createHashFromObject(input);
-      return CacheService.collections.public(
+      const result = await CacheService.collections.public(
         async () => {
           const context =
             viewerUserId ?
               createUserQueryContext(viewerUserId, { dbInstance })
             : createPublicQueryContext({ dbInstance });
 
+          const queryStartTime = performance.now();
           const result = await CollectionsQuery.getBrowseCollectionsAsync(input, context);
+          const queryDuration = performance.now() - queryStartTime;
+
+          // Track query performance
+          Sentry.captureMessage('Browse collections query executed', {
+            level: 'info',
+            tags: {
+              activeFilters: activeFilters.join(','),
+              cacheKey: 'browse_public',
+              operation: 'getBrowseCollectionsAsync',
+            },
+          });
+
+          // Track query performance
+          if (queryDuration > 1000) {
+            // Only report slow queries
+            Sentry.captureMessage('Browse collections slow query', {
+              level: 'info',
+              tags: {
+                activeFilters: activeFilters.join(','),
+                operation: 'query',
+              },
+            });
+          }
 
           // transform results to include Cloudinary URLs for first bobblehead photos
           const transformedCollections = result.collections.map((record) => ({
@@ -111,14 +170,97 @@ export class CollectionsFacade {
           },
         },
       );
+
+      const totalDuration = performance.now() - startTime;
+
+      // Track custom metrics for filter and pagination patterns
+      if (activeFilters.length > 0) {
+        Sentry.captureMessage('Browse collections filtered search', {
+          level: 'info',
+          tags: {
+            filterCount: activeFilters.length.toString(),
+            filters: activeFilters.join(','),
+          },
+        });
+      }
+
+      // Track pagination depth (how far users are paginating)
+      if (input.pagination?.page && input.pagination.page > 1) {
+        Sentry.captureMessage('Browse collections deep pagination', {
+          level: 'info',
+          tags: {
+            page: input.pagination.page.toString(),
+          },
+        });
+      }
+
+      // Track overall performance - report slow responses
+      if (totalDuration > 1000) {
+        Sentry.captureMessage('Browse collections slow response', {
+          level: 'info',
+          tags: {
+            hasFilters: activeFilters.length > 0 ? 'yes' : 'no',
+            resultCount: result.collections.length.toString(),
+            totalCount: result.pagination.totalCount.toString(),
+            viewerAuthenticated: !!viewerUserId,
+          },
+        });
+      }
+
+      // Add success breadcrumb with results summary
+      Sentry.addBreadcrumb({
+        category: 'browse_results',
+        data: {
+          resultCount: result.collections.length,
+          totalCount: result.pagination.totalCount,
+          totalPages: result.pagination.totalPages,
+        },
+        level: 'info',
+        message: `Browse completed: ${result.collections.length} results of ${result.pagination.totalCount} total`,
+      });
+
+      return result;
     } catch (error) {
+      const totalDuration = performance.now() - startTime;
+
+      // Track error metrics
+      Sentry.captureMessage('Browse collections error', {
+        level: 'error',
+        tags: {
+          activeFilters: activeFilters.join(','),
+          errorType: error instanceof Error ? error.constructor.name : 'unknown',
+        },
+      });
+
       const context: FacadeErrorContext = {
-        data: { input },
+        data: {
+          activeFilters,
+          filters: {
+            category: input.filters?.categoryId ? 'set' : 'unset',
+            dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',
+            owner: input.filters?.ownerId ? 'set' : 'unset',
+            query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',
+          },
+          input,
+          pagination: input.pagination,
+          totalDuration,
+        },
         facade: 'CollectionsFacade',
         method: 'browseCollections',
         operation: 'browse',
         userId: viewerUserId,
       };
+
+      Sentry.addBreadcrumb({
+        category: 'error',
+        data: {
+          activeFilters,
+          durationMs: totalDuration,
+        },
+        level: 'error',
+        message: `Browse collections failed after ${totalDuration.toFixed(2)}ms`,
+      });
+
       throw createFacadeError(context, error);
     }
   }

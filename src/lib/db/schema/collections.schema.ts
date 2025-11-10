@@ -51,6 +51,7 @@ export const collections = pgTable(
     index('collections_description_search_idx').using('gin', sql`${table.description} gin_trgm_ops`),
     index('collections_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
     index('collections_public_created_desc_idx').on(table.isPublic, sql`${table.createdAt} DESC`),
+    index('collections_public_like_count_idx').on(table.isPublic, sql`${table.likeCount} DESC`),
     index('collections_total_value_desc_idx').on(sql`${table.totalValue} DESC NULLS LAST`),
     index('collections_comment_count_desc_idx').on(sql`${table.commentCount} DESC`),
     index('collections_public_comment_count_idx').on(table.isPublic, sql`${table.commentCount} DESC`),
