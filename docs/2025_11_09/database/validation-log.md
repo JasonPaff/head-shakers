@@ -244,251 +244,251 @@
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.collection_id, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.collection_id, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.collection_id, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.collection_id, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 21:53:28 - MODIFICATION
             - **Tool**: mcp__Neon__describe_table_schema
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "tableName": "comments"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"tableName": "comments"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "tableName": "comments"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"tableName": "comments"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 21:53:35 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.first_name, u.last_name, u.image_url FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 21:53:40 - MODIFICATION
             - **Tool**: mcp__Neon__describe_table_schema
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "tableName": "users"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"tableName": "users"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "tableName": "users"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"tableName": "users"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 21:53:48 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.display_name, u.avatar_url, u.is_deleted as user_is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.display_name, u.avatar_url, u.is_deleted as user_is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.display_name, u.avatar_url, u.is_deleted as user_is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.target_id, c.comment_target_type, c.created_at, u.username, u.display_name, u.avatar_url, u.is_deleted as user_is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id ORDER BY c.created_at DESC LIMIT 5;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 21:56:29 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.user_id, u.id as actual_user_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = '090bbdde-9b77-4dbe-8d09-4ca1dc27253b';"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.user_id, u.id as actual_user_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = '090bbdde-9b77-4dbe-8d09-4ca1dc27253b';"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.user_id, u.id as actual_user_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = '090bbdde-9b77-4dbe-8d09-4ca1dc27253b';"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.user_id, u.id as actual_user_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.id = '090bbdde-9b77-4dbe-8d09-4ca1dc27253b';"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 22:00:02 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.created_at, u.id as user_table_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.target_id = '5ea0a782-fb9c-485b-bf20-97374c1df603' ORDER BY c.created_at DESC LIMIT 2;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.created_at, u.id as user_table_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.target_id = '5ea0a782-fb9c-485b-bf20-97374c1df603' ORDER BY c.created_at DESC LIMIT 2;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id, c.content, c.user_id, c.created_at, u.id as user_table_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.target_id = '5ea0a782-fb9c-485b-bf20-97374c1df603' ORDER BY c.created_at DESC LIMIT 2;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id, c.content, c.user_id, c.created_at, u.id as user_table_id, u.username, u.display_name, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id WHERE c.target_id = '5ea0a782-fb9c-485b-bf20-97374c1df603' ORDER BY c.created_at DESC LIMIT 2;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 22:36:41 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT id, user_id, content FROM comments LIMIT 1;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT id, user_id, content FROM comments LIMIT 1;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT id, user_id, content FROM comments LIMIT 1;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT id, user_id, content FROM comments LIMIT 1;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 22:36:44 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name IN ('comments', 'users') AND column_name IN ('id', 'user_id') ORDER BY table_name, column_name;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name IN ('comments', 'users') AND column_name IN ('id', 'user_id') ORDER BY table_name, column_name;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name IN ('comments', 'users') AND column_name IN ('id', 'user_id') ORDER BY table_name, column_name;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT column_name, data_type, udt_name FROM information_schema.columns WHERE table_name IN ('comments', 'users') AND column_name IN ('id', 'user_id') ORDER BY table_name, column_name;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 22:36:45 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id as comment_id, c.user_id, u.id as user_id, u.username, CASE WHEN c.user_id = u.id THEN 'MATCH' ELSE 'NO MATCH' END as join_status, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id LIMIT 5;"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id as comment_id, c.user_id, u.id as user_id, u.username, CASE WHEN c.user_id = u.id THEN 'MATCH' ELSE 'NO MATCH' END as join_status, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id LIMIT 5;"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT c.id as comment_id, c.user_id, u.id as user_id, u.username, CASE WHEN c.user_id = u.id THEN 'MATCH' ELSE 'NO MATCH' END as join_status, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id LIMIT 5;"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT c.id as comment_id, c.user_id, u.id as user_id, u.username, CASE WHEN c.user_id = u.id THEN 'MATCH' ELSE 'NO MATCH' END as join_status, u.is_deleted FROM comments c LEFT JOIN users u ON c.user_id = u.id LIMIT 5;"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }
 
             ## 2025-11-09 22:36:49 - MODIFICATION
             - **Tool**: mcp__Neon__run_sql
             - **Action**: MODIFIED: Added missing project ID, Added default database name, Defaulted to development branch
             - **Original Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT id, username, display_name, is_deleted FROM users WHERE id = '7b929672-4764-4613-9ddf-24613c803253';"
-  }
+
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT id, username, display_name, is_deleted FROM users WHERE id = '7b929672-4764-4613-9ddf-24613c803253';"
 }
-            - **Modified Params**: {
-  "params": {
-    "projectId": "misty-boat-49919732",
-    "databaseName": "head-shakers",
-    "branchId": "br-dark-forest-adf48tll",
-    "sql": "SELECT id, username, display_name, is_deleted FROM users WHERE id = '7b929672-4764-4613-9ddf-24613c803253';"
-  },
-  "projectId": "misty-boat-49919732",
-  "databaseName": "head-shakers",
-  "branchId": "br-dark-forest-adf48tll"
+} - **Modified Params**: {
+"params": {
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll",
+"sql": "SELECT id, username, display_name, is_deleted FROM users WHERE id = '7b929672-4764-4613-9ddf-24613c803253';"
+},
+"projectId": "misty-boat-49919732",
+"databaseName": "head-shakers",
+"branchId": "br-dark-forest-adf48tll"
 }

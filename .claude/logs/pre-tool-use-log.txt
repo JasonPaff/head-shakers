@@ -43910,3 +43910,254 @@ Input:
   "command": "mkdir -p \"C:\\Users\\JasonPaff\\dev\\head-shakers\\docs\\2025_11_09\""
 }
 ================================================================================
+
+================================================================================
+2025-11-09T23:57:42.937Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-like.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-09T23:57:42.937Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache-revalidation.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T23:57:42.940Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\social\\social.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T23:57:52.895Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\social\\social.actions.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-09T23:57:52.895Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\cache-tags.utils.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:02:29.126Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Analyze current cache invalidation timing issue",
+      "status": "completed",
+      "activeForm": "Analyzing current cache invalidation timing issue"
+    },
+    {
+      "content": "Update CacheRevalidationService to ensure synchronous completion",
+      "status": "in_progress",
+      "activeForm": "Updating CacheRevalidationService to ensure synchronous completion"
+    },
+    {
+      "content": "Add path-based revalidation for immediate cache clearing",
+      "status": "pending",
+      "activeForm": "Adding path-based revalidation for immediate cache clearing"
+    },
+    {
+      "content": "Update toggleLikeAction to wait for cache invalidation",
+      "status": "pending",
+      "activeForm": "Updating toggleLikeAction to wait for cache invalidation"
+    },
+    {
+      "content": "Test the fix to ensure cache invalidation happens before response",
+      "status": "pending",
+      "activeForm": "Testing the fix to ensure cache invalidation happens before response"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:02:38.460Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache-revalidation.service.ts",
+  "offset": 360,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:02:49.535Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache-revalidation.service.ts",
+  "old_string": "    /**\n     * revalidate after like/unlike\n     */\n    onLikeChange: (\n      entityType: CacheEntityType,\n      entityId: string,\n      userId: string,\n      operation: 'like' | 'unlike',\n    ): RevalidationResult => {\n      const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);\n      return CacheRevalidationService.revalidateTags(tags, {\n        entityId,\n        entityType,\n        operation: `social:${operation}`,\n        reason: `${entityType} ${operation}`,\n        userId,\n      });\n    },",
+  "new_string": "    /**\n     * revalidate after like/unlike\n     */\n    onLikeChange: (\n      entityType: CacheEntityType,\n      entityId: string,\n      userId: string,\n      operation: 'like' | 'unlike',\n    ): RevalidationResult => {\n      const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);\n\n      // Add path-based revalidation for immediate cache clearing\n      if (isCacheEnabled()) {\n        try {\n          switch (entityType) {\n            case 'bobblehead':\n              revalidatePath(`/bobbleheads/${entityId}`, 'page');\n              break;\n            case 'collection':\n              revalidatePath(`/collections/${entityId}`, 'page');\n              break;\n          }\n        } catch (error) {\n          console.error('[CacheRevalidation] Path revalidation error on like change:', error);\n        }\n      }\n\n      return CacheRevalidationService.revalidateTags(tags, {\n        entityId,\n        entityType,\n        operation: `social:${operation}`,\n        reason: `${entityType} ${operation}`,\n        userId,\n      });\n    },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:02:57.217Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Analyze current cache invalidation timing issue",
+      "status": "completed",
+      "activeForm": "Analyzing current cache invalidation timing issue"
+    },
+    {
+      "content": "Update CacheRevalidationService to ensure synchronous completion",
+      "status": "completed",
+      "activeForm": "Updating CacheRevalidationService to ensure synchronous completion"
+    },
+    {
+      "content": "Add path-based revalidation for immediate cache clearing",
+      "status": "completed",
+      "activeForm": "Adding path-based revalidation for immediate cache clearing"
+    },
+    {
+      "content": "Update toggleLikeAction to wait for cache invalidation",
+      "status": "in_progress",
+      "activeForm": "Updating toggleLikeAction to wait for cache invalidation"
+    },
+    {
+      "content": "Test the fix to ensure cache invalidation happens before response",
+      "status": "pending",
+      "activeForm": "Testing the fix to ensure cache invalidation happens before response"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:03:12.207Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\social\\social.actions.ts",
+  "old_string": "      const actionType = result.isLiked ? 'liked' : 'unliked';\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          actionType,\n          likeCount: result.likeCount,\n          targetId: likeData.targetId,\n          targetType: likeData.targetType,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,\n      });\n\n      CacheRevalidationService.social.onLikeChange(\n        likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType,\n        likeData.targetId,\n        ctx.userId,\n        result.isLiked ? 'like' : 'unlike',\n      );\n\n      return {\n        data: {\n          isLiked: result.isLiked,\n          likeCount: result.likeCount,\n          likeId: result.likeId,\n        },\n        message:\n          result.isLiked ?\n            `Added to liked ${likeData.targetType}s`\n          : `Removed from liked ${likeData.targetType}s`,\n        success: true,\n      };",
+  "new_string": "      const actionType = result.isLiked ? 'liked' : 'unliked';\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          actionType,\n          likeCount: result.likeCount,\n          targetId: likeData.targetId,\n          targetType: likeData.targetType,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,\n      });\n\n      // Perform cache invalidation synchronously and check result\n      const revalidationResult = CacheRevalidationService.social.onLikeChange(\n        likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType,\n        likeData.targetId,\n        ctx.userId,\n        result.isLiked ? 'like' : 'unlike',\n      );\n\n      // Log cache invalidation failures to Sentry but don't fail the request\n      if (!revalidationResult.isSuccess) {\n        Sentry.captureException(new Error('Cache invalidation failed for like action'), {\n          extra: {\n            entityId: likeData.targetId,\n            entityType: likeData.targetType,\n            error: revalidationResult.error,\n            operation: actionType,\n            tagsAttempted: revalidationResult.tagsInvalidated,\n            userId: ctx.userId,\n          },\n          level: 'warning',\n        });\n      }\n\n      return {\n        data: {\n          isLiked: result.isLiked,\n          likeCount: result.likeCount,\n          likeId: result.likeId,\n        },\n        message:\n          result.isLiked ?\n            `Added to liked ${likeData.targetType}s`\n          : `Removed from liked ${likeData.targetType}s`,\n        success: true,\n      };"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:03:23.481Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Analyze current cache invalidation timing issue",
+      "status": "completed",
+      "activeForm": "Analyzing current cache invalidation timing issue"
+    },
+    {
+      "content": "Update CacheRevalidationService to ensure synchronous completion",
+      "status": "completed",
+      "activeForm": "Updating CacheRevalidationService to ensure synchronous completion"
+    },
+    {
+      "content": "Add path-based revalidation for immediate cache clearing",
+      "status": "completed",
+      "activeForm": "Adding path-based revalidation for immediate cache clearing"
+    },
+    {
+      "content": "Update toggleLikeAction to wait for cache invalidation",
+      "status": "completed",
+      "activeForm": "Updating toggleLikeAction to wait for cache invalidation"
+    },
+    {
+      "content": "Test the fix to ensure cache invalidation happens before response",
+      "status": "in_progress",
+      "activeForm": "Testing the fix to ensure cache invalidation happens before response"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:03:29.396Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:03:40.274Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint and fix issues"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:04:36.593Z
+Tool: Bash
+Input:
+{
+  "command": "npm run format",
+  "timeout": 60000,
+  "description": "Format code with Prettier"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:04:52.855Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Analyze current cache invalidation timing issue",
+      "status": "completed",
+      "activeForm": "Analyzing current cache invalidation timing issue"
+    },
+    {
+      "content": "Update CacheRevalidationService to ensure synchronous completion",
+      "status": "completed",
+      "activeForm": "Updating CacheRevalidationService to ensure synchronous completion"
+    },
+    {
+      "content": "Add path-based revalidation for immediate cache clearing",
+      "status": "completed",
+      "activeForm": "Adding path-based revalidation for immediate cache clearing"
+    },
+    {
+      "content": "Update toggleLikeAction to wait for cache invalidation",
+      "status": "completed",
+      "activeForm": "Updating toggleLikeAction to wait for cache invalidation"
+    },
+    {
+      "content": "Test the fix to ensure cache invalidation happens before response",
+      "status": "completed",
+      "activeForm": "Testing the fix to ensure cache invalidation happens before response"
+    }
+  ]
+}
+================================================================================

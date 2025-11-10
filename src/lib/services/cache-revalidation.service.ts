@@ -368,6 +368,23 @@ export class CacheRevalidationService {
       operation: 'like' | 'unlike',
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);
+
+      // Add path-based revalidation for immediate cache clearing
+      if (isCacheEnabled()) {
+        try {
+          switch (entityType) {
+            case 'bobblehead':
+              revalidatePath(`/bobbleheads/${entityId}`, 'page');
+              break;
+            case 'collection':
+              revalidatePath(`/collections/${entityId}`, 'page');
+              break;
+          }
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on like change:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId,
         entityType,

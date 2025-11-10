@@ -73,12 +73,28 @@ export const toggleLikeAction = authActionClient
         message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
       });
 
-      CacheRevalidationService.social.onLikeChange(
+      // Perform cache invalidation synchronously and check result
+      const revalidationResult = CacheRevalidationService.social.onLikeChange(
         likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType,
         likeData.targetId,
         ctx.userId,
         result.isLiked ? 'like' : 'unlike',
       );
+
+      // Log cache invalidation failures to Sentry but don't fail the request
+      if (!revalidationResult.isSuccess) {
+        Sentry.captureException(new Error('Cache invalidation failed for like action'), {
+          extra: {
+            entityId: likeData.targetId,
+            entityType: likeData.targetType,
+            error: revalidationResult.error,
+            operation: actionType,
+            tagsAttempted: revalidationResult.tagsInvalidated,
+            userId: ctx.userId,
+          },
+          level: 'warning',
+        });
+      }
 
       return {
         data: {
