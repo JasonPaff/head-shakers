@@ -76,7 +76,7 @@ When the user runs this command, execute this simple 3-step workflow:
 
 ### Step 2: AI-Powered File Discovery
 
-**Objective**: Use AI to intelligently identify all files relevant to implementing the feature by analyzing the refined request and codebase structure.
+**Objective**: Use the file discovery agent to intelligently identify all files relevant to implementing the feature by analyzing the refined request and codebase structure.
 
 **Process**:
 
