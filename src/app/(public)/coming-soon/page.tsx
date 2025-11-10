@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { HeartIcon, RocketIcon, SparklesIcon, UsersIcon } from 'lucide-react';
 
 import { AdminAccess } from '@/app/(public)/coming-soon/admin-access';
+import { LaunchWaitlistForm } from '@/app/(public)/coming-soon/launch-waitlist-form';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/utils/tailwind-utils';
@@ -47,6 +48,14 @@ export default function ComingSoonPage() {
           <p className={'text-muted-foreground'}>
             We&apos;re putting the final touches on the platform. Stay tuned for the official launch!
           </p>
+        </div>
+
+        {/* Waitlist Signup Form */}
+        <div className={'mb-12 flex flex-col items-center gap-3'}>
+          <p className={'text-sm font-medium text-muted-foreground'}>
+            Get notified when we launch:
+          </p>
+          <LaunchWaitlistForm />
         </div>
 
         {/* Feature Preview Cards */}
