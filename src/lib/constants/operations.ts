@@ -38,9 +38,11 @@ export const OPERATIONS = {
   },
   COLLECTIONS: {
     BROWSE: 'browse_collections',
+    BROWSE_CATEGORIES: 'browse_categories',
     CREATE: 'create_collection',
     DELETE: 'delete_collection',
     GET_BY_USER: 'get_collections_by_user',
+    GET_CATEGORIES: 'get_categories',
     UPDATE: 'update_collection',
   },
   COMMENTS: {

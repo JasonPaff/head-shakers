@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, gte, ilike, isNull, lte, or, sql } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
+import type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';
 import type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';
 import type {
   DeleteCollection,
@@ -32,6 +33,16 @@ export type BobbleheadListRecord = {
   weight: null | number;
 };
 
+export type BrowseCategoriesResult = {
+  collections: Array<BrowseCollectionRecord>;
+  pagination: {
+    currentPage: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  };
+};
+
 export type BrowseCollectionRecord = {
   collection: CollectionRecord;
   firstBobbleheadPhoto: null | string;
@@ -52,6 +63,12 @@ export type BrowseCollectionsResult = {
     totalCount: number;
     totalPages: number;
   };
+};
+
+export type CategoryRecord = {
+  bobbleheadCount: number;
+  collectionCount: number;
+  name: string;
 };
 
 export type CollectionRecord = typeof collections.$inferSelect;
@@ -279,6 +296,263 @@ export class CollectionsQuery extends BaseQuery {
         ),
       )
       .orderBy(bobbleheads.createdAt);
+  }
+
+  static async getBrowseCategoriesAsync(
+    input: BrowseCategoriesInput,
+    context: QueryContext,
+  ): Promise<BrowseCategoriesResult> {
+    const dbInstance = this.getDbInstance(context);
+
+    // extract input parameters with defaults
+    const filters = input.filters;
+    const sort = input.sort;
+    const pagination = input.pagination;
+
+    const page = pagination?.page ?? 1;
+    const pageSize = pagination?.pageSize ?? 12;
+    const sortBy = sort?.sortBy ?? 'createdAt';
+    const sortOrder = sort?.sortOrder ?? 'desc';
+
+    // build permission filter - only public collections OR collections owned by current user
+    const permissionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      undefined,
+      context,
+    );
+
+    // build search filter for collection name and description
+    const searchFilter =
+      filters?.query ?
+        or(
+          ilike(collections.name, `%${filters.query}%`),
+          ilike(collections.description, `%${filters.query}%`),
+        )
+      : undefined;
+
+    // build category filter - filter collections that have bobbleheads in the specified category
+    const categoryFilter = filters?.category ? eq(bobbleheads.category, filters.category) : undefined;
+
+    // build owner filter
+    const ownerFilter = filters?.ownerId ? eq(collections.userId, filters.ownerId) : undefined;
+
+    // build date range filters
+    const dateFromFilter = filters?.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;
+    const dateToFilter = filters?.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;
+
+    // combine all filters for collections
+    const collectionFilters = this.combineFilters(
+      permissionFilter,
+      searchFilter,
+      ownerFilter,
+      dateFromFilter,
+      dateToFilter,
+    );
+
+    // build sort order
+    const orderByClause = this._getBrowseSortOrder(sortBy, sortOrder);
+
+    // calculate offset for pagination
+    const offset = (page - 1) * pageSize;
+
+    // if category filter is present, we need to filter collections that have bobbleheads in that category
+    if (categoryFilter) {
+      // get distinct collection IDs that have bobbleheads in the specified category
+      const collectionsWithCategory = dbInstance
+        .selectDistinct({
+          collectionId: bobbleheads.collectionId,
+        })
+        .from(bobbleheads)
+        .where(
+          this.combineFilters(
+            categoryFilter,
+            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          ),
+        )
+        .as('collections_with_category');
+
+      // get total count for pagination metadata
+      const countQuery = dbInstance
+        .select({ count: sql<number>`count(*)::int` })
+        .from(collections)
+        .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))
+        .where(collectionFilters);
+
+      const countResult = await countQuery;
+      const totalCount = countResult[0]?.count || 0;
+      const totalPages = Math.ceil(totalCount / pageSize);
+
+      // main query with joins for owner info, first bobblehead photo, and follower count
+      const results = await dbInstance
+        .select({
+          avatarUrl: users.avatarUrl,
+          commentCount: collections.commentCount,
+          coverImageUrl: collections.coverImageUrl,
+          createdAt: collections.createdAt,
+          description: collections.description,
+          displayName: users.displayName,
+          firstBobbleheadPhoto: sql<null | string>`(
+            SELECT ${bobbleheadPhotos.url}
+            FROM ${bobbleheads}
+            LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
+              AND ${bobbleheadPhotos.isPrimary} = true
+            WHERE ${bobbleheads.collectionId} = ${collections.id}
+              AND ${bobbleheads.isDeleted} = false
+            ORDER BY ${bobbleheads.createdAt} ASC
+            LIMIT 1
+          )`,
+          followerCount: sql<number>`(
+            SELECT COUNT(*)::int
+            FROM ${follows}
+            WHERE ${follows.targetId} = ${collections.id}
+              AND ${follows.followType} = 'collection'
+          )`,
+          id: collections.id,
+          isPublic: collections.isPublic,
+          lastItemAddedAt: collections.lastItemAddedAt,
+          likeCount: collections.likeCount,
+          name: collections.name,
+          ownerId: users.id,
+          ownerUsername: users.username,
+          totalItems: collections.totalItems,
+          totalValue: collections.totalValue,
+          updatedAt: collections.updatedAt,
+          userId: collections.userId,
+        })
+        .from(collections)
+        .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))
+        .innerJoin(users, eq(collections.userId, users.id))
+        .where(collectionFilters)
+        .orderBy(orderByClause)
+        .limit(pageSize)
+        .offset(offset);
+
+      // transform results to match BrowseCollectionRecord type
+      const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({
+        collection: {
+          commentCount: row.commentCount,
+          coverImageUrl: row.coverImageUrl,
+          createdAt: row.createdAt,
+          description: row.description,
+          id: row.id,
+          isPublic: row.isPublic,
+          lastItemAddedAt: row.lastItemAddedAt,
+          likeCount: row.likeCount,
+          name: row.name,
+          totalItems: row.totalItems,
+          totalValue: row.totalValue,
+          updatedAt: row.updatedAt,
+          userId: row.userId,
+        },
+        firstBobbleheadPhoto: row.firstBobbleheadPhoto,
+        followerCount: row.followerCount,
+        owner: {
+          avatarUrl: row.avatarUrl,
+          displayName: row.displayName,
+          id: row.ownerId,
+          username: row.ownerUsername,
+        },
+      }));
+
+      return {
+        collections: transformedResults,
+        pagination: {
+          currentPage: page,
+          pageSize,
+          totalCount,
+          totalPages,
+        },
+      };
+    }
+
+    // if no category filter, just return all collections (same as browse collections)
+    const countQuery = dbInstance.select({ count: sql<number>`count(*)::int` }).from(collections).where(collectionFilters);
+
+    const countResult = await countQuery;
+    const totalCount = countResult[0]?.count || 0;
+    const totalPages = Math.ceil(totalCount / pageSize);
+
+    // main query with joins for owner info, first bobblehead photo, and follower count
+    const results = await dbInstance
+      .select({
+        avatarUrl: users.avatarUrl,
+        commentCount: collections.commentCount,
+        coverImageUrl: collections.coverImageUrl,
+        createdAt: collections.createdAt,
+        description: collections.description,
+        displayName: users.displayName,
+        firstBobbleheadPhoto: sql<null | string>`(
+          SELECT ${bobbleheadPhotos.url}
+          FROM ${bobbleheads}
+          LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
+            AND ${bobbleheadPhotos.isPrimary} = true
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+            AND ${bobbleheads.isDeleted} = false
+          ORDER BY ${bobbleheads.createdAt} ASC
+          LIMIT 1
+        )`,
+        followerCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM ${follows}
+          WHERE ${follows.targetId} = ${collections.id}
+            AND ${follows.followType} = 'collection'
+        )`,
+        id: collections.id,
+        isPublic: collections.isPublic,
+        lastItemAddedAt: collections.lastItemAddedAt,
+        likeCount: collections.likeCount,
+        name: collections.name,
+        ownerId: users.id,
+        ownerUsername: users.username,
+        totalItems: collections.totalItems,
+        totalValue: collections.totalValue,
+        updatedAt: collections.updatedAt,
+        userId: collections.userId,
+      })
+      .from(collections)
+      .innerJoin(users, eq(collections.userId, users.id))
+      .where(collectionFilters)
+      .orderBy(orderByClause)
+      .limit(pageSize)
+      .offset(offset);
+
+    // transform results to match BrowseCollectionRecord type
+    const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({
+      collection: {
+        commentCount: row.commentCount,
+        coverImageUrl: row.coverImageUrl,
+        createdAt: row.createdAt,
+        description: row.description,
+        id: row.id,
+        isPublic: row.isPublic,
+        lastItemAddedAt: row.lastItemAddedAt,
+        likeCount: row.likeCount,
+        name: row.name,
+        totalItems: row.totalItems,
+        totalValue: row.totalValue,
+        updatedAt: row.updatedAt,
+        userId: row.userId,
+      },
+      firstBobbleheadPhoto: row.firstBobbleheadPhoto,
+      followerCount: row.followerCount,
+      owner: {
+        avatarUrl: row.avatarUrl,
+        displayName: row.displayName,
+        id: row.ownerId,
+        username: row.ownerUsername,
+      },
+    }));
+
+    return {
+      collections: transformedResults,
+      pagination: {
+        currentPage: page,
+        pageSize,
+        totalCount,
+        totalPages,
+      },
+    };
   }
 
   static async getBrowseCollectionsAsync(
@@ -528,6 +802,35 @@ export class CollectionsQuery extends BaseQuery {
         },
       },
     });
+  }
+
+  static async getDistinctCategoriesAsync(context: QueryContext): Promise<Array<CategoryRecord>> {
+    const dbInstance = this.getDbInstance(context);
+
+    // get distinct categories with counts from bobbleheads that belong to public collections
+    const results = await dbInstance
+      .selectDistinct({
+        bobbleheadCount: sql<number>`COUNT(DISTINCT ${bobbleheads.id})::int`,
+        category: bobbleheads.category,
+        collectionCount: sql<number>`COUNT(DISTINCT ${bobbleheads.collectionId})::int`,
+      })
+      .from(bobbleheads)
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .where(
+        this.combineFilters(
+          sql`${bobbleheads.category} IS NOT NULL`,
+          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+        ),
+      )
+      .groupBy(bobbleheads.category)
+      .orderBy(sql`lower(${bobbleheads.category}) asc`);
+
+    return results.map((row) => ({
+      bobbleheadCount: row.bobbleheadCount,
+      collectionCount: row.collectionCount,
+      name: row.category || '',
+    }));
   }
 
   static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {

@@ -48,10 +48,12 @@ export const ACTION_NAMES = {
   },
   COLLECTIONS: {
     BROWSE: 'browseCollections',
+    BROWSE_CATEGORIES: 'browseCategories',
     CREATE: 'createCollection',
     CREATE_SUB: 'createSubCollection',
     DELETE: 'deleteCollection',
     DELETE_SUB: 'deleteSubCollection',
+    GET_CATEGORIES: 'getCategories',
     GET_COLLECTIONS_BY_USER: 'getCollectionsByUser',
     GET_SUB_COLLECTIONS: 'getSubCollectionsByCollection',
     UPDATE: 'updateCollection',

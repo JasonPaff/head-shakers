@@ -17,6 +17,7 @@ import { CacheRevalidationService } from '@/lib/services/cache-revalidation.serv
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import { browseCategoriesInputSchema } from '@/lib/validations/browse-categories.validation';
 import { browseCollectionsInputSchema } from '@/lib/validations/browse-collections.validation';
 import {
   deleteCollectionSchema,
@@ -241,6 +242,86 @@ export const browseCollectionsAction = publicActionClient
           actionName: ACTION_NAMES.COLLECTIONS.BROWSE,
         },
         operation: OPERATIONS.COLLECTIONS.BROWSE,
+      });
+    }
+  });
+
+/**
+ * Get all distinct categories (public action)
+ */
+export const getCategoriesAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,
+    isTransactionRequired: false,
+  })
+  .action(async ({ ctx }) => {
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    try {
+      const categories = await CollectionsFacade.getCategories(dbInstance);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          categoryCount: categories.length,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Retrieved ${categories.length} categories`,
+      });
+
+      return categories;
+    } catch (error) {
+      return handleActionError(error, {
+        metadata: {
+          actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,
+        },
+        operation: OPERATIONS.COLLECTIONS.GET_CATEGORIES,
+      });
+    }
+  });
+
+/**
+ * Browse collections by category with filtering, sorting, and pagination (public action)
+ */
+export const browseCategoriesAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES,
+    isTransactionRequired: false,
+  })
+  .inputSchema(browseCategoriesInputSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const browseInput = browseCategoriesInputSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      filters: browseInput.filters,
+      pagination: browseInput.pagination,
+      sort: browseInput.sort,
+    });
+
+    try {
+      const result = await CollectionsFacade.browseCategories(browseInput, undefined, dbInstance);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          category: browseInput.filters?.category,
+          filters: browseInput.filters,
+          resultCount: result.collections.length,
+          totalCount: result.pagination.totalCount,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Browsed categories with filters`,
+      });
+
+      return result;
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES,
+        },
+        operation: OPERATIONS.COLLECTIONS.BROWSE_CATEGORIES,
       });
     }
   });

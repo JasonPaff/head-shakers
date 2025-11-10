@@ -55208,3 +55208,460 @@ Input:
   "new_string": "## Execution Status\n\n- ✅ Orchestration initialized\n- ✅ Step 1: Feature Refinement - Complete (276 words refined)\n- ✅ Step 2: File Discovery - Complete (49 files discovered)\n- ✅ Step 3: Implementation Planning - Complete (15 implementation steps)\n\n## Summary\n\n**Total Execution Time**: ~25 seconds\n**Feature Complexity**: High\n**Estimated Implementation Time**: 3-4 days (32-47 hours)\n**Implementation Steps**: 15 steps\n\n### Key Findings\n\n1. **Category Architecture**: Categories stored as varchar on bobbleheads table (not separate taxonomy)\n2. **Reference Implementation**: Browse collections page provides complete pattern to follow\n3. **Database Performance**: Existing index on bobbleheads.category supports efficient queries\n4. **Component Reusability**: Can reuse 4 browse components (content, filters, table, pagination)\n5. **Files Discovered**: 49 relevant files across 12 architectural layers"
 }
 ================================================================================
+
+================================================================================
+2025-11-10T03:49:32.484Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "pending",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "pending",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "pending",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "pending",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:49:42.006Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*browse-collections.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:49:42.007Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:49:42.007Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:49:42.011Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\collections\\collections.actions.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:49:51.351Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\browse-collections.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:50:03.330Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "in_progress",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "pending",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "pending",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "pending",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:50:12.517Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "export type BrowseCollectionsResult = {\n  collections: Array<BrowseCollectionRecord>;\n  pagination: {\n    currentPage: number;\n    pageSize: number;\n    totalCount: number;\n    totalPages: number;\n  };\n};",
+  "new_string": "export type BrowseCollectionsResult = {\n  collections: Array<BrowseCollectionRecord>;\n  pagination: {\n    currentPage: number;\n    pageSize: number;\n    totalCount: number;\n    totalPages: number;\n  };\n};\n\nexport type CategoryRecord = {\n  bobbleheadCount: number;\n  collectionCount: number;\n  name: string;\n};\n\nexport type BrowseCategoriesResult = {\n  collections: Array<BrowseCollectionRecord>;\n  pagination: {\n    currentPage: number;\n    pageSize: number;\n    totalCount: number;\n    totalPages: number;\n  };\n};"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:50:20.798Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';\nimport type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';\nimport type {\n  DeleteCollection,\n  InsertCollection,\n  UpdateCollection,\n} from '@/lib/validations/collections.validation';",
+  "new_string": "import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';\nimport type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';\nimport type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';\nimport type {\n  DeleteCollection,\n  InsertCollection,\n  UpdateCollection,\n} from '@/lib/validations/collections.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:51:01.010Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "    return {\n      collections: transformedResults,\n      pagination: {\n        currentPage: page,\n        pageSize,\n        totalCount,\n        totalPages,\n      },\n    };\n  }\n\n  static async getCollectionBobbleheadsWithPhotosAsync(",
+  "new_string": "    return {\n      collections: transformedResults,\n      pagination: {\n        currentPage: page,\n        pageSize,\n        totalCount,\n        totalPages,\n      },\n    };\n  }\n\n  static async getDistinctCategoriesAsync(context: QueryContext): Promise<Array<CategoryRecord>> {\n    const dbInstance = this.getDbInstance(context);\n\n    // get distinct categories with counts from bobbleheads that belong to public collections\n    const results = await dbInstance\n      .selectDistinct({\n        bobbleheadCount: sql<number>`COUNT(DISTINCT ${bobbleheads.id})::int`,\n        category: bobbleheads.category,\n        collectionCount: sql<number>`COUNT(DISTINCT ${bobbleheads.collectionId})::int`,\n      })\n      .from(bobbleheads)\n      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))\n      .where(\n        this.combineFilters(\n          sql`${bobbleheads.category} IS NOT NULL`,\n          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),\n        ),\n      )\n      .groupBy(bobbleheads.category)\n      .orderBy(sql`lower(${bobbleheads.category}) asc`);\n\n    return results.map((row) => ({\n      bobbleheadCount: row.bobbleheadCount,\n      collectionCount: row.collectionCount,\n      name: row.category || '',\n    }));\n  }\n\n  static async getBrowseCategoriesAsync(\n    input: BrowseCategoriesInput,\n    context: QueryContext,\n  ): Promise<BrowseCategoriesResult> {\n    const dbInstance = this.getDbInstance(context);\n\n    // extract input parameters with defaults\n    const filters = input.filters;\n    const sort = input.sort;\n    const pagination = input.pagination;\n\n    const page = pagination?.page ?? 1;\n    const pageSize = pagination?.pageSize ?? 12;\n    const sortBy = sort?.sortBy ?? 'createdAt';\n    const sortOrder = sort?.sortOrder ?? 'desc';\n\n    // build permission filter - only public collections OR collections owned by current user\n    const permissionFilter = this.buildBaseFilters(\n      collections.isPublic,\n      collections.userId,\n      undefined,\n      context,\n    );\n\n    // build search filter for collection name and description\n    const searchFilter =\n      filters?.query ?\n        or(\n          ilike(collections.name, `%${filters.query}%`),\n          ilike(collections.description, `%${filters.query}%`),\n        )\n      : undefined;\n\n    // build category filter - filter collections that have bobbleheads in the specified category\n    const categoryFilter = filters?.category ? eq(bobbleheads.category, filters.category) : undefined;\n\n    // build owner filter\n    const ownerFilter = filters?.ownerId ? eq(collections.userId, filters.ownerId) : undefined;\n\n    // build date range filters\n    const dateFromFilter = filters?.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;\n    const dateToFilter = filters?.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;\n\n    // combine all filters for collections\n    const collectionFilters = this.combineFilters(\n      permissionFilter,\n      searchFilter,\n      ownerFilter,\n      dateFromFilter,\n      dateToFilter,\n    );\n\n    // build sort order\n    const orderByClause = this._getBrowseSortOrder(sortBy, sortOrder);\n\n    // calculate offset for pagination\n    const offset = (page - 1) * pageSize;\n\n    // if category filter is present, we need to filter collections that have bobbleheads in that category\n    if (categoryFilter) {\n      // get distinct collection IDs that have bobbleheads in the specified category\n      const collectionsWithCategory = dbInstance\n        .selectDistinct({\n          collectionId: bobbleheads.collectionId,\n        })\n        .from(bobbleheads)\n        .where(\n          this.combineFilters(\n            categoryFilter,\n            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),\n          ),\n        )\n        .as('collections_with_category');\n\n      // get total count for pagination metadata\n      const countQuery = dbInstance\n        .select({ count: sql<number>`count(*)::int` })\n        .from(collections)\n        .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))\n        .where(collectionFilters);\n\n      const countResult = await countQuery;\n      const totalCount = countResult[0]?.count || 0;\n      const totalPages = Math.ceil(totalCount / pageSize);\n\n      // main query with joins for owner info, first bobblehead photo, and follower count\n      const results = await dbInstance\n        .select({\n          avatarUrl: users.avatarUrl,\n          commentCount: collections.commentCount,\n          coverImageUrl: collections.coverImageUrl,\n          createdAt: collections.createdAt,\n          description: collections.description,\n          displayName: users.displayName,\n          firstBobbleheadPhoto: sql<null | string>`(\n            SELECT ${bobbleheadPhotos.url}\n            FROM ${bobbleheads}\n            LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}\n              AND ${bobbleheadPhotos.isPrimary} = true\n            WHERE ${bobbleheads.collectionId} = ${collections.id}\n              AND ${bobbleheads.isDeleted} = false\n            ORDER BY ${bobbleheads.createdAt} ASC\n            LIMIT 1\n          )`,\n          followerCount: sql<number>`(\n            SELECT COUNT(*)::int\n            FROM ${follows}\n            WHERE ${follows.targetId} = ${collections.id}\n              AND ${follows.followType} = 'collection'\n          )`,\n          id: collections.id,\n          isPublic: collections.isPublic,\n          lastItemAddedAt: collections.lastItemAddedAt,\n          likeCount: collections.likeCount,\n          name: collections.name,\n          ownerId: users.id,\n          ownerUsername: users.username,\n          totalItems: collections.totalItems,\n          totalValue: collections.totalValue,\n          updatedAt: collections.updatedAt,\n          userId: collections.userId,\n        })\n        .from(collections)\n        .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))\n        .innerJoin(users, eq(collections.userId, users.id))\n        .where(collectionFilters)\n        .orderBy(orderByClause)\n        .limit(pageSize)\n        .offset(offset);\n\n      // transform results to match BrowseCollectionRecord type\n      const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({\n        collection: {\n          commentCount: row.commentCount,\n          coverImageUrl: row.coverImageUrl,\n          createdAt: row.createdAt,\n          description: row.description,\n          id: row.id,\n          isPublic: row.isPublic,\n          lastItemAddedAt: row.lastItemAddedAt,\n          likeCount: row.likeCount,\n          name: row.name,\n          totalItems: row.totalItems,\n          totalValue: row.totalValue,\n          updatedAt: row.updatedAt,\n          userId: row.userId,\n        },\n        firstBobbleheadPhoto: row.firstBobbleheadPhoto,\n        followerCount: row.followerCount,\n        owner: {\n          avatarUrl: row.avatarUrl,\n          displayName: row.displayName,\n          id: row.ownerId,\n          username: row.ownerUsername,\n        },\n      }));\n\n      return {\n        collections: transformedResults,\n        pagination: {\n          currentPage: page,\n          pageSize,\n          totalCount,\n          totalPages,\n        },\n      };\n    }\n\n    // if no category filter, just return all collections (same as browse collections)\n    const countQuery = dbInstance.select({ count: sql<number>`count(*)::int` }).from(collections).where(collectionFilters);\n\n    const countResult = await countQuery;\n    const totalCount = countResult[0]?.count || 0;\n    const totalPages = Math.ceil(totalCount / pageSize);\n\n    // main query with joins for owner info, first bobblehead photo, and follower count\n    const results = await dbInstance\n      .select({\n        avatarUrl: users.avatarUrl,\n        commentCount: collections.commentCount,\n        coverImageUrl: collections.coverImageUrl,\n        createdAt: collections.createdAt,\n        description: collections.description,\n        displayName: users.displayName,\n        firstBobbleheadPhoto: sql<null | string>`(\n          SELECT ${bobbleheadPhotos.url}\n          FROM ${bobbleheads}\n          LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}\n            AND ${bobbleheadPhotos.isPrimary} = true\n          WHERE ${bobbleheads.collectionId} = ${collections.id}\n            AND ${bobbleheads.isDeleted} = false\n          ORDER BY ${bobbleheads.createdAt} ASC\n          LIMIT 1\n        )`,\n        followerCount: sql<number>`(\n          SELECT COUNT(*)::int\n          FROM ${follows}\n          WHERE ${follows.targetId} = ${collections.id}\n            AND ${follows.followType} = 'collection'\n        )`,\n        id: collections.id,\n        isPublic: collections.isPublic,\n        lastItemAddedAt: collections.lastItemAddedAt,\n        likeCount: collections.likeCount,\n        name: collections.name,\n        ownerId: users.id,\n        ownerUsername: users.username,\n        totalItems: collections.totalItems,\n        totalValue: collections.totalValue,\n        updatedAt: collections.updatedAt,\n        userId: collections.userId,\n      })\n      .from(collections)\n      .innerJoin(users, eq(collections.userId, users.id))\n      .where(collectionFilters)\n      .orderBy(orderByClause)\n      .limit(pageSize)\n      .offset(offset);\n\n    // transform results to match BrowseCollectionRecord type\n    const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({\n      collection: {\n        commentCount: row.commentCount,\n        coverImageUrl: row.coverImageUrl,\n        createdAt: row.createdAt,\n        description: row.description,\n        id: row.id,\n        isPublic: row.isPublic,\n        lastItemAddedAt: row.lastItemAddedAt,\n        likeCount: row.likeCount,\n        name: row.name,\n        totalItems: row.totalItems,\n        totalValue: row.totalValue,\n        updatedAt: row.updatedAt,\n        userId: row.userId,\n      },\n      firstBobbleheadPhoto: row.firstBobbleheadPhoto,\n      followerCount: row.followerCount,\n      owner: {\n        avatarUrl: row.avatarUrl,\n        displayName: row.displayName,\n        id: row.ownerId,\n        username: row.ownerUsername,\n      },\n    }));\n\n    return {\n      collections: transformedResults,\n      pagination: {\n        currentPage: page,\n        pageSize,\n        totalCount,\n        totalPages,\n      },\n    };\n  }\n\n  static async getCollectionBobbleheadsWithPhotosAsync("
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:51:08.274Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "completed",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "in_progress",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "pending",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "pending",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:51:30.277Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\browse-categories.validation.ts",
+  "content": "import { z } from 'zod';\n\nimport { CONFIG } from '@/lib/constants';\n\n/**\n * Browse Categories Validation Schemas\n * Validation schemas for browsing and filtering collections by category with sorting and pagination\n */\n\n/**\n * Sort by options for category browse\n * Supports sorting by name, creation date, popularity (likes), followers, and bobblehead count\n */\nexport const BROWSE_CATEGORIES_SORT_BY = [\n  'name',\n  'createdAt',\n  'likeCount',\n  'followerCount',\n  'bobbleheadCount',\n] as const;\n\n/**\n * Sort order options\n */\nexport const BROWSE_CATEGORIES_SORT_ORDER = ['asc', 'desc'] as const;\n\n/**\n * Schema for browse categories sort options\n */\nexport const browseCategoriesSortSchema = z.object({\n  sortBy: z.enum(BROWSE_CATEGORIES_SORT_BY).optional().default('createdAt'),\n  sortOrder: z.enum(BROWSE_CATEGORIES_SORT_ORDER).optional().default('desc'),\n});\n\n/**\n * Schema for browse categories pagination\n * Uses collection-specific pagination limits from config\n */\nexport const browseCategoriesPaginationSchema = z.object({\n  page: z.coerce.number().int().positive().default(1),\n  pageSize: z.coerce\n    .number()\n    .int()\n    .positive()\n    .max(CONFIG.PAGINATION.COLLECTIONS.MAX, `Maximum page size is ${CONFIG.PAGINATION.COLLECTIONS.MAX}`)\n    .default(CONFIG.PAGINATION.COLLECTIONS.DEFAULT),\n});\n\n/**\n * Schema for browse categories filters\n * All filters are optional to support flexible browsing\n */\nexport const browseCategoriesFiltersSchema = z.object({\n  // Filter by category name (varchar string)\n  category: z.string().trim().max(255, 'Category name must be 255 characters or less').optional(),\n\n  // Filter by date range\n  dateFrom: z.coerce.date().optional(),\n\n  dateTo: z.coerce.date().optional(),\n\n  // Filter by owner user ID\n  ownerId: z.string().uuid('Invalid owner ID').optional(),\n\n  // Search query for collection name/description text search\n  query: z.string().trim().max(500, 'Search query must be 500 characters or less').optional(),\n});\n\n/**\n * Combined schema for full browse categories input\n * Merges filters, sorting, and pagination for complete browse functionality\n */\nexport const browseCategoriesInputSchema = z\n  .object({\n    filters: browseCategoriesFiltersSchema.optional(),\n    pagination: browseCategoriesPaginationSchema.optional(),\n    sort: browseCategoriesSortSchema.optional(),\n  })\n  .refine(\n    (data) => {\n      // Validate date range if both dates are provided\n      if (data.filters?.dateFrom && data.filters?.dateTo) {\n        return data.filters.dateFrom <= data.filters.dateTo;\n      }\n      return true;\n    },\n    {\n      message: 'dateFrom must be before or equal to dateTo',\n      path: ['filters', 'dateFrom'],\n    },\n  );\n\n// Type exports using z.infer for type-safe schema usage\nexport type BrowseCategoriesFilters = z.infer<typeof browseCategoriesFiltersSchema>;\nexport type BrowseCategoriesInput = z.infer<typeof browseCategoriesInputSchema>;\nexport type BrowseCategoriesPagination = z.infer<typeof browseCategoriesPaginationSchema>;\nexport type BrowseCategoriesSort = z.infer<typeof browseCategoriesSortSchema>;\nexport type BrowseCategoriesSortBy = (typeof BROWSE_CATEGORIES_SORT_BY)[number];\nexport type BrowseCategoriesSortOrder = (typeof BROWSE_CATEGORIES_SORT_ORDER)[number];\n"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:51:39.068Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "completed",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "completed",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "in_progress",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "pending",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:51:53.438Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "import type { FindOptions } from '@/lib/queries/base/query-context';\nimport type {\n  BobbleheadListRecord,\n  BrowseCollectionsResult,\n  CollectionRecord,\n  CollectionWithRelations,\n} from '@/lib/queries/collections/collections.query';\nimport type { FacadeErrorContext } from '@/lib/utils/error-types';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';",
+  "new_string": "import type { FindOptions } from '@/lib/queries/base/query-context';\nimport type {\n  BobbleheadListRecord,\n  BrowseCategoriesResult,\n  BrowseCollectionsResult,\n  CategoryRecord,\n  CollectionRecord,\n  CollectionWithRelations,\n} from '@/lib/queries/collections/collections.query';\nimport type { FacadeErrorContext } from '@/lib/utils/error-types';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';\nimport type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:52:26.332Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "      throw createFacadeError(context, error);\n    }\n  }\n\n  static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {",
+  "new_string": "      throw createFacadeError(context, error);\n    }\n  }\n\n  /**\n   * Get all distinct categories with counts\n   */\n  static async getCategories(dbInstance?: DatabaseExecutor): Promise<Array<CategoryRecord>> {\n    try {\n      return await CacheService.collections.public(\n        async () => {\n          const context = createPublicQueryContext({ dbInstance });\n          return await CollectionsQuery.getDistinctCategoriesAsync(context);\n        },\n        'categories',\n        {\n          context: {\n            entityType: 'collection',\n            facade: 'CollectionsFacade',\n            operation: 'getCategories',\n          },\n        },\n      );\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: {},\n        facade: 'CollectionsFacade',\n        method: 'getCategories',\n        operation: 'getCategories',\n      };\n      throw createFacadeError(context, error);\n    }\n  }\n\n  /**\n   * Browse collections by category with filtering, sorting, and pagination\n   */\n  static async browseCategories(\n    input: BrowseCategoriesInput,\n    viewerUserId?: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<BrowseCategoriesResult> {\n    const startTime = performance.now();\n\n    // Track filter usage patterns\n    const activeFilters: Array<string> = [];\n    if (input.filters?.query) activeFilters.push('search');\n    if (input.filters?.category) activeFilters.push('category');\n    if (input.filters?.ownerId) activeFilters.push('owner');\n    if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');\n\n    Sentry.addBreadcrumb({\n      category: 'browse_categories_filters',\n      data: {\n        activeFilters,\n        category: input.filters?.category ? 'set' : 'unset',\n        dateFrom: input.filters?.dateFrom ? 'set' : 'unset',\n        dateTo: input.filters?.dateTo ? 'set' : 'unset',\n        ownerId: input.filters?.ownerId ? 'set' : 'unset',\n        query:\n          input.filters?.query ?\n            `\"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}\"`\n          : 'empty',\n      },\n      level: 'info',\n      message: `Browse categories with filters: ${activeFilters.join(', ') || 'none'}`,\n    });\n\n    Sentry.addBreadcrumb({\n      category: 'browse_categories_pagination',\n      data: {\n        page: input.pagination?.page,\n        pageSize: input.pagination?.pageSize,\n      },\n      level: 'info',\n      message: `Browse categories pagination: page ${input.pagination?.page}, size ${input.pagination?.pageSize}`,\n    });\n\n    try {\n      const inputHash = createHashFromObject(input);\n      const result = await CacheService.collections.public(\n        async () => {\n          const context =\n            viewerUserId ?\n              createUserQueryContext(viewerUserId, { dbInstance })\n            : createPublicQueryContext({ dbInstance });\n\n          const queryStartTime = performance.now();\n          const result = await CollectionsQuery.getBrowseCategoriesAsync(input, context);\n          const queryDuration = performance.now() - queryStartTime;\n\n          // Track query performance\n          Sentry.captureMessage('Browse categories query executed', {\n            level: 'info',\n            tags: {\n              activeFilters: activeFilters.join(','),\n              cacheKey: 'browse_categories_public',\n              operation: 'getBrowseCategoriesAsync',\n            },\n          });\n\n          // Track slow queries\n          if (queryDuration > 1000) {\n            Sentry.captureMessage('Browse categories slow query', {\n              level: 'info',\n              tags: {\n                activeFilters: activeFilters.join(','),\n                operation: 'query',\n              },\n            });\n          }\n\n          // transform results to include Cloudinary URLs for first bobblehead photos\n          const transformedCollections = result.collections.map((record) => ({\n            ...record,\n            firstBobbleheadPhoto:\n              record.firstBobbleheadPhoto ?\n                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {\n                  crop: 'fill',\n                  gravity: 'auto',\n                  height: 300,\n                  quality: 'auto',\n                  width: 300,\n                })\n              : null,\n          }));\n\n          return {\n            ...result,\n            collections: transformedCollections,\n          };\n        },\n        inputHash,\n        {\n          context: {\n            entityType: 'collection',\n            facade: 'CollectionsFacade',\n            operation: 'browseCategories',\n            userId: viewerUserId,\n          },\n        },\n      );\n\n      const totalDuration = performance.now() - startTime;\n\n      // Track custom metrics for filter and pagination patterns\n      if (activeFilters.length > 0) {\n        Sentry.captureMessage('Browse categories filtered search', {\n          level: 'info',\n          tags: {\n            filterCount: activeFilters.length.toString(),\n            filters: activeFilters.join(','),\n          },\n        });\n      }\n\n      // Track pagination depth (how far users are paginating)\n      if (input.pagination?.page && input.pagination.page > 1) {\n        Sentry.captureMessage('Browse categories deep pagination', {\n          level: 'info',\n          tags: {\n            page: input.pagination.page.toString(),\n          },\n        });\n      }\n\n      // Track overall performance - report slow responses\n      if (totalDuration > 1000) {\n        Sentry.captureMessage('Browse categories slow response', {\n          level: 'info',\n          tags: {\n            hasFilters: activeFilters.length > 0 ? 'yes' : 'no',\n            resultCount: result.collections.length.toString(),\n            totalCount: result.pagination.totalCount.toString(),\n            viewerAuthenticated: !!viewerUserId,\n          },\n        });\n      }\n\n      // Add success breadcrumb with results summary\n      Sentry.addBreadcrumb({\n        category: 'browse_categories_results',\n        data: {\n          resultCount: result.collections.length,\n          totalCount: result.pagination.totalCount,\n          totalPages: result.pagination.totalPages,\n        },\n        level: 'info',\n        message: `Browse categories completed: ${result.collections.length} results of ${result.pagination.totalCount} total`,\n      });\n\n      return result;\n    } catch (error) {\n      const totalDuration = performance.now() - startTime;\n\n      // Track error metrics\n      Sentry.captureMessage('Browse categories error', {\n        level: 'error',\n        tags: {\n          activeFilters: activeFilters.join(','),\n          errorType: error instanceof Error ? error.constructor.name : 'unknown',\n        },\n      });\n\n      const context: FacadeErrorContext = {\n        data: {\n          activeFilters,\n          filters: {\n            category: input.filters?.category ? `[${input.filters.category}]` : 'unset',\n            dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',\n            owner: input.filters?.ownerId ? 'set' : 'unset',\n            query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',\n          },\n          input,\n          pagination: input.pagination,\n          totalDuration,\n        },\n        facade: 'CollectionsFacade',\n        method: 'browseCategories',\n        operation: 'browseCategories',\n        userId: viewerUserId,\n      };\n\n      Sentry.addBreadcrumb({\n        category: 'error',\n        data: {\n          activeFilters,\n          durationMs: totalDuration,\n        },\n        level: 'error',\n        message: `Browse categories failed after ${totalDuration.toFixed(2)}ms`,\n      });\n\n      throw createFacadeError(context, error);\n    }\n  }\n\n  static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:52:34.963Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "completed",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "completed",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "completed",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "in_progress",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:52:48.801Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/constants/action-names.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:52:48.813Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/constants/operations.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:52:56.170Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\action-names.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:52:56.187Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\operations.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:53:09.508Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\action-names.ts",
+  "old_string": "  COLLECTIONS: {\n    BROWSE: 'browseCollections',\n    CREATE: 'createCollection',\n    CREATE_SUB: 'createSubCollection',\n    DELETE: 'deleteCollection',\n    DELETE_SUB: 'deleteSubCollection',\n    GET_COLLECTIONS_BY_USER: 'getCollectionsByUser',\n    GET_SUB_COLLECTIONS: 'getSubCollectionsByCollection',\n    UPDATE: 'updateCollection',\n    UPDATE_SUB: 'updateSubCollection',\n  },",
+  "new_string": "  COLLECTIONS: {\n    BROWSE: 'browseCollections',\n    BROWSE_CATEGORIES: 'browseCategories',\n    CREATE: 'createCollection',\n    CREATE_SUB: 'createSubCollection',\n    DELETE: 'deleteCollection',\n    DELETE_SUB: 'deleteSubCollection',\n    GET_CATEGORIES: 'getCategories',\n    GET_COLLECTIONS_BY_USER: 'getCollectionsByUser',\n    GET_SUB_COLLECTIONS: 'getSubCollectionsByCollection',\n    UPDATE: 'updateCollection',\n    UPDATE_SUB: 'updateSubCollection',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:53:18.999Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\operations.ts",
+  "old_string": "  COLLECTIONS: {\n    BROWSE: 'browse_collections',\n    CREATE: 'create_collection',\n    DELETE: 'delete_collection',\n    GET_BY_USER: 'get_collections_by_user',\n    UPDATE: 'update_collection',\n  },",
+  "new_string": "  COLLECTIONS: {\n    BROWSE: 'browse_collections',\n    BROWSE_CATEGORIES: 'browse_categories',\n    CREATE: 'create_collection',\n    DELETE: 'delete_collection',\n    GET_BY_USER: 'get_collections_by_user',\n    GET_CATEGORIES: 'get_categories',\n    UPDATE: 'update_collection',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:53:28.057Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\collections\\collections.actions.ts",
+  "old_string": "import { handleActionError } from '@/lib/utils/action-error-handler';\nimport { ActionError, ErrorType } from '@/lib/utils/errors';\nimport { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';\nimport { browseCollectionsInputSchema } from '@/lib/validations/browse-collections.validation';",
+  "new_string": "import { handleActionError } from '@/lib/utils/action-error-handler';\nimport { ActionError, ErrorType } from '@/lib/utils/errors';\nimport { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';\nimport { browseCategoriesInputSchema } from '@/lib/validations/browse-categories.validation';\nimport { browseCollectionsInputSchema } from '@/lib/validations/browse-collections.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:53:44.423Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\collections\\collections.actions.ts",
+  "old_string": "      return handleActionError(error, {\n        input: parsedInput,\n        metadata: {\n          actionName: ACTION_NAMES.COLLECTIONS.BROWSE,\n        },\n        operation: OPERATIONS.COLLECTIONS.BROWSE,\n      });\n    }\n  });",
+  "new_string": "      return handleActionError(error, {\n        input: parsedInput,\n        metadata: {\n          actionName: ACTION_NAMES.COLLECTIONS.BROWSE,\n        },\n        operation: OPERATIONS.COLLECTIONS.BROWSE,\n      });\n    }\n  });\n\n/**\n * Get all distinct categories (public action)\n */\nexport const getCategoriesAction = publicActionClient\n  .metadata({\n    actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,\n    isTransactionRequired: false,\n  })\n  .action(async ({ ctx }) => {\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    try {\n      const categories = await CollectionsFacade.getCategories(dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          categoryCount: categories.length,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `Retrieved ${categories.length} categories`,\n      });\n\n      return categories;\n    } catch (error) {\n      return handleActionError(error, {\n        metadata: {\n          actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,\n        },\n        operation: OPERATIONS.COLLECTIONS.GET_CATEGORIES,\n      });\n    }\n  });\n\n/**\n * Browse collections by category with filtering, sorting, and pagination (public action)\n */\nexport const browseCategoriesAction = publicActionClient\n  .metadata({\n    actionName: ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES,\n    isTransactionRequired: false,\n  })\n  .inputSchema(browseCategoriesInputSchema)\n  .action(async ({ ctx, parsedInput }) => {\n    const browseInput = browseCategoriesInputSchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {\n      filters: browseInput.filters,\n      pagination: browseInput.pagination,\n      sort: browseInput.sort,\n    });\n\n    try {\n      const result = await CollectionsFacade.browseCategories(browseInput, undefined, dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,\n        data: {\n          category: browseInput.filters?.category,\n          filters: browseInput.filters,\n          resultCount: result.collections.length,\n          totalCount: result.pagination.totalCount,\n        },\n        level: SENTRY_LEVELS.INFO,\n        message: `Browsed categories with filters`,\n      });\n\n      return result;\n    } catch (error) {\n      return handleActionError(error, {\n        input: parsedInput,\n        metadata: {\n          actionName: ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES,\n        },\n        operation: OPERATIONS.COLLECTIONS.BROWSE_CATEGORIES,\n      });\n    }\n  });"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:53:55.026Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "completed",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "completed",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "completed",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "completed",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:54:01.480Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint with auto-fix"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:55:10.178Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-10T03:55:31.869Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create category query methods in CollectionsQuery (Step 1)",
+      "status": "completed",
+      "activeForm": "Creating category query methods in CollectionsQuery"
+    },
+    {
+      "content": "Create browse categories validation schemas (Step 2)",
+      "status": "completed",
+      "activeForm": "Creating browse categories validation schemas"
+    },
+    {
+      "content": "Create browse categories facade methods (Step 3)",
+      "status": "completed",
+      "activeForm": "Creating browse categories facade methods"
+    },
+    {
+      "content": "Create browse categories server actions (Step 4)",
+      "status": "completed",
+      "activeForm": "Creating browse categories server actions"
+    },
+    {
+      "content": "Run validation commands (lint and typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands"
+    }
+  ]
+}
+================================================================================

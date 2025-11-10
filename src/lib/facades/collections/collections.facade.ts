@@ -3,12 +3,15 @@ import * as Sentry from '@sentry/nextjs';
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type {
   BobbleheadListRecord,
+  BrowseCategoriesResult,
   BrowseCollectionsResult,
+  CategoryRecord,
   CollectionRecord,
   CollectionWithRelations,
 } from '@/lib/queries/collections/collections.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';
 import type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';
 import type {
   DeleteCollection,
@@ -64,6 +67,209 @@ export interface CollectionMetrics {
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
 export class CollectionsFacade {
+  /**
+   * Browse collections by category with filtering, sorting, and pagination
+   */
+  static async browseCategories(
+    input: BrowseCategoriesInput,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BrowseCategoriesResult> {
+    const startTime = performance.now();
+
+    // Track filter usage patterns
+    const activeFilters: Array<string> = [];
+    if (input.filters?.query) activeFilters.push('search');
+    if (input.filters?.category) activeFilters.push('category');
+    if (input.filters?.ownerId) activeFilters.push('owner');
+    if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');
+
+    Sentry.addBreadcrumb({
+      category: 'browse_categories_filters',
+      data: {
+        activeFilters,
+        category: input.filters?.category ? 'set' : 'unset',
+        dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
+        dateTo: input.filters?.dateTo ? 'set' : 'unset',
+        ownerId: input.filters?.ownerId ? 'set' : 'unset',
+        query:
+          input.filters?.query ?
+            `"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}"`
+          : 'empty',
+      },
+      level: 'info',
+      message: `Browse categories with filters: ${activeFilters.join(', ') || 'none'}`,
+    });
+
+    Sentry.addBreadcrumb({
+      category: 'browse_categories_pagination',
+      data: {
+        page: input.pagination?.page,
+        pageSize: input.pagination?.pageSize,
+      },
+      level: 'info',
+      message: `Browse categories pagination: page ${input.pagination?.page}, size ${input.pagination?.pageSize}`,
+    });
+
+    try {
+      const inputHash = createHashFromObject(input);
+      const result = await CacheService.collections.public(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          const queryStartTime = performance.now();
+          const result = await CollectionsQuery.getBrowseCategoriesAsync(input, context);
+          const queryDuration = performance.now() - queryStartTime;
+
+          // Track query performance
+          Sentry.captureMessage('Browse categories query executed', {
+            level: 'info',
+            tags: {
+              activeFilters: activeFilters.join(','),
+              cacheKey: 'browse_categories_public',
+              operation: 'getBrowseCategoriesAsync',
+            },
+          });
+
+          // Track slow queries
+          if (queryDuration > 1000) {
+            Sentry.captureMessage('Browse categories slow query', {
+              level: 'info',
+              tags: {
+                activeFilters: activeFilters.join(','),
+                operation: 'query',
+              },
+            });
+          }
+
+          // transform results to include Cloudinary URLs for first bobblehead photos
+          const transformedCollections = result.collections.map((record) => ({
+            ...record,
+            firstBobbleheadPhoto:
+              record.firstBobbleheadPhoto ?
+                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
+                  crop: 'fill',
+                  gravity: 'auto',
+                  height: 300,
+                  quality: 'auto',
+                  width: 300,
+                })
+              : null,
+          }));
+
+          return {
+            ...result,
+            collections: transformedCollections,
+          };
+        },
+        inputHash,
+        {
+          context: {
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'browseCategories',
+            userId: viewerUserId,
+          },
+        },
+      );
+
+      const totalDuration = performance.now() - startTime;
+
+      // Track custom metrics for filter and pagination patterns
+      if (activeFilters.length > 0) {
+        Sentry.captureMessage('Browse categories filtered search', {
+          level: 'info',
+          tags: {
+            filterCount: activeFilters.length.toString(),
+            filters: activeFilters.join(','),
+          },
+        });
+      }
+
+      // Track pagination depth (how far users are paginating)
+      if (input.pagination?.page && input.pagination.page > 1) {
+        Sentry.captureMessage('Browse categories deep pagination', {
+          level: 'info',
+          tags: {
+            page: input.pagination.page.toString(),
+          },
+        });
+      }
+
+      // Track overall performance - report slow responses
+      if (totalDuration > 1000) {
+        Sentry.captureMessage('Browse categories slow response', {
+          level: 'info',
+          tags: {
+            hasFilters: activeFilters.length > 0 ? 'yes' : 'no',
+            resultCount: result.collections.length.toString(),
+            totalCount: result.pagination.totalCount.toString(),
+            viewerAuthenticated: !!viewerUserId,
+          },
+        });
+      }
+
+      // Add success breadcrumb with results summary
+      Sentry.addBreadcrumb({
+        category: 'browse_categories_results',
+        data: {
+          resultCount: result.collections.length,
+          totalCount: result.pagination.totalCount,
+          totalPages: result.pagination.totalPages,
+        },
+        level: 'info',
+        message: `Browse categories completed: ${result.collections.length} results of ${result.pagination.totalCount} total`,
+      });
+
+      return result;
+    } catch (error) {
+      const totalDuration = performance.now() - startTime;
+
+      // Track error metrics
+      Sentry.captureMessage('Browse categories error', {
+        level: 'error',
+        tags: {
+          activeFilters: activeFilters.join(','),
+          errorType: error instanceof Error ? error.constructor.name : 'unknown',
+        },
+      });
+
+      const context: FacadeErrorContext = {
+        data: {
+          activeFilters,
+          filters: {
+            category: input.filters?.category ? `[${input.filters.category}]` : 'unset',
+            dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',
+            owner: input.filters?.ownerId ? 'set' : 'unset',
+            query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',
+          },
+          input,
+          pagination: input.pagination,
+          totalDuration,
+        },
+        facade: 'CollectionsFacade',
+        method: 'browseCategories',
+        operation: 'browseCategories',
+        userId: viewerUserId,
+      };
+
+      Sentry.addBreadcrumb({
+        category: 'error',
+        data: {
+          activeFilters,
+          durationMs: totalDuration,
+        },
+        level: 'error',
+        message: `Browse categories failed after ${totalDuration.toFixed(2)}ms`,
+      });
+
+      throw createFacadeError(context, error);
+    }
+  }
+
   /**
    * Browse collections with filtering, sorting, and pagination
    */
@@ -454,6 +660,36 @@ export class CollectionsFacade {
         method: 'getAllCollectionBobbleheadsWithPhotos',
         operation: 'getAllBobbleheadsWithPhotos',
         userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get all distinct categories with counts
+   */
+  static async getCategories(dbInstance?: DatabaseExecutor): Promise<Array<CategoryRecord>> {
+    try {
+      return await CacheService.collections.public(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          return await CollectionsQuery.getDistinctCategoriesAsync(context);
+        },
+        'categories',
+        {
+          context: {
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'getCategories',
+          },
+        },
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: {},
+        facade: 'CollectionsFacade',
+        method: 'getCategories',
+        operation: 'getCategories',
       };
       throw createFacadeError(context, error);
     }
