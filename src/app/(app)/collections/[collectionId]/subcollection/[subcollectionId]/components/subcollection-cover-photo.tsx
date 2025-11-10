@@ -14,7 +14,7 @@ interface SubCollectionCoverPhotoProps {
 
 export const SubCollectionCoverPhoto = ({ subcollection }: SubCollectionCoverPhotoProps) => {
   return (
-    <div className={'relative mb-6 aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted'}>
+    <div className={'relative mb-6 aspect-[4/1] w-full overflow-hidden rounded-lg bg-muted'}>
       <Conditional isCondition={!!subcollection?.coverImageUrl}>
         <CldImage
           alt={`${subcollection?.name} cover photo`}

@@ -14,7 +14,7 @@ interface CollectionCoverPhotoProps {
 
 export const CollectionCoverPhoto = ({ collection }: CollectionCoverPhotoProps) => {
   return (
-    <div className={'relative mb-6 aspect-[21/9] w-full overflow-hidden rounded-lg bg-muted'}>
+    <div className={'relative mb-6 aspect-[4/1] w-full overflow-hidden rounded-lg bg-muted'}>
       <Conditional isCondition={!!collection?.coverImageUrl}>
         <CldImage
           alt={`${collection?.name} cover photo`}

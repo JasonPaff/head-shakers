@@ -47,7 +47,7 @@ export default async function HomePage() {
         <UsernameOnboardingProvider currentUsername={currentUsername} shouldShow={shouldShowOnboarding} />
       )}
       {/* Hero */}
-      <section className={'py-12 text-center'}>
+      <section className={'pt-12 text-center'}>
         <h1 className={'mb-6 text-5xl font-bold text-balance md:text-6xl'}>
           Collect, Share, and <span className={'text-primary'}>Discover</span> Bobbleheads
         </h1>
