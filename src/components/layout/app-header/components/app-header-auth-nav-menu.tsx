@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ActivityIcon,
   ChartSplineIcon,
   LayoutDashboardIcon,
   PackageIcon,
@@ -12,20 +11,21 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import type { NavigationLink } from '@/components/layout/app-header/components/app-header-nav-menu';
 
-import { AppHeaderNavMenuLink } from '@/components/layout/app-header/components/app-header-nav-menu-link';
 import { AuthContent } from '@/components/ui/auth';
+import { Button } from '@/components/ui/button';
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useAdminRole } from '@/hooks/use-admin-role';
 import { generateTestId } from '@/lib/test-ids';
+import { cn } from '@/utils/tailwind-utils';
 
 const navigationLinks: Array<NavigationLink> = [
   {
@@ -75,12 +75,6 @@ const navigationLinks: Array<NavigationLink> = [
         icon: PackagePlusIcon,
         title: 'Add Bobblehead',
       },
-      {
-        description: 'Activity updates from collectors you follow',
-        href: $path({ route: '/dashboard/feed' }),
-        icon: ActivityIcon,
-        title: 'My Feed',
-      },
     ],
     label: 'My Collection',
   },
@@ -100,42 +94,49 @@ export const AppHeaderAuthNavMenu = () => {
   });
 
   return (
-    <NavigationMenu
-      className={'max-md:hidden'}
+    <div
+      className={'flex items-center gap-2 max-md:hidden'}
       data-testid={generateTestId('layout', 'app-header', 'auth-section')}
     >
-      <NavigationMenuList className={'gap-2'}>
-        {filteredNavigationLinks.map((link, index) => {
-          return (
-            <AuthContent key={index}>
-              <NavigationMenuItem>
-                <NavigationMenuTrigger>
+      {filteredNavigationLinks.map((link, index) => {
+        return (
+          <AuthContent key={index}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size={'sm'} variant={'ghost'}>
                   <link.icon aria-hidden className={'mr-2 size-4'} />
                   {link.label}
-                </NavigationMenuTrigger>
-                <NavigationMenuContent>
-                  <ul className={'grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'}>
-                    {link.items.map((item, itemIndex) => (
-                      <AppHeaderNavMenuLink
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align={'end'}
+                className={'w-[400px] p-4 md:w-[500px] lg:w-[600px]'}
+                collisionPadding={8}
+              >
+                <div className={'grid gap-3 md:grid-cols-2'}>
+                  {link.items.map((item, itemIndex) => (
+                    <DropdownMenuItem asChild key={itemIndex}>
+                      <Link
+                        className={cn(
+                          'flex cursor-pointer flex-col items-start gap-1 rounded-md p-3',
+                          'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
+                        )}
                         href={item.href}
-                        key={itemIndex}
-                        title={
-                          <div className={'flex items-center gap-2'}>
-                            <item.icon aria-hidden className={'size-4'} />
-                            {item.title}
-                          </div>
-                        }
                       >
-                        {item.description}
-                      </AppHeaderNavMenuLink>
-                    ))}
-                  </ul>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-            </AuthContent>
-          );
-        })}
-      </NavigationMenuList>
-    </NavigationMenu>
+                        <div className={'flex items-center gap-2 text-sm leading-none font-medium'}>
+                          <item.icon aria-hidden className={'size-4'} />
+                          {item.title}
+                        </div>
+                        <p className={'text-sm leading-snug text-muted-foreground'}>{item.description}</p>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </AuthContent>
+        );
+      })}
+    </div>
   );
 };

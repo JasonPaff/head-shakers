@@ -36,10 +36,7 @@ export const browseCollectionsPaginationSchema = z.object({
     .number()
     .int()
     .positive()
-    .max(
-      CONFIG.PAGINATION.COLLECTIONS.MAX,
-      `Maximum page size is ${CONFIG.PAGINATION.COLLECTIONS.MAX}`,
-    )
+    .max(CONFIG.PAGINATION.COLLECTIONS.MAX, `Maximum page size is ${CONFIG.PAGINATION.COLLECTIONS.MAX}`)
     .default(CONFIG.PAGINATION.COLLECTIONS.DEFAULT),
 });
 

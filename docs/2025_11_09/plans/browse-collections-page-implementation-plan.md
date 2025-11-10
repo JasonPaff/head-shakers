@@ -11,9 +11,11 @@
 ## Analysis Summary
 
 ### Feature Request Refinement
+
 The /browse page should provide users with a comprehensive, filterable interface for discovering and exploring collections across the platform, leveraging the existing Next.js App Router architecture and TanStack React Table for structured data display. This page should be implemented as a server component at `src/app/(app)/browse/page.tsx` that fetches paginated collection data using a new query in `src/lib/queries/collections.ts` with support for filtering by collection name, owner, category, creation date, and popularity metrics (like count, follower count). The page should integrate Nuqs for URL state management to persist filter selections, sorting preferences (by name, date created, most liked, most followers), and pagination state across browser navigation. The UI should feature a responsive grid or table layout using TanStack React Table for sortable columns displaying collection thumbnails (first bobblehead image via Cloudinary), collection name, owner profile information, item count, like count, and follower count, with each row linking to the collection detail page. A sidebar filter panel built with Radix UI components should allow users to dynamically filter collections, with form validation using Zod schemas in `src/lib/validations/collections.ts`. The implementation should include a new server action in `src/lib/actions/collections.ts` to handle search queries and filter combinations efficiently, utilizing the existing database schema relationships between collections, users, and bobbleheads. Real-time indicators could show trending or newly added collections, and the page should support authenticated features like the ability to follow collections or add them to a user's favorites. Loading states should be implemented using React Suspense boundaries for the collection list and filters independently, with skeleton screens for better perceived performance. The browse page should be accessible from the main navigation and respect user authentication state through Clerk, potentially showing personalized recommendations or sorting options based on the user's own collections and followed users. Search functionality should be implemented through a dedicated search input that triggers filtering without full page reloads, maintaining a smooth user experience consistent with the existing design system and component patterns already established in the platform.
 
 ### File Discovery Results
+
 - **Total Files Discovered**: 50 files across all architectural layers
 - **Critical Files**: 17 files (database schemas, queries, facades, validations, page)
 - **High Priority Files**: 19 files (UI components, services, similar page references)
@@ -50,20 +52,24 @@ Implement a comprehensive `/browse` page that allows users to discover and explo
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/collections/browse-collections.validation.ts` - Browse-specific validation schemas
 
 **Changes:**
+
 - Create `BrowseCollectionsInputSchema` with fields for search query, category filter, owner filter, date range, sort by (name, createdAt, likeCount, followerCount), sort order (asc, desc), page number, and page size
 - Create `BrowseCollectionsSortSchema` enum for sortBy options
 - Export inferred TypeScript types from schemas for use in query layer
 - Follow existing validation patterns from `collections.validation.ts`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema validates all filter combinations correctly
 - [ ] TypeScript types are properly inferred and exported
 - [ ] Schema integrates with existing validation patterns
@@ -78,9 +84,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Add new browse query method
 
 **Changes:**
+
 - Add `getBrowseCollections` method that accepts validated browse input parameters
 - Implement SQL query with WHERE clauses for search (using ILIKE on name/description), category filter, owner filter, date range filter
 - Add ORDER BY clause supporting sort by name, createdAt, likeCount, followerCount with configurable direction
@@ -92,11 +100,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing query patterns and use QueryContext for permission filtering
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query method accepts validated input parameters
 - [ ] SQL query efficiently filters and sorts collections
 - [ ] Permission filtering respects public/private visibility
@@ -112,9 +122,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/collections/collections.facade.ts` - Add browse facade method
 
 **Changes:**
+
 - Add `browseCollections` method that accepts browse input parameters
 - Validate input using `BrowseCollectionsInputSchema` from Step 1
 - Generate cache key based on filter/sort/pagination parameters
@@ -126,11 +138,13 @@ npm run lint:fix && npm run typecheck
 - Handle errors with proper error transformation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade method properly validates inputs
 - [ ] Caching logic reduces database queries for repeated requests
 - [ ] Cloudinary URLs are correctly generated for thumbnails
@@ -146,10 +160,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/browse.types.ts` - Type definitions for browse state
 - `src/app/(app)/browse/browse.parsers.ts` - Nuqs parser configurations
 
 **Changes:**
+
 - Create type definitions for browse filters, sort state, and pagination state
 - Create Nuqs parsers using `parseAsString` for search query (defaulting to empty string)
 - Create parser using `parseAsString` for sortBy (defaulting to 'createdAt')
@@ -162,11 +178,13 @@ npm run lint:fix && npm run typecheck
 - Export parser object for use in page component
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All URL parameters have proper parsers with defaults
 - [ ] Types align with validation schemas from Step 1
 - [ ] Parser configuration follows existing Nuqs patterns
@@ -181,10 +199,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/collections/browse-collections-table.tsx` - Main table component
 - `src/components/feature/collections/browse-collections-columns.tsx` - Column definitions
 
 **Changes:**
+
 - Create column definitions for thumbnail (image), name, owner (with avatar and username), item count, like count, follower count
 - Implement sortable column headers using TanStack React Table APIs
 - Add click handlers to collection rows that navigate to collection detail page
@@ -196,11 +216,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing table patterns from search page or admin tables
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Table displays all required collection information
 - [ ] Sortable columns trigger URL state updates
 - [ ] Rows are clickable and navigate correctly
@@ -217,10 +239,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/feature/collections/browse-filters.tsx` - Filter panel component
 - `src/components/feature/collections/browse-search-input.tsx` - Debounced search input
 
 **Changes:**
+
 - Create filter panel with search input that debounces at 300ms (follow DEBOUNCE constant)
 - Add category filter dropdown using Radix Select component populated from database categories
 - Add owner filter input with autocomplete suggestions (optional enhancement)
@@ -232,11 +256,13 @@ npm run lint:fix && npm run typecheck
 - Include filter count badge showing active filter count
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Search input properly debounces and updates URL state
 - [ ] Category filter displays available categories
 - [ ] All filter changes update URL parameters
@@ -253,9 +279,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/collections/browse-pagination.tsx` - Pagination controls
 
 **Changes:**
+
 - Create pagination component accepting total count, current page, page size, and onPageChange callback
 - Display page numbers with ellipsis for large page counts (show first, last, current, and adjacent pages)
 - Include previous/next buttons with disabled state on boundaries
@@ -267,11 +295,13 @@ npm run lint:fix && npm run typecheck
 - Position at top and bottom of results for better UX
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Pagination correctly calculates page numbers and ranges
 - [ ] Previous/next buttons have proper disabled states
 - [ ] Page size selector updates results per page
@@ -288,9 +318,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/browse-layout.tsx` - Client component for layout structure
 
 **Changes:**
+
 - Create client component that uses Nuqs hooks for URL state management
 - Compose filter panel (sidebar), table component, and pagination controls
 - Implement responsive grid layout (sidebar collapses to drawer on mobile)
@@ -302,11 +334,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing layout patterns from search or dashboard pages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Layout correctly positions all child components
 - [ ] Responsive design works across breakpoints
 - [ ] URL state management properly wired to all components
@@ -322,9 +356,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/page.tsx` - Main browse page server component
 
 **Changes:**
+
 - Create server component that accepts searchParams from Next.js
 - Call `getOptionalUserId()` from Clerk for authentication context (page works for both authenticated and unauthenticated users)
 - Parse searchParams using Nuqs parsers from Step 4 to get filter/sort/pagination values
@@ -336,11 +372,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing page patterns from collections or search pages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page successfully fetches and displays collections data
 - [ ] Suspense boundaries provide smooth loading experience
 - [ ] Authentication state properly handled for optional features
@@ -356,10 +394,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/loading.tsx` - Loading state component
 - `src/app/(app)/browse/error.tsx` - Error boundary component
 
 **Changes:**
+
 - Create loading.tsx that renders skeleton screens matching browse page layout
 - Include skeleton for filter panel, table rows, and pagination
 - Create error.tsx client component with error message display and retry button
@@ -368,11 +408,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing loading and error patterns from other app routes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Loading state provides clear visual feedback
 - [ ] Error state displays user-friendly messages
 - [ ] Retry functionality works correctly
@@ -388,10 +430,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/layout/header/main-nav.tsx` - Add browse link to navigation
 - `src/components/layout/header/mobile-nav.tsx` - Add browse link to mobile menu
 
 **Changes:**
+
 - Add "Browse" navigation item to main header navigation array
 - Link to `/browse` route using Next.js Link component
 - Position after "Dashboard" and before "Collections" in navigation order
@@ -401,11 +445,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing navigation item patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Browse link appears in desktop navigation
 - [ ] Browse link appears in mobile navigation
 - [ ] Link navigates to browse page correctly
@@ -421,9 +467,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/db/migrations/[timestamp]_add_browse_collections_indexes.sql` - Migration file
 
 **Changes:**
+
 - Add composite index on collections(isPublic, createdAt DESC) for default sort
 - Add composite index on collections(isPublic, likeCount DESC) for popular sort
 - Verify GIN index exists on collections name and description for text search (should already exist)
@@ -434,11 +482,13 @@ npm run lint:fix && npm run typecheck
 - Document index choices in migration comments
 
 **Validation Commands:**
+
 ```bash
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration creates all specified indexes
 - [ ] EXPLAIN ANALYZE shows indexes are being used
 - [ ] Query performance meets acceptable thresholds (sub-100ms)
@@ -453,10 +503,12 @@ npm run db:migrate
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/browse/page.tsx` - Add error tracking
 - `src/lib/facades/collections/collections.facade.ts` - Add performance tracking
 
 **Changes:**
+
 - Add Sentry error boundary wrapping browse page components
 - Add performance tracking for facade `browseCollections` method execution time
 - Track custom metrics for filter usage patterns (which filters are most used)
@@ -467,11 +519,13 @@ npm run db:migrate
 - Add error context (search query, active filters) to Sentry error reports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sentry captures browse page errors with context
 - [ ] Performance metrics are tracked for slow queries
 - [ ] Custom metrics provide usage insights
@@ -504,18 +558,21 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 ### Assumptions
+
 - Collections table already has likeCount and followerCount materialized or can be calculated via subqueries
 - GIN indexes for text search on collection name/description already exist (confirmed in discovery)
 - CacheService.collections pattern is established and functional
 - PAGINATION.COLLECTIONS constant is defined and accessible
 
 ### Risk Mitigation
+
 - Database indexes in Step 13 are critical for performance - prioritize early in implementation
 - Caching strategy in Step 3 should be tested under load to ensure cache hit rates are acceptable
 - URL state management in Step 4 needs careful testing to prevent infinite loops or state conflicts
 - Follow feature in Step 12 is optional and can be deferred if timeline is tight
 
 ### Future Enhancements
+
 - Add saved search functionality to persist favorite filter combinations
 - Implement trending collections algorithm based on recent activity
 - Add personalized recommendations based on user's followed collections
@@ -523,6 +580,7 @@ npm run lint:fix && npm run typecheck
 - Add export functionality to download browse results as CSV
 
 ### Performance Considerations
+
 - Consider implementing cursor-based pagination for very large result sets (>10k collections)
 - Monitor cache memory usage and implement cache eviction policies if needed
 - Lazy load collection thumbnails with Cloudinary progressive loading
@@ -533,6 +591,7 @@ npm run lint:fix && npm run typecheck
 ## Orchestration Logs
 
 Full orchestration logs available at:
+
 - `docs/2025_11_09/orchestration/browse-collections-page/00-orchestration-index.md`
 - `docs/2025_11_09/orchestration/browse-collections-page/01-feature-refinement.md`
 - `docs/2025_11_09/orchestration/browse-collections-page/02-file-discovery.md`

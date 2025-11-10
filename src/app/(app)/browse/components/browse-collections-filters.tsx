@@ -12,7 +12,12 @@ interface BrowseCollectionsFiltersProps {
   dateFrom?: string;
   dateTo?: string;
   onClearFilters: () => void;
-  onFiltersChange: (filters: { categoryId?: string; dateFrom?: string; dateTo?: string; ownerId?: string }) => void;
+  onFiltersChange: (filters: {
+    categoryId?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    ownerId?: string;
+  }) => void;
   onSearchChange: (search: string) => void;
   ownerId?: string;
   searchQuery: string;
@@ -58,7 +63,9 @@ export function BrowseCollectionsFilters({
           />
           {localSearch && (
             <button
-              className={'absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground'}
+              className={
+                'absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground'
+              }
               onClick={() => setLocalSearch('')}
               type={'button'}
             >

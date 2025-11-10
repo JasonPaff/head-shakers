@@ -16,6 +16,7 @@ As a user I would like to have a /browse page implemented to browse collections
 ## Context Provided
 
 ### Project Stack
+
 - Next.js 15.5.3 with App Router
 - React 19.1.0 with TypeScript
 - PostgreSQL with Neon serverless, Drizzle ORM
@@ -27,6 +28,7 @@ As a user I would like to have a /browse page implemented to browse collections
 - Cloudinary for image storage
 
 ### Project Architecture
+
 - App routes in `src/app/(app)/`
 - Feature components in `src/components/feature/`
 - Server actions in `src/lib/actions/`

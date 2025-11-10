@@ -78,6 +78,7 @@ The file-discovery-agent performed comprehensive codebase analysis using Glob, G
 ### CRITICAL PRIORITY (17 files)
 
 **Database Schema Files:**
+
 1. `src/lib/db/schema/collections.schema.ts` - Collection and subcollection table definitions
 2. `src/lib/db/schema/users.schema.ts` - User schema for owner information
 3. `src/lib/db/schema/social.schema.ts` - Follows and likes tables
@@ -85,31 +86,22 @@ The file-discovery-agent performed comprehensive codebase analysis using Glob, G
 5. `src/lib/db/schema/relations.schema.ts` - Database relations
 6. `src/lib/db/schema/index.ts` - Schema exports
 
-**Query Layer:**
-7. `src/lib/queries/collections/collections.query.ts` - **MUST MODIFY** - Add browse methods
-8. `src/lib/queries/base/base-query.ts` - Base query class with pagination
-9. `src/lib/queries/base/query-context.ts` - Query context types
+**Query Layer:** 7. `src/lib/queries/collections/collections.query.ts` - **MUST MODIFY** - Add browse methods 8. `src/lib/queries/base/base-query.ts` - Base query class with pagination 9. `src/lib/queries/base/query-context.ts` - Query context types
 
-**Validation:**
-10. `src/lib/validations/collections.validation.ts` - **MUST MODIFY** - Add filter schemas
+**Validation:** 10. `src/lib/validations/collections.validation.ts` - **MUST MODIFY** - Add filter schemas
 
-**Facades:**
-11. `src/lib/facades/collections/collections.facade.ts` - **MUST MODIFY** - Add browse methods
+**Facades:** 11. `src/lib/facades/collections/collections.facade.ts` - **MUST MODIFY** - Add browse methods
 
-**Page:**
-12. `src/app/(app)/browse/page.tsx` - **MUST IMPLEMENT** - Main browse page
+**Page:** 12. `src/app/(app)/browse/page.tsx` - **MUST IMPLEMENT** - Main browse page
 
-**Constants:**
-13. `src/lib/constants/index.ts` - Constants export
-14. `src/lib/constants/config.ts` - Pagination config (COLLECTIONS: 12/30)
-15. `src/lib/constants/defaults.ts` - Default values (PAGINATION: 20/100)
+**Constants:** 13. `src/lib/constants/index.ts` - Constants export 14. `src/lib/constants/config.ts` - Pagination config (COLLECTIONS: 12/30) 15. `src/lib/constants/defaults.ts` - Default values (PAGINATION: 20/100)
 
-**Navigation:**
-16. `src/components/layout/app-header/components/app-header-nav-menu.tsx` - Already has browse link
+**Navigation:** 16. `src/components/layout/app-header/components/app-header-nav-menu.tsx` - Already has browse link
 
 ### HIGH PRIORITY (19 files)
 
 **Similar Page Implementations (Perfect References):**
+
 1. `src/app/(app)/browse/search/page.tsx` - Search page with Suspense
 2. `src/app/(app)/browse/search/components/search-page-content.tsx` - **EXCELLENT REFERENCE** - Nuqs URL state
 3. `src/app/(app)/browse/search/components/search-filters.tsx` - Filter UI pattern
@@ -117,24 +109,11 @@ The file-discovery-agent performed comprehensive codebase analysis using Glob, G
 5. `src/app/(app)/browse/search/components/search-results-grid.tsx` - Grid layout
 6. `src/app/(app)/browse/featured/page.tsx` - ISR and Suspense patterns
 
-**UI Components:**
-7. `src/components/ui/card.tsx` - Card component
-8. `src/components/ui/table.tsx` - TanStack React Table
-9. `src/components/ui/input.tsx` - Search input
-10. `src/components/ui/select.tsx` - Sort dropdown
-11. `src/components/ui/checkbox.tsx` - Filter checkboxes
-12. `src/components/ui/skeleton.tsx` - Loading states
-13. `src/components/ui/empty-state.tsx` - No results state
-14. `src/components/ui/badge.tsx` - Metrics display
+**UI Components:** 7. `src/components/ui/card.tsx` - Card component 8. `src/components/ui/table.tsx` - TanStack React Table 9. `src/components/ui/input.tsx` - Search input 10. `src/components/ui/select.tsx` - Sort dropdown 11. `src/components/ui/checkbox.tsx` - Filter checkboxes 12. `src/components/ui/skeleton.tsx` - Loading states 13. `src/components/ui/empty-state.tsx` - No results state 14. `src/components/ui/badge.tsx` - Metrics display
 
-**Services:**
-15. `src/lib/services/cache-revalidation.service.ts` - Cache invalidation
-16. `src/lib/services/cloudinary.service.ts` - Image handling
+**Services:** 15. `src/lib/services/cache-revalidation.service.ts` - Cache invalidation 16. `src/lib/services/cloudinary.service.ts` - Image handling
 
-**Utilities:**
-17. `src/lib/utils/next-safe-action.ts` - Server action client
-18. `src/utils/optional-auth-utils.ts` - getOptionalUserId for auth
-19. `src/lib/queries/base/permission-filters.ts` - Permission filtering
+**Utilities:** 17. `src/lib/utils/next-safe-action.ts` - Server action client 18. `src/utils/optional-auth-utils.ts` - getOptionalUserId for auth 19. `src/lib/queries/base/permission-filters.ts` - Permission filtering
 
 ### MEDIUM PRIORITY (6 files)
 
@@ -165,6 +144,7 @@ The file-discovery-agent performed comprehensive codebase analysis using Glob, G
 ## Architecture Patterns Discovered
 
 ### Query Layer Pattern
+
 ```
 - Extend BaseQuery class
 - Use QueryContext for permission handling
@@ -174,6 +154,7 @@ The file-discovery-agent performed comprehensive codebase analysis using Glob, G
 ```
 
 ### Data Flow Pattern
+
 ```
 Page → Facade → Query → Database
 - Facades: Business logic + caching
@@ -182,6 +163,7 @@ Page → Facade → Query → Database
 ```
 
 ### URL State Management (from search page)
+
 ```
 - Nuqs with parseAsInteger, parseAsString, parseAsArrayOf
 - Debounced search (300ms)
@@ -189,6 +171,7 @@ Page → Facade → Query → Database
 ```
 
 ### Pagination Constants
+
 ```
 - Collections: DEFAULT: 12, MAX: 30
 - General: LIMIT: 20, MAX_LIMIT: 100
@@ -196,6 +179,7 @@ Page → Facade → Query → Database
 ```
 
 ### Database Schema Insights
+
 ```
 Collections have:
 - likeCount, totalItems, isPublic, userId
@@ -217,28 +201,33 @@ Collections have:
 ## Recommended Implementation Approach
 
 ### Phase 1: Query Layer
+
 - Add `findPublicCollectionsAsync()` to CollectionsQuery
 - Include joins: users, bobbleheads → photos
 - Filter by: name, date range, like count, followers
 - Support sorting options
 
 ### Phase 2: Facade Layer
+
 - Create `getBrowseCollectionsAsync()` in CollectionsFacade
 - Add caching with cache keys
 - Enrich with social data
 
 ### Phase 3: Validation
+
 - Filter options schema
 - Sort options enum
 - Pagination schema
 
 ### Phase 4: UI Components
+
 - browse-page-content.tsx (client, Nuqs)
 - browse-filters.tsx
 - browse-collection-grid.tsx
 - browse-pagination.tsx
 
 ### Phase 5: Page Structure
+
 - Server component wrapper
 - Suspense boundaries
 - Loading/empty states

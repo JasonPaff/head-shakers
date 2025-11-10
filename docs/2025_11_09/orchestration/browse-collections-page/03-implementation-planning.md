@@ -13,6 +13,7 @@
 The /browse page should provide users with a comprehensive, filterable interface for discovering and exploring collections across the platform, leveraging the existing Next.js App Router architecture and TanStack React Table for structured data display. [Full request included]
 
 **File Discovery Summary**:
+
 - 50 relevant files discovered across all architectural layers
 - Critical files to modify: collections.query.ts, collections.facade.ts, collections.validation.ts, browse/page.tsx
 - Excellent reference: search page components for Nuqs URL state management
@@ -26,6 +27,7 @@ You are the implementation-planner agent. Generate a detailed implementation pla
 **CRITICAL FORMAT REQUIREMENT**: Your output MUST be in MARKDOWN format following your defined template. Do NOT use XML format.
 
 **Required Template Structure**:
+
 - Overview (Estimated Duration, Complexity, Risk Level)
 - Quick Summary
 - Prerequisites
@@ -43,11 +45,13 @@ You are the implementation-planner agent. Generate a detailed implementation pla
 The implementation-planner agent generated a comprehensive 15-step implementation plan following the required template structure. Key highlights:
 
 ### Plan Overview
+
 - **Estimated Duration**: 2-3 days
 - **Complexity**: Medium
 - **Risk Level**: Low
 
 ### Plan Structure
+
 - **15 Implementation Steps** covering all architectural layers
 - Each step includes What/Why/Confidence/Files/Changes/Validation/Success Criteria
 - Comprehensive quality gates and success criteria
@@ -74,8 +78,10 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 ## Plan Validation Results
 
 ### Format Compliance
+
 ✅ **Markdown Format**: Confirmed (not XML)
 ✅ **Template Adherence**: All required sections present
+
 - Overview with duration, complexity, risk level
 - Quick Summary
 - Prerequisites checklist
@@ -84,6 +90,7 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 - Notes with assumptions, risks, future enhancements
 
 ### Content Quality Validation
+
 ✅ **No Code Examples**: Plan contains instructions only, no implementation code
 ✅ **Validation Commands**: Every step includes 'npm run lint:fix && npm run typecheck'
 ✅ **Actionable Steps**: All steps have clear, concrete actions
@@ -92,6 +99,7 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 ✅ **Type Safety**: Emphasizes TypeScript and Zod validation throughout
 
 ### Step Analysis
+
 - **Critical Files**: Steps 1-3 address core query/facade/validation layers
 - **UI Components**: Steps 5-7 create reusable components
 - **Page Implementation**: Steps 8-10 build page structure
@@ -101,12 +109,14 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 - **Quality**: Steps 14-15 add testing and monitoring
 
 ### Quality Gates
+
 ✅ **Comprehensive Checklist**: 20+ quality gate items
 ✅ **Manual Testing Scenarios**: 10+ scenarios defined
 ✅ **Performance Criteria**: Sub-100ms query time target
 ✅ **Accessibility**: Keyboard navigation and screen reader support
 
 ### Notes Section
+
 ✅ **Assumptions**: 4 clear assumptions documented
 ✅ **Risk Mitigation**: 4 risk mitigation strategies
 ✅ **Future Enhancements**: 5 potential enhancements listed
@@ -115,6 +125,7 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 ## Complexity Assessment
 
 ### Technical Complexity: Medium
+
 - **Reason**: Multiple architectural layers (query, facade, validation, UI)
 - **Factors**:
   - TanStack React Table integration
@@ -124,12 +135,14 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
   - Caching strategy
 
 ### Time Estimate: 2-3 Days
+
 - **Breakdown**:
   - Day 1: Query/Facade/Validation layers (Steps 1-3)
   - Day 2: UI Components and Page Implementation (Steps 4-10)
   - Day 3: Testing, Optimization, Integration (Steps 11-15)
 
 ### Risk Level: Low
+
 - **Reason**: Well-established patterns, existing references, clear architecture
 - **Mitigation**: Database indexes prioritized, caching tested, URL state carefully managed
 
@@ -144,6 +157,7 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 ## Files to Create/Modify Summary
 
 ### New Files to Create (15+)
+
 1. `src/lib/validations/collections/browse-collections.validation.ts`
 2. `src/app/(app)/browse/browse.types.ts`
 3. `src/app/(app)/browse/browse.parsers.ts`
@@ -161,6 +175,7 @@ The implementation-planner agent generated a comprehensive 15-step implementatio
 15. Test files (3+)
 
 ### Files to Modify (5)
+
 1. `src/lib/queries/collections/collections.query.ts`
 2. `src/lib/facades/collections/collections.facade.ts`
 3. `src/app/(app)/browse/page.tsx`

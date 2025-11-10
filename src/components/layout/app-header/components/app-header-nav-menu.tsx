@@ -2,7 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-import { EarthIcon, GridIcon, StarIcon, TrendingUpIcon, TrophyIcon } from 'lucide-react';
+import { EarthIcon, GridIcon, SearchIcon, StarIcon, TrophyIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 
 import { AppHeaderNavMenuLink } from '@/components/layout/app-header/components/app-header-nav-menu-link';
@@ -44,10 +44,10 @@ const navigationLinks: Array<NavigationLink> = [
         title: 'Featured',
       },
       {
-        description: 'Most popular bobbleheads and collections right now',
-        href: $path({ route: '/browse/trending' }),
-        icon: TrendingUpIcon,
-        title: 'Trending',
+        description: 'Search for bobbleheads, collections, and collectors',
+        href: $path({ route: '/browse/search' }),
+        icon: SearchIcon,
+        title: 'Search',
       },
       {
         description: 'Browse by category - sports, entertainment, vintage and more',

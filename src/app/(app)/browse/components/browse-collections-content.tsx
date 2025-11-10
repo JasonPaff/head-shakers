@@ -12,7 +12,10 @@ import { BrowseCollectionsTable } from '@/app/(app)/browse/components/browse-col
 import { Spinner } from '@/components/ui/spinner';
 import { browseCollectionsAction } from '@/lib/actions/collections/collections.actions';
 import { CONFIG } from '@/lib/constants';
-import { BROWSE_COLLECTIONS_SORT_BY, BROWSE_COLLECTIONS_SORT_ORDER } from '@/lib/validations/browse-collections.validation';
+import {
+  BROWSE_COLLECTIONS_SORT_BY,
+  BROWSE_COLLECTIONS_SORT_ORDER,
+} from '@/lib/validations/browse-collections.validation';
 
 export function BrowseCollectionsContent() {
   // State

@@ -306,8 +306,9 @@ export class CollectionsQuery extends BaseQuery {
     );
 
     // build search filter for collection name and description
-    const searchFilter = filters?.query
-      ? or(
+    const searchFilter =
+      filters?.query ?
+        or(
           ilike(collections.name, `%${filters.query}%`),
           ilike(collections.description, `%${filters.query}%`),
         )

@@ -89,7 +89,10 @@ export class CollectionsFacade {
         dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
         dateTo: input.filters?.dateTo ? 'set' : 'unset',
         ownerId: input.filters?.ownerId ? 'set' : 'unset',
-        query: input.filters?.query ? `"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}"` : 'empty',
+        query:
+          input.filters?.query ?
+            `"${input.filters.query.substring(0, 50)}${input.filters.query.length > 50 ? '...' : ''}"`
+          : 'empty',
       },
       level: 'info',
       message: `Browse with filters: ${activeFilters.join(', ') || 'none'}`,

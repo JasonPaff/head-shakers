@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  ActivityIcon,
   ChartSplineIcon,
   EarthIcon,
   LayoutDashboardIcon,
@@ -70,11 +69,6 @@ const userNavItems = [
     href: $path({ route: '/bobbleheads/add' }),
     icon: PackagePlusIcon,
     label: 'Add Bobblehead',
-  },
-  {
-    href: $path({ route: '/dashboard/feed' }),
-    icon: ActivityIcon,
-    label: 'My Feed',
   },
 ];
 
