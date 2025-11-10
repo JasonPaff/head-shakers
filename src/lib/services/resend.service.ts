@@ -125,7 +125,7 @@ export class ResendService {
               <p>In the meantime, follow us on social media or check back soon for updates!</p>
             </div>
             <div class="footer">
-              <p>&copy; 2024 Head Shakers. All rights reserved.</p>
+              <p>&copy; 2025 Head Shakers. All rights reserved.</p>
               <p>You received this email because you signed up for launch notifications.</p>
             </div>
           </div>
@@ -164,7 +164,7 @@ export class ResendService {
               <p>The wait is over!</p>
               <p>Head Shakers is now live and ready for you to start building your bobblehead collection.</p>
               <p>
-                <a href="https://headshakers.com" class="button">Go to Head Shakers</a>
+                <a href="https://head-shakers.com" class="button">Go to Head Shakers</a>
               </p>
               <p>Create your first collection, discover rare finds, and connect with other collectors today!</p>
             </div>
