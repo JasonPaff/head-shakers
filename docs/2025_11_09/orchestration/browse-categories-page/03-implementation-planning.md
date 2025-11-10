@@ -14,6 +14,7 @@ As a user, I would like to use the /browse/categories page to discover and navig
 ## File Analysis Context
 
 **Key Architecture Insights:**
+
 - Categories stored as varchar field on bobbleheads table (not separate taxonomy)
 - Must query DISTINCT categories from bobbleheads table
 - Filter collections by bobbleheads they contain in selected category (requires JOIN)
@@ -21,6 +22,7 @@ As a user, I would like to use the /browse/categories page to discover and navig
 - Reference implementation: browse collections page (complete pattern)
 
 **Critical Files for Implementation:**
+
 - Database: bobbleheads.schema.ts (category field), collections.schema.ts, relations.schema.ts
 - Queries: collections.query.ts (getBrowseCollectionsAsync method lines 284-433 needs adaptation)
 - Facades: collections.facade.ts (browseCollections method lines 70-269)
@@ -103,12 +105,15 @@ Implement a comprehensive category-based browsing system that allows users to di
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\collections\collections.query.ts` - Add getDistinctCategoriesAsync and getBrowseCategoriesAsync methods
 
 **Changes:**
+
 - Add getDistinctCategoriesAsync method to retrieve all distinct non-null categories from bobbleheads table with counts
 - Add getBrowseCategoriesAsync method similar to getBrowseCollectionsAsync but filtering collections by bobbleheads matching category parameter
 - Implement JOIN between collections and bobbleheads tables to filter by category field
@@ -116,11 +121,13 @@ Implement a comprehensive category-based browsing system that allows users to di
 - Leverage existing bobbleheads.category index for performance
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] getDistinctCategoriesAsync returns array of category names with counts
 - [ ] getBrowseCategoriesAsync filters collections containing bobbleheads in specified category
 - [ ] Queries respect permission filters for public and user-owned collections
@@ -135,12 +142,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\browse-categories.validation.ts` - Category browsing validation schemas
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create browseCategoriesSortSchema with sortBy options: name, createdAt, likeCount, followerCount, bobbleheadCount
 - Create browseCategoriesPaginationSchema using CONFIG.PAGINATION.COLLECTIONS settings
 - Create browseCategoriesFiltersSchema with category (varchar string), query, ownerId, dateFrom, dateTo fields
@@ -150,11 +160,13 @@ npm run lint:fix && npm run typecheck
 - Add date range validation refinement
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All validation schemas properly defined with correct field types
 - [ ] Category field validates varchar strings instead of UUIDs
 - [ ] Type exports match schema definitions
@@ -170,12 +182,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\collections\collections.facade.ts` - Add browseCategories and getCategories methods
 
 **Changes:**
+
 - Add getCategories method calling CollectionsQuery.getDistinctCategoriesAsync with public context
 - Add browseCategories method following exact pattern from browseCollections method
 - Implement CacheService.collections.public for caching with category-specific cache key
@@ -185,11 +200,13 @@ npm run lint:fix && npm run typecheck
 - Track active filters and slow query performance metrics
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] getCategories returns cached list of distinct categories with counts
 - [ ] browseCategories implements same caching strategy as browseCollections
 - [ ] Sentry integration captures performance metrics and errors
@@ -205,12 +222,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\collections\collections.actions.ts` - Add browseCategoriesAction and getCategoriesAction
 
 **Changes:**
+
 - Add browseCategoriesAction using publicActionClient with browseCategoriesInputSchema
 - Parse ctx.sanitizedInput through browseCategoriesInputSchema for type safety
 - Call CollectionsFacade.browseCategories with parsed input and optional dbInstance
@@ -220,11 +240,13 @@ npm run lint:fix && npm run typecheck
 - Use ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES constant
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] browseCategoriesAction properly validates and sanitizes input
 - [ ] Action calls facade method with correct parameters
 - [ ] Sentry tracking captures action execution and errors
@@ -240,12 +262,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\categories\components\browse-categories-content.tsx` - Main category browsing client component
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create BrowseCategoriesContent component following exact structure of BrowseCollectionsContent
 - Implement Nuqs URL state management for category filter, search, pagination, and sorting
 - Add useEffect to fetch data when query params change using browseCategoriesAction
@@ -256,11 +281,13 @@ npm run lint:fix && npm run typecheck
 - Add category selector UI element using getCategories for available categories
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component properly manages URL state with Nuqs
 - [ ] Data fetches on param changes using server action
 - [ ] Loading, error, and success states properly handled
@@ -276,12 +303,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\categories\page.tsx` - Main categories page
 
 **Changes:**
+
 - Replace placeholder with full page implementation
 - Add Sentry context and breadcrumbs for page load tracking
 - Implement Suspense boundary wrapping BrowseCategoriesContent with Spinner fallback
@@ -290,11 +320,13 @@ npm run lint:fix && npm run typecheck
 - Follow exact layout structure from browse collections page
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page renders with proper header and layout
 - [ ] Suspense boundary provides loading state
 - [ ] Metadata properly configured for SEO
@@ -310,12 +342,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\categories\[category]\page.tsx` - Dynamic category page
 
 **Changes:**
+
 - Replace placeholder with BrowseCategoriesContent component pre-filtered by category param
 - Parse category param using withParamValidation from route-type
 - Pass category param as default filter to BrowseCategoriesContent
@@ -324,11 +359,13 @@ npm run lint:fix && npm run typecheck
 - Add Suspense boundary with Spinner fallback
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dynamic route properly extracts category parameter
 - [ ] Content component receives category as default filter
 - [ ] Metadata includes category name dynamically
@@ -344,14 +381,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\layout\app-header\components\app-header-nav-menu.tsx` - Desktop navigation
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\layout\app-header\components\app-header-mobile-menu.tsx` - Mobile navigation
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\layout\app-header\components\app-header-auth-nav-menu.tsx` - Auth navigation
 
 **Changes:**
+
 - Add "Browse Categories" navigation item to Browse dropdown menu in all three components
 - Use Route.browseCategories() for type-safe routing
 - Place link after "Browse Collections" menu item
@@ -359,11 +399,13 @@ npm run lint:fix && npm run typecheck
 - Add appropriate icon from Lucide React
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation links appear in all three header components
 - [ ] Links use type-safe routing
 - [ ] Styling matches existing navigation items
@@ -379,24 +421,29 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\action-names.ts` - Add BROWSE_CATEGORIES and GET_CATEGORIES
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\operations.ts` - Add browse categories operations
 
 **Changes:**
+
 - Add BROWSE_CATEGORIES and GET_CATEGORIES to ACTION_NAMES.COLLECTIONS object
 - Add corresponding operations to OPERATIONS.COLLECTIONS object
 - Follow naming conventions from existing browse collections constants
 - Ensure constants are properly typed and exported
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action names added to constants file
 - [ ] Operations added to constants file
 - [ ] Constants follow established naming patterns
@@ -412,23 +459,28 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\collections\collections.query.ts` - Add BrowseCategoriesResult and CategoryRecord types
 
 **Changes:**
+
 - Create CategoryRecord interface with name, bobbleheadCount, collectionCount fields
 - Create BrowseCategoriesResult interface matching BrowseCollectionsResult structure
 - Export types for use in facades, actions, and components
 - Ensure types align with validation schema types from browse-categories.validation.ts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Types properly defined for all category browse data structures
 - [ ] Types align with validation schemas
 - [ ] Types exported for external use
@@ -444,12 +496,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\cache.ts` - Add category browse cache key patterns
 
 **Changes:**
+
 - Add BROWSE_CATEGORIES pattern to cache key constants
 - Add GET_CATEGORIES pattern for category list caching
 - Follow existing browse collections cache key structure
@@ -457,11 +512,13 @@ npm run lint:fix && npm run typecheck
 - Add TTL configuration for category caches
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cache key patterns added for category browse operations
 - [ ] Keys support parameterized caching by category
 - [ ] TTL values configured appropriately
@@ -477,12 +534,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\docs\2025_11_09\database\category-index-verification.md` - Index verification documentation
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Document existing bobbleheads_category_idx index on category column
 - Verify index supports DISTINCT category queries efficiently
 - Document JOIN performance with collections table using category filter
@@ -490,9 +550,11 @@ npm run lint:fix && npm run typecheck
 - Note that no additional indexes are required for initial implementation
 
 **Validation Commands:**
+
 - No validation needed for documentation file
 
 **Success Criteria:**
+
 - [ ] Documentation confirms existing index is sufficient
 - [ ] Query performance expectations documented
 - [ ] JOIN strategy with collections table verified
@@ -507,12 +569,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\components\browse-collections-filters.tsx` - Add category dropdown support
 
 **Changes:**
+
 - Add optional categories prop accepting array of category names
 - Add optional onCategoryChange callback prop
 - Add category dropdown/select UI element when categories prop provided
@@ -521,11 +586,13 @@ npm run lint:fix && npm run typecheck
 - Use existing Radix UI select component for category dropdown
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component accepts optional category props
 - [ ] Category dropdown renders when categories provided
 - [ ] Backward compatibility maintained for collections page
@@ -541,12 +608,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\sentry.ts` - Add category browse operations
 
 **Changes:**
+
 - Add browse_categories operation to tracked operations list
 - Add category-specific breadcrumb categories
 - Configure performance thresholds for category queries
@@ -554,11 +624,13 @@ npm run lint:fix && npm run typecheck
 - Ensure category operations tracked at same level as collection operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Category operations added to Sentry configuration
 - [ ] Performance thresholds configured
 - [ ] Custom tags support category filtering
@@ -574,14 +646,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\tests\lib\queries\collections\collections.query.browse-categories.test.ts` - Query tests
 - `C:\Users\JasonPaff\dev\head-shakers\tests\lib\facades\collections\collections.facade.browse-categories.test.ts` - Facade tests
 - `C:\Users\JasonPaff\dev\head-shakers\tests\lib\actions\collections\collections.actions.browse-categories.test.ts` - Action tests
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create query tests for getDistinctCategoriesAsync verifying category extraction and counts
 - Create query tests for getBrowseCategoriesAsync verifying collection filtering by category
 - Create facade tests verifying caching, error handling, and Cloudinary URL transformation
@@ -590,11 +665,13 @@ npm run lint:fix && npm run typecheck
 - Mock database responses and external services appropriately
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] Query tests cover distinct categories and browse filtering
 - [ ] Facade tests verify caching and transformations
 - [ ] Action tests verify validation and error handling
@@ -648,15 +725,16 @@ npm run lint:fix && npm run typecheck && npm run test
 
 ✅ **Format**: Markdown (not XML)
 ✅ **Template Compliance**: Includes all required sections
-  - Overview with duration, complexity, risk level
-  - Quick Summary
-  - Prerequisites
-  - Implementation Steps with What/Why/Confidence/Files/Changes/Validation/Success Criteria
-  - Quality Gates
-  - Notes
-✅ **Validation Commands**: Every step includes `npm run lint:fix && npm run typecheck`
-✅ **No Code Examples**: Plan contains only instructions, no implementation code
-✅ **Actionable Steps**: 15 concrete implementation steps with clear success criteria
+
+- Overview with duration, complexity, risk level
+- Quick Summary
+- Prerequisites
+- Implementation Steps with What/Why/Confidence/Files/Changes/Validation/Success Criteria
+- Quality Gates
+- Notes
+  ✅ **Validation Commands**: Every step includes `npm run lint:fix && npm run typecheck`
+  ✅ **No Code Examples**: Plan contains only instructions, no implementation code
+  ✅ **Actionable Steps**: 15 concrete implementation steps with clear success criteria
 
 ## Complexity Assessment
 

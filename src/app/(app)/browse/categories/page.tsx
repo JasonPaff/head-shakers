@@ -27,9 +27,7 @@ export default function CategoriesPage() {
       {/* Page Header */}
       <div className={'space-y-2'}>
         <h1 className={'text-3xl font-bold tracking-tight'}>Browse Categories</h1>
-        <p className={'text-muted-foreground'}>
-          Discover bobblehead collections organized by category
-        </p>
+        <p className={'text-muted-foreground'}>Discover bobblehead collections organized by category</p>
       </div>
 
       {/* Browse Content */}

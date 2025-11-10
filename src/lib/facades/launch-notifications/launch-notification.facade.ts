@@ -18,18 +18,12 @@ export class LaunchNotificationFacade {
   /**
    * add email to launch notification waitlist and send confirmation email
    */
-  static async addToWaitlistAsync(
-    data: AddToWaitlist,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<void> {
+  static async addToWaitlistAsync(data: AddToWaitlist, dbInstance?: DatabaseExecutor): Promise<void> {
     try {
       const context = createPublicQueryContext({ dbInstance });
 
       // add to waitlist (silent success for duplicates)
-      await LaunchNotificationQuery.addToWaitlistAsync(
-        { email: data.email },
-        context,
-      );
+      await LaunchNotificationQuery.addToWaitlistAsync({ email: data.email }, context);
 
       // send confirmation email
       // note: we send confirmation regardless of whether it's a new email or duplicate

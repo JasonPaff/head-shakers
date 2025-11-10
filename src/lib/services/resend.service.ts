@@ -85,7 +85,7 @@ export class ResendService {
         return resend.emails.send({
           from: 'Head Shakers <noreply@headshakers.com>',
           html: this.getConfirmationEmailHtml(),
-          subject: 'You\'re on the Head Shakers launch list!',
+          subject: "You're on the Head Shakers launch list!",
           to: email,
         });
       },

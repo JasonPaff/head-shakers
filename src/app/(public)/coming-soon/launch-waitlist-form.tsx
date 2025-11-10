@@ -46,7 +46,7 @@ export const LaunchWaitlistForm = withFocusManagement(() => {
               {(field) => (
                 <field.TextField
                   autoComplete={'email'}
-                  label={'Email'}
+                  label={''}
                   placeholder={'Enter your email'}
                   type={'email'}
                 />

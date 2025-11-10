@@ -52,9 +52,7 @@ export default function ComingSoonPage() {
 
         {/* Waitlist Signup Form */}
         <div className={'mb-12 flex flex-col items-center gap-3'}>
-          <p className={'text-sm font-medium text-muted-foreground'}>
-            Get notified when we launch:
-          </p>
+          <p className={'text-sm font-medium text-muted-foreground'}>Get notified when we launch:</p>
           <LaunchWaitlistForm />
         </div>
 

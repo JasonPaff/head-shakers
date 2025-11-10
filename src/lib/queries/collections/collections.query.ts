@@ -364,12 +364,7 @@ export class CollectionsQuery extends BaseQuery {
           collectionId: bobbleheads.collectionId,
         })
         .from(bobbleheads)
-        .where(
-          this.combineFilters(
-            categoryFilter,
-            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-          ),
-        )
+        .where(this.combineFilters(categoryFilter, eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED)))
         .as('collections_with_category');
 
       // get total count for pagination metadata
@@ -467,7 +462,10 @@ export class CollectionsQuery extends BaseQuery {
     }
 
     // if no category filter, just return all collections (same as browse collections)
-    const countQuery = dbInstance.select({ count: sql<number>`count(*)::int` }).from(collections).where(collectionFilters);
+    const countQuery = dbInstance
+      .select({ count: sql<number>`count(*)::int` })
+      .from(collections)
+      .where(collectionFilters);
 
     const countResult = await countQuery;
     const totalCount = countResult[0]?.count || 0;

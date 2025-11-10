@@ -13,7 +13,10 @@ export const Route = {
     page: z.coerce.number().int().positive().optional().default(1),
     pageSize: z.coerce.number().int().positive().optional(),
     q: z.string().optional().default(''),
-    sortBy: z.enum([...ENUMS.SEARCH.SORT_BY] as [string, ...Array<string>]).optional().default('relevance'),
+    sortBy: z
+      .enum([...ENUMS.SEARCH.SORT_BY] as [string, ...Array<string>])
+      .optional()
+      .default('relevance'),
     sortOrder: z
       .enum([...ENUMS.SEARCH.SORT_ORDER] as [string, ...Array<string>])
       .optional()

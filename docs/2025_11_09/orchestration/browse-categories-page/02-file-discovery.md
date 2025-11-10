@@ -286,6 +286,7 @@ As a user, I would like to use the /browse/categories page to discover and navig
 **Finding**: Categories are stored as a `varchar` field on the `bobbleheads` table (line 30 of bobbleheads.schema.ts), NOT as a separate taxonomy table.
 
 **Implications**:
+
 - Categories are user-defined text values
 - No predefined category hierarchy exists
 - Implementation needs to query DISTINCT category values from bobbleheads table
@@ -307,6 +308,7 @@ As a user, I would like to use the /browse/categories page to discover and navig
 ### 3. Query Architecture Pattern
 
 Uses `BaseQuery` class inheritance with:
+
 - `buildBaseFilters()` for permission filtering
 - `combineFilters()` for SQL WHERE clause composition
 - `QueryContext` for authentication-aware queries
@@ -319,6 +321,7 @@ Established pattern: Zod schemas → Type inference → Query inputs → Facade 
 ### 5. Key Integration Point
 
 **`collections.query.ts` - Line 318**: Current `categoryId` filter implementation
+
 ```typescript
 // Current: Filters by collection ID
 // Needed: Filter by bobblehead categories within collections

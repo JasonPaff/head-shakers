@@ -47,12 +47,8 @@ async function CategoryPage({ routeParams }: CategoryPageProps) {
     <div className={'container mx-auto space-y-6 py-8'}>
       {/* Page Header */}
       <div className={'space-y-2'}>
-        <h1 className={'text-3xl font-bold tracking-tight'}>
-          {category} Collections
-        </h1>
-        <p className={'text-muted-foreground'}>
-          Browse bobblehead collections in the {category} category
-        </p>
+        <h1 className={'text-3xl font-bold tracking-tight'}>{category} Collections</h1>
+        <p className={'text-muted-foreground'}>Browse bobblehead collections in the {category} category</p>
       </div>
 
       {/* Browse Content */}
