@@ -4,6 +4,7 @@ import {
   ChartSplineIcon,
   EarthIcon,
   LayoutDashboardIcon,
+  MailIcon,
   MenuIcon,
   PackagePlusIcon,
   ShieldHalfIcon,
@@ -82,6 +83,11 @@ const adminNavItems = [
     href: $path({ route: '/admin/analytics' }),
     icon: ChartSplineIcon,
     label: 'Analytics',
+  },
+  {
+    href: $path({ route: '/admin/launch-notifications' }),
+    icon: MailIcon,
+    label: 'Launch Notifications',
   },
   {
     href: $path({ route: '/admin/reports' }),
