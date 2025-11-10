@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 
+import { Settings } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import type { PageProps } from '@/app/(app)/users/[userId]/route-type';
@@ -8,8 +11,10 @@ import type { PageProps } from '@/app/(app)/users/[userId]/route-type';
 import { Route } from '@/app/(app)/users/[userId]/route-type';
 import { ViewTracker } from '@/components/analytics/view-tracker';
 import { ContentLayout } from '@/components/layout/content-layout';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
+import { checkIsOwner } from '@/utils/optional-auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
@@ -31,6 +36,9 @@ async function UserPage({ routeParams }: UserPageProps) {
     notFound();
   }
 
+  // Check if current user is viewing their own profile
+  const isOwner = await checkIsOwner(user.id);
+
   return (
     <ViewTracker targetId={userId} targetType={'profile'}>
       <div className={'py-8'}>
@@ -39,22 +47,35 @@ async function UserPage({ routeParams }: UserPageProps) {
             {/* Profile Header */}
             <Card className={'mb-8'}>
               <CardHeader>
-                <div className={'flex items-center gap-6'}>
-                  <div
-                    className={cn(
-                      'flex h-24 w-24 items-center justify-center',
-                      'rounded-full bg-primary text-primary-foreground',
-                    )}
-                  >
-                    <span className={'text-2xl font-semibold'}>
-                      {user.displayName.charAt(0).toUpperCase()}
-                    </span>
+                <div className={'flex items-start justify-between'}>
+                  <div className={'flex items-center gap-6'}>
+                    <div
+                      className={cn(
+                        'flex h-24 w-24 items-center justify-center',
+                        'rounded-full bg-primary text-primary-foreground',
+                      )}
+                    >
+                      <span className={'text-2xl font-semibold'}>
+                        {user.displayName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <CardTitle className={'mb-2 text-3xl'}>{user.displayName}</CardTitle>
+                      {user.username && (
+                        <p className={'mb-2 text-sm text-muted-foreground'}>@{user.username}</p>
+                      )}
+                      <p className={'text-muted-foreground'}>{user.email}</p>
+                      {user.bio && <p className={'mt-2 text-sm'}>{user.bio}</p>}
+                    </div>
                   </div>
-                  <div>
-                    <CardTitle className={'mb-2 text-3xl'}>{user.displayName}</CardTitle>
-                    <p className={'text-muted-foreground'}>{user.email}</p>
-                    {user.bio && <p className={'mt-2 text-sm'}>{user.bio}</p>}
-                  </div>
+                  {isOwner && (
+                    <Button asChild size={'sm'} variant={'outline'}>
+                      <Link href={$path({ route: '/settings/profile' })}>
+                        <Settings className={'mr-2 h-4 w-4'} />
+                        Edit Profile
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </CardHeader>
             </Card>

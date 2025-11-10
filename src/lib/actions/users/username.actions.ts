@@ -15,10 +15,7 @@ import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
-import {
-  checkUsernameAvailabilitySchema,
-  updateUsernameSchema,
-} from '@/lib/validations/users.validation';
+import { checkUsernameAvailabilitySchema, updateUsernameSchema } from '@/lib/validations/users.validation';
 
 /**
  * Check if username is available (public action)

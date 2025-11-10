@@ -18,7 +18,11 @@ export class UsersQuery extends BaseQuery {
   ): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);
+    const result = await dbInstance
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
 
     if (result.length === 0) {
       return false;
