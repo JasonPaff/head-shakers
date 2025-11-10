@@ -7,7 +7,6 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   FolderIcon,
-  MessageCircleIcon,
   MoreVerticalIcon,
   PencilIcon,
   ShareIcon,
@@ -42,7 +41,6 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
-import { BobbleheadCommentsDialog } from './bobblehead-comments-dialog';
 import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
 import { BobbleheadShareMenu } from './bobblehead-share-menu';
 
@@ -70,7 +68,6 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
   const prevButtonTestId = generateTestId('feature', 'bobblehead-nav', 'prev');
   const nextButtonTestId = generateTestId('feature', 'bobblehead-nav', 'next');
   const likeButtonTestId = generateTestId('feature', 'like-button', 'bobblehead');
-  const commentsButtonTestId = generateTestId('feature', 'comments-button', 'bobblehead');
   const shareButtonTestId = generateTestId('feature', 'share-button', 'bobblehead');
   const viewDetailsButtonTestId = generateTestId('feature', 'view-details-button', 'bobblehead');
   const actionMenuTestId = generateTestId('feature', 'action-menu', 'bobblehead');
@@ -338,21 +335,6 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
             targetType={'bobblehead'}
             testId={likeButtonTestId}
           />
-
-          {/* Comments */}
-          <BobbleheadCommentsDialog>
-            <Button
-              className={'h-8 px-2'}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              size={'sm'}
-              testId={commentsButtonTestId}
-              variant={'ghost'}
-            >
-              <MessageCircleIcon aria-hidden className={'size-4'} />
-            </Button>
-          </BobbleheadCommentsDialog>
 
           {/* Share */}
           <BobbleheadShareMenu bobbleheadId={bobblehead.id}>
