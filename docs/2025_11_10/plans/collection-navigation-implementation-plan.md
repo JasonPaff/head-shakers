@@ -315,39 +315,7 @@ npm run lint:fix && npm run typecheck
 
 ---
 
-### Step 8: Add URL State Management (Optional Client-Side Enhancement)
-
-**What**: Optionally implement Nuqs-based URL state to reflect navigation position in the URL for bookmarking and sharing.
-
-**Why**: This is an enhancement that allows users to share direct links to specific bobbleheads within collection navigation context. It's optional but improves UX.
-
-**Confidence**: Medium
-
-**Files to Modify:**
-- `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\route-type.ts` - Route type definition (if implementing query params)
-- `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-navigation.tsx` - Navigation component (optional state management)
-
-**Changes:**
-- Optionally add query parameters like `?collection={collectionId}` to the current bobblehead URL for context preservation
-- Use Nuqs `parseAsString` and `useQueryState` if implementing client-side state tracking
-- Update navigation button href generation to include context query params
-- This allows URLs like `/bobbleheads/[id]?collection=[collectionId]` to preserve navigation context
-
-**Validation Commands:**
-```bash
-npm run lint:fix && npm run typecheck
-```
-
-**Success Criteria:**
-- [ ] Optional enhancement, can be skipped without breaking feature
-- [ ] If implemented, URLs maintain collection context across navigation
-- [ ] Query params properly validated in route-type.ts
-- [ ] No performance impact from URL state management
-- [ ] Passes lint and typecheck validation
-
----
-
-### Step 9: Create Error Boundary and Fallback Handling
+### Step 8: Create Error Boundary and Fallback Handling
 
 **What**: Ensure navigation failures gracefully degrade without breaking the bobblehead detail view.
 
