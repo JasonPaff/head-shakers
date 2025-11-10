@@ -51306,3 +51306,546 @@ Input:
   "new_string": "## Status Updates\n\n- ✅ Step 1: Completed (90 seconds) - Feature request refined with project context\n- ✅ Step 2: Completed (135 seconds) - Discovered 50 relevant files across all layers\n- ✅ Step 3: Completed (155 seconds) - Generated 15-step implementation plan\n\n## Execution Summary\n\n- **Total Duration**: 380 seconds (6 minutes 20 seconds)\n- **Feature Request Expansion**: 15 words → 415 words (27.7x)\n- **Files Discovered**: 50 files (17 critical, 19 high priority)\n- **Implementation Steps**: 15 steps covering all architectural layers\n- **Estimated Implementation Time**: 2-3 days\n- **Complexity**: Medium\n- **Risk Level**: Low\n\n## Final Output\n\n✅ **Implementation plan saved to**: `docs/2025_11_09/plans/browse-collections-page-implementation-plan.md`\n\n### Key Highlights\n\n**Files to Create**: 15+ new files (validations, components, pages, tests)\n**Files to Modify**: 5 files (query, facade, page, navigation)\n**Architecture Patterns**: BaseQuery, Facade, Nuqs URL state, Suspense boundaries\n**Key Technologies**: TanStack React Table, Radix UI, Zod validation, Drizzle ORM"
 }
 ================================================================================
+
+================================================================================
+2025-11-10T02:28:11.401Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create Collection Browse Validation Schema with Zod",
+      "status": "in_progress",
+      "activeForm": "Creating Collection Browse Validation Schema with Zod"
+    },
+    {
+      "content": "Extend Collections Query Layer with getBrowseCollections method",
+      "status": "pending",
+      "activeForm": "Extending Collections Query Layer with getBrowseCollections method"
+    },
+    {
+      "content": "Create Collections Facade Method for Browse",
+      "status": "pending",
+      "activeForm": "Creating Collections Facade Method for Browse"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint, typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:17.878Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/validations/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:24.037Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\collections.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:24.037Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\public-search.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:31.387Z
+Tool: Grep
+Input:
+{
+  "pattern": "PAGINATION",
+  "path": "src/lib/constants",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:37.984Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\config.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:37.986Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\index.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:28:46.042Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\enums.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:06.153Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\browse-collections.validation.ts",
+  "content": "import { z } from 'zod';\n\nimport { CONFIG } from '@/lib/constants';\n\n/**\n * Browse Collections Validation Schemas\n * Validation schemas for browsing and filtering collections with sorting and pagination\n */\n\n/**\n * Sort by options for collections browse\n * Supports sorting by name, creation date, popularity (likes), and followers\n */\nexport const BROWSE_COLLECTIONS_SORT_BY = ['name', 'createdAt', 'likeCount', 'followerCount'] as const;\n\n/**\n * Sort order options\n */\nexport const BROWSE_COLLECTIONS_SORT_ORDER = ['asc', 'desc'] as const;\n\n/**\n * Schema for browse collections sort options\n */\nexport const browseCollectionsSortSchema = z.object({\n  sortBy: z.enum(BROWSE_COLLECTIONS_SORT_BY).optional().default('createdAt'),\n  sortOrder: z.enum(BROWSE_COLLECTIONS_SORT_ORDER).optional().default('desc'),\n});\n\n/**\n * Schema for browse collections pagination\n * Uses collection-specific pagination limits from config\n */\nexport const browseCollectionsPaginationSchema = z.object({\n  page: z.coerce.number().int().positive().default(1),\n  pageSize: z.coerce\n    .number()\n    .int()\n    .positive()\n    .max(\n      CONFIG.PAGINATION.COLLECTIONS.MAX,\n      `Maximum page size is ${CONFIG.PAGINATION.COLLECTIONS.MAX}`,\n    )\n    .default(CONFIG.PAGINATION.COLLECTIONS.DEFAULT),\n});\n\n/**\n * Schema for browse collections filters\n * All filters are optional to support flexible browsing\n */\nexport const browseCollectionsFiltersSchema = z.object({\n  // Search query for collection name/description text search\n  query: z.string().trim().max(500, 'Search query must be 500 characters or less').optional(),\n\n  // Filter by category ID\n  categoryId: z.string().uuid('Invalid category ID').optional(),\n\n  // Filter by owner user ID\n  ownerId: z.string().uuid('Invalid owner ID').optional(),\n\n  // Filter by date range\n  dateFrom: z.coerce.date().optional(),\n  dateTo: z.coerce.date().optional(),\n});\n\n/**\n * Combined schema for full browse collections input\n * Merges filters, sorting, and pagination for complete browse functionality\n */\nexport const browseCollectionsInputSchema = z\n  .object({\n    filters: browseCollectionsFiltersSchema.optional(),\n    pagination: browseCollectionsPaginationSchema.optional(),\n    sort: browseCollectionsSortSchema.optional(),\n  })\n  .refine(\n    (data) => {\n      // Validate date range if both dates are provided\n      if (data.filters?.dateFrom && data.filters?.dateTo) {\n        return data.filters.dateFrom <= data.filters.dateTo;\n      }\n      return true;\n    },\n    {\n      message: 'dateFrom must be before or equal to dateTo',\n      path: ['filters', 'dateFrom'],\n    },\n  );\n\n// Type exports using z.infer for type-safe schema usage\nexport type BrowseCollectionsInput = z.infer<typeof browseCollectionsInputSchema>;\nexport type BrowseCollectionsFilters = z.infer<typeof browseCollectionsFiltersSchema>;\nexport type BrowseCollectionsPagination = z.infer<typeof browseCollectionsPaginationSchema>;\nexport type BrowseCollectionsSort = z.infer<typeof browseCollectionsSortSchema>;\nexport type BrowseCollectionsSortBy = (typeof BROWSE_COLLECTIONS_SORT_BY)[number];\nexport type BrowseCollectionsSortOrder = (typeof BROWSE_COLLECTIONS_SORT_ORDER)[number];\n"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:13.785Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create Collection Browse Validation Schema with Zod",
+      "status": "completed",
+      "activeForm": "Creating Collection Browse Validation Schema with Zod"
+    },
+    {
+      "content": "Extend Collections Query Layer with getBrowseCollections method",
+      "status": "in_progress",
+      "activeForm": "Extending Collections Query Layer with getBrowseCollections method"
+    },
+    {
+      "content": "Create Collections Facade Method for Browse",
+      "status": "pending",
+      "activeForm": "Creating Collections Facade Method for Browse"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint, typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:18.598Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/queries/collections/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:23.573Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:31.459Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\base\\base-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:31.460Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\collections.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:39.130Z
+Tool: Grep
+Input:
+{
+  "pattern": "followers",
+  "path": "src/lib/db/schema",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:45.216Z
+Tool: Grep
+Input:
+{
+  "pattern": "export const.*followers",
+  "path": "src/lib/db/schema",
+  "output_mode": "content",
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:51.031Z
+Tool: Grep
+Input:
+{
+  "pattern": "Follow",
+  "path": "src/lib/db/schema/users.schema.ts",
+  "output_mode": "content",
+  "-C": 5,
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:29:56.544Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/db/schema/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:30:01.721Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\social.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:30:11.482Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts",
+  "limit": 80
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:30:24.926Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "import { and, asc, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';\n\nimport type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';\nimport type {\n  DeleteCollection,\n  InsertCollection,\n  UpdateCollection,\n} from '@/lib/validations/collections.validation';\n\nimport { DEFAULTS } from '@/lib/constants';\nimport { bobbleheadPhotos, bobbleheads, collections, subCollections } from '@/lib/db/schema';\nimport { BaseQuery } from '@/lib/queries/base/base-query';",
+  "new_string": "import { and, asc, desc, eq, gte, ilike, isNull, lte, or, sql } from 'drizzle-orm';\n\nimport type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';\nimport type {\n  DeleteCollection,\n  InsertCollection,\n  UpdateCollection,\n} from '@/lib/validations/collections.validation';\nimport type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';\n\nimport { DEFAULTS } from '@/lib/constants';\nimport { bobbleheadPhotos, bobbleheads, collections, follows, subCollections, users } from '@/lib/db/schema';\nimport { BaseQuery } from '@/lib/queries/base/base-query';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:30:36.593Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "export type CollectionWithRelations = CollectionRecord & {\n  bobbleheads: Array<{\n    id: string;\n    isFeatured: boolean;\n    subcollectionId: null | string;\n    updatedAt: Date;\n  }>;\n  subCollections: Array<{\n    bobbleheads: Array<{\n      id: string;\n      isFeatured: boolean;\n      updatedAt: Date;\n    }>;\n    collectionId: string;\n    createdAt: Date;\n    description: null | string;\n    id: string;\n    name: string;\n    updatedAt: Date;\n  }>;\n};",
+  "new_string": "export type CollectionWithRelations = CollectionRecord & {\n  bobbleheads: Array<{\n    id: string;\n    isFeatured: boolean;\n    subcollectionId: null | string;\n    updatedAt: Date;\n  }>;\n  subCollections: Array<{\n    bobbleheads: Array<{\n      id: string;\n      isFeatured: boolean;\n      updatedAt: Date;\n    }>;\n    collectionId: string;\n    createdAt: Date;\n    description: null | string;\n    id: string;\n    name: string;\n    updatedAt: Date;\n  }>;\n};\n\nexport type BrowseCollectionRecord = {\n  collection: CollectionRecord;\n  firstBobbleheadPhoto: null | string;\n  followerCount: number;\n  owner: {\n    avatarUrl: null | string;\n    displayName: string;\n    id: string;\n    username: string;\n  };\n};\n\nexport type BrowseCollectionsResult = {\n  collections: Array<BrowseCollectionRecord>;\n  pagination: {\n    currentPage: number;\n    pageSize: number;\n    totalCount: number;\n    totalPages: number;\n  };\n};"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:04.000Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "  static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance\n      .update(collections)\n      .set({ ...data, userId })\n      .where(and(eq(collections.id, data.collectionId), eq(collections.userId, userId)))\n      .returning();\n\n    return result?.[0] || null;\n  }\n\n  private static _getSearchCondition(searchTerm?: string) {",
+  "new_string": "  static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance\n      .update(collections)\n      .set({ ...data, userId })\n      .where(and(eq(collections.id, data.collectionId), eq(collections.userId, userId)))\n      .returning();\n\n    return result?.[0] || null;\n  }\n\n  static async getBrowseCollectionsAsync(\n    input: BrowseCollectionsInput,\n    context: QueryContext,\n  ): Promise<BrowseCollectionsResult> {\n    const dbInstance = this.getDbInstance(context);\n\n    // extract input parameters with defaults\n    const filters = input.filters || {};\n    const sort = input.sort || {};\n    const pagination = input.pagination || {};\n\n    const page = pagination.page || 1;\n    const pageSize = pagination.pageSize || 12;\n    const sortBy = sort.sortBy || 'createdAt';\n    const sortOrder = sort.sortOrder || 'desc';\n\n    // build permission filter - only public collections OR collections owned by current user\n    const permissionFilter = this.buildBaseFilters(\n      collections.isPublic,\n      collections.userId,\n      undefined,\n      context,\n    );\n\n    // build search filter for collection name and description\n    const searchFilter = filters.query\n      ? or(\n          ilike(collections.name, `%${filters.query}%`),\n          ilike(collections.description, `%${filters.query}%`),\n        )\n      : undefined;\n\n    // build category filter\n    const categoryFilter = filters.categoryId ? eq(collections.id, filters.categoryId) : undefined;\n\n    // build owner filter\n    const ownerFilter = filters.ownerId ? eq(collections.userId, filters.ownerId) : undefined;\n\n    // build date range filters\n    const dateFromFilter = filters.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;\n    const dateToFilter = filters.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;\n\n    // combine all filters\n    const whereConditions = this.combineFilters(\n      permissionFilter,\n      searchFilter,\n      categoryFilter,\n      ownerFilter,\n      dateFromFilter,\n      dateToFilter,\n    );\n\n    // build sort order\n    const orderByClause = this._getBrowseSortOrder(sortBy, sortOrder);\n\n    // calculate offset for pagination\n    const offset = (page - 1) * pageSize;\n\n    // get total count for pagination metadata\n    const countQuery = dbInstance\n      .select({ count: sql<number>`count(*)::int` })\n      .from(collections)\n      .where(whereConditions);\n\n    const countResult = await countQuery;\n    const totalCount = countResult[0]?.count || 0;\n    const totalPages = Math.ceil(totalCount / pageSize);\n\n    // main query with joins for owner info, first bobblehead photo, and follower count\n    const results = await dbInstance\n      .select({\n        avatarUrl: users.avatarUrl,\n        commentCount: collections.commentCount,\n        coverImageUrl: collections.coverImageUrl,\n        createdAt: collections.createdAt,\n        description: collections.description,\n        displayName: users.displayName,\n        firstBobbleheadPhoto: sql<null | string>`(\n          SELECT ${bobbleheadPhotos.url}\n          FROM ${bobbleheads}\n          LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}\n            AND ${bobbleheadPhotos.isPrimary} = true\n          WHERE ${bobbleheads.collectionId} = ${collections.id}\n            AND ${bobbleheads.isDeleted} = false\n          ORDER BY ${bobbleheads.createdAt} ASC\n          LIMIT 1\n        )`,\n        followerCount: sql<number>`(\n          SELECT COUNT(*)::int\n          FROM ${follows}\n          WHERE ${follows.targetId} = ${collections.id}\n            AND ${follows.followType} = 'collection'\n        )`,\n        id: collections.id,\n        isPublic: collections.isPublic,\n        lastItemAddedAt: collections.lastItemAddedAt,\n        likeCount: collections.likeCount,\n        name: collections.name,\n        ownerId: users.id,\n        ownerUsername: users.username,\n        totalItems: collections.totalItems,\n        totalValue: collections.totalValue,\n        updatedAt: collections.updatedAt,\n        userId: collections.userId,\n      })\n      .from(collections)\n      .innerJoin(users, eq(collections.userId, users.id))\n      .where(whereConditions)\n      .orderBy(orderByClause)\n      .limit(pageSize)\n      .offset(offset);\n\n    // transform results to match BrowseCollectionRecord type\n    const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({\n      collection: {\n        commentCount: row.commentCount,\n        coverImageUrl: row.coverImageUrl,\n        createdAt: row.createdAt,\n        description: row.description,\n        id: row.id,\n        isPublic: row.isPublic,\n        lastItemAddedAt: row.lastItemAddedAt,\n        likeCount: row.likeCount,\n        name: row.name,\n        totalItems: row.totalItems,\n        totalValue: row.totalValue,\n        updatedAt: row.updatedAt,\n        userId: row.userId,\n      },\n      firstBobbleheadPhoto: row.firstBobbleheadPhoto,\n      followerCount: row.followerCount,\n      owner: {\n        avatarUrl: row.avatarUrl,\n        displayName: row.displayName,\n        id: row.ownerId,\n        username: row.ownerUsername,\n      },\n    }));\n\n    return {\n      collections: transformedResults,\n      pagination: {\n        currentPage: page,\n        pageSize,\n        totalCount,\n        totalPages,\n      },\n    };\n  }\n\n  private static _getBrowseSortOrder(sortBy: string, sortOrder: string) {\n    const column = (() => {\n      switch (sortBy) {\n        case 'name':\n          return sql`lower(${collections.name})`;\n        case 'likeCount':\n          return collections.likeCount;\n        case 'followerCount':\n          // use the subquery for sorting by follower count\n          return sql`(\n            SELECT COUNT(*)::int\n            FROM ${follows}\n            WHERE ${follows.targetId} = ${collections.id}\n              AND ${follows.followType} = 'collection'\n          )`;\n        case 'createdAt':\n        default:\n          return collections.createdAt;\n      }\n    })();\n\n    return sortOrder === 'asc' ? asc(column) : desc(column);\n  }\n\n  private static _getSearchCondition(searchTerm?: string) {"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:12.709Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create Collection Browse Validation Schema with Zod",
+      "status": "completed",
+      "activeForm": "Creating Collection Browse Validation Schema with Zod"
+    },
+    {
+      "content": "Extend Collections Query Layer with getBrowseCollections method",
+      "status": "completed",
+      "activeForm": "Extending Collections Query Layer with getBrowseCollections method"
+    },
+    {
+      "content": "Create Collections Facade Method for Browse",
+      "status": "in_progress",
+      "activeForm": "Creating Collections Facade Method for Browse"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "pending",
+      "activeForm": "Running validation commands (lint, typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:17.829Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/facades/collections/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:22.822Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:30.607Z
+Tool: Grep
+Input:
+{
+  "pattern": "collections\\s*:",
+  "path": "src/lib/services/cache.service.ts",
+  "output_mode": "content",
+  "-A": 30,
+  "-n": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:37.676Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "limit": 100
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:43.675Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "offset": 250,
+  "limit": 150
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:31:48.976Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\cache.service.ts",
+  "offset": 400,
+  "limit": 150
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:32:00.607Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "import type { FindOptions } from '@/lib/queries/base/query-context';\nimport type {\n  BobbleheadListRecord,\n  CollectionRecord,\n  CollectionWithRelations,\n} from '@/lib/queries/collections/collections.query';\nimport type { FacadeErrorContext } from '@/lib/utils/error-types';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type {\n  DeleteCollection,\n  InsertCollection,\n  UpdateCollection,\n} from '@/lib/validations/collections.validation';",
+  "new_string": "import type { FindOptions } from '@/lib/queries/base/query-context';\nimport type {\n  BobbleheadListRecord,\n  BrowseCollectionsResult,\n  CollectionRecord,\n  CollectionWithRelations,\n} from '@/lib/queries/collections/collections.query';\nimport type { FacadeErrorContext } from '@/lib/utils/error-types';\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\nimport type {\n  DeleteCollection,\n  InsertCollection,\n  UpdateCollection,\n} from '@/lib/validations/collections.validation';\nimport type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:32:16.220Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "  static async updateAsync(data: UpdateCollection, userId: string, dbInstance?: DatabaseExecutor) {\n    try {\n      const context = createUserQueryContext(userId, { dbInstance });\n      return await CollectionsQuery.updateAsync(data, userId, context);\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { collectionId: data.collectionId },\n        facade: 'CollectionsFacade',\n        method: 'updateAsync',\n        operation: 'update',\n        userId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }\n}",
+  "new_string": "  static async updateAsync(data: UpdateCollection, userId: string, dbInstance?: DatabaseExecutor) {\n    try {\n      const context = createUserQueryContext(userId, { dbInstance });\n      return await CollectionsQuery.updateAsync(data, userId, context);\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { collectionId: data.collectionId },\n        facade: 'CollectionsFacade',\n        method: 'updateAsync',\n        operation: 'update',\n        userId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }\n\n  /**\n   * Browse collections with filtering, sorting, and pagination\n   */\n  static async browseCollections(\n    input: BrowseCollectionsInput,\n    viewerUserId?: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<BrowseCollectionsResult> {\n    try {\n      const inputHash = createHashFromObject(input);\n      return CacheService.collections.public(\n        async () => {\n          const context =\n            viewerUserId ?\n              createUserQueryContext(viewerUserId, { dbInstance })\n            : createPublicQueryContext({ dbInstance });\n\n          const result = await CollectionsQuery.getBrowseCollectionsAsync(input, context);\n\n          // transform results to include Cloudinary URLs for first bobblehead photos\n          const transformedCollections = result.collections.map((record) => ({\n            ...record,\n            firstBobbleheadPhoto:\n              record.firstBobbleheadPhoto ?\n                CloudinaryService.getOptimizedImageUrl(record.firstBobbleheadPhoto, {\n                  crop: 'fill',\n                  gravity: 'auto',\n                  height: 300,\n                  quality: 'auto',\n                  width: 300,\n                })\n              : null,\n          }));\n\n          return {\n            ...result,\n            collections: transformedCollections,\n          };\n        },\n        inputHash,\n        {\n          context: {\n            entityType: 'collection',\n            facade: 'CollectionsFacade',\n            operation: 'browse',\n            userId: viewerUserId,\n          },\n        },\n      );\n    } catch (error) {\n      const context: FacadeErrorContext = {\n        data: { input },\n        facade: 'CollectionsFacade',\n        method: 'browseCollections',\n        operation: 'browse',\n        userId: viewerUserId,\n      };\n      throw createFacadeError(context, error);\n    }\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:32:24.016Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create Collection Browse Validation Schema with Zod",
+      "status": "completed",
+      "activeForm": "Creating Collection Browse Validation Schema with Zod"
+    },
+    {
+      "content": "Extend Collections Query Layer with getBrowseCollections method",
+      "status": "completed",
+      "activeForm": "Extending Collections Query Layer with getBrowseCollections method"
+    },
+    {
+      "content": "Create Collections Facade Method for Browse",
+      "status": "completed",
+      "activeForm": "Creating Collections Facade Method for Browse"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "in_progress",
+      "activeForm": "Running validation commands (lint, typecheck)"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:32:29.806Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint to check and fix code issues"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:33:25.035Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:33:46.978Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\collections\\collections.facade.ts",
+  "old_string": "          // transform results to include Cloudinary URLs for first bobblehead photos\n          const transformedCollections = result.collections.map((record) => ({\n            ...record,\n            firstBobbleheadPhoto:\n              record.firstBobbleheadPhoto ?\n                CloudinaryService.getOptimizedImageUrl(record.firstBobbleheadPhoto, {\n                  crop: 'fill',\n                  gravity: 'auto',\n                  height: 300,\n                  quality: 'auto',\n                  width: 300,\n                })\n              : null,\n          }));",
+  "new_string": "          // transform results to include Cloudinary URLs for first bobblehead photos\n          const transformedCollections = result.collections.map((record) => ({\n            ...record,\n            firstBobbleheadPhoto:\n              record.firstBobbleheadPhoto ?\n                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {\n                  crop: 'fill',\n                  gravity: 'auto',\n                  height: 300,\n                  quality: 'auto',\n                  width: 300,\n                })\n              : null,\n          }));"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:33:55.006Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "    // extract input parameters with defaults\n    const filters = input.filters || {};\n    const sort = input.sort || {};\n    const pagination = input.pagination || {};\n\n    const page = pagination.page || 1;\n    const pageSize = pagination.pageSize || 12;\n    const sortBy = sort.sortBy || 'createdAt';\n    const sortOrder = sort.sortOrder || 'desc';",
+  "new_string": "    // extract input parameters with defaults\n    const filters = input.filters ?? {};\n    const sort = input.sort ?? {};\n    const pagination = input.pagination ?? {};\n\n    const page = pagination?.page ?? 1;\n    const pageSize = pagination?.pageSize ?? 12;\n    const sortBy = sort?.sortBy ?? 'createdAt';\n    const sortOrder = sort?.sortOrder ?? 'desc';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:34:01.489Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking again"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:34:18.220Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "    // extract input parameters with defaults\n    const filters = input.filters ?? {};\n    const sort = input.sort ?? {};\n    const pagination = input.pagination ?? {};\n\n    const page = pagination?.page ?? 1;\n    const pageSize = pagination?.pageSize ?? 12;\n    const sortBy = sort?.sortBy ?? 'createdAt';\n    const sortOrder = sort?.sortOrder ?? 'desc';",
+  "new_string": "    // extract input parameters with defaults\n    const filters = input.filters;\n    const sort = input.sort;\n    const pagination = input.pagination;\n\n    const page = pagination?.page ?? 1;\n    const pageSize = pagination?.pageSize ?? 12;\n    const sortBy = sort?.sortBy ?? 'createdAt';\n    const sortOrder = sort?.sortOrder ?? 'desc';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:34:24.162Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck && npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking and lint"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:34:40.315Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\collections\\collections.query.ts",
+  "old_string": "    // build search filter for collection name and description\n    const searchFilter = filters.query\n      ? or(\n          ilike(collections.name, `%${filters.query}%`),\n          ilike(collections.description, `%${filters.query}%`),\n        )\n      : undefined;\n\n    // build category filter\n    const categoryFilter = filters.categoryId ? eq(collections.id, filters.categoryId) : undefined;\n\n    // build owner filter\n    const ownerFilter = filters.ownerId ? eq(collections.userId, filters.ownerId) : undefined;\n\n    // build date range filters\n    const dateFromFilter = filters.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;\n    const dateToFilter = filters.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;",
+  "new_string": "    // build search filter for collection name and description\n    const searchFilter = filters?.query\n      ? or(\n          ilike(collections.name, `%${filters.query}%`),\n          ilike(collections.description, `%${filters.query}%`),\n        )\n      : undefined;\n\n    // build category filter\n    const categoryFilter = filters?.categoryId ? eq(collections.id, filters.categoryId) : undefined;\n\n    // build owner filter\n    const ownerFilter = filters?.ownerId ? eq(collections.userId, filters.ownerId) : undefined;\n\n    // build date range filters\n    const dateFromFilter = filters?.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;\n    const dateToFilter = filters?.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:34:45.982Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck && npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking and lint"
+}
+================================================================================
+
+================================================================================
+2025-11-10T02:35:52.220Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create Collection Browse Validation Schema with Zod",
+      "status": "completed",
+      "activeForm": "Creating Collection Browse Validation Schema with Zod"
+    },
+    {
+      "content": "Extend Collections Query Layer with getBrowseCollections method",
+      "status": "completed",
+      "activeForm": "Extending Collections Query Layer with getBrowseCollections method"
+    },
+    {
+      "content": "Create Collections Facade Method for Browse",
+      "status": "completed",
+      "activeForm": "Creating Collections Facade Method for Browse"
+    },
+    {
+      "content": "Run validation commands (lint, typecheck)",
+      "status": "completed",
+      "activeForm": "Running validation commands (lint, typecheck)"
+    }
+  ]
+}
+================================================================================

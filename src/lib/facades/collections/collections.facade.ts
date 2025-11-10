@@ -1,11 +1,13 @@
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type {
   BobbleheadListRecord,
+  BrowseCollectionsResult,
   CollectionRecord,
   CollectionWithRelations,
 } from '@/lib/queries/collections/collections.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { BrowseCollectionsInput } from '@/lib/validations/browse-collections.validation';
 import type {
   DeleteCollection,
   InsertCollection,
@@ -60,6 +62,67 @@ export interface CollectionMetrics {
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
 export class CollectionsFacade {
+  /**
+   * Browse collections with filtering, sorting, and pagination
+   */
+  static async browseCollections(
+    input: BrowseCollectionsInput,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BrowseCollectionsResult> {
+    try {
+      const inputHash = createHashFromObject(input);
+      return CacheService.collections.public(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          const result = await CollectionsQuery.getBrowseCollectionsAsync(input, context);
+
+          // transform results to include Cloudinary URLs for first bobblehead photos
+          const transformedCollections = result.collections.map((record) => ({
+            ...record,
+            firstBobbleheadPhoto:
+              record.firstBobbleheadPhoto ?
+                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
+                  crop: 'fill',
+                  gravity: 'auto',
+                  height: 300,
+                  quality: 'auto',
+                  width: 300,
+                })
+              : null,
+          }));
+
+          return {
+            ...result,
+            collections: transformedCollections,
+          };
+        },
+        inputHash,
+        {
+          context: {
+            entityType: 'collection',
+            facade: 'CollectionsFacade',
+            operation: 'browse',
+            userId: viewerUserId,
+          },
+        },
+      );
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { input },
+        facade: 'CollectionsFacade',
+        method: 'browseCollections',
+        operation: 'browse',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
     // count direct bobbleheads (not in subcollections)
     const directBobbleheads = collection.bobbleheads.filter(
