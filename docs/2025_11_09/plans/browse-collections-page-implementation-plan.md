@@ -414,46 +414,7 @@ npm run lint:fix && npm run typecheck
 
 ---
 
-### Step 12: Implement Collection Follow Feature (Optional Authenticated Feature)
-
-**What**: Add follow/unfollow functionality for collections visible on browse page for authenticated users
-**Why**: Enables authenticated users to follow interesting collections directly from browse interface
-**Confidence**: Medium
-
-**Files to Create:**
-- `src/lib/actions/collections/follow-collection.action.ts` - Server action for follow/unfollow
-- `src/components/feature/collections/follow-collection-button.tsx` - Client component for follow button
-
-**Changes:**
-- Create server action using next-safe-action that accepts collectionId
-- Validate user is authenticated using Clerk
-- Check if user already follows collection in database
-- Toggle follow status (insert or delete from collections_followers junction table)
-- Invalidate relevant cache keys for user's followed collections
-- Return updated follow state
-- Create client component button that calls server action
-- Show follow/unfollow state with optimistic UI updates
-- Display follower count increment/decrement
-- Only render for authenticated users
-- Integrate button into browse table rows
-- Follow existing follow patterns from user follows or likes features
-
-**Validation Commands:**
-```bash
-npm run lint:fix && npm run typecheck
-```
-
-**Success Criteria:**
-- [ ] Server action properly validates authentication
-- [ ] Follow/unfollow toggles database state correctly
-- [ ] Cache invalidation ensures fresh data
-- [ ] Optimistic UI provides immediate feedback
-- [ ] Button only shows for authenticated users
-- [ ] All validation commands pass
-
----
-
-### Step 13: Add Database Indexes for Browse Query Performance
+### Step 12: Add Database Indexes for Browse Query Performance
 
 **What**: Create database migration to add indexes optimizing browse page queries
 **Why**: Ensure fast query performance for filtered, sorted, and paginated collection queries
@@ -485,7 +446,7 @@ npm run db:migrate
 
 ---
 
-### Step 15: Add Telemetry and Error Tracking for Browse Page
+### Step 13: Add Telemetry and Error Tracking for Browse Page
 
 **What**: Integrate Sentry error tracking and performance monitoring for browse page
 **Why**: Monitor production errors and performance metrics for browse functionality

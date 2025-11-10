@@ -37,6 +37,7 @@ export const OPERATIONS = {
     UPLOAD_PHOTO: 'upload_bobblehead_photo',
   },
   COLLECTIONS: {
+    BROWSE: 'browse_collections',
     CREATE: 'create_collection',
     DELETE: 'delete_collection',
     GET_BY_USER: 'get_collections_by_user',

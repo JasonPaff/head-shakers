@@ -47,6 +47,7 @@ export const ACTION_NAMES = {
     UPLOAD_PHOTOS: 'uploadBobbleheadPhotos',
   },
   COLLECTIONS: {
+    BROWSE: 'browseCollections',
     CREATE: 'createCollection',
     CREATE_SUB: 'createSubCollection',
     DELETE: 'deleteCollection',

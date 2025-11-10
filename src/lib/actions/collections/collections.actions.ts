@@ -16,7 +16,8 @@ import { CollectionsFacade } from '@/lib/facades/collections/collections.facade'
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient } from '@/lib/utils/next-safe-action';
+import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import { browseCollectionsInputSchema } from '@/lib/validations/browse-collections.validation';
 import {
   deleteCollectionSchema,
   insertCollectionSchema,
@@ -195,6 +196,51 @@ export const deleteCollectionAction = authActionClient
         },
         operation: OPERATIONS.COLLECTIONS.DELETE,
         userId: ctx.userId,
+      });
+    }
+  });
+
+/**
+ * Browse collections with filtering, sorting, and pagination (public action)
+ */
+export const browseCollectionsAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.COLLECTIONS.BROWSE,
+    isTransactionRequired: false,
+  })
+  .inputSchema(browseCollectionsInputSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const browseInput = browseCollectionsInputSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      filters: browseInput.filters,
+      pagination: browseInput.pagination,
+      sort: browseInput.sort,
+    });
+
+    try {
+      const result = await CollectionsFacade.browseCollections(browseInput, undefined, dbInstance);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          filters: browseInput.filters,
+          resultCount: result.collections.length,
+          totalCount: result.pagination.totalCount,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Browsed collections with filters`,
+      });
+
+      return result;
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.COLLECTIONS.BROWSE,
+        },
+        operation: OPERATIONS.COLLECTIONS.BROWSE,
       });
     }
   });
