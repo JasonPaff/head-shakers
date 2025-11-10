@@ -13,6 +13,7 @@ declare module "@@@next-typesafe-url" {
     "/bobbleheads/[bobbleheadId]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/route-type").RouteType>;
     "/bobbleheads/[bobbleheadId]/edit": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/edit/route-type").RouteType>;
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
+    "/browse/search": InferRoute<import("./src/app/(app)/browse/search/route-type").RouteType>;
     "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
     "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
     "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
@@ -29,7 +30,6 @@ declare module "@@@next-typesafe-url" {
     "/browse/categories": StaticRoute;
     "/browse/featured": StaticRoute;
     "/browse": StaticRoute;
-    "/browse/search": StaticRoute;
     "/browse/trending": StaticRoute;
     "/collections/[collectionId]/edit": StaticRoute;
     "/collections/[collectionId]/settings": StaticRoute;

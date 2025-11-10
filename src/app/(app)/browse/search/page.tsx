@@ -1,9 +1,15 @@
 import type { Metadata } from 'next';
 
+import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { Suspense } from 'react';
 
+import type { PageProps } from '@/app/(app)/browse/search/route-type';
+
 import { SearchPageContent } from '@/app/(app)/browse/search/components/search-page-content';
+import { Route } from '@/app/(app)/browse/search/route-type';
 import { Skeleton } from '@/components/ui/skeleton';
+
+type SearchPageProps = PageProps;
 
 export function generateMetadata(): Metadata {
   return {
@@ -12,7 +18,9 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default function SearchPage() {
+async function SearchPage({ searchParams }: SearchPageProps) {
+  // Await searchParams to satisfy Next.js 15 async params
+  await searchParams;
   return (
     <div className={'container mx-auto px-4 py-8'}>
       {/* Page Header */}
@@ -39,3 +47,5 @@ export default function SearchPage() {
     </div>
   );
 }
+
+export default withParamValidation(SearchPage, Route);

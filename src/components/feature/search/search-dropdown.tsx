@@ -3,6 +3,7 @@
 import type { ChangeEvent, ComponentProps, KeyboardEvent } from 'react';
 
 import { ArrowRightIcon, SearchIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -63,7 +64,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
 
   // 5. Utility functions
   const getViewAllUrl = (searchQuery: string): string => {
-    return `browse/search?q=${encodeURIComponent(searchQuery)}`;
+    return $path({ route: '/browse/search', searchParams: { q: searchQuery } });
   };
 
   // 6. Event handlers
