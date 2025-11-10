@@ -88,7 +88,7 @@ export const UsernameSetupDialog = ({ currentUsername, isOpen, onClose }: Userna
               </p>
             </div>
 
-            <DialogFooter className={'gap-2 sm:gap-0'}>
+            <DialogFooter className={'space-x-0 sm:space-x-2'}>
               <Button disabled={isSkipping} onClick={handleSkip} variant={'outline'}>
                 {isSkipping ? 'Saving...' : 'Keep Current'}
               </Button>
@@ -125,5 +125,3 @@ export const UsernameSetupDialog = ({ currentUsername, isOpen, onClose }: Userna
     </Dialog>
   );
 };
-
-UsernameSetupDialog.displayName = 'UsernameSetupDialog';

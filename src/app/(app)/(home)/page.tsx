@@ -9,9 +9,11 @@ import { Suspense } from 'react';
 import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/featured-collections-async';
 import { FeaturedCollectionsErrorBoundary } from '@/app/(app)/(home)/components/featured-collections-error-boundary';
 import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
+import { UsernameOnboardingProvider } from '@/components/feature/users/username-onboarding-provider';
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 export const revalidate = 300;
@@ -27,8 +29,23 @@ export function generateMetadata(): Metadata {
 export default async function HomePage() {
   const currentUserId = await getOptionalUserId();
 
+  // Check if user needs username onboarding
+  let shouldShowOnboarding = false;
+  let currentUsername = '';
+  if (currentUserId) {
+    const user = await UsersFacade.getUserById(currentUserId);
+    if (user) {
+      currentUsername = user.username;
+      shouldShowOnboarding = !user.usernameChangedAt;
+    }
+  }
+
   return (
     <div className={'container mx-auto px-4 py-8'}>
+      {/* Username Onboarding */}
+      {shouldShowOnboarding && (
+        <UsernameOnboardingProvider currentUsername={currentUsername} shouldShow={shouldShowOnboarding} />
+      )}
       {/* Hero */}
       <section className={'py-12 text-center'}>
         <h1 className={'mb-6 text-5xl font-bold text-balance md:text-6xl'}>
