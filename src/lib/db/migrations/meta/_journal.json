@@ -50,6 +50,13 @@
       "when": 1762481058390,
       "tag": "20251107020418_regular_captain_stacy",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1762736075363,
+      "tag": "20251110005435_daily_zombie",
+      "breakpoints": true
     }
   ]
 }

@@ -109,10 +109,12 @@ export const ACTION_NAMES = {
     UPDATE: 'updateTag',
   },
   USERS: {
+    CHECK_USERNAME_AVAILABILITY: 'checkUsernameAvailability',
     DELETE_ACCOUNT: 'deleteUserAccount',
     UPDATE_NOTIFICATIONS: 'updateNotificationSettings',
     UPDATE_PROFILE: 'updateUserProfile',
     UPDATE_SETTINGS: 'updateUserSettings',
+    UPDATE_USERNAME: 'updateUsername',
   },
 } as const;
 

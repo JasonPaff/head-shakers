@@ -79,6 +79,7 @@ export const SCHEMA_LIMITS = {
     EMAIL: { MAX: 255 },
     LOCATION: { MAX: 100 },
     USERNAME: { MAX: 50, MIN: 3 },
+    USERNAME_CHANGE_COOLDOWN_DAYS: 90,
   },
   USER_ACTIVITY: {
     IP_ADDRESS: { MAX: 45 },

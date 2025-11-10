@@ -44161,3 +44161,3613 @@ Input:
   ]
 }
 ================================================================================
+
+================================================================================
+2025-11-10T00:17:02.076Z
+Tool: Task
+Input:
+{
+  "description": "Explore authentication implementation",
+  "prompt": "Examine and document the complete authentication implementation in this Next.js application. I need to understand:\n\n1. Middleware configuration - how authentication is enforced\n2. Clerk setup and configuration\n3. Auth-related components and utilities\n4. How user authentication flows work\n5. Protected routes implementation\n6. User session management\n7. Any custom auth logic or wrappers\n\nSearch for:\n- middleware.ts files\n- Clerk configuration and providers\n- Auth-related components in src/components\n- Auth utilities in src/lib\n- Environment variables and configuration\n- Protected route patterns in app directory\n- User context or session handling\n\nProvide a comprehensive overview of the authentication architecture, key files, and how it all works together. Set thoroughness to \"very thorough\".",
+  "subagent_type": "Explore",
+  "model": "sonnet"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:07.245Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/middleware.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:07.246Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/middleware.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:07.257Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*clerk*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:07.268Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*clerk*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:07.283Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*auth*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:07.289Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*auth*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:18.682Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\middleware.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:18.685Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\middleware\\auth.middleware.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:18.694Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\ui\\auth.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:18.703Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\app-header\\components\\app-header-auth-nav-menu.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:18.709Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\utils\\optional-auth-utils.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:28.510Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/*provider*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:28.516Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/app/**/layout.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:28.519Z
+Tool: Grep
+Input:
+{
+  "pattern": "ClerkProvider",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:28.530Z
+Tool: Grep
+Input:
+{
+  "pattern": "useUser|currentUser",
+  "glob": "src/**/*.{ts,tsx}",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:37.323Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\layout.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:37.324Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\layout.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:37.328Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\hooks\\use-admin-role.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:37.336Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\ably-provider.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:45.902Z
+Tool: Grep
+Input:
+{
+  "pattern": "SignIn|SignUp|UserButton|SignOutButton",
+  "glob": "src/**/*.{ts,tsx}",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:45.905Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/.env*"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:45.909Z
+Tool: Grep
+Input:
+{
+  "pattern": "CLERK_",
+  "glob": ".env.example",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:52.531Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\components\\layout\\app-header\\components\\app-header-user.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:52.531Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/.env.example"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:17:52.536Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(public)\\coming-soon\\admin-access.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:00.347Z
+Tool: Grep
+Input:
+{
+  "pattern": "api/webhooks",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:00.349Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/api/webhooks/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:00.360Z
+Tool: Grep
+Input:
+{
+  "pattern": "authActionClient|authenticatedActionClient",
+  "glob": "src/**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:07.645Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\api\\webhooks\\clerk\\route.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:07.646Z
+Tool: Grep
+Input:
+{
+  "pattern": "UserSyncService",
+  "glob": "src/**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:07.652Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\next-safe-action.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:15.333Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/lib/middleware/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:15.332Z
+Tool: Grep
+Input:
+{
+  "pattern": "adminMiddleware",
+  "glob": "src/lib/middleware/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:15.333Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\user-sync.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:24.337Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\middleware\\admin.middleware.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:24.337Z
+Tool: Grep
+Input:
+{
+  "pattern": "protect\\(|requireAuth",
+  "glob": "src/**/*.{ts,tsx}",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:24.339Z
+Tool: Bash
+Input:
+{
+  "command": "find \"C:\\Users\\JasonPaff\\dev\\head-shakers\" -name \"package.json\" -type f -path \"*/head-shakers/package.json\" -not -path \"*/node_modules/*\" 2>/dev/null | head -1",
+  "description": "Find root package.json to check Clerk version"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:33.853Z
+Tool: Grep
+Input:
+{
+  "pattern": "auth\\(\\)|useAuth|useUser",
+  "glob": "src/lib/actions/**/*.ts",
+  "output_mode": "content",
+  "head_limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:33.854Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\package.json"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:33.863Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/lib/db/schema/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:42.830Z
+Tool: Grep
+Input:
+{
+  "pattern": "role.*enum|enum.*role",
+  "glob": "src/lib/db/schema/*.ts",
+  "output_mode": "content",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:42.832Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:42.836Z
+Tool: Grep
+Input:
+{
+  "pattern": "NEXT_PUBLIC_CLERK|CLERK_",
+  "glob": "**/.env.e2e.example",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:50.587Z
+Tool: Grep
+Input:
+{
+  "pattern": "USER.*ROLE|ROLE.*=",
+  "glob": "src/lib/constants*.ts",
+  "output_mode": "content"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:50.593Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/constants*.ts",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:50.601Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\tests\\e2e\\auth.setup.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:57.908Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/constants.ts",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:57.908Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/constants/**/*.ts",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:18:57.908Z
+Tool: Grep
+Input:
+{
+  "pattern": "from '@/lib/constants'",
+  "glob": "src/**/*.ts",
+  "output_mode": "files_with_matches",
+  "head_limit": 1
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:05.275Z
+Tool: Grep
+Input:
+{
+  "pattern": "SignedIn|SignedOut",
+  "glob": "src/**/*.{ts,tsx}",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:05.282Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\enums.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:05.288Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\defaults.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:15.158Z
+Tool: Bash
+Input:
+{
+  "command": "dir \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\" /b /ad 2>nul | findstr \"^(\" | sort",
+  "description": "List route groups in app directory"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:18.117Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.env.e2e.example"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:18.119Z
+Tool: Grep
+Input:
+{
+  "pattern": "publicMetadata|metadata",
+  "glob": "src/hooks/*.ts",
+  "output_mode": "content",
+  "head_limit": 15
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:24.663Z
+Tool: Grep
+Input:
+{
+  "pattern": "rate.*limit|rateLimit",
+  "glob": "src/**/*.ts",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:24.663Z
+Tool: Bash
+Input:
+{
+  "command": "ls \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\" | grep \"^(\" | sort",
+  "description": "List route groups in app directory"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:32.105Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\middleware\\rate-limit.middleware.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:32.105Z
+Tool: Grep
+Input:
+{
+  "pattern": "ClerkProvider|clerk|Clerk",
+  "glob": "src/app/**/*.tsx",
+  "output_mode": "files_with_matches",
+  "head_limit": 10
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:33.876Z
+Tool: Bash
+Input:
+{
+  "command": "ls \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\" | head -20",
+  "description": "List pages in (app) route group"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:43.062Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/README*.md"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:43.062Z
+Tool: Grep
+Input:
+{
+  "pattern": "publicActionClient",
+  "glob": "src/lib/actions/**/*.ts",
+  "output_mode": "files_with_matches",
+  "head_limit": 5
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:19:43.067Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\error-messages.ts",
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:04.364Z
+Tool: Task
+Input:
+{
+  "description": "Research username implementation",
+  "prompt": "Research the current username implementation to plan for adding custom username functionality. The user wants to allow users to create their own custom usernames.\n\nI need to understand:\n\n1. **Current Username Generation**:\n   - How are usernames currently generated? (I know it's in UserSyncService.syncUserFromClerk())\n   - What's the exact generation logic?\n   - What validation/constraints exist?\n\n2. **Database Schema**:\n   - Username field constraints (unique, length, format)\n   - Any indexes on username\n   - Related fields (displayName vs username)\n\n3. **Username Usage**:\n   - Where are usernames used in the app? (URLs, profiles, mentions, etc.)\n   - Are usernames part of URLs? (e.g., /users/[username])\n   - Any existing username update functionality?\n\n4. **Settings/Profile Pages**:\n   - Is there already a settings page where this could be added?\n   - Any existing profile edit forms?\n   - What's the structure of user settings?\n\n5. **Validation Requirements**:\n   - What username validation exists?\n   - Are there reserved usernames?\n   - Character restrictions?\n   - Length requirements?\n\n6. **Related Services**:\n   - Any services that handle username operations?\n   - UsersFacade methods related to usernames?\n   - Any username uniqueness checks?\n\nSearch for:\n- src/lib/services/user-sync.service.ts (username generation)\n- src/lib/db/schema/users.schema.ts (schema)\n- src/app/(app)/settings/* (settings pages)\n- src/lib/validations/* (validation schemas)\n- src/lib/facades/users.facade.ts (user operations)\n- Any username-related queries or actions\n- Routes that use username parameters\n\nProvide comprehensive findings so I can create a detailed implementation plan for custom username functionality. Set thoroughness to \"very thorough\".",
+  "subagent_type": "Plan",
+  "model": "sonnet"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:11.879Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\services\\user-sync.service.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:11.881Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:11.891Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/settings/**/*.{ts,tsx}"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:11.895Z
+Tool: Grep
+Input:
+{
+  "pattern": "username",
+  "output_mode": "files_with_matches",
+  "type": "ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:21.573Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:21.573Z
+Tool: Grep
+Input:
+{
+  "pattern": "\\[username\\]",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:21.587Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\settings\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:21.590Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\settings\\profile\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:21.592Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\settings\\layout.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:33.490Z
+Tool: Grep
+Input:
+{
+  "pattern": "users/\\[username\\]|@\\[username\\]|profile/\\[username\\]",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:33.497Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\index.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:33.507Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/actions/**/*user*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:33.508Z
+Tool: Grep
+Input:
+{
+  "pattern": "SCHEMA_LIMITS|USERNAME",
+  "glob": "**/constants/**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:33.513Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/queries/**/*user*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:43.951Z
+Tool: Grep
+Input:
+{
+  "pattern": "updateUser|createUser|user\\.update",
+  "glob": "**/actions/**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:43.957Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\schema-limits.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:43.965Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\users\\users-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:43.971Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\error-messages.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:43.977Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/facades/**/*user*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:55.071Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/app/**/*[username]*/page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:55.077Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:55.082Z
+Tool: Grep
+Input:
+{
+  "pattern": "reserved.*username|username.*reserved|RESERVED.*USERNAME",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:55.094Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/components/**/*profile*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:28:55.095Z
+Tool: Grep
+Input:
+{
+  "pattern": "eq\\(users\\.username",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:06.933Z
+Tool: Grep
+Input:
+{
+  "pattern": "checkUsername|isUsername|validateUsername|username.*available|username.*check",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:06.941Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\users\\[userId]\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:06.942Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/db/migrations/**/*.sql"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:06.952Z
+Tool: Grep
+Input:
+{
+  "pattern": "displayName|display_name",
+  "glob": "**/*.tsx",
+  "output_mode": "files_with_matches",
+  "head_limit": 10
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:06.959Z
+Tool: Grep
+Input:
+{
+  "pattern": "profile.*edit|edit.*profile|update.*profile",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:18.480Z
+Tool: Grep
+Input:
+{
+  "pattern": "settings.*form|form.*settings|SettingsForm|ProfileForm",
+  "output_mode": "files_with_matches",
+  "-i": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:18.493Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\20250906001344_spicy_jean_grey.sql"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:18.497Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/components/feature/user*/**/*.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:18.496Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\settings\\notifications\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:18.496Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\app\\(app)\\settings\\privacy\\page.tsx"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:31.895Z
+Tool: Grep
+Input:
+{
+  "pattern": "role.*enum|USER.*ROLE",
+  "glob": "**/constants/**/*.ts",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:31.896Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/actions/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:31.899Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\defaults.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:31.901Z
+Tool: Grep
+Input:
+{
+  "pattern": "admin|dashboard|settings",
+  "glob": "**/.claudeignore",
+  "output_mode": "content",
+  "head_limit": 5
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:42.628Z
+Tool: Grep
+Input:
+{
+  "pattern": "\\/users\\/|users\\[userId\\]|profile|user.*page",
+  "glob": "**/app/**/*.tsx",
+  "output_mode": "files_with_matches",
+  "head_limit": 15
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:42.631Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\enums.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:29:42.642Z
+Tool: Grep
+Input:
+{
+  "pattern": "class.*UsersFacade|getUserBy",
+  "glob": "**/facades/**/*.ts",
+  "output_mode": "content",
+  "-C": 3
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:30:50.820Z
+Tool: AskUserQuestion
+Input:
+{
+  "questions": [
+    {
+      "question": "How frequently should users be able to change their username?",
+      "header": "Change Rate",
+      "options": [
+        {
+          "label": "One-time setup only",
+          "description": "Users can set their username once when first created (current auto-generated username is placeholder). Cannot change after setting."
+        },
+        {
+          "label": "Limited changes (e.g., once per 30-90 days)",
+          "description": "Users can change username but with time-based rate limiting to prevent abuse and confusion."
+        },
+        {
+          "label": "Unlimited changes",
+          "description": "Users can change username anytime without restrictions (may allow impersonation/abuse)."
+        }
+      ],
+      "multiSelect": false
+    },
+    {
+      "question": "Should user profile URLs use usernames or remain ID-based?",
+      "header": "URL Structure",
+      "options": [
+        {
+          "label": "Keep ID-based (/users/user_abc123)",
+          "description": "Simpler implementation, no URL conflicts when username changes, but less user-friendly URLs."
+        },
+        {
+          "label": "Switch to username-based (/users/john_doe)",
+          "description": "More user-friendly and shareable URLs, but requires redirect handling when username changes."
+        }
+      ],
+      "multiSelect": false
+    },
+    {
+      "question": "Should we track username change history?",
+      "header": "History",
+      "options": [
+        {
+          "label": "No history tracking",
+          "description": "Simpler implementation. Old usernames can be immediately reused by other users."
+        },
+        {
+          "label": "Track previous usernames",
+          "description": "Prevents confusion, supports redirects from old usernames, and prevents impersonation. Requires additional database table."
+        }
+      ],
+      "multiSelect": false
+    },
+    {
+      "question": "Where should the username change/setup feature be accessible?",
+      "header": "Location",
+      "options": [
+        {
+          "label": "Settings page (/settings/profile)",
+          "description": "Standard location for profile edits alongside other user settings."
+        },
+        {
+          "label": "Onboarding flow (first login)",
+          "description": "Prompt new users to customize their auto-generated username during first-time setup."
+        },
+        {
+          "label": "Profile page edit button",
+          "description": "Quick access from public profile view for editing username and other profile fields."
+        }
+      ],
+      "multiSelect": true
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:34:48.426Z
+Tool: ExitPlanMode
+Input:
+{
+  "plan": "# Custom Username Implementation Plan\n\n## Overview\nEnable users to set and update their custom usernames with rate limiting (once per 30-90 days). Accessible during onboarding and from profile page.\n\n## Phase 1: Database Schema Updates\n\n### Add Username Change Tracking\n- **Add to `users` table**: `usernameChangedAt` (timestamp, nullable)\n- **Migration**: Backfill existing users with `NULL` (allows immediate first change)\n- No username history table needed (per requirements)\n\n## Phase 2: Backend Foundation\n\n### 2.1 Constants & Validation\n- **Reserved usernames list** (`src/lib/constants/reserved-usernames.ts`): admin, moderator, system, api, help, support, etc.\n- **Rate limit constant**: `USERNAME_CHANGE_COOLDOWN_DAYS = 90` in `src/lib/constants/schema-limits.ts`\n- **Enhanced validation** (`src/lib/validations/users.validation.ts`):\n  - Check reserved usernames\n  - Existing format validation (alphanumeric + underscore, 3-50 chars)\n  - Add `updateUsernameSchema` with cooldown check\n\n### 2.2 Database Queries\n- **Add to `UsersQuery`** (`src/lib/queries/users/users-query.ts`):\n  - `findByUsernameAsync(username)` - Check username existence\n  - `checkUsernameAvailableAsync(username, excludeUserId?)` - Availability check\n  - Update cached queries to include `usernameChangedAt`\n\n### 2.3 Facade Layer\n- **Add to `UsersFacade`** (`src/lib/facades/users/users.facade.ts`):\n  - `getUserByUsername(username)` - Wrapper for query\n  - `isUsernameAvailable(username, excludeUserId?)` - Check availability\n  - `canChangeUsername(userId)` - Check if cooldown period passed\n  - `updateUsername(userId, newUsername)` - Update with timestamp\n\n### 2.4 Server Actions\n- **Create `src/lib/actions/users/update-username.action.ts`**:\n  - `checkUsernameAvailability(username)` - Public action for real-time checks\n  - `updateUsername(newUsername)` - Authenticated action with validations:\n    1. Check cooldown period\n    2. Validate format & reserved list\n    3. Check availability\n    4. Update username + set `usernameChangedAt`\n    5. Invalidate user cache\n\n## Phase 3: UI Components\n\n### 3.1 Username Form Component\n- **Create `src/components/feature/user/username-form.tsx`**:\n  - Input field with format validation\n  - Real-time availability checking (debounced)\n  - Visual feedback (available/taken/invalid)\n  - Cooldown timer display\n  - Save button with loading state\n  - Error handling & success messages\n\n### 3.2 Profile Settings Page\n- **Update `src/app/(app)/settings/profile/page.tsx`**:\n  - Display current username\n  - Embed UsernameForm component\n  - Show last changed date\n  - Show next available change date if in cooldown\n  - Display other profile fields (displayName, bio, avatar)\n\n### 3.3 Profile Page Edit\n- **Update `src/app/(app)/users/[userId]/page.tsx`**:\n  - Add \"Edit Profile\" button (only for own profile)\n  - Links to `/settings/profile` for edits\n  - Display username prominently in profile header\n\n## Phase 4: Onboarding Flow\n\n### 4.1 First Login Detection\n- **Add onboarding state check**:\n  - Check if `usernameChangedAt IS NULL` → First login\n  - Show username customization prompt\n\n### 4.2 Onboarding Dialog/Page\n- **Create `src/components/feature/user/username-onboarding-dialog.tsx`**:\n  - Modal/dialog shown on first login\n  - Explains auto-generated username\n  - Embedded UsernameForm\n  - \"Keep current\" and \"Customize\" options\n  - Dismissible (can skip and change later)\n\n### 4.3 Integration\n- **Add to `src/app/(app)/layout.tsx` or dashboard**:\n  - Check onboarding state on authenticated load\n  - Show dialog if first login\n  - Set `usernameChangedAt` on skip or customize\n\n## Phase 5: Cache Management\n\n### Update Cache Invalidation\n- **Modify `CacheService.users.profile()`**:\n  - Invalidate cache on username update\n  - Keep ID-based cache keys (no URL changes needed)\n\n## Phase 6: Testing\n\n### Unit Tests\n- Username validation (format, reserved, length)\n- Cooldown period calculation\n- Availability checking\n- Reserved username blocking\n\n### Integration Tests\n- Update username action (happy path)\n- Rate limiting enforcement (reject within cooldown)\n- Duplicate username prevention\n- Cache invalidation verification\n\n### E2E Tests\n- First login onboarding flow\n- Username change from settings page\n- Real-time availability checking\n- Cooldown timer display\n\n## Implementation Order\n\n1. ✅ Database migration (add `usernameChangedAt`)\n2. ✅ Constants & reserved usernames list\n3. ✅ Database queries & facade methods\n4. ✅ Server actions (check availability, update username)\n5. ✅ Username form component\n6. ✅ Profile settings page\n7. ✅ Onboarding dialog component\n8. ✅ Onboarding integration\n9. ✅ Profile page updates (display username, edit button)\n10. ✅ Cache invalidation\n11. ✅ Testing (unit → integration → E2E)\n12. ✅ Format code & type check\n\n## Files to Create/Modify\n\n### Create New Files (11)\n- `src/lib/db/migrations/XXXX_add_username_changed_at.sql`\n- `src/lib/constants/reserved-usernames.ts`\n- `src/lib/actions/users/update-username.action.ts`\n- `src/lib/actions/users/check-username-availability.action.ts`\n- `src/components/feature/user/username-form.tsx`\n- `src/components/feature/user/username-onboarding-dialog.tsx`\n- `tests/unit/validations/users.validation.test.ts`\n- `tests/integration/actions/update-username.test.ts`\n- `tests/e2e/username-onboarding.spec.ts`\n\n### Modify Existing Files (8)\n- `src/lib/constants/schema-limits.ts` (add cooldown constant)\n- `src/lib/validations/users.validation.ts` (enhanced validation)\n- `src/lib/queries/users/users-query.ts` (add username queries)\n- `src/lib/facades/users/users.facade.ts` (add username methods)\n- `src/app/(app)/settings/profile/page.tsx` (build profile settings UI)\n- `src/app/(app)/users/[userId]/page.tsx` (add edit button, display username)\n- `src/app/(app)/layout.tsx` or dashboard (onboarding integration)\n- `src/lib/db/schema/users.schema.ts` (add usernameChangedAt field)\n\n## Success Criteria\n- ✅ New users see onboarding prompt to customize username\n- ✅ Users can update username from settings (respects 90-day cooldown)\n- ✅ Real-time availability checking works without lag\n- ✅ Reserved usernames are blocked\n- ✅ Cooldown timer accurately shows next available change date\n- ✅ Profile page displays username prominently\n- ✅ All tests pass (unit, integration, E2E)\n- ✅ Type checking passes\n- ✅ Code formatted with Prettier"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:39:15.921Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add database migration for usernameChangedAt field",
+      "status": "pending",
+      "activeForm": "Adding database migration for usernameChangedAt field"
+    },
+    {
+      "content": "Create reserved usernames constants list",
+      "status": "pending",
+      "activeForm": "Creating reserved usernames constants list"
+    },
+    {
+      "content": "Update schema limits with cooldown constant",
+      "status": "pending",
+      "activeForm": "Updating schema limits with cooldown constant"
+    },
+    {
+      "content": "Add usernameChangedAt to users schema",
+      "status": "pending",
+      "activeForm": "Adding usernameChangedAt to users schema"
+    },
+    {
+      "content": "Enhance users validation schema",
+      "status": "pending",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:39:30.349Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add database migration for usernameChangedAt field",
+      "status": "in_progress",
+      "activeForm": "Adding database migration for usernameChangedAt field"
+    },
+    {
+      "content": "Create reserved usernames constants list",
+      "status": "pending",
+      "activeForm": "Creating reserved usernames constants list"
+    },
+    {
+      "content": "Update schema limits with cooldown constant",
+      "status": "pending",
+      "activeForm": "Updating schema limits with cooldown constant"
+    },
+    {
+      "content": "Add usernameChangedAt to users schema",
+      "status": "pending",
+      "activeForm": "Adding usernameChangedAt to users schema"
+    },
+    {
+      "content": "Enhance users validation schema",
+      "status": "pending",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:39:34.939Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:39:42.914Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts",
+  "old_string": "    updatedAt: timestamp('updated_at').defaultNow().notNull(),\n    username: varchar('username', { length: SCHEMA_LIMITS.USER.USERNAME.MAX }).notNull().unique(),\n  },",
+  "new_string": "    updatedAt: timestamp('updated_at').defaultNow().notNull(),\n    username: varchar('username', { length: SCHEMA_LIMITS.USER.USERNAME.MAX }).notNull().unique(),\n    usernameChangedAt: timestamp('username_changed_at'),\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:39:56.603Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add database migration for usernameChangedAt field",
+      "status": "in_progress",
+      "activeForm": "Adding database migration for usernameChangedAt field"
+    },
+    {
+      "content": "Create reserved usernames constants list",
+      "status": "pending",
+      "activeForm": "Creating reserved usernames constants list"
+    },
+    {
+      "content": "Update schema limits with cooldown constant",
+      "status": "pending",
+      "activeForm": "Updating schema limits with cooldown constant"
+    },
+    {
+      "content": "Add usernameChangedAt to users schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt to users schema"
+    },
+    {
+      "content": "Enhance users validation schema",
+      "status": "pending",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:40:00.311Z
+Tool: Bash
+Input:
+{
+  "command": "npm run db:generate",
+  "description": "Generate database migration for usernameChangedAt field"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:40:17.512Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\20251110004013_thick_kulan_gath.sql"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:40:32.060Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add database migration for usernameChangedAt field",
+      "status": "completed",
+      "activeForm": "Adding database migration for usernameChangedAt field"
+    },
+    {
+      "content": "Create reserved usernames constants list",
+      "status": "in_progress",
+      "activeForm": "Creating reserved usernames constants list"
+    },
+    {
+      "content": "Update schema limits with cooldown constant",
+      "status": "pending",
+      "activeForm": "Updating schema limits with cooldown constant"
+    },
+    {
+      "content": "Enhance users validation schema",
+      "status": "pending",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:40:36.146Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/constants/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:40:49.807Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\reserved-usernames.ts",
+  "content": "/**\n * Reserved usernames that cannot be used by regular users\n * to prevent conflicts with system routes, features, and common terms\n */\nexport const RESERVED_USERNAMES = [\n  // System/Admin\n  'admin',\n  'administrator',\n  'moderator',\n  'mod',\n  'system',\n  'root',\n  'superuser',\n  'support',\n  'help',\n  'helpdesk',\n\n  // API/Technical\n  'api',\n  'app',\n  'assets',\n  'cdn',\n  'static',\n  'public',\n  'private',\n  'auth',\n  'oauth',\n  'login',\n  'logout',\n  'signin',\n  'signout',\n  'signup',\n  'register',\n  'webhook',\n  'webhooks',\n  'callback',\n\n  // Application Routes\n  'dashboard',\n  'settings',\n  'profile',\n  'account',\n  'accounts',\n  'user',\n  'users',\n  'collections',\n  'collection',\n  'bobbleheads',\n  'bobblehead',\n  'browse',\n  'search',\n  'explore',\n  'discover',\n  'trending',\n  'featured',\n  'notifications',\n  'messages',\n  'inbox',\n  'about',\n  'terms',\n  'privacy',\n  'contact',\n  'faq',\n  'blog',\n  'news',\n  'updates',\n\n  // Common Terms (avoid confusion/impersonation)\n  'headshakers',\n  'head_shakers',\n  'official',\n  'verified',\n  'staff',\n  'team',\n  'null',\n  'undefined',\n  'true',\n  'false',\n  'test',\n  'demo',\n  'example',\n  'sample',\n\n  // Potentially Offensive (basic list)\n  'abuse',\n  'spam',\n  'scam',\n  'phishing',\n] as const;\n\n/**\n * Check if a username is reserved\n * @param username - Username to check (case-insensitive)\n * @returns true if username is reserved\n */\nexport function isReservedUsername(username: string): boolean {\n  const normalized = username.toLowerCase().trim();\n  return RESERVED_USERNAMES.includes(normalized as (typeof RESERVED_USERNAMES)[number]);\n}\n"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:02.861Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Create reserved usernames constants list",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants list"
+    },
+    {
+      "content": "Update schema limits with cooldown constant",
+      "status": "in_progress",
+      "activeForm": "Updating schema limits with cooldown constant"
+    },
+    {
+      "content": "Enhance users validation schema",
+      "status": "pending",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:07.103Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\schema-limits.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:15.214Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\schema-limits.ts",
+  "old_string": "  USER: {\n    AVATAR_URL: { MAX: 500 },\n    BIO: { MAX: 500 },\n    CLERK_ID: { MAX: 255 },\n    DISPLAY_NAME: { MAX: 100, MIN: 1 },\n    EMAIL: { MAX: 255 },\n    LOCATION: { MAX: 100 },\n    USERNAME: { MAX: 50, MIN: 3 },\n  },",
+  "new_string": "  USER: {\n    AVATAR_URL: { MAX: 500 },\n    BIO: { MAX: 500 },\n    CLERK_ID: { MAX: 255 },\n    DISPLAY_NAME: { MAX: 100, MIN: 1 },\n    EMAIL: { MAX: 255 },\n    LOCATION: { MAX: 100 },\n    USERNAME: { MAX: 50, MIN: 3 },\n    USERNAME_CHANGE_COOLDOWN_DAYS: 90,\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:28.369Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Update schema limits with cooldown constant",
+      "status": "completed",
+      "activeForm": "Updating schema limits with cooldown constant"
+    },
+    {
+      "content": "Enhance users validation schema",
+      "status": "in_progress",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:32.893Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:40.967Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts",
+  "old_string": "import { createInsertSchema, createSelectSchema } from 'drizzle-zod';\nimport z from 'zod';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';",
+  "new_string": "import { createInsertSchema, createSelectSchema } from 'drizzle-zod';\nimport z from 'zod';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';\nimport { isReservedUsername } from '@/lib/constants/reserved-usernames';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:50.378Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts",
+  "old_string": "export const updateUserSchema = insertUserSchema.partial();\n\nexport const selectUserSessionSchema = createSelectSchema(userSessions);",
+  "new_string": "export const updateUserSchema = insertUserSchema.partial();\n\n/**\n * Schema for updating username with enhanced validation\n */\nexport const updateUsernameSchema = z.object({\n  username: z\n    .string()\n    .min(SCHEMA_LIMITS.USER.USERNAME.MIN, {\n      message: `Username must be at least ${SCHEMA_LIMITS.USER.USERNAME.MIN} characters`,\n    })\n    .max(SCHEMA_LIMITS.USER.USERNAME.MAX, {\n      message: `Username must be at most ${SCHEMA_LIMITS.USER.USERNAME.MAX} characters`,\n    })\n    .regex(/^[a-zA-Z0-9_]+$/, {\n      message: 'Username can only contain letters, numbers, and underscores',\n    })\n    .refine((username) => !isReservedUsername(username), {\n      message: 'This username is reserved and cannot be used',\n    }),\n});\n\n/**\n * Schema for checking username availability (used by client for real-time checks)\n */\nexport const checkUsernameAvailabilitySchema = z.object({\n  username: z\n    .string()\n    .min(SCHEMA_LIMITS.USER.USERNAME.MIN)\n    .max(SCHEMA_LIMITS.USER.USERNAME.MAX)\n    .regex(/^[a-zA-Z0-9_]+$/),\n});\n\nexport const selectUserSessionSchema = createSelectSchema(userSessions);"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:41:58.197Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts",
+  "old_string": "export type UpdateNotificationSettings = z.infer<typeof updateNotificationSettingsSchema>;\nexport type UpdateUser = z.infer<typeof updateUserSchema>;\n\nexport type UpdateUserSession = z.infer<typeof updateUserSessionSchema>;\nexport type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;",
+  "new_string": "export type UpdateNotificationSettings = z.infer<typeof updateNotificationSettingsSchema>;\nexport type UpdateUser = z.infer<typeof updateUserSchema>;\nexport type UpdateUsername = z.infer<typeof updateUsernameSchema>;\nexport type CheckUsernameAvailability = z.infer<typeof checkUsernameAvailabilitySchema>;\n\nexport type UpdateUserSession = z.infer<typeof updateUserSessionSchema>;\nexport type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:42:10.774Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Enhance users validation schema",
+      "status": "completed",
+      "activeForm": "Enhancing users validation schema"
+    },
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "in_progress",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:42:16.954Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\users\\users-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:42:28.859Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\users\\users-query.ts",
+  "old_string": "  /**\n   * find user by user id\n   */\n  static async findByIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);\n\n    return result[0] || null;\n  }\n}",
+  "new_string": "  /**\n   * find user by user id\n   */\n  static async findByIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);\n\n    return result[0] || null;\n  }\n\n  /**\n   * find user by username\n   */\n  static async findByUsernameAsync(username: string, context: QueryContext): Promise<null | UserRecord> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select().from(users).where(eq(users.username, username)).limit(1);\n\n    return result[0] || null;\n  }\n\n  /**\n   * check if username exists (excluding a specific user id for updates)\n   */\n  static async checkUsernameExistsAsync(\n    username: string,\n    excludeUserId: string | undefined,\n    context: QueryContext,\n  ): Promise<boolean> {\n    const dbInstance = this.getDbInstance(context);\n\n    const query = dbInstance.select({ id: users.id }).from(users).where(eq(users.username, username));\n\n    const result = await query.limit(1);\n\n    // If no user found, username is available\n    if (!result[0]) return false;\n\n    // If found user is the excluded user, username is available for them\n    if (excludeUserId && result[0].id === excludeUserId) return false;\n\n    // Otherwise, username exists and is taken\n    return true;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:42:41.439Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add username queries to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding username queries to UsersQuery"
+    },
+    {
+      "content": "Add username methods to UsersFacade",
+      "status": "in_progress",
+      "activeForm": "Adding username methods to UsersFacade"
+    },
+    {
+      "content": "Create check-username-availability server action",
+      "status": "pending",
+      "activeForm": "Creating check-username-availability server action"
+    },
+    {
+      "content": "Create update-username server action",
+      "status": "pending",
+      "activeForm": "Creating update-username server action"
+    },
+    {
+      "content": "Create UsernameForm component with TanStack Form",
+      "status": "pending",
+      "activeForm": "Creating UsernameForm component with TanStack Form"
+    },
+    {
+      "content": "Build profile settings page as server component with Suspense",
+      "status": "pending",
+      "activeForm": "Building profile settings page as server component with Suspense"
+    },
+    {
+      "content": "Create username onboarding dialog component",
+      "status": "pending",
+      "activeForm": "Creating username onboarding dialog component"
+    },
+    {
+      "content": "Integrate onboarding check in dashboard/layout",
+      "status": "pending",
+      "activeForm": "Integrating onboarding check in dashboard/layout"
+    },
+    {
+      "content": "Update profile page to display username and edit button",
+      "status": "pending",
+      "activeForm": "Updating profile page to display username and edit button"
+    },
+    {
+      "content": "Add cache invalidation for username updates",
+      "status": "pending",
+      "activeForm": "Adding cache invalidation for username updates"
+    },
+    {
+      "content": "Run database migration",
+      "status": "pending",
+      "activeForm": "Running database migration"
+    },
+    {
+      "content": "Run type checking and fix any errors",
+      "status": "pending",
+      "activeForm": "Running type checking and fixing any errors"
+    },
+    {
+      "content": "Format all code with Prettier",
+      "status": "pending",
+      "activeForm": "Formatting all code with Prettier"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:42:46.993Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:42:55.991Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts",
+  "old_string": "import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { type UserRecord, UsersQuery } from '@/lib/queries/users/users-query';\nimport { CacheService } from '@/lib/services/cache.service';",
+  "new_string": "import { eq } from 'drizzle-orm';\n\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';\nimport { users } from '@/lib/db/schema';\nimport { createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { type UserRecord, UsersQuery } from '@/lib/queries/users/users-query';\nimport { CacheService } from '@/lib/services/cache.service';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:43:14.360Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts",
+  "old_string": "  /**\n   * get user by user ID\n   */\n  static async getUserById(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {\n    return CacheService.users.profile(\n      () => {\n        const context = createPublicQueryContext({ dbInstance });\n        return UsersQuery.findByIdAsync(userId, context);\n      },\n      userId,\n      { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },\n    );\n  }\n}",
+  "new_string": "  /**\n   * get user by user ID\n   */\n  static async getUserById(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {\n    return CacheService.users.profile(\n      () => {\n        const context = createPublicQueryContext({ dbInstance });\n        return UsersQuery.findByIdAsync(userId, context);\n      },\n      userId,\n      { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },\n    );\n  }\n\n  /**\n   * get user by username\n   */\n  static async getUserByUsername(username: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {\n    const context = createPublicQueryContext({ dbInstance });\n    return UsersQuery.findByUsernameAsync(username, context);\n  }\n\n  /**\n   * check if username is available (not taken by another user)\n   */\n  static async isUsernameAvailable(\n    username: string,\n    excludeUserId?: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<boolean> {\n    const context = createPublicQueryContext({ dbInstance });\n    const exists = await UsersQuery.checkUsernameExistsAsync(username, excludeUserId, context);\n    return !exists;\n  }\n\n  /**\n   * check if user can change their username (cooldown period has passed)\n   */\n  static async canChangeUsername(userId: string, dbInstance?: DatabaseExecutor): Promise<boolean> {\n    const user = await this.getUserById(userId, dbInstance);\n    if (!user) return false;\n\n    // If user has never changed username, they can change it\n    if (!user.usernameChangedAt) return true;\n\n    // Calculate if cooldown period has passed\n    const cooldownMs = SCHEMA_LIMITS.USER.USERNAME_CHANGE_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;\n    const timeSinceLastChange = Date.now() - new Date(user.usernameChangedAt).getTime();\n\n    return timeSinceLastChange >= cooldownMs;\n  }\n\n  /**\n   * get days remaining until user can change username again\n   */\n  static async getDaysUntilUsernameChangeAllowed(\n    userId: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<number> {\n    const user = await this.getUserById(userId, dbInstance);\n    if (!user || !user.usernameChangedAt) return 0;\n\n    const cooldownMs = SCHEMA_LIMITS.USER.USERNAME_CHANGE_COOLDOWN_DAYS * 24 * 60 * 60 * 1000;\n    const timeSinceLastChange = Date.now() - new Date(user.usernameChangedAt).getTime();\n    const timeRemaining = cooldownMs - timeSinceLastChange;\n\n    if (timeRemaining <= 0) return 0;\n\n    return Math.ceil(timeRemaining / (24 * 60 * 60 * 1000));\n  }\n\n  /**\n   * update username and set usernameChangedAt timestamp\n   */\n  static async updateUsername(\n    userId: string,\n    newUsername: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<UserRecord> {\n    const context = createPublicQueryContext({ dbInstance });\n    const db = context.dbInstance;\n\n    const [updatedUser] = await db\n      .update(users)\n      .set({\n        username: newUsername,\n        usernameChangedAt: new Date(),\n        updatedAt: new Date(),\n      })\n      .where(eq(users.id, userId))\n      .returning();\n\n    if (!updatedUser) {\n      throw new Error('Failed to update username');\n    }\n\n    // Invalidate user cache\n    await CacheService.users.invalidateProfile(userId);\n\n    return updatedUser;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:09.412Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "in_progress",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "pending",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "pending",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "pending",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:14.828Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/users.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:14.828Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:21.460Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/db/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:26.671Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:35.729Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\schema\\users.schema.ts",
+  "old_string": "    updatedAt: timestamp('updated_at').defaultNow().notNull(),\n    username: varchar('username', { length: SCHEMA_LIMITS.USER.USERNAME.MAX }).notNull().unique(),\n  },",
+  "new_string": "    updatedAt: timestamp('updated_at').defaultNow().notNull(),\n    username: varchar('username', { length: SCHEMA_LIMITS.USER.USERNAME.MAX }).notNull().unique(),\n    usernameChangedAt: timestamp('username_changed_at'),\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:49.247Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "in_progress",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "pending",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "pending",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:49.674Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/constants/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:48:55.376Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\schema-limits.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:04.479Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\schema-limits.ts",
+  "old_string": "  USER: {\n    AVATAR_URL: { MAX: 500 },\n    BIO: { MAX: 500 },\n    CLERK_ID: { MAX: 255 },\n    DISPLAY_NAME: { MAX: 100, MIN: 1 },\n    EMAIL: { MAX: 255 },\n    LOCATION: { MAX: 100 },\n    USERNAME: { MAX: 50, MIN: 3 },\n  },",
+  "new_string": "  USER: {\n    AVATAR_URL: { MAX: 500 },\n    BIO: { MAX: 500 },\n    CLERK_ID: { MAX: 255 },\n    DISPLAY_NAME: { MAX: 100, MIN: 1 },\n    EMAIL: { MAX: 255 },\n    LOCATION: { MAX: 100 },\n    USERNAME: { MAX: 50, MIN: 3 },\n    USERNAME_CHANGE_COOLDOWN_DAYS: 90,\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:26.012Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "in_progress",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "pending",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:26.497Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\reserved-usernames.ts",
+  "content": "/**\n * Reserved usernames that cannot be used by regular users\n * Includes system routes, admin pages, and protected terms\n */\nexport const RESERVED_USERNAMES = [\n  // System and admin routes\n  'admin',\n  'administrator',\n  'moderator',\n  'mod',\n  'support',\n  'help',\n  'system',\n  'root',\n  'api',\n  'auth',\n\n  // App routes\n  'dashboard',\n  'bobbleheads',\n  'collections',\n  'profile',\n  'settings',\n  'notifications',\n  'messages',\n  'search',\n  'explore',\n  'trending',\n  'featured',\n  'discover',\n\n  // Public routes\n  'about',\n  'terms',\n  'privacy',\n  'contact',\n  'faq',\n  'help',\n  'blog',\n  'news',\n  'legal',\n  'careers',\n  'jobs',\n\n  // Authentication routes\n  'login',\n  'logout',\n  'signup',\n  'signin',\n  'signout',\n  'register',\n  'verify',\n  'reset',\n  'password',\n  'forgot',\n\n  // API and special routes\n  'api',\n  'oauth',\n  'callback',\n  'webhook',\n  'webhooks',\n  'health',\n  'status',\n  'metrics',\n\n  // Protected terms\n  'headshakers',\n  'head-shakers',\n  'official',\n  'verified',\n  'team',\n  'staff',\n  'employee',\n\n  // Common system terms\n  'www',\n  'mail',\n  'email',\n  'smtp',\n  'ftp',\n  'ssh',\n  'cdn',\n  'static',\n  'assets',\n  'images',\n  'uploads',\n  'files',\n  'public',\n  'private',\n\n  // Reserved for future use\n  'shop',\n  'store',\n  'marketplace',\n  'premium',\n  'pro',\n  'enterprise',\n  'business',\n\n  // Prevent impersonation\n  'null',\n  'undefined',\n  'admin',\n  'administrator',\n  'owner',\n  'founder',\n  'ceo',\n  'cto',\n] as const;\n\n/**\n * Check if a username is reserved (case-insensitive)\n */\nexport function isReservedUsername(username: string): boolean {\n  return RESERVED_USERNAMES.includes(username.toLowerCase() as (typeof RESERVED_USERNAMES)[number]);\n}\n"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:39.690Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "in_progress",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "pending",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "pending",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:40.100Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/queries/**/*users*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:45.438Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\users\\users-query.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:49:56.030Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\users\\users-query.ts",
+  "old_string": "  /**\n   * find user by user id\n   */\n  static async findByIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);\n\n    return result[0] || null;\n  }\n}",
+  "new_string": "  /**\n   * find user by user id\n   */\n  static async findByIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);\n\n    return result[0] || null;\n  }\n\n  /**\n   * find user by username\n   */\n  static async findByUsernameAsync(username: string, context: QueryContext): Promise<null | UserRecord> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select().from(users).where(eq(users.username, username)).limit(1);\n\n    return result[0] || null;\n  }\n\n  /**\n   * check if username exists, optionally excluding a specific user\n   */\n  static async checkUsernameExistsAsync(\n    username: string,\n    context: QueryContext,\n    excludeUserId?: string,\n  ): Promise<boolean> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);\n\n    if (result.length === 0) {\n      return false;\n    }\n\n    // If we found a user with this username and we're excluding a specific user,\n    // check if the found user is the one we're excluding\n    if (excludeUserId && result[0].id === excludeUserId) {\n      return false;\n    }\n\n    return true;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:09.981Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "in_progress",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "pending",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "pending",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:10.423Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/facades/**/*users*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:16.463Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:27.239Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts",
+  "old_string": "import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { type UserRecord, UsersQuery } from '@/lib/queries/users/users-query';\nimport { CacheService } from '@/lib/services/cache.service';",
+  "new_string": "import { eq } from 'drizzle-orm';\n\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';\nimport { isReservedUsername } from '@/lib/constants/reserved-usernames';\nimport { users } from '@/lib/db/schema';\nimport { createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { type UserRecord, UsersQuery } from '@/lib/queries/users/users-query';\nimport { CacheService } from '@/lib/services/cache.service';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:44.566Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts",
+  "old_string": "  /**\n   * get user by user ID\n   */\n  static async getUserById(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {\n    return CacheService.users.profile(\n      () => {\n        const context = createPublicQueryContext({ dbInstance });\n        return UsersQuery.findByIdAsync(userId, context);\n      },\n      userId,\n      { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },\n    );\n  }\n}",
+  "new_string": "  /**\n   * get user by user ID\n   */\n  static async getUserById(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {\n    return CacheService.users.profile(\n      () => {\n        const context = createPublicQueryContext({ dbInstance });\n        return UsersQuery.findByIdAsync(userId, context);\n      },\n      userId,\n      { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },\n    );\n  }\n\n  /**\n   * get user by username\n   */\n  static async getUserByUsername(username: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {\n    const context = createPublicQueryContext({ dbInstance });\n    return UsersQuery.findByUsernameAsync(username, context);\n  }\n\n  /**\n   * check if username is available (not taken and not reserved)\n   * optionally exclude a specific user (for username changes)\n   */\n  static async isUsernameAvailable(\n    username: string,\n    excludeUserId?: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<boolean> {\n    // Check if username is reserved\n    if (isReservedUsername(username)) {\n      return false;\n    }\n\n    // Check if username is taken by another user\n    const context = createPublicQueryContext({ dbInstance });\n    const exists = await UsersQuery.checkUsernameExistsAsync(username, context, excludeUserId);\n\n    return !exists;\n  }\n\n  /**\n   * check if user can change their username (cooldown period has passed)\n   */\n  static async canChangeUsername(userId: string, dbInstance?: DatabaseExecutor): Promise<boolean> {\n    const user = await this.getUserById(userId, dbInstance);\n\n    if (!user) {\n      return false;\n    }\n\n    // If user has never changed their username, they can change it\n    if (!user.usernameChangedAt) {\n      return true;\n    }\n\n    const daysSinceLastChange = this.getDaysUntilUsernameChangeAllowed(user);\n\n    return daysSinceLastChange <= 0;\n  }\n\n  /**\n   * get days until user can change their username\n   * returns 0 or negative if user can change now\n   */\n  static getDaysUntilUsernameChangeAllowed(user: UserRecord): number {\n    if (!user.usernameChangedAt) {\n      return 0;\n    }\n\n    const daysSinceLastChange = Math.floor(\n      (Date.now() - user.usernameChangedAt.getTime()) / (1000 * 60 * 60 * 24),\n    );\n\n    return SCHEMA_LIMITS.USER.USERNAME_CHANGE_COOLDOWN_DAYS - daysSinceLastChange;\n  }\n\n  /**\n   * update username and set usernameChangedAt timestamp\n   */\n  static async updateUsername(\n    userId: string,\n    newUsername: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<UserRecord> {\n    const context = createPublicQueryContext({ dbInstance });\n    const db = context.dbInstance;\n\n    const [updatedUser] = await db\n      .update(users)\n      .set({\n        username: newUsername,\n        usernameChangedAt: new Date(),\n        updatedAt: new Date(),\n      })\n      .where(eq(users.id, userId))\n      .returning();\n\n    // Invalidate cache for this user\n    await CacheService.users.invalidateByUserId(userId);\n\n    return updatedUser;\n  }\n}"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:57.209Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "in_progress",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "pending",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:50:57.634Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/validations/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:03.541Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:12.602Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts",
+  "old_string": "import { createInsertSchema, createSelectSchema } from 'drizzle-zod';\nimport z from 'zod';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';",
+  "new_string": "import { createInsertSchema, createSelectSchema } from 'drizzle-zod';\nimport z from 'zod';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';\nimport { isReservedUsername } from '@/lib/constants/reserved-usernames';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:24.128Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts",
+  "old_string": "export const selectUserActivitySchema = createSelectSchema(userActivity);\nexport const insertUserActivitySchema = createInsertSchema(userActivity, {\n  ipAddress: z.string().max(SCHEMA_LIMITS.USER_ACTIVITY.IP_ADDRESS.MAX).optional(),\n}).omit({\n  createdAt: true,\n  id: true,\n  userId: true,\n});\n\nexport type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;",
+  "new_string": "export const selectUserActivitySchema = createSelectSchema(userActivity);\nexport const insertUserActivitySchema = createInsertSchema(userActivity, {\n  ipAddress: z.string().max(SCHEMA_LIMITS.USER_ACTIVITY.IP_ADDRESS.MAX).optional(),\n}).omit({\n  createdAt: true,\n  id: true,\n  userId: true,\n});\n\n/**\n * Schema for checking username availability\n */\nexport const checkUsernameAvailabilitySchema = z.object({\n  username: z\n    .string()\n    .min(SCHEMA_LIMITS.USER.USERNAME.MIN, {\n      message: `Username must be at least ${SCHEMA_LIMITS.USER.USERNAME.MIN} characters`,\n    })\n    .max(SCHEMA_LIMITS.USER.USERNAME.MAX, {\n      message: `Username must be at most ${SCHEMA_LIMITS.USER.USERNAME.MAX} characters`,\n    })\n    .regex(/^[a-zA-Z0-9_]+$/, {\n      message: 'Username can only contain letters, numbers, and underscores',\n    })\n    .refine((username) => !isReservedUsername(username), {\n      message: 'This username is reserved and cannot be used',\n    }),\n});\n\n/**\n * Schema for updating username\n */\nexport const updateUsernameSchema = z.object({\n  username: z\n    .string()\n    .min(SCHEMA_LIMITS.USER.USERNAME.MIN, {\n      message: `Username must be at least ${SCHEMA_LIMITS.USER.USERNAME.MIN} characters`,\n    })\n    .max(SCHEMA_LIMITS.USER.USERNAME.MAX, {\n      message: `Username must be at most ${SCHEMA_LIMITS.USER.USERNAME.MAX} characters`,\n    })\n    .regex(/^[a-zA-Z0-9_]+$/, {\n      message: 'Username can only contain letters, numbers, and underscores',\n    })\n    .refine((username) => !isReservedUsername(username), {\n      message: 'This username is reserved and cannot be used',\n    }),\n});\n\nexport type InsertLoginHistory = z.infer<typeof insertLoginHistorySchema>;"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:33.742Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\validations\\users.validation.ts",
+  "old_string": "export type UpdateNotificationSettings = z.infer<typeof updateNotificationSettingsSchema>;\nexport type UpdateUser = z.infer<typeof updateUserSchema>;\n\nexport type UpdateUserSession = z.infer<typeof updateUserSessionSchema>;\nexport type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;",
+  "new_string": "export type UpdateNotificationSettings = z.infer<typeof updateNotificationSettingsSchema>;\nexport type UpdateUser = z.infer<typeof updateUserSchema>;\n\nexport type UpdateUserSession = z.infer<typeof updateUserSessionSchema>;\nexport type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;\n\nexport type CheckUsernameAvailability = z.infer<typeof checkUsernameAvailabilitySchema>;\nexport type UpdateUsername = z.infer<typeof updateUsernameSchema>;"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:46.976Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "completed",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "in_progress",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "pending",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "pending",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:47.462Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/actions/**/*user*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:52.483Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/actions/**/*.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:51:59.161Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\collections\\collections.actions.ts",
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:06.946Z
+Tool: Grep
+Input:
+{
+  "pattern": "publicActionClient",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:13.216Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\next-safe-action.ts",
+  "limit": 80
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:19.864Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\next-safe-action.ts",
+  "offset": 80
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:26.894Z
+Tool: Grep
+Input:
+{
+  "pattern": "export const ACTION_NAMES",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:33.159Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\action-names.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:41.644Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\action-names.ts",
+  "old_string": "  USERS: {\n    DELETE_ACCOUNT: 'deleteUserAccount',\n    UPDATE_NOTIFICATIONS: 'updateNotificationSettings',\n    UPDATE_PROFILE: 'updateUserProfile',\n    UPDATE_SETTINGS: 'updateUserSettings',\n  },",
+  "new_string": "  USERS: {\n    CHECK_USERNAME_AVAILABILITY: 'checkUsernameAvailability',\n    DELETE_ACCOUNT: 'deleteUserAccount',\n    UPDATE_NOTIFICATIONS: 'updateNotificationSettings',\n    UPDATE_PROFILE: 'updateUserProfile',\n    UPDATE_SETTINGS: 'updateUserSettings',\n    UPDATE_USERNAME: 'updateUsername',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:48.637Z
+Tool: Grep
+Input:
+{
+  "pattern": "export const ERROR_MESSAGES",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:52:55.069Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\error-messages.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:53:04.380Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\error-messages.ts",
+  "old_string": "  USER: {\n    DELETE_FAILED: 'Failed to delete user account',\n    EMAIL_TAKEN: 'Email address is already in use',\n    INVALID_USERNAME: 'Username contains invalid characters',\n    NOT_FOUND: 'User not found',\n    SETTINGS_UPDATE_FAILED: 'Failed to update user settings',\n    UPDATE_FAILED: 'Failed to update user profile',\n    USERNAME_TAKEN: 'Username is already taken',\n  },",
+  "new_string": "  USER: {\n    DELETE_FAILED: 'Failed to delete user account',\n    EMAIL_TAKEN: 'Email address is already in use',\n    INVALID_USERNAME: 'Username contains invalid characters',\n    NOT_FOUND: 'User not found',\n    SETTINGS_UPDATE_FAILED: 'Failed to update user settings',\n    UPDATE_FAILED: 'Failed to update user profile',\n    USERNAME_CHANGE_COOLDOWN: 'You can only change your username once every 90 days',\n    USERNAME_RESERVED: 'This username is reserved and cannot be used',\n    USERNAME_TAKEN: 'Username is already taken',\n    USERNAME_UPDATE_FAILED: 'Failed to update username',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:53:11.269Z
+Tool: Grep
+Input:
+{
+  "pattern": "export const ERROR_CODES",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:53:16.838Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\error-codes.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:53:25.512Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\error-codes.ts",
+  "old_string": "  USERS: {\n    DELETE_FAILED: 'USER_DELETE_FAILED',\n    INSUFFICIENT_PRIVILEGES: 'USER_INSUFFICIENT_PRIVILEGES',\n    NOT_FOUND: 'USER_NOT_FOUND',\n    UPDATE_FAILED: 'USER_UPDATE_FAILED',\n  },",
+  "new_string": "  USERS: {\n    DELETE_FAILED: 'USER_DELETE_FAILED',\n    INSUFFICIENT_PRIVILEGES: 'USER_INSUFFICIENT_PRIVILEGES',\n    NOT_FOUND: 'USER_NOT_FOUND',\n    UPDATE_FAILED: 'USER_UPDATE_FAILED',\n    USERNAME_CHANGE_COOLDOWN: 'USER_USERNAME_CHANGE_COOLDOWN',\n    USERNAME_RESERVED: 'USER_USERNAME_RESERVED',\n    USERNAME_TAKEN: 'USER_USERNAME_TAKEN',\n    USERNAME_UPDATE_FAILED: 'USER_USERNAME_UPDATE_FAILED',\n  },"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:53:48.076Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\users\\username.actions.ts",
+  "content": "'use server';\n\nimport 'server-only';\nimport * as Sentry from '@sentry/nextjs';\n\nimport {\n  ACTION_NAMES,\n  ERROR_CODES,\n  ERROR_MESSAGES,\n  SENTRY_BREADCRUMB_CATEGORIES,\n  SENTRY_CONTEXTS,\n  SENTRY_LEVELS,\n} from '@/lib/constants';\nimport { UsersFacade } from '@/lib/facades/users/users.facade';\nimport { handleActionError } from '@/lib/utils/action-error-handler';\nimport { ActionError, ErrorType } from '@/lib/utils/errors';\nimport { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';\nimport {\n  checkUsernameAvailabilitySchema,\n  updateUsernameSchema,\n} from '@/lib/validations/users.validation';\n\n/**\n * Check if username is available (public action)\n */\nexport const checkUsernameAvailabilityAction = publicActionClient\n  .metadata({\n    actionName: ACTION_NAMES.USERS.CHECK_USERNAME_AVAILABILITY,\n  })\n  .inputSchema(checkUsernameAvailabilitySchema)\n  .action(async ({ ctx }) => {\n    const { username } = checkUsernameAvailabilitySchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.addBreadcrumb({\n      category: SENTRY_BREADCRUMB_CATEGORIES.USERNAME,\n      level: SENTRY_LEVELS.INFO,\n      message: 'Checking username availability',\n      data: { username },\n    });\n\n    try {\n      const isAvailable = await UsersFacade.isUsernameAvailable(username, undefined, dbInstance);\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.USERNAME,\n        level: SENTRY_LEVELS.INFO,\n        message: 'Username availability check completed',\n        data: { isAvailable, username },\n      });\n\n      return {\n        available: isAvailable,\n      };\n    } catch (error) {\n      return handleActionError(error, {\n        action: ACTION_NAMES.USERS.CHECK_USERNAME_AVAILABILITY,\n        context: { username },\n      });\n    }\n  });\n\n/**\n * Update user's username (authenticated action)\n */\nexport const updateUsernameAction = authActionClient\n  .metadata({\n    actionName: ACTION_NAMES.USERS.UPDATE_USERNAME,\n    isTransactionRequired: true,\n  })\n  .inputSchema(updateUsernameSchema)\n  .action(async ({ ctx }) => {\n    const { username } = updateUsernameSchema.parse(ctx.sanitizedInput);\n    const dbInstance = ctx.tx ?? ctx.db;\n\n    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {\n      newUsername: username,\n      userId: ctx.userId,\n    });\n\n    try {\n      // Check if user can change username (cooldown period)\n      const canChange = await UsersFacade.canChangeUsername(ctx.userId, dbInstance);\n\n      if (!canChange) {\n        throw new ActionError(\n          ErrorType.BUSINESS_RULE,\n          ERROR_CODES.USERS.USERNAME_CHANGE_COOLDOWN,\n          ERROR_MESSAGES.USER.USERNAME_CHANGE_COOLDOWN,\n          { ctx },\n          false,\n          400,\n        );\n      }\n\n      // Check if username is available (excluding current user)\n      const isAvailable = await UsersFacade.isUsernameAvailable(username, ctx.userId, dbInstance);\n\n      if (!isAvailable) {\n        throw new ActionError(\n          ErrorType.BUSINESS_RULE,\n          ERROR_CODES.USERS.USERNAME_TAKEN,\n          ERROR_MESSAGES.USER.USERNAME_TAKEN,\n          { ctx },\n          false,\n          400,\n        );\n      }\n\n      // Update username\n      const updatedUser = await UsersFacade.updateUsername(ctx.userId, username, dbInstance);\n\n      if (!updatedUser) {\n        throw new ActionError(\n          ErrorType.INTERNAL,\n          ERROR_CODES.USERS.USERNAME_UPDATE_FAILED,\n          ERROR_MESSAGES.USER.USERNAME_UPDATE_FAILED,\n          { ctx },\n          false,\n          500,\n        );\n      }\n\n      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.USERNAME,\n        level: SENTRY_LEVELS.INFO,\n        message: 'Username updated successfully',\n        data: {\n          newUsername: username,\n          userId: ctx.userId,\n        },\n      });\n\n      return {\n        success: true,\n        user: updatedUser,\n      };\n    } catch (error) {\n      return handleActionError(error, {\n        action: ACTION_NAMES.USERS.UPDATE_USERNAME,\n        context: { newUsername: username, userId: ctx.userId },\n      });\n    }\n  });\n"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:53:59.990Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "completed",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "completed",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "in_progress",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:00.645Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\constants\\sentry.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:11.025Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\users\\username.actions.ts",
+  "old_string": "    Sentry.addBreadcrumb({\n      category: SENTRY_BREADCRUMB_CATEGORIES.USERNAME,\n      level: SENTRY_LEVELS.INFO,\n      message: 'Checking username availability',\n      data: { username },\n    });",
+  "new_string": "    Sentry.addBreadcrumb({\n      category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,\n      level: SENTRY_LEVELS.INFO,\n      message: 'Checking username availability',\n      data: { username },\n    });",
+  "replace_all": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:18.065Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\users\\username.actions.ts",
+  "old_string": "      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.USERNAME,\n        level: SENTRY_LEVELS.INFO,\n        message: 'Username availability check completed',\n        data: { isAvailable, username },\n      });",
+  "new_string": "      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,\n        level: SENTRY_LEVELS.INFO,\n        message: 'Username availability check completed',\n        data: { isAvailable, username },\n      });",
+  "replace_all": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:25.740Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\users\\username.actions.ts",
+  "old_string": "      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.USERNAME,\n        level: SENTRY_LEVELS.INFO,\n        message: 'Username updated successfully',\n        data: {\n          newUsername: username,\n          userId: ctx.userId,\n        },\n      });",
+  "new_string": "      Sentry.addBreadcrumb({\n        category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,\n        level: SENTRY_LEVELS.INFO,\n        message: 'Username updated successfully',\n        data: {\n          newUsername: username,\n          userId: ctx.userId,\n        },\n      });",
+  "replace_all": true
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:32.794Z
+Tool: Bash
+Input:
+{
+  "command": "npm run db:generate",
+  "timeout": 120000,
+  "description": "Generate database migration for usernameChangedAt field"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:41.333Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\20251110005435_daily_zombie.sql"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:49.390Z
+Tool: SlashCommand
+Input:
+{
+  "command": "/db run migration \"Add usernameChangedAt field to users table\""
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:56.752Z
+Tool: Task
+Input:
+{
+  "description": "Run database migration for username feature",
+  "prompt": "Run the database migration to add the usernameChangedAt field to the users table. The migration file is located at: src\\lib\\db\\migrations\\20251110005435_daily_zombie.sql\n\nThis migration adds:\n1. username_changed_at timestamp column to users table\n2. comment_count columns and indexes to collections and sub_collections tables (part of the same migration)\n\nPlease execute this migration on the development database branch and confirm success.",
+  "subagent_type": "neon-db-expert"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:54:59.252Z
+Tool: SlashCommand
+Input:
+{
+  "command": "/db run migration 20251110005435_daily_zombie"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:01.016Z
+Tool: SlashCommand
+Input:
+{
+  "command": "/db run migration 20251110005435_daily_zombie"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:03.696Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\20251110005435_daily_zombie.sql"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:07.043Z
+Tool: Bash
+Input:
+{
+  "command": "npm run db:migrate",
+  "description": "Execute database migration using Drizzle ORM"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:14.101Z
+Tool: Bash
+Input:
+{
+  "command": "npm run db:generate 2>&1 | head -50",
+  "description": "Generate schema to check current database state"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:19.219Z
+Tool: Bash
+Input:
+{
+  "command": "psql \"$DATABASE_URL\" -c \"SELECT * FROM __drizzle_migrations__ ORDER BY when DESC LIMIT 10;\" 2>&1",
+  "description": "Check applied migrations history"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:22.663Z
+Tool: Bash
+Input:
+{
+  "command": "ls -la \"C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\\" | grep -E \"\\.sql$\" | tail -20",
+  "description": "List recent migration files"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:25.611Z
+Tool: Glob
+Input:
+{
+  "pattern": "src/lib/db/migrations/*.sql",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:28.492Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\20251109151001_add_comment_count_to_collections.sql"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:34.579Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\db\\migrations\\20251110005435_daily_zombie.sql",
+  "old_string": "ALTER TABLE \"collections\" ADD COLUMN \"comment_count\" integer DEFAULT 0 NOT NULL;--> statement-breakpoint\nALTER TABLE \"sub_collections\" ADD COLUMN \"comment_count\" integer DEFAULT 0 NOT NULL;--> statement-breakpoint\nALTER TABLE \"users\" ADD COLUMN \"username_changed_at\" timestamp;--> statement-breakpoint\nCREATE INDEX \"collections_comment_count_desc_idx\" ON \"collections\" USING btree (\"comment_count\" DESC);--> statement-breakpoint\nCREATE INDEX \"collections_public_comment_count_idx\" ON \"collections\" USING btree (\"is_public\",\"comment_count\" DESC);--> statement-breakpoint\nCREATE INDEX \"sub_collections_comment_count_desc_idx\" ON \"sub_collections\" USING btree (\"comment_count\" DESC);--> statement-breakpoint\nCREATE INDEX \"sub_collections_public_comment_count_idx\" ON \"sub_collections\" USING btree (\"is_public\",\"comment_count\" DESC);--> statement-breakpoint\nALTER TABLE \"collections\" ADD CONSTRAINT \"collections_comment_count_non_negative\" CHECK (\"collections\".\"comment_count\" >= 0);--> statement-breakpoint\nALTER TABLE \"sub_collections\" ADD CONSTRAINT \"sub_collections_comment_count_non_negative\" CHECK (\"sub_collections\".\"comment_count\" >= 0);",
+  "new_string": "-- Add username_changed_at timestamp to users table\nALTER TABLE \"users\" ADD COLUMN \"username_changed_at\" timestamp;--> statement-breakpoint"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:37.799Z
+Tool: Bash
+Input:
+{
+  "command": "npm run db:migrate",
+  "description": "Execute database migration using Drizzle ORM"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:43.072Z
+Tool: Bash
+Input:
+{
+  "command": "npm run db:generate 2>&1 | grep -A 2 \"^users\"",
+  "description": "Verify users table schema"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:58.624Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "completed",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "completed",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "completed",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:55:59.265Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Verify TypeScript compilation"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:15.790Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\utils\\action-error-handler.ts",
+  "limit": 50
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:22.623Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\users\\username.actions.ts",
+  "old_string": "      return handleActionError(error, {\n        action: ACTION_NAMES.USERS.CHECK_USERNAME_AVAILABILITY,\n        context: { username },\n      });",
+  "new_string": "      return handleActionError(error, {\n        operation: ACTION_NAMES.USERS.CHECK_USERNAME_AVAILABILITY,\n        metadata: { username },\n      });"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:27.677Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\actions\\users\\username.actions.ts",
+  "old_string": "      return handleActionError(error, {\n        action: ACTION_NAMES.USERS.UPDATE_USERNAME,\n        context: { newUsername: username, userId: ctx.userId },\n      });",
+  "new_string": "      return handleActionError(error, {\n        operation: ACTION_NAMES.USERS.UPDATE_USERNAME,\n        metadata: { newUsername: username, userId: ctx.userId },\n      });"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:33.067Z
+Tool: Bash
+Input:
+{
+  "command": "grep -n \"invalidate\\|profile\" src/lib/services/cache.service.ts | head -30",
+  "description": "Check CacheService methods"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:38.363Z
+Tool: Bash
+Input:
+{
+  "command": "grep -n \"CacheTagGenerators\\|user:\" src/lib/constants/cache.ts | head -30",
+  "description": "Check cache tag generators"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:43.270Z
+Tool: Bash
+Input:
+{
+  "command": "grep -n \"CacheTagGenerators\" src/lib/services/cache.service.ts | head -10",
+  "description": "Find CacheTagGenerators in cache service"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:56:47.834Z
+Tool: Bash
+Input:
+{
+  "command": "grep -n \"user\\|profile\" src/lib/utils/cache-tags.utils.ts",
+  "description": "Find user/profile cache tags"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:57:00.209Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:57:07.757Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts",
+  "old_string": "import { eq } from 'drizzle-orm';\n\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';\nimport { isReservedUsername } from '@/lib/constants/reserved-usernames';\nimport { users } from '@/lib/db/schema';\nimport { createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { type UserRecord, UsersQuery } from '@/lib/queries/users/users-query';\nimport { CacheService } from '@/lib/services/cache.service';",
+  "new_string": "import { eq } from 'drizzle-orm';\n\nimport type { DatabaseExecutor } from '@/lib/utils/next-safe-action';\n\nimport { SCHEMA_LIMITS } from '@/lib/constants';\nimport { isReservedUsername } from '@/lib/constants/reserved-usernames';\nimport { users } from '@/lib/db/schema';\nimport { createPublicQueryContext } from '@/lib/queries/base/query-context';\nimport { type UserRecord, UsersQuery } from '@/lib/queries/users/users-query';\nimport { CacheService } from '@/lib/services/cache.service';\nimport { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:57:15.085Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\facades\\users\\users.facade.ts",
+  "old_string": "  /**\n   * update username and set usernameChangedAt timestamp\n   */\n  static async updateUsername(\n    userId: string,\n    newUsername: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<UserRecord> {\n    const context = createPublicQueryContext({ dbInstance });\n    const db = context.dbInstance;\n\n    const [updatedUser] = await db\n      .update(users)\n      .set({\n        username: newUsername,\n        usernameChangedAt: new Date(),\n        updatedAt: new Date(),\n      })\n      .where(eq(users.id, userId))\n      .returning();\n\n    // Invalidate cache for this user\n    await CacheService.users.invalidateByUserId(userId);\n\n    return updatedUser;\n  }",
+  "new_string": "  /**\n   * update username and set usernameChangedAt timestamp\n   */\n  static async updateUsername(\n    userId: string,\n    newUsername: string,\n    dbInstance?: DatabaseExecutor,\n  ): Promise<UserRecord> {\n    const context = createPublicQueryContext({ dbInstance });\n    const db = context.dbInstance;\n\n    if (!db) {\n      throw new Error('Database instance is not available');\n    }\n\n    const result = await db\n      .update(users)\n      .set({\n        username: newUsername,\n        usernameChangedAt: new Date(),\n        updatedAt: new Date(),\n      })\n      .where(eq(users.id, userId))\n      .returning();\n\n    const updatedUser = result[0];\n\n    if (!updatedUser) {\n      throw new Error('Failed to update user username');\n    }\n\n    // Invalidate cache for this user\n    const tags = CacheTagGenerators.user.update(userId);\n    tags.forEach((tag) => CacheService.invalidateByTag(tag));\n\n    return updatedUser;\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:57:22.445Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\src\\lib\\queries\\users\\users-query.ts",
+  "old_string": "  /**\n   * check if username exists, optionally excluding a specific user\n   */\n  static async checkUsernameExistsAsync(\n    username: string,\n    context: QueryContext,\n    excludeUserId?: string,\n  ): Promise<boolean> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);\n\n    if (result.length === 0) {\n      return false;\n    }\n\n    // If we found a user with this username and we're excluding a specific user,\n    // check if the found user is the one we're excluding\n    if (excludeUserId && result[0].id === excludeUserId) {\n      return false;\n    }\n\n    return true;\n  }",
+  "new_string": "  /**\n   * check if username exists, optionally excluding a specific user\n   */\n  static async checkUsernameExistsAsync(\n    username: string,\n    context: QueryContext,\n    excludeUserId?: string,\n  ): Promise<boolean> {\n    const dbInstance = this.getDbInstance(context);\n\n    const result = await dbInstance.select({ id: users.id }).from(users).where(eq(users.username, username)).limit(1);\n\n    if (result.length === 0) {\n      return false;\n    }\n\n    const foundUser = result[0];\n\n    if (!foundUser) {\n      return false;\n    }\n\n    // If we found a user with this username and we're excluding a specific user,\n    // check if the found user is the one we're excluding\n    if (excludeUserId && foundUser.id === excludeUserId) {\n      return false;\n    }\n\n    return true;\n  }"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:57:28.317Z
+Tool: Bash
+Input:
+{
+  "command": "npm run typecheck",
+  "timeout": 120000,
+  "description": "Verify TypeScript compilation"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:57:39.275Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint",
+  "timeout": 120000,
+  "description": "Run ESLint to check code quality"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:58:32.988Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint:fix",
+  "timeout": 120000,
+  "description": "Fix ESLint errors automatically"
+}
+================================================================================
+
+================================================================================
+2025-11-10T00:59:26.643Z
+Tool: Bash
+Input:
+{
+  "command": "npm run lint",
+  "timeout": 120000,
+  "description": "Verify all linting issues are fixed"
+}
+================================================================================
+
+================================================================================
+2025-11-10T01:00:17.900Z
+Tool: TodoWrite
+Input:
+{
+  "todos": [
+    {
+      "content": "Add usernameChangedAt field to users table schema",
+      "status": "completed",
+      "activeForm": "Adding usernameChangedAt field to users table schema"
+    },
+    {
+      "content": "Add USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits",
+      "status": "completed",
+      "activeForm": "Adding USERNAME_CHANGE_COOLDOWN_DAYS constant to schema limits"
+    },
+    {
+      "content": "Create reserved usernames constants file",
+      "status": "completed",
+      "activeForm": "Creating reserved usernames constants file"
+    },
+    {
+      "content": "Add findByUsernameAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding findByUsernameAsync method to UsersQuery"
+    },
+    {
+      "content": "Add checkUsernameExistsAsync method to UsersQuery",
+      "status": "completed",
+      "activeForm": "Adding checkUsernameExistsAsync method to UsersQuery"
+    },
+    {
+      "content": "Add getUserByUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getUserByUsername method to UsersFacade"
+    },
+    {
+      "content": "Add isUsernameAvailable method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding isUsernameAvailable method to UsersFacade"
+    },
+    {
+      "content": "Add canChangeUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding canChangeUsername method to UsersFacade"
+    },
+    {
+      "content": "Add getDaysUntilUsernameChangeAllowed method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding getDaysUntilUsernameChangeAllowed method to UsersFacade"
+    },
+    {
+      "content": "Add updateUsername method to UsersFacade",
+      "status": "completed",
+      "activeForm": "Adding updateUsername method to UsersFacade"
+    },
+    {
+      "content": "Create updateUsernameSchema validation",
+      "status": "completed",
+      "activeForm": "Creating updateUsernameSchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailabilitySchema validation",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailabilitySchema validation"
+    },
+    {
+      "content": "Create checkUsernameAvailability server action",
+      "status": "completed",
+      "activeForm": "Creating checkUsernameAvailability server action"
+    },
+    {
+      "content": "Create updateUsername server action",
+      "status": "completed",
+      "activeForm": "Creating updateUsername server action"
+    },
+    {
+      "content": "Generate and run database migration",
+      "status": "completed",
+      "activeForm": "Generating and running database migration"
+    }
+  ]
+}
+================================================================================

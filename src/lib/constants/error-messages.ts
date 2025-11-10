@@ -161,7 +161,10 @@ export const ERROR_MESSAGES = {
     NOT_FOUND: 'User not found',
     SETTINGS_UPDATE_FAILED: 'Failed to update user settings',
     UPDATE_FAILED: 'Failed to update user profile',
+    USERNAME_CHANGE_COOLDOWN: 'You can only change your username once every 90 days',
+    USERNAME_RESERVED: 'This username is reserved and cannot be used',
     USERNAME_TAKEN: 'Username is already taken',
+    USERNAME_UPDATE_FAILED: 'Failed to update username',
   },
   VALIDATION: {
     FIELD_TOO_LONG: 'Field is too long',

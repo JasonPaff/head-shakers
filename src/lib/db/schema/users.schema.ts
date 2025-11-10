@@ -67,6 +67,7 @@ export const users = pgTable(
     role: userRoleEnum('role').default(DEFAULTS.USER.ROLE).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     username: varchar('username', { length: SCHEMA_LIMITS.USER.USERNAME.MAX }).notNull().unique(),
+    usernameChangedAt: timestamp('username_changed_at'),
   },
   (table) => [
     // single column indexes
