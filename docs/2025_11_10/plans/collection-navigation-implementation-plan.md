@@ -41,6 +41,7 @@ As a user, I want to navigate through bobbleheads within a collection directly f
 ### Architecture Insights
 
 **Key Patterns**:
+
 - Data Flow: Page → Async Wrapper → Facade → Query → Database
 - Server Components with async/sync component separation
 - Permission Context: All queries respect privacy settings with query contexts
@@ -48,12 +49,14 @@ As a user, I want to navigate through bobbleheads within a collection directly f
 - Ordering and Sorting: Collections support multiple sort options (newest, oldest, name_asc, name_desc)
 
 **Integration Points**:
+
 1. Query Enhancement: `collections.query.ts` - Add method to fetch neighbor bobbleheads
 2. Facade Enhancement: `collections.facade.ts` - Wrap query with permission/error handling
 3. Component Enhancement: `bobblehead-header.tsx` - Add next/prev buttons
 4. Async Data: `bobblehead-header-async.tsx` - Fetch neighbor IDs in parallel
 
 **Challenges Identified**:
+
 1. Sort order complexity - navigation must respect current collection sort
 2. Subcollection vs collection navigation - determine user context
 3. Permission checking - neighbors must respect same visibility rules
@@ -91,9 +94,11 @@ This feature enables seamless navigation through bobbleheads within a collection
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\collections\collections.query.ts` - Add new query method
 
 **Changes:**
+
 - Add new static method `getBobbleheadNavigationContextAsync` that accepts `collectionId`, `currentBobbleheadId`, and `context`
 - Return type should include: `{ previousBobbleheadId: string | null, nextBobbleheadId: string | null, currentIndex: number, totalCount: number }`
 - Query should respect permission filters (isPublic, userId, isDeleted checks) matching existing patterns
@@ -101,11 +106,13 @@ This feature enables seamless navigation through bobbleheads within a collection
 - Use same sort order as display layer (`createdAt` descending for 'newest', ascending for 'oldest', etc.)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method compiles without TypeScript errors
 - [ ] Method respects existing permission model (public/user/protected contexts)
 - [ ] Returns accurate previous/next/current index data for various collection states
@@ -123,9 +130,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\collections\collections.facade.ts` - Add new facade method
 
 **Changes:**
+
 - Add static method `getBobbleheadNavigationContext` that accepts `collectionId`, `currentBobbleheadId`, `viewerUserId`, and optional `dbInstance`
 - Use `CacheService.bobbleheads.byCollection` for caching (reuse existing cache key pattern)
 - Call the new query method from Step 1 with appropriate context
@@ -133,11 +142,13 @@ npm run lint:fix && npm run typecheck
 - Include Sentry breadcrumbs for tracking navigation patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method implements proper error handling with FacadeErrorContext
 - [ ] Uses existing caching patterns from other facade methods
 - [ ] Type signatures are properly exported for use in async components
@@ -155,9 +166,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-navigation.tsx` - Navigation UI component
 
 **Changes:**
+
 - Create component that accepts: `previousBobbleheadId`, `nextBobbleheadId`, `isLoading`, `collectionId`
 - Include optional `subcollectionId` for subcollection navigation
 - Use Lucide React ChevronLeftIcon and ChevronRightIcon (or ArrowLeftIcon/ArrowRightIcon if preferred for consistency with existing back button)
@@ -170,11 +183,13 @@ npm run lint:fix && npm run typecheck
 - Style to match existing bobblehead detail page aesthetic
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders without TypeScript errors
 - [ ] Navigation buttons show correct prev/next URLs via type-safe routing
 - [ ] Buttons disable appropriately at collection boundaries
@@ -194,9 +209,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-navigation-async.tsx` - Async server component wrapper
 
 **Changes:**
+
 - Create async component that accepts `bobbleheadId` and optional `collectionId` and `subcollectionId` parameters
 - Call `CollectionsFacade.getBobbleheadNavigationContext` to fetch navigation data
 - Handle loading/error states gracefully (error boundary will handle critical failures)
@@ -204,11 +221,13 @@ npm run lint:fix && npm run typecheck
 - Include optional tracking of navigation usage (via Sentry or analytics if desired)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Async component properly fetches navigation data from facade
 - [ ] Gracefully handles missing or null navigation data
 - [ ] Returns client component with populated navigation props
@@ -226,9 +245,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-header.tsx` - Sync client component
 
 **Changes:**
+
 - Add new props: `previousBobbleheadId`, `nextBobbleheadId`, `collectionId` (optional `subcollectionId`)
 - Integrate `<BobbleheadNavigation />` component into the header action buttons area
 - Position navigation buttons logically: either left side (near back button) or right side with action buttons
@@ -236,11 +257,13 @@ npm run lint:fix && npm run typecheck
 - Maintain visual alignment with existing buttons (Share, Edit, Delete, Report)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component accepts new navigation props without breaking existing functionality
 - [ ] Navigation buttons render and are accessible
 - [ ] Layout remains responsive across breakpoints
@@ -259,9 +282,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-header-async.tsx` - Async server component
 
 **Changes:**
+
 - Add `collectionId` to the component's accepted props (may need to pass from page component)
 - Fetch navigation context using facade method alongside existing bobblehead/likeData fetches
 - Handle cases where bobblehead has no collectionId (navigation not available)
@@ -270,11 +295,13 @@ npm run lint:fix && npm run typecheck
 - Maintain existing error handling and Suspense patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component fetches navigation data correctly
 - [ ] Navigation data passed to sync component without type errors
 - [ ] Handles cases where collection context is missing
@@ -293,20 +320,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\page.tsx` - Main page component
 
 **Changes:**
+
 - Verify that basic bobblehead fetch includes `collectionId` and `subcollectionId` fields
 - Pass `collectionId` and `subcollectionId` (if available) to `BobbleheadHeaderAsync` component as props
 - Consider whether these values should be added to URL parameters for bookmarking/sharing (optional enhancement)
 - Update Suspense fallback if needed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Collection context properly passed from page to async header component
 - [ ] No TypeScript errors in prop passing
 - [ ] Existing page functionality unchanged
@@ -324,9 +355,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-header-async.tsx` - Error handling in async component
 
 **Changes:**
+
 - Wrap `getBobbleheadNavigationContext` call in try-catch with sensible defaults (all navigation fields null)
 - Return sync header component with `previousBobbleheadId={null}` and `nextBobbleheadId={null}` on error
 - Log errors to Sentry for monitoring navigation-specific failures
@@ -334,11 +367,13 @@ npm run lint:fix && npm run typecheck
 - Test behavior when: collection is deleted, bobblehead is moved between collections, permissions change
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation errors don't crash the page
 - [ ] Header renders with disabled navigation buttons on error
 - [ ] Errors logged to Sentry with context

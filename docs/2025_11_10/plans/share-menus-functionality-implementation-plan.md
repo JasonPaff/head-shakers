@@ -18,18 +18,21 @@
 ## File Discovery Results
 
 ### Critical Priority Files (4 files)
+
 1. `src\components\feature\bobblehead\bobblehead-share-menu.tsx` - Bobblehead share menu UI
 2. `src\components\feature\collections\collection-share-menu.tsx` - Collection share menu UI
 3. `src\components\feature\subcollections\subcollection-share-menu.tsx` - Subcollection share menu UI
 4. `src\hooks\use-server-action.ts` - Server action hook pattern
 
 ### High Priority Files (12 files)
+
 **Server Actions**: collections.actions.ts, bobbleheads.actions.ts, subcollections.actions.ts
 **Validations**: collections.validation.ts, subcollections.validation.ts, social.validation.ts
 **Pages/Headers**: bobblehead-header.tsx, collection-header.tsx, subcollection-header.tsx
 **Page Routes**: collection page.tsx, bobblehead page.tsx, share page.tsx (stub)
 
 ### Supporting Files (12 files)
+
 **UI Components**: dropdown-menu.tsx, sonner.tsx
 **Constants**: action-names.ts, operations.ts, enums.ts
 **Utils**: next-safe-action.ts
@@ -70,9 +73,11 @@ Implement functional share menus for bobbleheads, collections, and subcollection
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/utils/share-utils.ts` - Share utility functions for URL generation and clipboard
 
 **Changes:**
+
 - Add function to generate absolute URLs from relative paths using environment variables
 - Add function to copy text to clipboard with error handling
 - Add function to generate social media share URLs for platforms (Twitter, Facebook, LinkedIn)
@@ -81,11 +86,13 @@ Implement functional share menus for bobbleheads, collections, and subcollection
 - Add validation for required environment variables (NEXT_PUBLIC_APP_URL)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Share utilities module created with proper TypeScript types
 - [ ] All validation commands pass
 - [ ] Functions handle errors gracefully
@@ -99,11 +106,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-share-menu.tsx` - Add handlers for bobblehead sharing
 - `src/components/feature/collections/collection-share-menu.tsx` - Add handlers for collection sharing
 - `src/components/feature/subcollections/subcollection-share-menu.tsx` - Add handlers for subcollection sharing
 
 **Changes:**
+
 - Import share utilities and toast from sonner
 - Import $path for type-safe URL generation
 - Add handleCopyLink function using clipboard utility with toast feedback
@@ -115,11 +124,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling with toast notifications for failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All three share menu components updated with handlers
 - [ ] Type-safe URLs generated using $path
 - [ ] Toast notifications configured for success and error states
@@ -134,21 +145,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `.env.example` - Document required environment variable
 - `.env.local` or `.env.development` - Add environment variable for local development
 
 **Changes:**
+
 - Add NEXT_PUBLIC_APP_URL with example value in .env.example
 - Add NEXT_PUBLIC_APP_URL with localhost value in local environment files
 - Add comment explaining this variable is required for share functionality
 - Document production URL format requirements
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Environment variable documented in .env.example
 - [ ] Local environment configured with development URL
 - [ ] All validation commands pass
@@ -162,9 +177,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/validations/social.validation.ts` - Add share validation schemas
 
 **Changes:**
+
 - Add shareEntitySchema with fields for entityType, entityId, shareMethod, and optional metadata
 - Add enum for shareMethod (COPY_LINK, TWITTER, FACEBOOK, LINKEDIN)
 - Add enum for entityType (BOBBLEHEAD, COLLECTION, SUBCOLLECTION)
@@ -172,11 +189,13 @@ npm run lint:fix && npm run typecheck
 - Add JSDoc comments for schema documentation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Share validation schema created with proper Zod types
 - [ ] All validation commands pass
 - [ ] Schema aligns with existing validation patterns
@@ -190,9 +209,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/actions/social.actions.ts` - Add share tracking action
 
 **Changes:**
+
 - Add trackShareAction using authActionClient pattern
 - Import share validation schema from social.validation.ts
 - Add input schema validation using shareEntitySchema
@@ -203,11 +224,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for failed tracking operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Share action created following authActionClient pattern
 - [ ] Proper error handling and validation
 - [ ] All validation commands pass
@@ -222,21 +245,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/action-names.ts` - Add TRACK_SHARE constant
 - `src/lib/constants/operations.ts` - Verify CREATE operation exists
 
 **Changes:**
+
 - Add TRACK_SHARE to ActionNames enum or constant object
 - Verify CREATE operation exists in Operations enum
 - Follow existing naming conventions and patterns
 - Add JSDoc comments for new constants
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constants added following project conventions
 - [ ] All validation commands pass
 - [ ] Constants match usage in share action
@@ -250,11 +277,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-share-menu.tsx` - Add analytics tracking
 - `src/components/feature/collections/collection-share-menu.tsx` - Add analytics tracking
 - `src/components/feature/subcollections/subcollection-share-menu.tsx` - Add analytics tracking
 
 **Changes:**
+
 - Import trackShareAction from social.actions.ts
 - Import useServerAction hook or call action directly
 - Add analytics tracking call after successful share operations
@@ -263,11 +292,13 @@ npm run lint:fix && npm run typecheck
 - Add optional loading states during tracking
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Analytics tracking integrated in all three components
 - [ ] Share functionality works even if tracking fails
 - [ ] All validation commands pass
@@ -282,11 +313,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionId]/page.tsx` - Add metadata export
 - `src/app/(app)/collections/[collectionId]/subcollections/[subcollectionId]/page.tsx` - Add metadata export
 - `src/app/(app)/bobbleheads/[bobbleheadId]/page.tsx` - Add metadata export
 
 **Changes:**
+
 - Add generateMetadata async function to each page component
 - Fetch entity data using existing queries
 - Return metadata object with title, description, openGraph, and twitter fields
@@ -296,11 +329,13 @@ npm run lint:fix && npm run typecheck
 - Handle cases where entity data is not found
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Metadata functions added to all three page types
 - [ ] Open Graph tags include images, titles, and descriptions
 - [ ] All validation commands pass
@@ -315,9 +350,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - testing only
 
 **Changes:**
+
 - Test copy-to-clipboard functionality in all three share menus
 - Verify toast notifications appear for success and error states
 - Test social media sharing URLs open correctly in new windows
@@ -328,11 +365,13 @@ npm run lint:fix && npm run typecheck
 - Verify mobile responsiveness of share menus
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Copy-to-clipboard works on all browsers
 - [ ] Toast notifications display correctly
 - [ ] Social media URLs are properly formatted
@@ -356,30 +395,35 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Implementation Approach:**
+
 - Steps 1-3 provide core client-side functionality and should be completed first
 - Steps 4-7 are optional analytics tracking features that can be implemented later if metrics are needed
 - Step 8 enhances social media preview appearance but is not critical for MVP
 - Step 9 is essential validation before considering feature complete
 
 **Architecture Decisions:**
+
 - Using client-side clipboard API for copy functionality (High Confidence)
 - Social media sharing opens in new windows rather than native share API (High Confidence)
 - Analytics tracking is optional and non-blocking (Medium Confidence)
 - Environment variable required for absolute URL generation (High Confidence)
 
 **Assumptions Requiring Confirmation:**
+
 - NEXT_PUBLIC_APP_URL environment variable can be added
 - Clipboard API is supported in target browsers
 - Social media platforms (Twitter, Facebook, LinkedIn) are appropriate for bobblehead collectors
 - Analytics tracking is desired but not required for MVP
 
 **Risk Mitigation:**
+
 - Clipboard operations wrapped in try-catch with fallback toast messages
 - Share functionality works independently of analytics tracking
 - Social media URLs validated before opening
 - Environment variable validation prevents runtime errors
 
 **Future Enhancements:**
+
 - Native Web Share API for mobile devices
 - Email sharing option
 - QR code generation for physical sharing

@@ -73,40 +73,19 @@ You are an AI file discovery agent for the Head Shakers bobblehead collection pl
 
 ### High Priority Files (12 files)
 
-**Server Actions (3 files)**:
-5. `src\lib\actions\collections\collections.actions.ts` - Collection server actions template
-6. `src\lib\actions\bobbleheads\bobbleheads.actions.ts` - Bobblehead server actions template
-7. `src\lib\actions\subcollections\subcollections.actions.ts` - Subcollection actions pattern
+**Server Actions (3 files)**: 5. `src\lib\actions\collections\collections.actions.ts` - Collection server actions template 6. `src\lib\actions\bobbleheads\bobbleheads.actions.ts` - Bobblehead server actions template 7. `src\lib\actions\subcollections\subcollections.actions.ts` - Subcollection actions pattern
 
-**Validations (3 files)**:
-8. `src\lib\validations\collections.validation.ts` - Collection Zod schemas
-9. `src\lib\validations\subcollections.validation.ts` - Subcollection schemas
-10. `src\lib\validations\social.validation.ts` - Social feature validations (similar pattern)
+**Validations (3 files)**: 8. `src\lib\validations\collections.validation.ts` - Collection Zod schemas 9. `src\lib\validations\subcollections.validation.ts` - Subcollection schemas 10. `src\lib\validations\social.validation.ts` - Social feature validations (similar pattern)
 
-**Pages & Integration (6 files)**:
-11. `src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-header.tsx`
-12. `src\app\(app)\collections\[collectionId]\(collection)\components\collection-header.tsx`
-13. `src\app\(app)\collections\[collectionId]\subcollection\[subcollectionId]\components\subcollection-header.tsx`
-14. `src\app\(app)\collections\[collectionId]\(collection)\page.tsx`
-15. `src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\page.tsx`
-16. `src\app\(app)\collections\[collectionId]\share\page.tsx` - Dedicated share page (stub)
+**Pages & Integration (6 files)**: 11. `src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-header.tsx` 12. `src\app\(app)\collections\[collectionId]\(collection)\components\collection-header.tsx` 13. `src\app\(app)\collections\[collectionId]\subcollection\[subcollectionId]\components\subcollection-header.tsx` 14. `src\app\(app)\collections\[collectionId]\(collection)\page.tsx` 15. `src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\page.tsx` 16. `src\app\(app)\collections\[collectionId]\share\page.tsx` - Dedicated share page (stub)
 
 ### Medium Priority Files (9 files)
 
-**Supporting Infrastructure (6 files)**:
-17. `src\components\ui\sonner.tsx` - Toast notification component
-18. `src\lib\constants\action-names.ts` - Action name constants
-19. `src\lib\constants\operations.ts` - Operation names for logging
-20. `src\lib\constants\enums.ts` - Application enums
-21. `src\components\ui\dropdown-menu.tsx` - Radix UI dropdown (already used)
-22. `src\lib\utils\next-safe-action.ts` - Action client configuration
+**Supporting Infrastructure (6 files)**: 17. `src\components\ui\sonner.tsx` - Toast notification component 18. `src\lib\constants\action-names.ts` - Action name constants 19. `src\lib\constants\operations.ts` - Operation names for logging 20. `src\lib\constants\enums.ts` - Application enums 21. `src\components\ui\dropdown-menu.tsx` - Radix UI dropdown (already used) 22. `src\lib\utils\next-safe-action.ts` - Action client configuration
 
-**Social Actions (1 file)**:
-23. `src\lib\actions\social\social.actions.ts` - Similar interaction patterns
+**Social Actions (1 file)**: 23. `src\lib\actions\social\social.actions.ts` - Similar interaction patterns
 
-**Facades & Queries (2 files)**:
-24. `src\lib\facades\collections\collections.facade.ts` - Collection business logic
-25. `src\lib\facades\bobbleheads\bobbleheads.facade.ts` - Bobblehead business logic
+**Facades & Queries (2 files)**: 24. `src\lib\facades\collections\collections.facade.ts` - Collection business logic 25. `src\lib\facades\bobbleheads\bobbleheads.facade.ts` - Bobblehead business logic
 
 ### Low Priority Files (3 files)
 
@@ -117,6 +96,7 @@ You are an AI file discovery agent for the Head Shakers bobblehead collection pl
 ## File Path Validation Results
 
 All 28 discovered files validated through AI content analysis:
+
 - ✅ All file paths confirmed to exist
 - ✅ All files accessible and readable
 - ✅ Content analysis performed on each file
@@ -168,18 +148,21 @@ All 28 discovered files validated through AI content analysis:
 ## Recommended Implementation Approach
 
 ### Phase 1: Core Functionality
+
 - Create share utilities for URL generation and clipboard
 - Implement client-side share handlers in menu components
 - Add toast notifications for user feedback
 - Test copy-to-clipboard functionality
 
 ### Phase 2: Backend Integration (Optional)
+
 - Add share validation schema if tracking shares
 - Create share action for analytics tracking
 - Update action names and operations constants
 - Implement cache invalidation if needed
 
 ### Phase 3: Social Media
+
 - Implement social media URL generation
 - Add window.open handlers for social sharing
 - Consider Open Graph meta tags for rich previews
