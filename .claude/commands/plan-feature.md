@@ -216,6 +216,8 @@ Execution time: X.X seconds
 
 - **CRITICAL**: Capture complete agent inputs and outputs (not summaries)
 - **CRITICAL**: Record precise timestamps for each step with ISO format
+- **CRITICAL**: Must use the file discovery agent for step 2
+- **CRITICAL**: Must use the implementation planner agent for step 3
 - **CRITICAL**: Validate and log all discovered file paths with existence checks
 - **CRITICAL**: Implement proper error handling and recovery for all subagent failures
 - **LOGGING**: Create comprehensive logging for each step with full data capture
