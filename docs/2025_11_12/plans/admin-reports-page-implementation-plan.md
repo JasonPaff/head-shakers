@@ -8,12 +8,14 @@
 ## Analysis Summary
 
 ### Feature Request Refinement
+
 - **Original Length**: 20 words
 - **Refined Length**: 362 words
 - **Expansion Ratio**: 18.1x
 - **Assessment**: Feature request successfully refined with comprehensive technical context
 
 ### File Discovery Results
+
 - **Total Files Discovered**: 35
 - **Critical Priority**: 5 (backend infrastructure - 100% complete)
 - **High Priority**: 8 (authentication, UI references)
@@ -23,6 +25,7 @@
 - **Files to Modify**: 2
 
 ### Key Finding
+
 **Backend infrastructure is 100% complete and production-ready.** All database schemas, queries, server actions, facades, and validations exist and are fully functional. Implementation work is primarily frontend UI development.
 
 ---
@@ -56,9 +59,11 @@ Implementation of the admin reports management page UI layer, building upon the 
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-filters.tsx` - Filter controls with Nuqs URL state
 
 **Changes:**
+
 - Create ReportFilters component using Nuqs parseAsString, parseAsArrayOf, and parseAsTimestamp for URL state
 - Add filter controls for report status (pending, investigating, resolved, dismissed)
 - Add filter controls for report type (bobblehead, collection, user_profile)
@@ -68,11 +73,13 @@ Implementation of the admin reports management page UI layer, building upon the 
 - Use Tailwind CSS for responsive layout and Radix UI components for dropdowns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component compiles without TypeScript errors
 - [ ] Nuqs hooks properly manage URL state for all filter types
 - [ ] Filter controls render with proper Radix UI components
@@ -88,9 +95,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\reports-table.tsx` - Main reports data table component
 
 **Changes:**
+
 - Create ReportsTable component accepting report data array and pagination metadata as props
 - Define TanStack Table columns for report summary, content preview, reported user/creator, submission date, status badge, and actions
 - Implement column definitions with sorting capabilities using TanStack's sorting features
@@ -101,11 +110,13 @@ npm run lint:fix && npm run typecheck
 - Follow patterns from trending-content-table.tsx for table structure and styling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component compiles without TypeScript errors
 - [ ] Table renders with all defined columns
 - [ ] Sorting functionality works through TanStack Table
@@ -122,9 +133,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Report detail modal dialog
 
 **Changes:**
+
 - Create ReportDetailDialog component using Radix UI Dialog component
 - Display full report information including reporter details, target content preview, reason/description, timestamps
 - Show content preview based on report type (bobblehead image, collection details, user profile)
@@ -135,11 +148,13 @@ npm run lint:fix && npm run typecheck
 - Implement loading and error states for fetching additional report details
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component compiles without TypeScript errors
 - [ ] Dialog properly displays using Radix UI Dialog primitives
 - [ ] All report fields render correctly with appropriate formatting
@@ -156,9 +171,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\update-report-status-dialog.tsx` - Status update dialog with form
 
 **Changes:**
+
 - Create UpdateReportStatusDialog component using Radix UI Dialog
 - Build form using TanStack React Form for status updates
 - Add status dropdown with options (pending, investigating, resolved, dismissed)
@@ -170,11 +187,13 @@ npm run lint:fix && npm run typecheck
 - Close dialog and refresh table data on successful submission
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component compiles without TypeScript errors
 - [ ] Form properly integrates with TanStack React Form
 - [ ] Status update calls existing server action correctly
@@ -191,9 +210,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\bulk-actions-toolbar.tsx` - Bulk actions toolbar component
 
 **Changes:**
+
 - Create BulkActionsToolbar component accepting selected row IDs and table instance
 - Add bulk status update dropdown with confirmation dialogs
 - Implement bulk resolve action calling bulkUpdateReportStatusAction
@@ -206,11 +227,13 @@ npm run lint:fix && npm run typecheck
 - Refresh table data after successful bulk operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component compiles without TypeScript errors
 - [ ] Bulk actions correctly call server actions for multiple reports
 - [ ] Confirmation dialogs prevent accidental bulk operations
@@ -227,9 +250,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\admin\reports\page.tsx` - Replace placeholder with full implementation
 
 **Changes:**
+
 - Replace placeholder content with complete reports page implementation
 - Implement server component data fetching using getContentReportsQuery from content-reports.query.ts
 - Extract URL search params for filters, pagination, and sorting using Nuqs
@@ -243,11 +268,13 @@ npm run lint:fix && npm run typecheck
 - Include page header with title, description, and quick stats
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page compiles without TypeScript errors
 - [ ] Data fetching correctly uses existing queries
 - [ ] URL state properly hydrates filter and table components
@@ -265,9 +292,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\layout\admin-nav.tsx` - Add reports navigation link (assuming this file exists)
 
 **Changes:**
+
 - Add reports navigation item to admin dashboard menu
 - Use $path helper for type-safe route to `/admin/reports`
 - Add appropriate icon from Lucide React (ShieldAlert or Flag icon)
@@ -276,11 +305,13 @@ npm run lint:fix && npm run typecheck
 - Follow existing navigation item patterns for consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation link compiles without TypeScript errors
 - [ ] Type-safe routing works correctly to reports page
 - [ ] Icon renders properly in navigation menu
@@ -296,21 +327,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - this step runs code generation command
 
 **Changes:**
+
 - Run next-typesafe-url route generation command
 - Verify `/admin/reports` appears in generated $path types
 - Test navigation to reports page from admin dashboard
 - Verify URL state management preserves route parameters
 
 **Validation Commands:**
+
 ```bash
 npm run next-typesafe-url
 npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Route generation completes without errors
 - [ ] TypeScript recognizes $path['/admin/reports']
 - [ ] Navigation to reports page works from multiple entry points
@@ -326,11 +361,13 @@ npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\admin\reports\page.tsx` - Add error and loading boundaries
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\reports-table.tsx` - Add empty state handling
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add loading state
 
 **Changes:**
+
 - Add error.tsx file in admin/reports route for error boundary
 - Add loading.tsx file in admin/reports route for loading skeleton
 - Implement table empty state with helpful messaging when no reports exist
@@ -340,11 +377,13 @@ npm run typecheck
 - Implement Sentry error tracking for moderation workflow issues
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Error boundaries catch and display errors gracefully
 - [ ] Loading states provide visual feedback during operations
 - [ ] Empty states guide users when no data exists
@@ -361,9 +400,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - this step focuses on manual testing and validation
 
 **Changes:**
+
 - Test complete report review workflow from dashboard to detail view
 - Verify filtering works correctly with all combinations
 - Test sorting on all sortable columns
@@ -377,12 +418,14 @@ npm run lint:fix && npm run typecheck
 - Test error scenarios and verify Sentry tracking
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] All user flows complete successfully
 - [ ] Filtering, sorting, and pagination work correctly
 - [ ] Bulk actions process multiple reports accurately
@@ -424,6 +467,7 @@ npm run build
 ## Orchestration Details
 
 For detailed orchestration logs including feature refinement, file discovery analysis, and implementation planning process, see:
+
 - `docs/2025_11_12/orchestration/admin-reports-page/00-orchestration-index.md`
 - `docs/2025_11_12/orchestration/admin-reports-page/01-feature-refinement.md`
 - `docs/2025_11_12/orchestration/admin-reports-page/02-file-discovery.md`

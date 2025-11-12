@@ -1,0 +1,477 @@
+'use client';
+
+import type { ColumnDef, RowSelectionState, SortingState } from '@tanstack/react-table';
+import type { ComponentPropsWithRef } from 'react';
+
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { ArrowDownIcon, ArrowUpIcon, EyeIcon, MoreVerticalIcon } from 'lucide-react';
+import { parseAsInteger, useQueryStates } from 'nuqs';
+import { useMemo, useState } from 'react';
+
+import type { SelectContentReport } from '@/lib/validations/moderation.validation';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Conditional } from '@/components/ui/conditional';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { cn } from '@/utils/tailwind-utils';
+
+interface ReportsTableProps extends ComponentPropsWithRef<'div'> {
+  data: Array<SelectContentReport>;
+  onBulkAction?: (reportIds: Array<string>, action: 'dismissed' | 'resolved' | 'reviewed') => void;
+  onViewDetails?: (reportId: string) => void;
+  totalCount?: number;
+}
+
+export const ReportsTable = ({
+  className,
+  data,
+  onBulkAction,
+  onViewDetails,
+  totalCount = 0,
+  ...props
+}: ReportsTableProps) => {
+  // useState hooks
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = useState<SortingState>([{ desc: true, id: 'createdAt' }]);
+
+  // Other hooks
+  const [pagination, setPagination] = useQueryStates(
+    {
+      page: parseAsInteger.withDefault(1),
+      pageSize: parseAsInteger.withDefault(25),
+    },
+    {
+      clearOnDefault: true,
+      history: 'push',
+    },
+  );
+
+  // useMemo hooks
+  const columns = useMemo<Array<ColumnDef<SelectContentReport>>>(
+    () => [
+      {
+        cell: ({ row }) => (
+          <Checkbox
+            aria-label={'Select row'}
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => {
+              row.toggleSelected(!!value);
+            }}
+          />
+        ),
+        enableSorting: false,
+        header: ({ table }) => (
+          <Checkbox
+            aria-label={'Select all'}
+            checked={
+              table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')
+            }
+            onCheckedChange={(value) => {
+              table.toggleAllPageRowsSelected(!!value);
+            }}
+          />
+        ),
+        id: 'select',
+        size: 50,
+      },
+      {
+        accessorKey: 'reason',
+        cell: ({ row }) => {
+          const reason = row.original.reason;
+          return (
+            <div className={'space-y-1'}>
+              <div className={'font-medium capitalize'}>
+                {reason
+                  .split('_')
+                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')}
+              </div>
+              <Conditional isCondition={!!row.original.description}>
+                <div className={'line-clamp-1 text-xs text-muted-foreground'}>{row.original.description}</div>
+              </Conditional>
+            </div>
+          );
+        },
+        enableSorting: true,
+        header: 'Report Summary',
+        size: 250,
+      },
+      {
+        accessorKey: 'targetType',
+        cell: ({ row }) => {
+          const targetType = row.original.targetType;
+          const _isBobblehead = targetType === 'bobblehead';
+          const _isCollection = targetType === 'collection';
+          const _isSubcollection = targetType === 'subcollection';
+
+          return (
+            <Badge
+              className={cn(
+                _isBobblehead && 'bg-green-100 text-green-800',
+                _isCollection && 'bg-blue-100 text-blue-800',
+                _isSubcollection && 'bg-purple-100 text-purple-800',
+              )}
+              variant={'secondary'}
+            >
+              {targetType.charAt(0).toUpperCase() + targetType.slice(1)}
+            </Badge>
+          );
+        },
+        enableSorting: true,
+        header: 'Content Type',
+        size: 150,
+      },
+      {
+        accessorKey: 'targetId',
+        cell: ({ row }) => {
+          const targetId = row.original.targetId;
+          return (
+            <div className={'max-w-[200px]'}>
+              <div className={'truncate font-mono text-xs text-muted-foreground'}>{targetId}</div>
+            </div>
+          );
+        },
+        enableSorting: false,
+        header: 'Content ID',
+        size: 200,
+      },
+      {
+        accessorKey: 'reporterId',
+        cell: ({ row }) => {
+          const reporterId = row.original.reporterId;
+          return (
+            <div className={'max-w-[200px]'}>
+              <div className={'truncate font-mono text-xs'}>{reporterId}</div>
+            </div>
+          );
+        },
+        enableSorting: false,
+        header: 'Reporter',
+        size: 200,
+      },
+      {
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          const date = new Date(row.original.createdAt);
+          return (
+            <div className={'space-y-0.5'}>
+              <div className={'text-sm'}>{date.toLocaleDateString()}</div>
+              <div className={'text-xs text-muted-foreground'}>{date.toLocaleTimeString()}</div>
+            </div>
+          );
+        },
+        enableSorting: true,
+        header: 'Submitted',
+        size: 150,
+      },
+      {
+        accessorKey: 'status',
+        cell: ({ row }) => {
+          const status = row.original.status;
+          const _isPending = status === 'pending';
+          const _isReviewed = status === 'reviewed';
+          const _isResolved = status === 'resolved';
+          const _isDismissed = status === 'dismissed';
+
+          return (
+            <Badge
+              className={cn(
+                _isPending && 'bg-yellow-100 text-yellow-800',
+                _isReviewed && 'bg-blue-100 text-blue-800',
+                _isResolved && 'bg-green-100 text-green-800',
+                _isDismissed && 'bg-gray-100 text-gray-800',
+              )}
+              variant={'secondary'}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Badge>
+          );
+        },
+        enableSorting: true,
+        header: 'Status',
+        size: 120,
+      },
+      {
+        cell: ({ row }) => {
+          const report = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className={'h-8 w-8 p-0'} variant={'ghost'}>
+                  <span className={'sr-only'}>Open menu</span>
+                  <MoreVerticalIcon className={'size-4'} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={'end'}>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    onViewDetails?.(report.id);
+                  }}
+                >
+                  <EyeIcon className={'mr-2 size-4'} />
+                  View Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    onBulkAction?.([report.id], 'reviewed');
+                  }}
+                >
+                  Mark as Reviewed
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    onBulkAction?.([report.id], 'resolved');
+                  }}
+                >
+                  Mark as Resolved
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    onBulkAction?.([report.id], 'dismissed');
+                  }}
+                >
+                  Dismiss Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+        enableSorting: false,
+        header: 'Actions',
+        id: 'actions',
+        size: 80,
+      },
+    ],
+    [onBulkAction, onViewDetails],
+  );
+
+  // TanStack Table instance - React Compiler warning is expected for this library
+  const table = useReactTable({
+    columns,
+    data,
+    enableRowSelection: true,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    manualPagination: true,
+    onRowSelectionChange: setRowSelection,
+    onSortingChange: setSorting,
+    pageCount: Math.ceil(totalCount / pagination.pageSize),
+    state: {
+      pagination: {
+        pageIndex: pagination.page - 1,
+        pageSize: pagination.pageSize,
+      },
+      rowSelection,
+      sorting,
+    },
+  });
+
+  // Event handlers
+  const handlePageChange = (newPage: number) => {
+    void setPagination({ page: newPage });
+    setRowSelection({});
+  };
+
+  const handlePageSizeChange = (newPageSize: number) => {
+    void setPagination({ page: 1, pageSize: newPageSize });
+    setRowSelection({});
+  };
+
+  const handleBulkAction = (action: 'dismissed' | 'resolved' | 'reviewed') => {
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const reportIds = selectedRows.map((row) => row.original.id);
+    onBulkAction?.(reportIds, action);
+    setRowSelection({});
+  };
+
+  // Derived variables for conditional rendering
+  const _hasNoResults = table.getRowModel().rows?.length === 0;
+  const _hasSelectedRows = Object.keys(rowSelection).length > 0;
+  const _selectedCount = table.getFilteredSelectedRowModel().rows.length;
+  const _totalPages = Math.ceil(totalCount / pagination.pageSize);
+  const _hasPreviousPage = pagination.page > 1;
+  const _hasNextPage = pagination.page < _totalPages;
+  const _startIndex = (pagination.page - 1) * pagination.pageSize + 1;
+  const _endIndex = Math.min(pagination.page * pagination.pageSize, totalCount);
+
+  return (
+    <div className={cn('space-y-4', className)} {...props}>
+      {/* Bulk Actions Bar */}
+      <Conditional isCondition={_hasSelectedRows}>
+        <div className={'flex items-center justify-between rounded-lg border bg-muted/50 p-4'}>
+          <div className={'text-sm font-medium'}>
+            {_selectedCount} {_selectedCount === 1 ? 'report' : 'reports'} selected
+          </div>
+          <div className={'flex gap-2'}>
+            <Button
+              onClick={() => {
+                handleBulkAction('reviewed');
+              }}
+              size={'sm'}
+              variant={'outline'}
+            >
+              Mark as Reviewed
+            </Button>
+            <Button
+              onClick={() => {
+                handleBulkAction('resolved');
+              }}
+              size={'sm'}
+              variant={'outline'}
+            >
+              Mark as Resolved
+            </Button>
+            <Button
+              onClick={() => {
+                handleBulkAction('dismissed');
+              }}
+              size={'sm'}
+              variant={'outline'}
+            >
+              Dismiss
+            </Button>
+          </div>
+        </div>
+      </Conditional>
+
+      {/* Data Table */}
+      <div className={'overflow-x-auto rounded-md border'}>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  const _canSort = header.column.getCanSort();
+                  const _isSorted = header.column.getIsSorted();
+
+                  return (
+                    <TableHead key={header.id} style={{ width: header.getSize() }}>
+                      <Conditional isCondition={_canSort}>
+                        <Button
+                          className={'h-auto p-0 font-medium hover:bg-transparent'}
+                          onClick={() => {
+                            header.column.toggleSorting();
+                          }}
+                          size={'sm'}
+                          variant={'ghost'}
+                        >
+                          {header.isPlaceholder ? null : (
+                            flexRender(header.column.columnDef.header, header.getContext())
+                          )}
+                          {_isSorted === 'desc' ?
+                            <ArrowDownIcon aria-hidden className={'ml-1 size-3'} />
+                          : _isSorted === 'asc' ?
+                            <ArrowUpIcon aria-hidden className={'ml-1 size-3'} />
+                          : null}
+                        </Button>
+                      </Conditional>
+                      <Conditional isCondition={!_canSort}>
+                        {header.isPlaceholder ? null : (
+                          flexRender(header.column.columnDef.header, header.getContext())
+                        )}
+                      </Conditional>
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            <Conditional isCondition={_hasNoResults}>
+              <TableRow>
+                <TableCell className={'h-24 text-center text-muted-foreground'} colSpan={columns.length}>
+                  No reports found.
+                </TableCell>
+              </TableRow>
+            </Conditional>
+            <Conditional isCondition={!_hasNoResults}>
+              {table.getRowModel().rows.map((row) => (
+                <TableRow
+                  className={'hover:bg-muted/50'}
+                  data-state={row.getIsSelected() && 'selected'}
+                  key={row.id}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </Conditional>
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pagination Controls */}
+      <div className={'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}>
+        {/* Results Info */}
+        <div className={'text-sm text-muted-foreground'}>
+          Showing {_startIndex} to {_endIndex} of {totalCount} results
+        </div>
+
+        {/* Page Size Selector */}
+        <div className={'flex items-center gap-2'}>
+          <span className={'text-sm font-medium'}>Rows per page:</span>
+          <div className={'flex gap-1'}>
+            {[10, 25, 50, 100].map((size) => (
+              <Button
+                className={cn('h-8 min-w-[2.5rem] px-2')}
+                key={size}
+                onClick={() => {
+                  handlePageSizeChange(size);
+                }}
+                size={'sm'}
+                variant={pagination.pageSize === size ? 'default' : 'outline'}
+              >
+                {size}
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        {/* Page Navigation */}
+        <div className={'flex items-center gap-2'}>
+          <Button
+            disabled={!_hasPreviousPage}
+            onClick={() => {
+              handlePageChange(pagination.page - 1);
+            }}
+            size={'sm'}
+            variant={'outline'}
+          >
+            Previous
+          </Button>
+          <div className={'flex items-center gap-1'}>
+            <span className={'text-sm font-medium'}>
+              Page {pagination.page} of {_totalPages}
+            </span>
+          </div>
+          <Button
+            disabled={!_hasNextPage}
+            onClick={() => {
+              handlePageChange(pagination.page + 1);
+            }}
+            size={'sm'}
+            variant={'outline'}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};

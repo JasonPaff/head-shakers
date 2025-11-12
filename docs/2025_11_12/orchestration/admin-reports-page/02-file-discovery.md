@@ -61,6 +61,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 ### Critical Priority (5 files)
 
 **1. src/lib/db/schema/moderation.schema.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: Critical
 - **Category**: Database Schema
@@ -68,6 +69,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: No changes needed - schema is complete
 
 **2. src/lib/queries/content-reports/content-reports.query.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: Critical
 - **Category**: Database Queries
@@ -75,6 +77,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Ready to use - no changes needed
 
 **3. src/lib/actions/admin/admin-content-reports.actions.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: Critical
 - **Category**: Server Actions
@@ -82,6 +85,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Production-ready - can be called directly from UI
 
 **4. src/lib/facades/content-reports/content-reports.facade.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: Critical
 - **Category**: Business Logic
@@ -89,6 +93,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Complete - no modifications needed
 
 **5. src/lib/validations/moderation.validation.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: Critical
 - **Category**: Validation Schemas
@@ -98,6 +103,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 ### High Priority (8 files)
 
 **6. src/app/(app)/admin/reports/page.tsx**
+
 - **Status**: ✅ Exists (placeholder)
 - **Priority**: High
 - **Category**: Page Component
@@ -105,6 +111,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Needs complete implementation with data fetching and table rendering
 
 **7. src/components/admin/analytics/trending-content-table.tsx**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: UI Component Reference
@@ -112,6 +119,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Use as template for reports table component
 
 **8. src/components/ui/table.tsx**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: UI Component
@@ -119,6 +127,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Use for building reports table structure
 
 **9. src/app/(app)/browse/search/components/search-page-content.tsx**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: UI Component Reference
@@ -126,6 +135,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Pattern for handling filters and URL state in reports table
 
 **10. src/middleware.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: Authentication Middleware
@@ -133,6 +143,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Already protecting admin routes - no changes needed
 
 **11. src/lib/middleware/admin.middleware.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: Authorization Middleware
@@ -140,6 +151,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Used by server actions - already functional
 
 **12. src/lib/utils/admin.utils.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: Utility Functions
@@ -147,6 +159,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - **Implementation Impact**: Use in reports page for authentication
 
 **13. src/lib/utils/next-safe-action.ts**
+
 - **Status**: ✅ Exists
 - **Priority**: High
 - **Category**: Action Client Configuration
@@ -156,6 +169,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 ### Medium Priority (14 files)
 
 **14-18. Constants Files**
+
 - src/lib/constants/enums.ts (report enums)
 - src/lib/constants/operations.ts (operation names)
 - src/lib/constants/action-names.ts (action metadata)
@@ -163,11 +177,13 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 - src/components/layout/admin/admin-layout.tsx (layout wrapper)
 
 **19-21. Schema Files**
+
 - src/lib/db/schema/users.schema.ts (reporter/moderator info)
 - src/lib/db/schema/bobbleheads.schema.ts (target validation)
 - src/lib/db/schema/collections.schema.ts (target validation)
 
 **22-27. UI Component Files**
+
 - src/components/ui/select.tsx (filter dropdowns)
 - src/components/ui/badge.tsx (status badges)
 - src/components/ui/button.tsx (action buttons)
@@ -178,6 +194,7 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 ### Low Priority (8 files)
 
 **28-35. Reference & Pattern Files**
+
 - src/app/(app)/admin/featured-content/page.tsx (admin page pattern)
 - src/app/(app)/admin/analytics/page.tsx (error boundaries)
 - src/app/(app)/admin/page.tsx (admin dashboard)
@@ -188,19 +205,23 @@ Please discover a minimum of 5 relevant files with proper categorization by prio
 ## File Path Validation
 
 ### Validation Process
+
 - ✅ All 35 discovered files validated for existence
 - ✅ All file paths are absolute and correct
 - ✅ No missing or inaccessible files found
 - ✅ All files have appropriate read permissions
 
 ### Files Requiring Creation
+
 None - all necessary backend infrastructure exists
 
 ### Files Requiring Modification
+
 1. **src/app/(app)/admin/reports/page.tsx** - Replace placeholder with full implementation
 2. **src/app/(app)/admin/page.tsx** - Update with real report stats
 
 ### New Files to Create
+
 1. **src/components/admin/reports/reports-table.tsx** - Main table component
 2. **src/components/admin/reports/report-detail-dialog.tsx** - Detail view
 3. **src/components/admin/reports/update-report-status-dialog.tsx** - Status update form

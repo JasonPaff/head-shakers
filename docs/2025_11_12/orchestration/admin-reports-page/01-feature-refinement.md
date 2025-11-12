@@ -16,6 +16,7 @@ as an admin I would like the admins reports page implemented so that I can deal 
 ## Context Provided
 
 ### Project Context (from CLAUDE.md)
+
 - Next.js 15.5.3 with App Router
 - React 19.1.0 with TypeScript
 - PostgreSQL with Neon serverless and Drizzle ORM
@@ -26,6 +27,7 @@ as an admin I would like the admins reports page implemented so that I can deal 
 - Type-safe routing with next-typesafe-url
 
 ### Folder Structure
+
 - src/app/(app)/ - App routes
 - src/components/ui/ - Reusable UI components
 - src/lib/db/ - Database schema
