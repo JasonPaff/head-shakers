@@ -117,7 +117,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 
 - `npm run dev` - Start development server with Turbopack
 - `npm run build` - Build for production
-- `npm run next-typesafe-url` - Generate type-safe routes
+- `npm run next-typesafe-url` - Generate type-safe routes for the $path object
 - `npm run format` - Format code with Prettier
 - `npm run test` - Run test suite
 - `npm run lint:fix` - Run ESLint
@@ -137,6 +137,7 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 - **Never use TS-ignore comments**: Always fix type errors instead of ignoring them.
 - **No Barrel Files**: Do not use `index.ts` files for re-exports. Always import directly from the file path.
 - **Real Time Notifications**: Use Ably for all real-time features. Use very sparingly and only when truly necessary for the feature.
+- **URLs**: Use $path from next-typesafe-url for all internal links.
 
 ## Project Documentation Conventions (Important)
 
