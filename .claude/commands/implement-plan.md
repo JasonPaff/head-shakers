@@ -1,6 +1,6 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Read(*), Write(*), Bash(git:*,mkdir:*), TodoWrite(*), AskUserQuestion(*)
-argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N]'
+allowed-tools: Task(subagent_type:general-purpose), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 model: sonnet
 ---
@@ -20,6 +20,7 @@ You are a lightweight implementation orchestrator that coordinates the execution
 - `--step-by-step`: Pause for user approval between each step
 - `--dry-run`: Show what would be done without making changes
 - `--resume-from=N`: Resume implementation from step N (if previous run failed)
+- `--worktree`: Create a new git worktree with feature branch for isolated development
 
 **Examples:**
 
@@ -27,6 +28,8 @@ You are a lightweight implementation orchestrator that coordinates the execution
 - `/implement-plan docs/2025_11_11/plans/notifications-implementation-plan.md --step-by-step`
 - `/implement-plan docs/2025_11_11/plans/admin-dashboard-implementation-plan.md --dry-run`
 - `/implement-plan docs/2025_11_11/plans/social-features-implementation-plan.md --resume-from=3`
+- `/implement-plan docs/2025_11_11/plans/user-profile-implementation-plan.md --worktree`
+- `/implement-plan docs/2025_11_11/plans/search-feature-implementation-plan.md --worktree --step-by-step`
 
 ## Architecture Overview
 
@@ -57,15 +60,38 @@ When the user runs this command, execute this comprehensive workflow:
 1. Record execution start time with ISO timestamp
 2. **Parse Arguments**:
    - Extract plan file path from `$ARGUMENTS`
-   - Detect execution mode flags (`--step-by-step`, `--dry-run`, `--resume-from=N`)
+   - Detect execution mode flags (`--step-by-step`, `--dry-run`, `--resume-from=N`, `--worktree`)
    - Validate plan file path exists
-3. **Git Safety Checks**:
+3. **Worktree Setup** (if `--worktree` flag present):
+   - Extract feature name from plan filename (e.g., `add-user-auth-implementation-plan.md` → `add-user-auth`)
+   - Generate feature slug (lowercase, hyphens, no special chars)
+   - Define worktree path: `.worktrees/{feature-slug}/`
+   - Define branch name: `feat/{feature-slug}`
+   - Ensure `.worktrees/` is in `.gitignore` (check and add if missing)
+   - Check if worktree path already exists:
+     - If exists: Error and ask user to remove existing worktree or use different plan name
+     - If not exists: Continue
+   - Run `git worktree add -b {branch-name} {worktree-path}`
+   - Capture worktree creation output
+   - Change working directory to worktree path: `cd {worktree-path}`
+   - Run `npm install` to set up dependencies (with timeout 300 seconds)
+   - Capture npm install output
+   - Verify npm install succeeded
+   - Log worktree setup details:
+     - Worktree path (absolute)
+     - Branch name
+     - npm install status
+     - Working directory changed to worktree
+   - **IMPORTANT**: All subsequent operations (git commands, file operations, validation) will now run in worktree context
+4. **Git Safety Checks**:
    - Run `git branch --show-current` to get current branch
-   - **CRITICAL**: Block execution if on `main` or production branch (`br-dry-forest-adjaydda`)
-   - Warn user and require explicit confirmation if on development branch
+   - **If worktree was created**: Branch will be new feature branch, skip production/main checks
+   - **If worktree was NOT created**:
+     - **CRITICAL**: Block execution if on `main` or production branch (`br-dry-forest-adjaydda`)
+     - Warn user and require explicit confirmation if on development branch
    - Run `git status` to check for uncommitted changes
    - If uncommitted changes exist, offer to stash or require commit first
-4. **Read Implementation Plan**:
+5. **Read Implementation Plan**:
    - Use Read tool to load the plan file
    - Parse plan structure and extract:
      - Feature name and overview
@@ -74,22 +100,26 @@ When the user runs this command, execute this comprehensive workflow:
      - All implementation steps with details
      - Quality gates section
      - Success criteria
-5. **Validate Prerequisites**:
+6. **Validate Prerequisites**:
    - Check each prerequisite from plan
    - Verify required files exist
    - Verify required packages are installed
    - If prerequisites not met, list missing items and exit
-6. **Create Implementation Directory**:
+7. **Create Implementation Directory**:
    - Extract feature name from plan filename
    - Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/` directory
    - Initialize `00-implementation-index.md` with overview and navigation
-7. **SAVE PRE-CHECKS LOG**: Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/01-pre-checks.md`:
+8. **SAVE PRE-CHECKS LOG**: Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/01-pre-checks.md`:
    - Execution metadata (timestamp, mode, plan path)
+   - Worktree details (if `--worktree` flag used):
+     - Worktree path (absolute)
+     - Feature branch name
+     - npm install output and status
    - Git status and branch information
    - Parsed plan summary (X steps, Y quality gates)
    - Prerequisites validation results
    - Safety check results
-8. **CHECKPOINT**: Pre-checks complete, ready to proceed
+9. **CHECKPOINT**: Pre-checks complete, ready to proceed
 
 **Dry-Run Mode**: If `--dry-run` flag present, output what would be done and exit after this phase.
 
@@ -416,13 +446,53 @@ When the user runs this command, execute this comprehensive workflow:
          Co-Authored-By: Claude <noreply@anthropic.com>
          ```
        - Use git commit process from Bash tool instructions
-8. **Final Output to User**:
+8. **Worktree Cleanup** (if `--worktree` flag was used):
+   - Use AskUserQuestion to ask user how to handle the worktree:
+     - Question: "Implementation complete in worktree. How would you like to proceed?"
+     - Options:
+       1. "Merge to main branch and remove worktree" - Merges feature branch to original branch, removes worktree
+       2. "Push branch and create PR" - Pushes feature branch to remote, offers to remove worktree
+       3. "Keep worktree for testing" - Leaves worktree in place for manual testing/review
+       4. "Remove worktree only" - Deletes worktree but keeps feature branch
+   - **Option 1 - Merge and Remove**:
+     - Change directory back to original working directory
+     - Run `git checkout {original-branch}` (from pre-checks log)
+     - Run `git merge feat/{feature-slug} --no-ff -m "Merge feature: {feature-name}"`
+     - If merge successful:
+       - Run `git worktree remove .worktrees/{feature-slug}`
+       - Run `git branch -d feat/{feature-slug}` (delete feature branch)
+       - Confirm merge and cleanup complete
+     - If merge conflicts:
+       - List conflict files
+       - Offer to abort merge or let user resolve manually
+   - **Option 2 - Push and PR**:
+     - Ensure commit was made (from step 7)
+     - Run `git push -u origin feat/{feature-slug}`
+     - Offer to create PR using `gh pr create` (if gh CLI available)
+     - Use AskUserQuestion to ask: "Remove worktree now or keep for testing?"
+       - If "Remove": Run `git worktree remove .worktrees/{feature-slug}` from original directory
+       - If "Keep": Leave worktree in place
+   - **Option 3 - Keep Worktree**:
+     - Output message: "Worktree kept at: {worktree-path}"
+     - Provide instructions: "To return to worktree: cd {worktree-path}"
+     - Provide cleanup command: "To remove later: git worktree remove {worktree-path}"
+   - **Option 4 - Remove Worktree Only**:
+     - Change directory back to original working directory
+     - Run `git worktree remove .worktrees/{feature-slug}`
+     - Output message: "Worktree removed. Feature branch 'feat/{feature-slug}' preserved."
+     - Provide merge instruction: "To merge later: git merge feat/{feature-slug}"
+   - Log worktree cleanup action to implementation summary
+9. **Final Output to User**:
    ```
    ## Implementation Complete
 
    ✓ Completed {N}/{Total} steps successfully
    ✓ Modified {X} files, created {Y} files
    ✓ Quality gates: {Z} passed, {W} failed
+   {IF WORKTREE}
+   ✓ Worktree: {worktree-action-taken}
+   ✓ Branch: feat/{feature-slug}
+   {END IF}
 
    Implementation log: docs/{date}/implementation/{feature-name}/
    - 📄 00-implementation-index.md - Navigation and overview
@@ -468,10 +538,11 @@ When the user runs this command, execute this comprehensive workflow:
 
 **Rollback Capability**:
 - If major failure occurs:
-  - Suggest using `git diff` to review changes
+  - **If in worktree**: Offer to remove entire worktree (clean rollback)
+  - **If not in worktree**: Suggest using `git diff` to review changes
   - Offer to `git restore` specific files
   - Recommend `git stash` to save partial work
-  - Never automatically discard work
+  - Never automatically discard work without user confirmation
 
 ## Implementation Details
 
@@ -479,7 +550,8 @@ When the user runs this command, execute this comprehensive workflow:
 
 - **ORCHESTRATOR PATTERN**: This command is a lightweight coordinator, NOT a direct implementer
 - **SUBAGENT DELEGATION**: Each step executed by isolated subagent with fresh context
-- **SAFETY FIRST**: Never execute on main or production branches without explicit confirmation
+- **WORKTREE ISOLATION**: Optional git worktree creation for isolated feature development with automated cleanup
+- **SAFETY FIRST**: Never execute on main or production branches without explicit confirmation (worktrees bypass this with new branches)
 - **SKILL INTEGRATION**: Subagents automatically invoke react-coding-conventions skill for React files
 - **SYSTEMATIC EXECUTION**: Execute steps in order, one at a time, via subagent delegation
 - **VALIDATION ENFORCEMENT**: Subagents always run lint:fix and typecheck for code changes
@@ -641,6 +713,14 @@ YY-implementation-summary.md        # Final summary and statistics
 - Always review the implementation plan before executing to ensure it's current
 - Use `--step-by-step` mode for complex or risky implementations
 - Use `--dry-run` mode to preview changes before applying them
+- Use `--worktree` mode for isolated feature development with these benefits:
+  - Complete isolation from main codebase
+  - Safe experimentation without affecting working directory
+  - Easy rollback by removing entire worktree
+  - Automatic dependency installation (npm install)
+  - Flexible cleanup options (merge, PR, keep, or remove)
+- **Worktree Location**: Created at `.worktrees/{feature-slug}/` (gitignored by default)
+- **Worktree Branch**: Uses `feat/{feature-slug}` naming convention
 - Implementation logs provide complete audit trail for debugging and review
 - Quality gates are enforced but non-blocking warnings won't stop execution
 - Git commit is offered but optional - you can commit manually if preferred
