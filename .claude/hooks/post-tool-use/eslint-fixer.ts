@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 /**
- * Prettier auto-formatter for Claude Code.
- * Runs Prettier on edited JS/TS files after Edit/Write operations.
+ * ESLint auto-fixer for Claude Code.
+ * Runs ESLint --fix on edited JS/TS files after Edit/Write operations.
  */
 import { execSync } from 'child_process';
 
@@ -26,13 +26,14 @@ async function main() {
     const filePath = data.tool_input?.file_path;
     const toolSucceeded = data.tool_response?.success !== false;
 
-    // Only run Prettier if the tool succeeded and file is a JS/TS file
+    // Only run ESLint if the tool succeeded and file is a JS/TS file
     if (!toolSucceeded || !filePath) {
       process.exit(0);
     }
 
     if (/\.(js|jsx|ts|tsx)$/.test(filePath)) {
-      execSync(`npx prettier --write "${filePath}"`, {
+      // Run ESLint --fix on the file
+      execSync(`npx eslint --fix "${filePath}"`, {
         stdio: 'inherit',
         cwd: process.env.CLAUDE_PROJECT_DIR || process.cwd(),
       });
@@ -41,6 +42,7 @@ async function main() {
     process.exit(0);
   } catch (error) {
     // Silently ignore errors to avoid blocking the workflow
+    // ESLint errors (syntax issues, etc.) shouldn't prevent Claude from continuing
     process.exit(0);
   }
 }

@@ -28,6 +28,10 @@
           {
             "type": "command",
             "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
+          },
+          {
+            "type": "command",
+            "command": "bun ./.claude/hooks/post-tool-use/eslint-fixer.ts"
           }
         ]
       }
