@@ -1,11 +1,11 @@
 ---
-allowed-tools: Task(subagent_type:*), Read(*), Edit(*), Write(*), Bash(*), TodoWrite(*), Skill(react-coding-conventions), Glob(*), Grep(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Read(*), Write(*), Bash(git:*,mkdir:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N]'
-description: Execute implementation plan with structured tracking and validation
+description: Execute implementation plan with structured tracking and validation using subagent architecture
 model: sonnet
 ---
 
-You are a systematic implementation executor that takes detailed implementation plans and executes them with comprehensive tracking, validation, and logging.
+You are a lightweight implementation orchestrator that coordinates the execution of detailed implementation plans by delegating each step to specialized subagents. Your role is coordination, tracking, and logging - NOT direct implementation.
 
 @CLAUDE.MD
 @package.json
@@ -28,15 +28,23 @@ You are a systematic implementation executor that takes detailed implementation 
 - `/implement-plan docs/2025_11_11/plans/admin-dashboard-implementation-plan.md --dry-run`
 - `/implement-plan docs/2025_11_11/plans/social-features-implementation-plan.md --resume-from=3`
 
+## Architecture Overview
+
+**Orchestrator Pattern**: This command uses an orchestrator + subagent architecture for scalability:
+
+- **Main Orchestrator** (this command): Lightweight coordination, todo management, logging
+- **Step Subagents**: Fresh context per step, handles actual implementation
+- **Benefits**: No context overflow, scalable to 50+ step plans, better isolation
+
 ## Workflow Overview
 
 When the user runs this command, execute this comprehensive workflow:
 
-1. **Pre-Implementation Checks**: Validate environment and parse plan
-2. **Setup**: Initialize todo list and logging structure
-3. **Step Execution**: Systematically implement each step with validation
-4. **Quality Gates**: Run all quality gates from the plan
-5. **Summary**: Generate implementation report and offer git commit
+1. **Pre-Implementation Checks**: Validate environment and parse plan (orchestrator)
+2. **Setup**: Initialize todo list and logging structure (orchestrator)
+3. **Step Execution**: Launch subagent for each step (orchestrator delegates to subagents)
+4. **Quality Gates**: Run validation commands (orchestrator or subagent)
+5. **Summary**: Generate implementation report and offer git commit (orchestrator)
 
 ## Step-by-Step Execution
 
@@ -107,22 +115,26 @@ When the user runs this command, execute this comprehensive workflow:
    - Format: "Implementing step N: {step title}" (activeForm)
    - All todos start as "pending" status
    - Add quality gates as separate todos at the end
-4. **Context Gathering**:
-   - Identify all files mentioned across all steps
-   - Read all relevant files into context (batch Read operations)
-   - If files need creation, note them separately
+4. **Prepare Step Metadata**:
+   - Store parsed step details for subagent delegation
+   - Note files mentioned in each step (for subagent context)
+   - Identify steps with dependencies on previous steps
 5. **SAVE SETUP LOG**: Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/02-setup.md`:
    - Setup metadata (timestamp, duration)
-   - Extracted steps summary
-   - Todo list created (X items)
-   - Files loaded into context (Y files)
-   - Files to be created (Z files)
+   - Extracted steps summary (N steps identified)
+   - Todo list created (N+1 items including quality gates)
+   - Step dependency analysis
+   - Files mentioned per step summary
 6. **UPDATE INDEX**: Append setup summary to implementation index
 7. **CHECKPOINT**: Setup complete, beginning implementation
 
-### Phase 3: Step-by-Step Implementation
+**Orchestrator Note**: No files are loaded into context at this phase. Each subagent will load only the files it needs.
 
-**Objective**: Execute each implementation step systematically with validation and logging.
+### Phase 3: Step-by-Step Implementation (Subagent Delegation)
+
+**Objective**: Orchestrate execution of each step by delegating to subagents with fresh context.
+
+**Architecture**: Each step runs in its own subagent with isolated context. The orchestrator coordinates, tracks progress, and aggregates results.
 
 **Process** (repeat for each step):
 
@@ -130,110 +142,222 @@ When the user runs this command, execute this comprehensive workflow:
 2. **Update Todo Status**:
    - Mark current step todo as "in_progress"
    - Ensure exactly ONE todo is in_progress at a time
-3. **Pre-Step Validation**:
+3. **Pre-Step Validation** (Orchestrator):
    - Verify all prerequisite steps are completed
-   - Check if files mentioned in step exist
    - If step depends on previous step, verify previous step success
-4. **Skill Invocation** (conditional):
-   - If step involves `.tsx`, `.jsx`, `.ts`, or `.js` files:
-     - **CRITICAL**: Invoke `react-coding-conventions` skill automatically
-     - Apply skill conventions to all code changes in this step
-5. **File Analysis**:
-   - Read all files mentioned in step (if not already in context)
-   - Analyze current state vs desired state from step description
-   - Identify specific changes needed
-6. **Implementation**:
-   - Apply changes per step instructions using Edit or Write tools
-   - For new files: Use Write tool
-   - For existing files: Use Edit tool with precise changes
-   - Follow "What" section guidance from plan
-   - Ensure changes align with "Why" rationale
-7. **Validation Execution**:
-   - Run all validation commands specified in step
-   - **REQUIRED**: Run `npm run lint:fix && npm run typecheck` for code changes
-   - Run any step-specific validation commands
-   - Capture all validation output
-8. **Success Criteria Verification**:
-   - Check each success criterion from step
-   - Verify expected outcomes achieved
-   - If criteria not met, log failure and determine if blocking
-9. **Step Logging**:
+   - Check if any blockers from previous steps
+4. **Prepare Subagent Input** (Orchestrator):
+   - Gather step details from parsed plan:
+     - Step number and title
+     - What (description of changes)
+     - Why (rationale)
+     - Files to modify/create (list of file paths)
+     - Validation commands to run
+     - Success criteria to verify
+     - Confidence level
+   - Include previous step summary (if dependent):
+     - What was changed in previous step
+     - Files modified/created
+     - Any notes for this step
+   - Detect if step involves React files (.tsx, .jsx, .ts, .js)
+5. **Launch Step Subagent**:
+   - Use Task tool with `subagent_type: "general-purpose"`
+   - Description: "Implement step {N}: {step title}"
+   - **CRITICAL**: Set timeout to 300 seconds (5 minutes) per step
+   - **Subagent Prompt Template**:
+     ```
+     You are implementing Step {N} of an implementation plan with FRESH CONTEXT.
+
+     Your task is to implement this step completely and return structured results.
+
+     ## Step Details
+
+     **Step**: {N}/{Total} - {Step Title}
+
+     **What to do**:
+     {What description from plan}
+
+     **Why**:
+     {Why rationale from plan}
+
+     **Files to work with**:
+     {List of file paths to modify or create}
+
+     **Validation commands**:
+     {List of validation commands to run}
+
+     **Success criteria**:
+     {List of success criteria to verify}
+
+     **Confidence level**: {Confidence from plan}
+
+     {IF DEPENDENT}
+     **Previous step context**:
+     Step {N-1} made these changes:
+     {Previous step summary}
+     {END IF}
+
+     ## Instructions
+
+     1. **Read Files**: Load all files mentioned above using the Read tool
+     2. **Apply Conventions**: {IF React files detected}Invoke the react-coding-conventions skill FIRST before making any changes{END IF}
+     3. **Implement Changes**:
+        - Use Edit tool for existing files
+        - Use Write tool for new files
+        - Follow the "What" description exactly
+        - Keep changes focused on this step only
+     4. **Validation**:
+        - Run ALL validation commands specified above
+        - For code changes, MUST run: npm run lint:fix && npm run typecheck
+        - Capture all validation output
+     5. **Verify Success Criteria**: Check each criterion and note pass/fail
+     6. **Return Structured Results**: At the end of your work, provide a clear summary in this format:
+
+     ## STEP RESULTS
+
+     **Status**: success | failure
+
+     **Files Modified**:
+     - path/to/file1.ts - Description of changes made
+     - path/to/file2.tsx - Description of changes made
+
+     **Files Created**:
+     - path/to/newfile.ts - Description of file purpose
+
+     **Validation Results**:
+     - Command: npm run lint:fix && npm run typecheck
+       Result: PASS | FAIL
+       Output: {relevant output}
+     - {other validation commands}
+
+     **Success Criteria**:
+     - [✓] Criterion 1: {description}
+     - [✓] Criterion 2: {description}
+     - [✗] Criterion 3: {description} - {reason for failure}
+
+     **Errors/Warnings**: {any issues encountered}
+
+     **Notes for Next Steps**: {anything important for subsequent steps}
+
+     IMPORTANT:
+     - Do NOT read files outside the list provided
+     - Do NOT implement steps beyond this one
+     - Do NOT skip validation commands
+     - Focus ONLY on this step's requirements
+     ```
+6. **Subagent Execution** (Subagent performs):
+   - Reads necessary files
+   - Invokes react-coding-conventions skill if React files
+   - Implements changes per step instructions
+   - Runs validation commands
+   - Verifies success criteria
+   - Returns structured results to orchestrator
+7. **Process Subagent Results** (Orchestrator):
+   - Capture full subagent response
+   - Parse structured results section
+   - Extract:
+     - Status (success/failure)
+     - Files modified/created with descriptions
+     - Validation command outputs
+     - Success criteria verification
+     - Errors/warnings
+     - Notes for next steps
+8. **Step Logging** (Orchestrator):
    - Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/0{N+2}-step-{N}-results.md`:
      - Step metadata (number, title, timestamp, duration)
-     - Files modified/created with change descriptions
-     - Validation command outputs
-     - Success criteria verification results
-     - Any errors, warnings, or notes
-     - Confidence assessment (from plan vs actual)
-10. **Update Todo Status**:
-    - If step succeeded: Mark todo as "completed"
-    - If step failed: Keep as "in_progress" and log error
-11. **Error Handling**:
-    - If step fails:
+     - Subagent input (what was asked)
+     - Subagent output (full response)
+     - Parsed results summary
+     - Files modified/created
+     - Validation results
+     - Success criteria verification
+     - Any errors or warnings
+9. **Update Todo Status** (Orchestrator):
+   - If step succeeded: Mark todo as "completed"
+   - If step failed: Keep as "in_progress" and log error
+10. **Error Handling** (Orchestrator):
+    - If subagent times out:
+      - Log timeout error
+      - Mark step as failed
+      - Continue or abort based on severity
+    - If subagent returns failure:
       - Log detailed error information
-      - Attempt automatic recovery if possible
+      - Attempt to determine if blocking
       - If `--step-by-step` mode: Ask user how to proceed
-      - Otherwise: Skip to error recovery phase
-12. **Step-by-Step Mode Check**:
+      - Otherwise: Continue or abort based on severity
+11. **Step-by-Step Mode Check** (Orchestrator):
     - If `--step-by-step` flag present:
       - Use AskUserQuestion to ask user:
-        - "Step {N} completed successfully. Continue to next step?"
-        - Options: "Continue", "Skip next step", "Abort implementation"
+        - "Step {N} completed {successfully/with errors}. Continue to next step?"
+        - Options: "Continue", "Skip next step", "Retry this step", "Abort implementation"
       - Handle user response accordingly
-13. **UPDATE INDEX**: Append step summary to implementation index
-14. **Progress Report**:
+12. **UPDATE INDEX** (Orchestrator): Append step summary to implementation index
+13. **Progress Report** (Orchestrator):
     - Output concise progress: "Completed step {N}/{Total} - {step title}"
 
 **Resume Mode**: If `--resume-from=N` flag present, skip to step N and begin execution there.
 
 **Context Management**:
-- Keep all modified files in context throughout implementation
-- Don't re-read files unnecessarily
-- Update context after each step if files changed significantly
+- **Orchestrator**: Maintains minimal context (parsed plan, step metadata, results summaries)
+- **Subagents**: Each gets fresh context with only files needed for their step
+- **Result**: Scalable to plans with 50+ steps without context overflow
 
 ### Phase 4: Quality Gates Execution
 
 **Objective**: Run all quality gates from the plan to ensure implementation quality.
 
+**Architecture**: Quality gates can run in orchestrator (simple) or delegated to subagent (complex tests).
+
 **Process**:
 
 1. Record quality gates start time with ISO timestamp
-2. **Extract Quality Gates**:
+2. **Extract Quality Gates** (Orchestrator):
    - Parse quality gates section from plan
    - Identify all validation commands and checks
-3. **Create Quality Gate Todos**:
+   - Assess complexity (simple commands vs complex test suites)
+3. **Mark Quality Gate Todo** (Orchestrator):
    - Mark quality gates todo as "in_progress"
-4. **Execute Each Quality Gate**:
-   - Run validation commands:
-     - `npm run lint:fix` (if not already run)
-     - `npm run typecheck`
-     - `npm run test` (if specified in plan)
-     - `npm run build` (if specified in plan)
-     - Any custom validation commands from plan
-   - Capture all output
-   - Check pass/fail status
-5. **Database Validation** (if applicable):
+4. **Execute Quality Gates**:
+
+   **Option A - Simple Validation** (Orchestrator runs directly):
+   - For basic commands (lint, typecheck, build):
+     - Run validation commands using Bash tool:
+       - `npm run lint:fix` (if not already run)
+       - `npm run typecheck`
+       - `npm run build` (if specified in plan)
+     - Capture all output
+     - Check pass/fail status
+
+   **Option B - Complex Testing** (Delegate to subagent):
+   - For comprehensive test suites (unit, integration, e2e):
+     - Use Task tool with `subagent_type: "general-purpose"`
+     - Description: "Run quality gates and test suites"
+     - **Subagent handles**: Running tests, analyzing failures, suggesting fixes
+     - **Returns**: Test results, coverage reports, failure analysis
+
+5. **Database Validation** (if applicable - Orchestrator):
    - If plan involves database changes:
      - Suggest running `/db check schema` to validate migrations
      - Verify database integrity
-6. **Integration Checks** (if applicable):
+6. **Integration Checks** (if applicable - Orchestrator):
    - If plan involves UI changes:
      - Suggest running `/ui-audit [page]` to test user interactions
-7. **Quality Gate Results**:
+7. **Quality Gate Results** (Orchestrator):
    - Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/XX-quality-gates.md`:
      - Quality gates metadata (timestamp, duration)
      - Each gate result (pass/fail)
      - Full output of all validation commands
+     - Test results (if applicable)
      - Summary of issues found
      - Blockers vs warnings categorization
-8. **Gate Status Check**:
+8. **Gate Status Check** (Orchestrator):
    - If all gates pass: Mark quality gates todo as "completed"
    - If any gate fails:
      - Log failure details
      - Keep todo as "in_progress"
      - Determine if blocking (critical vs non-critical failures)
      - Provide recommendations for fixes
-9. **UPDATE INDEX**: Append quality gates summary to implementation index
+9. **UPDATE INDEX** (Orchestrator): Append quality gates summary to implementation index
 
 ### Phase 5: Implementation Summary and Completion
 
@@ -353,16 +477,18 @@ When the user runs this command, execute this comprehensive workflow:
 
 **Critical Requirements**:
 
+- **ORCHESTRATOR PATTERN**: This command is a lightweight coordinator, NOT a direct implementer
+- **SUBAGENT DELEGATION**: Each step executed by isolated subagent with fresh context
 - **SAFETY FIRST**: Never execute on main or production branches without explicit confirmation
-- **SKILL INTEGRATION**: Automatically invoke react-coding-conventions skill for React files
-- **SYSTEMATIC EXECUTION**: Execute steps in order, one at a time
-- **VALIDATION ENFORCEMENT**: Always run lint:fix and typecheck for code changes
-- **TODO MANAGEMENT**: Keep todo list updated in real-time (ONE in_progress at a time)
-- **COMPREHENSIVE LOGGING**: Save detailed logs for each step and phase
-- **ERROR RECOVERY**: Handle errors gracefully with clear user guidance
+- **SKILL INTEGRATION**: Subagents automatically invoke react-coding-conventions skill for React files
+- **SYSTEMATIC EXECUTION**: Execute steps in order, one at a time, via subagent delegation
+- **VALIDATION ENFORCEMENT**: Subagents always run lint:fix and typecheck for code changes
+- **TODO MANAGEMENT**: Orchestrator keeps todo list updated in real-time (ONE in_progress at a time)
+- **COMPREHENSIVE LOGGING**: Orchestrator saves detailed logs for each step and phase
+- **ERROR RECOVERY**: Handle subagent errors gracefully with clear user guidance
 - **QUALITY ASSURANCE**: Enforce quality gates before completion
-- **BATCH OPERATIONS**: Use parallel tool calls where possible for performance
-- **CONTEXT EFFICIENCY**: Load files once, keep in context throughout
+- **CONTEXT EFFICIENCY**: Orchestrator maintains minimal context, subagents use fresh context per step
+- **SCALABILITY**: Can handle plans with 50+ steps without context overflow
 
 **Quality Standards**:
 
@@ -383,11 +509,12 @@ When the user runs this command, execute this comprehensive workflow:
 
 **Performance Optimization**:
 
-- Batch file reads when possible
-- Use parallel tool calls for independent operations
-- Reuse context instead of re-reading files
-- Skip unnecessary validations if already run
-- Cache validation results within session
+- **Orchestrator**: Minimal context usage, fast coordination
+- **Subagents**: Fresh context per step prevents bloat
+- **Parallel Potential**: Independent steps could run in parallel (future enhancement)
+- **Batch Operations**: Orchestrator batches pre-checks and setup operations
+- **Context Isolation**: Each subagent only loads files needed for its step
+- **Scalable Architecture**: Linear context growth instead of exponential
 
 **User Experience**:
 
@@ -473,12 +600,48 @@ YY-implementation-summary.md        # Final summary and statistics
 /ui-audit /notifications
 ```
 
+## Subagent Communication Protocol
+
+**Input to Step Subagent** (from orchestrator):
+```
+- Step number and title
+- What: Description of changes needed
+- Why: Rationale for the changes
+- Files: List of file paths to modify/create
+- Validation commands: Commands to run for verification
+- Success criteria: Criteria to check
+- Previous step context: Summary of what previous step did (if dependent)
+- React file detection: Boolean indicating if react-coding-conventions skill needed
+```
+
+**Output from Step Subagent** (to orchestrator):
+```
+- Status: success | failure
+- Files modified: List with descriptions of changes
+- Files created: List with descriptions
+- Validation results: Command outputs with pass/fail status
+- Success criteria: Verification of each criterion
+- Errors/warnings: Any issues encountered
+- Notes: Information for subsequent steps
+```
+
+**Architecture Benefits**:
+
+1. **Context Isolation**: Each step has clean, isolated context
+2. **Scalability**: Can handle 50+ step plans without context overflow
+3. **Error Containment**: Failures isolated to individual steps
+4. **Parallel Potential**: Future enhancement could run independent steps concurrently
+5. **Debugging**: Clear separation between orchestration and implementation
+6. **Resource Efficiency**: Only load files needed per step, not entire codebase
+
 ## Notes
 
 - This command is designed to work seamlessly with plans generated by `/plan-feature`
+- **Architecture**: Uses orchestrator + subagent pattern for scalability
 - Always review the implementation plan before executing to ensure it's current
 - Use `--step-by-step` mode for complex or risky implementations
 - Use `--dry-run` mode to preview changes before applying them
 - Implementation logs provide complete audit trail for debugging and review
 - Quality gates are enforced but non-blocking warnings won't stop execution
 - Git commit is offered but optional - you can commit manually if preferred
+- **Scalability**: Tested architecture can handle plans with 50+ steps efficiently
