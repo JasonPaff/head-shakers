@@ -1,0 +1,371 @@
+
+================================================================================
+2025-11-12T14:31:07.499Z
+Tool: Bash
+Input:
+{
+  "command": "mkdir -p \"C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\"",
+  "description": "Create components directory for reports page"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:31:22.003Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-async.tsx",
+  "content": "import { ContentReportsQuery } from '@/lib/queries/content-reports/content-reports.query';\nimport { getDbInstance } from '@/lib/queries/query-client';\n\nimport { ReportsPageClient } from './reports-page-client';\n\ninterface ReportsPageAsyncProps {\n  searchParams: {\n    dateEnd?: string;\n    dateStart?: string;\n    page?: string;\n    pageSize?: string;\n    reason?: string;\n    severity?: string;\n    status?: string;\n    targetType?: string;\n  };\n}\n\nexport const ReportsPageAsync = async ({ searchParams }: ReportsPageAsyncProps) => {\n  // Parse pagination parameters\n  const page = searchParams.page ? parseInt(searchParams.page, 10) : 1;\n  const pageSize = searchParams.pageSize ? parseInt(searchParams.pageSize, 10) : 25;\n\n  // Calculate offset for pagination\n  const offset = (page - 1) * pageSize;\n\n  // Build filter options from search params\n  const filterOptions = {\n    limit: pageSize,\n    moderatorId: undefined,\n    offset,\n    reason: searchParams.reason as\n      | 'copyright'\n      | 'harassment'\n      | 'inappropriate_content'\n      | 'misinformation'\n      | 'other'\n      | 'spam'\n      | undefined,\n    reporterId: undefined,\n    status: searchParams.status as 'dismissed' | 'pending' | 'resolved' | 'reviewed' | undefined,\n    targetType: searchParams.targetType as 'bobblehead' | 'collection' | 'subcollection' | undefined,\n  };\n\n  // Get database instance\n  const db = await getDbInstance();\n  const context = { db };\n\n  try {\n    // Fetch reports and stats in parallel\n    const [reports, stats] = await Promise.all([\n      ContentReportsQuery.getAllReportsForAdminAsync(filterOptions, context),\n      ContentReportsQuery.getReportsStatsAsync(context),\n    ]);\n\n    // Calculate total count based on filters\n    const totalCount =\n      searchParams.status ?\n        stats[searchParams.status as keyof typeof stats] || 0\n      : stats.total;\n\n    return (\n      <ReportsPageClient\n        initialData={{\n          reports,\n          stats,\n          totalCount,\n        }}\n      />\n    );\n  } catch (error) {\n    // Handle query errors\n    throw new Error(\n      `Failed to fetch reports: ${error instanceof Error ? error.message : 'Unknown error'}`,\n    );\n  }\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:31:29.919Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\docs\\2025_11_12\\plans\\email-signup-notifications-implementation-plan.md",
+  "content": "# Email Signup Real-Time Admin Notifications - Implementation Plan\n\n**Generated**: 2025-11-12T00:06:15Z\n\n**Original Request**: As an admin I would like to get a real time notification whenever a user signs up to the email list that will notify them with an email when the site goes live\n\n**Refined Request**: As an admin, I need to receive real-time notifications whenever a user signs up to the email list for launch notifications, enabling me to monitor user interest and engagement with the platform before launch. The system should include a new email list signup flow accessible from public pages (such as a landing page, about page, or footer section) where users can enter their email address and optionally select their interests or collector preferences. This signup data must be persisted in a new database table that tracks the email, signup timestamp, user interests, and subscription status, allowing admins to manage and segment the email list later. When a user successfully signs up, the system should immediately trigger a real-time notification to all authenticated admin users through Ably, displaying the new signup details (email, interests, signup time) in a dedicated admin notification panel or dashboard widget. The admin interface should show recent signups with the ability to view signup analytics such as total subscribers, signups over time, and interest distribution. Additionally, the email list signup feature must integrate with a background job queue using Upstash QStash to handle sending transactional confirmation emails to new subscribers, notifying them that they've been added to the launch notification list and will receive an email when the site goes live. Later, when the site is ready to launch, admins should have a server action to trigger a bulk email job through QStash that sends the launch notification email to all active subscribers via Resend. The real-time notification system should be implemented carefully using Ably only for the admin notification component itself, minimizing unnecessary real-time connections while ensuring admins have immediate visibility into signup activity.\n\n---\n\n## Overview\n\n**Estimated Duration**: 3-4 days\n**Complexity**: High\n**Risk Level**: Medium\n\n## Quick Summary\n\nThis plan implements a comprehensive email list signup system with real-time admin notifications via Ably, background email processing through QStash, and enhanced interest tracking. The system allows public users to sign up for launch notifications with optional interests, immediately notifies admins via Ably of new signups, sends confirmation emails via QStash, and provides admin analytics dashboards with real-time updates.\n\n## Analysis Summary\n\n- **Feature Request**: Refined with project context (13.2x expansion from 29 to 382 words)\n- **Files Discovered**: 35 relevant files across database, services, components, and API routes\n- **Architecture Status**: Existing infrastructure 50% complete (database schema, basic CRUD, email service, admin UI exist)\n- **Missing Components**: Ably integration, QStash integration, interest tracking, analytics dashboard, webhook endpoint\n- **Implementation Steps**: 18 detailed steps with validation commands and success criteria\n\n---\n\n## File Discovery Results\n\n### Critical Priority (9 files - Must Create/Modify)\n\n**New Files to Create:**\n1. `src/lib/services/ably.service.ts` - Ably service for real-time admin notifications\n2. `src/lib/services/qstash.service.ts` - QStash service for background email jobs\n3. `src/components/feature/admin/launch-signup-realtime-widget.tsx` - Real-time admin notification widget\n4. `src/app/api/webhooks/launch-notifications/route.ts` - QStash webhook endpoint\n\n**Existing Files to Modify:**\n5. `src/lib/db/schema/launch.schema.ts` - Add interests, source, status fields\n6. `src/lib/validations/launch-notification.validations.ts` - Add validation schemas\n7. `src/lib/facades/launch-notifications/launch-notification.facade.ts` - Integrate Ably and QStash\n8. `src/app/(public)/coming-soon/launch-waitlist-form.tsx` - Add interests UI\n9. `src/app/(app)/admin/launch-notifications/components/launch-notifications-manager.tsx` - Add real-time widget\n\n### High Priority (13 files - Supporting Implementation)\n\n- `src/lib/queries/launch-notifications/launch-notification-query.ts` - Add analytics queries\n- `src/lib/actions/launch-notifications/admin.actions.ts` - Update to use QStash\n- `src/lib/actions/launch-notifications/public.actions.ts` - Add Ably notification trigger\n- `src/app/(app)/admin/launch-notifications/page.tsx` - Integrate real-time widget\n- `src/lib/constants/action-names.ts` - Add new action names\n- `src/lib/constants/config.ts` - Add Ably channel names and webhook URLs\n- `src/lib/constants/redis-keys.ts` - Add Redis keys for deduplication\n- `src/lib/services/resend.service.ts` - Reference for email patterns\n- And 5 more reference files...\n\n### Architecture Insights\n\n**Existing Infrastructure:**\n- Database schema with basic email tracking\n- Complete query layer and facade for CRUD operations\n- ResendService with email templates\n- Admin UI with statistics and signup list\n- Public signup form on coming soon page\n\n**Missing Components:**\n- Real-time notifications via Ably\n- Background email processing via QStash\n- Interest tracking in database schema\n- Analytics dashboard with interest distribution\n- Webhook endpoint for QStash callbacks\n\n**Integration Flows:**\n1. **Ably Real-time**: Publish to `admin:launch-signups` channel on signup → Admin widget subscribes and displays\n2. **QStash Email**: Queue confirmation email on signup → Webhook processes asynchronously → Send via Resend\n3. **Database Extensions**: Add interests (JSONB), source (VARCHAR), status (ENUM) columns with indexes\n\n---\n\n## Prerequisites\n\n- [ ] Ably account credentials configured in environment variables\n- [ ] Upstash QStash credentials configured in environment variables\n- [ ] Resend API key configured for email sending\n- [ ] Database migration access for schema updates\n- [ ] Admin role enforcement in place via Clerk\n\n---\n\n## Implementation Steps\n\n### Step 1: Extend Database Schema with Interests and Status Fields\n\n**What**: Add new columns to the launch notifications table for interest tracking, signup source, and subscription status management\n\n**Why**: Foundation for storing enhanced signup data and supporting segmentation for targeted launch communications\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/db/schema/launch.schema.ts` - Add interests (text array), source (text), status (enum: active/unsubscribed/bounced), updatedAt (timestamp)\n\n**Changes:**\n- Add `interests` column as text array (e.g., categories like \"sports\", \"movies\", \"limited editions\")\n- Add `source` column as text to track where signup originated (e.g., \"landing\", \"footer\", \"about\")\n- Add `status` column as enum with values: \"active\", \"unsubscribed\", \"bounced\"\n- Add `updatedAt` column as timestamp with automatic update trigger\n- Add index on status column for efficient filtering\n- Add index on createdAt for analytics queries\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Schema file compiles without TypeScript errors\n- [ ] All new columns properly typed with Drizzle schema types\n- [ ] Indexes defined for performance optimization\n- [ ] All validation commands pass\n\n---\n\n### Step 2: Generate and Apply Database Migration\n\n**What**: Create and execute Drizzle migration for the schema changes\n\n**Why**: Safely apply database structure changes without data loss\n\n**Confidence**: High\n\n**Files to Create:**\n- `src/lib/db/migrations/[timestamp]_add_launch_notifications_enhanced_fields.sql` - Generated migration file\n\n**Changes:**\n- Run `npm run db:generate` to create migration from schema changes\n- Review generated migration SQL for correctness\n- Use `/db run migration` command through Neon DB Expert subagent\n- Verify migration applies cleanly to development branch\n- Confirm existing data preserved with new columns defaulting appropriately\n\n**Validation Commands:**\n```bash\nnpm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Migration file generated successfully\n- [ ] Migration applies without errors on development database\n- [ ] Existing launch notification records retain all data\n- [ ] New columns appear in database schema with correct types\n\n---\n\n### Step 3: Update Validation Schemas for Enhanced Signup Data\n\n**What**: Extend Zod validation schemas to include interests, source, and status fields with proper validation rules\n\n**Why**: Ensure type safety and data integrity for new fields throughout the application\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/validations/launch-notification.validations.ts` - Add interests array validation, source enum, status enum\n\n**Changes:**\n- Add `interests` field as optional array of strings with predefined categories (max 10 interests, each max 50 chars)\n- Add `source` field as optional string enum (\"landing\", \"footer\", \"about\", \"unknown\")\n- Add `status` field as enum (\"active\", \"unsubscribed\", \"bounced\") with default \"active\"\n- Update `createLaunchNotificationSchema` to include optional interests and source\n- Update `updateLaunchNotificationSchema` to allow status changes\n- Create `bulkEmailSchema` for admin bulk email trigger validation (requires confirmation flag)\n- Create `signupAnalyticsSchema` for date range and grouping options\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] All validation schemas compile without errors\n- [ ] Validation properly enforces array length and string length limits\n- [ ] Enum values match database schema exactly\n- [ ] All validation commands pass\n\n---\n\n### Step 4: Create Ably Service for Real-Time Admin Notifications\n\n**What**: Implement Ably service wrapper for publishing signup events to admin channel\n\n**Why**: Centralized service for real-time notification delivery to admin users with type safety\n\n**Confidence**: High\n\n**Files to Create:**\n- `src/lib/services/ably.service.ts` - Ably client wrapper with channel management\n\n**Changes:**\n- Create `AblyService` class with singleton pattern\n- Implement `publishSignupNotification` method that accepts signup data (email, interests, timestamp, id)\n- Use Ably REST API client (not realtime client to avoid unnecessary connections)\n- Target channel name: `admin:launch-signups` (define in config)\n- Include error handling with Sentry error tracking\n- Add retry logic (max 3 attempts) for failed publishes\n- Type all notification payloads with TypeScript interfaces\n- Implement connection pooling for REST client reuse\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Service exports properly typed methods\n- [ ] Ably REST client initializes correctly\n- [ ] Channel names follow project conventions\n- [ ] Error handling captures all failure scenarios\n- [ ] All validation commands pass\n\n---\n\n### Step 5: Create QStash Service for Background Email Jobs\n\n**What**: Implement QStash service for queuing confirmation emails and bulk launch notification emails\n\n**Why**: Reliable background job processing for email sending without blocking user signup flow\n\n**Confidence**: High\n\n**Files to Create:**\n- `src/lib/services/qstash.service.ts` - QStash client wrapper with email job methods\n\n**Changes:**\n- Create `QStashService` class with singleton pattern\n- Implement `queueConfirmationEmail` method (accepts email, interests, signupId)\n- Implement `queueBulkLaunchEmails` method (accepts optional filters for segmentation)\n- Use QStash publish endpoint with webhook callback URLs\n- Configure webhook URLs pointing to `/api/webhooks/launch-notifications`\n- Add job deduplication using content-based IDs (prevent duplicate emails)\n- Include retry configuration (max 3 retries with exponential backoff)\n- Add job status tracking via QStash message ID\n- Implement error handling with Sentry integration\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Service exports properly typed methods for email jobs\n- [ ] QStash client initializes with correct credentials\n- [ ] Webhook URLs constructed correctly using environment config\n- [ ] Deduplication logic prevents duplicate job submissions\n- [ ] All validation commands pass\n\n---\n\n### Step 6: Extend Query Layer with Analytics Functions\n\n**What**: Add database queries for signup analytics including total subscribers, signups over time, and interest distribution\n\n**Why**: Support admin dashboard analytics and reporting requirements\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/queries/launch-notifications/launch-notification-query.ts` - Add analytics query functions\n\n**Changes:**\n- Add `getSignupAnalytics` function returning total active subscribers, total signups today, total signups this week\n- Add `getSignupsByDateRange` function with grouping by day/week/month\n- Add `getInterestDistribution` function returning counts per interest category\n- Add `getSignupsBySource` function returning counts per signup source\n- Add `getRecentSignups` function with pagination (last 50 signups)\n- Optimize all queries with proper indexes and query planning\n- Use Drizzle query builder with proper typing\n- Add Redis caching for analytics queries (5-minute TTL)\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] All query functions properly typed with return types\n- [ ] Queries use indexes for performance\n- [ ] Redis caching implemented correctly\n- [ ] Functions handle empty result sets gracefully\n- [ ] All validation commands pass\n\n---\n\n### Step 7: Update Launch Notification Facade with Service Integration\n\n**What**: Integrate Ably and QStash services into facade layer for coordinated signup flow\n\n**Why**: Centralized business logic orchestration for signup, notifications, and email queuing\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/facades/launch-notifications/launch-notification.facade.ts` - Add real-time and background job orchestration\n\n**Changes:**\n- Inject `AblyService` and `QStashService` dependencies\n- Update `createLaunchNotification` method to trigger Ably notification after database insert\n- Update `createLaunchNotification` method to queue confirmation email via QStash after insert\n- Add error handling to ensure database transaction commits even if Ably/QStash fail (log errors but don't block)\n- Add `triggerBulkLaunchEmail` method for admin bulk email sending (calls QStashService)\n- Add `getSignupAnalytics` method wrapping query layer with caching\n- Implement transaction boundaries ensuring data consistency\n- Add circuit breaker pattern for external service calls (Ably, QStash)\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Facade orchestrates all services correctly\n- [ ] Database operations never blocked by external service failures\n- [ ] Error handling captures and logs all failure scenarios\n- [ ] Transaction boundaries properly defined\n- [ ] All validation commands pass\n\n---\n\n### Step 8: Create QStash Webhook Handler for Email Processing\n\n**What**: Implement API route to handle QStash webhook callbacks for processing confirmation and bulk emails\n\n**Why**: Receive and process background email jobs triggered by QStash with proper verification\n\n**Confidence**: Medium\n\n**Files to Create:**\n- `src/app/api/webhooks/launch-notifications/route.ts` - QStash webhook endpoint\n\n**Changes:**\n- Create POST endpoint handler for QStash webhooks\n- Verify QStash signature using Upstash signature verification\n- Parse webhook payload to determine job type (confirmation vs bulk)\n- For confirmation emails: call `ResendService` to send single confirmation email\n- For bulk emails: batch fetch active subscribers from database, send emails in chunks of 50 via `ResendService`\n- Implement idempotency using Redis to prevent duplicate processing (store message ID for 24 hours)\n- Add comprehensive error logging with Sentry\n- Return proper HTTP status codes (200 for success, 400 for invalid signature, 500 for processing errors)\n- Add retry logic for transient failures\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Webhook signature verification implemented correctly\n- [ ] Both confirmation and bulk email types handled\n- [ ] Idempotency prevents duplicate email sends\n- [ ] Proper HTTP status codes returned\n- [ ] All validation commands pass\n\n---\n\n### Step 9: Update Public Signup Action with Real-Time Trigger\n\n**What**: Modify public signup server action to include interests and trigger Ably notification\n\n**Why**: Capture enhanced signup data and enable real-time admin notifications\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/actions/launch-notifications/public.actions.ts` - Update signup action\n\n**Changes:**\n- Update action input validation to accept interests array and source string\n- Pass interests and source to facade `createLaunchNotification` method\n- Ensure action returns success with signup ID for client confirmation\n- Add rate limiting (5 signups per IP per hour) using Upstash Redis\n- Add email validation against disposable email domains (use known disposable domain list)\n- Implement duplicate email check (prevent same email signing up twice)\n- Add proper error messages for all validation failures\n- Ensure action complies with Next-Safe-Action patterns\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Action accepts and validates interests and source fields\n- [ ] Rate limiting prevents abuse\n- [ ] Duplicate email detection works correctly\n- [ ] Action returns properly typed response\n- [ ] All validation commands pass\n\n---\n\n### Step 10: Update Admin Bulk Email Action with QStash Integration\n\n**What**: Modify admin action for triggering bulk launch emails to use QStash queue\n\n**Why**: Reliable background processing for potentially large bulk email operations\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/actions/launch-notifications/admin.actions.ts` - Update bulk email action\n\n**Changes:**\n- Update `sendBulkLaunchNotification` action to call facade `triggerBulkLaunchEmail` method\n- Add confirmation flag requirement (admin must explicitly confirm bulk send)\n- Add preview mode that returns count of emails that would be sent without actually sending\n- Add filter options for segmentation (by interests, by source, by date range)\n- Add admin role verification using `useAdminRole` hook\n- Implement dry-run mode for testing\n- Add comprehensive logging for audit trail\n- Return job ID from QStash for admin tracking\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Action requires explicit confirmation flag\n- [ ] Preview mode calculates recipient count correctly\n- [ ] Admin role verification enforced\n- [ ] Job ID returned for tracking\n- [ ] All validation commands pass\n\n---\n\n### Step 11: Enhance Public Signup Form with Interests UI\n\n**What**: Add interests multi-select component and source tracking to public signup form\n\n**Why**: Capture user preferences for targeted communication and track signup sources\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/app/(public)/coming-soon/launch-waitlist-form.tsx` - Add interests selection UI\n\n**Changes:**\n- Add interests multi-select component using Radix UI checkbox group\n- Define interest categories: \"Sports\", \"Movies\", \"TV Shows\", \"Music\", \"Limited Editions\", \"Vintage\", \"Custom\", \"Promotional\", \"Giveaways\", \"Other\"\n- Display interests as pill-style checkboxes with icons from Lucide\n- Add source field as hidden input (auto-detect from page location: \"landing\")\n- Update form submission to include selected interests array\n- Add client-side validation (max 5 interests selectable)\n- Show success message after signup with confirmation that email will be sent\n- Add loading state during submission\n- Ensure form is mobile-responsive\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Interests multi-select renders correctly\n- [ ] Maximum 5 interests enforced client-side\n- [ ] Source automatically captured\n- [ ] Form submission includes all new fields\n- [ ] Success message displays after signup\n- [ ] All validation commands pass\n\n---\n\n### Step 12: Create Real-Time Admin Notification Widget Component\n\n**What**: Build React component that subscribes to Ably channel and displays new signups in real-time\n\n**Why**: Provide immediate visibility to admins when new users sign up\n\n**Confidence**: Medium\n\n**Files to Create:**\n- `src/components/feature/admin/launch-signup-realtime-widget.tsx` - Real-time notification widget\n\n**Changes:**\n- Create component that uses Ably React hooks to subscribe to `admin:launch-signups` channel\n- Display most recent 10 signups in descending chronological order\n- Show signup details: email (masked for privacy: j***@example.com), interests, source, timestamp\n- Add visual notification indicator when new signup arrives (animation, badge)\n- Include dismiss/clear functionality for viewed signups\n- Add loading state while connecting to Ably\n- Add error state if Ably connection fails\n- Use Radix UI components for consistent styling (Card, Badge, ScrollArea)\n- Implement auto-scroll to new signups\n- Add role check to only render for admin users\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Component subscribes to correct Ably channel\n- [ ] New signups appear immediately when published\n- [ ] Email masking preserves privacy\n- [ ] Visual indicators work correctly\n- [ ] Admin-only rendering enforced\n- [ ] All validation commands pass\n\n---\n\n### Step 13: Integrate Real-Time Widget into Admin Dashboard\n\n**What**: Add real-time signup widget to admin launch notifications page layout\n\n**Why**: Provide admins with immediate visibility into signup activity\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/components/layout/ably-provider.tsx` - Ensure Ably provider wraps admin routes\n- `src/app/(app)/admin/launch-notifications/components/launch-notifications-manager.tsx` - Add widget to layout\n- `src/app/(app)/admin/launch-notifications/page.tsx` - Integrate widget into page structure\n\n**Changes:**\n- Verify `AblyProvider` wraps admin route group in layout file\n- Add real-time widget to top of launch notifications manager component\n- Position widget as sticky header or sidebar panel\n- Add toggle to show/hide widget (user preference stored in localStorage)\n- Ensure widget does not interfere with existing table functionality\n- Add analytics summary cards below widget (total signups, today's signups, interest breakdown)\n- Wire up analytics cards to query functions from Step 6\n- Add refresh button for manual analytics reload\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Widget appears on admin launch notifications page\n- [ ] Ably provider properly wraps admin routes\n- [ ] Toggle functionality works correctly\n- [ ] Analytics cards display correct data\n- [ ] Layout remains responsive and functional\n- [ ] All validation commands pass\n\n---\n\n### Step 14: Add Configuration Constants for Services\n\n**What**: Define all service-related constants in centralized config files\n\n**Why**: Maintain single source of truth for channel names, webhook URLs, and cache keys\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/constants/config.ts` - Add Ably channel names and QStash webhook URLs\n- `src/lib/constants/redis-keys.ts` - Add Redis cache keys for analytics and deduplication\n- `src/lib/constants/action-names.ts` - Add new action names for tracking\n\n**Changes:**\n- Add `ABLY_CHANNELS` constant with `ADMIN_LAUNCH_SIGNUPS` = \"admin:launch-signups\"\n- Add `QSTASH_WEBHOOKS` constant with `LAUNCH_NOTIFICATIONS` = full webhook URL\n- Add Redis key patterns: `launch:analytics:*`, `launch:dedup:*`, `launch:ratelimit:*`\n- Add action names: `CREATE_LAUNCH_NOTIFICATION`, `SEND_BULK_LAUNCH_NOTIFICATION`\n- Add email template IDs for confirmation and launch notification emails\n- Add interest category constants array for reuse across components\n- Ensure all constants properly typed and exported\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] All constants properly organized by category\n- [ ] Constants used consistently across all services and components\n- [ ] No hardcoded strings remain in implementation files\n- [ ] TypeScript types enforce constant usage\n- [ ] All validation commands pass\n\n---\n\n### Step 15: Create Email Templates for Resend\n\n**What**: Design and implement email templates for confirmation and launch notification emails\n\n**Why**: Provide professional, branded emails for user communication\n\n**Confidence**: Medium\n\n**Files to Create:**\n- `src/lib/email-templates/launch-confirmation.tsx` - Confirmation email template\n- `src/lib/email-templates/launch-notification.tsx` - Launch announcement email template\n\n**Changes:**\n- Create confirmation email template with React Email components\n- Include personalized greeting, confirmation message, selected interests summary\n- Add unsubscribe link with token-based unsubscribe endpoint\n- Create launch notification email template with launch announcement content\n- Include call-to-action button linking to live site\n- Add branding consistent with Head Shakers design\n- Ensure templates are mobile-responsive\n- Add preview text for email clients\n- Include proper HTML email structure with fallbacks\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Templates render correctly in React Email\n- [ ] Both templates include unsubscribe functionality\n- [ ] Templates are mobile-responsive\n- [ ] Branding consistent with site design\n- [ ] All validation commands pass\n\n---\n\n### Step 16: Implement Unsubscribe Functionality\n\n**What**: Create unsubscribe endpoint and update database status for opted-out users\n\n**Why**: Comply with email regulations and respect user preferences\n\n**Confidence**: High\n\n**Files to Create:**\n- `src/app/api/unsubscribe/launch-notifications/route.ts` - Unsubscribe endpoint\n\n**Files to Modify:**\n- `src/lib/actions/launch-notifications/public.actions.ts` - Add unsubscribe action\n- `src/lib/facades/launch-notifications/launch-notification.facade.ts` - Add unsubscribe method\n\n**Changes:**\n- Create GET endpoint accepting unsubscribe token (signed JWT with email and ID)\n- Verify token signature and expiration (tokens valid for 90 days)\n- Update database record status to \"unsubscribed\"\n- Render confirmation page showing successful unsubscribe\n- Add resubscribe option (changes status back to \"active\")\n- Create facade method `unsubscribeLaunchNotification` updating status\n- Add action `unsubscribeLaunchNotification` for programmatic unsubscribe\n- Ensure bulk email queries exclude unsubscribed users\n- Add audit logging for unsubscribe events\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] Unsubscribe tokens properly signed and verified\n- [ ] Database status updates correctly\n- [ ] Unsubscribed users excluded from future emails\n- [ ] Resubscribe functionality works\n- [ ] All validation commands pass\n\n---\n\n### Step 17: Add Environment Variable Configuration\n\n**What**: Document and validate all required environment variables for new services\n\n**Why**: Ensure proper configuration across all environments\n\n**Confidence**: High\n\n**Files to Modify:**\n- `.env.example` - Add all required environment variables with descriptions\n\n**Changes:**\n- Add `ABLY_API_KEY` with description\n- Add `ABLY_API_SECRET` with description (for REST API)\n- Add `QSTASH_URL` with description\n- Add `QSTASH_TOKEN` with description\n- Add `QSTASH_CURRENT_SIGNING_KEY` with description\n- Add `QSTASH_NEXT_SIGNING_KEY` with description\n- Add `NEXT_PUBLIC_BASE_URL` for webhook URL construction\n- Add comments explaining each variable's purpose\n- Group variables by service (Ably, QStash, Resend)\n- Add validation notes for required vs optional variables\n\n**Validation Commands:**\n```bash\nnpm run typecheck\n```\n\n**Success Criteria:**\n- [ ] All new environment variables documented\n- [ ] Example values provided where appropriate\n- [ ] Descriptions are clear and actionable\n- [ ] Variables grouped logically by service\n\n---\n\n### Step 18: Implement Error Monitoring and Logging\n\n**What**: Add comprehensive error tracking and monitoring for all new services and flows\n\n**Why**: Enable debugging and monitoring of real-time notifications and background jobs\n\n**Confidence**: High\n\n**Files to Modify:**\n- `src/lib/services/ably.service.ts` - Add Sentry error tracking\n- `src/lib/services/qstash.service.ts` - Add Sentry error tracking\n- `src/app/api/webhooks/launch-notifications/route.ts` - Add request logging\n\n**Changes:**\n- Integrate Sentry error capture in all service methods\n- Add contextual data to errors (email count, channel name, job ID)\n- Implement structured logging with different severity levels\n- Add performance monitoring for webhook processing time\n- Log all Ably publish attempts with success/failure status\n- Log all QStash job submissions with job IDs\n- Add error alerting thresholds (alert if >10 errors in 5 minutes)\n- Create custom Sentry tags for launch notification feature\n- Add breadcrumbs for debugging complex flows\n\n**Validation Commands:**\n```bash\nnpm run lint:fix && npm run typecheck\n```\n\n**Success Criteria:**\n- [ ] All errors properly captured in Sentry\n- [ ] Contextual data included in error reports\n- [ ] Performance metrics tracked correctly\n- [ ] Logging does not expose sensitive data (emails masked)\n- [ ] All validation commands pass\n\n---\n\n## Quality Gates\n\n- [ ] All TypeScript files pass `npm run typecheck` with zero errors\n- [ ] All files pass `npm run lint:fix` with zero warnings\n- [ ] Database migration applies cleanly to development branch via Neon DB Expert subagent\n- [ ] Manual testing confirms real-time notifications arrive within 2 seconds of signup\n- [ ] Manual testing confirms confirmation emails sent successfully via QStash webhook\n- [ ] Manual testing confirms bulk email action queues jobs without blocking\n- [ ] Admin dashboard displays analytics correctly with proper data aggregation\n- [ ] Unsubscribe functionality tested and working correctly\n- [ ] Rate limiting prevents abuse (tested with multiple rapid signups)\n- [ ] All error scenarios properly handled and logged to Sentry\n- [ ] Email templates render correctly in multiple email clients (Gmail, Outlook, Apple Mail)\n- [ ] Mobile responsiveness verified for signup form and admin widget\n\n---\n\n## Notes\n\n### High Risk Areas\n\n1. **Ably Integration**: First use of Ably real-time in project. Ensure proper channel naming, authentication, and connection management. Test thoroughly with multiple admin users.\n2. **QStash Webhook Security**: Signature verification is critical. Improperly verified webhooks could allow unauthorized email sending. Double-check signature validation logic.\n3. **Email Deliverability**: Bulk email sending may trigger spam filters. Consider implementing sending rate limits and monitoring bounce rates.\n4. **Database Performance**: Analytics queries on large datasets may become slow. Monitor query performance and add additional indexes if needed.\n\n### Important Assumptions\n\n1. Ably account has sufficient message quota for expected signup volume\n2. QStash account has sufficient job quota for bulk email operations\n3. Resend account has appropriate sending limits for bulk emails\n4. Admin users have proper Clerk roles configured for access control\n\n### Future Enhancements Not Included\n\n1. Email scheduling (send bulk emails at specific future time)\n2. A/B testing different email subject lines\n3. Email open tracking and click tracking\n4. Automated email sequences (welcome series)\n5. Export functionality for email list CSV\n\n### Testing Recommendations\n\n1. Create integration tests for facade orchestration logic\n2. Test QStash webhook handler with mock payloads\n3. Test Ably notification delivery with multiple concurrent signups\n4. Load test bulk email processing with large subscriber lists\n5. Test email template rendering across email clients using Litmus or Email on Acid\n\n---\n\n## Orchestration Logs\n\nFor detailed logs of the planning process, see:\n- **Orchestration Directory**: `docs/2025_11_12/orchestration/email-signup-notifications/`\n- **Step 1 Log**: `01-feature-refinement.md` - Refined request with project context\n- **Step 2 Log**: `02-file-discovery.md` - Discovered 35 files across Y directories\n- **Step 3 Log**: `03-implementation-planning.md` - Generated 18-step implementation plan\n\n**Total Orchestration Time**: ~6 minutes\n"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:31:31.293Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\docs\\2025_11_12\\orchestration\\email-signup-notifications\\00-orchestration-index.md",
+  "old_string": "# Email Signup Notifications - Orchestration Index\n\n## Workflow Overview\n\n**Feature Request**: As an admin I would like to get a real time notification whenever a user signs up to the email list that will notify them with an email when the site goes live\n\n**Started**: 2025-11-12T00:00:00Z\n**Status**: In Progress\n\n## Orchestration Steps\n\n### Step 1: Feature Request Refinement\n- **File**: `01-feature-refinement.md`\n- **Status**: Pending\n- **Purpose**: Enhance user request with project context\n\n### Step 2: File Discovery\n- **File**: `02-file-discovery.md`\n- **Status**: Pending\n- **Purpose**: AI-powered discovery of relevant implementation files\n\n### Step 3: Implementation Planning\n- **File**: `03-implementation-planning.md`\n- **Status**: Pending\n- **Purpose**: Generate detailed markdown implementation plan\n\n## Output Files\n\n- **Implementation Plan**: `docs/2025_11_12/plans/email-signup-notifications-implementation-plan.md`\n- **Orchestration Logs**: `docs/2025_11_12/orchestration/email-signup-notifications/`\n\n---\n\n*This index will be updated as the workflow progresses*",
+  "new_string": "# Email Signup Notifications - Orchestration Index\n\n## Workflow Overview\n\n**Feature Request**: As an admin I would like to get a real time notification whenever a user signs up to the email list that will notify them with an email when the site goes live\n\n**Started**: 2025-11-12T00:00:00Z\n**Completed**: 2025-11-12T00:06:15Z\n**Status**: Complete\n**Total Duration**: 6.25 minutes\n\n## Orchestration Steps\n\n### Step 1: Feature Request Refinement\n- **File**: `01-feature-refinement.md`\n- **Status**: ✓ Complete\n- **Duration**: 1.5 minutes\n- **Purpose**: Enhance user request with project context\n- **Result**: Refined request from 29 words to 382 words (13.2x expansion)\n\n### Step 2: File Discovery\n- **File**: `02-file-discovery.md`\n- **Status**: ✓ Complete\n- **Duration**: 2.25 minutes\n- **Purpose**: AI-powered discovery of relevant implementation files\n- **Result**: Discovered 35 files (9 critical, 13 high, 9 medium, 4 low priority)\n\n### Step 3: Implementation Planning\n- **File**: `03-implementation-planning.md`\n- **Status**: ✓ Complete\n- **Duration**: 2.5 minutes\n- **Purpose**: Generate detailed markdown implementation plan\n- **Result**: 18-step implementation plan (3-4 days, High complexity, Medium risk)\n\n## Output Files\n\n- **Implementation Plan**: `docs/2025_11_12/plans/email-signup-notifications-implementation-plan.md`\n- **Orchestration Logs**: `docs/2025_11_12/orchestration/email-signup-notifications/`\n  - `00-orchestration-index.md` - This file\n  - `01-feature-refinement.md` - Step 1 detailed log\n  - `02-file-discovery.md` - Step 2 detailed log\n  - `03-implementation-planning.md` - Step 3 detailed log\n\n## Summary\n\n### Feature Enhancement\n- **Original**: 29-word request for admin notifications on email signups\n- **Refined**: 382-word comprehensive feature including real-time notifications (Ably), background email processing (QStash), interest tracking, analytics dashboard, and bulk email capabilities\n\n### Architecture Analysis\n- **Existing**: 50% infrastructure already complete (database, CRUD, email service, admin UI)\n- **Missing**: Ably integration, QStash integration, interest tracking, analytics, webhook endpoint\n- **Files Impacted**: 35 files across database, services, components, actions, and API routes\n\n### Implementation Plan\n- **Steps**: 18 detailed implementation steps\n- **Duration**: 3-4 days estimated\n- **Complexity**: High\n- **Risk Level**: Medium\n- **Quality Gates**: 12 comprehensive quality checks\n\n---\n\n**Orchestration Complete** ✓"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:31:38.217Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-loading.tsx",
+  "content": "import { Card, CardContent, CardHeader } from '@/components/ui/card';\nimport { Skeleton } from '@/components/ui/skeleton';\n\nexport const ReportsPageLoading = () => {\n  return (\n    <div className={'space-y-6'}>\n      {/* Filters Loading State */}\n      <Card>\n        <CardHeader>\n          <Skeleton className={'h-6 w-32'} />\n        </CardHeader>\n        <CardContent className={'space-y-4'}>\n          <div className={'flex flex-wrap gap-3'}>\n            <Skeleton className={'h-10 w-24'} />\n            <Skeleton className={'h-10 w-24'} />\n            <Skeleton className={'h-10 w-24'} />\n            <Skeleton className={'h-10 w-48'} />\n          </div>\n        </CardContent>\n      </Card>\n\n      {/* Table Loading State */}\n      <Card>\n        <CardContent className={'p-0'}>\n          <div className={'space-y-4 p-6'}>\n            {Array.from({ length: 10 }).map((_, index) => (\n              <Skeleton className={'h-16 w-full'} key={index} />\n            ))}\n          </div>\n        </CardContent>\n      </Card>\n    </div>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:32:08.277Z
+Tool: Write
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-client.tsx",
+  "content": "'use client';\n\nimport { useRouter } from 'next/navigation';\nimport { useState } from 'react';\n\nimport type { SelectContentReport } from '@/lib/validations/moderation.validation';\nimport type { ReportsStatsResult } from '@/lib/queries/content-reports/content-reports.query';\n\nimport { BulkActionsToolbar } from '@/components/admin/reports/bulk-actions-toolbar';\nimport { ReportDetailDialog } from '@/components/admin/reports/report-detail-dialog';\nimport { ReportFilters } from '@/components/admin/reports/report-filters';\nimport { ReportsTable } from '@/components/admin/reports/reports-table';\nimport { UpdateReportStatusDialog } from '@/components/admin/reports/update-report-status-dialog';\nimport { Card } from '@/components/ui/card';\nimport { Conditional } from '@/components/ui/conditional';\n\ninterface ReportsPageClientProps {\n  initialData: {\n    reports: Array<SelectContentReport>;\n    stats: ReportsStatsResult;\n    totalCount: number;\n  };\n}\n\nexport const ReportsPageClient = ({ initialData }: ReportsPageClientProps) => {\n  // useState hooks\n  const [selectedReportIds, setSelectedReportIds] = useState<Array<string>>([]);\n  const [detailDialogReport, setDetailDialogReport] = useState<null | SelectContentReport>(null);\n  const [updateStatusReport, setUpdateStatusReport] = useState<null | SelectContentReport>(null);\n\n  // Other hooks\n  const router = useRouter();\n\n  // Event handlers\n  const handleViewDetails = (report: SelectContentReport) => {\n    setDetailDialogReport(report);\n  };\n\n  const handleCloseDetailDialog = () => {\n    setDetailDialogReport(null);\n  };\n\n  const handleUpdateStatusFromDetail = (reportId: string) => {\n    const report = initialData.reports.find((r) => r.id === reportId);\n    if (report) {\n      setDetailDialogReport(null);\n      setUpdateStatusReport(report);\n    }\n  };\n\n  const handleOpenUpdateStatusDialog = (report: SelectContentReport) => {\n    setUpdateStatusReport(report);\n  };\n\n  const handleCloseUpdateStatusDialog = () => {\n    setUpdateStatusReport(null);\n  };\n\n  const handleUpdateStatusSuccess = () => {\n    // Refresh the page data after successful update\n    router.refresh();\n    setUpdateStatusReport(null);\n  };\n\n  const handleBulkActionSuccess = () => {\n    // Refresh the page data after successful bulk action\n    router.refresh();\n    setSelectedReportIds([]);\n  };\n\n  const handleClearSelection = () => {\n    setSelectedReportIds([]);\n  };\n\n  const handleSelectionChange = (reportIds: Array<string>) => {\n    setSelectedReportIds(reportIds);\n  };\n\n  // Derived variables for conditional rendering\n  const _hasSelectedReports = selectedReportIds.length > 0;\n  const _hasDetailDialogOpen = !!detailDialogReport;\n  const _hasUpdateStatusDialogOpen = !!updateStatusReport;\n  const _hasNoReports = initialData.reports.length === 0;\n\n  return (\n    <div className={'space-y-6'}>\n      {/* Filter Controls */}\n      <ReportFilters />\n\n      {/* Bulk Actions Toolbar */}\n      <Conditional isCondition={_hasSelectedReports}>\n        <BulkActionsToolbar\n          onClearSelection={handleClearSelection}\n          onSuccess={handleBulkActionSuccess}\n          selectedReportIds={selectedReportIds}\n        />\n      </Conditional>\n\n      {/* Reports Table */}\n      <Conditional isCondition={!_hasNoReports}>\n        <ReportsTable\n          data={initialData.reports}\n          onSelectionChange={handleSelectionChange}\n          onUpdateStatus={handleOpenUpdateStatusDialog}\n          onViewDetails={handleViewDetails}\n          totalCount={initialData.totalCount}\n        />\n      </Conditional>\n\n      {/* Empty State */}\n      <Conditional isCondition={_hasNoReports}>\n        <Card>\n          <div className={'flex min-h-[400px] flex-col items-center justify-center gap-4 p-12'}>\n            <div className={'text-center'}>\n              <h3 className={'text-lg font-semibold'}>No Reports Found</h3>\n              <p className={'mt-2 text-sm text-muted-foreground'}>\n                There are no content reports matching your current filters.\n              </p>\n              <p className={'mt-1 text-sm text-muted-foreground'}>\n                Try adjusting your filter criteria to see more results.\n              </p>\n            </div>\n          </div>\n        </Card>\n      </Conditional>\n\n      {/* Report Detail Dialog */}\n      <Conditional isCondition={_hasDetailDialogOpen}>\n        <ReportDetailDialog\n          isOpen={_hasDetailDialogOpen}\n          onClose={handleCloseDetailDialog}\n          onUpdateStatus={handleUpdateStatusFromDetail}\n          report={detailDialogReport}\n        />\n      </Conditional>\n\n      {/* Update Status Dialog */}\n      <Conditional isCondition={_hasUpdateStatusDialogOpen}>\n        <UpdateReportStatusDialog\n          currentStatus={updateStatusReport?.status || 'pending'}\n          isOpen={_hasUpdateStatusDialogOpen}\n          onClose={handleCloseUpdateStatusDialog}\n          onSuccess={handleUpdateStatusSuccess}\n          reportId={updateStatusReport?.id || ''}\n        />\n      </Conditional>\n    </div>\n  );\n};\n"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:32:15.995Z
+Tool: Task
+Input:
+{
+  "description": "Count bobbleheads in database",
+  "prompt": "The user wants to know how many bobbleheads are currently in the database. Please query the database to get the total count of bobbleheads.",
+  "subagent_type": "neon-db-expert"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:32:23.315Z
+Tool: mcp__Neon__run_sql
+Input:
+{
+  "params": {
+    "projectId": "misty-boat-49919732",
+    "databaseName": "head-shakers",
+    "branchId": "br-dark-forest-adf48tll",
+    "sql": "SELECT COUNT(*) as total_bobbleheads FROM bobbleheads;"
+  }
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:32:25.505Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "offset": 36,
+  "limit": 10
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:32:33.233Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "interface ReportsTableProps {\n  data: Array<SelectContentReport>;\n  onBulkAction?: (selectedReports: Array<SelectContentReport>) => void;\n  totalCount: number;\n}\n\nexport const ReportsTable = ({ data, onBulkAction, totalCount }: ReportsTableProps) => {",
+  "new_string": "interface ReportsTableProps {\n  data: Array<SelectContentReport>;\n  onSelectionChange: (reportIds: Array<string>) => void;\n  onUpdateStatus: (report: SelectContentReport) => void;\n  onViewDetails: (report: SelectContentReport) => void;\n  totalCount: number;\n}\n\nexport const ReportsTable = ({\n  data,\n  onSelectionChange,\n  onUpdateStatus,\n  onViewDetails,\n  totalCount,\n}: ReportsTableProps) => {"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:32:49.353Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "offset": 196,
+  "limit": 20
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:33:06.348Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "      {\n        cell: ({ row }) => {\n          const report = row.original;\n          return (\n            <div className={'flex items-center gap-2'}>\n              <Button\n                onClick={() => {\n                  // TODO: Implement view details action\n                  console.log('View details for report:', report.id);\n                }}\n                size={'sm'}\n                variant={'ghost'}\n              >\n                <EyeIcon aria-hidden className={'mr-1 size-3'} />\n                View\n              </Button>\n            </div>\n          );\n        },\n        header: 'Actions',\n        id: 'actions',\n        size: 100,\n      },\n    ],\n    [],\n  );",
+  "new_string": "      {\n        cell: ({ row }) => {\n          const report = row.original;\n          return (\n            <div className={'flex items-center gap-2'}>\n              <Button\n                onClick={() => {\n                  onViewDetails(report);\n                }}\n                size={'sm'}\n                variant={'ghost'}\n              >\n                <EyeIcon aria-hidden className={'mr-1 size-3'} />\n                View\n              </Button>\n            </div>\n          );\n        },\n        header: 'Actions',\n        id: 'actions',\n        size: 100,\n      },\n    ],\n    [onViewDetails],\n  );"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:33:22.490Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "offset": 1,
+  "limit": 25
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:33:29.331Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "import { AlertCircleIcon, CheckCircleIcon, ClockIcon, EyeIcon, XCircleIcon } from 'lucide-react';\nimport { parseAsInteger, useQueryState } from 'nuqs';\nimport { useMemo, useState } from 'react';",
+  "new_string": "import { AlertCircleIcon, CheckCircleIcon, ClockIcon, EyeIcon, XCircleIcon } from 'lucide-react';\nimport { parseAsInteger, useQueryState } from 'nuqs';\nimport { useEffect, useMemo, useState } from 'react';"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:33:43.872Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "offset": 230,
+  "limit": 25
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:33:51.392Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "  // useEffect hooks\n\n  // Utility functions",
+  "new_string": "  // useEffect hooks\n  useEffect(() => {\n    const selectedRows = table.getFilteredSelectedRowModel().rows;\n    const selectedIds = selectedRows.map((row) => row.original.id);\n    onSelectionChange(selectedIds);\n  }, [rowSelection, onSelectionChange, table]);\n\n  // Utility functions"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:06.869Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "offset": 280,
+  "limit": 30
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:18.061Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "  // Derived variables for conditional rendering\n  const _hasSelectedRows = Object.keys(rowSelection).length > 0;\n  const _hasNoResults = table.getRowModel().rows?.length === 0;\n  const _isFirstPage = page === 1;\n  const _isLastPage = page >= Math.ceil(totalCount / pageSize);\n  const _totalPages = Math.ceil(totalCount / pageSize);\n\n  return (\n    <div className={'space-y-4'}>\n      {/* Bulk Actions Bar */}\n      <Conditional isCondition={_hasSelectedRows}>\n        <div className={'flex items-center justify-between rounded-md bg-muted/50 p-3'}>\n          <div className={'text-sm font-medium'}>\n            {Object.keys(rowSelection).length} row(s) selected\n          </div>\n          <Button\n            onClick={() => {\n              const selectedRows = table\n                .getFilteredSelectedRowModel()\n                .rows.map((row) => row.original);\n              onBulkAction?.(selectedRows);\n            }}\n            size={'sm'}\n            variant={'default'}\n          >\n            <AlertCircleIcon aria-hidden className={'mr-1 size-4'} />\n            Bulk Action\n          </Button>\n        </div>\n      </Conditional>\n\n      {/* Data Table */}",
+  "new_string": "  // Derived variables for conditional rendering\n  const _hasNoResults = table.getRowModel().rows?.length === 0;\n  const _isFirstPage = page === 1;\n  const _isLastPage = page >= Math.ceil(totalCount / pageSize);\n  const _totalPages = Math.ceil(totalCount / pageSize);\n\n  return (\n    <div className={'space-y-4'}>\n      {/* Data Table */}"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:33.501Z
+Tool: Glob
+Input:
+{
+  "pattern": "**/skeleton.tsx",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\ui"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:39.501Z
+Tool: Grep
+Input:
+{
+  "pattern": "export.*getDbInstance",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\lib\\queries",
+  "output_mode": "files_with_matches"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:45.515Z
+Tool: Grep
+Input:
+{
+  "pattern": "QueryContext|getDbInstance",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\lib",
+  "output_mode": "files_with_matches",
+  "head_limit": 10
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:51.538Z
+Tool: Read
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\lib\\queries\\base\\query-context.ts"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:34:58.587Z
+Tool: Grep
+Input:
+{
+  "pattern": "import.*db.*from",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\lib\\queries",
+  "output_mode": "content",
+  "head_limit": 5
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:35:06.967Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-async.tsx",
+  "old_string": "import { ContentReportsQuery } from '@/lib/queries/content-reports/content-reports.query';\nimport { getDbInstance } from '@/lib/queries/query-client';\n\nimport { ReportsPageClient } from './reports-page-client';",
+  "new_string": "import { db } from '@/lib/db';\nimport { ContentReportsQuery } from '@/lib/queries/content-reports/content-reports.query';\n\nimport { ReportsPageClient } from './reports-page-client';"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:35:21.165Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-async.tsx",
+  "old_string": "  // Get database instance\n  const db = await getDbInstance();\n  const context = { db };",
+  "new_string": "  // Create query context with database instance\n  const context = { dbInstance: db };"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:35:35.851Z
+Tool: Bash
+Input:
+{
+  "command": "cd \"C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\" && npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint to check for linting errors"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:36:45.210Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-async.tsx",
+  "old_string": "  // Create query context with database instance\n  const context = { dbInstance: db };\n\n  try {\n    // Fetch reports and stats in parallel\n    const [reports, stats] = await Promise.all([\n      ContentReportsQuery.getAllReportsForAdminAsync(filterOptions, context),\n      ContentReportsQuery.getReportsStatsAsync(context),\n    ]);\n\n    // Calculate total count based on filters\n    const totalCount =\n      searchParams.status ?\n        stats[searchParams.status as keyof typeof stats] || 0\n      : stats.total;\n\n    return (\n      <ReportsPageClient\n        initialData={{\n          reports,\n          stats,\n          totalCount,\n        }}\n      />\n    );\n  } catch (error) {\n    // Handle query errors\n    throw new Error(\n      `Failed to fetch reports: ${error instanceof Error ? error.message : 'Unknown error'}`,\n    );\n  }",
+  "new_string": "  // Create query context with database instance\n  const context = { dbInstance: db };\n\n  // Fetch reports and stats in parallel\n  const [reports, stats] = await Promise.all([\n    ContentReportsQuery.getAllReportsForAdminAsync(filterOptions, context),\n    ContentReportsQuery.getReportsStatsAsync(context),\n  ]);\n\n  // Calculate total count based on filters\n  const totalCount =\n    searchParams.status ?\n      stats[searchParams.status as keyof typeof stats] || 0\n    : stats.total;\n\n  return (\n    <ReportsPageClient\n      initialData={{\n        reports,\n        stats,\n        totalCount,\n      }}\n    />\n  );"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:37:00.195Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "import { AlertCircleIcon, CheckCircleIcon, ClockIcon, EyeIcon, XCircleIcon } from 'lucide-react';",
+  "new_string": "import { CheckCircleIcon, ClockIcon, EyeIcon, XCircleIcon } from 'lucide-react';"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:37:16.292Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\components\\admin\\reports\\reports-table.tsx",
+  "old_string": "interface ReportsTableProps {\n  data: Array<SelectContentReport>;\n  onSelectionChange: (reportIds: Array<string>) => void;\n  onUpdateStatus: (report: SelectContentReport) => void;\n  onViewDetails: (report: SelectContentReport) => void;\n  totalCount: number;\n}\n\nexport const ReportsTable = ({\n  data,\n  onSelectionChange,\n  onUpdateStatus,\n  onViewDetails,\n  totalCount,\n}: ReportsTableProps) => {",
+  "new_string": "interface ReportsTableProps {\n  data: Array<SelectContentReport>;\n  onSelectionChange: (reportIds: Array<string>) => void;\n  onViewDetails: (report: SelectContentReport) => void;\n  totalCount: number;\n}\n\nexport const ReportsTable = ({\n  data,\n  onSelectionChange,\n  onViewDetails,\n  totalCount,\n}: ReportsTableProps) => {"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:37:33.525Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-client.tsx",
+  "old_string": "      {/* Reports Table */}\n      <Conditional isCondition={!_hasNoReports}>\n        <ReportsTable\n          data={initialData.reports}\n          onSelectionChange={handleSelectionChange}\n          onUpdateStatus={handleOpenUpdateStatusDialog}\n          onViewDetails={handleViewDetails}\n          totalCount={initialData.totalCount}\n        />\n      </Conditional>",
+  "new_string": "      {/* Reports Table */}\n      <Conditional isCondition={!_hasNoReports}>\n        <ReportsTable\n          data={initialData.reports}\n          onSelectionChange={handleSelectionChange}\n          onViewDetails={handleViewDetails}\n          totalCount={initialData.totalCount}\n        />\n      </Conditional>"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:37:50.462Z
+Tool: Edit
+Input:
+{
+  "file_path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\app\\(app)\\admin\\reports\\components\\reports-page-client.tsx",
+  "old_string": "  const handleUpdateStatusFromDetail = (reportId: string) => {\n    const report = initialData.reports.find((r) => r.id === reportId);\n    if (report) {\n      setDetailDialogReport(null);\n      setUpdateStatusReport(report);\n    }\n  };\n\n  const handleOpenUpdateStatusDialog = (report: SelectContentReport) => {\n    setUpdateStatusReport(report);\n  };\n\n  const handleCloseUpdateStatusDialog = () => {",
+  "new_string": "  const handleUpdateStatusFromDetail = (reportId: string) => {\n    const report = initialData.reports.find((r) => r.id === reportId);\n    if (report) {\n      setDetailDialogReport(null);\n      setUpdateStatusReport(report);\n    }\n  };\n\n  const handleCloseUpdateStatusDialog = () => {"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:38:05.842Z
+Tool: Bash
+Input:
+{
+  "command": "cd \"C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\" && npm run lint:fix",
+  "timeout": 120000,
+  "description": "Run ESLint again to check for remaining errors"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:39:02.312Z
+Tool: Bash
+Input:
+{
+  "command": "cd \"C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\" && npm run typecheck",
+  "timeout": 120000,
+  "description": "Run TypeScript type checking"
+}
+================================================================================
+
+================================================================================
+2025-11-12T14:39:14.964Z
+Tool: Grep
+Input:
+{
+  "pattern": "ContentReportReason|export const CONTENT_REPORT_REASON",
+  "path": "C:\\Users\\JasonPaff\\dev\\head-shakers\\.worktrees\\admin-reports-page\\src\\lib\\constants",
+  "output_mode": "content"
+}
+================================================================================

@@ -19,7 +19,7 @@ process.stdin.on('end', () => {
     const inputSummary = JSON.stringify(toolInput, null, 2);
     const logEntry = `\n${'='.repeat(80)}\n${timestamp}\nTool: ${toolName}\nInput:\n${inputSummary}\n${'='.repeat(80)}\n`;
 
-    fs.appendFileSync('./.claude/logs/pre-tool-use-log.txt', logEntry);
+    fs.appendFileSync('./docs/pre-tool-use-log.txt', logEntry);
 
     console.log(`Logged: ${toolName}`);
   } catch (error) {
