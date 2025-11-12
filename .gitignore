@@ -56,3 +56,6 @@ playwright/.clerk
 # /docs
 # /docs/*
 /.claude/
+
+# worktrees
+/.worktrees
