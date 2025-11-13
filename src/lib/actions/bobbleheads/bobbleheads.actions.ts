@@ -16,6 +16,8 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
@@ -190,10 +192,25 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
       CacheRevalidationService.bobbleheads.onCreate(newBobblehead.id, userId, newBobblehead.collectionId);
 
+      // fetch collection and subcollection slugs for navigation
+      const collection = await CollectionsFacade.getCollectionById(
+        newBobblehead.collectionId,
+        userId,
+        ctx.tx,
+      );
+      const collectionSlug = collection?.slug ?? null;
+      const subcollectionSlug =
+        newBobblehead.subcollectionId ?
+          ((await SubcollectionsFacade.getSubCollectionById(newBobblehead.subcollectionId, userId, ctx.tx))
+            ?.slug ?? null)
+        : null;
+
       return {
         data: {
           bobblehead: newBobblehead,
+          collectionSlug,
           photos: uploadedPhotos,
+          subcollectionSlug,
           tags: createdTags,
         },
         success: true,

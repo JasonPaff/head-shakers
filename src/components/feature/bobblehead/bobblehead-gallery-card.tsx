@@ -47,6 +47,7 @@ import { BobbleheadShareMenu } from './bobblehead-share-menu';
 interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   bobblehead: {
     collectionId: string;
+    collectionSlug: string;
     description?: null | string;
     featurePhoto?: null | string;
     id: string;
@@ -56,8 +57,10 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
       likeId: null | string;
     };
     name: null | string;
+    slug: string;
     subcollectionId?: null | string;
     subcollectionName?: null | string;
+    subcollectionSlug?: null | string;
   };
   isOwner: boolean;
 }
@@ -196,10 +199,10 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
             <Link
               className={'truncate hover:underline'}
               href={$path({
-                route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+                route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                 routeParams: {
-                  collectionId: bobblehead.collectionId,
-                  subcollectionId: bobblehead.subcollectionId!,
+                  collectionSlug: bobblehead.collectionSlug,
+                  subcollectionSlug: bobblehead.subcollectionSlug!,
                 },
               })}
               onClick={(e) => {
@@ -337,7 +340,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
           />
 
           {/* Share */}
-          <BobbleheadShareMenu bobbleheadId={bobblehead.id}>
+          <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>
             <Button
               className={'h-8 px-2'}
               onClick={(e) => {
@@ -357,8 +360,8 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
           <Button asChild size={'sm'} testId={viewDetailsButtonTestId} variant={'outline'}>
             <Link
               href={$path({
-                route: '/bobbleheads/[bobbleheadId]',
-                routeParams: { bobbleheadId: bobblehead.id },
+                route: '/bobbleheads/[bobbleheadSlug]',
+                routeParams: { bobbleheadSlug: bobblehead.slug },
               })}
             >
               View Details

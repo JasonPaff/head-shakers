@@ -45,15 +45,15 @@ export const BobbleheadHeader = ({
             href={
               _hasSubcollection ?
                 $path({
-                  route: '/collections/[collectionSlug]/subcollection/[subcollectionId]',
+                  route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                   routeParams: {
-                    collectionId: bobblehead.collectionId,
-                    subcollectionId: bobblehead.subcollectionId!,
+                    collectionSlug: bobblehead.collectionSlug,
+                    subcollectionSlug: bobblehead.subcollectionSlug!,
                   },
                 })
               : $path({
                   route: '/collections/[collectionSlug]',
-                  routeParams: { collectionId: bobblehead.collectionId },
+                  routeParams: { collectionSlug: bobblehead.collectionSlug },
                 })
             }
           >
@@ -65,7 +65,7 @@ export const BobbleheadHeader = ({
         {/* Action Buttons */}
         <div className={'flex items-center gap-2'}>
           {/* Share Menu */}
-          <BobbleheadShareMenu bobbleheadId={bobblehead.id}>
+          <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>
             <Button size={'sm'} variant={'outline'}>
               <ShareIcon aria-hidden className={'mr-2 size-4'} />
               Share
@@ -81,8 +81,8 @@ export const BobbleheadHeader = ({
               {/* Delete Bobblehead Button */}
               <BobbleheadHeaderDelete
                 bobbleheadId={bobblehead.id}
-                collectionId={bobblehead.collectionId}
-                subcollectionId={bobblehead.subcollectionId}
+                collectionSlug={bobblehead.collectionSlug}
+                subcollectionSlug={bobblehead.subcollectionSlug}
               >
                 Delete
               </BobbleheadHeaderDelete>

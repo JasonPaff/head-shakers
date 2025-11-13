@@ -113,8 +113,12 @@ export class SubcollectionsFacade {
   ): Promise<
     Array<
       BobbleheadListRecord & {
+        collectionId: string;
+        collectionSlug: string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
+        subcollectionId: string;
+        subcollectionSlug: string;
       }
     >
   > {
@@ -199,6 +203,7 @@ export class SubcollectionsFacade {
     bobbleheadCount: number;
     collectionId: string;
     collectionName: string;
+    collectionSlug: string;
     coverImageUrl: null | string;
     createdAt: Date;
     description: null | string;
@@ -207,6 +212,7 @@ export class SubcollectionsFacade {
     id: string;
     lastUpdatedAt: Date;
     name: string;
+    slug: string;
     userId?: string;
   }> {
     try {

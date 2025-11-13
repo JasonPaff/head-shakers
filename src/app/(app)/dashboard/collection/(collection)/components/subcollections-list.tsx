@@ -15,10 +15,12 @@ export interface SubcollectionData {
   bobbleheadCount: number;
   collectionId: string;
   collectionName: string;
+  collectionSlug: string;
   description: null | string;
   id: string;
   isCollectionPublic: boolean;
   name: string;
+  slug: string;
 }
 
 interface GroupedSubcollections {

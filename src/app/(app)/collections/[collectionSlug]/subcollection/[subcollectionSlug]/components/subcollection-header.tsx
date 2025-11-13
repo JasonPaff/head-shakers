@@ -39,7 +39,7 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
           <Link
             href={$path({
               route: '/collections/[collectionSlug]',
-              routeParams: { collectionId: subcollection.collectionId },
+              routeParams: { collectionSlug: subcollection.collectionSlug },
             })}
           >
             <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
@@ -50,8 +50,8 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
         <div className={'flex items-center gap-2'}>
           {/* Share Button */}
           <SubcollectionShareMenu
-            collectionId={subcollection.collectionId}
-            subcollectionId={subcollection.id}
+            collectionSlug={subcollection.collectionSlug}
+            subcollectionSlug={subcollection.slug}
           >
             <Button size={'sm'} variant={'outline'}>
               <ShareIcon aria-hidden className={'mr-2 size-4'} />

@@ -1,4 +1,4 @@
-import { BobbleheadCardSkeleton } from '@/app/(app)/collections/[collectionId]/(collection)/components/skeletons/bobblehead-card-skeleton';
+import { BobbleheadCardSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/bobblehead-card-skeleton';
 
 export const BobbleheadsTabSkeleton = () => {
   return (

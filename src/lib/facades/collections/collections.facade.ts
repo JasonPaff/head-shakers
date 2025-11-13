@@ -43,11 +43,13 @@ export interface CollectionDashboardData {
   isPublic: boolean;
   metrics: CollectionMetrics;
   name: string;
+  slug: string;
   subCollections: Array<{
     bobbleheadCount: number;
     description: null | string;
     id: string;
     name: string;
+    slug: string;
   }>;
 }
 
@@ -622,10 +624,13 @@ export class CollectionsFacade {
   ): Promise<
     Array<
       BobbleheadListRecord & {
+        collectionId: string;
+        collectionSlug: string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
         subcollectionId: null | string;
         subcollectionName: null | string;
+        subcollectionSlug: null | string;
       }
     >
   > {
@@ -762,10 +767,13 @@ export class CollectionsFacade {
   ): Promise<
     Array<
       BobbleheadListRecord & {
+        collectionId: string;
+        collectionSlug: string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
         subcollectionId: null | string;
         subcollectionName: null | string;
+        subcollectionSlug: null | string;
       }
     >
   > {
@@ -916,6 +924,7 @@ export class CollectionsFacade {
       isPublic: collection.isPublic,
       lastUpdatedAt: metrics.lastUpdated,
       name: collection.name,
+      slug: collection.slug,
       subCollectionCount: collection.subCollections.length,
       totalBobbleheadCount: metrics.totalBobbleheads,
       userId: collection.userId,
@@ -1144,11 +1153,13 @@ export class CollectionsFacade {
       isPublic: collection.isPublic,
       metrics,
       name: collection.name,
+      slug: collection.slug,
       subCollections: collection.subCollections.map((sub) => ({
         bobbleheadCount: sub.bobbleheads.length,
         description: sub.description,
         id: sub.id,
         name: sub.name,
+        slug: sub.slug,
       })),
     };
   }

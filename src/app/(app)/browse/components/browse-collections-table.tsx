@@ -32,8 +32,8 @@ export function BrowseCollectionsTable({ collections }: BrowseCollectionsTablePr
     <div className={'grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}>
       {collections.map((record) => {
         const collectionPath = $path({
-          route: '/collections/[collectionId]',
-          routeParams: { collectionId: record.collection.id },
+          route: '/collections/[collectionSlug]',
+          routeParams: { collectionSlug: record.collection.slug },
         }) as Route;
         return (
           <Link href={collectionPath} key={record.collection.id}>

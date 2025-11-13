@@ -52,7 +52,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
   return (
     <BobbleheadViewTracker
       bobbleheadId={bobbleheadId}
-      collectionId={basicBobblehead.collectionId || undefined}
+      collectionId={basicBobblehead.collectionId ?? undefined}
     >
       <div>
         {/* Header Section */}

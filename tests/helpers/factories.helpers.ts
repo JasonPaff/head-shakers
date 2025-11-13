@@ -24,50 +24,58 @@ export const userFactory = Factory.define<typeof users.$inferInsert>(({ sequence
   username: `${faker.internet.username().toLowerCase()}_${sequence}`,
 }));
 
-export const collectionFactory = Factory.define<typeof collections.$inferInsert>(({ sequence }) => ({
-  description: faker.lorem.paragraph(),
-  isPublic: faker.datatype.boolean({ probability: 0.7 }),
-  name: `${faker.word.adjective()} ${faker.word.noun()} Collection ${sequence}`,
-  totalItems: 0,
-  totalValue: '0.00',
-  userId: faker.string.uuid(),
-}));
+export const collectionFactory = Factory.define<typeof collections.$inferInsert>(({ sequence }) => {
+  const name = `${faker.word.adjective()} ${faker.word.noun()} Collection ${sequence}`;
+  return {
+    description: faker.lorem.paragraph(),
+    isPublic: faker.datatype.boolean({ probability: 0.7 }),
+    name,
+    slug: `${name.toLowerCase().replace(/\s+/g, '-')}-${sequence}`,
+    totalItems: 0,
+    totalValue: '0.00',
+    userId: faker.string.uuid(),
+  };
+});
 
-export const bobbleheadFactory = Factory.define<typeof bobbleheads.$inferInsert>(() => ({
-  acquisitionDate: faker.date.past({ years: 5 }),
-  acquisitionMethod: faker.helpers.arrayElement(['purchase', 'gift', 'trade', 'found']),
-  category: faker.helpers.arrayElement(['Sports', 'Movies', 'TV Shows', 'Comics', 'Gaming']),
-  characterName: faker.person.fullName(),
-  collectionId: faker.string.uuid(),
-  currentCondition: faker.helpers.arrayElement(['mint', 'excellent', 'good', 'fair', 'poor']),
-  customFields: [
-    {
-      edition: faker.airline.airline().name,
-    },
-    { rarity: faker.airline.airline().name },
-    { serialNumber: faker.airline.airline().name },
-  ] as const,
-  description: faker.lorem.paragraph(),
-  height: faker.number.float({ fractionDigits: 1, max: 12, min: 3 }),
-  isFeatured: faker.datatype.boolean({ probability: 0.1 }),
-  isPublic: faker.datatype.boolean({ probability: 0.8 }),
-  manufacturer: faker.company.name(),
-  material: faker.helpers.arrayElement(['Resin', 'Vinyl', 'Ceramic', 'Plastic', 'Polyresin']),
-  name: `${faker.person.firstName()} ${faker.person.lastName()} Bobblehead`,
-  purchaseLocation: faker.helpers.arrayElement([
-    'eBay',
-    'Amazon',
-    'Local Store',
-    'Comic Con',
-    'Antique Shop',
-  ]),
-  purchasePrice: Number(faker.commerce.price({ max: 500, min: 5 })),
-  series: faker.commerce.productName(),
-  status: faker.helpers.arrayElement(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']),
-  userId: faker.string.uuid(),
-  weight: faker.number.float({ fractionDigits: 1, max: 5, min: 0.5 }),
-  year: faker.date.past({ years: 30 }).getFullYear(),
-}));
+export const bobbleheadFactory = Factory.define<typeof bobbleheads.$inferInsert>(({ sequence }) => {
+  const name = `${faker.person.firstName()} ${faker.person.lastName()} Bobblehead`;
+  return {
+    acquisitionDate: faker.date.past({ years: 5 }),
+    acquisitionMethod: faker.helpers.arrayElement(['purchase', 'gift', 'trade', 'found']),
+    category: faker.helpers.arrayElement(['Sports', 'Movies', 'TV Shows', 'Comics', 'Gaming']),
+    characterName: faker.person.fullName(),
+    collectionId: faker.string.uuid(),
+    currentCondition: faker.helpers.arrayElement(['mint', 'excellent', 'good', 'fair', 'poor']),
+    customFields: [
+      {
+        edition: faker.airline.airline().name,
+      },
+      { rarity: faker.airline.airline().name },
+      { serialNumber: faker.airline.airline().name },
+    ] as const,
+    description: faker.lorem.paragraph(),
+    height: faker.number.float({ fractionDigits: 1, max: 12, min: 3 }),
+    isFeatured: faker.datatype.boolean({ probability: 0.1 }),
+    isPublic: faker.datatype.boolean({ probability: 0.8 }),
+    manufacturer: faker.company.name(),
+    material: faker.helpers.arrayElement(['Resin', 'Vinyl', 'Ceramic', 'Plastic', 'Polyresin']),
+    name,
+    purchaseLocation: faker.helpers.arrayElement([
+      'eBay',
+      'Amazon',
+      'Local Store',
+      'Comic Con',
+      'Antique Shop',
+    ]),
+    purchasePrice: Number(faker.commerce.price({ max: 500, min: 5 })),
+    series: faker.commerce.productName(),
+    slug: `${name.toLowerCase().replace(/\s+/g, '-')}-${sequence}`,
+    status: faker.helpers.arrayElement(['owned', 'for_trade', 'for_sale', 'sold', 'wishlist']),
+    userId: faker.string.uuid(),
+    weight: faker.number.float({ fractionDigits: 1, max: 5, min: 0.5 }),
+    year: faker.date.past({ years: 30 }).getFullYear(),
+  };
+});
 
 export const bobbleheadPhotoFactory = Factory.define<typeof bobbleheadPhotos.$inferInsert>(
   ({ sequence }) => ({

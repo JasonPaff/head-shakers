@@ -16,7 +16,7 @@ export class SubcollectionsQuery extends BaseQuery {
   /**
    * create a new subcollection
    */
-  static async createAsync(data: InsertSubCollection, context: QueryContext) {
+  static async createAsync(data: InsertSubCollection & { slug: string }, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.insert(subCollections).values(data).returning();
@@ -91,7 +91,17 @@ export class SubcollectionsQuery extends BaseQuery {
     subcollectionId: string,
     context: QueryContext,
     options?: { searchTerm?: string; sortBy?: string },
-  ): Promise<Array<BobbleheadListRecord & { featurePhoto?: null | string }>> {
+  ): Promise<
+    Array<
+      BobbleheadListRecord & {
+        collectionId: string;
+        collectionSlug: string;
+        featurePhoto?: null | string;
+        subcollectionId: string;
+        subcollectionSlug: string;
+      }
+    >
+  > {
     const dbInstance = this.getDbInstance(context);
 
     const bobbleheadFilter = this.buildBaseFilters(
@@ -132,6 +142,7 @@ export class SubcollectionsQuery extends BaseQuery {
     bobbleheadCount: number;
     collectionId: string;
     collectionName: string;
+    collectionSlug: string;
     coverImageUrl: null | string;
     createdAt: Date;
     description: null | string;
@@ -140,6 +151,7 @@ export class SubcollectionsQuery extends BaseQuery {
     id: string;
     lastUpdatedAt: Date;
     name: string;
+    slug: string;
     userId?: string;
   }> {
     const dbInstance = this.getDbInstance(context);
@@ -189,6 +201,7 @@ export class SubcollectionsQuery extends BaseQuery {
       bobbleheadCount: subCollection.bobbleheads.length,
       collectionId: subCollection.collectionId,
       collectionName: collection.name,
+      collectionSlug: collection.slug,
       coverImageUrl: subCollection.coverImageUrl,
       createdAt: subCollection.createdAt,
       description: subCollection.description,
@@ -197,6 +210,7 @@ export class SubcollectionsQuery extends BaseQuery {
       id: subCollection.id,
       lastUpdatedAt: subCollection.updatedAt,
       name: subCollection.name,
+      slug: subCollection.slug,
       userId: collection.user?.id,
     };
   }
@@ -357,6 +371,8 @@ export class SubcollectionsQuery extends BaseQuery {
       acquisitionMethod: bobbleheads.acquisitionMethod,
       category: bobbleheads.category,
       characterName: bobbleheads.characterName,
+      collectionId: bobbleheads.collectionId,
+      collectionSlug: collections.slug,
       condition: bobbleheads.currentCondition,
       description: bobbleheads.description,
       featurePhoto: bobbleheadPhotos.url,
@@ -369,7 +385,10 @@ export class SubcollectionsQuery extends BaseQuery {
       purchaseLocation: bobbleheads.purchaseLocation,
       purchasePrice: bobbleheads.purchasePrice,
       series: bobbleheads.series,
+      slug: bobbleheads.slug,
       status: bobbleheads.status,
+      subcollectionId: bobbleheads.subcollectionId,
+      subcollectionSlug: subCollections.slug,
       weight: bobbleheads.weight,
     };
   }

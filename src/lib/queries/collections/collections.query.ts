@@ -29,6 +29,7 @@ export type BobbleheadListRecord = {
   purchaseLocation: null | string;
   purchasePrice: null | number;
   series: null | string;
+  slug: string;
   status: null | string;
   weight: null | number;
 };
@@ -44,7 +45,9 @@ export type BrowseCategoriesResult = {
 };
 
 export type BrowseCollectionRecord = {
-  collection: CollectionRecord;
+  collection: CollectionRecord & {
+    slug: string;
+  };
   firstBobbleheadPhoto: null | string;
   followerCount: number;
   owner: {
@@ -96,7 +99,7 @@ export type CollectionWithRelations = CollectionRecord & {
 };
 
 export class CollectionsQuery extends BaseQuery {
-  static async createAsync(data: InsertCollection, userId: string, context: QueryContext) {
+  static async createAsync(data: InsertCollection & { slug: string }, userId: string, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -289,9 +292,12 @@ export class CollectionsQuery extends BaseQuery {
   ): Promise<
     Array<
       BobbleheadListRecord & {
+        collectionId: string;
+        collectionSlug: string;
         featurePhoto?: null | string;
         subcollectionId: null | string;
         subcollectionName: null | string;
+        subcollectionSlug: null | string;
       }
     >
   > {
@@ -482,6 +488,7 @@ export class CollectionsQuery extends BaseQuery {
           name: collections.name,
           ownerId: users.id,
           ownerUsername: users.username,
+          slug: collections.slug,
           totalItems: collections.totalItems,
           totalValue: collections.totalValue,
           updatedAt: collections.updatedAt,
@@ -507,6 +514,7 @@ export class CollectionsQuery extends BaseQuery {
           lastItemAddedAt: row.lastItemAddedAt,
           likeCount: row.likeCount,
           name: row.name,
+          slug: row.slug,
           totalItems: row.totalItems,
           totalValue: row.totalValue,
           updatedAt: row.updatedAt,
@@ -575,6 +583,7 @@ export class CollectionsQuery extends BaseQuery {
         name: collections.name,
         ownerId: users.id,
         ownerUsername: users.username,
+        slug: collections.slug,
         totalItems: collections.totalItems,
         totalValue: collections.totalValue,
         updatedAt: collections.updatedAt,
@@ -599,6 +608,7 @@ export class CollectionsQuery extends BaseQuery {
         lastItemAddedAt: row.lastItemAddedAt,
         likeCount: row.likeCount,
         name: row.name,
+        slug: row.slug,
         totalItems: row.totalItems,
         totalValue: row.totalValue,
         updatedAt: row.updatedAt,
@@ -726,6 +736,7 @@ export class CollectionsQuery extends BaseQuery {
         name: collections.name,
         ownerId: users.id,
         ownerUsername: users.username,
+        slug: collections.slug,
         totalItems: collections.totalItems,
         totalValue: collections.totalValue,
         updatedAt: collections.updatedAt,
@@ -750,6 +761,7 @@ export class CollectionsQuery extends BaseQuery {
         lastItemAddedAt: row.lastItemAddedAt,
         likeCount: row.likeCount,
         name: row.name,
+        slug: row.slug,
         totalItems: row.totalItems,
         totalValue: row.totalValue,
         updatedAt: row.updatedAt,
@@ -783,9 +795,12 @@ export class CollectionsQuery extends BaseQuery {
   ): Promise<
     Array<
       BobbleheadListRecord & {
+        collectionId: string;
+        collectionSlug: string;
         featurePhoto?: null | string;
         subcollectionId: null | string;
         subcollectionName: null | string;
+        subcollectionSlug: null | string;
       }
     >
   > {
@@ -979,6 +994,7 @@ export class CollectionsQuery extends BaseQuery {
       purchaseLocation: bobbleheads.purchaseLocation,
       purchasePrice: bobbleheads.purchasePrice,
       series: bobbleheads.series,
+      slug: bobbleheads.slug,
       status: bobbleheads.status,
       weight: bobbleheads.weight,
     };
@@ -987,9 +1003,12 @@ export class CollectionsQuery extends BaseQuery {
   private static _selectBobbleheadWithPhoto() {
     return {
       ...this._selectBobbleheadBase(),
+      collectionId: bobbleheads.collectionId,
+      collectionSlug: collections.slug,
       featurePhoto: bobbleheadPhotos.url,
       subcollectionId: bobbleheads.subcollectionId,
       subcollectionName: subCollections.name,
+      subcollectionSlug: subCollections.slug,
     };
   }
 }

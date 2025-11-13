@@ -73,9 +73,15 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
     if (!item) return '#';
     switch (item.targetType) {
       case 'bobblehead':
-        return $path({ route: '/bobbleheads/[bobbleheadId]', routeParams: { bobbleheadId: item.targetId } });
+        return $path({
+          route: '/bobbleheads/[bobbleheadSlug]',
+          routeParams: { bobbleheadSlug: item.targetId },
+        });
       case 'collection':
-        return $path({ route: '/collections/[collectionId]', routeParams: { collectionId: item.targetId } });
+        return $path({
+          route: '/collections/[collectionSlug]',
+          routeParams: { collectionSlug: item.targetId },
+        });
       case 'user':
         return $path({ route: '/users/[userId]', routeParams: { userId: item.targetId } });
       default:

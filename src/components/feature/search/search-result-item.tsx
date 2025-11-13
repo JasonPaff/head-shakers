@@ -36,16 +36,16 @@ export const SearchResultItem = ({
   // determine entity URL based on type
   const entityUrl =
     entityType === 'collection' ?
-      $path({ route: '/collections/[collectionId]', routeParams: { collectionId: result.id } })
+      $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: result.slug } })
     : entityType === 'subcollection' ?
       $path({
-        route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
         routeParams: {
-          collectionId: (result as SubcollectionSearchResult).collectionId,
-          subcollectionId: result.id,
+          collectionSlug: (result as SubcollectionSearchResult).collectionSlug,
+          subcollectionSlug: result.slug,
         },
       })
-    : $path({ route: '/bobbleheads/[bobbleheadId]', routeParams: { bobbleheadId: result.id } });
+    : $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: result.slug } });
 
   // Get entity-specific display data
   const displayName =

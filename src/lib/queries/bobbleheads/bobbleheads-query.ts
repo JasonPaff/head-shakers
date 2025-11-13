@@ -32,8 +32,10 @@ export type BobbleheadRecord = typeof bobbleheads.$inferSelect;
 
 export type BobbleheadWithRelations = BobbleheadRecord & {
   collectionName: null | string;
+  collectionSlug: null | string;
   photos: Array<typeof bobbleheadPhotos.$inferSelect>;
   subcollectionName: null | string;
+  subcollectionSlug: null | string;
   tags: Array<typeof tags.$inferSelect>;
 };
 
@@ -96,7 +98,7 @@ export class BobbleheadsQuery extends BaseQuery {
    * create a new bobblehead
    */
   static async createAsync(
-    data: InsertBobblehead,
+    data: InsertBobblehead & { slug: string },
     userId: string,
     context: QueryContext,
   ): Promise<BobbleheadRecord | null> {
@@ -270,8 +272,10 @@ export class BobbleheadsQuery extends BaseQuery {
     return {
       ...result[0].bobblehead,
       collectionName: result[0].collection?.name || null,
+      collectionSlug: result[0].collection?.slug || null,
       photos,
       subcollectionName: result[0].subcollection?.name || null,
+      subcollectionSlug: result[0].subcollection?.slug || null,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
   }
@@ -352,8 +356,10 @@ export class BobbleheadsQuery extends BaseQuery {
     return {
       ...result[0].bobblehead,
       collectionName: result[0].collection?.name || null,
+      collectionSlug: result[0].collection?.slug || null,
       photos,
       subcollectionName: result[0].subcollection?.name || null,
+      subcollectionSlug: result[0].subcollection?.slug || null,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
   }

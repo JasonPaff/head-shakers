@@ -17,15 +17,15 @@ import {
 } from '@/lib/utils/share-utils';
 
 type CollectionShareMenuProps = Children & {
-  collectionId: string;
+  collectionSlug: string;
 };
 
-export function CollectionShareMenu({ children, collectionId }: CollectionShareMenuProps) {
+export function CollectionShareMenu({ children, collectionSlug }: CollectionShareMenuProps) {
   const handleCopyLink = async () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionId]',
-        routeParams: { collectionId },
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const success = await copyToClipboard(absoluteUrl);
@@ -43,8 +43,8 @@ export function CollectionShareMenu({ children, collectionId }: CollectionShareM
   const handleShareToTwitter = () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionId]',
-        routeParams: { collectionId },
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('twitter', {
@@ -60,8 +60,8 @@ export function CollectionShareMenu({ children, collectionId }: CollectionShareM
   const handleShareToFacebook = () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionId]',
-        routeParams: { collectionId },
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('facebook', {

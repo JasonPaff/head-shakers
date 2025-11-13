@@ -15,6 +15,7 @@ export const SubcollectionsTabContent = async () => {
         collectionDescription: collection.description,
         collectionId: collection.id,
         collectionName: collection.name,
+        collectionSlug: collection.slug,
         isCollectionPublic: collection.isPublic,
       })),
     )

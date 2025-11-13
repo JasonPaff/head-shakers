@@ -108,10 +108,10 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
                       <Link
                         className={'text-muted-foreground hover:text-foreground'}
                         href={$path({
-                          route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+                          route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                           routeParams: {
-                            collectionId: collection.id,
-                            subcollectionId: sub.id,
+                            collectionSlug: collection.slug,
+                            subcollectionSlug: sub.slug,
                           },
                         })}
                       >
@@ -161,8 +161,8 @@ export const CollectionCard = ({ collection }: CollectionCardProps) => {
         <Button asChild className={'mt-4'}>
           <Link
             href={$path({
-              route: '/collections/[collectionId]',
-              routeParams: { collectionId: collection.id },
+              route: '/collections/[collectionSlug]',
+              routeParams: { collectionSlug: collection.slug },
             })}
           >
             View Collection

@@ -17,20 +17,20 @@ import {
 } from '@/lib/utils/share-utils';
 
 type SubcollectionShareMenuProps = Children & {
-  collectionId: string;
-  subcollectionId: string;
+  collectionSlug: string;
+  subcollectionSlug: string;
 };
 
 export function SubcollectionShareMenu({
   children,
-  collectionId,
-  subcollectionId,
+  collectionSlug,
+  subcollectionSlug,
 }: SubcollectionShareMenuProps) {
   const handleCopyLink = async () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-        routeParams: { collectionId, subcollectionId },
+        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+        routeParams: { collectionSlug, subcollectionSlug },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const success = await copyToClipboard(absoluteUrl);
@@ -48,8 +48,8 @@ export function SubcollectionShareMenu({
   const handleShareToTwitter = () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-        routeParams: { collectionId, subcollectionId },
+        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+        routeParams: { collectionSlug, subcollectionSlug },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('twitter', {
@@ -65,8 +65,8 @@ export function SubcollectionShareMenu({
   const handleShareToFacebook = () => {
     try {
       const relativePath = $path({
-        route: '/collections/[collectionId]/subcollection/[subcollectionId]',
-        routeParams: { collectionId, subcollectionId },
+        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+        routeParams: { collectionSlug, subcollectionSlug },
       });
       const absoluteUrl = generateAbsoluteUrl(relativePath);
       const shareUrl = generateSocialShareUrl('facebook', {

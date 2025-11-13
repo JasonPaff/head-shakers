@@ -54,10 +54,10 @@ export const SubcollectionsListItem = ({
                 <Link
                   className={'font-medium text-foreground hover:text-primary'}
                   href={$path({
-                    route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+                    route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                     routeParams: {
-                      collectionId: subcollection.collectionId,
-                      subcollectionId: subcollection.id,
+                      collectionSlug: subcollection.collectionSlug,
+                      subcollectionSlug: subcollection.slug,
                     },
                   })}
                 >

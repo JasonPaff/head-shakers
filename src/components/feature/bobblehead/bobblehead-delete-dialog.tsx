@@ -9,18 +9,18 @@ import { deleteBobbleheadAction } from '@/lib/actions/bobbleheads/bobbleheads.ac
 
 interface BobbleheadDeleteDialogProps {
   bobbleheadId: string;
-  collectionId: string;
+  collectionSlug: string;
   isOpen: boolean;
   onClose: () => void;
-  subcollectionId?: null | string;
+  subcollectionSlug?: null | string;
 }
 
 export const BobbleheadDeleteDialog = ({
   bobbleheadId,
-  collectionId,
+  collectionSlug,
   isOpen,
   onClose,
-  subcollectionId,
+  subcollectionSlug,
 }: BobbleheadDeleteDialogProps) => {
   const router = useRouter();
 
@@ -35,22 +35,22 @@ export const BobbleheadDeleteDialog = ({
   const handleDeleteAsync = async () => {
     await executeAsync({ bobbleheadId }).then(() => {
       // redirect to parent collection or subcollection
-      if (subcollectionId)
+      if (subcollectionSlug)
         router.push(
           $path({
-            route: '/collections/[collectionId]/subcollection/[subcollectionId]',
+            route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
             routeParams: {
-              collectionId,
-              subcollectionId,
+              collectionSlug,
+              subcollectionSlug,
             },
           }),
         );
       else {
         router.push(
           $path({
-            route: '/collections/[collectionId]',
+            route: '/collections/[collectionSlug]',
             routeParams: {
-              collectionId,
+              collectionSlug,
             },
           }),
         );

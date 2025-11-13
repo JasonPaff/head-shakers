@@ -198,8 +198,8 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                       <DropdownMenuItem asChild>
                         <Link
                           href={$path({
-                            route: '/bobbleheads/[bobbleheadId]',
-                            routeParams: { bobbleheadId: bobblehead.id },
+                            route: '/bobbleheads/[bobbleheadSlug]',
+                            routeParams: { bobbleheadSlug: bobblehead.slug },
                           })}
                         >
                           View Details
@@ -209,8 +209,8 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
                         {/* Edit Link */}
                         <Link
                           href={$path({
-                            route: '/bobbleheads/[bobbleheadId]/edit',
-                            routeParams: { bobbleheadId: bobblehead.id },
+                            route: '/bobbleheads/[bobbleheadSlug]/edit',
+                            routeParams: { bobbleheadSlug: bobblehead.slug },
                           })}
                         >
                           <PencilIcon aria-hidden className={'mr-2 size-4'} />
