@@ -1,5 +1,6 @@
 export * from '@/lib/db/schema/analytics.schema';
 export * from '@/lib/db/schema/bobbleheads.schema';
+export * from '@/lib/db/schema/bookmarks.schema';
 export * from '@/lib/db/schema/collections.schema';
 export * from '@/lib/db/schema/launch.schema';
 export * from '@/lib/db/schema/moderation.schema';

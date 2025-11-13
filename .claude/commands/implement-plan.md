@@ -87,7 +87,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Run `git branch --show-current` to get current branch
    - **If worktree was created**: Branch will be new feature branch, skip production/main checks
    - **If worktree was NOT created**:
-     - **CRITICAL**: Block execution if on `main` or production branch (`br-dry-forest-adjaydda`)
+     - **CRITICAL**: Block execution if on `main`
      - Warn user and require explicit confirmation if on development branch
    - Run `git status` to check for uncommitted changes
    - If uncommitted changes exist, offer to stash or require commit first
