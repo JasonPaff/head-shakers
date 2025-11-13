@@ -41,7 +41,10 @@ async function ItemPage({ routeParams }: ItemPageProps) {
   const { bobbleheadSlug } = await routeParams;
   const currentUserId = await getOptionalUserId();
 
-  const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(bobbleheadSlug, currentUserId);
+  const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(
+    bobbleheadSlug,
+    currentUserId ?? undefined,
+  );
 
   if (!basicBobblehead) {
     notFound();
@@ -52,6 +55,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
   return (
     <BobbleheadViewTracker
       bobbleheadId={bobbleheadId}
+      bobbleheadSlug={bobbleheadSlug}
       collectionId={basicBobblehead.collectionId ?? undefined}
     >
       <div>

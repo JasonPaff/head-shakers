@@ -38,6 +38,7 @@ export interface FeaturedContentDisplayProps {
 export interface FeaturedContentItem {
   comments: number;
   contentId: string;
+  contentSlug: string;
   contentType: 'bobblehead' | 'collection' | 'user';
   description: string;
   endDate?: null | string;
@@ -126,6 +127,23 @@ export const FeaturedContentDisplay = ({
   const renderFeaturedCard = (content: FeaturedContentItem, isHero = false) => {
     const cardClasses = isHero ? 'col-span-full lg:col-span-2' : 'col-span-1';
 
+    // Generate proper slug-based URL for content type
+    const contentUrl =
+      content.contentType === 'collection' ?
+        $path({
+          route: '/collections/[collectionSlug]',
+          routeParams: { collectionSlug: content.contentSlug },
+        })
+      : content.contentType === 'bobblehead' ?
+        $path({
+          route: '/bobbleheads/[bobbleheadSlug]',
+          routeParams: { bobbleheadSlug: content.contentSlug },
+        })
+      : $path({
+          route: '/users/[userId]',
+          routeParams: { userId: content.contentSlug },
+        });
+
     return (
       <Card className={cardClasses} key={content.id}>
         <div className={'relative'}>
@@ -206,9 +224,7 @@ export const FeaturedContentDisplay = ({
               }}
               size={'sm'}
             >
-              <Link href={`/${content.contentType}s/${content.contentId}`}>
-                View {getContentTypeLabel(content.contentType)}
-              </Link>
+              <Link href={contentUrl}>View {getContentTypeLabel(content.contentType)}</Link>
             </Button>
           </div>
         </CardContent>

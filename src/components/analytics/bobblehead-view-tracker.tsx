@@ -8,11 +8,14 @@ import { ViewTracker } from './view-tracker';
 
 type BobbleheadViewTrackerProps = Children<{
   bobbleheadId: string;
+  bobbleheadSlug?: string;
   className?: string;
   collectionId?: string;
+  collectionSlug?: string;
   onViewRecorded?: (viewData: { isDuplicate: boolean; totalViews: number; viewId: string }) => void;
   sessionId?: string;
   subcollectionId?: string;
+  subcollectionSlug?: string;
   viewThreshold?: number;
   viewTimeThreshold?: number;
 }> &
@@ -20,24 +23,30 @@ type BobbleheadViewTrackerProps = Children<{
 
 export const BobbleheadViewTracker = ({
   bobbleheadId,
+  bobbleheadSlug,
   children,
   className,
   collectionId,
+  collectionSlug,
   onViewRecorded,
   sessionId,
   subcollectionId,
+  subcollectionSlug,
   testId,
   viewThreshold = 0.1,
   viewTimeThreshold = 3000,
 }: BobbleheadViewTrackerProps) => {
   const bobbleheadTrackerTestId = testId || generateTestId('feature', 'bobblehead-card');
 
-  // add bobblehead-specific metadata
+  // add bobblehead-specific metadata with both IDs and slugs for comprehensive tracking
   const metadata = {
     bobbleheadId,
     pageType: 'bobblehead',
+    ...(bobbleheadSlug && { bobbleheadSlug }),
     ...(collectionId && { collectionId }),
+    ...(collectionSlug && { collectionSlug }),
     ...(subcollectionId && { subcollectionId }),
+    ...(subcollectionSlug && { subcollectionSlug }),
   };
 
   return (

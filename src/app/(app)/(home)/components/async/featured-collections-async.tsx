@@ -10,6 +10,7 @@ export async function FeaturedCollectionsAsync({ currentUserId }: FeaturedCollec
   let collections: Array<{
     comments: number;
     contentId: string;
+    contentSlug: string;
     description: string;
     id: string;
     imageUrl: null | string;
@@ -55,6 +56,7 @@ export async function FeaturedCollectionsAsync({ currentUserId }: FeaturedCollec
     return {
       comments: content.comments || 0,
       contentId: content.contentId,
+      contentSlug: content.contentSlug ?? content.contentId,
       description: content.description || '',
       id: content.id,
       imageUrl: content.imageUrl || null,

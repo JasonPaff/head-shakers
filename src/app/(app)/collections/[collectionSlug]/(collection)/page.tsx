@@ -52,7 +52,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   const collectionId = collection.id;
 
   return (
-    <CollectionViewTracker collectionId={collectionId}>
+    <CollectionViewTracker collectionId={collectionId} collectionSlug={collectionSlug}>
       <div>
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>

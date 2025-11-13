@@ -40,18 +40,21 @@ export const AddItemFormClient = withFocusManagement(
 
     const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
       onSuccess: ({ data }) => {
-        if (data?.subcollectionSlug && data?.collectionSlug) {
+        if (data?.data?.subcollectionSlug && data?.data?.collectionSlug) {
           router.push(
             $path({
               route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-              routeParams: { collectionSlug: data.collectionSlug, subcollectionSlug: data.subcollectionSlug },
+              routeParams: {
+                collectionSlug: data.data.collectionSlug,
+                subcollectionSlug: data.data.subcollectionSlug,
+              },
             }),
           );
-        } else if (data?.collectionSlug) {
+        } else if (data?.data?.collectionSlug) {
           router.push(
             $path({
               route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug: data.collectionSlug },
+              routeParams: { collectionSlug: data.data.collectionSlug },
             }),
           );
         }

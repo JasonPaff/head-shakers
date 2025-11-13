@@ -114,11 +114,11 @@ export class SubcollectionsFacade {
     Array<
       BobbleheadListRecord & {
         collectionId: string;
-        collectionSlug: string;
+        collectionSlug: null | string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
-        subcollectionId: string;
-        subcollectionSlug: string;
+        subcollectionId: null | string;
+        subcollectionSlug: null | string;
       }
     >
   > {

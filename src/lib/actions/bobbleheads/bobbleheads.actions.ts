@@ -189,7 +189,12 @@ export const createBobbleheadWithPhotosAction = authActionClient
         message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
       });
 
-      CacheRevalidationService.bobbleheads.onCreate(newBobblehead.id, userId, newBobblehead.collectionId);
+      CacheRevalidationService.bobbleheads.onCreate(
+        newBobblehead.id,
+        userId,
+        newBobblehead.collectionId,
+        newBobblehead.slug,
+      );
 
       // fetch collection and subcollection slugs for navigation
       const collection = await CollectionsFacade.getCollectionById(
@@ -267,6 +272,7 @@ export const deleteBobbleheadAction = authActionClient
         bobbleheadData.bobbleheadId,
         ctx.userId,
         deletedBobblehead?.collectionId,
+        deletedBobblehead?.slug,
       );
 
       return {
@@ -454,6 +460,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
         updatedBobblehead.id,
         userId,
         updatedBobblehead.collectionId,
+        updatedBobblehead.slug,
       );
 
       return {

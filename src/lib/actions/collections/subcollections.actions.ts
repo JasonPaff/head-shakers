@@ -59,7 +59,17 @@ export const createSubCollectionAction = authActionClient
         message: `Created subcollection: ${newSubcollection.name}`,
       });
 
-      CacheRevalidationService.collections.onUpdate(subcollectionData.collectionId, ctx.userId);
+      // Fetch collection slug for cache revalidation
+      const collection = await dbInstance.query.collections.findFirst({
+        columns: { slug: true },
+        where: (c, { eq }) => eq(c.id, subcollectionData.collectionId),
+      });
+
+      CacheRevalidationService.collections.onUpdate(
+        subcollectionData.collectionId,
+        ctx.userId,
+        collection?.slug,
+      );
 
       return {
         data: newSubcollection,

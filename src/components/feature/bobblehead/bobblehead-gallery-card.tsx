@@ -47,7 +47,7 @@ import { BobbleheadShareMenu } from './bobblehead-share-menu';
 interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   bobblehead: {
     collectionId: string;
-    collectionSlug: string;
+    collectionSlug: null | string;
     description?: null | string;
     featurePhoto?: null | string;
     id: string;
@@ -201,7 +201,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
               href={$path({
                 route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                 routeParams: {
-                  collectionSlug: bobblehead.collectionSlug,
+                  collectionSlug: bobblehead.collectionSlug!,
                   subcollectionSlug: bobblehead.subcollectionSlug!,
                 },
               })}
@@ -411,7 +411,7 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
       <Conditional isCondition={isDeleteDialogOpen}>
         <BobbleheadDeleteDialog
           bobbleheadId={bobblehead.id}
-          collectionSlug={bobblehead.collectionSlug}
+          collectionSlug={bobblehead.collectionSlug!}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
           subcollectionSlug={bobblehead.subcollectionSlug}

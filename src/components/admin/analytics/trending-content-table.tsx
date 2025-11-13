@@ -15,6 +15,7 @@ interface TrendingContentItem {
   averageViewDuration?: number; // in seconds
   rank: number;
   targetId: string;
+  targetSlug: string;
   targetType: 'bobblehead' | 'collection' | 'user';
   title: string; // will be fetched separately based on targetType and targetId
   totalViews: number;
@@ -75,12 +76,12 @@ export const TrendingContentTable = ({ className, data, timeRange }: TrendingCon
       case 'bobblehead':
         return $path({
           route: '/bobbleheads/[bobbleheadSlug]',
-          routeParams: { bobbleheadSlug: item.targetId },
+          routeParams: { bobbleheadSlug: item.targetSlug },
         });
       case 'collection':
         return $path({
           route: '/collections/[collectionSlug]',
-          routeParams: { collectionSlug: item.targetId },
+          routeParams: { collectionSlug: item.targetSlug },
         });
       case 'user':
         return $path({ route: '/users/[userId]', routeParams: { userId: item.targetId } });

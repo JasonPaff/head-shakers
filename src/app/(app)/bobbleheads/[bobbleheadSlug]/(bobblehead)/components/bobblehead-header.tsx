@@ -32,8 +32,10 @@ export const BobbleheadHeader = ({
   likeData,
 }: BobbleheadHeaderProps) => {
   const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
+  const _hasSubcollectionWithSlug = _hasSubcollection && !!bobblehead.subcollectionSlug;
   const _backButtonLabel =
     (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';
+  const _shouldNavigateToSubcollection = _hasSubcollectionWithSlug && !!bobblehead.subcollectionSlug;
 
   return (
     <Fragment>
@@ -44,12 +46,12 @@ export const BobbleheadHeader = ({
           <Button asChild size={'sm'} variant={'outline'}>
             <Link
               href={
-                _hasSubcollection && bobblehead.subcollectionSlug ?
+                _shouldNavigateToSubcollection ?
                   $path({
                     route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                     routeParams: {
                       collectionSlug: bobblehead.collectionSlug,
-                      subcollectionSlug: bobblehead.subcollectionSlug,
+                      subcollectionSlug: bobblehead.subcollectionSlug as string,
                     },
                   })
                 : $path({

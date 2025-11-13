@@ -94,6 +94,7 @@ export type CollectionWithRelations = CollectionRecord & {
     description: null | string;
     id: string;
     name: string;
+    slug: string;
     updatedAt: Date;
   }>;
 };
@@ -872,6 +873,7 @@ export class CollectionsQuery extends BaseQuery {
             description: true,
             id: true,
             name: true,
+            slug: true,
             updatedAt: true,
           },
           with: {

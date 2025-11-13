@@ -124,8 +124,23 @@ export class CacheRevalidationService {
     /**
      * revalidate after bobblehead creation
      */
-    onCreate: (bobbleheadId: string, userId: string, collectionId?: string): RevalidationResult => {
+    onCreate: (
+      bobbleheadId: string,
+      userId: string,
+      collectionId?: string,
+      bobbleheadSlug?: string,
+    ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && bobbleheadSlug) {
+        try {
+          revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on create:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: bobbleheadId,
         entityType: 'bobblehead',
@@ -138,8 +153,23 @@ export class CacheRevalidationService {
     /**
      * revalidate after bobblehead deletion
      */
-    onDelete: (bobbleheadId: string, userId: string, collectionId?: string): RevalidationResult => {
+    onDelete: (
+      bobbleheadId: string,
+      userId: string,
+      collectionId?: string,
+      bobbleheadSlug?: string,
+    ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && bobbleheadSlug) {
+        try {
+          revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on delete:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: bobbleheadId,
         entityType: 'bobblehead',
@@ -156,8 +186,19 @@ export class CacheRevalidationService {
       bobbleheadId: string,
       userId: string,
       operation: 'add' | 'delete' | 'reorder',
+      bobbleheadSlug?: string,
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && bobbleheadSlug) {
+        try {
+          revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on photo change:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: bobbleheadId,
         entityType: 'bobblehead',
@@ -170,8 +211,23 @@ export class CacheRevalidationService {
     /**
      * revalidate after tag operations
      */
-    onTagChange: (bobbleheadId: string, userId: string, operation: 'add' | 'remove'): RevalidationResult => {
+    onTagChange: (
+      bobbleheadId: string,
+      userId: string,
+      operation: 'add' | 'remove',
+      bobbleheadSlug?: string,
+    ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && bobbleheadSlug) {
+        try {
+          revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on tag change:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: bobbleheadId,
         entityType: 'bobblehead',
@@ -184,8 +240,23 @@ export class CacheRevalidationService {
     /**
      * revalidate after bobblehead update
      */
-    onUpdate: (bobbleheadId: string, userId: string, collectionId?: string): RevalidationResult => {
+    onUpdate: (
+      bobbleheadId: string,
+      userId: string,
+      collectionId?: string,
+      bobbleheadSlug?: string,
+    ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && bobbleheadSlug) {
+        try {
+          revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on update:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: bobbleheadId,
         entityType: 'bobblehead',
@@ -208,11 +279,28 @@ export class CacheRevalidationService {
       bobbleheadId: string,
       userId: string,
       operation: 'add' | 'remove',
+      collectionSlug?: string,
+      bobbleheadSlug?: string,
     ): RevalidationResult => {
       const tags = [
         ...CacheTagInvalidation.onCollectionChange(collectionId, userId),
         ...CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId),
       ];
+
+      // Path-based revalidation using slugs if provided
+      if (isCacheEnabled()) {
+        try {
+          if (collectionSlug) {
+            revalidatePath(`/collections/${collectionSlug}`, 'page');
+          }
+          if (bobbleheadSlug) {
+            revalidatePath(`/bobbleheads/${bobbleheadSlug}`, 'page');
+          }
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on bobblehead change:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
         entityType: 'collection',
@@ -225,8 +313,18 @@ export class CacheRevalidationService {
     /**
      * revalidate after collection creation
      */
-    onCreate: (collectionId: string, userId: string): RevalidationResult => {
+    onCreate: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onCollectionChange(collectionId, userId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && collectionSlug) {
+        try {
+          revalidatePath(`/collections/${collectionSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on create:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
         entityType: 'collection',
@@ -239,8 +337,18 @@ export class CacheRevalidationService {
     /**
      * revalidate after collection deletion
      */
-    onDelete: (collectionId: string, userId: string): RevalidationResult => {
+    onDelete: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onCollectionChange(collectionId, userId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && collectionSlug) {
+        try {
+          revalidatePath(`/collections/${collectionSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on delete:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
         entityType: 'collection',
@@ -253,8 +361,18 @@ export class CacheRevalidationService {
     /**
      * revalidate after collection update
      */
-    onUpdate: (collectionId: string, userId: string): RevalidationResult => {
+    onUpdate: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onCollectionChange(collectionId, userId);
+
+      // Path-based revalidation using slug if provided
+      if (isCacheEnabled() && collectionSlug) {
+        try {
+          revalidatePath(`/collections/${collectionSlug}`, 'page');
+        } catch (error) {
+          console.error('[CacheRevalidation] Path revalidation error on update:', error);
+        }
+      }
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
         entityType: 'collection',
@@ -306,23 +424,24 @@ export class CacheRevalidationService {
       entityId: string,
       userId: string,
       operation: 'add' | 'delete' | 'update',
+      entitySlug?: string,
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);
 
-      // Revalidate the specific page path where comments are displayed
-      if (isCacheEnabled()) {
+      // Revalidate the specific page path where comments are displayed using slug if provided
+      if (isCacheEnabled() && entitySlug) {
         try {
           switch (entityType) {
             case 'bobblehead':
-              revalidatePath(`/bobbleheads/${entityId}`, 'page');
+              revalidatePath(`/bobbleheads/${entitySlug}`, 'page');
               break;
             case 'collection':
-              revalidatePath(`/collections/${entityId}`, 'page');
+              revalidatePath(`/collections/${entitySlug}`, 'page');
               break;
             case 'subcollection':
               // For subcollections, we need to revalidate the subcollection page
-              // The path pattern is /collections/[collectionId]/subcollection/[subcollectionId]
-              // Since we don't have collectionId here, we'll use a layout revalidation
+              // The path pattern is /collections/[collectionSlug]/subcollection/[subcollectionSlug]
+              // Since we don't have collectionSlug here, we'll use a layout revalidation
               revalidatePath(`/collections`, 'layout');
               break;
           }
@@ -366,18 +485,19 @@ export class CacheRevalidationService {
       entityId: string,
       userId: string,
       operation: 'like' | 'unlike',
+      entitySlug?: string,
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);
 
-      // Add path-based revalidation for immediate cache clearing
-      if (isCacheEnabled()) {
+      // Add path-based revalidation for immediate cache clearing using slug if provided
+      if (isCacheEnabled() && entitySlug) {
         try {
           switch (entityType) {
             case 'bobblehead':
-              revalidatePath(`/bobbleheads/${entityId}`, 'page');
+              revalidatePath(`/bobbleheads/${entitySlug}`, 'page');
               break;
             case 'collection':
-              revalidatePath(`/collections/${entityId}`, 'page');
+              revalidatePath(`/collections/${entitySlug}`, 'page');
               break;
           }
         } catch (error) {

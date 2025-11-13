@@ -47,6 +47,7 @@ export const AnalyticsDashboardAsync = async ({
       averageViewDuration: item.averageViewDuration,
       rank: item.rank,
       targetId: item.targetId,
+      targetSlug: item.targetId, // TODO: fetch actual slug from bobblehead
       targetType: 'bobblehead' as const,
       title: `Bobblehead ${item.targetId}`, // this would be replaced with actual titles from content lookup
       totalViews: item.totalViews,
@@ -58,6 +59,7 @@ export const AnalyticsDashboardAsync = async ({
       averageViewDuration: item.averageViewDuration,
       rank: item.rank + trendingBobbleheads.length,
       targetId: item.targetId,
+      targetSlug: item.targetId, // TODO: fetch actual slug from collection
       targetType: 'collection' as const,
       title: `Collection ${item.targetId}`, // this would be replaced with actual titles from content lookup
       totalViews: item.totalViews,
@@ -69,6 +71,7 @@ export const AnalyticsDashboardAsync = async ({
       averageViewDuration: item.averageViewDuration,
       rank: item.rank + trendingBobbleheads.length + trendingCollections.length,
       targetId: item.targetId,
+      targetSlug: item.targetId, // User profiles use ID as slug
       targetType: 'user' as const, // map profile to user for consistency with the component
       title: `Profile ${item.targetId}`, // this would be replaced with actual profile names from user lookup
       totalViews: item.totalViews,

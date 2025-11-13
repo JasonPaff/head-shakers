@@ -6,6 +6,7 @@
 export interface FeaturedContentData {
   comments?: number;
   contentId: string;
+  contentSlug?: null | string;
   contentType: 'bobblehead' | 'collection' | 'user';
   createdAt: Date;
   curatorNotes: null | string;
@@ -29,8 +30,10 @@ export interface FeaturedContentData {
 export interface RawFeaturedContentData {
   bobbleheadLikes: null | number;
   bobbleheadOwner: null | string;
+  bobbleheadSlug: null | string;
   collectionCoverImageUrl: null | string;
   collectionOwner: null | string;
+  collectionSlug: null | string;
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
   createdAt: Date;
@@ -97,6 +100,7 @@ export class FeaturedContentTransformer {
     return rawData.map((row) => ({
       comments: 0, // TODO: implement comments count
       contentId: row.contentId,
+      contentSlug: this.determineContentSlug(row),
       contentType: row.contentType,
       createdAt: row.createdAt,
       curatorNotes: row.curatorNotes,
@@ -123,5 +127,13 @@ export class FeaturedContentTransformer {
   private static determineContentOwner(row: RawFeaturedContentData): null | string {
     // priority: bobblehead owner > collection owner > user
     return row.bobbleheadOwner || row.collectionOwner || row.userId;
+  }
+
+  /**
+   * business logic for determining the content slug
+   */
+  private static determineContentSlug(row: RawFeaturedContentData): null | string {
+    // return the appropriate slug based on content type
+    return row.bobbleheadSlug || row.collectionSlug || null;
   }
 }

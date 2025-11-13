@@ -34,7 +34,7 @@ export function generateMetadata(): Metadata {
 }
 
 async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPageProps) {
-  const { subcollectionSlug } = await routeParams;
+  const { collectionSlug, subcollectionSlug } = await routeParams;
   const resolvedSearchParams = await searchParams;
 
   // TODO: Add SubcollectionsFacade.getSubcollectionBySlug method
@@ -54,7 +54,12 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   const collectionId = basicSubcollection.collectionId;
 
   return (
-    <CollectionViewTracker collectionId={collectionId} subcollectionId={subcollectionId}>
+    <CollectionViewTracker
+      collectionId={collectionId}
+      collectionSlug={collectionSlug}
+      subcollectionId={subcollectionId}
+      subcollectionSlug={subcollectionSlug}
+    >
       <div>
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>

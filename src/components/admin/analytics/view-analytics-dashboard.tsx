@@ -28,6 +28,7 @@ type TrendingData = {
   averageViewDuration?: number;
   rank: number;
   targetId: string;
+  targetSlug: string;
   targetType: 'bobblehead' | 'collection' | 'user';
   title: string;
   totalViews: number;

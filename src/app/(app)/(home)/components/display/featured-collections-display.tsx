@@ -12,6 +12,7 @@ import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 export interface FeaturedCollection {
   comments: number;
   contentId: string;
+  contentSlug: string;
   description: string;
   id: string;
   imageUrl: null | string;
@@ -43,7 +44,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
 
         return (
           <Card className={'group overflow-hidden transition-all hover:shadow-lg'} key={collection.id}>
-            <Link className={'block'} href={`/collections/${collection.contentId}`}>
+            <Link className={'block'} href={`/collections/${collection.contentSlug}`}>
               <div className={'relative aspect-[4/3] w-full overflow-hidden bg-muted'}>
                 {hasImage ?
                   <CldImage
@@ -72,7 +73,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
 
             <CardContent className={'p-4'}>
               <div className={'mb-3'}>
-                <Link href={`/collections/${collection.contentId}`}>
+                <Link href={`/collections/${collection.contentSlug}`}>
                   <h3 className={'mb-1 line-clamp-1 font-semibold transition-colors hover:text-primary'}>
                     {collection.title}
                   </h3>
@@ -91,7 +92,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
                 />
 
                 <Button asChild size={'sm'} variant={'outline'}>
-                  <Link href={`/collections/${collection.contentId}`}>View Collection</Link>
+                  <Link href={`/collections/${collection.contentSlug}`}>View Collection</Link>
                 </Button>
               </div>
             </CardContent>

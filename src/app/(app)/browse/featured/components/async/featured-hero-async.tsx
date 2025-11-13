@@ -14,6 +14,7 @@ export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }:
     collection_of_week: Array<{
       comments: number;
       contentId: string;
+      contentSlug: string;
       contentType: 'bobblehead' | 'collection' | 'user';
       description: string;
       endDate: null | string;
@@ -32,6 +33,7 @@ export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }:
     homepage_banner: Array<{
       comments: number;
       contentId: string;
+      contentSlug: string;
       contentType: 'bobblehead' | 'collection' | 'user';
       description: string;
       endDate: null | string;
@@ -94,6 +96,7 @@ export async function FeaturedHeroAsync({ currentUserId, isTrackViews = false }:
       return {
         comments: content.comments || 0,
         contentId: content.contentId,
+        contentSlug: content.contentSlug || content.contentId,
         contentType: content.contentType,
         description: content.description || '',
         endDate: content.endDate?.toISOString().split('T')[0] || null,

@@ -6,7 +6,7 @@ model: haiku
 
 You must invoke the **neon-db-expert** subagent using the Task tool to handle this database operation.
 
-**User's Request:** {{$input}}
+**User's Request:** {{$ARGUMENTS}}
 
 **Instructions:**
 

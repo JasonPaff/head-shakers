@@ -24,13 +24,13 @@ const isPublicRoute = createRouteMatcher([
   '/search(.*)',
 
   // public collection views (read-only)
-  '/collections/:id', // matches /collections/[id]
-  '/collections/:id/subcollection(.*)', // matches subcollection routes
-  '/collections/:id/share(.*)', // sharing routes
+  '/collections/:slug', // matches /collections/[collectionSlug]
+  '/collections/:slug/subcollection(.*)', // matches subcollection routes
+  '/collections/:slug/share(.*)', // sharing routes
 
   // public bobblehead views (read-only)
-  '/bobbleheads/:id', // matches /bobbleheads/[id]
-  '/bobbleheads/:id/share(.*)', // sharing routes
+  '/bobbleheads/:slug', // matches /bobbleheads/[bobbleheadSlug]
+  '/bobbleheads/:slug/share(.*)', // sharing routes
 
   // public user profiles (read-only)
   '/users/:username',
@@ -56,9 +56,9 @@ const isProtectedRoute = createRouteMatcher([
   '/bobbleheads/add(.*)', // updated from items to bobbleheads
 
   // edit routes - require auth + ownership check
-  '/collections/:id/edit(.*)',
-  '/collections/:id/settings(.*)',
-  '/bobbleheads/:id/edit(.*)', // updated from items to bobbleheads
+  '/collections/:slug/edit(.*)',
+  '/collections/:slug/settings(.*)',
+  '/bobbleheads/:slug/edit(.*)', // updated from items to bobbleheads
 ]);
 
 const isAdminRoute = createRouteMatcher([

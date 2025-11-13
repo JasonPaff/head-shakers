@@ -17,6 +17,7 @@ export async function FeaturedTabbedContentAsync({
     editor_pick: Array<{
       comments: number;
       contentId: string;
+      contentSlug: string;
       contentType: 'bobblehead' | 'collection' | 'user';
       description: string;
       endDate: null | string;
@@ -35,6 +36,7 @@ export async function FeaturedTabbedContentAsync({
     trending: Array<{
       comments: number;
       contentId: string;
+      contentSlug: string;
       contentType: 'bobblehead' | 'collection' | 'user';
       description: string;
       endDate: null | string;
@@ -97,6 +99,7 @@ export async function FeaturedTabbedContentAsync({
       return {
         comments: content.comments || 0,
         contentId: content.contentId,
+        contentSlug: content.contentSlug || content.contentId,
         contentType: content.contentType,
         description: content.description || '',
         endDate: content.endDate?.toISOString().split('T')[0] || null,

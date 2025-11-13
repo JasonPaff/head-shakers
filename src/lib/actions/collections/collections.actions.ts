@@ -60,7 +60,7 @@ export const createCollectionAction = authActionClient
         message: `Created collection: ${newCollection.name}`,
       });
 
-      CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId);
+      CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
 
       return {
         data: newCollection,

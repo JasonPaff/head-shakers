@@ -10,6 +10,7 @@ import {
   UserIcon,
 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
+import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment, useState } from 'react';
 
@@ -26,6 +27,7 @@ import { ENUMS } from '@/lib/constants';
 export interface FeaturedContentItem {
   comments: number;
   contentId: string;
+  contentSlug: string;
   contentType: 'bobblehead' | 'collection' | 'user';
   description: string;
   endDate?: null | string;
@@ -112,6 +114,23 @@ export const FeaturedTabbedContentDisplay = ({
   const renderFeaturedCard = (content: FeaturedContentItem, isHero = false) => {
     const cardClasses = isHero ? 'col-span-full lg:col-span-2' : 'col-span-1';
     const hasImage = content.imageUrl && content.imageUrl !== '/placeholder.jpg';
+
+    // Generate proper slug-based URL for content type
+    const contentUrl =
+      content.contentType === 'collection' ?
+        $path({
+          route: '/collections/[collectionSlug]',
+          routeParams: { collectionSlug: content.contentSlug },
+        })
+      : content.contentType === 'bobblehead' ?
+        $path({
+          route: '/bobbleheads/[bobbleheadSlug]',
+          routeParams: { bobbleheadSlug: content.contentSlug },
+        })
+      : $path({
+          route: '/users/[userId]',
+          routeParams: { userId: content.contentSlug },
+        });
 
     return (
       <Card className={cardClasses} key={content.id}>
@@ -205,9 +224,7 @@ export const FeaturedTabbedContentDisplay = ({
               }}
               size={'sm'}
             >
-              <Link href={`/${content.contentType}s/${content.contentId}`}>
-                View {getContentTypeLabel(content.contentType)}
-              </Link>
+              <Link href={contentUrl}>View {getContentTypeLabel(content.contentType)}</Link>
             </Button>
           </div>
         </CardContent>
