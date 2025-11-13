@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { eq } from 'drizzle-orm';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -20,8 +21,8 @@ import { CollectionViewTracker } from '@/components/analytics/collection-view-tr
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
-import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { db } from '@/lib/db';
+import { collections } from '@/lib/db/schema';
 
 type CollectionPageProps = PageProps;
 
@@ -37,10 +38,12 @@ export function generateMetadata(): Metadata {
 async function CollectionPage({ routeParams, searchParams }: CollectionPageProps) {
   const { collectionSlug } = await routeParams;
   const resolvedSearchParams = await searchParams;
-  const currentUserId = await getOptionalUserId();
 
   // only fetch basic collection info for the initial render to verify it exists
-  const collection = await CollectionsFacade.getCollectionBySlug(collectionSlug, currentUserId);
+  // Note: slugs are globally unique, so we can query by slug alone
+  // TODO: Add a proper getCollectionBySlugOnly method to the facade
+  const results = await db.select().from(collections).where(eq(collections.slug, collectionSlug)).limit(1);
+  const collection = results[0];
 
   if (!collection) {
     notFound();

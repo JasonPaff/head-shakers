@@ -33,14 +33,14 @@ export const CollectionSidebarSubcollections = async ({
 
         {/* Add Subcollection Button */}
         <Conditional isCondition={isOwner}>
-          <CollectionSubcollectionsAdd />
+          <CollectionSubcollectionsAdd collectionId={collection.id} />
         </Conditional>
       </CardHeader>
 
       {/* Subcollections List */}
       <CardContent>
         <CollectionSubcollectionsList
-          collectionId={collection.id}
+          collectionSlug={collection.slug}
           isOwner={isOwner}
           subcollections={subcollections}
         />

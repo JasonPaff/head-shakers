@@ -12,7 +12,7 @@ import { Conditional } from '@/components/ui/conditional';
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 
 interface CollectionSubcollectionsListProps {
-  collectionId: string;
+  collectionSlug: string;
   isOwner: boolean;
   subcollections: Array<SubcollectionForList>;
 }
@@ -23,10 +23,11 @@ interface SubcollectionForList {
   description: null | string;
   id: string;
   name: string;
+  slug: string;
 }
 
 export const CollectionSubcollectionsList = ({
-  collectionId,
+  collectionSlug,
   isOwner,
   subcollections,
 }: CollectionSubcollectionsListProps) => {
@@ -47,8 +48,8 @@ export const CollectionSubcollectionsList = ({
               href={$path({
                 route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
                 routeParams: {
-                  collectionId,
-                  subcollectionId: subcollection.id,
+                  collectionSlug,
+                  subcollectionSlug: subcollection.slug,
                 },
               })}
             >

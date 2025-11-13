@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { eq } from 'drizzle-orm';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -18,8 +19,8 @@ import { CollectionViewTracker } from '@/components/analytics/collection-view-tr
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
-import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { db } from '@/lib/db';
+import { subCollections } from '@/lib/db/schema';
 
 type SubcollectionPageProps = PageProps;
 
@@ -33,34 +34,24 @@ export function generateMetadata(): Metadata {
 }
 
 async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPageProps) {
-  const { collectionSlug, subcollectionSlug } = await routeParams;
+  const { subcollectionSlug } = await routeParams;
   const resolvedSearchParams = await searchParams;
-  const currentUserId = await getOptionalUserId();
 
   // TODO: Add SubcollectionsFacade.getSubcollectionBySlug method
-  // For now, using a placeholder approach - need to implement proper slug lookup
-  // This will be implemented in the next phase
-  // const basicSubcollection = await SubcollectionsFacade.getSubcollectionBySlug(
-  //   collectionSlug,
-  //   subcollectionSlug,
-  //   currentUserId,
-  // );
-
-  // Temporary: Extract IDs from slugs (this is a placeholder - proper implementation needed)
-  // In production, we need SubcollectionsFacade.getSubcollectionBySlug
-  const collectionId = collectionSlug; // FIXME: Need to look up by slug
-  const subcollectionId = subcollectionSlug; // FIXME: Need to look up by slug
-
-  // Verify subcollection exists
-  const basicSubcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
-    collectionId,
-    subcollectionId,
-    currentUserId,
-  );
+  // For now, query subcollection directly by slug since slugs are globally unique
+  const results = await db
+    .select()
+    .from(subCollections)
+    .where(eq(subCollections.slug, subcollectionSlug))
+    .limit(1);
+  const basicSubcollection = results[0];
 
   if (!basicSubcollection) {
     notFound();
   }
+
+  const subcollectionId = basicSubcollection.id;
+  const collectionId = basicSubcollection.collectionId;
 
   return (
     <CollectionViewTracker collectionId={collectionId} subcollectionId={subcollectionId}>

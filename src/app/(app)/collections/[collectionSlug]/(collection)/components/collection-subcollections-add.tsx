@@ -1,19 +1,18 @@
 'use client';
 
 import { PlusIcon } from 'lucide-react';
-import { useRouteParams } from 'next-typesafe-url/app';
 import { Fragment } from 'react';
 
-import { Route } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
 import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';
 import { Button } from '@/components/ui/button';
 import { useToggle } from '@/hooks/use-toggle';
 
-export const CollectionSubcollectionsAdd = () => {
-  const [isOpen, setIsOpen] = useToggle();
-  const { data, isLoading } = useRouteParams(Route.routeParams);
+interface CollectionSubcollectionsAddProps {
+  collectionId: string;
+}
 
-  if (isLoading) return null;
+export const CollectionSubcollectionsAdd = ({ collectionId }: CollectionSubcollectionsAddProps) => {
+  const [isOpen, setIsOpen] = useToggle();
 
   return (
     <Fragment>
@@ -22,7 +21,7 @@ export const CollectionSubcollectionsAdd = () => {
         Add Subcollection
       </Button>
 
-      <SubcollectionCreateDialog collectionId={data!.collectionId} isOpen={isOpen} onClose={setIsOpen.off} />
+      <SubcollectionCreateDialog collectionId={collectionId} isOpen={isOpen} onClose={setIsOpen.off} />
     </Fragment>
   );
 };

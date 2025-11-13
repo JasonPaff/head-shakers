@@ -1169,7 +1169,7 @@ export class CollectionsFacade {
       const context = createUserQueryContext(userId, { dbInstance });
       const dbInst = context.dbInstance ?? db;
 
-      let updateData = { ...data };
+      const updateData: UpdateCollection & { slug?: string } = { ...data };
 
       // if name is being updated, regenerate slug
       if (data.name) {
@@ -1184,7 +1184,7 @@ export class CollectionsFacade {
 
         // ensure new slug is unique within user's collections
         const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-        updateData = { ...updateData, slug: uniqueSlug };
+        updateData.slug = uniqueSlug;
       }
 
       return await CollectionsQuery.updateAsync(updateData, userId, context);

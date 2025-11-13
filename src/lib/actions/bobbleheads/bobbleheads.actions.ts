@@ -17,7 +17,6 @@ import {
 } from '@/lib/constants';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
@@ -199,11 +198,14 @@ export const createBobbleheadWithPhotosAction = authActionClient
         ctx.tx,
       );
       const collectionSlug = collection?.slug ?? null;
-      const subcollectionSlug =
-        newBobblehead.subcollectionId ?
-          ((await SubcollectionsFacade.getSubCollectionById(newBobblehead.subcollectionId, userId, ctx.tx))
-            ?.slug ?? null)
-        : null;
+
+      let subcollectionSlug: null | string = null;
+      if (newBobblehead.subcollectionId) {
+        const subcollection = await ctx.tx.query.subCollections.findFirst({
+          where: (sc, { eq }) => eq(sc.id, newBobblehead.subcollectionId!),
+        });
+        subcollectionSlug = subcollection?.slug ?? null;
+      }
 
       return {
         data: {

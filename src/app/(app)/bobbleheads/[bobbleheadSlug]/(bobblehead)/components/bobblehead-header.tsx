@@ -40,27 +40,29 @@ export const BobbleheadHeader = ({
       {/* Navigation and Actions Row */}
       <div className={'mb-6 flex items-center justify-between gap-4'}>
         {/* Back Button */}
-        <Button asChild size={'sm'} variant={'outline'}>
-          <Link
-            href={
-              _hasSubcollection ?
-                $path({
-                  route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-                  routeParams: {
-                    collectionSlug: bobblehead.collectionSlug,
-                    subcollectionSlug: bobblehead.subcollectionSlug!,
-                  },
-                })
-              : $path({
-                  route: '/collections/[collectionSlug]',
-                  routeParams: { collectionSlug: bobblehead.collectionSlug },
-                })
-            }
-          >
-            <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
-            View {_backButtonLabel}
-          </Link>
-        </Button>
+        {bobblehead.collectionSlug && (
+          <Button asChild size={'sm'} variant={'outline'}>
+            <Link
+              href={
+                _hasSubcollection && bobblehead.subcollectionSlug ?
+                  $path({
+                    route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+                    routeParams: {
+                      collectionSlug: bobblehead.collectionSlug,
+                      subcollectionSlug: bobblehead.subcollectionSlug,
+                    },
+                  })
+                : $path({
+                    route: '/collections/[collectionSlug]',
+                    routeParams: { collectionSlug: bobblehead.collectionSlug },
+                  })
+              }
+            >
+              <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
+              View {_backButtonLabel}
+            </Link>
+          </Button>
+        )}
 
         {/* Action Buttons */}
         <div className={'flex items-center gap-2'}>
@@ -81,8 +83,8 @@ export const BobbleheadHeader = ({
               {/* Delete Bobblehead Button */}
               <BobbleheadHeaderDelete
                 bobbleheadId={bobblehead.id}
-                collectionSlug={bobblehead.collectionSlug}
-                subcollectionSlug={bobblehead.subcollectionSlug}
+                collectionSlug={bobblehead.collectionSlug ?? undefined}
+                subcollectionSlug={bobblehead.subcollectionSlug ?? undefined}
               >
                 Delete
               </BobbleheadHeaderDelete>

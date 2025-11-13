@@ -275,6 +275,7 @@ export class SubcollectionsFacade {
       featurePhoto: null | string;
       id: string;
       name: string;
+      slug: string;
     }>;
     userId?: string;
   }> {
@@ -306,7 +307,9 @@ export class SubcollectionsFacade {
       const dbInst = context.dbInstance ?? db;
       const { subcollectionId, ...updateData } = data;
 
-      let finalUpdateData = { ...updateData };
+      const finalUpdateData: Omit<UpdateSubCollection, 'subcollectionId'> & { slug?: string } = {
+        ...updateData,
+      };
 
       // if name is being updated, regenerate slug
       if (updateData.name) {
@@ -328,7 +331,7 @@ export class SubcollectionsFacade {
 
           // ensure new slug is unique within collection's subcollections
           const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-          finalUpdateData = { ...finalUpdateData, slug: uniqueSlug };
+          finalUpdateData.slug = uniqueSlug;
         }
       }
 

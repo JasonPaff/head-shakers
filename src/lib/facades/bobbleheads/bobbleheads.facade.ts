@@ -703,7 +703,7 @@ export class BobbleheadsFacade {
       const context = createUserQueryContext(userId, { dbInstance });
       const dbInst = context.dbInstance ?? db;
 
-      let updateData = { ...data };
+      const updateData: UpdateBobblehead & { slug?: string } = { ...data };
 
       // if name is being updated, regenerate slug
       if (data.name) {
@@ -717,7 +717,7 @@ export class BobbleheadsFacade {
 
         // ensure new slug is unique
         const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-        updateData = { ...updateData, slug: uniqueSlug };
+        updateData.slug = uniqueSlug;
       }
 
       return BobbleheadsQuery.updateAsync(updateData, userId, context);

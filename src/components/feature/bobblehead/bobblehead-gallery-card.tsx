@@ -411,10 +411,10 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
       <Conditional isCondition={isDeleteDialogOpen}>
         <BobbleheadDeleteDialog
           bobbleheadId={bobblehead.id}
-          collectionId={bobblehead.collectionId}
+          collectionSlug={bobblehead.collectionSlug}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
-          subcollectionId={bobblehead.subcollectionId}
+          subcollectionSlug={bobblehead.subcollectionSlug}
         />
       </Conditional>
     </Card>

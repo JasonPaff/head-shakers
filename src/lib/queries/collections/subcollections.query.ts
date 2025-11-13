@@ -95,10 +95,10 @@ export class SubcollectionsQuery extends BaseQuery {
     Array<
       BobbleheadListRecord & {
         collectionId: string;
-        collectionSlug: string;
+        collectionSlug: null | string;
         featurePhoto?: null | string;
-        subcollectionId: string;
-        subcollectionSlug: string;
+        subcollectionId: null | string;
+        subcollectionSlug: null | string;
       }
     >
   > {
@@ -121,6 +121,8 @@ export class SubcollectionsQuery extends BaseQuery {
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
+      .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.subcollectionId, subcollectionId),
@@ -257,6 +259,7 @@ export class SubcollectionsQuery extends BaseQuery {
       featurePhoto: null | string;
       id: string;
       name: string;
+      slug: string;
     }>;
     userId?: string;
   }> {
@@ -304,6 +307,7 @@ export class SubcollectionsQuery extends BaseQuery {
         featurePhoto: subCollection.coverImageUrl,
         id: subCollection.id,
         name: subCollection.name,
+        slug: subCollection.slug,
       })),
       userId: collection.user?.id,
     };
