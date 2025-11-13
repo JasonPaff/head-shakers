@@ -7,11 +7,13 @@ import {
   integer,
   pgTable,
   timestamp,
+  uniqueIndex,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core';
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
+import { SLUG_MAX_LENGTH } from '@/lib/constants/slug';
 import { users } from '@/lib/db/schema/users.schema';
 
 export const collections = pgTable(
@@ -26,6 +28,7 @@ export const collections = pgTable(
     lastItemAddedAt: timestamp('last_item_added_at'),
     likeCount: integer('like_count').default(DEFAULTS.COLLECTION.LIKE_COUNT).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.COLLECTION.NAME.MAX }).notNull(),
+    slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull(),
     totalItems: integer('total_items').default(DEFAULTS.COLLECTION.TOTAL_ITEMS).notNull(),
     totalValue: decimal('total_value', {
       precision: SCHEMA_LIMITS.COLLECTION.TOTAL_VALUE.PRECISION,
@@ -39,6 +42,7 @@ export const collections = pgTable(
   (table) => [
     // single column indexes
     index('collections_is_public_idx').on(table.isPublic),
+    index('collections_slug_idx').on(table.slug),
     index('collections_user_id_idx').on(table.userId),
 
     // composite indexes
@@ -63,6 +67,9 @@ export const collections = pgTable(
     check('collections_total_value_non_negative', sql`${table.totalValue} >= 0`),
     check('collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
     check('collections_comment_count_non_negative', sql`${table.commentCount} >= 0`),
+
+    // unique constraints
+    uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug),
   ],
 );
 
@@ -81,12 +88,14 @@ export const subCollections = pgTable(
     itemCount: integer('item_count').default(DEFAULTS.SUB_COLLECTION.ITEM_COUNT).notNull(),
     likeCount: integer('like_count').default(DEFAULTS.SUB_COLLECTION.LIKE_COUNT).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.SUB_COLLECTION.NAME.MAX }).notNull(),
+    slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull(),
     sortOrder: integer('sort_order').default(DEFAULTS.SUB_COLLECTION.SORT_ORDER).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },
   (table) => [
     // single column indexes
     index('sub_collections_collection_id_idx').on(table.collectionId),
+    index('sub_collections_slug_idx').on(table.slug),
     index('sub_collections_sort_order_idx').on(table.sortOrder),
 
     // composite indexes
@@ -107,5 +116,8 @@ export const subCollections = pgTable(
     ),
     check('sub_collections_name_not_empty', sql`length(${table.name}) > 0`),
     check('sub_collections_sort_order_non_negative', sql`${table.sortOrder} >= 0`),
+
+    // unique constraints
+    uniqueIndex('sub_collections_collection_slug_unique').on(table.collectionId, table.slug),
   ],
 );

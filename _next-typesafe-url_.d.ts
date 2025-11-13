@@ -10,12 +10,12 @@ declare module "@@@next-typesafe-url" {
 
   interface DynamicRouter {
     "/bobbleheads/add": InferRoute<import("./src/app/(app)/bobbleheads/add/route-type").RouteType>;
-    "/bobbleheads/[bobbleheadId]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/route-type").RouteType>;
-    "/bobbleheads/[bobbleheadId]/edit": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadId]/edit/route-type").RouteType>;
+    "/bobbleheads/[bobbleheadSlug]": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type").RouteType>;
+    "/bobbleheads/[bobbleheadSlug]/edit": InferRoute<import("./src/app/(app)/bobbleheads/[bobbleheadSlug]/edit/route-type").RouteType>;
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/browse/search": InferRoute<import("./src/app/(app)/browse/search/route-type").RouteType>;
-    "/collections/[collectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/(collection)/route-type").RouteType>;
-    "/collections/[collectionId]/subcollection/[subcollectionId]": InferRoute<import("./src/app/(app)/collections/[collectionId]/subcollection/[subcollectionId]/route-type").RouteType>;
+    "/collections/[collectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/(collection)/route-type").RouteType>;
+    "/collections/[collectionSlug]/subcollection/[subcollectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type").RouteType>;
     "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
     "/users/[userId]": InferRoute<import("./src/app/(app)/users/[userId]/route-type").RouteType>;
   }
@@ -32,9 +32,9 @@ declare module "@@@next-typesafe-url" {
     "/browse/featured": StaticRoute;
     "/browse": StaticRoute;
     "/browse/trending": StaticRoute;
-    "/collections/[collectionId]/edit": StaticRoute;
-    "/collections/[collectionId]/settings": StaticRoute;
-    "/collections/[collectionId]/share": StaticRoute;
+    "/collections/[collectionSlug]/edit": StaticRoute;
+    "/collections/[collectionSlug]/settings": StaticRoute;
+    "/collections/[collectionSlug]/share": StaticRoute;
     "/dashboard/feed": StaticRoute;
     "/dashboard/notifications": StaticRoute;
     "/settings/collections": StaticRoute;

@@ -36,6 +36,7 @@ export type BobbleheadSearchResult = {
   ownerUsername: null | string;
   primaryPhotoUrl: null | string;
   series: null | string;
+  slug: string;
   tags?: Array<TagRecord>;
   year: null | number;
 };
@@ -51,6 +52,7 @@ export type CollectionSearchResult = {
   name: string;
   ownerName: null | string;
   ownerUsername: null | string;
+  slug: string;
   tags?: Array<TagRecord>;
   totalItems: null | number;
 };
@@ -71,6 +73,7 @@ export type PublicSearchCounts = {
 export type SubcollectionSearchResult = {
   collectionId: string;
   collectionName: null | string;
+  collectionSlug: string;
   coverImageUrl: null | string;
   description: null | string;
   id: string;
@@ -79,6 +82,7 @@ export type SubcollectionSearchResult = {
   name: string;
   ownerName: null | string;
   ownerUsername: null | string;
+  slug: string;
 };
 
 export type UserSearchResult = {
@@ -120,6 +124,7 @@ export class ContentSearchQuery extends BaseQuery {
         ownerUsername: users.username,
         primaryPhotoUrl: bobbleheadPhotos.url,
         series: bobbleheads.series,
+        slug: bobbleheads.slug,
         year: bobbleheads.year,
       })
       .from(bobbleheads)
@@ -160,6 +165,7 @@ export class ContentSearchQuery extends BaseQuery {
         name: collections.name,
         ownerName: users.displayName,
         ownerUsername: users.username,
+        slug: collections.slug,
         totalItems: collections.totalItems,
       })
       .from(collections)
@@ -561,6 +567,7 @@ export class ContentSearchQuery extends BaseQuery {
         ownerUsername: users.username,
         primaryPhotoUrl: bobbleheadPhotos.url,
         series: bobbleheads.series,
+        slug: bobbleheads.slug,
         year: bobbleheads.year,
       })
       .from(bobbleheads)
@@ -645,6 +652,7 @@ export class ContentSearchQuery extends BaseQuery {
         name: collections.name,
         ownerName: users.displayName,
         ownerUsername: users.username,
+        slug: collections.slug,
         totalItems: collections.totalItems,
       })
       .from(collections)
@@ -759,6 +767,7 @@ export class ContentSearchQuery extends BaseQuery {
         ownerUsername: users.username,
         primaryPhotoUrl: bobbleheadPhotos.url,
         series: bobbleheads.series,
+        slug: bobbleheads.slug,
         year: bobbleheads.year,
       })
       .from(bobbleheads)
@@ -842,6 +851,7 @@ export class ContentSearchQuery extends BaseQuery {
         name: collections.name,
         ownerName: users.displayName,
         ownerUsername: users.username,
+        slug: collections.slug,
         totalItems: collections.totalItems,
       })
       .from(collections)
@@ -951,6 +961,7 @@ export class ContentSearchQuery extends BaseQuery {
       .select({
         collectionId: subCollections.collectionId,
         collectionName: collections.name,
+        collectionSlug: collections.slug,
         coverImageUrl: subCollections.coverImageUrl,
         description: subCollections.description,
         id: subCollections.id,
@@ -959,6 +970,7 @@ export class ContentSearchQuery extends BaseQuery {
         name: subCollections.name,
         ownerName: users.displayName,
         ownerUsername: users.username,
+        slug: subCollections.slug,
       })
       .from(subCollections)
       .innerJoin(collections, eq(subCollections.collectionId, collections.id))

@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { eq } from 'drizzle-orm';
 
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type {
@@ -19,6 +20,8 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
+import { db } from '@/lib/db';
+import { collections } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
@@ -31,6 +34,7 @@ import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 export interface CollectionDashboardData {
   coverImageUrl: null | string;
@@ -550,7 +554,23 @@ export class CollectionsFacade {
   static async createAsync(data: InsertCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return await CollectionsQuery.createAsync(data, userId, context);
+      const dbInst = context.dbInstance ?? db;
+
+      // generate slug from name
+      const baseSlug = generateSlug(data.name);
+
+      // query existing collection slugs for this user only (user-scoped)
+      const existingSlugs = await dbInst
+        .select({ slug: collections.slug })
+        .from(collections)
+        .where(eq(collections.userId, userId))
+        .then((results) => results.map((r) => r.slug));
+
+      // ensure slug is unique within user's collections
+      const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+
+      // create collection with unique slug
+      return await CollectionsQuery.createAsync({ ...data, slug: uniqueSlug }, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { isPublic: data.isPublic, name: data.name },
@@ -831,6 +851,54 @@ export class CollectionsFacade {
     );
   }
 
+  static async getCollectionBySlug(
+    slug: string,
+    userId: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CollectionRecord | null> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+      return CollectionsQuery.findBySlugAsync(slug, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { slug, userId },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionBySlug',
+        operation: 'getBySlug',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async getCollectionBySlugWithRelations(
+    slug: string,
+    userId: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CollectionWithRelations | null> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+      return CollectionsQuery.findBySlugWithRelationsAsync(slug, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { slug, userId },
+        facade: 'CollectionsFacade',
+        method: 'getCollectionBySlugWithRelations',
+        operation: 'getBySlugWithRelations',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
   static async getCollectionForPublicView(id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) {
     const collection = await this.getCollectionWithRelations(id, viewerUserId, dbInstance);
 
@@ -1088,7 +1156,27 @@ export class CollectionsFacade {
   static async updateAsync(data: UpdateCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return await CollectionsQuery.updateAsync(data, userId, context);
+      const dbInst = context.dbInstance ?? db;
+
+      let updateData = { ...data };
+
+      // if name is being updated, regenerate slug
+      if (data.name) {
+        const baseSlug = generateSlug(data.name);
+
+        // query existing slugs for this user, excluding current collection
+        const existingSlugs = await dbInst
+          .select({ slug: collections.slug })
+          .from(collections)
+          .where(eq(collections.userId, userId))
+          .then((results) => results.map((r) => r.slug).filter((slug) => slug !== data.collectionId));
+
+        // ensure new slug is unique within user's collections
+        const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+        updateData = { ...updateData, slug: uniqueSlug };
+      }
+
+      return await CollectionsQuery.updateAsync(updateData, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId },

@@ -2,6 +2,7 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import z from 'zod';
 
 import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
+import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/slug';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema';
 import {
   zodDateString,
@@ -123,6 +124,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   id: true,
   isDeleted: true,
   likeCount: true,
+  slug: true,
   updatedAt: true,
   userId: true,
   viewCount: true,
@@ -143,6 +145,16 @@ export const updateBobbleheadWithPhotosSchema = updateBobbleheadSchema.extend({
 
 export const getBobbleheadByIdSchema = z.object({
   id: z.uuid(),
+});
+
+export const getBobbleheadBySlugSchema = z.object({
+  slug: z
+    .string()
+    .min(SLUG_MIN_LENGTH, { message: `Slug must be at least ${SLUG_MIN_LENGTH} character long` })
+    .max(SLUG_MAX_LENGTH, { message: `Slug cannot exceed ${SLUG_MAX_LENGTH} characters` })
+    .regex(SLUG_PATTERN, {
+      message: 'Slug must contain only lowercase letters, numbers, and hyphens',
+    }),
 });
 
 export const deleteBobbleheadPhotoSchema = z.object({

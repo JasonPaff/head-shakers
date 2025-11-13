@@ -16,6 +16,7 @@ import {
 import type { CustomFields } from '@/lib/validations/bobbleheads.validation';
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
+import { SLUG_MAX_LENGTH } from '@/lib/constants/slug';
 import { collections, subCollections } from '@/lib/db/schema/collections.schema';
 import { tags } from '@/lib/db/schema/tags.schema';
 import { users } from '@/lib/db/schema/users.schema';
@@ -62,6 +63,7 @@ export const bobbleheads = pgTable(
       scale: SCHEMA_LIMITS.BOBBLEHEAD.PURCHASE_PRICE.SCALE,
     }),
     series: varchar('series', { length: SCHEMA_LIMITS.BOBBLEHEAD.SERIES.MAX }),
+    slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull().unique(),
     status: varchar('status', { length: SCHEMA_LIMITS.BOBBLEHEAD.STATUS.MAX })
       .default(DEFAULTS.BOBBLEHEAD.STATUS)
       .notNull(),
@@ -100,6 +102,7 @@ export const bobbleheads = pgTable(
     index('bobbleheads_created_at_idx').on(table.createdAt),
     index('bobbleheads_is_featured_idx').on(table.isFeatured),
     index('bobbleheads_is_public_idx').on(table.isPublic),
+    index('bobbleheads_slug_idx').on(table.slug),
     index('bobbleheads_status_idx').on(table.status),
     index('bobbleheads_sub_collection_id_idx').on(table.subcollectionId),
     index('bobbleheads_user_id_idx').on(table.userId),

@@ -55,6 +55,36 @@ export class SubcollectionsQuery extends BaseQuery {
   }
 
   /**
+   * find a subcollection by slug within a collection
+   */
+  static async findBySlugAsync(
+    collectionSlug: string,
+    subcollectionSlug: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | SelectSubCollection> {
+    const database = this.getDbInstance(context);
+
+    // First get the collection by slug
+    const collection = await database
+      .select({ id: collections.id })
+      .from(collections)
+      .where(and(eq(collections.slug, collectionSlug), eq(collections.userId, userId)))
+      .limit(1)
+      .then((results) => results[0]);
+
+    if (!collection) return null;
+
+    // Then get the subcollection by slug within that collection
+    return await database
+      .select()
+      .from(subCollections)
+      .where(and(eq(subCollections.collectionId, collection.id), eq(subCollections.slug, subcollectionSlug)))
+      .limit(1)
+      .then((results) => results[0] ?? null);
+  }
+
+  /**
    * get bobbleheads in a subcollection with photo data for public display
    */
   static async getSubcollectionBobbleheadsWithPhotosAsync(

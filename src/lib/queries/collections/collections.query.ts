@@ -180,6 +180,78 @@ export class CollectionsQuery extends BaseQuery {
     return collection || null;
   }
 
+  static async findBySlugAsync(
+    slug: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<CollectionRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select()
+      .from(collections)
+      .where(
+        this.combineFilters(
+          eq(collections.slug, slug),
+          eq(collections.userId, userId),
+          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+        ),
+      )
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  static async findBySlugWithRelationsAsync(
+    slug: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<CollectionWithRelations | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    // build permission filter
+    const permissionFilter = this.buildBaseFilters(
+      collections.isPublic,
+      collections.userId,
+      undefined,
+      context,
+    );
+
+    // get the collection by slug and userId
+    const collection = await dbInstance.query.collections.findFirst({
+      where: this.combineFilters(
+        eq(collections.slug, slug),
+        eq(collections.userId, userId),
+        permissionFilter,
+      ),
+      with: {
+        bobbleheads: {
+          columns: {
+            id: true,
+            isFeatured: true,
+            subcollectionId: true,
+            updatedAt: true,
+          },
+          where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+        },
+        subCollections: {
+          with: {
+            bobbleheads: {
+              columns: {
+                id: true,
+                isFeatured: true,
+                updatedAt: true,
+              },
+              where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+            },
+          },
+        },
+      },
+    });
+
+    return collection || null;
+  }
+
   static async findByUserAsync(
     userId: string,
     options: FindOptions = {},

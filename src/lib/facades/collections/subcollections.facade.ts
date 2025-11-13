@@ -1,3 +1,5 @@
+import { eq } from 'drizzle-orm';
+
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -8,6 +10,7 @@ import type {
 } from '@/lib/validations/subcollections.validation';
 
 import { db } from '@/lib/db';
+import { subCollections } from '@/lib/db/schema';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
   createProtectedQueryContext,
@@ -17,6 +20,7 @@ import {
 import { SubcollectionsQuery } from '@/lib/queries/collections/subcollections.query';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 export type PublicSubcollection = Awaited<
   ReturnType<typeof SubcollectionsFacade.getSubCollectionForPublicView>
@@ -32,7 +36,23 @@ export class SubcollectionsFacade {
   static async createAsync(data: InsertSubCollection, dbInstance: DatabaseExecutor = db) {
     try {
       const context = createPublicQueryContext({ dbInstance });
-      return await SubcollectionsQuery.createAsync(data, context);
+      const dbInst = context.dbInstance ?? db;
+
+      // generate slug from name
+      const baseSlug = generateSlug(data.name);
+
+      // query existing subcollection slugs for this collection only (collection-scoped)
+      const existingSlugs = await dbInst
+        .select({ slug: subCollections.slug })
+        .from(subCollections)
+        .where(eq(subCollections.collectionId, data.collectionId))
+        .then((results) => results.map((r) => r.slug));
+
+      // ensure slug is unique within collection's subcollections
+      const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+
+      // create subcollection with unique slug
+      return await SubcollectionsQuery.createAsync({ ...data, slug: uniqueSlug }, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId, name: data.name },
@@ -132,6 +152,35 @@ export class SubcollectionsFacade {
         facade: 'SubcollectionsFacade',
         method: 'getSubcollectionBobbleheadsWithPhotos',
         operation: 'getBobbleheadsWithPhotos',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * get a subcollection by slug within a collection
+   */
+  static async getSubcollectionBySlug(
+    collectionSlug: string,
+    subcollectionSlug: string,
+    userId: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ) {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+
+      return await SubcollectionsQuery.findBySlugAsync(collectionSlug, subcollectionSlug, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { collectionSlug, subcollectionSlug, userId },
+        facade: 'SubcollectionsFacade',
+        method: 'getSubcollectionBySlug',
+        operation: 'getBySlug',
         userId: viewerUserId,
       };
       throw createFacadeError(context, error);
@@ -248,8 +297,36 @@ export class SubcollectionsFacade {
   static async updateAsync(data: UpdateSubCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       const context = createProtectedQueryContext(userId, { dbInstance });
+      const dbInst = context.dbInstance ?? db;
       const { subcollectionId, ...updateData } = data;
-      return await SubcollectionsQuery.updateAsync(subcollectionId, updateData, userId, context);
+
+      let finalUpdateData = { ...updateData };
+
+      // if name is being updated, regenerate slug
+      if (updateData.name) {
+        // need to get the current subcollection to find its collectionId
+        const currentSubcollection = await dbInst.query.subCollections.findFirst({
+          columns: { collectionId: true },
+          where: eq(subCollections.id, subcollectionId),
+        });
+
+        if (currentSubcollection) {
+          const baseSlug = generateSlug(updateData.name);
+
+          // query existing slugs for this collection, excluding current subcollection
+          const existingSlugs = await dbInst
+            .select({ slug: subCollections.slug })
+            .from(subCollections)
+            .where(eq(subCollections.collectionId, currentSubcollection.collectionId))
+            .then((results) => results.map((r) => r.slug).filter((slug) => slug !== subcollectionId));
+
+          // ensure new slug is unique within collection's subcollections
+          const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+          finalUpdateData = { ...finalUpdateData, slug: uniqueSlug };
+        }
+      }
+
+      return await SubcollectionsQuery.updateAsync(subcollectionId, finalUpdateData, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { subcollectionId: data.subcollectionId },

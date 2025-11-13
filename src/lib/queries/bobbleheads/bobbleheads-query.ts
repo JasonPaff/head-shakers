@@ -277,6 +277,88 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
+   * find bobblehead by slug with standard permission filtering
+   */
+  static async findBySlugAsync(slug: string, context: QueryContext): Promise<BobbleheadRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select()
+      .from(bobbleheads)
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.slug, slug),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+        ),
+      )
+      .limit(1);
+
+    return result[0] || null;
+  }
+
+  /**
+   * find bobblehead by slug with all related data (photos, tags, collections)
+   */
+  static async findBySlugWithRelationsAsync(
+    slug: string,
+    context: QueryContext,
+  ): Promise<BobbleheadWithRelations | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    // get the bobblehead with collection/subcollection info
+    const result = await dbInstance
+      .select({
+        bobblehead: bobbleheads,
+        collection: collections,
+        subcollection: subCollections,
+      })
+      .from(bobbleheads)
+      .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.slug, slug),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+        ),
+      )
+      .limit(1);
+
+    if (!result[0]) return null;
+
+    // check if a collection is accessible (unless viewer is an owner)
+    const collection = result[0].collection;
+    if (collection && context.userId !== collection.userId && !collection.isPublic) {
+      return null;
+    }
+
+    const bobbleheadId = result[0].bobblehead.id;
+
+    // get photos
+    const photos = await dbInstance
+      .select()
+      .from(bobbleheadPhotos)
+      .where(eq(bobbleheadPhotos.bobbleheadId, bobbleheadId))
+      .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
+
+    // get tags
+    const bobbleheadTagsData = await dbInstance
+      .select({
+        tag: tags,
+      })
+      .from(bobbleheadTags)
+      .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
+      .where(eq(bobbleheadTags.bobbleheadId, bobbleheadId));
+
+    return {
+      ...result[0].bobblehead,
+      collectionName: result[0].collection?.name || null,
+      photos,
+      subcollectionName: result[0].subcollection?.name || null,
+      tags: bobbleheadTagsData.map((t) => t.tag),
+    };
+  }
+
+  /**
    * find bobbleheads by user with options
    */
   static async findByUserAsync(

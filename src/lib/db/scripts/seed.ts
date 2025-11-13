@@ -16,6 +16,7 @@ import {
   users,
   userSettings,
 } from '@/lib/db/schema';
+import { generateSlug } from '@/lib/utils/slug';
 
 const IS_RESET_DATABASE = process.env.RESET_DB === 'true';
 
@@ -473,6 +474,7 @@ async function seedBobbleheads(
       collectionId: collection!.id,
       commentCount: Math.floor(Math.random() * 10),
       likeCount: Math.floor(Math.random() * 25),
+      slug: generateSlug(bobblehead.name),
       subcollectionId,
       userId: user.id,
       viewCount: Math.floor(Math.random() * 100),
@@ -558,6 +560,7 @@ async function seedCollections(insertedUsers: (typeof users.$inferSelect)[]) {
 
   const collectionsWithUsers = sampleCollections.map((collection, index) => ({
     ...collection,
+    slug: generateSlug(collection.name),
     userId: insertedUsers[index % insertedUsers.length]!.id,
   }));
 
@@ -570,18 +573,21 @@ async function seedCollections(insertedUsers: (typeof users.$inferSelect)[]) {
       collectionId: insertedCollections.find((c) => c.name === 'MLB Hall of Fame')!.id,
       description: 'Hall of Fame Yankees players',
       name: 'Yankees Legends',
+      slug: generateSlug('Yankees Legends'),
       sortOrder: 1,
     },
     {
       collectionId: insertedCollections.find((c) => c.name === 'Star Wars Universe')!.id,
       description: 'Characters from Episodes IV-VI',
       name: 'Original Trilogy',
+      slug: generateSlug('Original Trilogy'),
       sortOrder: 1,
     },
     {
       collectionId: insertedCollections.find((c) => c.name === 'Marvel Heroes')!.id,
       description: 'All Spider-Man related characters',
       name: 'Spider-Verse',
+      slug: generateSlug('Spider-Verse'),
       sortOrder: 1,
     },
   ];

@@ -15,6 +15,8 @@ import type {
 } from '@/lib/validations/bobbleheads.validation';
 
 import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { db } from '@/lib/db';
+import { bobbleheads } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import {
@@ -28,6 +30,7 @@ import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 const facadeName = 'BobbleheadsFacade';
 
@@ -54,7 +57,22 @@ export class BobbleheadsFacade {
   ): Promise<BobbleheadRecord | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return BobbleheadsQuery.createAsync(data, userId, context);
+      const dbInst = context.dbInstance ?? db;
+
+      // generate slug from name
+      const baseSlug = generateSlug(data.name);
+
+      // query all existing bobblehead slugs to check for collisions
+      const existingSlugs = await dbInst
+        .select({ slug: bobbleheads.slug })
+        .from(bobbleheads)
+        .then((results) => results.map((r) => r.slug));
+
+      // ensure slug is unique across all bobbleheads
+      const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+
+      // create bobblehead with unique slug
+      return BobbleheadsQuery.createAsync({ ...data, slug: uniqueSlug }, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { manufacturer: data.manufacturer, name: data.name },
@@ -223,6 +241,52 @@ export class BobbleheadsFacade {
         },
       },
     );
+  }
+
+  static async getBobbleheadBySlug(
+    slug: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadRecord | null> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+      return BobbleheadsQuery.findBySlugAsync(slug, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { slug },
+        facade: facadeName,
+        method: 'getBobbleheadBySlug',
+        operation: 'getBySlug',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  static async getBobbleheadBySlugWithRelations(
+    slug: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadWithRelations | null> {
+    try {
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+      return BobbleheadsQuery.findBySlugWithRelationsAsync(slug, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { slug },
+        facade: facadeName,
+        method: 'getBobbleheadBySlugWithRelations',
+        operation: 'getBySlugWithRelations',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**
@@ -637,7 +701,26 @@ export class BobbleheadsFacade {
   ): Promise<BobbleheadRecord | null> {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      return BobbleheadsQuery.updateAsync(data, userId, context);
+      const dbInst = context.dbInstance ?? db;
+
+      let updateData = { ...data };
+
+      // if name is being updated, regenerate slug
+      if (data.name) {
+        const baseSlug = generateSlug(data.name);
+
+        // query existing slugs excluding current bobblehead
+        const existingSlugs = await dbInst
+          .select({ slug: bobbleheads.slug })
+          .from(bobbleheads)
+          .then((results) => results.map((r) => r.slug).filter((slug) => slug !== data.id));
+
+        // ensure new slug is unique
+        const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+        updateData = { ...updateData, slug: uniqueSlug };
+      }
+
+      return BobbleheadsQuery.updateAsync(updateData, userId, context);
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id: data.id, name: data.name },
