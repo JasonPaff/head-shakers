@@ -23,8 +23,12 @@ import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
 
-export async function generateMetadata({ routeParams }: UserPageProps): Promise<Metadata> {
-  const { userId } = await routeParams;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ userId: string }>;
+}): Promise<Metadata> {
+  const { userId } = await params;
 
   // Fetch user data
   const user = await UsersFacade.getUserByClerkId(userId);

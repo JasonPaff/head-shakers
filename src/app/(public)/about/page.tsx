@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { $path } from 'next-typesafe-url';
 import { Fragment } from 'react';
 
+import { FALLBACK_METADATA } from '@/lib/seo/seo.constants';
+
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://headshakers.com';
 
 export const metadata: Metadata = {
@@ -14,6 +16,13 @@ export const metadata: Metadata = {
   openGraph: {
     description:
       'Learn about Head Shakers, the premier digital platform for bobblehead collectors. Discover how we help collectors catalog, share, and connect over their bobblehead collections.',
+    images: [
+      {
+        height: 630,
+        url: FALLBACK_METADATA.imageUrl,
+        width: 1200,
+      },
+    ],
     locale: 'en_US',
     siteName: 'Head Shakers',
     title: 'About Head Shakers',
@@ -26,6 +35,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     description:
       'Learn about Head Shakers, the premier digital platform for bobblehead collectors. Discover how we help collectors catalog, share, and connect over their bobblehead collections.',
+    images: [FALLBACK_METADATA.imageUrl],
     title: 'About Head Shakers',
   },
 };

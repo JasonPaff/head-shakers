@@ -87,6 +87,9 @@ export interface OpenGraphImage {
  *
  * Used for social media sharing on Facebook, LinkedIn, and other platforms
  * that support the Open Graph protocol.
+ *
+ * Note: Next.js doesn't support all Open Graph types. We're limited to
+ * 'article', 'profile', and 'website' for compatibility.
  */
 export interface OpenGraphMetadata {
   /** A brief description of the page (recommended: max 155 characters) */
@@ -99,8 +102,8 @@ export interface OpenGraphMetadata {
   siteName?: string;
   /** The title of the page (recommended: max 60 characters) */
   title: string;
-  /** The type of content (e.g., 'website', 'article', 'profile') */
-  type: 'article' | 'product' | 'profile' | 'website';
+  /** The type of content - limited to Next.js supported types */
+  type: 'article' | 'profile' | 'website';
   /** The canonical URL of the page */
   url: string;
 }

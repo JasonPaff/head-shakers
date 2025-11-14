@@ -32,8 +32,12 @@ type SubcollectionPageProps = PageProps;
 
 export default withParamValidation(SubcollectionPage, Route);
 
-export async function generateMetadata({ routeParams }: SubcollectionPageProps): Promise<Metadata> {
-  const { collectionSlug, subcollectionSlug } = await routeParams;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ collectionSlug: string; subcollectionSlug: string }>;
+}): Promise<Metadata> {
+  const { collectionSlug, subcollectionSlug } = await params;
 
   // Fetch basic subcollection info
   const subcollectionResults = await db

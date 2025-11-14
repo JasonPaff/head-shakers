@@ -18,8 +18,12 @@ type CategoryPageProps = PageProps;
 // enable ISR with 15-minute revalidation for category pages
 export const revalidate = 900;
 
-export async function generateMetadata({ routeParams }: CategoryPageProps): Promise<Metadata> {
-  const { category } = await routeParams;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ category: string }>;
+}): Promise<Metadata> {
+  const { category } = await params;
 
   // Capitalize first letter for display
   const categoryDisplay = category.charAt(0).toUpperCase() + category.slice(1);

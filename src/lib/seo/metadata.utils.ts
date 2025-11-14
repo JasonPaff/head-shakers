@@ -193,7 +193,6 @@ export function generatePageMetadata(
         robots,
         shouldIncludeOpenGraph = true,
         shouldIncludeTwitterCard = true,
-        shouldUseTitleTemplate = true,
       } = options;
 
       // Add breadcrumb for metadata generation start
@@ -209,8 +208,8 @@ export function generatePageMetadata(
         message: `Generating metadata for ${pageType}`,
       });
 
-      // Generate title with optional template
-      const title = shouldUseTitleTemplate ? generateTitle(content.title) : content.title;
+      // Use title as-is - root layout handles template via title.template
+      const title = content.title;
 
       // Use provided description or fallback
       const description = content.description || FALLBACK_METADATA.description;
@@ -525,15 +524,20 @@ function convertRobotsMetadata(
  * Different page types map to different Open Graph types for better
  * social media representation.
  *
+ * Note: Next.js doesn't support 'product' as an OpenGraph type in its Metadata API,
+ * even though the Open Graph protocol does. For product pages (bobbleheads),
+ * we use 'website' which is the most appropriate fallback.
+ *
  * @param pageType - The application page type
  * @returns Open Graph type
  */
-function getOpenGraphType(pageType: PageType): 'article' | 'product' | 'profile' | 'website' {
+function getOpenGraphType(pageType: PageType): 'article' | 'profile' | 'website' {
   switch (pageType) {
     case 'article':
       return 'article';
     case 'bobblehead':
-      return 'product';
+      // Next.js doesn't support 'product' type, use 'website' instead
+      return 'website';
     case 'profile':
       return 'profile';
     case 'collection':

@@ -37,7 +37,6 @@ export const metadata: Metadata = {
     url: DEFAULT_SITE_METADATA.url,
   },
   robots: 'index, follow',
-  themeColor: '#000000',
   title: { default: DEFAULT_SITE_METADATA.title, template: '%s | Head Shakers' },
   twitter: {
     card: DEFAULT_SITE_METADATA.twitterCard,
@@ -53,14 +52,6 @@ export const metadata: Metadata = {
         'msvalidate.01': process.env.BING_SITE_VERIFICATION,
       },
     }),
-  },
-
-  viewport: {
-    initialScale: 1,
-    maximumScale: 5,
-    // eslint-disable-next-line react-snob/require-boolean-prefix-is
-    userScalable: true,
-    width: 'device-width',
   },
 };
 

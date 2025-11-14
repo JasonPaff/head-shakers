@@ -203,7 +203,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           changeFrequency: 'weekly',
           lastModified: collection.updatedAt,
           priority: 0.6,
-          url: `${baseUrl}/users/${collection.username}/collections/${collection.slug}`,
+          url: `${baseUrl}/collections/${collection.slug}`,
         }));
 
         // Combine all routes

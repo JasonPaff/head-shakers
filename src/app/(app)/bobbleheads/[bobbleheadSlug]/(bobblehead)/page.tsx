@@ -35,8 +35,12 @@ import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type ItemPageProps = PageProps;
 
-export async function generateMetadata({ routeParams }: ItemPageProps): Promise<Metadata> {
-  const { bobbleheadSlug } = await routeParams;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ bobbleheadSlug: string }>;
+}): Promise<Metadata> {
+  const { bobbleheadSlug } = await params;
 
   // Fetch bobblehead SEO metadata
   const bobblehead = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
@@ -109,7 +113,10 @@ async function ItemPage({ routeParams }: ItemPageProps) {
     seoMetadata ?
       generateProductSchema({
         category: seoMetadata.category || undefined,
-        dateCreated: seoMetadata.createdAt.toISOString(),
+        dateCreated:
+          seoMetadata.createdAt instanceof Date ? seoMetadata.createdAt.toISOString()
+          : typeof seoMetadata.createdAt === 'string' ? seoMetadata.createdAt
+          : new Date(seoMetadata.createdAt).toISOString(),
         description: seoMetadata.description || undefined,
         image: seoMetadata.primaryImage ? [seoMetadata.primaryImage] : undefined,
         name: seoMetadata.name,

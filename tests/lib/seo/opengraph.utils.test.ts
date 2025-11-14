@@ -134,13 +134,13 @@ describe('generateOpenGraphMetadata', () => {
     expect(result.type).toBe('article');
   });
 
-  it('should handle product type', () => {
+  it('should handle website type explicitly', () => {
     const result = generateOpenGraphMetadata({
       ...baseOptions,
-      type: 'product',
+      type: 'website',
     });
 
-    expect(result.type).toBe('product');
+    expect(result.type).toBe('website');
   });
 
   it('should handle profile type', () => {

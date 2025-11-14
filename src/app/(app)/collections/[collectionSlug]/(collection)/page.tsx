@@ -34,8 +34,12 @@ type CollectionPageProps = PageProps;
 
 export default withParamValidation(CollectionPage, Route);
 
-export async function generateMetadata({ routeParams }: CollectionPageProps): Promise<Metadata> {
-  const { collectionSlug } = await routeParams;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ collectionSlug: string }>;
+}): Promise<Metadata> {
+  const { collectionSlug } = await params;
 
   // Fetch basic collection info to get userId
   const results = await db.select().from(collections).where(eq(collections.slug, collectionSlug)).limit(1);

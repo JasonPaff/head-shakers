@@ -64,7 +64,7 @@ export function generateOpenGraphMetadata(options: {
   locale?: string;
   siteName?: string;
   title: string;
-  type?: 'article' | 'product' | 'profile' | 'website';
+  type?: 'article' | 'profile' | 'website';
   url: string;
 }): OpenGraphMetadata {
   const {

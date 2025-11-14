@@ -14,15 +14,48 @@ import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
+import { serializeJsonLd } from '@/lib/seo/metadata.utils';
+import {
+  DEFAULT_SITE_METADATA,
+  FALLBACK_METADATA,
+  ORGANIZATION_SCHEMA,
+  WEBSITE_SCHEMA,
+} from '@/lib/seo/seo.constants';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 export const revalidate = 300;
 
 export function generateMetadata(): Metadata {
   return {
-    description:
-      'Build your digital bobblehead collection, connect with other collectors, and discover rare finds from around the world.',
+    alternates: {
+      canonical: DEFAULT_SITE_METADATA.url,
+    },
+    description: DEFAULT_SITE_METADATA.description,
+    openGraph: {
+      description: DEFAULT_SITE_METADATA.description,
+      images: [
+        {
+          height: 630,
+          url: FALLBACK_METADATA.imageUrl,
+          width: 1200,
+        },
+      ],
+      locale: DEFAULT_SITE_METADATA.locale,
+      siteName: DEFAULT_SITE_METADATA.siteName,
+      title: DEFAULT_SITE_METADATA.title,
+      type: 'website',
+      url: DEFAULT_SITE_METADATA.url,
+    },
+    robots: 'index, follow',
     title: 'Home',
+    twitter: {
+      card: 'summary_large_image',
+      creator: DEFAULT_SITE_METADATA.twitterHandle,
+      description: DEFAULT_SITE_METADATA.description,
+      images: [FALLBACK_METADATA.imageUrl],
+      site: DEFAULT_SITE_METADATA.twitterHandle,
+      title: DEFAULT_SITE_METADATA.title,
+    },
   };
 }
 
@@ -42,6 +75,16 @@ export default async function HomePage() {
 
   return (
     <div className={'container mx-auto px-4 py-8'}>
+      {/* JSON-LD structured data for homepage */}
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(ORGANIZATION_SCHEMA) }}
+        type={'application/ld+json'}
+      />
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(WEBSITE_SCHEMA) }}
+        type={'application/ld+json'}
+      />
+
       {/* Username Onboarding */}
       {shouldShowOnboarding && (
         <UsernameOnboardingProvider currentUsername={currentUsername} shouldShow={shouldShowOnboarding} />

@@ -7,6 +7,10 @@ const isPublicRoute = createRouteMatcher([
   // homepage - anyone can view
   '/',
 
+  // SEO files - must be publicly accessible for search engines
+  '/sitemap.xml',
+  '/robots.txt',
+
   // static pages (route group)
   '/about(.*)',
   '/privacy(.*)',
