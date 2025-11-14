@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { eq } from 'drizzle-orm';
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -20,17 +21,110 @@ import { CommentSectionAsync } from '@/components/feature/comments/async/comment
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
-import { subCollections } from '@/lib/db/schema';
+import { collections, subCollections } from '@/lib/db/schema';
+import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
+import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
+import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
+import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
 
 type SubcollectionPageProps = PageProps;
 
 export default withParamValidation(SubcollectionPage, Route);
 
-export function generateMetadata(): Metadata {
-  return {
-    description: '',
-    title: 'Subcollection',
-  };
+export async function generateMetadata({ routeParams }: SubcollectionPageProps): Promise<Metadata> {
+  const { collectionSlug, subcollectionSlug } = await routeParams;
+
+  // Fetch basic subcollection info
+  const subcollectionResults = await db
+    .select()
+    .from(subCollections)
+    .where(eq(subCollections.slug, subcollectionSlug))
+    .limit(1);
+  const subcollection = subcollectionResults[0];
+
+  // Handle subcollection not found
+  if (!subcollection) {
+    return {
+      description: 'Subcollection not found',
+      robots: 'noindex, nofollow',
+      title: 'Subcollection Not Found | Head Shakers',
+    };
+  }
+
+  // Fetch parent collection info
+  const collectionResults = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, subcollection.collectionId))
+    .limit(1);
+  const collection = collectionResults[0];
+
+  if (!collection) {
+    return {
+      description: 'Collection not found',
+      robots: 'noindex, nofollow',
+      title: 'Collection Not Found | Head Shakers',
+    };
+  }
+
+  // Fetch full subcollection data for SEO
+  const seoData = await SubcollectionsFacade.getSubCollectionForPublicView(
+    subcollection.collectionId,
+    subcollection.id,
+  );
+
+  // Handle metadata not available
+  if (!seoData) {
+    return {
+      description: 'Subcollection not found',
+      robots: 'noindex, nofollow',
+      title: 'Subcollection Not Found | Head Shakers',
+    };
+  }
+
+  // Generate canonical URL for this subcollection
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+    routeParams: { collectionSlug, subcollectionSlug },
+  })}`;
+
+  // Prepare cover image URL for social sharing
+  let coverImage: string = FALLBACK_METADATA.imageUrl;
+
+  if (seoData.coverImageUrl) {
+    const publicId = extractPublicIdFromCloudinaryUrl(seoData.coverImageUrl);
+    coverImage = generateOpenGraphImageUrl(publicId);
+  } else if (seoData.featurePhoto) {
+    const publicId = extractPublicIdFromCloudinaryUrl(seoData.featurePhoto);
+    coverImage = generateOpenGraphImageUrl(publicId);
+  }
+
+  // Use subcollection description or fallback to a default
+  const description =
+    seoData.description ||
+    `${seoData.name} - Part of ${seoData.collectionName} collection. Browse ${seoData.bobbleheadCount} bobbleheads in this subcollection`;
+
+  // Private collections/subcollections should not be indexed
+  const isPublic = collection.isPublic;
+
+  // Generate page metadata with OG and Twitter cards
+  return generatePageMetadata(
+    'collection',
+    {
+      description,
+      images: [coverImage],
+      title: `${seoData.name} - ${seoData.collectionName}`,
+      url: canonicalUrl,
+    },
+    {
+      isIndexable: isPublic,
+      isPublic,
+      shouldIncludeOpenGraph: true,
+      shouldIncludeTwitterCard: true,
+      shouldUseTitleTemplate: true,
+    },
+  );
 }
 
 async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPageProps) {
@@ -53,6 +147,48 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   const subcollectionId = basicSubcollection.id;
   const collectionId = basicSubcollection.collectionId;
 
+  // Fetch parent collection info for breadcrumb
+  const collectionResults = await db
+    .select()
+    .from(collections)
+    .where(eq(collections.id, collectionId))
+    .limit(1);
+  const collection = collectionResults[0];
+
+  // Fetch SEO data for JSON-LD schemas
+  const seoData = await SubcollectionsFacade.getSubCollectionForPublicView(collectionId, subcollectionId);
+
+  // Generate canonical URL for JSON-LD schemas
+  const subcollectionUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+    routeParams: { collectionSlug, subcollectionSlug },
+  })}`;
+
+  // Generate CollectionPage schema for subcollection
+  const subcollectionPageSchema =
+    seoData ?
+      generateCollectionPageSchema({
+        description: seoData.description || undefined,
+        itemsCount: seoData.bobbleheadCount,
+        name: seoData.name,
+        url: subcollectionUrl,
+      })
+    : null;
+
+  // Generate Breadcrumb schema including parent collection
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: DEFAULT_SITE_METADATA.url },
+    { name: 'Collections', url: `${DEFAULT_SITE_METADATA.url}/collections` },
+    {
+      name: seoData?.collectionName || collection?.name || 'Collection',
+      url: `${DEFAULT_SITE_METADATA.url}${$path({
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug },
+      })}`,
+    },
+    { name: seoData?.name || basicSubcollection.name },
+  ]);
+
   return (
     <CollectionViewTracker
       collectionId={collectionId}
@@ -60,6 +196,18 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
       subcollectionId={subcollectionId}
       subcollectionSlug={subcollectionSlug}
     >
+      {/* JSON-LD structured data */}
+      {subcollectionPageSchema && (
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(subcollectionPageSchema) }}
+          type={'application/ld+json'}
+        />
+      )}
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }}
+        type={'application/ld+json'}
+      />
+
       <div>
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>

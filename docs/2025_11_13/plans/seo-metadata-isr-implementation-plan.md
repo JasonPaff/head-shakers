@@ -22,27 +22,32 @@ The Head Shakers application should implement comprehensive SEO optimization and
 ### Files by Priority
 
 **CRITICAL Priority (18 files)**:
+
 - New files to create: sitemap.ts, robots.ts, metadata.types.ts, seo.constants.ts, opengraph.utils.ts, jsonld.utils.ts, metadata.utils.ts, cache.utils.ts
 - Dynamic pages to enhance: users/[userId]/page.tsx, bobbleheads/[bobbleheadSlug]/page.tsx, collections/[collectionSlug]/page.tsx, subcollection/[subcollectionSlug]/page.tsx
 - Public pages: about/page.tsx, terms/page.tsx, privacy/page.tsx
 - Configuration: layout.tsx, next.config.ts
 
 **HIGH Priority (9 files)**:
+
 - Queries: bobbleheads-query.ts, collections.query.ts, users-query.ts
 - Facades: bobbleheads.facade.ts, collections.facade.ts, users.facade.ts
 - Utils: cloudinary.utils.ts, slug.ts, cache.utils.ts
 
 **MEDIUM Priority (9 files)**:
+
 - Browse pages: featured/page.tsx, trending/page.tsx, categories pages, search/page.tsx
 - User public pages: collections/page.tsx, followers/page.tsx, following/page.tsx
 
 **LOW Priority (6+ files)**:
+
 - Authenticated routes (noindex): dashboard, settings, admin
 - Edit routes (noindex): bobblehead/edit, collection/edit
 
 ### Architecture Insights
 
 **Existing Patterns Discovered**:
+
 1. ISR usage in featured page (revalidate = 300)
 2. Basic generateMetadata stubs in some pages
 3. Facade pattern well-established
@@ -52,6 +57,7 @@ The Head Shakers application should implement comprehensive SEO optimization and
 7. Next.js 16 with App Router
 
 **Integration Points**:
+
 1. Cloudinary utils need social media sizing (1200x630 OG, 800x418 Twitter)
 2. Existing query layer ready for metadata queries
 3. Redis caching can integrate with ISR
@@ -89,10 +95,12 @@ Implement comprehensive SEO optimization across Head Shakers including dynamic m
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/seo/metadata.types.ts` - TypeScript interfaces for metadata objects
 - `src/lib/seo/seo.constants.ts` - Default values, limits, and platform-specific requirements
 
 **Changes:**
+
 - Define `PageMetadata` interface with title, description, keywords, canonical, OG tags, Twitter tags
 - Define `OpenGraphMetadata` interface for OG-specific properties
 - Define `TwitterCardMetadata` interface for Twitter-specific properties
@@ -101,11 +109,13 @@ Implement comprehensive SEO optimization across Head Shakers including dynamic m
 - Define supported JSON-LD schema types (Person, Product, Organization, CollectionPage)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All metadata types are properly exported and have no TypeScript errors
 - [ ] Constants include Twitter (800x418), OG (1200x630), default fallback values
 - [ ] All validation commands pass
@@ -119,9 +129,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/utils/cloudinary.utils.ts` - Add social image optimization functions
 
 **Changes:**
+
 - Add `generateOpenGraphImageUrl` function accepting Cloudinary public ID, returns optimized 1200x630 URL
 - Add `generateTwitterCardImageUrl` function accepting Cloudinary public ID, returns optimized 800x418 URL
 - Add `generateSocialImageUrl` function with platform parameter (og, twitter, default)
@@ -129,11 +141,13 @@ npm run lint:fix && npm run typecheck
 - Add fallback logic for missing or invalid public IDs to return default social image
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Functions generate valid Cloudinary URLs with proper transformations
 - [ ] Fallback behavior returns site default social image
 - [ ] All validation commands pass
@@ -147,12 +161,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/seo/opengraph.utils.ts` - Open Graph metadata generation functions
 
 **Files to Modify:**
+
 - `src/lib/seo/seo.constants.ts` - Add site URL constant from environment variable
 
 **Changes:**
+
 - Create `generateOpenGraphMetadata` function accepting title, description, images, url, type
 - Create `generateTwitterCardMetadata` function accepting title, description, images, card type
 - Create `generateBaseMetadata` function for shared metadata properties
@@ -161,11 +178,13 @@ npm run lint:fix && npm run typecheck
 - Include site name, locale, and alternate locales in OG metadata
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Functions return properly formatted metadata objects compatible with Next.js Metadata API
 - [ ] Character limits are enforced with truncation and ellipsis
 - [ ] All validation commands pass
@@ -179,9 +198,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/seo/jsonld.utils.ts` - JSON-LD schema generation functions
 
 **Changes:**
+
 - Create `generatePersonSchema` for user profiles (accepts userId, name, image, url, description)
 - Create `generateProductSchema` for bobbleheads (accepts name, description, image, category, dateCreated)
 - Create `generateCollectionPageSchema` for collections (accepts name, description, items count, creator)
@@ -190,11 +211,13 @@ npm run lint:fix && npm run typecheck
 - All functions return properly formatted JSON-LD with @context and @type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All schema functions return valid JSON-LD format
 - [ ] Schemas match schema.org specifications for each type
 - [ ] All validation commands pass
@@ -208,9 +231,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/seo/metadata.utils.ts` - Main metadata generation orchestrator
 
 **Changes:**
+
 - Create `generatePageMetadata` function accepting page type, content data, options
 - Implement logic to combine base metadata, OG metadata, Twitter metadata, JSON-LD
 - Add canonical URL generation using next-typesafe-url $path helper
@@ -220,11 +245,13 @@ npm run lint:fix && npm run typecheck
 - Create helper for dynamic title template (page title | site name)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Function returns complete Metadata object compatible with Next.js generateMetadata
 - [ ] Canonical URLs use $path for type safety
 - [ ] Robots tags properly set for public vs authenticated routes
@@ -239,11 +266,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/users-query.ts` - Add getUserMetadata query
 - `src/lib/queries/bobbleheads-query.ts` - Add getBobbleheadMetadata query
 - `src/lib/queries/collections.query.ts` - Add getCollectionMetadata query
 
 **Changes:**
+
 - In users-query.ts: Add `getUserMetadata` selecting only userId, name, username, profileImage, bio
 - In bobbleheads-query.ts: Add `getBobbleheadMetadata` selecting only slug, name, description, primaryImage, category, createdAt, owner info
 - In collections.query.ts: Add `getCollectionMetadata` selecting only slug, name, description, coverImage, itemCount, owner info, isPublic
@@ -251,11 +280,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for not found cases
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Queries select minimal fields needed for metadata
 - [ ] Queries use efficient joins without N+1 issues
 - [ ] Error handling returns null for not found cases
@@ -270,11 +301,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/users.facade.ts` - Add getUserSeoMetadata method
 - `src/lib/facades/bobbleheads.facade.ts` - Add getBobbleheadSeoMetadata method
 - `src/lib/facades/collections.facade.ts` - Add getCollectionSeoMetadata method
 
 **Changes:**
+
 - In users.facade.ts: Add `getUserSeoMetadata` calling getUserMetadata with Redis caching (TTL 3600s)
 - In bobbleheads.facade.ts: Add `getBobbleheadSeoMetadata` calling getBobbleheadMetadata with caching (TTL 1800s)
 - In collections.facade.ts: Add `getCollectionSeoMetadata` calling getCollectionMetadata with caching (TTL 1800s)
@@ -283,11 +316,13 @@ npm run lint:fix && npm run typecheck
 - Include proper error handling and fallback to direct query on cache miss
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All facade methods properly integrate with existing CacheService
 - [ ] Cache keys follow existing naming conventions
 - [ ] TTL values are reasonable for content freshness vs performance
@@ -302,9 +337,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/users/[userId]/page.tsx` - Implement generateMetadata function
 
 **Changes:**
+
 - Add async `generateMetadata` function accepting params with userId
 - Call usersFacade.getUserSeoMetadata to fetch user data
 - Handle user not found case with appropriate 404 metadata
@@ -315,11 +352,13 @@ npm run lint:fix && npm run typecheck
 - Include breadcrumb schema for navigation context
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Metadata includes proper OG tags, Twitter cards, and JSON-LD
 - [ ] Profile images are optimized for social platforms
 - [ ] User not found returns appropriate metadata
@@ -334,9 +373,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/page.tsx` - Implement generateMetadata function
 
 **Changes:**
+
 - Add async `generateMetadata` function accepting params with bobbleheadSlug
 - Call bobbleheadsFacade.getBobbleheadSeoMetadata to fetch bobblehead data
 - Handle bobblehead not found case with appropriate 404 metadata
@@ -347,11 +388,13 @@ npm run lint:fix && npm run typecheck
 - Include owner attribution in description and OG metadata
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Product schema includes all relevant bobblehead properties
 - [ ] Images are properly optimized for OG and Twitter
 - [ ] Owner information is included in metadata
@@ -366,10 +409,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/page.tsx` - Implement generateMetadata function
 - `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx` - Implement generateMetadata function
 
 **Changes:**
+
 - In collection page: Add async generateMetadata with collectionSlug parameter
 - In subcollection page: Add async generateMetadata with collectionSlug and subcollectionSlug parameters
 - Call collectionsFacade.getCollectionSeoMetadata for both pages
@@ -381,11 +426,13 @@ npm run lint:fix && npm run typecheck
 - Include owner username and collection hierarchy in metadata
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Private collections are properly marked noindex
 - [ ] CollectionPage schema includes accurate item counts
 - [ ] Cover images are optimized for social platforms
@@ -401,11 +448,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(public)/about/page.tsx` - Add metadata export
 - `src/app/(public)/terms/page.tsx` - Add metadata export
 - `src/app/(public)/privacy/page.tsx` - Add metadata export
 
 **Changes:**
+
 - In about page: Export metadata object with site description, Organization JSON-LD schema
 - In terms page: Export metadata with legal page markup, appropriate robots tags
 - In privacy page: Export metadata with privacy policy markup, appropriate robots tags
@@ -415,11 +464,13 @@ npm run lint:fix && npm run typecheck
 - Add WebPage JSON-LD schema to all public pages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All public pages have complete metadata objects
 - [ ] Organization schema is properly formatted
 - [ ] Canonical URLs are correct
@@ -434,11 +485,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/browse/featured/page.tsx` - Enhance existing ISR with metadata
 - `src/app/(app)/browse/trending/page.tsx` - Add ISR and metadata
 - `src/app/(app)/browse/categories/[category]/page.tsx` - Add ISR and metadata
 
 **Changes:**
+
 - In featured page: Add generateMetadata function, ensure revalidate = 300 (5 min) is maintained
 - In trending page: Add export const revalidate = 600 (10 min), add generateMetadata
 - In category pages: Add export const revalidate = 900 (15 min), add dynamic generateMetadata
@@ -448,11 +501,13 @@ npm run lint:fix && npm run typecheck
 - Set appropriate cache-control headers
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Revalidate timings are set appropriately per page traffic patterns
 - [ ] Metadata reflects current featured/trending content
 - [ ] ISR properly regenerates pages at configured intervals
@@ -467,9 +522,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/sitemap.ts` - Dynamic sitemap generation
 
 **Changes:**
+
 - Create default export async function returning MetadataRoute.Sitemap array
 - Query database for all public users, bobbleheads, collections using facade layer
 - Generate static routes (about, terms, privacy, featured, trending)
@@ -481,11 +538,13 @@ npm run lint:fix && npm run typecheck
 - Implement pagination if content exceeds 50k URLs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sitemap includes all public indexable routes
 - [ ] URLs use proper canonical format with domain
 - [ ] Change frequencies and priorities are set appropriately
@@ -500,9 +559,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/robots.ts` - Robots.txt generation
 
 **Changes:**
+
 - Create default export function returning MetadataRoute.Robots object
 - Allow all crawlers for public routes (User-agent wildcard, Allow all)
 - Disallow authenticated routes (/dashboard, /settings, /admin, /api/webhooks)
@@ -513,11 +574,13 @@ npm run lint:fix && npm run typecheck
 - Use environment variable for site URL
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Public routes are properly allowed
 - [ ] Private/authenticated routes are disallowed
 - [ ] Sitemap reference is included
@@ -532,9 +595,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/layout.tsx` - Add global metadata export
 
 **Changes:**
+
 - Export metadata object with site title template, default description
 - Add viewport configuration (width, initial scale, theme color)
 - Include verification meta tags (Google Search Console, Bing Webmaster)
@@ -545,11 +610,13 @@ npm run lint:fix && npm run typecheck
 - Set metadataBase to site URL from environment variable
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Global metadata provides sensible defaults
 - [ ] metadataBase is properly configured from environment
 - [ ] Verification tags use environment variables
@@ -564,9 +631,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/seo/cache.utils.ts` - SEO-specific caching utilities
 
 **Changes:**
+
 - Create `cacheMetadata` function accepting key, generator function, TTL
 - Create `invalidateMetadataCache` function accepting content type and ID
 - Create cache key generators for user, bobblehead, collection metadata
@@ -576,11 +645,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for cache failures with fallback to direct generation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cache utilities integrate with existing CacheService
 - [ ] Cache keys follow consistent naming convention
 - [ ] Error handling gracefully falls back on cache failure
@@ -595,11 +666,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/actions/users.actions.ts` - Add metadata cache invalidation
 - `src/lib/actions/bobbleheads.actions.ts` - Add metadata cache invalidation
 - `src/lib/actions/collections.actions.ts` - Add metadata cache invalidation
 
 **Changes:**
+
 - In users actions: Call invalidateMetadataCache on profile update, avatar change
 - In bobbleheads actions: Call invalidateMetadataCache on create, update, delete, image change
 - In collections actions: Call invalidateMetadataCache on create, update, delete, visibility change
@@ -608,11 +681,13 @@ npm run lint:fix && npm run typecheck
 - Log invalidation operations for monitoring
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cache invalidation occurs after all relevant content mutations
 - [ ] Invalidation happens before path revalidation
 - [ ] No performance degradation from invalidation operations
@@ -627,10 +702,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/config/config.ts` - Add SEO configuration section
 - `next.config.ts` - Add metadata and image optimization settings
 
 **Changes:**
+
 - In config.ts: Add seo object with siteUrl, siteName, defaultDescription, twitterHandle, social links
 - In config.ts: Add metadata object with verification tokens, OG defaults, JSON-LD defaults
 - In next.config.ts: Configure image domains for Cloudinary
@@ -639,11 +716,13 @@ npm run lint:fix && npm run typecheck
 - Document required environment variables in comments
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All SEO settings are centralized in config
 - [ ] Environment variables are properly typed
 - [ ] Image domains include Cloudinary and any fallback CDNs
@@ -658,10 +737,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/seo/metadata.utils.ts` - Add Sentry instrumentation
 - `src/app/sitemap.ts` - Add Sentry instrumentation
 
 **Changes:**
+
 - Wrap metadata generation functions with Sentry transactions
 - Add breadcrumbs for each metadata component generation step
 - Track database query performance within metadata operations
@@ -671,11 +752,13 @@ npm run lint:fix && npm run typecheck
 - Track sitemap generation duration and entry counts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sentry transactions capture metadata generation timing
 - [ ] Performance bottlenecks are identifiable in Sentry dashboard
 - [ ] Error tracking includes metadata-specific context
@@ -690,12 +773,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `tests/lib/seo/metadata.utils.test.ts` - Metadata generation tests
 - `tests/lib/seo/opengraph.utils.test.ts` - OpenGraph tests
 - `tests/lib/seo/jsonld.utils.test.ts` - JSON-LD schema tests
 - `tests/lib/utils/cloudinary.utils.test.ts` - Enhance with social image tests
 
 **Changes:**
+
 - Test generatePageMetadata with various content types and edge cases
 - Test OpenGraph metadata generation with character limit enforcement
 - Test Twitter Card metadata with different card types
@@ -706,11 +791,13 @@ npm run lint:fix && npm run typecheck
 - Test metadata for private content (noindex verification)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All metadata generation paths are tested
 - [ ] Edge cases (missing data, invalid input) are covered
 - [ ] Character limits are verified in tests
@@ -726,6 +813,7 @@ npm run lint:fix && npm run typecheck && npm run test
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/dashboard/page.tsx` - Add noindex metadata
 - `src/app/(app)/settings/page.tsx` - Add noindex metadata
 - `src/app/(app)/admin/page.tsx` - Add noindex metadata
@@ -733,6 +821,7 @@ npm run lint:fix && npm run typecheck && npm run test
 - `src/app/(app)/collections/[collectionSlug]/edit/page.tsx` - Add noindex metadata
 
 **Changes:**
+
 - Export metadata object with robots set to noindex, nofollow
 - Remove from sitemap generation in sitemap.ts
 - Add X-Robots-Tag header in middleware for authenticated routes
@@ -740,11 +829,13 @@ npm run lint:fix && npm run typecheck && npm run test
 - Add meta tag for referrer policy on sensitive pages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All authenticated routes have noindex metadata
 - [ ] Dashboard and settings pages are excluded from sitemap
 - [ ] Edit routes are properly marked as noindex
@@ -759,10 +850,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/app/api/preview/route.ts` - Preview mode API endpoint
 - `src/lib/seo/preview.utils.ts` - Preview mode utilities
 
 **Changes:**
+
 - Create preview API route to enable/disable preview mode via draftMode
 - Add preview mode detection in generateMetadata functions
 - Allow metadata generation for draft/unpublished content in preview mode
@@ -772,11 +865,13 @@ npm run lint:fix && npm run typecheck
 - Document preview mode workflow for content editors
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Preview mode can be enabled via secure API endpoint
 - [ ] Metadata generates correctly for draft content in preview
 - [ ] Preview mode is visually indicated to editors
@@ -791,9 +886,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `docs/2025_11_13/specs/SEO_Implementation.md` - Comprehensive SEO documentation
 
 **Changes:**
+
 - Document metadata generation architecture and flow
 - Provide examples of metadata output for each content type
 - Document caching strategy and invalidation triggers
@@ -806,11 +903,13 @@ npm run lint:fix && npm run typecheck
 - Add monitoring and analytics setup instructions
 
 **Validation Commands:**
+
 ```bash
 # No validation needed for documentation
 ```
 
 **Success Criteria:**
+
 - [ ] Documentation covers all SEO components implemented
 - [ ] Examples are provided for each content type
 - [ ] Troubleshooting guide addresses common issues
@@ -825,9 +924,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Various page files may need adjustments based on audit findings
 
 **Changes:**
+
 - Test all dynamic metadata generation functions with real database data
 - Validate OpenGraph tags using Facebook Sharing Debugger
 - Validate Twitter Cards using Twitter Card Validator
@@ -841,11 +942,13 @@ npm run lint:fix && npm run typecheck
 - Test metadata cache performance and hit rates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test && npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] All pages generate valid metadata without errors
 - [ ] OpenGraph and Twitter Card validators show correct previews
 - [ ] JSON-LD schemas pass Google Rich Results Test
@@ -902,6 +1005,7 @@ npm run lint:fix && npm run typecheck && npm run test && npm run build
 ## Orchestration Logs
 
 Full orchestration logs are available at:
+
 - **Directory**: `docs/2025_11_13/orchestration/seo-metadata-isr/`
 - **Index**: `00-orchestration-index.md`
 - **Step 1**: `01-feature-refinement.md`

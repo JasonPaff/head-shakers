@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 
 export function generateMetadata(): Metadata {
   return {
-    description: '',
+    description: 'User settings and preferences',
+    robots: 'noindex, nofollow',
     title: { default: 'Settings', template: '%s | Settings' },
   };
 }

@@ -12,6 +12,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
+import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
@@ -127,6 +128,9 @@ export const updateUsernameAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: 'Username updated successfully',
       });
+
+      // invalidate metadata cache for the user (username affects metadata)
+      invalidateMetadataCache('user', ctx.userId);
 
       return {
         success: true,

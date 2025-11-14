@@ -8,6 +8,7 @@
 ## Subagent Input
 
 Delegated to neon-db-expert subagent to:
+
 - Run `npm run db:generate` to generate migration from schema changes
 - Review generated migration file
 - Run `npm run db:migrate` to apply migration to development database
@@ -57,6 +58,7 @@ Delegated to neon-db-expert subagent to:
 ### Data Population
 
 All records received URL-safe slug values generated from names and UUIDs:
+
 - Example: "My Collection" + UUID(a1b2c3d4...) → "my-collection-a1b2c3d4"
 
 ### Column Specifications
@@ -86,6 +88,7 @@ All records received URL-safe slug values generated from names and UUIDs:
 ## Documentation Generated
 
 **Neon DB Expert created**:
+
 - MIGRATION_COMPLETE.md - Executive summary
 - migration-log.md - Detailed operation log
 - migration-summary.md - Comprehensive results

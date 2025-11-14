@@ -44,6 +44,7 @@ Prioritize files by implementation criticality (Critical/High/Medium/Low).
 #### **CRITICAL Priority (Core Implementation)** - 18 Files
 
 **New Files to Create (7)**:
+
 1. `src/app/sitemap.ts` - Dynamic XML sitemap generation
 2. `src/app/robots.ts` - Robots.txt configuration
 3. `src/lib/utils/metadata.utils.ts` - Centralized metadata generation utilities
@@ -52,66 +53,31 @@ Prioritize files by implementation criticality (Critical/High/Medium/Low).
 6. `src/lib/constants/seo.ts` - SEO constants and defaults
 7. `src/types/metadata.types.ts` - TypeScript metadata types
 
-**Dynamic Page Routes to Enhance (4)**:
-8. `src/app/(app)/users/[userId]/page.tsx` - User profile metadata
-9. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` - Bobblehead detail
-10. `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Collection metadata
-11. `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx` - Subcollection
+**Dynamic Page Routes to Enhance (4)**: 8. `src/app/(app)/users/[userId]/page.tsx` - User profile metadata 9. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` - Bobblehead detail 10. `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Collection metadata 11. `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx` - Subcollection
 
-**Public Static Pages (4)**:
-12. `src/app/(public)/about/page.tsx` - About page
-13. `src/app/(public)/terms/page.tsx` - Terms page
-14. `src/app/(public)/privacy/page.tsx` - Privacy page
-15. `src/app/layout.tsx` - Root layout with base metadata
+**Public Static Pages (4)**: 12. `src/app/(public)/about/page.tsx` - About page 13. `src/app/(public)/terms/page.tsx` - Terms page 14. `src/app/(public)/privacy/page.tsx` - Privacy page 15. `src/app/layout.tsx` - Root layout with base metadata
 
-**Configuration Files (3)**:
-16. `next.config.ts` - Next.js configuration
-17. `src/lib/constants/config.ts` - Application config
-18. `public/robots.txt` - (May be generated dynamically)
+**Configuration Files (3)**: 16. `next.config.ts` - Next.js configuration 17. `src/lib/constants/config.ts` - Application config 18. `public/robots.txt` - (May be generated dynamically)
 
 #### **HIGH Priority (Supporting/Integration)** - 9 Files
 
-**Query Files (3)**:
-19. `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Bobblehead data fetching
-20. `src/lib/queries/collections/collections.query.ts` - Collection data fetching
-21. `src/lib/queries/users/users-query.ts` - User data queries
+**Query Files (3)**: 19. `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Bobblehead data fetching 20. `src/lib/queries/collections/collections.query.ts` - Collection data fetching 21. `src/lib/queries/users/users-query.ts` - User data queries
 
-**Facade Files (3)**:
-22. `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Bobblehead metadata retrieval
-23. `src/lib/facades/collections/collections.facade.ts` - Collection metadata retrieval
-24. `src/lib/facades/users/users.facade.ts` - User profile metadata
+**Facade Files (3)**: 22. `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Bobblehead metadata retrieval 23. `src/lib/facades/collections/collections.facade.ts` - Collection metadata retrieval 24. `src/lib/facades/users/users.facade.ts` - User profile metadata
 
-**Utility Files (3)**:
-25. `src/lib/utils/cloudinary.utils.ts` - Cloudinary OG image optimization
-26. `src/lib/utils/slug.ts` - URL slug utilities for canonical URLs
-27. `src/lib/utils/cache.utils.ts` - Cache integration with ISR
+**Utility Files (3)**: 25. `src/lib/utils/cloudinary.utils.ts` - Cloudinary OG image optimization 26. `src/lib/utils/slug.ts` - URL slug utilities for canonical URLs 27. `src/lib/utils/cache.utils.ts` - Cache integration with ISR
 
 #### **MEDIUM Priority (Browse/Discovery Pages)** - 9 Files
 
-**Public Browse Pages (6)**:
-28. `src/app/(app)/browse/featured/page.tsx` - Featured content (already has ISR)
-29. `src/app/(app)/browse/trending/page.tsx` - Trending content
-30. `src/app/(app)/browse/categories/page.tsx` - Categories listing
-31. `src/app/(app)/browse/categories/[category]/page.tsx` - Category detail
-32. `src/app/(app)/browse/page.tsx` - Browse landing
-33. `src/app/(app)/browse/search/page.tsx` - Search results
+**Public Browse Pages (6)**: 28. `src/app/(app)/browse/featured/page.tsx` - Featured content (already has ISR) 29. `src/app/(app)/browse/trending/page.tsx` - Trending content 30. `src/app/(app)/browse/categories/page.tsx` - Categories listing 31. `src/app/(app)/browse/categories/[category]/page.tsx` - Category detail 32. `src/app/(app)/browse/page.tsx` - Browse landing 33. `src/app/(app)/browse/search/page.tsx` - Search results
 
-**User Public Pages (3)**:
-34. `src/app/(app)/users/[userId]/collections/page.tsx` - User collections
-35. `src/app/(app)/users/[userId]/followers/page.tsx` - Followers (noindex)
-36. `src/app/(app)/users/[userId]/following/page.tsx` - Following (noindex)
+**User Public Pages (3)**: 34. `src/app/(app)/users/[userId]/collections/page.tsx` - User collections 35. `src/app/(app)/users/[userId]/followers/page.tsx` - Followers (noindex) 36. `src/app/(app)/users/[userId]/following/page.tsx` - Following (noindex)
 
 #### **LOW Priority (May Need Updates)** - 6+ Files
 
-**Authenticated Routes (4+)**:
-37. `src/app/(app)/dashboard/feed/page.tsx` - Dashboard feed (noindex)
-38. `src/app/(app)/dashboard/notifications/page.tsx` - Notifications (noindex)
-39. `src/app/(app)/settings/page.tsx` - Settings pages (noindex)
-40. `src/app/(app)/admin/page.tsx` - Admin routes (noindex)
+**Authenticated Routes (4+)**: 37. `src/app/(app)/dashboard/feed/page.tsx` - Dashboard feed (noindex) 38. `src/app/(app)/dashboard/notifications/page.tsx` - Notifications (noindex) 39. `src/app/(app)/settings/page.tsx` - Settings pages (noindex) 40. `src/app/(app)/admin/page.tsx` - Admin routes (noindex)
 
-**Edit/Management Routes (2+)**:
-41. `src/app/(app)/bobbleheads/[bobbleheadSlug]/edit/page.tsx` - Edit routes (noindex)
-42. `src/app/(app)/collections/[collectionSlug]/edit/page.tsx` - Edit routes (noindex)
+**Edit/Management Routes (2+)**: 41. `src/app/(app)/bobbleheads/[bobbleheadSlug]/edit/page.tsx` - Edit routes (noindex) 42. `src/app/(app)/collections/[collectionSlug]/edit/page.tsx` - Edit routes (noindex)
 
 ## File Path Validation Results
 
@@ -125,12 +91,14 @@ Prioritize files by implementation criticality (Critical/High/Medium/Low).
 ### File Existence Checks
 
 **Existing Files (35)**:
+
 - All page.tsx routes validated as existing
 - All query, facade, and utility files confirmed present
 - Root layout.tsx and next.config.ts confirmed
 - Cloudinary utils, slug utils confirmed
 
 **Files to Create (7)**:
+
 - sitemap.ts (needs creation)
 - robots.ts (needs creation)
 - metadata.utils.ts (needs creation)
@@ -170,21 +138,25 @@ Prioritize files by implementation criticality (Critical/High/Medium/Low).
 ### Recommended Implementation Phases
 
 **Phase 1 - Foundation**:
+
 - Create metadata utility files and type definitions
 - Implement sitemap and robots.txt
 - Add SEO constants
 
 **Phase 2 - Dynamic Pages**:
+
 - Enhance bobblehead, collection, user profile metadata
 - Implement JSON-LD structured data
 - Optimize Cloudinary images for social sharing
 
 **Phase 3 - Static & Browse Pages**:
+
 - Add metadata to public static pages
 - Implement ISR for browse/discover pages
 - Add canonical URLs
 
 **Phase 4 - Testing & Optimization**:
+
 - Test Open Graph previews
 - Validate structured data
 - Monitor Core Web Vitals
@@ -203,25 +175,30 @@ Prioritize files by implementation criticality (Critical/High/Medium/Low).
 ## Key File Analysis Highlights
 
 ### `src/app/(app)/users/[userId]/page.tsx`
+
 - Current: User profile display with basic generateMetadata stub
 - Uses: `UsersFacade.getUserByClerkId()` for data
 - Needs: Dynamic user info (display name, bio, avatar), profile JSON-LD
 
 ### `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`
+
 - Current: Bobblehead detail with photos, specs, comments
 - Uses: `BobbleheadsFacade.getBobbleheadBySlug()` with relations
 - Needs: Product schema, primary photo for OG, metadata
 
 ### `src/lib/facades/bobbleheads/bobbleheads.facade.ts`
+
 - Current: Comprehensive bobblehead business logic with caching
 - Exports: `getBobbleheadBySlug()`, view tracking
 - Ready: Already returns full data needed for metadata
 
 ### `src/lib/utils/cloudinary.utils.ts`
+
 - Current: URL parsing (publicId, format extraction)
 - Enhancement: Add transformation for OG images (1200x630)
 
 ### `src/app/layout.tsx`
+
 - Current: Root layout with Clerk auth, theme provider
 - Current Metadata: Basic title template and description
 - Enhancement: Global OG defaults, Twitter card defaults, canonical URL base

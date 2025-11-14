@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { eq } from 'drizzle-orm';
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -23,16 +24,84 @@ import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
+import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
+import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
+import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
 
 type CollectionPageProps = PageProps;
 
 export default withParamValidation(CollectionPage, Route);
 
-export function generateMetadata(): Metadata {
-  return {
-    description: '',
-    title: 'Collection',
-  };
+export async function generateMetadata({ routeParams }: CollectionPageProps): Promise<Metadata> {
+  const { collectionSlug } = await routeParams;
+
+  // Fetch basic collection info to get userId
+  const results = await db.select().from(collections).where(eq(collections.slug, collectionSlug)).limit(1);
+  const collection = results[0];
+
+  // Handle collection not found
+  if (!collection) {
+    return {
+      description: 'Collection not found',
+      robots: 'noindex, nofollow',
+      title: 'Collection Not Found | Head Shakers',
+    };
+  }
+
+  // Fetch full SEO metadata
+  const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, collection.userId);
+
+  // Handle metadata not available
+  if (!seoData) {
+    return {
+      description: 'Collection not found',
+      robots: 'noindex, nofollow',
+      title: 'Collection Not Found | Head Shakers',
+    };
+  }
+
+  // Generate canonical URL for this collection
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/collections/[collectionSlug]',
+    routeParams: { collectionSlug },
+  })}`;
+
+  // Prepare cover image URL for social sharing
+  let coverImage: string = FALLBACK_METADATA.imageUrl;
+
+  if (seoData.coverImage) {
+    const publicId = extractPublicIdFromCloudinaryUrl(seoData.coverImage);
+    coverImage = generateOpenGraphImageUrl(publicId);
+  }
+
+  // Use collection description or fallback to a default
+  const description =
+    seoData.description ||
+    `${seoData.name} by ${seoData.owner.displayName} - Browse ${seoData.itemCount} bobbleheads in this collection`;
+
+  // Private collections should not be indexed
+  const isPublic = seoData.isPublic;
+
+  // Generate page metadata with OG and Twitter cards
+  return generatePageMetadata(
+    'collection',
+    {
+      creatorHandle: seoData.owner.username ? `@${seoData.owner.username}` : undefined,
+      description,
+      images: [coverImage],
+      title: seoData.name,
+      url: canonicalUrl,
+    },
+    {
+      isIndexable: isPublic,
+      isPublic,
+      shouldIncludeOpenGraph: true,
+      shouldIncludeTwitterCard: true,
+      shouldUseTitleTemplate: true,
+    },
+  );
 }
 
 async function CollectionPage({ routeParams, searchParams }: CollectionPageProps) {
@@ -51,8 +120,47 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
 
   const collectionId = collection.id;
 
+  // Fetch SEO data for JSON-LD schemas
+  const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, collection.userId);
+
+  // Generate canonical URL for JSON-LD schemas
+  const collectionUrl = `${DEFAULT_SITE_METADATA.url}${$path({
+    route: '/collections/[collectionSlug]',
+    routeParams: { collectionSlug },
+  })}`;
+
+  // Generate CollectionPage schema
+  const collectionPageSchema =
+    seoData ?
+      generateCollectionPageSchema({
+        description: seoData.description || undefined,
+        itemsCount: seoData.itemCount,
+        name: seoData.name,
+        url: collectionUrl,
+      })
+    : null;
+
+  // Generate Breadcrumb schema for navigation context
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: DEFAULT_SITE_METADATA.url },
+    { name: 'Collections', url: `${DEFAULT_SITE_METADATA.url}/collections` },
+    { name: seoData?.name || collection.name },
+  ]);
+
   return (
     <CollectionViewTracker collectionId={collectionId} collectionSlug={collectionSlug}>
+      {/* JSON-LD structured data */}
+      {collectionPageSchema && (
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionPageSchema) }}
+          type={'application/ld+json'}
+        />
+      )}
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }}
+        type={'application/ld+json'}
+      />
+
       <div>
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>

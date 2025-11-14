@@ -23,6 +23,7 @@ Discover all files relevant to implementing this feature in the Head Shakers cod
 [Feature request text above]
 
 **Project Context:**
+
 - Next.js 15.5.3 App Router structure
 - Database: PostgreSQL/Neon with Drizzle ORM (schemas in src/lib/db/)
 - Server Actions in src/lib/actions/
@@ -33,6 +34,7 @@ Discover all files relevant to implementing this feature in the Head Shakers cod
 
 **Required Discovery:**
 Identify ALL files that will need to be created or modified, including:
+
 - Bobblehead detail page(s)
 - Database schema files
 - Server action files
@@ -280,6 +282,7 @@ IMPORTANT: Discover a MINIMUM of 5 relevant files. Be comprehensive and analyze 
 ### File Path Validation
 
 All discovered file paths follow the project structure conventions:
+
 - Schema files in `src/lib/db/schema/`
 - Actions in `src/lib/actions/bookmarks/`
 - Queries in `src/lib/queries/bookmarks/`
@@ -362,4 +365,5 @@ All discovered file paths follow the project structure conventions:
 Proceed to Step 3: Implementation Planning using the discovered files and architectural insights.
 
 ---
-*Step completed successfully at 2025-11-12T00:10:00Z*
+
+_Step completed successfully at 2025-11-12T00:10:00Z_

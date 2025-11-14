@@ -7,6 +7,7 @@
 ## Overview
 
 Executed Steps 5-8 together as they are tightly integrated:
+
 - Step 5: Update Validation Schemas (COMPLETE)
 - Step 6: Update Database Queries (70% COMPLETE)
 - Step 7: Update Facades (DEFERRED - requires additional implementation)
@@ -15,11 +16,13 @@ Executed Steps 5-8 together as they are tightly integrated:
 ## Step 5: Update Validation Schemas ✅ COMPLETE
 
 ### Files Modified
+
 - `src/lib/validations/bobbleheads.validation.ts`
 - `src/lib/validations/collections.validation.ts`
 - `src/lib/validations/subcollections.validation.ts`
 
 ### Changes Applied
+
 - Added `getBobbleheadBySlugSchema` with slug validation
 - Added `getCollectionBySlugSchema` with userId and slug validation
 - Added `getSubcollectionBySlugSchema` with collectionId and slug validation
@@ -27,6 +30,7 @@ Executed Steps 5-8 together as they are tightly integrated:
 - All schemas use slug pattern validation from constants
 
 ### Success Criteria
+
 - [✓] Slug validation enforces format, length, and pattern requirements
 - [✓] Validation schemas properly typed with Zod
 - [✓] Uses slug constants for validation rules
@@ -35,29 +39,35 @@ Executed Steps 5-8 together as they are tightly integrated:
 ## Step 6: Update Database Queries 70% COMPLETE
 
 ### Files Modified
+
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts` - ✅ Complete
 - `src/lib/queries/collections/collections.query.ts` - ✅ Complete
 - `src/lib/queries/subcollections/subcollections.query.ts` - ⚠️ Incomplete
 
 ### Changes Applied - Bobbleheads
+
 ✅ Added `findBySlugAsync(slug: string)` method
 ✅ Added `findBySlugWithRelationsAsync(slug: string)` method
 ✅ Uses proper Drizzle where clauses for slug filtering
 ✅ Properly typed with database schemas
 
 ### Changes Applied - Collections
+
 ✅ Added `findBySlugAsync(userId: string, slug: string)` method
 ✅ Added `findBySlugWithRelationsAsync(userId: string, slug: string)` method
 ✅ User-scoped slug queries (userId + slug)
 ✅ Properly handles user isolation
 
 ### Changes NOT Applied - Subcollections
+
 ⚠️ Subcollection queries not yet added
+
 - Would follow same pattern as bobbleheads/collections
 - Requires: `findBySlugAsync(collectionId: string, slug: string)`
 - Requires: `findBySlugWithRelationsAsync(collectionId: string, slug: string)`
 
 ### Success Criteria
+
 - [✓] Bobblehead queries properly typed with slug parameters
 - [✓] Collection queries use proper scoping (userId + slug)
 - [⚠️] Subcollection queries pending (low complexity, similar pattern)
@@ -68,6 +78,7 @@ Executed Steps 5-8 together as they are tightly integrated:
 ### Status: BLOCKED - Requires Implementation
 
 This step requires:
+
 1. All three facade files import slug utilities
 2. Create methods generate slugs from entity names
 3. Create methods query existing slugs for collision detection
@@ -78,6 +89,7 @@ This step requires:
 **Why Deferred**: This is a critical step requiring careful implementation to ensure slug generation, collision handling, and database consistency. Recommended to implement in focused dedicated step.
 
 ### Required Changes (TODO for focused Step 7b)
+
 - `src/lib/facades/bobblehead.ts`
   - Import: generateSlug, ensureUniqueSlug
   - Update createAsync to generate and validate slug
@@ -100,18 +112,22 @@ This step requires:
 ### Status: BLOCKED - Depends on Step 7
 
 Server actions primarily delegate to facades, so once facades are updated with slug-based methods, actions should largely work. Minimal changes expected:
+
 - Optional: Add new slug-based actions for public routes
 - Actions should continue using facade methods
 
 ## Validation Results
 
 ### npm run lint:fix
+
 ✅ **PASS** - No linting errors found
 
 ### npm run typecheck
+
 ⚠️ **PARTIAL PASS** - 13 TypeScript errors (EXPECTED)
 
 **Error Sources** (all expected and will be resolved):
+
 1. Seed scripts need slug fields in data fixtures
 2. Query methods need slug values in select statements
 3. Browse queries need slug field in results
@@ -136,6 +152,7 @@ Server actions primarily delegate to facades, so once facades are updated with s
 ## Critical Path Forward
 
 **Next Immediate Step**: Execute focused implementation of Step 7
+
 - Implement slug generation in all three facade create methods
 - Implement collision handling using ensureUniqueSlug
 - Add slug-based get methods to facades

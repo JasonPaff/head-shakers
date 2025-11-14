@@ -27,6 +27,7 @@ The cache invalidation system now supports two invalidation strategies:
 ### Backward Compatibility
 
 All slug parameters are **optional**, ensuring:
+
 - Legacy code continues to work without modification
 - Gradual migration of cache invalidation calls
 - No breaking changes to existing functionality
@@ -37,6 +38,7 @@ All slug parameters are **optional**, ensuring:
 ### 1. Cache Revalidation Service
 
 #### cache-revalidation.service.ts
+
 **File**: `src/lib/services/cache-revalidation.service.ts`
 
 **Updated Methods**:
@@ -82,6 +84,7 @@ All slug parameters are **optional**, ensuring:
    - Falls back to tag-based invalidation if no slug
 
 **Pattern Used**:
+
 ```typescript
 if (bobbleheadSlug) {
   revalidatePath(`/bobbleheads/${bobbleheadSlug}`);
@@ -92,50 +95,59 @@ if (bobbleheadSlug) {
 ### 2. Server Actions
 
 #### bobbleheads.actions.ts
+
 **File**: `src/lib/actions/bobbleheads/bobbleheads.actions.ts`
 
 **Updates**:
+
 - **onCreate**: Pass `bobbleheadSlug` to cache revalidation
 - **onUpdate**: Pass `bobbleheadSlug` to cache revalidation
 - **onDelete**: Pass `bobbleheadSlug` to cache revalidation
 
 **Example**:
+
 ```typescript
 await cacheRevalidationService.revalidateBobbleheadOnCreate({
   bobbleheadId: result.id,
-  bobbleheadSlug: result.slug,  // NEW
+  bobbleheadSlug: result.slug, // NEW
   collectionId: result.collectionId,
   userId: result.userId,
 });
 ```
 
 #### collections.actions.ts
+
 **File**: `src/lib/actions/collections/collections.actions.ts`
 
 **Updates**:
+
 - **onCreate**: Pass `collectionSlug` to cache revalidation
 
 **Example**:
+
 ```typescript
 await cacheRevalidationService.revalidateCollectionOnCreate({
   collectionId: result.id,
-  collectionSlug: result.slug,  // NEW
+  collectionSlug: result.slug, // NEW
   userId: result.userId,
 });
 ```
 
 #### subcollections.actions.ts
+
 **File**: `src/lib/actions/collections/subcollections.actions.ts`
 
 **Updates**:
+
 - **onUpdate**: Fetch collection slug and pass to cache revalidation
 
 **Example**:
+
 ```typescript
 const collection = await collectionsQuery.getCollectionById({ id: subcollection.collectionId });
 await cacheRevalidationService.revalidateCollectionOnUpdate({
   collectionId: subcollection.collectionId,
-  collectionSlug: collection?.slug,  // NEW
+  collectionSlug: collection?.slug, // NEW
   userId: subcollection.userId,
 });
 ```
@@ -143,6 +155,7 @@ await cacheRevalidationService.revalidateCollectionOnUpdate({
 ## Cache Invalidation Flow
 
 ### Before (Tag-Based Only)
+
 ```
 Action → Service → revalidateTag(id)
   ↓
@@ -150,6 +163,7 @@ Invalidates cache entries tagged with ID
 ```
 
 ### After (Tag + Path Based)
+
 ```
 Action → Service → revalidateTag(id)
                  → revalidatePath(/entity/slug)  [if slug provided]
@@ -161,18 +175,21 @@ Invalidates cache entries tagged with ID
 ## Path-Based Invalidation Patterns
 
 ### Bobblehead Paths
+
 ```typescript
 revalidatePath('/bobbleheads/[bobbleheadSlug]');
 // Invalidates: /bobbleheads/my-cool-bobblehead
 ```
 
 ### Collection Paths
+
 ```typescript
 revalidatePath('/collections/[collectionSlug]');
 // Invalidates: /collections/sports-collection
 ```
 
 ### Social Interaction Paths
+
 ```typescript
 // Like/comment on bobblehead
 revalidatePath('/bobbleheads/[bobbleheadSlug]');
@@ -186,15 +203,17 @@ revalidatePath('/collections/[collectionSlug]');
 ### Design Decision: Continue Using IDs
 
 **Why Redis cache keys still use IDs:**
+
 1. **Internal Tracking**: Redis keys are internal implementation details
 2. **Analytics**: Tracking view counts, etc. uses immutable IDs
 3. **Cache Warming**: Background jobs reference entities by ID
 4. **Non-URL Keys**: Redis keys aren't user-facing URLs
 
 **Example Redis Keys** (unchanged):
+
 ```typescript
-CACHE_KEYS.BOBBLEHEADS.BY_ID(id)
-CACHE_KEYS.COLLECTIONS.BY_ID(id)
+CACHE_KEYS.BOBBLEHEADS.BY_ID(id);
+CACHE_KEYS.COLLECTIONS.BY_ID(id);
 ```
 
 **Why This Is Correct**: Redis cache keys serve different purposes than route-based cache invalidation. They're for data caching, not URL-based page caching.
@@ -202,15 +221,19 @@ CACHE_KEYS.COLLECTIONS.BY_ID(id)
 ## Validation Results
 
 ### TypeScript Check
+
 ```bash
 npm run typecheck
 ```
+
 **Result**: ✅ PASS - Zero errors
 
 ### ESLint Check
+
 ```bash
 npm run lint:fix
 ```
+
 **Result**: ✅ PASS - No issues
 
 ## Success Criteria
@@ -233,30 +256,37 @@ None
 ## Impact Analysis
 
 ### Functional Impact
+
 **Enhancement** - More precise cache invalidation with path-based revalidation
 
 ### Performance Impact
+
 **Positive** - Slug-based path invalidation is more targeted than tag-based
 
 ### Backward Compatibility
+
 **Full** - Optional parameters ensure legacy code continues to work
 
 ### Cache Efficiency
+
 **Improved** - Dual invalidation (tag + path) ensures complete cache refresh
 
 ## Architecture Benefits
 
 ### Precise Invalidation
+
 - Tag-based invalidation: Broad cache clearing (all related entities)
 - Path-based invalidation: Specific page route clearing (exact URL)
 - Combined: Comprehensive cache management
 
 ### Flexible Migration
+
 - Optional parameters allow gradual adoption
 - Legacy code works without modification
 - New code can opt-in to slug-based invalidation
 
 ### Future-Proof
+
 - Service layer ready for full slug adoption
 - Easy to extend to subcollections in future
 - Consistent pattern across all entity types
@@ -277,6 +307,7 @@ None
 ## Code Quality
 
 All changes follow project conventions:
+
 - Optional parameters for backward compatibility
 - Proper TypeScript typing
 - Consistent naming patterns

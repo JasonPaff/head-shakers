@@ -846,6 +846,70 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(sortOrder);
   }
 
+  /**
+   * get collection metadata for SEO and social sharing
+   * returns minimal fields needed for metadata generation with owner info
+   */
+  static async getCollectionMetadata(
+    slug: string,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | {
+    coverImage: null | string;
+    description: null | string;
+    isPublic: boolean;
+    itemCount: number;
+    name: string;
+    owner: {
+      displayName: string;
+      username: string;
+    };
+    slug: string;
+  }> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        coverImage: collections.coverImageUrl,
+        description: collections.description,
+        isPublic: collections.isPublic,
+        itemCount: collections.totalItems,
+        name: collections.name,
+        ownerDisplayName: users.displayName,
+        ownerUsername: users.username,
+        slug: collections.slug,
+      })
+      .from(collections)
+      .innerJoin(users, eq(collections.userId, users.id))
+      .where(
+        this.combineFilters(
+          eq(collections.slug, slug),
+          eq(collections.userId, userId),
+          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
+        ),
+      )
+      .limit(1);
+
+    if (!result[0]) {
+      return null;
+    }
+
+    const row = result[0];
+
+    return {
+      coverImage: row.coverImage,
+      description: row.description,
+      isPublic: row.isPublic,
+      itemCount: row.itemCount,
+      name: row.name,
+      owner: {
+        displayName: row.ownerDisplayName,
+        username: row.ownerUsername,
+      },
+      slug: row.slug,
+    };
+  }
+
   static async getDashboardDataAsync(
     userId: string,
     context: QueryContext,

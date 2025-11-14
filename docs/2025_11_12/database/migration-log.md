@@ -23,34 +23,40 @@ Successfully added slug columns with unique constraints and indexes to bobblehea
 ## Changes Applied
 
 ### 1. Sub Collections Table
+
 - **Added Column**: `slug` varchar(100) NOT NULL DEFAULT 'temp'
 - **Populated Values**: Generated from table name + first 8 chars of UUID, lowercased with regex sanitization
 - **Index Created**: `sub_collections_slug_idx` on (slug)
 - **Unique Constraint**: `sub_collections_collection_slug_unique` on (collection_id, slug) - composite unique constraint
 
 **Verification**:
+
 - Total rows: 4
 - Rows with slug values: 4 (100%)
 - Index size: ~16 kB
 - Constraint type: UNIQUE INDEX
 
 ### 2. Collections Table
+
 - **Column Status**: Already existed but was nullable
 - **Populated Values**: Updated 2 NULL records with generated slugs (name + first 8 chars of UUID, sanitized)
 - **Unique Constraint**: `collections_user_slug_unique` on (user_id, slug) - composite unique constraint
 - **Index**: `collections_slug_idx` already existed
 
 **Verification**:
+
 - Total rows: 2
 - Rows with slug values: 2 (100%)
 - Constraint type: UNIQUE INDEX
 
 ### 3. Bobbleheads Table
+
 - **Column Status**: Already existed, all 6 rows had slug values
 - **Unique Constraint**: `bobbleheads_slug_unique` added for global uniqueness
 - **Index**: `bobbleheads_slug_idx` already existed
 
 **Verification**:
+
 - Total rows: 6
 - Rows with slug values: 6 (100%)
 - Constraint type: UNIQUE
@@ -90,6 +96,7 @@ ALTER TABLE "collections" ADD CONSTRAINT "collections_user_slug_unique" UNIQUE("
 ## Schema Validation Results
 
 ### Bobbleheads Table
+
 - **Columns**: 31 total
 - **Indexes**: 14 total (including bobbleheads_slug_idx)
 - **Constraints**:
@@ -100,6 +107,7 @@ ALTER TABLE "collections" ADD CONSTRAINT "collections_user_slug_unique" UNIQUE("
 - **Index Size**: 264 kB
 
 ### Collections Table
+
 - **Columns**: 14 total
 - **Indexes**: 10 total (including collections_slug_idx)
 - **Constraints**:
@@ -111,6 +119,7 @@ ALTER TABLE "collections" ADD CONSTRAINT "collections_user_slug_unique" UNIQUE("
 - **Index Size**: 168 kB
 
 ### Sub Collections Table
+
 - **Columns**: 13 total (now includes slug)
 - **Indexes**: 9 total (including sub_collections_slug_idx and sub_collections_collection_slug_unique)
 - **Constraints**:
@@ -131,6 +140,7 @@ The migration used the following logic to generate slug values:
 3. **Result**: URL-safe lowercase slugs with hyphens replacing non-alphanumeric characters
 
 **Example Slugs Generated**:
+
 - "My Collection" + "a1b2c3d4" → "my-collection-a1b2c3d4"
 - "Rare Finds" + "e5f6g7h8" → "rare-finds-e5f6g7h8"
 
@@ -139,10 +149,12 @@ The migration used the following logic to generate slug values:
 ## Unique Constraint Strategy
 
 ### Global Uniqueness
+
 - **bobbleheads.slug**: Globally unique across all users
 - Reason: Each bobblehead is a unique item that should have a distinct URL
 
 ### Composite Uniqueness
+
 - **collections.slug**: Unique per user (user_id, slug)
 - **sub_collections.slug**: Unique per collection (collection_id, slug)
 - Reason: Users can have collections with same name pattern, but slugs must be unique within their scope

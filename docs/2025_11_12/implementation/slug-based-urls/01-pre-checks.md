@@ -22,6 +22,7 @@
 **Quality Gates**: 8 gates defined
 
 ### Steps Overview
+
 1. Create Slug Generation Utilities
 2. Define Slug Constants
 3. Update Database Schema
@@ -54,6 +55,7 @@
 ## Safety Checks
 
 **CRITICAL WARNING**: This is a BREAKING CHANGE implementation that:
+
 - Eliminates ALL backwards compatibility with UUID-based URLs
 - Will break all existing bookmarked links
 - Will break external links to the site
@@ -64,6 +66,7 @@
 ## Implementation Directory Structure
 
 Created: `docs/2025_11_12/implementation/slug-based-urls/`
+
 - 01-pre-checks.md (this file)
 - 02-setup.md (to be created)
 - 03-step-1-results.md through 22-step-20-results.md (to be created)

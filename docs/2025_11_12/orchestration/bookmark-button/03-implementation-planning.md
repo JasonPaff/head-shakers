@@ -37,6 +37,7 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 [Complete file discovery results with categorization]
 
 **Architecture Patterns:**
+
 - Follow like feature implementation
 - Use authActionClient for authentication
 - Implement optimistic UI updates
@@ -78,6 +79,7 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 ### Step Structure Validation - All Steps Complete ✅
 
 Each of the 19 steps includes:
+
 - ✅ **What**: Clear description of the task
 - ✅ **Why**: Justification for the step
 - ✅ **Confidence**: Level assessment (High/Medium)
@@ -123,11 +125,13 @@ Each of the 19 steps includes:
 ## Complexity Assessment
 
 ### Overview Analysis
+
 - **Estimated Duration**: 2-3 days (reasonable for 19 steps)
 - **Complexity**: Medium (appropriate for feature following existing patterns)
 - **Risk Level**: Medium (mitigated by following established patterns)
 
 ### Step Complexity Distribution
+
 - **High Confidence Steps**: 18/19 steps (95%)
 - **Medium Confidence Steps**: 1/19 steps (5% - Step 12: Bookmarks collection page)
 - **Critical New Files**: 9 files (schema, actions, queries, facades, hooks, components)
@@ -135,6 +139,7 @@ Each of the 19 steps includes:
 - **Test Coverage**: 5 comprehensive test files
 
 ### Time Estimates by Phase
+
 - **Phase 1 (Steps 1-8)**: Database and backend setup - ~1 day
 - **Phase 2 (Steps 9-14)**: Frontend integration - ~0.5-1 day
 - **Phase 3 (Steps 15-19)**: Testing - ~0.5-1 day
@@ -173,6 +178,7 @@ Each of the 19 steps includes:
 ## Assumptions Requiring Confirmation
 
 As identified in the plan's Notes section:
+
 1. Bookmark count display on bobbleheads or user profiles is NOT required
 2. Toast notification system exists (or needs addition)
 3. Bookmark icon preference - plan uses Lucide Bookmark/BookmarkCheck icons
@@ -180,6 +186,7 @@ As identified in the plan's Notes section:
 ## Risk Mitigation Strategies
 
 As identified in the plan's Notes section:
+
 1. Following existing like feature patterns reduces risk
 2. Optimistic updates ensure responsive UI
 3. Comprehensive error handling with rollback
@@ -188,6 +195,7 @@ As identified in the plan's Notes section:
 ## Performance Considerations
 
 As identified in the plan's Notes section:
+
 1. Composite index on userId and bobbleheadId
 2. Pagination for bookmarks collection
 3. Cache bookmark status with proper invalidation
@@ -195,6 +203,7 @@ As identified in the plan's Notes section:
 ## Future Enhancements Not Included
 
 As identified in the plan's Notes section:
+
 1. Bookmark collections/folders
 2. Bookmark sharing
 3. Bookmark export
@@ -204,9 +213,11 @@ As identified in the plan's Notes section:
 ## Next Steps
 
 Implementation plan is ready for execution. The plan can be:
+
 1. Saved to `docs/2025_11_12/plans/bookmark-button-implementation-plan.md`
 2. Executed using `/implement-plan` command
 3. Used as reference for manual implementation
 
 ---
-*Step completed successfully at 2025-11-12T00:15:00Z*
+
+_Step completed successfully at 2025-11-12T00:15:00Z_

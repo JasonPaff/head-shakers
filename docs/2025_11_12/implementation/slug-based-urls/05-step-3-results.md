@@ -8,6 +8,7 @@
 ## Subagent Input
 
 Delegated to general-purpose subagent to:
+
 - Find and read bobbleheads, collections, and subcollections schema files
 - Add slug columns with appropriate constraints
 - Add indexes for slug lookups
@@ -33,23 +34,26 @@ Delegated to general-purpose subagent to:
 ### Schema Changes Summary
 
 **Bobbleheads Table**:
+
 ```typescript
-slug: varchar('slug', { length: 100 }).notNull().unique()
-index('bobbleheads_slug_idx').on(table.slug)
+slug: varchar('slug', { length: 100 }).notNull().unique();
+index('bobbleheads_slug_idx').on(table.slug);
 ```
 
 **Collections Table**:
+
 ```typescript
-slug: varchar('slug', { length: 100 }).notNull()
-uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug)
-index('collections_slug_idx').on(table.slug)
+slug: varchar('slug', { length: 100 }).notNull();
+uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug);
+index('collections_slug_idx').on(table.slug);
 ```
 
 **Subcollections Table**:
+
 ```typescript
-slug: varchar('slug', { length: 100 }).notNull()
-uniqueIndex('sub_collections_collection_slug_unique').on(table.collectionId, table.slug)
-index('sub_collections_slug_idx').on(table.slug)
+slug: varchar('slug', { length: 100 }).notNull();
+uniqueIndex('sub_collections_collection_slug_unique').on(table.collectionId, table.slug);
+index('sub_collections_slug_idx').on(table.slug);
 ```
 
 ### Validation Results
@@ -58,6 +62,7 @@ index('sub_collections_slug_idx').on(table.slug)
 ⚠️ **npm run typecheck**: EXPECTED FAILURES (application code not yet updated)
 
 **TypeScript Errors (Expected)**:
+
 - src/app/(app)/bobbleheads/add/components/add-item-form-options.ts
 - src/components/feature/bobblehead/bobblehead-edit-dialog.tsx
 - src/lib/db/scripts/seed.ts

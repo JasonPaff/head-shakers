@@ -9,9 +9,11 @@
 ## Inputs Used
 
 ### Refined Feature Request
+
 The Head Shakers application should implement comprehensive SEO optimization and dynamic metadata generation to improve search engine visibility and social media shareability across all public and authenticated routes. (Full request: 343 words)
 
 ### File Discovery Analysis
+
 - **Total Files**: 42+ discovered across all architectural layers
 - **Critical Priority**: 18 files (7 to create, 11 to modify)
 - **High Priority**: 9 files (queries, facades, utilities)
@@ -19,6 +21,7 @@ The Head Shakers application should implement comprehensive SEO optimization and
 - **Low Priority**: 6+ files (authenticated routes, edit routes)
 
 ### Architecture Insights
+
 - Existing ISR in featured page (revalidate = 300)
 - Basic generateMetadata stubs present
 - Facade pattern well-established
@@ -43,6 +46,7 @@ touching JS/JSX/TS/TSX files. Do NOT include code examples.
 ## Implementation Plan Generated
 
 ### Plan Metadata
+
 - **Format**: ✅ Markdown (not XML)
 - **Estimated Duration**: 5-6 days
 - **Complexity**: High
@@ -52,6 +56,7 @@ touching JS/JSX/TS/TSX files. Do NOT include code examples.
 ### Plan Structure Validation
 
 ✅ **Required Sections Present**:
+
 - Overview (with duration, complexity, risk)
 - Quick Summary
 - Prerequisites (5 items)
@@ -61,6 +66,7 @@ touching JS/JSX/TS/TSX files. Do NOT include code examples.
 
 ✅ **Step Structure Compliance**:
 Each of 24 steps includes:
+
 - What (objective description)
 - Why (rationale)
 - Confidence (High/Medium assessment)
@@ -72,18 +78,21 @@ Each of 24 steps includes:
 ### Implementation Phases
 
 **Phase 1: Foundation (Steps 1-7)** - 1.5 days
+
 - Create types, constants, and utility files
 - Implement Cloudinary optimization
 - Build metadata generation utilities
 - Enhance database queries and facades
 
 **Phase 2: Dynamic Pages (Steps 8-11)** - 1.5 days
+
 - User profile metadata
 - Bobblehead detail metadata
 - Collection and subcollection metadata
 - Public landing pages
 
 **Phase 3: Infrastructure (Steps 12-18)** - 1.5 days
+
 - ISR implementation
 - Sitemap and robots.txt
 - Root layout enhancement
@@ -92,6 +101,7 @@ Each of 24 steps includes:
 - Sentry monitoring
 
 **Phase 4: Quality & Validation (Steps 19-24)** - 1.5 days
+
 - Testing suite
 - Authenticated route guards
 - Preview mode
@@ -101,6 +111,7 @@ Each of 24 steps includes:
 ### Key Implementation Highlights
 
 #### New Files to Create (7)
+
 1. `src/lib/seo/metadata.types.ts` - TypeScript types
 2. `src/lib/seo/seo.constants.ts` - SEO constants
 3. `src/lib/seo/opengraph.utils.ts` - OpenGraph utilities
@@ -111,6 +122,7 @@ Each of 24 steps includes:
 8. `src/app/robots.ts` - Robots.txt configuration
 
 #### Critical Files to Modify (11)
+
 1. `src/lib/utils/cloudinary.utils.ts` - Social image optimization
 2. `src/app/(app)/users/[userId]/page.tsx` - User metadata
 3. `src/app/(app)/bobbleheads/[bobbleheadSlug]/page.tsx` - Bobblehead metadata
@@ -166,6 +178,7 @@ Each of 24 steps includes:
 ## Complexity Assessment
 
 ### Technical Complexity: High
+
 - Next.js metadata API integration
 - Dynamic content-based metadata generation
 - JSON-LD structured data implementation
@@ -175,6 +188,7 @@ Each of 24 steps includes:
 - Cache invalidation orchestration
 
 ### Integration Complexity: Medium
+
 - Well-established facade pattern simplifies integration
 - Existing Cloudinary utils provide foundation
 - Redis caching already in use
@@ -182,6 +196,7 @@ Each of 24 steps includes:
 - Clean separation of concerns
 
 ### Risk Assessment: Medium
+
 - Metadata failures have graceful fallbacks
 - ISR timing needs monitoring and adjustment
 - Cache performance critical for scalability
@@ -200,6 +215,7 @@ Each of 24 steps includes:
 ## Dependencies and Prerequisites
 
 ### Required Before Starting
+
 1. Cloudinary settings and URL generation verified
 2. Redis cache configuration confirmed
 3. Sentry performance monitoring reviewed
@@ -207,6 +223,7 @@ Each of 24 steps includes:
 5. next-typesafe-url properly configured
 
 ### Environment Variables Needed
+
 - `NEXT_PUBLIC_SITE_URL` - Site base URL
 - `NEXT_PUBLIC_SITE_NAME` - Site name for metadata
 - `NEXT_PUBLIC_TWITTER_HANDLE` - Twitter account

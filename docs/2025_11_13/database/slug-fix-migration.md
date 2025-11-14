@@ -7,10 +7,12 @@ Successfully fixed malformed slugs in both `collections` and `sub_collections` t
 ## Problem Statement
 
 The slugs in both tables were malformed with the following issues:
+
 - Missing first character(s) in the slug
 - UUID suffixes appended to the end (8-character prefix)
 
 ### Examples of Malformed Slugs (Before):
+
 ```
 Name: "Spooky Collection" → Slug: "-pooky-ollection-5ea0a782"
 Name: "Baltimore Orioles" → Slug: "-altimore-rioles-7ce6e293"
@@ -25,12 +27,14 @@ Name: "Norfolk Tides" → Slug: "-orfolk-ides-ca46ba95"
 Created a database migration that regenerates slugs from the `name` column using proper slug generation logic:
 
 ### Slug Generation Logic:
+
 1. Convert to lowercase using `LOWER()`
 2. Replace spaces and special characters with hyphens using `REGEXP_REPLACE()`
 3. Remove leading/trailing hyphens using `TRIM()`
 4. Remove UUID suffixes automatically (they weren't in the source `name` field)
 
 ### Migration SQL:
+
 ```sql
 -- Fix malformed slugs in collections and sub_collections tables
 -- Generate proper slugs from names using slug generation logic:
@@ -75,10 +79,12 @@ updated_at = NOW();
 ## Verification Results
 
 ### Before Migration (Temporary Branch Testing):
+
 - Collections table: Slugs were malformed with missing characters and UUID suffixes
 - Sub_collections table: Same issues
 
 ### After Migration (Temporary Branch Testing):
+
 ```
 Collections:
 - "Spooky Collection" → "spooky-collection" ✓
@@ -92,6 +98,7 @@ Sub_collections:
 ```
 
 ### Constraint Validation:
+
 1. **Collections unique constraint** (user_id, slug): No violations found ✓
 2. **Sub_collections unique constraint** (collection_id, slug): No violations found ✓
 3. **Slug format compliance**: All slugs follow the correct pattern:

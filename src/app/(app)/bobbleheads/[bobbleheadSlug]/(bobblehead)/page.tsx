@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -26,15 +27,63 @@ import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { generateBreadcrumbSchema, generateProductSchema } from '@/lib/seo/jsonld.utils';
+import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
+import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
+import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type ItemPageProps = PageProps;
 
-export function generateMetadata(): Metadata {
-  return {
-    description: '',
-    title: 'Bobblehead Details',
-  };
+export async function generateMetadata({ routeParams }: ItemPageProps): Promise<Metadata> {
+  const { bobbleheadSlug } = await routeParams;
+
+  // Fetch bobblehead SEO metadata
+  const bobblehead = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
+
+  // Handle bobblehead not found
+  if (!bobblehead) {
+    return {
+      description: 'Bobblehead not found',
+      robots: 'noindex, nofollow',
+      title: 'Bobblehead Not Found | Head Shakers',
+    };
+  }
+
+  // Generate canonical URL for this bobblehead
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug } })}`;
+
+  // Prepare primary image URL for social sharing
+  let productImage: string = FALLBACK_METADATA.imageUrl;
+
+  if (bobblehead.primaryImage) {
+    // Extract Cloudinary public ID from image URL and optimize for Open Graph
+    const publicId = extractPublicIdFromCloudinaryUrl(bobblehead.primaryImage);
+    productImage = generateOpenGraphImageUrl(publicId);
+  }
+
+  // Use description or generate fallback with owner attribution
+  const description =
+    bobblehead.description ||
+    `${bobblehead.name} - From ${bobblehead.owner.displayName}'s collection on Head Shakers`;
+
+  // Generate page metadata with OG and Twitter cards
+  return generatePageMetadata(
+    'bobblehead',
+    {
+      category: bobblehead.category || undefined,
+      description,
+      images: [productImage],
+      title: bobblehead.name,
+      url: canonicalUrl,
+    },
+    {
+      isPublic: true,
+      shouldIncludeOpenGraph: true,
+      shouldIncludeTwitterCard: true,
+      shouldUseTitleTemplate: true,
+    },
+  );
 }
 
 async function ItemPage({ routeParams }: ItemPageProps) {
@@ -52,12 +101,51 @@ async function ItemPage({ routeParams }: ItemPageProps) {
 
   const bobbleheadId = basicBobblehead.id;
 
+  // Fetch SEO metadata for JSON-LD schemas
+  const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
+
+  // Generate Product schema for bobblehead
+  const productSchema =
+    seoMetadata ?
+      generateProductSchema({
+        category: seoMetadata.category || undefined,
+        dateCreated: seoMetadata.createdAt.toISOString(),
+        description: seoMetadata.description || undefined,
+        image: seoMetadata.primaryImage ? [seoMetadata.primaryImage] : undefined,
+        name: seoMetadata.name,
+      })
+    : null;
+
+  // Generate Breadcrumb schema for navigation context
+  const breadcrumbSchema =
+    seoMetadata ?
+      generateBreadcrumbSchema([
+        { name: 'Home', url: DEFAULT_SITE_METADATA.url },
+        { name: 'Bobbleheads', url: `${DEFAULT_SITE_METADATA.url}/bobbleheads` },
+        { name: seoMetadata.name }, // Current page - no URL
+      ])
+    : null;
+
   return (
     <BobbleheadViewTracker
       bobbleheadId={bobbleheadId}
       bobbleheadSlug={bobbleheadSlug}
       collectionId={basicBobblehead.collectionId ?? undefined}
     >
+      {/* JSON-LD structured data */}
+      {productSchema && (
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(productSchema) }}
+          type={'application/ld+json'}
+        />
+      )}
+      {breadcrumbSchema && (
+        <script
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }}
+          type={'application/ld+json'}
+        />
+      )}
+
       <div>
         {/* Header Section */}
         <div className={'border-b border-border'}>

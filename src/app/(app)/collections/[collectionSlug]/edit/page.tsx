@@ -6,7 +6,8 @@ export default function EditCollectionPage() {
 
 export function generateMetadata(): Metadata {
   return {
-    description: '',
+    description: 'Edit collection details',
+    robots: 'noindex, nofollow',
     title: 'Edit Collection',
   };
 }

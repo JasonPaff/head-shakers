@@ -13,6 +13,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -58,6 +59,9 @@ export const createSubCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created subcollection: ${newSubcollection.name}`,
       });
+
+      // invalidate metadata cache for the new subcollection
+      invalidateMetadataCache('subcollection', newSubcollection.id);
 
       // Fetch collection slug for cache revalidation
       const collection = await dbInstance.query.collections.findFirst({
@@ -169,6 +173,9 @@ export const deleteSubCollectionAction = authActionClient
         message: `Deleted subcollection: ${deletedSubcollection.name}`,
       });
 
+      // invalidate metadata cache for the deleted subcollection
+      invalidateMetadataCache('subcollection', subcollectionData.subcollectionId);
+
       return {
         data: null,
         success: true,
@@ -223,6 +230,9 @@ export const updateSubCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Updated subcollection: ${updatedSubcollection.name}`,
       });
+
+      // invalidate metadata cache for the updated subcollection
+      invalidateMetadataCache('subcollection', subcollectionData.subcollectionId);
 
       return {
         data: updatedSubcollection,

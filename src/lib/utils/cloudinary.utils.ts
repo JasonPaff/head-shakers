@@ -5,6 +5,11 @@
 
 import * as Sentry from '@sentry/nextjs';
 
+import { IMAGE_DIMENSIONS } from '@/lib/seo/seo.constants';
+
+const CLOUDINARY_CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+const DEFAULT_SOCIAL_IMAGE = '/images/og-default.jpg';
+
 /**
  * Extracts the file format/extension from a Cloudinary URL
  *
@@ -101,5 +106,122 @@ export function extractPublicIdFromCloudinaryUrl(url: string): string {
       level: 'warning',
     });
     return url;
+  }
+}
+
+/**
+ * Generates an optimized Open Graph image URL for social sharing
+ *
+ * Creates a Cloudinary URL with transformations optimized for Open Graph
+ * (Facebook, LinkedIn, etc.) using 1200x630 dimensions.
+ *
+ * @param publicId - The Cloudinary public ID of the image
+ * @returns Optimized Cloudinary URL or default social image if publicId is invalid
+ *
+ * @example
+ * generateOpenGraphImageUrl('bobbleheads/item-123')
+ * // returns: "https://res.cloudinary.com/demo/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/bobbleheads/item-123"
+ */
+export function generateOpenGraphImageUrl(publicId: string): string {
+  try {
+    if (!publicId || !CLOUDINARY_CLOUD_NAME) {
+      return DEFAULT_SOCIAL_IMAGE;
+    }
+
+    const { height, width } = IMAGE_DIMENSIONS.openGraph;
+    const transformations = `c_fill,w_${width},h_${height},f_auto,q_auto`;
+
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${transformations}/${publicId}`;
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { operation: 'generate-og-image-url', publicId },
+      level: 'warning',
+    });
+    return DEFAULT_SOCIAL_IMAGE;
+  }
+}
+
+/**
+ * Generates an optimized social sharing image URL based on platform
+ *
+ * Creates a Cloudinary URL with platform-specific transformations.
+ * Supports Open Graph (og), Twitter (twitter), and default dimensions.
+ *
+ * @param publicId - The Cloudinary public ID of the image
+ * @param platform - The target social media platform ('og', 'twitter', or 'default')
+ * @returns Optimized Cloudinary URL or default social image if publicId is invalid
+ *
+ * @example
+ * generateSocialImageUrl('bobbleheads/item-123', 'og')
+ * // returns: "https://res.cloudinary.com/demo/image/upload/c_fill,w_1200,h_630,f_auto,q_auto/bobbleheads/item-123"
+ *
+ * @example
+ * generateSocialImageUrl('bobbleheads/item-123', 'twitter')
+ * // returns: "https://res.cloudinary.com/demo/image/upload/c_fill,w_800,h_418,f_auto,q_auto/bobbleheads/item-123"
+ */
+export function generateSocialImageUrl(
+  publicId: string,
+  platform: 'default' | 'og' | 'twitter' = 'default',
+): string {
+  try {
+    if (!publicId || !CLOUDINARY_CLOUD_NAME) {
+      return DEFAULT_SOCIAL_IMAGE;
+    }
+
+    // Select appropriate dimensions based on platform
+    let dimensions;
+    switch (platform) {
+      case 'og':
+        dimensions = IMAGE_DIMENSIONS.openGraph;
+        break;
+      case 'twitter':
+        dimensions = IMAGE_DIMENSIONS.twitter;
+        break;
+      default:
+        dimensions = IMAGE_DIMENSIONS.default;
+    }
+
+    const { height, width } = dimensions;
+    const transformations = `c_fill,w_${width},h_${height},f_auto,q_auto`;
+
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${transformations}/${publicId}`;
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { operation: 'generate-social-image-url', platform, publicId },
+      level: 'warning',
+    });
+    return DEFAULT_SOCIAL_IMAGE;
+  }
+}
+
+/**
+ * Generates an optimized Twitter Card image URL for social sharing
+ *
+ * Creates a Cloudinary URL with transformations optimized for Twitter/X
+ * large image cards using 800x418 dimensions.
+ *
+ * @param publicId - The Cloudinary public ID of the image
+ * @returns Optimized Cloudinary URL or default social image if publicId is invalid
+ *
+ * @example
+ * generateTwitterCardImageUrl('bobbleheads/item-123')
+ * // returns: "https://res.cloudinary.com/demo/image/upload/c_fill,w_800,h_418,f_auto,q_auto/bobbleheads/item-123"
+ */
+export function generateTwitterCardImageUrl(publicId: string): string {
+  try {
+    if (!publicId || !CLOUDINARY_CLOUD_NAME) {
+      return DEFAULT_SOCIAL_IMAGE;
+    }
+
+    const { height, width } = IMAGE_DIMENSIONS.twitter;
+    const transformations = `c_fill,w_${width},h_${height},f_auto,q_auto`;
+
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${transformations}/${publicId}`;
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { operation: 'generate-twitter-image-url', publicId },
+      level: 'warning',
+    });
+    return DEFAULT_SOCIAL_IMAGE;
   }
 }

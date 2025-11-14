@@ -59,7 +59,8 @@ export default function AdminPage() {
 
 export function generateMetadata(): Metadata {
   return {
-    description: '',
+    description: 'Admin dashboard for content moderation and site management',
+    robots: 'noindex, nofollow',
     title: 'Admin',
   };
 }

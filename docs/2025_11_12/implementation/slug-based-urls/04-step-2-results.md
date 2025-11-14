@@ -8,6 +8,7 @@
 ## Subagent Input
 
 Delegated to general-purpose subagent to:
+
 - Create new file `src/lib/constants/slug.ts`
 - Implement `SLUG_MAX_LENGTH` constant
 - Implement `SLUG_MIN_LENGTH` constant
@@ -18,6 +19,7 @@ Delegated to general-purpose subagent to:
 ## Subagent Output
 
 ### Files Created
+
 - `src/lib/constants/slug.ts` - Complete slug constants with validation rules and reserved words
 
 ### Constants Defined
@@ -28,9 +30,10 @@ Delegated to general-purpose subagent to:
 4. **SLUG_RESERVED_WORDS**: Comprehensive list of 73 reserved words
 
 **Reserved Words Categories**:
+
 - Authentication routes (auth, login, signup, etc.)
 - API routes (api, graphql, webhook, etc.)
-- Next.js protected routes (_next, public, static)
+- Next.js protected routes (\_next, public, static)
 - CRUD operations (new, edit, delete, etc.)
 - Application routes (dashboard, profile, settings, etc.)
 - Legal routes (terms, privacy, cookies, etc.)

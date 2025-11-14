@@ -17,6 +17,7 @@ import {
   collections,
   subCollections,
   tags,
+  users,
 } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -404,6 +405,72 @@ export class BobbleheadsQuery extends BaseQuery {
     }
 
     return query;
+  }
+
+  /**
+   * get bobblehead metadata for SEO and social sharing
+   * returns minimal fields needed for metadata generation with owner info
+   */
+  static async getBobbleheadMetadata(
+    slug: string,
+    context: QueryContext,
+  ): Promise<null | {
+    category: null | string;
+    createdAt: Date;
+    description: null | string;
+    name: string;
+    owner: {
+      displayName: string;
+      username: string;
+    };
+    primaryImage: null | string;
+    slug: string;
+  }> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        category: bobbleheads.category,
+        createdAt: bobbleheads.createdAt,
+        description: bobbleheads.description,
+        name: bobbleheads.name,
+        ownerDisplayName: users.displayName,
+        ownerUsername: users.username,
+        primaryImage: bobbleheadPhotos.url,
+        slug: bobbleheads.slug,
+      })
+      .from(bobbleheads)
+      .innerJoin(users, eq(bobbleheads.userId, users.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.slug, slug),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+        ),
+      )
+      .limit(1);
+
+    if (!result[0]) {
+      return null;
+    }
+
+    const row = result[0];
+
+    return {
+      category: row.category,
+      createdAt: row.createdAt,
+      description: row.description,
+      name: row.name,
+      owner: {
+        displayName: row.ownerDisplayName,
+        username: row.ownerUsername,
+      },
+      primaryImage: row.primaryImage,
+      slug: row.slug,
+    };
   }
 
   /**

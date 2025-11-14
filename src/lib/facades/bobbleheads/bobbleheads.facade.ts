@@ -455,6 +455,51 @@ export class BobbleheadsFacade {
   }
 
   /**
+   * get bobblehead metadata for SEO and social sharing
+   * returns minimal bobblehead information optimized for metadata generation
+   *
+   * Cache invalidation triggers:
+   * - Bobblehead updates (name, description, category)
+   * - Primary image changes
+   * - Owner profile updates
+   *
+   * @param slug - Bobblehead's unique slug
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Bobblehead metadata or null if not found
+   */
+  static async getBobbleheadSeoMetadata(
+    slug: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | {
+    category: null | string;
+    createdAt: Date;
+    description: null | string;
+    name: string;
+    owner: {
+      displayName: string;
+      username: string;
+    };
+    primaryImage: null | string;
+    slug: string;
+  }> {
+    return CacheService.bobbleheads.byId(
+      () => {
+        const context = createPublicQueryContext({ dbInstance });
+        return BobbleheadsQuery.getBobbleheadMetadata(slug, context);
+      },
+      slug,
+      {
+        context: {
+          entityType: 'bobblehead',
+          facade: 'BobbleheadsFacade',
+          operation: 'getSeoMetadata',
+        },
+        ttl: 1800, // 30 minutes - balance between freshness and performance
+      },
+    );
+  }
+
+  /**
    * Get view count for a bobblehead
    */
   static async getBobbleheadViewCountAsync(

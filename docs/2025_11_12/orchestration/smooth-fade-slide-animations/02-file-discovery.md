@@ -45,6 +45,7 @@ Return your analysis with file paths, priorities, and detailed reasoning for eac
 ## Discovered Files Summary
 
 ### Statistics
+
 - **Total Files Discovered**: 32 files
 - **Critical Priority**: 3 files
 - **High Priority**: 14 files
@@ -73,6 +74,7 @@ Return your analysis with file paths, priorities, and detailed reasoning for eac
 ### High Priority Files (14)
 
 **UI Components (Animation Targets)**
+
 1. **C:\Users\JasonPaff\dev\head-shakers\src\components\ui\card.tsx**
    - Primary candidate for fade-in/slide-up animations
    - Used extensively for content display
@@ -89,10 +91,10 @@ Return your analysis with file paths, priorities, and detailed reasoning for eac
    - Uses animate-pulse for loading states
    - Should coordinate with content fade-in
 
-**Feature Components (List Rendering)**
-5. **C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-gallery-card.tsx**
-   - Perfect candidate for cascade animations in grids
-   - 420-line component with hover transitions
+**Feature Components (List Rendering)** 5. **C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-gallery-card.tsx**
+
+- Perfect candidate for cascade animations in grids
+- 420-line component with hover transitions
 
 6. **C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\collection-card.tsx**
    - Primary target for cascade in dashboard grid
@@ -110,10 +112,7 @@ Return your analysis with file paths, priorities, and detailed reasoning for eac
    - Comments should cascade animate when loaded
    - List mapping at lines 54-66
 
-**Page Components (Initial Load Targets)**
-10. **C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\featured\page.tsx**
-    - Page sections should fade in on initial load
-    - Uses Suspense boundaries
+**Page Components (Initial Load Targets)** 10. **C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\featured\page.tsx** - Page sections should fade in on initial load - Uses Suspense boundaries
 
 11. **C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\featured\components\display\featured-hero-display.tsx**
     - Hero cards should animate with cascade
@@ -134,15 +133,18 @@ Return your analysis with file paths, priorities, and detailed reasoning for eac
 ### Medium Priority Files (11)
 
 **Layout Components**
+
 - content-layout.tsx - Content wrapper with responsive padding
 - page-content.tsx - Page-level container
 
 **Tab Content Components**
+
 - collections-tab-content.tsx - Collections grid rendering
 - bobbleheads-tab-content.tsx - Bobbleheads grid rendering
 - featured-content-display.tsx - Featured content tabs
 
 **Supporting UI Components**
+
 - popover.tsx - Should have consistent overlay animations
 - tooltip.tsx - Subtle fade animations
 - tabs.tsx - Tab switching transitions
@@ -191,22 +193,26 @@ Return your analysis with file paths, priorities, and detailed reasoning for eac
 ### Architecture Analysis
 
 **Server vs Client Component Considerations**:
+
 - Many grid/list components are server components
 - Animation logic must be in client components
 - Server components delegate rendering to client components
 
 **Suspense Boundary Handling**:
+
 - Pages use Suspense for async content loading
 - Animations should trigger after Suspense resolves
 - Should not conflict with skeleton display
 
 **Performance Considerations**:
+
 - Large grids (20+ items) with cascade animations
 - Should use CSS animations over JavaScript
 - Intersection Observer for viewport-triggered animations
 - Consider reduced complexity on mobile
 
 **Accessibility Requirements**:
+
 - Must respect prefers-reduced-motion media query
 - Ensure animations don't interfere with screen readers
 

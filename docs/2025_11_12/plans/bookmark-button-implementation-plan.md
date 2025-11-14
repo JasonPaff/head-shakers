@@ -20,6 +20,7 @@
 ## File Discovery Results
 
 ### Critical Priority (New Files - 9)
+
 1. `src/lib/db/schema/bookmarks.schema.ts` - Bookmarks table schema
 2. `src/lib/actions/bookmarks/bookmarks.actions.ts` - Server actions (toggleBookmark)
 3. `src/lib/validations/bookmark.validation.ts` - Zod validation schemas
@@ -31,6 +32,7 @@
 9. `src/app/(app)/dashboard/bookmarks/route-type.ts` - Type-safe routing
 
 ### High Priority (Modifications - 11)
+
 1. `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/page.tsx` - Detail page integration
 2. `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/bobblehead-header.tsx` - Add bookmark button
 3. `src/app/(app)/bobbleheads/[bobbleheadId]/(bobblehead)/components/async/bobblehead-header-async.tsx` - Add bookmark data fetching
@@ -44,6 +46,7 @@
 11. `src/lib/constants/cache.ts` - Add bookmark cache keys
 
 ### Medium Priority (Supporting - 6)
+
 1. `src/lib/services/cache-revalidation.service.ts` - Bookmark cache invalidation
 2. `src/lib/utils/cache-tags.utils.ts` - Bookmark cache tag generators
 3. `src/lib/db/schema/relations.schema.ts` - Bookmark relations
@@ -52,6 +55,7 @@
 6. `src/app/(app)/dashboard/collection/(collection)/components/dashboard-tabs.tsx` - Add bookmarks tab
 
 ### Reference Files (Pattern Templates - 7)
+
 1. `src/lib/db/schema/social.schema.ts` - Blueprint for bookmarks table
 2. `src/lib/actions/social.actions.ts` - Template for toggleBookmark
 3. `src/lib/validations/like.validation.ts` - Validation pattern
@@ -61,6 +65,7 @@
 7. `src/components/ui/like-button.tsx` - Button pattern
 
 ### Test Files (New - 5)
+
 1. `tests/lib/actions/bookmarks/bookmarks.actions.test.ts`
 2. `tests/lib/queries/bookmarks/bookmarks.query.test.ts`
 3. `tests/lib/facades/bookmarks/bookmarks.facade.test.ts`
@@ -101,13 +106,16 @@ Implement a one-click bookmark feature allowing authenticated users to save bobb
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\bookmarks.schema.ts` - Bookmarks table schema following social.schema.ts pattern
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\index.ts` - Export bookmarks schema
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\db\schema\relations.schema.ts` - Add bookmark relations to users and bobbleheads
 
 **Changes:**
+
 - Create bookmarks table with id, userId, bobbleheadId, createdAt fields
 - Add unique composite index on userId and bobbleheadId
 - Add foreign key constraints with cascade delete
@@ -115,11 +123,13 @@ Implement a one-click bookmark feature allowing authenticated users to save bobb
 - Define one-to-many relations from users and bobbleheads to bookmarks
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bookmarks schema matches Drizzle ORM patterns
 - [ ] Schema exports properly in index.ts
 - [ ] Relations defined in relations.schema.ts
@@ -134,19 +144,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\db\migrations\[timestamp]_create_bookmarks_table.sql` - Auto-generated migration file
 
 **Changes:**
+
 - Run `npm run db:generate` to generate migration from schema
 - Run `npm run db:migrate` to apply migration to development database
 - Verify migration success in Neon dashboard
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate && npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file generated successfully
 - [ ] Migration applied to development database
 - [ ] Bookmarks table exists with correct schema
@@ -161,19 +175,23 @@ npm run db:generate && npm run db:migrate
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\bookmark.validation.ts` - Zod schemas for bookmark operations
 
 **Changes:**
+
 - Create toggleBookmarkSchema with bobbleheadId validation
 - Follow pattern from like.validation.ts
 - Use cuid validation for bobbleheadId
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Validation schema properly typed
 - [ ] Schema follows project validation patterns
 - [ ] All validation commands pass
@@ -187,9 +205,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\bookmarks\bookmarks.query.ts` - Query class extending BaseQuery
 
 **Changes:**
+
 - Create BookmarksQuery class extending BaseQuery
 - Implement isBookmarkedByUser method
 - Implement getUserBookmarks method with pagination
@@ -197,11 +217,13 @@ npm run lint:fix && npm run typecheck
 - Follow pattern from social.query.ts methods
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] BookmarksQuery class properly extends BaseQuery
 - [ ] All query methods properly typed with Drizzle ORM
 - [ ] Methods follow existing query patterns
@@ -216,9 +238,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\bookmarks\bookmarks.facade.ts` - Facade handling bookmark business logic
 
 **Changes:**
+
 - Create BookmarksFacade class
 - Implement toggleBookmark method with transaction support
 - Handle bookmark creation and deletion logic
@@ -226,11 +250,13 @@ npm run lint:fix && npm run typecheck
 - Follow pattern from social.facade.ts toggleLike method
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade properly encapsulates business logic
 - [ ] Transaction handling implemented correctly
 - [ ] Error handling follows project patterns
@@ -245,6 +271,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\enums.ts` - Add BOOKMARK enum
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\defaults.ts` - Add IS_BOOKMARKED default (false)
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\action-names.ts` - Add BOOKMARKS.TOGGLE action name
@@ -254,6 +281,7 @@ npm run lint:fix && npm run typecheck
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\cache.ts` - Add bookmark cache key patterns
 
 **Changes:**
+
 - Add BOOKMARK to enums
 - Add IS_BOOKMARKED: false to defaults
 - Add BOOKMARKS.TOGGLE to action names
@@ -263,11 +291,13 @@ npm run lint:fix && npm run typecheck
 - Add cache key generators for bookmarks
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All bookmark constants added
 - [ ] Constants follow existing naming conventions
 - [ ] All validation commands pass
@@ -281,21 +311,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\services\cache-revalidation.service.ts` - Add revalidateBookmark method
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\utils\cache-tags.utils.ts` - Add getBookmarkCacheTags function
 
 **Changes:**
+
 - Implement revalidateBookmark method in cache service
 - Invalidate user bookmarks, bobblehead details, and bookmark collection caches
 - Add getBookmarkCacheTags utility function
 - Follow pattern from existing cache revalidation methods
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cache revalidation logic implemented
 - [ ] Cache tag generation follows patterns
 - [ ] All validation commands pass
@@ -309,9 +343,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\bookmarks\bookmarks.actions.ts` - Server action using authActionClient
 
 **Changes:**
+
 - Create toggleBookmarkAction using authActionClient
 - Validate input with toggleBookmarkSchema
 - Call BookmarksFacade.toggleBookmark
@@ -320,11 +356,13 @@ npm run lint:fix && npm run typecheck
 - Follow pattern from social.actions.ts toggleLike
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action properly uses authActionClient
 - [ ] Input validation with Zod schema
 - [ ] Cache revalidation called after mutation
@@ -340,9 +378,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\hooks\use-bookmark.tsx` - Custom React hook
 
 **Changes:**
+
 - Create useBookmark hook accepting bobbleheadId and initialIsBookmarked
 - Implement optimistic state updates
 - Handle action execution with toggleBookmarkAction
@@ -351,11 +391,13 @@ npm run lint:fix && npm run typecheck
 - Follow pattern from use-like.tsx
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook properly manages optimistic state
 - [ ] Error handling with rollback implemented
 - [ ] Loading states properly exposed
@@ -370,9 +412,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\bookmark-button.tsx` - Bookmark button component
 
 **Changes:**
+
 - Create BookmarkButton component using Radix UI Button
 - Accept bobbleheadId and initialIsBookmarked props
 - Use useBookmark hook for state management
@@ -383,11 +427,13 @@ npm run lint:fix && npm run typecheck
 - Follow pattern from like-button.tsx
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component properly uses Radix UI and Tailwind
 - [ ] Icon states toggle correctly
 - [ ] Loading states displayed
@@ -403,11 +449,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-header-async.tsx` - Fetch bookmark status
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-header.tsx` - Add bookmark button to header
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\page.tsx` - Pass bookmark data to header
 
 **Changes:**
+
 - Add isBookmarkedByUser query in bobblehead-header-async.tsx
 - Pass isBookmarked prop to BobbleheadHeader component
 - Add BookmarkButton component to header actions section
@@ -415,11 +463,13 @@ npm run lint:fix && npm run typecheck
 - Handle authentication state for bookmark button visibility
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bookmark status fetched on page load
 - [ ] Bookmark button integrated into header
 - [ ] Button positioned appropriately
@@ -435,10 +485,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\bookmarks\page.tsx` - Bookmarks collection page
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\bookmarks\route-type.ts` - Type-safe routing
 
 **Changes:**
+
 - Create server component fetching user bookmarks with pagination
 - Display bookmarked bobbleheads in grid layout
 - Include BookmarkButton for removal functionality
@@ -447,11 +499,13 @@ npm run lint:fix && npm run typecheck
 - Follow pattern from dashboard collection pages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page fetches and displays bookmarks
 - [ ] Pagination implemented if needed
 - [ ] Remove bookmark functionality works
@@ -468,20 +522,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\dashboard-tabs.tsx` - Add bookmarks tab
 
 **Changes:**
+
 - Add Bookmarks tab to dashboard tab list
 - Use Lucide React Bookmark icon
 - Link to /dashboard/bookmarks using $path
 - Position appropriately among existing tabs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bookmarks tab added to navigation
 - [ ] Icon and label display correctly
 - [ ] Link routes to bookmarks page
@@ -497,15 +555,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Run npm run next-typesafe-url to regenerate $path object
 - Verify /dashboard/bookmarks route is included in generated types
 
 **Validation Commands:**
+
 ```bash
 npm run next-typesafe-url && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Type-safe routes regenerated successfully
 - [ ] Bookmarks route available in $path object
 - [ ] No TypeScript errors in routing
@@ -520,9 +581,11 @@ npm run next-typesafe-url && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\tests\lib\queries\bookmarks\bookmarks.query.test.ts` - Query tests using Testcontainers
 
 **Changes:**
+
 - Test isBookmarkedByUser with existing and non-existing bookmarks
 - Test getUserBookmarks with pagination scenarios
 - Test getBookmarkCount method
@@ -530,11 +593,13 @@ npm run next-typesafe-url && npm run typecheck
 - Follow pattern from existing query tests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test tests/lib/queries/bookmarks/bookmarks.query.test.ts
 ```
 
 **Success Criteria:**
+
 - [ ] All query methods tested
 - [ ] Edge cases covered
 - [ ] Tests use Testcontainers properly
@@ -550,9 +615,11 @@ npm run lint:fix && npm run typecheck && npm run test tests/lib/queries/bookmark
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\tests\lib\facades\bookmarks\bookmarks.facade.test.ts` - Facade tests
 
 **Changes:**
+
 - Test toggleBookmark creates bookmark when not bookmarked
 - Test toggleBookmark removes bookmark when bookmarked
 - Test transaction rollback on errors
@@ -560,11 +627,13 @@ npm run lint:fix && npm run typecheck && npm run test tests/lib/queries/bookmark
 - Follow pattern from existing facade tests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test tests/lib/facades/bookmarks/bookmarks.facade.test.ts
 ```
 
 **Success Criteria:**
+
 - [ ] Toggle logic tested both directions
 - [ ] Transaction handling verified
 - [ ] Error scenarios covered
@@ -580,9 +649,11 @@ npm run lint:fix && npm run typecheck && npm run test tests/lib/facades/bookmark
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\tests\lib\actions\bookmarks\bookmarks.actions.test.ts` - Action tests with MSW
 
 **Changes:**
+
 - Test authentication requirement
 - Test input validation with invalid bobbleheadId
 - Test successful bookmark toggle
@@ -591,11 +662,13 @@ npm run lint:fix && npm run typecheck && npm run test tests/lib/facades/bookmark
 - Follow pattern from existing action tests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test tests/lib/actions/bookmarks/bookmarks.actions.test.ts
 ```
 
 **Success Criteria:**
+
 - [ ] Authentication tested
 - [ ] Validation errors handled
 - [ ] Cache revalidation verified
@@ -611,9 +684,11 @@ npm run lint:fix && npm run typecheck && npm run test tests/lib/actions/bookmark
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\tests\hooks\use-bookmark.test.tsx` - Hook tests using Testing Library
 
 **Changes:**
+
 - Test initial state rendering
 - Test optimistic update on toggle
 - Test rollback on action failure
@@ -622,11 +697,13 @@ npm run lint:fix && npm run typecheck && npm run test tests/lib/actions/bookmark
 - Follow pattern from existing hook tests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test tests/hooks/use-bookmark.test.tsx
 ```
 
 **Success Criteria:**
+
 - [ ] Optimistic updates tested
 - [ ] Error rollback verified
 - [ ] Loading states validated
@@ -642,9 +719,11 @@ npm run lint:fix && npm run typecheck && npm run test tests/hooks/use-bookmark.t
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\tests\components\ui\bookmark-button.test.tsx` - Component tests using Testing Library
 
 **Changes:**
+
 - Test component renders with correct icon based on state
 - Test click handler triggers toggle
 - Test loading state disables button
@@ -653,11 +732,13 @@ npm run lint:fix && npm run typecheck && npm run test tests/hooks/use-bookmark.t
 - Follow pattern from existing component tests
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test tests/components/ui/bookmark-button.test.tsx
 ```
 
 **Success Criteria:**
+
 - [ ] Render states tested
 - [ ] Click interactions verified
 - [ ] Accessibility validated
@@ -684,22 +765,26 @@ npm run lint:fix && npm run typecheck && npm run test tests/components/ui/bookma
 ## Notes
 
 ### Assumptions Requiring Confirmation
+
 - Bookmark count display on bobbleheads or user profiles is NOT required (assumed based on feature request)
 - Toast notification system exists or needs to be added for confirmation messages
 - Bookmark icon preference (Bookmark vs Star vs Heart) - using Lucide Bookmark/BookmarkCheck
 
 ### Risk Mitigation
+
 - Follow existing like feature patterns to reduce implementation risk
 - Use optimistic updates to ensure responsive UI even with network latency
 - Implement comprehensive error handling with rollback logic
 - Tag-based cache invalidation prevents stale data issues
 
 ### Performance Considerations
+
 - Add composite index on userId and bobbleheadId for fast bookmark lookups
 - Use pagination for bookmarks collection page if bookmark counts grow large
 - Cache bookmark status on bobblehead detail pages with appropriate invalidation
 
 ### Future Enhancements Not Included
+
 - Bookmark collections or folders for organizing bookmarks
 - Bookmark sharing or collaborative bookmark lists
 - Bookmark export functionality

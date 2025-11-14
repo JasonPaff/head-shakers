@@ -11,9 +11,11 @@
 ## Input Context
 
 ### Refined Feature Request
+
 The application should implement smooth fade-in and slide-up animations with intelligent cascade timing to create a polished user experience across key pages and components, leveraging Tailwind CSS 4's animation capabilities and custom keyframe definitions.
 
 ### File Discovery Summary
+
 - **Total Files**: 32 discovered files
 - **Critical**: 3 files (globals.css, postcss.config.mjs, tailwind-utils.ts)
 - **High**: 14 files (UI components, feature components, page components)
@@ -21,6 +23,7 @@ The application should implement smooth fade-in and slide-up animations with int
 - **Low**: 4 files (utility components)
 
 ### Existing Patterns
+
 - Radix UI data-[state] variant animations
 - Custom keyframe pattern (caret-blink) in globals.css
 - tw-animate-css library already imported
@@ -70,11 +73,13 @@ Generate the complete implementation plan now in MARKDOWN format.
 ## Implementation Plan Summary
 
 ### Overview
+
 - **Duration**: 2-3 days
 - **Complexity**: Medium
 - **Risk Level**: Low
 
 ### Plan Structure
+
 - **12 Implementation Steps**: From keyframe definitions to accessibility testing
 - **Quality Gates**: 10 validation criteria
 - **Format**: ✅ Markdown (as required)
@@ -99,11 +104,13 @@ Generate the complete implementation plan now in MARKDOWN format.
 ### Files Covered
 
 **Critical Files (3)**:
+
 - globals.css - Keyframes and utilities
 - postcss.config.mjs - Configuration validation
 - tailwind-utils.ts - Class merging for animations
 
 **High Priority Files (14)**:
+
 - Card components (card.tsx)
 - Dialog components (dialog.tsx, alert-dialog.tsx)
 - Feature components (bobblehead-gallery-card.tsx, collection-card.tsx)
@@ -111,11 +118,13 @@ Generate the complete implementation plan now in MARKDOWN format.
 - Detail page components (7 bobblehead detail cards)
 
 **Medium Priority Files (11)**:
+
 - Skeleton components (6 files)
 - Async wrappers (3 files)
 - Supporting UI components
 
 **New Files to Create (1)**:
+
 - useAnimationOnView hook for intersection observer-based animations
 
 ## Validation Results
@@ -132,6 +141,7 @@ Generate the complete implementation plan now in MARKDOWN format.
 ## Plan Quality Assessment
 
 ### Strengths
+
 - **Comprehensive**: Covers all discovered files systematically
 - **Well-Structured**: Logical progression from foundation to implementation
 - **Accessibility-First**: Dedicated testing step for motion preferences
@@ -139,12 +149,14 @@ Generate the complete implementation plan now in MARKDOWN format.
 - **Detailed Steps**: Each step has clear what/why/files/changes/validation/success criteria
 
 ### Complexity Analysis
+
 - **Time Estimate**: 2-3 days (reasonable for medium complexity)
 - **Step Count**: 12 steps (well-scoped, not too granular or broad)
 - **Risk Level**: Low (builds on existing patterns, minimal breaking changes)
 - **Confidence**: High for most steps, Medium/Low for performance optimizations
 
 ### Assumptions Requiring Confirmation
+
 1. Animation timing (300-500ms duration, 100-200ms cascade)
 2. All cards should animate by default
 3. Scroll-triggered animations desired for long lists
@@ -153,17 +165,20 @@ Generate the complete implementation plan now in MARKDOWN format.
 ## Notes Section Highlights
 
 **Animation Timing Philosophy**:
+
 - Base duration: 300-500ms
 - Cascade stagger: 100-200ms
 - Maximum cascade: 500-600ms
 - Dialog animations: 200-300ms
 
 **Performance Considerations**:
+
 - CSS animations with hardware acceleration
 - Intersection observer for off-screen content
 - Testing on lower-powered devices
 
 **Browser Compatibility**:
+
 - Tailwind CSS 4 animations (modern browsers)
 - Intersection Observer fallback
 - prefers-reduced-motion support

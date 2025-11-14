@@ -20,11 +20,13 @@ Analyzed the service layer to determine required changes for slug-based lookups.
 ### Key Findings
 
 #### 1. View Tracking Service
+
 - **Status**: No changes needed
 - **Reason**: Uses generic `targetId` parameters that work with both IDs and slugs
 - **Analysis**: The service is identifier-agnostic and works with any string identifier
 
 #### 2. Cache Revalidation Service
+
 - **Status**: No changes needed
 - **Reason**:
   - Uses entity IDs passed from facades/actions
@@ -32,6 +34,7 @@ Analyzed the service layer to determine required changes for slug-based lookups.
   - Internal implementation is ID-agnostic (just passes strings to tag generators)
 
 #### 3. Cache Service
+
 - **Status**: No changes needed
 - **Reason**:
   - Cache keys use IDs internally (`BY_ID`, `BOBBLEHEADS.BY_ID(id)`, etc.)
@@ -40,6 +43,7 @@ Analyzed the service layer to determine required changes for slug-based lookups.
   - Slug-based lookups happen at the query/facade level, not cache level
 
 #### 4. Cache Constants
+
 - **Status**: No changes needed
 - **Reason**: Cache key patterns using IDs are internal implementation details. Services using these keys receive parameters from facades already updated in Step 6.
 
@@ -66,6 +70,7 @@ Services → Operate on whatever identifiers are passed (identifier-agnostic)
 ### Service Layer Responsibilities
 
 Services in this codebase handle:
+
 - **Caching**: Store/retrieve data using keys provided by facades
 - **Revalidation**: Invalidate caches using identifiers from actions
 - **Tracking**: Record analytics events with target identifiers
@@ -80,10 +85,12 @@ One TypeScript error was discovered and fixed during validation:
 **File**: `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
 
 **Issue**: Nullable subcollectionSlug handling
+
 - Complex boolean condition violated ESLint rules
 - Type compatibility issue with null handling
 
 **Fix**:
+
 - Extracted complex condition to named variable `_hasSubcollectionWithSlug`
 - Added proper null handling for subcollectionSlug
 
@@ -92,15 +99,19 @@ One TypeScript error was discovered and fixed during validation:
 ## Validation Results
 
 ### TypeScript Check
+
 ```bash
 npm run typecheck
 ```
+
 **Result**: ✅ PASS - Zero errors
 
 ### ESLint Check
+
 ```bash
 npm run lint:fix
 ```
+
 **Result**: ✅ PASS - All issues resolved
 
 ## Success Criteria
@@ -124,6 +135,7 @@ None - No new service files needed
 Step 14 is complete with **no service layer changes required**. The architecture design means services operate on identifiers passed from higher layers (facades/queries). Previous steps (6, 7, 13) already updated the layers that interact with services.
 
 All slug-based routing and lookups are handled at:
+
 - Query layer (Step 6)
 - Facade layer (Step 6)
 - Action layer (Step 7)

@@ -93,6 +93,41 @@ export class UsersFacade {
   }
 
   /**
+   * get user metadata for SEO and social sharing
+   * returns minimal user information optimized for metadata generation
+   *
+   * Cache invalidation triggers:
+   * - User profile updates (display name, bio, avatar)
+   * - Username changes
+   *
+   * @param username - User's unique username
+   * @param dbInstance - Optional database instance for transactions
+   * @returns User metadata or null if user not found
+   */
+  static async getUserSeoMetadata(
+    username: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | {
+    avatarUrl: null | string;
+    bio: null | string;
+    displayName: string;
+    id: string;
+    username: string;
+  }> {
+    return CacheService.users.profile(
+      () => {
+        const context = createPublicQueryContext({ dbInstance });
+        return UsersQuery.getUserMetadata(username, context);
+      },
+      username,
+      {
+        context: { entityType: 'user', facade: 'UsersFacade', operation: 'getSeoMetadata' },
+        ttl: 3600, // 1 hour - user profiles are relatively stable
+      },
+    );
+  }
+
+  /**
    * check if username is available (not taken and not reserved)
    * optionally exclude a specific user (for username changes)
    */

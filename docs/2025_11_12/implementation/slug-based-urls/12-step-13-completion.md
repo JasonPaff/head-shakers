@@ -11,6 +11,7 @@ Successfully completed Step 13 of the slug-based URLs implementation plan, updat
 ## Final Results
 
 ### Error Resolution Timeline
+
 - **Initial errors**: 87 TypeScript errors
 - **After previous work**: 23 errors (74% reduction)
 - **Final state**: 0 errors (100% complete)
@@ -18,37 +19,49 @@ Successfully completed Step 13 of the slug-based URLs implementation plan, updat
 ### Files Modified in Final Push
 
 #### 1. Null Handling Fix (1 error fixed)
+
 **File**: `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`
+
 - **Issue**: `currentUserId` was `string | null` but facade expected `string | undefined`
 - **Fix**: Added nullish coalescing operator: `currentUserId ?? undefined`
 - **Result**: Type compatibility resolved
 
 #### 2. Action Response Access (6 errors fixed)
+
 **File**: `src/app/(app)/bobbleheads/add/components/add-item-form-client.tsx`
+
 - **Issue**: Accessing `data.collectionSlug` instead of `data.data.collectionSlug`
 - **Fix**: Updated all access patterns to use nested `data.data` structure
 - **Result**: Proper access to action return values
 
 #### 3. Type Definition Update (1 error fixed)
+
 **File**: `src/lib/queries/collections/collections.query.ts`
+
 - **Issue**: `CollectionWithRelations` type missing `slug` field in `subCollections` array
 - **Fix**: Added `slug: string` to subcollections type definition
 - **Result**: Type accurately reflects database schema
 
 #### 4. Query SELECT Statement (1 error fixed)
+
 **File**: `src/lib/queries/collections/collections.query.ts` (line 869-878)
+
 - **Issue**: Query not selecting `slug` column from subcollections
 - **Fix**: Added `slug: true` to columns selection
 - **Result**: Query now returns slug field
 
 #### 5. Facade Type Compatibility (2 errors fixed)
+
 **File**: `src/lib/facades/collections/subcollections.facade.ts`
+
 - **Issue**: Return type expected non-nullable slugs but query returned nullable
 - **Fix**: Updated return type to match query reality (`null | string`)
 - **Result**: Type compatibility between query and facade
 
 #### 6. Component Props Type (2 errors fixed)
+
 **File**: `src/components/feature/bobblehead/bobblehead-gallery-card.tsx`
+
 - **Issue**: Component expected `collectionSlug: string` but received `null | string`
 - **Fix**:
   - Updated interface to accept `collectionSlug: null | string`
@@ -56,7 +69,9 @@ Successfully completed Step 13 of the slug-based URLs implementation plan, updat
 - **Result**: Type-safe component props with runtime safety
 
 #### 7. ESLint Compliance (1 error fixed)
+
 **File**: `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
+
 - **Issue**: Complex boolean condition in JSX (`_hasSubcollection && bobblehead.subcollectionSlug`)
 - **Fix**: Extracted to descriptive variable `_hasSubcollectionWithSlug`
 - **Result**: Improved code readability and ESLint compliance
@@ -64,31 +79,39 @@ Successfully completed Step 13 of the slug-based URLs implementation plan, updat
 ## Validation Results
 
 ### TypeScript Check
+
 ```bash
 npm run typecheck
 ```
+
 **Result**: ✅ PASS - Zero errors
 
 ### ESLint Check
+
 ```bash
 npm run lint:fix
 ```
+
 **Result**: ✅ PASS - All issues resolved
 
 ## Changes Summary
 
 ### Type Safety Improvements
+
 1. **Nullable Type Handling**: Properly handled `null | string` types for slugs in contexts where they may not exist
 2. **Non-null Assertions**: Used assertions strategically where context guarantees non-null values (e.g., within subcollection pages)
 3. **Type Definitions**: Updated type definitions to match actual query return types
 
 ### Code Quality
+
 - Extracted complex boolean conditions to named variables
 - Followed React coding conventions for readable code
 - Maintained type safety throughout the codebase
 
 ### Navigation Updates
+
 All navigation links now use slug-based routing:
+
 - Bobblehead detail pages: `/bobbleheads/[bobbleheadSlug]`
 - Collection pages: `/collections/[collectionSlug]`
 - Subcollection pages: `/collections/[collectionSlug]/subcollection/[subcollectionSlug]`
@@ -98,6 +121,7 @@ All navigation links now use slug-based routing:
 The following components and files were updated throughout Step 13 (including previous batches):
 
 ### Component $path() Updates (16+ files)
+
 1. Bobblehead share menu
 2. Collection share menu
 3. Subcollection share menu
@@ -116,6 +140,7 @@ The following components and files were updated throughout Step 13 (including pr
 16. Admin trending content table
 
 ### Query and Type Updates (5+ files)
+
 1. Collections query - slug selection
 2. Bobbleheads query - navigation slugs
 3. Subcollections query - slug fields
@@ -125,13 +150,17 @@ The following components and files were updated throughout Step 13 (including pr
 ## Architecture Decisions
 
 ### Why Nullable Slugs?
+
 While slugs should never be null in a proper database state, we maintain nullable types at the query level because:
+
 1. **Database Reality**: Drizzle ORM infers types from schema where slugs can technically be null during migrations
 2. **Type Safety**: Better to handle null cases than assume non-null and risk runtime errors
 3. **Context-Specific Safety**: Use non-null assertions in contexts where slugs are guaranteed (e.g., subcollection detail pages)
 
 ### Non-null Assertions
+
 Used sparingly and only where:
+
 - The context guarantees the value exists (e.g., viewing a subcollection page means the subcollection and collection exist)
 - Alternative would be defensive rendering that never triggers in practice
 - Type system can't infer the context-specific guarantee
@@ -139,6 +168,7 @@ Used sparingly and only where:
 ## Next Steps
 
 Step 13 is now complete with:
+
 - ✅ Zero TypeScript errors
 - ✅ All ESLint issues resolved
 - ✅ All component navigation using slug-based URLs

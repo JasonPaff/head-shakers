@@ -19,6 +19,7 @@ import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade'
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
+import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
@@ -189,6 +190,9 @@ export const createBobbleheadWithPhotosAction = authActionClient
         message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
       });
 
+      // invalidate metadata cache for the new bobblehead
+      invalidateMetadataCache('bobblehead', newBobblehead.id);
+
       CacheRevalidationService.bobbleheads.onCreate(
         newBobblehead.id,
         userId,
@@ -267,6 +271,9 @@ export const deleteBobbleheadAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted bobblehead: ${deletedBobblehead.name} with Cloudinary photo cleanup`,
       });
+
+      // invalidate metadata cache for the deleted bobblehead
+      invalidateMetadataCache('bobblehead', bobbleheadData.bobbleheadId);
 
       CacheRevalidationService.bobbleheads.onDelete(
         bobbleheadData.bobbleheadId,
@@ -456,6 +463,9 @@ export const updateBobbleheadWithPhotosAction = authActionClient
         message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos and ${updatedTags.length} tags`,
       });
 
+      // invalidate metadata cache for the updated bobblehead
+      invalidateMetadataCache('bobblehead', updatedBobblehead.id);
+
       CacheRevalidationService.bobbleheads.onUpdate(
         updatedBobblehead.id,
         userId,
@@ -547,6 +557,9 @@ export const deleteBobbleheadPhotoAction = authActionClient
         message: `Deleted photo ${deletedPhoto.id} from bobblehead ${photoData.bobbleheadId}`,
       });
 
+      // invalidate metadata cache for the bobblehead (photo change affects metadata)
+      invalidateMetadataCache('bobblehead', photoData.bobbleheadId);
+
       CacheRevalidationService.bobbleheads.onPhotoChange(photoData.bobbleheadId, userId, 'delete');
 
       return {
@@ -607,6 +620,9 @@ export const reorderBobbleheadPhotosAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Reordered ${updatedPhotos.length} photos for bobblehead ${reorderData.bobbleheadId}`,
       });
+
+      // invalidate metadata cache for the bobblehead (photo order affects metadata)
+      invalidateMetadataCache('bobblehead', reorderData.bobbleheadId);
 
       CacheRevalidationService.bobbleheads.onPhotoChange(reorderData.bobbleheadId, userId, 'reorder');
 

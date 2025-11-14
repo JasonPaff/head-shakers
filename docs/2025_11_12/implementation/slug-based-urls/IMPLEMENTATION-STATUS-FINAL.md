@@ -13,6 +13,7 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ### ✅ What's Complete (Steps 1-10 + Infrastructure Fixes)
 
 **Foundation (Steps 1-7)**:
+
 - ✅ Slug generation utilities (generateSlug, ensureUniqueSlug, validateSlug)
 - ✅ Slug constants (SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN, 73 reserved words)
 - ✅ Database schema updated (slug columns added to all three tables)
@@ -22,11 +23,13 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 - ✅ Facades (slug generation with collision handling, all scoped correctly)
 
 **Breaking Changes (Steps 8-10)**:
+
 - ✅ Server actions (no changes needed - facades handle slug logic)
 - ✅ Route type definitions (bobbleheadSlug, collectionSlug, subcollectionSlug)
 - ✅ **BREAKING**: Directory renames ([id] → [slug] for all routes)
 
 **Infrastructure Fixes**:
+
 - ✅ SubcollectionsFacade.getSubcollectionBySlug method created
 - ✅ Search result types include slug fields (all 3 entities)
 - ✅ Search queries select slug column (8 queries updated)
@@ -35,6 +38,7 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ### ⚠️ In Progress (Steps 11-13)
 
 **Step 11: Page Components** - 2/7 complete
+
 - ✅ Bobblehead detail page
 - ✅ Collection detail page
 - ❌ Bobblehead edit page
@@ -44,6 +48,7 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 **Step 12: Layouts** - ✅ Complete (no layouts found)
 
 **Step 13: Component $path() Calls** - 0/50+ complete
+
 - Systematic updates needed across entire codebase
 - Pattern: `/bobbleheads/[bobbleheadId]` → `/bobbleheads/[bobbleheadSlug]`
 - 87 TypeScript errors guiding what needs updating
@@ -63,16 +68,19 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ## Detailed Completion Status
 
 ### Step 1: Slug Generation Utilities ✅ COMPLETE
+
 **Status**: Production Ready
 **Files Created**: `src/lib/utils/slug.ts`
 
 **Functions Implemented**:
+
 - `generateSlug(name: string): string` - URL-safe slug generation
 - `ensureUniqueSlug(baseSlug: string, existingSlugs: string[]): string` - Collision handling
 - `validateSlug(slug: string): boolean` - Format validation
 - `SLUG_PATTERN` - Regex constant
 
 **Features**:
+
 - Unicode normalization (NFD)
 - Diacritic removal
 - Special character handling
@@ -84,19 +92,22 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 2: Slug Constants ✅ COMPLETE
+
 **Status**: Production Ready
 **Files Created**: `src/lib/constants/slug.ts`
 
 **Constants Defined**:
+
 - `SLUG_MAX_LENGTH`: 150 characters
 - `SLUG_MIN_LENGTH`: 1 character
 - `SLUG_PATTERN`: `/^[a-z0-9]+(?:-[a-z0-9]+)*$/`
 - `SLUG_RESERVED_WORDS`: 73 words
 
 **Reserved Word Categories**:
+
 - Authentication (auth, login, signup, etc.)
 - API (api, graphql, webhook, etc.)
-- Next.js (_next, public, static)
+- Next.js (\_next, public, static)
 - CRUD (new, edit, delete, create, update)
 - Application (dashboard, profile, settings, etc.)
 - Legal (terms, privacy, cookies, etc.)
@@ -110,20 +121,24 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 3: Database Schema ✅ COMPLETE
+
 **Status**: Applied to Database
 **Files Modified**: 2 schema files
 
 **Changes**:
+
 - Bobbleheads: `slug VARCHAR(100) NOT NULL UNIQUE` + index
 - Collections: `slug VARCHAR(100) NOT NULL` + composite unique (userId, slug) + index
 - Subcollections: `slug VARCHAR(100) NOT NULL` + composite unique (collectionId, slug) + index
 
 **Constraints**:
+
 - `bobbleheads_slug_unique` - Global uniqueness
 - `collections_user_slug_unique` - User-scoped uniqueness
 - `sub_collections_collection_slug_unique` - Collection-scoped uniqueness
 
 **Indexes**:
+
 - `bobbleheads_slug_idx`
 - `collections_slug_idx`
 - `sub_collections_slug_idx`
@@ -133,21 +148,25 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 4: Database Migration ✅ COMPLETE
+
 **Status**: Applied to Development Database
 **Database**: head-shakers (branch: br-dark-forest-adf48tll)
 
 **Migration Results**:
+
 - Tables modified: 3 (bobbleheads, collections, subcollections)
 - Records updated: 12/12 (100%)
 - Constraints created: 3 unique indexes
 - Indexes created: 4 (3 slug indexes + 1 composite)
 
 **Data Population**:
+
 - All 6 bobbleheads have unique slugs
 - All 2 collections have user-scoped slugs
 - All 4 subcollections have collection-scoped slugs
 
 **Documentation**: Generated in `docs/2025_11_12/database/`
+
 - MIGRATION_COMPLETE.md
 - migration-log.md
 - migration-summary.md
@@ -158,15 +177,18 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 5: Validation Schemas ✅ COMPLETE
+
 **Status**: Production Ready
 **Files Modified**: 3 validation files
 
 **Schemas Updated**:
+
 - `bobbleheads.validation.ts` - getBobbleheadBySlugSchema
 - `collections.validation.ts` - getCollectionBySlugSchema
 - `subcollections.validation.ts` - getSubcollectionBySlugSchema
 
 **Features**:
+
 - Slug pattern validation using SLUG_PATTERN
 - Length constraints (min/max)
 - Type-safe Zod schemas
@@ -177,24 +199,29 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 6: Database Queries ✅ COMPLETE
+
 **Status**: Production Ready
 **Files Modified**: 3 query files
 
 **Methods Created**:
 
 **Bobbleheads**:
+
 - `findBySlugAsync(slug: string, context?)` - Global slug lookup
 - `findBySlugWithRelationsAsync(slug: string, context?)` - With relations
 
 **Collections**:
+
 - `findBySlugAsync(userId: string, slug: string, context?)` - User-scoped lookup
 - `findBySlugWithRelationsAsync(userId: string, slug: string, context?)` - With relations
 
 **Subcollections**:
+
 - `findBySlugAsync(collectionSlug: string, subcollectionSlug: string, userId: string, context?)` - Collection-scoped lookup
 - Two-step query: collection → subcollection
 
 **Features**:
+
 - Proper scoping (global, user-scoped, collection-scoped)
 - Drizzle ORM patterns
 - Context support for transactions
@@ -205,29 +232,34 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 7: Facades ✅ COMPLETE
+
 **Status**: Production Ready
 **Files Modified**: 3 facade files
 
 **Methods Updated/Created**:
 
 **Bobbleheads Facade**:
+
 - `createAsync` - Generates slug with global collision check
 - `getBobbleheadBySlug(slug: string, viewerUserId?, dbInstance?)`
 - `getBobbleheadBySlugWithRelations(slug: string, viewerUserId?, dbInstance?)`
 - `updateAsync` - Regenerates slug if name changes
 
 **Collections Facade**:
+
 - `createAsync` - Generates slug with user-scoped collision check
 - `getCollectionBySlug(userId: string, slug: string, viewerUserId?, dbInstance?)`
 - `getCollectionBySlugWithRelations(userId: string, slug: string, viewerUserId?, dbInstance?)`
 - `updateAsync` - Regenerates slug if name changes
 
 **Subcollections Facade**:
+
 - `createAsync` - Generates slug with collection-scoped collision check
 - `getSubcollectionBySlug(collectionSlug: string, subcollectionSlug: string, userId: string, viewerUserId?, dbInstance?)`
 - `updateAsync` - Regenerates slug if name changes
 
 **Slug Generation Flow**:
+
 1. `generateSlug(entityName)` → base slug
 2. Query existing slugs (with proper scoping)
 3. `ensureUniqueSlug(baseSlug, existingSlugs)` → unique slug
@@ -238,9 +270,11 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 8: Server Actions ✅ COMPLETE
+
 **Status**: No Changes Needed
 
 **Analysis**:
+
 - Reviewed all action files (bobbleheads, collections, subcollections)
 - Actions delegate to facades which handle slug-based operations
 - Return types include slug fields from database
@@ -251,16 +285,19 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 9: Route Type Definitions ✅ COMPLETE
+
 **Status**: Applied and Regenerated
 **Files Modified**: 4 route-type.ts files
 
 **Routes Updated**:
+
 - `/bobbleheads/[bobbleheadId]` → `/bobbleheads/[bobbleheadSlug]`
 - `/collections/[collectionId]` → `/collections/[collectionSlug]`
 - `/collections/[collectionId]/subcollection/[subcollectionId]` → `/collections/[collectionSlug]/subcollection/[subcollectionSlug]`
 - Edit routes also updated
 
 **Validation**:
+
 - Added SLUG_PATTERN regex validation
 - Added SLUG_MIN_LENGTH and SLUG_MAX_LENGTH constraints
 - Ran `npm run next-typesafe-url` successfully
@@ -272,15 +309,18 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Step 10: Rename Route Directories ✅ COMPLETE (BREAKING CHANGE)
+
 **Status**: BREAKING CHANGES APPLIED
 **Directories Renamed**: 3
 
 **Changes**:
+
 - `[bobbleheadId]` → `[bobbleheadSlug]` (107 files affected)
 - `[collectionId]` → `[collectionSlug]` (multiple nested routes)
 - `[subcollectionId]` → `[subcollectionSlug]` (multiple files)
 
 **Impact**:
+
 - ❌ All UUID-based URLs now broken (by design)
 - ❌ Existing bookmarks will not work
 - ❌ External links will break
@@ -293,21 +333,25 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ---
 
 ### Infrastructure Fixes ✅ COMPLETE
+
 **Status**: All Critical Gaps Filled
 
 **Fix 1: Subcollection Slug Methods**:
+
 - Created `SubcollectionsQuery.findBySlugAsync(collectionSlug, subcollectionSlug, userId, context)`
 - Created `SubcollectionsFacade.getSubcollectionBySlug(collectionSlug, subcollectionSlug, userId, viewerUserId?, dbInstance?)`
 - Two-step lookup: collection by slug → subcollection by slug
 - Properly scoped to user's collections
 
 **Fix 2: Search Result Types**:
+
 - Added `slug: string` to BobbleheadSearchResult
 - Added `slug: string` to CollectionSearchResult
 - Added `slug: string` and `collectionSlug: string` to SubcollectionSearchResult
 - Updated all 8 search queries to select slug column
 
 **Fix 3: Seed Script**:
+
 - Added `import { generateSlug } from '@/lib/utils/slug'`
 - Generate slugs for all 8 bobbleheads
 - Generate slugs for all 8 collections
@@ -321,6 +365,7 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ## Current State Summary
 
 ### What's Working ✅
+
 1. **Database**: Fully migrated with slug columns and constraints
 2. **Utilities**: Slug generation, validation, and collision handling
 3. **Queries**: Slug-based lookups for all entities
@@ -330,6 +375,7 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 7. **Seed Data**: Test database can be seeded with slugs
 
 ### What Needs Work ⚠️
+
 1. **Component Navigation**: 50+ components still using ID-based $path() calls
 2. **Page Components**: 5 page files need slug parameter updates
 3. **Browse Queries**: Some queries need slug in SELECT statements
@@ -341,6 +387,7 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ## TypeScript Error Analysis
 
 ### Current Errors: 87
+
 **Error Categories**:
 
 1. **Component $path() Calls** (~50-60 errors):
@@ -378,16 +425,19 @@ Successfully completed the **foundation and breaking changes** for slug-based UR
 ## Implementation Architecture
 
 ### Orchestrator + Subagent Pattern
+
 - **Main Orchestrator**: Coordination, todo management, logging
 - **Step Subagents**: Fresh context per step, actual implementation
 - **Benefits**: Scalable to 20-step plans, no context overflow, better isolation
 
 ### Slug Scoping Strategy
+
 - **Bobbleheads**: Global scope (all unique)
 - **Collections**: User-scoped (unique per user)
 - **Subcollections**: Collection-scoped (unique per collection)
 
 ### URL Structure
+
 ```
 Before: /bobbleheads/{uuid}
 After:  /bobbleheads/{slug}
@@ -404,20 +454,24 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 ## Remaining Work Breakdown
 
 ### High Priority (Steps 11-13)
+
 **Estimated Time**: 6-8 hours
 
 **Step 11: Page Components** (2-3 hours):
+
 - 5 remaining pages (edit, settings, share)
 - Update params interfaces
 - Update data fetching to use slug-based methods
 
 **Step 13: Component Updates** (4-5 hours):
+
 - 50+ component files
 - Systematic find-and-replace for $path() calls
 - Pattern: `[id]` → `[slug]`, `{ id: }` → `{ slug: }`
 - Ensure all objects have slug property
 
 ### Medium Priority (Steps 14-19)
+
 **Estimated Time**: 4-6 hours
 
 - Step 14: Services and utilities
@@ -428,6 +482,7 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 - Step 19: Remove ID-based references
 
 ### Testing & Validation (Step 20)
+
 **Estimated Time**: 2-4 hours
 
 - Comprehensive end-to-end testing
@@ -444,6 +499,7 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 ## Quality Gates Status
 
 ### Foundation Quality Gates ✅ PASS
+
 - [✓] Slug utilities tested and working
 - [✓] Database migration successful
 - [✓] Validation schemas enforced
@@ -451,6 +507,7 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 - [✓] Facade slug generation complete
 
 ### Application Quality Gates ⏳ PENDING
+
 - [ ] All TypeScript errors resolved
 - [ ] All routes properly configured
 - [ ] All $path() calls use slug-based URLs
@@ -465,11 +522,13 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 ## Risk Assessment
 
 ### Completed Work: LOW RISK ✅
+
 - Solid foundation following established patterns
 - Database migration verified and applied
 - All core infrastructure production-ready
 
 ### Remaining Work: MEDIUM RISK ⚠️
+
 - Component updates are extensive but straightforward
 - Systematic find-and-replace patterns reduce risk
 - TypeScript errors guide what needs updating
@@ -480,6 +539,7 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 ## Recommendations
 
 ### Next Steps
+
 1. **Complete component updates systematically**:
    - Create comprehensive list of all components with $path() calls
    - Batch update by category (cards, menus, headers, etc.)
@@ -500,6 +560,7 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
    - Verify SEO-friendly slug URLs
 
 ### User Communication
+
 - Document URL structure change for users
 - Consider 404 page with helpful messaging
 - Update any documentation referencing old URLs
@@ -509,6 +570,7 @@ After:  /collections/{username}/{collection-slug}/subcollection/{subcollection-s
 ## Documentation Generated
 
 ### Implementation Logs
+
 Location: `docs/2025_11_12/implementation/slug-based-urls/`
 
 1. `00-implementation-index.md` - Navigation and overview
@@ -526,6 +588,7 @@ Location: `docs/2025_11_12/implementation/slug-based-urls/`
 13. `IMPLEMENTATION-STATUS-FINAL.md` - This document
 
 ### Database Documentation
+
 Location: `docs/2025_11_12/database/`
 
 1. `MIGRATION_COMPLETE.md` - Migration summary

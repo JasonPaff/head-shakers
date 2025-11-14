@@ -75,4 +75,35 @@ export class UsersQuery extends BaseQuery {
 
     return result[0] || null;
   }
+
+  /**
+   * get user metadata for SEO and social sharing
+   * returns minimal fields needed for metadata generation
+   */
+  static async getUserMetadata(
+    username: string,
+    context: QueryContext,
+  ): Promise<null | {
+    avatarUrl: null | string;
+    bio: null | string;
+    displayName: string;
+    id: string;
+    username: string;
+  }> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        avatarUrl: users.avatarUrl,
+        bio: users.bio,
+        displayName: users.displayName,
+        id: users.id,
+        username: users.username,
+      })
+      .from(users)
+      .where(eq(users.username, username))
+      .limit(1);
+
+    return result[0] || null;
+  }
 }

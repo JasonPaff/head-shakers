@@ -12,6 +12,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import { AblyProvider } from '@/components/layout/ably-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 
 const geistSans = Geist({
   subsets: ['latin'],
@@ -24,11 +25,43 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  description: `A specialized platform for bobblehead collectors to showcase, track, and manage their collections. 
-                The site prioritizes collection display and management over social features, with robust 
-                tracking capabilities, real-time interactions, and community engagement through collection 
-                showcases and commenting.`,
-  title: { default: 'Dashboard', template: '%s | Head Shakers' },
+  description: FALLBACK_METADATA.description,
+  manifest: '/manifest.json',
+  metadataBase: new URL(DEFAULT_SITE_METADATA.url),
+  openGraph: {
+    description: FALLBACK_METADATA.description,
+    locale: DEFAULT_SITE_METADATA.locale,
+    siteName: DEFAULT_SITE_METADATA.siteName,
+    title: DEFAULT_SITE_METADATA.title,
+    type: DEFAULT_SITE_METADATA.ogType,
+    url: DEFAULT_SITE_METADATA.url,
+  },
+  robots: 'index, follow',
+  themeColor: '#000000',
+  title: { default: DEFAULT_SITE_METADATA.title, template: '%s | Head Shakers' },
+  twitter: {
+    card: DEFAULT_SITE_METADATA.twitterCard,
+    creator: DEFAULT_SITE_METADATA.twitterHandle,
+    site: DEFAULT_SITE_METADATA.twitterHandle,
+  },
+  verification: {
+    ...(process.env.GOOGLE_SITE_VERIFICATION && {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
+    }),
+    ...(process.env.BING_SITE_VERIFICATION && {
+      other: {
+        'msvalidate.01': process.env.BING_SITE_VERIFICATION,
+      },
+    }),
+  },
+
+  viewport: {
+    initialScale: 1,
+    maximumScale: 5,
+    // eslint-disable-next-line react-snob/require-boolean-prefix-is
+    userScalable: true,
+    width: 'device-width',
+  },
 };
 
 type RootLayoutProps = RequiredChildren;

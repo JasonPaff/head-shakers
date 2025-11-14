@@ -32,12 +32,15 @@ Implement smooth, accessible fade-in and slide-up animations across the Head Sha
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\globals.css` - Add custom keyframes and utility classes for fade-in, slide-up, and cascade animations
 
 **Changes:**
+
 - Add keyframe definitions for fade-in animation with opacity transitions
 - Add keyframe definitions for slide-up animation with transform and opacity
 - Add keyframe definitions for fade-slide-up combining both effects
@@ -47,11 +50,13 @@ Implement smooth, accessible fade-in and slide-up animations across the Head Sha
 - Create stagger delay utilities for list item cascades
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Keyframes are defined for fade-in, slide-up, and combined animations
 - [ ] Utility classes are created for various durations and delays
 - [ ] Motion-safe variants are properly configured
@@ -66,12 +71,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\card.tsx` - Add optional animation props and classes
 
 **Changes:**
+
 - Add optional isAnimated boolean prop to Card component with default false
 - Add optional animationDelay prop for cascade effects
 - Apply motion-safe fade-slide-up animation classes when isAnimated is true
@@ -79,11 +87,13 @@ npm run lint:fix && npm run typecheck
 - Ensure animations trigger on mount without requiring state changes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Card component accepts isAnimated and animationDelay props
 - [ ] Animation classes are conditionally applied based on props
 - [ ] TypeScript types are properly defined for new props
@@ -98,13 +108,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\dialog.tsx` - Replace existing animation classes with new unified system
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\alert-dialog.tsx` - Apply consistent animation patterns
 
 **Changes:**
+
 - Replace data-state animation classes in DialogContent with new fade-slide-up keyframes
 - Update animation timing to use 300ms duration for smoother feel
 - Ensure DialogOverlay uses consistent fade-in animation
@@ -113,11 +126,13 @@ npm run lint:fix && npm run typecheck
 - Maintain existing zoom animations but ensure timing consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog animations use new unified keyframes
 - [ ] Animation timing is consistent across all dialog types
 - [ ] Motion-safe variants are applied
@@ -133,12 +148,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-gallery-card.tsx` - Add animation support using updated Card component
 
 **Changes:**
+
 - Add isAnimated prop set to true when rendering Card
 - Calculate and apply animationDelay based on card index in parent grid
 - Ensure animations trigger on initial render
@@ -146,11 +164,13 @@ npm run lint:fix && npm run typecheck
 - Test that animations do not interfere with photo gallery modal opening
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cards animate on initial page load
 - [ ] Cascade timing creates staggered effect
 - [ ] Existing hover effects are preserved
@@ -166,13 +186,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\collection-card.tsx` - Add animation support
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\collections-tab-content.tsx` - Pass animation index to cards
 
 **Changes:**
+
 - Update CollectionCard to accept isAnimated and animationDelay props
 - Apply animation props to root Card component
 - Modify collections-tab-content.tsx to pass card index for cascade calculation
@@ -180,11 +203,13 @@ npm run lint:fix && npm run typecheck
 - Ensure animations work with collapsible subcollections section
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Collection cards animate with cascade effect
 - [ ] Stagger timing feels natural (not too slow or fast)
 - [ ] Animation props flow correctly from parent to child
@@ -200,12 +225,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\browse\featured\components\display\featured-hero-display.tsx` - Add animation support to featured cards
 
 **Changes:**
+
 - Update renderFeaturedCard function to accept animation index parameter
 - Apply motion-safe fade-slide-up classes to Card components in renderFeaturedCard
 - Calculate animation delay based on card position (hero banner first, then collection of week)
@@ -214,11 +242,13 @@ npm run lint:fix && npm run typecheck
 - Maintain responsive grid layout without animation interference
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Featured cards animate smoothly on page load
 - [ ] Hero banner animates before collection of week cards
 - [ ] Stagger timing feels appropriate for content hierarchy
@@ -234,9 +264,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-feature-card.tsx` - Add animation support
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-details-card.tsx` - Add animation support
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-specification-card.tsx` - Add animation support
@@ -246,6 +278,7 @@ npm run lint:fix && npm run typecheck
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\bobblehead-timestamps-card.tsx` - Add animation support
 
 **Changes:**
+
 - Add motion-safe animation classes directly to Card components in each file
 - Use fixed animation delays based on typical card display order (feature: 0ms, details: 100ms, specs: 200ms, acquisition: 300ms, custom: 400ms, status: 500ms, timestamps: 600ms)
 - Ensure animations do not interfere with server component rendering
@@ -253,11 +286,13 @@ npm run lint:fix && npm run typecheck
 - Consider using CSS-based animations to avoid hydration issues with server components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Detail cards animate in logical sequence top to bottom
 - [ ] Animation timing feels smooth and not rushed
 - [ ] Server component rendering is not affected
@@ -273,14 +308,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-feature-card-async.tsx` - Add animation coordination
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-detail-cards-async.tsx` - Add animation coordination
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\async\bobblehead-secondary-cards-async.tsx` - Add animation coordination
 
 **Changes:**
+
 - Wrap async component containers with motion-safe animation wrapper classes
 - Ensure animation classes are applied to parent containers that hold multiple cards
 - Pass appropriate animation delay props to child components
@@ -288,11 +326,13 @@ npm run lint:fix && npm run typecheck
 - Handle loading states without triggering animations during skeleton to content transitions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Animations trigger after async content loads
 - [ ] No animation flicker during skeleton to content transition
 - [ ] Cascade timing flows naturally across async boundaries
@@ -308,12 +348,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\hooks\use-animation-on-view.ts` - Custom hook for intersection observer-based animations
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create custom hook that uses Intersection Observer API
 - Accept threshold, root margin, and animation class parameters
 - Return ref to attach to animated element and isVisible state
@@ -323,11 +366,13 @@ npm run lint:fix && npm run typecheck
 - Include error handling for browsers without Intersection Observer support
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hook properly implements Intersection Observer
 - [ ] Motion preferences are respected
 - [ ] Memory leaks are prevented with proper cleanup
@@ -344,12 +389,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - Identify parent components that render long lists of cards (to be determined during implementation based on performance testing)
 
 **Changes:**
+
 - Apply use-animation-on-view hook to list item wrappers in identified components
 - Set appropriate intersection observer thresholds (10% visibility recommended)
 - Configure root margin to trigger animations slightly before items enter viewport
@@ -358,11 +406,13 @@ npm run lint:fix && npm run typecheck
 - Add fallback for initial viewport items to animate immediately without intersection
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Scroll-triggered animations activate at appropriate viewport positions
 - [ ] No performance degradation on pages with many items
 - [ ] Initial viewport items animate immediately on page load
@@ -378,9 +428,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\skeletons\bobblehead-feature-card-skeleton.tsx` - Add fade-out capability
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\skeletons\bobblehead-detail-cards-skeleton.tsx` - Add fade-out capability
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\bobbleheads\[bobbleheadId]\(bobblehead)\components\skeletons\bobblehead-secondary-cards-skeleton.tsx` - Add fade-out capability
@@ -389,6 +441,7 @@ npm run lint:fix && npm run typecheck
 - `C:\Users\JasonPaff\dev\head-shakers\src\app\(app)\dashboard\collection\(collection)\components\skeletons\collection-card-skeleton.tsx` - Add fade-out capability
 
 **Changes:**
+
 - Add optional isExiting prop to skeleton components with default false
 - Apply fade-out animation class when isExiting is true
 - Set fade-out duration to 200ms for quick exit
@@ -397,11 +450,13 @@ npm run lint:fix && npm run typecheck
 - Consider using React Suspense boundaries for automatic transition coordination
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton components can fade out smoothly
 - [ ] Content animations trigger as skeletons exit
 - [ ] No visual gap between skeleton exit and content entrance
@@ -417,12 +472,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - Review all modified component files to ensure motion-safe classes are correctly applied
 
 **Changes:**
+
 - Verify all animations use motion-safe variants that respect prefers-reduced-motion
 - Test with browser developer tools forcing prefers-reduced-motion media query
 - Ensure reduced motion mode shows content immediately without animations
@@ -432,11 +490,13 @@ npm run lint:fix && npm run typecheck
 - Validate screen reader announcements are not delayed by animations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All animations respect prefers-reduced-motion setting
 - [ ] Content is immediately visible with reduced motion enabled
 - [ ] Focus management works correctly during animations
@@ -462,23 +522,27 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Animation Timing Philosophy:**
+
 - Base duration: 300-500ms for most animations (feels smooth without being slow)
 - Cascade stagger: 100-200ms between items (creates rhythm without excessive delay)
 - Maximum total cascade time: 500-600ms (prevents users waiting too long for content)
 - Dialog animations: 200-300ms (quick but noticeable)
 
 **Performance Considerations:**
+
 - Use CSS animations and transforms for hardware acceleration
 - Prefer opacity and transform properties over layout-affecting properties
 - Consider intersection observer for long lists to prevent animating off-screen content
 - Test on lower-powered devices to ensure smooth performance
 
 **Browser Compatibility:**
+
 - Tailwind CSS 4 animations work in all modern browsers
 - Intersection Observer has fallback for older browsers in custom hook
 - prefers-reduced-motion is supported in all modern browsers with graceful fallback
 
 **Assumptions Requiring User Confirmation:**
+
 - Assumption: 300-500ms duration is appropriate for card animations (user may prefer faster/slower)
 - Assumption: 100-200ms cascade stagger creates desired effect (may need adjustment based on visual design preferences)
 - Assumption: All cards should animate by default (user may want to enable selectively)
@@ -491,25 +555,30 @@ npm run lint:fix && npm run typecheck
 ### Total Files Discovered: 32
 
 **Critical Priority (3 files)**:
+
 - globals.css - Primary CSS configuration
 - postcss.config.mjs - PostCSS configuration
 - tailwind-utils.ts - Class merging utility
 
 **High Priority (14 files)**:
+
 - UI Components: card.tsx, dialog.tsx, alert-dialog.tsx, skeleton.tsx
 - Feature Components: bobblehead-gallery-card.tsx, collection-card.tsx, search-result-item.tsx, comment-list.tsx
 - Page Components: featured page, hero display, collection detail, dashboard
 - Tab Content: collections-tab-content.tsx, bobbleheads-tab-content.tsx
 
 **Medium Priority (11 files)**:
+
 - Layout components: content-layout.tsx, page-content.tsx
 - Supporting UI: popover.tsx, tooltip.tsx, tabs.tsx, dropdown-menu.tsx, select.tsx, navigation-menu.tsx
 - Featured content display components
 
 **Low Priority (4 files)**:
+
 - hover-card.tsx, conditional.tsx, and other utility components
 
 ### Existing Animation Patterns:
+
 - Radix UI data-[state] variants in dialog components
 - Custom keyframe (caret-blink) in globals.css
 - tw-animate-css library imported

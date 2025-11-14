@@ -14,16 +14,63 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
+import { generateBreadcrumbSchema, generatePersonSchema } from '@/lib/seo/jsonld.utils';
+import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
+import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
+import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
 import { checkIsOwner } from '@/utils/optional-auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
 
-export function generateMetadata(): Metadata {
-  return {
-    description: 'User profile page',
-    title: 'User Profile',
-  };
+export async function generateMetadata({ routeParams }: UserPageProps): Promise<Metadata> {
+  const { userId } = await routeParams;
+
+  // Fetch user data
+  const user = await UsersFacade.getUserByClerkId(userId);
+
+  // Handle user not found
+  if (!user) {
+    return {
+      description: 'User not found',
+      robots: 'noindex, nofollow',
+      title: 'User Not Found | Head Shakers',
+    };
+  }
+
+  // Generate canonical URL for this user profile
+  const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/[userId]', routeParams: { userId } })}`;
+
+  // Prepare profile image URL for social sharing
+  let profileImage: string = FALLBACK_METADATA.imageUrl;
+
+  if (user.avatarUrl) {
+    // Extract Cloudinary public ID from avatar URL and optimize for Open Graph
+    const publicId = extractPublicIdFromCloudinaryUrl(user.avatarUrl);
+    profileImage = generateOpenGraphImageUrl(publicId);
+  }
+
+  // Use bio as description or fallback to a default
+  const description =
+    user.bio || `${user.displayName}'s profile on Head Shakers - Bobblehead Collection Platform`;
+
+  // Generate page metadata with OG and Twitter cards
+  return generatePageMetadata(
+    'profile',
+    {
+      description,
+      images: [profileImage],
+      title: user.displayName,
+      url: canonicalUrl,
+      userId: user.id,
+    },
+    {
+      isPublic: true,
+      shouldIncludeOpenGraph: true,
+      shouldIncludeTwitterCard: true,
+      shouldUseTitleTemplate: true,
+    },
+  );
 }
 
 async function UserPage({ routeParams }: UserPageProps) {
@@ -39,8 +86,37 @@ async function UserPage({ routeParams }: UserPageProps) {
   // Check if current user is viewing their own profile
   const isOwner = await checkIsOwner(user.id);
 
+  // Generate canonical URL for JSON-LD schemas
+  const profileUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/[userId]', routeParams: { userId } })}`;
+
+  // Generate Person schema for user profile
+  const personSchema = generatePersonSchema({
+    description: user.bio || undefined,
+    image: user.avatarUrl || undefined,
+    name: user.displayName,
+    url: profileUrl,
+    userId: user.id,
+  });
+
+  // Generate Breadcrumb schema for navigation context
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: DEFAULT_SITE_METADATA.url },
+    { name: 'Users', url: `${DEFAULT_SITE_METADATA.url}/users` },
+    { name: user.displayName }, // Current page - no URL
+  ]);
+
   return (
     <ViewTracker targetId={userId} targetType={'profile'}>
+      {/* JSON-LD structured data */}
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(personSchema) }}
+        type={'application/ld+json'}
+      />
+      <script
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbSchema) }}
+        type={'application/ld+json'}
+      />
+
       <div className={'py-8'}>
         <ContentLayout>
           <div className={'mx-auto max-w-4xl'}>

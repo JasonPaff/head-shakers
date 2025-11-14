@@ -966,6 +966,55 @@ export class CollectionsFacade {
   }
 
   /**
+   * get collection metadata for SEO and social sharing
+   * returns minimal collection information optimized for metadata generation
+   *
+   * Cache invalidation triggers:
+   * - Collection updates (name, description, cover image)
+   * - Bobblehead count changes (items added/removed)
+   * - Owner profile updates
+   * - Visibility changes (public/private)
+   *
+   * @param slug - Collection's unique slug
+   * @param userId - Owner's user ID
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Collection metadata or null if not found
+   */
+  static async getCollectionSeoMetadata(
+    slug: string,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | {
+    coverImage: null | string;
+    description: null | string;
+    isPublic: boolean;
+    itemCount: number;
+    name: string;
+    owner: {
+      displayName: string;
+      username: string;
+    };
+    slug: string;
+  }> {
+    return CacheService.collections.byId(
+      () => {
+        const context = createPublicQueryContext({ dbInstance });
+        return CollectionsQuery.getCollectionMetadata(slug, userId, context);
+      },
+      `${userId}:${slug}`,
+      {
+        context: {
+          entityType: 'collection',
+          facade: 'CollectionsFacade',
+          operation: 'getSeoMetadata',
+          userId,
+        },
+        ttl: 1800, // 30 minutes - balance between freshness and performance
+      },
+    );
+  }
+
+  /**
    * Get the view count for a collection
    */
   static async getCollectionViewCountAsync(

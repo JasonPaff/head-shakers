@@ -6,7 +6,8 @@ export default function EditItemPage() {
 
 export function generateMetadata(): Metadata {
   return {
-    description: '',
-    title: 'Edit Item',
+    description: 'Edit bobblehead details',
+    robots: 'noindex, nofollow',
+    title: 'Edit Bobblehead',
   };
 }

@@ -13,6 +13,7 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
@@ -59,6 +60,9 @@ export const createCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Created collection: ${newCollection.name}`,
       });
+
+      // invalidate metadata cache for the new collection
+      invalidateMetadataCache('collection', newCollection.id);
 
       CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
 
@@ -130,6 +134,9 @@ export const updateCollectionAction = authActionClient
         );
       }
 
+      // invalidate metadata cache for the updated collection
+      invalidateMetadataCache('collection', collectionData.collectionId);
+
       CacheRevalidationService.collections.onUpdate(collectionData.collectionId, ctx.userId);
 
       return {
@@ -182,6 +189,9 @@ export const deleteCollectionAction = authActionClient
         level: SENTRY_LEVELS.INFO,
         message: `Deleted collection: ${deletedCollection.name}`,
       });
+
+      // invalidate metadata cache for the deleted collection
+      invalidateMetadataCache('collection', collectionData.collectionId);
 
       CacheRevalidationService.collections.onDelete(collectionData.collectionId, ctx.userId);
 

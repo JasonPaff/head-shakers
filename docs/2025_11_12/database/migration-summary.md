@@ -18,18 +18,21 @@ Successfully implemented slug-based routing support across the bobbleheads, coll
 ### Tables Modified: 3
 
 #### 1. Bobbleheads (6 records)
+
 - **Change**: Added UNIQUE constraint to existing slug column
 - **Records Affected**: 6
 - **Constraint**: Global uniqueness (`bobbleheads_slug_unique`)
 - **Status**: All records already had slug values (100% complete)
 
 #### 2. Collections (2 records)
+
 - **Change**: Populated NULL slug values, added composite UNIQUE constraint
 - **Records Updated**: 2 (from NULL to generated values)
 - **Constraint**: User-scoped uniqueness (`collections_user_slug_unique`)
 - **Index**: `collections_slug_idx` (already existed)
 
 #### 3. Sub Collections (4 records)
+
 - **Change**: Added new slug column, populated all records, added composite UNIQUE constraint and index
 - **Records Created**: 4 (new slug values)
 - **Constraint**: Collection-scoped uniqueness (`sub_collections_collection_slug_unique`)
@@ -59,11 +62,11 @@ sub_collections
 
 ### Index Structure
 
-| Table | Index Name | Columns | Type | Size |
-|-------|-----------|---------|------|------|
-| bobbleheads | bobbleheads_slug_idx | (slug) | BTREE | 16 kB |
-| collections | collections_slug_idx | (slug) | BTREE | 16 kB |
-| sub_collections | sub_collections_slug_idx | (slug) | BTREE | 16 kB |
+| Table           | Index Name                             | Columns               | Type   | Size  |
+| --------------- | -------------------------------------- | --------------------- | ------ | ----- |
+| bobbleheads     | bobbleheads_slug_idx                   | (slug)                | BTREE  | 16 kB |
+| collections     | collections_slug_idx                   | (slug)                | BTREE  | 16 kB |
+| sub_collections | sub_collections_slug_idx               | (slug)                | BTREE  | 16 kB |
 | sub_collections | sub_collections_collection_slug_unique | (collection_id, slug) | UNIQUE | 16 kB |
 
 ---
@@ -87,6 +90,7 @@ bobbleheads         6               6                   100%
 ## SQL Statements Executed
 
 ### Transaction Block
+
 All statements executed in a single transaction for consistency:
 
 ```sql
@@ -104,15 +108,18 @@ All statements executed in a single transaction for consistency:
 ## Performance Impact
 
 ### Index Performance
+
 - All slug columns are indexed for O(log n) lookup performance
 - Composite indexes support efficient filtered queries by (collection_id, slug) or (user_id, slug)
 
 ### Storage Impact
+
 - Sub Collections table: +16 kB for new slug column
 - Total index size: 152 kB (sub_collections)
 - Minimal storage overhead for production
 
 ### Query Optimization
+
 - Slug-based lookups will now use index instead of full table scans
 - Composite constraints prevent duplicate slugs within scope
 - Hash index planning benefits from clustered lookups
@@ -122,6 +129,7 @@ All statements executed in a single transaction for consistency:
 ## Slug Generation Algorithm
 
 ### Logic
+
 ```python
 def generate_slug(name: str, id: UUID) -> str:
     """Generate URL-safe slug from name and UUID"""
@@ -131,10 +139,12 @@ def generate_slug(name: str, id: UUID) -> str:
 ```
 
 ### Examples
+
 - "My Collection" + UUID(a1b2c3d4...) → "my-collection-a1b2c3d4"
 - "Sports Figures" + UUID(e5f6g7h8...) → "sports-figures-e5f6g7h8"
 
 ### Benefits
+
 - Descriptive and human-readable
 - Includes partial UUID for collision avoidance
 - URL-safe (lowercase alphanumeric + hyphens only)
@@ -147,18 +157,21 @@ def generate_slug(name: str, id: UUID) -> str:
 ### Column Definitions
 
 **bobbleheads.slug**
+
 - Type: varchar(100)
 - Nullable: true (existing)
 - Default: NULL
 - Constraint: UNIQUE
 
 **collections.slug**
+
 - Type: varchar(100)
 - Nullable: true (existing)
 - Default: NULL
 - Constraint: UNIQUE (user_id, slug)
 
 **sub_collections.slug** (NEW)
+
 - Type: varchar(100)
 - Nullable: false
 - Default: 'temp'
@@ -205,12 +218,14 @@ Status: NOT NEEDED - Migration completed successfully.
 This migration completes Phase 2 of: `docs/2025_11_12/plans/slug-based-urls-implementation-plan.md`
 
 ### Completed Components
+
 - Database schema modifications
 - Index creation and optimization
 - Constraint implementation
 - Data population and verification
 
 ### Remaining Tasks
+
 - Application-level slug handling
 - API endpoint implementation
 - URL routing integration
@@ -221,6 +236,7 @@ This migration completes Phase 2 of: `docs/2025_11_12/plans/slug-based-urls-impl
 ## Testing Notes
 
 Development environment ready for testing:
+
 - Branch: `br-dark-forest-adf48tll` (development)
 - Database: `head-shakers` on Neon
 - All slug columns populated and indexed

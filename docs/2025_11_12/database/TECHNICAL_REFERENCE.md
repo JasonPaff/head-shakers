@@ -33,11 +33,13 @@ Index:          bobbleheads_slug_idx (BTREE)
 ```
 
 **Properties**:
+
 - Global uniqueness across all bobbleheads
 - Each bobblehead has one distinct, shareable URL slug
 - Descriptive and human-readable identifier
 
 **Storage**: VARCHAR(100) supports slugs up to 100 characters
+
 - Typical slug: 15-40 characters
 - Reserve capacity for long names
 
@@ -55,12 +57,14 @@ Index:          collections_slug_idx (BTREE)
 ```
 
 **Properties**:
+
 - Unique per user (composite constraint)
 - Users can have collections named "My Collection"
 - Same slug name reusable across different users
 - Primary key for user-specific collection URLs
 
 **Scope**: (user_id, slug) uniqueness ensures:
+
 - User A: "my-collection-a1b2" is unique
 - User B: Can also have "my-collection-x9y8" without conflict
 
@@ -80,12 +84,14 @@ Indexes:
 ```
 
 **Properties**:
+
 - Unique per collection (composite constraint)
 - NOT NULL to ensure all records have slugs
 - Sub-collections scoped within a collection
 - Cannot have duplicate slugs within same collection
 
 **Scope**: (collection_id, slug) uniqueness ensures:
+
 - Collection A: "vintage-items-x1y2" is unique
 - Collection B: Can also have "vintage-items-z9w8" without conflict
 
@@ -151,6 +157,7 @@ CONSTRAINT "bobbleheads_slug_unique" UNIQUE("slug")
 ```
 
 **Rule**: Each bobblehead must have a unique slug
+
 - Prevents duplicate URLs
 - Enables direct slug-based lookup
 - Example: `/bobbleheads/super-saiyan-a1b2c3d4`
@@ -166,11 +173,13 @@ CONSTRAINT "collections_user_slug_unique" UNIQUE("user_id", "slug")
 ```
 
 **Rule**: Slugs unique per user, but reusable across users
+
 - User A can have `"my-collection-a1b2"`
 - User B can also have `"my-collection-x9y8"`
 - User A cannot have duplicate `"my-collection-a1b2"` (different slug)
 
 **Enforcement**: PostgreSQL enforces at INSERT/UPDATE
+
 - Checks both user_id AND slug together
 - NULL handling: If user_id is NULL, constraint is ignored (per SQL standard)
 
@@ -183,11 +192,13 @@ CONSTRAINT "sub_collections_collection_slug_unique" UNIQUE("collection_id", "slu
 ```
 
 **Rule**: Slugs unique per collection, but reusable across collections
+
 - Collection A can have `"vintage-items-x1y2"`
 - Collection B can also have `"vintage-items-z9w8"`
 - Collection A cannot have duplicate `"vintage-items-x1y2"` (different slug)
 
 **Enforcement**: PostgreSQL enforces at INSERT/UPDATE
+
 - Hierarchical scoping prevents conflicts in URL routing
 - Example: `/user/collection-a/vintage-items-x1y2`
 
@@ -203,6 +214,7 @@ ON public.bobbleheads USING BTREE ("slug");
 ```
 
 **Properties**:
+
 - Type: BTREE (standard for string searches)
 - Column: slug (VARCHAR(100))
 - Size: ~16 kB
@@ -219,6 +231,7 @@ ON public.collections USING BTREE ("slug");
 ```
 
 **Properties**:
+
 - Type: BTREE
 - Column: slug (VARCHAR(100))
 - Size: ~16 kB
@@ -235,6 +248,7 @@ ON public.sub_collections USING BTREE ("slug");
 ```
 
 **Properties**:
+
 - Type: BTREE
 - Column: slug (VARCHAR(100))
 - Size: ~16 kB
@@ -251,6 +265,7 @@ ON public.sub_collections USING BTREE ("collection_id", "slug");
 ```
 
 **Properties**:
+
 - Type: UNIQUE BTREE
 - Columns: (collection_id, slug) composite
 - Size: ~16 kB
@@ -309,11 +324,13 @@ Output: "cafe-collection-p7q8r9s0"
 ### Behavior
 
 **URL-Safe Characters**:
+
 - Lowercase letters (a-z)
 - Numbers (0-9)
 - Hyphens (-)
 
 **Transformed Characters**:
+
 - Spaces → Hyphens
 - Underscores → Hyphens
 - Accented characters → Base character
@@ -321,6 +338,7 @@ Output: "cafe-collection-p7q8r9s0"
 - Consecutive hyphens → Single hyphen
 
 **UUID Inclusion**:
+
 - First 8 characters of UUID appended
 - Provides collision prevention
 - Makes slug more unique while staying readable
@@ -398,16 +416,19 @@ WHERE user_id = $1 AND slug = $2;
 ### Index Performance
 
 **Single Column Lookups**:
+
 - Query: `WHERE slug = 'value'`
 - Complexity: O(log n)
 - Estimated Rows: 1
 
 **Composite Lookups**:
+
 - Query: `WHERE collection_id = X AND slug = 'Y'`
 - Complexity: O(log n) with pre-filtered collection_id
 - Estimated Rows: 1 (enforced by constraint)
 
 **Full Table Scans**:
+
 - Avoided when using indexed columns
 - Avoid queries like `WHERE slug LIKE 'value%'` if possible
 
@@ -416,14 +437,17 @@ WHERE user_id = $1 AND slug = $2;
 ### Constraint Overhead
 
 **INSERT Performance Impact**: <1ms per insert
+
 - Constraint check: O(log n) via index
 - No blocking expected
 
 **UPDATE Performance Impact**: <1ms per update
+
 - If slug changes: Constraint validated
 - If slug unchanged: No constraint re-check
 
 **Storage Impact**: Minimal
+
 - VARCHAR(100) = 100 bytes maximum
 - 12 records × 100 bytes = 1.2 kB data
 - Index overhead: ~48 kB total (amortized)
@@ -439,6 +463,7 @@ WHERE user_id = $1 AND slug = $2;
 **Cause**: Attempting INSERT/UPDATE with duplicate slug
 
 **Solution**:
+
 1. Check existing slugs for the scope:
    ```sql
    SELECT slug FROM collections WHERE user_id = $1;
@@ -455,6 +480,7 @@ WHERE user_id = $1 AND slug = $2;
 **Cause**: Attempting INSERT into sub_collections without slug
 
 **Solution**:
+
 1. Always provide slug value for sub_collections
 2. Use slug generation function before INSERT
 3. Verify application generates slugs before database operations
@@ -466,6 +492,7 @@ WHERE user_id = $1 AND slug = $2;
 **Symptom**: Query slower than expected
 
 **Check**:
+
 ```sql
 EXPLAIN ANALYZE
 SELECT * FROM collections
@@ -475,6 +502,7 @@ WHERE user_id = $1 AND slug = $2;
 **Expected Plan**: Index Scan using collections_user_slug_unique
 
 **If Full Scan Occurs**:
+
 1. Check statistics: `ANALYZE collections;`
 2. Check index integrity: `REINDEX INDEX collections_slug_idx;`
 3. Review query optimizer settings
@@ -486,11 +514,13 @@ WHERE user_id = $1 AND slug = $2;
 **Symptom**: Slug lookups getting slower
 
 **Root Causes**:
+
 1. Missing statistics: Run `ANALYZE` on affected tables
 2. Bloated indexes: Run `VACUUM FULL` + `REINDEX`
 3. Index fragmentation: Rebuild with `REINDEX`
 
 **Monitoring**:
+
 ```sql
 SELECT schemaname, tablename, idx, idx_scan, idx_tup_read, idx_tup_fetch
 FROM pg_stat_user_indexes

@@ -8,6 +8,7 @@
 ## Subagent Input
 
 Delegated to general-purpose subagent to:
+
 - Update all three facade files with slug generation logic
 - Implement collision handling using ensureUniqueSlug
 - Add slug-based get methods calling Step 6 query methods
@@ -43,6 +44,7 @@ Delegated to general-purpose subagent to:
 ### Implementation Details
 
 **Bobblehead Facade (Global Scope)**:
+
 ```typescript
 // In createAsync:
 const baseSlug = generateSlug(data.name);
@@ -56,6 +58,7 @@ const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
 ```
 
 **Collection Facade (User-Scoped)**:
+
 ```typescript
 // In createAsync:
 const baseSlug = generateSlug(data.name);
@@ -69,6 +72,7 @@ const uniqueSlug = ensureUniqueSlug(baseSlug, userSlugs);
 ```
 
 **Subcollection Facade (Collection-Scoped)**:
+
 ```typescript
 // In createAsync:
 const baseSlug = generateSlug(data.name);
@@ -88,6 +92,7 @@ const uniqueSlug = ensureUniqueSlug(baseSlug, collectionSlugs);
 ### Collision Handling
 
 All three facades implement proper collision detection:
+
 1. Query existing slugs (with appropriate scoping)
 2. Generate base slug from entity name
 3. Call ensureUniqueSlug to append numeric suffix if needed (slug-2, slug-3, etc.)
@@ -96,6 +101,7 @@ All three facades implement proper collision detection:
 ### Update Operations
 
 All updateAsync methods:
+
 - Check if name property changed
 - Only regenerate slug if name changed
 - Query for collisions excluding current entity's ID
@@ -107,6 +113,7 @@ All updateAsync methods:
 ⚠️ **npm run typecheck**: PARTIAL (facade code passes, seed/test files have expected errors)
 
 **TypeScript Status**:
+
 - Facade implementations: ✅ All correct
 - Seed scripts: ⚠️ Need slug field updates (not part of this step)
 - Test factories: ⚠️ Need slug field updates (not part of this step)
