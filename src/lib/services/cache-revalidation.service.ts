@@ -185,7 +185,7 @@ export class CacheRevalidationService {
     onPhotoChange: (
       bobbleheadId: string,
       userId: string,
-      operation: 'add' | 'delete' | 'reorder',
+      operation: 'add' | 'delete' | 'reorder' | 'update',
       bobbleheadSlug?: string,
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId);

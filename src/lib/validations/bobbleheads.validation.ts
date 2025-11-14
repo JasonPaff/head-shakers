@@ -29,6 +29,7 @@ export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
 export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
 export type UpdateBobblehead = z.infer<typeof updateBobbleheadSchema>;
 export type UpdateBobbleheadPhoto = z.infer<typeof updateBobbleheadPhotoSchema>;
+export type UpdateBobbleheadPhotoMetadata = z.infer<typeof updateBobbleheadPhotoMetadataSchema>;
 export type UpdateBobbleheadWithPhotos = z.infer<typeof updateBobbleheadWithPhotosSchema>;
 
 export const selectBobbleheadPhotoSchema = createSelectSchema(bobbleheadPhotos);
@@ -168,8 +169,16 @@ export const reorderBobbleheadPhotosSchema = z.object({
     .array(
       z.object({
         id: z.uuid({ message: 'Photo ID is required' }),
+        isPrimary: z.boolean().optional(),
         sortOrder: z.number().min(0, { message: 'Sort order must be non-negative' }),
       }),
     )
     .min(1, { message: 'At least one photo is required for reordering' }),
+});
+
+export const updateBobbleheadPhotoMetadataSchema = z.object({
+  altText: z.string().max(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.ALT_TEXT.MAX).trim().optional(),
+  bobbleheadId: z.uuid({ message: 'Bobblehead ID is required' }),
+  caption: z.string().max(SCHEMA_LIMITS.BOBBLEHEAD_PHOTO.CAPTION.MAX).trim().optional(),
+  photoId: z.uuid({ message: 'Photo ID is required' }),
 });

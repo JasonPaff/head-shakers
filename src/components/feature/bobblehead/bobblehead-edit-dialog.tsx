@@ -30,6 +30,8 @@ import { CustomFields } from '@/app/(app)/bobbleheads/add/components/custom-fiel
 import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settings';
 import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
+import { PhotoManagementErrorBoundary } from '@/components/feature/bobblehead/photo-management-error-boundary';
+import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
@@ -45,6 +47,7 @@ import {
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useServerAction } from '@/hooks/use-server-action';
 import {
   getBobbleheadPhotosAction,
@@ -52,10 +55,7 @@ import {
 } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { DEFAULTS } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
-import {
-  extractFormatFromCloudinaryUrl,
-  extractPublicIdFromCloudinaryUrl,
-} from '@/lib/utils/cloudinary.utils';
+import { transformDatabasePhotoToCloudinary } from '@/lib/utils/photo-transform.utils';
 import { updateBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.validation';
 
 interface BobbleheadForEdit {
@@ -89,10 +89,21 @@ type BobbleheadPhoto = typeof bobbleheadPhotos.$inferSelect;
 // Custom ItemPhotos component for editing with bobblehead support
 interface ItemPhotosEditProps {
   bobbleheadId: string;
+  error: null | string;
   form: AnyFormApi;
+  isLoading: boolean;
+  onRetry: () => void;
+  photoCount: number;
 }
 
-function ItemPhotosEditComponent({ bobbleheadId, form }: ItemPhotosEditProps) {
+function ItemPhotosEditComponent({
+  bobbleheadId,
+  error,
+  form,
+  isLoading,
+  onRetry,
+  photoCount,
+}: ItemPhotosEditProps) {
   const photos =
     useStore(form.store, (state) => (state.values as { photos?: Array<CloudinaryPhoto> }).photos) || [];
 
@@ -107,7 +118,26 @@ function ItemPhotosEditComponent({ bobbleheadId, form }: ItemPhotosEditProps) {
     }
   };
 
-  const shouldShowMessage = photos.length > 0;
+  const _shouldShowMessage = photos.length > 0;
+  const _hasError = !!error;
+  const _isAtMaxPhotos = photos.length >= 8;
+  const _isNearMaxPhotos = photos.length === 7;
+
+  const getMotivationalMessage = () => {
+    if (photos.length === 0) {
+      return 'Add photos to make your bobblehead stand out!';
+    }
+    if (_isAtMaxPhotos) {
+      return 'Perfect! You have all 8 photos. Drag to reorder or delete to replace.';
+    }
+    if (_isNearMaxPhotos) {
+      return 'Almost there! Add 1 more photo to reach the maximum.';
+    }
+    if (photos.length >= 5) {
+      return `${photos.length}/8 photos - looking great! Keep adding more.`;
+    }
+    return `${photos.length}/8 photos - drag to reorder or add more`;
+  };
 
   return (
     <Card aria-labelledby={'photos-section-title'} role={'region'}>
@@ -126,29 +156,64 @@ function ItemPhotosEditComponent({ bobbleheadId, form }: ItemPhotosEditProps) {
       </CardHeader>
 
       <CardContent className={'relative space-y-6'} role={'main'}>
-        <div aria-label={'Photo upload area'} className={'relative'} role={'region'}>
-          <CloudinaryPhotoUpload
-            bobbleheadId={bobbleheadId}
-            maxPhotos={8}
-            onPhotosChange={handlePhotosChange}
-            photos={photos}
-          />
-        </div>
-
-        <AnimatedMotivationalMessage
-          className={'bg-green-100 dark:bg-green-900/40'}
-          shouldShow={shouldShowMessage}
-        >
-          <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
-            <div className={'size-2 rounded-full bg-green-500'} />
-            <Conditional
-              fallback={`${photos.length}/8 photos - drag to reorder`}
-              isCondition={photos.length === 0}
-            >
-              <span>Add photos to make your bobblehead stand out!</span>
-            </Conditional>
+        {/* Loading State */}
+        <Conditional isCondition={isLoading}>
+          <div className={'space-y-4'}>
+            <div className={'text-sm text-muted-foreground'}>Loading {photoCount} photos...</div>
+            <div className={'grid grid-cols-1 gap-4 md:grid-cols-2'}>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <Card className={'overflow-hidden'} key={index}>
+                  <CardContent className={'p-4'}>
+                    <div className={'space-y-3'}>
+                      <Skeleton className={'aspect-square w-full rounded-lg'} />
+                      <Skeleton className={'h-8 w-full'} />
+                      <Skeleton className={'h-16 w-full'} />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
-        </AnimatedMotivationalMessage>
+        </Conditional>
+
+        {/* Error State */}
+        <Conditional isCondition={_hasError}>
+          <Alert variant={'error'}>
+            <div className={'flex items-center justify-between'}>
+              <div>
+                <div className={'font-semibold'}>Failed to Load Photos</div>
+                <div>{error}</div>
+              </div>
+              <Button onClick={onRetry} size={'sm'} type={'button'} variant={'outline'}>
+                Retry
+              </Button>
+            </div>
+          </Alert>
+        </Conditional>
+
+        {/* Photo Upload Area */}
+        <Conditional isCondition={!isLoading && !_hasError}>
+          <div aria-label={'Photo upload area'} className={'relative'} role={'region'}>
+            <CloudinaryPhotoUpload
+              bobbleheadId={bobbleheadId}
+              maxPhotos={8}
+              onPhotosChange={handlePhotosChange}
+              photos={photos}
+            />
+          </div>
+        </Conditional>
+
+        <Conditional isCondition={!isLoading && !_hasError}>
+          <AnimatedMotivationalMessage
+            className={'bg-green-100 dark:bg-green-900/40'}
+            shouldShow={_shouldShowMessage}
+          >
+            <div className={'flex items-center gap-2 text-sm text-green-700 dark:text-green-300'}>
+              <div className={'size-2 rounded-full bg-green-500'} />
+              <span>{getMotivationalMessage()}</span>
+            </div>
+          </AnimatedMotivationalMessage>
+        </Conditional>
       </CardContent>
     </Card>
   );
@@ -161,14 +226,26 @@ export const BobbleheadEditDialog = withFocusManagement(
     const cancelButtonTestId = generateTestId('feature', 'bobblehead-edit-cancel');
     const submitButtonTestId = generateTestId('feature', 'bobblehead-edit-submit');
 
+    // useState hooks
+    const [isLoadingPhotos, setIsLoadingPhotos] = useState(false);
+    const [photoFetchError, setPhotoFetchError] = useState<null | string>(null);
+    const [photoCount, setPhotoCount] = useState(0);
+    const [retryAttempt, setRetryAttempt] = useState(0);
+    const [errorBoundaryKey, setErrorBoundaryKey] = useState(0);
+
+    // other hooks
     const router = useRouter();
     const { focusFirstError } = useFocusContext();
 
-    const [, setIsLoadingPhotos] = useState(false);
+    // refs
     const photosFetchedRef = useRef(false);
+    const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const formResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const serverActionAbortRef = useRef(false);
 
     const { executeAsync, isExecuting } = useServerAction(updateBobbleheadWithPhotosAction, {
       onAfterSuccess: () => {
+        if (serverActionAbortRef.current) return; // skip if dialog closed
         router.refresh();
         handleClose();
         onSuccess?.();
@@ -224,11 +301,133 @@ export const BobbleheadEditDialog = withFocusManagement(
       },
     });
 
+    // utility functions
+    const getRetryDelay = (attempt: number): number => {
+      const delays = [1000, 2000, 4000]; // 1s, 2s, 4s
+      return delays[attempt] ?? delays[delays.length - 1] ?? 4000;
+    };
+
+    const revokePhotoBlobUrls = () => {
+      const currentPhotos = (form.getFieldValue('photos') as Array<CloudinaryPhoto>) || [];
+      currentPhotos.forEach((photo) => {
+        // revoke blob URLs if they exist
+        if (photo.publicId && photo.publicId.startsWith('blob:')) {
+          URL.revokeObjectURL(photo.publicId);
+        }
+      });
+    };
+
+    // event handlers
     const handleClose = () => {
+      // abort any pending server actions
+      serverActionAbortRef.current = true;
+
+      // cleanup all timeouts
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current);
+        fetchTimeoutRef.current = null;
+      }
+      if (formResetTimeoutRef.current) {
+        clearTimeout(formResetTimeoutRef.current);
+        formResetTimeoutRef.current = null;
+      }
+
+      // revoke all photo blob URLs to prevent memory leaks
+      revokePhotoBlobUrls();
+
+      // reset state immediately (no setTimeout)
       photosFetchedRef.current = false;
-      setTimeout(() => form.reset(), 300);
+      setPhotoFetchError(null);
+      setRetryAttempt(0);
+      setPhotoCount(0);
+      form.reset();
+
       onClose();
     };
+
+    const handleRetryPhotoFetch = () => {
+      setRetryAttempt(0);
+      setPhotoFetchError(null);
+      photosFetchedRef.current = false;
+    };
+
+    const handlePhotoErrorBoundaryReset = () => {
+      setErrorBoundaryKey((prev) => prev + 1);
+      setRetryAttempt(0);
+      setPhotoFetchError(null);
+      photosFetchedRef.current = false;
+
+      Sentry.captureMessage('Photo error boundary reset triggered', {
+        extra: {
+          bobbleheadId: bobblehead.id,
+          operation: 'error-boundary-reset',
+        },
+        level: 'info',
+      });
+    };
+
+    const handleContinueWithoutPhotos = () => {
+      // clear photo-related errors and continue with form editing
+      setPhotoFetchError(null);
+      setIsLoadingPhotos(false);
+      form.setFieldValue('photos', []);
+
+      Sentry.captureMessage('User chose to continue without photos', {
+        extra: {
+          bobbleheadId: bobblehead.id,
+          operation: 'continue-without-photos',
+        },
+        level: 'info',
+      });
+    };
+
+    // cleanup effect on dialog close or unmount
+    useEffect(() => {
+      return () => {
+        // cleanup all timers on unmount
+        if (fetchTimeoutRef.current) {
+          clearTimeout(fetchTimeoutRef.current);
+        }
+        if (formResetTimeoutRef.current) {
+          clearTimeout(formResetTimeoutRef.current);
+        }
+
+        // revoke all blob URLs
+        revokePhotoBlobUrls();
+
+        // abort server actions
+        serverActionAbortRef.current = true;
+
+        // reset refs
+        photosFetchedRef.current = false;
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    // memory monitoring in development mode
+    useEffect(() => {
+      if (process.env.NODE_ENV !== 'development' || !isOpen) {
+        return;
+      }
+
+      const memoryCheckInterval = setInterval(() => {
+        if (typeof window !== 'undefined' && 'performance' in window && 'memory' in window.performance) {
+          const memory = (window.performance as { memory?: { usedJSHeapSize: number } }).memory;
+          if (memory && memory.usedJSHeapSize > 100000000) {
+            // 100MB threshold
+            console.warn(
+              '[BobbleheadEditDialog] High memory usage detected:',
+              (memory.usedJSHeapSize / 1048576).toFixed(2),
+              'MB',
+            );
+          }
+        }
+      }, 5000); // check every 5 seconds
+
+      return () => {
+        clearInterval(memoryCheckInterval);
+      };
+    }, [isOpen]);
 
     // fetch existing photos when dialog opens
     useEffect(() => {
@@ -237,49 +436,117 @@ export const BobbleheadEditDialog = withFocusManagement(
       const fetchPhotos = async () => {
         photosFetchedRef.current = true;
         setIsLoadingPhotos(true);
+        setPhotoFetchError(null);
+
+        const currentAttempt = retryAttempt;
+        const maxAttempts = 3;
+        const timeoutDuration = 30000; // 30 seconds
+
         try {
-          const result = await getBobbleheadPhotosAction({ bobbleheadId: bobblehead.id });
+          // create timeout promise
+          const timeoutPromise = new Promise<never>((_, reject) => {
+            fetchTimeoutRef.current = setTimeout(() => {
+              reject(new Error('Photo fetch timeout after 30 seconds'));
+            }, timeoutDuration);
+          });
+
+          // create fetch promise
+          const fetchPromise = getBobbleheadPhotosAction({ bobbleheadId: bobblehead.id });
+
+          // race between fetch and timeout
+          const result = await Promise.race([fetchPromise, timeoutPromise]);
+
+          // clear timeout if fetch completed
+          if (fetchTimeoutRef.current) {
+            clearTimeout(fetchTimeoutRef.current);
+            fetchTimeoutRef.current = null;
+          }
 
           if (result?.data && Array.isArray(result.data)) {
             // transform database photos to CloudinaryPhoto format
-            const transformedPhotos: Array<CloudinaryPhoto> = (result.data as Array<BobbleheadPhoto>).map(
-              (photo) => {
-                const publicId = extractPublicIdFromCloudinaryUrl(photo.url);
-                const format = extractFormatFromCloudinaryUrl(photo.url);
-
-                return {
-                  altText: photo.altText || '',
-                  bytes: photo.fileSize || 0,
-                  caption: photo.caption || '',
-                  format: format as 'heic' | 'jpeg' | 'jpg' | 'png' | 'webp',
-                  height: photo.height || 0,
-                  id: photo.id,
-                  isPrimary: photo.isPrimary,
-                  originalFilename: '',
-                  publicId: publicId || photo.url,
-                  sortOrder: photo.sortOrder,
-                  uploadedAt: photo.uploadedAt.toISOString(),
-                  url: photo.url,
-                  width: photo.width || 0,
-                };
-              },
+            const transformedPhotos = (result.data as Array<BobbleheadPhoto>).map(
+              transformDatabasePhotoToCloudinary,
             );
+
+            setPhotoCount(transformedPhotos.length);
 
             // update form field with existing photos
             form.setFieldValue('photos', transformedPhotos);
+
+            // log success
+            Sentry.captureMessage('Photos fetched successfully', {
+              extra: {
+                attempt: currentAttempt + 1,
+                bobbleheadId: bobblehead.id,
+                operation: 'fetch-photos',
+                photoCount: transformedPhotos.length,
+              },
+              level: 'info',
+            });
           }
         } catch (error) {
+          // clear timeout on error
+          if (fetchTimeoutRef.current) {
+            clearTimeout(fetchTimeoutRef.current);
+            fetchTimeoutRef.current = null;
+          }
+
+          const errorMessage = error instanceof Error ? error.message : 'Failed to load photos';
+          const isTimeout = errorMessage.includes('timeout');
+
+          // log attempt
           Sentry.captureException(error, {
-            extra: { bobbleheadId: bobblehead.id, operation: 'fetch-photos' },
+            extra: {
+              attempt: currentAttempt + 1,
+              bobbleheadId: bobblehead.id,
+              isTimeout,
+              operation: 'fetch-photos',
+            },
             level: 'error',
           });
+
+          // retry logic with exponential backoff
+          if (currentAttempt < maxAttempts - 1) {
+            const delay = getRetryDelay(currentAttempt);
+
+            Sentry.captureMessage('Retrying photo fetch', {
+              extra: {
+                attempt: currentAttempt + 1,
+                bobbleheadId: bobblehead.id,
+                delay,
+                operation: 'fetch-photos-retry',
+              },
+              level: 'info',
+            });
+
+            setTimeout(() => {
+              setRetryAttempt((prev) => prev + 1);
+              photosFetchedRef.current = false;
+            }, delay);
+          } else {
+            // max attempts reached, show error
+            setPhotoFetchError(
+              isTimeout ?
+                'Photo loading timed out. Please check your connection and try again.'
+              : 'Unable to load photos. Please try again.',
+            );
+
+            Sentry.captureMessage('Photo fetch failed after max retries', {
+              extra: {
+                attempts: maxAttempts,
+                bobbleheadId: bobblehead.id,
+                operation: 'fetch-photos-failed',
+              },
+              level: 'error',
+            });
+          }
         } finally {
           setIsLoadingPhotos(false);
         }
       };
 
       void fetchPhotos();
-    }, [isOpen, bobblehead.id, form]);
+    }, [isOpen, bobblehead.id, form, retryAttempt]);
 
     return (
       <Dialog
@@ -320,7 +587,20 @@ export const BobbleheadEditDialog = withFocusManagement(
               */}
               <BasicInformation form={form as never} />
               <CollectionAssignment collections={collections} form={form as never} />
-              <ItemPhotosEditComponent bobbleheadId={bobblehead.id} form={form} />
+              <PhotoManagementErrorBoundary
+                key={errorBoundaryKey}
+                onContinueWithoutPhotos={handleContinueWithoutPhotos}
+                onReset={handlePhotoErrorBoundaryReset}
+              >
+                <ItemPhotosEditComponent
+                  bobbleheadId={bobblehead.id}
+                  error={photoFetchError}
+                  form={form}
+                  isLoading={isLoadingPhotos}
+                  onRetry={handleRetryPhotoFetch}
+                  photoCount={photoCount}
+                />
+              </PhotoManagementErrorBoundary>
               <PhysicalAttributes form={form as never} />
               <AcquisitionDetails form={form as never} />
               <ItemTags form={form as never} />

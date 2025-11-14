@@ -46,6 +46,7 @@ export const ACTION_NAMES = {
     SEARCH: 'searchBobbleheads',
     UPDATE: 'updateBobblehead',
     UPDATE_PHOTO: 'updateBobbleheadPhoto',
+    UPDATE_PHOTO_METADATA: 'updateBobbleheadPhotoMetadata',
     UPLOAD_PHOTO: 'uploadBobbleheadPhoto',
     UPLOAD_PHOTOS: 'uploadBobbleheadPhotos',
   },

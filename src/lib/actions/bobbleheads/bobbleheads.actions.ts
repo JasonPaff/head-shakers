@@ -30,6 +30,7 @@ import {
   deleteBobbleheadPhotoSchema,
   deleteBobbleheadSchema,
   reorderBobbleheadPhotosSchema,
+  updateBobbleheadPhotoMetadataSchema,
   updateBobbleheadWithPhotosSchema,
 } from '@/lib/validations/bobbleheads.validation';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
@@ -534,6 +535,25 @@ export const deleteBobbleheadPhotoAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, photoData);
 
     try {
+      // get all photos for the bobblehead before deletion to determine if we need to promote a new primary
+      const allPhotos = await BobbleheadsFacade.getBobbleheadPhotos(photoData.bobbleheadId, userId, ctx.tx);
+
+      const photoToDelete = allPhotos.find((p) => p.id === photoData.photoId);
+
+      if (!photoToDelete) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.BOBBLEHEADS.DELETE_FAILED,
+          ERROR_MESSAGES.BOBBLEHEAD.DELETE_FAILED,
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.DELETE_PHOTO },
+          false,
+          404,
+        );
+      }
+
+      const wasPrimaryPhoto = photoToDelete.isPrimary;
+
+      // delete the photo
       const deletedPhoto = await BobbleheadsFacade.deletePhotoAsync(photoData, userId, ctx.tx);
 
       if (!deletedPhoto) {
@@ -547,11 +567,63 @@ export const deleteBobbleheadPhotoAction = authActionClient
         );
       }
 
+      // get remaining photos after deletion
+      const remainingPhotos = allPhotos.filter((p) => p.id !== photoData.photoId);
+
+      // if we deleted the primary photo and there are remaining photos, promote the first one
+      if (wasPrimaryPhoto && remainingPhotos.length > 0) {
+        // reindex all remaining photos with proper sortOrder and set first as primary
+        const photoOrder = remainingPhotos
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((photo, index) => ({
+            id: photo.id,
+            isPrimary: index === 0,
+            sortOrder: index,
+          }));
+
+        await BobbleheadsFacade.reorderPhotosAsync(
+          {
+            bobbleheadId: photoData.bobbleheadId,
+            photoOrder,
+          },
+          userId,
+          ctx.tx,
+        );
+
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            bobbleheadId: photoData.bobbleheadId,
+            newPrimaryPhotoId: photoOrder[0]?.id,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: 'Promoted new primary photo after deletion',
+        });
+      } else if (remainingPhotos.length > 0) {
+        // reindex sortOrder for remaining photos even if we didn't delete the primary
+        const photoOrder = remainingPhotos
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((photo, index) => ({
+            id: photo.id,
+            sortOrder: index,
+          }));
+
+        await BobbleheadsFacade.reorderPhotosAsync(
+          {
+            bobbleheadId: photoData.bobbleheadId,
+            photoOrder,
+          },
+          userId,
+          ctx.tx,
+        );
+      }
+
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           bobbleheadId: photoData.bobbleheadId,
           photoId: deletedPhoto.id,
+          wasPrimaryPhoto,
         },
         level: SENTRY_LEVELS.INFO,
         message: `Deleted photo ${deletedPhoto.id} from bobblehead ${photoData.bobbleheadId}`,
@@ -635,6 +707,70 @@ export const reorderBobbleheadPhotosAction = authActionClient
         input: parsedInput,
         metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.REORDER_PHOTOS },
         operation: OPERATIONS.BOBBLEHEADS.REORDER_PHOTOS,
+        userId,
+      });
+    }
+  });
+
+export const updateBobbleheadPhotoMetadataAction = authActionClient
+  .metadata({
+    actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_PHOTO_METADATA,
+    isTransactionRequired: true,
+  })
+  .use(
+    createRateLimitMiddleware(
+      CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_REORDER.REQUESTS,
+      CONFIG.RATE_LIMITING.ACTION_SPECIFIC.PHOTO_REORDER.WINDOW,
+    ),
+  )
+  .inputSchema(updateBobbleheadPhotoMetadataSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const metadataData = updateBobbleheadPhotoMetadataSchema.parse(ctx.sanitizedInput);
+    const userId = ctx.userId;
+
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
+      bobbleheadId: metadataData.bobbleheadId,
+      photoId: metadataData.photoId,
+    });
+
+    try {
+      const updatedPhoto = await BobbleheadsFacade.updatePhotoMetadataAsync(metadataData, userId, ctx.tx);
+
+      if (!updatedPhoto) {
+        throw new ActionError(
+          ErrorType.NOT_FOUND,
+          ERROR_CODES.BOBBLEHEADS.UPDATE_FAILED,
+          ERROR_MESSAGES.BOBBLEHEAD.UPDATE_FAILED,
+          { ctx, operation: OPERATIONS.BOBBLEHEADS.UPDATE_PHOTO_METADATA },
+          false,
+          404,
+        );
+      }
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          bobbleheadId: metadataData.bobbleheadId,
+          photoId: metadataData.photoId,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `Updated metadata for photo ${metadataData.photoId} in bobblehead ${metadataData.bobbleheadId}`,
+      });
+
+      // invalidate metadata cache for the bobblehead (photo metadata affects SEO)
+      invalidateMetadataCache('bobblehead', metadataData.bobbleheadId);
+
+      CacheRevalidationService.bobbleheads.onPhotoChange(metadataData.bobbleheadId, userId, 'update');
+
+      return {
+        data: updatedPhoto,
+        success: true,
+      };
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE_PHOTO_METADATA },
+        operation: OPERATIONS.BOBBLEHEADS.UPDATE_PHOTO_METADATA,
         userId,
       });
     }

@@ -6,19 +6,35 @@ import type { CloudinaryUploadWidgetResults } from 'next-cloudinary';
 // our internal photo representation from Cloudinary data
 export interface CloudinaryPhoto {
   altText?: string;
+  blobUrl?: string; // local blob URL for optimistic preview
   bytes: number;
   // user-defined metadata
   caption?: string;
   format: string;
   height: number;
-  id: string; // temporary ID for frontend use
+  id: string; // temporary ID for frontend use (temp-{timestamp}-{random}) or UUID for persisted
   isPrimary: boolean;
+  isUploading?: boolean; // optimistic upload state
   originalFilename: string;
   publicId: string; // cloudinary public_id
   sortOrder: number;
   uploadedAt: string;
+  uploadError?: string; // error message if upload failed
+  uploadProgress?: number; // upload progress percentage (0-100)
   url: string; // secure_url from Cloudinary
   width: number;
+}
+
+// individual file upload tracking
+export interface FileUploadProgress {
+  bytesUploaded: number;
+  error?: string;
+  filename: string;
+  isComplete: boolean;
+  isFailed: boolean;
+  retryCount: number;
+  startTime: number;
+  totalBytes: number;
 }
 
 // photo metadata that users can edit
@@ -32,6 +48,7 @@ export interface PhotoMetadata {
 // upload state for UI feedback
 export interface PhotoUploadState {
   error?: string;
+  fileProgress: Map<string, FileUploadProgress>;
   isUploading: boolean;
   progress?: number;
   totalCount: number;
@@ -63,3 +80,6 @@ export function transformCloudinaryResult(
     width: result.info.width,
   };
 }
+
+// re-export type guards for convenience
+export { isPersistedPhoto, isTempPhoto } from '@/lib/utils/photo-transform.utils';

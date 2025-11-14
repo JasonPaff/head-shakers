@@ -70,9 +70,10 @@ export const CONFIG = {
     IMAGE_QUALITY: 85,
     LARGE_SIZE: { height: 900, width: 1200 },
     MAX_FILES_PER_BOBBLEHEAD: 10,
+    MAX_RETRY_ATTEMPTS: 2, // maximum retry attempts for failed uploads
     MAX_SIZE: 10 * 1024 * 1024, // 10MB
     MEDIUM_SIZE: { height: 600, width: 800 },
-    PHOTO_REORDER_DEBOUNCE_MS: 1000, // 1 second debounce for photo reordering
+    PHOTO_REORDER_DEBOUNCE_MS: 800, // 800ms debounce for photo reordering
     THUMBNAIL_SIZE: { height: 300, width: 300 },
   },
   PAGINATION: {

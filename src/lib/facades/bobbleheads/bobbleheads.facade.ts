@@ -12,6 +12,7 @@ import type {
   InsertBobbleheadPhoto,
   ReorderBobbleheadPhotos,
   UpdateBobblehead,
+  UpdateBobbleheadPhotoMetadata,
 } from '@/lib/validations/bobbleheads.validation';
 
 import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
@@ -772,6 +773,40 @@ export class BobbleheadsFacade {
         facade: facadeName,
         method: 'updateAsync',
         operation: OPERATIONS.BOBBLEHEADS.UPDATE,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * update photo metadata (altText and caption)
+   */
+  static async updatePhotoMetadataAsync(
+    data: UpdateBobbleheadPhotoMetadata,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+
+      // update photo metadata
+      const updatedPhoto = await BobbleheadsQuery.updatePhotoMetadataAsync(data, userId, context);
+
+      if (!updatedPhoto) {
+        return null;
+      }
+
+      // invalidate caches
+      CacheRevalidationService.bobbleheads.onPhotoChange(data.bobbleheadId, userId, 'update');
+
+      return updatedPhoto;
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { bobbleheadId: data.bobbleheadId, photoId: data.photoId },
+        facade: facadeName,
+        method: 'updatePhotoMetadataAsync',
+        operation: OPERATIONS.BOBBLEHEADS.UPDATE_PHOTO_METADATA,
         userId,
       };
       throw createFacadeError(context, error);

@@ -34,6 +34,7 @@ export const OPERATIONS = {
     REORDER_PHOTOS: 'reorder_bobblehead_photos',
     SEARCH: 'search_bobbleheads',
     UPDATE: 'update_bobblehead',
+    UPDATE_PHOTO_METADATA: 'update_bobblehead_photo_metadata',
     UPLOAD_PHOTO: 'upload_bobblehead_photo',
   },
   COLLECTIONS: {

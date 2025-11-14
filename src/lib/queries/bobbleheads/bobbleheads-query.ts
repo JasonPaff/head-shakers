@@ -8,6 +8,7 @@ import type {
   InsertBobbleheadPhoto,
   ReorderBobbleheadPhotos,
   UpdateBobblehead,
+  UpdateBobbleheadPhotoMetadata,
 } from '@/lib/validations/bobbleheads.validation';
 
 import {
@@ -57,7 +58,7 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * batch update photo sortOrder values in a transaction
+   * batch update photo sortOrder and isPrimary values in a transaction
    */
   static async batchUpdatePhotoSortOrderAsync(
     data: ReorderBobbleheadPhotos,
@@ -77,16 +78,25 @@ export class BobbleheadsQuery extends BaseQuery {
       return [];
     }
 
-    // update each photo's sortOrder
-    const updatePromises = data.photoOrder.map((photoUpdate) =>
-      dbInstance
+    // update each photo's sortOrder and optionally isPrimary
+    const updatePromises = data.photoOrder.map((photoUpdate) => {
+      const updateData: { isPrimary?: boolean; sortOrder: number } = {
+        sortOrder: photoUpdate.sortOrder,
+      };
+
+      // only include isPrimary if it's explicitly provided
+      if (photoUpdate.isPrimary !== undefined) {
+        updateData.isPrimary = photoUpdate.isPrimary;
+      }
+
+      return dbInstance
         .update(bobbleheadPhotos)
-        .set({ sortOrder: photoUpdate.sortOrder })
+        .set(updateData)
         .where(
           and(eq(bobbleheadPhotos.id, photoUpdate.id), eq(bobbleheadPhotos.bobbleheadId, data.bobbleheadId)),
         )
-        .returning(),
-    );
+        .returning();
+    });
 
     const results = await Promise.all(updatePromises);
 
@@ -597,6 +607,37 @@ export class BobbleheadsQuery extends BaseQuery {
       .update(bobbleheads)
       .set(updateData)
       .where(and(eq(bobbleheads.id, id), eq(bobbleheads.userId, userId)))
+      .returning();
+
+    return result?.[0] || null;
+  }
+
+  /**
+   * update photo metadata (altText and caption) with ownership validation
+   */
+  static async updatePhotoMetadataAsync(
+    data: UpdateBobbleheadPhotoMetadata,
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | typeof bobbleheadPhotos.$inferSelect> {
+    const dbInstance = this.getDbInstance(context);
+
+    // verify ownership via join with bobbleheads table
+    const result = await dbInstance
+      .update(bobbleheadPhotos)
+      .set({
+        altText: data.altText,
+        caption: data.caption,
+      })
+      .from(bobbleheads)
+      .where(
+        and(
+          eq(bobbleheadPhotos.id, data.photoId),
+          eq(bobbleheadPhotos.bobbleheadId, data.bobbleheadId),
+          eq(bobbleheads.id, data.bobbleheadId),
+          eq(bobbleheads.userId, userId),
+        ),
+      )
       .returning();
 
     return result?.[0] || null;
