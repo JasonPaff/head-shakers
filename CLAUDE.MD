@@ -15,8 +15,8 @@ Head Shakers is a digital platform for bobblehead collectors to catalog, share, 
 
 ### Core Framework
 
-- **Next.js 15.5.3** with App Router
-- **React 19.1.0** with TypeScript
+- **Next.js 16.0.0** with App Router
+- **React 19.2.0** with TypeScript
 - **Tailwind CSS 4** for styling
 
 ### Database & Backend
