@@ -751,19 +751,27 @@ export class BobbleheadsFacade {
 
       const updateData: UpdateBobblehead & { slug?: string } = { ...data };
 
-      // if name is being updated, regenerate slug
+      // if name is being updated, check if it actually changed before regenerating slug
       if (data.name) {
-        const baseSlug = generateSlug(data.name);
+        // fetch existing bobblehead to compare name
+        const existing = await dbInst.query.bobbleheads.findFirst({
+          where: (b, { eq }) => eq(b.id, data.id),
+        });
 
-        // query existing slugs excluding current bobblehead
-        const existingSlugs = await dbInst
-          .select({ slug: bobbleheads.slug })
-          .from(bobbleheads)
-          .then((results) => results.map((r) => r.slug).filter((slug) => slug !== data.id));
+        // only regenerate slug if name has actually changed
+        if (existing && existing.name !== data.name) {
+          const baseSlug = generateSlug(data.name);
 
-        // ensure new slug is unique
-        const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-        updateData.slug = uniqueSlug;
+          // query existing slugs excluding current bobblehead
+          const existingSlugs = await dbInst
+            .select({ slug: bobbleheads.slug })
+            .from(bobbleheads)
+            .then((results) => results.map((r) => r.slug).filter((slug) => slug !== existing.slug));
+
+          // ensure new slug is unique
+          const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+          updateData.slug = uniqueSlug;
+        }
       }
 
       return BobbleheadsQuery.updateAsync(updateData, userId, context);

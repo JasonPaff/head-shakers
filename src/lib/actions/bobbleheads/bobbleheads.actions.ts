@@ -25,6 +25,7 @@ import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
+import { isTempPhoto } from '@/lib/utils/photo-transform.utils';
 import {
   createBobbleheadWithPhotosSchema,
   deleteBobbleheadPhotoSchema,
@@ -337,90 +338,96 @@ export const updateBobbleheadWithPhotosAction = authActionClient
         );
       }
 
-      // if photos are provided, create database records for them
+      // if photos are provided, only process NEW photos (filter out existing ones)
       let uploadedPhotos: Array<unknown> = [];
       if (photos && photos.length > 0) {
-        try {
-          // move photos from temp folder to permanent location in Cloudinary
-          const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
-            userId,
-            updatedBobblehead.collectionId,
-            updatedBobblehead.id,
-          );
-          const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
-            photos.map((photo) => ({
-              publicId: photo.publicId,
-              url: photo.url,
-            })),
-            permanentFolder,
-          );
+        // separate new photos (temp- IDs) from existing photos (UUID IDs)
+        // existing photos are already in the database and should not be re-inserted
+        const newPhotos = photos.filter(isTempPhoto);
 
-          // create a map of old publicId to new values for a quick lookup
-          const movedPhotosMap = new Map(
-            movedPhotos.map((moved) => [
-              moved.oldPublicId,
-              { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
-            ]),
-          );
-
-          // update photo records with new URLs and public IDs
-          const photoRecords = photos.map((photo) => {
-            const movedPhoto = movedPhotosMap.get(photo.publicId);
-            return {
-              altText: photo.altText,
-              bobbleheadId: updatedBobblehead.id,
-              caption: photo.caption,
-              fileSize: photo.bytes,
-              height: photo.height,
-              isPrimary: photo.isPrimary,
-              sortOrder: photo.sortOrder,
-              url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
-              width: photo.width,
-            };
-          });
-
-          // insert photos into the database with permanent URLs
-          uploadedPhotos = await Promise.all(
-            photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
-          );
-
-          // clean up any temp photos that failed to move
-          const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
-          if (failedMoves.length > 0) {
-            console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
-            Sentry.addBreadcrumb({
-              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-              data: { failedMoves },
-              level: SENTRY_LEVELS.WARNING,
-              message: 'Some photos failed to move to permanent location',
-            });
-          }
-        } catch (photoError) {
-          // if photo processing fails, we still want to keep the update,
-          // but we should log this for debugging
-          console.error('Photo processing failed:', photoError);
-          Sentry.captureException(photoError);
-
-          // still try to save photos with temp URLs as fallback
+        if (newPhotos.length > 0) {
           try {
-            const photoRecords = photos.map((photo) => ({
-              altText: photo.altText,
-              bobbleheadId: updatedBobblehead.id,
-              caption: photo.caption,
-              fileSize: photo.bytes,
-              height: photo.height,
-              isPrimary: photo.isPrimary,
-              sortOrder: photo.sortOrder,
-              url: photo.url,
-              width: photo.width,
-            }));
+            // move photos from temp folder to permanent location in Cloudinary
+            const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
+              userId,
+              updatedBobblehead.collectionId,
+              updatedBobblehead.id,
+            );
+            const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
+              newPhotos.map((photo) => ({
+                publicId: photo.publicId,
+                url: photo.url,
+              })),
+              permanentFolder,
+            );
 
+            // create a map of old publicId to new values for a quick lookup
+            const movedPhotosMap = new Map(
+              movedPhotos.map((moved) => [
+                moved.oldPublicId,
+                { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
+              ]),
+            );
+
+            // update photo records with new URLs and public IDs
+            const photoRecords = newPhotos.map((photo) => {
+              const movedPhoto = movedPhotosMap.get(photo.publicId);
+              return {
+                altText: photo.altText,
+                bobbleheadId: updatedBobblehead.id,
+                caption: photo.caption,
+                fileSize: photo.bytes,
+                height: photo.height,
+                isPrimary: photo.isPrimary,
+                sortOrder: photo.sortOrder,
+                url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
+                width: photo.width,
+              };
+            });
+
+            // insert photos into the database with permanent URLs
             uploadedPhotos = await Promise.all(
               photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
             );
-          } catch (fallbackError) {
-            console.error('Fallback photo save also failed:', fallbackError);
-            Sentry.captureException(fallbackError);
+
+            // clean up any temp photos that failed to move
+            const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
+            if (failedMoves.length > 0) {
+              console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
+              Sentry.addBreadcrumb({
+                category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+                data: { failedMoves },
+                level: SENTRY_LEVELS.WARNING,
+                message: 'Some photos failed to move to permanent location',
+              });
+            }
+          } catch (photoError) {
+            // if photo processing fails, we still want to keep the update,
+            // but we should log this for debugging
+            console.error('Photo processing failed:', photoError);
+            Sentry.captureException(photoError);
+
+            // still try to save photos with temp URLs as fallback
+            try {
+              const photoRecords = newPhotos.map((photo) => ({
+                altText: photo.altText,
+                bobbleheadId: updatedBobblehead.id,
+                caption: photo.caption,
+                fileSize: photo.bytes,
+                height: photo.height,
+                isPrimary: photo.isPrimary,
+                sortOrder: photo.sortOrder,
+                url: photo.url,
+                width: photo.width,
+              }));
+
+              uploadedPhotos = await Promise.all(
+                photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
+              );
+            } catch (fallbackError) {
+              console.error('Fallback photo save also failed:', fallbackError);
+              Sentry.captureException(fallbackError);
+            }
           }
         }
       }

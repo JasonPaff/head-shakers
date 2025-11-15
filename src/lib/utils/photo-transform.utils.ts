@@ -51,6 +51,10 @@ export const transformDatabasePhotoToCloudinary = (photo: BobbleheadPhoto): Clou
   const publicId = extractPublicIdFromCloudinaryUrl(photo.url);
   const format = extractFormatFromCloudinaryUrl(photo.url);
 
+  // Handle uploadedAt - it might be a Date object or already a string (from server action serialization)
+  const uploadedAtString =
+    typeof photo.uploadedAt === 'string' ? photo.uploadedAt : photo.uploadedAt.toISOString();
+
   return {
     altText: photo.altText || '',
     bytes: photo.fileSize || 0,
@@ -62,7 +66,7 @@ export const transformDatabasePhotoToCloudinary = (photo: BobbleheadPhoto): Clou
     originalFilename: '',
     publicId: publicId || photo.url,
     sortOrder: photo.sortOrder,
-    uploadedAt: photo.uploadedAt.toISOString(),
+    uploadedAt: uploadedAtString,
     url: photo.url,
     width: photo.width || 0,
   };

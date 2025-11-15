@@ -462,11 +462,13 @@ export const BobbleheadEditDialog = withFocusManagement(
             fetchTimeoutRef.current = null;
           }
 
-          if (result?.data && Array.isArray(result.data)) {
+          // next-safe-action wraps the result in { data: { data: photos, success: true } }
+          // so we need to check result?.data?.data for the actual photos array
+          const photosData = result?.data?.data;
+
+          if (photosData && Array.isArray(photosData)) {
             // transform database photos to CloudinaryPhoto format
-            const transformedPhotos = (result.data as Array<BobbleheadPhoto>).map(
-              transformDatabasePhotoToCloudinary,
-            );
+            const transformedPhotos = photosData.map(transformDatabasePhotoToCloudinary);
 
             setPhotoCount(transformedPhotos.length);
 
