@@ -21,7 +21,7 @@ import {
   XIcon,
 } from 'lucide-react';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import type { CloudinaryPhoto, FileUploadProgress, PhotoUploadState } from '@/types/cloudinary.types';
@@ -56,6 +56,10 @@ import { CONFIG } from '@/lib/constants';
 import { transformCloudinaryResult } from '@/types/cloudinary.types';
 import { cn } from '@/utils/tailwind-utils';
 
+export interface CloudinaryPhotoUploadRef {
+  flushPendingOperations: () => Promise<void>;
+}
+
 interface CloudinaryPhotoUploadProps {
   bobbleheadId?: string;
   isDisabled?: boolean;
@@ -65,6 +69,7 @@ interface CloudinaryPhotoUploadProps {
   ) => void;
   onUploadStateChange?: (isUploading: boolean) => void;
   photos: Array<CloudinaryPhoto>;
+  ref?: React.Ref<CloudinaryPhotoUploadRef>;
 }
 
 export const CloudinaryPhotoUpload = ({
@@ -74,6 +79,7 @@ export const CloudinaryPhotoUpload = ({
   onPhotosChange,
   onUploadStateChange,
   photos,
+  ref,
 }: CloudinaryPhotoUploadProps) => {
   // useState hooks
   const [uploadState, setUploadState] = useState<PhotoUploadState>({
@@ -205,8 +211,66 @@ export const CloudinaryPhotoUpload = ({
 
   // debounce timer refs
   const reorderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const metadataTimersRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
+  const metadataTimersRef = useRef<
+    Map<string, { timer: NodeJS.Timeout; updates: { altText?: string; caption?: string } }>
+  >(new Map());
   const uploadWidgetRef = useRef<null | { close: () => void }>(null);
+
+  // expose flush method to parent component via ref
+  useImperativeHandle(
+    ref,
+    () => ({
+      flushPendingOperations: async () => {
+        console.log('[CloudinaryPhotoUpload] FLUSH CALLED - Pending timers:', metadataTimersRef.current.size);
+        const promises: Array<Promise<unknown>> = [];
+
+        // flush all pending metadata updates
+        metadataTimersRef.current.forEach(({ timer, updates }, photoId) => {
+          console.log('[CloudinaryPhotoUpload] Flushing metadata for photo:', {
+            bobbleheadId,
+            photoId,
+            updates,
+          });
+          clearTimeout(timer);
+          if (bobbleheadId && !photoId.startsWith('temp-')) {
+            promises.push(
+              updatePhotoMetadata({
+                altText: updates.altText,
+                bobbleheadId,
+                caption: updates.caption,
+                photoId,
+              }),
+            );
+          }
+        });
+        metadataTimersRef.current.clear();
+
+        // flush pending reorder operation
+        if (reorderTimeoutRef.current) {
+          clearTimeout(reorderTimeoutRef.current);
+          reorderTimeoutRef.current = null;
+
+          const persistedPhotos = photos.filter((p) => !p.id.startsWith('temp-'));
+          if (persistedPhotos.length > 0 && bobbleheadId) {
+            promises.push(
+              reorderPhotos({
+                bobbleheadId,
+                photoOrder: persistedPhotos.map((photo) => ({
+                  id: photo.id,
+                  isPrimary: photo.isPrimary,
+                  sortOrder: photo.sortOrder,
+                })),
+              }),
+            );
+          }
+        }
+
+        // wait for all operations to complete
+        await Promise.all(promises);
+      },
+    }),
+    [bobbleheadId, photos, updatePhotoMetadata, reorderPhotos],
+  );
 
   const handleSuccess = useCallback(
     (results: CloudinaryUploadWidgetResults) => {
@@ -542,10 +606,16 @@ export const CloudinaryPhotoUpload = ({
       const isMetadataUpdate = 'altText' in updates || 'caption' in updates;
 
       if (isPersistedPhoto && isMetadataUpdate) {
+        console.log('[CloudinaryPhotoUpload] Setting metadata timer:', {
+          bobbleheadId,
+          photoId,
+          updates: { altText: updates.altText, caption: updates.caption },
+        });
+
         // clear existing timer for this photo
-        const existingTimer = metadataTimersRef.current.get(photoId);
-        if (existingTimer) {
-          clearTimeout(existingTimer);
+        const existing = metadataTimersRef.current.get(photoId);
+        if (existing) {
+          clearTimeout(existing.timer);
         }
 
         // add to saving state
@@ -557,6 +627,7 @@ export const CloudinaryPhotoUpload = ({
 
         // set new debounced timer
         const timer = setTimeout(() => {
+          console.log('[CloudinaryPhotoUpload] Debounce timer fired for:', photoId);
           void updatePhotoMetadata({
             altText: updates.altText,
             bobbleheadId: bobbleheadId,
@@ -566,7 +637,21 @@ export const CloudinaryPhotoUpload = ({
           metadataTimersRef.current.delete(photoId);
         }, CONFIG.SEARCH.DEBOUNCE_MS);
 
-        metadataTimersRef.current.set(photoId, timer);
+        // store both timer and updates for flushing
+        metadataTimersRef.current.set(photoId, {
+          timer,
+          updates: {
+            altText: updates.altText,
+            caption: updates.caption,
+          },
+        });
+      } else {
+        console.log('[CloudinaryPhotoUpload] Skipping metadata update:', {
+          bobbleheadId,
+          isMetadataUpdate,
+          isPersistedPhoto,
+          photoId,
+        });
       }
     },
     [bobbleheadId, onPhotosChange, updatePhotoMetadata],
@@ -719,7 +804,7 @@ export const CloudinaryPhotoUpload = ({
       }
 
       // clear all metadata timers
-      metadataTimers.forEach((timer) => {
+      metadataTimers.forEach(({ timer }) => {
         clearTimeout(timer);
       });
       metadataTimers.clear();

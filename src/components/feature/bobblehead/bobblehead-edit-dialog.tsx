@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
-import type { bobbleheadPhotos } from '@/lib/db/schema';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
@@ -34,7 +33,10 @@ import { PhotoManagementErrorBoundary } from '@/components/feature/bobblehead/ph
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { CloudinaryPhotoUpload } from '@/components/ui/cloudinary-photo-upload';
+import {
+  CloudinaryPhotoUpload,
+  type CloudinaryPhotoUploadRef,
+} from '@/components/ui/cloudinary-photo-upload';
 import { Conditional } from '@/components/ui/conditional';
 import {
   Dialog,
@@ -84,8 +86,6 @@ interface BobbleheadForEdit {
   year: null | number;
 }
 
-type BobbleheadPhoto = typeof bobbleheadPhotos.$inferSelect;
-
 // Custom ItemPhotos component for editing with bobblehead support
 interface ItemPhotosEditProps {
   bobbleheadId: string;
@@ -94,6 +94,7 @@ interface ItemPhotosEditProps {
   isLoading: boolean;
   onRetry: () => void;
   photoCount: number;
+  photoUploadRef?: React.RefObject<CloudinaryPhotoUploadRef | null>;
 }
 
 function ItemPhotosEditComponent({
@@ -103,6 +104,7 @@ function ItemPhotosEditComponent({
   isLoading,
   onRetry,
   photoCount,
+  photoUploadRef,
 }: ItemPhotosEditProps) {
   const photos =
     useStore(form.store, (state) => (state.values as { photos?: Array<CloudinaryPhoto> }).photos) || [];
@@ -199,6 +201,7 @@ function ItemPhotosEditComponent({
               maxPhotos={8}
               onPhotosChange={handlePhotosChange}
               photos={photos}
+              ref={photoUploadRef}
             />
           </div>
         </Conditional>
@@ -242,6 +245,7 @@ export const BobbleheadEditDialog = withFocusManagement(
     const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const formResetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const serverActionAbortRef = useRef(false);
+    const photoUploadRef = useRef<CloudinaryPhotoUploadRef>(null);
 
     const { executeAsync, isExecuting } = useServerAction(updateBobbleheadWithPhotosAction, {
       onAfterSuccess: () => {
@@ -287,6 +291,23 @@ export const BobbleheadEditDialog = withFocusManagement(
         year: bobblehead.year?.toString() || '',
       } as z.input<typeof updateBobbleheadWithPhotosSchema>,
       onSubmit: async ({ value }) => {
+        // flush any pending photo operations before submitting
+        console.log('[BobbleheadEditDialog] About to flush pending operations');
+        try {
+          await photoUploadRef.current?.flushPendingOperations();
+          console.log('[BobbleheadEditDialog] Flush completed successfully');
+        } catch (error) {
+          console.error('[BobbleheadEditDialog] Flush failed:', error);
+          Sentry.captureException(error, {
+            extra: {
+              bobbleheadId: bobblehead.id,
+              operation: 'flush-pending-operations',
+            },
+            level: 'warning',
+          });
+        }
+
+        console.log('[BobbleheadEditDialog] Proceeding with main update');
         await executeAsync(value);
       },
       onSubmitInvalid: ({ formApi }) => {
@@ -601,6 +622,7 @@ export const BobbleheadEditDialog = withFocusManagement(
                   isLoading={isLoadingPhotos}
                   onRetry={handleRetryPhotoFetch}
                   photoCount={photoCount}
+                  photoUploadRef={photoUploadRef}
                 />
               </PhotoManagementErrorBoundary>
               <PhysicalAttributes form={form as never} />
