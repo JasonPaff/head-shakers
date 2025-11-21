@@ -425,8 +425,10 @@ export class CacheRevalidationService {
       userId: string,
       operation: 'add' | 'delete' | 'update',
       entitySlug?: string,
+      commentId?: string,
+      parentCommentId?: string,
     ): RevalidationResult => {
-      const tags = CacheTagInvalidation.onSocialInteraction(entityType, entityId, userId);
+      const tags = CacheTagInvalidation.onCommentChange(entityType, entityId, commentId, parentCommentId);
 
       // Revalidate the specific page path where comments are displayed using slug if provided
       if (isCacheEnabled() && entitySlug) {
@@ -454,7 +456,7 @@ export class CacheRevalidationService {
         entityId,
         entityType,
         operation: `social:comment:${operation}`,
-        reason: `Comment ${operation} on ${entityType}`,
+        reason: `Comment ${operation} on ${entityType}${parentCommentId ? ' (reply)' : ''}`,
         userId,
       });
     },

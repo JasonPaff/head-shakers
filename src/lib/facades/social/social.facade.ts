@@ -1,10 +1,10 @@
-import type { FindOptions } from '@/lib/queries/base/query-context';
+import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { CommentTargetType, CommentWithUser, UserLikeStatus } from '@/lib/queries/social/social.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';
 
-import { type LikeTargetType, OPERATIONS } from '@/lib/constants';
+import { type LikeTargetType, MAX_COMMENT_NESTING_DEPTH, OPERATIONS } from '@/lib/constants';
 import { CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import {
@@ -30,6 +30,7 @@ export interface CommentListData {
 
 export interface CommentMutationResult {
   comment: CommentWithUser | null;
+  error?: string;
   isSuccessful: boolean;
 }
 
@@ -110,6 +111,96 @@ export class SocialFacade {
     }
   }
 
+  /**
+   * Create a reply to an existing comment
+   * Validates parent comment existence, depth limits, and target entity consistency
+   * Implements cache invalidation for parent comment to reflect new reply count
+   */
+  static async createCommentReply(
+    data: InsertComment & { parentCommentId: string },
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CommentMutationResult> {
+    try {
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+        // Validation 1: Verify parent comment exists and is not deleted
+        const parentComment = await SocialQuery.getCommentByIdAsync(data.parentCommentId, context);
+
+        if (!parentComment) {
+          return {
+            comment: null,
+            error: 'Parent comment not found or has been deleted',
+            isSuccessful: false,
+          };
+        }
+
+        // Validation 2: Ensure parent comment belongs to the same target entity
+        if (parentComment.targetId !== data.targetId || parentComment.targetType !== data.targetType) {
+          return {
+            comment: null,
+            error: 'Parent comment must belong to the same target entity',
+            isSuccessful: false,
+          };
+        }
+
+        // Validation 3: Enforce depth does not exceed MAX_COMMENT_NESTING_DEPTH
+        const currentDepth = await this.calculateCommentDepth(data.parentCommentId, context);
+
+        if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
+          return {
+            comment: null,
+            error: `Maximum nesting depth of ${MAX_COMMENT_NESTING_DEPTH} exceeded`,
+            isSuccessful: false,
+          };
+        }
+
+        // create the reply comment
+        const newComment = await SocialQuery.createCommentAsync(data, userId, context);
+
+        if (newComment) {
+          // increment comment count on the target entity
+          await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
+
+          // fetch the comment with user data using efficient method
+          const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(newComment.id, context);
+
+          // invalidate cache for parent comment to reflect new reply
+          const cacheTags = CacheTagGenerators.social.comments(
+            parentComment.targetType === 'subcollection' ? 'collection' : parentComment.targetType,
+            parentComment.targetId,
+          );
+          cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
+
+          return {
+            comment: commentWithUser,
+            isSuccessful: !!commentWithUser,
+          };
+        }
+
+        return {
+          comment: null,
+          isSuccessful: false,
+        };
+      });
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { commentData: data },
+        facade: 'SocialFacade',
+        method: 'createCommentReply',
+        operation: OPERATIONS.COMMENTS.CREATE_COMMENT,
+        userId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
+   * Delete a comment and cascade delete all nested replies
+   * Implements soft deletion by setting isDeleted flag
+   * Decrements comment count for each deleted comment in the tree
+   */
   static async deleteComment(
     commentId: string,
     userId: string,
@@ -126,6 +217,14 @@ export class SocialFacade {
           return false;
         }
 
+        // check if comment has replies for cascade deletion
+        const hasReplies = await SocialQuery.hasCommentRepliesAsync(commentId, context);
+
+        if (hasReplies) {
+          // recursively delete all child replies
+          await this.deleteCommentRepliesRecursive(commentId, context);
+        }
+
         // soft delete the comment
         const deletedComment = await SocialQuery.deleteCommentAsync(commentId, context);
 
@@ -136,6 +235,13 @@ export class SocialFacade {
             deletedComment.targetType,
             context,
           );
+
+          // invalidate cache for the target entity to reflect comment deletion
+          const cacheTags = CacheTagGenerators.social.comments(
+            deletedComment.targetType === 'subcollection' ? 'collection' : deletedComment.targetType,
+            deletedComment.targetId,
+          );
+          cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
 
           return true;
         }
@@ -249,11 +355,7 @@ export class SocialFacade {
             facade: 'SocialFacade',
             operation: 'getCommentById',
           },
-          tags: CacheTagGenerators.social.comment(
-            commentWithUser.targetType === 'subcollection' ? 'collection' : commentWithUser.targetType,
-            commentWithUser.targetId,
-            userId,
-          ),
+          tags: CacheTagGenerators.social.comment(commentId, userId),
         },
       );
     } catch (error) {
@@ -311,10 +413,9 @@ export class SocialFacade {
             facade: 'SocialFacade',
             operation: 'getComments',
           },
-          tags: CacheTagGenerators.social.comment(
+          tags: CacheTagGenerators.social.comments(
             targetType === 'subcollection' ? 'collection' : targetType,
             targetId,
-            viewerUserId || 'public',
           ),
         },
       );
@@ -431,8 +532,6 @@ export class SocialFacade {
     }
   }
 
-  // ==================== Comment Methods ====================
-
   static async getRecentLikeActivity(
     targetId: string,
     targetType: LikeTargetType,
@@ -492,6 +591,8 @@ export class SocialFacade {
       throw createFacadeError(context, error);
     }
   }
+
+  // ==================== Comment Methods ====================
 
   static async getUserLikeStatus(
     targetId: string,
@@ -634,6 +735,52 @@ export class SocialFacade {
         userId,
       };
       throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
+   * Calculate the current nesting depth of a comment
+   * Traverses up the comment tree to find the depth level
+   * Returns 0 for root comments (no parent)
+   */
+  private static async calculateCommentDepth(commentId: string, context: QueryContext): Promise<number> {
+    const commentThread = await SocialQuery.getCommentThreadWithRepliesAsync(commentId, 0, context);
+
+    if (!commentThread) {
+      return 0;
+    }
+
+    // the depth of the comment itself indicates how deep it is in the tree
+    return commentThread.depth;
+  }
+
+  /**
+   * Recursively delete all replies for a comment
+   * Used during cascade deletion to remove entire comment threads
+   */
+  private static async deleteCommentRepliesRecursive(commentId: string, context: QueryContext): Promise<void> {
+    // fetch all direct replies
+    const replies = await SocialQuery.getCommentRepliesAsync(commentId, {}, context);
+
+    // recursively delete nested replies for each direct reply
+    for (const reply of replies) {
+      const hasNestedReplies = await SocialQuery.hasCommentRepliesAsync(reply.id, context);
+
+      if (hasNestedReplies) {
+        await this.deleteCommentRepliesRecursive(reply.id, context);
+      }
+
+      // soft delete the reply
+      const deletedReply = await SocialQuery.deleteCommentAsync(reply.id, context);
+
+      if (deletedReply) {
+        // decrement comment count for each deleted reply
+        await SocialQuery.decrementCommentCountAsync(
+          deletedReply.targetId,
+          deletedReply.targetType,
+          context,
+        );
+      }
     }
   }
 }

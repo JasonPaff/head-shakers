@@ -2,6 +2,13 @@
  * Enum definitions used throughout the application
  * Centralized for consistency and type safety
  */
+
+/**
+ * Maximum allowed depth for nested comments
+ * Balances functionality with UI usability - deeper nesting becomes difficult to read on smaller screens
+ */
+export const MAX_COMMENT_NESTING_DEPTH = 5;
+
 export const ENUMS = {
   BOBBLEHEAD: {
     CONDITION: ['mint', 'excellent', 'good', 'fair', 'poor'] as const,

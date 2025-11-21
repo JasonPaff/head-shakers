@@ -1,4 +1,4 @@
-import { and, count, desc, eq, inArray, or, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNull, or, sql } from 'drizzle-orm';
 
 import type { LikeTargetType } from '@/lib/constants';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
@@ -11,13 +11,19 @@ import type {
   SelectLike,
 } from '@/lib/validations/social.validation';
 
-import { ENUMS } from '@/lib/constants';
+import { ENUMS, MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants';
 import { bobbleheads, collections, comments, likes, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type CommentRecord = SelectComment;
 
 export type CommentTargetType = (typeof ENUMS.COMMENT.TARGET_TYPE)[number];
+
+export type CommentWithDepth = CommentWithUser & {
+  depth: number;
+  replies?: Array<CommentWithDepth>;
+  replyCount?: number;
+};
 
 export type CommentWithUser = PublicComment & {
   user: null | {
@@ -247,6 +253,68 @@ export class SocialQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
+  /**
+   * Get comment replies for a specific parent comment
+   * Uses composite index on (parentCommentId, createdAt) for optimal performance
+   */
+  static async getCommentRepliesAsync(
+    parentCommentId: string,
+    options: FindOptions = {},
+    context: QueryContext,
+  ): Promise<Array<CommentWithUser>> {
+    const dbInstance = this.getDbInstance(context);
+    const pagination = this.applyPagination(options);
+
+    const query = dbInstance
+      .select({
+        content: comments.content,
+        createdAt: comments.createdAt,
+        editedAt: comments.editedAt,
+        id: comments.id,
+        isEdited: comments.isEdited,
+        likeCount: comments.likeCount,
+        parentCommentId: comments.parentCommentId,
+        targetId: comments.targetId,
+        targetType: comments.targetType,
+        user: {
+          avatarUrl: sql<null | string>`users.avatar_url`,
+          displayName: sql<null | string>`users.display_name`,
+          id: sql<string>`users.id`,
+          username: sql<null | string>`users.username`,
+        },
+        userId: comments.userId,
+      })
+      .from(comments)
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .where(and(eq(comments.parentCommentId, parentCommentId), eq(comments.isDeleted, false)))
+      .orderBy(desc(comments.createdAt));
+
+    if (pagination.limit) {
+      query.limit(pagination.limit);
+    }
+
+    if (pagination.offset) {
+      query.offset(pagination.offset);
+    }
+
+    return query;
+  }
+
+  /**
+   * Get count of direct replies for a comment
+   * Uses composite index on (parentCommentId, createdAt)
+   */
+  static async getCommentReplyCountAsync(parentCommentId: string, context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(comments)
+      .where(and(eq(comments.parentCommentId, parentCommentId), eq(comments.isDeleted, false)));
+
+    return result[0]?.count || 0;
+  }
+
   static async getCommentsAsync(
     targetId: string,
     targetType: CommentTargetType,
@@ -295,6 +363,144 @@ export class SocialQuery extends BaseQuery {
     }
 
     return query;
+  }
+
+  /**
+   * Get top-level comments for a target with nested replies
+   * Fetches root comments (parentCommentId is null) and recursively loads replies
+   *
+   * @param targetId - The target entity ID (bobblehead, collection, subcollection)
+   * @param targetType - The type of target entity
+   * @param options - Pagination and filtering options
+   * @param context - Query context with database instance
+   * @returns Array of root comments with nested replies and depth tracking
+   */
+  static async getCommentsWithRepliesAsync(
+    targetId: string,
+    targetType: CommentTargetType,
+    options: FindOptions = {},
+    context: QueryContext,
+  ): Promise<Array<CommentWithDepth>> {
+    const dbInstance = this.getDbInstance(context);
+    const pagination = this.applyPagination(options);
+
+    // fetch only root comments (no parent)
+    const query = dbInstance
+      .select({
+        content: comments.content,
+        createdAt: comments.createdAt,
+        editedAt: comments.editedAt,
+        id: comments.id,
+        isEdited: comments.isEdited,
+        likeCount: comments.likeCount,
+        parentCommentId: comments.parentCommentId,
+        targetId: comments.targetId,
+        targetType: comments.targetType,
+        user: {
+          avatarUrl: sql<null | string>`users.avatar_url`,
+          displayName: sql<null | string>`users.display_name`,
+          id: sql<string>`users.id`,
+          username: sql<null | string>`users.username`,
+        },
+        userId: comments.userId,
+      })
+      .from(comments)
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .where(
+        and(
+          eq(comments.targetId, targetId),
+          eq(comments.targetType, targetType),
+          isNull(comments.parentCommentId),
+          eq(comments.isDeleted, false),
+        ),
+      )
+      .orderBy(desc(comments.createdAt));
+
+    if (pagination.limit) {
+      query.limit(pagination.limit);
+    }
+
+    if (pagination.offset) {
+      query.offset(pagination.offset);
+    }
+
+    const rootComments = await query;
+
+    // recursively fetch replies for each root comment
+    const commentsWithDepth = await Promise.all(
+      rootComments.map(async (comment) => {
+        const replies = await this.getCommentRepliesAsync(comment.id, {}, context);
+
+        const repliesWithDepth =
+          replies.length > 0
+            ? await Promise.all(
+                replies.map((reply) => this.getCommentThreadWithRepliesAsync(reply.id, 1, context)),
+              )
+            : [];
+
+        return {
+          ...comment,
+          depth: 0,
+          replies: repliesWithDepth.filter((reply): reply is CommentWithDepth => reply !== null),
+          replyCount: replies.length,
+        };
+      }),
+    );
+
+    return commentsWithDepth;
+  }
+
+  /**
+   * Get comment thread with nested replies up to MAX_COMMENT_NESTING_DEPTH
+   * Recursively fetches child comments and calculates depth for each level
+   * Uses composite index on (parentCommentId, createdAt) for performance
+   *
+   * @param commentId - The root comment ID to fetch thread for
+   * @param currentDepth - Current nesting depth (0 for root comment)
+   * @param context - Query context with database instance
+   * @returns Comment with nested replies and depth tracking
+   */
+  static async getCommentThreadWithRepliesAsync(
+    commentId: string,
+    currentDepth: number = 0,
+    context: QueryContext,
+  ): Promise<CommentWithDepth | null> {
+    // fetch the comment with user data
+    const comment = await this.getCommentByIdWithUserAsync(commentId, context);
+
+    if (!comment) {
+      return null;
+    }
+
+    // initialize with depth tracking
+    const commentWithDepth: CommentWithDepth = {
+      ...comment,
+      depth: currentDepth,
+      replies: [],
+    };
+
+    // stop recursion at max depth to prevent performance issues and maintain UI usability
+    if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
+      return commentWithDepth;
+    }
+
+    // fetch direct replies using indexed query
+    const replies = await this.getCommentRepliesAsync(commentId, {}, context);
+
+    // recursively fetch nested replies for each direct reply
+    if (replies.length > 0) {
+      const repliesWithDepth = await Promise.all(
+        replies.map((reply) => this.getCommentThreadWithRepliesAsync(reply.id, currentDepth + 1, context)),
+      );
+
+      // filter out null results and add to comment
+      commentWithDepth.replies = repliesWithDepth.filter(
+        (reply): reply is CommentWithDepth => reply !== null,
+      );
+      commentWithDepth.replyCount = replies.length;
+    }
+
+    return commentWithDepth;
   }
 
   static async getLikeCountAsync(
@@ -355,8 +561,6 @@ export class SocialQuery extends BaseQuery {
     });
   }
 
-  // ==================== Comment Methods ====================
-
   static async getLikesForMultipleContentItemsAsync(
     contentIds: Array<string>,
     contentType: LikeTargetType,
@@ -412,6 +616,8 @@ export class SocialQuery extends BaseQuery {
 
     return result;
   }
+
+  // ==================== Comment Methods ====================
 
   static async getRecentLikesAsync(
     targetId: string,
@@ -552,6 +758,22 @@ export class SocialQuery extends BaseQuery {
         targetType,
       };
     });
+  }
+
+  /**
+   * Check if a comment has any replies
+   * Useful for showing deletion warnings and UI states
+   */
+  static async hasCommentRepliesAsync(commentId: string, context: QueryContext): Promise<boolean> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ id: comments.id })
+      .from(comments)
+      .where(and(eq(comments.parentCommentId, commentId), eq(comments.isDeleted, false)))
+      .limit(1);
+
+    return result.length > 0;
   }
 
   static async incrementCommentCountAsync(

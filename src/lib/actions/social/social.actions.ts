@@ -133,42 +133,76 @@ export const createCommentAction = authActionClient
     const dbInstance = ctx.tx ?? ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COMMENT_DATA, {
+      parentCommentId: commentData.parentCommentId,
       targetId: commentData.targetId,
       targetType: commentData.targetType,
       userId: ctx.userId,
     });
 
     try {
-      const result = await SocialFacade.createComment(
-        {
-          content: commentData.content,
-          targetId: commentData.targetId,
-          targetType: commentData.targetType,
-        },
-        ctx.userId,
-        dbInstance,
-      );
+      // Use createCommentReply for nested comments, createComment for top-level
+      const result =
+        commentData.parentCommentId ?
+          await SocialFacade.createCommentReply(
+            {
+              content: commentData.content,
+              parentCommentId: commentData.parentCommentId,
+              targetId: commentData.targetId,
+              targetType: commentData.targetType,
+            },
+            ctx.userId,
+            dbInstance,
+          )
+        : await SocialFacade.createComment(
+            {
+              content: commentData.content,
+              targetId: commentData.targetId,
+              targetType: commentData.targetType,
+            },
+            ctx.userId,
+            dbInstance,
+          );
 
       if (!result.isSuccessful) {
+        // Provide user-friendly error messages based on error type from facade
+        let errorMessage: string = ERROR_MESSAGES.COMMENTS.COMMENT_FAILED;
+
+        if (result.error && typeof result.error === 'string') {
+          // Map facade error messages to user-friendly messages
+          if (result.error.includes('Parent comment not found')) {
+            errorMessage = 'The comment you are replying to no longer exists.';
+          } else if (result.error.includes('deleted')) {
+            errorMessage = 'Cannot reply to a deleted comment.';
+          } else if (result.error.includes('same target')) {
+            errorMessage = 'Cannot reply to this comment. Please refresh and try again.';
+          } else if (result.error.includes('Maximum nesting depth')) {
+            errorMessage =
+              'Cannot reply to this comment. The conversation thread has reached its maximum depth.';
+          }
+        }
+
         throw new ActionError(
           ErrorType.BUSINESS_RULE,
           ERROR_CODES.COMMENTS.COMMENT_FAILED,
-          ERROR_MESSAGES.COMMENTS.COMMENT_FAILED,
+          errorMessage,
           { ctx, operation: OPERATIONS.COMMENTS.CREATE_COMMENT },
           true, // recoverable
           400,
         );
       }
 
+      const isReply = Boolean(commentData.parentCommentId);
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           commentId: result.comment?.id,
+          isReply,
+          parentCommentId: commentData.parentCommentId,
           targetId: commentData.targetId,
           targetType: commentData.targetType,
         },
         level: SENTRY_LEVELS.INFO,
-        message: `User created comment on ${commentData.targetType} ${commentData.targetId}`,
+        message: `User created ${isReply ? 'reply' : 'comment'} on ${commentData.targetType} ${commentData.targetId}`,
       });
 
       CacheRevalidationService.social.onCommentChange(
@@ -180,7 +214,7 @@ export const createCommentAction = authActionClient
 
       return {
         data: result.comment,
-        message: 'Comment added successfully',
+        message: isReply ? 'Reply added successfully' : 'Comment added successfully',
         success: true,
       };
     } catch (error) {

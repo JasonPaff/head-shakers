@@ -5,24 +5,25 @@ import type { ComponentProps } from 'react';
 import { MessageSquareTextIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import type { CommentWithUser } from '@/components/feature/comments/comment-item';
+import type { CommentWithDepth } from '@/lib/queries/social/social.query';
 
 import { CommentDeleteDialog } from '@/components/feature/comments/comment-delete-dialog';
 import { CommentEditDialog } from '@/components/feature/comments/comment-edit-dialog';
 import { CommentForm } from '@/components/feature/comments/comment-form';
 import { CommentList } from '@/components/feature/comments/comment-list';
 import { Conditional } from '@/components/ui/conditional';
+import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
 import { cn } from '@/utils/tailwind-utils';
 
 interface CommentSectionProps extends ComponentProps<'div'> {
-  comments: Array<CommentWithUser>;
+  comments: Array<CommentWithDepth>;
   currentUserId?: string;
   hasMore?: boolean;
   initialCommentCount?: number;
   isAuthenticated?: boolean;
   isEditable?: boolean;
   isLoading?: boolean;
-  onCommentCreate?: (content: string) => Promise<void> | void;
+  onCommentCreate?: (content: string, parentCommentId?: string) => Promise<void> | void;
   onCommentDelete?: (commentId: string) => Promise<void> | void;
   onCommentUpdate?: (commentId: string, content: string) => Promise<void> | void;
   onLoadMore?: () => void;
@@ -47,22 +48,33 @@ export const CommentSection = ({
   onLoadMore,
   ...props
 }: CommentSectionProps) => {
+  // 1. useState hooks
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [selectedComment, setSelectedComment] = useState<CommentWithUser | null>(null);
+  const [selectedComment, setSelectedComment] = useState<CommentWithDepth | null>(null);
   const [selectedCommentId, setSelectedCommentId] = useState<null | string>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [replyParentComment, setReplyParentComment] = useState<CommentWithDepth | null>(null);
 
+  // 7. Derived values for conditional rendering
   const _commentCount = comments.length || initialCommentCount;
   const _shouldShowForm = isAuthenticated && !!onCommentCreate;
   const _isProcessing = isSubmitting || isLoading;
+  const _isReplyMode = !!replyParentComment;
+  const _isAtMaxDepth = _isReplyMode && replyParentComment.depth + 1 >= MAX_COMMENT_NESTING_DEPTH;
+  const _parentCommentAuthor = replyParentComment?.user?.displayName ?? replyParentComment?.user?.username ?? undefined;
 
-  const handleCreateComment = async (content: string) => {
+  // 6. Event handlers
+  const handleCreateComment = async (content: string, parentCommentId?: string) => {
     if (!onCommentCreate) return;
 
     setIsSubmitting(true);
     try {
-      await onCommentCreate(content);
+      await onCommentCreate(content, parentCommentId);
+      // Clear reply state after successful submission
+      if (parentCommentId) {
+        setReplyParentComment(null);
+      }
     } catch (error) {
       console.error('Failed to create comment:', error);
     } finally {
@@ -70,7 +82,16 @@ export const CommentSection = ({
     }
   };
 
-  const handleEditClick = (comment: CommentWithUser) => {
+  const handleReplyClick = (comment: CommentWithDepth) => {
+    // Clicking reply on a different comment clears the previous reply state
+    setReplyParentComment(comment);
+  };
+
+  const handleCancelReply = () => {
+    setReplyParentComment(null);
+  };
+
+  const handleEditClick = (comment: CommentWithDepth) => {
     setSelectedComment(comment);
     setIsEditDialogOpen(true);
   };
@@ -133,9 +154,13 @@ export const CommentSection = ({
       <Conditional isCondition={_shouldShowForm}>
         <div className={'rounded-lg border bg-card p-4'}>
           <CommentForm
+            isAtMaxDepth={_isAtMaxDepth}
             isDisabled={_isProcessing}
             isSubmitting={isSubmitting}
+            onCancelReply={_isReplyMode ? handleCancelReply : undefined}
             onSubmit={handleCreateComment}
+            parentCommentAuthor={_parentCommentAuthor}
+            parentCommentId={replyParentComment?.id}
             placeholder={'Share your thoughts...'}
             submitButtonText={'Post Comment'}
           />
@@ -159,6 +184,7 @@ export const CommentSection = ({
         onDeleteClick={handleDeleteClick}
         onEditClick={handleEditClick}
         onLoadMore={onLoadMore}
+        onReply={isAuthenticated ? handleReplyClick : undefined}
       />
 
       {/* Edit Dialog */}

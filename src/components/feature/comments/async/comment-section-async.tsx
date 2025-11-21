@@ -3,10 +3,23 @@ import 'server-only';
 import type { ComponentProps } from 'react';
 
 import type { CommentTargetType } from '@/lib/constants';
+import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
 
 import { CommentSectionClient } from '@/components/feature/comments/async/comment-section-client';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
+
+/**
+ * Normalizes a CommentWithUser to CommentWithDepth format
+ * Adds depth and replies properties for nested comment support
+ */
+const normalizeComment = (comment: CommentWithUser, depth = 0): CommentWithDepth => {
+  return {
+    ...comment,
+    depth,
+    replies: [],
+  };
+};
 
 interface CommentSectionAsyncProps extends Omit<ComponentProps<'div'>, 'children'> {
   /**
@@ -49,12 +62,15 @@ export const CommentSectionAsync = async ({
     currentUserId || undefined,
   );
 
+  // Normalize comments to include depth information for nested reply support
+  const normalizedComments = comments.map((comment) => normalizeComment(comment, 0));
+
   return (
     <CommentSectionClient
       currentUserId={currentUserId || undefined}
       hasMore={hasMore}
       initialCommentCount={total}
-      initialComments={comments}
+      initialComments={normalizedComments}
       isAuthenticated={isAuthenticated}
       targetId={targetId}
       targetType={targetType}

@@ -10,10 +10,18 @@ import { insertCommentSchema } from '@/lib/validations/social.validation';
 
 /**
  * Schema for creating a new comment
- * Uses the base insert schema which validates content, targetId, and targetType
+ * Extends the base insert schema to support optional parent comment for replies
  * Note: userId is passed separately via auth context
+ * Note: Depth validation occurs in the facade layer using MAX_COMMENT_NESTING_DEPTH constant
+ *
+ * Facade layer validation requirements:
+ * 1. Parent comment exists and is not deleted
+ * 2. Current depth does not exceed MAX_COMMENT_NESTING_DEPTH (5 levels)
+ * 3. Parent comment belongs to the same target entity
  */
-export const createCommentSchema = insertCommentSchema;
+export const createCommentSchema = insertCommentSchema.extend({
+  parentCommentId: z.string().uuid('Invalid parent comment ID').optional(),
+});
 
 /**
  * Schema for updating an existing comment
