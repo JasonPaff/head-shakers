@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
 
@@ -13,16 +13,14 @@ import { CollectionSidebarSubcollectionsAsync } from '@/app/(app)/collections/[c
 import { CollectionStatsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-stats-async';
 import { CollectionErrorBoundary } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-error-boundary';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-header';
+import { CollectionPageClientWrapper } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-page-client-wrapper';
 import { CollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-bobbleheads-skeleton';
 import { CollectionHeaderSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-header-skeleton';
 import { CollectionStatsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-stats-skeleton';
 import { SubcollectionsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/subcollections-skeleton';
 import { Route } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
-import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
-import { CollectionStickyHeader } from '@/components/feature/collection/collection-sticky-header';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
-import { StickyHeaderWrapper } from '@/components/feature/sticky-header/sticky-header-wrapper';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
@@ -172,7 +170,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   ]);
 
   return (
-    <CollectionViewTracker collectionId={collectionId} collectionSlug={collectionSlug}>
+    <Fragment>
       {/* JSON-LD structured data */}
       {collectionPageSchema && (
         <script
@@ -185,82 +183,72 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
         type={'application/ld+json'}
       />
 
-      <StickyHeaderWrapper>
-        {(isSticky) => (
-          <div>
-            {/* Sticky Header - shown when scrolling */}
-            {isSticky && (
-              <CollectionStickyHeader
-                canDelete={canDelete}
-                canEdit={canEdit}
-                collection={publicCollection}
-                collectionId={publicCollection.id}
-                collectionSlug={publicCollection.slug}
-                isLiked={likeData?.isLiked ?? false}
-                isOwner={isOwner}
-                likeCount={likeData?.likeCount ?? 0}
-                title={publicCollection.name}
-              />
-            )}
+      <CollectionPageClientWrapper
+        canDelete={canDelete}
+        canEdit={canEdit}
+        collection={publicCollection}
+        collectionId={collectionId}
+        collectionSlug={collectionSlug}
+        isOwner={isOwner}
+        likeData={likeData}
+        title={publicCollection.name}
+      >
+        {/* Header Section with Suspense */}
+        <div className={'mt-3 border-b border-border'}>
+          <ContentLayout>
+            <CollectionErrorBoundary section={'header'}>
+              <Suspense fallback={<CollectionHeaderSkeleton />}>
+                <CollectionHeader collection={publicCollection} likeData={likeData} />
+              </Suspense>
+            </CollectionErrorBoundary>
+          </ContentLayout>
+        </div>
 
-            {/* Header Section with Suspense */}
-            <div className={'mt-3 border-b border-border'}>
-              <ContentLayout>
-                <CollectionErrorBoundary section={'header'}>
-                  <Suspense fallback={<CollectionHeaderSkeleton />}>
-                    <CollectionHeader collection={publicCollection} likeData={likeData} />
+        {/* Main Content */}
+        <div className={'mt-4'}>
+          <ContentLayout>
+            <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+              {/* Main Content Area */}
+              <div className={'lg:col-span-9'}>
+                <CollectionErrorBoundary section={'bobbleheads'}>
+                  <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
+                    <CollectionBobbleheadsAsync
+                      collectionId={collectionId}
+                      searchParams={resolvedSearchParams}
+                    />
                   </Suspense>
                 </CollectionErrorBoundary>
-              </ContentLayout>
-            </div>
+              </div>
 
-            {/* Main Content */}
-            <div className={'mt-4'}>
-              <ContentLayout>
-                <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
-                  {/* Main Content Area */}
-                  <div className={'lg:col-span-9'}>
-                    <CollectionErrorBoundary section={'bobbleheads'}>
-                      <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
-                        <CollectionBobbleheadsAsync
-                          collectionId={collectionId}
-                          searchParams={resolvedSearchParams}
-                        />
-                      </Suspense>
-                    </CollectionErrorBoundary>
-                  </div>
-
-                  {/* Sidebar */}
-                  <aside className={'flex flex-col gap-6 lg:col-span-3'}>
-                    <CollectionErrorBoundary section={'stats'}>
-                      <Suspense fallback={<CollectionStatsSkeleton />}>
-                        <CollectionStatsAsync collectionId={collectionId} />
-                      </Suspense>
-                    </CollectionErrorBoundary>
-
-                    <CollectionErrorBoundary section={'subcollections'}>
-                      <Suspense fallback={<SubcollectionsSkeleton />}>
-                        <CollectionSidebarSubcollectionsAsync collectionId={collectionId} />
-                      </Suspense>
-                    </CollectionErrorBoundary>
-                  </aside>
-                </div>
-              </ContentLayout>
-            </div>
-
-            {/* Comments Section */}
-            <div className={'mt-8'}>
-              <ContentLayout>
-                <CollectionErrorBoundary section={'comments'}>
-                  <Suspense fallback={<CommentSectionSkeleton />}>
-                    <CommentSectionAsync targetId={collectionId} targetType={'collection'} />
+              {/* Sidebar */}
+              <aside className={'flex flex-col gap-6 lg:col-span-3'}>
+                <CollectionErrorBoundary section={'stats'}>
+                  <Suspense fallback={<CollectionStatsSkeleton />}>
+                    <CollectionStatsAsync collectionId={collectionId} />
                   </Suspense>
                 </CollectionErrorBoundary>
-              </ContentLayout>
+
+                <CollectionErrorBoundary section={'subcollections'}>
+                  <Suspense fallback={<SubcollectionsSkeleton />}>
+                    <CollectionSidebarSubcollectionsAsync collectionId={collectionId} />
+                  </Suspense>
+                </CollectionErrorBoundary>
+              </aside>
             </div>
-          </div>
-        )}
-      </StickyHeaderWrapper>
-    </CollectionViewTracker>
+          </ContentLayout>
+        </div>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <CollectionErrorBoundary section={'comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync targetId={collectionId} targetType={'collection'} />
+              </Suspense>
+            </CollectionErrorBoundary>
+          </ContentLayout>
+        </div>
+      </CollectionPageClientWrapper>
+    </Fragment>
   );
 }

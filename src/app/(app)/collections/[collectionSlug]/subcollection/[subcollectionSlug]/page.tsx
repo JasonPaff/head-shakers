@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type';
 
@@ -15,12 +15,10 @@ import { SubcollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[colle
 import { SubcollectionHeaderSkeleton } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/skeletons/subcollection-header-skeleton';
 import { SubcollectionMetricsSkeleton } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/skeletons/subcollection-metrics-skeleton';
 import { SubcollectionErrorBoundary } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-error-boundary';
+import { SubcollectionPageClientWrapper } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-page-client-wrapper';
 import { Route } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type';
-import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
-import { StickyHeaderWrapper } from '@/components/feature/sticky-header/sticky-header-wrapper';
-import { SubcollectionStickyHeader } from '@/components/feature/subcollection/subcollection-sticky-header';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections, subCollections } from '@/lib/db/schema';
@@ -223,12 +221,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   ]);
 
   return (
-    <CollectionViewTracker
-      collectionId={collectionId}
-      collectionSlug={collectionSlug}
-      subcollectionId={subcollectionId}
-      subcollectionSlug={subcollectionSlug}
-    >
+    <Fragment>
       {/* JSON-LD structured data */}
       {subcollectionPageSchema && (
         <script
@@ -241,82 +234,73 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
         type={'application/ld+json'}
       />
 
-      <StickyHeaderWrapper>
-        {(isSticky) => (
-          <div>
-            {/* Sticky Header - shown when scrolling */}
-            {isSticky && (
-              <SubcollectionStickyHeader
-                canDelete={canDelete}
-                canEdit={canEdit}
-                collectionName={publicSubcollection.collectionName}
-                collectionSlug={collectionSlug}
-                isLiked={likeData?.isLiked ?? false}
-                isOwner={isOwner}
-                likeCount={likeData?.likeCount ?? 0}
-                subcollection={publicSubcollection}
-                subcollectionId={publicSubcollection.id}
-                subcollectionSlug={publicSubcollection.slug}
-                title={publicSubcollection.name}
-              />
-            )}
+      <SubcollectionPageClientWrapper
+        canDelete={canDelete}
+        canEdit={canEdit}
+        collectionId={collectionId}
+        collectionName={publicSubcollection.collectionName}
+        collectionSlug={collectionSlug}
+        isOwner={isOwner}
+        likeData={likeData}
+        subcollection={publicSubcollection}
+        subcollectionId={subcollectionId}
+        subcollectionSlug={subcollectionSlug}
+        title={publicSubcollection.name}
+      >
+        {/* Header Section with Suspense */}
+        <div className={'mt-3 border-b border-border'}>
+          <ContentLayout>
+            <SubcollectionErrorBoundary section={'header'}>
+              <Suspense fallback={<SubcollectionHeaderSkeleton />}>
+                <SubcollectionHeaderAsync collectionId={collectionId} subcollectionId={subcollectionId} />
+              </Suspense>
+            </SubcollectionErrorBoundary>
+          </ContentLayout>
+        </div>
 
-            {/* Header Section with Suspense */}
-            <div className={'mt-3 border-b border-border'}>
-              <ContentLayout>
-                <SubcollectionErrorBoundary section={'header'}>
-                  <Suspense fallback={<SubcollectionHeaderSkeleton />}>
-                    <SubcollectionHeaderAsync collectionId={collectionId} subcollectionId={subcollectionId} />
+        {/* Main Content */}
+        <div className={'mt-4'}>
+          <ContentLayout>
+            <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+              {/* Main Content Area */}
+              <div className={'order-2 lg:order-1 lg:col-span-9'}>
+                <SubcollectionErrorBoundary section={'bobbleheads'}>
+                  <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
+                    <SubcollectionBobbleheadsAsync
+                      collectionId={collectionId}
+                      searchParams={resolvedSearchParams}
+                      subcollectionId={subcollectionId}
+                    />
                   </Suspense>
                 </SubcollectionErrorBoundary>
-              </ContentLayout>
-            </div>
+              </div>
 
-            {/* Main Content */}
-            <div className={'mt-4'}>
-              <ContentLayout>
-                <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
-                  {/* Main Content Area */}
-                  <div className={'order-2 lg:order-1 lg:col-span-9'}>
-                    <SubcollectionErrorBoundary section={'bobbleheads'}>
-                      <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
-                        <SubcollectionBobbleheadsAsync
-                          collectionId={collectionId}
-                          searchParams={resolvedSearchParams}
-                          subcollectionId={subcollectionId}
-                        />
-                      </Suspense>
-                    </SubcollectionErrorBoundary>
-                  </div>
-
-                  {/* Sidebar */}
-                  <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
-                    <SubcollectionErrorBoundary section={'metrics'}>
-                      <Suspense fallback={<SubcollectionMetricsSkeleton />}>
-                        <SubcollectionMetricsAsync
-                          collectionId={collectionId}
-                          subcollectionId={subcollectionId}
-                        />
-                      </Suspense>
-                    </SubcollectionErrorBoundary>
-                  </aside>
-                </div>
-              </ContentLayout>
-            </div>
-
-            {/* Comments Section */}
-            <div className={'mt-8'}>
-              <ContentLayout>
-                <SubcollectionErrorBoundary section={'comments'}>
-                  <Suspense fallback={<CommentSectionSkeleton />}>
-                    <CommentSectionAsync targetId={subcollectionId} targetType={'subcollection'} />
+              {/* Sidebar */}
+              <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
+                <SubcollectionErrorBoundary section={'metrics'}>
+                  <Suspense fallback={<SubcollectionMetricsSkeleton />}>
+                    <SubcollectionMetricsAsync
+                      collectionId={collectionId}
+                      subcollectionId={subcollectionId}
+                    />
                   </Suspense>
                 </SubcollectionErrorBoundary>
-              </ContentLayout>
+              </aside>
             </div>
-          </div>
-        )}
-      </StickyHeaderWrapper>
-    </CollectionViewTracker>
+          </ContentLayout>
+        </div>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <SubcollectionErrorBoundary section={'comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync targetId={subcollectionId} targetType={'subcollection'} />
+              </Suspense>
+            </SubcollectionErrorBoundary>
+          </ContentLayout>
+        </div>
+      </SubcollectionPageClientWrapper>
+    </Fragment>
   );
 }

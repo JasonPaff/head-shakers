@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
 
@@ -14,6 +14,7 @@ import { BobbleheadMetricsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]
 import { BobbleheadPhotoGalleryAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-photo-gallery-async';
 import { BobbleheadSecondaryCardsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-secondary-cards-async';
 import { BobbleheadErrorBoundary } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-error-boundary';
+import { BobbleheadPageClientWrapper } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper';
 import { BobbleheadDetailCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-detail-cards-skeleton';
 import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
@@ -21,11 +22,8 @@ import { BobbleheadMetricsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSl
 import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-photo-gallery-skeleton';
 import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { Route } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
-import { BobbleheadViewTracker } from '@/components/analytics/bobblehead-view-tracker';
-import { BobbleheadStickyHeader } from '@/components/feature/bobblehead/bobblehead-sticky-header';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
-import { StickyHeaderWrapper } from '@/components/feature/sticky-header/sticky-header-wrapper';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
@@ -164,11 +162,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
     : null;
 
   return (
-    <BobbleheadViewTracker
-      bobbleheadId={bobbleheadId}
-      bobbleheadSlug={bobbleheadSlug}
-      collectionId={basicBobblehead.collectionId ?? undefined}
-    >
+    <Fragment>
       {/* JSON-LD structured data */}
       {productSchema && (
         <script
@@ -183,104 +177,91 @@ async function ItemPage({ routeParams }: ItemPageProps) {
         />
       )}
 
-      <StickyHeaderWrapper>
-        {(isSticky) => (
-          <div>
-            {/* Sticky Header - shown when scrolling */}
-            {isSticky && (
-              <BobbleheadStickyHeader
-                bobblehead={bobblehead}
-                canDelete={canDelete}
-                canEdit={canEdit}
-                collectionName={bobblehead.collectionName || ''}
-                collections={collections}
-                collectionSlug={bobblehead.collectionSlug || ''}
-                isLiked={likeData?.isLiked ?? false}
-                isOwner={isOwner}
-                likeCount={likeData?.likeCount ?? 0}
-                subcollectionName={bobblehead.subcollectionName}
-                subcollectionSlug={bobblehead.subcollectionSlug}
-                thumbnailUrl={bobblehead.photos?.[0]?.url}
-                title={bobblehead.name}
-              />
-            )}
+      <BobbleheadPageClientWrapper
+        bobblehead={bobblehead}
+        bobbleheadId={bobbleheadId}
+        bobbleheadSlug={bobbleheadSlug}
+        canDelete={canDelete}
+        canEdit={canEdit}
+        collectionId={basicBobblehead.collectionId ?? undefined}
+        collections={collections}
+        isOwner={isOwner}
+        likeData={likeData}
+      >
+        {/* Header Section */}
+        <div className={'border-b border-border'}>
+          <ContentLayout>
+            <BobbleheadErrorBoundary section={'header'}>
+              <Suspense fallback={<BobbleheadHeaderSkeleton />}>
+                <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
+              </Suspense>
+            </BobbleheadErrorBoundary>
+          </ContentLayout>
+        </div>
 
-            {/* Header Section */}
-            <div className={'border-b border-border'}>
-              <ContentLayout>
-                <BobbleheadErrorBoundary section={'header'}>
-                  <Suspense fallback={<BobbleheadHeaderSkeleton />}>
-                    <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
-                  </Suspense>
-                </BobbleheadErrorBoundary>
-              </ContentLayout>
-            </div>
+        {/* Feature Card Section */}
+        <div className={'mt-4'}>
+          <ContentLayout>
+            <BobbleheadErrorBoundary section={'feature'}>
+              <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
+                <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} />
+              </Suspense>
+            </BobbleheadErrorBoundary>
+          </ContentLayout>
+        </div>
 
-            {/* Feature Card Section */}
-            <div className={'mt-4'}>
-              <ContentLayout>
-                <BobbleheadErrorBoundary section={'feature'}>
-                  <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
-                    <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} />
-                  </Suspense>
-                </BobbleheadErrorBoundary>
-              </ContentLayout>
-            </div>
+        {/* Photo Gallery Section */}
+        <ContentLayout>
+          <BobbleheadErrorBoundary section={'gallery'}>
+            <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
+              <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} />
+            </Suspense>
+          </BobbleheadErrorBoundary>
+        </ContentLayout>
 
-            {/* Photo Gallery Section */}
+        {/* Metrics Section */}
+        <AuthContent>
+          <div className={'mt-4'}>
             <ContentLayout>
-              <BobbleheadErrorBoundary section={'gallery'}>
-                <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
-                  <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} />
+              <BobbleheadErrorBoundary section={'metrics'}>
+                <Suspense fallback={<BobbleheadMetricsSkeleton />}>
+                  <BobbleheadMetricsAsync bobbleheadId={bobbleheadId} />
                 </Suspense>
               </BobbleheadErrorBoundary>
             </ContentLayout>
-
-            {/* Metrics Section */}
-            <AuthContent>
-              <div className={'mt-4'}>
-                <ContentLayout>
-                  <BobbleheadErrorBoundary section={'metrics'}>
-                    <Suspense fallback={<BobbleheadMetricsSkeleton />}>
-                      <BobbleheadMetricsAsync bobbleheadId={bobbleheadId} />
-                    </Suspense>
-                  </BobbleheadErrorBoundary>
-                </ContentLayout>
-              </div>
-            </AuthContent>
-
-            {/* Primary Detail Cards Section */}
-            <ContentLayout>
-              <BobbleheadErrorBoundary section={'details'}>
-                <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
-                  <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} />
-                </Suspense>
-              </BobbleheadErrorBoundary>
-            </ContentLayout>
-
-            {/* Secondary Detail Cards Section */}
-            <ContentLayout>
-              <BobbleheadErrorBoundary section={'secondary'}>
-                <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
-                  <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} />
-                </Suspense>
-              </BobbleheadErrorBoundary>
-            </ContentLayout>
-
-            {/* Comments Section */}
-            <div className={'mt-8'}>
-              <ContentLayout>
-                <BobbleheadErrorBoundary section={'comments'}>
-                  <Suspense fallback={<CommentSectionSkeleton />}>
-                    <CommentSectionAsync targetId={bobbleheadId} targetType={'bobblehead'} />
-                  </Suspense>
-                </BobbleheadErrorBoundary>
-              </ContentLayout>
-            </div>
           </div>
-        )}
-      </StickyHeaderWrapper>
-    </BobbleheadViewTracker>
+        </AuthContent>
+
+        {/* Primary Detail Cards Section */}
+        <ContentLayout>
+          <BobbleheadErrorBoundary section={'details'}>
+            <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
+              <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} />
+            </Suspense>
+          </BobbleheadErrorBoundary>
+        </ContentLayout>
+
+        {/* Secondary Detail Cards Section */}
+        <ContentLayout>
+          <BobbleheadErrorBoundary section={'secondary'}>
+            <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
+              <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} />
+            </Suspense>
+          </BobbleheadErrorBoundary>
+        </ContentLayout>
+
+        {/* Comments Section */}
+        <div className={'mt-8'}>
+          <ContentLayout>
+            <BobbleheadErrorBoundary section={'comments'}>
+              <Suspense fallback={<CommentSectionSkeleton />}>
+                <CommentSectionAsync targetId={bobbleheadId} targetType={'bobblehead'} />
+              </Suspense>
+            </BobbleheadErrorBoundary>
+          </ContentLayout>
+        </div>
+      </BobbleheadPageClientWrapper>
+    </Fragment>
   );
 }
 

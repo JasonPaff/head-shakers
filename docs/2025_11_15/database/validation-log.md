@@ -355,14 +355,14 @@
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll",
-"sql": "SELECT id, name, slug, description, created_at, updated_at, (SELECT COUNT(_) FROM bobblehead_photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' ORDER BY created_at DESC;"
+"sql": "SELECT id, name, slug, description, created*at, updated_at, (SELECT COUNT(*) FROM bobblehead*photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' ORDER BY created_at DESC;"
 }
 } - **Modified Params**: {
 "params": {
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll",
-"sql": "SELECT id, name, slug, description, created_at, updated_at, (SELECT COUNT(_) FROM bobblehead_photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' ORDER BY created_at DESC;"
+"sql": "SELECT id, name, slug, description, created_at, updated_at, (SELECT COUNT(*) FROM bobblehead_photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' ORDER BY created_at DESC;"
 },
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
@@ -378,14 +378,14 @@
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll",
-"sql": "SELECT id, name, slug, is_deleted, deleted_at, created_at, (SELECT COUNT(_) FROM bobblehead_photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' AND (is_deleted = true OR deleted_at IS NOT NULL) ORDER BY deleted_at DESC;"
+"sql": "SELECT id, name, slug, is*deleted, deleted_at, created_at, (SELECT COUNT(*) FROM bobblehead*photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' AND (is_deleted = true OR deleted_at IS NOT NULL) ORDER BY deleted_at DESC;"
 }
 } - **Modified Params**: {
 "params": {
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll",
-"sql": "SELECT id, name, slug, is_deleted, deleted_at, created_at, (SELECT COUNT(_) FROM bobblehead_photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' AND (is_deleted = true OR deleted_at IS NOT NULL) ORDER BY deleted_at DESC;"
+"sql": "SELECT id, name, slug, is_deleted, deleted_at, created_at, (SELECT COUNT(*) FROM bobblehead_photos WHERE bobblehead_id = bobbleheads.id) as photo_count FROM bobbleheads WHERE LOWER(name) LIKE '%brooks robinson%' AND (is_deleted = true OR deleted_at IS NOT NULL) ORDER BY deleted_at DESC;"
 },
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",

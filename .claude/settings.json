@@ -1,4 +1,6 @@
 {
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["shared-server"],
   "model": "sonnet",
   "hooks": {
     "PreToolUse": [
