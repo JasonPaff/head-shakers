@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 - cloudinary.types.ts
 
@@ -40,7 +41,7 @@ React files detected: Yes (invoked react-coding-conventions skill)
    - uploadWidgetRef for widget instance storage
    - isUploadCancelled state flag
    - onUploadStateChange callback prop
-   - Derived variables for UI: _uploadingFiles, _failedFiles, _completedFiles
+   - Derived variables for UI: \_uploadingFiles, \_failedFiles, \_completedFiles
    - Individual file progress UI (max 3 visible, rest collapsed)
    - Upload speed (KB/s or MB/s) and time remaining display
    - Retry indicator showing attempt count
@@ -95,23 +96,27 @@ None
 ## Technical Details
 
 **Progress Tracking Flow**:
+
 1. handleQueuesStart: Initialize progress for each file
 2. handleSuccess: Mark file as 100% complete
 3. handleError: Mark file as failed with error message
 4. Retry: Increment retry count, re-attempt if < MAX_RETRY_ATTEMPTS
 
 **Upload Speed Calculation**:
+
 - Bytes uploaded / (current time - start time)
 - Formatted as KB/s or MB/s based on magnitude
 - Time remaining = remaining bytes / current speed
 
 **Cancellation**:
+
 1. User clicks "Cancel upload" button
 2. Widget instance closed via uploadWidgetRef
 3. isUploadCancelled flag set to prevent further operations
 4. Toast notification confirms cancellation
 
 **Form Submission Blocking**:
+
 - onUploadStateChange callback notifies parent
 - Parent can disable submit button during uploads
 - Warning banner shows during active uploads

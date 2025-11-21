@@ -12,11 +12,13 @@
 Complete XML sitemap generation with dynamic routes
 
 #### Static Routes (6)
+
 - Homepage (priority 1.0, daily)
 - Featured/Trending (priority 0.8, daily)
 - About/Terms/Privacy (priority 0.4, monthly)
 
 #### Dynamic Routes
+
 - User profiles (priority 0.6, weekly)
 - Bobbleheads (priority 0.6, weekly)
 - Public collections (priority 0.6, weekly)

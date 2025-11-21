@@ -12,6 +12,7 @@
 Preview mode API endpoint with two handlers:
 
 **GET Handler** - Enable preview mode:
+
 - Accepts preview token via query parameter (`?token=...`)
 - Validates token against `PREVIEW_SECRET` environment variable
 - Uses `crypto.timingSafeEqual()` for timing-safe comparison
@@ -21,6 +22,7 @@ Preview mode API endpoint with two handlers:
 - Returns JSON response with success status
 
 **DELETE Handler** - Disable preview mode:
+
 - Calls `draftMode().disable()` to clear preview cookie
 - Returns JSON response confirming preview mode disabled
 
@@ -28,6 +30,7 @@ Preview mode API endpoint with two handlers:
 Preview mode utility functions:
 
 **Functions Implemented**:
+
 - `isPreviewMode()` - Check if currently in preview mode using Next.js draftMode API
 - `getPreviewToken()` - Retrieve PREVIEW_SECRET from environment
 - `validatePreviewToken(token)` - Timing-safe token validation using crypto.timingSafeEqual
@@ -36,6 +39,7 @@ Preview mode utility functions:
 - `buildPreviewExitUrl(baseUrl?)` - Construct URL to exit preview mode
 
 **Security Features**:
+
 - Timing-safe token comparison prevents timing attacks
 - httpOnly cookies managed by Next.js draftMode API
 - Secure token storage in environment variables
@@ -45,12 +49,14 @@ Preview mode utility functions:
 ## Usage Workflow
 
 **Enable Preview Mode**:
+
 1. Editor visits: `GET /api/preview?token=SECRET&redirect=/bobbleheads/slug`
 2. API validates token and enables draftMode
 3. Editor is redirected to content with preview enabled
 4. Page uses `isPreviewMode()` to show draft content
 
 **Disable Preview Mode**:
+
 1. Editor clicks exit preview button
 2. Calls: `DELETE /api/preview`
 3. Preview mode disabled, user sees published content
@@ -67,6 +73,7 @@ Preview mode utility functions:
 - [✓] All validation commands pass
 
 **Key Features**:
+
 - Secure token-based authentication
 - Next.js 16 draftMode API integration
 - Timing attack prevention
@@ -75,6 +82,7 @@ Preview mode utility functions:
 - Comprehensive error handling
 
 **Environment Requirements**:
+
 - `PREVIEW_SECRET` environment variable must be set for runtime operation
 
 **Next Step**: Create SEO Documentation (Step 23)

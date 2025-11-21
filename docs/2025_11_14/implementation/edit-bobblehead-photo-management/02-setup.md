@@ -60,6 +60,7 @@ Total steps identified: **12**
 ## Todo List
 
 Created 16 todos:
+
 - 1 pre-checks (completed)
 - 1 setup (current)
 - 12 implementation steps
@@ -74,12 +75,14 @@ Created 16 todos:
 ## Files Mentioned
 
 **Core Files** (modified in multiple steps):
+
 - `src/components/ui/cloudinary-photo-upload.tsx` (11 steps)
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` (5 steps)
 - `src/lib/actions/bobbleheads/bobbleheads.actions.ts` (2 steps)
 - `src/types/cloudinary.types.ts` (3 steps)
 
 **New Files** (to be created):
+
 - `src/lib/utils/photo-transform.utils.ts` (Step 2)
 - `src/components/feature/bobblehead/photo-management-error-boundary.tsx` (Step 9)
 

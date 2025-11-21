@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 - config.ts
 
@@ -81,11 +82,13 @@ None
 ## Technical Details
 
 **Visual States**:
+
 - **Pending**: Pulsing border on cards + "Saving order..." spinner
 - **Success**: Green checkmark + "Order saved!" (auto-hide after 2s)
 - **Error**: Red X + error message + retry button
 
 **Debounce Flow**:
+
 1. User drags photo to new position
 2. Immediate UI update (optimistic)
 3. 800ms debounce starts

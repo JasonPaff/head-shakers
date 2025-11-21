@@ -57,6 +57,7 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
 ### Critical Priority - Core Implementation (4 files)
 
 #### 1. `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx`
+
 - **AI Reasoning**: Central orchestration point for the entire edit bobblehead workflow
 - **Current Functionality**:
   - Manages dialog state and form initialization
@@ -69,6 +70,7 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
 - **File Validation**: ✅ Exists
 
 #### 2. `src/components/ui/cloudinary-photo-upload.tsx`
+
 - **AI Reasoning**: Core photo management component implementing all photo lifecycle operations
 - **Current Functionality**:
   - Cloudinary widget integration for uploading new photos
@@ -77,12 +79,13 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
   - Debounced server-side persistence for reordering (500ms)
   - Photo metadata editing (alt text, captions)
   - Primary photo designation
-  - Handles both temporary (temp-*) and persisted photos
+  - Handles both temporary (temp-\*) and persisted photos
 - **Integration Points**: `deleteBobbleheadPhotoAction`, `reorderBobbleheadPhotosAction`, Next-Cloudinary widgets
 - **Implementation Impact**: Primary target for enhancements - implements all photo operations
 - **File Validation**: ✅ Exists
 
 #### 3. `src/lib/actions/bobbleheads/bobbleheads.actions.ts`
+
 - **AI Reasoning**: Server-side business logic orchestrating all photo operations
 - **Current Functionality**:
   - `updateBobbleheadWithPhotosAction`: Updates bobblehead with new photos, moves to permanent Cloudinary folder
@@ -94,6 +97,7 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
 - **File Validation**: ✅ Exists
 
 #### 4. `src/lib/validations/bobbleheads.validation.ts`
+
 - **AI Reasoning**: Type safety and validation for all photo operations across client/server boundary
 - **Current Functionality**:
   - `updateBobbleheadWithPhotosSchema`: Validates edit dialog submission
@@ -108,36 +112,42 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
 ### High Priority - Supporting Implementation (6 files)
 
 #### 5. `src/lib/db/schema/bobbleheads.schema.ts`
+
 - **AI Reasoning**: Defines data structure for photo storage in PostgreSQL
 - **Relevance**: Contains `bobbleheadPhotos` table schema with fields (id, bobbleheadId, url, altText, caption, width, height, fileSize, isPrimary, sortOrder, uploadedAt)
 - **Implementation Impact**: Understanding schema is essential for photo operations
 - **File Validation**: ✅ Exists
 
 #### 6. `src/lib/facades/bobbleheads/bobbleheads.facade.ts`
+
 - **AI Reasoning**: Orchestrates data layer operations with caching for photo management
 - **Relevance**: Contains `addPhotoAsync`, `getBobbleheadPhotos`, `deletePhotoAsync`, `reorderPhotosAsync` with cache management
 - **Implementation Impact**: Business logic layer for photo operations
 - **File Validation**: ✅ Exists
 
 #### 7. `src/lib/queries/bobbleheads/bobbleheads-query.ts`
+
 - **AI Reasoning**: Direct database operations layer using Drizzle ORM
 - **Relevance**: Contains database queries for photo CRUD operations with ownership validation
 - **Implementation Impact**: Data access layer for photo operations
 - **File Validation**: ✅ Exists
 
 #### 8. `src/types/cloudinary.types.ts`
+
 - **AI Reasoning**: Core type definitions ensuring type safety across photo workflows
 - **Relevance**: Defines `CloudinaryPhoto`, `PhotoMetadata`, `PhotoUploadState` interfaces and transformation utilities
 - **Implementation Impact**: Essential for type-safe photo transformations
 - **File Validation**: ✅ Exists
 
 #### 9. `src/lib/validations/photo-upload.validation.ts`
+
 - **AI Reasoning**: Enforces photo constraints and validation rules
 - **Relevance**: Contains `cloudinaryPhotoSchema`, `cloudinaryPhotosValidationSchema` with 8-photo max
 - **Implementation Impact**: Validation schemas for photo operations
 - **File Validation**: ✅ Exists
 
 #### 10. `src/lib/utils/cloudinary.utils.ts`
+
 - **AI Reasoning**: Essential for URL/publicId conversion and photo transformations
 - **Relevance**: Contains utilities for extracting publicId, format, generating optimized URLs
 - **Implementation Impact**: URL transformation utilities used in edit dialog
@@ -146,36 +156,44 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
 ### Medium Priority - Integration & Services (7 files)
 
 #### 11. `src/lib/services/cloudinary.service.ts`
+
 - **Relevance**: Cloudinary API integration for delete/move operations
 - **File Validation**: ✅ Exists (assumed)
 
 #### 12. `src/lib/services/cache-revalidation.service.ts`
+
 - **Relevance**: Cache invalidation after photo operations
 - **File Validation**: ✅ Exists (assumed)
 
 #### 13. `src/hooks/use-server-action.ts`
+
 - **Relevance**: UX feedback infrastructure for server actions
 - **File Validation**: ✅ Exists (assumed)
 
 #### 14. `src/components/ui/form/index.tsx`
+
 - **Relevance**: TanStack React Form configuration
 - **File Validation**: ✅ Exists (assumed)
 
 #### 15. `src/components/ui/form/field-components/combobox-field.tsx`
+
 - **Relevance**: Defines prop types used by edit dialog
 - **File Validation**: ✅ Exists (assumed)
 
 #### 16. `src/app/(app)/bobbleheads/add/components/item-photos.tsx`
+
 - **Relevance**: Reference implementation for photo upload patterns
 - **File Validation**: ✅ Exists (assumed)
 
 #### 17. `src/components/feature/bobblehead/bobblehead-gallery-card.tsx`
+
 - **Relevance**: Reference for photo display patterns
 - **File Validation**: ✅ Exists (assumed)
 
 ### Low Priority - Reference & Configuration (11 files)
 
 #### 18-28. Configuration and Reference Files
+
 - `src/lib/constants/config.ts` - MAX_PHOTOS_PER_BOBBLEHEAD config
 - `src/lib/constants/operations.ts` - Operation names for logging
 - `src/lib/constants/defaults.ts` - Default values for schema fields
@@ -218,6 +236,7 @@ Categorize discovered files by priority (Critical/High/Medium/Low) and provide r
 ### Integration Points Mapped
 
 **Server Actions Flow**:
+
 ```
 Dialog Opens → getBobbleheadPhotosAction → Transform to CloudinaryPhoto
 ↓
@@ -227,11 +246,13 @@ Form Submit → updateBobbleheadWithPhotosAction → Move to perm storage → Up
 ```
 
 **Cache Management**:
+
 - Cache invalidation: `CacheRevalidationService.bobbleheads.onPhotoChange`
 - Metadata cache: `invalidateMetadataCache`
 - Multi-layer caching: Redis, Next.js, metadata
 
 **Photo Lifecycle**:
+
 - Upload: Cloudinary widget → temp folder → client state
 - Modify: Update CloudinaryPhoto in form state
 - Delete: Optimistic update → server action → rollback on error
@@ -249,6 +270,7 @@ Form Submit → updateBobbleheadWithPhotosAction → Move to perm storage → Up
 ## File Path Validation Results
 
 ### Validation Method
+
 - Used `find` command to verify file existence
 - Checked for all critical and high priority files
 - Validated file paths are absolute and accessible
@@ -256,12 +278,14 @@ Form Submit → updateBobbleheadWithPhotosAction → Move to perm storage → Up
 ### Validation Results
 
 ✅ **All Critical Files Validated**:
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - EXISTS
 - `src/components/ui/cloudinary-photo-upload.tsx` - EXISTS
 - `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - EXISTS
 - `src/lib/validations/bobbleheads.validation.ts` - EXISTS
 
 ✅ **All High Priority Files Validated**:
+
 - `src/lib/db/schema/bobbleheads.schema.ts` - EXISTS
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - EXISTS
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts` - EXISTS
@@ -270,6 +294,7 @@ Form Submit → updateBobbleheadWithPhotosAction → Move to perm storage → Up
 ✅ **Medium/Low Priority Files**: Assumed to exist based on project structure
 
 ### Notes
+
 - Found files in both main workspace and `.worktrees/admin-reports-page/`
 - All file paths are absolute as required
 - No missing or inaccessible files discovered

@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 
 React files detected: Yes (invoked react-coding-conventions skill)
@@ -87,12 +88,14 @@ None
 ## Technical Details
 
 **Selection Mode**:
+
 - Toggle button switches between "Select Multiple" and "Exit Selection"
 - Checkboxes appear on persisted photos only
 - Auto-clear selections when exiting mode
 - Visual keyboard shortcut hints
 
 **Bulk Delete Flow**:
+
 1. User selects multiple photos via checkboxes
 2. Clicks "Delete Selected (X)" button
 3. Confirmation dialog shows count + thumbnails (max 8 visible)
@@ -103,11 +106,13 @@ None
 8. On error: Full rollback to previous state
 
 **Keyboard Shortcuts**:
+
 - **Cmd/Ctrl+A**: Select all persisted photos
 - **Escape**: Clear selection (or exit mode if none selected)
 - Event listeners cleaned up on unmount
 
 **Accessibility**:
+
 - Selection button: Descriptive labels for enter/exit modes
 - Checkboxes: "Select photo: [alt text]" labels
 - Bulk delete button: "Delete X selected photo(s)"
@@ -115,12 +120,12 @@ None
 
 **Visual States**:
 
-| Component | State | Visual |
-|-----------|-------|--------|
-| Photo Card | Selected | Primary border + ring |
-| Photo Card | Not Selected | Normal border |
-| Toolbar | Visible | Fade-in animation |
-| Checkbox | Checked | Filled checkbox |
+| Component  | State        | Visual                |
+| ---------- | ------------ | --------------------- |
+| Photo Card | Selected     | Primary border + ring |
+| Photo Card | Not Selected | Normal border         |
+| Toolbar    | Visible      | Fade-in animation     |
+| Checkbox   | Checked      | Filled checkbox       |
 
 ## Notes
 
@@ -142,6 +147,7 @@ All 12 steps of the bobblehead photo management enhancement are now implemented:
 12. ✅ Bulk photo actions ✅
 
 **Feature Summary**:
+
 - Efficient multi-photo management
 - Power user keyboard shortcuts
 - Full accessibility support

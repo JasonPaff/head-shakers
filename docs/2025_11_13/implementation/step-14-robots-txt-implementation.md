@@ -22,31 +22,37 @@ Successfully implemented robots.ts configuration to guide search engine crawlers
 ### Configuration Details
 
 #### Allowed Routes
+
 - Root path: `/` (allows all public routes by default)
 
 #### Disallowed Routes
 
 **Authenticated Routes:**
+
 - `/dashboard` and `/dashboard/*`
 - `/settings` and `/settings/*`
 - `/admin` and `/admin/*`
 
 **Edit and Create Routes:**
+
 - `/edit` and `/edit/*`
 - `/create` and `/create/*`
 - `*/edit` and `*/edit/*`
 - `*/create` and `*/create/*`
 
 **Internal API Routes:**
+
 - `/api/webhooks` and `/api/webhooks/*`
 - `/api/internal` and `/api/internal/*`
 
 **Authentication Routes:**
+
 - `/sign-in`
 - `/sign-up`
 - `/sign-out`
 
 #### Additional Configuration
+
 - **User Agent**: `*` (all crawlers)
 - **Crawl Delay**: 1 second (rate limiting)
 - **Sitemap URL**: Dynamic from `DEFAULT_SITE_METADATA.url`
@@ -67,15 +73,19 @@ Successfully implemented robots.ts configuration to guide search engine crawlers
 ## Validation Results
 
 ### Linting
+
 ```bash
 npm run lint:fix
 ```
+
 ✅ **PASSED** - No linting errors
 
 ### Type Checking
+
 ```bash
 npm run typecheck
 ```
+
 ✅ **PASSED** - No type errors
 
 ## Success Criteria

@@ -15,18 +15,21 @@
 ### Files Modified
 
 **1. src/app/(app)/browse/featured/page.tsx**
+
 - Maintained existing ISR: revalidate = 300 (5 minutes)
 - Enhanced metadata using generatePageMetadata()
 - Added CollectionPage JSON-LD schema
 - Open Graph and Twitter Card metadata
 
 **2. src/app/(app)/browse/trending/page.tsx**
+
 - Added ISR: revalidate = 600 (10 minutes)
 - Implemented complete metadata generation
 - Added CollectionPage JSON-LD schema
 - Open Graph and Twitter Card metadata
 
 **3. src/app/(app)/browse/categories/[category]/page.tsx**
+
 - Added ISR: revalidate = 900 (15 minutes)
 - Dynamic metadata based on category parameter
 - Added CollectionPage JSON-LD schema
@@ -35,6 +38,7 @@
 ### ISR Strategy
 
 Revalidation intervals optimized for traffic patterns:
+
 - **Featured**: 5 min (highest traffic, frequent updates)
 - **Trending**: 10 min (medium traffic, moderate updates)
 - **Categories**: 15 min (distributed traffic, stable content)

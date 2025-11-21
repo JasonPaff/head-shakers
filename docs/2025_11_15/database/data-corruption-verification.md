@@ -11,17 +11,21 @@ Investigation of reported data corruption issues for the Brooks Robinson Blood D
 ## Issues Investigated
 
 ### 1. Slug Issue
+
 **Reported Issue**: Slug incorrectly regenerated from 'brooks-robinson-blood-drive-bobblehead' to 'brooks-robinson-blood-drive-bobblehead-2'
 
 **Verification Result**: ✅ RESOLVED
+
 - **Bobblehead ID**: ece38507-9a82-40eb-a198-ac5a436be62f
 - **Current Slug**: `brooks-robinson-blood-drive-bobblehead` (correct)
 - **No '-2' suffix found**: Confirmed no other bobbleheads with '-2', '-3', or '-4' suffixes exist
 
 ### 2. Photo Duplication Issue
+
 **Reported Issue**: All photos were re-inserted instead of just new ones, resulting in 8 photos (duplicates) when there should be 4
 
 **Verification Result**: ✅ RESOLVED
+
 - **Current Photo Count**: 4 photos (correct)
 - **No Duplicates**: Confirmed no bobblehead has 8 or more photos in the database
 - **Photos Present**:
@@ -33,31 +37,39 @@ Investigation of reported data corruption issues for the Brooks Robinson Blood D
 ## Database Queries Executed
 
 1. **Find bobblehead by updated slug**:
+
    ```sql
    SELECT id, slug, name FROM bobbleheads WHERE slug = 'brooks-robinson-blood-drive-bobblehead-2';
    ```
+
    Result: No records found
 
 2. **Find bobblehead by partial slug match**:
+
    ```sql
    SELECT id, slug, name FROM bobbleheads WHERE slug LIKE 'brooks-robinson-blood-drive%' ORDER BY slug;
    ```
+
    Result: Found correct bobblehead with proper slug
 
 3. **Check photos for this bobblehead**:
+
    ```sql
    SELECT id, bobblehead_id, url, sort_order, uploaded_at FROM bobblehead_photos
    WHERE bobblehead_id = 'ece38507-9a82-40eb-a198-ac5a436be62f'
    ORDER BY uploaded_at;
    ```
+
    Result: 4 photos with correct sort order
 
 4. **Check for any '-2' suffix patterns**:
+
    ```sql
    SELECT id, slug, name FROM bobbleheads
    WHERE slug LIKE '%-2' OR slug LIKE '%-3' OR slug LIKE '%-4'
    ORDER BY slug;
    ```
+
    Result: No records found
 
 5. **Check for duplicate photos across all bobbleheads**:

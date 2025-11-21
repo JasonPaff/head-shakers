@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type';
 
@@ -15,18 +15,20 @@ import { SubcollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[colle
 import { SubcollectionHeaderSkeleton } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/skeletons/subcollection-header-skeleton';
 import { SubcollectionMetricsSkeleton } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/skeletons/subcollection-metrics-skeleton';
 import { SubcollectionErrorBoundary } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-error-boundary';
+import { SubcollectionPageClientWrapper } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-page-client-wrapper';
 import { Route } from '@/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type';
-import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections, subCollections } from '@/lib/db/schema';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type SubcollectionPageProps = PageProps;
 
@@ -159,6 +161,31 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
     .limit(1);
   const collection = collectionResults[0];
 
+  if (!collection) {
+    notFound();
+  }
+
+  const currentUserId = await getOptionalUserId();
+
+  // Fetch subcollection data and like data for both headers
+  const [publicSubcollection, likeData] = await Promise.all([
+    SubcollectionsFacade.getSubCollectionForPublicView(
+      collectionId,
+      subcollectionId,
+      currentUserId || undefined,
+    ),
+    SocialFacade.getContentLikeData(subcollectionId, 'subcollection', currentUserId || undefined),
+  ]);
+
+  if (!publicSubcollection) {
+    notFound();
+  }
+
+  // Compute permission flags
+  const isOwner = await checkIsOwner(collection.userId);
+  const canEdit = isOwner;
+  const canDelete = isOwner;
+
   // Fetch SEO data for JSON-LD schemas
   const seoData = await SubcollectionsFacade.getSubCollectionForPublicView(collectionId, subcollectionId);
 
@@ -194,12 +221,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   ]);
 
   return (
-    <CollectionViewTracker
-      collectionId={collectionId}
-      collectionSlug={collectionSlug}
-      subcollectionId={subcollectionId}
-      subcollectionSlug={subcollectionSlug}
-    >
+    <Fragment>
       {/* JSON-LD structured data */}
       {subcollectionPageSchema && (
         <script
@@ -212,7 +234,19 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
         type={'application/ld+json'}
       />
 
-      <div>
+      <SubcollectionPageClientWrapper
+        canDelete={canDelete}
+        canEdit={canEdit}
+        collectionId={collectionId}
+        collectionName={publicSubcollection.collectionName}
+        collectionSlug={collectionSlug}
+        isOwner={isOwner}
+        likeData={likeData}
+        subcollection={publicSubcollection}
+        subcollectionId={subcollectionId}
+        subcollectionSlug={subcollectionSlug}
+        title={publicSubcollection.name}
+      >
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>
           <ContentLayout>
@@ -266,7 +300,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
             </SubcollectionErrorBoundary>
           </ContentLayout>
         </div>
-      </div>
-    </CollectionViewTracker>
+      </SubcollectionPageClientWrapper>
+    </Fragment>
   );
 }

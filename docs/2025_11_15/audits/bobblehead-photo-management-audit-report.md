@@ -27,6 +27,7 @@ This comprehensive audit evaluates the bobblehead photo management implementatio
 ### Purpose
 
 The bobblehead photo management feature is integrated into the bobblehead edit dialog, allowing users to:
+
 1. Upload new photos to their bobbleheads
 2. Delete unwanted photos with confirmation dialogs
 3. Reorder photos using drag-and-drop
@@ -93,6 +94,7 @@ The bobblehead photo management feature is integrated into the bobblehead edit d
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 - Zod schemas properly validate deletion and reordering operations
 - UUID validation enforces security constraints
 - Type-safe TypeScript interfaces generated from schemas
@@ -109,6 +111,7 @@ The bobblehead photo management feature is integrated into the bobblehead edit d
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 - `deletePhotoAsync` removes photos with ownership validation
 - `batchUpdatePhotoSortOrderAsync` handles atomic updates
 - `getPhotoByIdAsync` retrieves photos with proper checks
@@ -126,6 +129,7 @@ The bobblehead photo management feature is integrated into the bobblehead edit d
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 - `deletePhotoAsync` orchestrates database + Cloudinary deletion
 - `reorderPhotosAsync` manages photo order updates
 - Non-blocking Cloudinary cleanup prevents error blocking
@@ -144,6 +148,7 @@ The bobblehead photo management feature is integrated into the bobblehead edit d
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 - `deleteBobbleheadPhotoAction` - secure server action with auth
 - `reorderBobbleheadPhotosAction` - ordered update with transaction support
 - `updateBobbleheadPhotoMetadataAction` - metadata updates with debouncing
@@ -162,6 +167,7 @@ The bobblehead photo management feature is integrated into the bobblehead edit d
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 ```typescript
 // State management for deletions
 const [photoToDelete, setPhotoToDelete] = useState<CloudinaryPhoto | null>(null);
@@ -190,11 +196,12 @@ const { executeAsync: deletePhoto, isExecuting: isDeletingPhoto } = useServerAct
       }
       setDeletingPhotoId(null);
     },
-  }
+  },
 );
 ```
 
 **Features**:
+
 - Confirmation dialog prevents accidental deletions
 - Optimistic UI removal with rollback on error
 - Undo functionality with 5-second window
@@ -212,6 +219,7 @@ const { executeAsync: deletePhoto, isExecuting: isDeletingPhoto } = useServerAct
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 ```typescript
 const [isReorderPending, setIsReorderPending] = useState(false);
 const [reorderError, setReorderError] = useState<null | string>(null);
@@ -231,11 +239,12 @@ const { executeAsync: reorderPhotos, isExecuting: isReorderingPhotos } = useServ
       setIsReorderPending(false);
       setReorderError('Failed to save photo order');
     },
-  }
+  },
 );
 ```
 
 **Features**:
+
 - @dnd-kit/sortable integration (referenced in code)
 - Debounced reordering to prevent excessive API calls
 - Visual feedback with "Saving order..." indicator
@@ -254,6 +263,7 @@ const { executeAsync: reorderPhotos, isExecuting: isReorderingPhotos } = useServ
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 ```typescript
 // Photo loading effect
 useEffect(() => {
@@ -311,6 +321,7 @@ useEffect(() => {
 ```
 
 **Features**:
+
 - Photos fetch when dialog opens
 - 30-second timeout protection
 - Retry logic with exponential backoff (1s, 2s, 4s)
@@ -330,6 +341,7 @@ useEffect(() => {
 **Implementation Status**: ✅ Complete (implicit in updateBobbleheadWithPhotosAction)
 
 **Details**:
+
 - Photo array included in form schema
 - Photos persist through form submission
 - Server action handles photo updates
@@ -346,10 +358,11 @@ useEffect(() => {
 **Implementation Status**: ✅ Complete
 
 **Features**:
+
 ```typescript
 // Optimistic deletion
 setPreviousPhotosState(photos);
-onPhotosChange(photos.filter(p => p.publicId !== photoToDelete.publicId));
+onPhotosChange(photos.filter((p) => p.publicId !== photoToDelete.publicId));
 setDeletingPhotoId(photoToDelete.publicId);
 
 // Rollback on error
@@ -359,10 +372,11 @@ onError: () => {
     setPreviousPhotosState([]);
   }
   setDeletingPhotoId(null);
-}
+};
 ```
 
 **Capabilities**:
+
 - Immediate UI updates for user actions
 - Rollback mechanism on server failures
 - Previous state tracking for undo
@@ -381,6 +395,7 @@ onError: () => {
 **Implementation Status**: ✅ Complete
 
 **Details**:
+
 - Cache revalidation called after successful operations
 - Targeted invalidation using proper cache keys
 - Bobblehead and photo-related caches invalidated
@@ -397,6 +412,7 @@ onError: () => {
 **Implementation Status**: ✅ Complete (Enhancement beyond original plan)
 
 **Details**:
+
 ```typescript
 const { executeAsync: updatePhotoMetadata } = useServerAction(updateBobbleheadPhotoMetadataAction, {
   isDisableToast: true,
@@ -422,6 +438,7 @@ const { executeAsync: updatePhotoMetadata } = useServerAction(updateBobbleheadPh
 ```
 
 **Features**:
+
 - Debounced metadata saves
 - Per-photo saving state tracking
 - No toast feedback (quieter UX)
@@ -438,6 +455,7 @@ const { executeAsync: updatePhotoMetadata } = useServerAction(updateBobbleheadPh
 **Implementation Status**: ✅ Complete (Enhancement beyond original plan)
 
 **Details**:
+
 ```typescript
 const [isSelectionMode, setIsSelectionMode] = useState(false);
 const [selectedPhotoIds, setSelectedPhotoIds] = useState<Set<string>>(new Set());
@@ -450,6 +468,7 @@ const [animatingPrimaryPhotoId, setAnimatingPrimaryPhotoId] = useState<null | st
 ```
 
 **Features**:
+
 - Selection mode for bulk operations
 - Bulk delete with confirmation dialog
 - Primary photo selection with animation
@@ -479,6 +498,7 @@ No high-priority issues that significantly impact functionality were identified.
 **Description**: The BobbleheadEditDialog component is well-implemented but not clearly exposed in the collection view's edit menu. Users navigating to `/collections/[slug]` won't find an obvious edit button that opens the photo management dialog.
 
 **Steps to Reproduce**:
+
 1. Navigate to a collection page
 2. Find a bobblehead card
 3. Click the three-dot menu
@@ -501,6 +521,7 @@ No high-priority issues that significantly impact functionality were identified.
 **Description**: While the component has good error handling for individual operations, if a user quickly performs multiple photo operations (delete, reorder, upload) before the previous operation completes, the state management may not handle concurrent operation failures gracefully.
 
 **Scenario**:
+
 1. User deletes photo A (optimistic update applied)
 2. Before deletion completes, user reorders photo B and C
 3. Deletion fails and rolls back
@@ -523,6 +544,7 @@ No high-priority issues that significantly impact functionality were identified.
 **Description**: The development-mode memory monitoring interval is set up but may not be properly cleaned up if the component re-renders with `isOpen` changing.
 
 **Code**:
+
 ```typescript
 useEffect(() => {
   if (process.env.NODE_ENV !== 'development' || !isOpen) {
@@ -565,6 +587,7 @@ useEffect(() => {
 **Description**: The undo success toast shows "Photo deleted successfully!" followed by an "Undo" action button. The 5-second window is reasonable but not explicitly communicated to the user.
 
 **Current**:
+
 ```typescript
 toast.success('Photo deleted successfully!', {
   action: {
@@ -576,6 +599,7 @@ toast.success('Photo deleted successfully!', {
 ```
 
 **Suggested Enhancement**:
+
 ```typescript
 toast.success('Photo deleted (Undo available for 5 seconds)', {
   action: {
@@ -599,6 +623,7 @@ toast.success('Photo deleted (Undo available for 5 seconds)', {
 **Description**: When reordering photos, the component shows "Saving order..." indicator but it disappears after 2 seconds regardless of whether the operation actually completed.
 
 **Code**:
+
 ```typescript
 setIsReorderSuccess(true);
 // hide success indicator after 2 seconds
@@ -635,6 +660,7 @@ onAfterSuccess: () => {
 **Why**: Users uploading multiple photos have no per-file progress indication
 
 **Suggested Approach**:
+
 - Display individual progress bars for each uploading file
 - Show percentage complete (e.g., "Photo 1: 45%")
 - Show file size and upload speed estimates
@@ -651,6 +677,7 @@ onAfterSuccess: () => {
 **Why**: Power users would benefit from keyboard navigation
 
 **Suggested Shortcuts**:
+
 - `D` - Delete selected photo (with confirmation)
 - `P` - Set as primary
 - `Arrow Keys` - Navigate between photos
@@ -667,6 +694,7 @@ onAfterSuccess: () => {
 **Why**: Users with 8 photos might want to find specific ones
 
 **Suggested Approach**:
+
 - Filter by alt text/caption content
 - Sort by upload date, file size, dimensions
 - Search by metadata
@@ -684,6 +712,7 @@ onAfterSuccess: () => {
 **Why**: Helps users optimize photos before upload
 
 **Suggested Display**:
+
 - Badge on each photo: "2000x1500 (485KB)"
 - Warning if image is too small or oversized
 - Recommendation for optimal dimensions
@@ -699,6 +728,7 @@ onAfterSuccess: () => {
 **Why**: Prevents accidental duplicate uploads
 
 **Suggested Approach**:
+
 - Hash-based duplicate detection
 - Warning dialog if identical photo uploaded
 - Option to skip, replace, or upload anyway
@@ -714,6 +744,7 @@ onAfterSuccess: () => {
 **Why**: More efficient for editing multiple photos
 
 **Suggested Approach**:
+
 - Select multiple photos
 - Edit alt text/caption in bulk
 - Apply templates or patterns to selected photos
@@ -729,6 +760,7 @@ onAfterSuccess: () => {
 **Why**: Screen reader users need context
 
 **Suggested Change**:
+
 ```typescript
 // Current
 <StarIcon aria-hidden className="size-5" />
@@ -793,6 +825,7 @@ onAfterSuccess: () => {
 ### Initial Load
 
 **Observations**:
+
 - Photos load within 2-3 seconds for typical 4-8 photo sets
 - Timeout protection prevents hanging at 30 seconds
 - Retry logic handles network failures gracefully
@@ -803,16 +836,19 @@ onAfterSuccess: () => {
 ### Interaction Responsiveness
 
 **Upload**:
+
 - Progress indicators provide real-time feedback
 - Multiple files handled sequentially
 - UI remains responsive during uploads
 
 **Deletion**:
+
 - Optimistic update provides instant feedback
 - Actual deletion typically completes within 1-2 seconds
 - Rollback is seamless if error occurs
 
 **Reordering**:
+
 - Drag and drop is smooth and responsive
 - Debouncing prevents excessive API calls
 - "Saving order..." indicator appears briefly
@@ -822,16 +858,19 @@ onAfterSuccess: () => {
 ### Database Query Performance
 
 **Photo Fetch**:
+
 - Initial fetch retrieves existing photos efficiently
 - Transformation to client format is minimal overhead
 - Database query appears well-optimized
 
 **Photo Delete**:
+
 - Single-photo deletion is fast
 - Cloudinary async cleanup doesn't block response
 - Database transaction ensures consistency
 
 **Photo Reorder**:
+
 - Batch update in single transaction
 - No N+1 query issues evident
 - Efficient sortOrder update
@@ -841,6 +880,7 @@ onAfterSuccess: () => {
 ### Network Requests
 
 **Observations from Code**:
+
 - Upload requests use Cloudinary's widget (efficient)
 - Delete/reorder use single server actions
 - Metadata updates debounced to prevent flooding
@@ -856,6 +896,7 @@ onAfterSuccess: () => {
 ### Tables Tested
 
 Based on code review:
+
 - `bobblehead_photos`: Photo deletion/update verified
 - `bobbleheads`: Form submission tested (indirectly)
 - No orphaned records expected with proper cleanup
@@ -894,6 +935,7 @@ ORDER BY sort_order;
 ### What Was Tested ✅
 
 **Features**:
+
 - Photo deletion with confirmation
 - Photo reordering via drag-and-drop
 - Metadata updates (alt text, captions)
@@ -906,6 +948,7 @@ ORDER BY sort_order;
 - Error boundary handling
 
 **Code Quality**:
+
 - TypeScript type safety
 - Zod schema validation
 - Proper error handling
@@ -954,6 +997,7 @@ ORDER BY sort_order;
 The bobblehead photo management implementation is **well-architected and feature-complete**, with all 12 implementation steps from the plan successfully realized. The codebase demonstrates:
 
 **Strengths**:
+
 - Comprehensive photo management features (upload, delete, reorder, metadata)
 - Robust error handling with optimistic updates and rollback
 - Memory-conscious cleanup and blob URL revocation
@@ -964,6 +1008,7 @@ The bobblehead photo management implementation is **well-architected and feature
 - Thoughtful state management
 
 **Areas for Enhancement**:
+
 - Collection view integration clarity
 - Concurrent operation handling refinement
 - Accessibility improvements (aria labels)

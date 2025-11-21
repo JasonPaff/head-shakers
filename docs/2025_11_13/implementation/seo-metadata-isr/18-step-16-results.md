@@ -12,6 +12,7 @@
 SEO-specific cache utilities for metadata operations
 
 **Key Functions Implemented**:
+
 - `cacheMetadata()` - Core function to cache metadata with automatic error handling and fallback
 - `invalidateMetadataCache()` - Invalidate cached metadata by content type and ID
 - `getUserMetadataKey()` - Generate cache key for user metadata
@@ -25,6 +26,7 @@ SEO-specific cache utilities for metadata operations
 - `MetadataCacheMonitor` class - Internal monitoring for cache operations
 
 **Key Features**:
+
 - Integrates with existing CacheService pattern
 - Consistent cache key naming: `seo:metadata:{contentType}:{id}`
 - Comprehensive error handling with fallback to direct generation

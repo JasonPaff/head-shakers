@@ -126,11 +126,13 @@ Enhance the edit bobblehead feature to provide a seamless photo management exper
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\bobbleheads\bobbleheads.actions.ts`
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\validations\bobbleheads.validation.ts`
 
 **Changes:**
+
 - Add new `updateBobbleheadPhotoMetadataSchema` validation schema
 - Create `updateBobbleheadPhotoMetadataAction` server action with rate limiting
 - Add debounced server action calls for metadata updates
@@ -138,11 +140,13 @@ Enhance the edit bobblehead feature to provide a seamless photo management exper
 - Implement cleanup for all debounce timers in useEffect cleanup
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New validation schema passes type checking
 - [ ] Server action properly validates input and updates database
 - [ ] Metadata updates are debounced to prevent excessive server calls
@@ -158,24 +162,29 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\utils\photo-transform.utils.ts`
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-edit-dialog.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\types\cloudinary.types.ts`
 
 **Changes:**
+
 - Create transformation utilities (`transformDatabasePhotoToCloudinary`, `transformCloudinaryPhotoToDatabase`)
 - Create type guards (`isPersistedPhoto`, `isTempPhoto`)
 - Replace inline transformation in edit dialog with utility functions
 - Add comprehensive JSDoc comments
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Transformation utilities handle all edge cases
 - [ ] Type guards correctly identify persisted vs temporary photos
 - [ ] Edit dialog uses new utilities without breaking existing functionality
@@ -190,10 +199,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-edit-dialog.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 
 **Changes:**
+
 - Display skeleton loaders for photos while fetching
 - Add error alert with retry button if fetch fails
 - Implement exponential backoff retry logic (max 3 attempts)
@@ -201,11 +212,13 @@ npm run lint:fix && npm run typecheck
 - Log all fetch attempts to Sentry
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Loading skeleton appears when dialog opens
 - [ ] Error states display with retry button
 - [ ] Retry logic handles transient failures
@@ -221,10 +234,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\actions\bobbleheads\bobbleheads.actions.ts`
 
 **Changes:**
+
 - Store complete previous state including isPrimary and sortOrder
 - Modify deleteBobbleheadPhotoAction to auto-reassign isPrimary if needed
 - Add transaction handling for atomic deletion and reindexing
@@ -233,11 +248,13 @@ npm run lint:fix && npm run typecheck
 - Implement undo functionality
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Deleting primary photo promotes next photo to primary
 - [ ] Rollback restores exact previous state
 - [ ] Database transaction ensures consistency
@@ -254,10 +271,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\lib\constants\config.ts`
 
 **Changes:**
+
 - Add pulsing border animation during reorder
 - Display "Saving order..." indicator during debounce
 - Show success checkmark when reorder completes
@@ -266,11 +285,13 @@ npm run lint:fix && npm run typecheck
 - Add visual drag preview with overlay
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Visual feedback appears when dragging begins
 - [ ] "Saving order..." indicator shows during debounce
 - [ ] Success/error states are clearly communicated
@@ -287,10 +308,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-edit-dialog.tsx`
 
 **Changes:**
+
 - Replace hide with disabled state showing "Maximum 8 photos reached"
 - Add info callout at 7 photos
 - Add warning callout at 8 photos
@@ -299,11 +322,13 @@ npm run lint:fix && npm run typecheck
 - Add FAQ section explaining limit
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Upload button clearly communicates limit state
 - [ ] Progressive warnings appear at 7 and 8 photos
 - [ ] Visual progress bar reflects photo count
@@ -319,10 +344,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\types\cloudinary.types.ts`
 
 **Changes:**
+
 - Extend PhotoUploadState to track individual file progress
 - Display individual progress bars for each uploading file
 - Add per-file error states with specific messages
@@ -332,11 +359,13 @@ npm run lint:fix && npm run typecheck
 - Prevent form submission during uploads
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Individual file progress tracked and displayed
 - [ ] Failed uploads show specific error messages
 - [ ] Retry logic handles transient failures
@@ -353,10 +382,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-edit-dialog.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 
 **Changes:**
+
 - Create cleanup function for blob URLs
 - Move form.reset() to immediate execution
 - Add cleanup for pending debounce timers
@@ -365,11 +396,13 @@ npm run lint:fix && npm run typecheck
 - Add memory monitoring in development mode
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No blob URLs leaked when dialog closes
 - [ ] All debounce timers properly cleared
 - [ ] Form state resets immediately on close
@@ -386,13 +419,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\photo-management-error-boundary.tsx`
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\feature\bobblehead\bobblehead-edit-dialog.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 
 **Changes:**
+
 - Create PhotoManagementErrorBoundary component
 - Add fallback UI with "Retry" and "Continue without photos" options
 - Log all errors to Sentry with stack traces
@@ -400,11 +436,13 @@ npm run lint:fix && npm run typecheck
 - Display user-friendly error messages
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Error boundary catches errors without form crash
 - [ ] Fallback UI provides clear recovery options
 - [ ] Errors logged to Sentry with context
@@ -420,9 +458,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 
 **Changes:**
+
 - Add prominent "Primary Photo" label on primary card
 - Show gold/yellow border on primary photo
 - Add tooltip explaining primary photo functionality
@@ -433,11 +473,13 @@ npm run lint:fix && npm run typecheck
 - Auto-set first photo as primary when needed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Primary photo visually distinct
 - [ ] Tooltips explain functionality
 - [ ] Smooth animations for changes
@@ -453,10 +495,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 - `C:\Users\JasonPaff\dev\head-shakers\src\types\cloudinary.types.ts`
 
 **Changes:**
+
 - Add `isUploading` and `uploadProgress` fields to CloudinaryPhoto type
 - Create local blob URL for immediate preview
 - Add photo to state before Cloudinary upload completes
@@ -466,11 +510,13 @@ npm run lint:fix && npm run typecheck
 - Remove blob URL after real data arrives
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Photos appear immediately when selected
 - [ ] Upload progress accurately displayed
 - [ ] Failed uploads show error states with retry
@@ -487,9 +533,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\ui\cloudinary-photo-upload.tsx`
 
 **Changes:**
+
 - Add "Select Multiple" toggle button
 - Show checkboxes on photo cards in selection mode
 - Add bulk action toolbar
@@ -501,11 +549,13 @@ npm run lint:fix && npm run typecheck
 - Add accessibility labels
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Selection mode shows checkboxes
 - [ ] Bulk delete confirms and handles rollback
 - [ ] Keyboard shortcuts work
@@ -532,6 +582,7 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Critical Considerations:**
+
 - Debounce timing (800ms) balances responsiveness with server load
 - Photo transformation utilities must handle null values
 - Memory management crucial for blob URLs
@@ -539,12 +590,14 @@ npm run lint:fix && npm run typecheck
 - Consider client-side compression before upload
 
 **Architecture Decisions:**
+
 - Debounced server actions for metadata and reorder
 - Optimistic updates for all operations with rollback
 - Error boundaries isolate photo failures
 - Type guards centralize photo identification
 
 **Testing Recommendations:**
+
 - Test with slow network throttling
 - Test concurrent operations
 - Test error scenarios

@@ -4,31 +4,33 @@ import { eq } from 'drizzle-orm';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
 
 import { CollectionBobbleheadsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-bobbleheads-async';
-import { CollectionHeaderAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-header-async';
 import { CollectionSidebarSubcollectionsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-sidebar-subcollections-async';
 import { CollectionStatsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-stats-async';
 import { CollectionErrorBoundary } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-error-boundary';
+import { CollectionHeader } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-header';
+import { CollectionPageClientWrapper } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-page-client-wrapper';
 import { CollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-bobbleheads-skeleton';
 import { CollectionHeaderSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-header-skeleton';
 import { CollectionStatsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-stats-skeleton';
 import { SubcollectionsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/subcollections-skeleton';
 import { Route } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
-import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type CollectionPageProps = PageProps;
 
@@ -123,6 +125,22 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   }
 
   const collectionId = collection.id;
+  const currentUserId = await getOptionalUserId();
+
+  // Fetch collection data and like data for both headers
+  const [publicCollection, likeData] = await Promise.all([
+    CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined),
+    SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId || undefined),
+  ]);
+
+  if (!publicCollection) {
+    notFound();
+  }
+
+  // Compute permission flags
+  const isOwner = await checkIsOwner(publicCollection.userId);
+  const canEdit = isOwner;
+  const canDelete = isOwner;
 
   // Fetch SEO data for JSON-LD schemas
   const seoData = await CollectionsFacade.getCollectionSeoMetadata(collectionSlug, collection.userId);
@@ -152,7 +170,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   ]);
 
   return (
-    <CollectionViewTracker collectionId={collectionId} collectionSlug={collectionSlug}>
+    <Fragment>
       {/* JSON-LD structured data */}
       {collectionPageSchema && (
         <script
@@ -165,13 +183,22 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
         type={'application/ld+json'}
       />
 
-      <div>
+      <CollectionPageClientWrapper
+        canDelete={canDelete}
+        canEdit={canEdit}
+        collection={publicCollection}
+        collectionId={collectionId}
+        collectionSlug={collectionSlug}
+        isOwner={isOwner}
+        likeData={likeData}
+        title={publicCollection.name}
+      >
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>
           <ContentLayout>
             <CollectionErrorBoundary section={'header'}>
               <Suspense fallback={<CollectionHeaderSkeleton />}>
-                <CollectionHeaderAsync collectionId={collectionId} />
+                <CollectionHeader collection={publicCollection} likeData={likeData} />
               </Suspense>
             </CollectionErrorBoundary>
           </ContentLayout>
@@ -221,7 +248,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
             </CollectionErrorBoundary>
           </ContentLayout>
         </div>
-      </div>
-    </CollectionViewTracker>
+      </CollectionPageClientWrapper>
+    </Fragment>
   );
 }

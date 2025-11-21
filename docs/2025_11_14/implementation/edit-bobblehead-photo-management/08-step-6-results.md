@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 - bobblehead-edit-dialog.tsx
 
@@ -60,6 +61,7 @@ React files detected: Yes (invoked react-coding-conventions skill)
 All ESLint and TypeScript checks passed successfully
 
 **Fixed Issues**:
+
 - Removed unused `_canUploadMore` variable
 - Escaped apostrophe in FAQ text using `&apos;`
 
@@ -88,18 +90,21 @@ None (fixed during implementation)
 ## Technical Details
 
 **Photo Count States**:
+
 - **0 photos**: Empty state message
 - **1-6 photos**: Progress messages
 - **7 photos**: Info callout ("Almost at the limit! You can add 1 more photo")
 - **8 photos**: Warning callout + disabled upload button
 
 **Overflow Protection**:
+
 1. Cloudinary widget `maxFiles` set to remaining slots
 2. If widget bypasses restriction, `handleSuccess` checks photo count
 3. Error toast shown if overflow detected
 4. Photo not added to state if over limit
 
 **FAQ Section**:
+
 - Collapsible with toggle button
 - Explains performance, user experience, and storage optimization
 - Helps users understand why limit exists

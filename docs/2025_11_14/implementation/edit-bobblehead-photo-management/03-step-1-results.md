@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 - bobbleheads.actions.ts
 - bobbleheads.validation.ts

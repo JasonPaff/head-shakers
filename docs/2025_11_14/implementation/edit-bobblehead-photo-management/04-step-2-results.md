@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - photo-transform.utils.ts (NEW)
 - bobblehead-edit-dialog.tsx
 - cloudinary.types.ts

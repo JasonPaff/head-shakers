@@ -10,26 +10,31 @@
 
 **src/app/(app)/settings/page.tsx**
 Added metadata export with:
+
 - `robots: "noindex, nofollow"` - Prevent indexing of settings page
 - `title: "Settings"` - Appropriate page title
 
 **src/app/(app)/admin/page.tsx**
 Added metadata export with:
+
 - `robots: "noindex, nofollow"` - Prevent indexing of admin panel
 - `title: "Admin Dashboard"` - Appropriate page title
 
 **src/app/(app)/bobbleheads/[bobbleheadSlug]/edit/page.tsx**
 Added metadata export with:
+
 - `robots: "noindex, nofollow"` - Prevent indexing of edit pages
 - `title: "Edit Bobblehead"` - Appropriate page title
 
 **src/app/(app)/collections/[collectionSlug]/edit/page.tsx**
 Added metadata export with:
+
 - `robots: "noindex, nofollow"` - Prevent indexing of edit pages
 - `title: "Edit Collection"` - Appropriate page title
 
 **src/app/sitemap.ts**
 Added documentation clarifying that authenticated routes are excluded:
+
 - Dashboard routes (not included)
 - Settings routes (not included)
 - Admin routes (not included)
@@ -39,11 +44,12 @@ Added documentation clarifying that authenticated routes are excluded:
 ## Metadata Format
 
 Used string format for robots directive following project conventions:
+
 ```typescript
 export const metadata: Metadata = {
-  robots: "noindex, nofollow",
-  title: "Page Title",
-}
+  robots: 'noindex, nofollow',
+  title: 'Page Title',
+};
 ```
 
 ## Validation Results
@@ -58,6 +64,7 @@ export const metadata: Metadata = {
 - [✓] All validation commands pass
 
 **Key Features**:
+
 - Privacy protection for authenticated content
 - Consistent metadata format across all private pages
 - Search engines will not index private user content
@@ -65,6 +72,7 @@ export const metadata: Metadata = {
 - Follows Next.js Metadata API best practices
 
 **Notes**:
+
 - Dashboard page does not exist in current codebase (no modification needed)
 - All existing page functionality preserved
 - Used string format for robots to comply with ESLint rules

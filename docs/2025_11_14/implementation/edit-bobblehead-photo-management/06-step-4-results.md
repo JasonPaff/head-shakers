@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 - bobbleheads.actions.ts
 
@@ -76,6 +77,7 @@ None
 ## Technical Details
 
 **Transaction Flow**:
+
 1. User deletes photo
 2. Optimistic update removes from UI
 3. Server action deletes photo with ctx.tx
@@ -84,6 +86,7 @@ None
 6. On error, rollback to exact previous state
 
 **Undo Flow**:
+
 1. Success toast shows with "Undo" button
 2. User has 5 seconds to click undo
 3. On undo, previous state restored from previousPhotosState

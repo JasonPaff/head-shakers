@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - photo-management-error-boundary.tsx (NEW)
 - bobblehead-edit-dialog.tsx
 - cloudinary-photo-upload.tsx
@@ -68,6 +69,7 @@ React files detected: Yes (invoked react-coding-conventions skill)
 **Result**: ✅ PASS
 
 **Fixed Issues**:
+
 - Extracted complex condition to `_shouldShowDevDetails` variable
 - Added null check for errorInfo state
 
@@ -106,6 +108,7 @@ None (fixed during implementation)
 5. **Unknown**: Catch-all for unclassified errors
 
 **Error Boundary Flow**:
+
 1. Error thrown in photo component
 2. componentDidCatch captures error
 3. Error type classified
@@ -114,11 +117,13 @@ None (fixed during implementation)
 6. User chooses: Retry or Continue Without Photos
 
 **Reset Mechanism**:
+
 - errorBoundaryKey incremented on dialog reopen
 - Key change forces boundary to unmount/remount
 - Fresh error-free state on each dialog open
 
 **Sentry Context**:
+
 - Component stack trace
 - Error type classification
 - Operation context (upload, delete, reorder, etc.)

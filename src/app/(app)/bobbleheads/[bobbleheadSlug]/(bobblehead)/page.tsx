@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { $path } from 'next-typesafe-url';
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
+import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
 
@@ -14,6 +14,7 @@ import { BobbleheadMetricsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]
 import { BobbleheadPhotoGalleryAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-photo-gallery-async';
 import { BobbleheadSecondaryCardsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-secondary-cards-async';
 import { BobbleheadErrorBoundary } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-error-boundary';
+import { BobbleheadPageClientWrapper } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper';
 import { BobbleheadDetailCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-detail-cards-skeleton';
 import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
@@ -21,17 +22,18 @@ import { BobbleheadMetricsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSl
 import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-photo-gallery-skeleton';
 import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { Route } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
-import { BobbleheadViewTracker } from '@/components/analytics/bobblehead-view-tracker';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateProductSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type ItemPageProps = PageProps;
 
@@ -105,6 +107,32 @@ async function ItemPage({ routeParams }: ItemPageProps) {
 
   const bobbleheadId = basicBobblehead.id;
 
+  // Fetch bobblehead with relations and like data for sticky header
+  const [bobblehead, likeData] = await Promise.all([
+    BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
+    SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId || undefined),
+  ]);
+
+  if (!bobblehead) {
+    notFound();
+  }
+
+  // Compute permission flags
+  const isOwner = await checkIsOwner(bobblehead.userId);
+  const canEdit = isOwner;
+  const canDelete = isOwner;
+
+  // Fetch user collections for edit dialog (only if owner)
+  let collections: Array<{ id: string; name: string }> = [];
+  if (isOwner && currentUserId) {
+    const userCollections =
+      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
+    collections = userCollections.map((collection) => ({
+      id: collection.id,
+      name: collection.name,
+    }));
+  }
+
   // Fetch SEO metadata for JSON-LD schemas
   const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
 
@@ -134,11 +162,7 @@ async function ItemPage({ routeParams }: ItemPageProps) {
     : null;
 
   return (
-    <BobbleheadViewTracker
-      bobbleheadId={bobbleheadId}
-      bobbleheadSlug={bobbleheadSlug}
-      collectionId={basicBobblehead.collectionId ?? undefined}
-    >
+    <Fragment>
       {/* JSON-LD structured data */}
       {productSchema && (
         <script
@@ -153,7 +177,17 @@ async function ItemPage({ routeParams }: ItemPageProps) {
         />
       )}
 
-      <div>
+      <BobbleheadPageClientWrapper
+        bobblehead={bobblehead}
+        bobbleheadId={bobbleheadId}
+        bobbleheadSlug={bobbleheadSlug}
+        canDelete={canDelete}
+        canEdit={canEdit}
+        collectionId={basicBobblehead.collectionId ?? undefined}
+        collections={collections}
+        isOwner={isOwner}
+        likeData={likeData}
+      >
         {/* Header Section */}
         <div className={'border-b border-border'}>
           <ContentLayout>
@@ -226,8 +260,8 @@ async function ItemPage({ routeParams }: ItemPageProps) {
             </BobbleheadErrorBoundary>
           </ContentLayout>
         </div>
-      </div>
-    </BobbleheadViewTracker>
+      </BobbleheadPageClientWrapper>
+    </Fragment>
   );
 }
 
