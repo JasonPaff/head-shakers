@@ -4,8 +4,8 @@ import type { ComponentProps } from 'react';
 
 import { useCallback } from 'react';
 
-import type { CommentWithUser } from '@/components/feature/comments/comment-item';
 import type { CommentTargetType } from '@/lib/constants';
+import type { CommentWithDepth } from '@/lib/queries/social/social.query';
 
 import { CommentSection } from '@/components/feature/comments/comment-section';
 import {
@@ -18,7 +18,7 @@ interface CommentSectionClientProps extends Omit<ComponentProps<'div'>, 'childre
   currentUserId?: string;
   hasMore?: boolean;
   initialCommentCount: number;
-  initialComments: Array<CommentWithUser>;
+  initialComments: Array<CommentWithDepth>;
   isAuthenticated: boolean;
   targetId: string;
   targetType: CommentTargetType;
@@ -39,9 +39,10 @@ export const CommentSectionClient = ({
   ...props
 }: CommentSectionClientProps) => {
   const handleCommentCreate = useCallback(
-    async (content: string) => {
+    async (content: string, parentCommentId?: string) => {
       const result = await createCommentAction({
         content,
+        parentCommentId,
         targetId,
         targetType,
       });

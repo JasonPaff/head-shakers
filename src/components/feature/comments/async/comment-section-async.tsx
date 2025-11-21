@@ -27,6 +27,7 @@ interface CommentSectionAsyncProps extends Omit<ComponentProps<'div'>, 'children
 /**
  * Async server component wrapper for comment section
  * Fetches initial comment data server-side and passes to client component
+ * Uses getCommentsWithReplies for threaded/nested comment display
  */
 export const CommentSectionAsync = async ({
   initialLimit = 10,
@@ -38,8 +39,8 @@ export const CommentSectionAsync = async ({
   const currentUserId = await getOptionalUserId();
   const isAuthenticated = !!currentUserId;
 
-  // Fetch initial comments with pagination
-  const { comments, hasMore, total } = await SocialFacade.getComments(
+  // Fetch initial comments with nested replies for threaded display
+  const { comments, hasMore, total } = await SocialFacade.getCommentsWithReplies(
     targetId,
     targetType,
     {

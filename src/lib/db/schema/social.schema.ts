@@ -125,6 +125,7 @@ export const comments = pgTable(
     index('comments_user_created_idx').on(table.userId, table.createdAt),
     index('comments_deleted_created_idx').on(table.isDeleted, table.createdAt),
     index('comments_target_deleted_idx').on(table.targetType, table.targetId, table.isDeleted),
+    index('comments_parent_created_idx').on(table.parentCommentId, table.createdAt),
 
     // partial indexes for polymorphic relationships
     index('comments_bobblehead_target_idx')

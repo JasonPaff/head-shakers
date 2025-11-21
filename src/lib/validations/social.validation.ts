@@ -33,6 +33,7 @@ export const insertCommentSchema = createInsertSchema(comments, {
     .max(SCHEMA_LIMITS.COMMENT.CONTENT.MAX)
     .transform((val) => val.trim()),
   likeCount: z.number().min(0).default(DEFAULTS.COMMENT.LIKE_COUNT),
+  parentCommentId: z.string().uuid('Invalid parent comment ID').optional(),
   targetType: z.enum(ENUMS.COMMENT.TARGET_TYPE),
 }).omit({
   createdAt: true,

@@ -32,6 +32,16 @@ export const SCHEMA_LIMITS = {
   },
   COMMENT: {
     CONTENT: { MAX: 5000, MIN: 1 },
+    /**
+     * Maximum depth for nested comment replies
+     * Rationale: Balances functionality with UI usability
+     * - Allows meaningful threaded discussions (2-3 levels typical)
+     * - Prevents infinite recursion and performance issues
+     * - Maintains readability on smaller screens where deep nesting is difficult to navigate
+     * - Aligns with industry standards (Reddit uses 10, Twitter uses 1, HackerNews unbounded but paginated)
+     * - 5 levels provides good balance between conversation depth and UI constraints
+     */
+    NESTING_DEPTH: { MAX: 5 },
   },
   CONTENT_REPORT: {
     DESCRIPTION: { MAX: 1000 },

@@ -2,25 +2,28 @@
 
 import type { ComponentProps } from 'react';
 
-import { EditIcon, TrashIcon } from 'lucide-react';
+import { EditIcon, MessageSquareReplyIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import type { CommentWithUser } from '@/lib/queries/social/social.query';
+import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
 import { cn } from '@/utils/tailwind-utils';
 
 // Re-export for convenience
-export type { CommentWithUser };
+export type { CommentWithDepth, CommentWithUser };
 
 interface CommentItemProps extends Omit<ComponentProps<'div'>, 'content'> {
-  comment: CommentWithUser;
+  comment: CommentWithDepth;
   currentUserId?: string;
+  depth?: number;
   isEditable?: boolean;
   onDeleteClick?: (commentId: string) => void;
-  onEditClick?: (comment: CommentWithUser) => void;
+  onEditClick?: (comment: CommentWithDepth) => void;
+  onReply?: (comment: CommentWithDepth) => void;
 }
 
 /**
@@ -61,27 +64,75 @@ const getRelativeTime = (date: Date | string) => {
 };
 
 /**
- * Individual comment display component
- * Displays comment content, author information, timestamp, and action buttons
+ * Returns depth-based background classes for visual nesting hierarchy
+ * Progressively lighter backgrounds for deeper nesting levels
+ */
+const getDepthBackgroundClass = (depth: number): string => {
+  const depthBackgrounds = [
+    'bg-card', // depth 0
+    'bg-muted/20', // depth 1
+    'bg-muted/30', // depth 2
+    'bg-muted/40', // depth 3
+    'bg-muted/50', // depth 4
+    'bg-muted/60', // depth 5+
+  ] as const;
+
+  const clampedDepth = Math.min(depth, MAX_COMMENT_NESTING_DEPTH);
+  return depthBackgrounds[clampedDepth] ?? 'bg-muted/60';
+};
+
+/**
+ * Returns depth-based border accent classes for visual nesting indicators
+ * Uses left border with decreasing opacity for deeper levels
+ */
+const getDepthBorderClass = (depth: number): string => {
+  if (depth === 0) return '';
+
+  const depthBorders = [
+    '', // depth 0 (not used)
+    'border-l-4 border-l-primary/60', // depth 1
+    'border-l-4 border-l-primary/45', // depth 2
+    'border-l-4 border-l-primary/30', // depth 3
+    'border-l-4 border-l-primary/20', // depth 4
+    'border-l-4 border-l-primary/10', // depth 5+
+  ] as const;
+
+  const clampedDepth = Math.min(depth, MAX_COMMENT_NESTING_DEPTH);
+  return depthBorders[clampedDepth] ?? 'border-l-4 border-l-primary/10';
+};
+
+/**
+ * Individual comment display component with nested reply support
+ * Displays comment content, author information, timestamp, action buttons, and reply functionality
+ * Supports visual nesting hierarchy through depth-based styling
  */
 export const CommentItem = ({
   className,
   comment,
   currentUserId,
+  depth = 0,
   isEditable = true,
   onDeleteClick,
   onEditClick,
+  onReply,
   ...props
 }: CommentItemProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  // Derived conditional rendering variables
   const _isCommentOwner = currentUserId === comment.userId;
   const _shouldShowActions = isEditable && _isCommentOwner && isHovered;
   const _hasEditedIndicator = comment.isEdited && !!comment.editedAt;
+  const _canReply = depth < MAX_COMMENT_NESTING_DEPTH && !!onReply;
+  const _isNested = depth > 0;
+  const _isDeeplyNested = depth >= 3;
+
+  // Display values
   const _displayName = comment.user?.displayName || 'Deleted User';
   const _username = comment.user?.username || 'deleted';
   const _avatarUrl = comment.user?.avatarUrl;
 
+  // Event handlers
   const handleEditClick = () => {
     if (onEditClick) {
       onEditClick(comment);
@@ -91,6 +142,12 @@ export const CommentItem = ({
   const handleDeleteClick = () => {
     if (onDeleteClick) {
       onDeleteClick(comment.id);
+    }
+  };
+
+  const handleReplyClick = () => {
+    if (onReply) {
+      onReply(comment);
     }
   };
 
@@ -105,7 +162,10 @@ export const CommentItem = ({
   return (
     <div
       className={cn(
-        'group relative rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50',
+        'group relative rounded-lg border transition-colors hover:bg-muted/50',
+        _isDeeplyNested ? 'p-3' : 'p-4',
+        getDepthBackgroundClass(depth),
+        getDepthBorderClass(depth),
         className,
       )}
       onMouseEnter={handleMouseEnter}
@@ -115,11 +175,12 @@ export const CommentItem = ({
       {/* Comment Header */}
       <div className={'mb-3 flex items-start justify-between gap-3'}>
         <div className={'flex items-center gap-3'}>
-          <Avatar className={'size-8'}>
+          {/* Avatar - smaller for deeply nested comments */}
+          <Avatar className={_isDeeplyNested ? 'size-6' : 'size-8'}>
             <Conditional isCondition={!!_avatarUrl}>
               <AvatarImage alt={_displayName} src={_avatarUrl || ''} />
             </Conditional>
-            <AvatarFallback>
+            <AvatarFallback className={_isDeeplyNested ? 'text-xs' : 'text-sm'}>
               {_displayName
                 .split(' ')
                 .map((n) => n[0])
@@ -130,9 +191,21 @@ export const CommentItem = ({
           </Avatar>
 
           <div className={'flex flex-col'}>
-            <span className={'text-sm font-semibold'}>{_displayName}</span>
-            <span className={'text-xs text-muted-foreground'}>@{_username}</span>
+            <span className={cn('font-semibold', _isDeeplyNested ? 'text-xs' : 'text-sm')}>{_displayName}</span>
+            <span className={cn('text-muted-foreground', _isDeeplyNested ? 'text-[10px]' : 'text-xs')}>
+              @{_username}
+            </span>
           </div>
+
+          {/* Nested Reply Indicator */}
+          <Conditional isCondition={_isNested}>
+            <span
+              className={'ml-1 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground'}
+              title={`Reply at depth ${depth}`}
+            >
+              Reply
+            </span>
+          </Conditional>
         </div>
 
         {/* Action Buttons */}
@@ -149,7 +222,9 @@ export const CommentItem = ({
       </div>
 
       {/* Comment Content */}
-      <p className={'mb-2 text-sm whitespace-pre-wrap text-foreground'}>{comment.content}</p>
+      <p className={cn('mb-2 whitespace-pre-wrap text-foreground', _isDeeplyNested ? 'text-xs' : 'text-sm')}>
+        {comment.content}
+      </p>
 
       {/* Comment Footer */}
       <div className={'flex items-center gap-2 text-xs text-muted-foreground'}>
@@ -157,6 +232,19 @@ export const CommentItem = ({
 
         <Conditional isCondition={_hasEditedIndicator}>
           <span className={'text-xs text-muted-foreground'}>• edited</span>
+        </Conditional>
+
+        {/* Reply Button */}
+        <Conditional isCondition={_canReply}>
+          <Button
+            aria-label={'Reply to comment'}
+            className={'h-auto p-0 text-xs text-muted-foreground hover:text-foreground'}
+            onClick={handleReplyClick}
+            variant={'ghost'}
+          >
+            <MessageSquareReplyIcon aria-hidden className={'mr-1 size-3'} />
+            Reply
+          </Button>
         </Conditional>
       </div>
     </div>

@@ -71,6 +71,13 @@
       "when": 1762793385024,
       "tag": "20251110164945_lethal_shadow_king",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1763743822211,
+      "tag": "20251121165022_dizzy_sunspot",
+      "breakpoints": true
     }
   ]
 }
