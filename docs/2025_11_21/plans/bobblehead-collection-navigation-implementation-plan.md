@@ -18,6 +18,7 @@ As a user, I want a way to navigate between bobbleheads within a collection or s
 ## File Discovery Results
 
 ### Critical Priority (6 files)
+
 1. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` - Main detail page
 2. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts` - Route definition
 3. `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Query layer (675 lines)
@@ -26,6 +27,7 @@ As a user, I want a way to navigate between bobbleheads within a collection or s
 6. `src/lib/db/schema/collections.schema.ts` - Collections schema
 
 ### High Priority (8 files)
+
 7. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx` - Header component
 8. `src/components/ui/button.tsx` - UI button component
 9. **NEW**: `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx` - Client navigation component
@@ -36,6 +38,7 @@ As a user, I want a way to navigate between bobbleheads within a collection or s
 14. **NEW**: Test files for navigation components
 
 ### Medium Priority (6 files)
+
 15. `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Server actions
 16. **NEW**: `src/lib/validations/bobblehead-navigation.validation.ts` - Navigation validation
 17. **NEW**: `src/lib/types/bobblehead-navigation.types.ts` - Navigation types
@@ -44,6 +47,7 @@ As a user, I want a way to navigate between bobbleheads within a collection or s
 20. `src/lib/services/cache-revalidation.service.ts` - Cache invalidation
 
 ### Low Priority (3 files)
+
 21. Base query utilities (query-context.ts, base-query.ts)
 22. Cache services (cache.service.ts)
 23. Utility files (slug.ts, optional-auth-utils.ts)
@@ -76,19 +80,23 @@ Implement sequential navigation between bobbleheads within a collection or subco
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts` - Add searchParams object with collectionId and subcollectionId
 
 **Changes:**
+
 - Add searchParams object to Route definition with parseAsString for collectionId and subcollectionId
 - Update PageProps type inference to include searchParams
 - Ensure validation follows existing Nuqs patterns with optional UUID parameters
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] searchParams includes optional collectionId and subcollectionId with UUID validation
 - [ ] PageProps type correctly infers searchParams alongside routeParams
 - [ ] All validation commands pass
@@ -102,9 +110,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Add getAdjacentBobbleheadsInCollectionAsync method
 
 **Changes:**
+
 - Add getAdjacentBobbleheadsInCollectionAsync method that accepts bobbleheadId, collectionId, optional subcollectionId, and QueryContext
 - Implement query logic to find previous and next bobbleheads based on createdAt DESC ordering
 - Apply buildBaseFilters for permission filtering (isPublic, userId, isDeleted)
@@ -113,11 +123,13 @@ npm run lint:fix && npm run typecheck
 - Use limit and orderBy clauses to efficiently fetch adjacent records
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query method correctly finds previous bobblehead (newer by createdAt)
 - [ ] Query method correctly finds next bobblehead (older by createdAt)
 - [ ] Permission filtering applied through buildBaseFilters
@@ -133,10 +145,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/types/bobblehead-navigation.types.ts` - Navigation type definitions
 - `src/lib/validations/bobblehead-navigation.validation.ts` - Zod validation schemas
 
 **Changes:**
+
 - Define BobbleheadNavigationData type with previousBobblehead and nextBobblehead properties
 - Define AdjacentBobblehead type with id, slug, name, and optional photo properties
 - Create getBobbleheadNavigationSchema validation schema accepting bobbleheadId, collectionId, and optional subcollectionId
@@ -144,11 +158,13 @@ npm run lint:fix && npm run typecheck
 - Export all types and schemas for use in facade and component layers
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Types properly define navigation data structure with nullable adjacent bobbleheads
 - [ ] Validation schemas use existing Zod utilities and follow project patterns
 - [ ] All exports properly typed and accessible
@@ -163,9 +179,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Add getBobbleheadNavigationData method
 
 **Changes:**
+
 - Add getBobbleheadNavigationData method accepting bobbleheadId, collectionId, optional subcollectionId, and optional userId
 - Implement caching with CacheService using createFacadeCacheKey from cache.utils.ts
 - Set TTL to 1800 seconds (30 minutes) consistent with other facade methods
@@ -175,11 +193,13 @@ npm run lint:fix && npm run typecheck
 - Return navigation data with properly typed previous and next bobbleheads
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade method properly caches navigation data with appropriate TTL
 - [ ] Error handling uses createFacadeError with proper context
 - [ ] QueryContext created based on userId presence (public vs user context)
@@ -195,9 +215,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx` - Client navigation component
 
 **Changes:**
+
 - Create client component with useQueryStates from Nuqs to read collectionId and subcollectionId
 - Accept navigationData prop with previousBobblehead and nextBobblehead
 - Use Radix UI Button components with Lucide React ChevronLeft and ChevronRight icons
@@ -209,11 +231,13 @@ npm run lint:fix && npm run typecheck
 - Add loading states during navigation transitions using useTransition
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component correctly reads collectionId and subcollectionId from URL via Nuqs
 - [ ] Previous and next buttons properly disabled at collection boundaries
 - [ ] Keyboard shortcuts work for arrow key navigation
@@ -230,9 +254,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async.tsx` - Server async wrapper
 
 **Changes:**
+
 - Create async server component accepting bobbleheadId, collectionId, and optional subcollectionId props
 - Call getOptionalUserId for current user context
 - Fetch navigation data via BobbleheadsFacade.getBobbleheadNavigationData
@@ -242,11 +268,13 @@ npm run lint:fix && npm run typecheck
 - Follow async wrapper pattern from bobblehead-header-async.tsx
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component fetches navigation data server-side
 - [ ] Properly handles missing collection context by returning null
 - [ ] Passes data to client component with correct prop types
@@ -262,20 +290,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-navigation-skeleton.tsx` - Skeleton loading component
 
 **Changes:**
+
 - Create skeleton component mirroring navigation button layout
 - Use Skeleton component from UI library for button placeholders
 - Match dimensions and spacing of actual navigation buttons
 - Follow skeleton patterns from existing bobblehead-header-skeleton.tsx
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton matches navigation component layout
 - [ ] Dimensions and spacing consistent with actual component
 - [ ] Uses existing Skeleton UI component
@@ -290,9 +322,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` - Add navigation section
 
 **Changes:**
+
 - Extract collectionId and optional subcollectionId from searchParams in ItemPage component
 - Add new section after BobbleheadHeader with ContentLayout wrapper
 - Wrap BobbleheadNavigationAsync in Suspense with BobbleheadNavigationSkeleton fallback
@@ -302,11 +336,13 @@ npm run lint:fix && npm run typecheck
 - Conditionally render based on collectionId presence
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation component integrated into page layout
 - [ ] Suspense and error boundaries properly configured
 - [ ] searchParams correctly extracted and passed to navigation component
@@ -323,9 +359,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobbleheads.tsx` - Update bobblehead links
 
 **Changes:**
+
 - Update links to bobblehead detail pages to include collectionId in searchParams
 - Include subcollectionId when viewing subcollection context
 - Use $path with both routeParams and searchParams
@@ -333,11 +371,13 @@ npm run lint:fix && npm run typecheck
 - Update any other collection view components that link to bobblehead details
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Links from collection views include collectionId parameter
 - [ ] Links from subcollection views include both collectionId and subcollectionId
 - [ ] Type-safe routing maintained with $path
@@ -353,9 +393,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Add navigation cache invalidation
 
 **Changes:**
+
 - Update revalidateBobblehead method to invalidate navigation cache keys
 - Add cache invalidation when bobbleheads are created or deleted in collections
 - Invalidate adjacent bobbleheads' navigation cache when collection structure changes
@@ -363,11 +405,13 @@ npm run lint:fix && npm run typecheck
 - Consider invalidating by collection ID pattern to clear all navigation for collection
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation cache invalidated on bobblehead creation in collection
 - [ ] Navigation cache invalidated on bobblehead deletion from collection
 - [ ] Cache invalidation patterns follow existing service patterns
@@ -383,10 +427,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `tests/lib/queries/bobbleheads/bobbleheads-navigation-query.test.ts` - Query layer tests
 - `tests/lib/facades/bobbleheads/bobbleheads-navigation-facade.test.ts` - Facade layer tests
 
 **Changes:**
+
 - Test query method with various collection contexts and permission scenarios
 - Test boundary conditions (first bobblehead, last bobblehead, single bobblehead)
 - Test subcollection filtering logic
@@ -396,11 +442,13 @@ npm run lint:fix && npm run typecheck
 - Use Testcontainers for database testing following existing patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] Query tests cover all permission scenarios
 - [ ] Facade tests verify caching behavior
 - [ ] Boundary condition tests pass
@@ -416,9 +464,11 @@ npm run lint:fix && npm run typecheck && npm run test
 **Confidence**: High
 
 **Files to Create:**
+
 - `tests/components/bobblehead-navigation.test.tsx` - Component integration tests
 
 **Changes:**
+
 - Test component rendering with navigation data
 - Test disabled states at collection boundaries
 - Test keyboard shortcut functionality (ArrowLeft, ArrowRight)
@@ -428,11 +478,13 @@ npm run lint:fix && npm run typecheck && npm run test
 - Mock Nuqs useQueryStates hook for controlled testing
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders correctly with navigation data
 - [ ] Disabled states work at boundaries
 - [ ] Keyboard shortcuts trigger navigation
@@ -498,6 +550,7 @@ npm run lint:fix && npm run typecheck && npm run test
 ## Orchestration Logs
 
 Complete orchestration logs available at:
+
 - `docs/2025_11_21/orchestration/bobblehead-collection-navigation/00-orchestration-index.md`
 - `docs/2025_11_21/orchestration/bobblehead-collection-navigation/01-feature-refinement.md`
 - `docs/2025_11_21/orchestration/bobblehead-collection-navigation/02-file-discovery.md`

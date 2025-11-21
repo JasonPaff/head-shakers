@@ -31,7 +31,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ### Critical Priority (2 files)
 
 #### 1. Database Schema
+
 **File**: `src/lib/db/schema/social.schema.ts`
+
 - **Priority**: Critical
 - **Category**: Database Schema
 - **Current State**: Contains `parentCommentId` field (line 108) with self-referential structure
@@ -42,7 +44,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Core schema already has the field - needs optimization for nested queries
 
 #### 2. Database Relations
+
 **File**: `src/lib/db/schema/relations.schema.ts`
+
 - **Priority**: Critical
 - **Category**: Database Relations
 - **Current State**: Defines self-referential relationships (lines 149-163) with `parentComment` and `replies`
@@ -52,7 +56,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ### High Priority (14 files)
 
 #### 3. Comment Validation
+
 **File**: `src/lib/validations/comment.validation.ts`
+
 - **Priority**: High
 - **Category**: Validation Schema
 - **Modifications Needed**:
@@ -63,7 +69,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Must validate reply-specific fields and constraints
 
 #### 4. Social Base Validation
+
 **File**: `src/lib/validations/social.validation.ts`
+
 - **Priority**: High
 - **Category**: Base Validation
 - **Modifications Needed**:
@@ -72,7 +80,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Drizzle-Zod generated base schemas need parent field support
 
 #### 5. Enums Constants
+
 **File**: `src/lib/constants/enums.ts`
+
 - **Priority**: High
 - **Category**: Constants
 - **Modifications Needed**:
@@ -81,7 +91,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Centralized configuration for nested comment behavior
 
 #### 6. Schema Limits
+
 **File**: `src/lib/constants/schema-limits.ts`
+
 - **Priority**: High
 - **Category**: Constants
 - **Modifications Needed**:
@@ -89,7 +101,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Validation limits for nested comment constraints
 
 #### 7. Social Query Layer
+
 **File**: `src/lib/queries/social/social.query.ts`
+
 - **Priority**: High
 - **Category**: Database Query Layer
 - **Modifications Needed**:
@@ -102,7 +116,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Core query methods need hierarchical fetching capabilities
 
 #### 8. Social Facade
+
 **File**: `src/lib/facades/social/social.facade.ts`
+
 - **Priority**: High
 - **Category**: Business Logic
 - **Modifications Needed**:
@@ -115,7 +131,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Business logic orchestration for reply operations
 
 #### 9. Social Actions
+
 **File**: `src/lib/actions/social/social.actions.ts`
+
 - **Priority**: High
 - **Category**: Server Actions
 - **Modifications Needed**:
@@ -126,7 +144,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Server actions need reply functionality with validation
 
 #### 10. Comment Item Component
+
 **File**: `src/components/feature/comments/comment-item.tsx`
+
 - **Priority**: High
 - **Category**: React Component
 - **Modifications Needed**:
@@ -139,7 +159,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Individual comment display needs reply UI and nesting visuals
 
 #### 11. Comment List Component
+
 **File**: `src/components/feature/comments/comment-list.tsx`
+
 - **Priority**: High
 - **Category**: React Component
 - **Modifications Needed**:
@@ -152,7 +174,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: List rendering must support hierarchical structure
 
 #### 12. Comment Form Component
+
 **File**: `src/components/feature/comments/comment-form.tsx`
+
 - **Priority**: High
 - **Category**: React Component
 - **Modifications Needed**:
@@ -163,7 +187,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Reusable form can support both root comments and replies
 
 #### 13. Comment Section Component
+
 **File**: `src/components/feature/comments/comment-section.tsx`
+
 - **Priority**: High
 - **Category**: React Component
 - **Modifications Needed**:
@@ -177,14 +203,18 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ### Medium Priority (9 files)
 
 #### 14. Comment Edit Dialog
+
 **File**: `src/components/feature/comments/comment-edit-dialog.tsx`
+
 - **Priority**: Medium
 - **Category**: React Component
 - **Modifications Needed**: Use as reference for creating `CommentReplyDialog`
 - **Reasoning**: Similar dialog pattern can be adapted for replies
 
 #### 15. Comment Delete Dialog
+
 **File**: `src/components/feature/comments/comment-delete-dialog.tsx`
+
 - **Priority**: Medium
 - **Category**: React Component
 - **Modifications Needed**:
@@ -193,7 +223,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Special handling needed for parent comment deletion
 
 #### 16. Comment Section Async
+
 **File**: `src/components/feature/comments/async/comment-section-async.tsx`
+
 - **Priority**: Medium
 - **Category**: React Server Component
 - **Modifications Needed**:
@@ -203,7 +235,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Server component fetches initial nested data
 
 #### 17. Comment Section Client
+
 **File**: `src/components/feature/comments/async/comment-section-client.tsx`
+
 - **Priority**: Medium
 - **Category**: React Client Component
 - **Modifications Needed**:
@@ -213,7 +247,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Client wrapper manages reply interactions
 
 #### 18. Cache Revalidation Service
+
 **File**: `src/lib/services/cache-revalidation.service.ts`
+
 - **Priority**: Medium
 - **Category**: Caching Service
 - **Modifications Needed**:
@@ -222,7 +258,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Cache invalidation for nested comments
 
 #### 19. Cache Tags Utils
+
 **File**: `src/lib/utils/cache-tags.utils.ts`
+
 - **Priority**: Medium
 - **Category**: Cache Utilities
 - **Modifications Needed**:
@@ -231,7 +269,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Cache tags must cover nested scenarios
 
 #### 20. Comment Count Migration
+
 **File**: `src/lib/db/migrations/20251109151001_add_comment_count_to_collections.sql`
+
 - **Priority**: Medium
 - **Category**: Database Migration
 - **Modifications Needed**:
@@ -241,7 +281,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Reference for creating new migration
 
 #### 21. Comment Section Skeleton
+
 **File**: `src/components/feature/comments/skeletons/comment-section-skeleton.tsx`
+
 - **Priority**: Medium
 - **Category**: Loading Skeleton
 - **Modifications Needed**:
@@ -250,7 +292,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - **Reasoning**: Loading states should reflect nested structure
 
 #### 22. Bobblehead Comments Dialog
+
 **File**: `src/components/feature/bobblehead/bobblehead-comments-dialog.tsx`
+
 - **Priority**: Medium
 - **Category**: Dialog Component
 - **Modifications Needed**: Test nested comments work in dialog context
@@ -259,7 +303,9 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ### Low Priority (7 files)
 
 #### 23-25. Collection/Bobblehead Pages
+
 **Files**:
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx`
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`
 - `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx`
@@ -296,21 +342,25 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ## Implementation Recommendations
 
 ### Phase 1: Database & Query Layer (Critical)
+
 1. Add composite indexes to `social.schema.ts` for performance
 2. Create new query methods in `social.query.ts` for hierarchical fetching
 3. Add depth validation utilities
 
 ### Phase 2: Validation & Business Logic (High)
+
 1. Extend validation schemas in `comment.validation.ts` and `social.validation.ts`
 2. Add reply methods to `social.facade.ts` with depth checks
 3. Update server actions in `social.actions.ts` to handle parent comment IDs
 
 ### Phase 3: UI Components (High)
+
 1. Add reply button and handlers to `comment-item.tsx`
 2. Implement recursive rendering in `comment-list.tsx`
 3. Create reply dialog and state management in `comment-section.tsx`
 
 ### Phase 4: Testing & Optimization (Medium)
+
 1. Test cache invalidation for nested comments
 2. Verify performance with deeply nested threads
 3. Add E2E tests for reply workflows

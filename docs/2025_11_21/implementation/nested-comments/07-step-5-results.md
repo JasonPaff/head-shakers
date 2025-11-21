@@ -59,6 +59,7 @@ Facade layer handles business logic and orchestration between queries and action
 ### Three Critical Validations
 
 **Validation 1: Parent Comment Existence**
+
 ```typescript
 const parentComment = await SocialQuery.getCommentByIdAsync(parentCommentId);
 if (!parentComment) {
@@ -70,14 +71,15 @@ if (parentComment.isDeleted) {
 ```
 
 **Validation 2: Target Entity Consistency**
+
 ```typescript
-if (parentComment.targetEntityId !== targetEntityId ||
-    parentComment.targetEntityType !== targetEntityType) {
+if (parentComment.targetEntityId !== targetEntityId || parentComment.targetEntityType !== targetEntityType) {
   return { success: false, error: 'Parent comment belongs to different entity' };
 }
 ```
 
 **Validation 3: Depth Limit Enforcement**
+
 ```typescript
 const currentDepth = await calculateCommentDepth(parentCommentId);
 if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
@@ -90,11 +92,13 @@ if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
 ### Cascade Delete Implementation
 
 **Decision**: Cascade delete chosen over orphaning
+
 - **Rationale**: Maintains data consistency and prevents orphaned reply trees
 - **Implementation**: Recursive soft deletion of all nested replies
 - **Benefit**: User-friendly behavior - deleting a comment removes entire thread
 
 **Soft Deletion**:
+
 - Sets `isDeleted = true` flag
 - Preserves data history for audit/recovery
 - Queries filter out deleted comments by default
@@ -104,19 +108,22 @@ if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
 ### Cache Invalidation Strategy
 
 **Reply Creation**:
+
 - Invalidates parent comment cache tag
 - Ensures parent's reply count updates
 - Triggers UI refresh for affected comments
 
 **Comment Deletion**:
+
 - Invalidates target entity cache tag
 - Ensures comment list updates
 - Triggers UI refresh for entire comment section
 
 **Cache Tags Used**:
+
 ```typescript
-CacheTagGenerators.social.comment(parentCommentId)
-CacheTagGenerators.social.comments(targetEntityType, targetEntityId)
+CacheTagGenerators.social.comment(parentCommentId);
+CacheTagGenerators.social.comments(targetEntityType, targetEntityId);
 ```
 
 ## Files Modified
@@ -203,6 +210,7 @@ CacheTagGenerators.social.comments(targetEntityType, targetEntityId)
 ## Error Handling
 
 All operations return structured results:
+
 ```typescript
 { success: boolean, error?: string, data?: T }
 ```
@@ -212,6 +220,7 @@ This allows server actions (Step 6) to provide user-friendly error messages.
 ## Transaction Safety
 
 Database operations wrapped in transactions where needed:
+
 - Atomic reply creation with count updates
 - Rollback on failure
 - Data consistency guaranteed
@@ -219,16 +228,19 @@ Database operations wrapped in transactions where needed:
 ## Notes for Next Steps
 
 **For Step 6 (Server Actions)**:
+
 - Call `SocialFacade.createCommentReply` for reply creation
 - Handle validation errors and return to client
 - Error messages are user-friendly and actionable
 
 **For Step 14 (Delete Dialog)**:
+
 - Use `hasCommentRepliesAsync` to show cascade warning
 - Use `getCommentReplyCountAsync` to show count
 - Inform user that entire thread will be deleted
 
 **For Step 12 (Async Comment Section)**:
+
 - Facade methods provide complete data with validations
 - Cache management ensures fresh data
 
@@ -239,6 +251,7 @@ Database operations wrapped in transactions where needed:
 **Decision**: Cascade delete
 
 **Reasons**:
+
 1. **User Experience**: Intuitive behavior - deleting a comment removes thread
 2. **Data Consistency**: No orphaned replies without context
 3. **UI Simplicity**: No need to display orphaned replies differently
@@ -249,6 +262,7 @@ Database operations wrapped in transactions where needed:
 **Decision**: Soft delete
 
 **Reasons**:
+
 1. **Data Preservation**: Audit trail maintained
 2. **Recovery**: Possible to restore deleted comments
 3. **Analytics**: Historical data available
@@ -259,6 +273,7 @@ Database operations wrapped in transactions where needed:
 **Decision**: Use existing query method
 
 **Reasons**:
+
 1. **Efficiency**: Reuses optimized recursive query
 2. **Consistency**: Same logic for display and validation
 3. **Maintainability**: Single source of truth for depth calculation

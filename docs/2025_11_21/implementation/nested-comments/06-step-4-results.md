@@ -63,6 +63,7 @@ Need efficient database queries to retrieve nested comment trees without N+1 que
 ### Index Utilization
 
 All queries leverage the composite index created in Step 1:
+
 - Index: `(parentCommentId, createdAt)`
 - Efficient lookups: `WHERE parentCommentId = ? ORDER BY createdAt`
 - Fast cascading operations via indexed column
@@ -70,9 +71,10 @@ All queries leverage the composite index created in Step 1:
 ### N+1 Query Prevention
 
 Recursive approach uses `Promise.all` to fetch sibling comments in parallel:
+
 ```typescript
 const repliesWithChildren = await Promise.all(
-  replies.map(reply => getCommentThreadWithRepliesAsync(reply.id, currentDepth + 1))
+  replies.map((reply) => getCommentThreadWithRepliesAsync(reply.id, currentDepth + 1)),
 );
 ```
 
@@ -81,6 +83,7 @@ This prevents sequential waiting and reduces total query time.
 ### Depth Limiting
 
 Enforces `MAX_COMMENT_NESTING_DEPTH` to prevent infinite recursion:
+
 ```typescript
 if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
   return { ...comment, depth: currentDepth, replies: [] };
@@ -174,15 +177,18 @@ const thread = await getCommentThreadWithRepliesAsync('comment-id');
 ## Notes for Next Steps
 
 **For Step 5 (Facade Layer)**:
+
 - Use `hasCommentRepliesAsync` to check before deletion
 - Use `getCommentThreadWithRepliesAsync` to calculate depth for validation
 - Use `getCommentReplyCountAsync` for displaying counts
 
 **For Step 12 (Async Comment Section)**:
+
 - Use `getCommentsWithRepliesAsync` for initial SSR data fetch
 - Provides complete nested structure for hydration
 
 **For Step 14 (Delete Dialog)**:
+
 - Use `hasCommentRepliesAsync` to show warnings
 - Use `getCommentReplyCountAsync` to display count in warning
 
@@ -191,6 +197,7 @@ const thread = await getCommentThreadWithRepliesAsync('comment-id');
 ### Index Performance
 
 The composite index `(parentCommentId, createdAt)` ensures:
+
 - Fast lookups for child comments
 - Sorted results without additional sort operation
 - Efficient query execution plans
@@ -198,6 +205,7 @@ The composite index `(parentCommentId, createdAt)` ensures:
 ### Depth Limiting
 
 The `MAX_COMMENT_NESTING_DEPTH` constant prevents:
+
 - Infinite recursion scenarios
 - Excessive database queries
 - UI rendering issues with deeply nested content
@@ -205,6 +213,7 @@ The `MAX_COMMENT_NESTING_DEPTH` constant prevents:
 ### Parallel Fetching
 
 Promise.all usage reduces total query time:
+
 - Fetches sibling comments in parallel
 - Reduces sequential waiting
 - Maintains query efficiency at scale

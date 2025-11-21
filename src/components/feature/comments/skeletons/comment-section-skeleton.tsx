@@ -103,7 +103,8 @@ const CommentItemSkeleton = ({ depth = 0 }: CommentItemSkeletonProps) => {
   ] as const;
 
   const _backgroundClass = _depthBackgrounds[Math.min(depth, 3)] ?? 'bg-muted/40';
-  const _borderClass = depth > 0 ? (_depthBorders[Math.min(depth, 3)] ?? 'border-l-4 border-l-primary/30') : '';
+  const _borderClass =
+    depth > 0 ? (_depthBorders[Math.min(depth, 3)] ?? 'border-l-4 border-l-primary/30') : '';
 
   return (
     <div className={cn('rounded-lg border', _padding, _backgroundClass, _borderClass)}>

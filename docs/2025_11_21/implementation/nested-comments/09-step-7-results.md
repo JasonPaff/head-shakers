@@ -48,6 +48,7 @@ Need to ensure parent comment caches are invalidated when replies are added or m
 **File**: src/lib/services/cache-revalidation.service.ts
 
 **Changes**:
+
 - Updated `onCommentChange` to accept `commentId` and `parentCommentId`
 - Switched from generic `onSocialInteraction` to specific `onCommentChange`
 - Enhanced reason message to indicate replies
@@ -57,6 +58,7 @@ Need to ensure parent comment caches are invalidated when replies are added or m
 **File**: src/lib/facades/social/social.facade.ts
 
 **Updates**:
+
 - Fixed cache tag usage after API changes
 - Reply creation: Uses `comments()` for entity list invalidation
 - Comment deletion: Uses `comments()` for entity list invalidation
@@ -70,23 +72,29 @@ Need to ensure parent comment caches are invalidated when replies are added or m
 When a reply is created:
 
 1. **Invalidate Parent Comment**:
+
    ```typescript
-   CacheTagGenerators.social.comment(parentCommentId, userId)
+   CacheTagGenerators.social.comment(parentCommentId, userId);
    ```
+
    - Updates parent to show new reply count
    - Refreshes parent comment data
 
 2. **Invalidate Thread Cache**:
+
    ```typescript
-   CacheTagGenerators.social.commentThread(parentCommentId)
+   CacheTagGenerators.social.commentThread(parentCommentId);
    ```
+
    - Refreshes reply thread display
    - Shows new reply immediately
 
 3. **Invalidate Entity List**:
+
    ```typescript
-   CacheTagGenerators.social.comments(entityType, entityId)
+   CacheTagGenerators.social.comments(entityType, entityId);
    ```
+
    - Updates overall comment count
    - Refreshes comment list
 
@@ -95,9 +103,11 @@ When a reply is created:
 When a comment is deleted:
 
 1. **Invalidate Entity List**:
+
    ```typescript
-   CacheTagGenerators.social.comments(entityType, entityId)
+   CacheTagGenerators.social.comments(entityType, entityId);
    ```
+
    - Removes deleted comment from list
    - Updates comment counts
 
@@ -164,7 +174,7 @@ When a comment is deleted:
 ### Individual Comment
 
 ```typescript
-CacheTagGenerators.social.comment(commentId, userId)
+CacheTagGenerators.social.comment(commentId, userId);
 // Tags: ['comment:123', 'user:456:comments']
 ```
 
@@ -173,7 +183,7 @@ CacheTagGenerators.social.comment(commentId, userId)
 ### Comment List
 
 ```typescript
-CacheTagGenerators.social.comments('bobblehead', bobbleheadId)
+CacheTagGenerators.social.comments('bobblehead', bobbleheadId);
 // Tags: ['bobblehead:789:comments']
 ```
 
@@ -182,7 +192,7 @@ CacheTagGenerators.social.comments('bobblehead', bobbleheadId)
 ### Comment Thread
 
 ```typescript
-CacheTagGenerators.social.commentThread(parentCommentId)
+CacheTagGenerators.social.commentThread(parentCommentId);
 // Tags: ['comment:123:thread']
 ```
 
@@ -191,6 +201,7 @@ CacheTagGenerators.social.commentThread(parentCommentId)
 ## Entity Type Support
 
 Supported entity types for comments:
+
 - `bobblehead` - Comments on bobbleheads
 - `collection` - Comments on collections
 - `subcollection` - Comments on subcollections
@@ -201,6 +212,7 @@ Supported entity types for comments:
 ### Granular Invalidation
 
 Three-tier approach prevents over-invalidation:
+
 - Individual comments invalidated only when that comment changes
 - Lists invalidated only when comments added/removed
 - Threads invalidated only when replies change
@@ -208,6 +220,7 @@ Three-tier approach prevents over-invalidation:
 ### Efficient Revalidation
 
 Cache service uses tag-based invalidation:
+
 - No full cache flushes needed
 - Only affected data revalidated
 - Minimizes server load
@@ -215,6 +228,7 @@ Cache service uses tag-based invalidation:
 ### Type Safety
 
 TypeScript ensures:
+
 - Valid entity types used
 - Correct parameter types passed
 - Cache tag generation is consistent
@@ -222,16 +236,19 @@ TypeScript ensures:
 ## Notes for Next Steps
 
 **For Steps 8-16 (UI Components)**:
+
 - Components can rely on cache management working correctly
 - No manual cache handling needed in components
 - Server actions and facades handle all cache operations
 
 **For Testing**:
+
 - Verify parent comment updates when reply added
 - Verify reply counts refresh properly
 - Verify no stale data after mutations
 
 **For Monitoring**:
+
 - Cache hit/miss rates can be tracked
 - Invalidation patterns can be analyzed
 - Performance metrics available
@@ -257,6 +274,7 @@ The cache system ensures:
 ✅ **Step 7 complete - Ready to proceed with Step 8**
 
 **Progress Summary**:
+
 - ✅ Backend infrastructure complete (Steps 1-7)
 - ✅ Database, queries, facade, actions, cache all implemented
 - 🎯 Next: UI component implementation (Steps 8-16)

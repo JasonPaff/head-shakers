@@ -12,6 +12,7 @@
 ## Input Context
 
 **Refined Feature Request Used**:
+
 ```
 As an admin, I need a comprehensive users management page that leverages the existing tech stack
 to view, filter, and manage all platform users. This page should be built within the Next.js 16
@@ -22,12 +23,14 @@ verification.
 ```
 
 **File Discovery Summary**:
+
 - 62 relevant files discovered
 - 58 existing files validated
 - 4 new components to create
 - Reference implementation identified: `.worktrees/admin-reports-page/`
 
 **Key Patterns**:
+
 - Three-layer architecture (Page → Facade → Query)
 - adminActionClient for secure mutations
 - TanStack React Table with nuqs URL state
@@ -61,15 +64,16 @@ JS/JSX/TS/TSX files. Do NOT include code examples.
 
 ✅ **Format Check**: Output is markdown (not XML)
 ✅ **Template Compliance**: All required sections present
-  - ✅ Overview with estimates
-  - ✅ Quick Summary
-  - ✅ Prerequisites
-  - ✅ Implementation Steps (20 steps)
-  - ✅ Quality Gates
-  - ✅ Notes
-✅ **Command Validation**: lint:fix && typecheck included in all applicable steps
-✅ **Content Quality**: No code examples, only instructions
-✅ **Completeness**: Plan addresses all aspects of refined request
+
+- ✅ Overview with estimates
+- ✅ Quick Summary
+- ✅ Prerequisites
+- ✅ Implementation Steps (20 steps)
+- ✅ Quality Gates
+- ✅ Notes
+  ✅ **Command Validation**: lint:fix && typecheck included in all applicable steps
+  ✅ **Content Quality**: No code examples, only instructions
+  ✅ **Completeness**: Plan addresses all aspects of refined request
 
 ---
 
@@ -110,18 +114,22 @@ JS/JSX/TS/TSX files. Do NOT include code examples.
 ### Required Sections Check
 
 ✅ **Overview Section**:
+
 - Estimated Duration: 3-4 days
 - Complexity: High
 - Risk Level: Medium
 
 ✅ **Quick Summary Section**:
+
 - Present with concise feature description
 
 ✅ **Prerequisites Section**:
+
 - 4 prerequisite items listed
 - Covers infrastructure, authentication, database, and permissions
 
 ✅ **Implementation Steps Section**:
+
 - 20 detailed steps
 - Each step includes:
   - ✅ What (description)
@@ -134,10 +142,12 @@ JS/JSX/TS/TSX files. Do NOT include code examples.
   - ✅ Success Criteria
 
 ✅ **Quality Gates Section**:
+
 - 14 quality gate checkpoints
 - Covers testing, security, performance, and code quality
 
 ✅ **Notes Section**:
+
 - Critical Assumptions (4 items)
 - Performance Considerations (4 items)
 - Security Considerations (4 items)
@@ -163,6 +173,7 @@ JS/JSX/TS/TSX files. Do NOT include code examples.
 ### Risk Assessment
 
 **Medium Risk Level Justified By**:
+
 - ✅ Reference implementation exists (reduces risk)
 - ✅ All patterns established in codebase
 - ⚠️ Audit logging adds complexity
@@ -197,6 +208,7 @@ JS/JSX/TS/TSX files. Do NOT include code examples.
 ### Per-Step Success Criteria
 
 All 20 steps include specific, measurable success criteria:
+
 - Functional requirements (features work correctly)
 - Code quality (validation commands pass)
 - Type safety (TypeScript passes)
@@ -205,6 +217,7 @@ All 20 steps include specific, measurable success criteria:
 ### Overall Quality Gates
 
 14 quality gates defined covering:
+
 - Code quality (typecheck, lint, tests)
 - Security (admin middleware, permissions)
 - Performance (database optimization, indexing)
@@ -218,11 +231,13 @@ All 20 steps include specific, measurable success criteria:
 **Per-Step Validation**: ✅ All applicable steps include validation commands
 
 **Standard Validation**:
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Testing Validation** (Step 20):
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
@@ -319,11 +334,13 @@ npm run lint:fix && npm run typecheck && npm run test
 ### Parallel Work Opportunities
 
 **Can be done in parallel**:
+
 - Steps 5-8 (all UI components)
 - Steps 13-15 (advanced features, if dependencies satisfied)
 - Steps 18-19 (error handling and loading states)
 
 **Must be sequential**:
+
 - Steps 1-4 (data layer foundation)
 - Step 16 (migration before audit logging)
 - Step 20 (testing after implementation)

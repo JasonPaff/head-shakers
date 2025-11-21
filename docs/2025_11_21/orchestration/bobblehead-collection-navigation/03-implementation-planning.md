@@ -31,6 +31,7 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 **File Discovery Results**: [23 files with priorities and analysis]
 
 **Project Context**:
+
 - Next.js 16.0.3 with App Router, React 19.2.0
 - TypeScript with strict type safety
 - Drizzle ORM with PostgreSQL/Neon
@@ -44,6 +45,7 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 - Permission filtering: QueryContext with buildBaseFilters()
 
 **Architectural Patterns to Follow**:
+
 1. Type-safe routing with route-type files
 2. Nuqs for URL state management
 3. Server/client separation (async wrappers → client components)
@@ -70,19 +72,21 @@ Generate a detailed implementation plan following these architectural patterns.
 
 ✅ **Format Check**: Plan generated in markdown format (not XML)
 ✅ **Template Compliance**: Includes all required sections:
-  - Overview with Duration/Complexity/Risk Level
-  - Quick Summary
-  - Prerequisites
-  - Implementation Steps (12 steps)
-  - Quality Gates
-  - Notes
+
+- Overview with Duration/Complexity/Risk Level
+- Quick Summary
+- Prerequisites
+- Implementation Steps (12 steps)
+- Quality Gates
+- Notes
 
 ✅ **Step Structure**: Each step includes:
-  - What/Why/Confidence
-  - Files to Modify/Create
-  - Changes description
-  - Validation Commands
-  - Success Criteria
+
+- What/Why/Confidence
+- Files to Modify/Create
+- Changes description
+- Validation Commands
+- Success Criteria
 
 ✅ **Validation Commands**: All steps touching TypeScript files include `npm run lint:fix && npm run typecheck`
 
@@ -91,61 +95,73 @@ Generate a detailed implementation plan following these architectural patterns.
 ### Implementation Steps Summary
 
 **Step 1**: Extend Route Type Definition with Navigation Context
+
 - **Files**: `route-type.ts`
 - **Priority**: Critical
 - **Confidence**: High
 
 **Step 2**: Create Navigation Query Methods in BobbleheadsQuery
+
 - **Files**: `bobbleheads-query.ts`
 - **Priority**: Critical
 - **Confidence**: High
 
 **Step 3**: Create Navigation Types and Validation Schemas
+
 - **Files**: NEW `bobblehead-navigation.types.ts`, NEW `bobblehead-navigation.validation.ts`
 - **Priority**: Critical
 - **Confidence**: High
 
 **Step 4**: Implement Navigation Facade Method with Caching
+
 - **Files**: `bobbleheads.facade.ts`
 - **Priority**: Critical
 - **Confidence**: High
 
 **Step 5**: Create Client Navigation Component
+
 - **Files**: NEW `bobblehead-navigation.tsx`
 - **Priority**: High
 - **Confidence**: High
 
 **Step 6**: Create Server Async Navigation Wrapper
+
 - **Files**: NEW `bobblehead-navigation-async.tsx`
 - **Priority**: High
 - **Confidence**: High
 
 **Step 7**: Create Navigation Skeleton Component
+
 - **Files**: NEW `bobblehead-navigation-skeleton.tsx`
 - **Priority**: High
 - **Confidence**: High
 
 **Step 8**: Integrate Navigation into Detail Page
+
 - **Files**: `page.tsx`
 - **Priority**: High
 - **Confidence**: High
 
 **Step 9**: Update Collection View Links to Include Context
+
 - **Files**: `collection-bobbleheads.tsx`
 - **Priority**: Medium
 - **Confidence**: Medium
 
 **Step 10**: Add Cache Invalidation for Navigation Data
+
 - **Files**: `cache-revalidation.service.ts`
 - **Priority**: Medium
 - **Confidence**: Medium
 
 **Step 11**: Add Navigation Action Tests
+
 - **Files**: NEW test files for query and facade layers
 - **Priority**: High
 - **Confidence**: High
 
 **Step 12**: Add Component Integration Tests
+
 - **Files**: NEW component test files
 - **Priority**: High
 - **Confidence**: High
@@ -153,23 +169,27 @@ Generate a detailed implementation plan following these architectural patterns.
 ### Complexity Assessment
 
 **Data Layer Complexity**: Medium
+
 - Adding navigation queries to existing 675-line query class
 - Facade integration with 824-line facade class
 - Requires understanding of window functions or indexed queries for prev/next logic
 
 **UI Layer Complexity**: Medium
+
 - Client component with Nuqs state management
 - Keyboard shortcut implementation
 - Loading states and transitions
 - Radix UI integration
 
 **Integration Complexity**: Medium
+
 - Route type extension with searchParams
 - Collection view link updates
 - Cache invalidation coordination
 - Suspense and error boundary integration
 
 **Testing Complexity**: Medium
+
 - Query layer tests with permission scenarios
 - Facade caching behavior tests
 - Component integration tests with keyboard interactions
@@ -178,18 +198,21 @@ Generate a detailed implementation plan following these architectural patterns.
 ### Time Estimates
 
 **Phase 1 - Data Layer** (Steps 1-4): 1 day
+
 - Route type extension: 2 hours
 - Query methods: 4 hours
 - Types and validations: 2 hours
 - Facade implementation: 4 hours
 
 **Phase 2 - UI Layer** (Steps 5-8): 1 day
+
 - Client component: 4 hours
 - Server wrapper: 2 hours
 - Skeleton component: 1 hour
 - Page integration: 3 hours
 
 **Phase 3 - Integration & Testing** (Steps 9-12): 0.5-1 day
+
 - Collection links: 2 hours
 - Cache invalidation: 2 hours
 - Tests: 4-6 hours
@@ -211,6 +234,7 @@ Generate a detailed implementation plan following these architectural patterns.
 ### Architecture Notes Captured
 
 **Follows Established Patterns**:
+
 - Three-layer architecture (Query → Facade → Component)
 - Server/client separation with async wrappers
 - Type-safe routing with route-type.ts and $path
@@ -219,17 +243,20 @@ Generate a detailed implementation plan following these architectural patterns.
 - Centralized error handling with createFacadeError()
 
 **Performance Considerations**:
+
 - Uses existing covering indexes on bobbleheads table
 - Caching with 30-minute TTL
 - Limited queries to single prev/next records
 - Passive event listeners for keyboard shortcuts
 
 **Security Considerations**:
+
 - Server-side permission filtering on all queries
 - URL parameter validation through Zod
 - No client-side permission bypass possible
 
 **Edge Cases Identified**:
+
 - First bobblehead (previousBobblehead null)
 - Last bobblehead (nextBobblehead null)
 - Single bobblehead (both null)
@@ -269,10 +296,12 @@ Generate a detailed implementation plan following these architectural patterns.
 ## Validation Results
 
 ### Format Validation
+
 ✅ **PASSED** - Plan is in markdown format (not XML)
 ✅ **PASSED** - No auto-conversion needed
 
 ### Template Compliance
+
 ✅ **PASSED** - Overview section present with Duration/Complexity/Risk Level
 ✅ **PASSED** - Quick Summary section present
 ✅ **PASSED** - Prerequisites section present with checklist
@@ -281,6 +310,7 @@ Generate a detailed implementation plan following these architectural patterns.
 ✅ **PASSED** - Notes section with 4 subsections
 
 ### Section Validation
+
 ✅ **PASSED** - Each step includes What/Why/Confidence
 ✅ **PASSED** - Each step lists Files to Modify/Create
 ✅ **PASSED** - Each step describes Changes
@@ -288,11 +318,13 @@ Generate a detailed implementation plan following these architectural patterns.
 ✅ **PASSED** - Each step defines Success Criteria
 
 ### Command Validation
+
 ✅ **PASSED** - All TypeScript steps include `npm run lint:fix && npm run typecheck`
 ✅ **PASSED** - Test steps include `npm run test` command
 ✅ **PASSED** - Commands properly formatted in code blocks
 
 ### Content Quality
+
 ✅ **PASSED** - No code examples or implementations included
 ✅ **PASSED** - Plan contains actionable instructions only
 ✅ **PASSED** - Addresses all aspects of refined feature request
@@ -300,6 +332,7 @@ Generate a detailed implementation plan following these architectural patterns.
 ✅ **PASSED** - Uses all 23 discovered files appropriately
 
 ### Completeness Check
+
 ✅ **PASSED** - All critical priority files addressed in steps
 ✅ **PASSED** - All high priority files addressed in steps
 ✅ **PASSED** - Medium/low priority files referenced appropriately
@@ -309,6 +342,7 @@ Generate a detailed implementation plan following these architectural patterns.
 ## Overall Status
 
 ✅ **SUCCESS** - Implementation plan successfully generated with:
+
 - Proper markdown format (no XML conversion needed)
 - Complete template compliance
 - All required sections present

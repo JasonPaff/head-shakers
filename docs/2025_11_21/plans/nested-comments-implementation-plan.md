@@ -22,6 +22,7 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ## File Discovery Results
 
 ### Architecture Layers Covered (8 layers)
+
 1. Database Schema
 2. Database Relations
 3. Validation Schemas
@@ -34,10 +35,12 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 ### Priority Distribution (32 files total)
 
 **Critical Priority (2 files)**
+
 - `src/lib/db/schema/social.schema.ts` - Already has `parentCommentId`, needs indexes
 - `src/lib/db/schema/relations.schema.ts` - Already defines parent-child relationships
 
 **High Priority (14 files)**
+
 - Validation schemas (comment.validation.ts, social.validation.ts)
 - Constants (enums.ts, schema-limits.ts)
 - Query layer (social.query.ts)
@@ -46,12 +49,14 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 - Core components (comment-item.tsx, comment-list.tsx, comment-form.tsx, comment-section.tsx)
 
 **Medium Priority (9 files)**
+
 - Supporting components (dialogs, async wrappers)
 - Cache management (cache-revalidation.service.ts, cache-tags.utils.ts)
 - Database migration (to be created)
 - Loading skeletons
 
 **Low Priority (7 files)**
+
 - Page integrations (already working via async components)
 - Supporting files
 
@@ -93,22 +98,27 @@ This plan activates the existing `parentCommentId` infrastructure in the databas
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/db/migrations/[timestamp]_add_comment_reply_indexes.sql` - Migration file for performance indexes
 
 **Files to Modify:**
+
 - `src/lib/db/schema/social.schema.ts` - Add index definitions for `parentCommentId`
 
 **Changes:**
+
 - Add composite index on `(parentCommentId, createdAt)` for efficient child comment retrieval
 - Add index on `parentCommentId` for cascading operations
 - Add database-level check constraint for preventing excessive nesting if supported
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file created with proper index definitions
 - [ ] Schema file updated with index annotations
 - [ ] All validation commands pass
@@ -125,20 +135,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/enums.ts` - Add `MAX_COMMENT_NESTING_DEPTH` constant
 - `src/lib/constants/schema-limits.ts` - Add depth limit configuration with rationale
 
 **Changes:**
+
 - Add `MAX_COMMENT_NESTING_DEPTH = 5` constant to enums
 - Add depth limit configuration to schema limits with documentation
 - Export constants for use in validation and query logic
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constants added and exported properly
 - [ ] TypeScript types infer correctly
 - [ ] All validation commands pass
@@ -154,10 +168,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/comment.validation.ts` - Add `parentCommentId` to create/update schemas with depth validation
 - `src/lib/validations/social.validation.ts` - Update Drizzle-Zod base schemas to include parent field
 
 **Changes:**
+
 - Add optional `parentCommentId` field to comment creation schema with UUID validation
 - Add validation rule to prevent commenting on deleted parent comments
 - Add depth validation logic using MAX_COMMENT_NESTING_DEPTH constant
@@ -165,11 +181,13 @@ npm run lint:fix && npm run typecheck
 - Add reply-specific validation schema if needed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Validation schemas accept `parentCommentId` parameter
 - [ ] Depth validation logic correctly enforces limits
 - [ ] TypeScript types correctly infer optional parent field
@@ -186,9 +204,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/queries/social/social.query.ts` - Add recursive comment fetching methods with depth calculation
 
 **Changes:**
+
 - Add `getCommentThreadWithReplies` method using Drizzle query builder
 - Implement recursive CTE or multiple joins for fetching nested comments up to max depth
 - Add depth calculation in query results
@@ -198,11 +218,13 @@ npm run lint:fix && npm run typecheck
 - Add pagination support for reply lists
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query methods return hierarchical comment structure
 - [ ] Depth is correctly calculated for each comment level
 - [ ] Query performance is acceptable with indexes
@@ -219,9 +241,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/social/social.facade.ts` - Add reply-specific operations with depth checks and cache management
 
 **Changes:**
+
 - Add `createCommentReply` method with depth validation before creation
 - Add method to verify parent comment exists and is not deleted
 - Add method to calculate current nesting depth for a comment
@@ -231,11 +255,13 @@ npm run lint:fix && npm run typecheck
 - Add transaction handling for reply creation with all related operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Reply creation validates depth limit before database operation
 - [ ] Parent comment existence is verified
 - [ ] Cache invalidation triggers properly for affected comments
@@ -252,9 +278,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/social/social.actions.ts` - Update comment creation action to accept and validate `parentCommentId`
 
 **Changes:**
+
 - Update `createCommentAction` to accept optional `parentCommentId` parameter
 - Add authorization check to ensure user can reply to parent comment
 - Add validation to prevent replying to deleted or hidden comments
@@ -263,11 +291,13 @@ npm run lint:fix && npm run typecheck
 - Update return types to include nesting context if needed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action accepts `parentCommentId` parameter correctly
 - [ ] Validation errors return user-friendly messages
 - [ ] Authorization checks pass for valid scenarios
@@ -284,10 +314,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/cache-revalidation.service.ts` - Add reply-specific cache invalidation logic
 - `src/lib/utils/cache-tags.utils.ts` - Verify cache tags cover nested comment scenarios
 
 **Changes:**
+
 - Add cache invalidation for parent comment when child reply is created
 - Add cache invalidation for entire thread when any nested comment changes
 - Verify cache tags include parent-child relationship indicators
@@ -295,11 +327,13 @@ npm run lint:fix && npm run typecheck
 - Update existing comment cache methods to handle nested scenarios
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cache invalidation triggers for parent comments when replies are added
 - [ ] Cache tags properly identify comment relationships
 - [ ] No stale data appears in UI after reply operations
@@ -316,9 +350,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/comments/comment-item.tsx` - Add reply button, depth prop, nesting visual indicators
 
 **Changes:**
+
 - Add `depth` prop to component to track nesting level
 - Add `onReply` callback prop for reply button click
 - Add reply button using Lucide React icon with appropriate label
@@ -329,11 +365,13 @@ npm run lint:fix && npm run typecheck
 - Update component layout to accommodate reply controls
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Reply button appears on each comment
 - [ ] Visual nesting clearly shows hierarchy
 - [ ] Reply button hidden at maximum depth
@@ -350,9 +388,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/comments/comment-list.tsx` - Implement recursive rendering logic for comment threads
 
 **Changes:**
+
 - Add recursive rendering function to handle comment children
 - Add depth tracking to pass to child components
 - Implement proper key management for nested lists
@@ -362,11 +402,13 @@ npm run lint:fix && npm run typecheck
 - Optimize re-renders with proper memoization
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comments render in correct hierarchical structure
 - [ ] Depth is properly tracked through recursion
 - [ ] Performance is acceptable for deeply nested threads
@@ -383,9 +425,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/comments/comment-form.tsx` - Add reply mode with parent context display
 
 **Changes:**
+
 - Add `parentCommentId` optional prop to component
 - Add `parentCommentContent` or `parentCommentAuthor` for context display
 - Add visual indicator showing reply context using Radix UI components
@@ -396,11 +440,13 @@ npm run lint:fix && npm run typecheck
 - Add loading state for reply submission
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Reply context is clearly displayed when in reply mode
 - [ ] Parent comment ID is correctly passed to action
 - [ ] Cancel button returns to normal comment mode
@@ -417,9 +463,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/comments/comment-section.tsx` - Add reply state management and dialog coordination
 
 **Changes:**
+
 - Add state to track currently active reply parent comment
 - Add handler for reply button clicks to set parent comment
 - Add handler for reply cancellation to clear parent state
@@ -429,11 +477,13 @@ npm run lint:fix && npm run typecheck
 - Handle concurrent reply scenarios
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Reply state is properly managed at section level
 - [ ] Only one reply is active at a time
 - [ ] State is cleared after submission or cancellation
@@ -450,9 +500,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/comments/async/comment-section-async.tsx` - Update data fetching to include nested structure
 
 **Changes:**
+
 - Update query call to use new nested comment fetching method
 - Ensure data structure includes depth and parent relationships
 - Pass nested data structure to client component
@@ -460,11 +512,13 @@ npm run lint:fix && npm run typecheck
 - Optimize query performance with proper includes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Server component fetches nested comment structure
 - [ ] Data includes all necessary parent-child relationships
 - [ ] SSR renders nested comments correctly
@@ -481,9 +535,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/comments/async/comment-section-client.tsx` - Add client-side reply state and optimistic updates
 
 **Changes:**
+
 - Add client state for reply interactions
 - Implement optimistic updates for reply creation
 - Add error handling and rollback for failed replies
@@ -492,11 +548,13 @@ npm run lint:fix && npm run typecheck
 - Handle nested comment re-fetching after mutations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Optimistic updates show replies immediately
 - [ ] Failed submissions roll back properly
 - [ ] Loading states provide feedback during submission
@@ -513,9 +571,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/comments/comment-delete-dialog.tsx` - Add reply cascade warning and handling
 
 **Changes:**
+
 - Add check to detect if comment has replies
 - Add warning message explaining reply deletion or orphaning behavior
 - Update confirmation dialog to show reply count
@@ -524,11 +584,13 @@ npm run lint:fix && npm run typecheck
 - Add success message mentioning affected replies
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog warns users about replies before deletion
 - [ ] Reply count is displayed accurately
 - [ ] Deletion correctly handles child replies
@@ -545,20 +607,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Modify:**
+
 - `src/components/feature/comments/skeletons/comment-section-skeleton.tsx` - Add nested loading indicators
 
 **Changes:**
+
 - Add indented skeleton items to simulate nesting
 - Add multiple depth levels to skeleton structure
 - Update skeleton count to reflect typical nested patterns
 - Ensure skeleton matches visual styling of real nested comments
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton displays nested structure visually
 - [ ] Loading experience matches real nested comments
 - [ ] All validation commands pass
@@ -574,9 +640,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-comments-dialog.tsx` - Verify integration and add any dialog-specific adjustments
 
 **Changes:**
+
 - Verify nested comments render correctly in dialog
 - Add any dialog-specific styling adjustments for nested structure
 - Test scroll behavior with deeply nested comments
@@ -584,11 +652,13 @@ npm run lint:fix && npm run typecheck
 - Add any necessary max-height or scroll containers
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Nested comments render correctly in dialog
 - [ ] Reply functionality works in dialog context
 - [ ] Scroll behavior is acceptable for nested threads
@@ -605,26 +675,31 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - migration execution only
 
 **Changes:**
+
 - Run `npm run db:generate` to generate migration
 - Review generated migration SQL
 - Run `npm run db:migrate` on development branch
 - Verify indexes are created successfully using database command
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Migration generates without errors
 - [ ] Indexes are created in development database
 - [ ] Query performance improves with indexes
 - [ ] Migration is ready for production deployment
 
 ---
+
 ---
 
 ## Quality Gates
@@ -643,29 +718,35 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 ### Critical Discovery
+
 The database schema already has `parentCommentId` implemented with proper foreign key relationships. This significantly reduces implementation risk as the foundational data model is validated.
 
 ### Performance Considerations
+
 - Recursive queries can be expensive; the composite index on `(parentCommentId, createdAt)` is critical for performance
 - Consider implementing pagination or lazy loading for threads with many replies
 - Monitor query performance in production and adjust indexes as needed
 
 ### Deletion Strategy Decision Required
+
 - Determine whether deleting a parent comment should cascade delete all replies or orphan them
 - Recommend cascade delete for consistency and to avoid orphaned data
 - This decision affects facade implementation in Step 5
 
 ### Real-time Notifications
+
 - Reply notifications can be implemented through Ably but should be used conservatively per project guidelines
 - Consider implementing as a separate follow-up feature after core functionality is stable
 - Email notifications for replies may be sufficient initially
 
 ### Depth Limit Rationale
+
 - Recommended MAX_COMMENT_NESTING_DEPTH of 5 balances functionality with UI usability
 - Deeper nesting becomes difficult to read and interact with on smaller screens
 - Limit can be adjusted based on user feedback after launch
 
 ### Assumptions Requiring Confirmation
+
 - Confirm deletion behavior preference (cascade vs orphan) before implementing Step 5
 - Verify MAX_COMMENT_NESTING_DEPTH of 5 is acceptable to stakeholders
 - Confirm whether real-time reply notifications are needed for initial release
@@ -675,6 +756,7 @@ The database schema already has `parentCommentId` implemented with proper foreig
 ## Orchestration Logs
 
 Detailed orchestration logs available at:
+
 - `docs/2025_11_21/orchestration/nested-comments/00-orchestration-index.md` - Workflow overview
 - `docs/2025_11_21/orchestration/nested-comments/01-feature-refinement.md` - Feature request refinement log
 - `docs/2025_11_21/orchestration/nested-comments/02-file-discovery.md` - File discovery analysis log

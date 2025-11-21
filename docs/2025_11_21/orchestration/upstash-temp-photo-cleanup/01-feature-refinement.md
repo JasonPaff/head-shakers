@@ -15,6 +15,7 @@ as a developer I want to be able to use the upstash QStash integration to have a
 ## Context Provided
 
 ### Project Information (from CLAUDE.md)
+
 - **Tech Stack**: Next.js 16.0.3, React 19.2.0, TypeScript, Tailwind CSS 4
 - **File Storage**: Cloudinary for image storage and optimization
 - **Background Jobs**: Upstash QStash for background job processing
@@ -22,6 +23,7 @@ as a developer I want to be able to use the upstash QStash integration to have a
 - **Architecture**: Server Actions for mutations, API routes for webhooks
 
 ### Dependencies (from package.json)
+
 - `@upstash/qstash`: v2.8.4
 - `@cloudinary/react`: v1.14.3
 - `@cloudinary/url-gen`: v1.22.0
@@ -57,9 +59,11 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 ## Validation Results
 
 ### Format Check
+
 ✅ **PASSED** - Output is a single paragraph without headers or sections
 
 ### Length Analysis
+
 - **Original Request**: 37 words
 - **Refined Request**: 332 words
 - **Expansion Ratio**: 8.97x
@@ -67,18 +71,21 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 - **Status**: ⚠️ **WARNING** - Expansion ratio exceeds 4x target, approaching 9x
 
 ### Scope Analysis
+
 ✅ **PASSED** - Core intent preserved: automated cleanup of temporary photos using QStash
 ✅ **PASSED** - No feature creep detected, all additions are technical context and implementation details
 
 ### Quality Check
+
 ✅ **PASSED** - Essential technical context added:
-  - QStash scheduled job capabilities and configuration
-  - Cloudinary API integration details
-  - Database comparison logic with PostgreSQL/Drizzle
-  - Error handling and logging requirements
-  - Retention period configurability
-  - API rate limiting considerations
-  - Success metrics and monitoring integration
+
+- QStash scheduled job capabilities and configuration
+- Cloudinary API integration details
+- Database comparison logic with PostgreSQL/Drizzle
+- Error handling and logging requirements
+- Retention period configurability
+- API rate limiting considerations
+- Success metrics and monitoring integration
 
 ## Notes
 

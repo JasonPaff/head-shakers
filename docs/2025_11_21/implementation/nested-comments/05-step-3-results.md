@@ -28,6 +28,7 @@ Need type-safe validation for reply creation and parent comment reference integr
 **File**: src/lib/validations/comment.validation.ts
 
 **Changes**:
+
 - Extended `createCommentSchema` to accept optional `parentCommentId` field
 - Added UUID validation for parent comment IDs
 - Added comprehensive documentation specifying facade layer validation requirements:
@@ -38,6 +39,7 @@ Need type-safe validation for reply creation and parent comment reference integr
 **File**: src/lib/validations/social.validation.ts
 
 **Changes**:
+
 - Updated `insertCommentSchema` (base Drizzle-Zod schema) to include `parentCommentId` as optional UUID field
 - Ensures parent field is available to all comment schemas that extend it
 - Maintains consistency with database schema
@@ -100,7 +102,7 @@ type CreateComment = {
   targetEntityType: string;
   parentCommentId?: string; // Optional UUID
   // ... other fields
-}
+};
 ```
 
 This ensures compile-time safety when working with comment creation throughout the application.
@@ -118,15 +120,18 @@ These cannot be validated at the schema level and require database queries.
 ## Notes for Next Steps
 
 **For Step 4 (Recursive Queries)**:
+
 - Query methods will need to calculate comment depth
 - Will traverse parent chain to determine nesting level
 
 **For Step 5 (Facade Layer)**:
+
 - Must implement the three validation requirements documented in schema
 - Will use recursive queries from Step 4 to check depth
 - Will verify parent comment existence and status
 
 **For Step 6 (Server Actions)**:
+
 - Will use `createCommentSchema` to validate incoming requests
 - Schema ensures `parentCommentId` is valid UUID if provided
 - Type inference provides compile-time safety

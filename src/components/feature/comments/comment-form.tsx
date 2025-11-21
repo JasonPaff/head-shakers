@@ -59,7 +59,8 @@ export const CommentForm = ({
   const _characterCount = content.length;
   const _isNearLimit = _characterCount > SCHEMA_LIMITS.COMMENT.CONTENT.MAX * 0.9;
   const _isOverLimit = _characterCount > SCHEMA_LIMITS.COMMENT.CONTENT.MAX;
-  const _effectivePlaceholder = _isReplyMode ? `Reply to ${parentCommentAuthor ?? 'comment'}...` : placeholder;
+  const _effectivePlaceholder =
+    _isReplyMode ? `Reply to ${parentCommentAuthor ?? 'comment'}...` : placeholder;
   const _effectiveSubmitText = _isReplyMode ? 'Post Reply' : submitButtonText;
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {

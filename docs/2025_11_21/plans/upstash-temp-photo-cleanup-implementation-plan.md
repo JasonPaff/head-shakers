@@ -21,42 +21,29 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 ### Critical Priority Files (11)
 
 **Cloudinary Integration & Services**
+
 1. `src/lib/services/cloudinary.service.ts` - Core Cloudinary service with batch delete methods
 2. `src/components/ui/cloudinary-photo-upload.tsx` - Shows temp photo creation in `users/${userId}/temp`
 3. `src/types/cloudinary.types.ts` - Type definitions for CloudinaryPhoto
 
-**Database Schema & Queries**
-4. `src/lib/db/schema/bobbleheads.schema.ts` - Bobbleheads and bobbleheadPhotos schema
-5. `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Database queries for bobbleheads
+**Database Schema & Queries** 4. `src/lib/db/schema/bobbleheads.schema.ts` - Bobbleheads and bobbleheadPhotos schema 5. `src/lib/queries/bobbleheads/bobbleheads-query.ts` - Database queries for bobbleheads
 
-**QStash Job Pattern (CRITICAL REFERENCES)**
-6. `src/app/api/analytics/process-views/route.ts` - QStash webhook endpoint pattern
-7. `src/lib/jobs/view-aggregation.job.ts` - Background job class pattern
-8. `src/lib/jobs/trending-calculation.job.ts` - Additional job reference
+**QStash Job Pattern (CRITICAL REFERENCES)** 6. `src/app/api/analytics/process-views/route.ts` - QStash webhook endpoint pattern 7. `src/lib/jobs/view-aggregation.job.ts` - Background job class pattern 8. `src/lib/jobs/trending-calculation.job.ts` - Additional job reference
 
-**Configuration & Constants**
-9. `src/lib/constants/cloudinary-paths.ts` - Path builders including `tempPath(userId)`
-10. `src/lib/constants/config.ts` - Application config with Cloudinary settings
-11. `.env` - Environment variables for Cloudinary and QStash
+**Configuration & Constants** 9. `src/lib/constants/cloudinary-paths.ts` - Path builders including `tempPath(userId)` 10. `src/lib/constants/config.ts` - Application config with Cloudinary settings 11. `.env` - Environment variables for Cloudinary and QStash
 
 ### High Priority Files (7)
 
-**Server Actions & Facades**
-12. `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Photo lifecycle patterns
-13. `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Business logic layer
+**Server Actions & Facades** 12. `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - Photo lifecycle patterns 13. `src/lib/facades/bobbleheads/bobbleheads.facade.ts` - Business logic layer
 
-**Utilities & Helpers**
-14. `src/lib/utils/photo-transform.utils.ts` - `isTempPhoto()` type guard
-15. `src/lib/utils/redis-client.ts` - Redis operations for job state
-16. `src/lib/utils/error-builders.ts` - Error handling utilities
-17. `src/lib/utils/circuit-breaker-registry.ts` - Circuit breaker patterns
+**Utilities & Helpers** 14. `src/lib/utils/photo-transform.utils.ts` - `isTempPhoto()` type guard 15. `src/lib/utils/redis-client.ts` - Redis operations for job state 16. `src/lib/utils/error-builders.ts` - Error handling utilities 17. `src/lib/utils/circuit-breaker-registry.ts` - Circuit breaker patterns
 
-**Middleware & Rate Limiting**
-18. `src/lib/middleware/rate-limit.middleware.ts` - Rate limiting patterns
+**Middleware & Rate Limiting** 18. `src/lib/middleware/rate-limit.middleware.ts` - Rate limiting patterns
 
 ### Architecture Insights
 
 **Key Patterns Identified**:
+
 1. QStash jobs are class-based services in `src/lib/jobs/`
 2. API routes use `verifySignatureAppRouter` for QStash webhook security
 3. Cloudinary service has batch delete with retry logic and circuit breakers
@@ -64,6 +51,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 5. View aggregation job shows periodic cleanup pattern (line 189)
 
 **Integration Points**:
+
 1. Use Cloudinary Admin API to list temp folder resources
 2. Query `bobblehead_photos` table for comparison
 3. Use existing `CloudinaryService.deletePhotosFromCloudinary()` for deletion
@@ -100,22 +88,27 @@ Implement an automated cleanup system using Upstash QStash that periodically ide
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/constants/cleanup-config.ts` - Cleanup job configuration constants
 
 **Files to Modify:**
+
 - `.env.local` - Add TEMP_PHOTO_RETENTION_HOURS and CLEANUP_BATCH_SIZE variables
 
 **Changes:**
+
 - Create cleanup-config.ts with constants for retention hours, batch size, and rate limits
 - Export configuration object with type safety
 - Add environment variables for TEMP_PHOTO_RETENTION_HOURS (default 24) and CLEANUP_BATCH_SIZE (default 50)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Configuration file exports typed constants object
 - [ ] Environment variables are documented
 - [ ] All validation commands pass
@@ -129,12 +122,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/jobs/temp-photo-cleanup.job.ts` - Core cleanup job implementation
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create TempPhotoCleanupJob class with execute() method
 - Implement listTempPhotos() method using Cloudinary Admin API to fetch resources from temp folders
 - Implement identifyOrphans() method to query bobblehead_photos table and compare public IDs
@@ -145,11 +141,13 @@ npm run lint:fix && npm run typecheck
 - Implement detailed logging for cleanup metrics (photos scanned, deleted, errors)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Job class follows established pattern from view-aggregation.job.ts
 - [ ] Method signatures use proper TypeScript types from Drizzle schema
 - [ ] Circuit breaker integration matches existing patterns
@@ -165,12 +163,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/api/cleanup/temp-photos/route.ts` - QStash webhook endpoint
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create POST handler function following api/analytics/process-views/route.ts pattern
 - Implement verifySignatureAppRouter for QStash authentication
 - Instantiate TempPhotoCleanupJob and call execute() method
@@ -180,11 +181,13 @@ npm run lint:fix && npm run typecheck
 - Return JSON response with cleanup statistics (scanned, deleted, errors)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Route uses verifySignatureAppRouter correctly
 - [ ] Response includes detailed cleanup metrics
 - [ ] Error handling returns appropriate HTTP status codes
@@ -200,25 +203,30 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/lib/services/cloudinary.service.ts` - Add listTempFolderResources() method
 
 **Changes:**
+
 - Add listTempFolderResources() method using Cloudinary Admin API v2.api.resources()
 - Implement pagination handling for large result sets
-- Add prefix filtering for users/*/temp folders
+- Add prefix filtering for users/\*/temp folders
 - Include created_at timestamp extraction for retention period filtering
 - Add error handling with circuit breaker integration
 - Return typed array of resource metadata (public_id, created_at, format)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method handles Cloudinary API pagination correctly
 - [ ] Return type includes necessary metadata for filtering
 - [ ] Error handling matches existing CloudinaryService patterns
@@ -234,12 +242,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/queries/bobbleheads/bobblehead-photos.queries.ts` - Photo queries for cleanup job
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create getAllPhotoPublicIds() query function using Drizzle ORM
 - Select only publicId column from bobbleheadPhotos table for efficiency
 - Return Set<string> for fast lookup performance
@@ -247,11 +258,13 @@ npm run lint:fix && npm run typecheck
 - Include query performance logging for monitoring
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query uses Drizzle ORM correctly with bobbleheadPhotos schema
 - [ ] Returns Set for O(1) lookup performance
 - [ ] Error handling includes proper PostgreSQL error types
@@ -267,12 +280,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/utils/cleanup-helpers.ts` - Utility functions for cleanup job
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create isOlderThanRetentionPeriod() function accepting created_at timestamp and retention hours
 - Implement getCurrentTimestamp() helper for testability
 - Add filterPhotosByAge() function to process Cloudinary resource arrays
@@ -280,11 +296,13 @@ npm run lint:fix && npm run typecheck
 - Add unit test friendly pure functions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Timestamp comparison logic handles timezone differences correctly
 - [ ] Functions are pure for easy unit testing
 - [ ] Type definitions match Cloudinary Admin API response structure
@@ -300,12 +318,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/lib/jobs/temp-photo-cleanup.job.ts` - Add batch processing to deleteOrphans() method
 
 **Changes:**
+
 - Implement chunk() utility to split orphan arrays into batches
 - Add delay between batch deletions to respect Cloudinary rate limits
 - Use existing CloudinaryService.deletePhotosFromCloudinary() for actual deletion
@@ -314,11 +335,13 @@ npm run lint:fix && npm run typecheck
 - Add batch-level error logging
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Batch size respects configured CLEANUP_BATCH_SIZE constant
 - [ ] Rate limiting delay calculated from cleanup-config.ts
 - [ ] Partial failures don't abort entire cleanup operation
@@ -334,13 +357,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/lib/jobs/temp-photo-cleanup.job.ts` - Add logging throughout execution
 - `src/app/api/cleanup/temp-photos/route.ts` - Add webhook execution logging
 
 **Changes:**
+
 - Add Sentry breadcrumbs for major cleanup phases (scan, identify, delete)
 - Implement performance timing for each operation phase
 - Log cleanup metrics (total scanned, orphans found, successfully deleted, errors)
@@ -349,11 +375,13 @@ npm run lint:fix && npm run typecheck
 - Track Cloudinary API call count for rate limit monitoring
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sentry breadcrumbs provide clear execution timeline
 - [ ] Metrics include all required visibility data
 - [ ] Error logs include actionable debugging information
@@ -369,13 +397,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `.env.local` - Add cleanup job environment variables
 - `.env.example` - Document required variables
 
 **Changes:**
+
 - Add TEMP_PHOTO_RETENTION_HOURS with default value 24
 - Add CLEANUP_BATCH_SIZE with default value 50
 - Add CLEANUP_RATE_LIMIT_DELAY_MS with default value 1000
@@ -383,11 +414,13 @@ npm run lint:fix && npm run typecheck
 - Add comments explaining configuration impact
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All required environment variables documented
 - [ ] Default values are production-safe
 - [ ] Variable names follow existing naming conventions
@@ -403,12 +436,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `docs/2025_11_21/deployment/qstash-cleanup-schedule.md` - Schedule configuration guide
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Document QStash dashboard configuration steps
 - Specify recommended cron schedule (daily at 2 AM UTC)
 - Include webhook URL format for production and staging
@@ -417,11 +453,13 @@ npm run lint:fix && npm run typecheck
 - Include verification steps post-deployment
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Documentation includes complete QStash setup steps
 - [ ] Cron schedule recommendation is justified
 - [ ] Webhook URL examples are accurate
@@ -483,6 +521,7 @@ npm run lint:fix && npm run typecheck
 **Step 3**: Implementation Planning - Completed
 
 **Full Orchestration Logs**: `docs/2025_11_21/orchestration/upstash-temp-photo-cleanup/`
+
 - `00-orchestration-index.md` - Workflow overview and navigation
 - `01-feature-refinement.md` - Detailed refinement log
 - `02-file-discovery.md` - Comprehensive file discovery analysis

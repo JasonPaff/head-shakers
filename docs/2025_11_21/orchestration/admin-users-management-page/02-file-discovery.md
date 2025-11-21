@@ -12,6 +12,7 @@
 ## Input
 
 **Refined Feature Request Used**:
+
 ```
 As an admin, I need a comprehensive users management page that leverages the existing tech stack
 to view, filter, and manage all platform users. This page should be built within the Next.js 16
@@ -74,100 +75,43 @@ Categorize files by priority (Critical/High/Medium/Low) based on implementation 
 ### Critical Priority (12 files)
 
 **Database Schemas:**
+
 1. ✅ `src/lib/db/schema/users.schema.ts` - User table schema with roles, authentication fields, verification status
 2. ✅ `src/lib/db/schema/system.schema.ts` - Notification settings and platform settings
 3. ✅ `src/lib/db/schema/moderation.schema.ts` - Content reports and audit log patterns
 4. ✅ `src/lib/db/schema/index.ts` - Central schema exports
 
-**Validation Schemas:**
-5. ✅ `src/lib/validations/users.validation.ts` - User validation with drizzle-zod patterns
-6. ✅ `src/lib/validations/admin.validation.ts` - Admin validation patterns
-7. ✅ `src/lib/validations/moderation.validation.ts` - Pagination and bulk operations validation
+**Validation Schemas:** 5. ✅ `src/lib/validations/users.validation.ts` - User validation with drizzle-zod patterns 6. ✅ `src/lib/validations/admin.validation.ts` - Admin validation patterns 7. ✅ `src/lib/validations/moderation.validation.ts` - Pagination and bulk operations validation
 
-**Queries:**
-8. ✅ `src/lib/queries/users/users-query.ts` - User queries (needs admin extensions)
-9. ✅ `src/lib/queries/base/base-query.ts` - Query base class with pagination
-10. ✅ `src/lib/queries/content-reports/content-reports.query.ts` - Reference implementation
+**Queries:** 8. ✅ `src/lib/queries/users/users-query.ts` - User queries (needs admin extensions) 9. ✅ `src/lib/queries/base/base-query.ts` - Query base class with pagination 10. ✅ `src/lib/queries/content-reports/content-reports.query.ts` - Reference implementation
 
-**Actions & Middleware:**
-11. ✅ `src/lib/actions/admin/admin-content-reports.actions.ts` - Reference implementation for admin actions
-12. ✅ `src/lib/middleware/admin.middleware.ts` - Admin role verification
+**Actions & Middleware:** 11. ✅ `src/lib/actions/admin/admin-content-reports.actions.ts` - Reference implementation for admin actions 12. ✅ `src/lib/middleware/admin.middleware.ts` - Admin role verification
 
 ### High Priority (8 files)
 
-**Admin Page:**
-13. ✅ `src/app/(app)/admin/users/page.tsx` - Page to implement (currently stub)
-14. ✅ `.worktrees/admin-reports-page/src/app/(app)/admin/reports/page.tsx` - Reference pattern
+**Admin Page:** 13. ✅ `src/app/(app)/admin/users/page.tsx` - Page to implement (currently stub) 14. ✅ `.worktrees/admin-reports-page/src/app/(app)/admin/reports/page.tsx` - Reference pattern
 
-**Components to Create:**
-15. ❌ `src/components/admin/users/users-table.tsx` - TanStack React Table (to create)
-16. ❌ `src/components/admin/users/user-filters.tsx` - Filter component (to create)
-17. ❌ `src/components/admin/users/user-action-dialog.tsx` - Action dialog (to create)
-18. ❌ `src/components/admin/users/user-detail-dialog.tsx` - Detail dialog (to create)
+**Components to Create:** 15. ❌ `src/components/admin/users/users-table.tsx` - TanStack React Table (to create) 16. ❌ `src/components/admin/users/user-filters.tsx` - Filter component (to create) 17. ❌ `src/components/admin/users/user-action-dialog.tsx` - Action dialog (to create) 18. ❌ `src/components/admin/users/user-detail-dialog.tsx` - Detail dialog (to create)
 
-**Reference Components:**
-19. ✅ `.worktrees/admin-reports-page/src/components/admin/reports/reports-table.tsx` - Table pattern reference
-20. ✅ `src/components/layout/admin/admin-layout.tsx` - Admin layout wrapper
+**Reference Components:** 19. ✅ `.worktrees/admin-reports-page/src/components/admin/reports/reports-table.tsx` - Table pattern reference 20. ✅ `src/components/layout/admin/admin-layout.tsx` - Admin layout wrapper
 
 ### Medium Priority (22 files)
 
-**UI Components:**
-21. ✅ `src/components/ui/table.tsx` - Base table components
-22. ✅ `src/components/ui/dialog.tsx` - Dialog components
-23. ✅ `src/components/ui/badge.tsx` - Status badges
-24. ✅ `src/components/ui/select.tsx` - Select component
-25. ✅ `src/components/ui/input.tsx` - Input component
-26. ✅ `src/components/ui/button.tsx` - Button component
-27. ✅ `src/components/ui/checkbox.tsx` - Checkbox component
-28. ✅ `src/components/ui/dropdown-menu.tsx` - Dropdown menu
-29. ✅ `src/components/ui/card.tsx` - Card component
-30. ✅ `src/components/ui/conditional.tsx` - Conditional rendering
-31. ✅ `src/components/ui/skeleton.tsx` - Loading skeletons
-32. ✅ `src/components/ui/empty-state.tsx` - Empty state component
+**UI Components:** 21. ✅ `src/components/ui/table.tsx` - Base table components 22. ✅ `src/components/ui/dialog.tsx` - Dialog components 23. ✅ `src/components/ui/badge.tsx` - Status badges 24. ✅ `src/components/ui/select.tsx` - Select component 25. ✅ `src/components/ui/input.tsx` - Input component 26. ✅ `src/components/ui/button.tsx` - Button component 27. ✅ `src/components/ui/checkbox.tsx` - Checkbox component 28. ✅ `src/components/ui/dropdown-menu.tsx` - Dropdown menu 29. ✅ `src/components/ui/card.tsx` - Card component 30. ✅ `src/components/ui/conditional.tsx` - Conditional rendering 31. ✅ `src/components/ui/skeleton.tsx` - Loading skeletons 32. ✅ `src/components/ui/empty-state.tsx` - Empty state component
 
-**Form Components:**
-33. ✅ `src/components/ui/form/index.tsx` - Form exports
-34. ✅ `src/components/ui/form/field-components/select-field.tsx` - Form select
-35. ✅ `src/components/ui/form/field-components/text-field.tsx` - Form text input
-36. ✅ `src/components/ui/form/field-components/checkbox-field.tsx` - Form checkbox
-37. ✅ `src/components/ui/form/form-components/submit-button.tsx` - Submit button
+**Form Components:** 33. ✅ `src/components/ui/form/index.tsx` - Form exports 34. ✅ `src/components/ui/form/field-components/select-field.tsx` - Form select 35. ✅ `src/components/ui/form/field-components/text-field.tsx` - Form text input 36. ✅ `src/components/ui/form/field-components/checkbox-field.tsx` - Form checkbox 37. ✅ `src/components/ui/form/form-components/submit-button.tsx` - Submit button
 
-**Admin Components:**
-38. ✅ `src/components/ui/admin/admin-route-guard.tsx` - Route protection
-39. ✅ `src/lib/utils/admin.utils.ts` - Admin utilities
-40. ✅ `src/lib/utils/next-safe-action.ts` - Action client definitions
+**Admin Components:** 38. ✅ `src/components/ui/admin/admin-route-guard.tsx` - Route protection 39. ✅ `src/lib/utils/admin.utils.ts` - Admin utilities 40. ✅ `src/lib/utils/next-safe-action.ts` - Action client definitions
 
-**Supporting Queries:**
-41. ✅ `src/lib/queries/base/query-context.ts` - Query context interface
-42. ✅ `src/lib/queries/base/permission-filters.ts` - Permission filtering
+**Supporting Queries:** 41. ✅ `src/lib/queries/base/query-context.ts` - Query context interface 42. ✅ `src/lib/queries/base/permission-filters.ts` - Permission filtering
 
 ### Low Priority (20 files)
 
-**Constants:**
-43. ✅ `src/lib/constants/enums.ts` - Enum definitions
-44. ✅ `src/lib/constants/defaults.ts` - Default values
-45. ✅ `src/lib/constants/schema-limits.ts` - Schema limits
-46. ✅ `src/lib/constants/error-messages.ts` - Error messages
-47. ✅ `src/lib/constants/error-codes.ts` - Error codes
-48. ✅ `src/lib/constants/action-names.ts` - Action name constants
-49. ✅ `src/lib/constants/operations.ts` - Operation constants
-50. ✅ `src/lib/constants/sentry.ts` - Sentry constants
+**Constants:** 43. ✅ `src/lib/constants/enums.ts` - Enum definitions 44. ✅ `src/lib/constants/defaults.ts` - Default values 45. ✅ `src/lib/constants/schema-limits.ts` - Schema limits 46. ✅ `src/lib/constants/error-messages.ts` - Error messages 47. ✅ `src/lib/constants/error-codes.ts` - Error codes 48. ✅ `src/lib/constants/action-names.ts` - Action name constants 49. ✅ `src/lib/constants/operations.ts` - Operation constants 50. ✅ `src/lib/constants/sentry.ts` - Sentry constants
 
-**Related Schemas:**
-51. ✅ `src/lib/db/schema/social.schema.ts` - Social features (for user stats)
-52. ✅ `src/lib/db/schema/analytics.schema.ts` - Analytics (for activity)
-53. ✅ `src/lib/db/schema/collections.schema.ts` - Collections (for counts)
-54. ✅ `src/lib/db/schema/bobbleheads.schema.ts` - Bobbleheads (for counts)
-55. ✅ `src/lib/db/schema/relations.schema.ts` - Schema relations
+**Related Schemas:** 51. ✅ `src/lib/db/schema/social.schema.ts` - Social features (for user stats) 52. ✅ `src/lib/db/schema/analytics.schema.ts` - Analytics (for activity) 53. ✅ `src/lib/db/schema/collections.schema.ts` - Collections (for counts) 54. ✅ `src/lib/db/schema/bobbleheads.schema.ts` - Bobbleheads (for counts) 55. ✅ `src/lib/db/schema/relations.schema.ts` - Schema relations
 
-**Additional Files:**
-56. ✅ `src/lib/facades/users/users.facade.ts` - User facade (may need extensions)
-57. ✅ `src/lib/facades/content-reports/content-reports.facade.ts` - Reference facade
-58. ✅ `src/middleware.ts` - Next.js middleware
-59. ✅ `src/lib/middleware/auth.middleware.ts` - Auth middleware
-60. ✅ `.worktrees/admin-reports-page/src/components/admin/reports/report-filters.tsx` - Filter reference
-61. ✅ `.worktrees/admin-reports-page/src/components/admin/reports/bulk-actions-toolbar.tsx` - Bulk actions reference
-62. ✅ `src/components/admin/analytics/trending-content-table.tsx` - Analytics table reference
+**Additional Files:** 56. ✅ `src/lib/facades/users/users.facade.ts` - User facade (may need extensions) 57. ✅ `src/lib/facades/content-reports/content-reports.facade.ts` - Reference facade 58. ✅ `src/middleware.ts` - Next.js middleware 59. ✅ `src/lib/middleware/auth.middleware.ts` - Auth middleware 60. ✅ `.worktrees/admin-reports-page/src/components/admin/reports/report-filters.tsx` - Filter reference 61. ✅ `.worktrees/admin-reports-page/src/components/admin/reports/bulk-actions-toolbar.tsx` - Bulk actions reference 62. ✅ `src/components/admin/analytics/trending-content-table.tsx` - Analytics table reference
 
 ---
 
@@ -208,23 +152,27 @@ Categorize files by priority (Critical/High/Medium/Low) based on implementation 
 ## Key Patterns Identified by AI
 
 ### 1. Three-Layer Architecture
+
 - **Pages** (Server Components) → Fetch data using Facades
 - **Facades** (Business Logic) → Call Queries and coordinate operations
 - **Queries** (Data Access) → Execute database operations with permissions
 
 ### 2. Admin Action Pattern
+
 - Use `adminActionClient` from next-safe-action utils
 - Define Zod validation schemas
 - Access admin context with role information
 - Integrate Sentry for logging
 
 ### 3. TanStack React Table Pattern
+
 - Column definitions with `ColumnDef<T>`
 - Manual pagination with server-side fetching
 - URL state management with nuqs
 - Bulk actions via row selection
 
 ### 4. Permission System
+
 - Role-based access (user, moderator, admin)
 - Middleware checks before action execution
 - Route guards for page protection
@@ -234,6 +182,7 @@ Categorize files by priority (Critical/High/Medium/Low) based on implementation 
 ## Reference Implementation Identified
 
 **Primary Reference**: `.worktrees/admin-reports-page/`
+
 - Complete admin table with filtering, pagination, sorting
 - Bulk operations with row selection
 - Stats cards and empty states

@@ -27,7 +27,10 @@ const isCommentWithDepth = (comment: CommentWithDepth | CommentWithUser): commen
  * Normalizes a comment to ensure it has depth information
  * Used to support both CommentWithUser and CommentWithDepth inputs
  */
-const normalizeComment = (comment: CommentWithDepth | CommentWithUser, defaultDepth = 0): CommentWithDepth => {
+const normalizeComment = (
+  comment: CommentWithDepth | CommentWithUser,
+  defaultDepth = 0,
+): CommentWithDepth => {
   if (isCommentWithDepth(comment)) {
     return comment;
   }

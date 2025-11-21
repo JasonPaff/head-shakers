@@ -45,6 +45,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
 ### High Priority (Core Implementation) - 9 Files
 
 #### Collection Detail Pages (3 files)
+
 1. `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx`
    - **Reason**: Collection detail page entry point with layout structure and header section
    - **Priority**: Critical - Requires modification to integrate sticky header
@@ -58,6 +59,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
    - **Priority**: Critical - Data flow integration point
 
 #### Subcollection Detail Pages (3 files)
+
 4. `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx`
    - **Reason**: Subcollection detail page entry point
    - **Priority**: Critical - Requires modification to integrate sticky header
@@ -71,6 +73,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
    - **Priority**: Critical - Data flow integration point
 
 #### Bobblehead Detail Pages (3 files)
+
 7. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`
    - **Reason**: Bobblehead detail page entry point
    - **Priority**: Critical - Requires modification to integrate sticky header
@@ -86,6 +89,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
 ### Medium Priority (Supporting/Integration) - 19 Files
 
 #### Action Components (10 files)
+
 10. `src/components/feature/collections/collection-share-menu.tsx`
     - **Reason**: Collection share menu with dropdown (Copy Link, Twitter, Facebook)
     - **Priority**: High - Will be reused in sticky header
@@ -127,11 +131,13 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
     - **Priority**: High - Will be reused in sticky header
 
 #### Like Components (1 file)
+
 20. `src/components/ui/like-button.tsx`
     - **Reason**: Like button with three variants (Icon, Text, Compact). LikeCompactButton ideal for sticky header
     - **Priority**: High - Will be reused in sticky header
 
 #### Skeleton Components (3 files)
+
 21. `src/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-header-skeleton.tsx`
     - **Reason**: Loading skeleton for collection header
     - **Priority**: Medium - May need sticky variant skeleton
@@ -147,6 +153,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
 ### Low Priority (May Need Updates) - 5 Files
 
 #### Layout Components (2 files)
+
 24. `src/components/layout/content-layout.tsx`
     - **Reason**: Container layout used on all detail pages (max-width, padding)
     - **Priority**: Low - Reference for width constraints
@@ -156,6 +163,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
     - **Priority**: Medium - Reference implementation pattern
 
 #### UI Base Components (2 files)
+
 26. `src/components/ui/button.tsx`
     - **Reason**: Base button component with variants (CVA). Provides size="icon" for compact buttons
     - **Priority**: High - Used for all action buttons in sticky header
@@ -165,6 +173,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
     - **Priority**: Medium - Reference for menu behavior
 
 #### Utility Files (3 files)
+
 28. `src/utils/tailwind-utils.ts`
     - **Reason**: cn() utility for className merging
     - **Priority**: Medium - Used in all component styling
@@ -190,6 +199,7 @@ Please provide comprehensive file discovery with prioritization and reasoning fo
 All three detail page types follow a consistent pattern:
 
 **Page Layout:**
+
 ```tsx
 <div>
   {/* Header Section */}
@@ -203,14 +213,13 @@ All three detail page types follow a consistent pattern:
 
   {/* Main Content */}
   <div className={'mt-4'}>
-    <ContentLayout>
-      {/* Content */}
-    </ContentLayout>
+    <ContentLayout>{/* Content */}</ContentLayout>
   </div>
 </div>
 ```
 
 **Header Component Structure:**
+
 - Back navigation button (top-left)
 - Action buttons row (top-right): Share, Edit (owner only), Delete (owner only), Report (non-owner)
 - Title and description
@@ -219,11 +228,13 @@ All three detail page types follow a consistent pattern:
 ### Existing Sticky Pattern Reference
 
 The app header (`app-header.tsx`) uses:
+
 ```tsx
 <header className={'sticky top-0 z-50 w-full border-b bg-background'}>
 ```
 
 **Key classes for sticky implementation:**
+
 - `sticky top-0` - Sticky positioning
 - `z-50` - High z-index (app header uses z-50, sticky headers should use z-40)
 - `w-full` - Full width

@@ -20,6 +20,7 @@
 The codebase contains a comprehensive photo management system with **ALL requested features already implemented**:
 
 ✅ **Core Features**:
+
 - Multiple photo upload with Next Cloudinary integration
 - Real-time preview with optimistic updates
 - Drag-and-drop reordering using dnd-kit
@@ -33,6 +34,7 @@ The codebase contains a comprehensive photo management system with **ALL request
 - Cloudinary transformations and optimization
 
 ✅ **Advanced Features** (Beyond Original Request):
+
 - Bulk photo operations (multi-select delete)
 - Primary photo management with confirmation
 - Upload progress tracking with speed/time estimates
@@ -89,13 +91,16 @@ This plan enhances an already fully-functional photo management system by improv
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/analytics/photo-management-events.ts` - Analytics event definitions and tracking utilities
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add analytics tracking to key user interactions (upload start, reorder, delete, bulk operations, error states)
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Track dialog open/close, form submission with photo changes
 
 **Changes:**
+
 - Add analytics event tracking for upload initiation, completion, cancellation, and failures
 - Track drag-and-drop reordering frequency and patterns
 - Monitor bulk operation usage (selection mode activation, bulk delete)
@@ -104,11 +109,13 @@ This plan enhances an already fully-functional photo management system by improv
 - Track error recovery actions (retry clicks, undo usage, continue without photos)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All photo management interactions emit appropriate analytics events
 - [ ] Performance metrics are captured and sent to monitoring system
 - [ ] Error events include sufficient context for debugging
@@ -125,10 +132,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Update CldImage configuration with progressive loading, blur-up placeholders, and responsive sizing
 - `src/lib/constants.ts` - Add image optimization constants (quality presets, breakpoints, transformation parameters)
 
 **Changes:**
+
 - Configure CldImage components with progressive JPEG format for gradual rendering
 - Implement blur-up placeholders using Cloudinary's automatic low-quality image placeholders
 - Add responsive image sizing based on viewport with art direction hints
@@ -138,11 +147,13 @@ npm run lint:fix && npm run typecheck
 - Implement intersection observer for scroll-based lazy loading triggers
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Images load progressively with visible blur-to-sharp transition
 - [ ] Lazy loading reduces initial page load time
 - [ ] WebP format served to compatible browsers
@@ -160,13 +171,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/constants/photo-error-messages.ts` - Centralized, user-friendly error messages with recovery suggestions
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Replace generic error messages with specific, actionable ones
 - `src/components/feature/bobblehead/photo-management-error-boundary.tsx` - Enhance error boundary UI with better context
 
 **Changes:**
+
 - Create categorized error messages (network, permission, storage, validation, server)
 - Add specific recovery suggestions for each error type
 - Implement inline help tooltips for common issues
@@ -177,11 +191,13 @@ npm run lint:fix && npm run typecheck
 - Show upload troubleshooting checklist for repeated failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Each error type has a specific, user-friendly message
 - [ ] Recovery suggestions are actionable and contextual
 - [ ] Automated retry succeeds for transient network failures
@@ -199,10 +215,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Enhance drag handles for touch, add swipe gestures, improve touch target sizes
 - `src/components/ui/sortable.tsx` - Optimize drag-and-drop library configuration for mobile touch
 
 **Changes:**
+
 - Increase touch target sizes for all interactive elements (minimum 44x44px)
 - Implement swipe-to-delete gesture with confirmation for mobile
 - Add haptic feedback for touch interactions (drag start/end, delete confirmation)
@@ -213,11 +231,13 @@ npm run lint:fix && npm run typecheck
 - Add pull-to-refresh for photo list reload on mobile
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All interactive elements meet WCAG minimum touch target size
 - [ ] Swipe gestures work smoothly without conflicts
 - [ ] Drag-and-drop reordering is intuitive on touch devices
@@ -235,10 +255,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add comprehensive ARIA labels, keyboard shortcuts, focus management
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Enhance dialog accessibility with proper focus trapping
 
 **Changes:**
+
 - Add comprehensive ARIA labels for all interactive elements
 - Implement complete keyboard navigation (Tab, Shift+Tab, Enter, Space, Arrow keys)
 - Add skip links for photo grid navigation
@@ -251,11 +273,13 @@ npm run lint:fix && npm run typecheck
 - Implement live regions for dynamic content updates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All interactive elements are keyboard accessible
 - [ ] Screen readers announce all state changes appropriately
 - [ ] Focus indicators are visible and meet contrast requirements
@@ -274,13 +298,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/bobblehead/photo-management-help-dialog.tsx` - Comprehensive help dialog with screenshots and tips
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add contextual tooltips, help icons, and first-time user hints
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Add help button to open photo management guide
 
 **Changes:**
+
 - Create interactive help dialog with step-by-step guides
 - Add tooltips for all interactive elements with keyboard shortcuts
 - Implement first-time user onboarding flow (dismissible)
@@ -292,11 +319,13 @@ npm run lint:fix && npm run typecheck
 - Create printable quick reference guide
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Help dialog is comprehensive and easy to understand
 - [ ] Tooltips appear on hover and focus for all interactive elements
 - [ ] First-time users receive appropriate onboarding
@@ -314,13 +343,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/ui/cloudinary-photo-upload-lazy.tsx` - Lazy-loaded wrapper with loading fallback
 
 **Files to Modify:**
+
 - `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` - Replace direct import with dynamic import
 - `next.config.ts` - Configure Webpack code splitting optimization for photo management modules
 
 **Changes:**
+
 - Implement dynamic import with React.lazy for CloudinaryPhotoUpload component
 - Create loading skeleton specific to photo management section
 - Configure Webpack to create separate chunks for Cloudinary dependencies
@@ -331,11 +363,13 @@ npm run lint:fix && npm run typecheck
 - Add service worker caching for Cloudinary assets
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Photo upload component is code-split into separate bundle
 - [ ] Initial bundle size reduced by moving photo management to async chunk
 - [ ] Loading experience is smooth with appropriate skeleton
@@ -353,9 +387,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add upload queue state management, pause/resume functionality, advanced retry logic
 
 **Changes:**
+
 - Implement upload queue with pause/resume capability
 - Add manual retry button for failed individual uploads
 - Create retry strategy with exponential backoff (already partially implemented, enhance)
@@ -367,11 +403,13 @@ npm run lint:fix && npm run typecheck
 - Add upload speed throttling option for users on limited connections
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Users can pause and resume upload queue
 - [ ] Failed uploads can be individually retried
 - [ ] Offline detection pauses uploads automatically
@@ -389,12 +427,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Create:**
+
 - `src/components/ui/photo-filter-bar.tsx` - Filter and search UI component for photo management
 
 **Files to Modify:**
+
 - `src/components/ui/cloudinary-photo-upload.tsx` - Add filter state and photo filtering logic
 
 **Changes:**
+
 - Add search functionality for photos by alt text or caption
 - Implement filter by upload date, file size, dimensions
 - Create sort options (newest first, oldest first, largest first, smallest first)
@@ -405,11 +446,13 @@ npm run lint:fix && npm run typecheck
 - Add filter reset button
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Search filters photos in real-time
 - [ ] All filter options work correctly
 - [ ] Filter state is clearly communicated to users
@@ -427,11 +470,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `tests/components/ui/cloudinary-photo-upload.test.tsx` - Component unit tests
 - `tests/components/feature/bobblehead/bobblehead-edit-dialog-photos.test.tsx` - Integration tests
 - `tests/e2e/photo-management.spec.ts` - End-to-end user workflow tests
 
 **Changes:**
+
 - Create unit tests for photo upload, reorder, delete, metadata editing
 - Add integration tests for server action calls and error handling
 - Implement E2E tests for complete user workflows (upload, edit, reorder, delete)
@@ -444,12 +489,14 @@ npm run lint:fix && npm run typecheck
 - Test bulk operations with various selection sizes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] Unit test coverage exceeds 80% for photo management components
 - [ ] All critical user workflows have E2E test coverage
 - [ ] Accessibility tests pass for all components
@@ -509,21 +556,25 @@ npm run test
 ## Recommended Implementation Sequence
 
 ### Phase 1 (Days 1-2): Foundation
+
 - Step 1: Analytics (0.5 day)
 - Step 3: Error Messages (0.5 day)
 - Step 5: Accessibility (1.5-2 days)
 
 ### Phase 2 (Days 3-4): Performance & UX
+
 - Step 2: Image Optimization (0.5-1 day)
 - Step 4: Mobile Touch (1-1.5 days)
 - Step 7: Code Splitting (0.5-1 day)
 
 ### Phase 3 (Days 5-7): Advanced Features & Quality
+
 - Step 6: Documentation (1 day)
 - Step 8: Upload Queue (1-1.5 days)
 - Step 10: Testing (develop throughout, finalize 2-3 days)
 
 ### Optional (Later)
+
 - Step 9: Filtering (when photo limits increase)
 
 ---

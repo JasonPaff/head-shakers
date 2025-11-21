@@ -24,6 +24,7 @@ The existing schema has the `parentCommentId` field but lacks performance indexe
 ## Subagent Input
 
 Subagent was tasked with:
+
 - Reading src/lib/db/schema/social.schema.ts
 - Adding composite index on `(parentCommentId, createdAt)` for efficient child comment retrieval
 - Adding index on `parentCommentId` for cascading operations (already existed)
@@ -37,11 +38,13 @@ Subagent was tasked with:
 **File**: src/lib/db/schema/social.schema.ts
 
 **Changes Made**:
+
 - Added composite index definition: `index('comments_parent_created_idx').on(table.parentCommentId, table.createdAt)`
 - Placed in composite indexes section (line 128)
 - Existing single-column index `comments_parent_comment_id_idx` already present (line 120)
 
 **Index Strategy**:
+
 1. **Single-column index** (`comments_parent_comment_id_idx`) - For cascading operations and simple parent lookups
 2. **Composite index** (`comments_parent_created_idx`) - For efficient retrieval of nested comments sorted by creation time
 
@@ -50,6 +53,7 @@ Subagent was tasked with:
 **File**: src/lib/db/migrations/20251121165022_dizzy_sunspot.sql
 
 **Migration Content**:
+
 ```sql
 CREATE INDEX "comments_parent_created_idx" ON "comments" USING btree ("parent_comment_id","created_at")
 ```
@@ -93,6 +97,7 @@ This was a pre-existing issue in the worktree that was blocking validation comma
 **Result**: ✓ PASS
 
 **Output**: Successfully generated migration file
+
 - Migration file: src\lib\db\migrations\20251121165022_dizzy_sunspot.sql
 - Contains composite index creation statement
 
@@ -122,11 +127,13 @@ This was a pre-existing issue in the worktree that was blocking validation comma
 ### Index Usage
 
 **Composite Index** (`comments_parent_created_idx`):
+
 - Optimizes queries: `WHERE parent_comment_id = ? ORDER BY created_at`
 - Critical for Step 4's recursive query methods
 - Enables efficient retrieval of child comments sorted by creation time
 
 **Single-column Index** (existing `comments_parent_comment_id_idx`):
+
 - Handles simple parent lookups
 - Supports cascading delete operations
 - Complements the composite index
@@ -134,6 +141,7 @@ This was a pre-existing issue in the worktree that was blocking validation comma
 ### Query Optimization Strategy
 
 The composite index is specifically designed for the common pattern of retrieving nested comments:
+
 ```sql
 SELECT * FROM comments
 WHERE parent_comment_id = ?
@@ -145,20 +153,24 @@ This pattern will be heavily used in Step 4's recursive query implementation.
 ## Notes for Next Steps
 
 **For Step 2 (Constants)**:
+
 - Constants can be added independently
 - No dependencies on this step
 
 **For Step 4 (Recursive Queries)**:
+
 - Composite index `comments_parent_created_idx` ready for use
 - Query methods should leverage this index for optimal performance
 - Single-column index handles cascading operations
 
 **For Step 17 (Migration Execution)**:
+
 - Migration file ready: 20251121165022_dizzy_sunspot.sql
 - Can be applied to development database with `npm run db:migrate`
 - Should verify index creation after migration
 
 **Database Performance**:
+
 - Monitor query performance after migration execution
 - Adjust indexes if needed based on actual usage patterns
 - Consider adding additional indexes if slow queries identified

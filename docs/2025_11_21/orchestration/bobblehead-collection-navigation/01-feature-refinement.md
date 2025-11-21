@@ -16,6 +16,7 @@ as a user I would like a way to cycle/scroll through the bobbleheads in a collec
 ## Context Provided
 
 ### Project Context (from CLAUDE.md)
+
 - Next.js 16.0.3 with App Router
 - React 19.2.0 with TypeScript
 - Drizzle ORM with PostgreSQL/Neon database
@@ -25,6 +26,7 @@ as a user I would like a way to cycle/scroll through the bobbleheads in a collec
 - Radix UI components with Lucide React icons
 
 ### Dependencies (from package.json)
+
 - next-typesafe-url: ^6.1.0
 - nuqs: ^2.7.2
 - next-safe-action: ^8.0.11
@@ -64,29 +66,35 @@ As a user, I want a way to navigate between bobbleheads within a collection or s
 ## Validation Results
 
 ### Format Check
+
 ✅ **PASSED** - Output is a single paragraph without headers or sections
 
 ### Length Analysis
+
 - **Original Word Count**: 23 words
 - **Refined Word Count**: 263 words
 - **Expansion Ratio**: 11.4x
 - ⚠️ **WARNING** - Exceeds recommended 2-4x expansion ratio but within acceptable 200-500 word range
 
 ### Scope Check
+
 ✅ **PASSED** - Core intent preserved (navigation between bobbleheads in collection from detail page)
 
 ### Quality Check
+
 ✅ **PASSED** - Essential technical context added:
-  - URL state management (Nuqs)
-  - Type-safe routing ($path)
-  - UI components (Radix UI, Lucide icons)
-  - Data fetching (Drizzle ORM)
-  - Server actions (Next-Safe-Action)
-  - Keyboard shortcuts
-  - Permission validation
-  - Loading states
+
+- URL state management (Nuqs)
+- Type-safe routing ($path)
+- UI components (Radix UI, Lucide icons)
+- Data fetching (Drizzle ORM)
+- Server actions (Next-Safe-Action)
+- Keyboard shortcuts
+- Permission validation
+- Loading states
 
 ### Overall Status
+
 ✅ **SUCCESS** - Feature request successfully refined with comprehensive project context
 
 ## Notes

@@ -16,6 +16,7 @@ as a user I would like to be able to reply directly to comments i.e. nested comm
 ## Context Provided
 
 ### Project Information (CLAUDE.md)
+
 - **Framework**: Next.js 16.0.3 with App Router, React 19.2.0, TypeScript
 - **Database**: PostgreSQL with Neon serverless, Drizzle ORM
 - **Validation**: Zod schemas, Drizzle-Zod for schema validation
@@ -25,12 +26,13 @@ as a user I would like to be able to reply directly to comments i.e. nested comm
 - **Real-time**: Ably (use sparingly)
 
 ### Dependencies (package.json)
+
 - drizzle-orm: ^0.44.7
 - drizzle-zod: ^0.8.3
 - next-safe-action: ^8.0.11
 - @tanstack/react-form: ^1.23.8
 - zod: ^4.1.12
-- @radix-ui/* (various components)
+- @radix-ui/\* (various components)
 - tailwindcss: ^4
 - lucide-react: ^0.548.0
 - ably: ^2.14.0

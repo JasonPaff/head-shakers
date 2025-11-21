@@ -34,6 +34,7 @@ The file discovery agent identified that the codebase already contains a compreh
 ### Critical Priority (8 files)
 
 **Core Components:**
+
 1. `src\components\feature\bobblehead\bobblehead-edit-dialog.tsx` (661 lines)
    - Main edit dialog with complete photo management integration
    - Uses CloudinaryPhotoUpload component
@@ -49,46 +50,43 @@ The file discovery agent identified that the codebase already contains a compreh
    - Upload progress tracking
    - Error handling with retry mechanisms
 
-**Database & Types:**
-3. `src\lib\db\schema\bobbleheads.schema.ts` (214 lines)
-   - bobbleheads and bobbleheadPhotos tables
-   - Indexes, constraints, cascading deletes
+**Database & Types:** 3. `src\lib\db\schema\bobbleheads.schema.ts` (214 lines)
+
+- bobbleheads and bobbleheadPhotos tables
+- Indexes, constraints, cascading deletes
 
 4. `src\types\cloudinary.types.ts`
    - CloudinaryPhoto, PhotoMetadata, PhotoUploadState types
    - Transformation utilities
 
-**Validation:**
-5. `src\lib\validations\bobbleheads.validation.ts`
-   - updateBobbleheadWithPhotosSchema
-   - Photo metadata validation
-   - Reorder schemas
+**Validation:** 5. `src\lib\validations\bobbleheads.validation.ts`
+
+- updateBobbleheadWithPhotosSchema
+- Photo metadata validation
+- Reorder schemas
 
 6. `src\lib\validations\photo-upload.validation.ts`
    - File size/type validation (max 10MB, jpg/jpeg/png/webp/heic)
 
-**Server Actions:**
-7. `src\lib\actions\bobbleheads\bobbleheads.actions.ts` (785 lines)
-   - updateBobbleheadWithPhotosAction
-   - deleteBobbleheadPhotoAction
-   - reorderBobbleheadPhotosAction
-   - updateBobbleheadPhotoMetadataAction
-   - getBobbleheadPhotosAction
-   - Rate limiting, transactions, cache invalidation
+**Server Actions:** 7. `src\lib\actions\bobbleheads\bobbleheads.actions.ts` (785 lines)
+
+- updateBobbleheadWithPhotosAction
+- deleteBobbleheadPhotoAction
+- reorderBobbleheadPhotosAction
+- updateBobbleheadPhotoMetadataAction
+- getBobbleheadPhotosAction
+- Rate limiting, transactions, cache invalidation
 
 ### High Priority (14 files)
 
-**Business Logic:**
-8. `src\lib\facades\bobbleheads\bobbleheads.facade.ts`
-   - Facade layer with caching and error handling
+**Business Logic:** 8. `src\lib\facades\bobbleheads\bobbleheads.facade.ts`
+
+- Facade layer with caching and error handling
 
 9. `src\lib\queries\bobbleheads\bobbleheads-query.ts`
    - Database query layer
 
-**Cloudinary Integration:**
-10. `src\lib\services\cloudinary.service.ts`
-    - Photo deletion, URL optimization, batch operations
-    - movePhotosToPermFolder functionality
+**Cloudinary Integration:** 10. `src\lib\services\cloudinary.service.ts` - Photo deletion, URL optimization, batch operations - movePhotosToPermFolder functionality
 
 11. `src\lib\utils\cloudinary.utils.ts`
     - Public ID extraction, format parsing
@@ -96,58 +94,27 @@ The file discovery agent identified that the codebase already contains a compreh
 12. `src\lib\constants\cloudinary-paths.ts`
     - Folder path constants and builders
 
-**Photo Utilities:**
-13. `src\lib\utils\photo-transform.utils.ts`
-    - Bidirectional transformation (BobbleheadPhoto ↔ CloudinaryPhoto)
-    - Type guards (isPersistedPhoto, isTempPhoto)
+**Photo Utilities:** 13. `src\lib\utils\photo-transform.utils.ts` - Bidirectional transformation (BobbleheadPhoto ↔ CloudinaryPhoto) - Type guards (isPersistedPhoto, isTempPhoto)
 
-**Error Handling:**
-14. `src\components\feature\bobblehead\photo-management-error-boundary.tsx`
-    - Error boundary with recovery options
-    - Error classification and Sentry integration
+**Error Handling:** 14. `src\components\feature\bobblehead\photo-management-error-boundary.tsx` - Error boundary with recovery options - Error classification and Sentry integration
 
-**Drag & Drop:**
-15. `src\components\ui\sortable.tsx`
-    - dnd-kit wrapper with accessibility
+**Drag & Drop:** 15. `src\components\ui\sortable.tsx` - dnd-kit wrapper with accessibility
 
-**Form Components (6 files):**
-16. `src\components\ui\form\index.tsx`
-17. `src\components\ui\form\focus-management\focus-context.tsx`
-18. `src\components\ui\form\focus-management\with-focus-management.tsx`
-19. `src\components\ui\form\field-components\text-field.tsx`
-20. `src\components\ui\form\field-components\textarea-field.tsx`
+**Form Components (6 files):** 16. `src\components\ui\form\index.tsx` 17. `src\components\ui\form\focus-management\focus-context.tsx` 18. `src\components\ui\form\focus-management\with-focus-management.tsx` 19. `src\components\ui\form\field-components\text-field.tsx` 20. `src\components\ui\form\field-components\textarea-field.tsx`
 
-**API:**
-21. `src\app\api\upload\sign\route.ts` - Cloudinary signature endpoint
+**API:** 21. `src\app\api\upload\sign\route.ts` - Cloudinary signature endpoint
 
 ### Medium Priority (13 files)
 
-**Radix UI Components (10 files):**
-22. `src\components\ui\dialog.tsx`
-23. `src\components\ui\alert-dialog.tsx`
-24. `src\components\ui\button.tsx`
-25. `src\components\ui\input.tsx`
-26. `src\components\ui\textarea.tsx`
-27. `src\components\ui\checkbox.tsx`
-28. `src\components\ui\tooltip.tsx`
-29. `src\components\ui\progress.tsx`
-30. `src\components\ui\card.tsx`
+**Radix UI Components (10 files):** 22. `src\components\ui\dialog.tsx` 23. `src\components\ui\alert-dialog.tsx` 24. `src\components\ui\button.tsx` 25. `src\components\ui\input.tsx` 26. `src\components\ui\textarea.tsx` 27. `src\components\ui\checkbox.tsx` 28. `src\components\ui\tooltip.tsx` 29. `src\components\ui\progress.tsx` 30. `src\components\ui\card.tsx`
 
-**Constants & Hooks:**
-31. `src\lib\constants\index.ts` - CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD = 8
-32. `src\hooks\use-server-action.ts` - Server action execution hook
+**Constants & Hooks:** 31. `src\lib\constants\index.ts` - CONFIG.CONTENT.MAX_PHOTOS_PER_BOBBLEHEAD = 8 32. `src\hooks\use-server-action.ts` - Server action execution hook
 
 ### Low Priority (15 files)
 
-**Gallery Components:**
-33. `src\components\feature\bobblehead\bobblehead-photo-gallery-modal.tsx`
-34. `src\app\(app)\bobbleheads\[bobbleheadSlug]\(bobblehead)\components\bobblehead-photo-gallery.tsx`
-35. `src\app\(app)\bobbleheads\[bobbleheadSlug]\(bobblehead)\components\async\bobblehead-photo-gallery-async.tsx`
+**Gallery Components:** 33. `src\components\feature\bobblehead\bobblehead-photo-gallery-modal.tsx` 34. `src\app\(app)\bobbleheads\[bobbleheadSlug]\(bobblehead)\components\bobblehead-photo-gallery.tsx` 35. `src\app\(app)\bobbleheads\[bobbleheadSlug]\(bobblehead)\components\async\bobblehead-photo-gallery-async.tsx`
 
-**Related Components:**
-36. `src\components\ui\photo-upload.tsx` - Generic photo upload
-37. `src\app\(app)\bobbleheads\add\components\item-photos.tsx` - Add flow photo component
-38. `src\components\ui\cloudinary-cover-upload.tsx` - Collection cover photos
+**Related Components:** 36. `src\components\ui\photo-upload.tsx` - Generic photo upload 37. `src\app\(app)\bobbleheads\add\components\item-photos.tsx` - Add flow photo component 38. `src\components\ui\cloudinary-cover-upload.tsx` - Collection cover photos
 
 ## File Path Validation
 
@@ -156,6 +123,7 @@ The file discovery agent identified that the codebase already contains a compreh
 ✅ All discovered file paths validated and confirmed to exist
 
 **Validation Process:**
+
 - File existence checks performed during discovery
 - Real file content analysis (not just filename matching)
 - Permissions and accessibility verified
@@ -197,15 +165,18 @@ The codebase contains a **production-ready comprehensive photo management system
 ### Key Implementation Patterns
 
 **Form State Management:**
+
 - TanStack React Form with Zod validation
 - Field-level validation and focus management
 
 **Photo Lifecycle:**
+
 - Temporary photos: `temp-{timestamp}-{random}` IDs, blob URLs
 - Persisted photos: UUID IDs, Cloudinary URLs
 - Type guards: `isTempPhoto()`, `isPersistedPhoto()`
 
 **Server Action Flow:**
+
 ```
 Client → Server Action (rate limiting)
   → Facade (caching)
@@ -215,11 +186,13 @@ Client → Server Action (rate limiting)
 ```
 
 **Cloudinary Integration:**
+
 - Upload to temp: `users/{userId}/temp`
 - Move to permanent: `users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}`
 - Transformations: auto format, auto quality, responsive sizing
 
 **Type Safety:**
+
 - Database schema → Zod schemas → TypeScript types → React components
 - Full end-to-end type safety
 
@@ -235,23 +208,23 @@ Client → Server Action (rate limiting)
 
 ### Requested Features vs Current Implementation
 
-| Feature | Status | Implementation Details |
-|---------|--------|------------------------|
-| Multiple photo upload | ✅ Implemented | Next Cloudinary widget integration |
-| Real-time preview | ✅ Implemented | Optimistic updates with blob URLs |
-| Drag-and-drop reordering | ✅ Implemented | dnd-kit with keyboard/touch support |
-| Inline metadata editing | ✅ Implemented | Alt text, captions with debounced save |
-| TanStack Form integration | ✅ Implemented | Full form state management |
-| Zod validation | ✅ Implemented | Comprehensive validation schemas |
-| TypeScript strict mode | ✅ Implemented | Full type safety throughout |
-| Radix UI components | ✅ Implemented | Dialog, AlertDialog, Card, etc. |
-| Loading states | ✅ Implemented | Per-file upload progress tracking |
-| Error handling | ✅ Implemented | Error boundary with recovery |
-| Server Components | ✅ Implemented | Data fetching architecture |
-| Server Actions | ✅ Implemented | Mutations with rate limiting |
-| Drizzle ORM persistence | ✅ Implemented | Transactional operations |
-| Type-safe routing | ✅ Implemented | next-typesafe-url integration |
-| Cloudinary transformations | ✅ Implemented | Auto format/quality, responsive |
+| Feature                    | Status         | Implementation Details                 |
+| -------------------------- | -------------- | -------------------------------------- |
+| Multiple photo upload      | ✅ Implemented | Next Cloudinary widget integration     |
+| Real-time preview          | ✅ Implemented | Optimistic updates with blob URLs      |
+| Drag-and-drop reordering   | ✅ Implemented | dnd-kit with keyboard/touch support    |
+| Inline metadata editing    | ✅ Implemented | Alt text, captions with debounced save |
+| TanStack Form integration  | ✅ Implemented | Full form state management             |
+| Zod validation             | ✅ Implemented | Comprehensive validation schemas       |
+| TypeScript strict mode     | ✅ Implemented | Full type safety throughout            |
+| Radix UI components        | ✅ Implemented | Dialog, AlertDialog, Card, etc.        |
+| Loading states             | ✅ Implemented | Per-file upload progress tracking      |
+| Error handling             | ✅ Implemented | Error boundary with recovery           |
+| Server Components          | ✅ Implemented | Data fetching architecture             |
+| Server Actions             | ✅ Implemented | Mutations with rate limiting           |
+| Drizzle ORM persistence    | ✅ Implemented | Transactional operations               |
+| Type-safe routing          | ✅ Implemented | next-typesafe-url integration          |
+| Cloudinary transformations | ✅ Implemented | Auto format/quality, responsive        |
 
 ### Advanced Features (Beyond Request)
 
@@ -291,6 +264,7 @@ The implementation includes **production-ready features** beyond the original re
 The file discovery agent has identified that **the requested feature is already fully implemented** in a production-ready state. The `cloudinary-photo-upload.tsx` component (1,875 lines) contains ALL requested functionality with advanced features beyond the original request.
 
 **Recommendation**: Instead of implementing new features, the implementation plan should focus on:
+
 1. **UX Improvements**: Refine existing interface based on user feedback
 2. **Performance Optimization**: Enhance upload speeds and responsiveness
 3. **Documentation**: Document existing capabilities for users

@@ -28,6 +28,7 @@ Need centralized configuration for maximum nesting depth to prevent infinite rec
 **File**: src/lib/constants/enums.ts
 
 **Change**: Added `MAX_COMMENT_NESTING_DEPTH = 5` constant
+
 - Exported as named export for use throughout application
 - Includes documentation explaining balance between functionality and UI usability
 - Set to 5 based on industry standards and usability considerations
@@ -35,6 +36,7 @@ Need centralized configuration for maximum nesting depth to prevent infinite rec
 **File**: src/lib/constants/schema-limits.ts
 
 **Change**: Added `NESTING_DEPTH: { MAX: 5 }` to COMMENT section
+
 - Comprehensive rationale documentation covering:
   - Functionality considerations
   - Performance implications
@@ -98,19 +100,23 @@ This value can be adjusted based on user feedback after launch.
 ## Notes for Next Steps
 
 **For Step 3 (Validation Schemas)**:
+
 - Import `MAX_COMMENT_NESTING_DEPTH` from enums.ts
 - Use in Zod validation schemas for parent comment depth validation
 - Reference `SCHEMA_LIMITS.COMMENT.NESTING_DEPTH.MAX` for consistency
 
 **For Step 4 (Recursive Queries)**:
+
 - Use constant to limit recursive query depth
 - Prevent infinite recursion in database queries
 
 **For Step 8 (Comment Item UI)**:
+
 - Use constant to determine when to hide reply button at maximum depth
 - Apply conditional styling for deeply nested comments
 
 **Consistency**:
+
 - Both constants are set to 5 to maintain consistency
 - Choose one as primary source (recommend enums.ts for code usage)
 - schema-limits.ts provides documentation and context

@@ -31,15 +31,16 @@ The official Clerk testing package provides integration helpers specifically des
 
 #### Key Functions
 
-| Function | Purpose | When to Use |
-|----------|---------|-------------|
-| `clerkSetup()` | Obtains a Testing Token for the test suite | Once in global setup, before all tests |
-| `setupClerkTestingToken({ page })` | Injects Testing Token for a specific test | Per-test when not using `clerk.signIn()` |
-| `clerk.signIn({ page, signInParams })` | Signs in a user programmatically | In auth setup to create stored states |
+| Function                               | Purpose                                    | When to Use                              |
+| -------------------------------------- | ------------------------------------------ | ---------------------------------------- |
+| `clerkSetup()`                         | Obtains a Testing Token for the test suite | Once in global setup, before all tests   |
+| `setupClerkTestingToken({ page })`     | Injects Testing Token for a specific test  | Per-test when not using `clerk.signIn()` |
+| `clerk.signIn({ page, signInParams })` | Signs in a user programmatically           | In auth setup to create stored states    |
 
 #### Testing Tokens
 
 Testing Tokens are Clerk's mechanism to bypass bot detection during E2E tests:
+
 - Short-lived tokens valid only for specific instances
 - Automatically handled when using `clerk.signIn()`
 - Can be manually set via `CLERK_TESTING_TOKEN` env var
@@ -47,10 +48,10 @@ Testing Tokens are Clerk's mechanism to bypass bot detection during E2E tests:
 
 #### Supported Sign-In Strategies
 
-| Strategy | Requirements | Best For |
-|----------|--------------|----------|
-| `password` | User with password enabled | Most E2E scenarios |
-| `phone_code` | Test phone number (e.g., `+15555550100`) | Phone-based auth testing |
+| Strategy     | Requirements                                     | Best For                 |
+| ------------ | ------------------------------------------------ | ------------------------ |
+| `password`   | User with password enabled                       | Most E2E scenarios       |
+| `phone_code` | Test phone number (e.g., `+15555550100`)         | Phone-based auth testing |
 | `email_code` | Test email (e.g., `user+clerk_test@example.com`) | Email-based auth testing |
 
 **Note:** Multi-factor authentication is NOT supported by the testing helpers.
@@ -113,6 +114,7 @@ Production Branch (main)
 ```
 
 **Why this works:**
+
 - Branches are **copy-on-write** - instant creation, zero storage cost until writes
 - Full isolation - each test run gets pristine data from develop
 - No cleanup needed - just delete the branch
@@ -121,21 +123,21 @@ Production Branch (main)
 #### SDK Initialization
 
 ```typescript
-import { createApiClient } from '@neondatabase/api-client'
+import { createApiClient } from '@neondatabase/api-client';
 
 const neonClient = createApiClient({
   apiKey: process.env.NEON_API_KEY!,
-})
+});
 ```
 
 #### Branch Management API
 
-| Method | Purpose |
-|--------|---------|
-| `createProjectBranch(projectId, options)` | Create new branch with optional endpoint |
-| `deleteProjectBranch(projectId, branchId)` | Delete branch and all resources |
-| `getConnectionUri(projectId, params)` | Get connection string for branch |
-| `listProjectBranches(projectId)` | List all branches in project |
+| Method                                     | Purpose                                  |
+| ------------------------------------------ | ---------------------------------------- |
+| `createProjectBranch(projectId, options)`  | Create new branch with optional endpoint |
+| `deleteProjectBranch(projectId, branchId)` | Delete branch and all resources          |
+| `getConnectionUri(projectId, params)`      | Get connection string for branch         |
+| `listProjectBranches(projectId)`           | List all branches in project             |
 
 #### Creating an E2E Branch
 
@@ -143,14 +145,16 @@ const neonClient = createApiClient({
 const response = await neonClient.createProjectBranch(PROJECT_ID, {
   branch: {
     name: `e2e-${runId}`,
-    parent_id: DEVELOP_BRANCH_ID,  // Branch from develop, not production
+    parent_id: DEVELOP_BRANCH_ID, // Branch from develop, not production
   },
-  endpoints: [{
-    type: EndpointType.ReadWrite,
-    autoscaling_limit_min_cu: 0.25,  // Minimum compute for cost savings
-    autoscaling_limit_max_cu: 0.25,
-  }],
-})
+  endpoints: [
+    {
+      type: EndpointType.ReadWrite,
+      autoscaling_limit_min_cu: 0.25, // Minimum compute for cost savings
+      autoscaling_limit_max_cu: 0.25,
+    },
+  ],
+});
 ```
 
 #### Getting Connection String
@@ -160,26 +164,26 @@ const connectionUri = await neonClient.getConnectionUri(PROJECT_ID, {
   branch_id: branchId,
   database_name: 'head-shakers',
   role_name: 'neondb_owner',
-})
+});
 // Returns: { uri: 'postgresql://...' }
 ```
 
 #### Cost Optimization Strategies
 
-| Strategy | Implementation |
-|----------|----------------|
-| Minimum compute | Use `0.25 CU` for E2E branches |
-| Auto-suspend | Set `suspend_timeout_seconds: 300` (5 min) |
+| Strategy          | Implementation                             |
+| ----------------- | ------------------------------------------ |
+| Minimum compute   | Use `0.25 CU` for E2E branches             |
+| Auto-suspend      | Set `suspend_timeout_seconds: 300` (5 min) |
 | Immediate cleanup | Delete branch in teardown, even on failure |
-| Copy-on-write | No storage cost until data is modified |
+| Copy-on-write     | No storage cost until data is modified     |
 
 #### Head Shakers Specific Configuration
 
-| Parameter | Value |
-|-----------|-------|
-| Project ID | `misty-boat-49919732` |
-| Database Name | `head-shakers` |
-| Production Branch | `br-dry-forest-adjaydda` (NEVER use for E2E) |
+| Parameter          | Value                                               |
+| ------------------ | --------------------------------------------------- |
+| Project ID         | `misty-boat-49919732`                               |
+| Database Name      | `head-shakers`                                      |
+| Production Branch  | `br-dry-forest-adjaydda` (NEVER use for E2E)        |
 | Development Branch | `br-dark-forest-adf48tll` (Parent for E2E branches) |
 
 ---
@@ -190,14 +194,14 @@ const connectionUri = await neonClient.getConnectionUri(PROJECT_ID, {
 
 Playwright offers two approaches for global setup. **Project Dependencies is the recommended approach:**
 
-| Feature | Project Dependencies | `globalSetup` Config |
-|---------|---------------------|---------------------|
-| HTML report visibility | Shown as separate project | Not shown |
-| Trace recording | Full trace available | Not supported |
-| Playwright fixtures | Fully supported | Not supported |
-| Browser management | Via `browser` fixture | Manual `browserType.launch()` |
-| Config options (headless, testIdAttribute) | Automatically applied | Ignored |
-| Parallelism and retries | Supported via config | Not applicable |
+| Feature                                    | Project Dependencies      | `globalSetup` Config          |
+| ------------------------------------------ | ------------------------- | ----------------------------- |
+| HTML report visibility                     | Shown as separate project | Not shown                     |
+| Trace recording                            | Full trace available      | Not supported                 |
+| Playwright fixtures                        | Fully supported           | Not supported                 |
+| Browser management                         | Via `browser` fixture     | Manual `browserType.launch()` |
+| Config options (headless, testIdAttribute) | Automatically applied     | Ignored                       |
+| Parallelism and retries                    | Supported via config      | Not applicable                |
 
 #### Project Dependencies Pattern
 
@@ -207,7 +211,7 @@ projects: [
   {
     name: 'setup',
     testMatch: /.*\.setup\.ts/,
-    teardown: 'teardown',  // Links to teardown project
+    teardown: 'teardown', // Links to teardown project
   },
   // Teardown runs after all tests complete
   {
@@ -220,27 +224,30 @@ projects: [
     dependencies: ['setup'],
     use: { storageState: '...' },
   },
-]
+];
 ```
 
 #### Fixture Scopes
 
-| Scope | Lifecycle | Use Case |
-|-------|-----------|----------|
-| `test` (default) | Created/destroyed per test | Page objects, test-specific data |
-| `worker` | Shared across tests in same worker | Database connections, accounts |
+| Scope            | Lifecycle                          | Use Case                         |
+| ---------------- | ---------------------------------- | -------------------------------- |
+| `test` (default) | Created/destroyed per test         | Page objects, test-specific data |
+| `worker`         | Shared across tests in same worker | Database connections, accounts   |
 
 #### Worker-Scoped Fixture Pattern
 
 ```typescript
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   // Worker fixture - runs once per worker process
-  sharedResource: [async ({}, use, workerInfo) => {
-    const resource = await createResource(workerInfo.workerIndex)
-    await use(resource)
-    await destroyResource(resource)
-  }, { scope: 'worker' }],
-})
+  sharedResource: [
+    async ({}, use, workerInfo) => {
+      const resource = await createResource(workerInfo.workerIndex);
+      await use(resource);
+      await destroyResource(resource);
+    },
+    { scope: 'worker' },
+  ],
+});
 ```
 
 #### Auto Fixtures
@@ -249,19 +256,23 @@ Fixtures that run automatically for every test (useful for global beforeEach/aft
 
 ```typescript
 export const test = base.extend({
-  autoSetup: [async ({ page }, use) => {
-    // Runs before each test
-    await page.goto('/')
-    await use()
-    // Runs after each test
-    console.log('Test completed')
-  }, { auto: true }],
-})
+  autoSetup: [
+    async ({ page }, use) => {
+      // Runs before each test
+      await page.goto('/');
+      await use();
+      // Runs after each test
+      console.log('Test completed');
+    },
+    { auto: true },
+  ],
+});
 ```
 
 #### Multi-Role Testing Patterns
 
 **Pattern 1: Separate Test Files**
+
 ```typescript
 // admin.spec.ts
 test.use({ storageState: 'playwright/.auth/admin.json' })
@@ -273,6 +284,7 @@ test('user test', ...)
 ```
 
 **Pattern 2: Test Describe Blocks**
+
 ```typescript
 test.describe('admin flows', () => {
   test.use({ storageState: 'playwright/.auth/admin.json' })
@@ -286,45 +298,47 @@ test.describe('user flows', () => {
 ```
 
 **Pattern 3: Multiple Contexts in Single Test**
+
 ```typescript
 test('admin and user interact', async ({ browser }) => {
   const adminContext = await browser.newContext({
-    storageState: 'playwright/.auth/admin.json'
-  })
+    storageState: 'playwright/.auth/admin.json',
+  });
   const userContext = await browser.newContext({
-    storageState: 'playwright/.auth/user.json'
-  })
+    storageState: 'playwright/.auth/user.json',
+  });
 
-  const adminPage = await adminContext.newPage()
-  const userPage = await userContext.newPage()
+  const adminPage = await adminContext.newPage();
+  const userPage = await userContext.newPage();
 
   // Test interaction between roles
 
-  await adminContext.close()
-  await userContext.close()
-})
+  await adminContext.close();
+  await userContext.close();
+});
 ```
 
 **Pattern 4: POM Fixtures for Multi-Role**
+
 ```typescript
 export const test = base.extend({
   adminPage: async ({ browser }, use) => {
     const context = await browser.newContext({
-      storageState: 'playwright/.auth/admin.json'
-    })
-    const page = await context.newPage()
-    await use(new AdminPage(page))
-    await context.close()
+      storageState: 'playwright/.auth/admin.json',
+    });
+    const page = await context.newPage();
+    await use(new AdminPage(page));
+    await context.close();
   },
   userPage: async ({ browser }, use) => {
     const context = await browser.newContext({
-      storageState: 'playwright/.auth/user.json'
-    })
-    const page = await context.newPage()
-    await use(new UserPage(page))
-    await context.close()
+      storageState: 'playwright/.auth/user.json',
+    });
+    const page = await context.newPage();
+    await use(new UserPage(page));
+    await context.close();
   },
-})
+});
 ```
 
 #### Parallel Worker Isolation
@@ -333,23 +347,26 @@ For isolating test data between parallel workers:
 
 ```typescript
 export const test = base.extend<{}, { dbUserName: string }>({
-  dbUserName: [async ({}, use, workerInfo) => {
-    // Unique per worker
-    const userName = `user-${workerInfo.workerIndex}`
-    await createUserInDb(userName)
-    await use(userName)
-    await deleteUserFromDb(userName)
-  }, { scope: 'worker' }],
-})
+  dbUserName: [
+    async ({}, use, workerInfo) => {
+      // Unique per worker
+      const userName = `user-${workerInfo.workerIndex}`;
+      await createUserInDb(userName);
+      await use(userName);
+      await deleteUserFromDb(userName);
+    },
+    { scope: 'worker' },
+  ],
+});
 ```
 
 #### Reporter Configuration
 
-| Environment | Recommended Reporters |
-|-------------|----------------------|
-| Local development | `html` (interactive) |
-| CI (sharded) | `blob` (for merging) + `github` (annotations) |
-| CI (non-sharded) | `html` + `github` |
+| Environment       | Recommended Reporters                         |
+| ----------------- | --------------------------------------------- |
+| Local development | `html` (interactive)                          |
+| CI (sharded)      | `blob` (for merging) + `github` (annotations) |
+| CI (non-sharded)  | `html` + `github`                             |
 
 ---
 
@@ -417,12 +434,12 @@ export const test = base.extend<{}, { dbUserName: string }>({
 
 ### Test User Matrix
 
-| Role | Username (env var) | Purpose | Collections | Admin |
-|------|-------------------|---------|-------------|-------|
-| Admin | `E2E_CLERK_ADMIN_USERNAME` | Admin panel testing | Has collections | Yes |
-| Established User | `E2E_CLERK_USER_USERNAME` | Main user flows | Has collections | No |
-| New User | `E2E_CLERK_NEW_USER_USERNAME` | Onboarding flows | No collections | No |
-| Anonymous | N/A (no auth) | Public page testing | N/A | N/A |
+| Role             | Username (env var)            | Purpose             | Collections     | Admin |
+| ---------------- | ----------------------------- | ------------------- | --------------- | ----- |
+| Admin            | `E2E_CLERK_ADMIN_USERNAME`    | Admin panel testing | Has collections | Yes   |
+| Established User | `E2E_CLERK_USER_USERNAME`     | Main user flows     | Has collections | No    |
+| New User         | `E2E_CLERK_NEW_USER_USERNAME` | Onboarding flows    | No collections  | No    |
+| Anonymous        | N/A (no auth)                 | Public page testing | N/A             | N/A   |
 
 ### Clerk Test Instance Requirements
 
@@ -519,16 +536,17 @@ playwright/
 
 ### Branch Naming Convention
 
-| Environment | Pattern | Example |
-|-------------|---------|---------|
-| Local | `e2e-local-{timestamp}` | `e2e-local-1700000000000` |
-| CI (future) | `e2e-{runId}-shard{n}` | `e2e-12345-shard1` |
+| Environment | Pattern                 | Example                   |
+| ----------- | ----------------------- | ------------------------- |
+| Local       | `e2e-local-{timestamp}` | `e2e-local-1700000000000` |
+| CI (future) | `e2e-{runId}-shard{n}`  | `e2e-12345-shard1`        |
 
 ### Neon API Client Wrapper
 
 Create a utility module that encapsulates all Neon operations:
 
 **Responsibilities:**
+
 - Initialize API client with authentication
 - Create branches with consistent configuration
 - Handle endpoint creation with cost-optimized settings
@@ -537,6 +555,7 @@ Create a utility module that encapsulates all Neon operations:
 - Implement retry logic for transient failures
 
 **Configuration Constants:**
+
 ```typescript
 const NEON_CONFIG = {
   projectId: 'misty-boat-49919732',
@@ -548,7 +567,7 @@ const NEON_CONFIG = {
     maxCu: 0.25,
     suspendTimeoutSeconds: 300,
   },
-}
+};
 ```
 
 ### Test Data Seeding Strategy
@@ -633,10 +652,10 @@ projects: [
   {
     name: 'unauthenticated',
     testDir: './tests/e2e/specs/public',
-    dependencies: ['db-setup'],  // Only needs DB, not auth
+    dependencies: ['db-setup'], // Only needs DB, not auth
     use: { storageState: { cookies: [], origins: [] } },
   },
-]
+];
 ```
 
 ### Execution Order
@@ -654,16 +673,16 @@ projects: [
 
 ### Key Configuration Options
 
-| Option | Local Value | Purpose |
-|--------|-------------|---------|
-| `fullyParallel` | `true` | Run tests in parallel |
-| `workers` | `undefined` (auto) | Use available CPU cores |
-| `retries` | `0` | No retries locally (fast feedback) |
-| `timeout` | `30000` | 30 second test timeout |
-| `expect.timeout` | `5000` | 5 second assertion timeout |
-| `use.trace` | `'on-first-retry'` | Record trace on failure |
-| `use.video` | `'off'` | No video locally (performance) |
-| `use.screenshot` | `'only-on-failure'` | Screenshot failures |
+| Option           | Local Value         | Purpose                            |
+| ---------------- | ------------------- | ---------------------------------- |
+| `fullyParallel`  | `true`              | Run tests in parallel              |
+| `workers`        | `undefined` (auto)  | Use available CPU cores            |
+| `retries`        | `0`                 | No retries locally (fast feedback) |
+| `timeout`        | `30000`             | 30 second test timeout             |
+| `expect.timeout` | `5000`              | 5 second assertion timeout         |
+| `use.trace`      | `'on-first-retry'`  | Record trace on failure            |
+| `use.video`      | `'off'`             | No video locally (performance)     |
+| `use.screenshot` | `'only-on-failure'` | Screenshot failures                |
 
 ### Web Server Configuration
 
@@ -723,28 +742,31 @@ webServer: {
 
 **Fixture Definitions:**
 
-| Fixture | Scope | Purpose |
-|---------|-------|---------|
-| `neonBranch` | worker | Branch info and connection string |
-| `testDataIds` | worker | IDs of seeded test data |
-| `adminPage` | test | Browser context with admin auth |
-| `userPage` | test | Browser context with user auth |
-| `newUserPage` | test | Browser context with new user auth |
+| Fixture       | Scope  | Purpose                            |
+| ------------- | ------ | ---------------------------------- |
+| `neonBranch`  | worker | Branch info and connection string  |
+| `testDataIds` | worker | IDs of seeded test data            |
+| `adminPage`   | test   | Browser context with admin auth    |
+| `userPage`    | test   | Browser context with user auth     |
+| `newUserPage` | test   | Browser context with new user auth |
 
 ### Page Object Model Structure
 
 Each page object should:
+
 1. Accept a Playwright `Page` in constructor
 2. Expose locators as properties (not methods)
 3. Provide action methods for user interactions
 4. Use test IDs from `@/lib/test-ids` for selectors
 
 **Base Page Class:**
+
 - `goto()`: Navigate to the page
 - `waitForLoad()`: Wait for page to be ready
 - Common locators: header, footer, navigation
 
 **Feature Pages:**
+
 - HomePage, CollectionPage, BobbleheadPage
 - AdminDashboard, UserProfile
 - Each extends base with feature-specific locators/actions
@@ -1022,18 +1044,21 @@ Phase 1 is complete when:
 ## Next Phases (Future)
 
 ### Phase 2: Test Coverage Expansion
+
 - Full CRUD tests for collections and bobbleheads
 - Social features testing
 - Admin functionality testing
 - Error handling and edge cases
 
 ### Phase 3: CI/CD Integration
+
 - GitHub Actions workflow
 - Sharding for parallel execution
 - HTML report artifacts
 - Blocking gate configuration
 
 ### Phase 4: Advanced Features
+
 - Visual regression testing
 - Performance testing
 - Cross-browser testing

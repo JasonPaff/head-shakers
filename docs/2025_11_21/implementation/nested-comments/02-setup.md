@@ -110,30 +110,38 @@
 ### Files to Modify (15 unique files)
 
 **Database & Schema Layer:**
+
 - src/lib/db/schema/social.schema.ts
 
 **Constants & Configuration:**
+
 - src/lib/constants/enums.ts
 - src/lib/constants/schema-limits.ts
 
 **Validation Layer:**
+
 - src/lib/validations/comment.validation.ts
 - src/lib/validations/social.validation.ts
 
 **Query Layer:**
+
 - src/lib/queries/social/social.query.ts
 
 **Facade Layer:**
+
 - src/lib/facades/social/social.facade.ts
 
 **Actions Layer:**
+
 - src/lib/actions/social/social.actions.ts
 
 **Cache Layer:**
+
 - src/lib/services/cache-revalidation.service.ts
 - src/lib/utils/cache-tags.utils.ts
 
 **Component Layer:**
+
 - src/components/feature/comments/comment-item.tsx
 - src/components/feature/comments/comment-list.tsx
 - src/components/feature/comments/comment-form.tsx
@@ -151,9 +159,11 @@
 ## Step Dependencies Analysis
 
 **No Dependencies (can start immediately):**
+
 - Steps 1, 2, 7, 15
 
 **Linear Dependencies:**
+
 - Step 3 depends on Step 2
 - Step 4 depends on Step 1
 - Step 5 depends on Steps 3, 4
@@ -174,10 +184,12 @@ Steps 1 → 4 → 5 → 6 → 8 → 9 → 10 → 11 → 13 → 16 → 17
 ## Implementation Strategy
 
 ### Phase 1: Foundation (Steps 1-2)
+
 - Database schema indexes
 - Constants and configuration
 
 ### Phase 2: Data Layer (Steps 3-7)
+
 - Validation schemas
 - Query methods
 - Facade logic
@@ -185,12 +197,14 @@ Steps 1 → 4 → 5 → 6 → 8 → 9 → 10 → 11 → 13 → 16 → 17
 - Cache management
 
 ### Phase 3: UI Components (Steps 8-11)
+
 - Comment item (reply button, nesting)
 - Comment list (recursive rendering)
 - Comment form (reply mode)
 - Comment section (state coordination)
 
 ### Phase 4: Integration (Steps 12-16)
+
 - Server-side data fetching
 - Client-side state management
 - Delete dialog enhancements
@@ -198,6 +212,7 @@ Steps 1 → 4 → 5 → 6 → 8 → 9 → 10 → 11 → 13 → 16 → 17
 - Dialog integration testing
 
 ### Phase 5: Migration (Step 17)
+
 - Execute database migration
 - Verify indexes created
 

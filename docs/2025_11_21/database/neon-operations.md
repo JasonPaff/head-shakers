@@ -27,10 +27,12 @@ This index was created separately because the full migration failed due to slug 
 ### Verification Results
 
 **Index Created Successfully:**
+
 - Name: `comments_parent_created_idx`
 - Definition: `CREATE INDEX comments_parent_created_idx ON public.comments USING btree (parent_comment_id, created_at)`
 
 **All Indexes on Comments Table (10 total):**
+
 1. comments_created_at_idx
 2. comments_deleted_created_idx
 3. comments_parent_comment_id_idx

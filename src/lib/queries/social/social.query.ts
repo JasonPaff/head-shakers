@@ -432,11 +432,11 @@ export class SocialQuery extends BaseQuery {
         const replies = await this.getCommentRepliesAsync(comment.id, {}, context);
 
         const repliesWithDepth =
-          replies.length > 0
-            ? await Promise.all(
-                replies.map((reply) => this.getCommentThreadWithRepliesAsync(reply.id, 1, context)),
-              )
-            : [];
+          replies.length > 0 ?
+            await Promise.all(
+              replies.map((reply) => this.getCommentThreadWithRepliesAsync(reply.id, 1, context)),
+            )
+          : [];
 
         return {
           ...comment,

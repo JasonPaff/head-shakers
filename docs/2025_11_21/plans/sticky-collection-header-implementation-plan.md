@@ -23,16 +23,19 @@
 ### High Priority Files (9 files)
 
 **Collection Detail Pages:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx`
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-header.tsx`
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-header-async.tsx`
 
 **Subcollection Detail Pages:**
+
 - `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx`
 - `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-header.tsx`
 - `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/async/subcollection-header-async.tsx`
 
 **Bobblehead Detail Pages:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx`
@@ -40,23 +43,27 @@
 ### Medium Priority Files (19 files)
 
 **Action Components:**
+
 - Collection: `collection-share-menu.tsx`, `collection-delete.tsx`, `collection-edit-section.tsx`
 - Subcollection: `subcollection-share-menu.tsx`, `subcollection-delete.tsx`, `subcollection-edit-section.tsx`
 - Bobblehead: `bobblehead-share-menu.tsx`, `bobblehead-header-edit.tsx`, `bobblehead-header-delete.tsx`
 - Shared: `report-button.tsx`, `like-button.tsx`
 
 **Skeleton Components:**
+
 - `collection-header-skeleton.tsx`
 - `subcollection-header-skeleton.tsx`
 - `bobblehead-header-skeleton.tsx`
 
 **Layout & UI:**
+
 - `content-layout.tsx`
 - `app-header.tsx` (reference for sticky pattern)
 - `button.tsx`
 - `dropdown-menu.tsx`
 
 **Utilities:**
+
 - `tailwind-utils.ts`
 - `use-toggle.ts`
 
@@ -72,24 +79,29 @@
 ## Architecture Insights
 
 ### Existing Sticky Pattern (from app-header.tsx)
+
 ```tsx
 <header className={'sticky top-0 z-50 w-full border-b bg-background'}>
 ```
 
 ### Recommended Sticky Header Styling
+
 - **Position**: `sticky top-0 z-40` (below app-header z-50)
 - **Visual Effect**: `backdrop-blur-sm bg-background/95 border-b`
 - **Width**: `w-full`
 - **Transitions**: `transition-transform duration-200`
 
 ### Current Header Structure
+
 All three entity types follow consistent pattern:
+
 - Back navigation button (top-left)
 - Action buttons row (top-right): Share, Edit (owner), Delete (owner), Report (non-owner)
 - Title and description
 - Metadata row with Like button and stats
 
 ### Scroll Detection Strategy
+
 - Use **IntersectionObserver API** for native performance
 - Sentinel element before original header triggers visibility
 - Boolean state controls sticky header conditional rendering
@@ -126,9 +138,11 @@ Implement sticky positioning behavior for collection, subcollection, and bobbleh
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/sticky-header/sticky-header-wrapper.tsx` - Client component that manages scroll state and sticky header visibility
 
 **Changes:**
+
 - Create new folder `src/components/feature/sticky-header/`
 - Implement scroll detection using IntersectionObserver API to track when original header exits viewport
 - Manage boolean state for sticky header visibility using useState
@@ -136,11 +150,13 @@ Implement sticky positioning behavior for collection, subcollection, and bobbleh
 - Export TypeScript interface for wrapper props including threshold and rootMargin options
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component compiles without TypeScript errors
 - [ ] IntersectionObserver properly detects scroll position
 - [ ] State updates trigger re-renders correctly
@@ -156,9 +172,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` - Client component rendering compact collection header
 
 **Changes:**
+
 - Accept props matching CollectionHeaderProps interface including collectionId, slug, title, privacy, likeCount, isLiked, canEdit, canDelete
 - Render fixed positioned header with `sticky top-0 z-40 backdrop-blur-sm bg-background/95 border-b` styling
 - Include collection title truncated with ellipsis for long names
@@ -168,11 +186,13 @@ npm run lint:fix && npm run typecheck
 - Add smooth opacity transition when appearing/disappearing using Tailwind transition utilities
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders with correct z-index below app header
 - [ ] All action buttons functional and properly typed
 - [ ] Title truncation works correctly
@@ -189,9 +209,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` - Client component rendering compact subcollection header
 
 **Changes:**
+
 - Accept props matching SubcollectionHeaderProps interface including subcollectionId, slug, title, privacy, likeCount, isLiked, canEdit, canDelete, collectionSlug
 - Apply identical styling pattern as collection sticky header for consistency
 - Integrate ShareSubcollectionMenu, EditSubcollectionButton, DeleteSubcollectionButton, ReportButton components
@@ -200,11 +222,13 @@ npm run lint:fix && npm run typecheck
 - Implement same responsive and transition behavior as collection variant
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component matches collection sticky header visual pattern
 - [ ] All subcollection-specific actions integrated correctly
 - [ ] Parent collection context visible in compact format
@@ -220,9 +244,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` - Client component rendering compact bobblehead header
 
 **Changes:**
+
 - Accept props matching BobbleheadHeaderProps interface including bobbleheadId, slug, name, privacy, likeCount, isLiked, canEdit, canDelete, subcollectionSlug, collectionSlug
 - Apply consistent styling with sibling sticky headers
 - Integrate ShareBobbleheadMenu, EditBobbleheadButton, DeleteBobbleheadButton, ReportButton components
@@ -231,11 +257,13 @@ npm run lint:fix && npm run typecheck
 - Include collection/subcollection breadcrumb path in condensed format
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component follows established sticky header pattern
 - [ ] Bobblehead-specific actions function correctly
 - [ ] Thumbnail image renders properly when included
@@ -251,9 +279,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Add sticky header integration to page layout
 
 **Changes:**
+
 - Import StickyHeaderWrapper and CollectionStickyHeader components
 - Wrap main content with StickyHeaderWrapper component
 - Add sentinel div element immediately before original CollectionHeader to serve as intersection observer target
@@ -262,11 +292,13 @@ npm run lint:fix && npm run typecheck
 - Ensure original header and sticky header receive identical prop values for consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sticky header appears when scrolling past original header
 - [ ] Sticky header hides when scrolling back to top
 - [ ] No layout shifts or content jumps during transition
@@ -282,9 +314,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/page.tsx` - Add sticky header integration
 
 **Changes:**
+
 - Import StickyHeaderWrapper and SubcollectionStickyHeader components
 - Apply identical integration pattern as collection page
 - Add intersection observer sentinel element
@@ -293,11 +327,13 @@ npm run lint:fix && npm run typecheck
 - Ensure type safety for all prop passing
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sticky header behavior matches collection page implementation
 - [ ] Parent collection context properly displayed
 - [ ] Navigation between collection and subcollection maintains sticky behavior
@@ -312,9 +348,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` - Add sticky header integration
 
 **Changes:**
+
 - Import StickyHeaderWrapper and BobbleheadStickyHeader components
 - Follow established integration pattern from collection and subcollection pages
 - Position sentinel element for scroll detection
@@ -323,11 +361,13 @@ npm run lint:fix && npm run typecheck
 - Handle optional thumbnail image prop correctly
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sticky header appears and disappears based on scroll position
 - [ ] Breadcrumb hierarchy displays correctly in compact format
 - [ ] Thumbnail image renders when available
@@ -343,11 +383,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` - Add responsive layout classes
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` - Add responsive layout classes
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` - Add responsive layout classes
 
 **Changes:**
+
 - Apply Tailwind responsive classes for breakpoints sm, md, lg, xl
 - Adjust spacing between action buttons using responsive gap utilities
 - Implement title width constraints with responsive max-width classes
@@ -356,11 +398,13 @@ npm run lint:fix && npm run typecheck
 - Test layout on mobile 320px, tablet 768px, and desktop 1024px+ viewports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action buttons remain accessible without horizontal scrolling on mobile
 - [ ] Title truncation adapts to available space at each breakpoint
 - [ ] No visual overflow or layout breaking at any viewport size
@@ -376,12 +420,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` - Add transition classes
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` - Add transition classes
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` - Add transition classes
 - `src/components/feature/sticky-header/sticky-header-wrapper.tsx` - Add transition state management
 
 **Changes:**
+
 - Add Tailwind transition classes for opacity and transform properties
 - Implement slide-down animation using translate-y utilities when appearing
 - Add fade-in effect with opacity transition
@@ -390,11 +436,13 @@ npm run lint:fix && npm run typecheck
 - Ensure animations respect prefers-reduced-motion accessibility preference
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Sticky header slides down smoothly when appearing
 - [ ] Fade effect enhances visual transition
 - [ ] Animation duration feels natural and not jarring
@@ -410,9 +458,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/sticky-header/sticky-header-wrapper.tsx` - Optimize observer configuration
 
 **Changes:**
+
 - Set appropriate rootMargin value to trigger visibility change slightly before header exits viewport
 - Configure threshold array for precise intersection detection
 - Implement cleanup function to disconnect observer on component unmount
@@ -421,11 +471,13 @@ npm run lint:fix && npm run typecheck
 - Ensure observer only initialized once per component instance
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Smooth scrolling performance without jank or stuttering
 - [ ] Sticky header appears at optimal scroll position
 - [ ] No memory leaks from undisconnected observers
@@ -441,11 +493,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` - Verify $path usage in navigation
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` - Verify $path usage in navigation
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` - Verify $path usage in navigation
 
 **Changes:**
+
 - Import $path from next-typesafe-url for all internal navigation links
 - Replace any hardcoded URL strings with $path route generation
 - Verify edit button navigation uses $path for edit routes
@@ -454,11 +508,13 @@ npm run lint:fix && npm run typecheck
 - Add TypeScript checks for route parameter types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All navigation uses $path with no hardcoded strings
 - [ ] TypeScript enforces correct route parameters
 - [ ] Edit, share, and breadcrumb navigation functional
@@ -474,11 +530,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` - Add null checks and loading states
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` - Add null checks and loading states
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` - Add null checks and loading states
 
 **Changes:**
+
 - Add null/undefined checks for optional props like thumbnail images
 - Implement skeleton loader state if data not immediately available
 - Handle missing permission props gracefully by hiding restricted actions
@@ -487,11 +545,13 @@ npm run lint:fix && npm run typecheck
 - Add error boundary consideration for component failure isolation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders without errors when optional props missing
 - [ ] Skeleton state displays appropriately during loading
 - [ ] Permission-restricted actions hidden when user lacks access
@@ -507,12 +567,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` - Add ARIA attributes
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` - Add ARIA attributes
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` - Add ARIA attributes
 - `src/components/feature/sticky-header/sticky-header-wrapper.tsx` - Add landmark roles
 
 **Changes:**
+
 - Add role="banner" or appropriate landmark role to sticky header container
 - Include aria-label describing sticky header purpose
 - Ensure all icon-only buttons have descriptive aria-label attributes
@@ -522,11 +584,13 @@ npm run lint:fix && npm run typecheck
 - Verify screen reader announcements for sticky header state changes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Screen readers properly announce sticky header and action buttons
 - [ ] Keyboard navigation works without mouse interaction
 - [ ] Focus indicators visible on all interactive elements

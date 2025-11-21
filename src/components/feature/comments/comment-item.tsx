@@ -191,7 +191,9 @@ export const CommentItem = ({
           </Avatar>
 
           <div className={'flex flex-col'}>
-            <span className={cn('font-semibold', _isDeeplyNested ? 'text-xs' : 'text-sm')}>{_displayName}</span>
+            <span className={cn('font-semibold', _isDeeplyNested ? 'text-xs' : 'text-sm')}>
+              {_displayName}
+            </span>
             <span className={cn('text-muted-foreground', _isDeeplyNested ? 'text-[10px]' : 'text-xs')}>
               @{_username}
             </span>

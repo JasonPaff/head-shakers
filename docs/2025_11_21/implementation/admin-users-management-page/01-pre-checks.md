@@ -25,11 +25,11 @@
 
 ## Prerequisites Validation
 
-| Prerequisite | Status |
-|--------------|--------|
+| Prerequisite                | Status                                                     |
+| --------------------------- | ---------------------------------------------------------- |
 | Admin middleware configured | Verified (`src/lib/middleware/admin.middleware.ts` exists) |
-| User schema accessible | Verified (`src/lib/db/schema/users.schema.ts` exists) |
-| Users query layer | Verified (`src/lib/queries/users/users-query.ts` exists) |
+| User schema accessible      | Verified (`src/lib/db/schema/users.schema.ts` exists)      |
+| Users query layer           | Verified (`src/lib/queries/users/users-query.ts` exists)   |
 
 ## Parsed Plan Summary
 

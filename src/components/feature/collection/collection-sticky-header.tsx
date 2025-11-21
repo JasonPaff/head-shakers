@@ -50,7 +50,7 @@ export const CollectionStickyHeader = ({
         className={
           'sticky top-16 z-40 border-b bg-background/95 backdrop-blur-sm transition-all duration-300 ease-in-out motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-reduce:transition-none'
         }
-        role={'banner'}
+        role={'region'}
       >
         <div className={'container mx-auto px-3 py-2 md:px-4 md:py-3 lg:px-6'}>
           <div className={'flex items-center justify-between gap-2 md:gap-3 lg:gap-4'}>
@@ -108,13 +108,13 @@ export const CollectionStickyHeader = ({
       </header>
 
       {/* Edit Dialog */}
-      <Conditional isCondition={isEditDialogOpen && !!collection}>
+      {isEditDialogOpen && collection && (
         <CollectionEditDialog
-          collection={collection!}
+          collection={collection}
           isOpen={isEditDialogOpen}
           onClose={setIsEditDialogOpen.off}
         />
-      </Conditional>
+      )}
     </Fragment>
   );
 };

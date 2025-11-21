@@ -116,10 +116,12 @@ Initial TypeScript errors resolved by using proper array access pattern with nul
 ## Notes for Next Steps
 
 **For Step 9 (Comment List)**:
+
 - Use this component with `depth` prop for recursive rendering
 - Pass `onReply` callback from parent
 
 **For Step 11 (Comment Section)**:
+
 - Connect `onReply` callback to state management
 - Handle reply initiation
 

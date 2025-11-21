@@ -28,22 +28,26 @@ As an admin, I need a comprehensive users management page that leverages the exi
 ### Critical Files Discovered (12)
 
 **Database Schemas:**
+
 - `src/lib/db/schema/users.schema.ts` - User table with roles and status fields
 - `src/lib/db/schema/system.schema.ts` - Notification and platform settings
 - `src/lib/db/schema/moderation.schema.ts` - Content reports and audit patterns
 - `src/lib/db/schema/index.ts` - Central schema exports
 
 **Validation Schemas:**
+
 - `src/lib/validations/users.validation.ts` - User validation patterns
 - `src/lib/validations/admin.validation.ts` - Admin validation patterns
 - `src/lib/validations/moderation.validation.ts` - Bulk operations validation
 
 **Queries:**
+
 - `src/lib/queries/users/users-query.ts` - User queries (needs extensions)
 - `src/lib/queries/base/base-query.ts` - Query base class
 - `src/lib/queries/content-reports/content-reports.query.ts` - Reference
 
 **Actions & Middleware:**
+
 - `src/lib/actions/admin/admin-content-reports.actions.ts` - Reference
 - `src/lib/middleware/admin.middleware.ts` - Admin verification
 
@@ -55,6 +59,7 @@ As an admin, I need a comprehensive users management page that leverages the exi
 - 2 reference components
 
 ### Medium Priority (22 UI components)
+
 ### Low Priority (20 supporting files)
 
 **Total Files**: 62 discovered, 58 validated ✅
@@ -89,12 +94,15 @@ Implement a comprehensive admin users management page with server-side data fetc
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/queries/admin/admin-users-query.ts` - Admin-specific user queries with filtering and pagination
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create `getAdminUsersWithStats` function with parameters for filtering (role, status, search, dateRange)
 - Add pagination support with limit/offset
 - Include computed fields (collection count, last activity timestamp, account age)
@@ -104,11 +112,13 @@ Implement a comprehensive admin users management page with server-side data fetc
 - Add proper type exports for query results
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query functions accept proper filter parameters
 - [ ] Pagination logic handles edge cases correctly
 - [ ] All query results are properly typed
@@ -123,12 +133,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/facades/admin/admin-users-facade.ts` - Business logic layer for user management
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create `getUsersListForAdmin` function that calls query layer and adds business logic
 - Add validation for filter parameters
 - Implement `validateUserOperation` helper for permission checks
@@ -137,11 +150,13 @@ npm run lint:fix && npm run typecheck
 - Add TypeScript interfaces for facade return types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade properly validates all inputs
 - [ ] Error handling covers all edge cases
 - [ ] Business logic is separated from data access
@@ -156,12 +171,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/admin/admin-users.actions.ts` - Server actions for user management
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create `updateUserRoleAction` with Zod validation schema
 - Add `updateUserStatusAction` for suspend/activate operations
 - Implement `verifyUserAction` for manual verification
@@ -172,11 +190,13 @@ npm run lint:fix && npm run typecheck
 - Use adminActionClient from existing action patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All actions use proper Zod validation schemas
 - [ ] Admin permissions are verified via middleware
 - [ ] Actions return type-safe results
@@ -191,12 +211,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/admin-users.validation.ts` - Validation schemas for admin user operations
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create `adminUserFiltersSchema` for query parameters
 - Add `updateUserRoleSchema` with allowed role values
 - Implement `updateUserStatusSchema` with status transitions
@@ -206,11 +229,13 @@ npm run lint:fix && npm run typecheck
 - Include proper error messages for validation failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All schemas align with database schema constraints
 - [ ] Error messages are user-friendly
 - [ ] Schemas properly validate edge cases
@@ -225,13 +250,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/users-table.tsx` - Main table component with TanStack React Table
 - `src/components/feature/admin/users/users-table-columns.tsx` - Column definitions with sorting and actions
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Implement TanStack React Table with column definitions
 - Add sortable columns for username, email, role, status, created date
 - Include action column with dropdown menu for quick actions
@@ -242,11 +270,13 @@ npm run lint:fix && npm run typecheck
 - Add status badges with appropriate styling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Table displays all user data correctly
 - [ ] Sorting works for all columns
 - [ ] Pagination handles edge cases
@@ -261,13 +291,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/user-filters.tsx` - Filter component with nuqs integration
 - `src/components/feature/admin/users/user-search.tsx` - Search input component
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create filter component with role dropdown using Radix UI Select
 - Add status filter with multi-select capability
 - Implement date range picker for registration date filtering
@@ -278,11 +311,13 @@ npm run lint:fix && npm run typecheck
 - Add filter count indicator
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All filters update URL parameters correctly
 - [ ] Filter state persists on page refresh
 - [ ] Clear filters resets all filter states
@@ -297,15 +332,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/user-role-dialog.tsx` - Role update dialog
 - `src/components/feature/admin/users/user-status-dialog.tsx` - Status change dialog
 - `src/components/feature/admin/users/user-verification-dialog.tsx` - Verification dialog
 - `src/components/feature/admin/users/bulk-action-dialog.tsx` - Bulk operations dialog
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create role dialog with Radix Dialog and Select components
 - Add status dialog with reason input field for suspensions
 - Implement verification dialog with checkbox confirmations
@@ -316,11 +354,13 @@ npm run lint:fix && npm run typecheck
 - Add confirmation prompts for destructive actions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All dialogs properly validate inputs
 - [ ] Loading states prevent duplicate submissions
 - [ ] Toast notifications display correctly
@@ -335,15 +375,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/user-detail-dialog.tsx` - Main detail dialog
 - `src/components/feature/admin/users/user-profile-tab.tsx` - Profile information tab
 - `src/components/feature/admin/users/user-activity-tab.tsx` - Activity history tab
 - `src/components/feature/admin/users/user-audit-tab.tsx` - Audit log tab
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create dialog with Radix Tabs component
 - Add profile tab showing user metadata and statistics
 - Implement activity tab with timeline of recent actions
@@ -354,11 +397,13 @@ npm run lint:fix && npm run typecheck
 - Add loading skeleton states
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All tabs display correct user data
 - [ ] Data loading is optimized with proper caching
 - [ ] Quick actions trigger appropriate dialogs
@@ -373,12 +418,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/users/page.tsx` - Main admin users page implementation
 
 **Changes:**
+
 - Implement server component with searchParams for filters
 - Add data fetching using facade layer
 - Include metadata for SEO
@@ -390,11 +438,13 @@ npm run lint:fix && npm run typecheck
 - Implement error boundary handling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page loads with proper SSR
 - [ ] Filters work with URL parameters
 - [ ] Admin middleware blocks unauthorized access
@@ -409,12 +459,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/user-statistics-cards.tsx` - Statistics display component
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/users/page.tsx` - Add statistics section
 
 **Changes:**
+
 - Create statistics cards component with Radix Card
 - Add total users count with growth indicator
 - Include role distribution breakdown
@@ -425,11 +478,13 @@ npm run lint:fix && npm run typecheck
 - Add click-through filtering from statistics
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Statistics accurately reflect database state
 - [ ] Metrics update with filter changes
 - [ ] Click-through filters work correctly
@@ -444,13 +499,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/bulk-actions-toolbar.tsx` - Toolbar for bulk operations
 
 **Files to Modify:**
+
 - `src/components/feature/admin/users/users-table.tsx` - Add row selection
 - `src/lib/actions/admin/admin-users.actions.ts` - Add bulk action handlers
 
 **Changes:**
+
 - Add checkbox column to table for row selection
 - Create toolbar showing selected count and available actions
 - Add bulk role update capability
@@ -461,11 +519,13 @@ npm run lint:fix && npm run typecheck
 - Implement optimistic updates for bulk operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Row selection works across paginated pages
 - [ ] Bulk actions handle partial failures gracefully
 - [ ] UI shows progress for bulk operations
@@ -480,13 +540,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/lib/utils/export/user-export.ts` - Export utility functions
 - `src/app/api/admin/users/export/route.ts` - Export API route
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/users/page.tsx` - Add export button
 
 **Changes:**
+
 - Create export utility for CSV formatting
 - Add JSON export option
 - Implement export button with format selection
@@ -497,11 +560,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for export failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Export includes all filtered data
 - [ ] CSV format is properly structured
 - [ ] Large exports stream without timeout
@@ -516,13 +581,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/lib/db/schema/admin-audit-logs.schema.ts` - Audit log database schema
 - `src/lib/utils/audit/audit-logger.ts` - Audit logging utility
 
 **Files to Modify:**
+
 - `src/lib/actions/admin/admin-users.actions.ts` - Add audit logging to all actions
 
 **Changes:**
+
 - Create audit logs table schema with action type, actor, target user, changes, timestamp
 - Implement audit logger utility function
 - Add logging to all user mutation actions
@@ -533,11 +601,13 @@ npm run lint:fix && npm run typecheck
 - Include export capability for audit logs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All admin actions are logged
 - [ ] Audit logs include sufficient detail
 - [ ] Logs are queryable and searchable
@@ -552,13 +622,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/user-activity-timeline.tsx` - Activity timeline component
 - `src/lib/queries/admin/admin-user-activity-query.ts` - Activity data queries
 
 **Files to Modify:**
+
 - `src/components/feature/admin/users/user-detail-dialog.tsx` - Integrate timeline
 
 **Changes:**
+
 - Create activity query for user actions and milestones
 - Implement timeline component with chronological display
 - Add activity type icons and descriptions
@@ -569,11 +642,13 @@ npm run lint:fix && npm run typecheck
 - Implement filtering by activity type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Timeline displays activities chronologically
 - [ ] Activity types are clearly differentiated
 - [ ] Timeline performs well with many activities
@@ -588,13 +663,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/user-search-autocomplete.tsx` - Search with autocomplete
 
 **Files to Modify:**
+
 - `src/components/feature/admin/users/user-filters.tsx` - Replace basic search
 - `src/lib/queries/admin/admin-users-query.ts` - Add search suggestions query
 
 **Changes:**
+
 - Create autocomplete component with Radix Combobox
 - Add debounced search suggestions query
 - Implement fuzzy matching for usernames and emails
@@ -605,11 +683,13 @@ npm run lint:fix && npm run typecheck
 - Add loading states for suggestions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Autocomplete shows relevant suggestions
 - [ ] Debouncing prevents excessive queries
 - [ ] Keyboard navigation works correctly
@@ -624,12 +704,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - Migration file generated by Drizzle in `src/lib/db/migrations/`
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Run `npm run db:generate` to create migration file
 - Review generated migration SQL
 - Run `npm run db:migrate` to apply migration
@@ -638,11 +721,13 @@ npm run lint:fix && npm run typecheck
 - Ensure foreign key constraints are correct
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file is generated successfully
 - [ ] Migration applies without errors
 - [ ] Audit logs table exists with correct schema
@@ -657,12 +742,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/components/layout/admin/admin-nav.tsx` - Add users link to navigation
 
 **Changes:**
+
 - Add users management link with appropriate icon
 - Position link logically in admin navigation
 - Add active state styling
@@ -671,11 +759,13 @@ npm run lint:fix && npm run typecheck
 - Ensure proper permission checks
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Link appears in admin navigation
 - [ ] Active state highlights correctly
 - [ ] Navigation uses type-safe routes
@@ -690,14 +780,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/users-error-boundary.tsx` - Error boundary component
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/users/page.tsx` - Add error boundary
 - All action files - Enhance error messages
 - All dialog components - Add error states
 
 **Changes:**
+
 - Create error boundary with reset capability
 - Add error states to all dialogs
 - Implement retry logic for failed actions
@@ -708,11 +801,13 @@ npm run lint:fix && npm run typecheck
 - Add timeout handling for long operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Error boundary catches component errors
 - [ ] Error messages are user-friendly
 - [ ] Retry mechanisms work correctly
@@ -727,14 +822,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/admin/users/users-table-skeleton.tsx` - Table skeleton
 - `src/components/feature/admin/users/user-detail-skeleton.tsx` - Detail skeleton
 
 **Files to Modify:**
+
 - All dialog components - Add loading states
 - `src/app/(app)/admin/users/page.tsx` - Add loading boundary
 
 **Changes:**
+
 - Create skeleton component matching table structure
 - Add loading spinner for action buttons
 - Implement detail dialog skeleton
@@ -745,11 +843,13 @@ npm run lint:fix && npm run typecheck
 - Add skeleton for statistics cards
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeletons match actual component structure
 - [ ] Loading states prevent interaction during operations
 - [ ] Optimistic updates provide instant feedback
@@ -764,14 +864,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `tests/integration/admin/admin-users-page.test.ts` - Page integration tests
 - `tests/integration/admin/admin-users-actions.test.ts` - Action tests
 - `tests/integration/admin/admin-users-queries.test.ts` - Query tests
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create integration tests for data fetching
 - Add tests for all server actions
 - Implement tests for filter combinations
@@ -782,11 +885,13 @@ npm run lint:fix && npm run typecheck
 - Add tests for export functionality
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All integration tests pass
 - [ ] Test coverage meets project standards
 - [ ] Edge cases are properly tested
@@ -862,6 +967,7 @@ npm run lint:fix && npm run typecheck && npm run test
 ## Orchestration Logs
 
 For detailed step-by-step execution logs, see:
+
 - `docs/2025_11_21/orchestration/admin-users-management-page/00-orchestration-index.md`
 - `docs/2025_11_21/orchestration/admin-users-management-page/01-feature-refinement.md`
 - `docs/2025_11_21/orchestration/admin-users-management-page/02-file-discovery.md`

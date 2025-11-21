@@ -82,8 +82,8 @@ export const CommentDeleteDialog = ({
           <AlertDialogDescription asChild>
             <div className={'space-y-3'}>
               <p>
-                Are you sure you want to delete this comment? This action cannot be undone and the comment will be
-                permanently removed.
+                Are you sure you want to delete this comment? This action cannot be undone and the comment
+                will be permanently removed.
               </p>
 
               {/* Reply Cascade Warning */}
@@ -91,16 +91,17 @@ export const CommentDeleteDialog = ({
                 <div
                   className={cn(
                     'rounded-md border border-amber-200 bg-amber-50 p-3 text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200',
-                    _hasManyReplies && 'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/50 dark:text-red-200'
+                    _hasManyReplies &&
+                      'border-red-200 bg-red-50 text-red-800 dark:border-red-800 dark:bg-red-950/50 dark:text-red-200',
                   )}
                 >
                   <p className={'font-medium'}>
                     {_hasManyReplies ? 'Warning: This will delete many replies!' : 'This comment has replies'}
                   </p>
                   <p className={'mt-1 text-sm'}>
-                    {_hasMultipleReplies
-                      ? `Deleting this comment will also permanently delete ${replyCount} replies.`
-                      : 'Deleting this comment will also permanently delete 1 reply.'}
+                    {_hasMultipleReplies ?
+                      `Deleting this comment will also permanently delete ${replyCount} replies.`
+                    : 'Deleting this comment will also permanently delete 1 reply.'}
                   </p>
                 </div>
               </Conditional>

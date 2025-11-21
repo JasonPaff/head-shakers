@@ -464,7 +464,12 @@ export const CacheTagInvalidation = {
   /**
    * get tags to invalidate when comment is created or updated
    */
-  onCommentChange: (entityType: CacheEntityType, entityId: string, commentId?: string, parentCommentId?: string) => {
+  onCommentChange: (
+    entityType: CacheEntityType,
+    entityId: string,
+    commentId?: string,
+    parentCommentId?: string,
+  ) => {
     const tags = CacheTagGenerators.social.comments(entityType, entityId);
 
     // Add individual comment cache tag if commentId is provided

@@ -19,6 +19,7 @@ As a user, I would like to be able to reply directly to comments on bobblehead c
 **Critical Infrastructure Finding**: Database schema already has `parentCommentId` field implemented with proper self-referential foreign key relationships. The infrastructure exists but is not currently used in application logic or UI.
 
 **Priority Distribution**:
+
 - Critical Priority: 2 files (database schema and relations)
 - High Priority: 14 files (validation, queries, facades, actions, core components)
 - Medium Priority: 9 files (supporting components, caching, migrations)
@@ -39,6 +40,7 @@ IMPORTANT: Include 'npm run lint:fix && npm run typecheck' validation for every 
 The implementation planner agent generated a comprehensive 18-step implementation plan covering:
 
 ### Overview
+
 - **Estimated Duration**: 3-4 days
 - **Complexity**: High
 - **Risk Level**: Medium
@@ -46,10 +48,12 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 ### Implementation Phases
 
 **Phase 1: Database Optimization (Steps 1-2)**
+
 - Database schema index creation for performance
 - Constants configuration for nesting depth limits
 
 **Phase 2: Validation & Business Logic (Steps 3-7)**
+
 - Validation schema updates for `parentCommentId`
 - Recursive query methods for nested comment fetching
 - Facade layer reply operations with depth validation
@@ -57,6 +61,7 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 - Cache management for nested comment scenarios
 
 **Phase 3: UI Components (Steps 8-13)**
+
 - Comment item reply button and visual nesting
 - Recursive comment list rendering
 - Comment form reply mode
@@ -65,11 +70,13 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 - Client component reply state management
 
 **Phase 4: Supporting Features (Steps 14-16)**
+
 - Delete dialog parent comment handling
 - Loading skeleton nested structure
 - Bobblehead dialog integration verification
 
 **Phase 5: Migration & Testing (Steps 17-18)**
+
 - Database migration execution
 - Integration testing and performance verification
 
@@ -77,21 +84,23 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 
 ✅ **Format Check**: Markdown format (not XML)
 ✅ **Template Compliance**: All required sections present
-  - Overview with duration, complexity, risk
-  - Quick Summary
-  - Prerequisites checklist
-  - Implementation Steps (18 steps)
-  - Quality Gates checklist
-  - Notes section
+
+- Overview with duration, complexity, risk
+- Quick Summary
+- Prerequisites checklist
+- Implementation Steps (18 steps)
+- Quality Gates checklist
+- Notes section
 
 ✅ **Step Structure**: Each step includes:
-  - What (clear description)
-  - Why (justification)
-  - Confidence level
-  - Files to modify/create
-  - Changes description
-  - Validation commands
-  - Success criteria checklist
+
+- What (clear description)
+- Why (justification)
+- Confidence level
+- Files to modify/create
+- Changes description
+- Validation commands
+- Success criteria checklist
 
 ✅ **Validation Commands**: All steps include `npm run lint:fix && npm run typecheck`
 ✅ **No Code Examples**: Plan contains instructions only, no implementation code
@@ -99,6 +108,7 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 ## Template Compliance Validation
 
 **Required Sections Present:**
+
 - ✅ Overview (with Estimated Duration, Complexity, Risk Level)
 - ✅ Quick Summary
 - ✅ Prerequisites
@@ -107,6 +117,7 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 - ✅ Notes
 
 **Step Quality Checks:**
+
 - ✅ All steps have clear "What" descriptions
 - ✅ All steps have "Why" justifications
 - ✅ All steps include confidence levels
@@ -118,6 +129,7 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 ## Complexity Assessment
 
 **Complexity Factors Identified:**
+
 1. **Recursive Query Implementation**: Medium complexity for efficient hierarchical data fetching
 2. **Cache Invalidation**: High complexity for nested comment cache management
 3. **UI Recursion**: Medium complexity for recursive component rendering
@@ -148,6 +160,7 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 ✅ Notes critical decisions needed (deletion strategy)
 
 **Completeness Analysis:**
+
 - ✅ Database layer: Indexes, migrations, constraints
 - ✅ Validation layer: Zod schemas, depth limits
 - ✅ Query layer: Recursive fetching, depth calculation
@@ -159,20 +172,24 @@ The implementation planner agent generated a comprehensive 18-step implementatio
 ## Critical Insights from Plan
 
 ### Key Discovery Highlighted
+
 The plan correctly emphasizes that the database schema already has `parentCommentId` implemented, significantly reducing implementation risk and complexity.
 
 ### Decision Points Identified
+
 1. **Deletion Strategy**: Cascade delete vs. orphan replies when parent deleted (requires stakeholder decision)
 2. **Max Nesting Depth**: Recommends depth of 5, needs confirmation
 3. **Real-time Notifications**: Optional feature for initial release, can be deferred
 
 ### Performance Considerations
+
 1. Composite index on `(parentCommentId, createdAt)` critical for performance
 2. Pagination or lazy loading recommended for large reply threads
 3. Query performance target: Under 500ms for typical threads
 4. Monitor production performance and adjust indexes as needed
 
 ### Risk Mitigation Strategies
+
 1. Existing schema reduces migration risk
 2. Incremental step-by-step approach
 3. Validation at each step with lint/typecheck
@@ -186,6 +203,7 @@ The plan correctly emphasizes that the database schema already has `parentCommen
 **Completeness**: Plan addresses all discovered files and architectural layers comprehensively
 
 **Recommendations from Plan**:
+
 1. Confirm deletion behavior preference before Step 5 implementation
 2. Verify MAX_COMMENT_NESTING_DEPTH of 5 acceptable to stakeholders
 3. Consider real-time notifications as separate follow-up feature

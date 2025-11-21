@@ -25,6 +25,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 ### Critical Priority (Core Implementation) - 11 files
 
 **Cloudinary Integration & Services**
+
 1. `src/lib/services/cloudinary.service.ts`
    - **Purpose**: Core Cloudinary service with deletion methods
    - **Key Methods**: `deletePhotosFromCloudinary`, `deletePhotosByUrls`, `extractPublicIdFromUrl`
@@ -43,12 +44,12 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
    - **AI Analysis**: Provides type safety for photo operations
    - **Priority Reasoning**: Required for TypeScript implementation
 
-**Database Schema & Queries**
-4. `src/lib/db/schema/bobbleheads.schema.ts`
-   - **Purpose**: Bobbleheads and bobbleheadPhotos tables schema
-   - **Key Details**: Defines relationship between photos and bobbleheads (lines 160-191)
-   - **AI Analysis**: Shows database structure for orphan detection queries
-   - **Priority Reasoning**: Must query this schema to identify persisted photos
+**Database Schema & Queries** 4. `src/lib/db/schema/bobbleheads.schema.ts`
+
+- **Purpose**: Bobbleheads and bobbleheadPhotos tables schema
+- **Key Details**: Defines relationship between photos and bobbleheads (lines 160-191)
+- **AI Analysis**: Shows database structure for orphan detection queries
+- **Priority Reasoning**: Must query this schema to identify persisted photos
 
 5. `src/lib/queries/bobbleheads/bobbleheads-query.ts`
    - **Purpose**: Database queries for bobbleheads
@@ -56,12 +57,12 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
    - **AI Analysis**: Will need extension for photo URL queries
    - **Priority Reasoning**: Core data access layer for implementation
 
-**QStash Job Pattern**
-6. `src/app/api/analytics/process-views/route.ts`
-   - **Purpose**: **CRITICAL REFERENCE** - Existing QStash webhook endpoint
-   - **Key Pattern**: `verifySignatureAppRouter` pattern (lines 16-82)
-   - **AI Analysis**: Shows proper job structure and security verification
-   - **Priority Reasoning**: Template for new cleanup job API route
+**QStash Job Pattern** 6. `src/app/api/analytics/process-views/route.ts`
+
+- **Purpose**: **CRITICAL REFERENCE** - Existing QStash webhook endpoint
+- **Key Pattern**: `verifySignatureAppRouter` pattern (lines 16-82)
+- **AI Analysis**: Shows proper job structure and security verification
+- **Priority Reasoning**: Template for new cleanup job API route
 
 7. `src/lib/jobs/view-aggregation.job.ts`
    - **Purpose**: **CRITICAL REFERENCE** - Existing background job class
@@ -74,12 +75,12 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
    - **AI Analysis**: Alternative job implementation pattern
    - **Priority Reasoning**: Secondary reference for job structure
 
-**Configuration & Constants**
-9. `src/lib/constants/cloudinary-paths.ts`
-   - **Purpose**: Cloudinary path builders
-   - **Key Method**: `tempPath(userId)` generates `temp/uploads/${userId}` (line 72)
-   - **AI Analysis**: Centralized path generation for consistency
-   - **Priority Reasoning**: Must use for temp folder path construction
+**Configuration & Constants** 9. `src/lib/constants/cloudinary-paths.ts`
+
+- **Purpose**: Cloudinary path builders
+- **Key Method**: `tempPath(userId)` generates `temp/uploads/${userId}` (line 72)
+- **AI Analysis**: Centralized path generation for consistency
+- **Priority Reasoning**: Must use for temp folder path construction
 
 10. `src/lib/constants/config.ts`
     - **Purpose**: Application configuration
@@ -95,12 +96,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 
 ### High Priority (Supporting Implementation) - 7 files
 
-**Server Actions & Facades**
-12. `src/lib/actions/bobbleheads/bobbleheads.actions.ts`
-    - **Purpose**: Bobblehead creation action
-    - **Key Pattern**: Shows photo move from temp to permanent folder (lines 74-128)
-    - **AI Analysis**: Demonstrates photo lifecycle and temp cleanup on success
-    - **Priority Reasoning**: Shows existing cleanup patterns to maintain consistency
+**Server Actions & Facades** 12. `src/lib/actions/bobbleheads/bobbleheads.actions.ts` - **Purpose**: Bobblehead creation action - **Key Pattern**: Shows photo move from temp to permanent folder (lines 74-128) - **AI Analysis**: Demonstrates photo lifecycle and temp cleanup on success - **Priority Reasoning**: Shows existing cleanup patterns to maintain consistency
 
 13. `src/lib/facades/bobbleheads/bobbleheads.facade.ts`
     - **Purpose**: Business logic layer for bobbleheads
@@ -108,12 +104,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
     - **AI Analysis**: Facade pattern for business logic
     - **Priority Reasoning**: May need facade methods for cleanup operations
 
-**Utilities & Helpers**
-14. `src/lib/utils/photo-transform.utils.ts`
-    - **Purpose**: Photo transformation utilities
-    - **Key Methods**: `isTempPhoto()`, `isPersistedPhoto()` type guards (lines 132-159)
-    - **AI Analysis**: Utilities for identifying temp vs persisted photos
-    - **Priority Reasoning**: Use type guards for photo classification
+**Utilities & Helpers** 14. `src/lib/utils/photo-transform.utils.ts` - **Purpose**: Photo transformation utilities - **Key Methods**: `isTempPhoto()`, `isPersistedPhoto()` type guards (lines 132-159) - **AI Analysis**: Utilities for identifying temp vs persisted photos - **Priority Reasoning**: Use type guards for photo classification
 
 15. `src/lib/utils/redis-client.ts`
     - **Purpose**: Redis operations wrapper
@@ -131,21 +122,11 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
     - **AI Analysis**: Resilient external API call handling
     - **Priority Reasoning**: Already integrated in Cloudinary service
 
-**Middleware & Rate Limiting**
-18. `src/lib/middleware/rate-limit.middleware.ts`
-    - **Purpose**: Rate limiting middleware
-    - **Key Pattern**: Redis-based rate limiting (lines 1-84)
-    - **AI Analysis**: Can adapt for cleanup job rate limiting
-    - **Priority Reasoning**: May protect cleanup endpoint
+**Middleware & Rate Limiting** 18. `src/lib/middleware/rate-limit.middleware.ts` - **Purpose**: Rate limiting middleware - **Key Pattern**: Redis-based rate limiting (lines 1-84) - **AI Analysis**: Can adapt for cleanup job rate limiting - **Priority Reasoning**: May protect cleanup endpoint
 
 ### Medium Priority (Integration Points) - 12 files
 
-**Service Layer**
-19. `src/lib/services/view-tracking.service.ts`
-    - **Purpose**: QStash integration example
-    - **Key Pattern**: Batch processing (lines 1-100)
-    - **AI Analysis**: Shows QStash service integration patterns
-    - **Priority Reasoning**: Reference for service layer patterns
+**Service Layer** 19. `src/lib/services/view-tracking.service.ts` - **Purpose**: QStash integration example - **Key Pattern**: Batch processing (lines 1-100) - **AI Analysis**: Shows QStash service integration patterns - **Priority Reasoning**: Reference for service layer patterns
 
 20. `src/lib/services/cache-revalidation.service.ts`
     - **Purpose**: Cache revalidation after operations
@@ -157,22 +138,14 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
     - **AI Analysis**: Caching patterns and utilities
     - **Priority Reasoning**: Supporting caching functionality
 
-**API Routes**
-22. `src/app/api/upload/sign/route.ts`
-    - **Purpose**: Cloudinary upload signature endpoint
-    - **AI Analysis**: Reference for Cloudinary integration
-    - **Priority Reasoning**: Shows Cloudinary API patterns
+**API Routes** 22. `src/app/api/upload/sign/route.ts` - **Purpose**: Cloudinary upload signature endpoint - **AI Analysis**: Reference for Cloudinary integration - **Priority Reasoning**: Shows Cloudinary API patterns
 
 23. `src/app/api/webhooks/clerk/route.ts`
     - **Purpose**: Webhook authentication pattern reference
     - **AI Analysis**: Alternative webhook security pattern
     - **Priority Reasoning**: Secondary reference for webhook handling
 
-**Constants & Validation**
-24. `src/lib/constants/index.ts`
-    - **Purpose**: Main constants export
-    - **AI Analysis**: Central constants barrel
-    - **Priority Reasoning**: Export point for new constants
+**Constants & Validation** 24. `src/lib/constants/index.ts` - **Purpose**: Main constants export - **AI Analysis**: Central constants barrel - **Priority Reasoning**: Export point for new constants
 
 25. `src/lib/constants/redis-keys.ts`
     - **Purpose**: Redis key patterns
@@ -186,13 +159,9 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 
 ### Low Priority (May Need Updates) - 20 files
 
-**Documentation & Reference** - 3 files
-27. `docs/2025_11_21/orchestration/upstash-temp-photo-cleanup/01-feature-refinement.md`
-28. `package.json`
-29. `CLAUDE.md`
+**Documentation & Reference** - 3 files 27. `docs/2025_11_21/orchestration/upstash-temp-photo-cleanup/01-feature-refinement.md` 28. `package.json` 29. `CLAUDE.md`
 
-**Testing Infrastructure** - 1 directory
-30. `tests/` - Test directory structure
+**Testing Infrastructure** - 1 directory 30. `tests/` - Test directory structure
 
 ## File Validation Results
 
@@ -201,6 +170,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 ✅ **All critical files exist and are accessible**
 
 **Verified Critical Files**:
+
 - ✅ `src/lib/services/cloudinary.service.ts` - EXISTS
 - ✅ `src/components/ui/cloudinary-photo-upload.tsx` - EXISTS
 - ✅ `src/types/cloudinary.types.ts` - EXISTS
@@ -213,6 +183,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 - ✅ `.env` - EXISTS
 
 **Files Flagged for Creation**:
+
 - 🆕 `src/lib/jobs/temp-photo-cleanup.job.ts` - TO BE CREATED
 - 🆕 `src/app/api/cleanup/temp-photos/route.ts` - TO BE CREATED
 - 🆕 `src/lib/constants/cleanup-config.ts` - OPTIONAL TO BE CREATED
@@ -220,6 +191,7 @@ As a developer, I want to implement an automated cleanup job using Upstash QStas
 ### Content Validation
 
 AI analysis performed content-based discovery by:
+
 - Reading file contents to understand functionality
 - Identifying specific methods and patterns
 - Analyzing integration points and dependencies
