@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftIcon, PencilIcon, ShareIcon, TrashIcon } from 'lucide-react';
+import { ArrowLeftIcon, PencilIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -172,9 +172,7 @@ export const BobbleheadStickyHeader = ({
                       size={'icon'}
                       subcollectionSlug={subcollectionSlug}
                       variant={'ghost'}
-                    >
-                      <TrashIcon aria-hidden className={'size-4'} />
-                    </BobbleheadHeaderDelete>
+                    />
                   </Conditional>
                 </Fragment>
               </Conditional>

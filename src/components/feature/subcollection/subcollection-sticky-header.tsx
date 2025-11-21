@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftIcon, PencilIcon, ShareIcon, TrashIcon } from 'lucide-react';
+import { ArrowLeftIcon, PencilIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -120,9 +120,7 @@ export const SubcollectionStickyHeader = ({
 
                   {/* Delete Button */}
                   <Conditional isCondition={canDelete}>
-                    <SubcollectionDelete size={'icon'} subcollectionId={subcollectionId} variant={'ghost'}>
-                      <TrashIcon aria-hidden className={'size-4'} />
-                    </SubcollectionDelete>
+                    <SubcollectionDelete size={'icon'} subcollectionId={subcollectionId} variant={'ghost'} />
                   </Conditional>
                 </Fragment>
               </Conditional>

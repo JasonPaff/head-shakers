@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
+  type AnyPgColumn,
   boolean,
   check,
   index,
@@ -105,7 +106,9 @@ export const comments = pgTable(
     isDeleted: boolean('is_deleted').default(DEFAULTS.COMMENT.IS_DELETED).notNull(),
     isEdited: boolean('is_edited').default(DEFAULTS.COMMENT.IS_EDITED).notNull(),
     likeCount: integer('like_count').default(DEFAULTS.COMMENT.LIKE_COUNT).notNull(),
-    parentCommentId: uuid('parent_comment_id'),
+    parentCommentId: uuid('parent_comment_id').references((): AnyPgColumn => comments.id, {
+      onDelete: 'cascade',
+    }),
     targetId: uuid('target_id').notNull(),
     targetType: commentTargetTypeEnum('comment_target_type').notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

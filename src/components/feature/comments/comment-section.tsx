@@ -65,6 +65,29 @@ export const CommentSection = ({
   const _parentCommentAuthor =
     replyParentComment?.user?.displayName ?? replyParentComment?.user?.username ?? undefined;
 
+  // Helper function to find comment by ID in nested tree
+  const findCommentById = (commentList: Array<CommentWithDepth>, id: string): CommentWithDepth | null => {
+    for (const comment of commentList) {
+      if (comment.id === id) return comment;
+      if (comment.replies && comment.replies.length > 0) {
+        const found = findCommentById(comment.replies, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  // Helper to count all descendants recursively
+  const countTotalReplies = (comment: CommentWithDepth): number => {
+    if (!comment.replies || comment.replies.length === 0) return 0;
+    return comment.replies.reduce((sum, reply) => sum + 1 + countTotalReplies(reply), 0);
+  };
+
+  // Derived values for delete dialog
+  const _selectedDeleteComment = selectedCommentId ? findCommentById(comments, selectedCommentId) : null;
+  const _hasReplies = !!(_selectedDeleteComment?.replies && _selectedDeleteComment.replies.length > 0);
+  const _totalReplyCount = _selectedDeleteComment ? countTotalReplies(_selectedDeleteComment) : 0;
+
   // 6. Event handlers
   const handleCreateComment = async (content: string, parentCommentId?: string) => {
     if (!onCommentCreate) return;
@@ -200,10 +223,12 @@ export const CommentSection = ({
       {/* Delete Dialog */}
       <CommentDeleteDialog
         commentId={selectedCommentId}
+        hasReplies={_hasReplies}
         isOpen={isDeleteDialogOpen}
         isSubmitting={isSubmitting}
         onClose={handleDeleteClose}
         onConfirm={handleDeleteConfirm}
+        replyCount={_totalReplyCount}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { PencilIcon, ShareIcon, TrashIcon } from 'lucide-react';
+import { PencilIcon, ShareIcon } from 'lucide-react';
 import { Fragment } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
@@ -91,9 +91,7 @@ export const CollectionStickyHeader = ({
 
                   {/* Delete Button */}
                   <Conditional isCondition={canDelete}>
-                    <CollectionDelete collectionId={collectionId} size={'icon'} variant={'ghost'}>
-                      <TrashIcon aria-hidden className={'size-4'} />
-                    </CollectionDelete>
+                    <CollectionDelete collectionId={collectionId} size={'icon'} variant={'ghost'} />
                   </Conditional>
                 </Fragment>
               </Conditional>

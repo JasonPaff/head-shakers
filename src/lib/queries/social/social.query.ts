@@ -12,7 +12,7 @@ import type {
 } from '@/lib/validations/social.validation';
 
 import { ENUMS, MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants';
-import { bobbleheads, collections, comments, likes, subCollections } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, likes, subCollections, userBlocks } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type CommentRecord = SelectComment;
@@ -836,6 +836,26 @@ export class SocialQuery extends BaseQuery {
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);
     }
+  }
+
+  /**
+   * Check if a user is blocked by another user
+   * Returns true if blockedUserId has been blocked by blockerUserId
+   */
+  static async isUserBlockedByAsync(
+    blockedUserId: string,
+    blockerUserId: string,
+    context: QueryContext,
+  ): Promise<boolean> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ id: userBlocks.id })
+      .from(userBlocks)
+      .where(and(eq(userBlocks.blockerId, blockerUserId), eq(userBlocks.blockedId, blockedUserId)))
+      .limit(1);
+
+    return result.length > 0;
   }
 
   static async updateCommentAsync(

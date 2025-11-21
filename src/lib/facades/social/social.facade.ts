@@ -156,7 +156,18 @@ export class SocialFacade {
           };
         }
 
-        // Validation 3: Enforce depth does not exceed MAX_COMMENT_NESTING_DEPTH
+        // Validation 3: Check if the replying user is blocked by the parent comment author
+        const isBlocked = await SocialQuery.isUserBlockedByAsync(userId, parentComment.userId, context);
+
+        if (isBlocked) {
+          return {
+            comment: null,
+            error: 'You cannot reply to this comment',
+            isSuccessful: false,
+          };
+        }
+
+        // Validation 4: Enforce depth does not exceed MAX_COMMENT_NESTING_DEPTH
         const currentDepth = await this.calculateCommentDepth(data.parentCommentId, context);
 
         if (currentDepth >= MAX_COMMENT_NESTING_DEPTH) {
