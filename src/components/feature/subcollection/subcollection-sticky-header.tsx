@@ -56,7 +56,7 @@ export const SubcollectionStickyHeader = ({
       <header
         aria-label={'Subcollection sticky header'}
         className={
-          'sticky top-0 z-40 border-b bg-background/95 backdrop-blur-sm transition-all duration-300 ease-in-out motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-reduce:transition-none'
+          'sticky top-16 z-40 border-b bg-background/95 backdrop-blur-sm transition-all duration-300 ease-in-out motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-top-2 motion-reduce:transition-none'
         }
         role={'banner'}
       >
