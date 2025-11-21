@@ -1,5 +1,10 @@
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
-import type { CommentTargetType, CommentWithUser, UserLikeStatus } from '@/lib/queries/social/social.query';
+import type {
+  CommentTargetType,
+  CommentWithDepth,
+  CommentWithUser,
+  UserLikeStatus,
+} from '@/lib/queries/social/social.query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';
@@ -24,6 +29,12 @@ export interface CommentData {
 
 export interface CommentListData {
   comments: Array<CommentWithUser>;
+  hasMore: boolean;
+  total: number;
+}
+
+export interface CommentListWithRepliesData {
+  comments: Array<CommentWithDepth>;
   hasMore: boolean;
   total: number;
 }
@@ -431,6 +442,77 @@ export class SocialFacade {
     }
   }
 
+  /**
+   * Get comments with nested replies for a target entity
+   * Fetches root comments (parentCommentId is null) with recursively loaded replies
+   * Returns comments in a threaded structure with depth tracking
+   */
+  static async getCommentsWithReplies(
+    targetId: string,
+    targetType: CommentTargetType,
+    options: FindOptions = {},
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<CommentListWithRepliesData> {
+    try {
+      // Create cache key with pagination parameters for proper cache segmentation
+      const limit = options.limit || 10;
+      const offset = options.offset || 0;
+      const cacheKey = `${CACHE_KEYS.SOCIAL.COMMENTS(targetType, targetId)}:threaded:${limit}:${offset}:${viewerUserId || 'public'}`;
+
+      return CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          // fetch comments with nested replies
+          const comments = await SocialQuery.getCommentsWithRepliesAsync(
+            targetId,
+            targetType,
+            options,
+            context,
+          );
+
+          // get total count of root comments only
+          const total = await SocialQuery.getCommentCountAsync(targetId, targetType, context);
+
+          // determine if there are more root comments
+          const hasMore = offset + comments.length < total;
+
+          return {
+            comments,
+            hasMore,
+            total,
+          };
+        },
+        cacheKey,
+        {
+          context: {
+            entityId: targetId,
+            entityType: 'social',
+            facade: 'SocialFacade',
+            operation: 'getCommentsWithReplies',
+          },
+          tags: CacheTagGenerators.social.comments(
+            targetType === 'subcollection' ? 'collection' : targetType,
+            targetId,
+          ),
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { options, targetId, targetType },
+        facade: 'SocialFacade',
+        method: 'getCommentsWithReplies',
+        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
+        userId: viewerUserId,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
   static async getContentLikeData(
     targetId: string,
     targetType: LikeTargetType,
@@ -758,7 +840,10 @@ export class SocialFacade {
    * Recursively delete all replies for a comment
    * Used during cascade deletion to remove entire comment threads
    */
-  private static async deleteCommentRepliesRecursive(commentId: string, context: QueryContext): Promise<void> {
+  private static async deleteCommentRepliesRecursive(
+    commentId: string,
+    context: QueryContext,
+  ): Promise<void> {
     // fetch all direct replies
     const replies = await SocialQuery.getCommentRepliesAsync(commentId, {}, context);
 
@@ -775,11 +860,7 @@ export class SocialFacade {
 
       if (deletedReply) {
         // decrement comment count for each deleted reply
-        await SocialQuery.decrementCommentCountAsync(
-          deletedReply.targetId,
-          deletedReply.targetType,
-          context,
-        );
+        await SocialQuery.decrementCommentCountAsync(deletedReply.targetId, deletedReply.targetType, context);
       }
     }
   }
