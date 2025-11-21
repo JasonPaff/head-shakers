@@ -17,6 +17,7 @@
 ## Subagent Input
 
 Files provided:
+
 - bobblehead-edit-dialog.tsx
 - cloudinary-photo-upload.tsx
 
@@ -73,7 +74,7 @@ None
 ## React Coding Conventions
 
 - ✅ Boolean variables use `is` prefix (isLoadingPhotos, isLoading)
-- ✅ Derived conditional variables use `_` prefix (_shouldShowMessage, _hasError)
+- ✅ Derived conditional variables use `_` prefix (\_shouldShowMessage, \_hasError)
 - ✅ Component internal organization follows standard structure
 - ✅ UI sections have descriptive comments
 - ✅ Single quotes in JSX attributes

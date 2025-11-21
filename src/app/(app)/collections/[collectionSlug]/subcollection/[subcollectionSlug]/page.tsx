@@ -19,14 +19,18 @@ import { Route } from '@/app/(app)/collections/[collectionSlug]/subcollection/[s
 import { CollectionViewTracker } from '@/components/analytics/collection-view-tracker';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
+import { StickyHeaderWrapper } from '@/components/feature/sticky-header/sticky-header-wrapper';
+import { SubcollectionStickyHeader } from '@/components/feature/subcollection/subcollection-sticky-header';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections, subCollections } from '@/lib/db/schema';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type SubcollectionPageProps = PageProps;
 
@@ -159,6 +163,31 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
     .limit(1);
   const collection = collectionResults[0];
 
+  if (!collection) {
+    notFound();
+  }
+
+  const currentUserId = await getOptionalUserId();
+
+  // Fetch subcollection data and like data for both headers
+  const [publicSubcollection, likeData] = await Promise.all([
+    SubcollectionsFacade.getSubCollectionForPublicView(
+      collectionId,
+      subcollectionId,
+      currentUserId || undefined,
+    ),
+    SocialFacade.getContentLikeData(subcollectionId, 'subcollection', currentUserId || undefined),
+  ]);
+
+  if (!publicSubcollection) {
+    notFound();
+  }
+
+  // Compute permission flags
+  const isOwner = await checkIsOwner(collection.userId);
+  const canEdit = isOwner;
+  const canDelete = isOwner;
+
   // Fetch SEO data for JSON-LD schemas
   const seoData = await SubcollectionsFacade.getSubCollectionForPublicView(collectionId, subcollectionId);
 
@@ -212,61 +241,82 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
         type={'application/ld+json'}
       />
 
-      <div>
-        {/* Header Section with Suspense */}
-        <div className={'mt-3 border-b border-border'}>
-          <ContentLayout>
-            <SubcollectionErrorBoundary section={'header'}>
-              <Suspense fallback={<SubcollectionHeaderSkeleton />}>
-                <SubcollectionHeaderAsync collectionId={collectionId} subcollectionId={subcollectionId} />
-              </Suspense>
-            </SubcollectionErrorBoundary>
-          </ContentLayout>
-        </div>
+      <StickyHeaderWrapper>
+        {(isSticky) => (
+          <div>
+            {/* Sticky Header - shown when scrolling */}
+            {isSticky && (
+              <SubcollectionStickyHeader
+                canDelete={canDelete}
+                canEdit={canEdit}
+                collectionName={publicSubcollection.collectionName}
+                collectionSlug={collectionSlug}
+                isLiked={likeData?.isLiked ?? false}
+                isOwner={isOwner}
+                likeCount={likeData?.likeCount ?? 0}
+                subcollection={publicSubcollection}
+                subcollectionId={publicSubcollection.id}
+                subcollectionSlug={publicSubcollection.slug}
+                title={publicSubcollection.name}
+              />
+            )}
 
-        {/* Main Content */}
-        <div className={'mt-4'}>
-          <ContentLayout>
-            <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
-              {/* Main Content Area */}
-              <div className={'order-2 lg:order-1 lg:col-span-9'}>
-                <SubcollectionErrorBoundary section={'bobbleheads'}>
-                  <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
-                    <SubcollectionBobbleheadsAsync
-                      collectionId={collectionId}
-                      searchParams={resolvedSearchParams}
-                      subcollectionId={subcollectionId}
-                    />
+            {/* Header Section with Suspense */}
+            <div className={'mt-3 border-b border-border'}>
+              <ContentLayout>
+                <SubcollectionErrorBoundary section={'header'}>
+                  <Suspense fallback={<SubcollectionHeaderSkeleton />}>
+                    <SubcollectionHeaderAsync collectionId={collectionId} subcollectionId={subcollectionId} />
                   </Suspense>
                 </SubcollectionErrorBoundary>
-              </div>
-
-              {/* Sidebar */}
-              <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
-                <SubcollectionErrorBoundary section={'metrics'}>
-                  <Suspense fallback={<SubcollectionMetricsSkeleton />}>
-                    <SubcollectionMetricsAsync
-                      collectionId={collectionId}
-                      subcollectionId={subcollectionId}
-                    />
-                  </Suspense>
-                </SubcollectionErrorBoundary>
-              </aside>
+              </ContentLayout>
             </div>
-          </ContentLayout>
-        </div>
 
-        {/* Comments Section */}
-        <div className={'mt-8'}>
-          <ContentLayout>
-            <SubcollectionErrorBoundary section={'comments'}>
-              <Suspense fallback={<CommentSectionSkeleton />}>
-                <CommentSectionAsync targetId={subcollectionId} targetType={'subcollection'} />
-              </Suspense>
-            </SubcollectionErrorBoundary>
-          </ContentLayout>
-        </div>
-      </div>
+            {/* Main Content */}
+            <div className={'mt-4'}>
+              <ContentLayout>
+                <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
+                  {/* Main Content Area */}
+                  <div className={'order-2 lg:order-1 lg:col-span-9'}>
+                    <SubcollectionErrorBoundary section={'bobbleheads'}>
+                      <Suspense fallback={<SubcollectionBobbleheadsSkeleton />}>
+                        <SubcollectionBobbleheadsAsync
+                          collectionId={collectionId}
+                          searchParams={resolvedSearchParams}
+                          subcollectionId={subcollectionId}
+                        />
+                      </Suspense>
+                    </SubcollectionErrorBoundary>
+                  </div>
+
+                  {/* Sidebar */}
+                  <aside className={'order-1 flex flex-col gap-6 lg:order-2 lg:col-span-3'}>
+                    <SubcollectionErrorBoundary section={'metrics'}>
+                      <Suspense fallback={<SubcollectionMetricsSkeleton />}>
+                        <SubcollectionMetricsAsync
+                          collectionId={collectionId}
+                          subcollectionId={subcollectionId}
+                        />
+                      </Suspense>
+                    </SubcollectionErrorBoundary>
+                  </aside>
+                </div>
+              </ContentLayout>
+            </div>
+
+            {/* Comments Section */}
+            <div className={'mt-8'}>
+              <ContentLayout>
+                <SubcollectionErrorBoundary section={'comments'}>
+                  <Suspense fallback={<CommentSectionSkeleton />}>
+                    <CommentSectionAsync targetId={subcollectionId} targetType={'subcollection'} />
+                  </Suspense>
+                </SubcollectionErrorBoundary>
+              </ContentLayout>
+            </div>
+          </div>
+        )}
+      </StickyHeaderWrapper>
     </CollectionViewTracker>
   );
 }

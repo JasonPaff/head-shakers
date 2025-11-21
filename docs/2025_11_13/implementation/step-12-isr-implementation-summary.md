@@ -13,6 +13,7 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 ### 1. Featured Page (`src/app/(app)/browse/featured/page.tsx`)
 
 **Enhancements**:
+
 - ✅ Maintained existing ISR configuration: `export const revalidate = 300` (5 minutes)
 - ✅ Enhanced `generateMetadata()` to use `generatePageMetadata()` utility
 - ✅ Added CollectionPage JSON-LD schema for SEO
@@ -20,6 +21,7 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 - ✅ Added structured data script tag to page component
 
 **Metadata Features**:
+
 - Page type: `collection`
 - URL: `/browse/featured`
 - Description: "Discover featured bobblehead collections, rare items, and top collectors in our community showcase"
@@ -30,6 +32,7 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 ### 2. Trending Page (`src/app/(app)/browse/trending/page.tsx`)
 
 **Enhancements**:
+
 - ✅ Added ISR configuration: `export const revalidate = 600` (10 minutes)
 - ✅ Implemented `generateMetadata()` function with full metadata support
 - ✅ Added CollectionPage JSON-LD schema
@@ -37,6 +40,7 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 - ✅ Added structured data script tag to page component
 
 **Metadata Features**:
+
 - Page type: `collection`
 - URL: `/browse/trending`
 - Description: "Explore the hottest bobblehead collections and trending items from our community. See what collectors are talking about right now."
@@ -47,6 +51,7 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 ### 3. Category Page (`src/app/(app)/browse/categories/[category]/page.tsx`)
 
 **Enhancements**:
+
 - ✅ Added ISR configuration: `export const revalidate = 900` (15 minutes)
 - ✅ Enhanced `generateMetadata()` to use `generatePageMetadata()` utility
 - ✅ Made metadata dynamic based on category parameter
@@ -55,6 +60,7 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 - ✅ Improved UI with proper capitalization of category display names
 
 **Metadata Features**:
+
 - Page type: `collection`
 - URL: `/browse/categories/{category}` (dynamic)
 - Description: "Browse bobblehead collections in the {Category} category. Discover {category} bobbleheads from collectors around the world."
@@ -66,10 +72,10 @@ Successfully implemented Incremental Static Regeneration (ISR) with comprehensiv
 
 Revalidation intervals were set based on content update patterns and traffic expectations:
 
-| Page | Revalidation | Reason |
-|------|-------------|---------|
-| Featured | 300s (5 min) | High traffic, frequently updated content |
-| Trending | 600s (10 min) | Medium traffic, moderately dynamic content |
+| Page       | Revalidation  | Reason                                          |
+| ---------- | ------------- | ----------------------------------------------- |
+| Featured   | 300s (5 min)  | High traffic, frequently updated content        |
+| Trending   | 600s (10 min) | Medium traffic, moderately dynamic content      |
 | Categories | 900s (15 min) | Lower traffic per category, more stable content |
 
 ## Technical Implementation Details
@@ -77,6 +83,7 @@ Revalidation intervals were set based on content update patterns and traffic exp
 ### Imports Added
 
 All pages now import:
+
 ```typescript
 import { Fragment } from 'react';
 import { generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
@@ -87,6 +94,7 @@ import { DEFAULT_SITE_METADATA } from '@/lib/seo/seo.constants';
 ### JSON-LD Schema Generation
 
 Each page generates a CollectionPage schema:
+
 ```typescript
 const collectionPageSchema = generateCollectionPageSchema({
   description: '...',
@@ -98,6 +106,7 @@ const collectionPageSchema = generateCollectionPageSchema({
 ### Metadata Generation Pattern
 
 Using the centralized metadata utility:
+
 ```typescript
 export function generateMetadata(): Metadata {
   return generatePageMetadata(
@@ -128,11 +137,13 @@ export function generateMetadata(): Metadata {
 ## Validation Results
 
 ### ESLint
+
 ```
 ✅ PASSED - No errors or warnings
 ```
 
 ### TypeScript
+
 ```
 ✅ PASSED - No type errors
 ```

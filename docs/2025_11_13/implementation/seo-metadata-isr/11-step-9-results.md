@@ -14,7 +14,7 @@
 
 ## Previous Step Context
 
-Step 8 established pattern: generateMetadata ’ fetch data ’ generate schemas ’ return Metadata
+Step 8 established pattern: generateMetadata ï¿½ fetch data ï¿½ generate schemas ï¿½ return Metadata
 
 ## Implementation Results
 

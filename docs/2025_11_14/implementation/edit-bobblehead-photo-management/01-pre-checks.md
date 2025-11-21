@@ -21,6 +21,7 @@
 **Quality Gates**: 11 checks
 
 ### Steps Overview:
+
 1. Enhance Photo Metadata Update Handling
 2. Improve Photo Transformation and State Management
 3. Enhance Photo Fetch with Loading States
@@ -41,9 +42,10 @@
 ✅ **Next-Safe-Action**: Package installed and configured
 ✅ **TanStack React Form**: v1.25.0 installed
 ✅ **Required Packages**:
-  - @tanstack/react-form@1.25.0
-  - next-cloudinary@6.17.4
-  - drizzle-orm@0.44.7
+
+- @tanstack/react-form@1.25.0
+- next-cloudinary@6.17.4
+- drizzle-orm@0.44.7
 
 ## Safety Checks
 

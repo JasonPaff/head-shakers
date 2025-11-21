@@ -10,7 +10,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
-import type { bobbleheadPhotos } from '@/lib/db/schema';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { CloudinaryPhoto } from '@/types/cloudinary.types';
 
@@ -83,8 +82,6 @@ interface BobbleheadForEdit {
   weight: null | number;
   year: null | number;
 }
-
-type BobbleheadPhoto = typeof bobbleheadPhotos.$inferSelect;
 
 // Custom ItemPhotos component for editing with bobblehead support
 interface ItemPhotosEditProps {

@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 - cloudinary.types.ts
 
@@ -108,6 +109,7 @@ None
    - Show error overlay with retry button
 
 **Memory Management**:
+
 - Blob URLs revoked in 3 places:
   1. handleSuccess (successful upload)
   2. handleRetryUpload (user retries)
@@ -115,12 +117,12 @@ None
 
 **Visual States**:
 
-| State | Border | Overlay | Controls |
-|-------|--------|---------|----------|
-| Uploading | Pulsing | Spinner + % | Disabled |
-| Processing | Normal | "Processing..." | Disabled |
-| Error | Normal | Error + Retry | Disabled |
-| Complete | Normal | None | Enabled |
+| State      | Border  | Overlay         | Controls |
+| ---------- | ------- | --------------- | -------- |
+| Uploading  | Pulsing | Spinner + %     | Disabled |
+| Processing | Normal  | "Processing..." | Disabled |
+| Error      | Normal  | Error + Retry   | Disabled |
+| Complete   | Normal  | None            | Enabled  |
 
 ## Notes for Next Steps
 

@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - cloudinary-photo-upload.tsx
 
 React files detected: Yes (invoked react-coding-conventions skill)
@@ -92,21 +93,25 @@ None
 4. **Tooltip**: Explanatory text on star button hover
 
 **Confirmation Flow**:
+
 1. User clicks star on non-primary photo
 2. Confirmation dialog shows: "This will replace your current cover photo..."
 3. User confirms or cancels
 4. On confirm: Animation plays, primary updates, toast shows
 
 **Animation**:
+
 - Duration: 500ms
 - Effect: Pulse animation
 - Trigger: Primary photo change
 - State: `animatingPrimaryPhotoId`
 
 **Auto-Primary Logic** (existing, verified):
+
 ```typescript
-isPrimary: currentPhotos.length === 0
+isPrimary: currentPhotos.length === 0;
 ```
+
 First photo automatically set as primary
 
 ## Notes for Next Steps

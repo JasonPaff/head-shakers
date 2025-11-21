@@ -16,6 +16,7 @@
 ## Subagent Input
 
 Files provided:
+
 - bobblehead-edit-dialog.tsx
 - cloudinary-photo-upload.tsx
 
@@ -109,6 +110,7 @@ None
    - Runs every 5 seconds during development
 
 **Cleanup Triggers**:
+
 - Dialog close via handleClose()
 - Component unmount via useEffect cleanup
 - Both paths ensure complete cleanup

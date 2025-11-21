@@ -22,16 +22,20 @@ import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleh
 import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { Route } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
 import { BobbleheadViewTracker } from '@/components/analytics/bobblehead-view-tracker';
+import { BobbleheadStickyHeader } from '@/components/feature/bobblehead/bobblehead-sticky-header';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
+import { StickyHeaderWrapper } from '@/components/feature/sticky-header/sticky-header-wrapper';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateProductSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 
 type ItemPageProps = PageProps;
 
@@ -105,6 +109,32 @@ async function ItemPage({ routeParams }: ItemPageProps) {
 
   const bobbleheadId = basicBobblehead.id;
 
+  // Fetch bobblehead with relations and like data for sticky header
+  const [bobblehead, likeData] = await Promise.all([
+    BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
+    SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId || undefined),
+  ]);
+
+  if (!bobblehead) {
+    notFound();
+  }
+
+  // Compute permission flags
+  const isOwner = await checkIsOwner(bobblehead.userId);
+  const canEdit = isOwner;
+  const canDelete = isOwner;
+
+  // Fetch user collections for edit dialog (only if owner)
+  let collections: Array<{ id: string; name: string }> = [];
+  if (isOwner && currentUserId) {
+    const userCollections =
+      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
+    collections = userCollections.map((collection) => ({
+      id: collection.id,
+      name: collection.name,
+    }));
+  }
+
   // Fetch SEO metadata for JSON-LD schemas
   const seoMetadata = await BobbleheadsFacade.getBobbleheadSeoMetadata(bobbleheadSlug);
 
@@ -153,80 +183,103 @@ async function ItemPage({ routeParams }: ItemPageProps) {
         />
       )}
 
-      <div>
-        {/* Header Section */}
-        <div className={'border-b border-border'}>
-          <ContentLayout>
-            <BobbleheadErrorBoundary section={'header'}>
-              <Suspense fallback={<BobbleheadHeaderSkeleton />}>
-                <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
-              </Suspense>
-            </BobbleheadErrorBoundary>
-          </ContentLayout>
-        </div>
+      <StickyHeaderWrapper>
+        {(isSticky) => (
+          <div>
+            {/* Sticky Header - shown when scrolling */}
+            {isSticky && (
+              <BobbleheadStickyHeader
+                bobblehead={bobblehead}
+                canDelete={canDelete}
+                canEdit={canEdit}
+                collectionName={bobblehead.collectionName || ''}
+                collections={collections}
+                collectionSlug={bobblehead.collectionSlug || ''}
+                isLiked={likeData?.isLiked ?? false}
+                isOwner={isOwner}
+                likeCount={likeData?.likeCount ?? 0}
+                subcollectionName={bobblehead.subcollectionName}
+                subcollectionSlug={bobblehead.subcollectionSlug}
+                thumbnailUrl={bobblehead.photos?.[0]?.url}
+                title={bobblehead.name}
+              />
+            )}
 
-        {/* Feature Card Section */}
-        <div className={'mt-4'}>
-          <ContentLayout>
-            <BobbleheadErrorBoundary section={'feature'}>
-              <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
-                <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} />
-              </Suspense>
-            </BobbleheadErrorBoundary>
-          </ContentLayout>
-        </div>
+            {/* Header Section */}
+            <div className={'border-b border-border'}>
+              <ContentLayout>
+                <BobbleheadErrorBoundary section={'header'}>
+                  <Suspense fallback={<BobbleheadHeaderSkeleton />}>
+                    <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
+                  </Suspense>
+                </BobbleheadErrorBoundary>
+              </ContentLayout>
+            </div>
 
-        {/* Photo Gallery Section */}
-        <ContentLayout>
-          <BobbleheadErrorBoundary section={'gallery'}>
-            <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
-              <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} />
-            </Suspense>
-          </BobbleheadErrorBoundary>
-        </ContentLayout>
+            {/* Feature Card Section */}
+            <div className={'mt-4'}>
+              <ContentLayout>
+                <BobbleheadErrorBoundary section={'feature'}>
+                  <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
+                    <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} />
+                  </Suspense>
+                </BobbleheadErrorBoundary>
+              </ContentLayout>
+            </div>
 
-        {/* Metrics Section */}
-        <AuthContent>
-          <div className={'mt-4'}>
+            {/* Photo Gallery Section */}
             <ContentLayout>
-              <BobbleheadErrorBoundary section={'metrics'}>
-                <Suspense fallback={<BobbleheadMetricsSkeleton />}>
-                  <BobbleheadMetricsAsync bobbleheadId={bobbleheadId} />
+              <BobbleheadErrorBoundary section={'gallery'}>
+                <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
+                  <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} />
                 </Suspense>
               </BobbleheadErrorBoundary>
             </ContentLayout>
+
+            {/* Metrics Section */}
+            <AuthContent>
+              <div className={'mt-4'}>
+                <ContentLayout>
+                  <BobbleheadErrorBoundary section={'metrics'}>
+                    <Suspense fallback={<BobbleheadMetricsSkeleton />}>
+                      <BobbleheadMetricsAsync bobbleheadId={bobbleheadId} />
+                    </Suspense>
+                  </BobbleheadErrorBoundary>
+                </ContentLayout>
+              </div>
+            </AuthContent>
+
+            {/* Primary Detail Cards Section */}
+            <ContentLayout>
+              <BobbleheadErrorBoundary section={'details'}>
+                <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
+                  <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} />
+                </Suspense>
+              </BobbleheadErrorBoundary>
+            </ContentLayout>
+
+            {/* Secondary Detail Cards Section */}
+            <ContentLayout>
+              <BobbleheadErrorBoundary section={'secondary'}>
+                <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
+                  <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} />
+                </Suspense>
+              </BobbleheadErrorBoundary>
+            </ContentLayout>
+
+            {/* Comments Section */}
+            <div className={'mt-8'}>
+              <ContentLayout>
+                <BobbleheadErrorBoundary section={'comments'}>
+                  <Suspense fallback={<CommentSectionSkeleton />}>
+                    <CommentSectionAsync targetId={bobbleheadId} targetType={'bobblehead'} />
+                  </Suspense>
+                </BobbleheadErrorBoundary>
+              </ContentLayout>
+            </div>
           </div>
-        </AuthContent>
-
-        {/* Primary Detail Cards Section */}
-        <ContentLayout>
-          <BobbleheadErrorBoundary section={'details'}>
-            <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
-              <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} />
-            </Suspense>
-          </BobbleheadErrorBoundary>
-        </ContentLayout>
-
-        {/* Secondary Detail Cards Section */}
-        <ContentLayout>
-          <BobbleheadErrorBoundary section={'secondary'}>
-            <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
-              <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} />
-            </Suspense>
-          </BobbleheadErrorBoundary>
-        </ContentLayout>
-
-        {/* Comments Section */}
-        <div className={'mt-8'}>
-          <ContentLayout>
-            <BobbleheadErrorBoundary section={'comments'}>
-              <Suspense fallback={<CommentSectionSkeleton />}>
-                <CommentSectionAsync targetId={bobbleheadId} targetType={'bobblehead'} />
-              </Suspense>
-            </BobbleheadErrorBoundary>
-          </ContentLayout>
-        </div>
-      </div>
+        )}
+      </StickyHeaderWrapper>
     </BobbleheadViewTracker>
   );
 }

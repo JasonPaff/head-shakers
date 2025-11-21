@@ -500,14 +500,14 @@
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll",
-"sql": "SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM sub_collections UNION ALL SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM collections UNION ALL SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM bobbleheads;"
+"sql": "SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM sub_collections UNION ALL SELECT COUNT(_) as total, COUNT(slug) as with*slug FROM collections UNION ALL SELECT COUNT(*) as total, COUNT(slug) as with*slug FROM bobbleheads;"
 }
 } - **Modified Params**: {
 "params": {
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-dark-forest-adf48tll",
-"sql": "SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM sub_collections UNION ALL SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM collections UNION ALL SELECT COUNT(_) as total, COUNT(slug) as with_slug FROM bobbleheads;"
+"sql": "SELECT COUNT(*) as total, COUNT(slug) as with*slug FROM sub_collections UNION ALL SELECT COUNT(*) as total, COUNT(slug) as with*slug FROM collections UNION ALL SELECT COUNT(*) as total, COUNT(slug) as with_slug FROM bobbleheads;"
 },
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
@@ -915,14 +915,14 @@
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-proud-poetry-adh3808p",
-"sql": "-- Check for any slug constraint violations in collections\nSELECT user_id, slug, COUNT(_) as count\nFROM collections\nGROUP BY user_id, slug\nHAVING COUNT(_) > 1;"
+"sql": "-- Check for any slug constraint violations in collections\nSELECT user*id, slug, COUNT(*) as count\nFROM collections\nGROUP BY user*id, slug\nHAVING COUNT(*) > 1;"
 }
 } - **Modified Params**: {
 "params": {
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-proud-poetry-adh3808p",
-"sql": "-- Check for any slug constraint violations in collections\nSELECT user_id, slug, COUNT(_) as count\nFROM collections\nGROUP BY user_id, slug\nHAVING COUNT(_) > 1;"
+"sql": "-- Check for any slug constraint violations in collections\nSELECT user*id, slug, COUNT(*) as count\nFROM collections\nGROUP BY user*id, slug\nHAVING COUNT(*) > 1;"
 },
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
@@ -938,14 +938,14 @@
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-proud-poetry-adh3808p",
-"sql": "-- Check for any slug constraint violations in sub_collections\nSELECT collection_id, slug, COUNT(_) as count\nFROM sub_collections\nGROUP BY collection_id, slug\nHAVING COUNT(_) > 1;"
+"sql": "-- Check for any slug constraint violations in sub*collections\nSELECT collection_id, slug, COUNT(*) as count\nFROM sub*collections\nGROUP BY collection_id, slug\nHAVING COUNT(*) > 1;"
 }
 } - **Modified Params**: {
 "params": {
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",
 "branchId": "br-proud-poetry-adh3808p",
-"sql": "-- Check for any slug constraint violations in sub_collections\nSELECT collection_id, slug, COUNT(_) as count\nFROM sub_collections\nGROUP BY collection_id, slug\nHAVING COUNT(_) > 1;"
+"sql": "-- Check for any slug constraint violations in sub*collections\nSELECT collection_id, slug, COUNT(*) as count\nFROM sub*collections\nGROUP BY collection_id, slug\nHAVING COUNT(*) > 1;"
 },
 "projectId": "misty-boat-49919732",
 "databaseName": "head-shakers",

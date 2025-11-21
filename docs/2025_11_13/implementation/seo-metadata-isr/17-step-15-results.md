@@ -12,6 +12,7 @@
 Root layout enhanced with comprehensive global metadata
 
 **Global Metadata Configuration**:
+
 - Title template: `%s | Head Shakers`
 - Default description from FALLBACK_METADATA
 - Robots: `index, follow`
@@ -24,6 +25,7 @@ Root layout enhanced with comprehensive global metadata
 - Theme color: #000000
 
 **Key Features**:
+
 - Uses constants from seo.constants.ts
 - Optional verification tags (only if env vars set)
 - Full TypeScript compliance

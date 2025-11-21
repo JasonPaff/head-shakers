@@ -10,6 +10,7 @@
 
 **src/lib/seo/metadata.utils.ts**
 Added Sentry instrumentation to `generatePageMetadata()`:
+
 - Main span: `seo.metadata.generate` - Tracks overall metadata generation
 - Nested spans:
   - `seo.metadata.opengraph` - Open Graph component generation
@@ -22,6 +23,7 @@ Added Sentry instrumentation to `generatePageMetadata()`:
 
 **src/app/sitemap.ts**
 Added Sentry instrumentation to `sitemap()`:
+
 - Main span: `seo.sitemap.generate` - Tracks overall sitemap generation
 - Nested spans for database queries:
   - `seo.sitemap.query.users`
@@ -52,6 +54,7 @@ Added Sentry instrumentation to `sitemap()`:
 - [✓] All validation commands pass
 
 **Key Features**:
+
 - Lightweight, non-blocking instrumentation
 - Hierarchical span structure for detailed performance analysis
 - Custom measurements for sitemap route counts
@@ -60,6 +63,7 @@ Added Sentry instrumentation to `sitemap()`:
 - Database query performance tracking
 
 **Sentry Dashboard Availability**:
+
 - Operations: `seo.metadata`, `seo.sitemap`, `db.query`
 - Span names: Various for detailed tracking
 - Measurements: Route counts for sitemap analysis

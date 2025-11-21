@@ -10,6 +10,7 @@
 
 **src/lib/actions/bobbleheads/bobbleheads.actions.ts**
 Added metadata cache invalidation to 5 actions:
+
 - `createBobbleheadWithPhotosAction` - Invalidate on create
 - `deleteBobbleheadAction` - Invalidate on delete
 - `updateBobbleheadWithPhotosAction` - Invalidate on update
@@ -18,21 +19,25 @@ Added metadata cache invalidation to 5 actions:
 
 **src/lib/actions/collections/collections.actions.ts**
 Added metadata cache invalidation to 3 actions:
+
 - `createCollectionAction` - Invalidate on create
 - `updateCollectionAction` - Invalidate on update
 - `deleteCollectionAction` - Invalidate on delete
 
 **src/lib/actions/collections/subcollections.actions.ts**
 Added metadata cache invalidation to 3 actions:
+
 - `createSubCollectionAction` - Invalidate on create
 - `deleteSubCollectionAction` - Invalidate on delete
 - `updateSubCollectionAction` - Invalidate on update
 
 **src/lib/actions/users/username.actions.ts**
 Added metadata cache invalidation to 1 action:
+
 - `updateUsernameAction` - Invalidate on username change (affects metadata display)
 
 **Implementation Pattern**:
+
 1. Import `invalidateMetadataCache` from `@/lib/seo/cache.utils`
 2. Call invalidation AFTER successful mutation
 3. Call invalidation BEFORE `CacheRevalidationService` calls
@@ -51,6 +56,7 @@ Added metadata cache invalidation to 1 action:
 - [✓] All validation commands pass
 
 **Key Features**:
+
 - Strategic placement ensures metadata freshness
 - Graceful error handling (from Step 16 implementation)
 - Consistent pattern across all actions

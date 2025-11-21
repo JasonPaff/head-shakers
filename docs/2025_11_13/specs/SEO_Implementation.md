@@ -73,17 +73,17 @@ The SEO implementation for Head Shakers provides comprehensive search engine opt
 
 ### Key Components and Responsibilities
 
-| Component | Responsibility |
-|-----------|---------------|
-| **metadata.utils.ts** | Core orchestration - generates complete metadata objects |
-| **opengraph.utils.ts** | Open Graph and Twitter Card metadata generation |
-| **jsonld.utils.ts** | Structured data (schema.org) generation |
-| **cache.utils.ts** | Metadata caching, invalidation, and warming |
-| **preview.utils.ts** | Preview mode for content editors |
-| **seo.constants.ts** | Configuration values, limits, defaults |
-| **sitemap.ts** | Dynamic sitemap generation |
-| **robots.ts** | Robots.txt configuration |
-| **/api/preview** | Preview mode API endpoint |
+| Component              | Responsibility                                           |
+| ---------------------- | -------------------------------------------------------- |
+| **metadata.utils.ts**  | Core orchestration - generates complete metadata objects |
+| **opengraph.utils.ts** | Open Graph and Twitter Card metadata generation          |
+| **jsonld.utils.ts**    | Structured data (schema.org) generation                  |
+| **cache.utils.ts**     | Metadata caching, invalidation, and warming              |
+| **preview.utils.ts**   | Preview mode for content editors                         |
+| **seo.constants.ts**   | Configuration values, limits, defaults                   |
+| **sitemap.ts**         | Dynamic sitemap generation                               |
+| **robots.ts**          | Robots.txt configuration                                 |
+| **/api/preview**       | Preview mode API endpoint                                |
 
 ### Technology Stack
 
@@ -140,6 +140,7 @@ The SEO implementation for Head Shakers provides comprehensive search engine opt
 ### Caching Strategy
 
 **Cache Keys Pattern:**
+
 ```
 seo:metadata:{contentType}:{contentId}
 
@@ -150,6 +151,7 @@ Examples:
 ```
 
 **Cache Tags Pattern:**
+
 ```
 Tags: ['seo', 'metadata', {contentType}, '{contentType}:{contentId}']
 
@@ -159,6 +161,7 @@ Examples:
 ```
 
 **TTL Values:**
+
 - **Metadata Cache**: 3600 seconds (1 hour) - `CACHE_CONFIG.TTL.LONG`
 - **Extended Cache**: 7200 seconds (2 hours) - `CACHE_CONFIG.TTL.EXTENDED` (for featured content)
 - **Short Cache**: 300 seconds (5 minutes) - `CACHE_CONFIG.TTL.SHORT` (for rapidly changing data)
@@ -174,6 +177,7 @@ Cache invalidation automatically occurs when:
 5. **Photos Reordered** → Invalidates parent content metadata
 
 **Implementation Example:**
+
 ```typescript
 // In bobbleheads.actions.ts
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
@@ -185,16 +189,19 @@ invalidateMetadataCache('bobblehead', bobbleheadId);
 ### ISR Configuration
 
 **Static Pages** (no database queries):
+
 - `/about`, `/terms`, `/privacy`
 - **Revalidation**: On-demand only
 - **Cache**: Served from CDN until manual revalidation
 
 **Dynamic Pages** (with database queries):
+
 - `/bobbleheads/[slug]`, `/collections/[slug]`, `/users/[username]`
 - **Revalidation**: 60 seconds (next.config.ts)
 - **Cache**: ISR with stale-while-revalidate
 
 **Sitemap**:
+
 - Generated on-demand with database queries
 - **Cache**: 60 seconds
 - **Fallback**: Static routes only if DB query fails
@@ -284,6 +291,7 @@ invalidateMetadataCache('bobblehead', bobbleheadId);
    - Returns object compatible with Next.js Metadata API
 
 **Character Limits:**
+
 - OG Title: 60 characters (truncated with ellipsis)
 - OG Description: 155 characters (truncated with ellipsis)
 - Twitter Title: 70 characters (truncated with ellipsis)
@@ -316,6 +324,7 @@ invalidateMetadataCache('bobblehead', bobbleheadId);
    - Used on homepage and about page
 
 **Usage Pattern:**
+
 ```typescript
 // Generate schema
 const productSchema = generateProductSchema({
@@ -361,6 +370,7 @@ const productSchema = generateProductSchema({
    - Useful for monitoring and optimization
 
 **Key Generators:**
+
 - `getBobbleheadMetadataKey(id)` → `seo:metadata:bobblehead:{id}`
 - `getCollectionMetadataKey(id)` → `seo:metadata:collection:{id}`
 - `getSubcollectionMetadataKey(id)` → `seo:metadata:subcollection:{id}`
@@ -440,17 +450,20 @@ Environment variables used for SEO configuration (from `src/lib/config/config.ts
 #### /api/preview
 
 **GET /api/preview?token={SECRET}&slug={PATH}**
+
 - Enables preview mode with token validation
 - Sets secure httpOnly cookie via draftMode()
 - Redirects to content at `slug` path
 - Returns 401 if token invalid
 
 **DELETE /api/preview**
+
 - Disables preview mode
 - Clears preview cookie
 - Optional redirect via `?redirect=/path` query param
 
 **Security Features:**
+
 - Timing-safe token comparison prevents timing attacks
 - httpOnly cookies prevent XSS attacks
 - Requires HTTPS in production
@@ -458,6 +471,7 @@ Environment variables used for SEO configuration (from `src/lib/config/config.ts
 #### sitemap.ts
 
 **GET /sitemap.xml**
+
 - Generates XML sitemap dynamically
 - Includes:
   - Static pages (homepage, about, terms, privacy, featured, trending)
@@ -472,6 +486,7 @@ Environment variables used for SEO configuration (from `src/lib/config/config.ts
 - Sentry monitoring for performance tracking
 
 **Change Frequencies:**
+
 - Homepage: daily (priority 1.0)
 - Featured/Trending: daily (priority 0.8)
 - User profiles: weekly (priority 0.6)
@@ -482,13 +497,14 @@ Environment variables used for SEO configuration (from `src/lib/config/config.ts
 #### robots.ts
 
 **GET /robots.txt**
+
 - Static configuration (no database queries)
 - Allows all public routes
 - Blocks:
-  - Authenticated routes (/dashboard/*, /settings/*, /admin/*)
-  - Edit routes (*/edit/*)
-  - Create routes (*/create/*)
-  - Internal APIs (/api/webhooks/*, /api/internal/*)
+  - Authenticated routes (/dashboard/_, /settings/_, /admin/\*)
+  - Edit routes (_/edit/_)
+  - Create routes (_/create/_)
+  - Internal APIs (/api/webhooks/_, /api/internal/_)
   - Auth routes (/sign-in, /sign-up, /sign-out)
 - Includes sitemap URL
 - Sets crawl-delay: 1 second
@@ -580,6 +596,7 @@ export default async function UserProfilePage({ params }) {
 ```
 
 **Generated Meta Tags:**
+
 ```html
 <title>John Collector | Head Shakers</title>
 <meta name="description" content="Bobblehead enthusiast since 2010" />
@@ -600,14 +617,14 @@ export default async function UserProfilePage({ params }) {
 
 <!-- JSON-LD -->
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "name": "John Collector",
-  "description": "Bobblehead enthusiast since 2010",
-  "image": "https://res.cloudinary.com/.../avatar.jpg",
-  "url": "https://headshakers.com/users/johncollector"
-}
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "John Collector",
+    "description": "Bobblehead enthusiast since 2010",
+    "image": "https://res.cloudinary.com/.../avatar.jpg",
+    "url": "https://headshakers.com/users/johncollector"
+  }
 </script>
 ```
 
@@ -734,7 +751,8 @@ export async function generateMetadata({ routeParams }): Promise<Metadata> {
   // Use collection cover image or fallback
   const coverImage = collection.coverImageUrl || FALLBACK_METADATA.imageUrl;
 
-  const description = collection.description ||
+  const description =
+    collection.description ||
     `${collection.name} by ${collection.owner.displayName} - ${collection.itemCount} bobbleheads`;
 
   return generatePageMetadata(
@@ -750,7 +768,7 @@ export async function generateMetadata({ routeParams }): Promise<Metadata> {
       shouldIncludeOpenGraph: true,
       shouldIncludeTwitterCard: true,
       shouldUseTitleTemplate: true,
-    }
+    },
   );
 }
 ```
@@ -826,6 +844,7 @@ export default function DashboardPage() {
 ```
 
 **Key Differences:**
+
 - No Open Graph or Twitter metadata (no social sharing for private pages)
 - `robots: 'noindex, nofollow'` prevents indexing
 - Not included in sitemap.xml
@@ -854,15 +873,16 @@ NEXT_PUBLIC_YANDEX_SITE_VERIFICATION=your-yandex-verification-code
 
 #### Environment Variable Details
 
-| Variable | Required | Purpose | Example |
-|----------|----------|---------|---------|
-| `NEXT_PUBLIC_SITE_URL` | **Yes** | Base URL for canonical links, sitemap, OG tags | `https://headshakers.com` |
-| `PREVIEW_SECRET` | **Yes** | Secret token for preview mode authentication | `crypto.randomBytes(32).toString('hex')` |
-| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | No | Google Search Console verification meta tag | `abc123...xyz789` |
-| `NEXT_PUBLIC_BING_SITE_VERIFICATION` | No | Bing Webmaster Tools verification meta tag | `def456...uvw012` |
-| `NEXT_PUBLIC_YANDEX_SITE_VERIFICATION` | No | Yandex Webmaster verification meta tag | `ghi789...rst345` |
+| Variable                               | Required | Purpose                                        | Example                                  |
+| -------------------------------------- | -------- | ---------------------------------------------- | ---------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`                 | **Yes**  | Base URL for canonical links, sitemap, OG tags | `https://headshakers.com`                |
+| `PREVIEW_SECRET`                       | **Yes**  | Secret token for preview mode authentication   | `crypto.randomBytes(32).toString('hex')` |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | No       | Google Search Console verification meta tag    | `abc123...xyz789`                        |
+| `NEXT_PUBLIC_BING_SITE_VERIFICATION`   | No       | Bing Webmaster Tools verification meta tag     | `def456...uvw012`                        |
+| `NEXT_PUBLIC_YANDEX_SITE_VERIFICATION` | No       | Yandex Webmaster verification meta tag         | `ghi789...rst345`                        |
 
 **Generating PREVIEW_SECRET:**
+
 ```bash
 # Using Node.js
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
@@ -941,16 +961,17 @@ export default nextConfig;
 
 Configure revalidation intervals based on content update frequency:
 
-| Content Type | Revalidation Interval | Rationale |
-|--------------|----------------------|-----------|
-| Static pages (about, terms) | On-demand only | Rarely changes |
-| Homepage | 60 seconds | Featured content rotates |
-| Bobblehead pages | 60 seconds | Metadata may change (likes, views) |
-| User profiles | 60 seconds | Bio, stats may update |
-| Collection pages | 60 seconds | Items may be added/removed |
-| Sitemap | 60 seconds | New content added regularly |
+| Content Type                | Revalidation Interval | Rationale                          |
+| --------------------------- | --------------------- | ---------------------------------- |
+| Static pages (about, terms) | On-demand only        | Rarely changes                     |
+| Homepage                    | 60 seconds            | Featured content rotates           |
+| Bobblehead pages            | 60 seconds            | Metadata may change (likes, views) |
+| User profiles               | 60 seconds            | Bio, stats may update              |
+| Collection pages            | 60 seconds            | Items may be added/removed         |
+| Sitemap                     | 60 seconds            | New content added regularly        |
 
 **Setting Revalidation:**
+
 ```typescript
 // In page.tsx
 export const revalidate = 60; // Revalidate every 60 seconds
@@ -965,6 +986,7 @@ export const revalidate = 60; // Revalidate every 60 seconds
 **Static pages** are pages that don't query the database for dynamic content (e.g., about, terms, privacy).
 
 **Step 1:** Define metadata object
+
 ```typescript
 // src/app/(public)/new-page/page.tsx
 import type { Metadata } from 'next';
@@ -1001,6 +1023,7 @@ export default function NewPage() {
 ```
 
 **Step 2:** Add to sitemap (if public)
+
 ```typescript
 // src/app/sitemap.ts
 const staticRoutes: MetadataRoute.Sitemap = [
@@ -1015,6 +1038,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
 ```
 
 **Step 3:** Verify robots.txt (if authenticated)
+
 ```typescript
 // src/app/robots.ts
 // If page requires authentication, add to disallow list:
@@ -1030,6 +1054,7 @@ disallow: [
 **Dynamic pages** query the database for content (e.g., bobbleheads, collections, users).
 
 **Step 1:** Create metadata generator function
+
 ```typescript
 // src/app/(app)/items/[itemId]/page.tsx
 import type { Metadata } from 'next';
@@ -1069,7 +1094,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
       shouldIncludeOpenGraph: true,
       shouldIncludeTwitterCard: true,
       shouldUseTitleTemplate: true,
-    }
+    },
   );
 }
 
@@ -1079,6 +1104,7 @@ export default async function ItemPage({ params }) {
 ```
 
 **Step 2:** Implement caching in facade
+
 ```typescript
 // src/lib/facades/items/items.facade.ts
 import { cacheMetadata, getItemMetadataKey } from '@/lib/seo/cache.utils';
@@ -1099,12 +1125,13 @@ export async function getItemSeoMetadata(itemId: string) {
       return item;
     },
     CACHE_CONFIG.TTL.LONG,
-    tags
+    tags,
   );
 }
 ```
 
 **Step 3:** Add cache invalidation to actions
+
 ```typescript
 // src/lib/actions/items/items.actions.ts
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
@@ -1120,6 +1147,7 @@ export async function updateItem(data: UpdateItemData) {
 ```
 
 **Step 4:** Add to sitemap (if public)
+
 ```typescript
 // src/app/sitemap.ts
 // Query all public items
@@ -1142,6 +1170,7 @@ const itemRoutes: MetadataRoute.Sitemap = publicItems.map((item) => ({
 ```
 
 **Step 5:** Add JSON-LD schemas (optional but recommended)
+
 ```typescript
 // In page component
 import { generateProductSchema } from '@/lib/seo/jsonld.utils';
@@ -1171,12 +1200,13 @@ export default async function ItemPage({ params }) {
 ### Common Patterns and Best Practices
 
 **Pattern 1: Fallback Descriptions**
+
 ```typescript
-const description = item.description ||
-  `${item.name} by ${item.owner.displayName} on Head Shakers`;
+const description = item.description || `${item.name} by ${item.owner.displayName} on Head Shakers`;
 ```
 
 **Pattern 2: Image Optimization**
+
 ```typescript
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
 
@@ -1188,6 +1218,7 @@ if (item.imageUrl) {
 ```
 
 **Pattern 3: Conditional Metadata**
+
 ```typescript
 return generatePageMetadata(
   'bobblehead',
@@ -1205,17 +1236,18 @@ return generatePageMetadata(
     // Private items should not be indexed
     isPublic: item.isPublic,
     isIndexable: item.isPublic,
-  }
+  },
 );
 ```
 
 **Pattern 4: Type-Safe URLs**
+
 ```typescript
 import { $path } from 'next-typesafe-url';
 
 const canonicalUrl = `${DEFAULT_SITE_METADATA.url}${$path({
   route: '/items/[itemId]',
-  routeParams: { itemId }
+  routeParams: { itemId },
 })}`;
 ```
 
@@ -1291,6 +1323,7 @@ CacheService.invalidateByTag('seo');
 ### Cache Warming Strategy
 
 **When to Warm Cache:**
+
 1. After deployments (fresh cache)
 2. After bulk data imports
 3. Before high-traffic events
@@ -1308,10 +1341,8 @@ async function warmFeaturedContent() {
   const featuredIds = await getFeaturedBobbleheadIds();
 
   // Warm metadata cache
-  await warmMetadataCache(
-    'bobblehead',
-    featuredIds,
-    async (id) => BobbleheadsFacade.getBobbleheadSeoMetadata(id)
+  await warmMetadataCache('bobblehead', featuredIds, async (id) =>
+    BobbleheadsFacade.getBobbleheadSeoMetadata(id),
   );
 
   console.log(`Warmed cache for ${featuredIds.length} featured bobbleheads`);
@@ -1328,13 +1359,13 @@ import { batchCacheMetadata } from '@/lib/seo/cache.utils';
 
 // Warm cache for multiple items
 async function warmCollectionMetadata(collectionIds: string[]) {
-  const collections = collectionIds.map(id => ({ id }));
+  const collections = collectionIds.map((id) => ({ id }));
 
   await batchCacheMetadata(
     'collection',
     collections,
     async (item) => CollectionsFacade.getCollectionSeoMetadata(item.id),
-    CACHE_CONFIG.TTL.EXTENDED // 2 hours for featured content
+    CACHE_CONFIG.TTL.EXTENDED, // 2 hours for featured content
   );
 }
 ```
@@ -1357,6 +1388,7 @@ console.log(`Errors: ${stats.errors}`);
 ```
 
 **Expected Hit Rates:**
+
 - **Development**: 40-60% (frequent restarts)
 - **Production**: 80-95% (stable cache)
 - **After Deployment**: 0-20% (cache warming phase)
@@ -1364,6 +1396,7 @@ console.log(`Errors: ${stats.errors}`);
 **Monitoring with Sentry:**
 
 All metadata generation operations are automatically tracked in Sentry:
+
 - Operation duration
 - Cache hit/miss rates
 - Error rates
@@ -1371,12 +1404,12 @@ All metadata generation operations are automatically tracked in Sentry:
 
 ### TTL Values and Rationale
 
-| Cache Type | TTL | Rationale |
-|------------|-----|-----------|
+| Cache Type          | TTL        | Rationale                          |
+| ------------------- | ---------- | ---------------------------------- |
 | Metadata (standard) | 3600s (1h) | Balances freshness and performance |
-| Featured content | 7200s (2h) | Changes infrequently, high traffic |
-| User stats | 300s (5m) | Updates frequently (likes, views) |
-| Static content | Indefinite | Revalidated on-demand only |
+| Featured content    | 7200s (2h) | Changes infrequently, high traffic |
+| User stats          | 300s (5m)  | Updates frequently (likes, views)  |
+| Static content      | Indefinite | Revalidated on-demand only         |
 
 **Adjusting TTL:**
 
@@ -1389,7 +1422,7 @@ await cacheMetadata(
   key,
   generator,
   CACHE_CONFIG.TTL.SHORT, // 5 minutes
-  tags
+  tags,
 );
 
 // Use longer TTL for stable content
@@ -1397,7 +1430,7 @@ await cacheMetadata(
   key,
   generator,
   CACHE_CONFIG.TTL.EXTENDED, // 2 hours
-  tags
+  tags,
 );
 ```
 
@@ -1408,6 +1441,7 @@ await cacheMetadata(
 ### Running Tests
 
 **Unit Tests:**
+
 ```bash
 # Run all SEO tests
 npm test -- src/lib/seo
@@ -1420,6 +1454,7 @@ npm test -- --coverage src/lib/seo
 ```
 
 **Integration Tests:**
+
 ```bash
 # Test metadata generation end-to-end
 npm test -- tests/integration/seo
@@ -1451,7 +1486,7 @@ describe('generatePageMetadata', () => {
         isPublic: true,
         shouldIncludeOpenGraph: true,
         shouldIncludeTwitterCard: true,
-      }
+      },
     );
 
     expect(metadata.title).toBe('Test Bobblehead | Head Shakers');
@@ -1472,7 +1507,7 @@ describe('generatePageMetadata', () => {
       },
       {
         isPublic: false,
-      }
+      },
     );
 
     expect(metadata.robots).toBe('noindex, nofollow');
@@ -1483,6 +1518,7 @@ describe('generatePageMetadata', () => {
 ### Validating with External Tools
 
 **Facebook Sharing Debugger:**
+
 1. Visit: https://developers.facebook.com/tools/debug/
 2. Enter URL: `https://headshakers.com/bobbleheads/test-slug`
 3. Click "Scrape Again" to refresh cache
@@ -1493,6 +1529,7 @@ describe('generatePageMetadata', () => {
    - OG type is correct
 
 **Twitter Card Validator:**
+
 1. Visit: https://cards-dev.twitter.com/validator
 2. Enter URL: `https://headshakers.com/bobbleheads/test-slug`
 3. Click "Preview Card"
@@ -1503,6 +1540,7 @@ describe('generatePageMetadata', () => {
    - Image loads
 
 **Google Rich Results Test:**
+
 1. Visit: https://search.google.com/test/rich-results
 2. Enter URL or paste HTML
 3. Verify:
@@ -1512,6 +1550,7 @@ describe('generatePageMetadata', () => {
    - No errors or warnings
 
 **LinkedIn Post Inspector:**
+
 1. Visit: https://www.linkedin.com/post-inspector/
 2. Enter URL
 3. Verify Open Graph tags display correctly
@@ -1570,11 +1609,13 @@ curl "http://localhost:3000/api/preview?token=invalid&slug=/bobbleheads/test"
 #### Issue 1: Metadata Not Updating
 
 **Symptoms:**
+
 - Old metadata appears after content update
 - Facebook/Twitter shows stale information
 - Changes not visible in source HTML
 
 **Possible Causes:**
+
 1. Cache not invalidated
 2. ISR not revalidating
 3. CDN cache stale
@@ -1601,6 +1642,7 @@ invalidateMetadataCache('bobblehead', bobbleheadId);
 ```
 
 **Prevention:**
+
 ```typescript
 // Always invalidate cache in server actions
 export async function updateBobblehead(data: UpdateBobbleheadData) {
@@ -1616,11 +1658,13 @@ export async function updateBobblehead(data: UpdateBobbleheadData) {
 #### Issue 2: Images Not Showing in Social Previews
 
 **Symptoms:**
+
 - Image URL is correct but doesn't display
 - Social platforms show fallback/no image
 - Image works in browser but not in preview
 
 **Possible Causes:**
+
 1. Image too large (>8MB for Facebook)
 2. Incorrect dimensions
 3. CORS issues
@@ -1661,6 +1705,7 @@ const metadata = {
 ```
 
 **Debug Checklist:**
+
 - [ ] Image URL returns 200 (not 404)
 - [ ] Image is HTTPS (not HTTP)
 - [ ] Image size < 8MB
@@ -1672,11 +1717,13 @@ const metadata = {
 #### Issue 3: Sitemap Not Generating
 
 **Symptoms:**
+
 - `/sitemap.xml` returns 404 or error
 - Sitemap is empty
 - Database query fails
 
 **Possible Causes:**
+
 1. Database connection failure
 2. Query error
 3. Invalid data
@@ -1701,6 +1748,7 @@ console.log('Site URL:', process.env.NEXT_PUBLIC_SITE_URL);
 ```
 
 **Fallback Sitemap:**
+
 ```typescript
 // src/app/sitemap.ts already includes fallback
 try {
@@ -1715,11 +1763,13 @@ try {
 #### Issue 4: Preview Mode Not Working
 
 **Symptoms:**
+
 - Preview URL returns 401
 - Preview mode doesn't enable
 - Draft content not visible
 
 **Possible Causes:**
+
 1. PREVIEW_SECRET not set or incorrect
 2. Token mismatch
 3. Cookie not set
@@ -1739,6 +1789,7 @@ node -e "console.log('http://localhost:3000/api/preview?token=' + process.env.PR
 ```
 
 **Debug in Page:**
+
 ```typescript
 import { isPreviewMode } from '@/lib/seo/preview.utils';
 
@@ -1753,12 +1804,14 @@ export default async function Page() {
 #### Issue 5: Cache Issues
 
 **Symptoms:**
+
 - Cache hit rate very low
 - High database load
 - Slow metadata generation
 - Cache errors in logs
 
 **Possible Causes:**
+
 1. Redis connection failure
 2. Cache keys not consistent
 3. Cache eviction due to memory limits
@@ -1784,6 +1837,7 @@ console.log('Cache key:', getBobbleheadMetadataKey('bobblehead_123'));
 ```
 
 **Expected Hit Rates:**
+
 - Development: 40-60%
 - Production (steady state): 80-95%
 - Production (after deployment): 0-20% initially, rising to 80%+
@@ -1791,6 +1845,7 @@ console.log('Cache key:', getBobbleheadMetadataKey('bobblehead_123'));
 #### Issue 6: Type Errors
 
 **Symptoms:**
+
 - TypeScript compilation errors
 - Type mismatch in metadata objects
 - Missing required properties
@@ -1889,11 +1944,12 @@ Sentry.startSpan(
   },
   () => {
     // Metadata generation
-  }
+  },
 );
 ```
 
 **View in Sentry:**
+
 1. Go to Performance → Transactions
 2. Filter by: `op:seo.metadata`
 3. Check:
@@ -1921,17 +1977,18 @@ if (process.env.NODE_ENV === 'development') {
 
 ### Metadata Generation Performance Targets
 
-| Metric | Target | Critical Threshold |
-|--------|--------|--------------------|
-| **Cold Generation** (cache miss) | < 100ms | > 500ms |
-| **Warm Generation** (cache hit) | < 10ms | > 50ms |
-| **Sitemap Generation** | < 3000ms | > 10000ms |
-| **Cache Hit Rate** | > 85% | < 60% |
-| **Database Query Time** | < 50ms | > 200ms |
+| Metric                           | Target   | Critical Threshold |
+| -------------------------------- | -------- | ------------------ |
+| **Cold Generation** (cache miss) | < 100ms  | > 500ms            |
+| **Warm Generation** (cache hit)  | < 10ms   | > 50ms             |
+| **Sitemap Generation**           | < 3000ms | > 10000ms          |
+| **Cache Hit Rate**               | > 85%    | < 60%              |
+| **Database Query Time**          | < 50ms   | > 200ms            |
 
 ### Caching Best Practices
 
 **1. Use Appropriate TTL:**
+
 ```typescript
 // Frequently changing content → Shorter TTL
 await cacheMetadata(key, generator, CACHE_CONFIG.TTL.SHORT, tags); // 5 min
@@ -1944,6 +2001,7 @@ await cacheMetadata(key, generator, CACHE_CONFIG.TTL.EXTENDED, tags); // 2 hours
 ```
 
 **2. Warm Cache Proactively:**
+
 ```typescript
 // After deployment
 async function postDeploymentWarmup() {
@@ -1956,6 +2014,7 @@ async function postDeploymentWarmup() {
 ```
 
 **3. Invalidate Precisely:**
+
 ```typescript
 // ✅ GOOD: Invalidate only affected content
 invalidateMetadataCache('bobblehead', bobbleheadId);
@@ -1965,6 +2024,7 @@ CacheService.invalidateByTag('seo');
 ```
 
 **4. Monitor Hit Rates:**
+
 ```typescript
 // Regular monitoring
 setInterval(() => {
@@ -1979,24 +2039,28 @@ setInterval(() => {
 ### ISR Configuration Guidelines
 
 **Static Pages:**
+
 ```typescript
 // No revalidation needed (update on deployment only)
 export const revalidate = false;
 ```
 
 **Frequently Updated:**
+
 ```typescript
 // Revalidate every minute
 export const revalidate = 60;
 ```
 
 **Moderate Updates:**
+
 ```typescript
 // Revalidate every 5 minutes
 export const revalidate = 300;
 ```
 
 **Rarely Updated:**
+
 ```typescript
 // Revalidate every hour
 export const revalidate = 3600;
@@ -2005,6 +2069,7 @@ export const revalidate = 3600;
 ### Database Query Optimization
 
 **1. Select Only Needed Columns:**
+
 ```typescript
 // ✅ GOOD: Select only metadata fields
 const bobblehead = await db
@@ -2027,6 +2092,7 @@ const bobblehead = await db.query.bobbleheads.findFirst({
 ```
 
 **2. Use Indexes:**
+
 ```sql
 -- Ensure indexes exist for metadata queries
 CREATE INDEX idx_bobbleheads_slug ON bobbleheads(slug);
@@ -2035,6 +2101,7 @@ CREATE INDEX idx_users_username ON users(username);
 ```
 
 **3. Avoid N+1 Queries:**
+
 ```typescript
 // ✅ GOOD: Join in single query
 const bobblehead = await db
@@ -2087,6 +2154,7 @@ Sentry.setMeasurement('metadata.cache.hit_rate', hitRate, 'percent');
 **Performance Alerts in Sentry:**
 
 Configure alerts for:
+
 - Metadata generation > 200ms (P95)
 - Sitemap generation > 5s
 - Cache hit rate < 60%
@@ -2099,12 +2167,14 @@ Configure alerts for:
 ### Regular Maintenance Tasks
 
 **Weekly:**
+
 - [ ] Review cache hit rates in monitoring
 - [ ] Check Sentry for SEO-related errors
 - [ ] Validate sitemap generates successfully
 - [ ] Test metadata on 5 random pages with external validators
 
 **Monthly:**
+
 - [ ] Update verification tokens if rotated
 - [ ] Review and update FALLBACK_METADATA if needed
 - [ ] Check for new schema.org types relevant to platform
@@ -2112,6 +2182,7 @@ Configure alerts for:
 - [ ] Review robots.txt for new routes to block/allow
 
 **Quarterly:**
+
 - [ ] Analyze metadata performance trends
 - [ ] Update CHARACTER_LIMITS based on platform changes
 - [ ] Review and optimize cache TTL values
@@ -2119,6 +2190,7 @@ Configure alerts for:
 - [ ] Update documentation for new features
 
 **After Major Releases:**
+
 - [ ] Warm cache for new featured content
 - [ ] Verify all new page types have proper metadata
 - [ ] Test preview mode if authentication changed
@@ -2157,6 +2229,7 @@ export const DEFAULT_SITE_METADATA = {
 
 1. Add new default image to `/public/images/`
 2. Update constants:
+
 ```typescript
 export const FALLBACK_METADATA = {
   imageUrl: `${DEFAULT_SITE_METADATA.url}/images/og-new-default.jpg`, // ✏️ Update
@@ -2179,17 +2252,14 @@ export const DEFAULT_SITE_METADATA = {
 ### Adding New Content Types
 
 **Step 1: Add to MetadataContentType**
+
 ```typescript
 // src/lib/seo/cache.utils.ts
-export type MetadataContentType =
-  | 'bobblehead'
-  | 'collection'
-  | 'subcollection'
-  | 'user'
-  | 'article'; // ✏️ Add new type
+export type MetadataContentType = 'bobblehead' | 'collection' | 'subcollection' | 'user' | 'article'; // ✏️ Add new type
 ```
 
 **Step 2: Create Cache Key Generator**
+
 ```typescript
 // src/lib/seo/cache.utils.ts
 export function getArticleMetadataKey(articleId: string): string {
@@ -2198,6 +2268,7 @@ export function getArticleMetadataKey(articleId: string): string {
 ```
 
 **Step 3: Update batchCacheMetadata and warmMetadataCache**
+
 ```typescript
 // Add case for new content type
 case 'article':
@@ -2207,6 +2278,7 @@ case 'article':
 ```
 
 **Step 4: Update invalidateMetadataCache**
+
 ```typescript
 case 'article':
   CacheService.invalidateByTag(CACHE_CONFIG.TAGS.ARTICLE(contentId));
@@ -2214,6 +2286,7 @@ case 'article':
 ```
 
 **Step 5: Add Cache Tags**
+
 ```typescript
 // src/lib/utils/cache-tags.utils.ts
 export const CacheTagGenerators = {
@@ -2226,6 +2299,7 @@ export const CacheTagGenerators = {
 ```
 
 **Step 6: Add to Constants (if needed)**
+
 ```typescript
 // src/lib/constants/cache.ts
 export const CACHE_CONFIG = {
@@ -2237,6 +2311,7 @@ export const CACHE_CONFIG = {
 ```
 
 **Step 7: Implement Facade Method**
+
 ```typescript
 // src/lib/facades/articles/articles.facade.ts
 export async function getArticleSeoMetadata(articleId: string) {
@@ -2259,12 +2334,13 @@ export async function getArticleSeoMetadata(articleId: string) {
       return article;
     },
     CACHE_CONFIG.TTL.LONG,
-    tags
+    tags,
   );
 }
 ```
 
 **Step 8: Add Invalidation to Actions**
+
 ```typescript
 // src/lib/actions/articles/articles.actions.ts
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
@@ -2331,6 +2407,7 @@ async function cleanupStaleMetadataCache() {
 **Dashboard Metrics:**
 
 Track these metrics in your monitoring dashboard:
+
 - Metadata generation duration (P50, P95, P99)
 - Cache hit rate by content type
 - Sitemap generation time
@@ -2346,6 +2423,7 @@ Track these metrics in your monitoring dashboard:
 **Token Management:**
 
 1. **Generate Strong Tokens:**
+
 ```bash
 # Use cryptographically secure random generation
 openssl rand -hex 32
@@ -2355,6 +2433,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 2. **Store Securely:**
+
 ```bash
 # ✅ GOOD: Environment variable (never commit)
 PREVIEW_SECRET=abc123...xyz789
@@ -2364,11 +2443,13 @@ const PREVIEW_SECRET = 'abc123'; // Never do this!
 ```
 
 3. **Rotate Regularly:**
+
 - Rotate preview tokens quarterly or after suspected compromise
 - Update environment variables in all environments
 - Test preview mode after rotation
 
 4. **Timing-Safe Comparison:**
+
 ```typescript
 // Already implemented in validatePreviewToken()
 // Uses crypto.timingSafeEqual() to prevent timing attacks
@@ -2404,10 +2485,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 
 ```typescript
 // src/app/sitemap.ts
-const publicCollections = await db
-  .select()
-  .from(collections)
-  .where(eq(collections.isPublic, true)); // ✅ Only public content
+const publicCollections = await db.select().from(collections).where(eq(collections.isPublic, true)); // ✅ Only public content
 ```
 
 **Block in robots.txt:**
@@ -2433,6 +2511,7 @@ export default function robots(): MetadataRoute.Robots {
 ### robots.txt and noindex Usage
 
 **When to Use `noindex`:**
+
 - Private user content
 - Authenticated-only pages
 - Draft/preview content
@@ -2441,6 +2520,7 @@ export default function robots(): MetadataRoute.Robots {
 - Search results pages
 
 **When to Use `nofollow`:**
+
 - Login/logout pages
 - User-generated links (comments)
 - Untrusted content
@@ -2448,13 +2528,13 @@ export default function robots(): MetadataRoute.Robots {
 
 **Configuration Matrix:**
 
-| Page Type | index | follow | Use Case |
-|-----------|-------|--------|----------|
-| Public content | ✅ | ✅ | Normal pages |
-| Private content | ❌ | ❌ | User dashboard |
-| Search results | ❌ | ✅ | Let bots crawl links but don't index page |
-| Login page | ❌ | ❌ | No value to index |
-| Public duplicate | ✅ | ✅ | Use canonical tag instead |
+| Page Type        | index | follow | Use Case                                  |
+| ---------------- | ----- | ------ | ----------------------------------------- |
+| Public content   | ✅    | ✅     | Normal pages                              |
+| Private content  | ❌    | ❌     | User dashboard                            |
+| Search results   | ❌    | ✅     | Let bots crawl links but don't index page |
+| Login page       | ❌    | ❌     | No value to index                         |
+| Public duplicate | ✅    | ✅     | Use canonical tag instead                 |
 
 ### HTTPS Requirements
 
@@ -2473,6 +2553,7 @@ if (process.env.NODE_ENV === 'production') {
 **Preview Mode Cookie Security:**
 
 Next.js draftMode() automatically sets:
+
 - `httpOnly: true` - Prevents XSS attacks
 - `secure: true` - HTTPS only (in production)
 - `sameSite: 'lax'` - CSRF protection
@@ -2537,10 +2618,7 @@ export async function GET(request: Request) {
   });
 
   if (!rateLimitResult.success) {
-    return NextResponse.json(
-      { error: 'Too many requests' },
-      { status: 429 }
-    );
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
 
   // ... rest of preview logic
@@ -2561,6 +2639,7 @@ This SEO implementation provides a comprehensive, performant, and maintainable s
 - **Maintain** the system with minimal effort
 
 For questions or issues not covered in this guide, consult:
+
 - [Next.js Metadata API Documentation](https://nextjs.org/docs/app/api-reference/functions/generate-metadata)
 - [Schema.org Documentation](https://schema.org/)
 - [Open Graph Protocol](https://ogp.me/)

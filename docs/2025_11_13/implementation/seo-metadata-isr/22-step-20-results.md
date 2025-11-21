@@ -10,6 +10,7 @@
 
 **tests/lib/seo/metadata.utils.test.ts**
 Comprehensive metadata generation tests (43 test cases):
+
 - `generateAlternates()` - 6 tests for alternate language links
 - `generateRobotsMetadata()` - 6 tests for robots directives
 - `generateTitle()` - 5 tests for title template application
@@ -21,6 +22,7 @@ Comprehensive metadata generation tests (43 test cases):
 
 **tests/lib/seo/opengraph.utils.test.ts**
 Complete OpenGraph and Twitter Card tests (42 test cases):
+
 - `generateBaseMetadata()` - 8 tests for shared metadata
 - `generateOpenGraphMetadata()` - 17 tests including:
   - Character limit enforcement (60 chars title, 155 chars description)
@@ -35,6 +37,7 @@ Complete OpenGraph and Twitter Card tests (42 test cases):
 
 **tests/lib/seo/jsonld.utils.test.ts**
 Full JSON-LD schema tests (36 test cases):
+
 - `generateBreadcrumbSchema()` - 6 tests for navigation breadcrumbs
 - `generateCollectionPageSchema()` - 8 tests for collection markup
 - `generateOrganizationSchema()` - 6 tests for site-wide organization
@@ -45,6 +48,7 @@ Full JSON-LD schema tests (36 test cases):
 
 **tests/lib/utils/cloudinary.utils.test.ts**
 Extensive Cloudinary image tests (43 test cases):
+
 - `extractFormatFromCloudinaryUrl()` - 5 tests for format extraction
 - `extractPublicIdFromCloudinaryUrl()` - 8 tests for public ID parsing
 - `generateOpenGraphImageUrl()` - 10 tests:
@@ -63,12 +67,14 @@ Extensive Cloudinary image tests (43 test cases):
 ## Test Coverage Summary
 
 **Total Test Cases**: 164
+
 - Metadata utils: 43 tests
 - OpenGraph utils: 42 tests
 - JSON-LD utils: 36 tests
 - Cloudinary utils: 43 tests
 
 **Coverage Areas**:
+
 - ✅ All metadata generation paths tested
 - ✅ Edge cases covered (null, undefined, empty strings)
 - ✅ Character limits verified and tested
@@ -92,6 +98,7 @@ Extensive Cloudinary image tests (43 test cases):
 - [✓] All validation commands pass
 
 **Key Features**:
+
 - Comprehensive test coverage across all SEO utilities
 - Proper mocking of dependencies (Sentry, CacheService)
 - Follows project's Vitest patterns

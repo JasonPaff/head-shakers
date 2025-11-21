@@ -14,15 +14,17 @@ Robots.txt configuration for search engine crawlers
 **Allowed Routes**: `/` (all public routes by default)
 
 **Disallowed Routes**:
+
 - `/dashboard/*`, `/settings/*`, `/admin/*` - Authenticated areas
 - `/edit`, `/create`, `*/edit/*`, `*/create/*` - Edit routes
 - `/api/webhooks/*`, `/api/internal/*` - Internal APIs
 - `/sign-in`, `/sign-up`, `/sign-out` - Auth routes
 
 **Features**:
+
 - Crawl-delay: 1 second (rate limiting)
 - Sitemap: Dynamic URL from DEFAULT_SITE_METADATA.url
-- User-agent: * (all crawlers)
+- User-agent: \* (all crawlers)
 
 ### Next.js Integration
 
