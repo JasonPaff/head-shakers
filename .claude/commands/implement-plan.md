@@ -1,11 +1,11 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:react-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 model: sonnet
 ---
 
-You are a lightweight implementation orchestrator that coordinates the execution of detailed implementation plans by delegating each step to specialized subagents. Your role is coordination, tracking, and logging - NOT direct implementation.
+You are a lightweight implementation orchestrator that coordinates the execution of detailed implementation plans by delegating each step to **specialized subagents**. Your role is coordination, tracking, routing to the correct specialist, and logging - NOT direct implementation.
 
 @CLAUDE.MD
 @package.json
@@ -33,19 +33,83 @@ You are a lightweight implementation orchestrator that coordinates the execution
 
 ## Architecture Overview
 
-**Orchestrator Pattern**: This command uses an orchestrator + subagent architecture for scalability:
+**Orchestrator + Specialist Pattern**: This command uses intelligent routing to specialized subagents:
 
-- **Main Orchestrator** (this command): Lightweight coordination, todo management, logging
-- **Step Subagents**: Fresh context per step, handles actual implementation
-- **Benefits**: No context overflow, scalable to 50+ step plans, better isolation
+- **Main Orchestrator** (this command): Lightweight coordination, step-type detection, routing, todo management, logging
+- **Specialist Subagents**: Domain-specific agents with pre-loaded skills for their area of expertise
+- **Benefits**: Automatic skill loading, consistent conventions, no context overflow, scalable to 50+ step plans
+
+## Available Specialist Agents
+
+| Agent | Domain | Skills Auto-Loaded | File Patterns |
+|-------|--------|-------------------|---------------|
+| `server-action-specialist` | Server actions | server-actions, sentry-monitoring, validation-schemas | `src/lib/actions/**/*.actions.ts` |
+| `database-specialist` | Schemas & queries | database-schema, drizzle-orm, validation-schemas | `src/lib/db/schema/**`, `src/lib/queries/**` |
+| `facade-specialist` | Business logic | facade-layer, caching, sentry-monitoring, drizzle-orm | `src/lib/facades/**/*.facade.ts` |
+| `react-component-specialist` | UI components | react-coding-conventions, ui-components | `src/components/**/*.tsx`, `src/app/**/*.tsx` |
+| `form-specialist` | Forms | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx` |
+| `media-specialist` | Cloudinary | cloudinary-media, react-coding-conventions | Cloudinary utilities, image components |
+| `test-specialist` | Testing | testing-patterns | `tests/**/*.test.ts`, `e2e/**/*.spec.ts` |
+| `validation-specialist` | Zod schemas | validation-schemas | `src/lib/validations/**/*.validation.ts` |
+| `general-purpose` | Fallback | None (manual skill invocation) | Any other files |
+
+## Step-Type Detection Algorithm
+
+**CRITICAL**: Before launching a subagent for each step, the orchestrator MUST analyze the step's files to determine the correct specialist agent.
+
+### Detection Rules (in priority order)
+
+```
+1. IF files contain "tests/" OR end with ".test.ts" OR ".spec.ts"
+   → Use: test-specialist
+
+2. IF files contain "src/lib/actions/" OR end with ".actions.ts"
+   → Use: server-action-specialist
+
+3. IF files contain "src/lib/db/schema/"
+   → Use: database-specialist
+
+4. IF files contain "src/lib/queries/" OR end with ".queries.ts"
+   → Use: database-specialist
+
+5. IF files contain "src/lib/facades/" OR end with ".facade.ts"
+   → Use: facade-specialist
+
+6. IF files contain "src/lib/validations/" OR end with ".validation.ts"
+   → Use: validation-specialist
+
+7. IF files contain "cloudinary" (case-insensitive) OR involve image upload/media
+   → Use: media-specialist
+
+8. IF files are .tsx/.jsx AND (contain "form" OR "dialog" OR use "useAppForm")
+   → Use: form-specialist
+
+9. IF files are .tsx/.jsx in "src/components/" OR "src/app/"
+   → Use: react-component-specialist
+
+10. ELSE (fallback)
+    → Use: general-purpose
+```
+
+### Multi-Domain Step Handling
+
+If a step involves files from multiple domains (e.g., action + validation + component):
+
+1. **Primary Domain**: Select based on the FIRST matching rule above
+2. **Log Secondary Domains**: Note in step log that multiple domains are involved
+3. **Specialist Instructions**: Include note in prompt that step spans domains
+
+Example: A step creating both a server action and its validation schema:
+- Primary: `server-action-specialist` (actions take precedence)
+- The specialist will be instructed that validation files are also involved
 
 ## Workflow Overview
 
 When the user runs this command, execute this comprehensive workflow:
 
 1. **Pre-Implementation Checks**: Validate environment and parse plan (orchestrator)
-2. **Setup**: Initialize todo list and logging structure (orchestrator)
-3. **Step Execution**: Launch subagent for each step (orchestrator delegates to subagents)
+2. **Setup**: Initialize todo list, detect step types, and prepare routing (orchestrator)
+3. **Step Execution**: Route each step to appropriate specialist subagent (orchestrator)
 4. **Quality Gates**: Run validation commands (orchestrator or subagent)
 5. **Summary**: Generate implementation report and offer git commit (orchestrator)
 
@@ -123,9 +187,9 @@ When the user runs this command, execute this comprehensive workflow:
 
 **Dry-Run Mode**: If `--dry-run` flag present, output what would be done and exit after this phase.
 
-### Phase 2: Setup and Initialization
+### Phase 2: Setup and Initialization with Step-Type Detection
 
-**Objective**: Initialize todo list and prepare for systematic execution.
+**Objective**: Initialize todo list, detect step types, and prepare routing table.
 
 **Process**:
 
@@ -139,32 +203,48 @@ When the user runs this command, execute this comprehensive workflow:
      - Validation commands
      - Success criteria
      - Confidence level
-3. **Create Todo List**:
+3. **Detect Step Types** (CRITICAL NEW STEP):
+   - For each step, analyze the files list using the Detection Rules
+   - Determine the appropriate specialist agent
+   - Create routing table:
+     ```
+     Step 1: database-specialist (files in src/lib/db/schema/)
+     Step 2: validation-specialist (files in src/lib/validations/)
+     Step 3: facade-specialist (files in src/lib/facades/)
+     Step 4: server-action-specialist (files in src/lib/actions/)
+     Step 5: form-specialist (form component files)
+     Step 6: react-component-specialist (page component)
+     Step 7: test-specialist (test files)
+     ```
+   - Log any steps that span multiple domains
+4. **Create Todo List**:
    - Use TodoWrite tool to create todos for all steps
-   - Format: "Step N: {step title}" (content)
+   - Format: "Step N: {step title} [{specialist-type}]" (content)
    - Format: "Implementing step N: {step title}" (activeForm)
    - All todos start as "pending" status
    - Add quality gates as separate todos at the end
-4. **Prepare Step Metadata**:
+5. **Prepare Step Metadata**:
    - Store parsed step details for subagent delegation
+   - Store detected specialist type for each step
    - Note files mentioned in each step (for subagent context)
    - Identify steps with dependencies on previous steps
-5. **SAVE SETUP LOG**: Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/02-setup.md`:
+6. **SAVE SETUP LOG**: Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/02-setup.md`:
    - Setup metadata (timestamp, duration)
    - Extracted steps summary (N steps identified)
+   - **Step routing table with specialist assignments**
    - Todo list created (N+1 items including quality gates)
    - Step dependency analysis
    - Files mentioned per step summary
-6. **UPDATE INDEX**: Append setup summary to implementation index
-7. **CHECKPOINT**: Setup complete, beginning implementation
+7. **UPDATE INDEX**: Append setup summary to implementation index
+8. **CHECKPOINT**: Setup complete, beginning implementation
 
 **Orchestrator Note**: No files are loaded into context at this phase. Each subagent will load only the files it needs.
 
-### Phase 3: Step-by-Step Implementation (Subagent Delegation)
+### Phase 3: Step-by-Step Implementation (Specialist Subagent Delegation)
 
-**Objective**: Orchestrate execution of each step by delegating to subagents with fresh context.
+**Objective**: Orchestrate execution of each step by routing to the appropriate specialist subagent.
 
-**Architecture**: Each step runs in its own subagent with isolated context. The orchestrator coordinates, tracks progress, and aggregates results.
+**Architecture**: Each step runs in a specialist subagent with pre-loaded skills for its domain.
 
 **Process** (repeat for each step):
 
@@ -176,7 +256,10 @@ When the user runs this command, execute this comprehensive workflow:
    - Verify all prerequisite steps are completed
    - If step depends on previous step, verify previous step success
    - Check if any blockers from previous steps
-4. **Prepare Subagent Input** (Orchestrator):
+4. **Determine Specialist Agent** (Orchestrator):
+   - Look up specialist type from routing table (created in Phase 2)
+   - Log the selected specialist: "Routing to {specialist-type} for step {N}"
+5. **Prepare Specialist Subagent Input** (Orchestrator):
    - Gather step details from parsed plan:
      - Step number and title
      - What (description of changes)
@@ -189,20 +272,25 @@ When the user runs this command, execute this comprehensive workflow:
      - What was changed in previous step
      - Files modified/created
      - Any notes for this step
-   - Detect if step involves React files (.tsx, .jsx, .ts, .js)
-5. **Launch Step Subagent**:
-   - Use Task tool with `subagent_type: "general-purpose"`
+   - Note if step spans multiple domains
+6. **Launch Specialist Subagent**:
+   - Use Task tool with `subagent_type: "{detected-specialist-type}"`
    - Description: "Implement step {N}: {step title}"
    - **CRITICAL**: Set timeout to 300 seconds (5 minutes) per step
-   - **Subagent Prompt Template**:
+   - **Specialist Subagent Prompt Template**:
      ```
-     You are implementing Step {N} of an implementation plan with FRESH CONTEXT.
+     You are implementing Step {N} of an implementation plan as a {SPECIALIST-TYPE}.
 
-     Your task is to implement this step completely and return structured results.
+     **IMPORTANT**: You are a specialized agent. Your agent definition includes required skills to load.
+     BEFORE implementing anything, load ALL skills listed in your agent definition by reading their reference files.
+
+     Your task is to implement this step completely following all project conventions and return structured results.
 
      ## Step Details
 
      **Step**: {N}/{Total} - {Step Title}
+     **Specialist**: {specialist-type}
+     **Skills to Load**: {skills from agent definition}
 
      **What to do**:
      {What description from plan}
@@ -221,6 +309,10 @@ When the user runs this command, execute this comprehensive workflow:
 
      **Confidence level**: {Confidence from plan}
 
+     {IF MULTI-DOMAIN}
+     **Note**: This step spans multiple domains. Primary domain is {primary}. Also involves: {secondary domains}
+     {END IF}
+
      {IF DEPENDENT}
      **Previous step context**:
      Step {N-1} made these changes:
@@ -229,12 +321,13 @@ When the user runs this command, execute this comprehensive workflow:
 
      ## Instructions
 
-     1. **Read Files**: Load all files mentioned above using the Read tool
-     2. **Apply Conventions**: {IF React files detected}Invoke the react-coding-conventions skill FIRST before making any changes{END IF}
+     1. **Load Skills FIRST**: Read all skill reference files from your agent definition BEFORE any implementation
+     2. **Read Files**: Load all files mentioned above using the Read tool
      3. **Implement Changes**:
         - Use Edit tool for existing files
         - Use Write tool for new files
         - Follow the "What" description exactly
+        - Apply ALL conventions from loaded skills
         - Keep changes focused on this step only
      4. **Validation**:
         - Run ALL validation commands specified above
@@ -247,12 +340,21 @@ When the user runs this command, execute this comprehensive workflow:
 
      **Status**: success | failure
 
+     **Specialist Used**: {specialist-type}
+
+     **Skills Loaded**:
+     - {skill-name}: {reference-file-path}
+     - ...
+
      **Files Modified**:
      - path/to/file1.ts - Description of changes made
      - path/to/file2.tsx - Description of changes made
 
      **Files Created**:
      - path/to/newfile.ts - Description of file purpose
+
+     **Conventions Applied**:
+     - [List key conventions from skills that were followed]
 
      **Validation Results**:
      - Command: npm run lint:fix && npm run typecheck
@@ -270,42 +372,47 @@ When the user runs this command, execute this comprehensive workflow:
      **Notes for Next Steps**: {anything important for subsequent steps}
 
      IMPORTANT:
+     - Load your skills FIRST before any implementation
      - Do NOT read files outside the list provided
      - Do NOT implement steps beyond this one
      - Do NOT skip validation commands
      - Focus ONLY on this step's requirements
      ```
-6. **Subagent Execution** (Subagent performs):
+7. **Subagent Execution** (Specialist performs):
+   - Loads required skills from agent definition
    - Reads necessary files
-   - Invokes react-coding-conventions skill if React files
-   - Implements changes per step instructions
+   - Implements changes per step instructions with skill conventions
    - Runs validation commands
    - Verifies success criteria
    - Returns structured results to orchestrator
-7. **Process Subagent Results** (Orchestrator):
+8. **Process Subagent Results** (Orchestrator):
    - Capture full subagent response
    - Parse structured results section
    - Extract:
      - Status (success/failure)
+     - Specialist used and skills loaded
      - Files modified/created with descriptions
+     - Conventions applied
      - Validation command outputs
      - Success criteria verification
      - Errors/warnings
      - Notes for next steps
-8. **Step Logging** (Orchestrator):
+9. **Step Logging** (Orchestrator):
    - Create `docs/{YYYY_MM_DD}/implementation/{feature-name}/0{N+2}-step-{N}-results.md`:
      - Step metadata (number, title, timestamp, duration)
+     - **Specialist used and skills loaded**
      - Subagent input (what was asked)
      - Subagent output (full response)
      - Parsed results summary
      - Files modified/created
+     - Conventions applied
      - Validation results
      - Success criteria verification
      - Any errors or warnings
-9. **Update Todo Status** (Orchestrator):
-   - If step succeeded: Mark todo as "completed"
-   - If step failed: Keep as "in_progress" and log error
-10. **Error Handling** (Orchestrator):
+10. **Update Todo Status** (Orchestrator):
+    - If step succeeded: Mark todo as "completed"
+    - If step failed: Keep as "in_progress" and log error
+11. **Error Handling** (Orchestrator):
     - If subagent times out:
       - Log timeout error
       - Mark step as failed
@@ -315,28 +422,28 @@ When the user runs this command, execute this comprehensive workflow:
       - Attempt to determine if blocking
       - If `--step-by-step` mode: Ask user how to proceed
       - Otherwise: Continue or abort based on severity
-11. **Step-by-Step Mode Check** (Orchestrator):
+12. **Step-by-Step Mode Check** (Orchestrator):
     - If `--step-by-step` flag present:
       - Use AskUserQuestion to ask user:
-        - "Step {N} completed {successfully/with errors}. Continue to next step?"
+        - "Step {N} completed {successfully/with errors} using {specialist-type}. Continue to next step?"
         - Options: "Continue", "Skip next step", "Retry this step", "Abort implementation"
       - Handle user response accordingly
-12. **UPDATE INDEX** (Orchestrator): Append step summary to implementation index
-13. **Progress Report** (Orchestrator):
-    - Output concise progress: "Completed step {N}/{Total} - {step title}"
+13. **UPDATE INDEX** (Orchestrator): Append step summary to implementation index
+14. **Progress Report** (Orchestrator):
+    - Output concise progress: "Completed step {N}/{Total} - {step title} [{specialist-type}]"
 
 **Resume Mode**: If `--resume-from=N` flag present, skip to step N and begin execution there.
 
 **Context Management**:
-- **Orchestrator**: Maintains minimal context (parsed plan, step metadata, results summaries)
-- **Subagents**: Each gets fresh context with only files needed for their step
+- **Orchestrator**: Maintains minimal context (parsed plan, routing table, results summaries)
+- **Specialists**: Each gets fresh context with pre-loaded skills for their domain
 - **Result**: Scalable to plans with 50+ steps without context overflow
 
 ### Phase 4: Quality Gates Execution
 
 **Objective**: Run all quality gates from the plan to ensure implementation quality.
 
-**Architecture**: Quality gates can run in orchestrator (simple) or delegated to subagent (complex tests).
+**Architecture**: Quality gates can run in orchestrator (simple) or delegated to test-specialist (complex tests).
 
 **Process**:
 
@@ -358,9 +465,9 @@ When the user runs this command, execute this comprehensive workflow:
      - Capture all output
      - Check pass/fail status
 
-   **Option B - Complex Testing** (Delegate to subagent):
+   **Option B - Complex Testing** (Delegate to test-specialist):
    - For comprehensive test suites (unit, integration, e2e):
-     - Use Task tool with `subagent_type: "general-purpose"`
+     - Use Task tool with `subagent_type: "test-specialist"`
      - Description: "Run quality gates and test suites"
      - **Subagent handles**: Running tests, analyzing failures, suggesting fixes
      - **Returns**: Test results, coverage reports, failure analysis
@@ -402,10 +509,12 @@ When the user runs this command, execute this comprehensive workflow:
    - Number of files modified/created
    - Number of validation commands run
    - Quality gates status (X/Y passed)
+   - **Specialist usage breakdown** (e.g., "3 steps: database-specialist, 2 steps: react-component-specialist")
 3. **Generate Change Summary**:
    - List all files modified with brief descriptions
    - List all files created
    - Summarize major changes by category (components, actions, queries, etc.)
+   - **List skills that were applied**
 4. **Review Todos**:
    - Count completed todos
    - List any incomplete todos
@@ -416,6 +525,8 @@ When the user runs this command, execute this comprehensive workflow:
      - Implementation plan reference
      - Execution mode used
      - Steps completed (N/Total)
+     - **Specialist routing summary**
+     - **Skills applied per step**
      - Files changed summary
      - Quality gates results
      - Known issues or warnings
@@ -437,8 +548,8 @@ When the user runs this command, execute this comprehensive workflow:
          Implementation log: docs/{date}/implementation/{feature-name}/
 
          Steps completed:
-         - [Step 1 title]
-         - [Step 2 title]
+         - [Step 1 title] (database-specialist)
+         - [Step 2 title] (server-action-specialist)
          ...
 
          🤖 Generated with [Claude Code](https://claude.com/claude-code)
@@ -489,6 +600,7 @@ When the user runs this command, execute this comprehensive workflow:
    ✓ Completed {N}/{Total} steps successfully
    ✓ Modified {X} files, created {Y} files
    ✓ Quality gates: {Z} passed, {W} failed
+   ✓ Specialists used: {breakdown}
    {IF WORKTREE}
    ✓ Worktree: {worktree-action-taken}
    ✓ Branch: feat/{feature-slug}
@@ -497,8 +609,8 @@ When the user runs this command, execute this comprehensive workflow:
    Implementation log: docs/{date}/implementation/{feature-name}/
    - 📄 00-implementation-index.md - Navigation and overview
    - 📄 01-pre-checks.md - Pre-implementation validation
-   - 📄 02-setup.md - Setup and initialization
-   - 📄 03-step-1-results.md - Step 1 execution log
+   - 📄 02-setup.md - Setup, routing table, and specialist assignments
+   - 📄 03-step-1-results.md - Step 1 execution log (database-specialist)
    ...
    - 📄 XX-quality-gates.md - Quality validation results
    - 📄 YY-implementation-summary.md - Complete summary
@@ -512,11 +624,12 @@ When the user runs this command, execute this comprehensive workflow:
 
 **Step Failure Handling**:
 1. Capture full error details (message, stack trace, context)
-2. Log error to step results file
+2. Log error to step results file including which specialist was used
 3. Attempt automatic recovery:
    - If validation failure: Show validation output and suggest fixes
    - If file not found: Suggest creating file or checking plan
    - If dependency missing: Suggest installation command
+   - If skill loading failed: Retry with explicit skill paths
 4. If recovery not possible:
    - Mark step as failed in todo
    - Continue to next step OR abort based on severity
@@ -549,31 +662,32 @@ When the user runs this command, execute this comprehensive workflow:
 **Critical Requirements**:
 
 - **ORCHESTRATOR PATTERN**: This command is a lightweight coordinator, NOT a direct implementer
-- **SUBAGENT DELEGATION**: Each step executed by isolated subagent with fresh context
+- **SPECIALIST ROUTING**: Each step routed to domain-specific specialist with pre-loaded skills
+- **SKILL AUTO-LOADING**: Specialists automatically load relevant skills from their agent definitions
 - **WORKTREE ISOLATION**: Optional git worktree creation for isolated feature development with automated cleanup
 - **SAFETY FIRST**: Never execute on main or production branches without explicit confirmation (worktrees bypass this with new branches)
-- **SKILL INTEGRATION**: Subagents automatically invoke react-coding-conventions skill for React files
-- **SYSTEMATIC EXECUTION**: Execute steps in order, one at a time, via subagent delegation
-- **VALIDATION ENFORCEMENT**: Subagents always run lint:fix and typecheck for code changes
+- **SYSTEMATIC EXECUTION**: Execute steps in order, one at a time, via specialist delegation
+- **VALIDATION ENFORCEMENT**: Specialists always run lint:fix and typecheck for code changes
 - **TODO MANAGEMENT**: Orchestrator keeps todo list updated in real-time (ONE in_progress at a time)
-- **COMPREHENSIVE LOGGING**: Orchestrator saves detailed logs for each step and phase
+- **COMPREHENSIVE LOGGING**: Orchestrator saves detailed logs including specialist and skills used
 - **ERROR RECOVERY**: Handle subagent errors gracefully with clear user guidance
 - **QUALITY ASSURANCE**: Enforce quality gates before completion
-- **CONTEXT EFFICIENCY**: Orchestrator maintains minimal context, subagents use fresh context per step
+- **CONTEXT EFFICIENCY**: Orchestrator maintains minimal context, specialists use fresh context per step
 - **SCALABILITY**: Can handle plans with 50+ steps without context overflow
 
 **Quality Standards**:
 
 - All code must pass lint and typecheck
-- All modified files must follow project conventions
+- All modified files must follow project conventions (enforced by specialist skills)
 - All success criteria must be verified
 - All validation commands must be executed
-- All changes must be logged with rationale
+- All changes must be logged with rationale and skills applied
 
 **Logging Requirements**:
 
 - **Human-Readable Format**: Use markdown with clear headers and sections
 - **Complete Data Capture**: Full validation output, error messages, changes made
+- **Specialist Tracking**: Log which specialist and skills were used for each step
 - **Incremental Saves**: Save logs after each step completes
 - **Navigation Structure**: Index file with links to all logs
 - **Timestamp Precision**: ISO format timestamps for all events
@@ -582,16 +696,16 @@ When the user runs this command, execute this comprehensive workflow:
 **Performance Optimization**:
 
 - **Orchestrator**: Minimal context usage, fast coordination
-- **Subagents**: Fresh context per step prevents bloat
+- **Specialists**: Fresh context per step with pre-loaded domain skills
 - **Parallel Potential**: Independent steps could run in parallel (future enhancement)
 - **Batch Operations**: Orchestrator batches pre-checks and setup operations
-- **Context Isolation**: Each subagent only loads files needed for its step
+- **Context Isolation**: Each specialist only loads files needed for its step
 - **Scalable Architecture**: Linear context growth instead of exponential
 
 **User Experience**:
 
-- Clear progress indicators ("Step N/Total")
-- Concise status updates after each step
+- Clear progress indicators ("Step N/Total [{specialist}]")
+- Concise status updates after each step with specialist used
 - Detailed logs available for review
 - Helpful error messages with actionable guidance
 - Offer next steps upon completion
@@ -601,14 +715,14 @@ When the user runs this command, execute this comprehensive workflow:
 **Implementation Logs**: `docs/{YYYY_MM_DD}/implementation/{feature-name}/`
 
 ```
-00-implementation-index.md          # Navigation and workflow overview
+00-implementation-index.md          # Navigation, routing table, and workflow overview
 01-pre-checks.md                    # Pre-implementation validation results
-02-setup.md                         # Setup and initialization details
-03-step-1-results.md                # Step 1 execution log
-04-step-2-results.md                # Step 2 execution log
+02-setup.md                         # Setup, step-type detection, and specialist routing
+03-step-1-results.md                # Step 1 execution log (includes specialist + skills)
+04-step-2-results.md                # Step 2 execution log (includes specialist + skills)
 ...
 XX-quality-gates.md                 # Quality gate validation results
-YY-implementation-summary.md        # Final summary and statistics
+YY-implementation-summary.md        # Final summary with specialist breakdown
 ```
 
 **Index File Structure** (`00-implementation-index.md`):
@@ -630,22 +744,30 @@ YY-implementation-summary.md        # Final summary and statistics
 - Quality Gates: {W} passed, {V} failed
 - Total Duration: {X.X} minutes
 
+## Specialist Routing
+
+| Step | Specialist | Skills Loaded |
+|------|------------|---------------|
+| 1. {title} | database-specialist | database-schema, drizzle-orm, validation-schemas |
+| 2. {title} | server-action-specialist | server-actions, sentry-monitoring, validation-schemas |
+| ... | ... | ... |
+
 ## Navigation
 
 - [Pre-Implementation Checks](./01-pre-checks.md)
-- [Setup and Initialization](./02-setup.md)
-- [Step 1: {title}](./03-step-1-results.md)
-- [Step 2: {title}](./04-step-2-results.md)
+- [Setup and Routing](./02-setup.md)
+- [Step 1: {title}](./03-step-1-results.md) [database-specialist]
+- [Step 2: {title}](./04-step-2-results.md) [server-action-specialist]
 ...
 - [Quality Gates](./XX-quality-gates.md)
 - [Implementation Summary](./YY-implementation-summary.md)
 
 ## Quick Status
 
-| Step | Status | Duration | Issues |
-|------|--------|----------|--------|
-| 1. {title} | ✓ | 2.3s | None |
-| 2. {title} | ✓ | 5.1s | None |
+| Step | Specialist | Status | Duration | Issues |
+|------|------------|--------|----------|--------|
+| 1. {title} | database-specialist | ✓ | 2.3s | None |
+| 2. {title} | server-action-specialist | ✓ | 5.1s | None |
 ...
 
 ## Summary
@@ -672,25 +794,28 @@ YY-implementation-summary.md        # Final summary and statistics
 /ui-audit /notifications
 ```
 
-## Subagent Communication Protocol
+## Specialist Communication Protocol
 
-**Input to Step Subagent** (from orchestrator):
+**Input to Specialist Subagent** (from orchestrator):
 ```
 - Step number and title
+- Specialist type and skills to load
 - What: Description of changes needed
 - Why: Rationale for the changes
 - Files: List of file paths to modify/create
 - Validation commands: Commands to run for verification
 - Success criteria: Criteria to check
 - Previous step context: Summary of what previous step did (if dependent)
-- React file detection: Boolean indicating if react-coding-conventions skill needed
+- Multi-domain note: If step spans multiple domains
 ```
 
-**Output from Step Subagent** (to orchestrator):
+**Output from Specialist Subagent** (to orchestrator):
 ```
 - Status: success | failure
+- Specialist used and skills loaded
 - Files modified: List with descriptions of changes
 - Files created: List with descriptions
+- Conventions applied: Key patterns from skills
 - Validation results: Command outputs with pass/fail status
 - Success criteria: Verification of each criterion
 - Errors/warnings: Any issues encountered
@@ -699,20 +824,23 @@ YY-implementation-summary.md        # Final summary and statistics
 
 **Architecture Benefits**:
 
-1. **Context Isolation**: Each step has clean, isolated context
-2. **Scalability**: Can handle 50+ step plans without context overflow
-3. **Error Containment**: Failures isolated to individual steps
-4. **Parallel Potential**: Future enhancement could run independent steps concurrently
-5. **Debugging**: Clear separation between orchestration and implementation
-6. **Resource Efficiency**: Only load files needed per step, not entire codebase
+1. **Automatic Skill Loading**: Specialists know which skills to load for their domain
+2. **Convention Enforcement**: Skills ensure consistent code patterns
+3. **Context Isolation**: Each step has clean, isolated context
+4. **Scalability**: Can handle 50+ step plans without context overflow
+5. **Error Containment**: Failures isolated to individual steps
+6. **Parallel Potential**: Future enhancement could run independent steps concurrently
+7. **Debugging**: Clear logs show which specialist and skills were used
+8. **Resource Efficiency**: Only load files and skills needed per step
 
 ## Notes
 
 - This command is designed to work seamlessly with plans generated by `/plan-feature`
-- **Architecture**: Uses orchestrator + subagent pattern for scalability
+- **Architecture**: Uses orchestrator + specialist subagent pattern with automatic skill loading
+- **Specialists**: 8 domain-specific agents with pre-configured skills for their area
 - Always review the implementation plan before executing to ensure it's current
 - Use `--step-by-step` mode for complex or risky implementations
-- Use `--dry-run` mode to preview changes before applying them
+- Use `--dry-run` mode to preview changes and specialist routing before applying them
 - Use `--worktree` mode for isolated feature development with these benefits:
   - Complete isolation from main codebase
   - Safe experimentation without affecting working directory
@@ -721,7 +849,7 @@ YY-implementation-summary.md        # Final summary and statistics
   - Flexible cleanup options (merge, PR, keep, or remove)
 - **Worktree Location**: Created at `.worktrees/{feature-slug}/` (gitignored by default)
 - **Worktree Branch**: Uses `feat/{feature-slug}` naming convention
-- Implementation logs provide complete audit trail for debugging and review
+- Implementation logs provide complete audit trail including specialists and skills used
 - Quality gates are enforced but non-blocking warnings won't stop execution
 - Git commit is offered but optional - you can commit manually if preferred
 - **Scalability**: Tested architecture can handle plans with 50+ steps efficiently
