@@ -26,6 +26,8 @@ export type AdjacentBobblehead = {
  * and position information for "X of Y" display
  */
 export type BobbleheadNavigationData = {
+  /** Optional context information about the collection/subcollection being navigated */
+  context: NavigationContext | null;
   /**
    * 1-indexed ordinal position of the current bobblehead within the filtered context.
    * Position 1 is the most recently created bobblehead (newest by createdAt).
@@ -54,4 +56,17 @@ export type GetBobbleheadNavigationInput = {
   collectionId: string;
   /** Optional subcollection ID for filtered navigation */
   subcollectionId: null | string;
+};
+
+/**
+ * Context information for the collection or subcollection
+ * that bounds the navigation scope
+ */
+export type NavigationContext = {
+  /** Unique identifier for the collection or subcollection */
+  contextId: string;
+  /** Display name of the collection or subcollection */
+  contextName: string;
+  /** Whether this is a collection or subcollection */
+  contextType: 'collection' | 'subcollection';
 };

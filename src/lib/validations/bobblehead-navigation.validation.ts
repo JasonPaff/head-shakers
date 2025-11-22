@@ -8,6 +8,7 @@ import { zodNullableUUID } from '@/lib/utils/zod.utils';
 export type AdjacentBobbleheadSchema = z.infer<typeof adjacentBobbleheadSchema>;
 export type BobbleheadNavigationDataSchema = z.infer<typeof bobbleheadNavigationDataSchema>;
 export type GetBobbleheadNavigation = z.infer<typeof getBobbleheadNavigationSchema>;
+export type NavigationContextSchema = z.infer<typeof navigationContextSchema>;
 
 /**
  * Schema for an adjacent bobblehead in navigation context
@@ -30,11 +31,33 @@ export const adjacentBobbleheadSchema = z.object({
 export const nullableAdjacentBobbleheadSchema = adjacentBobbleheadSchema.nullable();
 
 /**
+ * Schema for navigation context (collection or subcollection info)
+ * Contains information about the collection/subcollection that bounds navigation
+ */
+export const navigationContextSchema = z.object({
+  /** Unique identifier for the collection or subcollection */
+  contextId: z.uuid({ message: 'Context ID must be a valid UUID' }),
+  /** Display name of the collection or subcollection */
+  contextName: z.string().min(1, { message: 'Context name is required' }),
+  /** Whether this is a collection or subcollection */
+  contextType: z.enum(['collection', 'subcollection'], {
+    message: 'Context type must be either collection or subcollection',
+  }),
+});
+
+/**
+ * Schema for nullable navigation context (used when no context exists)
+ */
+export const nullableNavigationContextSchema = navigationContextSchema.nullable();
+
+/**
  * Schema for complete bobblehead navigation data
  * Contains references to both adjacent bobbleheads within a collection context
  * and position information for "X of Y" display
  */
 export const bobbleheadNavigationDataSchema = z.object({
+  /** Optional context information about the collection/subcollection being navigated */
+  context: nullableNavigationContextSchema,
   /**
    * 1-indexed ordinal position of the current bobblehead within the filtered context.
    * Position 1 is the most recently created bobblehead (newest by createdAt).

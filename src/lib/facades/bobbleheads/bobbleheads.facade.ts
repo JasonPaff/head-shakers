@@ -25,6 +25,8 @@ import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import {
   createProtectedQueryContext,
@@ -414,6 +416,34 @@ export class BobbleheadsFacade {
           const currentPosition = positionResult?.currentPosition ?? 0;
           const totalCount = positionResult?.totalCount ?? 0;
 
+          // Fetch context information (collection or subcollection name)
+          let contextData: BobbleheadNavigationDataSchema['context'] = null;
+          if (subcollectionId) {
+            // Fetch subcollection name
+            const subcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
+              collectionId,
+              subcollectionId,
+              viewerUserId,
+            );
+            if (subcollection) {
+              contextData = {
+                contextId: subcollection.id,
+                contextName: subcollection.name,
+                contextType: 'subcollection',
+              };
+            }
+          } else {
+            // Fetch collection name
+            const collection = await CollectionsFacade.getCollectionById(collectionId, viewerUserId);
+            if (collection) {
+              contextData = {
+                contextId: collection.id,
+                contextName: collection.name,
+                contextType: 'collection',
+              };
+            }
+          }
+
           // Transform result to match the expected schema (minimal navigation data)
           // The query now joins with bobbleheadPhotos to include the primary photo URL
           const transformBobblehead = (
@@ -435,6 +465,8 @@ export class BobbleheadsFacade {
             data: {
               bobbleheadId,
               collectionId,
+              contextName: contextData?.contextName || null,
+              contextType: contextData?.contextType || null,
               currentPosition,
               hasNext: !!adjacentResult.nextBobblehead,
               hasPrevious: !!adjacentResult.previousBobblehead,
@@ -446,6 +478,7 @@ export class BobbleheadsFacade {
           });
 
           return {
+            context: contextData,
             currentPosition,
             nextBobblehead: transformBobblehead(adjacentResult.nextBobblehead),
             previousBobblehead: transformBobblehead(adjacentResult.previousBobblehead),

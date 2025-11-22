@@ -16,6 +16,7 @@ import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadNavigationPreview } from './bobblehead-navigation-preview';
+import { CollectionContextIndicator } from './collection-context-indicator';
 
 type BobbleheadNavigationProps = {
   navigationData: BobbleheadNavigationData;
@@ -120,6 +121,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
   const _hasNext = !!navigationData.nextBobblehead;
   const _hasNavigation = _hasPrevious || _hasNext;
   const _hasPositionInfo = navigationData.currentPosition > 0 && navigationData.totalCount > 0;
+  const _hasContext = !!navigationData.context;
   const _canNavigatePrevious = _hasPrevious && !!previousUrl;
   const _canNavigateNext = _hasNext && !!nextUrl;
 
@@ -174,17 +176,27 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
           </span>
         }
 
-        {/* Position Indicator */}
-        <Conditional isCondition={_hasPositionInfo}>
-          <span
-            aria-label={`Bobblehead ${navigationData.currentPosition} of ${navigationData.totalCount} in collection`}
-            className={'text-sm text-muted-foreground'}
-            data-slot={'bobblehead-navigation-position'}
-            data-testid={positionTestId}
-          >
-            {navigationData.currentPosition} of {navigationData.totalCount}
-          </span>
-        </Conditional>
+        {/* Center Content - Context and Position */}
+        <div className={'flex flex-col items-center gap-1'}>
+          {/* Collection Context Indicator */}
+          <Conditional isCondition={_hasContext}>
+            <div className={'hidden sm:block'}>
+              <CollectionContextIndicator context={navigationData.context!} />
+            </div>
+          </Conditional>
+
+          {/* Position Indicator */}
+          <Conditional isCondition={_hasPositionInfo}>
+            <span
+              aria-label={`Bobblehead ${navigationData.currentPosition} of ${navigationData.totalCount} in collection`}
+              className={'text-sm text-muted-foreground'}
+              data-slot={'bobblehead-navigation-position'}
+              data-testid={positionTestId}
+            >
+              {navigationData.currentPosition} of {navigationData.totalCount}
+            </span>
+          </Conditional>
+        </div>
 
         {/* Next Link */}
         {_canNavigateNext ?
