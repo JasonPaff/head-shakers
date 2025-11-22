@@ -63,6 +63,8 @@ export default defineConfig({
     {
       name: 'auth-setup',
       testMatch: /setup\/auth\.setup\.ts/,
+      // Run auth setup tests serially to reduce concurrent DB load on fresh endpoint
+      fullyParallel: false,
     },
 
     // ═══════════════════════════════════════════════════════════════
@@ -113,12 +115,15 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: 'npm run dev',
+    // Use production build for stability (recommended by Neon guide)
+    // Dev mode has hot reloading issues that can cause transient connection errors
+    command: process.env.CI ? 'npm run build && npm start' : 'npm run dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
-    timeout: 240000,
+    timeout: 300000, // 5 minutes to allow for build time
     env: {
       DATABASE_URL: getE2EDatabaseUrl() || process.env.DATABASE_URL || '',
+      NODE_ENV: process.env.CI ? 'production' : 'development',
     },
   },
 });

@@ -97,10 +97,11 @@ export async function createE2EBranch(): Promise<E2EBranchInfo> {
     // Wait for endpoint to be ready
     await waitForEndpointReady(NEON_CONFIG.projectId, endpointId);
 
-    // Get connection string
+    // Get pooled connection string (recommended by Neon for serverless stability)
     const connectionResponse = await client.getConnectionUri({
       branch_id: branchId,
       database_name: NEON_CONFIG.databaseName,
+      pooled: true,
       projectId: NEON_CONFIG.projectId,
       role_name: NEON_CONFIG.roleName,
     });
@@ -110,6 +111,9 @@ export async function createE2EBranch(): Promise<E2EBranchInfo> {
     if (!connectionString) {
       throw new Error('Failed to get connection string');
     }
+
+    // Warmup the connection to ensure it's fully ready (recommended by Neon)
+    await warmupConnection(connectionString);
 
     console.log(`E2E branch ready: ${branchName}`);
 
@@ -212,6 +216,29 @@ async function waitForEndpointReady(
   throw new Error(
     `Endpoint ${endpointId} did not become ready within ${(maxAttempts * delayMs) / 1000} seconds`,
   );
+}
+
+/**
+ * Warmup the database connection by running a simple query
+ * This ensures the connection is fully established before tests run
+ */
+async function warmupConnection(connectionString: string, maxAttempts = 5): Promise<void> {
+  const { Pool } = await import('@neondatabase/serverless');
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      const pool = new Pool({ connectionString });
+      await pool.query('SELECT 1');
+      await pool.end();
+      console.log('Database connection warmed up successfully');
+      return;
+    } catch (error) {
+      console.log(`Connection warmup attempt ${attempt + 1}/${maxAttempts} failed, retrying...`);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
+  }
+
+  console.warn('Connection warmup failed after all attempts, proceeding anyway...');
 }
 
 export { NEON_CONFIG };
