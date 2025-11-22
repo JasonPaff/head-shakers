@@ -2,35 +2,75 @@
 
 ## Overview
 
-Head Shakers uses Vitest for unit and integration tests, Testing Library for component tests, and Playwright for E2E tests. Tests follow a consistent structure and naming convention.
+Head Shakers uses Vitest 4.0.3 for unit, integration, and component tests, Testing Library for component tests, and Playwright 1.56.1 for E2E tests. Tests follow a consistent structure and naming convention.
+
+**Key Libraries**:
+- **Vitest** - Test runner with v8 coverage
+- **@testing-library/react** - React component testing
+- **@testing-library/user-event** - User interaction simulation
+- **@testing-library/jest-dom** - DOM matchers
+- **MSW 2.x** - API mocking
+- **@testcontainers/postgresql** - Database testing
+- **Playwright** - E2E browser automation
+- **@clerk/testing** - Clerk authentication testing
 
 ## Test Structure
 
 ```
 tests/
-├── unit/                    # Unit tests (pure functions, utilities)
-│   ├── lib/
-│   └── utils/
-├── integration/             # Integration tests (API, database)
-│   ├── actions/
-│   ├── facades/
-│   └── queries/
-├── components/              # Component tests
-│   ├── ui/
-│   └── feature/
-├── e2e/                     # End-to-end tests
-│   └── *.spec.ts
-├── fixtures/                # Test fixtures and factories
-├── mocks/                   # MSW handlers and mocks
-└── setup/                   # Test setup files
+├── unit/                           # Unit tests (pure functions, validations)
+│   └── lib/
+│       └── validations/            # Zod schema validation tests
+├── integration/                    # Integration tests with real database
+│   ├── actions/                    # Facade/business logic tests
+│   └── db/                         # Database integration tests
+├── components/                     # React component tests
+│   ├── ui/                         # UI component tests
+│   └── feature/                    # Feature-specific component tests
+├── e2e/                            # End-to-end Playwright tests
+│   ├── specs/                      # Test suites by user type
+│   │   ├── smoke/                  # Health and basic functionality
+│   │   ├── public/                 # Unauthenticated user tests
+│   │   ├── user/                   # Standard user tests
+│   │   ├── admin/                  # Admin user tests
+│   │   └── onboarding/             # New user onboarding tests
+│   ├── setup/                      # Auth setup (auth.setup.ts)
+│   ├── pages/                      # Page Object Model classes
+│   ├── fixtures/                   # Custom Playwright fixtures
+│   ├── helpers/                    # ComponentFinder and utilities
+│   ├── utils/                      # Neon branch, test data utilities
+│   ├── global.setup.ts             # Global setup (DB branch creation)
+│   └── global.teardown.ts          # Global teardown (cleanup)
+├── setup/                          # Vitest setup files
+│   ├── vitest.setup.ts             # Per-file setup (MSW, mocks, Clerk)
+│   ├── vitest.global-setup.ts      # Global setup (Testcontainers)
+│   ├── test-db.ts                  # Testcontainers PostgreSQL management
+│   ├── msw.setup.ts                # MSW server configuration
+│   └── test-utils.tsx              # Custom render with providers
+├── fixtures/                       # Test data factories for database
+│   ├── user.factory.ts
+│   ├── collection.factory.ts
+│   └── bobblehead.factory.ts
+└── mocks/                          # MSW handlers and mock data
+    ├── handlers/                   # API mock handlers
+    │   ├── auth.handlers.ts
+    │   ├── bobbleheads.handlers.ts
+    │   └── collections.handlers.ts
+    └── data/                       # Mock data objects
+        ├── users.mock.ts
+        ├── collections.mock.ts
+        └── bobbleheads.mock.ts
 ```
 
 ## File Naming
 
 - **Unit tests**: `{file-name}.test.ts`
-- **Integration tests**: `{file-name}.integration.test.ts`
+- **Integration tests**: `{file-name}.test.ts` or `{file-name}.integration.test.ts`
 - **Component tests**: `{component-name}.test.tsx`
 - **E2E tests**: `{feature}.spec.ts`
+- **Factories**: `{entity}.factory.ts`
+- **Mock data**: `{entity}.mock.ts`
+- **MSW handlers**: `{entity}.handlers.ts`
 
 ## Unit Test Pattern
 
@@ -166,12 +206,15 @@ describe('SocialFacade', () => {
 
 ## Component Test Pattern
 
+Use the custom render from `tests/setup/test-utils.tsx` which includes all providers and pre-configured userEvent.
+
 ```typescript
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+// tests/components/feature/social/comment-form.test.tsx
+import { waitFor } from '@testing-library/react';
 
 import { CommentForm } from '@/components/feature/social/comment-form';
+
+import { customRender, screen } from '@/tests/setup/test-utils';
 
 // Mock server action
 vi.mock('@/lib/actions/social/social.actions', () => ({
@@ -186,20 +229,20 @@ describe('CommentForm', () => {
   };
 
   it('should render the form', () => {
-    render(<CommentForm {...defaultProps} />);
+    customRender(<CommentForm {...defaultProps} />);
 
     expect(screen.getByLabelText(/comment/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
   });
 
   it('should submit form with valid input', async () => {
-    const user = userEvent.setup();
     const { createCommentAction } = await import('@/lib/actions/social/social.actions');
     vi.mocked(createCommentAction).mockResolvedValueOnce({
       data: { success: true, data: { id: 'comment-1' }, message: 'Created' },
     });
 
-    render(<CommentForm {...defaultProps} />);
+    // customRender returns { user, ...renderResult }
+    const { user } = customRender(<CommentForm {...defaultProps} />);
 
     await user.type(screen.getByLabelText(/comment/i), 'Test comment');
     await user.click(screen.getByRole('button', { name: /submit/i }));
@@ -212,9 +255,7 @@ describe('CommentForm', () => {
   });
 
   it('should show validation error for empty input', async () => {
-    const user = userEvent.setup();
-
-    render(<CommentForm {...defaultProps} />);
+    const { user } = customRender(<CommentForm {...defaultProps} />);
 
     await user.click(screen.getByRole('button', { name: /submit/i }));
 
@@ -225,43 +266,114 @@ describe('CommentForm', () => {
 });
 ```
 
+**Note**: No need to import `describe`, `it`, `expect`, `vi` - globals are enabled in Vitest config.
+
 ## E2E Test Pattern (Playwright)
+
+### Project Structure
+
+E2E tests are organized into 5 projects with dependencies:
+
+1. **auth-setup** - Authenticates test users (runs first)
+2. **smoke** - Health and basic functionality checks
+3. **user-authenticated** - Standard user tests
+4. **admin-authenticated** - Admin user tests
+5. **new-user-authenticated** - Onboarding tests
+6. **unauthenticated** - Public route tests
+
+### Using Custom Fixtures
+
+Always use custom fixtures from `tests/e2e/fixtures/base.fixture.ts`:
+
+```typescript
+// tests/e2e/specs/user/comments.spec.ts
+import { expect } from '@playwright/test';
+
+import { test } from '@/tests/e2e/fixtures/base.fixture';
+
+test.describe('Comments Feature', () => {
+  // userPage fixture has pre-authenticated user context
+  test('should add a comment to bobblehead', async ({ userPage, userFinder }) => {
+    await userPage.goto('/bobbleheads/test-bobblehead-id');
+
+    // Use ComponentFinder for consistent data-testid lookups
+    await userPage.fill(userFinder.form('comment', 'input'), 'Great bobblehead!');
+    await userPage.click(userFinder.form('submit', 'button'));
+
+    await expect(userPage.getByText('Great bobblehead!')).toBeVisible();
+  });
+
+  // adminPage fixture has pre-authenticated admin context
+  test('admin can moderate comments', async ({ adminPage, adminFinder }) => {
+    await adminPage.goto('/admin/comments');
+
+    await adminPage.click(adminFinder.feature('comment', 'menu'));
+    await adminPage.click(adminFinder.feature('delete', 'button'));
+
+    await expect(adminPage.getByText('Comment deleted')).toBeVisible();
+  });
+});
+```
+
+### Available Fixtures
+
+```typescript
+// Custom fixtures from tests/e2e/fixtures/base.fixture.ts
+{
+  adminPage,      // Separate browser context with admin auth
+  userPage,       // Separate browser context with user auth
+  newUserPage,    // Separate browser context with new user auth
+  finder,         // ComponentFinder for default page
+  adminFinder,    // ComponentFinder for adminPage
+  userFinder,     // ComponentFinder for userPage
+  newUserFinder,  // ComponentFinder for newUserPage
+  branchInfo,     // Worker-scoped database branch info
+}
+```
+
+### ComponentFinder Helper
+
+Use ComponentFinder for standardized `data-testid` lookups:
+
+```typescript
+// All methods return Playwright locator strings
+finder.feature('bobblehead', 'card')     // [data-testid="feature-bobblehead-card"]
+finder.form('comment', 'input')           // [data-testid="form-comment-input"]
+finder.formField('email')                 // [data-testid="form-field-email"]
+finder.ui('button', 'primary')            // [data-testid="ui-button-primary"]
+finder.layout('sidebar', 'nav')           // [data-testid="layout-sidebar-nav"]
+finder.tableCell(0, 1)                    // [data-testid="table-cell-0-1"]
+finder.component('custom', 'widget', 'main') // [data-testid="custom-widget-main"]
+```
+
+### Page Object Model
+
+Extend `BasePage` for reusable page interactions:
+
+```typescript
+// tests/e2e/pages/collection.page.ts
+import { BasePage } from './base.page';
+
+export class CollectionPage extends BasePage {
+  readonly url = '/collections';
+
+  async addItem(name: string) {
+    await this.page.click(this.byTestId('feature-add-item-button'));
+    await this.page.fill(this.byTestId('form-item-name-input'), name);
+    await this.page.click(this.byTestId('form-submit-button'));
+  }
+}
+```
+
+### Basic E2E Test (Without Custom Fixtures)
 
 ```typescript
 import { expect, test } from '@playwright/test';
 
-test.describe('Comments Feature', () => {
-  test.beforeEach(async ({ page }) => {
-    // Login as test user
-    await page.goto('/sign-in');
-    await page.fill('[name="email"]', 'test@example.com');
-    await page.fill('[name="password"]', 'testpassword');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('/dashboard');
-  });
-
-  test('should add a comment to bobblehead', async ({ page }) => {
-    // Navigate to a bobblehead
-    await page.goto('/bobbleheads/test-bobblehead-id');
-
-    // Add comment
-    await page.fill('[data-testid="comment-input"]', 'Great bobblehead!');
-    await page.click('[data-testid="submit-comment"]');
-
-    // Verify comment appears
-    await expect(page.getByText('Great bobblehead!')).toBeVisible();
-  });
-
-  test('should delete own comment', async ({ page }) => {
-    await page.goto('/bobbleheads/test-bobblehead-id');
-
-    // Find and delete comment
-    await page.click('[data-testid="comment-menu"]');
-    await page.click('[data-testid="delete-comment"]');
-    await page.click('[data-testid="confirm-delete"]');
-
-    // Verify comment is gone
-    await expect(page.getByText('Great bobblehead!')).not.toBeVisible();
+test.describe('Public Pages', () => {
+  test('should display home page', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: /welcome/i })).toBeVisible();
   });
 });
 ```
@@ -343,25 +455,54 @@ export async function createTestBobblehead(userId: string, overrides = {}) {
 
 ## Testing Database (Testcontainers)
 
+The database is automatically managed via global setup. Use the helpers from `tests/setup/test-db.ts`:
+
 ```typescript
-// tests/setup/database.ts
-import { PostgreSqlContainer } from '@testcontainers/postgresql';
-import { afterAll, beforeAll } from 'vitest';
+// tests/integration/actions/social.facade.test.ts
+import { SocialFacade } from '@/lib/facades/social/social.facade';
 
-let container: PostgreSqlContainer;
+import { createTestUser } from '@/tests/fixtures/user.factory';
+import { getTestDb, resetTestDatabase } from '@/tests/setup/test-db';
 
-beforeAll(async () => {
-  container = await new PostgreSqlContainer().start();
-  process.env.DATABASE_URL = container.getConnectionUri();
+describe('SocialFacade', () => {
+  let db: ReturnType<typeof getTestDb>;
+  let testUserId: string;
 
-  // Run migrations
-  await runMigrations();
-});
+  beforeAll(() => {
+    db = getTestDb(); // Get Drizzle ORM instance
+  });
 
-afterAll(async () => {
-  await container.stop();
+  beforeEach(async () => {
+    await resetTestDatabase(); // Truncate all tables with CASCADE
+    const user = await createTestUser();
+    testUserId = user.id;
+  });
+
+  it('should toggle like', async () => {
+    const result = await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, db);
+    expect(result.isSuccessful).toBe(true);
+  });
 });
 ```
+
+### Available Database Helpers
+
+```typescript
+import {
+  getTestDb,           // Get Drizzle ORM database instance
+  resetTestDatabase,   // Truncate all tables (23 tables with CASCADE)
+  cleanupTable,        // Cleanup specific table
+  closeTestDb,         // Close worker connection
+  isTestDbInitialized, // Check initialization status
+} from '@/tests/setup/test-db';
+```
+
+### Database Configuration
+
+- **Container**: PostgreSQL 16 Alpine (Testcontainers)
+- **Migrations**: Auto-run from `src/lib/db/migrations/`
+- **Connection pooling**: Max 5 connections per worker
+- **Timeouts**: 5s connection, 30s idle
 
 ## Test Description Conventions
 
@@ -416,21 +557,82 @@ expect(mockFn).toHaveBeenCalledTimes(1);
 ## Test Commands
 
 ```bash
-# Run all tests
-npm run test
+# Vitest Commands
+npm run test              # Run all tests (watch mode)
+npm run test:run          # Run tests once (no watch)
+npm run test:coverage     # Run with coverage report
+npm run test:unit         # Run unit tests only (tests/unit)
+npm run test:integration  # Run integration tests only (tests/integration)
+npm run test:components   # Run component tests only (tests/components)
+npm run test:ui           # Run with Vitest UI dashboard
 
-# Run specific test file
-npm run test -- path/to/test.test.ts
+# Run specific file
+npm run test:run -- tests/unit/lib/validations/users.validation.test.ts
 
-# Run tests in watch mode
-npm run test -- --watch
+# Playwright E2E Commands
+npm run test:e2e          # Run all E2E tests
+npm run test:e2e:ui       # Run with Playwright UI
 
-# Run E2E tests
-npm run test:e2e
-
-# Run with coverage
-npm run test -- --coverage
+# Run specific E2E test
+npm run test:e2e -- tests/e2e/specs/smoke/health.spec.ts
+npm run test:e2e -- --grep "user can add"
 ```
+
+## Configuration Details
+
+### Vitest Configuration
+
+```typescript
+// vitest.config.ts key settings
+{
+  environment: 'jsdom',
+  globals: true,                    // No imports for describe/it/expect
+  pool: 'forks',                    // Fork-based isolation
+  fileParallelism: false,           // Sequential to prevent DB deadlocks
+  testTimeout: 30000,               // 30 second timeout
+  retry: process.env.CI ? 2 : 0,    // Retry in CI only
+  coverage: {
+    thresholds: { statements: 60, branches: 60, functions: 60, lines: 60 }
+  }
+}
+```
+
+### Playwright Configuration
+
+```typescript
+// playwright.config.ts key settings
+{
+  timeout: 60000,                   // 60 second test timeout
+  expect: { timeout: 10000 },       // 10 second expect timeout
+  retries: process.env.CI ? 2 : 1,  // Retries
+  workers: process.env.CI ? 4 : undefined,
+  webServer: {
+    command: process.env.CI ? 'npm run build && npm start' : 'npm run dev'
+  }
+}
+```
+
+## Pre-Mocked Dependencies
+
+The following are automatically mocked in `tests/setup/vitest.setup.ts`:
+
+```typescript
+// Clerk authentication
+'@clerk/nextjs' - ClerkProvider, useAuth, useUser, UserButton, SignedIn, SignedOut, etc.
+'@clerk/nextjs/server' - auth(), clerkClient(), currentUser()
+
+// Next.js
+'next/navigation' - useRouter, useParams, usePathname, redirect, notFound
+'next/headers' - cookies(), headers()
+
+// Third-party
+'sonner' - Toast notifications
+'next-themes' - Theme provider
+```
+
+Default test user in mocks:
+- `userId: 'test-user-id'`
+- `email: 'test@example.com'`
 
 ## Anti-Patterns to Avoid
 
@@ -442,3 +644,4 @@ npm run test -- --coverage
 6. **Never test multiple behaviors** - One assertion focus per test
 7. **Never mock what you're testing** - Mock dependencies only
 8. **Never use snapshot tests for logic** - Use explicit assertions
+9. **Never import describe/it/expect/vi** - They are globals (Vitest config)
