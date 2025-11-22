@@ -110,6 +110,7 @@
     "@clerk/testing": "^1.13.8",
     "@eslint/js": "^9.38.0",
     "@faker-js/faker": "^10.1.0",
+    "@neondatabase/api-client": "^2.2.0",
     "@next/eslint-plugin-next": "16.0.0",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/postcss": "^4",
