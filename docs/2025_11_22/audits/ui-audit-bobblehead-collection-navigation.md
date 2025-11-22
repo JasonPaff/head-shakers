@@ -111,6 +111,7 @@ Enable users to browse through bobbleheads sequentially within a collection cont
 **Description**: Users can navigate using arrow keys.
 
 **Implementation Details**:
+
 - Left Arrow: Navigate to previous bobblehead
 - Right Arrow: Navigate to next bobblehead
 - Keyboard input is ignored when user is in input/textarea fields
@@ -213,6 +214,7 @@ Enable users to browse through bobbleheads sequentially within a collection cont
 ### Accessibility Notes
 
 The implementation demonstrates excellent accessibility practices:
+
 - Proper use of `aria-label` for Previous/Next with destination names
 - `aria-disabled` instead of HTML `disabled` for span elements
 - Semantic navigation landmark
@@ -320,6 +322,7 @@ No critical errors related to the navigation feature. Some Sentry network errors
 ### Technical Implementation Notes
 
 The navigation component:
+
 - Uses `nuqs` for parsing URL query parameters
 - Uses `next-typesafe-url` ($path) for type-safe route generation
 - Implements keyboard navigation via document-level event listener

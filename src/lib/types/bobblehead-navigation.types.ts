@@ -23,12 +23,25 @@ export type AdjacentBobblehead = {
 /**
  * Complete navigation context for a bobblehead within a collection
  * Contains references to both adjacent bobbleheads (if they exist)
+ * and position information for "X of Y" display
  */
 export type BobbleheadNavigationData = {
+  /**
+   * 1-indexed ordinal position of the current bobblehead within the filtered context.
+   * Position 1 is the most recently created bobblehead (newest by createdAt).
+   * Position increases as bobbleheads get older.
+   */
+  currentPosition: number;
   /** The next bobblehead in the collection (older by createdAt) */
   nextBobblehead: AdjacentBobblehead | null;
   /** The previous bobblehead in the collection (newer by createdAt) */
   previousBobblehead: AdjacentBobblehead | null;
+  /**
+   * Total count of bobbleheads in the filtered context.
+   * When subcollectionId is provided, this is the count within that subcollection.
+   * Otherwise, this is the count within the entire collection.
+   */
+  totalCount: number;
 };
 
 /**

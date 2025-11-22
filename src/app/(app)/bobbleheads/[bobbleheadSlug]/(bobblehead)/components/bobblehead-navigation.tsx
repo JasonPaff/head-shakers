@@ -116,11 +116,15 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
   const _hasPrevious = !!navigationData.previousBobblehead;
   const _hasNext = !!navigationData.nextBobblehead;
   const _hasNavigation = _hasPrevious || _hasNext;
+  const _hasPositionInfo = navigationData.currentPosition > 0 && navigationData.totalCount > 0;
+  const _canNavigatePrevious = _hasPrevious && !!previousUrl;
+  const _canNavigateNext = _hasNext && !!nextUrl;
 
   // Test IDs
   const navTestId = generateTestId('feature', 'bobblehead-nav');
   const prevLinkTestId = generateTestId('feature', 'bobblehead-nav', 'previous');
   const nextLinkTestId = generateTestId('feature', 'bobblehead-nav', 'next');
+  const positionTestId = generateTestId('feature', 'bobblehead-nav', 'position');
 
   // Shared button styling
   const linkClassName = cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'gap-2');
@@ -135,7 +139,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
         data-testid={navTestId}
       >
         {/* Previous Link */}
-        {_hasPrevious && previousUrl ?
+        {_canNavigatePrevious ?
           <Link
             aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
             className={linkClassName}
@@ -158,8 +162,20 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
           </span>
         }
 
+        {/* Position Indicator */}
+        <Conditional isCondition={_hasPositionInfo}>
+          <span
+            aria-label={`Bobblehead ${navigationData.currentPosition} of ${navigationData.totalCount} in collection`}
+            className={'text-sm text-muted-foreground'}
+            data-slot={'bobblehead-navigation-position'}
+            data-testid={positionTestId}
+          >
+            {navigationData.currentPosition} of {navigationData.totalCount}
+          </span>
+        </Conditional>
+
         {/* Next Link */}
-        {_hasNext && nextUrl ?
+        {_canNavigateNext ?
           <Link
             aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
             className={linkClassName}

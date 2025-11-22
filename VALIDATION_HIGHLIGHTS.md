@@ -7,6 +7,7 @@
 **Location**: `bobblehead-navigation.tsx` lines 81-112
 
 **What Makes This Excellent**:
+
 - Smart input detection prevents keyboard navigation conflicts
 - Proper event prevention avoids browser defaults
 - Clear dependency array management
@@ -24,7 +25,7 @@ useEffect(() => {
     switch (event.key) {
       case 'ArrowLeft':
         if (navigationData.previousBobblehead) {
-          event.preventDefault();  // Prevents default scroll behavior
+          event.preventDefault(); // Prevents default scroll behavior
           handleNavigatePrevious();
         }
         break;
@@ -38,7 +39,7 @@ useEffect(() => {
   };
 
   document.addEventListener('keydown', handleKeyDown);
-  return () => document.removeEventListener('keydown', handleKeyDown);  // Cleanup!
+  return () => document.removeEventListener('keydown', handleKeyDown); // Cleanup!
 }, [
   navigationData.previousBobblehead,
   navigationData.nextBobblehead,
@@ -48,6 +49,7 @@ useEffect(() => {
 ```
 
 **Why This Pattern Works**:
+
 - Prevents keyboard navigation while user is typing in forms
 - Handles contentEditable elements properly
 - Cleans up event listeners on component unmount
@@ -60,6 +62,7 @@ useEffect(() => {
 **Location**: `bobblehead-navigation.tsx` lines 136-138, 152-154
 
 **What Makes This Excellent**:
+
 - Labels change based on navigation state (available vs. not available)
 - Provides context about adjacent items in aria-label
 - Clear disabled state communication
@@ -93,6 +96,7 @@ useEffect(() => {
 ```
 
 **Why This Pattern Works**:
+
 - Screen reader users know exactly what will happen when they click
 - Disabled state is communicated in aria-label, not just visually
 - Users know what item they're navigating to
@@ -104,25 +108,31 @@ useEffect(() => {
 **Location**: `bobblehead-navigation.tsx` lines 148, 162
 
 **What Makes This Excellent**:
+
 - Mobile users get maximum space for touch targets
 - Desktop users get context labels
 - Consistent component sizing regardless of screen size
 
 ```tsx
-{/* Previous Button - Icon visible on all sizes, text only on sm+ */}
+{
+  /* Previous Button - Icon visible on all sizes, text only on sm+ */
+}
 <Button size={'sm'} variant={'outline'}>
   <ChevronLeftIcon aria-hidden className={'size-4'} />
-  <span className={'hidden sm:inline'}>Previous</span>  {/* Hidden on mobile */}
-</Button>
+  <span className={'hidden sm:inline'}>Previous</span> {/* Hidden on mobile */}
+</Button>;
 
-{/* Next Button - Reordered for LTR reading */}
+{
+  /* Next Button - Reordered for LTR reading */
+}
 <Button size={'sm'} variant={'outline'}>
-  <span className={'hidden sm:inline'}>Next</span>     {/* Hidden on mobile */}
+  <span className={'hidden sm:inline'}>Next</span> {/* Hidden on mobile */}
   <ChevronRightIcon aria-hidden className={'size-4'} />
-</Button>
+</Button>;
 ```
 
 **Why This Pattern Works**:
+
 - Mobile: Small touch targets with just icons
 - Desktop: Full context with labels
 - Skeleton placeholders match this sizing: `w-24 sm:w-28`
@@ -134,6 +144,7 @@ useEffect(() => {
 **Location**: `bobblehead-navigation.tsx` lines 20-112
 
 **What Makes This Excellent**:
+
 - Follows React hooks best practices consistently
 - Clear separation of concerns
 - Proper dependency management
@@ -185,6 +196,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 ```
 
 **Why This Pattern Works**:
+
 - Easy to understand code flow
 - No dependency array issues
 - Clear data flow from top to bottom
@@ -197,6 +209,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 **Location**: `bobblehead-navigation.tsx` lines 127
 
 **What Makes This Excellent**:
+
 - Uses project's Conditional component
 - Clean and readable
 - No JSX in return when component shouldn't render
@@ -214,6 +227,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 ```
 
 **Why This Pattern Works**:
+
 - Component doesn't render in DOM at all when condition is false
 - Cleaner than ternary operators for component-level logic
 - Consistent with project patterns
@@ -225,6 +239,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 **Location**: `bobblehead-navigation.tsx` lines 121-124 and throughout
 
 **What Makes This Excellent**:
+
 - Generates test IDs once, reuses throughout
 - Uses project's generateTestId utility
 - Proper namespace and component naming
@@ -240,7 +255,7 @@ const nextButtonTestId = generateTestId('feature', 'bobblehead-nav', 'next');
 <nav data-testid={navTestId}>
   <Button data-testid={prevButtonTestId} />
   <Button data-testid={nextButtonTestId} />
-</nav>
+</nav>;
 
 // Results in:
 // - feature-bobblehead-nav
@@ -249,6 +264,7 @@ const nextButtonTestId = generateTestId('feature', 'bobblehead-nav', 'next');
 ```
 
 **Why This Pattern Works**:
+
 - Single source of truth for test IDs
 - Consistent naming prevents typos
 - Easy to find elements in tests
@@ -261,6 +277,7 @@ const nextButtonTestId = generateTestId('feature', 'bobblehead-nav', 'next');
 **Location**: `bobblehead-navigation.tsx` lines 24, 65-78, 118-119, 139, 154
 
 **What Makes This Excellent**:
+
 - Uses React's useTransition for pending state
 - Updates UI during navigation
 - Disables buttons during transition
@@ -291,6 +308,7 @@ const _isNextDisabled = !_hasNext || isPending;
 ```
 
 **Why This Pattern Works**:
+
 - Users see that navigation is happening
 - Prevents double-clicks during transition
 - Modern React pattern (useTransition)
@@ -303,15 +321,16 @@ const _isNextDisabled = !_hasNext || isPending;
 **Location**: `bobblehead-navigation-skeleton.tsx` lines 11-18
 
 **What Makes This Excellent**:
+
 - Proper ARIA attributes for loading state
 - Semantic role for navigation context
 - Matches actual component structure
 
 ```tsx
 <div
-  aria-busy={'true'}               // Clear loading indicator
-  aria-label={'Loading navigation'}  // Describes what's loading
-  role={'navigation'}               // Semantic context
+  aria-busy={'true'} // Clear loading indicator
+  aria-label={'Loading navigation'} // Describes what's loading
+  role={'navigation'} // Semantic context
   className={'flex items-center justify-between gap-4'}
   data-slot={'bobblehead-navigation-skeleton'}
   data-testid={navSkeletonTestId}
@@ -323,6 +342,7 @@ const _isNextDisabled = !_hasNext || isPending;
 ```
 
 **Why This Pattern Works**:
+
 - Screen readers announce "busy" state
 - Proper landmark for navigation
 - Responsive sizing matches real component
@@ -335,6 +355,7 @@ const _isNextDisabled = !_hasNext || isPending;
 **Location**: `bobblehead-navigation.tsx` lines 41-59
 
 **What Makes This Excellent**:
+
 - Uses project's $path for type-safe routing
 - Preserves collection context through URL params
 - Handles optional subcollection ID
@@ -359,11 +380,12 @@ const buildNavigationUrl = useCallback(
       searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
     });
   },
-  [collectionId, subcollectionId],  // Proper dependencies
+  [collectionId, subcollectionId], // Proper dependencies
 );
 ```
 
 **Why This Pattern Works**:
+
 - Type-safe routing prevents URL mistakes
 - Collection context preserved during navigation
 - Optional params handled gracefully
@@ -376,6 +398,7 @@ const buildNavigationUrl = useCallback(
 **Location**: `page.tsx` lines 210-221
 
 **What Makes This Excellent**:
+
 - Error boundary wraps component
 - Suspense provides loading fallback
 - Conditional rendering for collection context
@@ -393,6 +416,7 @@ const buildNavigationUrl = useCallback(
 ```
 
 **Why This Pattern Works**:
+
 - Errors don't crash entire page
 - Loading state handled gracefully
 - Navigation only shows when relevant
@@ -463,6 +487,7 @@ Mobile/Touch Testing:
 ## Performance Considerations
 
 ### Already Optimized:
+
 - ✅ useCallback prevents unnecessary re-renders of handlers
 - ✅ useTransition prevents layout shift during navigation
 - ✅ Proper memoization of computed values
@@ -475,6 +500,7 @@ Mobile/Touch Testing:
 ## Security Considerations
 
 ### Already Addressed:
+
 - ✅ URL generation through $path (prevents injection)
 - ✅ No eval or dynamic code execution
 - ✅ Proper HTML escaping (React handles this)
@@ -501,12 +527,15 @@ This implementation demonstrates:
 ## Reference Files
 
 ### Main Implementation
+
 - `/src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx`
 
 ### Skeleton Component
+
 - `/src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-navigation-skeleton.tsx`
 
 ### Supporting Files
+
 - `/src/components/ui/button.tsx` - Button component with variants
 - `/src/components/ui/conditional.tsx` - Conditional rendering component
 - `/src/components/ui/skeleton.tsx` - Skeleton loading component

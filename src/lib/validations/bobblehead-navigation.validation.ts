@@ -32,12 +32,31 @@ export const nullableAdjacentBobbleheadSchema = adjacentBobbleheadSchema.nullabl
 /**
  * Schema for complete bobblehead navigation data
  * Contains references to both adjacent bobbleheads within a collection context
+ * and position information for "X of Y" display
  */
 export const bobbleheadNavigationDataSchema = z.object({
+  /**
+   * 1-indexed ordinal position of the current bobblehead within the filtered context.
+   * Position 1 is the most recently created bobblehead (newest by createdAt).
+   * Position increases as bobbleheads get older.
+   */
+  currentPosition: z
+    .number({ message: 'Current position is required' })
+    .int({ message: 'Current position must be a whole number' })
+    .positive({ message: 'Current position must be at least 1' }),
   /** The next bobblehead in the collection (older by createdAt) */
   nextBobblehead: nullableAdjacentBobbleheadSchema,
   /** The previous bobblehead in the collection (newer by createdAt) */
   previousBobblehead: nullableAdjacentBobbleheadSchema,
+  /**
+   * Total count of bobbleheads in the filtered context.
+   * When subcollectionId is provided, this is the count within that subcollection.
+   * Otherwise, this is the count within the entire collection.
+   */
+  totalCount: z
+    .number({ message: 'Total count is required' })
+    .int({ message: 'Total count must be a whole number' })
+    .nonnegative({ message: 'Total count cannot be negative' }),
 });
 
 /**

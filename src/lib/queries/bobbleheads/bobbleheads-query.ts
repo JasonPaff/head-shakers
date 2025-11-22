@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, like, lt, ne, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, like, lt, ne, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
@@ -33,6 +33,16 @@ export type AdjacentBobbleheadsResult = {
 export type BobbleheadDeleteResult = {
   bobblehead: BobbleheadRecord | null;
   photos: Array<typeof bobbleheadPhotos.$inferSelect>;
+};
+
+/**
+ * result type for bobblehead position within a collection context
+ */
+export type BobbleheadPositionResult = {
+  /** 1-indexed ordinal position based on createdAt DESC ordering (position 1 = newest) */
+  currentPosition: number;
+  /** total number of bobbleheads in the filtered collection context */
+  totalCount: number;
 };
 
 /**
@@ -565,6 +575,80 @@ export class BobbleheadsQuery extends BaseQuery {
       },
       primaryImage: row.primaryImage,
       slug: row.slug,
+    };
+  }
+
+  /**
+   * get the position of a bobblehead within a collection/subcollection context
+   *
+   * position calculation:
+   * - uses createdAt DESC ordering where position 1 = newest bobblehead
+   * - position is calculated by counting bobbleheads with createdAt >= current bobblehead's createdAt
+   * - this ensures consistent ordering with the list view and adjacent navigation
+   *
+   * @param bobbleheadId - the ID of the bobblehead to find position for
+   * @param collectionId - the collection to scope the position calculation
+   * @param subcollectionId - optional subcollection to further narrow the scope
+   * @param context - query context for permissions and database instance
+   * @returns position result with currentPosition (1-indexed) and totalCount, or null if bobblehead not found
+   */
+  static async getBobbleheadPositionInCollectionAsync(
+    bobbleheadId: string,
+    collectionId: string,
+    subcollectionId: null | string,
+    context: QueryContext,
+  ): Promise<BobbleheadPositionResult | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    // first, get the current bobblehead to find its createdAt timestamp
+    const currentBobblehead = await dbInstance
+      .select({ createdAt: bobbleheads.createdAt })
+      .from(bobbleheads)
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.id, bobbleheadId),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+        ),
+      )
+      .limit(1);
+
+    if (!currentBobblehead[0]) {
+      return null;
+    }
+
+    const currentCreatedAt = currentBobblehead[0].createdAt;
+
+    // build base filter conditions for collection context
+    const baseConditions = [
+      eq(bobbleheads.collectionId, collectionId),
+      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+    ];
+
+    // add subcollection filter when provided
+    if (subcollectionId) {
+      baseConditions.push(eq(bobbleheads.subcollectionId, subcollectionId));
+    }
+
+    // count total bobbleheads in the collection context
+    const totalResult = await dbInstance
+      .select({ count: count() })
+      .from(bobbleheads)
+      .where(this.combineFilters(...baseConditions));
+
+    const totalCount = totalResult[0]?.count || 0;
+
+    // calculate position: count bobbleheads with createdAt >= current (including current)
+    // this gives us the 1-indexed position in DESC order (position 1 = newest)
+    const positionResult = await dbInstance
+      .select({ count: count() })
+      .from(bobbleheads)
+      .where(this.combineFilters(gte(bobbleheads.createdAt, currentCreatedAt), ...baseConditions));
+
+    const currentPosition = positionResult[0]?.count || 0;
+
+    return {
+      currentPosition,
+      totalCount,
     };
   }
 

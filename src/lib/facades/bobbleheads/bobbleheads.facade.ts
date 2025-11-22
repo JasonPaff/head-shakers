@@ -389,13 +389,26 @@ export class BobbleheadsFacade {
               createUserQueryContext(viewerUserId, { dbInstance })
             : createPublicQueryContext({ dbInstance });
 
-          // Fetch adjacent bobbleheads from the query layer
-          const result = await BobbleheadsQuery.getAdjacentBobbleheadsInCollectionAsync(
-            bobbleheadId,
-            collectionId,
-            subcollectionId || null,
-            context,
-          );
+          // Execute both queries in parallel for optimal performance
+          const [adjacentResult, positionResult] = await Promise.all([
+            BobbleheadsQuery.getAdjacentBobbleheadsInCollectionAsync(
+              bobbleheadId,
+              collectionId,
+              subcollectionId || null,
+              context,
+            ),
+            BobbleheadsQuery.getBobbleheadPositionInCollectionAsync(
+              bobbleheadId,
+              collectionId,
+              subcollectionId || null,
+              context,
+            ),
+          ]);
+
+          // Handle edge case where position query returns null (bobblehead not found in collection)
+          // Default to position 0 and count 0 to indicate no valid position
+          const currentPosition = positionResult?.currentPosition ?? 0;
+          const totalCount = positionResult?.totalCount ?? 0;
 
           // Transform result to match the expected schema (minimal navigation data)
           // Note: photoUrl is set to null as the base query doesn't join photos
@@ -419,17 +432,21 @@ export class BobbleheadsFacade {
             data: {
               bobbleheadId,
               collectionId,
-              hasNext: !!result.nextBobblehead,
-              hasPrevious: !!result.previousBobblehead,
+              currentPosition,
+              hasNext: !!adjacentResult.nextBobblehead,
+              hasPrevious: !!adjacentResult.previousBobblehead,
               subcollectionId: subcollectionId || null,
+              totalCount,
             },
             level: SENTRY_LEVELS.INFO,
             message: 'Fetched bobblehead navigation data',
           });
 
           return {
-            nextBobblehead: transformBobblehead(result.nextBobblehead),
-            previousBobblehead: transformBobblehead(result.previousBobblehead),
+            currentPosition,
+            nextBobblehead: transformBobblehead(adjacentResult.nextBobblehead),
+            previousBobblehead: transformBobblehead(adjacentResult.previousBobblehead),
+            totalCount,
           };
         },
         cacheKey,

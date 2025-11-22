@@ -5,12 +5,13 @@ export const BobbleheadNavigationSkeleton = () => {
   // Test IDs
   const navSkeletonTestId = generateTestId('feature', 'bobblehead-nav', 'skeleton');
   const prevButtonSkeletonTestId = generateTestId('feature', 'bobblehead-nav', 'previous-skeleton');
+  const positionSkeletonTestId = generateTestId('feature', 'bobblehead-nav', 'position-skeleton');
   const nextButtonSkeletonTestId = generateTestId('feature', 'bobblehead-nav', 'next-skeleton');
 
   return (
     <div
       aria-busy={'true'}
-      aria-label={'Loading navigation'}
+      aria-label={'Bobblehead navigation'}
       className={'flex items-center justify-between gap-4'}
       data-slot={'bobblehead-navigation-skeleton'}
       data-testid={navSkeletonTestId}
@@ -18,6 +19,9 @@ export const BobbleheadNavigationSkeleton = () => {
     >
       {/* Previous Button Skeleton */}
       <Skeleton className={'h-8 w-24 sm:w-28'} testId={prevButtonSkeletonTestId} />
+
+      {/* Position Indicator Skeleton */}
+      <Skeleton className={'h-4 w-12'} testId={positionSkeletonTestId} />
 
       {/* Next Button Skeleton */}
       <Skeleton className={'h-8 w-24 sm:w-28'} testId={nextButtonSkeletonTestId} />
