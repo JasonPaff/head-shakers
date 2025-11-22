@@ -52,13 +52,13 @@ As a user, I would like to be able to report comments through the same reporting
 
 ## Validation Results
 
-| Check | Result |
-|-------|--------|
-| Format (single paragraph) | PASS |
-| Word Count | 327 words |
-| Length Ratio | 17.2x original (19 -> 327) |
-| Intent Preserved | PASS |
-| Technical Context Added | PASS |
+| Check                     | Result                     |
+| ------------------------- | -------------------------- |
+| Format (single paragraph) | PASS                       |
+| Word Count                | 327 words                  |
+| Length Ratio              | 17.2x original (19 -> 327) |
+| Intent Preserved          | PASS                       |
+| Technical Context Added   | PASS                       |
 
 ## Notes
 

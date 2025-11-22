@@ -55,42 +55,42 @@ Return a structured list of discovered files with:
 
 ### Critical Priority (Must Modify)
 
-| File Path | Reason |
-|-----------|--------|
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx` | Primary header component displaying back button with truncated parent collection label - requires adding breadcrumb navigation |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx` | Server component that fetches bobblehead data - may need to pass additional collection context |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx` | Loading skeleton needs updating to match new header layout with breadcrumb section |
+| File Path                                                                                                     | Reason                                                                                                                         |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`                    | Primary header component displaying back button with truncated parent collection label - requires adding breadcrumb navigation |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx`        | Server component that fetches bobblehead data - may need to pass additional collection context                                 |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx` | Loading skeleton needs updating to match new header layout with breadcrumb section                                             |
 
 ### High Priority (Supporting Implementation)
 
-| File Path | Reason |
-|-----------|--------|
-| `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` | Sticky header with existing breadcrumb pattern (Collection > Subcollection > Title) - reference implementation |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Main page component passing collectionId/subcollectionId context to children |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx` | Client component showing collection context indicator - existing pattern for collection display |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-context-indicator.tsx` | Existing component displaying collection/subcollection badge - can be reused or adapted |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper.tsx` | Client wrapper showing how collection data flows from page to components |
+| File Path                                                                                               | Reason                                                                                                         |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `src/components/feature/bobblehead/bobblehead-sticky-header.tsx`                                        | Sticky header with existing breadcrumb pattern (Collection > Subcollection > Title) - reference implementation |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`                                      | Main page component passing collectionId/subcollectionId context to children                                   |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx`          | Client component showing collection context indicator - existing pattern for collection display                |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-context-indicator.tsx`   | Existing component displaying collection/subcollection badge - can be reused or adapted                        |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper.tsx` | Client wrapper showing how collection data flows from page to components                                       |
 
 ### Medium Priority (Data Layer / Reference)
 
-| File Path | Reason |
-|-----------|--------|
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Query class fetching bobblehead with collectionName, collectionSlug, subcollectionName, subcollectionSlug |
-| `src/lib/facades/bobbleheads/bobbleheads.facade.ts` | Facade coordinating bobblehead data fetching including navigation context |
-| `src/lib/facades/collections/collections.facade.ts` | Provides getCollectionById for fallback display when no URL context |
-| `src/lib/facades/collections/subcollections.facade.ts` | Provides getSubCollectionForPublicView for fallback subcollection display |
-| `src/lib/types/bobblehead-navigation.types.ts` | Type definitions for NavigationContext and BobbleheadNavigationData |
-| `src/lib/validations/bobblehead-navigation.validation.ts` | Zod schemas for navigation context validation |
+| File Path                                                 | Reason                                                                                                    |
+| --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts`        | Query class fetching bobblehead with collectionName, collectionSlug, subcollectionName, subcollectionSlug |
+| `src/lib/facades/bobbleheads/bobbleheads.facade.ts`       | Facade coordinating bobblehead data fetching including navigation context                                 |
+| `src/lib/facades/collections/collections.facade.ts`       | Provides getCollectionById for fallback display when no URL context                                       |
+| `src/lib/facades/collections/subcollections.facade.ts`    | Provides getSubCollectionForPublicView for fallback subcollection display                                 |
+| `src/lib/types/bobblehead-navigation.types.ts`            | Type definitions for NavigationContext and BobbleheadNavigationData                                       |
+| `src/lib/validations/bobblehead-navigation.validation.ts` | Zod schemas for navigation context validation                                                             |
 
 ### Low Priority (Reference / Minor Updates)
 
-| File Path | Reason |
-|-----------|--------|
-| `src/lib/db/schema/bobbleheads.schema.ts` | Database schema with collectionId and subcollectionId fields |
-| `src/lib/db/schema/collections.schema.ts` | Collection and SubCollection schemas with name, slug fields |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts` | Route type definitions for navigation context via URL |
-| `src/lib/seo/jsonld.utils.ts` | Contains generateBreadcrumbSchema - reference for breadcrumb patterns |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async.tsx` | Server component fetching navigation data pattern |
+| File Path                                                                                                  | Reason                                                                |
+| ---------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `src/lib/db/schema/bobbleheads.schema.ts`                                                                  | Database schema with collectionId and subcollectionId fields          |
+| `src/lib/db/schema/collections.schema.ts`                                                                  | Collection and SubCollection schemas with name, slug fields           |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts`                                    | Route type definitions for navigation context via URL                 |
+| `src/lib/seo/jsonld.utils.ts`                                                                              | Contains generateBreadcrumbSchema - reference for breadcrumb patterns |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async.tsx` | Server component fetching navigation data pattern                     |
 
 ## Architecture Insights
 

@@ -13,26 +13,29 @@
 ## File Discovery Results
 
 ### Critical Priority Files
-| File | Category | Description |
-|------|----------|-------------|
-| `src/app/(app)/admin/users/page.tsx` | Page | Existing placeholder page to implement |
-| `src/lib/db/schema/users.schema.ts` | Schema | User schema with userRoleEnum, lockedUntil, isVerified |
-| `src/lib/utils/admin.utils.ts` | Utility | requireModerator(), checkIsModerator(), getCurrentUserWithRole() |
-| `src/lib/queries/users/users-query.ts` | Query | UsersQuery class (needs listing/filtering methods) |
-| `src/lib/facades/users/users.facade.ts` | Facade | UsersFacade (needs admin operations) |
-| `src/lib/validations/users.validation.ts` | Validation | User validation schemas |
+
+| File                                      | Category   | Description                                                      |
+| ----------------------------------------- | ---------- | ---------------------------------------------------------------- |
+| `src/app/(app)/admin/users/page.tsx`      | Page       | Existing placeholder page to implement                           |
+| `src/lib/db/schema/users.schema.ts`       | Schema     | User schema with userRoleEnum, lockedUntil, isVerified           |
+| `src/lib/utils/admin.utils.ts`            | Utility    | requireModerator(), checkIsModerator(), getCurrentUserWithRole() |
+| `src/lib/queries/users/users-query.ts`    | Query      | UsersQuery class (needs listing/filtering methods)               |
+| `src/lib/facades/users/users.facade.ts`   | Facade     | UsersFacade (needs admin operations)                             |
+| `src/lib/validations/users.validation.ts` | Validation | User validation schemas                                          |
 
 ### High Priority Files (Patterns)
-| File | Category | Description |
-|------|----------|-------------|
-| `src/lib/utils/next-safe-action.ts` | Utility | adminActionClient configuration |
-| `src/lib/middleware/admin.middleware.ts` | Middleware | Admin middleware with role validation |
-| `src/lib/actions/admin/admin-content-reports.actions.ts` | Action | Example admin action patterns |
-| `src/lib/validations/moderation.validation.ts` | Validation | Example admin filter schemas |
-| `src/lib/constants/enums.ts` | Constants | USER.ROLE enum definitions |
-| `src/lib/constants/action-names.ts` | Constants | Action name constants |
+
+| File                                                     | Category   | Description                           |
+| -------------------------------------------------------- | ---------- | ------------------------------------- |
+| `src/lib/utils/next-safe-action.ts`                      | Utility    | adminActionClient configuration       |
+| `src/lib/middleware/admin.middleware.ts`                 | Middleware | Admin middleware with role validation |
+| `src/lib/actions/admin/admin-content-reports.actions.ts` | Action     | Example admin action patterns         |
+| `src/lib/validations/moderation.validation.ts`           | Validation | Example admin filter schemas          |
+| `src/lib/constants/enums.ts`                             | Constants  | USER.ROLE enum definitions            |
+| `src/lib/constants/action-names.ts`                      | Constants  | Action name constants                 |
 
 ### Files to Create
+
 1. `src/lib/actions/admin/admin-users.actions.ts` - Server actions
 2. `src/lib/validations/admin-users.validation.ts` - Zod schemas
 3. `src/app/(app)/admin/users/components/user-management-client.tsx` - Main client component
@@ -41,6 +44,7 @@
 6. `src/app/(app)/admin/users/components/user-details-dialog.tsx` - User details dialog
 
 ### Files to Modify
+
 1. `src/app/(app)/admin/users/page.tsx` - Replace placeholder
 2. `src/lib/queries/users/users-query.ts` - Add listing/filtering methods
 3. `src/lib/facades/users/users.facade.ts` - Add admin operations
@@ -77,19 +81,23 @@ Implement a comprehensive user management admin page that enables moderators and
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/action-names.ts` - Add admin user action names
 - `src/lib/constants/operations.ts` - Add admin user operation names
 
 **Changes:**
+
 - Add `ADMIN_USERS` section to ACTION_NAMES with: GET_USERS, UPDATE_USER_ROLE, LOCK_USER, UNLOCK_USER, VERIFY_USER_EMAIL, GET_USER_DETAILS, GET_USER_STATS
 - Add `ADMIN_USERS` section to OPERATIONS with corresponding operation names
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New constants are properly typed and follow existing naming patterns
 - [ ] All validation commands pass
 
@@ -102,9 +110,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/admin-users.validation.ts` - Admin user validation schemas
 
 **Changes:**
+
 - Create `adminUsersFilterSchema` with: search, role, status (active/locked/verified), sortBy, sortOrder, limit, offset
 - Create `adminUpdateUserRoleSchema` with: userId, newRole (user/moderator)
 - Create `adminLockUserSchema` with: userId, lockDuration (optional), reason
@@ -114,11 +124,13 @@ npm run lint:fix && npm run typecheck
 - Export all schema types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All schemas follow existing validation patterns from moderation.validation.ts
 - [ ] Role enum properly restricts values to 'user' and 'moderator' (admin role cannot be assigned via UI)
 - [ ] All validation commands pass
@@ -132,9 +144,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/users/users-query.ts` - Add admin listing methods
 
 **Changes:**
+
 - Add `findUsersForAdminAsync` method with pagination, sorting, and filtering (by role, status, search)
 - Add `countUsersForAdminAsync` method for total count with same filters
 - Add `getUserWithActivityAsync` method to get user details with recent activity
@@ -143,11 +157,13 @@ npm run lint:fix && npm run typecheck
 - Add proper indexes usage for performance (leverage existing users_role_idx, users_verified_created_idx)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Methods follow BaseQuery patterns with proper context handling
 - [ ] Pagination and filtering work correctly
 - [ ] Search functionality covers username, email, displayName
@@ -162,9 +178,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/users/users.facade.ts` - Add admin operations
 
 **Changes:**
+
 - Add `getUsersForAdminAsync` method that calls query layer and returns paginated results with stats
 - Add `updateUserRoleAsync` method with role validation (prevent self-demotion, prevent assigning admin role)
 - Add `lockUserAsync` method to set lockedUntil timestamp
@@ -175,11 +193,13 @@ npm run lint:fix && npm run typecheck
 - Add business rule validations (cannot demote self, cannot lock admin users)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All methods follow existing facade patterns
 - [ ] Cache invalidation is properly implemented
 - [ ] Business rules prevent invalid operations
@@ -194,9 +214,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/admin/admin-users.actions.ts` - Admin user server actions
 
 **Changes:**
+
 - Create `getAdminUsersAction` using adminActionClient for listing users with filters
 - Create `updateUserRoleAction` for promoting/demoting users (moderator only to moderator/user)
 - Create `lockUserAction` for locking user accounts
@@ -209,11 +231,13 @@ npm run lint:fix && npm run typecheck
 - Use handleActionError for consistent error handling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All actions use adminActionClient for authorization
 - [ ] Actions follow admin-content-reports.actions.ts patterns
 - [ ] Sentry audit logging is implemented for all role changes and status updates
@@ -228,9 +252,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/users/components/users-data-table.tsx` - TanStack table component
 
 **Changes:**
+
 - Create UsersDataTable component following reports-table.tsx patterns
 - Define columns: checkbox (selection), username, email, displayName, role (badge), status (active/locked/verified badges), memberSince, lastActiveAt, actions dropdown
 - Implement row selection for bulk operations
@@ -241,11 +267,13 @@ npm run lint:fix && npm run typecheck
 - Style status badges (active=green, locked=red, unverified=yellow)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Table renders user data correctly with proper column widths
 - [ ] Sorting and pagination work with URL state
 - [ ] Actions dropdown triggers appropriate callbacks
@@ -260,9 +288,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/users/components/user-role-dialog.tsx` - Role change dialog
 
 **Changes:**
+
 - Create UserRoleDialog component using AlertDialog from Radix UI
 - Accept props: user (current user data), isOpen, onClose, onConfirm
 - Display current role and target role selection (Select component)
@@ -272,11 +302,13 @@ npm run lint:fix && npm run typecheck
 - Add proper toast messages for success/error
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog displays user info and role options correctly
 - [ ] Role selection excludes 'admin' option (cannot promote to admin via UI)
 - [ ] Confirmation prevents accidental role changes
@@ -291,9 +323,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/users/components/user-details-dialog.tsx` - User details dialog
 
 **Changes:**
+
 - Create UserDetailsDialog component using Dialog from Radix UI
 - Accept props: userId, isOpen, onClose
 - Fetch user details using getUserDetailsAction when opened
@@ -302,11 +336,13 @@ npm run lint:fix && npm run typecheck
 - Add action buttons: Lock/Unlock Account, Verify Email, Change Role
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Dialog loads and displays user details correctly
 - [ ] Loading states are handled properly
 - [ ] Action buttons trigger appropriate operations
@@ -321,9 +357,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/users/components/user-management-client.tsx` - Main client component
 
 **Changes:**
+
 - Create UserManagementClient component following featured-content-manager.tsx patterns
 - Accept initialData prop for server-side loaded users
 - Implement filter controls: search input, role select, status select
@@ -334,11 +372,13 @@ npm run lint:fix && npm run typecheck
 - Use nuqs for URL-based filter state management
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component structure follows existing admin patterns
 - [ ] Filters update table data correctly
 - [ ] Dialog flows work end-to-end
@@ -353,9 +393,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/users/page.tsx` - Replace placeholder implementation
 
 **Changes:**
+
 - Keep existing requireModerator() authorization check
 - Import and use UsersFacade.getUsersForAdminAsync for initial data
 - Parse URL search params for initial filter state
@@ -364,11 +406,13 @@ npm run lint:fix && npm run typecheck
 - Keep dynamic = 'force-dynamic' export
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page loads with initial user data
 - [ ] Authorization is enforced for non-moderator users
 - [ ] URL params properly hydrate initial filters
@@ -383,9 +427,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - All created files may need minor adjustments based on integration testing
 
 **Changes:**
+
 - Test role change flow end-to-end
 - Test lock/unlock flow end-to-end
 - Test email verification flow
@@ -396,12 +442,14 @@ npm run lint:fix && npm run typecheck
 - Verify cache invalidation updates UI correctly
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] All user management operations work correctly
 - [ ] Error states display appropriate messages
 - [ ] Audit logging captures all admin actions
@@ -425,22 +473,26 @@ npm run build
 ## Notes
 
 **Authorization Considerations:**
+
 - Role management is restricted to moderators and admins via adminActionClient
 - Admin role cannot be assigned via UI (only direct database access)
 - Users cannot demote themselves to prevent accidental lockout
 - Admin users cannot be locked via UI (protection for platform administrators)
 
 **Performance Considerations:**
+
 - Leverage existing database indexes (users_role_idx, users_verified_created_idx, users_email_lower_idx)
 - Implement server-side pagination to handle large user bases
 - Use URL state (nuqs) for shareable/bookmarkable filter states
 
 **Audit Trail:**
+
 - All role changes logged via Sentry breadcrumbs with user context
 - Account lock/unlock operations logged with reason
 - Email verification actions logged
 
 **Clerk Integration:**
+
 - Current implementation uses local database for user management
 - Clerk is used for authentication only
 - Consider future integration with Clerk's user management API for synced operations if needed

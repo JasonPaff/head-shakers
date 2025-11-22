@@ -12,12 +12,12 @@ The Head Shakers testing setup is **well-architected and follows many modern bes
 
 **Overall Score: 7.5/10**
 
-| Category | Score | Notes |
-|----------|-------|-------|
-| Configuration | 9/10 | Excellent Vitest and Playwright config |
-| Infrastructure | 9/10 | MSW, fixtures, and utilities well-designed |
-| Test Coverage | 3/10 | Critical gap - minimal actual tests |
-| Best Practices | 7/10 | Good patterns, missing some modern features |
+| Category       | Score | Notes                                       |
+| -------------- | ----- | ------------------------------------------- |
+| Configuration  | 9/10  | Excellent Vitest and Playwright config      |
+| Infrastructure | 9/10  | MSW, fixtures, and utilities well-designed  |
+| Test Coverage  | 3/10  | Critical gap - minimal actual tests         |
+| Best Practices | 7/10  | Good patterns, missing some modern features |
 
 ---
 
@@ -37,13 +37,13 @@ The Head Shakers testing setup is **well-architected and follows many modern bes
 
 ### Technologies
 
-| Tool | Purpose | Version |
-|------|---------|---------|
-| **Vitest** | Unit/Integration/Component testing | Latest |
-| **Playwright** | E2E testing | Latest |
-| **Testing Library** | React component testing | Latest |
-| **MSW** | API mocking | Latest |
-| **Testcontainers** | Database testing (planned) | - |
+| Tool                | Purpose                            | Version |
+| ------------------- | ---------------------------------- | ------- |
+| **Vitest**          | Unit/Integration/Component testing | Latest  |
+| **Playwright**      | E2E testing                        | Latest  |
+| **Testing Library** | React component testing            | Latest  |
+| **MSW**             | API mocking                        | Latest  |
+| **Testcontainers**  | Database testing (planned)         | -       |
 
 ### Test Scripts
 
@@ -114,6 +114,7 @@ The Vitest configuration demonstrates several best practices:
 ```
 
 **Strengths:**
+
 - Separate test patterns for unit/integration/component tests
 - Using `forks` pool for reliable test isolation
 - CI-aware retry configuration (2 retries in CI, 0 locally)
@@ -141,6 +142,7 @@ tests/mocks/
 ```
 
 **Factory Pattern Example:**
+
 ```typescript
 // tests/mocks/data/users.mock.ts
 export const mockUser = {
@@ -153,12 +155,13 @@ export function createMockUser(overrides?: Partial<User>): User {
   return {
     ...mockUser,
     id: `user-${Date.now()}`,
-    ...overrides
+    ...overrides,
   };
 }
 ```
 
 **Strengths:**
+
 - Handler organization by domain (auth, collections, bobbleheads)
 - Factory functions for generating unique test data
 - `onUnhandledRequest: 'error'` catches missing mocks
@@ -178,11 +181,12 @@ projects: [
   { name: 'user-authenticated', dependencies: ['auth-setup'] },
   { name: 'admin-authenticated', dependencies: ['auth-setup'] },
   { name: 'new-user-authenticated', dependencies: ['auth-setup'] },
-  { name: 'unauthenticated', dependencies: ['auth-setup'] }
-]
+  { name: 'unauthenticated', dependencies: ['auth-setup'] },
+];
 ```
 
 **Strengths:**
+
 - **Page Object Model** pattern in `tests/e2e/pages/`
 - **Custom fixtures** with multi-role authentication support
 - **ComponentFinder** utility for consistent test ID usage
@@ -202,7 +206,7 @@ const NEON_CONFIG = {
   projectId: 'misty-boat-49919732',
   databaseName: 'head-shakers',
   developBranchId: 'br-dark-forest-adf48tll',
-  e2eBranchId: process.env.NEON_E2E_BRANCH_ID
+  e2eBranchId: process.env.NEON_E2E_BRANCH_ID,
 };
 
 // Key functions
@@ -213,6 +217,7 @@ export async function cleanupOldE2EBranches(maxAgeMs); // 24h retention
 ```
 
 **Strengths:**
+
 - Creates isolated database branches per test run
 - Supports both dedicated and dynamic branches
 - Automatic cleanup of old branches (24h retention)
@@ -247,6 +252,7 @@ export * from '@testing-library/react';
 ```
 
 **Strengths:**
+
 - Follows React Testing Library patterns
 - Includes `userEvent` for realistic interactions
 - Re-exports all RTL utilities for convenience
@@ -276,6 +282,7 @@ coverage: {
 ```
 
 **Strengths:**
+
 - 60% threshold (reasonable starting point)
 - Sensible exclusions (types, pages, migrations)
 - Multiple reporters for different use cases
@@ -287,12 +294,12 @@ coverage: {
 
 ### 1. Critical: Empty Test Directories
 
-| Directory | Status | Current Files | Expected |
-|-----------|--------|---------------|----------|
-| `tests/unit/` | Minimal | 1 file | 20+ files |
-| `tests/integration/` | **Empty** | 0 files | 15+ files |
-| `tests/components/` | **Empty** | 0 files | 30+ files |
-| `tests/e2e/specs/` | Minimal | 2 files | 10+ files |
+| Directory            | Status    | Current Files | Expected  |
+| -------------------- | --------- | ------------- | --------- |
+| `tests/unit/`        | Minimal   | 1 file        | 20+ files |
+| `tests/integration/` | **Empty** | 0 files       | 15+ files |
+| `tests/components/`  | **Empty** | 0 files       | 30+ files |
+| `tests/e2e/specs/`   | Minimal   | 2 files       | 10+ files |
 
 **Current Test Count:** ~10 test cases total
 
@@ -311,6 +318,7 @@ export async function createTestUser(overrides?) {
 ```
 
 **Impact:**
+
 - Cannot test actual database queries
 - Cannot verify Drizzle ORM operations
 - Cannot test transaction behavior
@@ -357,7 +365,7 @@ describe('createCollectionAction', () => {
   it('creates collection with valid input', async () => {
     const result = await createCollectionAction({
       name: 'Test Collection',
-      description: 'A test collection'
+      description: 'A test collection',
     });
     expect(result.data?.success).toBe(true);
   });
@@ -388,21 +396,22 @@ class ComponentFinder {
 }
 
 // Usage
-finder.feature('bobblehead-card', 'article')
+finder.feature('bobblehead-card', 'article');
 ```
 
 **Best Practice from Playwright Documentation:**
+
 > "Prefer user-facing attributes to XPath or CSS selectors"
 
 ```typescript
 // Recommended approach - prioritize semantic locators
-page.getByRole('button', { name: 'Add to Collection' })
-page.getByLabel('Collection Name')
-page.getByText('Featured Collections')
-page.getByPlaceholder('Search bobbleheads...')
+page.getByRole('button', { name: 'Add to Collection' });
+page.getByLabel('Collection Name');
+page.getByText('Featured Collections');
+page.getByPlaceholder('Search bobbleheads...');
 
 // Fall back to test IDs only when necessary
-page.getByTestId('feature-bobblehead-card')
+page.getByTestId('feature-bobblehead-card');
 ```
 
 ### 6. Missing: Accessibility Testing
@@ -487,12 +496,12 @@ describe('CollectionList error handling', () => {
 
 ### 9. Configuration Gaps
 
-| Missing Feature | Description | Benefit |
-|----------------|-------------|---------|
-| **Test sharding** | `--shard` flag for parallel CI | Faster CI runs |
-| **Blob reporter** | Merge results from shards | Unified reporting |
-| **Happy-dom** | Alternative to jsdom | 2-3x faster tests |
-| **Type testing** | `expectTypeOf` assertions | Catch type regressions |
+| Missing Feature   | Description                     | Benefit                |
+| ----------------- | ------------------------------- | ---------------------- |
+| **Test sharding** | `--shard` flag for parallel CI  | Faster CI runs         |
+| **Blob reporter** | Merge results from shards       | Unified reporting      |
+| **Happy-dom**     | Alternative to jsdom            | 2-3x faster tests      |
+| **Type testing**  | `expectTypeOf` assertions       | Catch type regressions |
 | **ESLint plugin** | `eslint-plugin-testing-library` | Enforce best practices |
 
 ### 10. CI/CD Integration Gaps
@@ -511,51 +520,51 @@ Missing features for robust CI/CD:
 
 ### Vitest Best Practices
 
-| Practice | Current | Recommended | Status |
-|----------|---------|-------------|--------|
-| Shared Vite config | Yes | Yes | ✅ |
-| Watch mode for dev | Yes | Yes | ✅ |
-| Parallel execution | Yes (forks) | Yes | ✅ |
-| Concurrent tests | No | Optional | ⚠️ |
-| Snapshot testing | No | Recommended | ❌ |
-| v8 coverage | Yes | Yes | ✅ |
-| Type testing | No | Recommended | ❌ |
-| Test sharding | No | Recommended for CI | ❌ |
+| Practice           | Current     | Recommended        | Status |
+| ------------------ | ----------- | ------------------ | ------ |
+| Shared Vite config | Yes         | Yes                | ✅     |
+| Watch mode for dev | Yes         | Yes                | ✅     |
+| Parallel execution | Yes (forks) | Yes                | ✅     |
+| Concurrent tests   | No          | Optional           | ⚠️     |
+| Snapshot testing   | No          | Recommended        | ❌     |
+| v8 coverage        | Yes         | Yes                | ✅     |
+| Type testing       | No          | Recommended        | ❌     |
+| Test sharding      | No          | Recommended for CI | ❌     |
 
 ### React Testing Library Best Practices
 
-| Practice | Current | Recommended | Status |
-|----------|---------|-------------|--------|
-| Custom render with providers | Yes | Yes | ✅ |
-| userEvent for interactions | Yes | Yes | ✅ |
-| Query by role/label | Partial | Yes | ⚠️ |
-| Avoid implementation details | N/A | Yes | N/A |
-| Async utilities (findBy) | N/A | Yes | N/A |
-| Testing user behavior | N/A | Yes | N/A |
+| Practice                     | Current | Recommended | Status |
+| ---------------------------- | ------- | ----------- | ------ |
+| Custom render with providers | Yes     | Yes         | ✅     |
+| userEvent for interactions   | Yes     | Yes         | ✅     |
+| Query by role/label          | Partial | Yes         | ⚠️     |
+| Avoid implementation details | N/A     | Yes         | N/A    |
+| Async utilities (findBy)     | N/A     | Yes         | N/A    |
+| Testing user behavior        | N/A     | Yes         | N/A    |
 
 ### Playwright Best Practices
 
-| Practice | Current | Recommended | Status |
-|----------|---------|-------------|--------|
-| Page Object Model | Yes | Yes | ✅ |
-| Semantic locators | Partial | Yes | ⚠️ |
-| Auto-waiting | Yes | Yes | ✅ |
-| Trace on failure | Yes | Yes | ✅ |
-| Multiple browser projects | Partial | Recommended | ⚠️ |
-| Visual regression | No | Recommended | ❌ |
-| Accessibility testing | No | Recommended | ❌ |
-| API mocking | No | Recommended | ❌ |
+| Practice                  | Current | Recommended | Status |
+| ------------------------- | ------- | ----------- | ------ |
+| Page Object Model         | Yes     | Yes         | ✅     |
+| Semantic locators         | Partial | Yes         | ⚠️     |
+| Auto-waiting              | Yes     | Yes         | ✅     |
+| Trace on failure          | Yes     | Yes         | ✅     |
+| Multiple browser projects | Partial | Recommended | ⚠️     |
+| Visual regression         | No      | Recommended | ❌     |
+| Accessibility testing     | No      | Recommended | ❌     |
+| API mocking               | No      | Recommended | ❌     |
 
 ### MSW Best Practices
 
-| Practice | Current | Recommended | Status |
-|----------|---------|-------------|--------|
-| Handler organization | Yes | Yes | ✅ |
-| Error on unhandled | Yes | Yes | ✅ |
-| Reset between tests | Yes | Yes | ✅ |
-| Factory functions | Yes | Yes | ✅ |
-| Network error testing | No | Recommended | ❌ |
-| Delay simulation | No | Optional | ⚠️ |
+| Practice              | Current | Recommended | Status |
+| --------------------- | ------- | ----------- | ------ |
+| Handler organization  | Yes     | Yes         | ✅     |
+| Error on unhandled    | Yes     | Yes         | ✅     |
+| Reset between tests   | Yes     | Yes         | ✅     |
+| Factory functions     | Yes     | Yes         | ✅     |
+| Network error testing | No      | Recommended | ❌     |
+| Delay simulation      | No      | Optional    | ⚠️     |
 
 ---
 
@@ -568,12 +577,14 @@ Missing features for robust CI/CD:
 **Target:** 10-15 component test files covering critical UI components
 
 **Priority Components:**
+
 - `Button`, `Input`, `Select` (form primitives)
 - `Dialog`, `Dropdown` (interactive components)
 - `CollectionCard`, `BobbleheadCard` (feature components)
 - Form components with validation
 
 **Example Implementation:**
+
 ```typescript
 // tests/components/ui/dialog.test.tsx
 import { render, screen, waitFor } from '@/tests/setup/test-utils';
@@ -612,12 +623,14 @@ describe('Dialog', () => {
 **Target:** Full database integration testing capability
 
 **Steps:**
+
 1. Install `@testcontainers/postgresql`
 2. Create test database setup utility
 3. Uncomment and implement test factories
 4. Add integration tests for queries and facades
 
 **Example Implementation:**
+
 ```typescript
 // tests/setup/test-db.ts
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
@@ -628,9 +641,7 @@ let container: PostgreSqlContainer;
 let db: ReturnType<typeof drizzle>;
 
 export async function setupTestDb() {
-  container = await new PostgreSqlContainer()
-    .withDatabase('test_head_shakers')
-    .start();
+  container = await new PostgreSqlContainer().withDatabase('test_head_shakers').start();
 
   const connectionString = container.getConnectionUri();
   db = drizzle(connectionString, { schema });
@@ -655,6 +666,7 @@ export function getTestDb() {
 **Target:** All server actions in `src/lib/actions/`
 
 **Example:**
+
 ```typescript
 // tests/integration/actions/bobbleheads.test.ts
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -670,7 +682,7 @@ describe('Bobblehead Actions', () => {
       const result = await createBobbleheadAction({
         name: 'Test Bobblehead',
         category: 'sports',
-        collectionId: 'collection-123'
+        collectionId: 'collection-123',
       });
 
       expect(result.data).toBeDefined();
@@ -680,7 +692,7 @@ describe('Bobblehead Actions', () => {
     it('validates required fields', async () => {
       const result = await createBobbleheadAction({
         name: '',
-        category: 'sports'
+        category: 'sports',
       });
 
       expect(result.validationErrors?.name).toBeDefined();
@@ -694,11 +706,13 @@ describe('Bobblehead Actions', () => {
 #### 4. Improve Playwright Locator Strategy
 
 **Current:**
+
 ```typescript
-finder.feature('bobblehead-card', 'article')
+finder.feature('bobblehead-card', 'article');
 ```
 
 **Recommended:**
+
 ```typescript
 // Update Page Objects to prefer semantic locators
 class CollectionPage extends BasePage {
@@ -719,11 +733,13 @@ class CollectionPage extends BasePage {
 #### 5. Add Accessibility Testing
 
 **Install:**
+
 ```bash
 npm install -D jest-axe @axe-core/playwright
 ```
 
 **Unit Test Integration:**
+
 ```typescript
 // tests/setup/vitest.setup.ts
 import { toHaveNoViolations } from 'jest-axe';
@@ -731,6 +747,7 @@ expect.extend(toHaveNoViolations);
 ```
 
 **E2E Integration:**
+
 ```typescript
 // tests/e2e/specs/accessibility/a11y.spec.ts
 import AxeBuilder from '@axe-core/playwright';
@@ -753,6 +770,7 @@ test.describe('Accessibility', () => {
 #### 6. Configure Test Sharding for CI
 
 **Update CI workflow:**
+
 ```yaml
 # .github/workflows/test.yml
 jobs:
@@ -779,16 +797,16 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       maxDiffPixels: 100,
-      threshold: 0.2
-    }
-  }
+      threshold: 0.2,
+    },
+  },
 });
 
 // tests/e2e/specs/visual/homepage.spec.ts
 test('homepage visual regression', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveScreenshot('homepage.png', {
-    fullPage: true
+    fullPage: true,
   });
 });
 ```
@@ -828,14 +846,14 @@ export default [
     files: ['tests/**/*.{ts,tsx}'],
     plugins: {
       'testing-library': testingLibrary,
-      'vitest': vitest
+      vitest: vitest,
     },
     rules: {
       'testing-library/prefer-screen-queries': 'error',
       'testing-library/no-wait-for-multiple-assertions': 'error',
-      'vitest/expect-expect': 'error'
-    }
-  }
+      'vitest/expect-expect': 'error',
+    },
+  },
 ];
 ```
 
@@ -845,39 +863,39 @@ export default [
 
 ### Phase 1: Foundation (Week 1-2)
 
-| Task | Priority | Effort | Owner |
-|------|----------|--------|-------|
-| Add 10 component tests | High | 3 days | - |
-| Add 5 validation unit tests | High | 1 day | - |
-| Setup Testcontainers | High | 2 days | - |
-| Add ESLint testing plugins | Medium | 0.5 day | - |
+| Task                        | Priority | Effort  | Owner |
+| --------------------------- | -------- | ------- | ----- |
+| Add 10 component tests      | High     | 3 days  | -     |
+| Add 5 validation unit tests | High     | 1 day   | -     |
+| Setup Testcontainers        | High     | 2 days  | -     |
+| Add ESLint testing plugins  | Medium   | 0.5 day | -     |
 
 ### Phase 2: Integration (Week 3-4)
 
-| Task | Priority | Effort | Owner |
-|------|----------|--------|-------|
-| Add server action tests | High | 3 days | - |
-| Add facade layer tests | High | 2 days | - |
-| Add query tests | Medium | 2 days | - |
-| Implement accessibility tests | Medium | 2 days | - |
+| Task                          | Priority | Effort | Owner |
+| ----------------------------- | -------- | ------ | ----- |
+| Add server action tests       | High     | 3 days | -     |
+| Add facade layer tests        | High     | 2 days | -     |
+| Add query tests               | Medium   | 2 days | -     |
+| Implement accessibility tests | Medium   | 2 days | -     |
 
 ### Phase 3: Enhancement (Week 5-6)
 
-| Task | Priority | Effort | Owner |
-|------|----------|--------|-------|
-| Update Playwright locators | Medium | 2 days | - |
-| Add visual regression tests | Low | 2 days | - |
-| Configure test sharding | Low | 1 day | - |
-| Add type testing | Low | 1 day | - |
+| Task                        | Priority | Effort | Owner |
+| --------------------------- | -------- | ------ | ----- |
+| Update Playwright locators  | Medium   | 2 days | -     |
+| Add visual regression tests | Low      | 2 days | -     |
+| Configure test sharding     | Low      | 1 day  | -     |
+| Add type testing            | Low      | 1 day  | -     |
 
 ### Phase 4: Maturity (Ongoing)
 
-| Task | Priority | Effort | Owner |
-|------|----------|--------|-------|
-| Increase coverage to 80% | Medium | Ongoing | - |
-| Add E2E specs for all features | Medium | Ongoing | - |
-| Implement flaky test detection | Low | 1 day | - |
-| Add coverage trend tracking | Low | 1 day | - |
+| Task                           | Priority | Effort  | Owner |
+| ------------------------------ | -------- | ------- | ----- |
+| Increase coverage to 80%       | Medium   | Ongoing | -     |
+| Add E2E specs for all features | Medium   | Ongoing | -     |
+| Implement flaky test detection | Low      | 1 day   | -     |
+| Add coverage trend tracking    | Low      | 1 day   | -     |
 
 ---
 
@@ -885,47 +903,47 @@ export default [
 
 ### Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `vitest.config.ts` | Vitest test runner configuration |
-| `playwright.config.ts` | Playwright E2E configuration |
+| File                          | Purpose                              |
+| ----------------------------- | ------------------------------------ |
+| `vitest.config.ts`            | Vitest test runner configuration     |
+| `playwright.config.ts`        | Playwright E2E configuration         |
 | `tests/setup/vitest.setup.ts` | Global test setup with MSW and mocks |
-| `tests/setup/msw.setup.ts` | MSW server initialization |
-| `tests/setup/test-utils.tsx` | Custom render function and utilities |
+| `tests/setup/msw.setup.ts`    | MSW server initialization            |
+| `tests/setup/test-utils.tsx`  | Custom render function and utilities |
 
 ### Mock Files
 
-| File | Purpose |
-|------|---------|
-| `tests/mocks/handlers/index.ts` | Combined MSW handlers |
-| `tests/mocks/handlers/auth.handlers.ts` | Authentication endpoint mocks |
-| `tests/mocks/handlers/collections.handlers.ts` | Collections endpoint mocks |
-| `tests/mocks/handlers/bobbleheads.handlers.ts` | Bobbleheads endpoint mocks |
-| `tests/mocks/data/users.mock.ts` | User mock data and factories |
-| `tests/mocks/data/collections.mock.ts` | Collection mock data and factories |
-| `tests/mocks/data/bobbleheads.mock.ts` | Bobblehead mock data and factories |
+| File                                           | Purpose                            |
+| ---------------------------------------------- | ---------------------------------- |
+| `tests/mocks/handlers/index.ts`                | Combined MSW handlers              |
+| `tests/mocks/handlers/auth.handlers.ts`        | Authentication endpoint mocks      |
+| `tests/mocks/handlers/collections.handlers.ts` | Collections endpoint mocks         |
+| `tests/mocks/handlers/bobbleheads.handlers.ts` | Bobbleheads endpoint mocks         |
+| `tests/mocks/data/users.mock.ts`               | User mock data and factories       |
+| `tests/mocks/data/collections.mock.ts`         | Collection mock data and factories |
+| `tests/mocks/data/bobbleheads.mock.ts`         | Bobblehead mock data and factories |
 
 ### E2E Files
 
-| File | Purpose |
-|------|---------|
-| `tests/e2e/global.setup.ts` | E2E setup (Neon branch, Clerk auth) |
-| `tests/e2e/global.teardown.ts` | E2E cleanup |
-| `tests/e2e/setup/auth.setup.ts` | Multi-user authentication setup |
-| `tests/e2e/fixtures/base.fixture.ts` | Playwright fixtures and helpers |
-| `tests/e2e/pages/*.page.ts` | Page Object Models |
-| `tests/e2e/utils/neon-branch.ts` | Neon database branching utilities |
-| `tests/e2e/helpers/test-helpers.ts` | ComponentFinder and test ID utilities |
+| File                                 | Purpose                               |
+| ------------------------------------ | ------------------------------------- |
+| `tests/e2e/global.setup.ts`          | E2E setup (Neon branch, Clerk auth)   |
+| `tests/e2e/global.teardown.ts`       | E2E cleanup                           |
+| `tests/e2e/setup/auth.setup.ts`      | Multi-user authentication setup       |
+| `tests/e2e/fixtures/base.fixture.ts` | Playwright fixtures and helpers       |
+| `tests/e2e/pages/*.page.ts`          | Page Object Models                    |
+| `tests/e2e/utils/neon-branch.ts`     | Neon database branching utilities     |
+| `tests/e2e/helpers/test-helpers.ts`  | ComponentFinder and test ID utilities |
 
 ### Test Files
 
-| File | Status |
-|------|--------|
+| File                                                        | Status |
+| ----------------------------------------------------------- | ------ |
 | `tests/unit/lib/validations/collections.validation.test.ts` | Exists |
-| `tests/e2e/specs/smoke/auth-flow.spec.ts` | Exists |
-| `tests/e2e/specs/smoke/health.spec.ts` | Exists |
-| `tests/integration/*` | Empty |
-| `tests/components/*` | Empty |
+| `tests/e2e/specs/smoke/auth-flow.spec.ts`                   | Exists |
+| `tests/e2e/specs/smoke/health.spec.ts`                      | Exists |
+| `tests/integration/*`                                       | Empty  |
+| `tests/components/*`                                        | Empty  |
 
 ---
 
@@ -951,4 +969,4 @@ The Head Shakers testing infrastructure is **well-designed and production-ready*
 
 ---
 
-*Report generated by Claude Code analysis on November 22, 2025*
+_Report generated by Claude Code analysis on November 22, 2025_

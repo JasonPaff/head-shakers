@@ -13,11 +13,13 @@
 **Refined Request**: Enhance bobblehead details page header with collection/subcollection breadcrumb navigation links
 
 **Critical Files Identified**:
+
 - bobblehead-header.tsx (modify)
 - bobblehead-header-async.tsx (reference)
 - bobblehead-header-skeleton.tsx (modify)
 
 **Reference Files**:
+
 - bobblehead-sticky-header.tsx (breadcrumb pattern)
 - collection-context-indicator.tsx (existing context display)
 
@@ -54,15 +56,15 @@ See the implementation plan in the next file: `docs/2025_11_22/plans/bobblehead-
 
 ## Plan Summary
 
-| Step | Description | Files | Confidence |
-|------|-------------|-------|------------|
-| 1 | Create CollectionBreadcrumb Component | 1 new file | High |
-| 2 | Update BobbleheadHeader | 1 modification | High |
-| 3 | Update Header Skeleton | 1 modification | High |
-| 4 | Add Test ID Type | 1 modification | High |
-| 5 | Enhance Mobile Responsiveness | 1 modification | Medium |
-| 6 | Verify Integration with Sticky Header | Review only | High |
-| 7 | Manual Testing and Visual Verification | None | High |
+| Step | Description                            | Files          | Confidence |
+| ---- | -------------------------------------- | -------------- | ---------- |
+| 1    | Create CollectionBreadcrumb Component  | 1 new file     | High       |
+| 2    | Update BobbleheadHeader                | 1 modification | High       |
+| 3    | Update Header Skeleton                 | 1 modification | High       |
+| 4    | Add Test ID Type                       | 1 modification | High       |
+| 5    | Enhance Mobile Responsiveness          | 1 modification | Medium     |
+| 6    | Verify Integration with Sticky Header  | Review only    | High       |
+| 7    | Manual Testing and Visual Verification | None           | High       |
 
 ## Quality Gate Results
 

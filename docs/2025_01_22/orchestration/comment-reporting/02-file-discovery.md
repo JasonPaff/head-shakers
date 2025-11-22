@@ -19,57 +19,57 @@ As a user, I would like to be able to report comments through the same reporting
 
 ## Critical Files (Require Modification)
 
-| File Path | Category | Description |
-|-----------|----------|-------------|
-| `src/lib/db/schema/moderation.schema.ts` | schema | Contains `contentReports` table - already supports 'comment' in enum |
-| `src/lib/constants/enums.ts` | constants | `CONTENT_REPORT.TARGET_TYPE` already includes 'comment' |
-| `src/lib/validations/moderation.validation.ts` | validation | **Must add 'comment'** to `createContentReportSchema` targetType |
-| `src/lib/queries/content-reports/content-reports.query.ts` | query | **Must add 'comment' case** to `validateTargetAsync()` |
-| `src/lib/facades/content-reports/content-reports.facade.ts` | facade | **Must add 'comment' case** to `validateReportTarget()` |
-| `src/components/feature/content-reports/report-button.tsx` | component | **Must add 'comment'** to `ReportTargetType` |
-| `src/components/feature/comments/comment-item.tsx` | component | **Must add ReportButton** for non-owners |
+| File Path                                                   | Category   | Description                                                          |
+| ----------------------------------------------------------- | ---------- | -------------------------------------------------------------------- |
+| `src/lib/db/schema/moderation.schema.ts`                    | schema     | Contains `contentReports` table - already supports 'comment' in enum |
+| `src/lib/constants/enums.ts`                                | constants  | `CONTENT_REPORT.TARGET_TYPE` already includes 'comment'              |
+| `src/lib/validations/moderation.validation.ts`              | validation | **Must add 'comment'** to `createContentReportSchema` targetType     |
+| `src/lib/queries/content-reports/content-reports.query.ts`  | query      | **Must add 'comment' case** to `validateTargetAsync()`               |
+| `src/lib/facades/content-reports/content-reports.facade.ts` | facade     | **Must add 'comment' case** to `validateReportTarget()`              |
+| `src/components/feature/content-reports/report-button.tsx`  | component  | **Must add 'comment'** to `ReportTargetType`                         |
+| `src/components/feature/comments/comment-item.tsx`          | component  | **Must add ReportButton** for non-owners                             |
 
 ## High Priority Files
 
-| File Path | Category | Description |
-|-----------|----------|-------------|
-| `src/lib/db/schema/social.schema.ts` | schema | Contains `comments` table definition |
-| `src/lib/db/schema/relations.schema.ts` | schema | Contains report relations |
-| `src/lib/validations/comment.validation.ts` | validation | Comment validation patterns |
-| `src/lib/queries/social/social.query.ts` | query | Contains `getCommentByIdAsync()` |
-| `src/lib/facades/social/social.facade.ts` | facade | Comment-related methods |
-| `src/lib/actions/content-reports/content-reports.actions.ts` | action | Report server actions |
-| `src/components/feature/content-reports/report-reason-dialog.tsx` | component | Report dialog |
+| File Path                                                         | Category   | Description                          |
+| ----------------------------------------------------------------- | ---------- | ------------------------------------ |
+| `src/lib/db/schema/social.schema.ts`                              | schema     | Contains `comments` table definition |
+| `src/lib/db/schema/relations.schema.ts`                           | schema     | Contains report relations            |
+| `src/lib/validations/comment.validation.ts`                       | validation | Comment validation patterns          |
+| `src/lib/queries/social/social.query.ts`                          | query      | Contains `getCommentByIdAsync()`     |
+| `src/lib/facades/social/social.facade.ts`                         | facade     | Comment-related methods              |
+| `src/lib/actions/content-reports/content-reports.actions.ts`      | action     | Report server actions                |
+| `src/components/feature/content-reports/report-reason-dialog.tsx` | component  | Report dialog                        |
 
 ## Medium Priority Files (Admin UI)
 
-| File Path | Category | Description |
-|-----------|----------|-------------|
-| `src/components/admin/reports/reports-table.tsx` | admin | **Add 'comment' badge** |
-| `src/components/admin/reports/report-detail-dialog.tsx` | admin | **Add 'comment' handling** |
-| `src/components/admin/reports/report-filters.tsx` | admin | **Add 'comment' filter** |
-| `src/app/(app)/admin/reports/page.tsx` | admin | Reports page |
+| File Path                                               | Category | Description                |
+| ------------------------------------------------------- | -------- | -------------------------- |
+| `src/components/admin/reports/reports-table.tsx`        | admin    | **Add 'comment' badge**    |
+| `src/components/admin/reports/report-detail-dialog.tsx` | admin    | **Add 'comment' handling** |
+| `src/components/admin/reports/report-filters.tsx`       | admin    | **Add 'comment' filter**   |
+| `src/app/(app)/admin/reports/page.tsx`                  | admin    | Reports page               |
 
 ## Reference Files (Pattern Examples)
 
-| File Path | Category | Description |
-|-----------|----------|-------------|
-| `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` | reference | ReportButton integration example |
-| `src/components/feature/collection/collection-sticky-header.tsx` | reference | ReportButton integration example |
+| File Path                                                              | Category  | Description                      |
+| ---------------------------------------------------------------------- | --------- | -------------------------------- |
+| `src/components/feature/bobblehead/bobblehead-sticky-header.tsx`       | reference | ReportButton integration example |
+| `src/components/feature/collection/collection-sticky-header.tsx`       | reference | ReportButton integration example |
 | `src/components/feature/subcollection/subcollection-sticky-header.tsx` | reference | ReportButton integration example |
 
 ## Low Priority/Supporting Files
 
-| File Path | Category | Description |
-|-----------|----------|-------------|
-| `src/lib/constants/error-codes.ts` | constants | Error codes for reports |
-| `src/lib/constants/error-messages.ts` | constants | Error messages |
-| `src/lib/constants/operations.ts` | constants | Operation constants |
-| `src/lib/constants/action-names.ts` | constants | Action names |
-| `src/components/feature/content-reports/report-status-indicator.tsx` | component | Status indicator |
-| `src/components/feature/content-reports/report-status-wrapper.tsx` | component | Status wrapper |
-| `src/components/feature/comments/comment-list.tsx` | component | Comment list |
-| `src/components/feature/comments/comment-section.tsx` | component | Comment section |
+| File Path                                                            | Category  | Description             |
+| -------------------------------------------------------------------- | --------- | ----------------------- |
+| `src/lib/constants/error-codes.ts`                                   | constants | Error codes for reports |
+| `src/lib/constants/error-messages.ts`                                | constants | Error messages          |
+| `src/lib/constants/operations.ts`                                    | constants | Operation constants     |
+| `src/lib/constants/action-names.ts`                                  | constants | Action names            |
+| `src/components/feature/content-reports/report-status-indicator.tsx` | component | Status indicator        |
+| `src/components/feature/content-reports/report-status-wrapper.tsx`   | component | Status wrapper          |
+| `src/components/feature/comments/comment-list.tsx`                   | component | Comment list            |
+| `src/components/feature/comments/comment-section.tsx`                | component | Comment section         |
 
 ## Key Architecture Insights
 
@@ -107,10 +107,10 @@ userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notN
 
 ## Validation Results
 
-| Check | Result |
-|-------|--------|
-| Minimum Files (3+) | PASS - 35 files discovered |
-| File Existence | PASS - All paths validated |
-| Categorization | PASS - Proper priority assignment |
-| Coverage | PASS - All layers covered |
+| Check               | Result                              |
+| ------------------- | ----------------------------------- |
+| Minimum Files (3+)  | PASS - 35 files discovered          |
+| File Existence      | PASS - All paths validated          |
+| Categorization      | PASS - Proper priority assignment   |
+| Coverage            | PASS - All layers covered           |
 | Pattern Recognition | PASS - Existing patterns identified |
