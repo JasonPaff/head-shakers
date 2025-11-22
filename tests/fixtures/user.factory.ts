@@ -52,17 +52,17 @@ export async function createTestModeratorUser(overrides: CreateTestUserOptions =
  */
 export async function createTestUser(overrides: CreateTestUserOptions = {}) {
   const db = getTestDb();
-  const timestamp = Date.now();
+  const uniqueId = crypto.randomUUID();
 
   const userData = {
     avatarUrl: overrides.avatarUrl ?? null,
     bio: overrides.bio ?? null,
-    clerkId: overrides.clerkId ?? `clerk-${timestamp}`,
+    clerkId: overrides.clerkId ?? `clerk-${uniqueId}`,
     displayName: overrides.displayName ?? 'Test User',
-    email: overrides.email ?? `test-${timestamp}@example.com`,
+    email: overrides.email ?? `test-${uniqueId}@example.com`,
     location: overrides.location ?? null,
     role: overrides.role ?? 'user',
-    username: overrides.username ?? `testuser-${timestamp}`,
+    username: overrides.username ?? `testuser-${uniqueId}`,
   };
 
   const [user] = await db.insert(users).values(userData).returning();
@@ -75,10 +75,11 @@ export async function createTestUser(overrides: CreateTestUserOptions = {}) {
 export async function createTestUsers(count: number, overrides: CreateTestUserOptions = {}) {
   const createdUsers = [];
   for (let i = 0; i < count; i++) {
+    const uniqueId = crypto.randomUUID();
     const user = await createTestUser({
       ...overrides,
-      email: `testuser-${Date.now()}-${i}@example.com`,
-      username: `testuser-${Date.now()}-${i}`,
+      email: `testuser-${uniqueId}@example.com`,
+      username: `testuser-${uniqueId}`,
     });
     createdUsers.push(user);
   }

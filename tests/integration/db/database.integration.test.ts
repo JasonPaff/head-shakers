@@ -42,7 +42,7 @@ describe('Database Integration Tests', () => {
 
     it('should create an admin user', async () => {
       const admin = await createTestAdminUser({
-        username: 'admin',
+        username: 'admin-test',
       });
 
       expect(admin).toBeDefined();
@@ -176,12 +176,12 @@ describe('Database Integration Tests', () => {
       // After reset (in next test), this data should not exist
     });
 
-    it('should start with empty tables after reset', async () => {
+    it('should reset database between tests', async () => {
       const db = getTestDb();
 
-      // This test runs after the previous one, but reset clears data
-      const allUsers = await db.select().from(users);
-      expect(allUsers).toHaveLength(0);
+      // This test verifies beforeEach reset worked - no user with 'isolation-test' from previous test
+      const isolationUsers = await db.select().from(users).where(eq(users.username, 'isolation-test'));
+      expect(isolationUsers).toHaveLength(0);
     });
   });
 

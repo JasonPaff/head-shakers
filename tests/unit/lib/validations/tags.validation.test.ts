@@ -154,7 +154,7 @@ describe('tags validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('At least one tag is required');
+        expect(result.error.issues[0]?.message).toContain('At least one tag is required');
       }
     });
 
@@ -259,7 +259,7 @@ describe('tags validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('at least 2 characters');
+        expect(result.error.issues[0]?.message).toContain('at least 2 characters');
       }
     });
 
@@ -269,7 +269,7 @@ describe('tags validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('Query too long');
+        expect(result.error.issues[0]?.message).toContain('Query too long');
       }
     });
 

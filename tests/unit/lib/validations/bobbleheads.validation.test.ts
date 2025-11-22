@@ -144,7 +144,7 @@ describe('bobbleheads validation schemas', () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.photoOrder).toHaveLength(2);
-        expect(result.data.photoOrder[1].isPrimary).toBe(true);
+        expect(result.data.photoOrder[1]?.isPrimary).toBe(true);
       }
     });
 

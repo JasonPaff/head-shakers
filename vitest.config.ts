@@ -58,8 +58,11 @@ export default defineConfig({
     // Globals - allows using describe, it, expect without imports
     globals: true,
 
-    // Pool configuration - using threads for shared memory with test database
-    pool: 'threads',
+    // Pool configuration - using forks for better isolation
+    pool: 'forks',
+
+    // Run integration tests sequentially to avoid database deadlocks
+    fileParallelism: false,
 
     // Timeout (increased for integration tests with database)
     testTimeout: 30000,

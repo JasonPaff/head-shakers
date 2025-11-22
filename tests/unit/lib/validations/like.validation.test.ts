@@ -52,7 +52,7 @@ describe('like validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('bobblehead, collection, or subcollection');
+        expect(result.error.issues[0]?.message).toContain('bobblehead, collection, or subcollection');
       }
     });
 
@@ -65,7 +65,7 @@ describe('like validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('valid UUID');
+        expect(result.error.issues[0]?.message).toContain('valid UUID');
       }
     });
 
@@ -175,28 +175,23 @@ describe('like validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('At least one target is required');
+        expect(result.error.issues[0]?.message).toContain('At least one target is required');
       }
     });
 
     it('should reject targets exceeding maximum (50)', () => {
-      const targets = Array.from({ length: 51 }, (_, i) => ({
-        targetId: `123e4567-e89b-12d3-a456-42661417400${i.toString().padStart(1, '0')}`,
-        targetType: 'bobblehead' as const,
-      }));
-
-      // Generate valid UUIDs
-      const validTargets = Array.from({ length: 51 }, () => ({
+      // Generate 51 targets with valid UUIDs to test maximum limit
+      const targets = Array.from({ length: 51 }, () => ({
         targetId: '123e4567-e89b-12d3-a456-426614174000',
         targetType: 'bobblehead' as const,
       }));
 
-      const input = { targets: validTargets };
+      const input = { targets };
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('Maximum 50 targets');
+        expect(result.error.issues[0]?.message).toContain('Maximum 50 targets');
       }
     });
 

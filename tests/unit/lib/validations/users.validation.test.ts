@@ -25,7 +25,7 @@ describe('users validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain(
+        expect(result.error.issues[0]?.message).toContain(
           `Username must be at least ${SCHEMA_LIMITS.USER.USERNAME.MIN} characters`,
         );
       }
@@ -37,7 +37,7 @@ describe('users validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain(
+        expect(result.error.issues[0]?.message).toContain(
           `Username must be at most ${SCHEMA_LIMITS.USER.USERNAME.MAX} characters`,
         );
       }
@@ -49,7 +49,7 @@ describe('users validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('letters, numbers, and underscores');
+        expect(result.error.issues[0]?.message).toContain('letters, numbers, and underscores');
       }
     });
 
@@ -73,7 +73,7 @@ describe('users validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('reserved');
+        expect(result.error.issues[0]?.message).toContain('reserved');
       }
     });
   });
