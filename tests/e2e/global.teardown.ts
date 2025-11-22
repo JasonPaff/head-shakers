@@ -1,7 +1,12 @@
+import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-import { deleteE2EBranch, type E2EBranchInfo } from './utils/neon-branch';
+import { deleteE2EBranch, type E2EBranchInfo, NEON_CONFIG } from './utils/neon-branch';
+
+// Load env vars to check for dedicated branch config
+dotenv.config({ path: '.env.e2e' });
+dotenv.config({ path: '.env.local' });
 
 const branchInfoFile = path.resolve(process.cwd(), 'playwright/.e2e-branch.json');
 const authDir = path.resolve(process.cwd(), 'playwright/.auth');
@@ -9,20 +14,26 @@ const authDir = path.resolve(process.cwd(), 'playwright/.auth');
 export default async function globalTeardown() {
   console.log('Running E2E global teardown...');
 
-  // Clean up database branch
+  // Check if using dedicated branch
+  const isDedicatedBranch = !!NEON_CONFIG.e2eBranchId;
+
+  // Clean up database branch (only for dynamic branches)
   if (fs.existsSync(branchInfoFile)) {
     try {
       const branchInfo: E2EBranchInfo = JSON.parse(fs.readFileSync(branchInfoFile, 'utf-8'));
 
-      console.log(`Cleaning up E2E branch: ${branchInfo.branchName}`);
+      if (isDedicatedBranch) {
+        console.log(`Dedicated E2E branch preserved: ${branchInfo.branchName}`);
+        console.log('(Branch will be reused in next test run)');
+      } else {
+        // Only delete dynamic branches
+        console.log(`Cleaning up dynamic E2E branch: ${branchInfo.branchName}`);
+        await deleteE2EBranch(branchInfo.branchId);
+        console.log('E2E Database Teardown Complete');
+      }
 
-      // Delete the branch
-      await deleteE2EBranch(branchInfo.branchId);
-
-      // Remove the branch info file
+      // Remove the branch info file (always, to ensure fresh connection on next run)
       fs.unlinkSync(branchInfoFile);
-
-      console.log('E2E Database Teardown Complete');
     } catch (error) {
       console.error('Failed to read branch info or cleanup:', error);
       // Don't throw - teardown should not fail the test suite

@@ -121,8 +121,12 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 300000, // 5 minutes to allow for build time
+    // Spread all env vars from parent process, then override DATABASE_URL with E2E branch
     env: {
+      ...process.env,
+      // Override database URL with E2E branch connection string
       DATABASE_URL: getE2EDatabaseUrl() || process.env.DATABASE_URL || '',
+      // Ensure correct NODE_ENV for the test environment
       NODE_ENV: process.env.CI ? 'production' : 'development',
     },
   },

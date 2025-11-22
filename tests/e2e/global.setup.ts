@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-import { cleanupOldE2EBranches, createE2EBranch } from './utils/neon-branch';
+import { cleanupOldE2EBranches, getE2EBranch, NEON_CONFIG } from './utils/neon-branch';
 
 // Ensure environment variables are loaded
 dotenv.config({ path: '.env.e2e' });
@@ -24,29 +24,62 @@ export default async function globalSetup() {
     throw new Error('NEON_API_KEY is required for E2E database branching');
   }
 
-  // Step 1: Create E2E database branch (must happen before web server starts)
-  console.log('Creating E2E database branch...');
+  // Verify Upstash credentials for caching
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+    console.warn('WARNING: Upstash Redis credentials not set. Caching may fail.');
+    console.warn('Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in .env.e2e');
+  }
+
+  // Step 1: Get or create E2E database branch
+  console.log('Setting up E2E database branch...');
   try {
-    // Clean up any old branches first (older than 24 hours)
-    await cleanupOldE2EBranches();
+    // Check if using dedicated branch or dynamic branches
+    const isDedicatedBranch = !!NEON_CONFIG.e2eBranchId;
 
-    // Create a new E2E branch
-    const branchInfo = await createE2EBranch();
+    if (isDedicatedBranch) {
+      console.log('Using dedicated E2E branch (no reset - preserving test data)');
+      // For dedicated branch, we don't reset by default to preserve seeded test data
+      // Set E2E_RESET_BRANCH=true to force reset if needed
+      const shouldReset = process.env.E2E_RESET_BRANCH === 'true';
+      const branchInfo = await getE2EBranch({ reset: shouldReset });
 
-    // Ensure playwright directory exists
-    const branchInfoDir = path.dirname(branchInfoFile);
-    if (!fs.existsSync(branchInfoDir)) {
-      fs.mkdirSync(branchInfoDir, { recursive: true });
+      // Ensure playwright directory exists
+      const branchInfoDir = path.dirname(branchInfoFile);
+      if (!fs.existsSync(branchInfoDir)) {
+        fs.mkdirSync(branchInfoDir, { recursive: true });
+      }
+
+      // Save branch info for web server
+      fs.writeFileSync(branchInfoFile, JSON.stringify(branchInfo, null, 2));
+
+      console.log('E2E Database Setup Complete (dedicated branch)');
+      console.log(`Branch: ${branchInfo.branchName}`);
+      console.log(`Branch ID: ${branchInfo.branchId}`);
+    } else {
+      // Legacy: Dynamic branch creation
+      console.log('No dedicated E2E branch configured, using dynamic branches...');
+
+      // Clean up any old branches first (older than 24 hours)
+      await cleanupOldE2EBranches();
+
+      // Create a new E2E branch
+      const branchInfo = await getE2EBranch();
+
+      // Ensure playwright directory exists
+      const branchInfoDir = path.dirname(branchInfoFile);
+      if (!fs.existsSync(branchInfoDir)) {
+        fs.mkdirSync(branchInfoDir, { recursive: true });
+      }
+
+      // Save branch info for teardown and web server
+      fs.writeFileSync(branchInfoFile, JSON.stringify(branchInfo, null, 2));
+
+      console.log('E2E Database Setup Complete (dynamic branch)');
+      console.log(`Branch: ${branchInfo.branchName}`);
+      console.log(`Branch ID: ${branchInfo.branchId}`);
     }
-
-    // Save branch info for teardown and web server
-    fs.writeFileSync(branchInfoFile, JSON.stringify(branchInfo, null, 2));
-
-    console.log('E2E Database Setup Complete');
-    console.log(`Branch: ${branchInfo.branchName}`);
-    console.log(`Branch ID: ${branchInfo.branchId}`);
   } catch (error) {
-    console.error('Failed to create E2E database branch:', error);
+    console.error('Failed to setup E2E database branch:', error);
     throw error;
   }
 
