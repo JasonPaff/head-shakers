@@ -1,7 +1,5 @@
 import 'server-only';
-import { ArrowLeftIcon, CalendarIcon, HeartIcon, ShareIcon } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import Link from 'next/link';
+import { CalendarIcon, HeartIcon, ShareIcon } from 'lucide-react';
 import { Fragment, Suspense } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
@@ -31,41 +29,10 @@ export const BobbleheadHeader = ({
   isOwner = false,
   likeData,
 }: BobbleheadHeaderProps) => {
-  const _hasSubcollection = !!bobblehead.subcollectionId && !!bobblehead.subcollectionName;
-  const _hasSubcollectionWithSlug = _hasSubcollection && !!bobblehead.subcollectionSlug;
-  const _backButtonLabel =
-    (_hasSubcollection ? bobblehead.subcollectionName : bobblehead.collectionName) ?? 'Parent';
-  const _shouldNavigateToSubcollection = _hasSubcollectionWithSlug && !!bobblehead.subcollectionSlug;
-
   return (
     <Fragment>
-      {/* Navigation and Actions Row */}
-      <div className={'mb-6 flex items-center justify-between gap-4'}>
-        {/* Back Button */}
-        {bobblehead.collectionSlug && (
-          <Button asChild size={'sm'} variant={'outline'}>
-            <Link
-              href={
-                _shouldNavigateToSubcollection ?
-                  $path({
-                    route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-                    routeParams: {
-                      collectionSlug: bobblehead.collectionSlug,
-                      subcollectionSlug: bobblehead.subcollectionSlug as string,
-                    },
-                  })
-                : $path({
-                    route: '/collections/[collectionSlug]',
-                    routeParams: { collectionSlug: bobblehead.collectionSlug },
-                  })
-              }
-            >
-              <ArrowLeftIcon aria-hidden className={'mr-2 size-4'} />
-              View {_backButtonLabel}
-            </Link>
-          </Button>
-        )}
-
+      {/* Actions Row */}
+      <div className={'mb-6 flex items-center justify-end gap-4'}>
         {/* Action Buttons */}
         <div className={'flex items-center gap-2'}>
           {/* Share Menu */}
