@@ -113,6 +113,7 @@ export const ReportsTable = ({
           const _isBobblehead = targetType === 'bobblehead';
           const _isCollection = targetType === 'collection';
           const _isSubcollection = targetType === 'subcollection';
+          const _isComment = targetType === 'comment';
 
           return (
             <Badge
@@ -120,6 +121,7 @@ export const ReportsTable = ({
                 _isBobblehead && 'bg-green-100 text-green-800',
                 _isCollection && 'bg-blue-100 text-blue-800',
                 _isSubcollection && 'bg-purple-100 text-purple-800',
+                _isComment && 'bg-orange-100 text-orange-800',
               )}
               variant={'secondary'}
             >

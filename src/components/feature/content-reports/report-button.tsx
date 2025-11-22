@@ -10,7 +10,7 @@ import { generateTestId } from '@/lib/test-ids';
 
 import { ReportReasonDialog } from './report-reason-dialog';
 
-export type ReportTargetType = 'bobblehead' | 'collection' | 'subcollection';
+export type ReportTargetType = 'bobblehead' | 'collection' | 'comment' | 'subcollection';
 
 interface ReportButtonProps extends ComponentTestIdProps {
   className?: string;
@@ -36,6 +36,8 @@ export const ReportButton = ({
         return 'Report this bobblehead';
       case 'collection':
         return 'Report this collection';
+      case 'comment':
+        return 'Report this comment';
       case 'subcollection':
         return 'Report this subcollection';
       default:

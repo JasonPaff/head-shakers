@@ -60,6 +60,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
   const _isBobblehead = report?.targetType === 'bobblehead';
   const _isCollection = report?.targetType === 'collection';
   const _isSubcollection = report?.targetType === 'subcollection';
+  const _isComment = report?.targetType === 'comment';
 
   // Utility functions
   const formatDate = (date: Date | string) => {
@@ -180,6 +181,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                       _isBobblehead && 'bg-green-100 text-green-800',
                       _isCollection && 'bg-blue-100 text-blue-800',
                       _isSubcollection && 'bg-purple-100 text-purple-800',
+                      _isComment && 'bg-orange-100 text-orange-800',
                     )}
                     variant={'secondary'}
                   >

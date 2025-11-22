@@ -24,6 +24,7 @@ import {
   ContentReportsQuery,
   type ReportsStatsResult,
 } from '@/lib/queries/content-reports/content-reports.query';
+import { SocialQuery } from '@/lib/queries/social/social.query';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 const facadeName = 'ContentReportsFacade';
@@ -380,7 +381,7 @@ export class ContentReportsFacade {
   static async getReportStatusAsync(
     userId: string,
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     dbInstance?: DatabaseExecutor,
   ): Promise<{ hasReported: boolean; report: null | SelectContentReport }> {
     try {
@@ -478,13 +479,17 @@ export class ContentReportsFacade {
           }
           break;
         }
-        case 'comment':
-        case 'user':
-          // these will be implemented in future phases
-          isTargetExists = false;
-          canReport = false;
-          reason = 'Target type not yet supported';
+        case 'comment': {
+          const comment = await SocialQuery.getCommentByIdAsync(targetId, context);
+          isTargetExists = !!comment;
+
+          // prevent self-reporting
+          if (comment?.userId === userId) {
+            canReport = false;
+            reason = 'Cannot report your own content';
+          }
           break;
+        }
         case 'subcollection': {
           // TODO: Implement subcollection validation when findByIdAsync method is available
           // const subcollection = await SubcollectionsQuery.findByIdAsync(targetId, context);
@@ -496,6 +501,12 @@ export class ContentReportsFacade {
           isTargetExists = true; // temporarily allow for implementation
           break;
         }
+        case 'user':
+          // these will be implemented in future phases
+          isTargetExists = false;
+          canReport = false;
+          reason = 'Target type not yet supported';
+          break;
         default:
           isTargetExists = false;
           canReport = false;
@@ -525,7 +536,7 @@ export class ContentReportsFacade {
    */
   static async validateReportTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<{ canReport: boolean; reason?: string }> {

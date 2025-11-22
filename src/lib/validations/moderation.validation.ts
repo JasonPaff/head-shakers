@@ -36,7 +36,7 @@ export const createContentReportSchema = insertContentReportSchema
       'other',
     ]),
     targetId: z.string(),
-    targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+    targetType: z.enum(['bobblehead', 'collection', 'subcollection', 'comment']),
   })
   .omit({
     reporterId: true,
@@ -44,7 +44,7 @@ export const createContentReportSchema = insertContentReportSchema
 
 export const checkReportStatusSchema = z.object({
   targetId: z.string(),
-  targetType: z.enum(['bobblehead', 'collection', 'subcollection']),
+  targetType: z.enum(['bobblehead', 'collection', 'subcollection', 'comment']),
 });
 
 export const updateContentReportSchema = createInsertSchema(contentReports, {
@@ -88,7 +88,7 @@ export const adminReportsFilterSchema = z.object({
   reason: z.enum(ENUMS.CONTENT_REPORT.REASON).optional(),
   reporterId: z.string().optional(),
   status: z.enum(ENUMS.CONTENT_REPORT.STATUS).optional(),
-  targetType: z.enum(['bobblehead', 'collection', 'subcollection']).optional(),
+  targetType: z.enum(['bobblehead', 'collection', 'subcollection', 'comment']).optional(),
 });
 
 export const adminReportsQuerySchema = z.object({
