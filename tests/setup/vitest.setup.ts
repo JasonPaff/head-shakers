@@ -1,5 +1,4 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, vi } from 'vitest';
 
 import { server } from './msw.setup';
@@ -8,8 +7,8 @@ import { server } from './msw.setup';
 beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
 
 // Clean up after each test
+// Note: cleanup() is performed automatically by Vitest's testing-library integration
 afterEach(() => {
-  cleanup();
   server.resetHandlers();
   vi.clearAllMocks();
 });
@@ -116,7 +115,7 @@ vi.mock('sonner', () => ({
     info: vi.fn(),
     loading: vi.fn(),
     message: vi.fn(),
-    promise: vi.fn((promise) => promise),
+    promise: vi.fn(<T>(promise: Promise<T>): Promise<T> => promise),
     success: vi.fn(),
     warning: vi.fn(),
   },

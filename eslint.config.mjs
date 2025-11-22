@@ -7,8 +7,10 @@ import eslintPrettier from 'eslint-config-prettier';
 import eslintReact from 'eslint-plugin-react';
 import eslintReactHooks from 'eslint-plugin-react-hooks';
 import eslintReactSnob from 'eslint-plugin-react-snob';
+import eslintTestingLibrary from 'eslint-plugin-testing-library';
 import eslintTypescript from 'typescript-eslint';
 import eslintTypescriptParser from '@typescript-eslint/parser';
+import eslintVitest from '@vitest/eslint-plugin';
 import globals from 'globals';
 
 export default eslintTypescript.config([
@@ -78,6 +80,23 @@ export default eslintTypescript.config([
   },
   {
     ...eslintReactSnob.configs.strict,
+  },
+  // testing library config for component tests (exclude E2E tests which use Playwright)
+  {
+    files: ['tests/**/*.{ts,tsx}'],
+    ignores: ['tests/e2e/**/*.{ts,tsx}'],
+    ...eslintTestingLibrary.configs['flat/react'],
+  },
+  // vitest config for unit/integration/component tests (exclude E2E which uses Playwright)
+  {
+    files: ['tests/**/*.{ts,tsx}'],
+    ignores: ['tests/e2e/**/*.{ts,tsx}'],
+    plugins: {
+      vitest: eslintVitest,
+    },
+    rules: {
+      ...eslintVitest.configs.recommended.rules,
+    },
   },
   // customize rules
   {
