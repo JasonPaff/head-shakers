@@ -23,6 +23,15 @@ export const ACTION_NAMES = {
     UPDATE_FEATURED_CONTENT: 'updateFeaturedContent',
     UPDATE_REPORT_STATUS: 'updateReportStatus',
   },
+  ADMIN_USERS: {
+    GET_USER_DETAILS: 'getAdminUserDetails',
+    GET_USER_STATS: 'getAdminUserStats',
+    GET_USERS: 'getAdminUsers',
+    LOCK_USER: 'lockUser',
+    UNLOCK_USER: 'unlockUser',
+    UPDATE_USER_ROLE: 'updateUserRole',
+    VERIFY_USER_EMAIL: 'verifyUserEmail',
+  },
   ANALYTICS: {
     AGGREGATE_VIEWS: 'aggregateViews',
     BATCH_RECORD_VIEWS: 'batchRecordViews',

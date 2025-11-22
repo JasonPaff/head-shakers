@@ -15,6 +15,15 @@ export const OPERATIONS = {
     UPDATE_FEATURED_CONTENT: 'admin_update_featured_content',
     UPDATE_REPORT_STATUS: 'admin_update_report_status',
   },
+  ADMIN_USERS: {
+    GET_USER_DETAILS: 'admin_get_user_details',
+    GET_USER_STATS: 'admin_get_user_stats',
+    GET_USERS: 'admin_get_users',
+    LOCK_USER: 'admin_lock_user',
+    UNLOCK_USER: 'admin_unlock_user',
+    UPDATE_USER_ROLE: 'admin_update_user_role',
+    VERIFY_USER_EMAIL: 'admin_verify_user_email',
+  },
   ANALYTICS: {
     AGGREGATE_VIEWS: 'aggregate_views',
     BATCH_RECORD_VIEWS: 'batch_record_views',
