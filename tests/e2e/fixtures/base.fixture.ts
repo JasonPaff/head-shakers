@@ -1,22 +1,18 @@
 import { test as base, type BrowserContext, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 import { type ComponentFinder, createComponentFinder } from '../helpers/test-helpers';
 import { type E2EBranchInfo } from '../utils/neon-branch';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Auth storage paths
-const authDir = path.join(__dirname, '../../../playwright/.auth');
+// Auth storage paths (use process.cwd() for consistent resolution)
+const authDir = path.resolve(process.cwd(), 'playwright/.auth');
 const adminAuth = path.join(authDir, 'admin.json');
 const userAuth = path.join(authDir, 'user.json');
 const newUserAuth = path.join(authDir, 'new-user.json');
 
 // Branch info file
-const branchInfoFile = path.join(__dirname, '../../../playwright/.e2e-branch.json');
+const branchInfoFile = path.resolve(process.cwd(), 'playwright/.e2e-branch.json');
 
 export interface TestFixtures {
   adminFinder: ComponentFinder;
@@ -32,6 +28,30 @@ export interface WorkerFixtures {
   branchInfo: E2EBranchInfo | null;
 }
 
+/**
+ * Validates that an auth state file exists and is valid JSON.
+ * Throws a descriptive error if the file is missing or invalid.
+ */
+function validateAuthStateFile(filePath: string, roleName: string): void {
+  if (!fs.existsSync(filePath)) {
+    throw new Error(
+      `Auth state file for "${roleName}" not found at ${filePath}. ` +
+        'Ensure auth-setup project ran successfully before this test. ' +
+        'Check that the Clerk test user credentials are correct in .env.e2e',
+    );
+  }
+
+  try {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    JSON.parse(content);
+  } catch (error) {
+    throw new Error(
+      `Auth state file for "${roleName}" at ${filePath} is not valid JSON. ` +
+        `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
+  }
+}
+
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   // ComponentFinder for admin page
   adminFinder: async ({ adminPage }, use) => {
@@ -41,6 +61,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   // Test-scoped fixture for admin page with separate browser context
   adminPage: async ({ browser }, use) => {
+    validateAuthStateFile(adminAuth, 'admin');
     const context: BrowserContext = await browser.newContext({
       storageState: adminAuth,
     });
@@ -81,6 +102,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   // Test-scoped fixture for new user page with separate browser context
   newUserPage: async ({ browser }, use) => {
+    validateAuthStateFile(newUserAuth, 'new-user');
     const context: BrowserContext = await browser.newContext({
       storageState: newUserAuth,
     });
@@ -97,6 +119,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   // Test-scoped fixture for user page with separate browser context
   userPage: async ({ browser }, use) => {
+    validateAuthStateFile(userAuth, 'user');
     const context: BrowserContext = await browser.newContext({
       storageState: userAuth,
     });

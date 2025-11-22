@@ -2,15 +2,11 @@ import { clerk } from '@clerk/testing/playwright';
 import { expect, type Page, test as setup } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
 import { createComponentFinder } from '../helpers/test-helpers';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Auth storage paths
-const authDir = path.join(__dirname, '../../../playwright/.auth');
+// Auth storage paths (use process.cwd() for consistent resolution)
+const authDir = path.resolve(process.cwd(), 'playwright/.auth');
 const adminAuthFile = path.join(authDir, 'admin.json');
 const userAuthFile = path.join(authDir, 'user.json');
 const newUserAuthFile = path.join(authDir, 'new-user.json');
@@ -20,7 +16,30 @@ if (!fs.existsSync(authDir)) {
   fs.mkdirSync(authDir, { recursive: true });
 }
 
-// Test user credentials from environment
+// Validate required environment variables
+function validateEnvVars(): void {
+  const required = [
+    'E2E_CLERK_ADMIN_USERNAME',
+    'E2E_CLERK_ADMIN_PASSWORD',
+    'E2E_CLERK_USER_USERNAME',
+    'E2E_CLERK_USER_PASSWORD',
+    'E2E_CLERK_NEW_USER_USERNAME',
+    'E2E_CLERK_NEW_USER_PASSWORD',
+  ];
+
+  const missing = required.filter((v) => !process.env[v]);
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required environment variables for E2E auth setup: ${missing.join(', ')}. ` +
+        'Please ensure .env.e2e is properly configured with Clerk test user credentials.',
+    );
+  }
+}
+
+// Validate env vars at module load time (fails fast if misconfigured)
+validateEnvVars();
+
+// Test user credentials from environment (safe to use ! after validation)
 const TEST_USERS = {
   admin: {
     identifier: process.env.E2E_CLERK_ADMIN_USERNAME!,
@@ -53,8 +72,15 @@ async function authenticateUser(
   // Navigate to the home page to load Clerk
   await page.goto('/');
 
-  // Wait for Clerk to load
-  await page.waitForTimeout(1000);
+  // Wait for Clerk to be ready by checking for the Clerk global object
+  // This is more reliable than a fixed timeout
+  await page.waitForFunction(
+    () => {
+      // Clerk exposes window.Clerk when fully loaded
+      return typeof (window as unknown as { Clerk?: unknown }).Clerk !== 'undefined';
+    },
+    { timeout: 10000 },
+  );
 
   // Sign in using Clerk test helper
   await clerk.signIn({

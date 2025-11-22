@@ -19,12 +19,7 @@ test.describe('Application Health Checks', () => {
   });
 
   test('static assets load correctly', async ({ page }) => {
-    await page.goto('/');
-
-    // Wait for page to be fully loaded
-    await page.waitForLoadState('networkidle');
-
-    // Check for console errors related to asset loading
+    // Register console listener BEFORE navigation to capture all errors
     const consoleErrors: Array<string> = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
@@ -32,8 +27,10 @@ test.describe('Application Health Checks', () => {
       }
     });
 
-    // Wait a moment for any delayed errors
-    await page.waitForTimeout(1000);
+    await page.goto('/');
+
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('networkidle');
 
     // Filter out non-critical errors
     const criticalErrors = consoleErrors.filter(
