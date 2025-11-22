@@ -8,7 +8,11 @@ export default defineConfig({
     // Environment
     environment: 'jsdom',
 
-    // Global setup
+    // Global setup for test database (Testcontainers)
+    // Note: teardown is returned from globalSetup function
+    globalSetup: ['./tests/setup/vitest.global-setup.ts'],
+
+    // Per-file setup (MSW, mocks, etc.)
     setupFiles: ['./tests/setup/vitest.setup.ts'],
 
     // Test file patterns (exclude e2e - handled by Playwright)
@@ -54,11 +58,11 @@ export default defineConfig({
     // Globals - allows using describe, it, expect without imports
     globals: true,
 
-    // Pool configuration for better performance
-    pool: 'forks',
+    // Pool configuration - using threads for shared memory with test database
+    pool: 'threads',
 
-    // Timeout
-    testTimeout: 10000,
+    // Timeout (increased for integration tests with database)
+    testTimeout: 30000,
 
     // Retry flaky tests in CI
     retry: process.env.CI ? 2 : 0,

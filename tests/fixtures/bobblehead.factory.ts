@@ -1,28 +1,34 @@
 /**
  * Bobblehead factory for creating test bobbleheads in the database.
  *
- * NOTE: These factories interact with the actual database.
- * Use them in integration tests with Testcontainers or a test database.
+ * NOTE: These factories interact with the actual test database via Testcontainers.
+ * Use them in integration tests only.
  * For unit tests, use the mock data from tests/mocks/data/bobbleheads.mock.ts instead.
  */
 
-// Import these when you have Testcontainers set up:
-// import { db } from '@/lib/db';
-// import { bobbleheads } from '@/lib/db/schema';
+import { bobbleheads } from '@/lib/db/schema/index';
+
+import { getTestDb } from '../setup/test-db';
 
 export type BobbleheadCondition = 'excellent' | 'fair' | 'good' | 'mint' | 'poor';
 
 export interface CreateTestBobbleheadOptions {
   acquisitionDate?: Date | null;
+  acquisitionMethod?: null | string;
+  category?: null | string;
+  characterName?: null | string;
   collectionId: string;
-  condition?: BobbleheadCondition;
+  currentCondition?: BobbleheadCondition;
   description?: null | string;
-  id?: string;
   isPublic?: boolean;
+  manufacturer?: null | string;
   name?: string;
-  purchasePrice?: null | string;
+  purchasePrice?: null | number;
+  series?: null | string;
+  slug?: string;
   subcollectionId?: null | string;
   userId: string;
+  year?: null | number;
 }
 
 /**
@@ -38,31 +44,32 @@ export interface CreateTestBobbleheadOptions {
  * ```
  */
 export async function createTestBobblehead(options: CreateTestBobbleheadOptions) {
+  const db = getTestDb();
   const timestamp = Date.now();
   const name = options.name ?? `Test Bobblehead ${timestamp}`;
+  const slug = options.slug ?? `test-bobblehead-${timestamp}`;
 
-  const defaultBobblehead = {
+  const bobbleheadData = {
     acquisitionDate: options.acquisitionDate ?? null,
+    acquisitionMethod: options.acquisitionMethod ?? null,
+    category: options.category ?? null,
+    characterName: options.characterName ?? null,
     collectionId: options.collectionId,
-    condition: options.condition ?? 'good',
-    createdAt: new Date(),
+    currentCondition: options.currentCondition ?? 'good',
     description: options.description ?? null,
-    id: options.id ?? `bobblehead-${timestamp}`,
     isPublic: options.isPublic ?? true,
+    manufacturer: options.manufacturer ?? null,
     name,
-    photos: [],
     purchasePrice: options.purchasePrice ?? null,
+    series: options.series ?? null,
+    slug,
     subcollectionId: options.subcollectionId ?? null,
-    updatedAt: new Date(),
     userId: options.userId,
+    year: options.year ?? null,
   };
 
-  // TODO: Uncomment when Testcontainers is set up
-  // const [bobblehead] = await db.insert(bobbleheads).values(defaultBobblehead).returning();
-  // return bobblehead;
-
-  // For now, return the mock bobblehead object
-  return defaultBobblehead;
+  const [bobblehead] = await db.insert(bobbleheads).values(bobbleheadData).returning();
+  return bobblehead;
 }
 
 /**
@@ -74,17 +81,51 @@ export async function createTestBobbleheads(
   count: number,
   overrides: Partial<Omit<CreateTestBobbleheadOptions, 'collectionId' | 'userId'>> = {},
 ) {
-  const bobbleheads = [];
+  const createdBobbleheads = [];
   for (let i = 0; i < count; i++) {
     const bobblehead = await createTestBobblehead({
       ...overrides,
       collectionId,
       name: `Bobblehead ${i + 1}`,
+      slug: `bobblehead-${Date.now()}-${i}`,
       userId,
     });
-    bobbleheads.push(bobblehead);
+    createdBobbleheads.push(bobblehead);
   }
-  return bobbleheads;
+  return createdBobbleheads;
+}
+
+/**
+ * Create a featured test bobblehead.
+ */
+export async function createTestFeaturedBobblehead(options: CreateTestBobbleheadOptions) {
+  const db = getTestDb();
+  const timestamp = Date.now();
+  const name = options.name ?? `Featured Bobblehead ${timestamp}`;
+  const slug = options.slug ?? `featured-bobblehead-${timestamp}`;
+
+  const bobbleheadData = {
+    acquisitionDate: options.acquisitionDate ?? null,
+    acquisitionMethod: options.acquisitionMethod ?? null,
+    category: options.category ?? null,
+    characterName: options.characterName ?? null,
+    collectionId: options.collectionId,
+    currentCondition: options.currentCondition ?? 'mint',
+    description: options.description ?? null,
+    isFeatured: true,
+    isPublic: true,
+    manufacturer: options.manufacturer ?? null,
+    name,
+    purchasePrice: options.purchasePrice ?? null,
+    series: options.series ?? null,
+    slug,
+    subcollectionId: options.subcollectionId ?? null,
+    userId: options.userId,
+    year: options.year ?? null,
+  };
+
+  const [bobblehead] = await db.insert(bobbleheads).values(bobbleheadData).returning();
+  return bobblehead;
 }
 
 /**

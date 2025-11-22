@@ -1,24 +1,25 @@
 /**
  * User factory for creating test users in the database.
  *
- * NOTE: These factories interact with the actual database.
- * Use them in integration tests with Testcontainers or a test database.
+ * NOTE: These factories interact with the actual test database via Testcontainers.
+ * Use them in integration tests only.
  * For unit tests, use the mock data from tests/mocks/data/users.mock.ts instead.
  */
 
-// Import these when you have Testcontainers set up:
-// import { db } from '@/lib/db';
-// import { users } from '@/lib/db/schema';
+import { users } from '@/lib/db/schema/index';
+
+import { getTestDb } from '../setup/test-db';
 
 export interface CreateTestUserOptions {
+  avatarUrl?: null | string;
   bio?: null | string;
   clerkId?: string;
-  displayName?: null | string;
+  displayName?: string;
   email?: string;
   id?: string;
-  imageUrl?: null | string;
-  isAdmin?: boolean;
-  username?: null | string;
+  location?: null | string;
+  role?: 'admin' | 'moderator' | 'user';
+  username?: string;
 }
 
 /**
@@ -27,7 +28,17 @@ export interface CreateTestUserOptions {
 export async function createTestAdminUser(overrides: CreateTestUserOptions = {}) {
   return createTestUser({
     ...overrides,
-    isAdmin: true,
+    role: 'admin',
+  });
+}
+
+/**
+ * Create a moderator test user in the database.
+ */
+export async function createTestModeratorUser(overrides: CreateTestUserOptions = {}) {
+  return createTestUser({
+    ...overrides,
+    role: 'moderator',
   });
 }
 
@@ -40,39 +51,36 @@ export async function createTestAdminUser(overrides: CreateTestUserOptions = {})
  * ```
  */
 export async function createTestUser(overrides: CreateTestUserOptions = {}) {
+  const db = getTestDb();
   const timestamp = Date.now();
-  const defaultUser = {
-    bio: null,
+
+  const userData = {
+    avatarUrl: overrides.avatarUrl ?? null,
+    bio: overrides.bio ?? null,
     clerkId: overrides.clerkId ?? `clerk-${timestamp}`,
-    createdAt: new Date(),
     displayName: overrides.displayName ?? 'Test User',
     email: overrides.email ?? `test-${timestamp}@example.com`,
-    id: overrides.id ?? `user-${timestamp}`,
-    imageUrl: null,
-    isAdmin: overrides.isAdmin ?? false,
-    updatedAt: new Date(),
+    location: overrides.location ?? null,
+    role: overrides.role ?? 'user',
     username: overrides.username ?? `testuser-${timestamp}`,
   };
 
-  // TODO: Uncomment when Testcontainers is set up
-  // const [user] = await db.insert(users).values(defaultUser).returning();
-  // return user;
-
-  // For now, return the mock user object
-  return defaultUser;
+  const [user] = await db.insert(users).values(userData).returning();
+  return user;
 }
 
 /**
  * Create multiple test users.
  */
 export async function createTestUsers(count: number, overrides: CreateTestUserOptions = {}) {
-  const users = [];
+  const createdUsers = [];
   for (let i = 0; i < count; i++) {
     const user = await createTestUser({
       ...overrides,
+      email: `testuser-${Date.now()}-${i}@example.com`,
       username: `testuser-${Date.now()}-${i}`,
     });
-    users.push(user);
+    createdUsers.push(user);
   }
-  return users;
+  return createdUsers;
 }

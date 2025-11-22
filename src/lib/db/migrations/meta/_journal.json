@@ -54,36 +54,36 @@
     {
       "idx": 7,
       "version": "7",
+      "when": 1762600000000,
+      "tag": "20251109151001_add_comment_count_to_collections",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
       "when": 1762736075363,
       "tag": "20251110005435_daily_zombie",
       "breakpoints": true
     },
     {
-      "idx": 8,
+      "idx": 9,
       "version": "7",
       "when": 1762743678416,
       "tag": "20251110030118_fair_rocket_raccoon",
       "breakpoints": true
     },
     {
-      "idx": 9,
+      "idx": 10,
       "version": "7",
       "when": 1762793385024,
       "tag": "20251110164945_lethal_shadow_king",
       "breakpoints": true
     },
     {
-      "idx": 10,
+      "idx": 11,
       "version": "7",
       "when": 1763743822211,
       "tag": "20251121165022_dizzy_sunspot",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1763759459226,
-      "tag": "20251121211059_vengeful_pandemic",
       "breakpoints": true
     }
   ]

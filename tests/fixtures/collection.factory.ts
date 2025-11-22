@@ -1,19 +1,18 @@
 /**
  * Collection factory for creating test collections in the database.
  *
- * NOTE: These factories interact with the actual database.
- * Use them in integration tests with Testcontainers or a test database.
+ * NOTE: These factories interact with the actual test database via Testcontainers.
+ * Use them in integration tests only.
  * For unit tests, use the mock data from tests/mocks/data/collections.mock.ts instead.
  */
 
-// Import these when you have Testcontainers set up:
-// import { db } from '@/lib/db';
-// import { collections } from '@/lib/db/schema';
+import { collections } from '@/lib/db/schema/index';
+
+import { getTestDb } from '../setup/test-db';
 
 export interface CreateTestCollectionOptions {
   coverImageUrl?: null | string;
   description?: null | string;
-  id?: string;
   isPublic?: boolean;
   name?: string;
   slug?: string;
@@ -32,30 +31,22 @@ export interface CreateTestCollectionOptions {
  * ```
  */
 export async function createTestCollection(options: CreateTestCollectionOptions) {
+  const db = getTestDb();
   const timestamp = Date.now();
   const name = options.name ?? `Test Collection ${timestamp}`;
-  const slug = options.slug ?? name.toLowerCase().replace(/\s+/g, '-');
+  const slug = options.slug ?? `test-collection-${timestamp}`;
 
-  const defaultCollection = {
+  const collectionData = {
     coverImageUrl: options.coverImageUrl ?? null,
-    createdAt: new Date(),
     description: options.description ?? null,
-    id: options.id ?? `collection-${timestamp}`,
     isPublic: options.isPublic ?? true,
-    lastItemAddedAt: null,
     name,
     slug,
-    totalItems: 0,
-    updatedAt: new Date(),
     userId: options.userId,
   };
 
-  // TODO: Uncomment when Testcontainers is set up
-  // const [collection] = await db.insert(collections).values(defaultCollection).returning();
-  // return collection;
-
-  // For now, return the mock collection object
-  return defaultCollection;
+  const [collection] = await db.insert(collections).values(collectionData).returning();
+  return collection;
 }
 
 /**
@@ -66,16 +57,17 @@ export async function createTestCollections(
   count: number,
   overrides: Partial<Omit<CreateTestCollectionOptions, 'userId'>> = {},
 ) {
-  const collections = [];
+  const createdCollections = [];
   for (let i = 0; i < count; i++) {
     const collection = await createTestCollection({
       ...overrides,
       name: `Collection ${i + 1}`,
+      slug: `collection-${Date.now()}-${i}`,
       userId,
     });
-    collections.push(collection);
+    createdCollections.push(collection);
   }
-  return collections;
+  return createdCollections;
 }
 
 /**

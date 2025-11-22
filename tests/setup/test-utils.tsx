@@ -3,13 +3,14 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Fragment } from 'react';
 
 /**
  * Wrapper component that provides all necessary providers for testing.
  * Add providers here as needed (e.g., QueryClientProvider, ThemeProvider).
  */
 function AllTheProviders({ children }: { children: ReactNode }) {
-  return <>{children}</>;
+  return <Fragment>{children}</Fragment>;
 }
 
 /**
