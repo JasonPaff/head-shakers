@@ -425,12 +425,13 @@ async function waitForEndpointReady(
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const response = await client.getProjectEndpoint(projectId, endpointId);
     const endpoint = response.data?.endpoint;
+    const currentState = String(endpoint?.current_state ?? '');
 
-    if (endpoint?.current_state === 'active') {
+    if (currentState === 'active') {
       return;
     }
 
-    if (endpoint?.current_state === 'idle') {
+    if (currentState === 'idle') {
       // Endpoint is ready but suspended, that's fine for our purposes
       return;
     }
@@ -458,7 +459,7 @@ async function warmupConnection(connectionString: string, maxAttempts = 5): Prom
       await pool.end();
       console.log('Database connection warmed up successfully');
       return;
-    } catch (error) {
+    } catch {
       console.log(`Connection warmup attempt ${attempt + 1}/${maxAttempts} failed, retrying...`);
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }

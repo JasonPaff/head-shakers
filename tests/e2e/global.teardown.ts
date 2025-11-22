@@ -20,7 +20,7 @@ export default async function globalTeardown() {
   // Clean up database branch (only for dynamic branches)
   if (fs.existsSync(branchInfoFile)) {
     try {
-      const branchInfo: E2EBranchInfo = JSON.parse(fs.readFileSync(branchInfoFile, 'utf-8'));
+      const branchInfo = JSON.parse(fs.readFileSync(branchInfoFile, 'utf-8')) as E2EBranchInfo;
 
       if (isDedicatedBranch) {
         console.log(`Dedicated E2E branch preserved: ${branchInfo.branchName}`);

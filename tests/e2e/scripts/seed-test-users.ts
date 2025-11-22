@@ -43,6 +43,13 @@ const TEST_USERS = [
   },
 ];
 
+interface BranchInfo {
+  branchId: string;
+  branchName: string;
+  connectionString: string;
+  endpointId: string;
+}
+
 interface ClerkUser {
   emailAddresses: Array<{ emailAddress: string }>;
   firstName: null | string;
@@ -50,6 +57,14 @@ interface ClerkUser {
   imageUrl: string;
   lastName: null | string;
   username: null | string;
+}
+
+interface UserRow {
+  clerk_id: string;
+  email: string;
+  id: string;
+  role: string;
+  username: string;
 }
 
 async function getClerkUserByEmail(
@@ -103,7 +118,7 @@ async function main() {
 
   if (fs.existsSync(branchInfoFile)) {
     try {
-      const branchInfo = JSON.parse(fs.readFileSync(branchInfoFile, 'utf-8'));
+      const branchInfo = JSON.parse(fs.readFileSync(branchInfoFile, 'utf-8')) as BranchInfo;
       connectionString = branchInfo.connectionString;
       console.log(`Using E2E branch: ${branchInfo.branchName}`);
     } catch {
@@ -212,11 +227,20 @@ async function seedUser(
   `;
 
   try {
-    const result = await pool.query(query, [clerkId, email, username, displayName, role, avatarUrl || null]);
+    const result = await pool.query<UserRow>(query, [
+      clerkId,
+      email,
+      username,
+      displayName,
+      role,
+      avatarUrl || null,
+    ]);
     const row = result.rows[0];
-    console.log(`  ✓ Seeded user: ${row.email} (${row.role})`);
-    console.log(`    ID: ${row.id}`);
-    console.log(`    Clerk ID: ${row.clerk_id}`);
+    if (row) {
+      console.log(`  ✓ Seeded user: ${row.email} (${row.role})`);
+      console.log(`    ID: ${row.id}`);
+      console.log(`    Clerk ID: ${row.clerk_id}`);
+    }
     return true;
   } catch (error) {
     console.error(`  ✗ Failed to seed user ${email}:`, error);

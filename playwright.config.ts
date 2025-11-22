@@ -1,30 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Load E2E environment variables
+// Load E2E environment variables (including DATABASE_URL for E2E branch)
+// The .env.e2e file should contain DATABASE_URL pointing to the dedicated E2E testing branch
 dotenv.config({ path: '.env.e2e' });
-
-// Read E2E branch connection string if available
-// Note: This is called at config parse time, so the file must exist
-// Database branch is created in globalSetup before the web server starts
-function getE2EDatabaseUrl(): string | undefined {
-  const branchInfoFile = path.join(__dirname, 'playwright/.e2e-branch.json');
-  if (fs.existsSync(branchInfoFile)) {
-    try {
-      const branchInfo = JSON.parse(fs.readFileSync(branchInfoFile, 'utf-8'));
-      return branchInfo.connectionString;
-    } catch {
-      return undefined;
-    }
-  }
-  return undefined;
-}
 
 // Auth storage paths
 const authDir = './playwright/.auth';
@@ -121,11 +105,10 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 300000, // 5 minutes to allow for build time
-    // Spread all env vars from parent process, then override DATABASE_URL with E2E branch
+    // Pass E2E environment variables to the web server
+    // DATABASE_URL from .env.e2e points to the dedicated E2E testing branch
     env: {
       ...process.env,
-      // Override database URL with E2E branch connection string
-      DATABASE_URL: getE2EDatabaseUrl() || process.env.DATABASE_URL || '',
       // Ensure correct NODE_ENV for the test environment
       NODE_ENV: process.env.CI ? 'production' : 'development',
     },

@@ -29,11 +29,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
+            "command": "bun ./.claude/hooks/post-tool-use/eslint-fixer.ts"
           },
           {
             "type": "command",
-            "command": "bun ./.claude/hooks/post-tool-use/eslint-fixer.ts"
+            "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
           }
         ]
       }

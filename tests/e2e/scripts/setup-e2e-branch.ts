@@ -48,4 +48,7 @@ async function main() {
   }
 }
 
-main();
+main().catch((error: unknown) => {
+  console.error('Setup script failed:', error);
+  process.exit(1);
+});
