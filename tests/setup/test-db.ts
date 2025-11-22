@@ -12,11 +12,9 @@
  */
 
 import type { StartedPostgreSqlContainer } from '@testcontainers/postgresql';
-import type { Table } from 'drizzle-orm';
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
-import { getTableName } from 'drizzle-orm';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { migrate } from 'drizzle-orm/node-postgres/migrator';
@@ -44,15 +42,14 @@ const KNOWN_TABLES = [
   'comments',
   'likes',
   'follows',
+  'notifications',
   'featured_content',
-  'analytics_events',
+  'platform_settings',
   'content_metrics',
-  'user_metrics',
-  'reports',
-  'moderation_actions',
-  'system_settings',
-  'beta_users',
-  'feature_flags',
+  'launch_notifications',
+  'content_reports',
+  'content_views',
+  'search_queries',
 ];
 
 // Container instance (only used in global setup)
@@ -108,19 +105,14 @@ export function isTestDbInitialized(): boolean {
 export async function resetTestDatabase(): Promise<void> {
   const db = getTestDb();
 
-  // Get all table names from schema
-  const tableNames = Object.values(schema)
-    .filter((value) => isDrizzleTable(value))
-    .map((table) => getTableName(table as Table))
-    .filter((name) => !name.startsWith('__')); // Exclude migration tables
-
-  if (tableNames.length === 0) {
+  // Use known tables list for reliable truncation
+  if (KNOWN_TABLES.length === 0) {
     console.warn('[TestDB] No tables found to truncate');
     return;
   }
 
   // Truncate all tables with CASCADE to handle foreign keys
-  await db.execute(sql.raw(`TRUNCATE TABLE ${tableNames.map((t) => `"${t}"`).join(', ')} CASCADE`));
+  await db.execute(sql.raw(`TRUNCATE TABLE ${KNOWN_TABLES.map((t) => `"${t}"`).join(', ')} CASCADE`));
 }
 
 /**
