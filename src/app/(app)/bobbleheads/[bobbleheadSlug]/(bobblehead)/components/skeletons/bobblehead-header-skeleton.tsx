@@ -17,6 +17,11 @@ export const BobbleheadHeaderSkeleton = () => (
       </div>
     </div>
 
+    {/* Collection Breadcrumb */}
+    <div className={'mb-4'}>
+      <Skeleton className={'h-5 w-56'} />
+    </div>
+
     <div className={'flex flex-col gap-6'}>
       {/* Title and Description */}
       <div>

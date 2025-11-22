@@ -9,6 +9,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 
 import { BobbleheadHeaderDelete } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-delete';
 import { BobbleheadHeaderEdit } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header-edit';
+import { CollectionBreadcrumb } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb';
 import { ViewCountAsync } from '@/components/analytics/async/view-count-async';
 import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
@@ -99,6 +100,18 @@ export const BobbleheadHeader = ({
           </Conditional>
         </div>
       </div>
+
+      {/* Collection Breadcrumb */}
+      {bobblehead.collectionSlug && (
+        <div className={'mb-4'}>
+          <CollectionBreadcrumb
+            collectionName={bobblehead.collectionName}
+            collectionSlug={bobblehead.collectionSlug}
+            subcollectionName={bobblehead.subcollectionName}
+            subcollectionSlug={bobblehead.subcollectionSlug}
+          />
+        </div>
+      )}
 
       <div className={'flex flex-col gap-6'}>
         {/* Title and Description */}
