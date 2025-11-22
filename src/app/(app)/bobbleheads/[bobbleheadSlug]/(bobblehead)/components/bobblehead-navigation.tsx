@@ -11,8 +11,11 @@ import type { BobbleheadNavigationData } from '@/lib/types/bobblehead-navigation
 
 import { buttonVariants } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
+
+import { BobbleheadNavigationPreview } from './bobblehead-navigation-preview';
 
 type BobbleheadNavigationProps = {
   navigationData: BobbleheadNavigationData;
@@ -125,6 +128,8 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
   const prevLinkTestId = generateTestId('feature', 'bobblehead-nav', 'previous');
   const nextLinkTestId = generateTestId('feature', 'bobblehead-nav', 'next');
   const positionTestId = generateTestId('feature', 'bobblehead-nav', 'position');
+  const prevHoverCardTestId = generateTestId('feature', 'bobblehead-nav', 'previous-hover');
+  const nextHoverCardTestId = generateTestId('feature', 'bobblehead-nav', 'next-hover');
 
   // Shared button styling
   const linkClassName = cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'gap-2');
@@ -140,16 +145,23 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
       >
         {/* Previous Link */}
         {_canNavigatePrevious ?
-          <Link
-            aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
-            className={linkClassName}
-            data-slot={'bobblehead-navigation-previous'}
-            data-testid={prevLinkTestId}
-            href={previousUrl}
-          >
-            <ChevronLeftIcon aria-hidden className={'size-4'} />
-            <span className={'hidden sm:inline'}>Previous</span>
-          </Link>
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Link
+                aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
+                className={linkClassName}
+                data-slot={'bobblehead-navigation-previous'}
+                data-testid={prevLinkTestId}
+                href={previousUrl}
+              >
+                <ChevronLeftIcon aria-hidden className={'size-4'} />
+                <span className={'hidden sm:inline'}>Previous</span>
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent data-testid={prevHoverCardTestId} side={'bottom'}>
+              <BobbleheadNavigationPreview bobblehead={navigationData.previousBobblehead!} />
+            </HoverCardContent>
+          </HoverCard>
         : <span
             aria-disabled={'true'}
             aria-label={'No previous bobblehead'}
@@ -176,16 +188,23 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 
         {/* Next Link */}
         {_canNavigateNext ?
-          <Link
-            aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
-            className={linkClassName}
-            data-slot={'bobblehead-navigation-next'}
-            data-testid={nextLinkTestId}
-            href={nextUrl}
-          >
-            <span className={'hidden sm:inline'}>Next</span>
-            <ChevronRightIcon aria-hidden className={'size-4'} />
-          </Link>
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <Link
+                aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
+                className={linkClassName}
+                data-slot={'bobblehead-navigation-next'}
+                data-testid={nextLinkTestId}
+                href={nextUrl}
+              >
+                <span className={'hidden sm:inline'}>Next</span>
+                <ChevronRightIcon aria-hidden className={'size-4'} />
+              </Link>
+            </HoverCardTrigger>
+            <HoverCardContent data-testid={nextHoverCardTestId} side={'bottom'}>
+              <BobbleheadNavigationPreview bobblehead={navigationData.nextBobblehead!} />
+            </HoverCardContent>
+          </HoverCard>
         : <span
             aria-disabled={'true'}
             aria-label={'No next bobblehead'}

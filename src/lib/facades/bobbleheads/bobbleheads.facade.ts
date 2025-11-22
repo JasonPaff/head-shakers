@@ -2,7 +2,11 @@ import * as Sentry from '@sentry/nextjs';
 
 import type { bobbleheadPhotos } from '@/lib/db/schema';
 import type { FindOptions } from '@/lib/queries/base/query-context';
-import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import type {
+  AdjacentBobblehead,
+  BobbleheadRecord,
+  BobbleheadWithRelations,
+} from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { BobbleheadNavigationDataSchema } from '@/lib/validations/bobblehead-navigation.validation';
@@ -411,17 +415,16 @@ export class BobbleheadsFacade {
           const totalCount = positionResult?.totalCount ?? 0;
 
           // Transform result to match the expected schema (minimal navigation data)
-          // Note: photoUrl is set to null as the base query doesn't join photos
-          // The primary image can be lazy-loaded on the frontend if needed
+          // The query now joins with bobbleheadPhotos to include the primary photo URL
           const transformBobblehead = (
-            bobblehead: BobbleheadRecord | null,
+            bobblehead: AdjacentBobblehead | null,
           ): BobbleheadNavigationDataSchema['nextBobblehead'] => {
             if (!bobblehead) return null;
 
             return {
               id: bobblehead.id,
               name: bobblehead.name,
-              photoUrl: null,
+              photoUrl: bobblehead.photoUrl,
               slug: bobblehead.slug,
             };
           };

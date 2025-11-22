@@ -23,11 +23,18 @@ import {
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 /**
+ * adjacent bobblehead with primary photo URL for navigation previews
+ */
+export type AdjacentBobblehead = BobbleheadRecord & {
+  photoUrl: null | string;
+};
+
+/**
  * result type for adjacent bobblehead navigation within a collection
  */
 export type AdjacentBobbleheadsResult = {
-  nextBobblehead: BobbleheadRecord | null;
-  previousBobblehead: BobbleheadRecord | null;
+  nextBobblehead: AdjacentBobblehead | null;
+  previousBobblehead: AdjacentBobblehead | null;
 };
 
 export type BobbleheadDeleteResult = {
@@ -478,9 +485,17 @@ export class BobbleheadsQuery extends BaseQuery {
 
     // find previous bobblehead (newer = createdAt > current, order by createdAt ASC to get closest)
     // explicitly exclude current bobblehead to prevent self-reference
+    // LEFT JOIN with bobbleheadPhotos to get primary photo URL
     const previousResult = await dbInstance
-      .select()
+      .select({
+        bobblehead: bobbleheads,
+        photoUrl: bobbleheadPhotos.url,
+      })
       .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
       .where(
         this.combineFilters(
           ne(bobbleheads.id, bobbleheadId),
@@ -493,9 +508,17 @@ export class BobbleheadsQuery extends BaseQuery {
 
     // find next bobblehead (older = createdAt < current, order by createdAt DESC to get closest)
     // explicitly exclude current bobblehead to prevent self-reference
+    // LEFT JOIN with bobbleheadPhotos to get primary photo URL
     const nextResult = await dbInstance
-      .select()
+      .select({
+        bobblehead: bobbleheads,
+        photoUrl: bobbleheadPhotos.url,
+      })
       .from(bobbleheads)
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
+      )
       .where(
         this.combineFilters(
           ne(bobbleheads.id, bobbleheadId),
@@ -506,9 +529,16 @@ export class BobbleheadsQuery extends BaseQuery {
       .orderBy(desc(bobbleheads.createdAt))
       .limit(1);
 
+    // transform results to include photoUrl in the bobblehead record
+    const previousBobblehead =
+      previousResult[0] ? { ...previousResult[0].bobblehead, photoUrl: previousResult[0].photoUrl } : null;
+
+    const nextBobblehead =
+      nextResult[0] ? { ...nextResult[0].bobblehead, photoUrl: nextResult[0].photoUrl } : null;
+
     return {
-      nextBobblehead: nextResult[0] || null,
-      previousBobblehead: previousResult[0] || null,
+      nextBobblehead,
+      previousBobblehead,
     };
   }
 
