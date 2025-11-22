@@ -20,29 +20,29 @@ The sticky-collection-header feature has **successfully passed validation** afte
 
 ### Quick Stats
 
-| Metric | Before Fix | After Fix |
-|--------|------------|-----------|
-| Total Issues | 11 | 9 |
-| Critical | 0 | 0 |
-| High Priority | 2 | 0 |
-| Medium Priority | 5 | 5 |
-| Low Priority | 4 | 4 |
-| Auto-Fixable | 0 | 0 |
-| Files Affected | 4 | 4 |
-| Validation Score | 82 | 91 |
+| Metric           | Before Fix | After Fix |
+| ---------------- | ---------- | --------- |
+| Total Issues     | 11         | 9         |
+| Critical         | 0          | 0         |
+| High Priority    | 2          | 0         |
+| Medium Priority  | 5          | 5         |
+| Low Priority     | 4          | 4         |
+| Auto-Fixable     | 0          | 0         |
+| Files Affected   | 4          | 4         |
+| Validation Score | 82         | 91        |
 
 ### Status by Phase
 
-| Phase | Status | Issues | Duration |
-|-------|--------|--------|----------|
-| Static Analysis | PASS | 0 | 2.3s |
-| Conventions | PASS | 0 | 1.8s |
-| Code Review | PASS | 9 (non-blocking) | 4.2s |
-| Auto-Fix | PASS | Applied | 0.5s |
-| Manual Fix | PASS | 2 issues resolved | Manual |
-| Report Generation | PASS | - | 1.2s |
-| UI Validation | SKIPPED | - | - |
-| Database Validation | SKIPPED | No DB changes | - |
+| Phase               | Status  | Issues            | Duration |
+| ------------------- | ------- | ----------------- | -------- |
+| Static Analysis     | PASS    | 0                 | 2.3s     |
+| Conventions         | PASS    | 0                 | 1.8s     |
+| Code Review         | PASS    | 9 (non-blocking)  | 4.2s     |
+| Auto-Fix            | PASS    | Applied           | 0.5s     |
+| Manual Fix          | PASS    | 2 issues resolved | Manual   |
+| Report Generation   | PASS    | -                 | 1.2s     |
+| UI Validation       | SKIPPED | -                 | -        |
+| Database Validation | SKIPPED | No DB changes     | -        |
 
 ---
 
@@ -52,21 +52,23 @@ Two high-priority issues were identified and successfully resolved:
 
 ### Fix #1: Multiple ARIA Landmark Violation (RESOLVED)
 
-| Attribute | Value |
-|-----------|-------|
-| **Severity** | High (was blocking) |
-| **Issue** | Multiple `role="banner"` landmarks violating WCAG SC 1.3.1 |
-| **Root Cause** | All three sticky header components used `role="banner"` which conflicts with the main app header's banner role |
-| **Files Modified** | 3 files |
-| **Fix Applied** | Changed `role={'banner'}` to `role={'region'}` |
-| **Verification** | ARIA landmark audit now passes; each page has single banner landmark |
+| Attribute          | Value                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------- |
+| **Severity**       | High (was blocking)                                                                                            |
+| **Issue**          | Multiple `role="banner"` landmarks violating WCAG SC 1.3.1                                                     |
+| **Root Cause**     | All three sticky header components used `role="banner"` which conflicts with the main app header's banner role |
+| **Files Modified** | 3 files                                                                                                        |
+| **Fix Applied**    | Changed `role={'banner'}` to `role={'region'}`                                                                 |
+| **Verification**   | ARIA landmark audit now passes; each page has single banner landmark                                           |
 
 **Files Changed:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` (line 53)
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` (line 61)
 - `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` (line 70)
 
 **Code Change:**
+
 ```tsx
 // Before (WCAG violation)
 <header role={'banner'} aria-label="Collection sticky header">
@@ -77,20 +79,22 @@ Two high-priority issues were identified and successfully resolved:
 
 ### Fix #2: Non-null Assertion Operator Usage (RESOLVED)
 
-| Attribute | Value |
-|-----------|-------|
-| **Severity** | High (was blocking) |
-| **Issue** | Using non-null assertion (`!`) with `<Conditional>` wrapper for edit dialogs |
-| **Root Cause** | TypeScript required non-null assertion because `<Conditional>` didn't narrow the type |
-| **Files Modified** | 2 files |
-| **Fix Applied** | Replaced `<Conditional>` wrapper with standard JSX conditional rendering |
-| **Verification** | TypeScript correctly narrows types; no assertions needed |
+| Attribute          | Value                                                                                 |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| **Severity**       | High (was blocking)                                                                   |
+| **Issue**          | Using non-null assertion (`!`) with `<Conditional>` wrapper for edit dialogs          |
+| **Root Cause**     | TypeScript required non-null assertion because `<Conditional>` didn't narrow the type |
+| **Files Modified** | 2 files                                                                               |
+| **Fix Applied**    | Replaced `<Conditional>` wrapper with standard JSX conditional rendering              |
+| **Verification**   | TypeScript correctly narrows types; no assertions needed                              |
 
 **Files Changed:**
+
 - `src/components/feature/collection/collection-sticky-header.tsx` (lines 110-117)
 - `src/components/feature/subcollection/subcollection-sticky-header.tsx` (lines 139-146)
 
 **Code Change:**
+
 ```tsx
 // Before (non-null assertion risk)
 <Conditional isCondition={isEditDialogOpen}>
@@ -115,10 +119,10 @@ Two high-priority issues were identified and successfully resolved:
 
 **No high priority issues remaining.** Both original high priority issues have been resolved.
 
-| Original Issue | Status | Resolution |
-|----------------|--------|------------|
-| Multiple `role="banner"` landmarks | FIXED | Changed to `role="region"` |
-| Non-null assertion operator usage | FIXED | Replaced with JSX conditional |
+| Original Issue                     | Status | Resolution                    |
+| ---------------------------------- | ------ | ----------------------------- |
+| Multiple `role="banner"` landmarks | FIXED  | Changed to `role="region"`    |
+| Non-null assertion operator usage  | FIXED  | Replaced with JSX conditional |
 
 ---
 
@@ -175,12 +179,12 @@ These issues are recommended for future improvement but do not block the merge.
 
 ## Low Priority Issues (Polish)
 
-| File | Line | Issue | Recommendation |
-|------|------|-------|----------------|
-| sticky-header-wrapper.tsx | 41 | Inconsistent comment style | Use consistent // or block comments |
-| bobblehead-sticky-header.tsx | 60-61 | Underscore prefix on derived variables | Follows project convention - no change needed |
-| All sticky headers | Various | Duplicated header className strings | Extract to shared constant |
-| All sticky headers | Various | Hardcoded `top-16` value | Consider CSS variable for app header height |
+| File                         | Line    | Issue                                  | Recommendation                                |
+| ---------------------------- | ------- | -------------------------------------- | --------------------------------------------- |
+| sticky-header-wrapper.tsx    | 41      | Inconsistent comment style             | Use consistent // or block comments           |
+| bobblehead-sticky-header.tsx | 60-61   | Underscore prefix on derived variables | Follows project convention - no change needed |
+| All sticky headers           | Various | Duplicated header className strings    | Extract to shared constant                    |
+| All sticky headers           | Various | Hardcoded `top-16` value               | Consider CSS variable for app header height   |
 
 ---
 
@@ -213,25 +217,25 @@ This feature implements UI/UX functionality that requires manual visual testing 
 
 ### Manual Testing Performed
 
-| Test Case | Result |
-|-----------|--------|
-| Collection sticky header appears on scroll | PASS |
-| Subcollection sticky header appears on scroll | PASS |
-| Bobblehead sticky header appears on scroll | PASS |
-| Sticky header hides when scrolling to top | PASS |
-| Action buttons functional in sticky state | PASS |
-| Responsive layout on mobile/tablet/desktop | PASS |
-| Animation respects prefers-reduced-motion | PASS |
-| Keyboard navigation through action buttons | PASS |
-| Screen reader announces sticky header | PASS |
-| ARIA landmark audit (single banner per page) | PASS |
+| Test Case                                     | Result |
+| --------------------------------------------- | ------ |
+| Collection sticky header appears on scroll    | PASS   |
+| Subcollection sticky header appears on scroll | PASS   |
+| Bobblehead sticky header appears on scroll    | PASS   |
+| Sticky header hides when scrolling to top     | PASS   |
+| Action buttons functional in sticky state     | PASS   |
+| Responsive layout on mobile/tablet/desktop    | PASS   |
+| Animation respects prefers-reduced-motion     | PASS   |
+| Keyboard navigation through action buttons    | PASS   |
+| Screen reader announces sticky header         | PASS   |
+| ARIA landmark audit (single banner per page)  | PASS   |
 
 ### Recommended Future Tests
 
-| Implementation File | Suggested Test |
-|---------------------|----------------|
+| Implementation File       | Suggested Test                                                             |
+| ------------------------- | -------------------------------------------------------------------------- |
 | sticky-header-wrapper.tsx | tests/unit/components/feature/sticky-header/sticky-header-wrapper.spec.tsx |
-| All sticky headers | tests/e2e/sticky-header.spec.ts (Playwright scroll behavior) |
+| All sticky headers        | tests/e2e/sticky-header.spec.ts (Playwright scroll behavior)               |
 
 ---
 
@@ -266,16 +270,16 @@ The sticky-collection-header feature is **approved for merge**. All critical and
 
 ### Score Breakdown
 
-| Category | Points | Deductions | Running Total |
-|----------|--------|------------|---------------|
-| Starting Score | 100 | - | 100 |
-| Critical Issues (0) | - | 0 | 100 |
-| High Priority Issues (0) | - | 0 | 100 |
-| Medium Priority Issues (5) | - | -15 (-3 each) | 85 |
-| Low Priority Issues (4) | - | -4 (-1 each) | 81 |
-| Bonus: Clean Static Analysis | +5 | - | 86 |
-| Bonus: Convention Compliance (100%) | +5 | - | 91 |
-| **Final Score** | - | - | **91/100** |
+| Category                            | Points | Deductions    | Running Total |
+| ----------------------------------- | ------ | ------------- | ------------- |
+| Starting Score                      | 100    | -             | 100           |
+| Critical Issues (0)                 | -      | 0             | 100           |
+| High Priority Issues (0)            | -      | 0             | 100           |
+| Medium Priority Issues (5)          | -      | -15 (-3 each) | 85            |
+| Low Priority Issues (4)             | -      | -4 (-1 each)  | 81            |
+| Bonus: Clean Static Analysis        | +5     | -             | 86            |
+| Bonus: Convention Compliance (100%) | +5     | -             | 91            |
+| **Final Score**                     | -      | -             | **91/100**    |
 
 ### Grade: Excellent
 
@@ -441,31 +445,32 @@ Migrations Required: None
 
 ### New Files Created (4)
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `src/components/feature/sticky-header/sticky-header-wrapper.tsx` | 50 | Shared scroll detection wrapper using IntersectionObserver |
-| `src/components/feature/collection/collection-sticky-header.tsx` | 121 | Collection detail page sticky header |
-| `src/components/feature/subcollection/subcollection-sticky-header.tsx` | 150 | Subcollection detail page sticky header |
-| `src/components/feature/bobblehead/bobblehead-sticky-header.tsx` | 203 | Bobblehead detail page sticky header |
+| File                                                                   | Lines | Purpose                                                    |
+| ---------------------------------------------------------------------- | ----- | ---------------------------------------------------------- |
+| `src/components/feature/sticky-header/sticky-header-wrapper.tsx`       | 50    | Shared scroll detection wrapper using IntersectionObserver |
+| `src/components/feature/collection/collection-sticky-header.tsx`       | 121   | Collection detail page sticky header                       |
+| `src/components/feature/subcollection/subcollection-sticky-header.tsx` | 150   | Subcollection detail page sticky header                    |
+| `src/components/feature/bobblehead/bobblehead-sticky-header.tsx`       | 203   | Bobblehead detail page sticky header                       |
 
 ### Existing Files Modified (3)
 
-| File | Changes |
-|------|---------|
-| Collection detail page.tsx | Added StickyHeaderWrapper integration |
+| File                          | Changes                               |
+| ----------------------------- | ------------------------------------- |
+| Collection detail page.tsx    | Added StickyHeaderWrapper integration |
 | Subcollection detail page.tsx | Added StickyHeaderWrapper integration |
-| Bobblehead detail page.tsx | Added StickyHeaderWrapper integration |
+| Bobblehead detail page.tsx    | Added StickyHeaderWrapper integration |
 
 ---
 
 ## Change Log
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 2025-11-21 | Initial validation report (score: 82/100) |
-| 2.0 | 2025-11-21 | Final report after fixes applied (score: 91/100) |
+| Version | Date       | Changes                                          |
+| ------- | ---------- | ------------------------------------------------ |
+| 1.0     | 2025-11-21 | Initial validation report (score: 82/100)        |
+| 2.0     | 2025-11-21 | Final report after fixes applied (score: 91/100) |
 
 ### Changes in v2.0:
+
 - Fixed: Multiple `role="banner"` landmarks changed to `role="region"`
 - Fixed: Non-null assertions replaced with JSX conditional rendering
 - Status changed from "NEEDS_FIXES" to "PASS"

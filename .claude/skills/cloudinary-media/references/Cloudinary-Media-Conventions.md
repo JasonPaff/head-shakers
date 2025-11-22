@@ -55,9 +55,9 @@ import { transformCloudinaryResult } from '@/types/cloudinary.types';
 
 ```typescript
 interface CloudinaryPhoto {
-  id: string;                    // temp-{timestamp}-{random} or UUID for persisted
-  publicId: string;              // Cloudinary public_id
-  url: string;                   // secure_url from Cloudinary
+  id: string; // temp-{timestamp}-{random} or UUID for persisted
+  publicId: string; // Cloudinary public_id
+  url: string; // secure_url from Cloudinary
   originalFilename: string;
   format: string;
   width: number;
@@ -68,10 +68,10 @@ interface CloudinaryPhoto {
   sortOrder: number;
   altText?: string;
   caption?: string;
-  blobUrl?: string;              // Local blob URL for optimistic preview
-  isUploading?: boolean;         // Optimistic upload state
-  uploadProgress?: number;       // Upload progress (0-100)
-  uploadError?: string;          // Error message if upload failed
+  blobUrl?: string; // Local blob URL for optimistic preview
+  isUploading?: boolean; // Optimistic upload state
+  uploadProgress?: number; // Upload progress (0-100)
+  uploadError?: string; // Error message if upload failed
 }
 ```
 
@@ -296,8 +296,8 @@ const movedPhotos = await CloudinaryService.movePhotosToPermFolder(photos, targe
 // Example:
 const targetFolder = CloudinaryPathBuilder.bobbleheadPath(userId, collectionId, bobbleheadId);
 const moved = await CloudinaryService.movePhotosToPermFolder(
-  tempPhotos.map(p => ({ publicId: p.publicId, url: p.url })),
-  targetFolder
+  tempPhotos.map((p) => ({ publicId: p.publicId, url: p.url })),
+  targetFolder,
 );
 ```
 
@@ -330,23 +330,23 @@ const signature = CloudinaryService.generateUploadSignature(paramsToSign);
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 
 // Base folder names
-CLOUDINARY_PATHS.FOLDERS.BOBBLEHEADS  // 'bobbleheads'
-CLOUDINARY_PATHS.FOLDERS.COLLECTIONS  // 'collections'
-CLOUDINARY_PATHS.FOLDERS.PROFILE      // 'profile'
-CLOUDINARY_PATHS.FOLDERS.TEMP         // 'temp'
-CLOUDINARY_PATHS.FOLDERS.UPLOADS      // 'uploads'
-CLOUDINARY_PATHS.FOLDERS.USERS        // 'users'
+CLOUDINARY_PATHS.FOLDERS.BOBBLEHEADS; // 'bobbleheads'
+CLOUDINARY_PATHS.FOLDERS.COLLECTIONS; // 'collections'
+CLOUDINARY_PATHS.FOLDERS.PROFILE; // 'profile'
+CLOUDINARY_PATHS.FOLDERS.TEMP; // 'temp'
+CLOUDINARY_PATHS.FOLDERS.UPLOADS; // 'uploads'
+CLOUDINARY_PATHS.FOLDERS.USERS; // 'users'
 
 // Path patterns (for reference)
-CLOUDINARY_PATHS.PATTERNS.USER_ROOT                   // 'users/{userId}'
-CLOUDINARY_PATHS.PATTERNS.PROFILE_PHOTOS              // 'users/{userId}/profile'
-CLOUDINARY_PATHS.PATTERNS.COLLECTION_ROOT             // 'users/{userId}/collections/{collectionId}'
-CLOUDINARY_PATHS.PATTERNS.BOBBLEHEAD_ROOT             // 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}'
-CLOUDINARY_PATHS.PATTERNS.TEMP_UPLOADS                // 'temp/uploads/{userId}'
+CLOUDINARY_PATHS.PATTERNS.USER_ROOT; // 'users/{userId}'
+CLOUDINARY_PATHS.PATTERNS.PROFILE_PHOTOS; // 'users/{userId}/profile'
+CLOUDINARY_PATHS.PATTERNS.COLLECTION_ROOT; // 'users/{userId}/collections/{collectionId}'
+CLOUDINARY_PATHS.PATTERNS.BOBBLEHEAD_ROOT; // 'users/{userId}/collections/{collectionId}/bobbleheads/{bobbleheadId}'
+CLOUDINARY_PATHS.PATTERNS.TEMP_UPLOADS; // 'temp/uploads/{userId}'
 
 // Placeholder images
-CLOUDINARY_PATHS.PLACEHOLDERS.COLLECTION_COVER        // '/images/placeholders/collection-cover-placeholder.png'
-CLOUDINARY_PATHS.PLACEHOLDERS.SUBCOLLECTION_COVER     // '/images/placeholders/subcollection-cover-placeholder.png'
+CLOUDINARY_PATHS.PLACEHOLDERS.COLLECTION_COVER; // '/images/placeholders/collection-cover-placeholder.png'
+CLOUDINARY_PATHS.PLACEHOLDERS.SUBCOLLECTION_COVER; // '/images/placeholders/subcollection-cover-placeholder.png'
 ```
 
 ### Path Builder Functions
@@ -371,7 +371,11 @@ const coverPath = CloudinaryPathBuilder.collectionCoverPath(userId, collectionId
 // Returns: 'users/{userId}/collections/{collectionId}/cover'
 
 // Subcollection cover path
-const subcollectionCoverPath = CloudinaryPathBuilder.subcollectionCoverPath(userId, collectionId, subcollectionId);
+const subcollectionCoverPath = CloudinaryPathBuilder.subcollectionCoverPath(
+  userId,
+  collectionId,
+  subcollectionId,
+);
 // Returns: 'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover'
 
 // Bobblehead photos path
@@ -459,9 +463,7 @@ const handleQueuesStart = (data: { files?: Array<File> }) => {
 const handleSuccess = (results: CloudinaryUploadWidgetResults) => {
   onPhotosChange((currentPhotos) => {
     const filename = results.info?.original_filename;
-    const optimisticIndex = currentPhotos.findIndex(
-      (p) => p.isUploading && p.originalFilename === filename
-    );
+    const optimisticIndex = currentPhotos.findIndex((p) => p.isUploading && p.originalFilename === filename);
 
     if (optimisticIndex !== -1) {
       const optimisticPhoto = currentPhotos[optimisticIndex];
@@ -496,22 +498,16 @@ import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const entity = await getEntity(params.id);
-  const primaryPhoto = entity.photos.find(p => p.isPrimary);
-  const primaryImagePublicId = primaryPhoto
-    ? extractPublicIdFromCloudinaryUrl(primaryPhoto.url)
-    : null;
+  const primaryPhoto = entity.photos.find((p) => p.isPrimary);
+  const primaryImagePublicId = primaryPhoto ? extractPublicIdFromCloudinaryUrl(primaryPhoto.url) : null;
 
   return {
     openGraph: {
-      images: primaryImagePublicId
-        ? [{ url: generateOpenGraphImageUrl(primaryImagePublicId) }]
-        : undefined,
+      images: primaryImagePublicId ? [{ url: generateOpenGraphImageUrl(primaryImagePublicId) }] : undefined,
     },
     twitter: {
       card: 'summary_large_image',
-      images: primaryImagePublicId
-        ? [generateTwitterCardImageUrl(primaryImagePublicId)]
-        : undefined,
+      images: primaryImagePublicId ? [generateTwitterCardImageUrl(primaryImagePublicId)] : undefined,
     },
   };
 }
@@ -562,9 +558,7 @@ try {
 
 ```typescript
 const handleError = (error: CloudinaryUploadWidgetError) => {
-  const errorMessage =
-    typeof error === 'string' ? error
-    : error?.statusText ?? 'Upload failed';
+  const errorMessage = typeof error === 'string' ? error : (error?.statusText ?? 'Upload failed');
 
   const errorType =
     errorMessage.toLowerCase().includes('network') ? 'network'
@@ -689,16 +683,16 @@ import { StarIcon } from 'lucide-react';
 
 ## Transformation Reference
 
-| Transformation | Code | Use Case |
-|---------------|------|----------|
-| Fill crop | `crop={'fill'}` | Gallery thumbnails, cards |
-| Thumb crop | `crop={'thumb'}` | Avatars, profile photos |
-| Face gravity | `gravity={'face'}` | Profile photos, avatars |
-| Auto gravity | `gravity={'auto'}` | General images |
-| Auto quality | `quality={'auto'}` | All images |
-| Good quality | `quality={'auto:good'}` | High-quality displays |
-| Low quality | `quality={'auto:low'}` | Thumbnails, previews |
-| Auto format | `format={'auto'}` or `f_auto` | All images |
+| Transformation | Code                          | Use Case                  |
+| -------------- | ----------------------------- | ------------------------- |
+| Fill crop      | `crop={'fill'}`               | Gallery thumbnails, cards |
+| Thumb crop     | `crop={'thumb'}`              | Avatars, profile photos   |
+| Face gravity   | `gravity={'face'}`            | Profile photos, avatars   |
+| Auto gravity   | `gravity={'auto'}`            | General images            |
+| Auto quality   | `quality={'auto'}`            | All images                |
+| Good quality   | `quality={'auto:good'}`       | High-quality displays     |
+| Low quality    | `quality={'auto:low'}`        | Thumbnails, previews      |
+| Auto format    | `format={'auto'}` or `f_auto` | All images                |
 
 ## Anti-Patterns to Avoid
 

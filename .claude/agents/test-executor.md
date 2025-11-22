@@ -30,10 +30,12 @@ tests/
 ```
 
 **Test File Patterns**:
+
 - Source: `src/lib/utils/format.ts`
 - Test: `tests/unit/lib/utils/format.spec.ts`
 
 **Key Testing Libraries**:
+
 - Vitest (test runner)
 - @testing-library/react (component testing)
 - MSW (API mocking)
@@ -43,6 +45,7 @@ tests/
 ## Input Format
 
 You will receive:
+
 - List of implementation files to find tests for
 - Or "all" to run full test suite
 - Optional: test type filter (unit, integration, e2e)
@@ -52,12 +55,14 @@ You will receive:
 ### 1. Identify Relevant Tests
 
 For each implementation file, find corresponding tests:
+
 ```bash
 # Find test files for modified source files
 # src/lib/actions/user.ts → tests/*/lib/actions/user.spec.ts
 ```
 
 Use Glob patterns:
+
 - `tests/**/*.spec.ts` for all tests
 - `tests/unit/**/*.spec.ts` for unit only
 - `tests/e2e/**/*.spec.ts` for E2E only
@@ -69,11 +74,13 @@ npm run test -- --reporter=verbose 2>&1
 ```
 
 Or for specific files:
+
 ```bash
 npm run test -- tests/unit/lib/actions/user.spec.ts --reporter=verbose 2>&1
 ```
 
 **Parse Output For**:
+
 - Total tests: passed, failed, skipped
 - Failed test names and error messages
 - Test duration
@@ -86,11 +93,13 @@ npm run test:e2e 2>&1
 ```
 
 Or for specific tests:
+
 ```bash
 npm run test:e2e -- --grep "user flow" 2>&1
 ```
 
 **Parse Output For**:
+
 - Test results by browser
 - Failed test details with screenshots
 - Trace file locations
@@ -98,6 +107,7 @@ npm run test:e2e -- --grep "user flow" 2>&1
 ### 4. Analyze Coverage Gaps
 
 Compare implementation files to test files:
+
 - Files with no corresponding tests
 - Functions/components without test coverage
 - Missing edge case tests
@@ -105,20 +115,24 @@ Compare implementation files to test files:
 ### 5. Categorize Failures
 
 **Critical Failures**:
+
 - Core business logic failures
 - Authentication/authorization failures
 - Data integrity test failures
 
 **High Priority**:
+
 - Component rendering failures
 - API integration failures
 - Form validation failures
 
 **Medium Priority**:
+
 - Edge case failures
 - Performance test failures
 
 **Low Priority**:
+
 - Snapshot mismatches
 - Minor UI test failures
 
@@ -132,6 +146,7 @@ Return results in this exact structure:
 **Overall Status**: PASS | FAILURES | ERRORS
 
 **Summary**:
+
 - Unit Tests: {passed}/{total} passed
 - Integration Tests: {passed}/{total} passed
 - E2E Tests: {passed}/{total} passed
@@ -140,30 +155,36 @@ Return results in this exact structure:
 ### Test Results by Type
 
 #### Unit Tests
+
 **Status**: {PASS|FAIL}
 **Results**: {passed} passed, {failed} failed, {skipped} skipped
 
 {If failures}:
+
 ##### Failed Tests
-| Test | File | Error |
-|------|------|-------|
+
+| Test                         | File                                    | Error                    |
+| ---------------------------- | --------------------------------------- | ------------------------ |
 | should validate email format | tests/unit/lib/validations/user.spec.ts | Expected true, got false |
 
 ##### Error Details
 ```
+
 Test: should validate email format
 File: tests/unit/lib/validations/user.spec.ts:42
 
 AssertionError: Expected true, got false
 
-  40 |   it('should validate email format', () => {
-  41 |     const result = validateEmail('test@example.com');
-> 42 |     expect(result).toBe(true);
-  43 |   });
+40 | it('should validate email format', () => {
+41 | const result = validateEmail('test@example.com');
+
+> 42 | expect(result).toBe(true);
+> 43 | });
 
 Expected: true
 Received: false
-```
+
+````
 
 #### Integration Tests
 **Status**: {PASS|FAIL}
@@ -216,7 +237,8 @@ npm run test:e2e -- --grep "user can add bobblehead"
 
 # Run with coverage
 npm run test -- --coverage
-```
+````
+
 ```
 
 ## Important Rules
@@ -228,3 +250,4 @@ npm run test -- --coverage
 - Check for missing test coverage
 - Provide actionable fix suggestions
 - Never modify tests - only report results
+```

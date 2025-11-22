@@ -110,10 +110,10 @@ export class {Domain}Facade {
 
 ## Context Selection
 
-| Operation Type | Context Factory | Use Case |
-|----------------|-----------------|----------|
-| Public reads | `createPublicQueryContext` | Unauthenticated data access |
-| User reads | `createUserQueryContext` | Authenticated reads with ownership |
+| Operation Type   | Context Factory               | Use Case                                 |
+| ---------------- | ----------------------------- | ---------------------------------------- |
+| Public reads     | `createPublicQueryContext`    | Unauthenticated data access              |
+| User reads       | `createUserQueryContext`      | Authenticated reads with ownership       |
 | Protected writes | `createProtectedQueryContext` | All write operations within transactions |
 
 ```typescript
@@ -399,10 +399,10 @@ static async getContentData(
 ```typescript
 const errorContext: FacadeErrorContext = {
   data: { entityId, additionalData }, // Relevant data for debugging
-  facade: facadeName,                 // Uses the const defined at top
-  method: 'methodName',               // Method that failed
-  operation: OPERATIONS.DOMAIN.OP,    // Operation constant
-  userId: viewerUserId,               // Optional user context
+  facade: facadeName, // Uses the const defined at top
+  method: 'methodName', // Method that failed
+  operation: OPERATIONS.DOMAIN.OP, // Operation constant
+  userId: viewerUserId, // Optional user context
 };
 ```
 
@@ -431,9 +431,9 @@ try {
 
 ```typescript
 export interface MutationResult {
-  entity: EntityType | null;  // The created/updated entity
-  error?: string;             // Optional error message
-  isSuccessful: boolean;      // Success flag
+  entity: EntityType | null; // The created/updated entity
+  error?: string; // Optional error message
+  isSuccessful: boolean; // Success flag
 }
 ```
 
@@ -454,9 +454,9 @@ static async getPhotosAsync(...): Promise<Array<PhotoRecord>>
 
 ```typescript
 export interface ListData {
-  items: Array<EntityType>;   // The list items
-  hasMore: boolean;           // Pagination indicator
-  total: number;              // Total count
+  items: Array<EntityType>; // The list items
+  hasMore: boolean; // Pagination indicator
+  total: number; // Total count
 }
 ```
 

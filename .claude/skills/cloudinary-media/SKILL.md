@@ -40,6 +40,7 @@ This skill activates when:
 ## Key Patterns
 
 ### Image Display
+
 - Use `CldImage` from `next-cloudinary` for all Cloudinary images
 - Pass `publicId` to `src` prop (not full URL)
 - Always include `alt`, `crop`, `gravity`, `quality={'auto'}` props
@@ -47,6 +48,7 @@ This skill activates when:
 - Extract publicId using `extractPublicIdFromCloudinaryUrl()` when needed
 
 ### URL Generation
+
 - Use `generateOpenGraphImageUrl()` for OG images (1200x630)
 - Use `generateTwitterCardImageUrl()` for Twitter cards (800x418)
 - Use `generateSocialImageUrl()` for platform-specific dimensions
@@ -54,6 +56,7 @@ This skill activates when:
 - All utilities include Sentry error logging with fallbacks
 
 ### Upload Service
+
 - Use `CloudinaryService` static methods for server-side operations
 - Use `deletePhotosByUrls()` for batch deletion with URL context
 - Use `movePhotosToPermFolder()` to move temp uploads to permanent locations
@@ -61,6 +64,7 @@ This skill activates when:
 - All service methods use circuit breakers and retry logic
 
 ### Path Organization
+
 - Use `CLOUDINARY_PATHS.FOLDERS` for base folder names
 - Use `CloudinaryPathBuilder` functions for dynamic paths:
   - `bobbleheadPath(userId, collectionId, bobbleheadId)`
@@ -70,6 +74,7 @@ This skill activates when:
 - Never hardcode folder paths directly
 
 ### Type Definitions
+
 - Use `CloudinaryPhoto` interface for photo data
 - Use `transformCloudinaryResult()` to convert upload results
 - Use `PhotoUploadState` for tracking upload progress
@@ -77,6 +82,7 @@ This skill activates when:
 - Use type guards `isPersistedPhoto()` and `isTempPhoto()`
 
 ### Upload Components
+
 - Use `CloudinaryPhotoUpload` component for photo management
 - Configure `CldUploadWidget` with proper options and signature endpoint
 - Implement optimistic updates with blob URLs during upload
@@ -84,6 +90,7 @@ This skill activates when:
 - Support bulk selection and deletion
 
 ### Error Handling
+
 - All utilities log errors to Sentry with operation context
 - Return sensible fallbacks on error (default image, original URL)
 - Use `createServiceError` for service-level errors

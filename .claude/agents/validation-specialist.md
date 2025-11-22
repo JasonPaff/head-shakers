@@ -64,6 +64,7 @@ Use utilities from `@/lib/utils/zod.utils`:
 ## File Patterns
 
 This agent handles files matching:
+
 - `src/lib/validations/**/*.validation.ts`
 - Any file creating Zod schemas for the project
 

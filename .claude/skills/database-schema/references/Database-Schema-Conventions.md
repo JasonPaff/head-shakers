@@ -303,13 +303,13 @@ export const entityTags = pgTable(
 
 ## Column Naming
 
-| Pattern | Example | Use Case |
-|---------|---------|----------|
-| `snake_case` | `created_at` | All database columns |
-| `{entity}Id` | `collectionId` | Foreign key references |
-| `is{Adjective}` | `isPublic`, `isDeleted` | Boolean flags |
-| `{noun}Count` | `likeCount`, `viewCount` | Counter columns |
-| `{noun}At` | `createdAt`, `deletedAt` | Timestamp columns |
+| Pattern         | Example                  | Use Case               |
+| --------------- | ------------------------ | ---------------------- |
+| `snake_case`    | `created_at`             | All database columns   |
+| `{entity}Id`    | `collectionId`           | Foreign key references |
+| `is{Adjective}` | `isPublic`, `isDeleted`  | Boolean flags          |
+| `{noun}Count`   | `likeCount`, `viewCount` | Counter columns        |
+| `{noun}At`      | `createdAt`, `deletedAt` | Timestamp columns      |
 
 ## Constants Usage
 
@@ -321,10 +321,9 @@ import { SLUG_MAX_LENGTH } from '@/lib/constants/slug';
 
 // Length limits
 varchar('name', { length: SCHEMA_LIMITS.ENTITY.NAME.MAX })
-
-// Defaults
-.default(DEFAULTS.ENTITY.IS_PUBLIC)
-.default(DEFAULTS.ENTITY.LIKE_COUNT)
+  // Defaults
+  .default(DEFAULTS.ENTITY.IS_PUBLIC)
+  .default(DEFAULTS.ENTITY.LIKE_COUNT);
 ```
 
 ## Anti-Patterns to Avoid

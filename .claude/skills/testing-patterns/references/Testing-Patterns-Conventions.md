@@ -142,12 +142,7 @@ describe('SocialFacade', () => {
 
   describe('toggleLike', () => {
     it('should create a like when not liked', async () => {
-      const result = await SocialFacade.toggleLike(
-        'target-123',
-        'bobblehead',
-        testUserId,
-        db,
-      );
+      const result = await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, db);
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(true);
@@ -159,12 +154,7 @@ describe('SocialFacade', () => {
       await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, db);
 
       // Toggle (unlike)
-      const result = await SocialFacade.toggleLike(
-        'target-123',
-        'bobblehead',
-        testUserId,
-        db,
-      );
+      const result = await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, db);
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(false);
@@ -346,10 +336,7 @@ export async function createTestBobblehead(userId: string, overrides = {}) {
     ...overrides,
   };
 
-  const [bobblehead] = await db
-    .insert(bobbleheads)
-    .values(defaultBobblehead)
-    .returning();
+  const [bobblehead] = await db.insert(bobbleheads).values(defaultBobblehead).returning();
   return bobblehead;
 }
 ```

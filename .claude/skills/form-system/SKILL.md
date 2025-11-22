@@ -37,6 +37,7 @@ This skill activates when:
 ## Key Patterns
 
 ### Form Setup
+
 - Use `useAppForm` hook from `@/components/ui/form`
 - Wrap form components with `withFocusManagement` HOC
 - Configure validation with `validators: { onSubmit: zodSchema }`
@@ -45,26 +46,31 @@ This skill activates when:
 - Always set `canSubmitWhenInvalid: true`
 
 ### Field Rendering
+
 - Use `form.AppField` with field components (`TextField`, etc.)
 - Each field supports `label`, `description`, `isRequired`, `focusRef`, and `testId` props
 - Use field `listeners` for side effects (onChange, onBlur)
 
 ### Form Submission
+
 - Wrap `form.handleSubmit()` in event handler with `e.preventDefault()` and `e.stopPropagation()`
 - Integrate with `useServerAction` hook for server actions
 - Use `form.SubmitButton` wrapped in `form.AppForm` for automatic loading state
 
 ### Accessing Form Values
+
 - Use `useStore` from `@tanstack/react-form` for reactive access
 - Access via `useStore(form.store, (state) => state.values.fieldName)`
 - Never access form values directly during render
 
 ### Programmatic Operations
+
 - Use `form.setFieldValue()` to update field values
 - Use `form.validateField()` to trigger validation
 - Use field listeners for dependent field updates
 
 ### Server Action Options
+
 - `toastMessages` for loading/success/error toasts
 - `isDisableToast: true` for background operations
 - `onSuccess` callback for post-submission logic

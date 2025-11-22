@@ -107,7 +107,12 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
       <Conditional isCondition={!isEmpty}>
         <div className={'mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'}>
           {bobbleheads.map((bobblehead) => (
-            <BobbleheadGalleryCard bobblehead={bobblehead} isOwner={isOwner} key={bobblehead.id} />
+            <BobbleheadGalleryCard
+              bobblehead={bobblehead}
+              isOwner={isOwner}
+              key={bobblehead.id}
+              navigationContext={{ collectionId: collection.id }}
+            />
           ))}
         </div>
       </Conditional>

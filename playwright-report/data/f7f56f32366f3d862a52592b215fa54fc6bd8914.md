@@ -1,0 +1,184 @@
+# Page snapshot
+
+```yaml
+- generic:
+    - generic:
+        - banner:
+            - generic:
+                - generic:
+                    - generic:
+                        - link:
+                            - /url: /
+                            - generic: HS
+                            - generic: Head Shakers
+                    - generic:
+                        - navigation:
+                            - generic:
+                                - list:
+                                    - listitem:
+                                        - button:
+                                            - img
+                                            - text: Browse
+                                            - img
+                    - generic:
+                        - generic:
+                            - generic:
+                                - generic:
+                                    - img
+                                    - generic:
+                                        - textbox:
+                                            - /placeholder: Search...
+                        - generic:
+                            - generic:
+                                - button:
+                                    - img
+                                    - text: My Collection
+                    - generic:
+                        - img
+                    - generic:
+                        - generic:
+                            - generic:
+                                - generic:
+                                    - button:
+                                        - generic:
+                                            - generic:
+                                                - img
+                        - button:
+                            - img
+                            - generic: Toggle theme
+        - generic:
+            - main:
+                - generic:
+                    - generic:
+                        - heading [level=1]: Collect, Share, and Discover Bobbleheads
+                        - paragraph: Build your digital bobblehead collection, connect with other collectors, and discover rare finds from around the world.
+                        - generic:
+                            - link:
+                                - /url: /dashboard/collection
+                                - text: My Collection
+                            - link:
+                                - /url: /browse
+                                - text: Browse Collections
+                            - link:
+                                - /url: /browse/search
+                                - img
+                                - text: Search
+                    - generic:
+                        - heading [level=2]: Featured Collections
+                        - generic:
+                            - generic:
+                                - link:
+                                    - /url: /collections/baltimore-orioles
+                                    - generic:
+                                        - img
+                                - generic:
+                                    - generic:
+                                        - link:
+                                            - /url: /collections/baltimore-orioles
+                                            - heading [level=3]: Baltimore Orioles
+                                        - paragraph: by Unknown
+                                    - paragraph: The best collection ever!!!
+                                    - generic:
+                                        - button:
+                                            - img
+                                            - generic:
+                                                - generic:
+                                                    - generic:
+                                                        - generic:
+                                                            - generic:
+                                                                - generic: '2'
+                                        - link:
+                                            - /url: /collections/baltimore-orioles
+                                            - text: View Collection
+                            - generic:
+                                - link:
+                                    - /url: /collections/baltimore-orioles
+                                    - generic:
+                                        - img
+                                - generic:
+                                    - generic:
+                                        - link:
+                                            - /url: /collections/baltimore-orioles
+                                            - heading [level=3]: Baltimore Orioles
+                                        - paragraph: by Unknown
+                                    - paragraph: The best Baltimore Orioles stadium giveaway bobblehead colleciton ever!
+                                    - generic:
+                                        - button:
+                                            - img
+                                            - generic:
+                                                - generic:
+                                                    - generic:
+                                                        - generic:
+                                                            - generic:
+                                                                - generic: '2'
+                                        - link:
+                                            - /url: /collections/baltimore-orioles
+                                            - text: View Collection
+                            - generic:
+                                - link:
+                                    - /url: /collections/spooky-collection
+                                    - generic:
+                                        - img
+                                - generic:
+                                    - generic:
+                                        - link:
+                                            - /url: /collections/spooky-collection
+                                            - heading [level=3]: Spooky Collection
+                                        - paragraph: by Unknown
+                                    - paragraph: The scariest collection you've ever seen!
+                                    - generic:
+                                        - button:
+                                            - img
+                                            - generic:
+                                                - generic:
+                                                    - generic:
+                                                        - generic:
+                                                            - generic:
+                                                                - generic: '1'
+                                        - link:
+                                            - /url: /collections/spooky-collection
+                                            - text: View Collection
+                        - generic:
+                            - link:
+                                - /url: /browse/featured
+                                - text: View All Featured Content
+                                - img
+                    - generic:
+                        - generic:
+                            - generic:
+                                - heading [level=2]: Join the Community
+                                - paragraph: Connect with fellow collectors, share your finds, and discover new additions to your collection.
+                            - generic:
+                                - generic:
+                                    - generic:
+                                        - img
+                                    - heading [level=3]: Connect
+                                    - paragraph: Follow other collectors and build your network
+                                - generic:
+                                    - generic:
+                                        - img
+                                    - heading [level=3]: Discover
+                                    - paragraph: Find trending bobbleheads and rare collectibles
+                                - generic:
+                                    - generic:
+                                        - img
+                                    - heading [level=3]: Share
+                                    - paragraph: Showcase your collection and get feedback
+    - region "Notifications alt+T"
+    - button "Open Next.js Dev Tools" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+    - alert
+    - dialog "Welcome to Head Shakers!" [ref=e10]:
+        - generic [ref=e11]:
+            - heading "Welcome to Head Shakers!" [level=2] [ref=e12]
+            - paragraph [ref=e13]:
+                - text: "We've created an auto-generated username for you:"
+                - generic [ref=e14]: '@user-test'
+        - paragraph [ref=e16]: You can keep this username or customize it to something unique. Once set, you can change your username again in 90 days.
+        - generic [ref=e17]:
+            - button "Keep Current" [active] [ref=e18]
+            - button "Customize" [ref=e19]
+        - button "Close" [ref=e20]:
+            - img
+            - generic [ref=e21]: Close
+```

@@ -13,7 +13,15 @@ type Children<TProps = NonNullable<unknown>> = Readonly<{ children?: ReactNode |
 
 type ErrorBoundaryProps = Children<{
   fallback?: ReactNode;
-  section?: 'comments' | 'details' | 'feature' | 'gallery' | 'header' | 'metrics' | 'secondary';
+  section?:
+    | 'comments'
+    | 'details'
+    | 'feature'
+    | 'gallery'
+    | 'header'
+    | 'metrics'
+    | 'navigation'
+    | 'secondary';
 }>;
 
 interface ErrorBoundaryState {

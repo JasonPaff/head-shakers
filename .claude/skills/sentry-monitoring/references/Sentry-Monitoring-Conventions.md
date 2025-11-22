@@ -128,12 +128,7 @@ export const toggleLikeAction = authActionClient
     });
 
     try {
-      const result = await SocialFacade.toggleLike(
-        data.targetId,
-        data.targetType,
-        ctx.userId,
-        dbInstance,
-      );
+      const result = await SocialFacade.toggleLike(data.targetId, data.targetType, ctx.userId, dbInstance);
 
       if (!result.isSuccessful) {
         throw new ActionError(/* ... */);
@@ -198,11 +193,11 @@ Sentry.setContext(SENTRY_CONTEXTS.COMMENT_DATA, {
 
 ### Context Data Guidelines
 
-| Context Type | Include | Exclude |
-|--------------|---------|---------|
-| Entity Data | IDs, types, counts | Content, PII |
-| User Context | userId, role | Email, name |
-| Request Data | Action name, operation | Full input |
+| Context Type | Include                | Exclude      |
+| ------------ | ---------------------- | ------------ |
+| Entity Data  | IDs, types, counts     | Content, PII |
+| User Context | userId, role           | Email, name  |
+| Request Data | Action name, operation | Full input   |
 
 ```typescript
 // GOOD - Include identifiers only
@@ -214,8 +209,8 @@ Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
 
 // BAD - Don't include content or PII
 Sentry.setContext('comment', {
-  content: data.content,      // Don't include content
-  email: user.email,          // Don't include PII
+  content: data.content, // Don't include content
+  email: user.email, // Don't include PII
 });
 ```
 
@@ -240,25 +235,25 @@ Sentry.addBreadcrumb({
 
 ### Breadcrumb Categories
 
-| Category | Use Case |
-|----------|----------|
-| `ACTION` | Server action execution |
-| `BUSINESS_LOGIC` | Core operations (CRUD, toggles) |
-| `DATABASE` | Database operations |
-| `AUTH` | Authentication events |
-| `EXTERNAL_SERVICE` | Third-party API calls |
-| `NAVIGATION` | Route changes |
-| `USER_INTERACTION` | User-initiated actions |
-| `VALIDATION` | Input validation |
+| Category           | Use Case                        |
+| ------------------ | ------------------------------- |
+| `ACTION`           | Server action execution         |
+| `BUSINESS_LOGIC`   | Core operations (CRUD, toggles) |
+| `DATABASE`         | Database operations             |
+| `AUTH`             | Authentication events           |
+| `EXTERNAL_SERVICE` | Third-party API calls           |
+| `NAVIGATION`       | Route changes                   |
+| `USER_INTERACTION` | User-initiated actions          |
+| `VALIDATION`       | Input validation                |
 
 ### Breadcrumb Levels
 
-| Level | Use Case |
-|-------|----------|
-| `INFO` | Successful operations |
-| `WARNING` | Non-critical issues |
-| `ERROR` | Caught errors |
-| `DEBUG` | Detailed debugging info |
+| Level     | Use Case                |
+| --------- | ----------------------- |
+| `INFO`    | Successful operations   |
+| `WARNING` | Non-critical issues     |
+| `ERROR`   | Caught errors           |
+| `DEBUG`   | Detailed debugging info |
 
 ## Capturing Exceptions
 
@@ -366,11 +361,11 @@ Sentry.captureException(error, {
 
 ## Error Levels
 
-| Level | Use Case | Example |
-|-------|----------|---------|
+| Level     | Use Case              | Example                   |
+| --------- | --------------------- | ------------------------- |
 | `warning` | Non-critical failures | Cache invalidation failed |
-| `error` | Recoverable errors | Business rule violation |
-| `fatal` | Critical failures | Database connection lost |
+| `error`   | Recoverable errors    | Business rule violation   |
+| `fatal`   | Critical failures     | Database connection lost  |
 
 ## Middleware Integration
 

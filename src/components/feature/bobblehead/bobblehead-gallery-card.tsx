@@ -63,9 +63,18 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
     subcollectionSlug?: null | string;
   };
   isOwner: boolean;
+  navigationContext?: {
+    collectionId?: string;
+    subcollectionId?: string;
+  };
 }
 
-export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: BobbleheadGalleryCardProps) => {
+export const BobbleheadGalleryCard = ({
+  bobblehead,
+  isOwner,
+  navigationContext,
+  testId,
+}: BobbleheadGalleryCardProps) => {
   const cardTestId = testId || generateTestId('feature', 'bobblehead-card');
   const photoAreaTestId = generateTestId('feature', 'bobblehead-photo', 'clickable');
   const prevButtonTestId = generateTestId('feature', 'bobblehead-nav', 'prev');
@@ -362,6 +371,10 @@ export const BobbleheadGalleryCard = ({ bobblehead, isOwner, testId }: Bobblehea
               href={$path({
                 route: '/bobbleheads/[bobbleheadSlug]',
                 routeParams: { bobbleheadSlug: bobblehead.slug },
+                searchParams: {
+                  collectionId: navigationContext?.collectionId,
+                  subcollectionId: navigationContext?.subcollectionId,
+                },
               })}
             >
               View Details

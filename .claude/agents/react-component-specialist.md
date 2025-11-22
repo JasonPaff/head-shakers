@@ -81,6 +81,7 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 ## File Patterns
 
 This agent handles files matching:
+
 - `src/components/**/*.tsx`
 - `src/app/**/*.tsx` (page components)
 - Any `.tsx` or `.jsx` file not related to forms

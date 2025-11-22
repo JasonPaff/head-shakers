@@ -63,6 +63,7 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 ## File Patterns
 
 This agent handles files matching:
+
 - `src/lib/utils/cloudinary*.ts`
 - Components with image upload functionality
 - Photo gallery components

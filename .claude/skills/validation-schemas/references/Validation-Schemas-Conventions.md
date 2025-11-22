@@ -251,7 +251,7 @@ Zod transforms can change types during validation. Forms need the **input type**
 
 ```typescript
 // Example: zodDecimal transforms string -> number | null
-purchasePrice: zodDecimal({ fieldName: 'Purchase Price' }).optional()
+purchasePrice: zodDecimal({ fieldName: 'Purchase Price' }).optional();
 // Input type: string | undefined
 // Output type: number | null | undefined
 
@@ -694,14 +694,16 @@ id: z.uuid({ message: 'Invalid ID' }),
 
 ```typescript
 // ❌ Wrong - using output type for form
-const form = useAppForm<InsertBobblehead>({ // Output type!
+const form = useAppForm<InsertBobblehead>({
+  // Output type!
   defaultValues: {
     purchasePrice: 0, // Wrong! Form receives string input
   },
 });
 
 // ✅ Correct - using input type for form
-const form = useAppForm<InsertBobbleheadInput>({ // Input type!
+const form = useAppForm<InsertBobbleheadInput>({
+  // Input type!
   defaultValues: {
     purchasePrice: '', // Correct! Form field value is string
   },

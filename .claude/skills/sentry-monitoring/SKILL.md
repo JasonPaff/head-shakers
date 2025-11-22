@@ -33,46 +33,51 @@ This skill activates when:
 ## Key Patterns
 
 ### Server Actions
+
 - Set context at the start with `Sentry.setContext(SENTRY_CONTEXTS.*, {...})`
 - Add breadcrumbs for successful operations
 - Log non-critical failures (e.g., cache invalidation) with `level: 'warning'`
 
 ### Facades
+
 - Add breadcrumbs for non-blocking operations (Cloudinary cleanup)
 - Capture non-critical exceptions without failing the operation
 
 ### Error Boundaries
+
 - Use `Sentry.captureException` with `contexts`, `extra`, `tags`, and `level`
 - Use `Sentry.captureMessage` for user action logging (retry, continue without)
 
 ### Utilities
+
 - Capture exceptions with `extra` context for operations
 - Use appropriate levels: `'warning'` for recoverable, `'error'` for critical
 
 ### Middleware
+
 - Use `Sentry.withScope` and `Sentry.startSpan` for performance tracking
 - Set tags and context within the scope
 
 ## Constants (Always Use)
 
-| Constant | Import Path | Purpose |
-|----------|-------------|---------|
-| `SENTRY_CONTEXTS` | `@/lib/constants` | Context names for `setContext` |
-| `SENTRY_BREADCRUMB_CATEGORIES` | `@/lib/constants` | Breadcrumb category values |
-| `SENTRY_LEVELS` | `@/lib/constants` | Breadcrumb level values |
-| `SENTRY_TAGS` | `@/lib/constants` | Tag names for `setTag` |
-| `SENTRY_OPERATIONS` | `@/lib/constants` | Operation names for spans |
+| Constant                       | Import Path       | Purpose                        |
+| ------------------------------ | ----------------- | ------------------------------ |
+| `SENTRY_CONTEXTS`              | `@/lib/constants` | Context names for `setContext` |
+| `SENTRY_BREADCRUMB_CATEGORIES` | `@/lib/constants` | Breadcrumb category values     |
+| `SENTRY_LEVELS`                | `@/lib/constants` | Breadcrumb level values        |
+| `SENTRY_TAGS`                  | `@/lib/constants` | Tag names for `setTag`         |
+| `SENTRY_OPERATIONS`            | `@/lib/constants` | Operation names for spans      |
 
 ## Usage Pattern Reference
 
-| Use Case | Primary Method | Level |
-|----------|----------------|-------|
-| Action start | `Sentry.setContext` | N/A |
-| Successful operation | `Sentry.addBreadcrumb` | `INFO` |
+| Use Case             | Primary Method            | Level     |
+| -------------------- | ------------------------- | --------- |
+| Action start         | `Sentry.setContext`       | N/A       |
+| Successful operation | `Sentry.addBreadcrumb`    | `INFO`    |
 | Non-critical failure | `Sentry.captureException` | `warning` |
-| Critical failure | Let error propagate | `error` |
-| User action logging | `Sentry.captureMessage` | `info` |
-| Performance tracking | `Sentry.startSpan` | N/A |
+| Critical failure     | Let error propagate       | `error`   |
+| User action logging  | `Sentry.captureMessage`   | `info`    |
+| Performance tracking | `Sentry.startSpan`        | N/A       |
 
 ## References
 

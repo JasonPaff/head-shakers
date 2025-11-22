@@ -73,6 +73,7 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 ## File Patterns
 
 This agent handles files matching:
+
 - Form components in `src/components/**/*-form*.tsx`
 - Dialog forms in `src/components/**/*-dialog*.tsx`
 - Page forms in `src/app/**/*form*.tsx`

@@ -115,9 +115,7 @@ import { generateTestId } from '@/lib/test-ids';
 export const Button = ({ testId, ...props }: ButtonProps) => {
   const buttonTestId = testId || generateTestId('ui', 'button');
 
-  return (
-    <button data-testid={buttonTestId} {...props} />
-  );
+  return <button data-testid={buttonTestId} {...props} />;
 };
 
 // For form fields
@@ -181,7 +179,7 @@ type InputProps = {
 
 // Incorrect - DO NOT USE
 type DialogContentProps = {
-  showCloseButton?: boolean;  // Missing 'is' prefix
+  showCloseButton?: boolean; // Missing 'is' prefix
 };
 ```
 
@@ -464,11 +462,19 @@ import { Conditional } from '@/components/ui/conditional';
 ### Simple Conditions
 
 ```tsx
-{/* Ternary for simple conditions */}
-{isError ? <ErrorMessage /> : <Content />}
+{
+  /* Ternary for simple conditions */
+}
+{
+  isError ? <ErrorMessage /> : <Content />;
+}
 
-{/* Short-circuit for optional rendering */}
-{showBadge && <Badge>{count}</Badge>}
+{
+  /* Short-circuit for optional rendering */
+}
+{
+  showBadge && <Badge>{count}</Badge>;
+}
 ```
 
 ## Link Navigation
