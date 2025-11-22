@@ -57,7 +57,7 @@ playwright/.e2e-branch.json
 # docs
 # /docs
 # /docs/*
-/.claude/
+# /.claude/
 
 # worktrees
 /.worktrees/

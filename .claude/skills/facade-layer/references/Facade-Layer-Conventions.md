@@ -1,0 +1,560 @@
+# Facade Layer Conventions
+
+## Overview
+
+The facade layer in Head Shakers provides a business logic abstraction between server actions and database queries. Facades coordinate multiple queries, manage transactions, handle caching, orchestrate cross-service operations, and enforce business rules with Sentry monitoring.
+
+## File Structure
+
+```
+src/lib/facades/
+├── {domain}/
+│   └── {domain}.facade.ts
+```
+
+## File Naming
+
+- **Files**: `{domain}.facade.ts` (e.g., `social.facade.ts`, `bobbleheads.facade.ts`)
+- **Classes**: `{Domain}Facade` (e.g., `SocialFacade`, `BobbleheadsFacade`)
+- **Methods**: `{verb}{Entity}Async` or `{verb}{Entity}` (e.g., `createAsync`, `getBobbleheadById`, `toggleLike`)
+
+## Facade Class Structure
+
+```typescript
+import * as Sentry from '@sentry/nextjs';
+
+import type { FindOptions } from '@/lib/queries/base/query-context';
+import type { {EntityRecord}, {EntityWithRelations} } from '@/lib/queries/{domain}/{domain}-query';
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
+import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { Insert{Entity}, Update{Entity} } from '@/lib/validations/{domain}.validation';
+
+import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { db } from '@/lib/db';
+import {
+  createProtectedQueryContext,
+  createPublicQueryContext,
+  createUserQueryContext,
+} from '@/lib/queries/base/query-context';
+import { {Domain}Query } from '@/lib/queries/{domain}/{domain}-query';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
+import { CacheService } from '@/lib/services/cache.service';
+import { createFacadeError } from '@/lib/utils/error-builders';
+
+// Define facade name constant for consistent error context
+const facadeName = '{Domain}Facade';
+
+// Result interfaces
+export interface {Entity}MutationResult {
+  entity: {EntityType} | null;
+  error?: string;
+  isSuccessful: boolean;
+}
+
+export interface {Entity}ListData {
+  items: Array<{EntityType}>;
+  hasMore: boolean;
+  total: number;
+}
+
+export class {Domain}Facade {
+  // Read operations (with domain-specific caching)
+  static async get{Entity}ById(
+    id: string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{EntityRecord} | null> {
+    return CacheService.{domain}.byId(
+      () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return {Domain}Query.findByIdAsync(id, context);
+      },
+      id,
+      {
+        context: {
+          entityId: id,
+          entityType: '{entity}',
+          facade: facadeName,
+          operation: 'getById',
+          userId: viewerUserId,
+        },
+      },
+    );
+  }
+
+  // Write operations (with transactions)
+  static async createAsync(
+    data: Insert{Entity},
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{EntityRecord} | null> {
+    try {
+      const context = createUserQueryContext(userId, { dbInstance });
+      return {Domain}Query.createAsync(data, userId, context);
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { name: data.name },
+        facade: facadeName,
+        method: 'createAsync',
+        operation: OPERATIONS.{DOMAIN}.CREATE,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+}
+```
+
+## Context Selection
+
+| Operation Type | Context Factory | Use Case |
+|----------------|-----------------|----------|
+| Public reads | `createPublicQueryContext` | Unauthenticated data access |
+| User reads | `createUserQueryContext` | Authenticated reads with ownership |
+| Protected writes | `createProtectedQueryContext` | All write operations within transactions |
+
+```typescript
+// Public read - no auth required
+const context = createPublicQueryContext({ dbInstance });
+
+// User read - shows user's private + all public
+const context = createUserQueryContext(viewerUserId, { dbInstance });
+
+// Protected write - requires auth, typically within transaction
+const context = createProtectedQueryContext(userId, { dbInstance: tx });
+```
+
+## Transaction Handling
+
+### Standard Transaction Pattern
+
+```typescript
+static async update{Entity}(
+  data: Update{Entity},
+  userId: string,
+  dbInstance: DatabaseExecutor = db,
+): Promise<{Entity}MutationResult> {
+  try {
+    return await (dbInstance ?? db).transaction(async (tx) => {
+      const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+      // Step 1: Verify ownership/permissions
+      const existing = await {Domain}Query.findByIdAsync(data.id, context);
+      if (!existing || existing.userId !== userId) {
+        return { entity: null, isSuccessful: false };
+      }
+
+      // Step 2: Perform the update
+      const updated = await {Domain}Query.updateAsync(data, userId, context);
+
+      // Step 3: Related operations
+      await {Domain}Query.updateRelatedAsync(data.id, context);
+
+      return {
+        entity: updated,
+        isSuccessful: !!updated,
+      };
+    });
+  } catch (error) {
+    const errorContext: FacadeErrorContext = {
+      data: { id: data.id },
+      facade: facadeName,
+      method: 'update{Entity}',
+      operation: OPERATIONS.{DOMAIN}.UPDATE,
+      userId,
+    };
+    throw createFacadeError(errorContext, error);
+  }
+}
+```
+
+### Non-Transaction Pattern (Simple Queries)
+
+```typescript
+static async get{Entity}ById(
+  id: string,
+  viewerUserId?: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<{EntityRecord} | null> {
+  try {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
+    return {Domain}Query.findByIdAsync(id, context);
+  } catch (error) {
+    const context: FacadeErrorContext = {
+      data: { id },
+      facade: facadeName,
+      method: 'get{Entity}ById',
+      operation: 'getById',
+      userId: viewerUserId,
+    };
+    throw createFacadeError(context, error);
+  }
+}
+```
+
+## Caching Integration
+
+### Domain-Specific CacheService Helpers
+
+The project uses domain-specific cache helpers instead of generic `CacheService.cached()`:
+
+```typescript
+// Use domain-specific helpers
+return CacheService.bobbleheads.byId(fn, id, options);
+return CacheService.bobbleheads.photos(fn, bobbleheadId, options);
+return CacheService.bobbleheads.byCollection(fn, collectionId, optionsHash, options);
+return CacheService.bobbleheads.byUser(fn, userId, optionsHash, options);
+return CacheService.bobbleheads.search(fn, searchTerm, filtersHash, options);
+return CacheService.bobbleheads.withRelations(fn, id, options);
+
+// Analytics caching
+return CacheService.analytics.aggregates(fn, targetType, targetId, period, options);
+return CacheService.analytics.engagement(fn, targetType, targetIds, optionsHash, options);
+return CacheService.analytics.performance(fn, targetType, targetIds, options);
+```
+
+### Cache Context Pattern
+
+```typescript
+{
+  context: {
+    entityId: id,
+    entityType: 'bobblehead',
+    facade: 'BobbleheadsFacade',
+    operation: 'getById',
+    userId: viewerUserId,
+  },
+  ttl: 1800, // Optional custom TTL
+}
+```
+
+### Using createHashFromObject for Cache Keys
+
+```typescript
+import { createHashFromObject } from '@/lib/utils/cache.utils';
+
+static async search{Entity}s(
+  searchTerm: string,
+  filters: { category?: string; status?: string } = {},
+  options: FindOptions = {},
+  viewerUserId?: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<Array<{EntityRecord}>> {
+  try {
+    const filtersHash = createHashFromObject(filters || {});
+    return CacheService.{domain}.search(
+      () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return {Domain}Query.searchAsync(searchTerm, filters, options, context);
+      },
+      searchTerm,
+      filtersHash,
+      {
+        context: {
+          entityType: 'search',
+          facade: facadeName,
+          operation: 'search',
+          userId: viewerUserId,
+        },
+      },
+    );
+  } catch (error) {
+    // ... error handling
+  }
+}
+```
+
+### Cache Invalidation with CacheRevalidationService
+
+```typescript
+// After mutations, invalidate using domain-specific revalidation
+CacheRevalidationService.bobbleheads.onPhotoChange(bobbleheadId, userId, 'delete');
+CacheRevalidationService.bobbleheads.onPhotoChange(bobbleheadId, userId, 'update');
+CacheRevalidationService.bobbleheads.onPhotoChange(bobbleheadId, userId, 'reorder');
+
+// Social invalidation
+const cacheTags = CacheTagGenerators.social.comments(targetType, targetId);
+cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
+```
+
+## Sentry Integration
+
+### Breadcrumbs for Business Logic
+
+```typescript
+Sentry.addBreadcrumb({
+  category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+  data: { bobbleheadId: bobblehead.id, count: successfulDeletions },
+  level: SENTRY_LEVELS.INFO,
+  message: `Successfully deleted ${successfulDeletions} photos from Cloudinary`,
+});
+```
+
+### Non-Blocking Error Capture
+
+```typescript
+// For non-critical operations that shouldn't fail the main operation
+try {
+  await ExternalService.cleanup(resourceId);
+} catch (error) {
+  // Don't fail the entire operation if cleanup fails
+  Sentry.captureException(error, {
+    extra: { resourceId, operation: 'cleanup' },
+    level: 'warning',
+  });
+}
+```
+
+## Cross-Facade Coordination
+
+### Calling Other Facades
+
+```typescript
+static async deleteAsync(
+  data: Delete{Entity},
+  userId: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<{EntityRecord} | null> {
+  try {
+    const context = createUserQueryContext(userId, { dbInstance });
+
+    // Delete from primary query
+    const deleteResult = await {Domain}Query.deleteAsync(data, userId, context);
+
+    if (!deleteResult.entity) {
+      return null;
+    }
+
+    // Coordinate with other facades
+    const wasTagRemovalSuccessful = await TagsFacade.removeAllFrom{Entity}(
+      deleteResult.entity.id,
+      userId
+    );
+
+    if (!wasTagRemovalSuccessful) {
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: { entityId: deleteResult.entity.id },
+        level: SENTRY_LEVELS.WARNING,
+        message: 'Failed to remove tags during entity deletion',
+      });
+    }
+
+    return deleteResult.entity;
+  } catch (error) {
+    // ... error handling
+  }
+}
+```
+
+### Parallel Data Fetching
+
+```typescript
+static async getContentData(
+  targetId: string,
+  targetType: LikeTargetType,
+  viewerUserId?: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<ContentData> {
+  try {
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
+
+    // Fetch independent data in parallel
+    const [likeCount, userStatus, comments] = await Promise.all([
+      SocialFacade.getLikeCount(targetId, targetType, dbInstance),
+      viewerUserId ?
+        SocialQuery.getUserLikeStatusAsync(targetId, targetType, viewerUserId, context)
+      : Promise.resolve({ isLiked: false, likeId: null }),
+      SocialQuery.getCommentsAsync(targetId, targetType, {}, context),
+    ]);
+
+    return {
+      comments,
+      isLiked: userStatus.isLiked,
+      likeCount,
+      likeId: userStatus.likeId,
+    };
+  } catch (error) {
+    // ... error handling
+  }
+}
+```
+
+## Error Handling
+
+### Error Context Structure
+
+```typescript
+const errorContext: FacadeErrorContext = {
+  data: { entityId, additionalData }, // Relevant data for debugging
+  facade: facadeName,                 // Uses the const defined at top
+  method: 'methodName',               // Method that failed
+  operation: OPERATIONS.DOMAIN.OP,    // Operation constant
+  userId: viewerUserId,               // Optional user context
+};
+```
+
+### Using createFacadeError
+
+```typescript
+import { createFacadeError } from '@/lib/utils/error-builders';
+
+try {
+  // ... operation
+} catch (error) {
+  const errorContext: FacadeErrorContext = {
+    data: { entityId },
+    facade: facadeName,
+    method: 'toggleLike',
+    operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
+    userId,
+  };
+  throw createFacadeError(errorContext, error);
+}
+```
+
+## Return Type Conventions
+
+### Mutation Results (for complex operations)
+
+```typescript
+export interface MutationResult {
+  entity: EntityType | null;  // The created/updated entity
+  error?: string;             // Optional error message
+  isSuccessful: boolean;      // Success flag
+}
+```
+
+### Simple Returns (for straightforward operations)
+
+```typescript
+// Return entity or null directly
+static async createAsync(...): Promise<{EntityRecord} | null>
+
+// Return boolean for delete operations
+static async deleteAsync(...): Promise<boolean>
+
+// Return typed data directly
+static async getPhotosAsync(...): Promise<Array<PhotoRecord>>
+```
+
+### List Results
+
+```typescript
+export interface ListData {
+  items: Array<EntityType>;   // The list items
+  hasMore: boolean;           // Pagination indicator
+  total: number;              // Total count
+}
+```
+
+## Business Logic Patterns
+
+### Ownership Verification
+
+```typescript
+// Verify ownership before updates/deletes
+const existing = await {Domain}Query.findByIdAsync(entityId, context);
+if (!existing || existing.userId !== userId) {
+  return { entity: null, isSuccessful: false };
+}
+```
+
+### Cascading Operations with Cleanup
+
+```typescript
+static async deleteWithCascade(
+  data: Delete{Entity},
+  userId: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<{EntityRecord} | null> {
+  try {
+    const context = createUserQueryContext(userId, { dbInstance });
+
+    // Get entity and related data, then delete from database
+    const deleteResult = await {Domain}Query.deleteAsync(data, userId, context);
+    const { entity, relatedItems } = deleteResult;
+
+    if (!entity) {
+      return null;
+    }
+
+    // Non-blocking cleanup of external resources
+    if (relatedItems && relatedItems.length > 0) {
+      try {
+        const cleanupResults = await ExternalService.cleanup(relatedItems);
+
+        const successCount = cleanupResults.filter((r) => r.success).length;
+        const failures = cleanupResults.filter((r) => !r.success);
+
+        if (successCount > 0) {
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { entityId: entity.id, count: successCount },
+            level: SENTRY_LEVELS.INFO,
+            message: `Successfully cleaned up ${successCount} related items`,
+          });
+        }
+
+        if (failures.length > 0) {
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { entityId: entity.id, count: failures.length, failures },
+            level: SENTRY_LEVELS.WARNING,
+            message: `Failed to clean up ${failures.length} related items`,
+          });
+        }
+      } catch (error) {
+        // Don't fail the entire operation if cleanup fails
+        Sentry.captureException(error, {
+          extra: { entityId: entity.id, operation: 'cleanup' },
+          level: 'warning',
+        });
+      }
+    }
+
+    return entity;
+  } catch (error) {
+    // ... error handling
+  }
+}
+```
+
+### Depth/Limit Validation
+
+```typescript
+// Validate nesting depth for hierarchical data
+const currentDepth = await this.calculateDepth(parentId, context);
+if (currentDepth >= MAX_NESTING_DEPTH) {
+  return {
+    entity: null,
+    error: `Maximum nesting depth of ${MAX_NESTING_DEPTH} exceeded`,
+    isSuccessful: false,
+  };
+}
+```
+
+## Anti-Patterns to Avoid
+
+1. **Never skip error wrapping** - Always use `createFacadeError`
+2. **Never access queries without context** - Always create proper context
+3. **Never expose raw query results** - Transform to typed interfaces
+4. **Never skip ownership checks** - Always verify before mutations
+5. **Never cache write operations** - Only cache reads
+6. **Never let cleanup failures break main operations** - Use try/catch with Sentry
+7. **Never hardcode facade name in errors** - Use `const facadeName` at top of file
+8. **Never use generic `CacheService.cached()`** - Use domain-specific helpers
+9. **Never skip cache invalidation after writes** - Use CacheRevalidationService
+10. **Never fetch sequential independent data** - Use `Promise.all` for parallel fetching
