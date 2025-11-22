@@ -44,11 +44,11 @@ import { {schema} } from '@/lib/validations/{domain}.validation';
 
 ## Action Client Types
 
-| Client | Use Case | Auth Required |
-|--------|----------|---------------|
-| `authActionClient` | Standard authenticated actions | Yes (user) |
-| `adminActionClient` | Admin/moderator actions | Yes (admin role) |
-| `publicActionClient` | Public actions (no auth) | No |
+| Client               | Use Case                       | Auth Required    |
+| -------------------- | ------------------------------ | ---------------- |
+| `authActionClient`   | Standard authenticated actions | Yes (user)       |
+| `adminActionClient`  | Admin/moderator actions        | Yes (admin role) |
+| `publicActionClient` | Public actions (no auth)       | No               |
 
 ## Action Structure Template
 
@@ -160,25 +160,25 @@ const dbInstance = ctx.tx ?? ctx.db;
 
 ### 4. Error Types
 
-| ErrorType | Use Case | Status Code |
-|-----------|----------|-------------|
-| `BUSINESS_RULE` | Validation/business logic failures | 400 |
-| `AUTHORIZATION` | Permission denied | 403 |
-| `NOT_FOUND` | Resource not found | 404 |
-| `DATABASE` | Database errors | 500 |
-| `RATE_LIMIT` | Too many requests | 429 |
-| `VALIDATION` | Input validation failures | 400 |
+| ErrorType       | Use Case                           | Status Code |
+| --------------- | ---------------------------------- | ----------- |
+| `BUSINESS_RULE` | Validation/business logic failures | 400         |
+| `AUTHORIZATION` | Permission denied                  | 403         |
+| `NOT_FOUND`     | Resource not found                 | 404         |
+| `DATABASE`      | Database errors                    | 500         |
+| `RATE_LIMIT`    | Too many requests                  | 429         |
+| `VALIDATION`    | Input validation failures          | 400         |
 
 ### 5. ActionError Construction
 
 ```typescript
 throw new ActionError(
-  ErrorType.BUSINESS_RULE,    // Error type
-  ERROR_CODES.DOMAIN.ERROR,   // Unique error code
+  ErrorType.BUSINESS_RULE, // Error type
+  ERROR_CODES.DOMAIN.ERROR, // Unique error code
   ERROR_MESSAGES.DOMAIN.ERROR, // User-friendly message
-  { ctx, operation },          // Context for logging
-  true,                        // isRecoverable
-  400,                         // HTTP status code
+  { ctx, operation }, // Context for logging
+  true, // isRecoverable
+  400, // HTTP status code
 );
 ```
 
@@ -249,9 +249,9 @@ All actions must return a consistent shape:
 
 ```typescript
 return {
-  data: result.entity,           // The result data
+  data: result.entity, // The result data
   message: 'Operation successful', // User-friendly message
-  success: true,                  // Boolean success flag
+  success: true, // Boolean success flag
 };
 ```
 
@@ -267,24 +267,24 @@ import { useServerAction } from '@/hooks/use-server-action';
 
 ### Hook Options
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `toastMessages` | `{ loading?: string, success?: string \| ((data) => string), error?: string \| ((error) => string) }` | Custom toast messages |
-| `isDisableToast` | `boolean` | Disable all toasts for silent operations |
-| `onSuccess` | `({ data }) => void` | Called with action result on success |
-| `onAfterSuccess` | `() => void` | Called after success toast is shown |
-| `onBeforeSuccess` | `() => void` | Called before success toast is shown |
-| `onAfterError` | `() => void` | Called after error toast is shown |
-| `onBeforeError` | `() => void` | Called before error toast is shown |
+| Option            | Type                                                                                                  | Description                              |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| `toastMessages`   | `{ loading?: string, success?: string \| ((data) => string), error?: string \| ((error) => string) }` | Custom toast messages                    |
+| `isDisableToast`  | `boolean`                                                                                             | Disable all toasts for silent operations |
+| `onSuccess`       | `({ data }) => void`                                                                                  | Called with action result on success     |
+| `onAfterSuccess`  | `() => void`                                                                                          | Called after success toast is shown      |
+| `onBeforeSuccess` | `() => void`                                                                                          | Called before success toast is shown     |
+| `onAfterError`    | `() => void`                                                                                          | Called after error toast is shown        |
+| `onBeforeError`   | `() => void`                                                                                          | Called before error toast is shown       |
 
 ### Hook Return Values
 
-| Value | Type | Description |
-|-------|------|-------------|
+| Value          | Type                         | Description                            |
+| -------------- | ---------------------------- | -------------------------------------- |
 | `executeAsync` | `(input) => Promise<Result>` | Async execution with toast integration |
-| `execute` | `(input) => void` | Sync execution for callbacks |
-| `isExecuting` | `boolean` | Loading state indicator |
-| `result` | `Result \| undefined` | Last execution result |
+| `execute`      | `(input) => void`            | Sync execution for callbacks           |
+| `isExecuting`  | `boolean`                    | Loading state indicator                |
+| `result`       | `Result \| undefined`        | Last execution result                  |
 
 ---
 
@@ -622,7 +622,7 @@ onSuccess: ({ data }) => {
   // data.message - user-friendly message
   // data.data - the actual result entity
   const entity = data.data;
-}
+};
 
 // From result object (for sync execute)
 const entity = result?.data?.data;

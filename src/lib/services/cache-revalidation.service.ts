@@ -212,9 +212,10 @@ export class CacheRevalidationService {
         entityId: collectionId,
         entityType: 'collection',
         operation: 'bobblehead:navigation:change',
-        reason: bobbleheadId ?
-          `Navigation invalidated due to bobblehead ${bobbleheadId} change`
-        : 'Navigation invalidated due to collection structure change',
+        reason:
+          bobbleheadId ?
+            `Navigation invalidated due to bobblehead ${bobbleheadId} change`
+          : 'Navigation invalidated due to collection structure change',
       });
     },
 

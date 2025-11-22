@@ -23,24 +23,25 @@
 
 ### Detection Results
 
-| Step | Files | Pattern Matched | Specialist Assigned |
-|------|-------|-----------------|---------------------|
-| 1 | `src/app/.../route-type.ts` | .tsx/.jsx in src/app/ | react-component-specialist |
-| 2 | `src/lib/queries/.../bobbleheads-query.ts` | src/lib/queries/ | database-specialist |
-| 3 | `src/lib/types/...`, `src/lib/validations/...` | src/lib/validations/ | validation-specialist |
-| 4 | `src/lib/facades/.../bobbleheads.facade.ts` | src/lib/facades/ | facade-specialist |
-| 5 | `src/app/.../components/bobblehead-navigation.tsx` | .tsx in src/app/ | react-component-specialist |
-| 6 | `src/app/.../components/async/...` | .tsx in src/app/ | react-component-specialist |
-| 7 | `src/app/.../components/skeletons/...` | .tsx in src/app/ | react-component-specialist |
-| 8 | `src/app/.../page.tsx` | .tsx in src/app/ | react-component-specialist |
-| 9 | `src/app/.../collection-bobbleheads.tsx` | .tsx in src/app/ | react-component-specialist |
-| 10 | `src/lib/services/cache-revalidation.service.ts` | facade-layer related | facade-specialist |
-| 11 | `tests/lib/queries/...`, `tests/lib/facades/...` | tests/ | test-specialist |
-| 12 | `tests/components/...` | tests/ | test-specialist |
+| Step | Files                                              | Pattern Matched       | Specialist Assigned        |
+| ---- | -------------------------------------------------- | --------------------- | -------------------------- |
+| 1    | `src/app/.../route-type.ts`                        | .tsx/.jsx in src/app/ | react-component-specialist |
+| 2    | `src/lib/queries/.../bobbleheads-query.ts`         | src/lib/queries/      | database-specialist        |
+| 3    | `src/lib/types/...`, `src/lib/validations/...`     | src/lib/validations/  | validation-specialist      |
+| 4    | `src/lib/facades/.../bobbleheads.facade.ts`        | src/lib/facades/      | facade-specialist          |
+| 5    | `src/app/.../components/bobblehead-navigation.tsx` | .tsx in src/app/      | react-component-specialist |
+| 6    | `src/app/.../components/async/...`                 | .tsx in src/app/      | react-component-specialist |
+| 7    | `src/app/.../components/skeletons/...`             | .tsx in src/app/      | react-component-specialist |
+| 8    | `src/app/.../page.tsx`                             | .tsx in src/app/      | react-component-specialist |
+| 9    | `src/app/.../collection-bobbleheads.tsx`           | .tsx in src/app/      | react-component-specialist |
+| 10   | `src/lib/services/cache-revalidation.service.ts`   | facade-layer related  | facade-specialist          |
+| 11   | `tests/lib/queries/...`, `tests/lib/facades/...`   | tests/                | test-specialist            |
+| 12   | `tests/components/...`                             | tests/                | test-specialist            |
 
 ## Todo List Created
 
 16 items created:
+
 - Phase 1: Pre-implementation (completed)
 - Phase 2: Setup (in progress)
 - Steps 1-12: Implementation steps (pending)
@@ -60,19 +61,19 @@
 ## Files Per Step Summary
 
 | Step | Files to Modify | Files to Create |
-|------|-----------------|-----------------|
-| 1 | 1 | 0 |
-| 2 | 1 | 0 |
-| 3 | 0 | 2 |
-| 4 | 1 | 0 |
-| 5 | 0 | 1 |
-| 6 | 0 | 1 |
-| 7 | 0 | 1 |
-| 8 | 1 | 0 |
-| 9 | 1 | 0 |
-| 10 | 1 | 0 |
-| 11 | 0 | 2 |
-| 12 | 0 | 1 |
+| ---- | --------------- | --------------- |
+| 1    | 1               | 0               |
+| 2    | 1               | 0               |
+| 3    | 0               | 2               |
+| 4    | 1               | 0               |
+| 5    | 0               | 1               |
+| 6    | 0               | 1               |
+| 7    | 0               | 1               |
+| 8    | 1               | 0               |
+| 9    | 1               | 0               |
+| 10   | 1               | 0               |
+| 11   | 0               | 2               |
+| 12   | 0               | 1               |
 
 **Total**: 6 files to modify, 8 files to create
 

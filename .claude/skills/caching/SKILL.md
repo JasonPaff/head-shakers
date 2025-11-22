@@ -57,14 +57,14 @@ This skill activates when:
 
 ## Usage Pattern Reference
 
-| Use Case | CacheService Helper | Invalidation Service |
-|----------|---------------------|---------------------|
-| Bobblehead by ID | `CacheService.bobbleheads.byId()` | `CacheRevalidationService.bobbleheads.onUpdate()` |
-| Collection list | `CacheService.collections.byUser()` | `CacheRevalidationService.collections.onCreate()` |
-| User profile | `CacheService.users.profile()` | `CacheRevalidationService.users.onProfileUpdate()` |
-| Public search | `CacheService.redisSearch.publicDropdown()` | `CacheService.search.invalidatePublic()` |
-| Analytics | `CacheService.analytics.viewCounts()` | `CacheRevalidationService.analytics.onViewRecord()` |
-| Social (likes) | N/A (use tag generators) | `CacheRevalidationService.social.onLikeChange()` |
+| Use Case         | CacheService Helper                         | Invalidation Service                                |
+| ---------------- | ------------------------------------------- | --------------------------------------------------- |
+| Bobblehead by ID | `CacheService.bobbleheads.byId()`           | `CacheRevalidationService.bobbleheads.onUpdate()`   |
+| Collection list  | `CacheService.collections.byUser()`         | `CacheRevalidationService.collections.onCreate()`   |
+| User profile     | `CacheService.users.profile()`              | `CacheRevalidationService.users.onProfileUpdate()`  |
+| Public search    | `CacheService.redisSearch.publicDropdown()` | `CacheService.search.invalidatePublic()`            |
+| Analytics        | `CacheService.analytics.viewCounts()`       | `CacheRevalidationService.analytics.onViewRecord()` |
+| Social (likes)   | N/A (use tag generators)                    | `CacheRevalidationService.social.onLikeChange()`    |
 
 ## References
 

@@ -204,14 +204,14 @@ interface FindOptions {
 // Combines permission filter + soft delete filter automatically
 const result = await dbInstance
   .select()
-  .from({table})
+  .from({ table })
   .where(
     this.combineFilters(
-      eq({table}.id, id),
+      eq({ table }.id, id),
       this.buildBaseFilters(
-        {table}.isPublic,    // isPublic column (or undefined if not applicable)
-        {table}.userId,       // userId column for ownership check
-        {table}.isDeleted,    // isDeleted column (or undefined if no soft delete)
+        { table }.isPublic, // isPublic column (or undefined if not applicable)
+        { table }.userId, // userId column for ownership check
+        { table }.isDeleted, // isDeleted column (or undefined if no soft delete)
         context,
       ),
     ),
@@ -230,26 +230,26 @@ import {
 } from '@/lib/queries/base/permission-filters';
 
 // Permission filter only
-const permFilter = buildPermissionFilter({table}.isPublic, {table}.userId, context);
+const permFilter = buildPermissionFilter({ table }.isPublic, { table }.userId, context);
 
 // Soft delete filter only
-const deleteFilter = buildSoftDeleteFilter({table}.isDeleted, context);
+const deleteFilter = buildSoftDeleteFilter({ table }.isDeleted, context);
 
 // Ownership filter only
-const ownerFilter = buildOwnershipFilter({table}.userId, context);
+const ownerFilter = buildOwnershipFilter({ table }.userId, context);
 
 // Combine multiple filters
-const combined = combineFilters(permFilter, deleteFilter, eq({table}.id, id));
+const combined = combineFilters(permFilter, deleteFilter, eq({ table }.id, id));
 ```
 
 ### Filter Logic by Context
 
-| Context Type | isPublic | userId | requiredUserId | Filter Result |
-|--------------|----------|--------|----------------|---------------|
-| Public | true | - | - | `isPublic = true` only |
-| User | - | set | - | `isPublic = true OR userId = context.userId` |
-| Protected | - | set | set | `userId = requiredUserId` (owner only) |
-| Admin | - | set | - | All content (no filter) |
+| Context Type | isPublic | userId | requiredUserId | Filter Result                                |
+| ------------ | -------- | ------ | -------------- | -------------------------------------------- |
+| Public       | true     | -      | -              | `isPublic = true` only                       |
+| User         | -        | set    | -              | `isPublic = true OR userId = context.userId` |
+| Protected    | -        | set    | set            | `userId = requiredUserId` (owner only)       |
+| Admin        | -        | set    | -              | All content (no filter)                      |
 
 ## Pagination
 
@@ -559,9 +559,7 @@ const avatarUrl = sql<null | string>`users.avatar_url`;
 const recentItems = sql`${table.createdAt} >= NOW() - INTERVAL '7 days'`;
 
 // CASE expressions for conditional counting
-const recentCount = count(
-  sql`CASE WHEN ${table.createdAt} >= NOW() - INTERVAL '7 days' THEN 1 END`,
-);
+const recentCount = count(sql`CASE WHEN ${table.createdAt} >= NOW() - INTERVAL '7 days' THEN 1 END`);
 
 // Safe counter decrement (never go below 0)
 const safeDecrement = sql`GREATEST(0, ${table.count} - 1)`;
@@ -569,13 +567,13 @@ const safeDecrement = sql`GREATEST(0, ${table.count} - 1)`;
 
 ## Return Value Conventions
 
-| Query Type | Return Type | Empty Result |
-|------------|-------------|--------------|
-| Single item | `T \| null` | `null` |
-| List | `Array<T>` | `[]` |
-| Count | `number` | `0` |
-| Boolean check | `boolean` | `false` |
-| Map | `Map<K, V>` | `new Map()` |
+| Query Type    | Return Type                                | Empty Result                    |
+| ------------- | ------------------------------------------ | ------------------------------- |
+| Single item   | `T \| null`                                | `null`                          |
+| List          | `Array<T>`                                 | `[]`                            |
+| Count         | `number`                                   | `0`                             |
+| Boolean check | `boolean`                                  | `false`                         |
+| Map           | `Map<K, V>`                                | `new Map()`                     |
 | Delete result | `{ entity: T \| null; related: Array<R> }` | `{ entity: null, related: [] }` |
 
 ## Type Exports

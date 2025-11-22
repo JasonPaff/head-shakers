@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gt, like, lt, or } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, like, lt, ne, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
@@ -467,18 +467,32 @@ export class BobbleheadsQuery extends BaseQuery {
     }
 
     // find previous bobblehead (newer = createdAt > current, order by createdAt ASC to get closest)
+    // explicitly exclude current bobblehead to prevent self-reference
     const previousResult = await dbInstance
       .select()
       .from(bobbleheads)
-      .where(this.combineFilters(gt(bobbleheads.createdAt, currentCreatedAt), ...baseConditions))
+      .where(
+        this.combineFilters(
+          ne(bobbleheads.id, bobbleheadId),
+          gt(bobbleheads.createdAt, currentCreatedAt),
+          ...baseConditions,
+        ),
+      )
       .orderBy(asc(bobbleheads.createdAt))
       .limit(1);
 
     // find next bobblehead (older = createdAt < current, order by createdAt DESC to get closest)
+    // explicitly exclude current bobblehead to prevent self-reference
     const nextResult = await dbInstance
       .select()
       .from(bobbleheads)
-      .where(this.combineFilters(lt(bobbleheads.createdAt, currentCreatedAt), ...baseConditions))
+      .where(
+        this.combineFilters(
+          ne(bobbleheads.id, bobbleheadId),
+          lt(bobbleheads.createdAt, currentCreatedAt),
+          ...baseConditions,
+        ),
+      )
       .orderBy(desc(bobbleheads.createdAt))
       .limit(1);
 

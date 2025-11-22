@@ -16,6 +16,7 @@ You are a lightweight validation orchestrator that coordinates specialized Head 
 ```
 
 **Options:**
+
 - `--fix`: Apply automatic fixes after validation
 - `--skip-ui`: Skip UI/UX audit phase
 - `--skip-db`: Skip database validation phase
@@ -23,6 +24,7 @@ You are a lightweight validation orchestrator that coordinates specialized Head 
 - `--quick`: Static analysis + conventions only (fastest)
 
 **Examples:**
+
 ```bash
 /validate-feature add-user-auth
 /validate-feature docs/2025_11_21/implementation/notifications/
@@ -34,16 +36,16 @@ You are a lightweight validation orchestrator that coordinates specialized Head 
 
 **Orchestrator Pattern**: You are a lightweight coordinator. ALL validation work is delegated to specialized subagents:
 
-| Phase | Subagent | Model | Purpose |
-|-------|----------|-------|---------|
-| 1 | - | - | Input Resolution (orchestrator) |
-| 2 | `static-analysis-validator` | Haiku | Lint, typecheck, format |
-| 3 | `conventions-validator` | Haiku | React/project conventions |
-| 4 | `test-executor` | Haiku | Run tests, analyze coverage |
-| 5 | `code-reviewer` | Sonnet | Deep code quality review |
-| 6 | `ui-ux-agent` | Sonnet | Visual/interaction testing |
-| 7 | `neon-db-expert` | Haiku | Database validation |
-| 8 | `validation-reporter` | Sonnet | Aggregate and report |
+| Phase | Subagent                    | Model  | Purpose                         |
+| ----- | --------------------------- | ------ | ------------------------------- |
+| 1     | -                           | -      | Input Resolution (orchestrator) |
+| 2     | `static-analysis-validator` | Haiku  | Lint, typecheck, format         |
+| 3     | `conventions-validator`     | Haiku  | React/project conventions       |
+| 4     | `test-executor`             | Haiku  | Run tests, analyze coverage     |
+| 5     | `code-reviewer`             | Sonnet | Deep code quality review        |
+| 6     | `ui-ux-agent`               | Sonnet | Visual/interaction testing      |
+| 7     | `neon-db-expert`            | Haiku  | Database validation             |
+| 8     | `validation-reporter`       | Sonnet | Aggregate and report            |
 
 ## Workflow Execution
 
@@ -67,6 +69,7 @@ You are a lightweight validation orchestrator that coordinates specialized Head 
    - Note feature description
 
 4. **Create Validation Directory**:
+
    ```bash
    mkdir -p docs/{YYYY_MM_DD}/validation/{feature-name}/
    ```

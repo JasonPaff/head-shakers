@@ -17,6 +17,7 @@ You are a lightweight implementation orchestrator that coordinates the execution
 ```
 
 **Options:**
+
 - `--step-by-step`: Pause for user approval between each step
 - `--dry-run`: Show what would be done without making changes
 - `--resume-from=N`: Resume implementation from step N (if previous run failed)
@@ -41,17 +42,17 @@ You are a lightweight implementation orchestrator that coordinates the execution
 
 ## Available Specialist Agents
 
-| Agent | Domain | Skills Auto-Loaded | File Patterns |
-|-------|--------|-------------------|---------------|
-| `server-action-specialist` | Server actions | server-actions, sentry-monitoring, validation-schemas | `src/lib/actions/**/*.actions.ts` |
-| `database-specialist` | Schemas & queries | database-schema, drizzle-orm, validation-schemas | `src/lib/db/schema/**`, `src/lib/queries/**` |
-| `facade-specialist` | Business logic | facade-layer, caching, sentry-monitoring, drizzle-orm | `src/lib/facades/**/*.facade.ts` |
-| `react-component-specialist` | UI components | react-coding-conventions, ui-components | `src/components/**/*.tsx`, `src/app/**/*.tsx` |
-| `form-specialist` | Forms | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx` |
-| `media-specialist` | Cloudinary | cloudinary-media, react-coding-conventions | Cloudinary utilities, image components |
-| `test-specialist` | Testing | testing-patterns | `tests/**/*.test.ts`, `e2e/**/*.spec.ts` |
-| `validation-specialist` | Zod schemas | validation-schemas | `src/lib/validations/**/*.validation.ts` |
-| `general-purpose` | Fallback | None (manual skill invocation) | Any other files |
+| Agent                        | Domain            | Skills Auto-Loaded                                                        | File Patterns                                   |
+| ---------------------------- | ----------------- | ------------------------------------------------------------------------- | ----------------------------------------------- |
+| `server-action-specialist`   | Server actions    | server-actions, sentry-monitoring, validation-schemas                     | `src/lib/actions/**/*.actions.ts`               |
+| `database-specialist`        | Schemas & queries | database-schema, drizzle-orm, validation-schemas                          | `src/lib/db/schema/**`, `src/lib/queries/**`    |
+| `facade-specialist`          | Business logic    | facade-layer, caching, sentry-monitoring, drizzle-orm                     | `src/lib/facades/**/*.facade.ts`                |
+| `react-component-specialist` | UI components     | react-coding-conventions, ui-components                                   | `src/components/**/*.tsx`, `src/app/**/*.tsx`   |
+| `form-specialist`            | Forms             | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx` |
+| `media-specialist`           | Cloudinary        | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components          |
+| `test-specialist`            | Testing           | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`        |
+| `validation-specialist`      | Zod schemas       | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`        |
+| `general-purpose`            | Fallback          | None (manual skill invocation)                                            | Any other files                                 |
 
 ## Step-Type Detection Algorithm
 
@@ -100,6 +101,7 @@ If a step involves files from multiple domains (e.g., action + validation + comp
 3. **Specialist Instructions**: Include note in prompt that step spans domains
 
 Example: A step creating both a server action and its validation schema:
+
 - Primary: `server-action-specialist` (actions take precedence)
 - The specialist will be instructed that validation files are also involved
 
@@ -278,6 +280,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Description: "Implement step {N}: {step title}"
    - **CRITICAL**: Set timeout to 300 seconds (5 minutes) per step
    - **Specialist Subagent Prompt Template**:
+
      ```
      You are implementing Step {N} of an implementation plan as a {SPECIALIST-TYPE}.
 
@@ -378,6 +381,7 @@ When the user runs this command, execute this comprehensive workflow:
      - Do NOT skip validation commands
      - Focus ONLY on this step's requirements
      ```
+
 7. **Subagent Execution** (Specialist performs):
    - Loads required skills from agent definition
    - Reads necessary files
@@ -435,6 +439,7 @@ When the user runs this command, execute this comprehensive workflow:
 **Resume Mode**: If `--resume-from=N` flag present, skip to step N and begin execution there.
 
 **Context Management**:
+
 - **Orchestrator**: Maintains minimal context (parsed plan, routing table, results summaries)
 - **Specialists**: Each gets fresh context with pre-loaded skills for their domain
 - **Result**: Scalable to plans with 50+ steps without context overflow
@@ -539,6 +544,7 @@ When the user runs this command, execute this comprehensive workflow:
        - Options: "Yes, commit all changes", "No, I'll commit manually", "Show me git diff first"
      - If user chooses commit:
        - Generate descriptive commit message:
+
          ```
          feat: [Feature name from plan]
 
@@ -556,7 +562,9 @@ When the user runs this command, execute this comprehensive workflow:
 
          Co-Authored-By: Claude <noreply@anthropic.com>
          ```
+
        - Use git commit process from Bash tool instructions
+
 8. **Worktree Cleanup** (if `--worktree` flag was used):
    - Use AskUserQuestion to ask user how to handle the worktree:
      - Question: "Implementation complete in worktree. How would you like to proceed?"
@@ -594,6 +602,7 @@ When the user runs this command, execute this comprehensive workflow:
      - Provide merge instruction: "To merge later: git merge feat/{feature-slug}"
    - Log worktree cleanup action to implementation summary
 9. **Final Output to User**:
+
    ```
    ## Implementation Complete
 
@@ -623,6 +632,7 @@ When the user runs this command, execute this comprehensive workflow:
 ## Error Recovery and Resilience
 
 **Step Failure Handling**:
+
 1. Capture full error details (message, stack trace, context)
 2. Log error to step results file including which specialist was used
 3. Attempt automatic recovery:
@@ -636,6 +646,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Log failure reason clearly
 
 **Quality Gate Failure Handling**:
+
 1. Identify which gate failed (lint, typecheck, test, build)
 2. Show relevant error output
 3. Categorize as blocker vs warning
@@ -650,6 +661,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Continue anyway (if non-blocking)
 
 **Rollback Capability**:
+
 - If major failure occurs:
   - **If in worktree**: Offer to remove entire worktree (clean rollback)
   - **If not in worktree**: Suggest using `git diff` to review changes
@@ -746,11 +758,11 @@ YY-implementation-summary.md        # Final summary with specialist breakdown
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Loaded |
-|------|------------|---------------|
-| 1. {title} | database-specialist | database-schema, drizzle-orm, validation-schemas |
+| Step       | Specialist               | Skills Loaded                                         |
+| ---------- | ------------------------ | ----------------------------------------------------- |
+| 1. {title} | database-specialist      | database-schema, drizzle-orm, validation-schemas      |
 | 2. {title} | server-action-specialist | server-actions, sentry-monitoring, validation-schemas |
-| ... | ... | ... |
+| ...        | ...                      | ...                                                   |
 
 ## Navigation
 
@@ -758,16 +770,17 @@ YY-implementation-summary.md        # Final summary with specialist breakdown
 - [Setup and Routing](./02-setup.md)
 - [Step 1: {title}](./03-step-1-results.md) [database-specialist]
 - [Step 2: {title}](./04-step-2-results.md) [server-action-specialist]
-...
+  ...
 - [Quality Gates](./XX-quality-gates.md)
 - [Implementation Summary](./YY-implementation-summary.md)
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|------------|--------|----------|--------|
-| 1. {title} | database-specialist | ✓ | 2.3s | None |
-| 2. {title} | server-action-specialist | ✓ | 5.1s | None |
+| Step       | Specialist               | Status | Duration | Issues |
+| ---------- | ------------------------ | ------ | -------- | ------ |
+| 1. {title} | database-specialist      | ✓      | 2.3s     | None   |
+| 2. {title} | server-action-specialist | ✓      | 5.1s     | None   |
+
 ...
 
 ## Summary
@@ -797,6 +810,7 @@ YY-implementation-summary.md        # Final summary with specialist breakdown
 ## Specialist Communication Protocol
 
 **Input to Specialist Subagent** (from orchestrator):
+
 ```
 - Step number and title
 - Specialist type and skills to load
@@ -810,6 +824,7 @@ YY-implementation-summary.md        # Final summary with specialist breakdown
 ```
 
 **Output from Specialist Subagent** (to orchestrator):
+
 ```
 - Status: success | failure
 - Specialist used and skills loaded

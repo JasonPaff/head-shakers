@@ -57,6 +57,7 @@ After analysis, provide your recommendation for which option best fits the {{$3}
 ## Expected Output
 
 The agent will:
+
 1. Analyze the target area of the codebase
 2. Generate three distinct feature suggestions with impact analysis
 3. Save structured documentation to `docs/{YYYY_MM_DD}/suggestions/`

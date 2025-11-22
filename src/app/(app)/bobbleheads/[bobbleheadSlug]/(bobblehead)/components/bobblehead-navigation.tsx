@@ -2,13 +2,14 @@
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { parseAsString, useQueryStates } from 'nuqs';
-import { useCallback, useEffect, useTransition } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import type { BobbleheadNavigationData } from '@/lib/types/bobblehead-navigation.types';
 
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
@@ -18,11 +19,7 @@ type BobbleheadNavigationProps = {
 };
 
 export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationProps) => {
-  // useState hooks - none needed
-
   // Other hooks
-  const [isPending, startTransition] = useTransition();
-
   const [{ collectionId, subcollectionId }] = useQueryStates(
     {
       collectionId: parseAsString,
@@ -35,9 +32,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 
   const router = useRouter();
 
-  // useMemo hooks - none needed
-
-  // Utility functions (before handlers since handlers depend on this)
+  // Build navigation URLs
   const buildNavigationUrl = useCallback(
     (bobbleheadSlug: string) => {
       const searchParams: Record<string, string> = {};
@@ -58,26 +53,32 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
     [collectionId, subcollectionId],
   );
 
-  // Event handlers (before useEffect since useEffect depends on these)
-  const handleNavigatePrevious = useCallback(() => {
-    if (!navigationData.previousBobblehead) return;
+  // Memoize URLs for links
+  const previousUrl = useMemo(
+    () =>
+      navigationData.previousBobblehead ? buildNavigationUrl(navigationData.previousBobblehead.slug) : null,
+    [navigationData.previousBobblehead, buildNavigationUrl],
+  );
 
-    startTransition(() => {
-      const url = buildNavigationUrl(navigationData.previousBobblehead!.slug);
-      router.push(url);
-    });
-  }, [navigationData.previousBobblehead, buildNavigationUrl, router]);
+  const nextUrl = useMemo(
+    () => (navigationData.nextBobblehead ? buildNavigationUrl(navigationData.nextBobblehead.slug) : null),
+    [navigationData.nextBobblehead, buildNavigationUrl],
+  );
+
+  // Keyboard navigation handlers for arrow keys
+  const handleNavigatePrevious = useCallback(() => {
+    if (previousUrl) {
+      router.push(previousUrl);
+    }
+  }, [previousUrl, router]);
 
   const handleNavigateNext = useCallback(() => {
-    if (!navigationData.nextBobblehead) return;
+    if (nextUrl) {
+      router.push(nextUrl);
+    }
+  }, [nextUrl, router]);
 
-    startTransition(() => {
-      const url = buildNavigationUrl(navigationData.nextBobblehead!.slug);
-      router.push(url);
-    });
-  }, [navigationData.nextBobblehead, buildNavigationUrl, router]);
-
-  // useEffect hooks - keyboard navigation
+  // Keyboard navigation (arrow keys)
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       // Skip if user is typing in an input or textarea
@@ -115,13 +116,15 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
   const _hasPrevious = !!navigationData.previousBobblehead;
   const _hasNext = !!navigationData.nextBobblehead;
   const _hasNavigation = _hasPrevious || _hasNext;
-  const _isPreviousDisabled = !_hasPrevious || isPending;
-  const _isNextDisabled = !_hasNext || isPending;
 
   // Test IDs
   const navTestId = generateTestId('feature', 'bobblehead-nav');
-  const prevButtonTestId = generateTestId('feature', 'bobblehead-nav', 'previous');
-  const nextButtonTestId = generateTestId('feature', 'bobblehead-nav', 'next');
+  const prevLinkTestId = generateTestId('feature', 'bobblehead-nav', 'previous');
+  const nextLinkTestId = generateTestId('feature', 'bobblehead-nav', 'next');
+
+  // Shared button styling
+  const linkClassName = cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'gap-2');
+  const disabledClassName = cn(linkClassName, 'pointer-events-none opacity-50');
 
   return (
     <Conditional isCondition={_hasNavigation}>
@@ -131,37 +134,53 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
         data-slot={'bobblehead-navigation'}
         data-testid={navTestId}
       >
-        {/* Previous Button */}
-        <Button
-          aria-label={
-            _hasPrevious ? `Previous: ${navigationData.previousBobblehead?.name}` : 'No previous bobblehead'
-          }
-          className={cn('gap-2', isPending && 'opacity-70')}
-          data-slot={'bobblehead-navigation-previous'}
-          data-testid={prevButtonTestId}
-          disabled={_isPreviousDisabled}
-          onClick={handleNavigatePrevious}
-          size={'sm'}
-          variant={'outline'}
-        >
-          <ChevronLeftIcon aria-hidden className={'size-4'} />
-          <span className={'hidden sm:inline'}>Previous</span>
-        </Button>
+        {/* Previous Link */}
+        {_hasPrevious && previousUrl ?
+          <Link
+            aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
+            className={linkClassName}
+            data-slot={'bobblehead-navigation-previous'}
+            data-testid={prevLinkTestId}
+            href={previousUrl}
+          >
+            <ChevronLeftIcon aria-hidden className={'size-4'} />
+            <span className={'hidden sm:inline'}>Previous</span>
+          </Link>
+        : <span
+            aria-disabled={'true'}
+            aria-label={'No previous bobblehead'}
+            className={disabledClassName}
+            data-slot={'bobblehead-navigation-previous'}
+            data-testid={prevLinkTestId}
+          >
+            <ChevronLeftIcon aria-hidden className={'size-4'} />
+            <span className={'hidden sm:inline'}>Previous</span>
+          </span>
+        }
 
-        {/* Next Button */}
-        <Button
-          aria-label={_hasNext ? `Next: ${navigationData.nextBobblehead?.name}` : 'No next bobblehead'}
-          className={cn('gap-2', isPending && 'opacity-70')}
-          data-slot={'bobblehead-navigation-next'}
-          data-testid={nextButtonTestId}
-          disabled={_isNextDisabled}
-          onClick={handleNavigateNext}
-          size={'sm'}
-          variant={'outline'}
-        >
-          <span className={'hidden sm:inline'}>Next</span>
-          <ChevronRightIcon aria-hidden className={'size-4'} />
-        </Button>
+        {/* Next Link */}
+        {_hasNext && nextUrl ?
+          <Link
+            aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
+            className={linkClassName}
+            data-slot={'bobblehead-navigation-next'}
+            data-testid={nextLinkTestId}
+            href={nextUrl}
+          >
+            <span className={'hidden sm:inline'}>Next</span>
+            <ChevronRightIcon aria-hidden className={'size-4'} />
+          </Link>
+        : <span
+            aria-disabled={'true'}
+            aria-label={'No next bobblehead'}
+            className={disabledClassName}
+            data-slot={'bobblehead-navigation-next'}
+            data-testid={nextLinkTestId}
+          >
+            <span className={'hidden sm:inline'}>Next</span>
+            <ChevronRightIcon aria-hidden className={'size-4'} />
+          </span>
+        }
       </nav>
     </Conditional>
   );

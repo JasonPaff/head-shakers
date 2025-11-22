@@ -182,7 +182,7 @@ const form = useAppForm({
 
   // Validation timing configuration
   validationLogic: revalidateLogic({
-    mode: 'submit',              // Validate on submit
+    mode: 'submit', // Validate on submit
     modeAfterSubmission: 'change', // Re-validate on change after first submit
   }),
 
@@ -203,7 +203,9 @@ export const { fieldContext, formContext, useFieldContext, useFormContext } = cr
 
 // Form hook and HOCs
 export const { useAppForm, withFieldGroup, withForm } = createFormHook({
-  fieldComponents: { /* all field components */ },
+  fieldComponents: {
+    /* all field components */
+  },
   formComponents: { SubmitButton },
   fieldContext,
   formContext,
@@ -240,10 +242,7 @@ const currentFieldValue = useStore(form.store, (state) => state.values.fieldName
 const isSubmitting = useStore(form.store, (state) => state.isSubmitting);
 
 // Multiple values
-const [username, email] = useStore(form.store, (state) => [
-  state.values.username,
-  state.values.email,
-]);
+const [username, email] = useStore(form.store, (state) => [state.values.username, state.values.email]);
 ```
 
 ## Extracting Reusable Form Options
@@ -271,8 +270,12 @@ import { entityFormOptions } from './entity-form-options';
 
 const form = useAppForm({
   ...entityFormOptions,
-  onSubmit: async ({ value }) => { /* ... */ },
-  onSubmitInvalid: ({ formApi }) => { /* ... */ },
+  onSubmit: async ({ value }) => {
+    /* ... */
+  },
+  onSubmitInvalid: ({ formApi }) => {
+    /* ... */
+  },
   validators: { onSubmit: insertEntitySchema },
 });
 ```
@@ -333,11 +336,11 @@ const handleContentSelect = async (contentId: string, contentName: string, image
 
 ```typescript
 interface CommonFieldProps {
-  description?: string;    // Help text below the field
-  focusRef?: FocusRef;     // Custom ref for focus management
-  isRequired?: boolean;    // Shows required indicator on label
-  label: string;           // Required: label text
-  testId?: string;         // Override auto-generated test ID
+  description?: string; // Help text below the field
+  focusRef?: FocusRef; // Custom ref for focus management
+  isRequired?: boolean; // Shows required indicator on label
+  label: string; // Required: label text
+  testId?: string; // Override auto-generated test ID
 }
 ```
 
@@ -461,11 +464,9 @@ export const MyForm = withFocusManagement(({ onClose }: Props) => {
 });
 
 // For generic components with type parameters
-export const MyForm = withFocusManagement<MyFormProps>(
-  ({ onClose, entityId }) => {
-    // ... form implementation
-  },
-);
+export const MyForm = withFocusManagement<MyFormProps>(({ onClose, entityId }) => {
+  // ... form implementation
+});
 ```
 
 ### Focus First Error
@@ -558,15 +559,17 @@ const { execute, isExecuting, result } = useServerAction(checkAvailabilityAction
 
 ```typescript
 // For forms with create/update modes
-const { executeAsync: createAsync, isExecuting: isCreating } = useServerAction(
-  createAction,
-  { toastMessages: { /* ... */ } },
-);
+const { executeAsync: createAsync, isExecuting: isCreating } = useServerAction(createAction, {
+  toastMessages: {
+    /* ... */
+  },
+});
 
-const { executeAsync: updateAsync, isExecuting: isUpdating } = useServerAction(
-  updateAction,
-  { toastMessages: { /* ... */ } },
-);
+const { executeAsync: updateAsync, isExecuting: isUpdating } = useServerAction(updateAction, {
+  toastMessages: {
+    /* ... */
+  },
+});
 
 const form = useAppForm({
   // ...
@@ -751,6 +754,7 @@ export const SimpleForm = ({
 ```
 
 Use this pattern when:
+
 - Form has only 1-2 fields
 - No complex validation needed
 - No focus management required

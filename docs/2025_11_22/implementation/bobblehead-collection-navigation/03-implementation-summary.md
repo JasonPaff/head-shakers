@@ -21,24 +21,25 @@ Implemented sequential navigation between bobbleheads within a collection or sub
 
 ## Steps Completed
 
-| Step | Title | Specialist | Status |
-|------|-------|------------|--------|
-| 1 | Extend Route Type Definition | react-component-specialist | ✓ Completed |
-| 2 | Create Navigation Query Methods | database-specialist | ✓ Completed |
-| 3 | Create Navigation Types and Validation | validation-specialist | ✓ Completed |
-| 4 | Implement Navigation Facade with Caching | facade-specialist | ✓ Completed |
-| 5 | Create Client Navigation Component | react-component-specialist | ✓ Completed |
-| 6 | Create Server Async Navigation Wrapper | react-component-specialist | ✓ Completed |
-| 7 | Create Navigation Skeleton Component | react-component-specialist | ✓ Completed |
-| 8 | Integrate Navigation into Detail Page | react-component-specialist | ✓ Completed |
-| 9 | Update Collection View Links | react-component-specialist | ✓ Completed |
-| 10 | Add Cache Invalidation | facade-specialist | ✓ Completed |
-| 11 | Navigation Action Tests | test-specialist | ⏭ Skipped (user will add manually) |
-| 12 | Component Integration Tests | test-specialist | ⏭ Skipped (user will add manually) |
+| Step | Title                                    | Specialist                 | Status                              |
+| ---- | ---------------------------------------- | -------------------------- | ----------------------------------- |
+| 1    | Extend Route Type Definition             | react-component-specialist | ✓ Completed                         |
+| 2    | Create Navigation Query Methods          | database-specialist        | ✓ Completed                         |
+| 3    | Create Navigation Types and Validation   | validation-specialist      | ✓ Completed                         |
+| 4    | Implement Navigation Facade with Caching | facade-specialist          | ✓ Completed                         |
+| 5    | Create Client Navigation Component       | react-component-specialist | ✓ Completed                         |
+| 6    | Create Server Async Navigation Wrapper   | react-component-specialist | ✓ Completed                         |
+| 7    | Create Navigation Skeleton Component     | react-component-specialist | ✓ Completed                         |
+| 8    | Integrate Navigation into Detail Page    | react-component-specialist | ✓ Completed                         |
+| 9    | Update Collection View Links             | react-component-specialist | ✓ Completed                         |
+| 10   | Add Cache Invalidation                   | facade-specialist          | ✓ Completed                         |
+| 11   | Navigation Action Tests                  | test-specialist            | ⏭ Skipped (user will add manually) |
+| 12   | Component Integration Tests              | test-specialist            | ⏭ Skipped (user will add manually) |
 
 ## Files Changed
 
 ### Files Modified (10)
+
 1. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts` - Added searchParams with collectionId/subcollectionId
 2. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` - Integrated navigation component
 3. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-error-boundary.tsx` - Added 'navigation' section type
@@ -51,6 +52,7 @@ Implemented sequential navigation between bobbleheads within a collection or sub
 10. `_next-typesafe-url_.d.ts` - Auto-regenerated route types
 
 ### Files Created (6)
+
 1. `src/lib/types/bobblehead-navigation.types.ts` - Navigation type definitions
 2. `src/lib/validations/bobblehead-navigation.validation.ts` - Zod validation schemas
 3. `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx` - Client navigation component
@@ -60,15 +62,16 @@ Implemented sequential navigation between bobbleheads within a collection or sub
 
 ## Quality Gates
 
-| Gate | Result |
-|------|--------|
-| `npm run lint:fix` | ✓ PASS |
-| `npm run typecheck` | ✓ PASS |
+| Gate                        | Result |
+| --------------------------- | ------ |
+| `npm run lint:fix`          | ✓ PASS |
+| `npm run typecheck`         | ✓ PASS |
 | `npm run next-typesafe-url` | ✓ PASS |
 
 ## Feature Highlights
 
 ### Navigation Component
+
 - Previous/Next buttons with Lucide React icons (ChevronLeft/ChevronRight)
 - Keyboard shortcuts: ArrowLeft (previous), ArrowRight (next)
 - Disabled state at collection boundaries
@@ -76,11 +79,13 @@ Implemented sequential navigation between bobbleheads within a collection or sub
 - Responsive design (icons only on mobile, text + icons on desktop)
 
 ### URL State Management
+
 - Uses Nuqs for type-safe URL state
 - Preserves collectionId and subcollectionId in query parameters
 - Type-safe routing with $path from next-typesafe-url
 
 ### Architecture
+
 - Query layer: `getAdjacentBobbleheadsInCollectionAsync` with permission filtering
 - Facade layer: `getBobbleheadNavigationData` with Redis caching (30min TTL)
 - Server component: `BobbleheadNavigationAsync` for data fetching

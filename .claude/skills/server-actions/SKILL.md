@@ -52,13 +52,13 @@ This skill activates when:
 
 ## Usage Pattern Reference
 
-| Use Case | Hook Setup | Execution |
-|----------|------------|-----------|
-| Form submission | `toastMessages` + `onSuccess` | `await executeAsync(value)` |
-| Delete with navigation | `toastMessages` | `await executeAsync(id).then(redirect)` |
-| Search/autocomplete | `isDisableToast: true` | `execute(query)` in useEffect |
-| Silent background ops | `isDisableToast: true` | `execute(data)` in callback |
-| Availability check | `isDisableToast: true` | `execute(value)` in useEffect |
+| Use Case               | Hook Setup                    | Execution                               |
+| ---------------------- | ----------------------------- | --------------------------------------- |
+| Form submission        | `toastMessages` + `onSuccess` | `await executeAsync(value)`             |
+| Delete with navigation | `toastMessages`               | `await executeAsync(id).then(redirect)` |
+| Search/autocomplete    | `isDisableToast: true`        | `execute(query)` in useEffect           |
+| Silent background ops  | `isDisableToast: true`        | `execute(data)` in callback             |
+| Availability check     | `isDisableToast: true`        | `execute(value)` in useEffect           |
 
 ## References
 

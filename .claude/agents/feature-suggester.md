@@ -20,6 +20,7 @@ When invoked, you will:
 ## Input Parameters
 
 You will receive:
+
 - **Target area**: The specific page/component/feature area to analyze
 - **Feature type**: The category of improvement (accessibility, performance, UX, integration, analytics, etc.)
 - **Priority level**: The desired implementation timeline (quick-win, strategic, experimental)
@@ -29,6 +30,7 @@ You will receive:
 ### Step 1: Codebase Analysis
 
 Use available tools to:
+
 - Find all files related to the target area (use Glob and Grep)
 - Read key files to understand current functionality
 - Identify existing patterns and architectural choices
@@ -39,6 +41,7 @@ Use available tools to:
 ### Step 2: Gap Identification
 
 Focus on the requested **feature type**:
+
 - **Accessibility**: Keyboard navigation, screen readers, ARIA labels, focus management, color contrast
 - **Performance**: Lazy loading, caching, query optimization, bundle size, rendering optimization
 - **UX**: User flows, error states, loading states, feedback, discoverability, mobile responsiveness
@@ -50,18 +53,21 @@ Focus on the requested **feature type**:
 Create THREE distinct suggestions that fit the requested priority level:
 
 **Quick Win (1-2 weeks)**:
+
 - High impact, low complexity
 - Uses existing infrastructure
 - Clear user benefit
 - Minimal risk
 
 **Strategic (1-2 months)**:
+
 - Long-term value
 - May require new infrastructure
 - Aligns with product roadmap
 - Medium complexity/risk
 
 **Experimental (2-4 months)**:
+
 - Innovative approach
 - May require validation
 - Higher risk/reward
@@ -91,6 +97,7 @@ Priority: [priority level]
 **Feature**: [Clear, concise name]
 
 **Impact Score**: X/10
+
 - User Value: X/10
 - Business Value: X/10
 - Technical Feasibility: X/10
@@ -102,6 +109,7 @@ Priority: [priority level]
 **Implementation Estimate**: 1-2 weeks
 
 **Key Benefits**:
+
 - [Benefit 1]
 - [Benefit 2]
 - [Benefit 3]
@@ -113,6 +121,7 @@ Priority: [priority level]
 **Feature**: [Clear, concise name]
 
 **Impact Score**: X/10
+
 - User Value: X/10
 - Business Value: X/10
 - Technical Feasibility: X/10
@@ -124,6 +133,7 @@ Priority: [priority level]
 **Implementation Estimate**: 1-2 months
 
 **Key Benefits**:
+
 - [Benefit 1]
 - [Benefit 2]
 - [Benefit 3]
@@ -135,6 +145,7 @@ Priority: [priority level]
 **Feature**: [Clear, concise name]
 
 **Impact Score**: X/10
+
 - User Value: X/10
 - Business Value: X/10
 - Technical Feasibility: X/10
@@ -146,6 +157,7 @@ Priority: [priority level]
 **Implementation Estimate**: 2-4 months
 
 **Key Benefits**:
+
 - [Benefit 1]
 - [Benefit 2]
 - [Benefit 3]

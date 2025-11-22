@@ -3,6 +3,7 @@
 ## Overview
 
 Head Shakers uses a dual-layer caching strategy:
+
 1. **Next.js unstable_cache** - For most cached data with tag-based invalidation
 2. **Upstash Redis** - For high-traffic public search queries
 
@@ -166,7 +167,8 @@ const result = await CacheService.cached(
   () => fetchData(), // 1. The async function to cache
   'custom:cache:key', // 2. Unique cache key
   {
-    context: { // 3. Operation context for logging
+    context: {
+      // 3. Operation context for logging
       entityId: 'id',
       entityType: 'type',
       facade: 'FacadeName',
@@ -174,7 +176,7 @@ const result = await CacheService.cached(
     },
     tags: ['tag1', 'tag2'], // 4. Tags for invalidation
     ttl: CACHE_CONFIG.TTL.MEDIUM, // 5. Time-to-live
-  }
+  },
 );
 ```
 
@@ -257,20 +259,20 @@ Use `CACHE_CONFIG.TTL` for consistent TTL values:
 ```typescript
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 
-CACHE_CONFIG.TTL.SHORT        // 60 seconds - Frequently changing data
-CACHE_CONFIG.TTL.MEDIUM       // 300 seconds (5 min) - Standard data
-CACHE_CONFIG.TTL.LONG         // 900 seconds (15 min) - Stable entity data
-CACHE_CONFIG.TTL.EXTENDED     // 3600 seconds (1 hour) - Rarely changing data
-CACHE_CONFIG.TTL.PUBLIC_SEARCH // 600 seconds (10 min) - Public search results
+CACHE_CONFIG.TTL.SHORT; // 60 seconds - Frequently changing data
+CACHE_CONFIG.TTL.MEDIUM; // 300 seconds (5 min) - Standard data
+CACHE_CONFIG.TTL.LONG; // 900 seconds (15 min) - Stable entity data
+CACHE_CONFIG.TTL.EXTENDED; // 3600 seconds (1 hour) - Rarely changing data
+CACHE_CONFIG.TTL.PUBLIC_SEARCH; // 600 seconds (10 min) - Public search results
 ```
 
-| TTL Type | Duration | Use Case |
-|----------|----------|----------|
-| SHORT | 1 min | Dashboard stats, trending content, recent views |
-| MEDIUM | 5 min | List results, user stats, analytics |
-| LONG | 15 min | Single entity data, user profiles |
-| EXTENDED | 1 hour | Featured content, photos, popular searches |
-| PUBLIC_SEARCH | 10 min | Public search results (dropdown and page) |
+| TTL Type      | Duration | Use Case                                        |
+| ------------- | -------- | ----------------------------------------------- |
+| SHORT         | 1 min    | Dashboard stats, trending content, recent views |
+| MEDIUM        | 5 min    | List results, user stats, analytics             |
+| LONG          | 15 min   | Single entity data, user profiles               |
+| EXTENDED      | 1 hour   | Featured content, photos, popular searches      |
+| PUBLIC_SEARCH | 10 min   | Public search results (dropdown and page)       |
 
 ## Caching in Facades
 
@@ -417,7 +419,12 @@ CacheRevalidationService.bobbleheads.onUpdate(bobbleheadId, userId, collectionId
 CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId, slug);
 
 // After photo operations
-CacheRevalidationService.bobbleheads.onPhotoChange(bobbleheadId, userId, 'add' | 'delete' | 'update' | 'reorder', slug);
+CacheRevalidationService.bobbleheads.onPhotoChange(
+  bobbleheadId,
+  userId,
+  'add' | 'delete' | 'update' | 'reorder',
+  slug,
+);
 
 // After tag operations
 CacheRevalidationService.bobbleheads.onTagChange(bobbleheadId, userId, 'add' | 'remove', slug);
@@ -437,7 +444,12 @@ CacheRevalidationService.collections.onDelete(collectionId, userId, slug);
 
 // After bobblehead added/removed
 CacheRevalidationService.collections.onBobbleheadChange(
-  collectionId, bobbleheadId, userId, 'add' | 'remove', collectionSlug, bobbleheadSlug
+  collectionId,
+  bobbleheadId,
+  userId,
+  'add' | 'remove',
+  collectionSlug,
+  bobbleheadSlug,
 );
 ```
 
@@ -449,7 +461,13 @@ CacheRevalidationService.social.onLikeChange(entityType, entityId, userId, 'like
 
 // After comment operations
 CacheRevalidationService.social.onCommentChange(
-  entityType, entityId, userId, 'add' | 'update' | 'delete', slug, commentId, parentCommentId
+  entityType,
+  entityId,
+  userId,
+  'add' | 'update' | 'delete',
+  slug,
+  commentId,
+  parentCommentId,
 );
 
 // After follow/unfollow
@@ -574,11 +592,11 @@ await RedisOperations.delete(key);
 
 ```typescript
 interface CacheOptions {
-  context?: CacheContext;       // Operation context for logging
-  isBypassCache?: boolean;      // Skip cache, call function directly
-  isForceRefresh?: boolean;     // Refresh cache with new data
-  tags?: Array<string>;         // Cache tags for invalidation
-  ttl?: number;                 // Time-to-live in seconds
+  context?: CacheContext; // Operation context for logging
+  isBypassCache?: boolean; // Skip cache, call function directly
+  isForceRefresh?: boolean; // Refresh cache with new data
+  tags?: Array<string>; // Cache tags for invalidation
+  ttl?: number; // Time-to-live in seconds
 }
 
 interface CacheContext {
@@ -623,7 +641,9 @@ export const updateBobbleheadAction = authActionClient
 
       return { success: true, message: 'Bobblehead updated', data: result.entity };
     } catch (error) {
-      handleActionError(error, { /* ... */ });
+      handleActionError(error, {
+        /* ... */
+      });
     }
   });
 ```
