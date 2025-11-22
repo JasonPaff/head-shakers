@@ -5,7 +5,7 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-import { isCacheEnabled, isCacheLoggingEnabled } from '@/lib/constants/cache';
+import { CACHE_CONFIG, isCacheEnabled, isCacheLoggingEnabled } from '@/lib/constants/cache';
 import { type CacheEntityType, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
 
 /**
@@ -123,6 +123,8 @@ export class CacheRevalidationService {
   static readonly bobbleheads = {
     /**
      * revalidate after bobblehead creation
+     * Also invalidates navigation cache for the collection to ensure
+     * adjacent bobbleheads show correct prev/next links
      */
     onCreate: (
       bobbleheadId: string,
@@ -131,6 +133,12 @@ export class CacheRevalidationService {
       bobbleheadSlug?: string,
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId);
+
+      // Add navigation cache invalidation for the collection
+      // This ensures all bobbleheads in the collection have their navigation updated
+      if (collectionId) {
+        CacheRevalidationService.bobbleheads.onNavigationChange(collectionId, bobbleheadId);
+      }
 
       // Path-based revalidation using slug if provided
       if (isCacheEnabled() && bobbleheadSlug) {
@@ -152,6 +160,8 @@ export class CacheRevalidationService {
 
     /**
      * revalidate after bobblehead deletion
+     * Also invalidates navigation cache for the collection to ensure
+     * adjacent bobbleheads show correct prev/next links
      */
     onDelete: (
       bobbleheadId: string,
@@ -160,6 +170,12 @@ export class CacheRevalidationService {
       bobbleheadSlug?: string,
     ): RevalidationResult => {
       const tags = CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId);
+
+      // Add navigation cache invalidation for the collection
+      // This ensures all bobbleheads in the collection have their navigation updated
+      if (collectionId) {
+        CacheRevalidationService.bobbleheads.onNavigationChange(collectionId, bobbleheadId);
+      }
 
       // Path-based revalidation using slug if provided
       if (isCacheEnabled() && bobbleheadSlug) {
@@ -176,6 +192,29 @@ export class CacheRevalidationService {
         operation: 'bobblehead:delete',
         reason: 'Bobblehead deleted',
         userId,
+      });
+    },
+
+    /**
+     * revalidate navigation cache when collection structure changes
+     * Invalidates the collection-bobbleheads tag to clear all navigation
+     * data for bobbleheads in the affected collection
+     *
+     * @param collectionId - The collection whose navigation needs invalidation
+     * @param bobbleheadId - Optional bobblehead ID that triggered the change
+     */
+    onNavigationChange: (collectionId: string, bobbleheadId?: string): RevalidationResult => {
+      // Use the collection-bobbleheads tag pattern which matches
+      // the tag used in getBobbleheadNavigationData caching
+      const tags = [CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionId)];
+
+      return CacheRevalidationService.revalidateTags(tags, {
+        entityId: collectionId,
+        entityType: 'collection',
+        operation: 'bobblehead:navigation:change',
+        reason: bobbleheadId ?
+          `Navigation invalidated due to bobblehead ${bobbleheadId} change`
+        : 'Navigation invalidated due to collection structure change',
       });
     },
 
@@ -273,6 +312,8 @@ export class CacheRevalidationService {
   static readonly collections = {
     /**
      * revalidate after bobblehead added/removed from a collection
+     * Also invalidates navigation cache to ensure adjacent bobbleheads
+     * show correct prev/next links after structural changes
      */
     onBobbleheadChange: (
       collectionId: string,
@@ -286,6 +327,10 @@ export class CacheRevalidationService {
         ...CacheTagInvalidation.onCollectionChange(collectionId, userId),
         ...CacheTagInvalidation.onBobbleheadChange(bobbleheadId, userId, collectionId),
       ];
+
+      // Invalidate navigation cache for the collection
+      // This ensures all bobbleheads in the collection have their navigation updated
+      CacheRevalidationService.bobbleheads.onNavigationChange(collectionId, bobbleheadId);
 
       // Path-based revalidation using slugs if provided
       if (isCacheEnabled()) {

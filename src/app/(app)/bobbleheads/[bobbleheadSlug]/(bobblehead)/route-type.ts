@@ -4,6 +4,13 @@ import { z } from 'zod';
 
 import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/slug';
 
+const searchParamsSchema = z.object({
+  collectionId: z.uuid('Invalid collection ID').optional(),
+  subcollectionId: z.uuid('Invalid subcollection ID').optional(),
+});
+
+export type BobbleheadNavigationContext = z.infer<typeof searchParamsSchema>;
+
 export const Route = {
   routeParams: z.object({
     bobbleheadSlug: z
@@ -12,6 +19,7 @@ export const Route = {
       .max(SLUG_MAX_LENGTH, `Bobblehead slug must be ${SLUG_MAX_LENGTH} characters or less`)
       .regex(SLUG_PATTERN, 'Bobblehead slug must contain only lowercase letters, numbers, and hyphens'),
   }),
+  searchParams: searchParamsSchema,
 } satisfies DynamicRoute;
 
 export type PageProps = InferPagePropsType<RouteType>;

@@ -11,6 +11,7 @@ import { BobbleheadDetailCardsAsync } from '@/app/(app)/bobbleheads/[bobbleheadS
 import { BobbleheadFeatureCardAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-feature-card-async';
 import { BobbleheadHeaderAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async';
 import { BobbleheadMetricsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-metrics-async';
+import { BobbleheadNavigationAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async';
 import { BobbleheadPhotoGalleryAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-photo-gallery-async';
 import { BobbleheadSecondaryCardsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-secondary-cards-async';
 import { BobbleheadErrorBoundary } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-error-boundary';
@@ -19,6 +20,7 @@ import { BobbleheadDetailCardsSkeleton } from '@/app/(app)/bobbleheads/[bobblehe
 import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
 import { BobbleheadMetricsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-metrics-skeleton';
+import { BobbleheadNavigationSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-navigation-skeleton';
 import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-photo-gallery-skeleton';
 import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { Route } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
@@ -26,6 +28,7 @@ import { CommentSectionAsync } from '@/components/feature/comments/async/comment
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
+import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
@@ -92,8 +95,9 @@ export async function generateMetadata({
   );
 }
 
-async function ItemPage({ routeParams }: ItemPageProps) {
+async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
   const { bobbleheadSlug } = await routeParams;
+  const { collectionId, subcollectionId } = await searchParams;
   const currentUserId = await getOptionalUserId();
 
   const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(
@@ -198,6 +202,23 @@ async function ItemPage({ routeParams }: ItemPageProps) {
             </BobbleheadErrorBoundary>
           </ContentLayout>
         </div>
+
+        {/* Navigation Section */}
+        <Conditional isCondition={!!collectionId}>
+          <div className={'mt-4'}>
+            <ContentLayout>
+              <BobbleheadErrorBoundary section={'navigation'}>
+                <Suspense fallback={<BobbleheadNavigationSkeleton />}>
+                  <BobbleheadNavigationAsync
+                    bobbleheadId={bobbleheadId}
+                    collectionId={collectionId ?? null}
+                    subcollectionId={subcollectionId}
+                  />
+                </Suspense>
+              </BobbleheadErrorBoundary>
+            </ContentLayout>
+          </div>
+        </Conditional>
 
         {/* Feature Card Section */}
         <div className={'mt-4'}>

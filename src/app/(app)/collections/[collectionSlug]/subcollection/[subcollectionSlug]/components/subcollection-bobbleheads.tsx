@@ -102,7 +102,12 @@ export const SubcollectionBobbleheads = async ({
       <Conditional isCondition={!hasNoBobbleheads}>
         <div className={'grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'}>
           {bobbleheads.map((bobblehead) => (
-            <BobbleheadGalleryCard bobblehead={bobblehead} isOwner={isOwner} key={bobblehead.id} />
+            <BobbleheadGalleryCard
+              bobblehead={bobblehead}
+              isOwner={isOwner}
+              key={bobblehead.id}
+              navigationContext={{ collectionId, subcollectionId: subcollection.id }}
+            />
           ))}
         </div>
       </Conditional>

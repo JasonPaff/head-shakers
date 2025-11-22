@@ -5,6 +5,7 @@ import type { FindOptions } from '@/lib/queries/base/query-context';
 import type { BobbleheadRecord, BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import type { BobbleheadNavigationDataSchema } from '@/lib/validations/bobblehead-navigation.validation';
 import type {
   DeleteBobblehead,
   DeleteBobbleheadPhoto,
@@ -16,6 +17,7 @@ import type {
 } from '@/lib/validations/bobbleheads.validation';
 
 import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
@@ -29,7 +31,8 @@ import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
-import { createHashFromObject } from '@/lib/utils/cache.utils';
+import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
+import { createFacadeCacheKey, createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
@@ -341,6 +344,116 @@ export class BobbleheadsFacade {
         userId: viewerUserId,
       };
       throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get navigation data for a bobblehead within its collection context.
+   * Returns adjacent bobbleheads (previous/next) based on createdAt ordering.
+   *
+   * Caching: Uses MEDIUM TTL (1800 seconds / 30 minutes) with collection-based invalidation.
+   *
+   * @param bobbleheadId - The ID of the current bobblehead
+   * @param collectionId - The ID of the collection containing the bobblehead
+   * @param subcollectionId - Optional subcollection ID for filtered navigation
+   * @param viewerUserId - Optional viewer user ID for permission context
+   * @param dbInstance - Optional database instance for transactions
+   * @returns Navigation data with previous and next bobbleheads
+   */
+  static async getBobbleheadNavigationData(
+    bobbleheadId: string,
+    collectionId: string,
+    subcollectionId?: null | string,
+    viewerUserId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<BobbleheadNavigationDataSchema> {
+    try {
+      // Create unique cache key incorporating all parameters
+      const cacheKey = createFacadeCacheKey('bobblehead', 'navigation', bobbleheadId, {
+        collectionId,
+        subcollectionId: subcollectionId || null,
+        viewerUserId,
+      });
+
+      // Generate cache tags for invalidation
+      const cacheTags = [
+        ...CacheTagGenerators.bobblehead.read(bobbleheadId, viewerUserId),
+        CACHE_CONFIG.TAGS.COLLECTION_BOBBLEHEADS(collectionId),
+      ];
+
+      return await CacheService.cached(
+        async () => {
+          // Create appropriate query context based on user presence
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          // Fetch adjacent bobbleheads from the query layer
+          const result = await BobbleheadsQuery.getAdjacentBobbleheadsInCollectionAsync(
+            bobbleheadId,
+            collectionId,
+            subcollectionId || null,
+            context,
+          );
+
+          // Transform result to match the expected schema (minimal navigation data)
+          // Note: photoUrl is set to null as the base query doesn't join photos
+          // The primary image can be lazy-loaded on the frontend if needed
+          const transformBobblehead = (
+            bobblehead: BobbleheadRecord | null,
+          ): BobbleheadNavigationDataSchema['nextBobblehead'] => {
+            if (!bobblehead) return null;
+
+            return {
+              id: bobblehead.id,
+              name: bobblehead.name,
+              photoUrl: null,
+              slug: bobblehead.slug,
+            };
+          };
+
+          // Add breadcrumb for successful cache miss (data fetched)
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: {
+              bobbleheadId,
+              collectionId,
+              hasNext: !!result.nextBobblehead,
+              hasPrevious: !!result.previousBobblehead,
+              subcollectionId: subcollectionId || null,
+            },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Fetched bobblehead navigation data',
+          });
+
+          return {
+            nextBobblehead: transformBobblehead(result.nextBobblehead),
+            previousBobblehead: transformBobblehead(result.previousBobblehead),
+          };
+        },
+        cacheKey,
+        {
+          context: {
+            entityId: bobbleheadId,
+            entityType: 'bobblehead',
+            facade: facadeName,
+            operation: 'getNavigationData',
+            userId: viewerUserId,
+          },
+          tags: cacheTags,
+          ttl: CACHE_CONFIG.TTL.MEDIUM, // 30 minutes - 1800 seconds
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { bobbleheadId, collectionId, subcollectionId },
+        facade: facadeName,
+        method: 'getBobbleheadNavigationData',
+        operation: 'getNavigationData',
+        userId: viewerUserId,
+      };
+      throw createFacadeError(errorContext, error);
     }
   }
 

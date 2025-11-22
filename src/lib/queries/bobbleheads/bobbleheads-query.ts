@@ -1,4 +1,4 @@
-import { and, desc, eq, like, or } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, like, lt, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
@@ -21,6 +21,14 @@ import {
   users,
 } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+
+/**
+ * result type for adjacent bobblehead navigation within a collection
+ */
+export type AdjacentBobbleheadsResult = {
+  nextBobblehead: BobbleheadRecord | null;
+  previousBobblehead: BobbleheadRecord | null;
+};
 
 export type BobbleheadDeleteResult = {
   bobblehead: BobbleheadRecord | null;
@@ -415,6 +423,69 @@ export class BobbleheadsQuery extends BaseQuery {
     }
 
     return query;
+  }
+
+  /**
+   * get adjacent bobbleheads (previous and next) within a collection/subcollection context
+   * uses createdAt DESC ordering where "previous" = newer item, "next" = older item
+   */
+  static async getAdjacentBobbleheadsInCollectionAsync(
+    bobbleheadId: string,
+    collectionId: string,
+    subcollectionId: null | string,
+    context: QueryContext,
+  ): Promise<AdjacentBobbleheadsResult> {
+    const dbInstance = this.getDbInstance(context);
+
+    // first, get the current bobblehead to find its createdAt timestamp
+    const currentBobblehead = await dbInstance
+      .select({ createdAt: bobbleheads.createdAt })
+      .from(bobbleheads)
+      .where(
+        this.combineFilters(
+          eq(bobbleheads.id, bobbleheadId),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+        ),
+      )
+      .limit(1);
+
+    if (!currentBobblehead[0]) {
+      return { nextBobblehead: null, previousBobblehead: null };
+    }
+
+    const currentCreatedAt = currentBobblehead[0].createdAt;
+
+    // build base filter conditions for collection context
+    const baseConditions = [
+      eq(bobbleheads.collectionId, collectionId),
+      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+    ];
+
+    // add subcollection filter when provided
+    if (subcollectionId) {
+      baseConditions.push(eq(bobbleheads.subcollectionId, subcollectionId));
+    }
+
+    // find previous bobblehead (newer = createdAt > current, order by createdAt ASC to get closest)
+    const previousResult = await dbInstance
+      .select()
+      .from(bobbleheads)
+      .where(this.combineFilters(gt(bobbleheads.createdAt, currentCreatedAt), ...baseConditions))
+      .orderBy(asc(bobbleheads.createdAt))
+      .limit(1);
+
+    // find next bobblehead (older = createdAt < current, order by createdAt DESC to get closest)
+    const nextResult = await dbInstance
+      .select()
+      .from(bobbleheads)
+      .where(this.combineFilters(lt(bobbleheads.createdAt, currentCreatedAt), ...baseConditions))
+      .orderBy(desc(bobbleheads.createdAt))
+      .limit(1);
+
+    return {
+      nextBobblehead: nextResult[0] || null,
+      previousBobblehead: previousResult[0] || null,
+    };
   }
 
   /**
