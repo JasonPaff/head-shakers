@@ -42,6 +42,7 @@ This skill activates when:
 ## Key Patterns
 
 ### Vitest (Unit/Integration/Component)
+
 - Use `describe`/`it` blocks with clear descriptions (globals enabled, no imports)
 - Use `customRender` from `tests/setup/test-utils.tsx` for component tests
 - Use Testing Library queries (`getByRole`, `getByTestId`) for component tests
@@ -50,6 +51,7 @@ This skill activates when:
 - Use factories from `tests/fixtures/` for test data creation
 
 ### Playwright (E2E)
+
 - Use custom fixtures from `tests/e2e/fixtures/base.fixture.ts`
 - Use `ComponentFinder` from helpers for `data-testid` lookups
 - Use Page Object Model pattern (extend `BasePage`)

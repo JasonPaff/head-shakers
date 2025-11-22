@@ -9,12 +9,15 @@
 ## Input: Refined Request & File Analysis
 
 ### Refined Feature Request
+
 As a user, I would like to be able to report comments through the same reporting mechanism available for collections, subcollections, and bobbleheads, enabling community moderation of inappropriate or harmful comment content across the platform.
 
 ### Key Discovery
+
 Database already supports 'comment' in `ENUMS.CONTENT_REPORT.TARGET_TYPE` - only application layer changes needed.
 
 ### Files Requiring Modification (8 total)
+
 1. `src/lib/validations/moderation.validation.ts` - Add 'comment' to schemas
 2. `src/lib/queries/content-reports/content-reports.query.ts` - Add 'comment' case
 3. `src/lib/facades/content-reports/content-reports.facade.ts` - Update 'comment' validation
@@ -28,16 +31,16 @@ Database already supports 'comment' in `ENUMS.CONTENT_REPORT.TARGET_TYPE` - only
 
 The implementation planner generated a comprehensive 8-step plan:
 
-| Step | Description | Confidence |
-|------|-------------|------------|
-| 1 | Update validation schemas to include 'comment' | High |
-| 2 | Update query layer to validate comments | High |
-| 3 | Update facade layer to validate comments | High |
-| 4 | Update ReportButton component | High |
-| 5 | Add ReportButton to CommentItem | High |
-| 6 | Update admin reports table badge | High |
-| 7 | Update admin report detail dialog | High |
-| 8 | Update admin report filters | High |
+| Step | Description                                    | Confidence |
+| ---- | ---------------------------------------------- | ---------- |
+| 1    | Update validation schemas to include 'comment' | High       |
+| 2    | Update query layer to validate comments        | High       |
+| 3    | Update facade layer to validate comments       | High       |
+| 4    | Update ReportButton component                  | High       |
+| 5    | Add ReportButton to CommentItem                | High       |
+| 6    | Update admin reports table badge               | High       |
+| 7    | Update admin report detail dialog              | High       |
+| 8    | Update admin report filters                    | High       |
 
 ## Plan Metrics
 
@@ -49,14 +52,14 @@ The implementation planner generated a comprehensive 8-step plan:
 
 ## Validation Results
 
-| Check | Result |
-|-------|--------|
-| Format (Markdown) | PASS |
-| Template Compliance | PASS |
-| Required Sections | PASS (Overview, Prerequisites, Steps, Quality Gates, Notes) |
+| Check               | Result                                                           |
+| ------------------- | ---------------------------------------------------------------- |
+| Format (Markdown)   | PASS                                                             |
+| Template Compliance | PASS                                                             |
+| Required Sections   | PASS (Overview, Prerequisites, Steps, Quality Gates, Notes)      |
 | Validation Commands | PASS (all steps include `npm run lint:fix && npm run typecheck`) |
-| No Code Examples | PASS |
-| Actionable Steps | PASS |
+| No Code Examples    | PASS                                                             |
+| Actionable Steps    | PASS                                                             |
 
 ## Output
 

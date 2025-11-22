@@ -4,7 +4,7 @@ import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/e
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { InsertContentReport, SelectContentReport } from '@/lib/validations/moderation.validation';
 
-import { bobbleheads, collections, contentReports, subCollections } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, contentReports, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type AdminReportsFilterOptions = FindOptions & {
@@ -12,7 +12,7 @@ export type AdminReportsFilterOptions = FindOptions & {
   reason?: ContentReportReason;
   reporterId?: string;
   status?: ContentReportStatus;
-  targetType?: 'bobblehead' | 'collection' | 'subcollection';
+  targetType?: 'bobblehead' | 'collection' | 'comment' | 'subcollection';
 };
 
 export type ContentReportRecord = typeof contentReports.$inferSelect;
@@ -96,7 +96,7 @@ export class ContentReportsQuery extends BaseQuery {
   static async checkExistingReportAsync(
     userId: string,
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     context: QueryContext,
   ): Promise<null | SelectContentReport> {
     const dbInstance = this.getDbInstance(context);
@@ -117,7 +117,7 @@ export class ContentReportsQuery extends BaseQuery {
    */
   static async countReportsForTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     context: QueryContext,
   ): Promise<number> {
     const reports = await this.getReportsByTargetAsync(targetId, targetType, {}, context);
@@ -262,7 +262,7 @@ export class ContentReportsQuery extends BaseQuery {
    */
   static async getReportsByTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     options: FindOptions = {},
     context: QueryContext,
   ): Promise<Array<SelectContentReport>> {
@@ -332,7 +332,7 @@ export class ContentReportsQuery extends BaseQuery {
   static async getReportStatusAsync(
     userId: string,
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     context: QueryContext,
   ): Promise<{ hasReported: boolean; report: null | SelectContentReport }> {
     const report = await this.checkExistingReportAsync(userId, targetId, targetType, context);
@@ -380,7 +380,7 @@ export class ContentReportsQuery extends BaseQuery {
    */
   static async validateTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     context: QueryContext,
   ): Promise<ContentReportTargetInfo> {
     const dbInstance = this.getDbInstance(context);
@@ -413,6 +413,21 @@ export class ContentReportsQuery extends BaseQuery {
         return {
           isExists: !!collection,
           ownerId: collection?.userId || null,
+        };
+      }
+
+      case 'comment': {
+        const comment = await dbInstance.query.comments.findFirst({
+          columns: {
+            id: true,
+            userId: true,
+          },
+          where: eq(comments.id, targetId),
+        });
+
+        return {
+          isExists: !!comment,
+          ownerId: comment?.userId || null,
         };
       }
 

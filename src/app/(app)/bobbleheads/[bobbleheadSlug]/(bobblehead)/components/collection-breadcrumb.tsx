@@ -71,8 +71,9 @@ export const CollectionBreadcrumb = ({
 
   // Determine mobile link target
   const _shouldLinkToSubcollection = _hasSubcollection && !!subcollectionSlug;
-  const mobileLinkHref = _shouldLinkToSubcollection
-    ? $path({
+  const mobileLinkHref =
+    _shouldLinkToSubcollection ?
+      $path({
         route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
         routeParams: {
           collectionSlug,
@@ -133,7 +134,7 @@ export const CollectionBreadcrumb = ({
 
   return (
     <nav
-      aria-label={"Collection breadcrumb"}
+      aria-label={'Collection breadcrumb'}
       className={'flex items-center gap-0.5 text-sm sm:gap-1.5'}
       data-slot={'collection-breadcrumb'}
       data-testid={breadcrumbTestId}

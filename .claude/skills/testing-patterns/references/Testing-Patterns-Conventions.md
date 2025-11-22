@@ -5,6 +5,7 @@
 Head Shakers uses Vitest 4.0.3 for unit, integration, and component tests, Testing Library for component tests, and Playwright 1.56.1 for E2E tests. Tests follow a consistent structure and naming convention.
 
 **Key Libraries**:
+
 - **Vitest** - Test runner with v8 coverage
 - **@testing-library/react** - React component testing
 - **@testing-library/user-event** - User interaction simulation
@@ -337,13 +338,13 @@ Use ComponentFinder for standardized `data-testid` lookups:
 
 ```typescript
 // All methods return Playwright locator strings
-finder.feature('bobblehead', 'card')     // [data-testid="feature-bobblehead-card"]
-finder.form('comment', 'input')           // [data-testid="form-comment-input"]
-finder.formField('email')                 // [data-testid="form-field-email"]
-finder.ui('button', 'primary')            // [data-testid="ui-button-primary"]
-finder.layout('sidebar', 'nav')           // [data-testid="layout-sidebar-nav"]
-finder.tableCell(0, 1)                    // [data-testid="table-cell-0-1"]
-finder.component('custom', 'widget', 'main') // [data-testid="custom-widget-main"]
+finder.feature('bobblehead', 'card'); // [data-testid="feature-bobblehead-card"]
+finder.form('comment', 'input'); // [data-testid="form-comment-input"]
+finder.formField('email'); // [data-testid="form-field-email"]
+finder.ui('button', 'primary'); // [data-testid="ui-button-primary"]
+finder.layout('sidebar', 'nav'); // [data-testid="layout-sidebar-nav"]
+finder.tableCell(0, 1); // [data-testid="table-cell-0-1"]
+finder.component('custom', 'widget', 'main'); // [data-testid="custom-widget-main"]
 ```
 
 ### Page Object Model
@@ -489,10 +490,10 @@ describe('SocialFacade', () => {
 
 ```typescript
 import {
-  getTestDb,           // Get Drizzle ORM database instance
-  resetTestDatabase,   // Truncate all tables (23 tables with CASCADE)
-  cleanupTable,        // Cleanup specific table
-  closeTestDb,         // Close worker connection
+  getTestDb, // Get Drizzle ORM database instance
+  resetTestDatabase, // Truncate all tables (23 tables with CASCADE)
+  cleanupTable, // Cleanup specific table
+  closeTestDb, // Close worker connection
   isTestDbInitialized, // Check initialization status
 } from '@/tests/setup/test-db';
 ```
@@ -631,6 +632,7 @@ The following are automatically mocked in `tests/setup/vitest.setup.ts`:
 ```
 
 Default test user in mocks:
+
 - `userId: 'test-user-id'`
 - `email: 'test@example.com'`
 

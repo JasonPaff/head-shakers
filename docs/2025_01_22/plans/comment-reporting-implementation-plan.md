@@ -287,6 +287,7 @@ npm run lint:fix && npm run typecheck
 ### Key Insight: Database Already Supports Comments
 
 The database enum `ENUMS.CONTENT_REPORT.TARGET_TYPE` already includes 'comment' (confirmed at line 35 of `src/lib/constants/enums.ts`):
+
 ```
 TARGET_TYPE: ['bobblehead', 'comment', 'user', 'collection', 'subcollection'] as const
 ```
@@ -296,6 +297,7 @@ This means NO database migrations are required. All changes are application-laye
 ### Comment Validation Strategy
 
 The `SocialQuery.getCommentByIdAsync()` method already exists and returns the comment with its `userId` field, which is exactly what's needed for:
+
 1. Verifying the comment exists
 2. Preventing self-reporting (comparing comment.userId with reporter's userId)
 
@@ -306,6 +308,7 @@ The ReportButton is placed in the comment footer alongside the Reply button. Thi
 ### Badge Color Consistency
 
 Orange was chosen for comment badges to differentiate from:
+
 - Green: Bobbleheads
 - Blue: Collections
 - Purple: Subcollections

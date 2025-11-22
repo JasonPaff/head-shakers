@@ -270,6 +270,7 @@ npm run lint:fix && npm run typecheck
 ## Orchestration Reference
 
 Orchestration logs: `docs/2025_11_22/orchestration/bobblehead-details-collection-display/`
+
 - `00-orchestration-index.md` - Workflow overview
 - `01-feature-refinement.md` - Step 1 log
 - `02-file-discovery.md` - Step 2 log

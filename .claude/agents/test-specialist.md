@@ -68,7 +68,7 @@ tests/
 - [ ] Prefer user-centric queries over implementation details
 - [ ] Test user interactions with `userEvent` (pre-configured in customRender)
 - [ ] Verify accessibility with proper queries
-- [ ] Use `data-testid` with namespace pattern (ui-*, feature-*, form-*)
+- [ ] Use `data-testid` with namespace pattern (ui-_, feature-_, form-\*)
 
 ### Integration Test Requirements
 

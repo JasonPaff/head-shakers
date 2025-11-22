@@ -20,66 +20,66 @@ Develop a comprehensive user management admin page for the Head Shakers platform
 
 ### Critical Priority (Core Implementation Files)
 
-| File Path | Category | Relevance |
-|-----------|----------|-----------|
-| `src/app/(app)/admin/users/page.tsx` | Page | **Existing placeholder page** - Currently shows "User management interface coming soon...". This is the main file to implement the user management UI. |
-| `src/lib/db/schema/users.schema.ts` | Schema | **User database schema** - Defines `users` table with `userRoleEnum` ('user', 'moderator', 'admin'), contains all user fields including role, isVerified, lockedUntil, lastActiveAt, createdAt, etc. Also defines `userActivity` table for activity history. |
-| `src/lib/utils/admin.utils.ts` | Utility | **Authorization utilities** - Contains `requireModerator()`, `checkIsModerator()`, and `getCurrentUserWithRole()` functions for permission checks. |
-| `src/lib/queries/users/users-query.ts` | Query | **User query class** - Existing UsersQuery class with `findByIdAsync`, `findByClerkIdAsync`, `findByUsernameAsync` methods. Needs new methods for listing/filtering users. |
-| `src/lib/facades/users/users.facade.ts` | Facade | **User business logic facade** - Contains `getUserById`, `getUserByClerkId`, `updateUsername` operations. Needs new admin operations for role updates and account management. |
-| `src/lib/validations/users.validation.ts` | Validation | **User validation schemas** - Contains Zod schemas for user data. Needs new admin schemas for role updates, user filtering, and account status changes. |
+| File Path                                 | Category   | Relevance                                                                                                                                                                                                                                                    |
+| ----------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `src/app/(app)/admin/users/page.tsx`      | Page       | **Existing placeholder page** - Currently shows "User management interface coming soon...". This is the main file to implement the user management UI.                                                                                                       |
+| `src/lib/db/schema/users.schema.ts`       | Schema     | **User database schema** - Defines `users` table with `userRoleEnum` ('user', 'moderator', 'admin'), contains all user fields including role, isVerified, lockedUntil, lastActiveAt, createdAt, etc. Also defines `userActivity` table for activity history. |
+| `src/lib/utils/admin.utils.ts`            | Utility    | **Authorization utilities** - Contains `requireModerator()`, `checkIsModerator()`, and `getCurrentUserWithRole()` functions for permission checks.                                                                                                           |
+| `src/lib/queries/users/users-query.ts`    | Query      | **User query class** - Existing UsersQuery class with `findByIdAsync`, `findByClerkIdAsync`, `findByUsernameAsync` methods. Needs new methods for listing/filtering users.                                                                                   |
+| `src/lib/facades/users/users.facade.ts`   | Facade     | **User business logic facade** - Contains `getUserById`, `getUserByClerkId`, `updateUsername` operations. Needs new admin operations for role updates and account management.                                                                                |
+| `src/lib/validations/users.validation.ts` | Validation | **User validation schemas** - Contains Zod schemas for user data. Needs new admin schemas for role updates, user filtering, and account status changes.                                                                                                      |
 
 ### High Priority (Patterns & Infrastructure)
 
-| File Path | Category | Relevance |
-|-----------|----------|-----------|
-| `src/lib/utils/next-safe-action.ts` | Utility | **Server action client configuration** - Defines `adminActionClient` for moderator/admin-protected actions with middleware chain. |
-| `src/lib/middleware/admin.middleware.ts` | Middleware | **Admin middleware** - Validates user role and adds `isAdmin`, `isModerator`, `role` to action context. |
-| `src/lib/actions/admin/admin-content-reports.actions.ts` | Action | **Example admin actions** - Shows pattern for admin server actions with `adminActionClient`, filtering, pagination, and bulk operations. |
-| `src/lib/validations/moderation.validation.ts` | Validation | **Example admin validation schemas** - Contains `adminReportsFilterSchema` with pagination/filtering patterns to follow. |
-| `src/lib/constants/enums.ts` | Constants | **Role enum definitions** - Defines `USER.ROLE: ['user', 'moderator', 'admin']` and `UserRole` type. |
-| `src/lib/constants/action-names.ts` | Constants | **Action name constants** - Centralized action names; needs new ADMIN entries for user management actions. |
-| `src/lib/queries/base/query-context.ts` | Query | **Query context utilities** - Defines `createAdminQueryContext()`, pagination options, and query context interfaces. |
-| `src/lib/queries/base/base-query.ts` | Query | **Base query class** - Abstract base with `applyPagination()`, `executeWithRetry()`, and database instance handling. |
+| File Path                                                | Category   | Relevance                                                                                                                                |
+| -------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/utils/next-safe-action.ts`                      | Utility    | **Server action client configuration** - Defines `adminActionClient` for moderator/admin-protected actions with middleware chain.        |
+| `src/lib/middleware/admin.middleware.ts`                 | Middleware | **Admin middleware** - Validates user role and adds `isAdmin`, `isModerator`, `role` to action context.                                  |
+| `src/lib/actions/admin/admin-content-reports.actions.ts` | Action     | **Example admin actions** - Shows pattern for admin server actions with `adminActionClient`, filtering, pagination, and bulk operations. |
+| `src/lib/validations/moderation.validation.ts`           | Validation | **Example admin validation schemas** - Contains `adminReportsFilterSchema` with pagination/filtering patterns to follow.                 |
+| `src/lib/constants/enums.ts`                             | Constants  | **Role enum definitions** - Defines `USER.ROLE: ['user', 'moderator', 'admin']` and `UserRole` type.                                     |
+| `src/lib/constants/action-names.ts`                      | Constants  | **Action name constants** - Centralized action names; needs new ADMIN entries for user management actions.                               |
+| `src/lib/queries/base/query-context.ts`                  | Query      | **Query context utilities** - Defines `createAdminQueryContext()`, pagination options, and query context interfaces.                     |
+| `src/lib/queries/base/base-query.ts`                     | Query      | **Base query class** - Abstract base with `applyPagination()`, `executeWithRetry()`, and database instance handling.                     |
 
 ### Medium Priority (UI Components)
 
-| File Path | Category | Relevance |
-|-----------|----------|-----------|
-| `src/components/ui/table.tsx` | Component | **Table component** - Basic Table components for data display. |
-| `src/components/ui/dialog.tsx` | Component | **Dialog component** - Radix Dialog primitives for user detail/edit modals. |
-| `src/components/ui/alert-dialog.tsx` | Component | **Alert dialog component** - Confirmation dialogs for role changes and account actions. |
-| `src/components/ui/dropdown-menu.tsx` | Component | **Dropdown menu component** - Actions dropdown for per-row user operations. |
-| `src/components/ui/select.tsx` | Component | **Select component** - For role selection dropdowns and filtering. |
-| `src/components/ui/input.tsx` | Component | **Input component** - With search icon support for user search functionality. |
-| `src/components/ui/badge.tsx` | Component | **Badge component** - For displaying user roles and status indicators. |
-| `src/components/ui/button.tsx` | Component | **Button component** - With variants for actions. |
-| `src/components/ui/card.tsx` | Component | **Card component** - For stats cards and user detail panels. |
-| `src/components/ui/tabs.tsx` | Component | **Tabs component** - For organizing user list, filters, and details views. |
-| `src/components/ui/avatar.tsx` | Component | **Avatar component** - For displaying user profile images in the table. |
+| File Path                             | Category  | Relevance                                                                               |
+| ------------------------------------- | --------- | --------------------------------------------------------------------------------------- |
+| `src/components/ui/table.tsx`         | Component | **Table component** - Basic Table components for data display.                          |
+| `src/components/ui/dialog.tsx`        | Component | **Dialog component** - Radix Dialog primitives for user detail/edit modals.             |
+| `src/components/ui/alert-dialog.tsx`  | Component | **Alert dialog component** - Confirmation dialogs for role changes and account actions. |
+| `src/components/ui/dropdown-menu.tsx` | Component | **Dropdown menu component** - Actions dropdown for per-row user operations.             |
+| `src/components/ui/select.tsx`        | Component | **Select component** - For role selection dropdowns and filtering.                      |
+| `src/components/ui/input.tsx`         | Component | **Input component** - With search icon support for user search functionality.           |
+| `src/components/ui/badge.tsx`         | Component | **Badge component** - For displaying user roles and status indicators.                  |
+| `src/components/ui/button.tsx`        | Component | **Button component** - With variants for actions.                                       |
+| `src/components/ui/card.tsx`          | Component | **Card component** - For stats cards and user detail panels.                            |
+| `src/components/ui/tabs.tsx`          | Component | **Tabs component** - For organizing user list, filters, and details views.              |
+| `src/components/ui/avatar.tsx`        | Component | **Avatar component** - For displaying user profile images in the table.                 |
 
 ### Medium Priority (Reference Implementations)
 
-| File Path | Category | Relevance |
-|-----------|----------|-----------|
-| `src/app/(app)/admin/featured-content/page.tsx` | Page | **Example admin page** - Shows pattern for admin page with `requireModerator()`, data fetching, and component integration. |
-| `src/app/(app)/admin/featured-content/components/featured-content-manager.tsx` | Component | **Example admin manager** - Shows pattern for admin management UI with tabs, stats cards, and CRUD operations. |
-| `src/app/(app)/admin/page.tsx` | Page | **Admin dashboard** - Uses AdminLayout wrapper, shows how admin pages are structured. |
-| `src/components/layout/admin/admin-layout.tsx` | Component | **Admin layout wrapper** - Layout component with AdminRouteGuard for permission-based routing. |
-| `src/components/ui/admin/admin-route-guard.tsx` | Component | **Route guard component** - Server component that checks `getCurrentUserWithRole()` and redirects unauthorized users. |
+| File Path                                                                      | Category  | Relevance                                                                                                                  |
+| ------------------------------------------------------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `src/app/(app)/admin/featured-content/page.tsx`                                | Page      | **Example admin page** - Shows pattern for admin page with `requireModerator()`, data fetching, and component integration. |
+| `src/app/(app)/admin/featured-content/components/featured-content-manager.tsx` | Component | **Example admin manager** - Shows pattern for admin management UI with tabs, stats cards, and CRUD operations.             |
+| `src/app/(app)/admin/page.tsx`                                                 | Page      | **Admin dashboard** - Uses AdminLayout wrapper, shows how admin pages are structured.                                      |
+| `src/components/layout/admin/admin-layout.tsx`                                 | Component | **Admin layout wrapper** - Layout component with AdminRouteGuard for permission-based routing.                             |
+| `src/components/ui/admin/admin-route-guard.tsx`                                | Component | **Route guard component** - Server component that checks `getCurrentUserWithRole()` and redirects unauthorized users.      |
 
 ### Low Priority (Supporting Files)
 
-| File Path | Category | Relevance |
-|-----------|----------|-----------|
-| `src/hooks/use-server-action.ts` | Hook | **Server action hook** - Client hook for executing server actions with toast notifications. |
-| `src/hooks/use-admin-role.ts` | Hook | **Admin role hook** - Client-side hook using Clerk's `useUser()` to check role from publicMetadata. |
-| `src/hooks/use-toggle.ts` | Hook | **Toggle hook** - For managing boolean UI state (dialogs open/close). |
-| `src/lib/services/user-sync.service.ts` | Service | **User sync service** - Shows how users are created/updated from Clerk data. |
-| `src/lib/utils/action-error-handler.ts` | Utility | **Error handler** - Centralized error handling for server actions with Sentry integration. |
-| `src/lib/constants/defaults.ts` | Constants | **Default values** - Contains `USER.ROLE: 'user'` default and pagination defaults. |
-| `src/lib/test-ids/index.ts` | Utility | **Test ID generator** - For creating consistent test IDs on UI components. |
-| `src/lib/actions/users/username.actions.ts` | Action | **User action example** - Shows pattern for authenticated user actions. |
+| File Path                                   | Category  | Relevance                                                                                           |
+| ------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------- |
+| `src/hooks/use-server-action.ts`            | Hook      | **Server action hook** - Client hook for executing server actions with toast notifications.         |
+| `src/hooks/use-admin-role.ts`               | Hook      | **Admin role hook** - Client-side hook using Clerk's `useUser()` to check role from publicMetadata. |
+| `src/hooks/use-toggle.ts`                   | Hook      | **Toggle hook** - For managing boolean UI state (dialogs open/close).                               |
+| `src/lib/services/user-sync.service.ts`     | Service   | **User sync service** - Shows how users are created/updated from Clerk data.                        |
+| `src/lib/utils/action-error-handler.ts`     | Utility   | **Error handler** - Centralized error handling for server actions with Sentry integration.          |
+| `src/lib/constants/defaults.ts`             | Constants | **Default values** - Contains `USER.ROLE: 'user'` default and pagination defaults.                  |
+| `src/lib/test-ids/index.ts`                 | Utility   | **Test ID generator** - For creating consistent test IDs on UI components.                          |
+| `src/lib/actions/users/username.actions.ts` | Action    | **User action example** - Shows pattern for authenticated user actions.                             |
 
 ## Architecture Insights
 
@@ -149,6 +149,7 @@ Based on discovery, these new files will be needed:
 ## Summary
 
 Step 2 completed successfully. Discovered 35+ relevant files across 6 categories:
+
 - **Critical**: 6 files (existing placeholder page, schema, utils, query, facade, validation)
 - **High**: 8 files (action client, middleware, example actions, patterns)
 - **Medium**: 16 files (UI components, reference implementations)

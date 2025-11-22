@@ -236,8 +236,8 @@ Return results in this exact structure:
 
 ##### Failed Tests
 
-| Test                         | File                                              | Error                    |
-| ---------------------------- | ------------------------------------------------- | ------------------------ |
+| Test                         | File                                                | Error                    |
+| ---------------------------- | --------------------------------------------------- | ------------------------ |
 | should validate email format | tests/unit/lib/validations/users.validation.test.ts | Expected true, got false |
 
 ##### Error Details
@@ -342,3 +342,4 @@ npm run test:coverage
 - **Auth State**: Saved to `playwright/.auth/` directory
 - **Screenshots**: On failure
 - **Traces**: On first retry
+````

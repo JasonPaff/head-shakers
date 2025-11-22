@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
 
+import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -124,6 +125,7 @@ export const CommentItem = ({
   const _shouldShowActions = isEditable && _isCommentOwner && isHovered;
   const _hasEditedIndicator = comment.isEdited && !!comment.editedAt;
   const _canReply = depth < MAX_COMMENT_NESTING_DEPTH && !!onReply;
+  const _canReport = !!currentUserId && !_isCommentOwner;
   const _isNested = depth > 0;
   const _isDeeplyNested = depth >= 3;
 
@@ -247,6 +249,16 @@ export const CommentItem = ({
             <MessageSquareReplyIcon aria-hidden className={'mr-1 size-3'} />
             Reply
           </Button>
+        </Conditional>
+
+        {/* Report Button */}
+        <Conditional isCondition={_canReport}>
+          <ReportButton
+            className={'h-auto p-0 text-xs text-muted-foreground hover:text-foreground'}
+            targetId={comment.id}
+            targetType={'comment'}
+            variant={'ghost'}
+          />
         </Conditional>
       </div>
     </div>

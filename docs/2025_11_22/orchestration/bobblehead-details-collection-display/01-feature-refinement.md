@@ -56,11 +56,11 @@ As a user, I would like the bobblehead details page header section to provide cl
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
-| Original Word Count | 19 words |
-| Refined Word Count | 251 words |
-| Expansion Ratio | 13.2x |
+| Metric              | Value     |
+| ------------------- | --------- |
+| Original Word Count | 19 words  |
+| Refined Word Count  | 251 words |
+| Expansion Ratio     | 13.2x     |
 
 ## Scope Analysis
 
