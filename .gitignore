@@ -50,6 +50,8 @@ next-env.d.ts
 
 # playwright auth state
 playwright/.clerk
+playwright/.auth
+playwright/.e2e-branch.json
 /nul
 
 # docs

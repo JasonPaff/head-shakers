@@ -120,11 +120,6 @@ function ItemPhotosEditComponent({
     }
   };
 
-  const _shouldShowMessage = photos.length > 0;
-  const _hasError = !!error;
-  const _isAtMaxPhotos = photos.length >= 8;
-  const _isNearMaxPhotos = photos.length === 7;
-
   const getMotivationalMessage = () => {
     if (photos.length === 0) {
       return 'Add photos to make your bobblehead stand out!';
@@ -140,6 +135,11 @@ function ItemPhotosEditComponent({
     }
     return `${photos.length}/8 photos - drag to reorder or add more`;
   };
+
+  const _shouldShowMessage = photos.length > 0;
+  const _hasError = !!error;
+  const _isAtMaxPhotos = photos.length >= 8;
+  const _isNearMaxPhotos = photos.length === 7;
 
   return (
     <Card aria-labelledby={'photos-section-title'} role={'region'}>
@@ -425,32 +425,7 @@ export const BobbleheadEditDialog = withFocusManagement(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // memory monitoring in development mode
-    useEffect(() => {
-      if (process.env.NODE_ENV !== 'development' || !isOpen) {
-        return;
-      }
-
-      const memoryCheckInterval = setInterval(() => {
-        if (typeof window !== 'undefined' && 'performance' in window && 'memory' in window.performance) {
-          const memory = (window.performance as { memory?: { usedJSHeapSize: number } }).memory;
-          if (memory && memory.usedJSHeapSize > 100000000) {
-            // 100MB threshold
-            console.warn(
-              '[BobbleheadEditDialog] High memory usage detected:',
-              (memory.usedJSHeapSize / 1048576).toFixed(2),
-              'MB',
-            );
-          }
-        }
-      }, 5000); // check every 5 seconds
-
-      return () => {
-        clearInterval(memoryCheckInterval);
-      };
-    }, [isOpen]);
-
-    // fetch existing photos when dialog opens
+    // fetch existing photos when the dialog opens
     useEffect(() => {
       if (!isOpen || !bobblehead.id || photosFetchedRef.current) return;
 
@@ -580,7 +555,7 @@ export const BobbleheadEditDialog = withFocusManagement(
         open={isOpen}
       >
         <DialogContent
-          className={'flex max-h-[90vh] !grid-cols-1 flex-col overflow-hidden sm:max-w-[700px]'}
+          className={'flex max-h-[95vh] !grid-cols-1 flex-col overflow-hidden sm:max-w-[1000px]'}
           testId={dialogTestId}
         >
           {/* Header */}
