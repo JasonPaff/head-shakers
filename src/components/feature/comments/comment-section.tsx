@@ -15,6 +15,16 @@ import { Conditional } from '@/components/ui/conditional';
 import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
 import { cn } from '@/utils/tailwind-utils';
 
+const countAllReplies = (comment: CommentWithDepth): number => {
+  if (!comment.replies || comment.replies.length === 0) {
+    return 0;
+  }
+
+  return comment.replies.reduce((total, reply) => {
+    return total + 1 + countAllReplies(reply);
+  }, 0);
+};
+
 interface CommentSectionProps extends ComponentProps<'div'> {
   comments: Array<CommentWithDepth>;
   currentUserId?: string;
@@ -57,7 +67,8 @@ export const CommentSection = ({
   const [replyParentComment, setReplyParentComment] = useState<CommentWithDepth | null>(null);
 
   // 7. Derived values for conditional rendering
-  const _commentCount = comments.length || initialCommentCount;
+  const _commentRepliesCount = comments.reduce((total, comment) => total + countAllReplies(comment), 0);
+  const _commentCount = comments.length + _commentRepliesCount || initialCommentCount;
   const _shouldShowForm = isAuthenticated && !!onCommentCreate;
   const _isProcessing = isSubmitting || isLoading;
   const _isReplyMode = !!replyParentComment;
