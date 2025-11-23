@@ -1,7 +1,7 @@
 'use client';
 
 import * as Sentry from '@sentry/nextjs';
-import { parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
+import { parseAsBoolean, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
 import { useEffect, useState, useTransition } from 'react';
 
 import type { BrowseCollectionsResult } from '@/lib/queries/collections/collections.query';
@@ -31,6 +31,7 @@ export function BrowseCollectionsContent() {
       category: parseAsString,
       dateFrom: parseAsString,
       dateTo: parseAsString,
+      includeSubcollections: parseAsBoolean.withDefault(true),
       owner: parseAsString,
       page: parseAsInteger.withDefault(1),
       pageSize: parseAsInteger.withDefault(CONFIG.PAGINATION.COLLECTIONS.DEFAULT),
@@ -74,6 +75,7 @@ export function BrowseCollectionsContent() {
               categoryId: queryParams.category || undefined,
               dateFrom: queryParams.dateFrom ? new Date(queryParams.dateFrom) : undefined,
               dateTo: queryParams.dateTo ? new Date(queryParams.dateTo) : undefined,
+              includeSubcollections: queryParams.includeSubcollections,
               ownerId: queryParams.owner || undefined,
               query: queryParams.q || undefined,
             },
@@ -197,6 +199,7 @@ export function BrowseCollectionsContent() {
     queryParams.sortOrder,
     queryParams.page,
     queryParams.pageSize,
+    queryParams.includeSubcollections,
   ]);
 
   // Event handlers
@@ -238,6 +241,10 @@ export function BrowseCollectionsContent() {
     });
   };
 
+  const handleIncludeSubcollectionsChange = (isIncludeSubcollections: boolean) => {
+    void setQueryParams({ includeSubcollections: isIncludeSubcollections, page: 1 });
+  };
+
   return (
     <div className={'space-y-6'}>
       {/* Filters */}
@@ -245,8 +252,10 @@ export function BrowseCollectionsContent() {
         categoryId={queryParams.category || undefined}
         dateFrom={queryParams.dateFrom || undefined}
         dateTo={queryParams.dateTo || undefined}
+        isIncludeSubcollections={queryParams.includeSubcollections}
         onClearFilters={handleClearFilters}
         onFiltersChange={handleFiltersChange}
+        onIncludeSubcollectionsChange={handleIncludeSubcollectionsChange}
         onSearchChange={handleSearchChange}
         ownerId={queryParams.owner || undefined}
         searchQuery={queryParams.q}

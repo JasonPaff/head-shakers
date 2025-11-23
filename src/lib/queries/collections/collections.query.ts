@@ -68,6 +68,38 @@ export type BrowseCollectionsResult = {
   };
 };
 
+/**
+ * Response type for browse collections with subcollections included
+ */
+export type BrowseCollectionsWithSubcollectionsResult = {
+  collections: Array<BrowseCollectionWithSubcollectionsRecord>;
+  pagination: {
+    currentPage: number;
+    pageSize: number;
+    totalCount: number;
+    totalPages: number;
+  };
+};
+
+/**
+ * Extended browse collection record that includes subcollection data
+ */
+export type BrowseCollectionWithSubcollectionsRecord = BrowseCollectionRecord & {
+  subCollections: Array<BrowseSubcollectionRecord>;
+};
+
+/**
+ * Represents a subcollection record for browse results
+ */
+export type BrowseSubcollectionRecord = {
+  coverImageUrl: null | string;
+  description: null | string;
+  id: string;
+  itemCount: number;
+  name: string;
+  slug: string;
+};
+
 export type CategoryRecord = {
   bobbleheadCount: number;
   collectionCount: number;
@@ -639,7 +671,7 @@ export class CollectionsQuery extends BaseQuery {
   static async getBrowseCollectionsAsync(
     input: BrowseCollectionsInput,
     context: QueryContext,
-  ): Promise<BrowseCollectionsResult> {
+  ): Promise<BrowseCollectionsResult | BrowseCollectionsWithSubcollectionsResult> {
     const dbInstance = this.getDbInstance(context);
 
     // extract input parameters with defaults
@@ -651,6 +683,9 @@ export class CollectionsQuery extends BaseQuery {
     const pageSize = pagination?.pageSize ?? 12;
     const sortBy = sort?.sortBy ?? 'createdAt';
     const sortOrder = sort?.sortOrder ?? 'desc';
+
+    // check if subcollections should be included (defaults to false for backward compatibility)
+    const includeSubcollections = filters?.includeSubcollections ?? false;
 
     // build permission filter - only public collections OR collections owned by current user
     const permissionFilter = this.buildBaseFilters(
@@ -750,7 +785,55 @@ export class CollectionsQuery extends BaseQuery {
       .limit(pageSize)
       .offset(offset);
 
-    // transform results to match BrowseCollectionRecord type
+    // if subcollections are requested, fetch them in a single batch query to avoid N+1
+    if (includeSubcollections) {
+      // get all collection IDs from the results
+      const collectionIds = results.map((row) => row.id);
+
+      // fetch all subcollections for these collections in a single query
+      const subcollectionsMap = await this._fetchSubcollectionsBatchAsync(collectionIds, dbInstance);
+
+      // transform results to include subcollections
+      const transformedResults: Array<BrowseCollectionWithSubcollectionsRecord> = results.map((row) => ({
+        collection: {
+          commentCount: row.commentCount,
+          coverImageUrl: row.coverImageUrl,
+          createdAt: row.createdAt,
+          description: row.description,
+          id: row.id,
+          isPublic: row.isPublic,
+          lastItemAddedAt: row.lastItemAddedAt,
+          likeCount: row.likeCount,
+          name: row.name,
+          slug: row.slug,
+          totalItems: row.totalItems,
+          totalValue: row.totalValue,
+          updatedAt: row.updatedAt,
+          userId: row.userId,
+        },
+        firstBobbleheadPhoto: row.firstBobbleheadPhoto,
+        followerCount: row.followerCount,
+        owner: {
+          avatarUrl: row.avatarUrl,
+          displayName: row.displayName,
+          id: row.ownerId,
+          username: row.ownerUsername,
+        },
+        subCollections: subcollectionsMap.get(row.id) || [],
+      }));
+
+      return {
+        collections: transformedResults,
+        pagination: {
+          currentPage: page,
+          pageSize,
+          totalCount,
+          totalPages,
+        },
+      };
+    }
+
+    // transform results to match BrowseCollectionRecord type (without subcollections)
     const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({
       collection: {
         commentCount: row.commentCount,
@@ -994,6 +1077,67 @@ export class CollectionsQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
+  }
+
+  /**
+   * Fetches subcollections for multiple collections in a single batch query.
+   * Returns a Map where key is collectionId and value is array of subcollection records.
+   * This avoids N+1 query issues when fetching subcollections for browse results.
+   */
+  private static async _fetchSubcollectionsBatchAsync(
+    collectionIds: Array<string>,
+    dbInstance: ReturnType<typeof this.getDbInstance>,
+  ): Promise<Map<string, Array<BrowseSubcollectionRecord>>> {
+    const result = new Map<string, Array<BrowseSubcollectionRecord>>();
+
+    if (collectionIds.length === 0) {
+      return result;
+    }
+
+    // fetch all subcollections for the given collection IDs in a single query
+    // use a subquery to count actual bobbleheads instead of relying on denormalized itemCount
+    const subcollectionRows = await dbInstance
+      .select({
+        collectionId: subCollections.collectionId,
+        coverImageUrl: subCollections.coverImageUrl,
+        description: subCollections.description,
+        id: subCollections.id,
+        itemCount: sql<number>`(
+          SELECT COUNT(*)::int
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.subcollectionId} = ${subCollections.id}
+            AND ${bobbleheads.isDeleted} = false
+        )`.as('item_count'),
+        name: subCollections.name,
+        slug: subCollections.slug,
+      })
+      .from(subCollections)
+      .where(
+        and(
+          sql`${subCollections.collectionId} IN (${sql.join(
+            collectionIds.map((id) => sql`${id}`),
+            sql`, `,
+          )})`,
+          eq(subCollections.isPublic, true),
+        ),
+      )
+      .orderBy(asc(subCollections.sortOrder), asc(subCollections.name));
+
+    // group subcollections by collection ID
+    for (const row of subcollectionRows) {
+      const existing = result.get(row.collectionId) || [];
+      existing.push({
+        coverImageUrl: row.coverImageUrl,
+        description: row.description,
+        id: row.id,
+        itemCount: row.itemCount,
+        name: row.name,
+        slug: row.slug,
+      });
+      result.set(row.collectionId, existing);
+    }
+
+    return result;
   }
 
   private static _getBrowseSortOrder(sortBy: string, sortOrder: string) {

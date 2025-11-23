@@ -53,6 +53,9 @@ export const browseCollectionsFiltersSchema = z.object({
 
   dateTo: z.coerce.date().optional(),
 
+  // Whether to include subcollections in browse results (defaults to true)
+  includeSubcollections: z.boolean().optional().default(true),
+
   // Filter by owner user ID
   ownerId: z.string().uuid('Invalid owner ID').optional(),
   // Search query for collection name/description text search

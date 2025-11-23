@@ -1,13 +1,15 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
 
 import type { CategoryRecord } from '@/lib/queries/collections/collections.query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { CONFIG } from '@/lib/constants';
 
 interface BrowseCollectionsFiltersProps {
@@ -15,6 +17,7 @@ interface BrowseCollectionsFiltersProps {
   categoryId?: string;
   dateFrom?: string;
   dateTo?: string;
+  isIncludeSubcollections?: boolean;
   onCategoryChange?: (category: string) => void;
   onClearFilters: () => void;
   onFiltersChange: (filters: {
@@ -23,22 +26,29 @@ interface BrowseCollectionsFiltersProps {
     dateTo?: string;
     ownerId?: string;
   }) => void;
+  onIncludeSubcollectionsChange?: (isIncludeSubcollections: boolean) => void;
   onSearchChange: (search: string) => void;
   ownerId?: string;
   searchQuery: string;
 }
 
-export function BrowseCollectionsFilters({
+export const BrowseCollectionsFilters = ({
   categories,
   categoryId,
+  isIncludeSubcollections = true,
   onCategoryChange,
   onClearFilters,
+  onIncludeSubcollectionsChange,
   onSearchChange,
   searchQuery,
-}: BrowseCollectionsFiltersProps) {
+}: BrowseCollectionsFiltersProps) => {
+  // 1. useState hooks
   const [localSearch, setLocalSearch] = useState(searchQuery);
 
-  // Debounce search input
+  // 2. Other hooks
+  const switchId = useId();
+
+  // 4. useEffect hooks - Debounce search input
   useEffect(() => {
     const timer = setTimeout(() => {
       if (localSearch !== searchQuery) {
@@ -54,8 +64,14 @@ export function BrowseCollectionsFilters({
     setLocalSearch(searchQuery);
   }, [searchQuery]);
 
-  const hasFilters = searchQuery.length > 0 || !!categoryId;
-  const shouldShowCategoryDropdown = categories && categories.length > 0 && onCategoryChange;
+  // 6. Event handlers
+  const handleSubcollectionsToggle = (isChecked: boolean) => {
+    onIncludeSubcollectionsChange?.(isChecked);
+  };
+
+  // 7. Derived variables
+  const _hasFilters = searchQuery.length > 0 || !!categoryId || !isIncludeSubcollections;
+  const _shouldShowCategoryDropdown = categories && categories.length > 0 && onCategoryChange;
 
   return (
     <div className={'space-y-4'}>
@@ -83,8 +99,20 @@ export function BrowseCollectionsFilters({
           )}
         </div>
 
+        {/* Subcollections Toggle */}
+        <div className={'flex items-center gap-2'}>
+          <Switch
+            checked={isIncludeSubcollections}
+            id={switchId}
+            onCheckedChange={handleSubcollectionsToggle}
+          />
+          <Label className={'cursor-pointer whitespace-nowrap'} htmlFor={switchId}>
+            Include Subcollections
+          </Label>
+        </div>
+
         {/* Category Dropdown - Only show if categories prop is provided */}
-        {shouldShowCategoryDropdown && (
+        {_shouldShowCategoryDropdown && (
           <Select onValueChange={onCategoryChange} value={categoryId || undefined}>
             <SelectTrigger className={'w-full sm:w-[200px]'}>
               <SelectValue placeholder={'All Categories'} />
@@ -101,7 +129,7 @@ export function BrowseCollectionsFilters({
         )}
 
         {/* Clear Filters Button */}
-        {hasFilters && (
+        {_hasFilters && (
           <Button onClick={onClearFilters} size={'default'} variant={'outline'}>
             <X className={'mr-2 size-4'} />
             Clear Filters
@@ -110,4 +138,4 @@ export function BrowseCollectionsFilters({
       </div>
     </div>
   );
-}
+};
