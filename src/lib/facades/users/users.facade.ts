@@ -254,8 +254,9 @@ export class UsersFacade {
     }
 
     // Calculate lock expiration time
-    const lockedUntil = lockDurationHours
-      ? new Date(Date.now() + lockDurationHours * 60 * 60 * 1000)
+    const lockedUntil =
+      lockDurationHours ?
+        new Date(Date.now() + lockDurationHours * 60 * 60 * 1000)
       : new Date('9999-12-31T23:59:59.999Z'); // Far future date for indefinite lock
 
     const result = await executor
@@ -287,10 +288,7 @@ export class UsersFacade {
    * @param dbInstance - Optional database instance for transactions
    * @returns Updated user record
    */
-  static async unlockUserAsync(
-    targetUserId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<UserRecord> {
+  static async unlockUserAsync(targetUserId: string, dbInstance?: DatabaseExecutor): Promise<UserRecord> {
     const executor = dbInstance ?? db;
 
     const result = await executor

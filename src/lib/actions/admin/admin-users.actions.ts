@@ -185,12 +185,7 @@ export const updateUserRoleAction = adminActionClient
     });
 
     try {
-      const updatedUser = await UsersFacade.updateUserRoleAsync(
-        targetUserId,
-        newRole,
-        userId,
-        dbInstance,
-      );
+      const updatedUser = await UsersFacade.updateUserRoleAsync(targetUserId, newRole, userId, dbInstance);
 
       // Audit log breadcrumb for role changes (security-sensitive operation)
       Sentry.addBreadcrumb({
@@ -272,12 +267,7 @@ export const lockUserAction = adminActionClient
     });
 
     try {
-      const updatedUser = await UsersFacade.lockUserAsync(
-        targetUserId,
-        userId,
-        lockDuration,
-        dbInstance,
-      );
+      const updatedUser = await UsersFacade.lockUserAsync(targetUserId, userId, lockDuration, dbInstance);
 
       // Audit log breadcrumb for account locking (security-sensitive operation)
       Sentry.addBreadcrumb({
@@ -295,9 +285,8 @@ export const lockUserAction = adminActionClient
 
       return {
         data: updatedUser,
-        message: lockDuration
-          ? `User account locked for ${lockDuration} hours`
-          : 'User account locked indefinitely',
+        message:
+          lockDuration ? `User account locked for ${lockDuration} hours` : 'User account locked indefinitely',
         success: true,
       };
     } catch (error) {

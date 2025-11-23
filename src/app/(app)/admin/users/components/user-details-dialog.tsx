@@ -62,12 +62,7 @@ type UserDetailsDialogProps = ComponentPropsWithRef<'div'> & {
  * Displays comprehensive user information for admin review
  * Includes profile info, account status, timestamps, and statistics
  */
-export const UserDetailsDialog = ({
-  isOpen,
-  onClose,
-  onSuccess,
-  userId,
-}: UserDetailsDialogProps) => {
+export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDetailsDialogProps) => {
   // useState hooks
   const [userDetails, setUserDetails] = useState<null | UserDetailsData>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -102,20 +97,17 @@ export const UserDetailsDialog = ({
     },
   });
 
-  const { executeAsync: verifyEmail, isPending: isVerifying } = useServerAction(
-    verifyUserEmailAction,
-    {
-      onSuccess: () => {
-        onSuccess?.();
-        void refetchUserDetails();
-      },
-      toastMessages: {
-        error: 'Failed to verify user email',
-        loading: 'Verifying user email...',
-        success: 'User email verified successfully',
-      },
+  const { executeAsync: verifyEmail, isPending: isVerifying } = useServerAction(verifyUserEmailAction, {
+    onSuccess: () => {
+      onSuccess?.();
+      void refetchUserDetails();
     },
-  );
+    toastMessages: {
+      error: 'Failed to verify user email',
+      loading: 'Verifying user email...',
+      success: 'User email verified successfully',
+    },
+  });
 
   // useEffect hooks
   useEffect(() => {
@@ -197,13 +189,13 @@ export const UserDetailsDialog = ({
 
   // Derived variables
   const _hasUserDetails = !!userDetails;
-  const _isUserLocked = userDetails?.user.lockedUntil
-    ? new Date(userDetails.user.lockedUntil) > new Date()
-    : false;
+  const _isUserLocked =
+    userDetails?.user.lockedUntil ? new Date(userDetails.user.lockedUntil) > new Date() : false;
   const _isUserVerified = userDetails?.user.isVerified ?? false;
   const _isActionPending = isLocking || isUnlocking || isVerifying;
-  const _userInitials = userDetails?.user.displayName
-    ? userDetails.user.displayName
+  const _userInitials =
+    userDetails?.user.displayName ?
+      userDetails.user.displayName
         .split(' ')
         .map((n) => n[0])
         .join('')
@@ -248,16 +240,9 @@ export const UserDetailsDialog = ({
 
   return (
     <Dialog onOpenChange={handleOpenChange} open={isOpen}>
-      <DialogContent
-        className={'max-w-2xl'}
-        data-slot={'user-details-dialog'}
-        testId={dialogTestId}
-      >
+      <DialogContent className={'max-w-2xl'} data-slot={'user-details-dialog'} testId={dialogTestId}>
         <DialogHeader>
-          <DialogTitle
-            className={'flex items-center gap-2'}
-            data-slot={'user-details-dialog-title'}
-          >
+          <DialogTitle className={'flex items-center gap-2'} data-slot={'user-details-dialog-title'}>
             <UserIcon aria-hidden className={'size-5'} />
             User Details
           </DialogTitle>
@@ -280,10 +265,7 @@ export const UserDetailsDialog = ({
 
         {/* No User ID State */}
         <Conditional isCondition={!isLoading && !error && !userId}>
-          <div
-            className={'py-8 text-center text-muted-foreground'}
-            data-slot={'user-details-dialog-empty'}
-          >
+          <div className={'py-8 text-center text-muted-foreground'} data-slot={'user-details-dialog-empty'}>
             No user selected
           </div>
         </Conditional>
@@ -310,9 +292,7 @@ export const UserDetailsDialog = ({
                     <div className={'text-lg font-semibold'}>
                       {userDetails?.user.displayName ?? userDetails?.user.username}
                     </div>
-                    <div className={'text-sm text-muted-foreground'}>
-                      @{userDetails?.user.username}
-                    </div>
+                    <div className={'text-sm text-muted-foreground'}>@{userDetails?.user.username}</div>
                   </div>
                   <div className={'flex items-center gap-2 text-sm text-muted-foreground'}>
                     <MailCheckIcon aria-hidden className={'size-4'} />
@@ -334,10 +314,7 @@ export const UserDetailsDialog = ({
             {/* Account Status Section */}
             <section data-slot={'user-details-status-section'}>
               <h3 className={'mb-3 text-sm font-semibold text-muted-foreground'}>Account Status</h3>
-              <div
-                className={'grid grid-cols-3 gap-4'}
-                data-slot={'user-details-status-grid'}
-              >
+              <div className={'grid grid-cols-3 gap-4'} data-slot={'user-details-status-grid'}>
                 {/* Role */}
                 <div
                   className={'flex flex-col items-center gap-2 rounded-lg border p-3'}
@@ -393,38 +370,23 @@ export const UserDetailsDialog = ({
             {/* Timestamps Section */}
             <section data-slot={'user-details-timestamps-section'}>
               <h3 className={'mb-3 text-sm font-semibold text-muted-foreground'}>Timestamps</h3>
-              <div
-                className={'grid grid-cols-2 gap-3'}
-                data-slot={'user-details-timestamps-grid'}
-              >
-                <div
-                  className={'flex items-center gap-2 text-sm'}
-                  data-slot={'user-details-created-at'}
-                >
+              <div className={'grid grid-cols-2 gap-3'} data-slot={'user-details-timestamps-grid'}>
+                <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-created-at'}>
                   <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Created:</span>
                   <span>{_formatDate(userDetails?.user.createdAt)}</span>
                 </div>
-                <div
-                  className={'flex items-center gap-2 text-sm'}
-                  data-slot={'user-details-updated-at'}
-                >
+                <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-updated-at'}>
                   <ClockIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Updated:</span>
                   <span>{_formatDate(userDetails?.user.updatedAt)}</span>
                 </div>
-                <div
-                  className={'flex items-center gap-2 text-sm'}
-                  data-slot={'user-details-last-active'}
-                >
+                <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-last-active'}>
                   <ClockIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Last Active:</span>
                   <span>{_formatDateTime(userDetails?.user.lastActiveAt)}</span>
                 </div>
-                <div
-                  className={'flex items-center gap-2 text-sm'}
-                  data-slot={'user-details-member-since'}
-                >
+                <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-member-since'}>
                   <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />
                   <span className={'text-muted-foreground'}>Member Since:</span>
                   <span>{_formatDate(userDetails?.user.memberSince)}</span>
@@ -435,19 +397,14 @@ export const UserDetailsDialog = ({
             {/* Statistics Section */}
             <section data-slot={'user-details-stats-section'}>
               <h3 className={'mb-3 text-sm font-semibold text-muted-foreground'}>Statistics</h3>
-              <div
-                className={'grid grid-cols-2 gap-4'}
-                data-slot={'user-details-stats-grid'}
-              >
+              <div className={'grid grid-cols-2 gap-4'} data-slot={'user-details-stats-grid'}>
                 <div
                   className={'flex items-center gap-3 rounded-lg border p-3'}
                   data-slot={'user-details-collections-count'}
                 >
                   <FolderIcon aria-hidden className={'size-5 text-blue-500'} />
                   <div>
-                    <div className={'text-2xl font-bold'}>
-                      {userDetails?.stats.collectionsCount ?? 0}
-                    </div>
+                    <div className={'text-2xl font-bold'}>{userDetails?.stats.collectionsCount ?? 0}</div>
                     <div className={'text-xs text-muted-foreground'}>
                       Collections ({userDetails?.stats.publicCollectionsCount ?? 0} public)
                     </div>
@@ -459,9 +416,7 @@ export const UserDetailsDialog = ({
                 >
                   <PackageIcon aria-hidden className={'size-5 text-purple-500'} />
                   <div>
-                    <div className={'text-2xl font-bold'}>
-                      {userDetails?.stats.bobbleheadsCount ?? 0}
-                    </div>
+                    <div className={'text-2xl font-bold'}>{userDetails?.stats.bobbleheadsCount ?? 0}</div>
                     <div className={'text-xs text-muted-foreground'}>
                       Bobbleheads ({userDetails?.stats.publicBobbleheadsCount ?? 0} public)
                     </div>
@@ -472,14 +427,10 @@ export const UserDetailsDialog = ({
 
             {/* Recent Activity Section */}
             <Conditional
-              isCondition={
-                !!userDetails?.user.recentActivity && userDetails.user.recentActivity.length > 0
-              }
+              isCondition={!!userDetails?.user.recentActivity && userDetails.user.recentActivity.length > 0}
             >
               <section data-slot={'user-details-activity-section'}>
-                <h3 className={'mb-3 text-sm font-semibold text-muted-foreground'}>
-                  Recent Activity
-                </h3>
+                <h3 className={'mb-3 text-sm font-semibold text-muted-foreground'}>Recent Activity</h3>
                 <div
                   className={'max-h-40 space-y-2 overflow-y-auto'}
                   data-slot={'user-details-activity-list'}
@@ -491,9 +442,7 @@ export const UserDetailsDialog = ({
                       key={activity.id}
                     >
                       <span className={'capitalize'}>{activity.actionType.replace(/_/g, ' ')}</span>
-                      <span className={'text-muted-foreground'}>
-                        {_formatDateTime(activity.createdAt)}
-                      </span>
+                      <span className={'text-muted-foreground'}>{_formatDateTime(activity.createdAt)}</span>
                     </div>
                   ))}
                 </div>
@@ -504,10 +453,7 @@ export const UserDetailsDialog = ({
 
         {/* Action Buttons */}
         <Conditional isCondition={!isLoading && !error && _hasUserDetails}>
-          <DialogFooter
-            className={'flex-col gap-2 sm:flex-row'}
-            data-slot={'user-details-dialog-footer'}
-          >
+          <DialogFooter className={'flex-col gap-2 sm:flex-row'} data-slot={'user-details-dialog-footer'}>
             {/* Lock/Unlock Button */}
             <Conditional isCondition={_isUserLocked}>
               <Button

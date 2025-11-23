@@ -19,7 +19,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
 import { useServerAction } from '@/hooks/use-server-action';
-import { getAdminUsersAction, lockUserAction, unlockUserAction } from '@/lib/actions/admin/admin-users.actions';
+import {
+  getAdminUsersAction,
+  lockUserAction,
+  unlockUserAction,
+} from '@/lib/actions/admin/admin-users.actions';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -56,11 +60,7 @@ const STATUS_OPTIONS = [
  * Main client component that orchestrates the user management interface
  * Handles filtering, data display, and dialog management
  */
-export const UserManagementClient = ({
-  className,
-  initialData,
-  ...props
-}: UserManagementClientProps) => {
+export const UserManagementClient = ({ className, initialData, ...props }: UserManagementClientProps) => {
   // useState hooks
   const [users, setUsers] = useState<Array<AdminUserListRecord>>(initialData.users);
   const [totalCount, setTotalCount] = useState(initialData.total);
@@ -262,10 +262,7 @@ export const UserManagementClient = ({
       {...props}
     >
       {/* Quick Stats */}
-      <div
-        className={'grid gap-4 md:grid-cols-2 lg:grid-cols-4'}
-        data-slot={'user-management-stats'}
-      >
+      <div className={'grid gap-4 md:grid-cols-2 lg:grid-cols-4'} data-slot={'user-management-stats'}>
         <Card>
           <CardHeader className={'flex flex-row items-center justify-between space-y-0 pb-2'}>
             <CardTitle className={'text-sm font-medium'}>Total Users</CardTitle>

@@ -22,19 +22,19 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills to Load |
-|------|------------|----------------|
-| 1. Add Admin User Management Constants | general-purpose | N/A |
-| 2. Create Admin Users Validation Schemas | validation-specialist | validation-schemas |
-| 3. Add User Query Methods | database-specialist | database-schema, drizzle-orm |
-| 4. Add Admin User Operations to Facade | facade-specialist | facade-layer, caching, sentry-monitoring |
-| 5. Create Admin Users Server Actions | server-action-specialist | server-actions, sentry-monitoring, validation-schemas |
-| 6. Create Users Data Table Component | react-component-specialist | react-coding-conventions, ui-components |
-| 7. Create User Role Change Dialog | react-component-specialist | react-coding-conventions, ui-components |
-| 8. Create User Details Dialog | react-component-specialist | react-coding-conventions, ui-components |
-| 9. Create User Management Client | react-component-specialist | react-coding-conventions, ui-components |
-| 10. Update Admin Users Page | react-component-specialist | react-coding-conventions |
-| 11. Integration Testing | general-purpose | N/A |
+| Step                                     | Specialist                 | Skills to Load                                        |
+| ---------------------------------------- | -------------------------- | ----------------------------------------------------- |
+| 1. Add Admin User Management Constants   | general-purpose            | N/A                                                   |
+| 2. Create Admin Users Validation Schemas | validation-specialist      | validation-schemas                                    |
+| 3. Add User Query Methods                | database-specialist        | database-schema, drizzle-orm                          |
+| 4. Add Admin User Operations to Facade   | facade-specialist          | facade-layer, caching, sentry-monitoring              |
+| 5. Create Admin Users Server Actions     | server-action-specialist   | server-actions, sentry-monitoring, validation-schemas |
+| 6. Create Users Data Table Component     | react-component-specialist | react-coding-conventions, ui-components               |
+| 7. Create User Role Change Dialog        | react-component-specialist | react-coding-conventions, ui-components               |
+| 8. Create User Details Dialog            | react-component-specialist | react-coding-conventions, ui-components               |
+| 9. Create User Management Client         | react-component-specialist | react-coding-conventions, ui-components               |
+| 10. Update Admin Users Page              | react-component-specialist | react-coding-conventions                              |
+| 11. Integration Testing                  | general-purpose            | N/A                                                   |
 
 ## Navigation
 
@@ -54,19 +54,19 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|------------|--------|----------|--------|
-| 1. Constants | general-purpose | Pending | - | - |
-| 2. Validation | validation-specialist | Pending | - | - |
-| 3. Queries | database-specialist | Pending | - | - |
-| 4. Facade | facade-specialist | Pending | - | - |
-| 5. Actions | server-action-specialist | Pending | - | - |
-| 6. Data Table | react-component-specialist | Pending | - | - |
-| 7. Role Dialog | react-component-specialist | Pending | - | - |
-| 8. Details Dialog | react-component-specialist | Pending | - | - |
-| 9. Client Component | react-component-specialist | Pending | - | - |
-| 10. Page | react-component-specialist | Pending | - | - |
-| 11. Testing | general-purpose | Pending | - | - |
+| Step                | Specialist                 | Status  | Duration | Issues |
+| ------------------- | -------------------------- | ------- | -------- | ------ |
+| 1. Constants        | general-purpose            | Pending | -        | -      |
+| 2. Validation       | validation-specialist      | Pending | -        | -      |
+| 3. Queries          | database-specialist        | Pending | -        | -      |
+| 4. Facade           | facade-specialist          | Pending | -        | -      |
+| 5. Actions          | server-action-specialist   | Pending | -        | -      |
+| 6. Data Table       | react-component-specialist | Pending | -        | -      |
+| 7. Role Dialog      | react-component-specialist | Pending | -        | -      |
+| 8. Details Dialog   | react-component-specialist | Pending | -        | -      |
+| 9. Client Component | react-component-specialist | Pending | -        | -      |
+| 10. Page            | react-component-specialist | Pending | -        | -      |
+| 11. Testing         | general-purpose            | Pending | -        | -      |
 
 ## Summary
 
