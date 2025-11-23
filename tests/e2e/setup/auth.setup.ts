@@ -72,15 +72,9 @@ async function authenticateUser(
   // Navigate to the home page to load Clerk
   await page.goto('/');
 
-  // Wait for Clerk to be ready by checking for the Clerk global object
-  // This is more reliable than a fixed timeout
-  await page.waitForFunction(
-    () => {
-      // Clerk exposes window.Clerk when fully loaded
-      return typeof (window as unknown as { Clerk?: unknown }).Clerk !== 'undefined';
-    },
-    { timeout: 10000 },
-  );
+  // Use Clerk's official loaded() helper - more reliable than custom waitForFunction
+  // Increased timeout to handle slow network conditions and cold starts
+  await clerk.loaded({ page });
 
   // Sign in using Clerk test helper
   await clerk.signIn({

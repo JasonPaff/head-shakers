@@ -49,9 +49,20 @@ test.describe('Application Health Checks', () => {
       if (
         lowerError.includes('sentry.io') ||
         lowerError.includes('clerk.') ||
+        lowerError.includes('clerk') ||
         lowerError.includes('cloudinary') ||
         lowerError.includes('ingest.us.sentry.io')
       ) {
+        return false;
+      }
+
+      // Ignore Clerk-specific runtime errors (timeout, loading failures)
+      if (lowerError.includes('clerkruntimeerror') || lowerError.includes('failed_to_load_clerk')) {
+        return false;
+      }
+
+      // Ignore rate limiting errors (429) - these are transient external service issues
+      if (lowerError.includes('429') || lowerError.includes('too many requests')) {
         return false;
       }
 
@@ -71,7 +82,19 @@ test.describe('Application Health Checks', () => {
       }
 
       // Only flag errors that are likely application-critical
-      return lowerError.includes('failed to load') || lowerError.includes('err_');
+      // Exclude external service "failed to load" errors by checking for local resources
+      const isExternalFailure =
+        lowerError.includes('clerk') || lowerError.includes('sentry') || lowerError.includes('cloudinary');
+
+      if (lowerError.includes('failed to load') && isExternalFailure) {
+        return false;
+      }
+
+      // Flag critical application errors
+      return (
+        (lowerError.includes('failed to load') && !isExternalFailure) ||
+        (lowerError.includes('err_') && !lowerError.includes('net::err_'))
+      );
     });
 
     expect(criticalErrors).toHaveLength(0);

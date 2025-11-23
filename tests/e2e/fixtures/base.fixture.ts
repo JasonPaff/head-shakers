@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks,no-empty-pattern */
 import { test as base, type BrowserContext, type Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
@@ -54,25 +55,25 @@ function validateAuthStateFile(filePath: string, roleName: string): void {
 
 export const test = base.extend<TestFixtures, WorkerFixtures>({
   // ComponentFinder for admin page
-  adminFinder: async ({ adminPage }, runTest) => {
+  adminFinder: async ({ adminPage }, use) => {
     const finder = createComponentFinder(adminPage);
-    await runTest(finder);
+    await use(finder);
   },
 
   // Test-scoped fixture for admin page with separate browser context
-  adminPage: async ({ browser }, runTest) => {
+  adminPage: async ({ browser }, use) => {
     validateAuthStateFile(adminAuth, 'admin');
     const context: BrowserContext = await browser.newContext({
       storageState: adminAuth,
     });
     const page = await context.newPage();
-    await runTest(page);
+    await use(page);
     await context.close();
   },
 
   // Worker-scoped fixture for database branch info
   branchInfo: [
-    async (_fixtures, runTest) => {
+    async ({}, use) => {
       let branchInfo: E2EBranchInfo | null = null;
 
       if (fs.existsSync(branchInfoFile)) {
@@ -83,48 +84,48 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
         }
       }
 
-      await runTest(branchInfo);
+      await use(branchInfo);
     },
     { scope: 'worker' },
   ],
 
   // Test-scoped fixture for ComponentFinder on the default page
-  finder: async ({ page }, runTest) => {
+  finder: async ({ page }, use) => {
     const finder = createComponentFinder(page);
-    await runTest(finder);
+    await use(finder);
   },
 
   // ComponentFinder for new user page
-  newUserFinder: async ({ newUserPage }, runTest) => {
+  newUserFinder: async ({ newUserPage }, use) => {
     const finder = createComponentFinder(newUserPage);
-    await runTest(finder);
+    await use(finder);
   },
 
   // Test-scoped fixture for new user page with separate browser context
-  newUserPage: async ({ browser }, runTest) => {
+  newUserPage: async ({ browser }, use) => {
     validateAuthStateFile(newUserAuth, 'new-user');
     const context: BrowserContext = await browser.newContext({
       storageState: newUserAuth,
     });
     const page = await context.newPage();
-    await runTest(page);
+    await use(page);
     await context.close();
   },
 
   // ComponentFinder for user page
-  userFinder: async ({ userPage }, runTest) => {
+  userFinder: async ({ userPage }, use) => {
     const finder = createComponentFinder(userPage);
-    await runTest(finder);
+    await use(finder);
   },
 
   // Test-scoped fixture for user page with separate browser context
-  userPage: async ({ browser }, runTest) => {
+  userPage: async ({ browser }, use) => {
     validateAuthStateFile(userAuth, 'user');
     const context: BrowserContext = await browser.newContext({
       storageState: userAuth,
     });
     const page = await context.newPage();
-    await runTest(page);
+    await use(page);
     await context.close();
   },
 });
