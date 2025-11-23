@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import { EyeIcon, EyeOffIcon, StarIcon, TrendingUpIcon } from 'lucide-react';
+import { EyeIcon, EyeOffIcon, HeartIcon, MessageCircleIcon, StarIcon, TrendingUpIcon } from 'lucide-react';
 
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -34,6 +34,12 @@ const getStatusBadgeVariant = (
     default:
       return 'outline';
   }
+};
+
+const formatNumber = (num: number) => {
+  if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+  else if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+  return num.toString();
 };
 
 export const FeatureCardStatus = ({ bobblehead, className, testId, ...props }: FeatureCardStatusProps) => {
@@ -85,6 +91,36 @@ export const FeatureCardStatus = ({ bobblehead, className, testId, ...props }: F
               <Badge variant={'default'}>Yes</Badge>
             </div>
           </Conditional>
+
+          {/* Engagement Metrics */}
+          <div className={'border-t pt-3'} data-testid={`${statusTestId}-engagement`}>
+            <span className={'mb-3 block text-sm text-muted-foreground'}>Engagement</span>
+            <div className={'grid grid-cols-3 gap-4'}>
+              <div className={'text-center'}>
+                <div className={'mb-1 flex items-center justify-center gap-1'}>
+                  <EyeIcon aria-hidden className={'size-4 text-muted-foreground'} />
+                  <span className={'text-sm font-medium'}>{formatNumber(bobblehead.viewCount || 0)}</span>
+                </div>
+                <p className={'text-xs text-muted-foreground'}>Views</p>
+              </div>
+
+              <div className={'text-center'}>
+                <div className={'mb-1 flex items-center justify-center gap-1'}>
+                  <HeartIcon aria-hidden className={'size-4 text-muted-foreground'} />
+                  <span className={'text-sm font-medium'}>{formatNumber(bobblehead.likeCount || 0)}</span>
+                </div>
+                <p className={'text-xs text-muted-foreground'}>Likes</p>
+              </div>
+
+              <div className={'text-center'}>
+                <div className={'mb-1 flex items-center justify-center gap-1'}>
+                  <MessageCircleIcon aria-hidden className={'size-4 text-muted-foreground'} />
+                  <span className={'text-sm font-medium'}>{formatNumber(bobblehead.commentCount || 0)}</span>
+                </div>
+                <p className={'text-xs text-muted-foreground'}>Comments</p>
+              </div>
+            </div>
+          </div>
         </div>
       </FeatureCardSection>
     </div>

@@ -1,16 +1,10 @@
 import 'server-only';
 import { notFound } from 'next/navigation';
 
-import { BobbleheadAcquisitionCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-acquisition-card';
-import { BobbleheadCustomFieldsCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-custom-fields-card';
-import { BobbleheadDetailsCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-details-card';
 import { BobbleheadFeatureCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-feature-card';
 import { BobbleheadHeader } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header';
 import { BobbleheadMetrics } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-metrics';
 import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery';
-import { BobbleheadSpecificationCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-specification-card';
-import { BobbleheadStatusPrivacyCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-status-privacy-card';
-import { BobbleheadTimestampsCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-timestamps-card';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { AuthContent } from '@/components/ui/auth';
 import { Conditional } from '@/components/ui/conditional';
@@ -92,24 +86,6 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
           <BobbleheadPhotoGalleryCard bobblehead={bobblehead} />
         </ContentLayout>
       </Conditional>
-
-      {/* Primary Detail Cards Section */}
-      <ContentLayout>
-        <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'}>
-          <BobbleheadDetailsCard bobblehead={bobblehead} />
-          <BobbleheadSpecificationCard bobblehead={bobblehead} />
-          <BobbleheadAcquisitionCard bobblehead={bobblehead} />
-        </div>
-      </ContentLayout>
-
-      {/* Secondary Detail Cards Section */}
-      <ContentLayout>
-        <div className={'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'}>
-          <BobbleheadStatusPrivacyCard bobblehead={bobblehead} />
-          <BobbleheadTimestampsCard bobblehead={bobblehead} />
-          <BobbleheadCustomFieldsCard bobblehead={bobblehead} />
-        </div>
-      </ContentLayout>
     </div>
   );
 };

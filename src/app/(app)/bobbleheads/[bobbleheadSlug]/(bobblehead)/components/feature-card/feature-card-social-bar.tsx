@@ -107,7 +107,12 @@ export const FeatureCardSocialBar = ({
 
         {/* Report Button (non-owners only) */}
         <Conditional isCondition={!isOwner}>
-          <ReportButton targetId={bobbleheadId} targetType={'bobblehead'} variant={'ghost'} />
+          <ReportButton
+            className={'gap-2 text-muted-foreground hover:text-foreground'}
+            targetId={bobbleheadId}
+            targetType={'bobblehead'}
+            variant={'ghost'}
+          />
         </Conditional>
       </div>
     </div>

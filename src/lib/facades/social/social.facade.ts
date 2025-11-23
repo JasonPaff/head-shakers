@@ -125,7 +125,7 @@ export class SocialFacade {
   /**
    * Create a reply to an existing comment
    * Validates parent comment existence, depth limits, and target entity consistency
-   * Implements cache invalidation for parent comment to reflect new reply count
+   * Cache invalidation is handled at the action layer via CacheRevalidationService
    */
   static async createCommentReply(
     data: InsertComment & { parentCommentId: string },
@@ -188,12 +188,7 @@ export class SocialFacade {
           // fetch the comment with user data using efficient method
           const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(newComment.id, context);
 
-          // invalidate cache for parent comment to reflect new reply
-          const cacheTags = CacheTagGenerators.social.comments(
-            parentComment.targetType === 'subcollection' ? 'collection' : parentComment.targetType,
-            parentComment.targetId,
-          );
-          cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
+          // Note: Cache invalidation is handled at the action layer via CacheRevalidationService
 
           return {
             comment: commentWithUser,
@@ -258,12 +253,7 @@ export class SocialFacade {
             context,
           );
 
-          // invalidate cache for the target entity to reflect comment deletion
-          const cacheTags = CacheTagGenerators.social.comments(
-            deletedComment.targetType === 'subcollection' ? 'collection' : deletedComment.targetType,
-            deletedComment.targetId,
-          );
-          cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
+          // Note: Cache invalidation is handled at the action layer via CacheRevalidationService
 
           return true;
         }

@@ -1,7 +1,6 @@
 import { BobbleheadDetailCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-detail-cards-skeleton';
 import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
-import { BobbleheadMetricsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-metrics-skeleton';
 import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-photo-gallery-skeleton';
 import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
@@ -13,13 +12,6 @@ export default function BobbleheadLoading() {
       <div className={'border-b border-border'}>
         <ContentLayout>
           <BobbleheadHeaderSkeleton />
-        </ContentLayout>
-      </div>
-
-      {/* Metrics Section */}
-      <div className={'mt-4'}>
-        <ContentLayout>
-          <BobbleheadMetricsSkeleton />
         </ContentLayout>
       </div>
 

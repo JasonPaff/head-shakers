@@ -363,8 +363,13 @@ export const CacheTagGenerators = {
    * generate tags for social operations
    */
   social: {
-    comment: (commentId: string, userId: string) =>
-      new CacheTagBuilder().addEntity('comment', commentId).addEntity('user', userId).build(),
+    comment: (commentId: string, userId?: string) => {
+      const builder = new CacheTagBuilder().addEntity('comment', commentId);
+      if (userId) {
+        builder.addEntity('user', userId);
+      }
+      return builder.build();
+    },
 
     comments: (entityType: CacheEntityType, entityId: string) => {
       if (entityType !== 'bobblehead' && entityType !== 'collection' && entityType !== 'subcollection') {
@@ -474,14 +479,14 @@ export const CacheTagInvalidation = {
 
     // Add individual comment cache tag if commentId is provided
     if (commentId) {
-      tags.push(...CacheTagGenerators.social.comment(commentId, ''));
+      tags.push(...CacheTagGenerators.social.comment(commentId));
     }
 
     // Add parent comment thread cache tag if this is a reply
     if (parentCommentId) {
       tags.push(...CacheTagGenerators.social.commentThread(parentCommentId));
       // Also invalidate the parent comment itself
-      tags.push(...CacheTagGenerators.social.comment(parentCommentId, ''));
+      tags.push(...CacheTagGenerators.social.comment(parentCommentId));
     }
 
     return tags;

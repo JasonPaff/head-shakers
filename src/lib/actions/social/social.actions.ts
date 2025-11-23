@@ -13,16 +13,57 @@ import {
   SENTRY_LEVELS,
 } from '@/lib/constants';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
+import { createPublicQueryContext } from '@/lib/queries/base/query-context';
+import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
+import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient } from '@/lib/utils/next-safe-action';
+import { authActionClient, type DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import {
   createCommentSchema,
   deleteCommentSchema,
   updateCommentSchema,
 } from '@/lib/validations/comment.validation';
 import { toggleLikeSchema } from '@/lib/validations/like.validation';
+
+/**
+ * Fetch the slug for an entity based on its type and ID.
+ * Used for cache path-based revalidation after comment operations.
+ *
+ * @param targetType - The type of entity ('bobblehead' | 'collection' | 'subcollection')
+ * @param targetId - The ID of the entity
+ * @param dbInstance - Database instance to use for the query
+ * @returns The entity slug if found, undefined otherwise
+ */
+async function getEntitySlugByTypeAndId(
+  targetType: 'bobblehead' | 'collection' | 'subcollection',
+  targetId: string,
+  dbInstance: DatabaseExecutor,
+): Promise<string | undefined> {
+  const publicContext = createPublicQueryContext({ dbInstance });
+
+  try {
+    switch (targetType) {
+      case 'bobblehead': {
+        const bobblehead = await BobbleheadsQuery.findByIdAsync(targetId, publicContext);
+        return bobblehead?.slug;
+      }
+      case 'collection': {
+        const collection = await CollectionsQuery.findByIdAsync(targetId, publicContext);
+        return collection?.slug;
+      }
+      case 'subcollection':
+        // Subcollections use layout-based revalidation, no specific slug needed
+        return undefined;
+      default:
+        return undefined;
+    }
+  } catch {
+    // Silently fail - slug lookup failure should not block the main operation
+    return undefined;
+  }
+}
 
 export const toggleLikeAction = authActionClient
   .metadata({
@@ -205,12 +246,19 @@ export const createCommentAction = authActionClient
         message: `User created ${isReply ? 'reply' : 'comment'} on ${commentData.targetType} ${commentData.targetId}`,
       });
 
+      // Fetch entity slug for path-based cache revalidation
+      const entitySlug = await getEntitySlugByTypeAndId(
+        commentData.targetType,
+        commentData.targetId,
+        dbInstance,
+      );
+
       CacheRevalidationService.social.onCommentChange(
         commentData.targetType === 'subcollection' ? 'collection' : commentData.targetType,
         commentData.targetId,
         ctx.userId,
         'add',
-        undefined, // entitySlug - not available here
+        entitySlug,
         result.comment?.id,
         commentData.parentCommentId,
       );
@@ -276,11 +324,19 @@ export const updateCommentAction = authActionClient
       });
 
       if (result.comment) {
+        // Fetch entity slug for path-based cache revalidation
+        const entitySlug = await getEntitySlugByTypeAndId(
+          result.comment.targetType,
+          result.comment.targetId,
+          dbInstance,
+        );
+
         CacheRevalidationService.social.onCommentChange(
           result.comment.targetType === 'subcollection' ? 'collection' : result.comment.targetType,
           result.comment.targetId,
           ctx.userId,
           'update',
+          entitySlug,
         );
       }
 
@@ -343,6 +399,13 @@ export const deleteCommentAction = authActionClient
       });
 
       if (commentResult?.comment) {
+        // Fetch entity slug for path-based cache revalidation
+        const entitySlug = await getEntitySlugByTypeAndId(
+          commentResult.comment.targetType,
+          commentResult.comment.targetId,
+          dbInstance,
+        );
+
         CacheRevalidationService.social.onCommentChange(
           commentResult.comment.targetType === 'subcollection' ?
             'collection'
@@ -350,6 +413,7 @@ export const deleteCommentAction = authActionClient
           commentResult.comment.targetId,
           ctx.userId,
           'delete',
+          entitySlug,
         );
       }
 
