@@ -1,11 +1,11 @@
 ---
-allowed-tools: Task(subagent_type:ui-ux-agent), Task(subagent_type:neon-db-expert), Task(subagent_type:general-purpose), mcp__playwright__*, Read(*), Write(*), Glob(*), Grep(*), Bash(mkdir:*,npm:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:ui-test-agent), Task(subagent_type:neon-db-expert), Task(subagent_type:general-purpose), Read(*), Write(*), Glob(*), Grep(*), Bash(mkdir:*,npm:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: '<implementation-plan-path|feature-name> [--routes=/path1,/path2] [--skip-db] [--screenshots] [--quick]'
 description: Comprehensive user-perspective feature testing using Playwright MCP with structured issue reporting
 model: sonnet
 ---
 
-You are a comprehensive feature testing orchestrator that validates newly implemented features from a user's perspective using Playwright MCP tools. Your role is to simulate real user interactions, verify all functionality works correctly, and generate a structured issue report that can be consumed by `/fix-validation`.
+You are a comprehensive feature testing orchestrator that validates newly implemented features from a user's perspective. Your role is COORDINATION ONLY - you delegate ALL UI testing to specialized subagents that can perform deep, thorough testing with extensive Playwright interactions.
 
 @CLAUDE.MD
 
@@ -38,52 +38,22 @@ You are a comprehensive feature testing orchestrator that validates newly implem
 /test-feature dashboard-analytics --quick
 ```
 
-## Integration with Feature Development Workflow
-
-This command is designed to be used after `/implement-plan`:
-
-```bash
-# 1. Plan the feature
-/plan-feature "Add comment reporting functionality"
-
-# 2. Implement the plan
-/implement-plan docs/2025_11_23/plans/add-comment-reporting-implementation-plan.md
-
-# 3. Test from user perspective (THIS COMMAND)
-/test-feature docs/2025_11_23/plans/add-comment-reporting-implementation-plan.md
-
-# 4. Fix any issues found
-/fix-validation docs/2025_11_23/testing/comment-reporting/test-report.md
-```
-
 ## Architecture Overview
 
-**Testing Orchestrator Pattern**: You coordinate comprehensive user-perspective testing:
+**Subagent-Based Testing Pattern**: You are a lightweight coordinator that delegates ALL testing work to specialized subagents. This ensures deep, thorough testing because each subagent can make many tool calls to explore functionality comprehensively.
 
 | Phase | Component | Purpose |
 |-------|-----------|---------|
 | 1 | Orchestrator | Parse plan, extract routes, prepare test matrix |
-| 2 | Playwright MCP | Navigate, interact, and verify UI behavior |
+| 2 | UI Subagents | Deep testing of each route/feature area |
 | 3 | Database Agent | Verify data persistence and integrity |
 | 4 | Orchestrator | Aggregate results into structured report |
 
-**Playwright MCP Tools Available:**
-- `mcp__playwright__browser_navigate` - Navigate to URLs
-- `mcp__playwright__browser_snapshot` - Get page accessibility tree (PREFER THIS)
-- `mcp__playwright__browser_click` - Click elements
-- `mcp__playwright__browser_type` - Type into inputs
-- `mcp__playwright__browser_press_key` - Press keyboard keys
-- `mcp__playwright__browser_hover` - Hover over elements
-- `mcp__playwright__browser_take_screenshot` - Capture screenshots
-- `mcp__playwright__browser_console_messages` - Get console errors/warnings
-- `mcp__playwright__browser_network_requests` - Monitor network activity
-- `mcp__playwright__browser_wait_for` - Wait for elements/conditions
-- `mcp__playwright__browser_evaluate` - Execute JavaScript
-- `mcp__playwright__browser_close` - Close browser
+**CRITICAL**: You must NEVER use Playwright tools directly. ALL UI testing is delegated to `ui-ux-agent` subagents so they can perform extensive, thorough testing without context limitations.
 
 ## Workflow Execution
 
-### Phase 1: Test Planning (Orchestrator)
+### Phase 1: Test Planning (Orchestrator - YOU)
 
 **Objective**: Parse the implementation plan and build a comprehensive test matrix.
 
@@ -110,30 +80,34 @@ This command is designed to be used after `/implement-plan`:
      - Validation results
      - Any notes about edge cases
 
-4. **Identify Routes to Test**:
+4. **Identify Routes and Features to Test**:
    - If `--routes` flag: Use explicitly provided routes
    - Otherwise, extract from implementation:
      - Parse `src/app/**/page.tsx` files mentioned
      - Map file paths to routes (e.g., `src/app/(app)/bobbleheads/[id]/page.tsx` → `/bobbleheads/[id]`)
+     - Identify feature areas (forms, filters, search, navigation, etc.)
      - Include related routes (parent pages, linked pages)
 
-5. **Build Test Matrix**:
-   - For each route, create test scenarios:
+5. **Build Test Delegation Plan**:
+   - Group related routes and features into logical test units
+   - Each test unit becomes a subagent task
+   - Example breakdown:
      ```
-     Route: /bobbleheads/add
-     Scenarios:
-       - SMOKE: Page loads without errors
-       - FORM: All form fields accept valid input
-       - VALIDATION: Form shows errors for invalid input
-       - SUBMIT: Form submission creates record
-       - NAVIGATION: Links work correctly
-       - ERROR: Error states display properly
-       - EDGE: Empty states, boundary values
+     Test Unit 1: Add Bobblehead Form
+       - Route: /bobbleheads/add
+       - Focus: Form submission, validation, field interactions
+       - Scenarios: FORM, VALIDATION, SUBMIT, EDGE_CASES
+
+     Test Unit 2: Search and Filters
+       - Route: /browse/search
+       - Focus: Filter controls, search input, results display
+       - Scenarios: FILTER_INTERACTIONS, SEARCH, RESULTS, COMBINATIONS
+
+     Test Unit 3: Collection Navigation
+       - Routes: /collections, /collections/[id]
+       - Focus: Navigation, data display, CRUD operations
+       - Scenarios: NAVIGATION, DATA_DISPLAY, INTERACTIONS
      ```
-   - Prioritize scenarios:
-     - `--quick`: SMOKE + FORM + SUBMIT only
-     - Default: All scenarios except EDGE
-     - `--screenshots`: All scenarios with captures
 
 6. **Create Test Directory**:
    ```bash
@@ -141,7 +115,7 @@ This command is designed to be used after `/implement-plan`:
    ```
 
 7. **Initialize Todo List**:
-   - Create todos for each route to test
+   - Create todos for each test unit (subagent)
    - Add database verification todo (if not `--skip-db`)
    - Add report generation todo
 
@@ -149,202 +123,249 @@ This command is designed to be used after `/implement-plan`:
    - Create `docs/{YYYY_MM_DD}/testing/{feature-name}/00-test-plan.md`:
      - Feature context
      - Routes to test
-     - Test matrix by route
-     - Scenarios to execute
-     - Database checks planned
+     - Test units and their focus areas
+     - Scenarios to execute per unit
 
-### Phase 2: UI Testing (Playwright MCP)
+### Phase 2: UI Testing (DELEGATE TO SUBAGENTS)
 
-**Objective**: Execute comprehensive user-perspective testing using Playwright MCP tools.
+**Objective**: Launch specialized UI testing subagents for deep, comprehensive testing of each test unit.
 
-**Process** (repeat for each route):
+**CRITICAL INSTRUCTIONS FOR SUBAGENT LAUNCHING**:
 
-1. **Update Todo Status**:
-   - Mark current route testing as "in_progress"
+Each UI subagent MUST be given:
+1. **Specific focus area** - What exactly to test (e.g., "filters functionality")
+2. **Comprehensive scenario list** - All scenarios to cover
+3. **Instructions to be exhaustive** - Test ALL combinations, edge cases, states
+4. **Evidence requirements** - What to capture and document
 
-2. **Start Browser Session** (if not already started):
-   - Ensure dev server is running (`npm run dev` on port 3000)
-   - Navigate to base URL: `http://localhost:3000`
+**For EACH test unit, launch a dedicated `ui-test-agent` subagent:**
 
-3. **Navigate to Route**:
-   - Use `mcp__playwright__browser_navigate` to go to the route
-   - Handle dynamic segments (e.g., `[id]`) by:
-     - Querying database for valid IDs to use
-     - Or navigating to list page first and clicking through
+```
+Use Task tool with subagent_type: "ui-test-agent"
+Model: sonnet
+Timeout: 600 seconds (10 minutes - allow deep testing)
 
-4. **Initial Page Assessment**:
-   - Use `mcp__playwright__browser_snapshot` to get accessibility tree
-   - Use `mcp__playwright__browser_console_messages` to check for errors
-   - Take screenshot if `--screenshots` flag or if errors found
-   - Record:
-     - Page title and heading
-     - Interactive elements found
-     - Console errors/warnings
-     - Network failures
+Prompt:
+"You are performing DEEP, COMPREHENSIVE UI testing for the {feature-name} feature.
 
-5. **Execute Test Scenarios**:
+## Your Mission
 
-   **SMOKE Test**:
-   - Verify page loads successfully (no blank page)
-   - Check no console errors
-   - Verify key elements present (from implementation's success criteria)
-   - Check network requests completed successfully
+Test the **{test-unit-name}** functionality EXHAUSTIVELY. Do not stop after testing one thing - test EVERY aspect, EVERY combination, EVERY edge case.
 
-   **FORM Tests** (if forms present):
-   - Identify all form fields using snapshot
-   - For each field:
-     - Use `mcp__playwright__browser_click` to focus
-     - Use `mcp__playwright__browser_type` to enter test data
-     - Verify field accepts input
-   - Test form validation:
-     - Submit empty form
-     - Enter invalid data (wrong format, too long, etc.)
-     - Verify error messages display
-   - Test successful submission:
-     - Fill all required fields with valid data
-     - Submit form
-     - Verify success feedback (toast, redirect, etc.)
+## Route(s) to Test
+{routes}
 
-   **NAVIGATION Tests**:
-   - Find all links/buttons using snapshot
-   - Click navigation elements
-   - Verify correct routing occurs
-   - Test back button behavior
+## Focus Area
+{specific focus description - e.g., "Filter functionality including all filter types, combinations, and interactions"}
 
-   **INTERACTION Tests** (for components):
-   - Test dialogs: open, interact, close
-   - Test dropdowns: select options
-   - Test toggles: switch states
-   - Test data tables: sort, filter, paginate
-   - Test search: enter queries, verify results
+## Feature Context
+{description from implementation plan}
 
-   **ERROR State Tests**:
-   - Test 404 scenarios (invalid IDs)
-   - Test unauthorized access (if applicable)
-   - Test loading states (slow network simulation if possible)
-   - Test empty states (no data scenarios)
+## Files Involved
+{list of relevant UI files from implementation}
 
-   **EDGE Case Tests** (unless `--quick`):
-   - Boundary values (max length inputs, etc.)
-   - Special characters
-   - Rapid clicking/submitting
-   - Browser back/forward during operations
+## MANDATORY Test Scenarios - Test ALL of these:
 
-6. **Record Test Results**:
-   - For each scenario, record:
-     - Scenario name
-     - Status: PASS | FAIL | SKIP
-     - Steps executed
-     - Expected vs actual behavior
-     - Screenshots (if taken)
-     - Console output
-     - Network activity
+### Scenario Group 1: Basic Functionality (SMOKE)
+- [ ] Page loads without console errors
+- [ ] All expected UI elements are visible
+- [ ] Layout renders correctly
+- [ ] No network errors on load
 
-7. **Handle Failures**:
-   - On failure, capture:
-     - Screenshot of current state
-     - Full accessibility tree snapshot
-     - Console messages
-     - Network requests
-     - Detailed description of expected vs actual
+### Scenario Group 2: {Primary Functionality - varies by test unit}
+For filters:
+- [ ] Test EACH filter type individually
+- [ ] Test filter with single selection
+- [ ] Test filter with multiple selections (if applicable)
+- [ ] Test clearing individual filters
+- [ ] Test clearing all filters
+- [ ] Verify results update correctly after each filter change
+- [ ] Test filter persistence (if applicable)
 
-8. **Save Route Test Log**:
-   - Create `docs/{YYYY_MM_DD}/testing/{feature-name}/0{N}-test-{route-slug}.md`:
-     - Route tested
-     - Scenarios executed
-     - Pass/fail counts
-     - Detailed results per scenario
-     - Screenshots captured
-     - Issues found
+For forms:
+- [ ] Test each field accepts valid input
+- [ ] Test required field validation (submit without filling)
+- [ ] Test each field's specific validation rules
+- [ ] Test field interactions (dependent fields)
+- [ ] Test form submission with valid data
+- [ ] Test form submission feedback (loading, success, error states)
 
-9. **Update Todo Status**:
-   - Mark route testing as "completed"
+For data displays:
+- [ ] Verify data displays correctly
+- [ ] Test pagination (all pages, navigation)
+- [ ] Test sorting (all sort options, both directions)
+- [ ] Test empty states
+- [ ] Test loading states
 
-### Phase 3: Database Verification (Conditional)
+### Scenario Group 3: Combinations & Edge Cases
+- [ ] Test filter/feature combinations
+- [ ] Test with boundary values
+- [ ] Test with special characters
+- [ ] Test rapid interactions (quick clicks, typing)
+- [ ] Test after browser back/forward
+- [ ] Test with empty/minimal data
+- [ ] Test with large amounts of data (if applicable)
+
+### Scenario Group 4: Error Handling
+- [ ] Test error states display correctly
+- [ ] Test recovery from errors
+- [ ] Test invalid URL parameters (for dynamic routes)
+- [ ] Check console for errors after each interaction
+
+### Scenario Group 5: User Experience
+- [ ] Test loading indicators appear during async operations
+- [ ] Test feedback messages (toasts, alerts)
+- [ ] Test focus management
+- [ ] Test keyboard accessibility (Tab, Enter, Escape)
+
+## Testing Protocol
+
+1. **Be Exhaustive**: Test EVERY scenario listed above. Do not skip any.
+2. **Multiple Tool Calls**: Use many Playwright tool calls to thoroughly test each scenario
+3. **Document Everything**: Record results for every test, not just failures
+4. **Capture Evidence**: Take screenshots of failures and important states
+5. **Check Console**: After EVERY interaction, check for console errors
+6. **Check Network**: Monitor for failed network requests
+
+## Screenshots Required
+{if --screenshots: "Take screenshots after EVERY significant interaction"}
+{if not --screenshots: "Take screenshots for: failures, error states, unexpected behavior, empty states"}
+
+## Output Format (REQUIRED)
+
+Return your results in this EXACT format:
+
+### TEST UNIT: {test-unit-name}
+
+**Routes Tested**: {routes}
+**Total Scenarios Tested**: {count}
+**Pass Rate**: {passed}/{total} ({percentage}%)
+
+#### PASSED SCENARIOS
+1. [PASS] {scenario name} - {brief verification note}
+2. [PASS] {scenario name} - {brief verification note}
+...
+
+#### FAILED SCENARIOS
+
+**ISSUE-{N}: {Title}**
+- **Severity**: CRITICAL | HIGH | MEDIUM | LOW
+- **Route**: {route}
+- **Scenario**: {scenario_name}
+- **Problem**: {detailed description}
+- **Expected**: {what should happen}
+- **Actual**: {what actually happened}
+- **Steps to Reproduce**:
+  1. {step}
+  2. {step}
+- **Console Errors**: {any errors captured}
+- **Network Issues**: {any failed requests}
+- **Screenshot**: {filename if captured}
+- **Recommended Fix**: {suggestion based on behavior}
+
+#### SKIPPED SCENARIOS (and why)
+- {scenario} - {reason}
+
+#### CONSOLE ERRORS OBSERVED
+- {list all console errors seen during testing}
+
+#### SCREENSHOTS CAPTURED
+- {filename} - {description}
+
+#### ADDITIONAL OBSERVATIONS
+- {any UX issues, performance concerns, or recommendations}
+"
+```
+
+**Launch Strategy:**
+
+1. **Parallel When Possible**: If test units are independent, launch multiple subagents in parallel
+2. **Sequential When Dependent**: If testing creates data needed by another test, run sequentially
+
+**After Each Subagent Completes:**
+- Capture the full output
+- Update todo list
+- Save intermediate results to `docs/{YYYY_MM_DD}/testing/{feature-name}/0{N}-{test-unit-slug}.md`
+
+### Phase 3: Database Verification (DELEGATE)
 
 **Skip if**: `--skip-db` flag present
 
-**Objective**: Verify database operations work correctly and data integrity is maintained.
+**Launch subagent: `neon-db-expert`**
 
-**Process**:
+```
+Use Task tool with subagent_type: "neon-db-expert"
+Model: haiku (fast)
+Timeout: 120 seconds
 
-1. **Launch Database Agent**:
-   ```
-   Use Task tool with subagent_type: "neon-db-expert"
-   Model: haiku (fast)
-   Timeout: 120 seconds
+Prompt:
+"Verify database operations for the {feature-name} feature.
 
-   Prompt:
-   "Verify database operations for the {feature-name} feature.
+## Context
 
-   ## Context
+Implementation Files:
+{list of action/query files from implementation}
 
-   Implementation Files:
-   {list of action/query files from implementation}
+## Tests Performed by UI Agents
+{summary of what UI testing covered - forms submitted, data created, etc.}
 
-   ## Verification Checks
+## Verification Checks
 
-   1. **Data Creation Tests**:
-      - After form submissions in UI testing, verify records exist
-      - Check all required fields were saved
-      - Verify relationships are correctly established
+1. **Data Creation Tests**:
+   - After form submissions in UI testing, verify records exist
+   - Check all required fields were saved
+   - Verify relationships are correctly established
 
-   2. **Data Integrity**:
-      - Check foreign key constraints
-      - Verify no orphaned records
-      - Check timestamps are set correctly
+2. **Data Integrity**:
+   - Check foreign key constraints
+   - Verify no orphaned records
+   - Check timestamps are set correctly
 
-   3. **Authorization**:
-      - Verify user can only access their own data
-      - Check admin-only data is protected
+3. **Authorization**:
+   - Verify user can only access their own data
+   - Check admin-only data is protected
 
-   4. **Query Performance**:
-      - Check for any obviously slow queries
-      - Verify indexes are being used
+4. **Query Performance**:
+   - Check for any obviously slow queries
+   - Verify indexes are being used
 
-   ## Return Format
+## Return Format
 
-   ### DATABASE VERIFICATION RESULTS
+### DATABASE VERIFICATION RESULTS
 
-   **Records Verified**:
-   - Table: {table_name}
-     - Records checked: {count}
-     - Issues found: {list or 'None'}
+**Records Verified**:
+- Table: {table_name}
+  - Records checked: {count}
+  - Issues found: {list or 'None'}
 
-   **Integrity Checks**:
-   - Foreign Keys: PASS|FAIL - {details}
-   - Orphaned Records: PASS|FAIL - {details}
-   - Timestamps: PASS|FAIL - {details}
+**Integrity Checks**:
+- Foreign Keys: PASS|FAIL - {details}
+- Orphaned Records: PASS|FAIL - {details}
+- Timestamps: PASS|FAIL - {details}
 
-   **Authorization**:
-   - User isolation: PASS|FAIL - {details}
-   - Admin protection: PASS|FAIL - {details}
+**Authorization**:
+- User isolation: PASS|FAIL - {details}
+- Admin protection: PASS|FAIL - {details}
 
-   **Performance**:
-   - Slow queries identified: {list or 'None'}
-   - Missing indexes: {list or 'None'}
+**Performance**:
+- Slow queries identified: {list or 'None'}
+- Missing indexes: {list or 'None'}
 
-   **Issues**: {detailed list of any problems found}
-   "
-   ```
+**Issues**: {detailed list of any problems found}
+"
+```
 
-2. **Capture Results**:
-   - Parse database agent output
-   - Add issues to report
+### Phase 4: Report Generation (Orchestrator - YOU)
 
-3. **Save Database Log**:
-   - Create `docs/{YYYY_MM_DD}/testing/{feature-name}/0{N}-database-verification.md`
-
-### Phase 4: Report Generation (Orchestrator)
-
-**Objective**: Generate structured issue report compatible with `/fix-validation`.
+**Objective**: Aggregate ALL subagent results into structured report compatible with `/fix-validation`.
 
 **Process**:
 
 1. **Aggregate All Results**:
-   - Collect results from all route tests
+   - Collect results from ALL UI subagents
    - Collect database verification results
    - Calculate pass/fail statistics
+   - Merge and deduplicate issues
 
 2. **Categorize Issues by Severity**:
 
@@ -387,15 +408,22 @@ This command is designed to be used after `/implement-plan`:
    **Generated**: {timestamp}
    **Implementation Plan**: {plan_path}
    **Test Mode**: {full|quick|custom}
-   **Playwright Session**: {session_id if applicable}
+   **Testing Architecture**: Subagent-based deep testing
 
    ## Executive Summary
 
    - **Test Score**: {score}/100 ({grade: A/B/C/D/F})
    - **Status**: {PASS | NEEDS FIXES | CRITICAL ISSUES}
-   - **Routes Tested**: {count}
-   - **Scenarios Executed**: {count}
+   - **Test Units Executed**: {count}
+   - **Total Scenarios Tested**: {count across all subagents}
    - **Pass Rate**: {pass_count}/{total_count} ({percentage}%)
+
+   ## Test Coverage Summary
+
+   | Test Unit | Route(s) | Scenarios | Passed | Failed | Status |
+   |-----------|----------|-----------|--------|--------|--------|
+   | {name} | {routes} | {count} | {pass} | {fail} | {status} |
+   ...
 
    ## Issue Summary
 
@@ -409,21 +437,24 @@ This command is designed to be used after `/implement-plan`:
 
    ## Critical Issues
 
-   {For each critical issue}
+   {For each critical issue from ALL subagents}
    ### CRIT-{N}: {Title}
 
    - **Route**: {route}
+   - **Test Unit**: {which subagent found this}
    - **Scenario**: {scenario_name}
    - **File**: {likely_source_file}:{line_if_known}
    - **Problem**: {detailed description}
    - **Expected**: {what should happen}
    - **Actual**: {what actually happened}
+   - **Steps to Reproduce**:
+     1. {step}
+     2. {step}
    - **Evidence**:
      - Screenshot: {path_if_captured}
      - Console: {error_messages}
      - Network: {failed_requests}
    - **Recommended Fix**: {suggested fix based on implementation}
-   - **Related Step**: {implementation_step_if_applicable}
 
    ## High Priority Issues
 
@@ -437,25 +468,20 @@ This command is designed to be used after `/implement-plan`:
 
    {Same format}
 
-   ## Test Coverage
+   ## Test Unit Details
 
-   ### Routes Tested
+   ### {Test Unit 1 Name}
 
-   | Route | Scenarios | Passed | Failed | Status |
-   |-------|-----------|--------|--------|--------|
-   | {route} | {count} | {pass} | {fail} | {status} |
-   ...
+   **Focus**: {what was tested}
+   **Routes**: {routes}
+   **Scenarios Executed**: {count}
+   **Pass Rate**: {percentage}%
 
-   ### Scenario Breakdown
+   {Summary of findings}
 
-   | Scenario Type | Executed | Passed | Failed |
-   |---------------|----------|--------|--------|
-   | Smoke | {x} | {y} | {z} |
-   | Form | {x} | {y} | {z} |
-   | Navigation | {x} | {y} | {z} |
-   | Interaction | {x} | {y} | {z} |
-   | Error States | {x} | {y} | {z} |
-   | Edge Cases | {x} | {y} | {z} |
+   ### {Test Unit 2 Name}
+
+   {Repeat for each test unit}
 
    ## Database Verification
 
@@ -469,17 +495,14 @@ This command is designed to be used after `/implement-plan`:
 
    {Details of any issues}
 
-   ## Console Output Summary
+   ## Console Errors Summary
 
-   **Errors**: {count}
-   {List of unique console errors}
-
-   **Warnings**: {count}
-   {List of unique console warnings}
+   **Total Unique Errors**: {count}
+   {List of unique console errors across all test units}
 
    ## Screenshots Captured
 
-   {List of screenshots with descriptions}
+   {List of screenshots with descriptions from all subagents}
 
    ## Recommendations
 
@@ -494,11 +517,13 @@ This command is designed to be used after `/implement-plan`:
    ### Consider Fixing
    1. {Medium priority fix 1}
 
-   ## Test Execution Details
+   ## Testing Metrics
 
    - **Start Time**: {timestamp}
    - **End Time**: {timestamp}
    - **Duration**: {duration}
+   - **Subagents Launched**: {count}
+   - **Total Playwright Interactions**: {estimated count from subagent reports}
    - **Browser**: Playwright (Chromium)
    - **Base URL**: http://localhost:3000
 
@@ -521,13 +546,7 @@ This command is designed to be used after `/implement-plan`:
    ```
    ```
 
-5. **Create Test Index**:
-   - Update `docs/{YYYY_MM_DD}/testing/{feature-name}/00-test-plan.md` with results summary
-
-6. **Close Browser Session**:
-   - Use `mcp__playwright__browser_close` to clean up
-
-7. **Final Output**:
+5. **Final Output**:
    ```
    ## Feature Testing Complete
 
@@ -535,11 +554,11 @@ This command is designed to be used after `/implement-plan`:
    **Score**: {score}/100 ({grade})
    **Status**: {PASS | NEEDS FIXES | CRITICAL ISSUES}
 
-   **Test Results**:
+   **Testing Summary**:
    | Metric | Value |
    |--------|-------|
-   | Routes Tested | {count} |
-   | Scenarios Executed | {count} |
+   | Test Units Executed | {count} |
+   | Total Scenarios | {count} |
    | Pass Rate | {percentage}% |
    | Critical Issues | {count} |
    | High Priority | {count} |
@@ -557,40 +576,51 @@ This command is designed to be used after `/implement-plan`:
    Feature testing passed. Ready for code review.
    ```
 
-## Test Data Strategy
+## Subagent Specialization Guidelines
 
-**Using Real Data**:
-- Query database for existing records to test with
-- Use Clerk test users if available
+When defining test units, consider these specialization patterns:
 
-**Creating Test Data** (if needed):
-- Use the feature's own forms to create test data
-- Clean up test data after testing (optional)
+### Form Testing Subagent
+Focus areas: Input validation, form submission, field interactions, error messages
+Scenarios: All field types, validation rules, submit flows, error recovery
 
-**Dynamic Route Handling**:
-- For routes like `/bobbleheads/[id]`:
-  1. First navigate to list page (`/bobbleheads`)
-  2. Click on an item to get a valid ID
-  3. Or query database for a valid ID
+### Filter/Search Testing Subagent
+Focus areas: Filter controls, search functionality, result updates, filter combinations
+Scenarios: Each filter individually, combinations, clear/reset, URL state, edge cases
+
+### Navigation Testing Subagent
+Focus areas: Links, routing, breadcrumbs, back/forward behavior
+Scenarios: All navigation paths, deep links, invalid routes, history behavior
+
+### Data Display Testing Subagent
+Focus areas: Tables, lists, cards, pagination, sorting
+Scenarios: Data accuracy, pagination edges, sort options, empty states, loading
+
+### CRUD Operations Testing Subagent
+Focus areas: Create/Read/Update/Delete operations
+Scenarios: Full lifecycle, permissions, optimistic updates, error handling
+
+### Dialog/Modal Testing Subagent
+Focus areas: Dialog opening/closing, form interactions within dialogs
+Scenarios: All trigger mechanisms, close behaviors, submission, nested dialogs
 
 ## Error Handling
 
 - **Dev server not running**: Output clear error, suggest `npm run dev`
+- **Subagent timeout**: Log timeout, mark test unit as incomplete, continue
+- **Subagent failure**: Log error, capture any partial results, continue
 - **Auth required**: Note in report, test public pages or suggest auth setup
-- **Page timeout**: Record as CRITICAL issue, continue to next route
-- **Element not found**: Record as issue with snapshot, continue testing
-- **Database query fails**: Record as issue, skip remaining DB checks
+- **Page timeout**: Record as CRITICAL issue, continue to next test unit
 
 ## Important Notes
 
-- **User Perspective**: Test as a real user would interact, not as a developer
-- **Follow Implementation**: Use the implementation plan to know what to test
-- **Evidence-Based**: Always capture evidence (screenshots, console, network) for issues
-- **Structured Output**: Report format must be compatible with `/fix-validation`
-- **Don't Fix Yourself**: Only identify issues, don't attempt to fix code
-- **Be Thorough**: Test happy paths AND error paths
-- **Console Errors Matter**: Any console error is at least a MEDIUM issue
-- **Visual Regression**: Note any obvious visual problems even if not "broken"
+- **NEVER use Playwright tools directly** - ALL UI testing goes to `ui-test-agent` subagents
+- **Be generous with subagent prompts** - Detailed instructions = thorough testing
+- **Allow long timeouts** - Deep testing takes time, use 600s for UI subagents
+- **Parallelize when possible** - Independent test units can run simultaneously
+- **Capture ALL output** - Subagent responses feed into the final report
+- **Don't fix, only identify** - This command documents issues for `/fix-validation`
+- **Evidence is crucial** - Ensure subagents capture screenshots and console logs
 
 ## Report Compatibility
 
