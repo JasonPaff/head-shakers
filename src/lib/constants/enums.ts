@@ -61,6 +61,7 @@ export const ENUMS = {
     RESULT_TYPE: ['bobblehead', 'collection', 'subcollection', 'user'] as const,
     SORT_BY: ['relevance', 'date', 'price', 'popularity'] as const,
     SORT_ORDER: ['asc', 'desc'] as const,
+    VIEW_MODE: ['grid', 'list'] as const,
   },
   USER: {
     ROLE: ['user', 'moderator', 'admin'] as const,
@@ -89,6 +90,7 @@ export type FollowType = (typeof ENUMS.FOLLOW.TYPE)[number];
 export type LikeTargetType = (typeof ENUMS.LIKE.TARGET_TYPE)[number];
 export type NotificationType = (typeof ENUMS.NOTIFICATION.TYPE)[number];
 export type PrivacyLevel = (typeof ENUMS.USER_SETTINGS.PRIVACY_LEVEL)[number];
+export type SearchViewMode = (typeof ENUMS.SEARCH.VIEW_MODE)[number];
 export type UserRole = (typeof ENUMS.USER.ROLE)[number];
 export type UserTheme = (typeof ENUMS.USER_SETTINGS.THEME)[number];
 
