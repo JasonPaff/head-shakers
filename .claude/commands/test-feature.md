@@ -1,11 +1,11 @@
 ---
-allowed-tools: Task(subagent_type:ui-test-agent), Task(subagent_type:neon-db-expert), Task(subagent_type:general-purpose), Read(*), Write(*), Glob(*), Grep(*), Bash(mkdir:*,npm:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:ui-test-agent), Task(subagent_type:neon-db-expert), Task(subagent_type:general-purpose), Read(*), Write(*), Glob(*), Grep(*), Bash(mkdir:*,npm:*,curl:*), TodoWrite(*), AskUserQuestion(*), mcp__Neon__run_sql, mcp__Neon__get_database_tables
 argument-hint: '<implementation-plan-path|feature-name> [--routes=/path1,/path2] [--skip-db] [--screenshots] [--quick]'
 description: Comprehensive user-perspective feature testing using Playwright MCP with structured issue reporting
 model: sonnet
 ---
 
-You are a comprehensive feature testing orchestrator that validates newly implemented features from a user's perspective. Your role is COORDINATION ONLY - you delegate ALL UI testing to specialized subagents that can perform deep, thorough testing with extensive Playwright interactions.
+You are a comprehensive feature testing orchestrator that validates newly implemented features from a user's perspective. Your role is COORDINATION ONLY - you delegate ALL UI testing to specialized `ui-test-agent` subagents that can perform deep, thorough testing with extensive Playwright interactions.
 
 @CLAUDE.MD
 
@@ -20,7 +20,7 @@ You are a comprehensive feature testing orchestrator that validates newly implem
 - `--routes=/path1,/path2`: Explicitly specify routes to test (comma-separated)
 - `--skip-db`: Skip database verification checks
 - `--screenshots`: Capture screenshots for every interaction (verbose mode)
-- `--quick`: Test only critical paths, skip edge cases
+- `--quick`: Quick smoke test mode (see Quick Mode Scenarios below)
 
 **Examples:**
 
@@ -44,14 +44,70 @@ You are a comprehensive feature testing orchestrator that validates newly implem
 
 | Phase | Component | Purpose |
 |-------|-----------|---------|
-| 1 | Orchestrator | Parse plan, extract routes, prepare test matrix |
+| 0 | Orchestrator | **Pre-flight checks** (dev server, auth, test data) |
+| 1 | Orchestrator | Parse plan, extract routes, resolve dynamic params |
 | 2 | UI Subagents | Deep testing of each route/feature area |
 | 3 | Database Agent | Verify data persistence and integrity |
 | 4 | Orchestrator | Aggregate results into structured report |
 
-**CRITICAL**: You must NEVER use Playwright tools directly. ALL UI testing is delegated to `ui-ux-agent` subagents so they can perform extensive, thorough testing without context limitations.
+**CRITICAL**: You must NEVER use Playwright tools directly. ALL UI testing is delegated to `ui-test-agent` subagents so they can perform extensive, thorough testing without context limitations.
 
 ## Workflow Execution
+
+### Phase 0: Pre-Flight Checks (Orchestrator - YOU) **MANDATORY**
+
+**Objective**: Verify the environment is ready for testing before doing anything else.
+
+**Process**:
+
+1. **Check Dev Server Running**:
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "FAILED"
+   ```
+   - If returns 200: Server is running ✓
+   - If fails or returns other code:
+     - Output: "❌ Dev server not running. Please start it with `npm run dev` and re-run this command."
+     - **STOP EXECUTION** - Do not proceed to Phase 1
+
+2. **Detect Authentication Requirements**:
+   - Check if routes are under `src/app/(app)/` → These require authentication
+   - Check if routes are under `src/app/(public)/` → Public, no auth needed
+   - If authenticated routes detected:
+     - Ask user using AskUserQuestion:
+       ```
+       Question: "This feature includes authenticated routes. How should testing handle authentication?"
+       Options:
+       - "Use Clerk test mode (routes will show sign-in if not authenticated)"
+       - "Skip authenticated routes, test public pages only"
+       - "I'll sign in manually before testing starts"
+       ```
+     - Record the authentication strategy for subagents
+
+3. **Verify Test Data Exists** (for routes with dynamic params):
+   - If routes contain `[id]`, `[slug]`, or similar dynamic segments:
+     - Use Neon MCP to query for valid test data:
+       ```sql
+       -- For bobblehead routes
+       SELECT id, name FROM bobbleheads LIMIT 5;
+       -- For collection routes
+       SELECT id, name FROM collections LIMIT 5;
+       -- For user routes
+       SELECT id, username FROM users LIMIT 5;
+       ```
+     - If no data found: Suggest running `npm run db:seed`
+     - Store valid IDs for route resolution in Phase 1
+
+4. **Pre-Flight Summary**:
+   ```
+   ✓ Dev server: Running on http://localhost:3000
+   ✓ Authentication: {strategy selected}
+   ✓ Test data: Found {N} bobbleheads, {N} collections
+   ✓ Ready to proceed with testing
+   ```
+
+**If ANY pre-flight check fails, STOP and report the issue. Do not proceed.**
+
+---
 
 ### Phase 1: Test Planning (Orchestrator - YOU)
 
@@ -88,7 +144,30 @@ You are a comprehensive feature testing orchestrator that validates newly implem
      - Identify feature areas (forms, filters, search, navigation, etc.)
      - Include related routes (parent pages, linked pages)
 
-5. **Build Test Delegation Plan**:
+5. **Resolve Dynamic Route Parameters** (CRITICAL):
+   - For each route with dynamic segments like `[id]`, `[slug]`, `[username]`:
+     - Use test data IDs collected in Phase 0
+     - Create concrete URLs for testing:
+       ```
+       Route Template: /bobbleheads/[id]
+       Test Data IDs: [123, 456, 789]
+       Resolved URLs:
+         - /bobbleheads/123 (primary test)
+         - /bobbleheads/456 (secondary, if time permits)
+       ```
+     - For `[slug]` params, query the appropriate table for valid slugs
+     - **If no valid IDs found**: Mark route as SKIPPED with reason "No test data available"
+
+   - **Route Resolution Table** (store for subagents):
+     ```
+     | Template Route | Resolved URL | Test Data Source |
+     |----------------|--------------|------------------|
+     | /bobbleheads/[id] | /bobbleheads/123 | bobbleheads.id=123 ("Batman Bobble") |
+     | /collections/[id] | /collections/456 | collections.id=456 ("Sports Heroes") |
+     | /users/[username] | /users/testuser | users.username="testuser" |
+     ```
+
+6. **Build Test Delegation Plan**:
    - Group related routes and features into logical test units
    - Each test unit becomes a subagent task
    - Example breakdown:
@@ -109,17 +188,17 @@ You are a comprehensive feature testing orchestrator that validates newly implem
        - Scenarios: NAVIGATION, DATA_DISPLAY, INTERACTIONS
      ```
 
-6. **Create Test Directory**:
+7. **Create Test Directory**:
    ```bash
    mkdir -p docs/{YYYY_MM_DD}/testing/{feature-name}/
    ```
 
-7. **Initialize Todo List**:
+8. **Initialize Todo List**:
    - Create todos for each test unit (subagent)
    - Add database verification todo (if not `--skip-db`)
    - Add report generation todo
 
-8. **Save Test Plan**:
+9. **Save Test Plan**:
    - Create `docs/{YYYY_MM_DD}/testing/{feature-name}/00-test-plan.md`:
      - Feature context
      - Routes to test
@@ -152,8 +231,34 @@ Prompt:
 
 Test the **{test-unit-name}** functionality EXHAUSTIVELY. Do not stop after testing one thing - test EVERY aspect, EVERY combination, EVERY edge case.
 
+## Base URL (CRITICAL)
+
+**ALL navigation must use this base URL**: `http://localhost:3000`
+
+When navigating, always use the full URL:
+- Navigate to: `http://localhost:3000{route}`
+- Example: `http://localhost:3000/browse/search`
+
 ## Route(s) to Test
-{routes}
+
+**Template Routes**: {template_routes}
+**Resolved URLs** (use these for navigation):
+{resolved_urls_table}
+
+Example:
+- Template: /bobbleheads/[id]
+- Resolved: http://localhost:3000/bobbleheads/123
+- Test Data: bobbleheads.id=123 ('Batman Bobble')
+
+## Authentication Context
+
+**Auth Strategy**: {auth_strategy - e.g., "Routes require auth - expect sign-in redirect if not authenticated" OR "Public routes - no auth needed"}
+
+{if auth required}
+- If you encounter a sign-in page, document it as expected behavior (not a bug)
+- Note which routes redirected to sign-in in your report
+- Test any public portions of the page that don't require auth
+{end if}
 
 ## Focus Area
 {specific focus description - e.g., "Filter functionality including all filter types, combinations, and interactions"}
@@ -277,15 +382,26 @@ Return your results in this EXACT format:
 "
 ```
 
-**Launch Strategy:**
+**Launch Strategy: SEQUENTIAL ONLY**
 
-1. **Parallel When Possible**: If test units are independent, launch multiple subagents in parallel
-2. **Sequential When Dependent**: If testing creates data needed by another test, run sequentially
+**IMPORTANT**: UI test subagents MUST be launched sequentially, NOT in parallel. This is because:
+1. All subagents share the same Playwright MCP browser instance
+2. Parallel subagents would conflict and interfere with each other
+3. Each subagent needs exclusive browser access for reliable testing
 
-**After Each Subagent Completes:**
+**Execution Flow:**
+```
+1. Launch Test Unit 1 subagent → Wait for completion → Save results
+2. Launch Test Unit 2 subagent → Wait for completion → Save results
+3. Launch Test Unit 3 subagent → Wait for completion → Save results
+... continue for all test units
+```
+
+**After EACH Subagent Completes (before launching next):**
 - Capture the full output
-- Update todo list
+- Update todo list (mark completed, mark next as in_progress)
 - Save intermediate results to `docs/{YYYY_MM_DD}/testing/{feature-name}/0{N}-{test-unit-slug}.md`
+- The subagent should close the browser, but if issues occur, the next subagent will start fresh
 
 ### Phase 3: Database Verification (DELEGATE)
 
@@ -604,20 +720,96 @@ Scenarios: Full lifecycle, permissions, optimistic updates, error handling
 Focus areas: Dialog opening/closing, form interactions within dialogs
 Scenarios: All trigger mechanisms, close behaviors, submission, nested dialogs
 
+## Quick Mode Scenarios (`--quick`)
+
+When `--quick` flag is set, instruct subagents to test ONLY these scenarios per feature type:
+
+### Forms (Quick Mode)
+- [ ] Page loads without errors
+- [ ] Submit with valid data → success
+- [ ] Submit with empty required fields → shows validation errors
+- **SKIP**: Individual field validation, edge cases, special characters, recovery flows
+
+### Filters/Search (Quick Mode)
+- [ ] Page loads with default state
+- [ ] Apply one filter → results update
+- [ ] Clear filters → returns to default
+- [ ] Search with valid query → shows results
+- **SKIP**: Multi-filter combinations, URL state, pagination, edge cases
+
+### Data Display (Quick Mode)
+- [ ] Page loads with data visible
+- [ ] Pagination works (if present)
+- [ ] Click item → navigates correctly
+- **SKIP**: All sorting options, empty states, loading states, edge cases
+
+### Navigation (Quick Mode)
+- [ ] All main navigation links work
+- [ ] Browser back works
+- **SKIP**: Deep links, invalid routes, breadcrumbs, history edge cases
+
+### Dialogs (Quick Mode)
+- [ ] Dialog opens when triggered
+- [ ] Dialog closes (X button or Escape)
+- [ ] Primary action works
+- **SKIP**: Backdrop click, focus management, nested dialogs, edge cases
+
+**Quick Mode Timeout**: Use 180 seconds per subagent instead of 600.
+
+---
+
 ## Error Handling
 
-- **Dev server not running**: Output clear error, suggest `npm run dev`
-- **Subagent timeout**: Log timeout, mark test unit as incomplete, continue
-- **Subagent failure**: Log error, capture any partial results, continue
-- **Auth required**: Note in report, test public pages or suggest auth setup
-- **Page timeout**: Record as CRITICAL issue, continue to next test unit
+### Pre-Flight Failures (Phase 0)
+- **Dev server not running**:
+  - Output: "❌ Dev server not running at http://localhost:3000"
+  - Action: **STOP EXECUTION**, instruct user to run `npm run dev`
+  - Do NOT proceed to Phase 1
+
+- **No test data found**:
+  - Output: "⚠️ No test data found for dynamic routes"
+  - Action: Suggest `npm run db:seed`, ask if user wants to continue with static routes only
+
+### Subagent Failures (Phase 2)
+- **Subagent timeout** (600s exceeded):
+  - Log: "⏱️ Test unit '{name}' timed out after 600 seconds"
+  - Action: Record partial results if available, mark unit as INCOMPLETE
+  - Add to report: "TEST UNIT INCOMPLETE: {name} - Subagent timed out"
+  - **Continue to next subagent** - do not abort entire test
+
+- **Subagent crashes/errors**:
+  - Log: "❌ Test unit '{name}' failed: {error message}"
+  - Action: Capture error details, mark unit as FAILED
+  - Add to report as CRITICAL issue
+  - **Continue to next subagent** - resilient execution
+
+- **Browser state corruption**:
+  - If a subagent reports browser issues, the next subagent will start fresh
+  - Each subagent is responsible for its own browser cleanup
+
+### Page/Route Failures
+- **Page timeout** (page won't load):
+  - Record as CRITICAL issue: "Page failed to load within timeout"
+  - Include URL, any console errors captured
+  - Continue testing other routes
+
+- **Auth redirect** (expected):
+  - If auth strategy is "expect redirects", this is NOT an issue
+  - Document which routes redirected to sign-in
+  - Test any public content that loaded before redirect
+
+- **404 Not Found**:
+  - Record as HIGH issue if route should exist
+  - Verify route path is correct in implementation
+  - Check if dynamic param resolution failed
 
 ## Important Notes
 
 - **NEVER use Playwright tools directly** - ALL UI testing goes to `ui-test-agent` subagents
+- **NEVER launch UI subagents in parallel** - They share the browser and will conflict
 - **Be generous with subagent prompts** - Detailed instructions = thorough testing
 - **Allow long timeouts** - Deep testing takes time, use 600s for UI subagents
-- **Parallelize when possible** - Independent test units can run simultaneously
+- **Run subagents SEQUENTIALLY** - Wait for each to complete before launching the next
 - **Capture ALL output** - Subagent responses feed into the final report
 - **Don't fix, only identify** - This command documents issues for `/fix-validation`
 - **Evidence is crucial** - Ensure subagents capture screenshots and console logs
