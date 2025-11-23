@@ -34,9 +34,11 @@ Redesign the `/browse/categories` page with a modern, visually cohesive interfac
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/browse-categories.validation.ts` - Add view mode enum, update sort options
 
 **Changes:**
+
 - Add `BROWSE_CATEGORIES_VIEW_MODE` constant array with 'grid' and 'list' values
 - Add `BROWSE_CATEGORIES_CARD_SORT_BY` constant for category card sorting: 'alphabetical', 'popularity', 'recent', 'itemCount'
 - Create `browseCategoriesViewModeSchema` for view mode validation
@@ -44,11 +46,13 @@ Redesign the `/browse/categories` page with a modern, visually cohesive interfac
 - Export new types: `BrowseCategoriesViewMode`, `CategoryCardSortBy`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New validation schemas compile without TypeScript errors
 - [ ] Types are properly exported and accessible
 - [ ] All validation commands pass
@@ -62,20 +66,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/utils/category-icons.ts` - Icon mapping utility
 
 **Changes:**
+
 - Create `getCategoryIcon` function mapping category names to Lucide icons
 - Include default icon fallback for unmapped categories
 - Create `getCategoryDescription` function providing brief descriptions for common categories
 - Create `getCategoryColor` function for category-specific color variants
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Function returns appropriate icons for known categories
 - [ ] Fallback icon works for unknown categories
 - [ ] All validation commands pass
@@ -89,9 +97,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/categories-breadcrumb.tsx` - Breadcrumb component
 
 **Changes:**
+
 - Create breadcrumb with links: Home > Browse > Categories
 - Use `$path` from next-typesafe-url for type-safe routes
 - Follow existing `CollectionBreadcrumb` component patterns
@@ -99,11 +109,13 @@ npm run lint:fix && npm run typecheck
 - Add responsive styling for mobile/desktop views
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Breadcrumb renders correctly with proper links
 - [ ] Touch targets meet 44px minimum for accessibility
 - [ ] All validation commands pass
@@ -117,9 +129,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/categories-hero.tsx` - Hero section component
 
 **Changes:**
+
 - Create hero section with gradient background styling
 - Display page title "Browse by Category" with engaging subtitle
 - Show aggregate stats (total categories, total bobbleheads across categories)
@@ -127,11 +141,13 @@ npm run lint:fix && npm run typecheck
 - Ensure responsive layout across viewports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hero displays correctly with stats
 - [ ] Responsive design works on mobile/tablet/desktop
 - [ ] All validation commands pass
@@ -145,9 +161,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/category-card.tsx` - Category card with CVA variants
 
 **Changes:**
+
 - Create `categoryCardVariants` using CVA with 'grid' and 'list' variants
 - Grid variant: Vertical card with icon, name, description, count badge
 - List variant: Horizontal layout with compact information
@@ -157,11 +175,13 @@ npm run lint:fix && npm run typecheck
 - Include proper test IDs following project conventions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Card renders correctly in both grid and list modes
 - [ ] Hover and transition animations work smoothly
 - [ ] All validation commands pass
@@ -175,9 +195,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/view-mode-toggle.tsx` - View toggle component
 
 **Changes:**
+
 - Create toggle using existing Tabs component from Radix UI
 - Include Grid and List icons from Lucide React
 - Add proper ARIA labels for accessibility
@@ -185,11 +207,13 @@ npm run lint:fix && npm run typecheck
 - Accept `viewMode` and `onViewModeChange` props
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Toggle switches between grid/list views
 - [ ] Accessible keyboard navigation works
 - [ ] All validation commands pass
@@ -203,9 +227,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/categories-toolbar.tsx` - Toolbar component
 
 **Changes:**
+
 - Integrate ViewModeToggle component
 - Add sort dropdown with options: Alphabetical (A-Z), Most Popular, Most Recent, Item Count
 - Include search input for filtering categories by name
@@ -213,11 +239,13 @@ npm run lint:fix && npm run typecheck
 - Use responsive flex layout with proper spacing
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All filter controls work correctly
 - [ ] Responsive layout adapts to viewport sizes
 - [ ] All validation commands pass
@@ -231,9 +259,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/category-cards-grid.tsx` - Grid/List container
 
 **Changes:**
+
 - Accept `categories`, `viewMode`, and `onCategoryClick` props
 - Render responsive grid for grid view (2/3/4 columns based on viewport)
 - Render stacked list for list view
@@ -241,11 +271,13 @@ npm run lint:fix && npm run typecheck
 - Add animation/transition between view modes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid displays correctly with proper column counts
 - [ ] List view displays correctly
 - [ ] Empty state renders when no categories match filters
@@ -260,22 +292,26 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/browse/categories/components/skeletons/categories-hero-skeleton.tsx` - Hero skeleton
 - `src/app/(app)/browse/categories/components/skeletons/category-card-skeleton.tsx` - Card skeleton
 - `src/app/(app)/browse/categories/components/skeletons/categories-content-skeleton.tsx` - Full content skeleton
 
 **Changes:**
+
 - Create hero skeleton matching hero section dimensions
 - Create card skeleton with icon, title, description placeholders
 - Create combined skeleton for full page loading state
 - Use project Skeleton component with proper animations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeletons match actual component dimensions
 - [ ] Animations render smoothly
 - [ ] All validation commands pass
@@ -289,9 +325,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/browse/categories/components/browse-categories-content.tsx` - Major refactor
 
 **Changes:**
+
 - Add `viewMode` URL state using nuqs `parseAsStringEnum`
 - Add `categorySortBy` URL state for category card sorting
 - Add `categorySearch` URL state for filtering categories by name
@@ -302,11 +340,13 @@ npm run lint:fix && npm run typecheck
 - Preserve existing collection browsing functionality when category is selected
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] View mode persists in URL and updates display
 - [ ] Sorting and filtering work correctly
 - [ ] Category selection navigates correctly
@@ -321,9 +361,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/browse/categories/page.tsx` - Update page structure
 
 **Changes:**
+
 - Add async server component pattern for fetching category stats
 - Import CategoriesHero and CategoriesBreadcrumb components
 - Update layout with proper spacing and structure
@@ -332,11 +374,13 @@ npm run lint:fix && npm run typecheck
 - Keep existing Sentry context setup
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page renders hero and content sections
 - [ ] Suspense fallbacks display during loading
 - [ ] SEO metadata is properly configured
@@ -351,9 +395,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/test-ids/types.ts` - Add new component test IDs
 
 **Changes:**
+
 - Add 'category-card' to ComponentTestId union
 - Add 'categories-hero' to ComponentTestId union
 - Add 'categories-toolbar' to ComponentTestId union
@@ -361,11 +407,13 @@ npm run lint:fix && npm run typecheck
 - Add 'categories-grid' to ComponentTestId union
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New test IDs are recognized by TypeScript
 - [ ] All validation commands pass
 
@@ -389,21 +437,25 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Architecture Decisions:**
+
 - **Server Component Strategy**: The main page.tsx remains a server component for initial data fetching (category stats for hero), while BrowseCategoriesContent handles client-side interactivity
 - **CVA for Variants**: Using CVA for CategoryCard variants aligns with existing project patterns (Badge, Button components)
 - **URL State Management**: All filter/sort/view state persisted in URL using nuqs for shareability and bookmarking
 
 **Risk Mitigations:**
+
 - **Category Icon Mapping**: Default fallback icon ensures graceful handling of new/unknown categories
 - **Empty States**: Dedicated empty state handling when filters return no results
 - **Backward Compatibility**: Existing URL parameters for collection browsing preserved
 
 **Assumptions Requiring Confirmation:**
+
 - Category descriptions will be generated from category names (no database field exists)
 - Icon mapping is hardcoded based on common bobblehead category names
 - Category count statistics can be computed from existing query results
 
 **Performance Considerations:**
+
 - Category cards use optimized grid layout without expensive animations on scroll
 - View mode transitions use CSS transforms for GPU acceleration
 - Filtering/sorting performed client-side to avoid additional server requests
@@ -413,20 +465,24 @@ npm run lint:fix && npm run typecheck
 ## File Discovery Results
 
 ### Critical Priority (Must Modify)
+
 - `src/app/(app)/browse/categories/page.tsx`
 - `src/app/(app)/browse/categories/components/browse-categories-content.tsx`
 
 ### High Priority
+
 - `src/app/(app)/browse/components/browse-collections-filters.tsx`
 - `src/app/(app)/browse/components/browse-collections-table.tsx`
 - `src/lib/validations/browse-categories.validation.ts`
 
 ### Reference Files
+
 - `src/app/(app)/browse/featured/page.tsx` - Hero section patterns
 - `src/components/ui/card.tsx` - Card components
 - `src/components/ui/badge.tsx` - Badge variants
 - `src/components/ui/skeleton.tsx` - Loading states
 
 ### Database Context
+
 - Categories derived from `category` field on bobbleheads
 - `CategoryRecord` type: `{ name: string; bobbleheadCount: number; collectionCount: number }`

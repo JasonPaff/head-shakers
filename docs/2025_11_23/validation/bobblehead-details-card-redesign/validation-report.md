@@ -16,27 +16,27 @@ The bobblehead details card redesign demonstrates excellent component architectu
 
 ### Quick Stats
 
-| Metric          | Value            |
-| --------------- | ---------------- |
-| Total Issues    | 15               |
-| Critical        | 2                |
-| High Priority   | 6                |
-| Medium Priority | 6                |
-| Low Priority    | 2                |
-| Auto-Fixable    | 1                |
-| Files Affected  | 9                |
-| Tests Passing   | Skipped          |
+| Metric          | Value   |
+| --------------- | ------- |
+| Total Issues    | 15      |
+| Critical        | 2       |
+| High Priority   | 6       |
+| Medium Priority | 6       |
+| Low Priority    | 2       |
+| Auto-Fixable    | 1       |
+| Files Affected  | 9       |
+| Tests Passing   | Skipped |
 
 ### Status by Phase
 
-| Phase           | Status      | Issues | Duration |
-| --------------- | ----------- | ------ | -------- |
-| Static Analysis | FAIL        | 2      | ~30s     |
-| Conventions     | PASS        | 0      | ~45s     |
-| Tests           | SKIPPED     | -      | -        |
-| Code Review     | ISSUES      | 13     | ~3min    |
-| UI Validation   | SKIPPED     | -      | -        |
-| Database        | SKIPPED     | -      | -        |
+| Phase           | Status  | Issues | Duration |
+| --------------- | ------- | ------ | -------- |
+| Static Analysis | FAIL    | 2      | ~30s     |
+| Conventions     | PASS    | 0      | ~45s     |
+| Tests           | SKIPPED | -      | -        |
+| Code Review     | ISSUES  | 13     | ~3min    |
+| UI Validation   | SKIPPED | -      | -        |
+| Database        | SKIPPED | -      | -        |
 
 ---
 
@@ -50,6 +50,7 @@ The bobblehead details card redesign demonstrates excellent component architectu
 - **Description**: Type `(index: number) => void` is not assignable to type `ReactEventHandler<HTMLDivElement> & ((index: number) => void)`. The `onImageClick` prop expects a union type that includes React's event handler signature.
 - **Impact**: TypeScript compilation fails - blocks build and deployment
 - **Fix**: Update the event handler signature to accept either an index OR wrap the handler to extract index from event target data attribute:
+
 ```typescript
 // Option 1: Update prop type to accept index only
 onImageClick?: (index: number) => void;
@@ -69,17 +70,18 @@ onImageClick={(e) => {
 - **Description**: Type `{ altText: string | null; url: string; }[]` is not assignable to type `PhotoItem[]`. The `altText` field uses `null` but `PhotoItem` expects `string | undefined`.
 - **Impact**: TypeScript compilation fails - blocks build and deployment
 - **Fix**: Either update the `PhotoItem` type definition to accept `null`, or transform the data before passing:
+
 ```typescript
 // Option 1: Update PhotoItem type
 type PhotoItem = {
   altText: string | null | undefined;
   url: string;
-}
+};
 
 // Option 2: Transform data (preferred for consistency)
-const _photos = bobblehead.photos.map(p => ({
+const _photos = bobblehead.photos.map((p) => ({
   ...p,
-  altText: p.altText ?? undefined
+  altText: p.altText ?? undefined,
 }));
 ```
 
@@ -96,7 +98,7 @@ const _photos = bobblehead.photos.map(p => ({
 - **Impact**: Pollutes browser console, potential information exposure, indicates incomplete cleanup
 - **Fix**: Remove the console.log statement entirely
 
-### Issue 4: Missing Memoization on _photos Array
+### Issue 4: Missing Memoization on \_photos Array
 
 - **Severity**: High
 - **File**: `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-feature-card.tsx`
@@ -104,13 +106,15 @@ const _photos = bobblehead.photos.map(p => ({
 - **Description**: The `_photos` derived array is recreated on every render without memoization
 - **Impact**: Causes unnecessary re-renders of child components, performance degradation
 - **Fix**: Wrap with `useMemo`:
+
 ```typescript
-const _photos = useMemo(() =>
-  bobblehead.photos.map(p => ({
-    ...p,
-    altText: p.altText ?? undefined
-  })),
-  [bobblehead.photos]
+const _photos = useMemo(
+  () =>
+    bobblehead.photos.map((p) => ({
+      ...p,
+      altText: p.altText ?? undefined,
+    })),
+  [bobblehead.photos],
 );
 ```
 
@@ -122,6 +126,7 @@ const _photos = useMemo(() =>
 - **Description**: `PhotoItem` type is defined in two separate components instead of being shared
 - **Impact**: Type drift risk, maintenance burden, current type mismatch root cause
 - **Fix**: Extract to shared types file:
+
 ```typescript
 // src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/types.ts
 export type PhotoItem = {
@@ -156,6 +161,7 @@ export type PhotoItem = {
 - **Description**: `tag.color` passed directly to inline style without validation
 - **Impact**: If tag color comes from user input or database without sanitization, could allow style injection
 - **Fix**: Validate color is a valid CSS color value or use allowlist:
+
 ```typescript
 const isValidColor = (color: string) => /^#[0-9A-Fa-f]{6}$/.test(color);
 const safeColor = isValidColor(tag.color) ? tag.color : 'var(--muted)';
@@ -218,10 +224,10 @@ const safeColor = isValidColor(tag.color) ? tag.color : 'var(--muted)';
 - **Description**: Function could be simplified using filter/reduce pattern
 - **Impact**: Minor code readability issue
 - **Fix**: Refactor to more idiomatic approach:
+
 ```typescript
 const countAcquisitionFields = (b: BobbleheadWithRelations) =>
-  [b.purchasePrice, b.acquisitionDate, b.purchaseLocation, b.acquisitionMethod]
-    .filter(Boolean).length;
+  [b.purchasePrice, b.acquisitionDate, b.purchaseLocation, b.acquisitionMethod].filter(Boolean).length;
 ```
 
 ---
@@ -272,14 +278,14 @@ These are TanStack Table React Compiler warnings and test file custom-class warn
 
 ### Recommended Tests to Create
 
-| Implementation File | Suggested Test |
-| ------------------- | -------------- |
-| `feature-card-primary-image.tsx` | `tests/unit/feature-card-primary-image.spec.tsx` |
-| `feature-card-social-bar.tsx` | `tests/unit/feature-card-social-bar.spec.tsx` |
-| `feature-card-quick-info.tsx` | `tests/unit/feature-card-quick-info.spec.tsx` |
-| `feature-card-specifications.tsx` | `tests/unit/feature-card-specifications.spec.tsx` |
-| `feature-card-acquisition.tsx` | `tests/unit/feature-card-acquisition.spec.tsx` |
-| `bobblehead-feature-card.tsx` | `tests/integration/bobblehead-feature-card.spec.tsx` |
+| Implementation File               | Suggested Test                                       |
+| --------------------------------- | ---------------------------------------------------- |
+| `feature-card-primary-image.tsx`  | `tests/unit/feature-card-primary-image.spec.tsx`     |
+| `feature-card-social-bar.tsx`     | `tests/unit/feature-card-social-bar.spec.tsx`        |
+| `feature-card-quick-info.tsx`     | `tests/unit/feature-card-quick-info.spec.tsx`        |
+| `feature-card-specifications.tsx` | `tests/unit/feature-card-specifications.spec.tsx`    |
+| `feature-card-acquisition.tsx`    | `tests/unit/feature-card-acquisition.spec.tsx`       |
+| `bobblehead-feature-card.tsx`     | `tests/integration/bobblehead-feature-card.spec.tsx` |
 
 ---
 
@@ -354,6 +360,7 @@ git add . && git commit -m "feat: redesign bobblehead details card with improved
 ### Static Analysis Details
 
 **TypeScript Errors (2)**:
+
 ```
 src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-feature-card.tsx(110,11):
 error TS2322: Type '(index: number) => void' is not assignable to type
@@ -365,6 +372,7 @@ Type 'null' is not assignable to type 'string | undefined'.
 ```
 
 **Lint Results**:
+
 - 0 errors
 - 10 warnings (all pre-existing, unrelated to this feature)
   - TanStack Table React Compiler warnings
@@ -374,32 +382,34 @@ Type 'null' is not assignable to type 'string | undefined'.
 
 **Overall Status**: COMPLIANT - 100% compliance score
 
-| Convention | Status | Compliance |
-| ---------- | ------ | ---------- |
-| Boolean naming (is prefix) | Pass | 100% |
-| Derived variables (_ prefix) | Pass | 100% |
-| Export style (named only) | Pass | 100% |
-| JSX quotes | Pass | 100% |
-| Event handlers (handle/on) | Pass | 100% |
-| Type imports | Pass | 100% |
-| Props interfaces | Pass | 100% |
-| UI block comments | Pass | 100% |
-| No forwardRef | Pass | 100% |
-| No barrel files | Pass | 100% |
-| generateTestId usage | Pass | 100% |
-| Conditional component | Pass | 100% |
+| Convention                    | Status | Compliance |
+| ----------------------------- | ------ | ---------- |
+| Boolean naming (is prefix)    | Pass   | 100%       |
+| Derived variables (\_ prefix) | Pass   | 100%       |
+| Export style (named only)     | Pass   | 100%       |
+| JSX quotes                    | Pass   | 100%       |
+| Event handlers (handle/on)    | Pass   | 100%       |
+| Type imports                  | Pass   | 100%       |
+| Props interfaces              | Pass   | 100%       |
+| UI block comments             | Pass   | 100%       |
+| No forwardRef                 | Pass   | 100%       |
+| No barrel files               | Pass   | 100%       |
+| generateTestId usage          | Pass   | 100%       |
+| Conditional component         | Pass   | 100%       |
 
 **Files Analyzed**: 9 components in feature-card implementation
 
 ### Code Review Details
 
 **Summary**:
+
 - Critical Issues: 2 (TypeScript type mismatches - also caught by static analysis)
 - High Priority: 5 (unique issues)
 - Medium Priority: 6
 - Low Priority: 2
 
 **Key Findings**:
+
 1. Console.log in production code (HIGH)
 2. Missing memoization patterns (HIGH)
 3. Duplicate type definitions (HIGH)
@@ -416,6 +426,7 @@ Type 'null' is not assignable to type 'string | undefined'.
 Reason: Implementation exists in worktree branch. Development server not running on worktree, preventing Playwright-based UI validation.
 
 **Recommendation**: Run manual visual verification at breakpoints:
+
 - 320px (mobile)
 - 768px (tablet)
 - 1200px+ (desktop)

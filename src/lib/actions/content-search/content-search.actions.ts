@@ -340,6 +340,9 @@ export const searchPublicContentAction = publicActionClient
     const dbInstance = ctx.tx ?? ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
+      category: input.filters?.category,
+      dateFrom: input.filters?.dateFrom,
+      dateTo: input.filters?.dateTo,
       entityTypes: input.filters?.entityTypes,
       page: input.pagination?.page,
       pageSize: input.pagination?.pageSize,
@@ -358,7 +361,10 @@ export const searchPublicContentAction = publicActionClient
       Sentry.addBreadcrumb({
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
+          category: input.filters?.category,
           counts: result.counts,
+          dateFrom: input.filters?.dateFrom,
+          dateTo: input.filters?.dateTo,
           entityTypes: input.filters?.entityTypes,
           page: input.pagination?.page,
           pageSize: input.pagination?.pageSize,

@@ -4,13 +4,14 @@ import { AlertCircle, Search } from 'lucide-react';
 import { parseAsArrayOf, parseAsInteger, parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
 import { Fragment, useEffect, useState, useTransition } from 'react';
 
+import type { SearchViewMode } from '@/lib/constants/enums';
 import type { PublicSearchPageResponse } from '@/lib/facades/content-search/content-search.facade';
 
 import { SearchFilters } from '@/app/(app)/browse/search/components/search-filters';
 import { SearchPagination } from '@/app/(app)/browse/search/components/search-pagination';
-import { SearchResultsGrid } from '@/app/(app)/browse/search/components/search-results-grid';
+import { SearchResults } from '@/app/(app)/browse/search/components/search-results-grid';
+import { SearchResultsSkeleton } from '@/app/(app)/browse/search/components/search-skeletons';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Spinner } from '@/components/ui/spinner';
 import { searchPublicContentAction } from '@/lib/actions/content-search/content-search.actions';
 import { CONFIG, ENUMS } from '@/lib/constants';
 
@@ -24,6 +25,9 @@ export const SearchPageContent = () => {
 
   const [queryParams, setQueryParams] = useQueryStates(
     {
+      category: parseAsString.withDefault(''),
+      dateFrom: parseAsString.withDefault(''),
+      dateTo: parseAsString.withDefault(''),
       entityTypes: parseAsArrayOf(
         parseAsStringEnum(['collection', 'subcollection', 'bobblehead'] as const),
       ).withDefault(['collection', 'subcollection', 'bobblehead']),
@@ -33,6 +37,7 @@ export const SearchPageContent = () => {
       sortBy: parseAsStringEnum([...ENUMS.SEARCH.SORT_BY]).withDefault('relevance'),
       sortOrder: parseAsStringEnum([...ENUMS.SEARCH.SORT_ORDER]).withDefault('desc'),
       tagIds: parseAsArrayOf(parseAsString).withDefault([]),
+      viewMode: parseAsStringEnum([...ENUMS.SEARCH.VIEW_MODE]).withDefault('grid'),
     },
     {
       clearOnDefault: true,
@@ -54,6 +59,9 @@ export const SearchPageContent = () => {
         try {
           const result = await searchPublicContentAction({
             filters: {
+              category: queryParams.category || undefined,
+              dateFrom: queryParams.dateFrom || undefined,
+              dateTo: queryParams.dateTo || undefined,
               entityTypes: queryParams.entityTypes,
               sortBy: queryParams.sortBy,
               sortOrder: queryParams.sortOrder,
@@ -89,6 +97,9 @@ export const SearchPageContent = () => {
     queryParams.sortOrder,
     queryParams.page,
     queryParams.pageSize,
+    queryParams.category,
+    queryParams.dateFrom,
+    queryParams.dateTo,
   ]);
 
   // Event handlers
@@ -97,12 +108,19 @@ export const SearchPageContent = () => {
   };
 
   const handleFiltersChange = (filters: {
+    category?: string;
+    dateFrom?: string;
+    dateTo?: string;
     entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;
     sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];
     sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];
     tagIds?: Array<string>;
   }) => {
     void setQueryParams({ ...filters, page: 1 });
+  };
+
+  const handleViewModeChange = (viewMode: SearchViewMode) => {
+    void setQueryParams({ viewMode });
   };
 
   const handlePageChange = (page: number) => {
@@ -122,6 +140,9 @@ export const SearchPageContent = () => {
     <div className={'space-y-6'}>
       {/* Search Filters */}
       <SearchFilters
+        category={queryParams.category}
+        dateFrom={queryParams.dateFrom}
+        dateTo={queryParams.dateTo}
         entityTypes={queryParams.entityTypes}
         onFiltersChange={handleFiltersChange}
         onQueryChange={handleQueryChange}
@@ -132,11 +153,7 @@ export const SearchPageContent = () => {
       />
 
       {/* Loading State */}
-      {_isLoading && (
-        <div className={'flex min-h-[400px] items-center justify-center'}>
-          <Spinner className={'size-16'} />
-        </div>
-      )}
+      {_isLoading && <SearchResultsSkeleton viewMode={queryParams.viewMode} />}
 
       {/* Error State */}
       {_hasError && !_isLoading && (
@@ -165,11 +182,13 @@ export const SearchPageContent = () => {
       {_isShowResultsWithPagination && (
         <Fragment>
           {/* Results Grid */}
-          <SearchResultsGrid
+          <SearchResults
             bobbleheads={searchResults.bobbleheads}
             collections={searchResults.collections}
             counts={searchResults.counts}
+            onViewModeChange={handleViewModeChange}
             subcollections={searchResults.subcollections}
+            viewMode={queryParams.viewMode}
           />
 
           {/* Pagination */}

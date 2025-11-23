@@ -27,10 +27,18 @@ export const publicSearchQuerySchema = z
   );
 
 /**
- * Schema for search filters (entity types, tags, sort options)
+ * Schema for search filters (entity types, tags, sort options, view mode, date range, category)
  * All filters are optional to support flexible search queries
  */
 export const searchFiltersSchema = z.object({
+  // Category filtering - optional category string for filtering results
+  category: z.string().trim().optional(),
+
+  // Date range filtering - optional date strings for filtering by date range
+  dateFrom: z.string().optional(),
+
+  dateTo: z.string().optional(),
+
   // Entity type toggles - array of entity types to include in search
   entityTypes: z
     .array(z.enum(SEARCHABLE_ENTITY_TYPES))
@@ -42,6 +50,7 @@ export const searchFiltersSchema = z.object({
   sortBy: z.enum(ENUMS.SEARCH.SORT_BY).optional().default('relevance'),
 
   sortOrder: z.enum(ENUMS.SEARCH.SORT_ORDER).optional().default('desc'),
+
   // Tag filtering - array of tag IDs to filter by (include only logic)
   tagIds: z
     .array(z.string().uuid('Invalid tag ID'))
@@ -51,6 +60,9 @@ export const searchFiltersSchema = z.object({
     )
     .optional()
     .default([]),
+
+  // View mode - grid or list display mode
+  viewMode: z.enum(ENUMS.SEARCH.VIEW_MODE).optional().default('grid'),
 });
 
 /**

@@ -1,4 +1,4 @@
-import { and, count, eq, ilike, inArray, not, or, type SQL } from 'drizzle-orm';
+import { and, count, eq, gte, ilike, inArray, lte, not, or, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
@@ -68,6 +68,19 @@ export type PublicSearchCounts = {
   collections: number;
   subcollections: number;
   total: number;
+};
+
+/**
+ * Additional filter options for public search queries
+ * Supports date range and category filtering
+ */
+export type PublicSearchFilterOptions = {
+  /** Filter by category (case-insensitive partial match) */
+  category?: string;
+  /** Filter results created on or after this date */
+  dateFrom?: string;
+  /** Filter results created on or before this date */
+  dateTo?: string;
 };
 
 export type SubcollectionSearchResult = {
@@ -362,11 +375,13 @@ export class ContentSearchQuery extends BaseQuery {
    * @param query - Search text to match across all entity types
    * @param context - Query context with database instance
    * @param tagIds - Optional array of tag IDs to filter by
+   * @param filterOptions - Optional additional filters (dateFrom, dateTo, category)
    */
   static async getSearchResultCounts(
     query: string,
     context: QueryContext,
     tagIds?: Array<string>,
+    filterOptions?: PublicSearchFilterOptions,
   ): Promise<PublicSearchCounts> {
     const dbInstance = this.getDbInstance(context);
 
@@ -384,6 +399,14 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(users.username, `%${query}%`),
       );
       if (textSearch) collectionConditions.push(textSearch);
+    }
+
+    // Apply date range filters to collections
+    if (filterOptions?.dateFrom) {
+      collectionConditions.push(gte(collections.createdAt, new Date(filterOptions.dateFrom)));
+    }
+    if (filterOptions?.dateTo) {
+      collectionConditions.push(lte(collections.createdAt, new Date(filterOptions.dateTo)));
     }
 
     if (tagIds && tagIds.length > 0) {
@@ -423,6 +446,14 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(users.username, `%${query}%`),
       );
       if (textSearch) subcollectionConditions.push(textSearch);
+    }
+
+    // Apply date range filters to subcollections
+    if (filterOptions?.dateFrom) {
+      subcollectionConditions.push(gte(subCollections.createdAt, new Date(filterOptions.dateFrom)));
+    }
+    if (filterOptions?.dateTo) {
+      subcollectionConditions.push(lte(subCollections.createdAt, new Date(filterOptions.dateTo)));
     }
 
     if (tagIds && tagIds.length > 0) {
@@ -466,6 +497,17 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(collections.name, `%${query}%`),
       );
       if (textSearch) bobbleheadConditions.push(textSearch);
+    }
+
+    // Apply date range and category filters to bobbleheads
+    if (filterOptions?.dateFrom) {
+      bobbleheadConditions.push(gte(bobbleheads.createdAt, new Date(filterOptions.dateFrom)));
+    }
+    if (filterOptions?.dateTo) {
+      bobbleheadConditions.push(lte(bobbleheads.createdAt, new Date(filterOptions.dateTo)));
+    }
+    if (filterOptions?.category) {
+      bobbleheadConditions.push(ilike(bobbleheads.category, `%${filterOptions.category}%`));
     }
 
     if (tagIds && tagIds.length > 0) {
@@ -710,13 +752,14 @@ export class ContentSearchQuery extends BaseQuery {
    * Search public bobbleheads for unauthenticated users
    * Uses GIN indexes on name/description fields for efficient text search
    * Searches across multiple fields including manufacturer, series, character name
-   * Supports tag filtering
+   * Supports tag filtering, date range filtering, and category filtering
    *
    * @param query - Search text to match against multiple bobblehead fields
    * @param limit - Maximum number of results to return
    * @param context - Query context with database instance
    * @param tagIds - Optional array of tag IDs to filter by (include only logic)
    * @param offset - Optional offset for pagination
+   * @param filterOptions - Optional additional filters (dateFrom, dateTo, category)
    */
   static async searchPublicBobbleheads(
     query: string,
@@ -724,6 +767,7 @@ export class ContentSearchQuery extends BaseQuery {
     context: QueryContext,
     tagIds?: Array<string>,
     offset?: number,
+    filterOptions?: PublicSearchFilterOptions,
   ): Promise<Array<BobbleheadSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -751,6 +795,17 @@ export class ContentSearchQuery extends BaseQuery {
       if (textSearchCondition) {
         conditions.push(textSearchCondition);
       }
+    }
+
+    // Apply date range and category filters
+    if (filterOptions?.dateFrom) {
+      conditions.push(gte(bobbleheads.createdAt, new Date(filterOptions.dateFrom)));
+    }
+    if (filterOptions?.dateTo) {
+      conditions.push(lte(bobbleheads.createdAt, new Date(filterOptions.dateTo)));
+    }
+    if (filterOptions?.category) {
+      conditions.push(ilike(bobbleheads.category, `%${filterOptions.category}%`));
     }
 
     const queryBuilder = dbInstance
@@ -805,13 +860,14 @@ export class ContentSearchQuery extends BaseQuery {
   /**
    * Search public collections for unauthenticated users
    * Uses GIN indexes on name/description fields for efficient text search
-   * Supports tag filtering via joins with bobblehead tags
+   * Supports tag filtering via joins with bobblehead tags and date range filtering
    *
    * @param query - Search text to match against name, description, and owner information
    * @param limit - Maximum number of results to return
    * @param context - Query context with database instance
    * @param tagIds - Optional array of tag IDs to filter by (include only logic)
    * @param offset - Optional offset for pagination
+   * @param filterOptions - Optional additional filters (dateFrom, dateTo)
    */
   static async searchPublicCollections(
     query: string,
@@ -819,6 +875,7 @@ export class ContentSearchQuery extends BaseQuery {
     context: QueryContext,
     tagIds?: Array<string>,
     offset?: number,
+    filterOptions?: PublicSearchFilterOptions,
   ): Promise<Array<CollectionSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -840,6 +897,14 @@ export class ContentSearchQuery extends BaseQuery {
       if (textSearchCondition) {
         conditions.push(textSearchCondition);
       }
+    }
+
+    // Apply date range filters
+    if (filterOptions?.dateFrom) {
+      conditions.push(gte(collections.createdAt, new Date(filterOptions.dateFrom)));
+    }
+    if (filterOptions?.dateTo) {
+      conditions.push(lte(collections.createdAt, new Date(filterOptions.dateTo)));
     }
 
     const queryBuilder = dbInstance
@@ -919,13 +984,14 @@ export class ContentSearchQuery extends BaseQuery {
   /**
    * Search public subcollections for unauthenticated users
    * Filters by parent collection visibility (both subcollection and parent must be public)
-   * Supports tag filtering via bobblehead tags within the subcollection
+   * Supports tag filtering via bobblehead tags within the subcollection and date range filtering
    *
    * @param query - Search text to match against name, description, collection name, and owner information
    * @param limit - Maximum number of results to return
    * @param context - Query context with database instance
    * @param tagIds - Optional array of tag IDs to filter by (include only logic)
    * @param offset - Optional offset for pagination
+   * @param filterOptions - Optional additional filters (dateFrom, dateTo)
    */
   static async searchPublicSubcollections(
     query: string,
@@ -933,6 +999,7 @@ export class ContentSearchQuery extends BaseQuery {
     context: QueryContext,
     tagIds?: Array<string>,
     offset?: number,
+    filterOptions?: PublicSearchFilterOptions,
   ): Promise<Array<SubcollectionSearchResult>> {
     const dbInstance = this.getDbInstance(context);
 
@@ -955,6 +1022,14 @@ export class ContentSearchQuery extends BaseQuery {
       if (textSearchCondition) {
         conditions.push(textSearchCondition);
       }
+    }
+
+    // Apply date range filters
+    if (filterOptions?.dateFrom) {
+      conditions.push(gte(subCollections.createdAt, new Date(filterOptions.dateFrom)));
+    }
+    if (filterOptions?.dateTo) {
+      conditions.push(lte(subCollections.createdAt, new Date(filterOptions.dateTo)));
     }
 
     const queryBuilder = dbInstance

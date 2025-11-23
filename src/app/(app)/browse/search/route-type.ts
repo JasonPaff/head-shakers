@@ -6,6 +6,9 @@ import { ENUMS } from '@/lib/constants';
 
 export const Route = {
   searchParams: z.object({
+    category: z.string().optional(),
+    dateFrom: z.string().optional(),
+    dateTo: z.string().optional(),
     entityTypes: z
       .array(z.enum(['collection', 'subcollection', 'bobblehead']))
       .optional()
@@ -22,6 +25,10 @@ export const Route = {
       .optional()
       .default('desc'),
     tagIds: z.array(z.string()).optional().default([]),
+    viewMode: z
+      .enum([...ENUMS.SEARCH.VIEW_MODE] as [string, ...Array<string>])
+      .optional()
+      .default('grid'),
   }),
 } satisfies DynamicRoute;
 

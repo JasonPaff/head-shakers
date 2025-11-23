@@ -8,9 +8,11 @@
 ## Input Context
 
 ### Refined Request Used
+
 Enhance the visual appeal and overall UI/UX of the bobblehead details page image carousels by improving the existing Embla Carousel implementation with smoother transitions, better navigation controls, improved thumbnail interactions, and lightbox modal enhancements.
 
 ### File Analysis Input
+
 - 6 Critical priority files identified for modification
 - 3 High priority supporting files
 - 6 Medium/Low priority reference files
@@ -30,12 +32,14 @@ Do NOT include code examples.
 ## Agent Response Summary
 
 ### Plan Statistics
+
 - **Estimated Duration**: 3-4 days
 - **Complexity**: Medium
 - **Risk Level**: Low
 - **Total Steps**: 9 implementation steps
 
 ### Steps Generated
+
 1. Extend Core Carousel Component with Dot Indicators and Animation Support
 2. Add Carousel-Specific CSS Animation Keyframes
 3. Enhance Feature Card Primary Image with Blur Placeholders and Transitions
@@ -47,9 +51,11 @@ Do NOT include code examples.
 9. Integration Testing and Visual Verification
 
 ### Files to Create
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/feature-card-lightbox-modal.tsx`
 
 ### Files to Modify
+
 - `src/components/ui/carousel.tsx`
 - `src/app/globals.css`
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/feature-card-primary-image.tsx`

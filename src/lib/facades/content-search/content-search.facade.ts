@@ -4,6 +4,7 @@ import type {
   CollectionSearchResult,
   ConsolidatedSearchResults,
   PublicSearchCounts,
+  PublicSearchFilterOptions,
   SubcollectionSearchResult,
   UserSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
@@ -258,18 +259,40 @@ export class ContentSearchFacade {
     const offset = (page - 1) * pageSize;
 
     // Generate cache key hashes from query and filter parameters
+    // Explicitly include relevant filter fields (excluding viewMode which is UI-only)
+    // This ensures different filter combinations generate unique cache keys
     const queryHash = createHashFromObject({ query });
-    const filtersHash = createHashFromObject({ filters, pagination });
+    const filtersHash = createHashFromObject({
+      category: filters?.category,
+      dateFrom: filters?.dateFrom,
+      dateTo: filters?.dateTo,
+      entityTypes: filters?.entityTypes,
+      pagination,
+      sortBy: filters?.sortBy,
+      sortOrder: filters?.sortOrder,
+      tagIds: filters?.tagIds,
+    });
 
     return CacheService.redisSearch.publicPage(
       async () => {
         const context = createPublicQueryContext({ dbInstance });
+
+        // Build additional filter options from filters
+        const filterOptions: PublicSearchFilterOptions | undefined =
+          filters?.dateFrom || filters?.dateTo || filters?.category ?
+            {
+              category: filters?.category,
+              dateFrom: filters?.dateFrom,
+              dateTo: filters?.dateTo,
+            }
+          : undefined;
 
         // Get total counts for all entity types
         const counts = await ContentSearchQuery.getSearchResultCounts(
           query,
           context,
           filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
+          filterOptions,
         );
 
         // Determine which entity types to search based on filters
@@ -284,6 +307,7 @@ export class ContentSearchFacade {
               context,
               filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
               offset,
+              filterOptions,
             )
           : Promise.resolve([]),
           entityTypes.includes('subcollection') ?
@@ -293,6 +317,7 @@ export class ContentSearchFacade {
               context,
               filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
               offset,
+              filterOptions,
             )
           : Promise.resolve([]),
           entityTypes.includes('bobblehead') ?
@@ -302,6 +327,7 @@ export class ContentSearchFacade {
               context,
               filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
               offset,
+              filterOptions,
             )
           : Promise.resolve([]),
         ]);
