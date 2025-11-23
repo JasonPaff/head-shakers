@@ -4,7 +4,7 @@ import type { KeyboardEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
@@ -76,17 +76,20 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
   const handleModalKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'ArrowLeft') handlePreviousModalPhoto();
     else if (event.key === 'ArrowRight') handleNextModalPhoto();
-    else if (event.key === 'Escape') setIsPhotoDialogOpen.off();
   };
 
   const _currentModalPhoto = bobblehead.photos[modalPhotoIndex] || bobblehead.photos[0];
   const _hasMultiplePhotos = bobblehead.photos.length > 1;
   const _hasModalImage = _currentModalPhoto?.url && _currentModalPhoto.url !== '/placeholder.jpg';
 
-  const _photos = bobblehead.photos.map((photo) => ({
-    altText: photo.altText,
-    url: photo.url,
-  }));
+  const _photos = useMemo(
+    () =>
+      bobblehead.photos.map((photo) => ({
+        altText: photo.altText ?? undefined,
+        url: photo.url,
+      })),
+    [bobblehead.photos],
+  );
 
   return (
     <Card className={'overflow-hidden'} data-slot={'bobblehead-feature-card'}>
@@ -107,7 +110,7 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
         <FeatureCardImageGallery
           className={'px-4 pt-4'}
           currentIndex={mainPhotoIndex}
-          onSelect={handleGallerySelect}
+          onImageSelect={handleGallerySelect}
           photos={_photos}
         />
       </Conditional>

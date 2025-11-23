@@ -4,6 +4,7 @@ import type { ComponentProps, KeyboardEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
+import { useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -14,6 +15,8 @@ import { useToggle } from '@/hooks/use-toggle';
 import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
+
+import type { PhotoItem } from './types';
 
 type FeatureCardPrimaryImageProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
@@ -26,11 +29,6 @@ type FeatureCardPrimaryImageProps = ComponentProps<'div'> &
     onPrevious: () => void;
     photos: Array<PhotoItem>;
   };
-
-type PhotoItem = {
-  altText?: null | string;
-  url: string;
-};
 
 export const FeatureCardPrimaryImage = ({
   bobbleheadName,
@@ -46,13 +44,15 @@ export const FeatureCardPrimaryImage = ({
   ...props
 }: FeatureCardPrimaryImageProps) => {
   const [isHovering, setIsHovering] = useToggle();
+  const [_hasImageError, setHasImageError] = useState(false);
 
   const imageTestId = testId || generateTestId('feature', 'bobblehead-photo', 'primary');
 
   // Derived variables
   const _currentPhoto = photos[currentIndex] || photos[0];
   const _hasMultiplePhotos = photos.length > 1;
-  const _hasImage = Boolean(_currentPhoto?.url) && _currentPhoto?.url !== '/placeholder.jpg';
+  const _hasImage =
+    Boolean(_currentPhoto?.url) && _currentPhoto?.url !== '/placeholder.jpg' && !_hasImageError;
   const _photoCount = photos.length;
   const _currentPhotoNumber = currentIndex + 1;
   const _photoAlt = _currentPhoto?.altText ?? bobbleheadName;
@@ -87,8 +87,13 @@ export const FeatureCardPrimaryImage = ({
     onNext();
   };
 
+  const handleImageError = () => {
+    setHasImageError(true);
+  };
+
   return (
     <div
+      aria-label={`View ${bobbleheadName} image in fullscreen`}
       className={cn('relative aspect-[3/4] cursor-pointer lg:aspect-square', className)}
       data-slot={'feature-card-primary-image'}
       data-testid={imageTestId}
@@ -118,6 +123,7 @@ export const FeatureCardPrimaryImage = ({
           crop={'fill'}
           format={'auto'}
           height={800}
+          onError={handleImageError}
           quality={'auto:good'}
           src={extractPublicIdFromCloudinaryUrl(_currentPhoto?.url ?? '')}
           width={600}

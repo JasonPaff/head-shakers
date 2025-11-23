@@ -79,24 +79,14 @@ export const FeatureCardAcquisition = ({
       data-testid={acquisitionTestId}
       {...props}
     >
-      <FeatureCardSection
-        isDefaultOpen={false}
-        itemCount={_itemCount}
-        title={'Acquisition Details'}
-      >
+      <FeatureCardSection isDefaultOpen={false} itemCount={_itemCount} title={'Acquisition Details'}>
         {/* Empty State */}
         <Conditional isCondition={!_hasAcquisitionData}>
           <div className={'py-4 text-center'}>
-            <div
-              className={
-                'mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-muted/50'
-              }
-            >
+            <div className={'mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-muted/50'}>
               <ShoppingCartIcon aria-hidden className={'size-5 text-muted-foreground'} />
             </div>
-            <p className={'text-sm text-muted-foreground'}>
-              No acquisition information has been added yet.
-            </p>
+            <p className={'text-sm text-muted-foreground'}>No acquisition information has been added yet.</p>
           </div>
         </Conditional>
 

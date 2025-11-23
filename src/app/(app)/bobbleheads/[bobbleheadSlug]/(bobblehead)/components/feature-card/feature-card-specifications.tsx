@@ -68,10 +68,7 @@ export const FeatureCardSpecifications = ({ bobblehead }: FeatureCardSpecificati
         }
         isCondition={_hasAnySpecs}
       >
-        <div
-          className={'space-y-3'}
-          data-slot={'feature-card-specifications-list'}
-        >
+        <div className={'space-y-3'} data-slot={'feature-card-specifications-list'}>
           {_specificationItems.map((spec) => (
             <FeatureCardDetailItem
               icon={spec.icon}

@@ -9,7 +9,6 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Button } from '@/components/ui/button';
 import { LikeIconButton } from '@/components/ui/like-button';
-import { Separator } from '@/components/ui/separator';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -29,16 +28,14 @@ export const FeatureCardSocialBar = ({
   ...props
 }: FeatureCardSocialBarProps) => {
   const socialBarTestId = testId || generateTestId('feature', 'bobblehead-details', 'social-bar');
-  const commentsButtonTestId = testId
-    ? `${testId}-comments`
-    : generateTestId('feature', 'bobblehead-details', 'comments-btn');
-  const shareButtonTestId = testId
-    ? `${testId}-share`
-    : generateTestId('feature', 'bobblehead-details', 'share-btn');
+  const commentsButtonTestId =
+    testId ? `${testId}-comments` : generateTestId('feature', 'bobblehead-details', 'comments-btn');
+  const shareButtonTestId =
+    testId ? `${testId}-share` : generateTestId('feature', 'bobblehead-details', 'share-btn');
 
   const handleShareClick = () => {
-    // Share functionality placeholder
-    console.log('Share clicked for bobblehead:', bobbleheadId);
+    // TODO: Implement share functionality for bobblehead sharing
+    void bobbleheadId;
   };
 
   const _commentLabel = commentCount === 1 ? 'comment' : 'comments';
@@ -50,9 +47,6 @@ export const FeatureCardSocialBar = ({
       data-testid={socialBarTestId}
       {...props}
     >
-      {/* Visual Separator */}
-      <Separator />
-
       {/* Social Actions Row */}
       <div className={'flex items-center gap-4'}>
         {/* Like Button */}

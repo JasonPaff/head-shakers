@@ -62,15 +62,15 @@ export const FeatureCardSection = ({
         </div>
         <ChevronDownIcon
           aria-hidden
-          className={cn('size-4 shrink-0 text-muted-foreground transition-transform duration-200', isOpen && 'rotate-180')}
+          className={cn(
+            'size-4 shrink-0 text-muted-foreground transition-transform duration-200',
+            isOpen && 'rotate-180',
+          )}
         />
       </CollapsibleTrigger>
 
       {/* Section Content */}
-      <CollapsibleContent
-        className={'mt-3 space-y-3'}
-        data-slot={'feature-card-section-content'}
-      >
+      <CollapsibleContent className={'mt-3 space-y-3'} data-slot={'feature-card-section-content'}>
         {children}
       </CollapsibleContent>
     </Collapsible>

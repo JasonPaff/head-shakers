@@ -58,12 +58,12 @@ The test-gap-analyzer examined all source files against existing tests and ident
 
 **File**: `src/lib/actions/social/social.actions.ts`
 
-| Gap | Tests Needed | Risk |
-| --- | ------------ | ---- |
-| createCommentAction error handling | 4-5 | High - Invalid input not tested |
-| updateCommentAction authorization | 3-4 | High - Auth bypass possible |
-| deleteCommentAction cascade | 3-4 | High - Cascade failures untested |
-| Cache invalidation verification | 2-3 | Medium - Stale data possible |
+| Gap                                | Tests Needed | Risk                             |
+| ---------------------------------- | ------------ | -------------------------------- |
+| createCommentAction error handling | 4-5          | High - Invalid input not tested  |
+| updateCommentAction authorization  | 3-4          | High - Auth bypass possible      |
+| deleteCommentAction cascade        | 3-4          | High - Cascade failures untested |
+| Cache invalidation verification    | 2-3          | Medium - Stale data possible     |
 
 **Missing Test Cases**:
 
@@ -78,12 +78,12 @@ The test-gap-analyzer examined all source files against existing tests and ident
 
 **File**: `src/lib/facades/social/social.facade.ts`
 
-| Gap | Tests Needed | Risk |
-| --- | ------------ | ---- |
-| createCommentReply validations | 4-5 | Critical - Business rules |
-| deleteComment cascade | 3-4 | High - Data integrity |
-| Depth limit enforcement | 2-3 | High - System limits |
-| Blocked user prevention | 2-3 | Medium - Access control |
+| Gap                            | Tests Needed | Risk                      |
+| ------------------------------ | ------------ | ------------------------- |
+| createCommentReply validations | 4-5          | Critical - Business rules |
+| deleteComment cascade          | 3-4          | High - Data integrity     |
+| Depth limit enforcement        | 2-3          | High - System limits      |
+| Blocked user prevention        | 2-3          | Medium - Access control   |
 
 **Missing Test Cases**:
 
@@ -168,37 +168,37 @@ The test-gap-analyzer examined all source files against existing tests and ident
 
 **File**: `src/lib/queries/social/social.query.ts`
 
-| Gap | Tests Needed |
-| --- | ------------ |
-| Soft delete filtering | 2 |
-| Pagination edge cases | 2-3 |
-| Recursive tree building | 2-3 |
-| Polymorphic operations | 2-3 |
+| Gap                     | Tests Needed |
+| ----------------------- | ------------ |
+| Soft delete filtering   | 2            |
+| Pagination edge cases   | 2-3          |
+| Recursive tree building | 2-3          |
+| Polymorphic operations  | 2-3          |
 
 #### 6. E2E Tests (6-8 tests)
 
 **File to Create**: `tests/e2e/specs/comments.spec.ts`
 
-| Scenario | Tests |
-| --- | --- |
-| Complete comment thread workflow | 2 |
-| Reply nesting up to max depth | 1 |
-| Edit and delete flows | 2 |
-| Permission-based UI | 2-3 |
+| Scenario                         | Tests |
+| -------------------------------- | ----- |
+| Complete comment thread workflow | 2     |
+| Reply nesting up to max depth    | 1     |
+| Edit and delete flows            | 2     |
+| Permission-based UI              | 2-3   |
 
 ---
 
 ## Test Count Summary
 
-| Category | Existing | New Needed | Total |
-| --- | --- | --- | --- |
-| Unit Tests (Actions) | 0 | 12-14 | 12-14 |
-| Unit Tests (Validation) | ~30 | 0 | ~30 |
-| Component Tests | 0 | 42-48 | 42-48 |
-| Integration Tests (Facade) | ~20 | 12-14 | 32-34 |
-| Integration Tests (Query) | 0 | 8-10 | 8-10 |
-| E2E Tests | 0 | 6-8 | 6-8 |
-| **TOTAL** | ~50 | **80-94** | **130-144** |
+| Category                   | Existing | New Needed | Total       |
+| -------------------------- | -------- | ---------- | ----------- |
+| Unit Tests (Actions)       | 0        | 12-14      | 12-14       |
+| Unit Tests (Validation)    | ~30      | 0          | ~30         |
+| Component Tests            | 0        | 42-48      | 42-48       |
+| Integration Tests (Facade) | ~20      | 12-14      | 32-34       |
+| Integration Tests (Query)  | 0        | 8-10       | 8-10        |
+| E2E Tests                  | 0        | 6-8        | 6-8         |
+| **TOTAL**                  | ~50      | **80-94**  | **130-144** |
 
 ---
 
@@ -246,14 +246,14 @@ tests/
 
 ## Risk Assessment
 
-| Gap | Risk Level | Impact |
-| --- | --- | --- |
-| Server action error handling | HIGH | Invalid operations could corrupt data |
-| Cascade deletion | HIGH | Orphaned data or data loss |
-| Depth limit enforcement | HIGH | System abuse possible |
-| Component rendering | MEDIUM | Poor UX, visual bugs |
-| Permission checks | MEDIUM | Unauthorized access |
-| Cache invalidation | LOW | Stale data temporarily |
+| Gap                          | Risk Level | Impact                                |
+| ---------------------------- | ---------- | ------------------------------------- |
+| Server action error handling | HIGH       | Invalid operations could corrupt data |
+| Cascade deletion             | HIGH       | Orphaned data or data loss            |
+| Depth limit enforcement      | HIGH       | System abuse possible                 |
+| Component rendering          | MEDIUM     | Poor UX, visual bugs                  |
+| Permission checks            | MEDIUM     | Unauthorized access                   |
+| Cache invalidation           | LOW        | Stale data temporarily                |
 
 ---
 

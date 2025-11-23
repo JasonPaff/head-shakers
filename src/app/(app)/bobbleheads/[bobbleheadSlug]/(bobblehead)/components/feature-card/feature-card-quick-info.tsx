@@ -8,6 +8,12 @@ import { cn } from '@/utils/tailwind-utils';
 
 import { FeatureCardDetailItem } from './feature-card-detail-item';
 
+// Helper function to validate hex colors for XSS prevention
+const isValidHexColor = (color: null | string | undefined): boolean => {
+  if (!color) return false;
+  return /^#[0-9A-Fa-f]{6}$/.test(color);
+};
+
 type FeatureCardQuickInfoProps = ComponentTestIdProps & {
   bobblehead: BobbleheadWithRelations;
 };
@@ -27,11 +33,7 @@ export const FeatureCardQuickInfo = ({ bobblehead, testId }: FeatureCardQuickInf
   const _hasMoreTags = _remainingTagsCount > 0;
 
   return (
-    <div
-      className={'space-y-4'}
-      data-slot={'feature-card-quick-info'}
-      data-testid={quickInfoTestId}
-    >
+    <div className={'space-y-4'} data-slot={'feature-card-quick-info'} data-testid={quickInfoTestId}>
       {/* Character and Series Section */}
       <div className={'space-y-1'}>
         <Conditional
@@ -104,7 +106,7 @@ export const FeatureCardQuickInfo = ({ bobblehead, testId }: FeatureCardQuickInf
             <Badge
               className={cn('text-xs')}
               key={tag.id}
-              style={{ backgroundColor: tag.color }}
+              style={{ backgroundColor: isValidHexColor(tag.color) ? tag.color : undefined }}
               testId={`${quickInfoTestId}-tag-${tag.id}`}
               variant={'default'}
             >

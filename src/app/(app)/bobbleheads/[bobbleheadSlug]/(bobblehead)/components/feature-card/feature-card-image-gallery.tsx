@@ -11,22 +11,21 @@ import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
-export type PhotoItem = {
-  altText?: null | string;
-  url: string;
-};
+import type { PhotoItem } from './types';
 
-type FeatureCardImageGalleryProps = ComponentTestIdProps &
-  Omit<ComponentProps<'div'>, 'onSelect'> & {
+export type { PhotoItem };
+
+type FeatureCardImageGalleryProps = ComponentProps<'div'> &
+  ComponentTestIdProps & {
     currentIndex: number;
-    onSelect: (index: number) => void;
+    onImageSelect: (index: number) => void;
     photos: Array<PhotoItem>;
   };
 
 export const FeatureCardImageGallery = ({
   className,
   currentIndex,
-  onSelect,
+  onImageSelect,
   photos,
   testId,
   ...props
@@ -37,19 +36,19 @@ export const FeatureCardImageGallery = ({
 
   const handleThumbnailClick = useCallback(
     (index: number) => {
-      onSelect(index);
+      onImageSelect(index);
     },
-    [onSelect],
+    [onImageSelect],
   );
 
   const handleKeyDown = useCallback(
     (index: number, event: React.KeyboardEvent) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        onSelect(index);
+        onImageSelect(index);
       }
     },
-    [onSelect],
+    [onImageSelect],
   );
 
   return (
