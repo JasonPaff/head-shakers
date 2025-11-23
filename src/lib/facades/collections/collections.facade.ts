@@ -6,6 +6,7 @@ import type {
   BobbleheadListRecord,
   BrowseCategoriesResult,
   BrowseCollectionsResult,
+  BrowseCollectionsWithSubcollectionsResult,
   CategoryRecord,
   CollectionRecord,
   CollectionWithRelations,
@@ -283,7 +284,7 @@ export class CollectionsFacade {
     input: BrowseCollectionsInput,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<BrowseCollectionsResult> {
+  ): Promise<BrowseCollectionsResult | BrowseCollectionsWithSubcollectionsResult> {
     const startTime = performance.now();
 
     // Track filter usage patterns
@@ -292,6 +293,7 @@ export class CollectionsFacade {
     if (input.filters?.categoryId) activeFilters.push('category');
     if (input.filters?.ownerId) activeFilters.push('owner');
     if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');
+    if (input.filters?.includeSubcollections) activeFilters.push('includeSubcollections');
 
     Sentry.addBreadcrumb({
       category: 'browse_filters',
@@ -300,6 +302,7 @@ export class CollectionsFacade {
         categoryId: input.filters?.categoryId ? 'set' : 'unset',
         dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
         dateTo: input.filters?.dateTo ? 'set' : 'unset',
+        includeSubcollections: input.filters?.includeSubcollections ? 'enabled' : 'disabled',
         ownerId: input.filters?.ownerId ? 'set' : 'unset',
         query:
           input.filters?.query ?
@@ -356,19 +359,44 @@ export class CollectionsFacade {
           }
 
           // transform results to include Cloudinary URLs for first bobblehead photos
-          const transformedCollections = result.collections.map((record) => ({
-            ...record,
-            firstBobbleheadPhoto:
-              record.firstBobbleheadPhoto ?
-                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
-                  crop: 'fill',
-                  gravity: 'auto',
-                  height: 300,
-                  quality: 'auto',
-                  width: 300,
-                })
-              : null,
-          }));
+          // and subcollection cover images when includeSubcollections is enabled
+          const transformedCollections = result.collections.map((record) => {
+            const baseTransform = {
+              ...record,
+              firstBobbleheadPhoto:
+                record.firstBobbleheadPhoto ?
+                  CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
+                    crop: 'fill',
+                    gravity: 'auto',
+                    height: 300,
+                    quality: 'auto',
+                    width: 300,
+                  })
+                : null,
+            };
+
+            // Transform subcollection cover images if present (when includeSubcollections is enabled)
+            if ('subCollections' in record && Array.isArray(record.subCollections)) {
+              return {
+                ...baseTransform,
+                subCollections: record.subCollections.map((subCollection) => ({
+                  ...subCollection,
+                  coverImageUrl:
+                    subCollection.coverImageUrl ?
+                      CloudinaryService.getOptimizedUrl(subCollection.coverImageUrl, {
+                        crop: 'fill',
+                        gravity: 'auto',
+                        height: 200,
+                        quality: 'auto',
+                        width: 200,
+                      })
+                    : null,
+                })),
+              };
+            }
+
+            return baseTransform;
+          });
 
           return {
             ...result,
@@ -453,6 +481,7 @@ export class CollectionsFacade {
           filters: {
             category: input.filters?.categoryId ? 'set' : 'unset',
             dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',
+            includeSubcollections: input.filters?.includeSubcollections ? 'enabled' : 'disabled',
             owner: input.filters?.ownerId ? 'set' : 'unset',
             query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',
           },
