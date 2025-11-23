@@ -1,15 +1,10 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
-import { CldImage } from 'next-cloudinary';
-import { $path } from 'next-typesafe-url';
-import Image from 'next/image';
-import Link from 'next/link';
+import { FolderOpen } from 'lucide-react';
 
-import { SubcollectionActions } from '@/components/feature/subcollections/subcollection-actions';
-import { Badge } from '@/components/ui/badge';
-import { Conditional } from '@/components/ui/conditional';
-import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
+import { SubcollectionCard } from '@/components/feature/subcollections/subcollection-card';
+import { EmptyState } from '@/components/ui/empty-state';
+import { generateTestId } from '@/lib/test-ids';
 
 interface CollectionSubcollectionsListProps {
   collectionSlug: string;
@@ -31,82 +26,44 @@ export const CollectionSubcollectionsList = ({
   isOwner,
   subcollections,
 }: CollectionSubcollectionsListProps) => {
-  const hasSubcollections = subcollections.length > 0;
+  const subcollectionGridTestId = generateTestId('feature', 'subcollection-grid');
 
-  if (!hasSubcollections) {
-    return <p className={'text-sm text-muted-foreground'}>This collection has no subcollections.</p>;
+  const _hasSubcollections = subcollections.length > 0;
+
+  if (!_hasSubcollections) {
+    return (
+      <EmptyState
+        className={'min-h-[200px]'}
+        description={'Organize your collection by creating subcollections'}
+        icon={FolderOpen}
+        testId={generateTestId('feature', 'subcollection-empty-state')}
+        title={'No Subcollections'}
+      />
+    );
   }
 
   return (
-    <ul className={'space-y-3'}>
+    <div
+      aria-label={'Subcollections list'}
+      className={'grid grid-cols-1 gap-4 sm:grid-cols-2'}
+      data-slot={'subcollection-grid'}
+      data-testid={subcollectionGridTestId}
+      role={'list'}
+    >
       {subcollections.map((subcollection) => (
-        <li className={'group relative'} key={subcollection.id}>
-          <div className={'flex items-start gap-2'}>
-            <Link
-              className={`flex min-w-0 flex-1 items-center gap-3 rounded-lg border border-border
-                bg-card p-3 shadow-sm transition-all hover:bg-accent hover:shadow-md`}
-              href={$path({
-                route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-                routeParams: {
-                  collectionSlug,
-                  subcollectionSlug: subcollection.slug,
-                },
-              })}
-            >
-              {/* Cover Photo or Placeholder */}
-              <div className={'relative size-12 flex-shrink-0 overflow-hidden rounded-md bg-muted'}>
-                <Conditional isCondition={!!subcollection.coverImageUrl}>
-                  <CldImage
-                    alt={`${subcollection.name} cover`}
-                    className={'object-cover'}
-                    fill
-                    sizes={'48px'}
-                    src={subcollection.coverImageUrl ?? ''}
-                  />
-                </Conditional>
-                <Conditional isCondition={!subcollection.coverImageUrl}>
-                  <Image
-                    alt={'Subcollection placeholder'}
-                    className={'object-cover'}
-                    fill
-                    sizes={'48px'}
-                    src={CLOUDINARY_PATHS.PLACEHOLDERS.SUBCOLLECTION_COVER}
-                  />
-                </Conditional>
-              </div>
-
-              {/* Content */}
-              <div className={'min-w-0 flex-1 overflow-hidden'}>
-                <div className={'mb-1 flex items-start gap-2'}>
-                  <h4 className={'min-w-0 flex-1 truncate text-sm font-medium'}>{subcollection.name}</h4>
-                  <Badge className={'flex-shrink-0 text-xs'} variant={'secondary'}>
-                    {subcollection.bobbleheadCount}
-                  </Badge>
-                </div>
-                <Conditional isCondition={!!subcollection.description}>
-                  <p className={'line-clamp-2 cursor-help text-xs break-words text-muted-foreground'}>
-                    {subcollection.description}
-                  </p>
-                </Conditional>
-              </div>
-
-              {/* Chevron Icon */}
-              <div className={'flex-shrink-0'}>
-                <ChevronRightIcon
-                  className={'size-4 text-muted-foreground transition-colors group-hover:text-foreground'}
-                />
-              </div>
-            </Link>
-
-            {/* Actions Menu */}
-            <Conditional isCondition={isOwner}>
-              <div className={'flex-shrink-0'}>
-                <SubcollectionActions subcollection={subcollection} />
-              </div>
-            </Conditional>
-          </div>
-        </li>
+        <div
+          data-slot={'subcollection-list-item'}
+          data-testid={generateTestId('feature', 'subcollection-list-item', subcollection.id)}
+          key={subcollection.id}
+          role={'listitem'}
+        >
+          <SubcollectionCard
+            collectionSlug={collectionSlug}
+            isOwner={isOwner}
+            subcollection={subcollection}
+          />
+        </div>
       ))}
-    </ul>
+    </div>
   );
 };

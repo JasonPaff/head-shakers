@@ -64,9 +64,9 @@ export type ComponentTestId =
   | 'follow-button'
   | 'form'
   | 'form-description'
+  | 'form-error'
 
   // Layout Components
-  | 'form-error'
   | 'form-field'
   | 'form-label'
   | 'form-submit'
@@ -90,9 +90,9 @@ export type ComponentTestId =
   | 'label'
   | 'like-button'
   | 'loading'
+  | 'main-nav'
 
   // Feature Components
-  | 'main-nav'
   | 'menubar'
   | 'mobile-nav'
   | 'navigation-menu'
@@ -115,6 +115,16 @@ export type ComponentTestId =
   | 'slider'
   | 'sonner'
   | 'spinner'
+  | 'subcollection-actions'
+  | 'subcollection-actions-delete'
+  | 'subcollection-actions-edit'
+  | 'subcollection-actions-trigger'
+  | 'subcollection-card'
+  | 'subcollection-card-image-link'
+  | 'subcollection-card-title-link'
+  | 'subcollection-empty-state'
+  | 'subcollection-grid'
+  | 'subcollection-list-item'
   | 'switch'
   | 'table'
   | 'tabs'

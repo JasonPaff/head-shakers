@@ -2,7 +2,6 @@
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MoreVerticalIcon, PencilIcon, TrashIcon } from 'lucide-react';
-import { Fragment } from 'react';
 
 import { SubcollectionDeleteDialog } from '@/components/feature/subcollections/subcollection-delete-dialog';
 import { SubcollectionEditDialog } from '@/components/feature/subcollections/subcollection-edit-dialog';
@@ -16,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useToggle } from '@/hooks/use-toggle';
+import { generateTestId } from '@/lib/test-ids';
 
 interface SubcollectionActionsProps {
   subcollection: {
@@ -29,22 +29,43 @@ export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProp
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
 
+  const actionsTestId = generateTestId('feature', 'subcollection-actions', subcollection.id);
+  const triggerTestId = generateTestId('feature', 'subcollection-actions-trigger', subcollection.id);
+  const editMenuItemTestId = generateTestId('feature', 'subcollection-actions-edit', subcollection.id);
+  const deleteMenuItemTestId = generateTestId('feature', 'subcollection-actions-delete', subcollection.id);
+
   return (
-    <Fragment>
+    <div data-slot={'subcollection-actions'} data-testid={actionsTestId}>
+      {/* Actions Dropdown Menu */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button size={'sm'} variant={'ghost'}>
-            <MoreVerticalIcon aria-hidden className={'size-4'} />
+          <Button
+            aria-label={`Open actions menu for ${subcollection.name}`}
+            className={'min-h-11 min-w-11'}
+            size={'icon'}
+            testId={triggerTestId}
+            variant={'ghost'}
+          >
+            <MoreVerticalIcon aria-hidden className={'size-5'} />
             <VisuallyHidden>Open menu</VisuallyHidden>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align={'end'}>
-          <DropdownMenuItem onClick={setIsEditDialogOpen.on}>
+          <DropdownMenuItem
+            className={'py-3'}
+            data-testid={editMenuItemTestId}
+            onClick={setIsEditDialogOpen.on}
+          >
             <PencilIcon aria-hidden className={'mr-2 size-4'} />
             Edit Details
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={setIsDeleteDialogOpen.on} variant={'destructive'}>
+          <DropdownMenuItem
+            className={'py-3'}
+            data-testid={deleteMenuItemTestId}
+            onClick={setIsDeleteDialogOpen.on}
+            variant={'destructive'}
+          >
             <TrashIcon aria-hidden className={'mr-2 size-4'} />
             Delete Subcollection
           </DropdownMenuItem>
@@ -68,6 +89,6 @@ export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProp
           subcollectionId={subcollection.id}
         />
       </Conditional>
-    </Fragment>
+    </div>
   );
 };
