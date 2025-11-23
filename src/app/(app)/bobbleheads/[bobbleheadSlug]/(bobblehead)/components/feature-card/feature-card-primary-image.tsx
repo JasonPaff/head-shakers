@@ -4,16 +4,15 @@ import type { ComponentProps, KeyboardEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { useToggle } from '@/hooks/use-toggle';
 import { generateTestId } from '@/lib/test-ids';
-import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
+import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 import type { PhotoItem } from './types';
@@ -43,8 +42,8 @@ export const FeatureCardPrimaryImage = ({
   testId,
   ...props
 }: FeatureCardPrimaryImageProps) => {
-  const [isHovering, setIsHovering] = useToggle();
   const [_hasImageError, setHasImageError] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const imageTestId = testId || generateTestId('feature', 'bobblehead-photo', 'primary');
 
@@ -56,6 +55,14 @@ export const FeatureCardPrimaryImage = ({
   const _photoCount = photos.length;
   const _currentPhotoNumber = currentIndex + 1;
   const _photoAlt = _currentPhoto?.altText ?? bobbleheadName;
+
+  // Memoized values
+  const _publicId = useMemo(
+    () => extractPublicIdFromCloudinaryUrl(_currentPhoto?.url ?? ''),
+    [_currentPhoto?.url],
+  );
+
+  const _blurDataUrl = useMemo(() => generateBlurDataUrl(_publicId), [_publicId]);
 
   // Condition badge variant helper
   const getConditionVariant = (condition: null | string | undefined) => {
@@ -91,21 +98,23 @@ export const FeatureCardPrimaryImage = ({
     setHasImageError(true);
   };
 
+  const handleImageLoad = useCallback(() => {
+    setIsImageLoaded(true);
+  }, []);
+
   return (
     <div
       aria-label={`View ${bobbleheadName} image in fullscreen`}
-      className={cn('relative aspect-[3/4] cursor-pointer lg:aspect-square', className)}
+      className={cn('group relative aspect-[3/4] cursor-pointer overflow-hidden lg:aspect-square', className)}
       data-slot={'feature-card-primary-image'}
       data-testid={imageTestId}
       onClick={handleClick}
       onKeyDown={handleKeyDown}
-      onMouseEnter={setIsHovering.on}
-      onMouseLeave={setIsHovering.off}
       role={'button'}
       tabIndex={0}
       {...props}
     >
-      {/* Main Image */}
+      {/* Main Image with Blur Placeholder and Fade-in Transition */}
       <Conditional
         fallback={
           <div
@@ -117,27 +126,42 @@ export const FeatureCardPrimaryImage = ({
         }
         isCondition={_hasImage}
       >
-        <CldImage
-          alt={_photoAlt}
-          className={'size-full object-cover'}
-          crop={'fill'}
-          format={'auto'}
-          height={800}
-          onError={handleImageError}
-          quality={'auto:good'}
-          src={extractPublicIdFromCloudinaryUrl(_currentPhoto?.url ?? '')}
-          width={600}
-        />
+        <div
+          className={cn('size-full transition-transform duration-300 ease-out', 'group-hover:scale-105')}
+          data-slot={'feature-card-primary-image-wrapper'}
+        >
+          <CldImage
+            alt={_photoAlt}
+            blurDataURL={_blurDataUrl}
+            className={cn(
+              'size-full object-cover',
+              'transition-opacity duration-500 ease-out',
+              isImageLoaded ? 'opacity-100' : 'opacity-0',
+            )}
+            crop={'fill'}
+            format={'auto'}
+            height={800}
+            onError={handleImageError}
+            onLoad={handleImageLoad}
+            placeholder={'blur'}
+            quality={'auto:good'}
+            src={_publicId}
+            width={600}
+          />
+        </div>
       </Conditional>
 
-      {/* Navigation Arrows */}
-      <Conditional isCondition={_hasMultiplePhotos && isHovering}>
+      {/* Navigation Arrows - Always visible on mobile, hover-fade on desktop */}
+      <Conditional isCondition={_hasMultiplePhotos}>
         {/* Previous Button */}
         <Button
           className={cn(
-            'absolute top-1/2 left-4 z-10 -translate-y-1/2',
-            'bg-black/50 text-white hover:bg-black/70',
-            'transition-opacity duration-200',
+            'absolute top-1/2 left-2 z-10 -translate-y-1/2',
+            'bg-black/40 text-white hover:bg-black/70',
+            'transition-all duration-200',
+            // Mobile: always semi-visible, Desktop: fade on hover
+            'opacity-60 md:opacity-0',
+            'md:group-hover:opacity-100',
           )}
           data-slot={'feature-card-primary-image-prev'}
           onClick={handlePreviousClick}
@@ -151,9 +175,12 @@ export const FeatureCardPrimaryImage = ({
         {/* Next Button */}
         <Button
           className={cn(
-            'absolute top-1/2 right-4 z-10 -translate-y-1/2',
-            'bg-black/50 text-white hover:bg-black/70',
-            'transition-opacity duration-200',
+            'absolute top-1/2 right-2 z-10 -translate-y-1/2',
+            'bg-black/40 text-white hover:bg-black/70',
+            'transition-all duration-200',
+            // Mobile: always semi-visible, Desktop: fade on hover
+            'opacity-60 md:opacity-0',
+            'md:group-hover:opacity-100',
           )}
           data-slot={'feature-card-primary-image-next'}
           onClick={handleNextClick}
@@ -165,17 +192,21 @@ export const FeatureCardPrimaryImage = ({
         </Button>
       </Conditional>
 
-      {/* Photo Counter */}
-      <Conditional isCondition={_hasMultiplePhotos && isHovering}>
+      {/* Photo Counter with Backdrop Blur */}
+      <Conditional isCondition={_hasMultiplePhotos}>
         <div
           className={cn(
-            'absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full',
-            'bg-black/50 px-3 py-1 text-sm text-white',
-            'transition-opacity duration-200',
+            'absolute bottom-4 left-1/2 z-10 -translate-x-1/2 rounded-full',
+            'bg-black/40 px-3 py-1 text-sm font-medium text-white',
+            'backdrop-blur-sm',
+            'transition-all duration-200',
+            // Mobile: always semi-visible, Desktop: fade on hover
+            'opacity-60 md:opacity-0',
+            'md:group-hover:opacity-100',
           )}
           data-slot={'feature-card-primary-image-counter'}
         >
-          {_currentPhotoNumber} of {_photoCount}
+          {_currentPhotoNumber} / {_photoCount}
         </div>
       </Conditional>
 

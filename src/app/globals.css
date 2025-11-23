@@ -157,6 +157,73 @@
   animation: caret-blink 1.25s ease-out infinite;
 }
 
+/* Carousel Animation Keyframes */
+@keyframes carousel-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes carousel-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes dot-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Carousel Animation Utilities */
+@utility animate-carousel-fade-in {
+  animation: carousel-fade-in 0.3s ease-out;
+}
+
+@utility animate-carousel-scale-in {
+  animation: carousel-scale-in 0.3s ease-out;
+}
+
+@utility animate-dot-pulse {
+  animation: dot-pulse 1.5s ease-in-out infinite;
+}
+
+/* Scroll Snap Utilities for Thumbnail Strip */
+@utility scroll-snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+}
+
+@utility scroll-snap-y-mandatory {
+  scroll-snap-type: y mandatory;
+}
+
+@utility scroll-snap-start {
+  scroll-snap-align: start;
+}
+
+@utility scroll-snap-center {
+  scroll-snap-align: center;
+}
+
+@utility scroll-snap-end {
+  scroll-snap-align: end;
+}
+
 * {
   @apply scroll-smooth antialiased;
 }

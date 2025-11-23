@@ -1,27 +1,20 @@
 'use client';
 
-import type { KeyboardEvent } from 'react';
-
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { CldImage } from 'next-cloudinary';
 import { useMemo, useState } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { useToggle } from '@/hooks/use-toggle';
-import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
-import { cn } from '@/utils/tailwind-utils';
 
 import { FeatureCardAcquisition } from './feature-card/feature-card-acquisition';
 import { FeatureCardCustomFields } from './feature-card/feature-card-custom-fields';
 import { FeatureCardDescription } from './feature-card/feature-card-description';
 import { FeatureCardImageGallery } from './feature-card/feature-card-image-gallery';
+import { FeatureCardLightboxModal } from './feature-card/feature-card-lightbox-modal';
 import { FeatureCardPrimaryImage } from './feature-card/feature-card-primary-image';
 import { FeatureCardQuickInfo } from './feature-card/feature-card-quick-info';
 import { FeatureCardSocialBar } from './feature-card/feature-card-social-bar';
@@ -60,18 +53,6 @@ export const BobbleheadFeatureCard = ({
     });
   };
 
-  const handlePreviousModalPhoto = () => {
-    setModalPhotoIndex((prev) => {
-      return prev > 0 ? prev - 1 : bobblehead.photos.length - 1;
-    });
-  };
-
-  const handleNextModalPhoto = () => {
-    setModalPhotoIndex((prev) => {
-      return prev < bobblehead.photos.length - 1 ? prev + 1 : 0;
-    });
-  };
-
   const handleImageClick = () => {
     setModalPhotoIndex(mainPhotoIndex);
     setIsPhotoDialogOpen.on();
@@ -81,14 +62,15 @@ export const BobbleheadFeatureCard = ({
     setMainPhotoIndex(index);
   };
 
-  const handleModalKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'ArrowLeft') handlePreviousModalPhoto();
-    else if (event.key === 'ArrowRight') handleNextModalPhoto();
+  const handleModalIndexChange = (index: number) => {
+    setModalPhotoIndex(index);
   };
 
-  const _currentModalPhoto = bobblehead.photos[modalPhotoIndex] || bobblehead.photos[0];
+  const handleModalClose = () => {
+    setIsPhotoDialogOpen.off();
+  };
+
   const _hasMultiplePhotos = bobblehead.photos.length > 1;
-  const _hasModalImage = _currentModalPhoto?.url && _currentModalPhoto.url !== '/placeholder.jpg';
 
   const _photos = useMemo(
     () =>
@@ -189,81 +171,15 @@ export const BobbleheadFeatureCard = ({
         <FeatureCardCustomFields bobblehead={bobblehead} />
       </div>
 
-      {/* Image Modal */}
-      <Dialog onOpenChange={setIsPhotoDialogOpen.update} open={isPhotoDialogOpen}>
-        <DialogContent className={'max-w-6xl p-0'} onKeyDown={handleModalKeyDown}>
-          <DialogHeader className={'p-4'}>
-            <DialogTitle>{bobblehead.name} Photos</DialogTitle>
-            <DialogDescription>View full-size photos of this bobblehead</DialogDescription>
-          </DialogHeader>
-          <div className={'flex items-center justify-center bg-black'}>
-            {/* Previous button */}
-            <Conditional isCondition={_hasMultiplePhotos}>
-              <Button
-                className={cn(
-                  'absolute top-1/2 left-4 z-10 -translate-y-1/2',
-                  'bg-black/50 text-white hover:bg-black/70',
-                )}
-                onClick={handlePreviousModalPhoto}
-                size={'icon'}
-                variant={'ghost'}
-              >
-                <ChevronLeftIcon aria-hidden className={'size-6'} />
-                <span className={'sr-only'}>Previous photo</span>
-              </Button>
-            </Conditional>
-
-            {/* Main image */}
-            <div className={'flex max-h-[80vh] w-full items-center justify-center'}>
-              {_hasModalImage ?
-                <CldImage
-                  alt={_currentModalPhoto?.altText ?? bobblehead.name}
-                  className={'max-h-full max-w-full object-contain'}
-                  crop={'pad'}
-                  format={'auto'}
-                  height={1200}
-                  quality={'auto:best'}
-                  src={extractPublicIdFromCloudinaryUrl(_currentModalPhoto.url)}
-                  width={1200}
-                />
-              : <img
-                  alt={bobblehead.name}
-                  className={'max-h-full max-w-full object-contain'}
-                  src={'/placeholder.jpg'}
-                />
-              }
-            </div>
-
-            {/* Next button */}
-            <Conditional isCondition={_hasMultiplePhotos}>
-              <Button
-                className={cn(
-                  'absolute top-1/2 right-4 z-10 -translate-y-1/2',
-                  'bg-black/50 text-white hover:bg-black/70',
-                )}
-                onClick={handleNextModalPhoto}
-                size={'icon'}
-                variant={'ghost'}
-              >
-                <ChevronRightIcon aria-hidden className={'size-6'} />
-                <span className={'sr-only'}>Next photo</span>
-              </Button>
-            </Conditional>
-
-            {/* Photo counter */}
-            <Conditional isCondition={_hasMultiplePhotos}>
-              <div
-                className={cn(
-                  'absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full',
-                  'bg-black/50 px-3 py-1 text-sm text-white',
-                )}
-              >
-                {modalPhotoIndex + 1} of {bobblehead.photos.length}
-              </div>
-            </Conditional>
-          </div>
-        </DialogContent>
-      </Dialog>
+      {/* Image Lightbox Modal */}
+      <FeatureCardLightboxModal
+        bobbleheadName={bobblehead.name}
+        currentIndex={modalPhotoIndex}
+        isOpen={isPhotoDialogOpen}
+        onClose={handleModalClose}
+        onIndexChange={handleModalIndexChange}
+        photos={_photos}
+      />
     </Card>
   );
 };

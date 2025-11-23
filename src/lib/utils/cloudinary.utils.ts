@@ -110,6 +110,38 @@ export function extractPublicIdFromCloudinaryUrl(url: string): string {
 }
 
 /**
+ * Generates a low-quality blur placeholder URL for progressive image loading
+ *
+ * Creates a Cloudinary URL with blur and low quality transformations
+ * suitable for use as a placeholder while the full image loads.
+ *
+ * @param publicId - The Cloudinary public ID of the image
+ * @returns Blurred placeholder Cloudinary URL or empty string if publicId is invalid
+ *
+ * @example
+ * generateBlurDataUrl('bobbleheads/item-123')
+ * // returns: "https://res.cloudinary.com/demo/image/upload/c_fill,w_10,h_10,e_blur:1000,q_1,f_auto/bobbleheads/item-123"
+ */
+export function generateBlurDataUrl(publicId: string): string {
+  try {
+    if (!publicId || !CLOUDINARY_CLOUD_NAME) {
+      return '';
+    }
+
+    // Use very small dimensions with blur effect for placeholder
+    const transformations = 'c_fill,w_10,h_10,e_blur:1000,q_1,f_auto';
+
+    return `https://res.cloudinary.com/${CLOUDINARY_CLOUD_NAME}/image/upload/${transformations}/${publicId}`;
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { operation: 'generate-blur-data-url', publicId },
+      level: 'warning',
+    });
+    return '';
+  }
+}
+
+/**
  * Generates an optimized Open Graph image URL for social sharing
  *
  * Creates a Cloudinary URL with transformations optimized for Open Graph
