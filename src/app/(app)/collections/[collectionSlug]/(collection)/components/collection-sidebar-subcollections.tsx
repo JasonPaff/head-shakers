@@ -4,6 +4,7 @@ import type { PublicCollection } from '@/lib/facades/collections/collections.fac
 
 import { CollectionSubcollectionsAdd } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-add';
 import { CollectionSubcollectionsList } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list';
+import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
@@ -28,8 +29,12 @@ export const CollectionSidebarSubcollections = async ({
 
   return (
     <Card>
-      <CardHeader className={'flex-row items-center justify-between space-y-0 pb-3'}>
-        <CardTitle>Subcollections</CardTitle>
+      <CardHeader className={'flex-row items-center justify-between gap-2 space-y-0 pb-3'}>
+        {/* Title and Count Badge */}
+        <div className={'flex items-center gap-2'}>
+          <CardTitle>Subcollections</CardTitle>
+          <Badge variant={'secondary'}>{subcollections.length}</Badge>
+        </div>
 
         {/* Add Subcollection Button */}
         <Conditional isCondition={isOwner}>
