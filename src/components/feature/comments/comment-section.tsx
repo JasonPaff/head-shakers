@@ -64,6 +64,7 @@ export const CommentSection = ({
   const _isAtMaxDepth = _isReplyMode && replyParentComment.depth + 1 >= MAX_COMMENT_NESTING_DEPTH;
   const _parentCommentAuthor =
     replyParentComment?.user?.displayName ?? replyParentComment?.user?.username ?? undefined;
+  const _parentCommentContent = replyParentComment?.content ?? undefined;
 
   // Helper function to find comment by ID in nested tree
   const findCommentById = (commentList: Array<CommentWithDepth>, id: string): CommentWithDepth | null => {
@@ -184,6 +185,7 @@ export const CommentSection = ({
             onCancelReply={_isReplyMode ? handleCancelReply : undefined}
             onSubmit={handleCreateComment}
             parentCommentAuthor={_parentCommentAuthor}
+            parentCommentContent={_parentCommentContent}
             parentCommentId={replyParentComment?.id}
             placeholder={'Share your thoughts...'}
             submitButtonText={'Post Comment'}

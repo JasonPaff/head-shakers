@@ -3,7 +3,7 @@
 import type { ComponentProps } from 'react';
 
 import { LoaderIcon, ReplyIcon, XIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -20,6 +20,7 @@ interface CommentFormProps extends Omit<ComponentProps<'form'>, 'onSubmit'> {
   onCancelReply?: () => void;
   onSubmit: (content: string, parentCommentId?: string) => Promise<void> | void;
   parentCommentAuthor?: string;
+  parentCommentContent?: string;
   parentCommentId?: string;
   placeholder?: string;
   submitButtonText?: string;
@@ -40,12 +41,21 @@ export const CommentForm = ({
   onCancelReply,
   onSubmit,
   parentCommentAuthor,
+  parentCommentContent,
   parentCommentId,
   placeholder = 'Write a comment...',
   submitButtonText = 'Post Comment',
   ...props
 }: CommentFormProps) => {
   const [content, setContent] = useState(initialContent);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Autofocus textarea when entering reply mode
+  useEffect(() => {
+    if (parentCommentId && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [parentCommentId]);
 
   // 7. Derived values for conditional rendering
   const _isReplyMode = !!parentCommentId;
@@ -94,27 +104,30 @@ export const CommentForm = ({
     <form className={cn('space-y-3', className)} onSubmit={handleSubmit} {...props}>
       {/* Reply Context Indicator */}
       <Conditional isCondition={_shouldShowReplyContext}>
-        <div
-          className={cn(
-            'flex items-center justify-between gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2',
-          )}
-        >
-          <div className={'flex items-center gap-2 text-sm text-muted-foreground'}>
-            <ReplyIcon aria-hidden className={'size-4'} />
-            <span>
-              Replying to <span className={'font-medium text-foreground'}>{parentCommentAuthor}</span>
-            </span>
+        <div className={cn('flex flex-col gap-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2')}>
+          <div className={'flex items-center justify-between gap-2'}>
+            <div className={'flex items-center gap-2 text-sm text-muted-foreground'}>
+              <ReplyIcon aria-hidden className={'size-4 shrink-0'} />
+              <span>
+                Replying to <span className={'font-medium text-foreground'}>{parentCommentAuthor}</span>
+              </span>
+            </div>
+            <Conditional isCondition={_shouldShowCancelReply}>
+              <Button
+                aria-label={'Cancel reply'}
+                className={'size-6 shrink-0 p-0'}
+                onClick={handleCancelReplyClick}
+                type={'button'}
+                variant={'ghost'}
+              >
+                <XIcon aria-hidden className={'size-4'} />
+              </Button>
+            </Conditional>
           </div>
-          <Conditional isCondition={_shouldShowCancelReply}>
-            <Button
-              aria-label={'Cancel reply'}
-              className={'size-6 p-0'}
-              onClick={handleCancelReplyClick}
-              type={'button'}
-              variant={'ghost'}
-            >
-              <XIcon aria-hidden className={'size-4'} />
-            </Button>
+          <Conditional isCondition={!!parentCommentContent}>
+            <div className={'border-l-2 border-primary/30 pl-3 text-xs text-muted-foreground'}>
+              <p className={'line-clamp-2 italic'}>&ldquo;{parentCommentContent}&rdquo;</p>
+            </div>
           </Conditional>
         </div>
       </Conditional>
@@ -147,6 +160,7 @@ export const CommentForm = ({
           maxLength={SCHEMA_LIMITS.COMMENT.CONTENT.MAX + 100}
           onChange={handleContentChange}
           placeholder={_effectivePlaceholder}
+          ref={textareaRef}
           value={content}
         />
 

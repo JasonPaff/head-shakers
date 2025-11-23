@@ -210,6 +210,9 @@ export const createCommentAction = authActionClient
         commentData.targetId,
         ctx.userId,
         'add',
+        undefined, // entitySlug - not available here
+        result.comment?.id,
+        commentData.parentCommentId,
       );
 
       return {
