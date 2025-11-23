@@ -143,6 +143,7 @@ export const CommentForm = ({
             isAtMaxDepth && 'cursor-not-allowed opacity-50',
           )}
           disabled={isDisabled || isSubmitting || isAtMaxDepth}
+          id={'comment-input'}
           maxLength={SCHEMA_LIMITS.COMMENT.CONTENT.MAX + 100}
           onChange={handleContentChange}
           placeholder={_effectivePlaceholder}

@@ -19,11 +19,14 @@ import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 import { FeatureCardAcquisition } from './feature-card/feature-card-acquisition';
+import { FeatureCardCustomFields } from './feature-card/feature-card-custom-fields';
+import { FeatureCardDescription } from './feature-card/feature-card-description';
 import { FeatureCardImageGallery } from './feature-card/feature-card-image-gallery';
 import { FeatureCardPrimaryImage } from './feature-card/feature-card-primary-image';
 import { FeatureCardQuickInfo } from './feature-card/feature-card-quick-info';
 import { FeatureCardSocialBar } from './feature-card/feature-card-social-bar';
 import { FeatureCardSpecifications } from './feature-card/feature-card-specifications';
+import { FeatureCardStatus } from './feature-card/feature-card-status';
 
 const getPrimaryPhotoIndex = (photos: BobbleheadWithRelations['photos']) => {
   const primaryIndex = photos.findIndex((photo) => photo.isPrimary);
@@ -32,10 +35,15 @@ const getPrimaryPhotoIndex = (photos: BobbleheadWithRelations['photos']) => {
 
 type BobbleheadFeatureCardProps = {
   bobblehead: BobbleheadWithRelations;
+  isOwner?: boolean;
   likeData: ContentLikeData;
 };
 
-export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatureCardProps) => {
+export const BobbleheadFeatureCard = ({
+  bobblehead,
+  isOwner = false,
+  likeData,
+}: BobbleheadFeatureCardProps) => {
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useToggle();
   const [mainPhotoIndex, setMainPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
   const [modalPhotoIndex, setModalPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
@@ -133,14 +141,23 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
             <Separator />
 
             {/* Social Actions */}
-            <FeatureCardSocialBar bobbleheadId={bobblehead.id} likeData={likeData} />
+            <FeatureCardSocialBar
+              bobbleheadId={bobblehead.id}
+              bobbleheadSlug={bobblehead.slug}
+              commentCount={bobblehead.commentCount}
+              isOwner={isOwner}
+              likeData={likeData}
+            />
 
             <Separator />
 
             {/* Collapsible Sections */}
             <div className={'flex-1 space-y-4 overflow-y-auto'}>
+              <FeatureCardDescription bobblehead={bobblehead} />
               <FeatureCardSpecifications bobblehead={bobblehead} />
               <FeatureCardAcquisition bobblehead={bobblehead} />
+              <FeatureCardStatus bobblehead={bobblehead} />
+              <FeatureCardCustomFields bobblehead={bobblehead} />
             </div>
           </div>
         </div>
@@ -154,13 +171,22 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
         <Separator />
 
         {/* Social Actions */}
-        <FeatureCardSocialBar bobbleheadId={bobblehead.id} likeData={likeData} />
+        <FeatureCardSocialBar
+          bobbleheadId={bobblehead.id}
+          bobbleheadSlug={bobblehead.slug}
+          commentCount={bobblehead.commentCount}
+          isOwner={isOwner}
+          likeData={likeData}
+        />
 
         <Separator />
 
         {/* Collapsible Sections */}
+        <FeatureCardDescription bobblehead={bobblehead} />
         <FeatureCardSpecifications bobblehead={bobblehead} />
         <FeatureCardAcquisition bobblehead={bobblehead} />
+        <FeatureCardStatus bobblehead={bobblehead} />
+        <FeatureCardCustomFields bobblehead={bobblehead} />
       </div>
 
       {/* Image Modal */}

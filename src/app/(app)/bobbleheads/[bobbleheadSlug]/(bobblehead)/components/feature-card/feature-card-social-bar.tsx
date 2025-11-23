@@ -7,7 +7,10 @@ import { MessageCircleIcon, Share2Icon } from 'lucide-react';
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
+import { BobbleheadShareMenu } from '@/components/feature/bobblehead/bobblehead-share-menu';
+import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
+import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
@@ -15,14 +18,18 @@ import { cn } from '@/utils/tailwind-utils';
 type FeatureCardSocialBarProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
     bobbleheadId: string;
+    bobbleheadSlug: string;
     commentCount?: number;
+    isOwner?: boolean;
     likeData: ContentLikeData;
   };
 
 export const FeatureCardSocialBar = ({
   bobbleheadId,
+  bobbleheadSlug,
   className,
   commentCount = 0,
+  isOwner = false,
   likeData,
   testId,
   ...props
@@ -33,9 +40,20 @@ export const FeatureCardSocialBar = ({
   const shareButtonTestId =
     testId ? `${testId}-share` : generateTestId('feature', 'bobblehead-details', 'share-btn');
 
-  const handleShareClick = () => {
-    // TODO: Implement share functionality for bobblehead sharing
-    void bobbleheadId;
+  const handleCommentsClick = () => {
+    // Scroll to comments section
+    const commentsSection = document.getElementById('comments-section');
+    if (commentsSection) {
+      commentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // Focus the comment input after scrolling completes
+      setTimeout(() => {
+        const commentInput = document.getElementById('comment-input');
+        if (commentInput) {
+          commentInput.focus();
+        }
+      }, 500); // Delay to allow smooth scroll to complete
+    }
   };
 
   const _commentLabel = commentCount === 1 ? 'comment' : 'comments';
@@ -63,6 +81,7 @@ export const FeatureCardSocialBar = ({
           aria-label={`${commentCount} ${_commentLabel}. View comments`}
           className={'gap-2 text-muted-foreground hover:text-foreground'}
           data-slot={'social-bar-comments-button'}
+          onClick={handleCommentsClick}
           size={'sm'}
           testId={commentsButtonTestId}
           variant={'ghost'}
@@ -72,18 +91,24 @@ export const FeatureCardSocialBar = ({
         </Button>
 
         {/* Share Button */}
-        <Button
-          aria-label={'Share this bobblehead'}
-          className={'gap-2 text-muted-foreground hover:text-foreground'}
-          data-slot={'social-bar-share-button'}
-          onClick={handleShareClick}
-          size={'sm'}
-          testId={shareButtonTestId}
-          variant={'ghost'}
-        >
-          <Share2Icon aria-hidden className={'size-4'} />
-          <span className={'text-sm'}>Share</span>
-        </Button>
+        <BobbleheadShareMenu bobbleheadSlug={bobbleheadSlug}>
+          <Button
+            aria-label={'Share this bobblehead'}
+            className={'gap-2 text-muted-foreground hover:text-foreground'}
+            data-slot={'social-bar-share-button'}
+            size={'sm'}
+            testId={shareButtonTestId}
+            variant={'ghost'}
+          >
+            <Share2Icon aria-hidden className={'size-4'} />
+            <span className={'text-sm'}>Share</span>
+          </Button>
+        </BobbleheadShareMenu>
+
+        {/* Report Button (non-owners only) */}
+        <Conditional isCondition={!isOwner}>
+          <ReportButton targetId={bobbleheadId} targetType={'bobblehead'} variant={'ghost'} />
+        </Conditional>
       </div>
     </div>
   );
