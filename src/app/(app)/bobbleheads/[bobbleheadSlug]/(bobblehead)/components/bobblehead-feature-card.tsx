@@ -93,30 +93,61 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
 
   return (
     <Card className={'overflow-hidden'} data-slot={'bobblehead-feature-card'}>
-      {/* Primary Image Section */}
-      <FeatureCardPrimaryImage
-        bobbleheadName={bobblehead.name}
-        currentCondition={bobblehead.currentCondition}
-        currentIndex={mainPhotoIndex}
-        isFeatured={bobblehead.isFeatured}
-        onClick={handleImageClick}
-        onNext={handleNextMainPhoto}
-        onPrevious={handlePreviousMainPhoto}
-        photos={_photos}
-      />
+      {/* Two-column layout on desktop, single column on mobile */}
+      <div className={'flex flex-col lg:flex-row'}>
+        {/* Left Column: Image Section */}
+        <div className={'lg:w-[55%] xl:w-[50%]'}>
+          {/* Primary Image Section - constrained height on desktop */}
+          <FeatureCardPrimaryImage
+            bobbleheadName={bobblehead.name}
+            className={'lg:aspect-[4/5] xl:aspect-[3/4]'}
+            currentCondition={bobblehead.currentCondition}
+            currentIndex={mainPhotoIndex}
+            isFeatured={bobblehead.isFeatured}
+            onClick={handleImageClick}
+            onNext={handleNextMainPhoto}
+            onPrevious={handlePreviousMainPhoto}
+            photos={_photos}
+          />
 
-      {/* Thumbnail Gallery */}
-      <Conditional isCondition={_hasMultiplePhotos}>
-        <FeatureCardImageGallery
-          className={'px-4 pt-4'}
-          currentIndex={mainPhotoIndex}
-          onImageSelect={handleGallerySelect}
-          photos={_photos}
-        />
-      </Conditional>
+          {/* Thumbnail Gallery - below image on both layouts */}
+          <Conditional isCondition={_hasMultiplePhotos}>
+            <FeatureCardImageGallery
+              className={'p-4'}
+              currentIndex={mainPhotoIndex}
+              onImageSelect={handleGallerySelect}
+              photos={_photos}
+            />
+          </Conditional>
+        </div>
 
-      {/* Content Section */}
-      <div className={'space-y-6 p-4'} data-slot={'bobblehead-feature-card-content'}>
+        {/* Right Column: Info Sidebar (desktop only) */}
+        <div
+          className={'hidden border-l border-border lg:flex lg:w-[45%] lg:flex-col xl:w-[50%]'}
+          data-slot={'bobblehead-feature-card-sidebar'}
+        >
+          <div className={'flex flex-1 flex-col space-y-6 p-6'}>
+            {/* Quick Info */}
+            <FeatureCardQuickInfo bobblehead={bobblehead} />
+
+            <Separator />
+
+            {/* Social Actions */}
+            <FeatureCardSocialBar bobbleheadId={bobblehead.id} likeData={likeData} />
+
+            <Separator />
+
+            {/* Collapsible Sections */}
+            <div className={'flex-1 space-y-4 overflow-y-auto'}>
+              <FeatureCardSpecifications bobblehead={bobblehead} />
+              <FeatureCardAcquisition bobblehead={bobblehead} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Content Section (hidden on desktop) */}
+      <div className={'space-y-6 p-4 lg:hidden'} data-slot={'bobblehead-feature-card-content'}>
         {/* Quick Info */}
         <FeatureCardQuickInfo bobblehead={bobblehead} />
 
