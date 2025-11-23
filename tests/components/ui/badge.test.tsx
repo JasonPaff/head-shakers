@@ -60,9 +60,9 @@ describe('Badge', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      render(<Badge className={'custom-class'}>Styled</Badge>);
+      render(<Badge className={'p-1'}>Styled</Badge>);
       const badge = screen.getByText('Styled');
-      expect(badge).toHaveClass('custom-class');
+      expect(badge).toHaveClass('p-1');
     });
 
     it('has correct base styles', () => {

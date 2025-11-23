@@ -89,8 +89,8 @@ describe('EmptyState', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      render(<EmptyState {...defaultProps} className={'custom-class'} />);
-      expect(screen.getByTestId(/empty-state/)).toHaveClass('custom-class');
+      render(<EmptyState {...defaultProps} className={'p-1'} />);
+      expect(screen.getByTestId(/empty-state/)).toHaveClass('p-1');
     });
 
     it('has base styling classes', () => {

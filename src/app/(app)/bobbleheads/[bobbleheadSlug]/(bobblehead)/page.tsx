@@ -7,22 +7,18 @@ import { Fragment, Suspense } from 'react';
 
 import type { PageProps } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
 
-import { BobbleheadDetailCardsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-detail-cards-async';
 import { BobbleheadFeatureCardAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-feature-card-async';
 import { BobbleheadHeaderAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async';
 import { BobbleheadMetricsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-metrics-async';
 import { BobbleheadNavigationAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async';
 import { BobbleheadPhotoGalleryAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-photo-gallery-async';
-import { BobbleheadSecondaryCardsAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-secondary-cards-async';
 import { BobbleheadErrorBoundary } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-error-boundary';
 import { BobbleheadPageClientWrapper } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper';
-import { BobbleheadDetailCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-detail-cards-skeleton';
 import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
 import { BobbleheadMetricsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-metrics-skeleton';
 import { BobbleheadNavigationSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-navigation-skeleton';
 import { BobbleheadPhotoGallerySkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-photo-gallery-skeleton';
-import { BobbleheadSecondaryCardsSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-secondary-cards-skeleton';
 import { Route } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
@@ -252,24 +248,6 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
             </ContentLayout>
           </div>
         </AuthContent>
-
-        {/* Primary Detail Cards Section */}
-        <ContentLayout>
-          <BobbleheadErrorBoundary section={'details'}>
-            <Suspense fallback={<BobbleheadDetailCardsSkeleton />}>
-              <BobbleheadDetailCardsAsync bobbleheadId={bobbleheadId} />
-            </Suspense>
-          </BobbleheadErrorBoundary>
-        </ContentLayout>
-
-        {/* Secondary Detail Cards Section */}
-        <ContentLayout>
-          <BobbleheadErrorBoundary section={'secondary'}>
-            <Suspense fallback={<BobbleheadSecondaryCardsSkeleton />}>
-              <BobbleheadSecondaryCardsAsync bobbleheadId={bobbleheadId} />
-            </Suspense>
-          </BobbleheadErrorBoundary>
-        </ContentLayout>
 
         {/* Comments Section */}
         <div className={'mt-8'}>

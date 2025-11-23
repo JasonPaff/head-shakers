@@ -26,11 +26,11 @@ describe('Card', () => {
 
     it('applies custom className', () => {
       render(
-        <Card className={'custom-class'} testId={'styled-card'}>
+        <Card className={'p-1'} testId={'styled-card'}>
           Content
         </Card>,
       );
-      expect(screen.getByTestId('styled-card')).toHaveClass('custom-class');
+      expect(screen.getByTestId('styled-card')).toHaveClass('p-1');
     });
 
     it('has correct data-slot attribute', () => {

@@ -32,10 +32,22 @@ export const BobbleheadHeader = ({
 }: BobbleheadHeaderProps) => {
   return (
     <Fragment>
-      {/* Actions Row */}
-      <div className={'mb-6 flex items-center justify-end gap-4'}>
-        {/* Action Buttons */}
-        <div className={'flex items-center gap-2'}>
+      {/* Breadcrumb and Actions Row - Aligned */}
+      <div className={'mb-6 flex items-center justify-between gap-4'}>
+        {/* Collection Breadcrumb - Left Side */}
+        <div className={'min-w-0 flex-1'}>
+          {bobblehead.collectionSlug && (
+            <CollectionBreadcrumb
+              collectionName={bobblehead.collectionName}
+              collectionSlug={bobblehead.collectionSlug}
+              subcollectionName={bobblehead.subcollectionName}
+              subcollectionSlug={bobblehead.subcollectionSlug}
+            />
+          )}
+        </div>
+
+        {/* Action Buttons - Right Side */}
+        <div className={'flex shrink-0 items-center gap-2'}>
           {/* Share Menu */}
           <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>
             <Button size={'sm'} variant={'outline'}>
@@ -67,18 +79,6 @@ export const BobbleheadHeader = ({
           </Conditional>
         </div>
       </div>
-
-      {/* Collection Breadcrumb */}
-      {bobblehead.collectionSlug && (
-        <div className={'mb-4'}>
-          <CollectionBreadcrumb
-            collectionName={bobblehead.collectionName}
-            collectionSlug={bobblehead.collectionSlug}
-            subcollectionName={bobblehead.subcollectionName}
-            subcollectionSlug={bobblehead.subcollectionSlug}
-          />
-        </div>
-      )}
 
       <div className={'flex flex-col gap-6'}>
         {/* Title and Description */}

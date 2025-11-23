@@ -31,8 +31,8 @@ describe('Spinner', () => {
     });
 
     it('applies custom className', () => {
-      render(<Spinner className={'custom-class'} testId={'spinner'} />);
-      expect(screen.getByTestId('spinner')).toHaveClass('custom-class');
+      render(<Spinner className={'p-1'} testId={'spinner'} />);
+      expect(screen.getByTestId('spinner')).toHaveClass('p-1');
     });
 
     it('allows size override via className', () => {

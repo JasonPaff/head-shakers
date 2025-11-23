@@ -148,8 +148,8 @@ describe('Switch', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      render(<Switch aria-label={'Styled'} className={'custom-class'} />);
-      expect(screen.getByRole('switch')).toHaveClass('custom-class');
+      render(<Switch aria-label={'Styled'} className={'p-1'} />);
+      expect(screen.getByRole('switch')).toHaveClass('p-1');
     });
 
     it('has base switch styles', () => {

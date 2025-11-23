@@ -83,9 +83,9 @@ describe('Alert', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      render(<Alert className={'custom-class'}>Styled</Alert>);
+      render(<Alert className={'p-1'}>Styled</Alert>);
       const svg = screen.getByTestId(/alert/).querySelector('svg');
-      expect(svg).toHaveClass('custom-class');
+      expect(svg).toHaveClass('p-1');
     });
 
     it('has base alert styles', () => {

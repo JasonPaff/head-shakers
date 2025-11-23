@@ -2,6 +2,7 @@
 
 import type { ComponentProps } from 'react';
 
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import type { CommentTargetType } from '@/lib/constants';
@@ -38,6 +39,8 @@ export const CommentSectionClient = ({
   targetType,
   ...props
 }: CommentSectionClientProps) => {
+  const router = useRouter();
+
   const handleCommentCreate = useCallback(
     async (content: string, parentCommentId?: string) => {
       const result = await createCommentAction({
@@ -50,31 +53,40 @@ export const CommentSectionClient = ({
       if (result?.serverError) {
         throw new Error(result.serverError);
       }
-      // Page will automatically revalidate via revalidatePath() in the server action
+      // Refresh the page to fetch updated comments from server
+      router.refresh();
     },
-    [targetId, targetType],
+    [targetId, targetType, router],
   );
 
-  const handleCommentUpdate = useCallback(async (commentId: string, content: string) => {
-    const result = await updateCommentAction({
-      commentId,
-      content,
-    });
+  const handleCommentUpdate = useCallback(
+    async (commentId: string, content: string) => {
+      const result = await updateCommentAction({
+        commentId,
+        content,
+      });
 
-    if (result?.serverError) {
-      throw new Error(result.serverError);
-    }
-    // Page will automatically revalidate via revalidatePath() in the server action
-  }, []);
+      if (result?.serverError) {
+        throw new Error(result.serverError);
+      }
+      // Refresh the page to fetch updated comments from server
+      router.refresh();
+    },
+    [router],
+  );
 
-  const handleCommentDelete = useCallback(async (commentId: string) => {
-    const result = await deleteCommentAction({ commentId });
+  const handleCommentDelete = useCallback(
+    async (commentId: string) => {
+      const result = await deleteCommentAction({ commentId });
 
-    if (result?.serverError) {
-      throw new Error(result.serverError);
-    }
-    // Page will automatically revalidate via revalidatePath() in the server action
-  }, []);
+      if (result?.serverError) {
+        throw new Error(result.serverError);
+      }
+      // Refresh the page to fetch updated comments from server
+      router.refresh();
+    },
+    [router],
+  );
 
   return (
     <CommentSection

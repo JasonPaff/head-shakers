@@ -65,8 +65,8 @@ describe('Label', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      render(<Label className={'custom-class'}>Styled Label</Label>);
-      expect(screen.getByText('Styled Label')).toHaveClass('custom-class');
+      render(<Label className={'p-1'}>Styled Label</Label>);
+      expect(screen.getByText('Styled Label')).toHaveClass('p-1');
     });
 
     it('has base styling classes', () => {

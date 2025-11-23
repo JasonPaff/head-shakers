@@ -134,8 +134,8 @@ describe('Checkbox', () => {
 
   describe('styling', () => {
     it('applies custom className', () => {
-      render(<Checkbox aria-label={'Styled'} className={'custom-class'} />);
-      expect(screen.getByRole('checkbox')).toHaveClass('custom-class');
+      render(<Checkbox aria-label={'Styled'} className={'p-1'} />);
+      expect(screen.getByRole('checkbox')).toHaveClass('p-1');
     });
 
     it('has base checkbox styles', () => {
