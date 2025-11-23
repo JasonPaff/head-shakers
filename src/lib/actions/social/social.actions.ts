@@ -180,6 +180,10 @@ export const createCommentAction = authActionClient
       userId: ctx.userId,
     });
 
+    // Fetch entity slug BEFORE the mutation using base db connection (not transaction)
+    // This ensures we have the slug for cache path revalidation even if transaction-scoped queries fail
+    const entitySlug = await getEntitySlugByTypeAndId(commentData.targetType, commentData.targetId, ctx.db);
+
     try {
       // Use createCommentReply for nested comments, createComment for top-level
       const result =
@@ -246,13 +250,6 @@ export const createCommentAction = authActionClient
         message: `User created ${isReply ? 'reply' : 'comment'} on ${commentData.targetType} ${commentData.targetId}`,
       });
 
-      // Fetch entity slug for path-based cache revalidation
-      const entitySlug = await getEntitySlugByTypeAndId(
-        commentData.targetType,
-        commentData.targetId,
-        dbInstance,
-      );
-
       CacheRevalidationService.social.onCommentChange(
         commentData.targetType === 'subcollection' ? 'collection' : commentData.targetType,
         commentData.targetId,
@@ -295,6 +292,18 @@ export const updateCommentAction = authActionClient
       userId: ctx.userId,
     });
 
+    // Fetch comment details BEFORE the mutation to get targetType/targetId for slug lookup
+    // Use base db connection (not transaction) to ensure we can get the slug for cache invalidation
+    const existingComment = await SocialFacade.getCommentById(updateData.commentId, ctx.userId, ctx.db);
+    const entitySlug =
+      existingComment?.comment ?
+        await getEntitySlugByTypeAndId(
+          existingComment.comment.targetType,
+          existingComment.comment.targetId,
+          ctx.db,
+        )
+      : undefined;
+
     try {
       const result = await SocialFacade.updateComment(
         updateData.commentId,
@@ -324,13 +333,6 @@ export const updateCommentAction = authActionClient
       });
 
       if (result.comment) {
-        // Fetch entity slug for path-based cache revalidation
-        const entitySlug = await getEntitySlugByTypeAndId(
-          result.comment.targetType,
-          result.comment.targetId,
-          dbInstance,
-        );
-
         CacheRevalidationService.social.onCommentChange(
           result.comment.targetType === 'subcollection' ? 'collection' : result.comment.targetType,
           result.comment.targetId,
@@ -372,10 +374,19 @@ export const deleteCommentAction = authActionClient
       userId: ctx.userId,
     });
 
-    try {
-      // Get comment details before deletion for cache invalidation
-      const commentResult = await SocialFacade.getCommentById(deleteData.commentId, ctx.userId, dbInstance);
+    // Get comment details BEFORE deletion using base db connection (not transaction)
+    // This ensures we have the data needed for cache invalidation
+    const commentResult = await SocialFacade.getCommentById(deleteData.commentId, ctx.userId, ctx.db);
+    const entitySlug =
+      commentResult?.comment ?
+        await getEntitySlugByTypeAndId(
+          commentResult.comment.targetType,
+          commentResult.comment.targetId,
+          ctx.db,
+        )
+      : undefined;
 
+    try {
       const result = await SocialFacade.deleteComment(deleteData.commentId, ctx.userId, dbInstance);
 
       if (!result) {
@@ -399,13 +410,6 @@ export const deleteCommentAction = authActionClient
       });
 
       if (commentResult?.comment) {
-        // Fetch entity slug for path-based cache revalidation
-        const entitySlug = await getEntitySlugByTypeAndId(
-          commentResult.comment.targetType,
-          commentResult.comment.targetId,
-          dbInstance,
-        );
-
         CacheRevalidationService.social.onCommentChange(
           commentResult.comment.targetType === 'subcollection' ?
             'collection'
