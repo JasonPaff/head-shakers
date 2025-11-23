@@ -72,7 +72,7 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   // Worker-scoped fixture for database branch info
   branchInfo: [
-    async ({}, runTest) => {
+    async (_fixtures, runTest) => {
       let branchInfo: E2EBranchInfo | null = null;
 
       if (fs.existsSync(branchInfoFile)) {
