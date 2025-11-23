@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeftIcon, PencilIcon, ShareIcon } from 'lucide-react';
+import { ArrowLeftIcon, MessageCircleIcon, PencilIcon, ShareIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Fragment } from 'react';
@@ -24,6 +24,7 @@ interface BobbleheadStickyHeaderProps {
   collectionName: string;
   collections: Array<ComboboxItem>;
   collectionSlug: string;
+  commentCount: number;
   isLiked: boolean;
   isOwner: boolean;
   likeCount: number;
@@ -40,6 +41,7 @@ export const BobbleheadStickyHeader = ({
   collectionName,
   collections,
   collectionSlug,
+  commentCount,
   isLiked,
   isOwner,
   likeCount,
@@ -54,6 +56,20 @@ export const BobbleheadStickyHeader = ({
   // event handlers
   const handleEditClick = () => {
     setIsEditDialogOpen.on();
+  };
+
+  const handleCommentsClick = () => {
+    const commentsSection = document.getElementById('comments-section');
+    if (commentsSection) {
+      commentsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      setTimeout(() => {
+        const commentInput = document.getElementById('comment-input');
+        if (commentInput) {
+          commentInput.focus();
+        }
+      }, 500);
+    }
   };
 
   // derived variables
@@ -141,6 +157,18 @@ export const BobbleheadStickyHeader = ({
                 targetId={bobblehead.id}
                 targetType={'bobblehead'}
               />
+
+              {/* Comments Button */}
+              <Button
+                aria-label={`${commentCount} comments. View comments`}
+                className={'gap-1.5 text-muted-foreground hover:text-foreground'}
+                onClick={handleCommentsClick}
+                size={'sm'}
+                variant={'ghost'}
+              >
+                <MessageCircleIcon aria-hidden className={'size-4'} />
+                <span className={'text-sm'}>{commentCount}</span>
+              </Button>
 
               {/* Share Menu */}
               <BobbleheadShareMenu bobbleheadSlug={bobblehead.slug}>

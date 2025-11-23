@@ -164,7 +164,7 @@ export const CommentSection = ({
   };
 
   return (
-    <div className={cn('space-y-6', className)} {...props}>
+    <div className={cn('space-y-6', className)} id={'comments-section'} {...props}>
       {/* Section Header */}
       <div className={'flex items-center gap-2'}>
         <MessageSquareTextIcon aria-hidden className={'size-5 text-muted-foreground'} />

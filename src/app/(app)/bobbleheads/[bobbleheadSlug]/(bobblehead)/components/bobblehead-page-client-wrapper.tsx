@@ -53,6 +53,7 @@ export function BobbleheadPageClientWrapper({
                 collectionName={bobblehead.collectionName || ''}
                 collections={collections}
                 collectionSlug={bobblehead.collectionSlug || ''}
+                commentCount={bobblehead.commentCount ?? 0}
                 isLiked={likeData?.isLiked ?? false}
                 isOwner={isOwner}
                 likeCount={likeData?.likeCount ?? 0}

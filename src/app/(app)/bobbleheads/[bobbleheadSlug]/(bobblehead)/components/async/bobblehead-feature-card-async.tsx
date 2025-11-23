@@ -21,5 +21,7 @@ export const BobbleheadFeatureCardAsync = async ({ bobbleheadId }: BobbleheadFea
     notFound();
   }
 
-  return <BobbleheadFeatureCard bobblehead={bobblehead} likeData={likeData} />;
+  const isOwner = !!currentUserId && currentUserId === bobblehead.userId;
+
+  return <BobbleheadFeatureCard bobblehead={bobblehead} isOwner={isOwner} likeData={likeData} />;
 };

@@ -15,6 +15,7 @@
 ## Agent Prompt Summary
 
 Generate a MARKDOWN implementation plan with:
+
 - Overview (total tests, complexity, risk level)
 - Prerequisites (fixtures, mocks, setup needed)
 - Implementation Steps (ordered by: infrastructure → unit → component → integration → e2e)
@@ -25,23 +26,25 @@ Generate a MARKDOWN implementation plan with:
 
 The test-planner agent generated a comprehensive 12-step implementation plan covering:
 
-| Phase | Steps | Tests |
-|-------|-------|-------|
-| Infrastructure | 1-2 | Mock data, Factory |
-| Unit | 3 | 14 tests |
-| Component | 4-9 | 96 tests |
-| Integration | 10-11 | 22 tests |
-| E2E | 12 | 8 tests |
+| Phase          | Steps | Tests              |
+| -------------- | ----- | ------------------ |
+| Infrastructure | 1-2   | Mock data, Factory |
+| Unit           | 3     | 14 tests           |
+| Component      | 4-9   | 96 tests           |
+| Integration    | 10-11 | 22 tests           |
+| E2E            | 12    | 8 tests            |
 
 ## Plan Highlights
 
 ### Test Distribution
+
 - **Unit Tests**: 12-14 (server actions)
 - **Component Tests**: 42-48 (6 components)
 - **Integration Tests**: 20-24 (facade edge cases, queries)
 - **E2E Tests**: 6-8 (user flows)
 
 ### Key Files to Create
+
 ```
 tests/
 ├── mocks/data/comments.mock.ts
@@ -59,6 +62,7 @@ tests/
 ```
 
 ### Quality Gates
+
 1. Infrastructure ready (types compile)
 2. Unit tests pass (14 tests)
 3. Component tests pass with 60%+ coverage

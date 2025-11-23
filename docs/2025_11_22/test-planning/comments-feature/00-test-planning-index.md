@@ -8,12 +8,12 @@
 
 This orchestration document tracks the 4-step test planning process for the comments feature.
 
-| Step | Name                    | Status    | Started    | Completed  |
-| ---- | ----------------------- | --------- | ---------- | ---------- |
-| 1    | Test Scope Refinement   | Complete  | 2025-11-22 | 2025-11-22 |
-| 2    | Source & Test Discovery | Complete  | 2025-11-22 | 2025-11-22 |
-| 3    | Coverage Gap Analysis   | Complete  | 2025-11-22 | 2025-11-22 |
-| 4    | Test Plan Generation    | Complete  | 2025-11-22 | 2025-11-22 |
+| Step | Name                    | Status   | Started    | Completed  |
+| ---- | ----------------------- | -------- | ---------- | ---------- |
+| 1    | Test Scope Refinement   | Complete | 2025-11-22 | 2025-11-22 |
+| 2    | Source & Test Discovery | Complete | 2025-11-22 | 2025-11-22 |
+| 3    | Coverage Gap Analysis   | Complete | 2025-11-22 | 2025-11-22 |
+| 4    | Test Plan Generation    | Complete | 2025-11-22 | 2025-11-22 |
 
 ## Final Summary
 

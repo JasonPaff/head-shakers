@@ -22,23 +22,23 @@
 
 ## Coverage Matrix
 
-| Source File | Unit | Component | Integration | E2E | Gap Status |
-|-------------|------|-----------|-------------|-----|------------|
-| `src/lib/actions/social/social.actions.ts` | ❌ | N/A | ✅ Partial | ❌ | Critical |
-| `src/lib/facades/social/social.facade.ts` | ❌ | N/A | ✅ Partial | ❌ | Critical |
-| `src/lib/queries/social/social.query.ts` | ❌ | N/A | ✅ Partial | ❌ | Critical |
-| `src/components/feature/comments/comment-form.tsx` | N/A | ❌ | N/A | N/A | High |
-| `src/components/feature/comments/comment-item.tsx` | N/A | ❌ | N/A | N/A | High |
-| `src/components/feature/comments/comment-section.tsx` | N/A | ❌ | N/A | N/A | High |
-| `src/components/feature/comments/comment-list.tsx` | N/A | ❌ | N/A | N/A | High |
-| `src/components/feature/comments/comment-delete-dialog.tsx` | N/A | ❌ | N/A | N/A | Medium |
-| `src/components/feature/comments/comment-edit-dialog.tsx` | N/A | ❌ | N/A | N/A | Medium |
-| `src/components/feature/comments/async/comment-section-async.tsx` | ❌ | N/A | ❌ | N/A | Medium |
-| `src/components/feature/comments/async/comment-section-client.tsx` | N/A | ❌ | N/A | ❌ | High |
-| `src/lib/validations/comment.validation.ts` | ✅ | N/A | N/A | N/A | Complete |
-| `src/lib/validations/social.validation.ts` | ✅ | N/A | N/A | N/A | Adequate |
-| `src/lib/db/schema/social.schema.ts` | ✅ | N/A | N/A | N/A | Complete |
-| Comment utilities & types | ✅ | N/A | N/A | N/A | Adequate |
+| Source File                                                        | Unit | Component | Integration | E2E | Gap Status |
+| ------------------------------------------------------------------ | ---- | --------- | ----------- | --- | ---------- |
+| `src/lib/actions/social/social.actions.ts`                         | ❌   | N/A       | ✅ Partial  | ❌  | Critical   |
+| `src/lib/facades/social/social.facade.ts`                          | ❌   | N/A       | ✅ Partial  | ❌  | Critical   |
+| `src/lib/queries/social/social.query.ts`                           | ❌   | N/A       | ✅ Partial  | ❌  | Critical   |
+| `src/components/feature/comments/comment-form.tsx`                 | N/A  | ❌        | N/A         | N/A | High       |
+| `src/components/feature/comments/comment-item.tsx`                 | N/A  | ❌        | N/A         | N/A | High       |
+| `src/components/feature/comments/comment-section.tsx`              | N/A  | ❌        | N/A         | N/A | High       |
+| `src/components/feature/comments/comment-list.tsx`                 | N/A  | ❌        | N/A         | N/A | High       |
+| `src/components/feature/comments/comment-delete-dialog.tsx`        | N/A  | ❌        | N/A         | N/A | Medium     |
+| `src/components/feature/comments/comment-edit-dialog.tsx`          | N/A  | ❌        | N/A         | N/A | Medium     |
+| `src/components/feature/comments/async/comment-section-async.tsx`  | ❌   | N/A       | ❌          | N/A | Medium     |
+| `src/components/feature/comments/async/comment-section-client.tsx` | N/A  | ❌        | N/A         | ❌  | High       |
+| `src/lib/validations/comment.validation.ts`                        | ✅   | N/A       | N/A         | N/A | Complete   |
+| `src/lib/validations/social.validation.ts`                         | ✅   | N/A       | N/A         | N/A | Adequate   |
+| `src/lib/db/schema/social.schema.ts`                               | ✅   | N/A       | N/A         | N/A | Complete   |
+| Comment utilities & types                                          | ✅   | N/A       | N/A         | N/A | Adequate   |
 
 ---
 
@@ -51,16 +51,19 @@
 **Current Coverage**: Integration tests only (basic happy path)
 
 **Missing Test Types**:
+
 - Unit tests for action-level validation and error handling
 - E2E tests for complete user flows
 
 **Exports Requiring Tests**:
+
 - `createCommentAction` - Server action with transaction, input sanitization, error mapping, cache invalidation
 - `updateCommentAction` - Server action with authorization, cache invalidation
 - `deleteCommentAction` - Server action with cascade deletion, cache invalidation
 - `toggleLikeAction` - Like toggle with Sentry integration (exists but may need expansion)
 
 **Key Scenarios Not Covered**:
+
 1. **Input Validation Errors**
    - Invalid UUIDs for targetId, commentId, parentCommentId
    - Content exceeding SCHEMA_LIMITS (>5000 chars)
@@ -94,11 +97,13 @@
    - Action metadata properly set (isTransactionRequired)
 
 **Risk Assessment**:
+
 - **Severity**: HIGH - These are mutation endpoints, directly impact data
 - **Complexity**: HIGH - Multiple validation layers, error mapping, cache interaction
 - **User Impact**: DIRECT - Users cannot create/edit/delete comments without these
 
 **Estimated Tests**: 12-14 unit/integration tests
+
 - 2 tests per action (happy path variant already in integration)
 - 2-3 error scenarios per action
 - 1 cache invalidation test per action
@@ -110,11 +115,13 @@
 **Current Coverage**: Integration tests exist but partial
 
 **Missing Test Types**:
+
 - Complete edge case coverage for comment operations
 - Depth calculation validation
 - Cascade deletion verification
 
 **Exports Requiring Extended Tests**:
+
 - `createComment` - Happy path exists, needs edge cases
 - `createCommentReply` - 4 validations exist, need individual failure testing
   - Parent exists/not deleted
@@ -130,6 +137,7 @@
 - `deleteCommentRepliesRecursive` (private) - Full tree deletion
 
 **Key Scenarios Not Covered**:
+
 1. **Parent Comment Validations**
    - Non-existent parent comment (returns null)
    - Deleted parent comment (isDeleted=true)
@@ -167,11 +175,13 @@
    - Cache invalidated on mutations
 
 **Risk Assessment**:
+
 - **Severity**: HIGH - Core business logic for comments
 - **Complexity**: HIGH - Multiple validations, transactions, recursive operations
 - **User Impact**: INDIRECT - Users see failures/inconsistencies if wrong
 
 **Estimated Tests**: 12-14 integration tests
+
 - 5-6 for createCommentReply validations
 - 3-4 for deleteComment cascade scenarios
 - 2-3 for depth calculation
@@ -184,11 +194,13 @@
 **Current Coverage**: Partial through facade integration tests
 
 **Missing Test Types**:
+
 - Direct unit tests for query methods
 - Edge cases for pagination and recursion
 - Error condition handling
 
 **Exports Requiring Tests**:
+
 - `createCommentAsync` - Basic insert
 - `deleteCommentAsync` - Soft delete with timestamps
 - `getCommentByIdAsync` - Filters deleted comments
@@ -206,6 +218,7 @@
 - `updateCommentAsync` - Update with timestamps
 
 **Key Scenarios Not Covered**:
+
 1. **Soft Delete**
    - Updates isDeleted and deletedAt correctly
    - Deleted comments excluded from subsequent queries
@@ -239,11 +252,13 @@
    - Count updates to correct table
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - Direct DB access, can cause data inconsistencies
 - **Complexity**: MEDIUM - Some recursive logic, but mostly straightforward queries
 - **User Impact**: INDIRECT - Data correctness depends on these
 
 **Estimated Tests**: 8-10 unit tests
+
 - 2 for soft delete and filtering
 - 2 for pagination
 - 2 for recursive tree building
@@ -258,9 +273,11 @@
 **Current Coverage**: None
 
 **Component Exports**:
+
 - `CommentForm` - Form component for comment submission/editing
 
 **Key Functionality Requiring Tests**:
+
 1. **Content Validation**
    - Content between MIN (1) and MAX (5000) characters
    - Empty content disables submit
@@ -314,11 +331,13 @@
    - HTML form props (onSubmit) work correctly
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - User-facing, affects comment UX
 - **Complexity**: MEDIUM - Multiple conditional states, validation logic
 - **User Impact**: DIRECT - Users need this to create/edit comments
 
 **Estimated Tests**: 8-10 component tests
+
 - 2 for content validation states
 - 2 for character counter behavior
 - 2 for reply mode display
@@ -333,9 +352,11 @@
 **Current Coverage**: None
 
 **Component Exports**:
+
 - `CommentItem` - Individual comment display with actions
 
 **Key Functionality Requiring Tests**:
+
 1. **Depth-Based Styling**
    - Background progressively lighter: bg-card, muted/20, /30, /40, /50, /60
    - Border left accent with decreasing opacity
@@ -387,11 +408,13 @@
    - Content whitespace preserved (pre-wrap)
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - User-facing display, affects comment readability
 - **Complexity**: MEDIUM - Multiple conditional renders, depth-based logic
 - **User Impact**: DIRECT - Core comment display component
 
 **Estimated Tests**: 8-10 component tests
+
 - 2 for depth-based styling
 - 2 for timestamp formatting and date handling
 - 2 for button visibility and ownership
@@ -406,9 +429,11 @@
 **Current Coverage**: None
 
 **Component Exports**:
+
 - `CommentSection` - Main orchestrator component
 
 **Key Functionality Requiring Tests**:
+
 1. **State Management**
    - Edit dialog state (open/close, selected comment)
    - Delete dialog state (open/close, selected comment ID)
@@ -459,11 +484,13 @@
    - Comment list still displays
 
 **Risk Assessment**:
+
 - **Severity**: HIGH - Main orchestrator for comment feature
 - **Complexity**: HIGH - Complex state management, nested search, conditional rendering
 - **User Impact**: DIRECT - Core UX for comment interactions
 
 **Estimated Tests**: 10-12 component tests
+
 - 2 for state management (dialogs, reply mode)
 - 2 for comment tree navigation
 - 2 for form display and interaction
@@ -478,9 +505,11 @@
 **Current Coverage**: None
 
 **Component Exports**:
+
 - `CommentSectionClient` - Client wrapper wiring up server actions
 
 **Key Functionality Requiring Tests**:
+
 1. **Server Action Integration**
    - createCommentAction called with correct payload
    - updateCommentAction called with correct payload
@@ -501,11 +530,13 @@
    - Callbacks properly bound
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - Bridges server actions to UI
 - **Complexity**: MEDIUM - Async callback handling
 - **User Impact**: INDIRECT - Part of comment flow
 
 **Estimated Tests**: 4-6 component tests
+
 - 1 for each action integration
 - 1 for error handling
 - 1 for loading states
@@ -517,9 +548,11 @@
 **Current Coverage**: None
 
 **Component Exports**:
+
 - `CommentList` - Recursive comment thread renderer
 
 **Key Functionality Requiring Tests**:
+
 1. **Recursive Rendering**
    - Root comments rendered
    - Replies recursively rendered
@@ -540,11 +573,13 @@
    - CommentWithDepth passed through unchanged
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - Comment display
 - **Complexity**: MEDIUM - Recursive rendering
 - **User Impact**: DIRECT - Comment thread visibility
 
 **Estimated Tests**: 5-6 component tests
+
 - 1 for recursive rendering
 - 1 for depth tracking
 - 1 for load more button
@@ -560,6 +595,7 @@
 **Current Coverage**: None
 
 **Key Functionality Requiring Tests**:
+
 1. **Dialog State**
    - Opens only when isOpen=true AND commentId not null
    - Dialog remains closed when commentId=null even if isOpen=true
@@ -585,11 +621,13 @@
    - Cancel button remains enabled
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - Prevents accidental deletion
 - **Complexity**: LOW - Simple dialog
 - **User Impact**: DIRECT - User sees before deleting
 
 **Estimated Tests**: 4-5 component tests
+
 - 1 for dialog visibility
 - 1 for reply count warning text
 - 1 for confirmation flow
@@ -602,6 +640,7 @@
 **Current Coverage**: None
 
 **Key Functionality Requiring Tests**:
+
 1. **Dialog State**
    - Opens only when isOpen=true AND comment not null
    - Dialog closes after submission
@@ -619,11 +658,13 @@
    - Dialog disabled during submission
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - Comment editing
 - **Complexity**: LOW - Dialog wrapper
 - **User Impact**: DIRECT - Edit interface
 
 **Estimated Tests**: 4-5 component tests
+
 - 1 for dialog visibility
 - 1 for form integration
 - 1 for submission flow
@@ -638,6 +679,7 @@
 **Component Type**: Server Component
 
 **Key Functionality Requiring Tests**:
+
 1. **Server-Side Data Fetching**
    - Fetches initial comments with SocialFacade.getCommentsWithReplies
    - Passes correct targetId, targetType
@@ -652,11 +694,13 @@
    - Forwards className and other HTML props
 
 **Risk Assessment**:
+
 - **Severity**: MEDIUM - Data fetching
 - **Complexity**: MEDIUM - Async server component
 - **User Impact**: INDIRECT - Initial load
 
 **Estimated Tests**: 2-3 integration tests
+
 - 1 for successful data fetch
 - 1 for authentication state
 - 1 for error handling (comment fetch failure)
@@ -670,6 +714,7 @@
 **Current Coverage**: Adequate
 
 **Files**:
+
 - `src/lib/db/schema/social.schema.ts` - Database schema (verified, well-indexed)
 - `src/lib/validations/comment.validation.ts` - Zod schemas (280 lines, comprehensive)
 - `src/lib/validations/social.validation.ts` - Base schemas (adequate)
@@ -683,6 +728,7 @@
 **Status**: Low priority - these are configuration and support files
 
 **Files**:
+
 - Comment-related constants (SCHEMA_LIMITS, MAX_COMMENT_NESTING_DEPTH)
 - Comment type definitions
 - Skeleton loader component
@@ -696,6 +742,7 @@
 **1. `tests/unit/lib/validations/comment.validation.test.ts` (~280 lines)**
 
 **Coverage**:
+
 - `createCommentSchema` - Valid/invalid content, UUIDs, target types
 - `updateCommentSchema` - Valid/invalid IDs and content
 - `deleteCommentSchema` - Valid/invalid comment IDs
@@ -710,6 +757,7 @@
 **2. `tests/unit/validations/social.validation.test.ts`**
 
 **Coverage**:
+
 - Base drizzle-zod schemas (insertCommentSchema, insertLikeSchema)
 - Like validation schemas
 
@@ -720,6 +768,7 @@
 **3. `tests/integration/actions/social.facade.test.ts` (~440 lines)**
 
 **Coverage**:
+
 - `toggleLike` - Basic like/unlike flow
 - `createComment` - Happy path comment creation
 - `createCommentReply` - Happy path reply creation
@@ -730,6 +779,7 @@
 **Quality**: PARTIAL - Happy paths covered, edge cases and error scenarios missing
 
 **Specific Gaps in Facade Tests**:
+
 - No parent comment validation failures (not found, deleted, wrong target)
 - No blocked user scenario
 - No depth validation testing
@@ -744,6 +794,7 @@
 ### Existing Fixtures
 
 Located in `tests/fixtures/`:
+
 - `bobblehead.factory.ts` - createTestBobblehead()
 - `collection.factory.ts` - createTestCollection()
 - `user.factory.ts` - createTestUser()
@@ -755,11 +806,13 @@ Located in `tests/fixtures/`:
 ### Existing Mocks
 
 **Database**:
+
 - vi.mock('@/lib/db') - Points to test database
 - Test database setup: `tests/setup/test-db`
 - Database reset: resetTestDatabase()
 
 **External Services**:
+
 - Sentry mocked
 - Cache service mocked
 - Redis client mocked
@@ -773,21 +826,23 @@ Located in `tests/fixtures/`:
 For new tests:
 
 1. **Comment Factory Needed**
+
    ```typescript
    // tests/fixtures/comment.factory.ts
    export async function createTestComment(
      overrides?: Partial<InsertComment>,
-     userId?: string
-   ): Promise<SelectComment | null>
+     userId?: string,
+   ): Promise<SelectComment | null>;
    ```
 
 2. **User Block Factory Needed**
+
    ```typescript
    // Add to user.factory.ts or create block.factory.ts
    export async function createTestUserBlock(
      blockerUserId: string,
-     blockedUserId: string
-   ): Promise<SelectUserBlock | null>
+     blockedUserId: string,
+   ): Promise<SelectUserBlock | null>;
    ```
 
 3. **Test Database Seeding**
@@ -835,6 +890,7 @@ For new tests:
 ### Unit Tests (12-14 tests)
 
 **Server Actions** (6-8 tests):
+
 - Input validation: 1 test (all invalid scenarios)
 - Authorization: 1 test (update/delete wrong user)
 - Business rules: 2 tests (max depth, blocked user, parent not found)
@@ -843,6 +899,7 @@ For new tests:
 - Transaction behavior: 1 test
 
 **Query Layer** (6-8 tests):
+
 - Soft delete filtering: 1 test
 - Pagination: 1 test
 - Recursive tree building: 1 test
@@ -855,6 +912,7 @@ For new tests:
 ### Component Tests (16-18 tests)
 
 **CommentForm** (8-10 tests):
+
 - Content validation states: 2 tests
 - Character counter: 2 tests
 - Reply mode: 2 tests
@@ -863,6 +921,7 @@ For new tests:
 - Accessibility: 1 test
 
 **CommentItem** (8-10 tests):
+
 - Depth styling: 2 tests
 - User display/fallbacks: 1-2 tests
 - Timestamps: 1 test
@@ -871,6 +930,7 @@ For new tests:
 - Event handlers: 1-2 tests
 
 **CommentSection** (10-12 tests):
+
 - State management: 2 tests
 - Tree navigation: 1 test
 - Form integration: 1-2 tests
@@ -879,6 +939,7 @@ For new tests:
 - Authentication: 1 test
 
 **CommentList** (5-6 tests):
+
 - Recursive rendering: 1 test
 - Pagination: 1 test
 - Empty state: 1 test
@@ -886,10 +947,12 @@ For new tests:
 - Load more: 1 test
 
 **Dialogs** (8-10 tests):
+
 - CommentDeleteDialog: 4-5 tests
 - CommentEditDialog: 4-5 tests
 
 **AsyncComponents** (4-6 tests):
+
 - CommentSectionClient: 3-4 tests
 - CommentSectionAsync: 2-3 tests
 
@@ -898,16 +961,19 @@ For new tests:
 ### Integration Tests (12-14 tests)
 
 **Facade Extended** (8-10 tests):
+
 - createCommentReply validations: 5 tests (parent exists, same target, blocked, depth, success)
 - deleteComment cascade: 3-4 tests (no replies, with replies, counts)
 - Cache behavior: 1-2 tests
 
 **Async Components** (2-3 tests):
+
 - CommentSectionAsync data fetch: 1 test
 - Error handling: 1 test
 - Authentication: 1 test
 
 **Server Actions with Transaction** (2-3 tests):
+
 - Transaction rollback on error: 1 test
 - Multiple concurrent actions: 1 test
 
@@ -916,6 +982,7 @@ For new tests:
 ### E2E Tests (6-8 tests)
 
 **Complete User Flows**:
+
 1. User creates comment on bobblehead (4-step flow)
 2. User replies to comment (validations + depth warning)
 3. User edits own comment (success + unauthorized attempt)
@@ -959,6 +1026,7 @@ For new tests:
 ### Code Patterns to Test
 
 1. **Transaction Pattern**
+
    ```typescript
    await db.transaction(async (tx) => {
      // All operations use tx instead of db
@@ -966,29 +1034,30 @@ For new tests:
    ```
 
 2. **Cache Key Generation**
+
    ```typescript
    const cacheKey = `${CACHE_KEYS.SOCIAL.COMMENTS(targetType, targetId)}:list:${limit}:${offset}`;
    ```
 
 3. **Type Mapping for Cache**
    ```typescript
-   targetType === 'subcollection' ? 'collection' : targetType
+   targetType === 'subcollection' ? 'collection' : targetType;
    ```
 
 ---
 
 ## Risk Assessment Summary
 
-| Component | Risk Level | Reason |
-|-----------|-----------|--------|
-| Server Actions | **CRITICAL** | Direct mutations, no tests for error cases |
-| Facade Layer | **CRITICAL** | Complex validations, cascade deletion |
-| Comment Form | **HIGH** | Core user interaction, no tests |
-| Comment Section | **HIGH** | State management, dialog coordination |
-| Comment Item | **HIGH** | Display component, depth logic |
-| Query Layer | **MEDIUM** | Mostly simple queries, some recursive |
-| Dialogs | **MEDIUM** | Supporting components |
-| Async Wrappers | **MEDIUM** | Data fetching layer |
+| Component       | Risk Level   | Reason                                     |
+| --------------- | ------------ | ------------------------------------------ |
+| Server Actions  | **CRITICAL** | Direct mutations, no tests for error cases |
+| Facade Layer    | **CRITICAL** | Complex validations, cascade deletion      |
+| Comment Form    | **HIGH**     | Core user interaction, no tests            |
+| Comment Section | **HIGH**     | State management, dialog coordination      |
+| Comment Item    | **HIGH**     | Display component, depth logic             |
+| Query Layer     | **MEDIUM**   | Mostly simple queries, some recursive      |
+| Dialogs         | **MEDIUM**   | Supporting components                      |
+| Async Wrappers  | **MEDIUM**   | Data fetching layer                        |
 
 ---
 

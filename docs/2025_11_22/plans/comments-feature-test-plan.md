@@ -15,12 +15,12 @@
 
 **Total New Tests Needed**: 80-94 tests across all categories
 
-| Test Type | Count | Priority |
-|-----------|-------|----------|
-| Unit | 12-14 | Critical |
-| Component | 42-48 | Critical/High |
-| Integration | 20-24 | Critical |
-| E2E | 6-8 | High |
+| Test Type   | Count | Priority      |
+| ----------- | ----- | ------------- |
+| Unit        | 12-14 | Critical      |
+| Component   | 42-48 | Critical/High |
+| Integration | 20-24 | Critical      |
+| E2E         | 6-8   | High          |
 
 ---
 
@@ -523,24 +523,18 @@ npm run lint:fix && npm run typecheck
 **Test Cases to Add:**
 
 **createCommentReply edge cases:**
+
 1. `should fail when parent comment belongs to different target`
 2. `should fail when user is blocked by parent comment author`
 3. `should fail when depth would exceed MAX_COMMENT_NESTING_DEPTH`
 4. `should succeed at depth MAX_COMMENT_NESTING_DEPTH - 1`
 5. `should return error message for deleted parent comment`
 
-**deleteComment edge cases:**
-6. `should cascade soft delete all nested replies`
-7. `should decrement comment count for each deleted comment in tree`
-8. `should soft delete (set isDeleted true, deletedAt)`
-9. `should not hard delete comments`
+**deleteComment edge cases:** 6. `should cascade soft delete all nested replies` 7. `should decrement comment count for each deleted comment in tree` 8. `should soft delete (set isDeleted true, deletedAt)` 9. `should not hard delete comments`
 
-**Blocked user scenarios:**
-10. `should prevent reply when blocked bidirectionally`
-11. `should allow reply when not blocked`
+**Blocked user scenarios:** 10. `should prevent reply when blocked bidirectionally` 11. `should allow reply when not blocked`
 
-**Cache invalidation:**
-12. `should invalidate cache tags after createCommentReply`
+**Cache invalidation:** 12. `should invalidate cache tags after createCommentReply`
 
 **Patterns to Follow:**
 
@@ -659,26 +653,31 @@ npm run test:e2e -- tests/e2e/specs/user/comments.spec.ts
 ## Quality Gates
 
 ### Phase 1: Infrastructure (Steps 1-2)
+
 - [ ] Mock data file created and exports correct types
 - [ ] Factory creates valid database records
 - [ ] TypeScript compilation passes
 
 ### Phase 2: Unit Tests (Step 3)
+
 - [ ] All server action tests pass
 - [ ] Error handling verified
 - [ ] Cache invalidation verified
 
 ### Phase 3: Component Tests (Steps 4-9)
+
 - [ ] All component tests pass
 - [ ] Coverage threshold met (60%+ for new files)
 - [ ] No accessibility regressions
 
 ### Phase 4: Integration Tests (Steps 10-11)
+
 - [ ] All integration tests pass with Testcontainers
 - [ ] Edge cases properly covered
 - [ ] Database state verified
 
 ### Phase 5: E2E Tests (Step 12)
+
 - [ ] All E2E tests pass
 - [ ] No flaky tests
 - [ ] Full user workflows verified
@@ -708,13 +707,13 @@ npm run test:e2e -- tests/e2e/specs/user/comments.spec.ts
 
 ### Mocking Strategy
 
-| Dependency | Unit Tests | Component Tests | Integration Tests |
-|------------|------------|-----------------|-------------------|
-| Clerk auth | Mock | Mock | Mock |
-| SocialFacade | Mock | Not needed | Real |
-| SocialQuery | Mock | Not needed | Real |
-| CacheService | Mock | Mock | Mock |
-| Database | N/A | N/A | Testcontainers |
+| Dependency   | Unit Tests | Component Tests | Integration Tests |
+| ------------ | ---------- | --------------- | ----------------- |
+| Clerk auth   | Mock       | Mock            | Mock              |
+| SocialFacade | Mock       | Not needed      | Real              |
+| SocialQuery  | Mock       | Not needed      | Real              |
+| CacheService | Mock       | Mock            | Mock              |
+| Database     | N/A        | N/A             | Testcontainers    |
 
 ## Notes
 

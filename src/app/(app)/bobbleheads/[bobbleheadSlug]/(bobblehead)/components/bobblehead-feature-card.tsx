@@ -4,33 +4,46 @@ import type { KeyboardEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import type { ContentLikeData } from '@/lib/facades/social/social.facade';
 import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobbleheads-query';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { LikeTextButton } from '@/components/ui/like-button';
+import { Separator } from '@/components/ui/separator';
 import { useToggle } from '@/hooks/use-toggle';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
+
+import { FeatureCardAcquisition } from './feature-card/feature-card-acquisition';
+import { FeatureCardCustomFields } from './feature-card/feature-card-custom-fields';
+import { FeatureCardDescription } from './feature-card/feature-card-description';
+import { FeatureCardImageGallery } from './feature-card/feature-card-image-gallery';
+import { FeatureCardPrimaryImage } from './feature-card/feature-card-primary-image';
+import { FeatureCardQuickInfo } from './feature-card/feature-card-quick-info';
+import { FeatureCardSocialBar } from './feature-card/feature-card-social-bar';
+import { FeatureCardSpecifications } from './feature-card/feature-card-specifications';
+import { FeatureCardStatus } from './feature-card/feature-card-status';
 
 const getPrimaryPhotoIndex = (photos: BobbleheadWithRelations['photos']) => {
   const primaryIndex = photos.findIndex((photo) => photo.isPrimary);
   return primaryIndex !== -1 ? primaryIndex : 0;
 };
 
-interface BobbleheadFeatureCardProps {
+type BobbleheadFeatureCardProps = {
   bobblehead: BobbleheadWithRelations;
+  isOwner?: boolean;
   likeData: ContentLikeData;
-}
+};
 
-export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatureCardProps) => {
-  const [isHoveringImage, setIsHoveringImage] = useToggle();
+export const BobbleheadFeatureCard = ({
+  bobblehead,
+  isOwner = false,
+  likeData,
+}: BobbleheadFeatureCardProps) => {
   const [isPhotoDialogOpen, setIsPhotoDialogOpen] = useToggle();
   const [mainPhotoIndex, setMainPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
   const [modalPhotoIndex, setModalPhotoIndex] = useState(getPrimaryPhotoIndex(bobblehead.photos));
@@ -60,201 +73,128 @@ export const BobbleheadFeatureCard = ({ bobblehead, likeData }: BobbleheadFeatur
   };
 
   const handleImageClick = () => {
-    // set modal index to current main image when opening
     setModalPhotoIndex(mainPhotoIndex);
     setIsPhotoDialogOpen.on();
+  };
+
+  const handleGallerySelect = (index: number) => {
+    setMainPhotoIndex(index);
   };
 
   const handleModalKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'ArrowLeft') handlePreviousModalPhoto();
     else if (event.key === 'ArrowRight') handleNextModalPhoto();
-    else if (event.key === 'Escape') setIsPhotoDialogOpen.off();
   };
 
-  const _currentMainPhoto = bobblehead.photos[mainPhotoIndex] || bobblehead.photos[0];
   const _currentModalPhoto = bobblehead.photos[modalPhotoIndex] || bobblehead.photos[0];
-  const _hasMoreThanThreeTags = bobblehead.tags.length > 3;
-  const _topThreeTags = bobblehead.tags.slice(0, 3);
   const _hasMultiplePhotos = bobblehead.photos.length > 1;
-  const _hasImage = _currentMainPhoto?.url && _currentMainPhoto.url !== '/placeholder.jpg';
   const _hasModalImage = _currentModalPhoto?.url && _currentModalPhoto.url !== '/placeholder.jpg';
 
+  const _photos = useMemo(
+    () =>
+      bobblehead.photos.map((photo) => ({
+        altText: photo.altText ?? undefined,
+        url: photo.url,
+      })),
+    [bobblehead.photos],
+  );
+
   return (
-    <Card className={'overflow-hidden'}>
-      <div className={'grid grid-cols-1 lg:grid-cols-2'}>
-        {/* Image Section */}
+    <Card className={'overflow-hidden'} data-slot={'bobblehead-feature-card'}>
+      {/* Two-column layout on desktop, single column on mobile */}
+      <div className={'flex flex-col lg:flex-row'}>
+        {/* Left Column: Image Section */}
+        <div className={'lg:w-[55%] xl:w-[50%]'}>
+          {/* Primary Image Section - constrained height on desktop */}
+          <FeatureCardPrimaryImage
+            bobbleheadName={bobblehead.name}
+            className={'lg:aspect-[4/5] xl:aspect-[3/4]'}
+            currentCondition={bobblehead.currentCondition}
+            currentIndex={mainPhotoIndex}
+            isFeatured={bobblehead.isFeatured}
+            onClick={handleImageClick}
+            onNext={handleNextMainPhoto}
+            onPrevious={handlePreviousMainPhoto}
+            photos={_photos}
+          />
+
+          {/* Thumbnail Gallery - below image on both layouts */}
+          <Conditional isCondition={_hasMultiplePhotos}>
+            <FeatureCardImageGallery
+              className={'p-4'}
+              currentIndex={mainPhotoIndex}
+              onImageSelect={handleGallerySelect}
+              photos={_photos}
+            />
+          </Conditional>
+        </div>
+
+        {/* Right Column: Info Sidebar (desktop only) */}
         <div
-          className={'relative aspect-[3/4] cursor-pointer lg:aspect-square'}
-          onClick={handleImageClick}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleImageClick();
-            }
-          }}
-          onMouseEnter={setIsHoveringImage.on}
-          onMouseLeave={setIsHoveringImage.off}
-          role={'button'}
-          tabIndex={0}
+          className={'hidden border-l border-border lg:flex lg:w-[45%] lg:flex-col xl:w-[50%]'}
+          data-slot={'bobblehead-feature-card-sidebar'}
         >
-          {/* Featured Image */}
-          {_hasImage ?
-            <CldImage
-              alt={_currentMainPhoto?.altText ?? bobblehead.name}
-              className={'size-full object-cover'}
-              crop={'fill'}
-              format={'auto'}
-              height={800}
-              quality={'auto:good'}
-              src={extractPublicIdFromCloudinaryUrl(_currentMainPhoto.url)}
-              width={600}
+          <div className={'flex flex-1 flex-col space-y-6 p-6'}>
+            {/* Quick Info */}
+            <FeatureCardQuickInfo bobblehead={bobblehead} />
+
+            <Separator />
+
+            {/* Social Actions */}
+            <FeatureCardSocialBar
+              bobbleheadId={bobblehead.id}
+              bobbleheadSlug={bobblehead.slug}
+              commentCount={bobblehead.commentCount}
+              isOwner={isOwner}
+              likeData={likeData}
             />
-          : <img alt={bobblehead.name} className={'size-full object-cover'} src={'/placeholder.jpg'} />}
 
-          {/* Navigation Arrows  */}
-          <Conditional isCondition={_hasMultiplePhotos && isHoveringImage}>
-            {/* Previous Button */}
-            <Button
-              className={cn(
-                'absolute top-1/2 left-4 z-10 -translate-y-1/2',
-                'bg-black/50 text-white hover:bg-black/70',
-                'transition-opacity duration-200',
-              )}
-              onClick={(e) => {
-                e.stopPropagation();
-                handlePreviousMainPhoto();
-              }}
-              size={'icon'}
-              variant={'ghost'}
-            >
-              <ChevronLeftIcon aria-hidden className={'size-6'} />
-              <span className={'sr-only'}>Previous photo</span>
-            </Button>
+            <Separator />
 
-            {/* Next Button */}
-            <Button
-              className={cn(
-                'absolute top-1/2 right-4 z-10 -translate-y-1/2',
-                'bg-black/50 text-white hover:bg-black/70',
-                'transition-opacity duration-200',
-              )}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleNextMainPhoto();
-              }}
-              size={'icon'}
-              variant={'ghost'}
-            >
-              <ChevronRightIcon aria-hidden className={'size-6'} />
-              <span className={'sr-only'}>Next photo</span>
-            </Button>
-          </Conditional>
-
-          {/* Photo Counter */}
-          <Conditional isCondition={_hasMultiplePhotos && isHoveringImage}>
-            <div
-              className={cn(
-                'absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full',
-                'bg-black/50 px-3 py-1 text-sm text-white',
-                'transition-opacity duration-200',
-              )}
-            >
-              {mainPhotoIndex + 1} of {bobblehead.photos.length}
-            </div>
-          </Conditional>
-
-          {/* Featured Badge */}
-          <Conditional isCondition={bobblehead.isFeatured}>
-            <Badge className={'absolute top-4 left-4 bg-accent text-accent-foreground shadow-lg'}>
-              Featured
-            </Badge>
-          </Conditional>
-
-          {/* Condition Badge */}
-          <Conditional isCondition={!!bobblehead.currentCondition}>
-            <Badge
-              className={'absolute top-4 right-4 shadow-lg'}
-              variant={
-                bobblehead.currentCondition?.toLowerCase().includes('mint') ? 'default'
-                : bobblehead.currentCondition?.toLowerCase().includes('good') ?
-                  'secondary'
-                : 'outline'
-              }
-            >
-              {bobblehead.currentCondition}
-            </Badge>
-          </Conditional>
-        </div>
-
-        {/* Details Section */}
-        <div className={'flex flex-col justify-between px-4'}>
-          <div>
-            <div className={'mb-4 space-y-1'}>
-              {/* Character */}
-              <Conditional isCondition={!!bobblehead.characterName}>
-                <p className={'text-lg font-medium text-primary'}>{bobblehead.characterName}</p>
-              </Conditional>
-              {/* Series */}
-              <Conditional isCondition={!!bobblehead.series}>
-                <p className={'text-sm text-muted-foreground'}>{bobblehead.series}</p>
-              </Conditional>
-            </div>
-
-            {/* Tags */}
-            <div className={'mb-6 flex flex-wrap gap-2'}>
-              {_topThreeTags.map((tag) => (
-                <Badge key={tag.id} variant={'outline'}>
-                  {tag.name}
-                </Badge>
-              ))}
-              <Conditional isCondition={_hasMoreThanThreeTags}>
-                <Badge variant={'outline'}>+{bobblehead.tags.length - 3} more</Badge>
-              </Conditional>
-            </div>
-
-            {/* Key Details */}
-            <div className={'space-y-3 border-t pt-6'}>
-              {/* Manufacturer */}
-              <div className={'flex justify-between'}>
-                <span className={'text-sm text-muted-foreground'}>Manufacturer</span>
-                <span className={'text-sm font-medium'}>{bobblehead.manufacturer || 'Unknown'}</span>
-              </div>
-
-              {/* Year */}
-              <div className={'flex justify-between'}>
-                <span className={'text-sm text-muted-foreground'}>Year</span>
-                <span className={'text-sm font-medium'}>{bobblehead.year || 'Unknown'}</span>
-              </div>
-
-              {/* Category */}
-              <Conditional isCondition={!!bobblehead.category}>
-                <div className={'flex justify-between'}>
-                  <span className={'text-sm text-muted-foreground'}>Category</span>
-                  <span className={'text-sm font-medium'}>{bobblehead.category}</span>
-                </div>
-              </Conditional>
+            {/* Collapsible Sections */}
+            <div className={'flex-1 space-y-4 overflow-y-auto'}>
+              <FeatureCardDescription bobblehead={bobblehead} />
+              <FeatureCardSpecifications bobblehead={bobblehead} />
+              <FeatureCardAcquisition bobblehead={bobblehead} />
+              <FeatureCardStatus bobblehead={bobblehead} />
+              <FeatureCardCustomFields bobblehead={bobblehead} />
             </div>
           </div>
-
-          {/* Like Button */}
-          <div className={'mt-6'}>
-            <LikeTextButton
-              className={'w-full'}
-              initialLikeCount={likeData.likeCount}
-              isInitiallyLiked={likeData.isLiked}
-              size={'lg'}
-              targetId={bobblehead.id}
-              targetType={'bobblehead'}
-            />
-          </div>
         </div>
+      </div>
+
+      {/* Mobile Content Section (hidden on desktop) */}
+      <div className={'space-y-6 p-4 lg:hidden'} data-slot={'bobblehead-feature-card-content'}>
+        {/* Quick Info */}
+        <FeatureCardQuickInfo bobblehead={bobblehead} />
+
+        <Separator />
+
+        {/* Social Actions */}
+        <FeatureCardSocialBar
+          bobbleheadId={bobblehead.id}
+          bobbleheadSlug={bobblehead.slug}
+          commentCount={bobblehead.commentCount}
+          isOwner={isOwner}
+          likeData={likeData}
+        />
+
+        <Separator />
+
+        {/* Collapsible Sections */}
+        <FeatureCardDescription bobblehead={bobblehead} />
+        <FeatureCardSpecifications bobblehead={bobblehead} />
+        <FeatureCardAcquisition bobblehead={bobblehead} />
+        <FeatureCardStatus bobblehead={bobblehead} />
+        <FeatureCardCustomFields bobblehead={bobblehead} />
       </div>
 
       {/* Image Modal */}
       <Dialog onOpenChange={setIsPhotoDialogOpen.update} open={isPhotoDialogOpen}>
         <DialogContent className={'max-w-6xl p-0'} onKeyDown={handleModalKeyDown}>
           <DialogHeader className={'p-4'}>
-            <DialogTitle>Bobblehead Photos Placeholder Title</DialogTitle>
-            <DialogDescription>Bobblehead photos placeholder description</DialogDescription>
+            <DialogTitle>{bobblehead.name} Photos</DialogTitle>
+            <DialogDescription>View full-size photos of this bobblehead</DialogDescription>
           </DialogHeader>
           <div className={'flex items-center justify-center bg-black'}>
             {/* Previous button */}
