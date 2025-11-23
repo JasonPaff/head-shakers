@@ -53,7 +53,8 @@ export const SearchResults = ({
   const _isGridView = viewMode === ENUMS.SEARCH.VIEW_MODE[0];
   const _isListView = viewMode === ENUMS.SEARCH.VIEW_MODE[1];
   const _hasViewModeControl = !!onViewModeChange;
-  const _hasMultipleSections = (_hasCollections ? 1 : 0) + (_hasSubcollections ? 1 : 0) + (_hasBobbleheads ? 1 : 0) > 1;
+  const _hasMultipleSections =
+    (_hasCollections ? 1 : 0) + (_hasSubcollections ? 1 : 0) + (_hasBobbleheads ? 1 : 0) > 1;
 
   // Event handlers
   const handleViewModeChange = (newViewMode: SearchViewMode) => {
@@ -98,13 +99,19 @@ export const SearchResults = ({
           </h2>
           <div className={'flex flex-wrap gap-1.5 sm:gap-2'}>
             <Conditional isCondition={counts.collections > 0}>
-              <Badge className={'text-xs'} variant={'outline'}>{counts.collections} Collections</Badge>
+              <Badge className={'text-xs'} variant={'outline'}>
+                {counts.collections} Collections
+              </Badge>
             </Conditional>
             <Conditional isCondition={counts.subcollections > 0}>
-              <Badge className={'text-xs'} variant={'outline'}>{counts.subcollections} Subcollections</Badge>
+              <Badge className={'text-xs'} variant={'outline'}>
+                {counts.subcollections} Subcollections
+              </Badge>
             </Conditional>
             <Conditional isCondition={counts.bobbleheads > 0}>
-              <Badge className={'text-xs'} variant={'outline'}>{counts.bobbleheads} Bobbleheads</Badge>
+              <Badge className={'text-xs'} variant={'outline'}>
+                {counts.bobbleheads} Bobbleheads
+              </Badge>
             </Conditional>
           </div>
         </div>
@@ -122,10 +129,7 @@ export const SearchResults = ({
       {/* Grid View Content */}
       <Conditional isCondition={_isGridView}>
         <div
-          className={cn(
-            'space-y-8 transition-opacity duration-200',
-            'animate-in fade-in-0',
-          )}
+          className={cn('space-y-8 transition-opacity duration-200', 'animate-in fade-in-0')}
           data-slot={'search-results-grid-content'}
         >
           {/* Collections Section */}
@@ -133,7 +137,9 @@ export const SearchResults = ({
             <div className={'space-y-3 sm:space-y-4'} data-slot={'search-results-collections-section'}>
               <div className={'flex items-center gap-2'}>
                 <h3 className={'text-base font-semibold sm:text-lg'}>Collections</h3>
-                <Badge className={'text-xs'} variant={'secondary'}>{collections.length}</Badge>
+                <Badge className={'text-xs'} variant={'secondary'}>
+                  {collections.length}
+                </Badge>
               </div>
               <div className={'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'}>
                 {collections.map((collection) => (
@@ -158,7 +164,9 @@ export const SearchResults = ({
             <div className={'space-y-3 sm:space-y-4'} data-slot={'search-results-subcollections-section'}>
               <div className={'flex items-center gap-2'}>
                 <h3 className={'text-base font-semibold sm:text-lg'}>Subcollections</h3>
-                <Badge className={'text-xs'} variant={'secondary'}>{subcollections.length}</Badge>
+                <Badge className={'text-xs'} variant={'secondary'}>
+                  {subcollections.length}
+                </Badge>
               </div>
               <div className={'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'}>
                 {subcollections.map((subcollection) => (
@@ -183,7 +191,9 @@ export const SearchResults = ({
             <div className={'space-y-3 sm:space-y-4'} data-slot={'search-results-bobbleheads-section'}>
               <div className={'flex items-center gap-2'}>
                 <h3 className={'text-base font-semibold sm:text-lg'}>Bobbleheads</h3>
-                <Badge className={'text-xs'} variant={'secondary'}>{bobbleheads.length}</Badge>
+                <Badge className={'text-xs'} variant={'secondary'}>
+                  {bobbleheads.length}
+                </Badge>
               </div>
               <div className={'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'}>
                 {bobbleheads.map((bobblehead) => (
@@ -203,16 +213,10 @@ export const SearchResults = ({
       {/* List View Content */}
       <Conditional isCondition={_isListView}>
         <div
-          className={cn(
-            'transition-opacity duration-200',
-            'animate-in fade-in-0',
-          )}
+          className={cn('transition-opacity duration-200', 'animate-in fade-in-0')}
           data-slot={'search-results-list-content'}
         >
-          <SearchResultsList
-            items={listItems}
-            testId={`${searchResultsTestId}-list`}
-          />
+          <SearchResultsList items={listItems} testId={`${searchResultsTestId}-list`} />
         </div>
       </Conditional>
     </div>

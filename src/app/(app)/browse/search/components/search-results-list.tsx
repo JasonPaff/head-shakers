@@ -57,12 +57,22 @@ export const SearchResultsList = ({
       {
         accessorFn: (row) => {
           const result = row.result;
-          return 'primaryPhotoUrl' in result ? result.primaryPhotoUrl : 'coverImageUrl' in result ? result.coverImageUrl : null;
+          return (
+            'primaryPhotoUrl' in result ? result.primaryPhotoUrl
+            : 'coverImageUrl' in result ? result.coverImageUrl
+            : null
+          );
         },
         cell: ({ row }) => {
           const result = row.original.result;
-          const imageUrl = 'primaryPhotoUrl' in result ? result.primaryPhotoUrl : 'coverImageUrl' in result ? result.coverImageUrl : null;
-          const displayName = 'name' in result && result.name ? result.name : 'characterName' in result && result.characterName ? result.characterName : 'Unknown';
+          const imageUrl =
+            'primaryPhotoUrl' in result ? result.primaryPhotoUrl
+            : 'coverImageUrl' in result ? result.coverImageUrl
+            : null;
+          const displayName =
+            'name' in result && result.name ? result.name
+            : 'characterName' in result && result.characterName ? result.characterName
+            : 'Unknown';
 
           const _hasValidImage = imageUrl && imageUrl !== '/placeholder.jpg';
 
@@ -97,12 +107,19 @@ export const SearchResultsList = ({
       {
         accessorFn: (row) => {
           const result = row.result;
-          return 'name' in result && result.name ? result.name : 'characterName' in result && result.characterName ? result.characterName : 'Unknown';
+          return (
+            'name' in result && result.name ? result.name
+            : 'characterName' in result && result.characterName ? result.characterName
+            : 'Unknown'
+          );
         },
         cell: ({ row }) => {
           const result = row.original.result;
           const entityType = row.original.entityType;
-          const displayName = 'name' in result && result.name ? result.name : 'characterName' in result && result.characterName ? result.characterName : 'Unknown';
+          const displayName =
+            'name' in result && result.name ? result.name
+            : 'characterName' in result && result.characterName ? result.characterName
+            : 'Unknown';
           const description = 'description' in result && result.description ? result.description : null;
 
           const entityUrl = getEntityUrl(entityType, result);
@@ -140,14 +157,17 @@ export const SearchResultsList = ({
           const _isCollection = entityType === 'collection';
           const _isSubcollection = entityType === 'subcollection';
 
-          const badgeVariant = _isCollection ? 'default' : _isSubcollection ? 'secondary' : 'outline';
-          const label = _isCollection ? 'Collection' : _isSubcollection ? 'Subcollection' : 'Bobblehead';
+          const badgeVariant =
+            _isCollection ? 'default'
+            : _isSubcollection ? 'secondary'
+            : 'outline';
+          const label =
+            _isCollection ? 'Collection'
+            : _isSubcollection ? 'Subcollection'
+            : 'Bobblehead';
 
           return (
-            <Badge
-              data-slot={'search-results-list-type-badge'}
-              variant={badgeVariant}
-            >
+            <Badge data-slot={'search-results-list-type-badge'} variant={badgeVariant}>
               {label}
             </Badge>
           );
@@ -160,11 +180,18 @@ export const SearchResultsList = ({
       {
         accessorFn: (row) => {
           const result = row.result;
-          return 'ownerName' in result && result.ownerName ? result.ownerName : 'ownerUsername' in result && result.ownerUsername ? result.ownerUsername : 'Unknown';
+          return (
+            'ownerName' in result && result.ownerName ? result.ownerName
+            : 'ownerUsername' in result && result.ownerUsername ? result.ownerUsername
+            : 'Unknown'
+          );
         },
         cell: ({ row }) => {
           const result = row.original.result;
-          const owner = 'ownerName' in result && result.ownerName ? result.ownerName : 'ownerUsername' in result && result.ownerUsername ? result.ownerUsername : 'Unknown';
+          const owner =
+            'ownerName' in result && result.ownerName ? result.ownerName
+            : 'ownerUsername' in result && result.ownerUsername ? result.ownerUsername
+            : 'Unknown';
 
           return (
             <span className={'text-sm text-muted-foreground'} data-slot={'search-results-list-owner'}>
@@ -184,12 +211,7 @@ export const SearchResultsList = ({
           const entityUrl = getEntityUrl(entityType, result);
 
           return (
-            <Button
-              asChild
-              data-slot={'search-results-list-view-button'}
-              size={'sm'}
-              variant={'ghost'}
-            >
+            <Button asChild data-slot={'search-results-list-view-button'} size={'sm'} variant={'ghost'}>
               <Link href={entityUrl}>
                 <ExternalLinkIcon aria-hidden className={'size-4'} />
                 <span className={'sr-only'}>View</span>
@@ -229,10 +251,7 @@ export const SearchResultsList = ({
       {...props}
     >
       {/* Data Table */}
-      <div
-        className={'overflow-x-auto rounded-md border'}
-        data-slot={'search-results-list-table-container'}
-      >
+      <div className={'overflow-x-auto rounded-md border'} data-slot={'search-results-list-table-container'}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -290,10 +309,7 @@ export const SearchResultsList = ({
             {/* Results Rows */}
             <Conditional isCondition={!_hasNoResults}>
               {table.getRowModel().rows.map((row) => (
-                <TableRow
-                  className={'hover:bg-muted/50'}
-                  key={row.id}
-                >
+                <TableRow className={'hover:bg-muted/50'} key={row.id}>
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

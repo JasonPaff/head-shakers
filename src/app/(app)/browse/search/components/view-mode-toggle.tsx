@@ -25,12 +25,8 @@ export const ViewModeToggle = ({
   ...props
 }: ViewModeToggleProps) => {
   const toggleTestId = testId || generateTestId('ui', 'toggle-group');
-  const gridButtonTestId = testId
-    ? `${testId}-grid`
-    : generateTestId('ui', 'toggle', 'grid');
-  const listButtonTestId = testId
-    ? `${testId}-list`
-    : generateTestId('ui', 'toggle', 'list');
+  const gridButtonTestId = testId ? `${testId}-grid` : generateTestId('ui', 'toggle', 'grid');
+  const listButtonTestId = testId ? `${testId}-list` : generateTestId('ui', 'toggle', 'list');
 
   const _isGridActive = viewMode === ENUMS.SEARCH.VIEW_MODE[0];
   const _isListActive = viewMode === ENUMS.SEARCH.VIEW_MODE[1];
@@ -58,9 +54,9 @@ export const ViewModeToggle = ({
         aria-pressed={_isGridActive}
         className={cn(
           'h-8 w-8 p-0',
-          _isGridActive
-            ? 'bg-accent text-accent-foreground'
-            : 'bg-transparent text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground',
+          _isGridActive ?
+            'bg-accent text-accent-foreground'
+          : 'bg-transparent text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground',
         )}
         data-slot={'view-mode-toggle-button'}
         data-testid={gridButtonTestId}
@@ -77,9 +73,9 @@ export const ViewModeToggle = ({
         aria-pressed={_isListActive}
         className={cn(
           'h-8 w-8 p-0',
-          _isListActive
-            ? 'bg-accent text-accent-foreground'
-            : 'bg-transparent text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground',
+          _isListActive ?
+            'bg-accent text-accent-foreground'
+          : 'bg-transparent text-muted-foreground hover:bg-accent/50 hover:text-accent-foreground',
         )}
         data-slot={'view-mode-toggle-button'}
         data-testid={listButtonTestId}

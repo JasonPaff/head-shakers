@@ -153,9 +153,7 @@ export const SearchPageContent = () => {
       />
 
       {/* Loading State */}
-      {_isLoading && (
-        <SearchResultsSkeleton viewMode={queryParams.viewMode} />
-      )}
+      {_isLoading && <SearchResultsSkeleton viewMode={queryParams.viewMode} />}
 
       {/* Error State */}
       {_hasError && !_isLoading && (

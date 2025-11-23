@@ -50,8 +50,9 @@ export const generateMetadata = async ({ searchParams }: GenerateMetadataProps):
     };
     const formattedTypes = entityTypes.map((type) => entityLabels[type] ?? type);
     const entityLabel = formattedTypes.join(', ');
-    description = _hasQuery
-      ? `${entityLabel.charAt(0).toUpperCase() + entityLabel.slice(1)} matching "${query}" in Head Shakers`
+    description =
+      _hasQuery ?
+        `${entityLabel.charAt(0).toUpperCase() + entityLabel.slice(1)} matching "${query}" in Head Shakers`
       : `Browse ${entityLabel} in Head Shakers`;
   }
 

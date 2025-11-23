@@ -17,15 +17,16 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `src/lib/constants/enums.ts` | Added `VIEW_MODE: ['grid', 'list'] as const` to `ENUMS.SEARCH` and added `SearchViewMode` type export |
-| `src/app/(app)/browse/search/route-type.ts` | Added `viewMode`, `dateFrom`, `dateTo`, and `category` parameters to the route schema |
-| `src/lib/validations/public-search.validation.ts` | Extended `searchFiltersSchema` with `category`, `dateFrom`, `dateTo`, and `viewMode` fields |
+| File                                              | Changes                                                                                               |
+| ------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `src/lib/constants/enums.ts`                      | Added `VIEW_MODE: ['grid', 'list'] as const` to `ENUMS.SEARCH` and added `SearchViewMode` type export |
+| `src/app/(app)/browse/search/route-type.ts`       | Added `viewMode`, `dateFrom`, `dateTo`, and `category` parameters to the route schema                 |
+| `src/lib/validations/public-search.validation.ts` | Extended `searchFiltersSchema` with `category`, `dateFrom`, `dateTo`, and `viewMode` fields           |
 
 ## Schema Details
 
 ### Enum Addition
+
 ```typescript
 SEARCH: {
   // ... existing enums
@@ -34,6 +35,7 @@ SEARCH: {
 ```
 
 ### Route Type Schema
+
 ```typescript
 viewMode: z.enum(ENUMS.SEARCH.VIEW_MODE).optional().default('grid'),
 dateFrom: z.string().trim().optional(),
@@ -42,6 +44,7 @@ category: z.string().trim().optional(),
 ```
 
 ### Validation Schema Extension
+
 Same fields added to `searchFiltersSchema` for server-side validation.
 
 ## Conventions Applied
@@ -55,10 +58,10 @@ Same fields added to `searchFiltersSchema` for server-side validation.
 
 ## Validation Results
 
-| Command | Result | Notes |
-|---------|--------|-------|
-| `npm run lint:fix` | PASS | No errors |
-| `npm run typecheck` | PASS | Exit code 0 |
+| Command             | Result | Notes       |
+| ------------------- | ------ | ----------- |
+| `npm run lint:fix`  | PASS   | No errors   |
+| `npm run typecheck` | PASS   | Exit code 0 |
 
 Pre-existing TanStack Table React Compiler warnings remain (unrelated to changes).
 

@@ -123,9 +123,8 @@ export const SearchFilters = ({
   const handleEntityTypeToggle = useCallback(
     (entityType: 'bobblehead' | 'collection' | 'subcollection') => {
       const _isSelected = entityTypes.includes(entityType);
-      const newEntityTypes = _isSelected
-        ? entityTypes.filter((type) => type !== entityType)
-        : [...entityTypes, entityType];
+      const newEntityTypes =
+        _isSelected ? entityTypes.filter((type) => type !== entityType) : [...entityTypes, entityType];
 
       // Ensure at least one entity type is selected
       if (newEntityTypes.length > 0) {
@@ -368,7 +367,9 @@ export const SearchFilters = ({
               <div className={'relative'}>
                 <CalendarIcon
                   aria-hidden
-                  className={'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'}
+                  className={
+                    'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'
+                  }
                 />
                 <Input
                   className={'min-h-11 pl-10'}
@@ -387,7 +388,9 @@ export const SearchFilters = ({
               <div className={'relative'}>
                 <CalendarIcon
                   aria-hidden
-                  className={'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'}
+                  className={
+                    'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'
+                  }
                 />
                 <Input
                   className={'min-h-11 pl-10'}
@@ -579,12 +582,13 @@ export const SearchFilters = ({
                 </Conditional>
               </div>
               <SheetDescription>
-                Filter and sort your search results. {activeFilterCount > 0 ? `${activeFilterCount} filter${activeFilterCount === 1 ? '' : 's'} active.` : 'No filters active.'}
+                Filter and sort your search results.{' '}
+                {activeFilterCount > 0 ?
+                  `${activeFilterCount} filter${activeFilterCount === 1 ? '' : 's'} active.`
+                : 'No filters active.'}
               </SheetDescription>
             </SheetHeader>
-            <div className={'flex-1 overflow-y-auto overscroll-contain py-4'}>
-              {filterContent}
-            </div>
+            <div className={'flex-1 overflow-y-auto overscroll-contain py-4'}>{filterContent}</div>
             <SheetFooter className={'flex-shrink-0 border-t pt-4'}>
               <Button
                 className={'min-h-11 w-full'}

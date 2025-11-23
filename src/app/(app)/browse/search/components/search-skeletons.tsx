@@ -24,7 +24,10 @@ export const SearchCardSkeleton = ({ className, testId, ...props }: SearchCardSk
       {...props}
     >
       {/* Card Image Skeleton - Matches aspect-[4/3] from SearchResultCard */}
-      <div className={'relative aspect-[4/3] w-full overflow-hidden'} data-slot={'search-card-skeleton-image'}>
+      <div
+        className={'relative aspect-[4/3] w-full overflow-hidden'}
+        data-slot={'search-card-skeleton-image'}
+      >
         <Skeleton className={'size-full rounded-none'} />
         {/* Badge Skeleton Overlay */}
         <div className={'absolute top-3 left-3 z-10'} data-slot={'search-card-skeleton-badge'}>
@@ -206,7 +209,10 @@ export const SearchResultsSkeleton = ({
           data-slot={'search-results-skeleton-grid'}
         >
           {Array.from({ length: count }).map((_, index) => (
-            <SearchCardSkeleton key={`grid-skeleton-${index}`} testId={`${searchResultsSkeletonTestId}-card-${index}`} />
+            <SearchCardSkeleton
+              key={`grid-skeleton-${index}`}
+              testId={`${searchResultsSkeletonTestId}-card-${index}`}
+            />
           ))}
         </div>
       )}
@@ -278,10 +284,7 @@ export const SearchPageSkeleton = ({
       {...props}
     >
       {/* Filters Skeleton */}
-      <SearchFiltersSkeleton
-        isExpanded={isFiltersExpanded}
-        testId={`${searchPageSkeletonTestId}-filters`}
-      />
+      <SearchFiltersSkeleton isExpanded={isFiltersExpanded} testId={`${searchPageSkeletonTestId}-filters`} />
 
       {/* Results Header Skeleton */}
       <div className={'flex items-center justify-between'} data-slot={'search-page-skeleton-header'}>
@@ -297,7 +300,10 @@ export const SearchPageSkeleton = ({
       />
 
       {/* Pagination Skeleton */}
-      <div className={'flex items-center justify-center gap-2 pt-4'} data-slot={'search-page-skeleton-pagination'}>
+      <div
+        className={'flex items-center justify-center gap-2 pt-4'}
+        data-slot={'search-page-skeleton-pagination'}
+      >
         <Skeleton className={'size-9'} />
         <Skeleton className={'size-9'} />
         <Skeleton className={'size-9'} />

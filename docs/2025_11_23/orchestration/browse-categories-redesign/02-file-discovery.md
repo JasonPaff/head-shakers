@@ -46,69 +46,69 @@ Return a comprehensive list with file paths, descriptions, and priority levels.
 
 ### Critical Priority (Must Modify)
 
-| File | Description |
-|------|-------------|
-| `src/app/(app)/browse/categories/page.tsx` | Main categories page entry point. Simple server component with Suspense boundary. |
+| File                                                                       | Description                                                                                 |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `src/app/(app)/browse/categories/page.tsx`                                 | Main categories page entry point. Simple server component with Suspense boundary.           |
 | `src/app/(app)/browse/categories/components/browse-categories-content.tsx` | Client component (~317 lines) handling URL state, category fetching, filtering, pagination. |
-| `src/app/(app)/browse/categories/[category]/page.tsx` | Dynamic route for specific category pages with SEO metadata and JSON-LD. |
+| `src/app/(app)/browse/categories/[category]/page.tsx`                      | Dynamic route for specific category pages with SEO metadata and JSON-LD.                    |
 
 ### High Priority (Very Likely to Need Changes)
 
-| File | Description |
-|------|-------------|
-| `src/app/(app)/browse/components/browse-collections-filters.tsx` | Shared filter component with search, category dropdown, clear filters. |
-| `src/app/(app)/browse/components/browse-collections-table.tsx` | Collection card grid display with Card components. |
-| `src/app/(app)/browse/components/browse-collections-pagination.tsx` | Pagination component for browse pages. |
-| `src/lib/validations/browse-categories.validation.ts` | Zod schemas for category browsing (sort options, pagination, filters). |
+| File                                                                | Description                                                            |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `src/app/(app)/browse/components/browse-collections-filters.tsx`    | Shared filter component with search, category dropdown, clear filters. |
+| `src/app/(app)/browse/components/browse-collections-table.tsx`      | Collection card grid display with Card components.                     |
+| `src/app/(app)/browse/components/browse-collections-pagination.tsx` | Pagination component for browse pages.                                 |
+| `src/lib/validations/browse-categories.validation.ts`               | Zod schemas for category browsing (sort options, pagination, filters). |
 
 ### Medium Priority (May Need Updates)
 
-| File | Description |
-|------|-------------|
-| `src/lib/actions/collections/collections.actions.ts` | Server actions: browseCategoriesAction, getCategoriesAction |
-| `src/lib/queries/collections/collections.query.ts` | Query layer: getBrowseCategoriesAsync, getDistinctCategoriesAsync |
-| `src/lib/facades/collections/collections.facade.ts` | Business logic facade with caching |
-| `src/app/(app)/browse/categories/[category]/route-type.ts` | Route type definitions for next-typesafe-url |
+| File                                                       | Description                                                       |
+| ---------------------------------------------------------- | ----------------------------------------------------------------- |
+| `src/lib/actions/collections/collections.actions.ts`       | Server actions: browseCategoriesAction, getCategoriesAction       |
+| `src/lib/queries/collections/collections.query.ts`         | Query layer: getBrowseCategoriesAsync, getDistinctCategoriesAsync |
+| `src/lib/facades/collections/collections.facade.ts`        | Business logic facade with caching                                |
+| `src/app/(app)/browse/categories/[category]/route-type.ts` | Route type definitions for next-typesafe-url                      |
 
 ### Low Priority (Reference Files)
 
-| File | Description |
-|------|-------------|
-| `src/app/(app)/browse/page.tsx` | Main browse collections page pattern |
-| `src/app/(app)/browse/featured/page.tsx` | Hero section and tabbed content patterns |
-| `src/app/(app)/browse/featured/components/skeletons/featured-card-skeleton.tsx` | Skeleton loading patterns |
-| `src/app/(app)/browse/components/browse-collections-content.tsx` | Similar client component pattern |
+| File                                                                            | Description                              |
+| ------------------------------------------------------------------------------- | ---------------------------------------- |
+| `src/app/(app)/browse/page.tsx`                                                 | Main browse collections page pattern     |
+| `src/app/(app)/browse/featured/page.tsx`                                        | Hero section and tabbed content patterns |
+| `src/app/(app)/browse/featured/components/skeletons/featured-card-skeleton.tsx` | Skeleton loading patterns                |
+| `src/app/(app)/browse/components/browse-collections-content.tsx`                | Similar client component pattern         |
 
 ### UI Components (Reusable)
 
-| File | Description |
-|------|-------------|
-| `src/components/ui/card.tsx` | Card, CardHeader, CardContent, CardTitle, CardDescription, CardFooter |
-| `src/components/ui/skeleton.tsx` | Skeleton component for loading states |
-| `src/components/ui/badge.tsx` | Badge with variants (default, secondary, destructive, outline) |
-| `src/components/ui/empty-state.tsx` | EmptyState component |
-| `src/components/ui/button.tsx` | Button component with variants |
-| `src/components/ui/select.tsx` | Select dropdown component |
-| `src/components/ui/input.tsx` | Input component |
-| `src/components/ui/avatar.tsx` | Avatar component |
-| `src/components/ui/spinner.tsx` | Spinner loading indicator |
+| File                                | Description                                                           |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| `src/components/ui/card.tsx`        | Card, CardHeader, CardContent, CardTitle, CardDescription, CardFooter |
+| `src/components/ui/skeleton.tsx`    | Skeleton component for loading states                                 |
+| `src/components/ui/badge.tsx`       | Badge with variants (default, secondary, destructive, outline)        |
+| `src/components/ui/empty-state.tsx` | EmptyState component                                                  |
+| `src/components/ui/button.tsx`      | Button component with variants                                        |
+| `src/components/ui/select.tsx`      | Select dropdown component                                             |
+| `src/components/ui/input.tsx`       | Input component                                                       |
+| `src/components/ui/avatar.tsx`      | Avatar component                                                      |
+| `src/components/ui/spinner.tsx`     | Spinner loading indicator                                             |
 
 ### Database Schema Files
 
-| File | Description |
-|------|-------------|
+| File                                      | Description                                     |
+| ----------------------------------------- | ----------------------------------------------- |
 | `src/lib/db/schema/bobbleheads.schema.ts` | Bobbleheads table with category field (varchar) |
-| `src/lib/db/schema/collections.schema.ts` | Collections table schema |
+| `src/lib/db/schema/collections.schema.ts` | Collections table schema                        |
 
 ### Configuration & SEO Files
 
-| File | Description |
-|------|-------------|
-| `src/lib/constants/config.ts` | PAGINATION settings (DEFAULT: 12, MAX: 30) |
-| `src/lib/seo/metadata.utils.ts` | Metadata generation utilities |
-| `src/lib/seo/jsonld.utils.ts` | JSON-LD schema generation |
-| `src/lib/seo/seo.constants.ts` | DEFAULT_SITE_METADATA |
-| `src/components/layout/app-header/components/app-header-nav-menu.tsx` | Navigation with /browse/categories link |
+| File                                                                  | Description                                |
+| --------------------------------------------------------------------- | ------------------------------------------ |
+| `src/lib/constants/config.ts`                                         | PAGINATION settings (DEFAULT: 12, MAX: 30) |
+| `src/lib/seo/metadata.utils.ts`                                       | Metadata generation utilities              |
+| `src/lib/seo/jsonld.utils.ts`                                         | JSON-LD schema generation                  |
+| `src/lib/seo/seo.constants.ts`                                        | DEFAULT_SITE_METADATA                      |
+| `src/components/layout/app-header/components/app-header-nav-menu.tsx` | Navigation with /browse/categories link    |
 
 ## Architecture Insights
 
@@ -139,13 +139,13 @@ Return a comprehensive list with file paths, descriptions, and priority levels.
 
 All discovered files validated to exist in the codebase.
 
-| Priority | Files Found | Files Validated |
-|----------|-------------|-----------------|
-| Critical | 3 | 3 |
-| High | 4 | 4 |
-| Medium | 4 | 4 |
-| Low | 4 | 4 |
-| UI Components | 9 | 9 |
-| Database | 2 | 2 |
-| Config/SEO | 5 | 5 |
-| **Total** | **31** | **31** |
+| Priority      | Files Found | Files Validated |
+| ------------- | ----------- | --------------- |
+| Critical      | 3           | 3               |
+| High          | 4           | 4               |
+| Medium        | 4           | 4               |
+| Low           | 4           | 4               |
+| UI Components | 9           | 9               |
+| Database      | 2           | 2               |
+| Config/SEO    | 5           | 5               |
+| **Total**     | **31**      | **31**          |

@@ -7,23 +7,23 @@
 
 Based on the implementation plan analysis, here is the specialist routing for each step:
 
-| Step | Title | Primary Files | Specialist | Skills Auto-Loaded |
-|------|-------|---------------|------------|-------------------|
-| 1 | Route Type Definitions & Validation Schemas | `route-type.ts`, `*.validation.ts`, `enums.ts` | validation-specialist | validation-schemas |
-| 2 | Search Result Card Component | `search-result-card.tsx` (NEW) | react-component-specialist | react-coding-conventions, ui-components |
-| 3 | Search Results List Component | `search-results-list.tsx` (NEW) | react-component-specialist | react-coding-conventions, ui-components |
-| 4 | View Mode Toggle Component | `view-mode-toggle.tsx` (NEW) | react-component-specialist | react-coding-conventions, ui-components |
-| 5 | Search Autocomplete Component | `search-autocomplete.tsx` (NEW) | react-component-specialist | react-coding-conventions, ui-components |
-| 6 | Enhanced Search Filters | `search-filters.tsx` | react-component-specialist | react-coding-conventions, ui-components |
-| 7 | Skeleton Loading Components | `search-skeletons.tsx` (NEW) | react-component-specialist | react-coding-conventions, ui-components |
-| 8 | Search Results Grid | `search-results-grid.tsx` | react-component-specialist | react-coding-conventions, ui-components |
-| 9 | Search Page Content | `search-page-content.tsx` | react-component-specialist | react-coding-conventions, ui-components |
-| 10 | Search Page Server Component | `page.tsx` | react-component-specialist | react-coding-conventions, ui-components |
-| 11 | Backend Query Layer | `content-search.query.ts`, `content-search.facade.ts` | database-specialist | database-schema, drizzle-orm |
-| 12 | Server Actions | `content-search.actions.ts` | server-action-specialist | server-actions, validation-schemas |
-| 13 | Redis Cache Key Generation | `content-search.facade.ts` | facade-specialist | facade-layer, caching |
-| 14 | SearchResultItem Backward Compatibility | `search-result-item.tsx` | react-component-specialist | react-coding-conventions |
-| 15 | Responsive Mobile Layout | Multiple component files | react-component-specialist | react-coding-conventions, ui-components |
+| Step | Title                                       | Primary Files                                         | Specialist                 | Skills Auto-Loaded                      |
+| ---- | ------------------------------------------- | ----------------------------------------------------- | -------------------------- | --------------------------------------- |
+| 1    | Route Type Definitions & Validation Schemas | `route-type.ts`, `*.validation.ts`, `enums.ts`        | validation-specialist      | validation-schemas                      |
+| 2    | Search Result Card Component                | `search-result-card.tsx` (NEW)                        | react-component-specialist | react-coding-conventions, ui-components |
+| 3    | Search Results List Component               | `search-results-list.tsx` (NEW)                       | react-component-specialist | react-coding-conventions, ui-components |
+| 4    | View Mode Toggle Component                  | `view-mode-toggle.tsx` (NEW)                          | react-component-specialist | react-coding-conventions, ui-components |
+| 5    | Search Autocomplete Component               | `search-autocomplete.tsx` (NEW)                       | react-component-specialist | react-coding-conventions, ui-components |
+| 6    | Enhanced Search Filters                     | `search-filters.tsx`                                  | react-component-specialist | react-coding-conventions, ui-components |
+| 7    | Skeleton Loading Components                 | `search-skeletons.tsx` (NEW)                          | react-component-specialist | react-coding-conventions, ui-components |
+| 8    | Search Results Grid                         | `search-results-grid.tsx`                             | react-component-specialist | react-coding-conventions, ui-components |
+| 9    | Search Page Content                         | `search-page-content.tsx`                             | react-component-specialist | react-coding-conventions, ui-components |
+| 10   | Search Page Server Component                | `page.tsx`                                            | react-component-specialist | react-coding-conventions, ui-components |
+| 11   | Backend Query Layer                         | `content-search.query.ts`, `content-search.facade.ts` | database-specialist        | database-schema, drizzle-orm            |
+| 12   | Server Actions                              | `content-search.actions.ts`                           | server-action-specialist   | server-actions, validation-schemas      |
+| 13   | Redis Cache Key Generation                  | `content-search.facade.ts`                            | facade-specialist          | facade-layer, caching                   |
+| 14   | SearchResultItem Backward Compatibility     | `search-result-item.tsx`                              | react-component-specialist | react-coding-conventions                |
+| 15   | Responsive Mobile Layout                    | Multiple component files                              | react-component-specialist | react-coding-conventions, ui-components |
 
 ## Detection Logic Applied
 
@@ -36,6 +36,7 @@ Based on the implementation plan analysis, here is the specialist routing for ea
 ## Files Summary
 
 ### New Files to Create (5)
+
 - `src/app/(app)/browse/search/components/search-result-card.tsx`
 - `src/app/(app)/browse/search/components/search-results-list.tsx`
 - `src/app/(app)/browse/search/components/view-mode-toggle.tsx`
@@ -43,6 +44,7 @@ Based on the implementation plan analysis, here is the specialist routing for ea
 - `src/app/(app)/browse/search/components/search-skeletons.tsx`
 
 ### Existing Files to Modify (11)
+
 - `src/app/(app)/browse/search/route-type.ts`
 - `src/lib/validations/public-search.validation.ts`
 - `src/lib/constants/enums.ts`
@@ -59,6 +61,7 @@ Based on the implementation plan analysis, here is the specialist routing for ea
 ## Todo List Created
 
 18 items added to todo list:
+
 - 2 phase items (pre-checks, setup)
 - 15 step items (one per implementation step)
 - 1 quality gates item

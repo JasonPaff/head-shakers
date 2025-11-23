@@ -53,11 +53,11 @@ The `/browse` page currently displays only top-level collections in the browsabl
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
-| Original Word Count | 22 words |
-| Refined Word Count | ~320 words |
-| Expansion Ratio | ~14.5x |
+| Metric              | Value      |
+| ------------------- | ---------- |
+| Original Word Count | 22 words   |
+| Refined Word Count  | ~320 words |
+| Expansion Ratio     | ~14.5x     |
 
 ## Scope Analysis
 

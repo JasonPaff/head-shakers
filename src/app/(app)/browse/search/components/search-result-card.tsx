@@ -89,12 +89,14 @@ export const SearchResultCard = ({
 
   // Memoized badge configuration
   const badgeConfig = useMemo(() => {
-    const configMap: Record<SearchResultCardEntityType, { label: string; variant: 'default' | 'outline' | 'secondary' }> =
-      {
-        bobblehead: { label: 'Bobblehead', variant: 'outline' },
-        collection: { label: 'Collection', variant: 'default' },
-        subcollection: { label: 'Subcollection', variant: 'secondary' },
-      };
+    const configMap: Record<
+      SearchResultCardEntityType,
+      { label: string; variant: 'default' | 'outline' | 'secondary' }
+    > = {
+      bobblehead: { label: 'Bobblehead', variant: 'outline' },
+      collection: { label: 'Collection', variant: 'default' },
+      subcollection: { label: 'Subcollection', variant: 'secondary' },
+    };
 
     return configMap[entityType];
   }, [entityType]);
@@ -165,10 +167,7 @@ export const SearchResultCard = ({
           </Conditional>
 
           {/* Entity Type Badge Overlay */}
-          <div
-            className={'absolute top-3 left-3 z-10'}
-            data-slot={'search-result-card-badge-container'}
-          >
+          <div className={'absolute top-3 left-3 z-10'} data-slot={'search-result-card-badge-container'}>
             <Badge
               className={'shadow-sm'}
               data-slot={'search-result-card-badge'}
@@ -180,10 +179,7 @@ export const SearchResultCard = ({
         </div>
 
         {/* Card Content Section */}
-        <CardHeader
-          className={'space-y-1.5 p-4'}
-          data-slot={'search-result-card-header'}
-        >
+        <CardHeader className={'space-y-1.5 p-4'} data-slot={'search-result-card-header'}>
           {/* Result Name */}
           <h3
             className={cn(
@@ -196,20 +192,14 @@ export const SearchResultCard = ({
           </h3>
 
           {/* Owner Info */}
-          <p
-            className={'truncate text-sm text-muted-foreground'}
-            data-slot={'search-result-card-owner'}
-          >
+          <p className={'truncate text-sm text-muted-foreground'} data-slot={'search-result-card-owner'}>
             By {displayData.owner}
           </p>
         </CardHeader>
 
         {/* Card Description Section */}
         <Conditional isCondition={_hasDescription}>
-          <CardContent
-            className={'px-4 pt-0 pb-4'}
-            data-slot={'search-result-card-content'}
-          >
+          <CardContent className={'px-4 pt-0 pb-4'} data-slot={'search-result-card-content'}>
             <p
               className={'line-clamp-2 text-sm text-muted-foreground'}
               data-slot={'search-result-card-description'}

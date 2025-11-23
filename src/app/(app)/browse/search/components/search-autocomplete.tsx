@@ -288,10 +288,7 @@ export const SearchAutocomplete = ({
             sideOffset={8}
             testId={popoverContentTestId}
           >
-            <Command
-              className={'rounded-lg border shadow-md'}
-              shouldFilter={false}
-            >
+            <Command className={'rounded-lg border shadow-md'} shouldFilter={false}>
               <CommandList>
                 {/* Loading State */}
                 <Conditional isCondition={_isLoading}>

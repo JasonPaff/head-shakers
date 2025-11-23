@@ -92,12 +92,14 @@ export const SearchResultItem = ({
 
   // Memoized badge configuration
   const badgeConfig = useMemo(() => {
-    const configMap: Record<SearchResultItemEntityType, { label: string; variant: 'default' | 'outline' | 'secondary' }> =
-      {
-        bobblehead: { label: 'Bobblehead', variant: 'outline' },
-        collection: { label: 'Collection', variant: 'default' },
-        subcollection: { label: 'Subcollection', variant: 'secondary' },
-      };
+    const configMap: Record<
+      SearchResultItemEntityType,
+      { label: string; variant: 'default' | 'outline' | 'secondary' }
+    > = {
+      bobblehead: { label: 'Bobblehead', variant: 'outline' },
+      collection: { label: 'Collection', variant: 'default' },
+      subcollection: { label: 'Subcollection', variant: 'secondary' },
+    };
 
     return configMap[entityType];
   }, [entityType]);
@@ -200,10 +202,7 @@ export const SearchResultItem = ({
         </Conditional>
 
         {/* Owner Info */}
-        <p
-          className={'truncate text-xs text-muted-foreground'}
-          data-slot={'search-result-item-owner'}
-        >
+        <p className={'truncate text-xs text-muted-foreground'} data-slot={'search-result-item-owner'}>
           By {displayData.owner}
         </p>
       </div>

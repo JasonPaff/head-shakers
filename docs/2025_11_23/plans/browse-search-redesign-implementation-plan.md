@@ -558,6 +558,7 @@ npm run lint:fix && npm run typecheck
 ## File Discovery Summary
 
 ### Critical Files (7)
+
 - `src/app/(app)/browse/search/page.tsx`
 - `src/app/(app)/browse/search/route-type.ts`
 - `src/app/(app)/browse/search/components/search-page-content.tsx`
@@ -567,6 +568,7 @@ npm run lint:fix && npm run typecheck
 - `src/components/feature/search/search-result-item.tsx`
 
 ### High Priority Files (7)
+
 - `src/lib/actions/content-search/content-search.actions.ts`
 - `src/lib/facades/content-search/content-search.facade.ts`
 - `src/lib/queries/content-search/content-search.query.ts`
@@ -576,6 +578,7 @@ npm run lint:fix && npm run typecheck
 - `src/lib/constants/config.ts`
 
 ### New Files to Create (5)
+
 - `src/app/(app)/browse/search/components/search-result-card.tsx`
 - `src/app/(app)/browse/search/components/search-results-list.tsx`
 - `src/app/(app)/browse/search/components/view-mode-toggle.tsx`

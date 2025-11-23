@@ -15,28 +15,28 @@ The onboarding-experience feature demonstrates solid foundational architecture w
 
 ### Quick Stats
 
-| Metric          | Value       |
-| --------------- | ----------- |
-| Total Issues    | 18          |
-| Critical        | 2           |
-| High Priority   | 4           |
-| Medium Priority | 7           |
-| Low Priority    | 5           |
-| Auto-Fixable    | 0           |
-| Files Affected  | 6           |
-| Tests Passing   | 0/0         |
+| Metric          | Value                       |
+| --------------- | --------------------------- |
+| Total Issues    | 18                          |
+| Critical        | 2                           |
+| High Priority   | 4                           |
+| Medium Priority | 7                           |
+| Low Priority    | 5                           |
+| Auto-Fixable    | 0                           |
+| Files Affected  | 6                           |
+| Tests Passing   | 0/0                         |
 | Test Coverage   | 0% (10 files missing tests) |
 
 ### Status by Phase
 
-| Phase           | Status     | Issues | Duration |
-| --------------- | ---------- | ------ | -------- |
-| Static Analysis | PASS       | 0      | -        |
-| Conventions     | ISSUES     | 2      | -        |
-| Tests           | FAIL       | 10     | -        |
-| Code Review     | ISSUES     | 16     | -        |
-| UI Validation   | SKIPPED    | -      | -        |
-| Database        | PASS       | 0      | -        |
+| Phase           | Status  | Issues | Duration |
+| --------------- | ------- | ------ | -------- |
+| Static Analysis | PASS    | 0      | -        |
+| Conventions     | ISSUES  | 2      | -        |
+| Tests           | FAIL    | 10     | -        |
+| Code Review     | ISSUES  | 16     | -        |
+| UI Validation   | SKIPPED | -      | -        |
+| Database        | PASS    | 0      | -        |
 
 ---
 
@@ -53,7 +53,7 @@ The onboarding-experience feature demonstrates solid foundational architecture w
   ```typescript
   const currentUser = await auth();
   if (currentUser.userId !== input.userId && !isAdmin(currentUser)) {
-    throw new Error('Unauthorized: Cannot reset another user\'s onboarding');
+    throw new Error("Unauthorized: Cannot reset another user's onboarding");
   }
   ```
 
@@ -167,13 +167,13 @@ The onboarding-experience feature demonstrates solid foundational architecture w
 
 ## Low Priority Issues
 
-| File | Issue | Recommendation |
-| ---- | ----- | -------------- |
-| Multiple components | Missing display names | Add `Component.displayName = 'ComponentName'` for better debugging |
-| Step components | Magic numbers in Cloudinary config | Extract to named constants |
-| Wizard steps | Missing keyboard navigation for skip | Add keyboard shortcuts for accessibility |
-| onboarding-progress.tsx | Test ID generation could be memoized | Use `useMemo` for test ID generation |
-| onboarding.actions.ts | Unused variable in server action | Remove or use the variable |
+| File                    | Issue                                | Recommendation                                                     |
+| ----------------------- | ------------------------------------ | ------------------------------------------------------------------ |
+| Multiple components     | Missing display names                | Add `Component.displayName = 'ComponentName'` for better debugging |
+| Step components         | Magic numbers in Cloudinary config   | Extract to named constants                                         |
+| Wizard steps            | Missing keyboard navigation for skip | Add keyboard shortcuts for accessibility                           |
+| onboarding-progress.tsx | Test ID generation could be memoized | Use `useMemo` for test ID generation                               |
+| onboarding.actions.ts   | Unused variable in server action     | Remove or use the variable                                         |
 
 ---
 
@@ -182,6 +182,7 @@ The onboarding-experience feature demonstrates solid foundational architecture w
 No auto-fixable issues identified. All issues require manual code changes.
 
 **Previously Fixed (during validation)**:
+
 - Lint error in `onboarding-reset-card.tsx` - shorthand fragment issue resolved
 - Format issues - resolved via Prettier
 
@@ -197,17 +198,17 @@ No auto-fixable issues identified. All issues require manual code changes.
 
 ### CRITICAL: Files Missing Tests (10 total)
 
-| Implementation File | Suggested Test |
-| ------------------- | -------------- |
-| `src/lib/validations/onboarding.validation.ts` | `tests/unit/lib/validations/onboarding.validation.test.ts` |
-| `src/lib/facades/onboarding.facade.ts` | `tests/integration/facades/onboarding.facade.test.ts` |
-| `src/lib/actions/onboarding.actions.ts` | `tests/integration/actions/onboarding.actions.test.ts` |
-| `src/components/feature/onboarding/onboarding-wizard.tsx` | `tests/components/feature/onboarding/onboarding-wizard.test.tsx` |
-| `src/components/feature/onboarding/onboarding-provider.tsx` | `tests/components/feature/onboarding/onboarding-provider.test.tsx` |
-| `src/components/feature/onboarding/onboarding-progress.tsx` | `tests/components/feature/onboarding/onboarding-progress.test.tsx` |
-| `src/components/feature/onboarding/onboarding-reset-card.tsx` | `tests/components/feature/onboarding/onboarding-reset-card.test.tsx` |
-| `src/components/feature/onboarding/steps/welcome-step.tsx` | `tests/components/feature/onboarding/steps/welcome-step.test.tsx` |
-| `src/components/feature/onboarding/steps/profile-step.tsx` | `tests/components/feature/onboarding/steps/profile-step.test.tsx` |
+| Implementation File                                            | Suggested Test                                                        |
+| -------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `src/lib/validations/onboarding.validation.ts`                 | `tests/unit/lib/validations/onboarding.validation.test.ts`            |
+| `src/lib/facades/onboarding.facade.ts`                         | `tests/integration/facades/onboarding.facade.test.ts`                 |
+| `src/lib/actions/onboarding.actions.ts`                        | `tests/integration/actions/onboarding.actions.test.ts`                |
+| `src/components/feature/onboarding/onboarding-wizard.tsx`      | `tests/components/feature/onboarding/onboarding-wizard.test.tsx`      |
+| `src/components/feature/onboarding/onboarding-provider.tsx`    | `tests/components/feature/onboarding/onboarding-provider.test.tsx`    |
+| `src/components/feature/onboarding/onboarding-progress.tsx`    | `tests/components/feature/onboarding/onboarding-progress.test.tsx`    |
+| `src/components/feature/onboarding/onboarding-reset-card.tsx`  | `tests/components/feature/onboarding/onboarding-reset-card.test.tsx`  |
+| `src/components/feature/onboarding/steps/welcome-step.tsx`     | `tests/components/feature/onboarding/steps/welcome-step.test.tsx`     |
+| `src/components/feature/onboarding/steps/profile-step.tsx`     | `tests/components/feature/onboarding/steps/profile-step.test.tsx`     |
 | `src/components/feature/onboarding/steps/preferences-step.tsx` | `tests/components/feature/onboarding/steps/preferences-step.test.tsx` |
 
 ### Recommended Test Priority
@@ -297,27 +298,29 @@ git add . && git commit -m "feat: add onboarding experience with wizard flow"
 **Status**: PASS - All Issues Resolved
 
 All 10 implementation files analyzed:
+
 - ESLint: 0 errors, 0 warnings (for onboarding files)
 - TypeScript: 0 errors in strict mode
 - Prettier: All files formatted correctly
 
 Previously fixed during validation:
+
 - `onboarding-reset-card.tsx`: Shorthand fragment syntax error corrected
 
 ### Conventions Details
 
 **Status**: COMPLIANT (2 medium issues)
 
-| Convention | Status |
-| ---------- | ------ |
-| Boolean naming (is prefix) | PASS |
-| Derived variables (_ prefix) | PASS |
-| Export style (named exports) | PASS |
-| JSX attribute quotes | PASS |
-| No barrel files | PASS |
-| No forwardRef | PASS |
-| No any types | PASS |
-| Sequential comment numbering | FAIL (1 file) |
+| Convention                    | Status        |
+| ----------------------------- | ------------- |
+| Boolean naming (is prefix)    | PASS          |
+| Derived variables (\_ prefix) | PASS          |
+| Export style (named exports)  | PASS          |
+| JSX attribute quotes          | PASS          |
+| No barrel files               | PASS          |
+| No forwardRef                 | PASS          |
+| No any types                  | PASS          |
+| Sequential comment numbering  | FAIL (1 file) |
 
 ### Test Details
 
@@ -332,6 +335,7 @@ This represents the largest gap in the feature's quality assurance.
 ### Code Review Details
 
 **Summary**:
+
 - Critical Issues: 2 (security)
 - High Priority: 4 (stability/correctness)
 - Medium Priority: 5 (quality/UX)
@@ -350,6 +354,7 @@ The overall architecture follows project conventions well. The facade pattern co
 Reason: No development server running for visual/interactive testing.
 
 To run UI validation:
+
 ```bash
 cd .worktrees/onboarding-experience && npm run dev
 # Then re-run validation with UI phase
@@ -359,31 +364,31 @@ cd .worktrees/onboarding-experience && npm run dev
 
 **Status**: COMPLETE AND VALID
 
-| Check | Result |
-| ----- | ------ |
+| Check               | Result                                                        |
+| ------------------- | ------------------------------------------------------------- |
 | Schema column added | `has_completed_onboarding` (boolean, NOT NULL, default false) |
-| Migration applied | `20251122234051_outgoing_purifiers.sql` |
-| Constants defined | `DEFAULTS.ONBOARDING.HAS_COMPLETED_ONBOARDING = false` |
-| Facade methods | 3 implemented (complete, reset, getStatus) |
-| Server actions | 3 implemented with proper structure |
-| Query patterns | Follow project conventions |
-| Data integrity | No concerns identified |
+| Migration applied   | `20251122234051_outgoing_purifiers.sql`                       |
+| Constants defined   | `DEFAULTS.ONBOARDING.HAS_COMPLETED_ONBOARDING = false`        |
+| Facade methods      | 3 implemented (complete, reset, getStatus)                    |
+| Server actions      | 3 implemented with proper structure                           |
+| Query patterns      | Follow project conventions                                    |
+| Data integrity      | No concerns identified                                        |
 
 ---
 
 ## Score Breakdown
 
-| Category | Deduction | Reason |
-| -------- | --------- | ------ |
-| Base Score | 100 | Starting point |
-| Critical Issues (2) | -40 | 2 x -20 points |
-| High Priority Issues (4) | -40 | 4 x -10 points (capped contribution) |
-| Medium Priority Issues (6) | -18 | 6 x -3 points |
-| Low Priority Issues (5) | -5 | 5 x -1 point |
-| Test Coverage Bonus | +5 | N/A - no tests |
-| **Final Score** | **52** | Needs Work |
+| Category                   | Deduction | Reason                               |
+| -------------------------- | --------- | ------------------------------------ |
+| Base Score                 | 100       | Starting point                       |
+| Critical Issues (2)        | -40       | 2 x -20 points                       |
+| High Priority Issues (4)   | -40       | 4 x -10 points (capped contribution) |
+| Medium Priority Issues (6) | -18       | 6 x -3 points                        |
+| Low Priority Issues (5)    | -5        | 5 x -1 point                         |
+| Test Coverage Bonus        | +5        | N/A - no tests                       |
+| **Final Score**            | **52**    | Needs Work                           |
 
-*Note: Score capped at minimum 0, maximum 100. Additional penalty applied for complete absence of test coverage.*
+_Note: Score capped at minimum 0, maximum 100. Additional penalty applied for complete absence of test coverage._
 
 ---
 
