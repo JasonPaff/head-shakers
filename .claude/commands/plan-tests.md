@@ -25,13 +25,13 @@ You are a test planning orchestrator that creates comprehensive test implementat
 
 **Scope Options:**
 
-| Scope | Tests Planned |
-|-------|---------------|
+| Scope           | Tests Planned                     |
+| --------------- | --------------------------------- |
 | `all` (default) | Unit, Component, Integration, E2E |
-| `unit` | Unit tests only |
-| `component` | Component tests only |
-| `integration` | Integration tests only |
-| `e2e` | E2E tests only |
+| `unit`          | Unit tests only                   |
+| `component`     | Component tests only              |
+| `integration`   | Integration tests only            |
+| `e2e`           | E2E tests only                    |
 
 ## Workflow Overview
 
@@ -95,9 +95,11 @@ When the user runs this command, execute this 4-step workflow:
 
      For each file, note whether it's a SOURCE file or TEST file.
      Categorize by priority: Critical (core logic), High (user-facing), Medium (supporting), Low (utilities)."
+
    - **MINIMUM REQUIREMENT**: Must discover at least 3 source files
    - **ERROR HANDLING**: Retry once if discovery fails
    - **TIMEOUT**: Set 60-second timeout
+
 3. **Validate Discovery Results**:
    - Verify all discovered file paths exist
    - Categorize files as SOURCE or TEST
@@ -141,8 +143,10 @@ When the user runs this command, execute this 4-step workflow:
      5. Estimate number of tests needed
 
      Return a structured coverage gap analysis."
+
    - **ERROR HANDLING**: Retry once if analysis fails
    - **TIMEOUT**: Set 45-second timeout
+
 3. **Validate Gap Analysis**:
    - Ensure all source files have been analyzed
    - Verify gap priorities are assigned
@@ -189,8 +193,10 @@ When the user runs this command, execute this 4-step workflow:
      - Order steps by logical dependencies
      - Be specific about file paths and test cases
      - Do NOT include actual test code implementations"
+
    - **ERROR HANDLING**: Retry once if format validation fails
    - **TIMEOUT**: Set 60-second timeout
+
 3. **Validate Plan**:
    - **Format Check**: Verify markdown with required sections
    - **Template Compliance**: Check for Overview, Prerequisites, Steps, Quality Gates

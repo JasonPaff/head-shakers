@@ -1,12 +1,14 @@
 # Step 1: Test Scope Refinement
 
 ## Step Metadata
+
 - **Started**: 2025-11-22T00:00:00Z
 - **Completed**: 2025-11-22T00:01:00Z
 - **Duration**: ~60 seconds
 - **Status**: Complete
 
 ## Input
+
 - **Original Request**: `comments --all`
 - **Scope Filter**: all (Unit, Component, Integration, E2E)
 
@@ -49,17 +51,20 @@ The comments feature in Head Shakers encompasses a comprehensive threading syste
 ## Refined Test Scope
 
 ### Components to Test
+
 - CommentForm - Content validation, character count, reply mode
 - CommentItem - Display, action buttons, depth styling
 - CommentSection - Thread orchestration, pagination, state management
 - Delete/Edit dialogs - Confirmation flows
 
 ### Server Actions to Test
+
 - createCommentAction - Create comments and replies
 - updateCommentAction - Edit comment content
 - deleteCommentAction - Soft delete with cascade
 
 ### Business Logic (Facade) to Test
+
 - Parent comment verification
 - Depth limit enforcement (max 5 levels)
 - Target entity consistency
@@ -67,12 +72,14 @@ The comments feature in Head Shakers encompasses a comprehensive threading syste
 - Cache invalidation
 
 ### Data Operations to Test
+
 - CRUD operations on comments table
 - User information joins
 - Comment count aggregates
 - Cascade deletion
 
 ### Error Scenarios
+
 - Invalid UUIDs
 - Empty/whitespace content
 - Content exceeding 5000 characters
@@ -84,6 +91,7 @@ The comments feature in Head Shakers encompasses a comprehensive threading syste
 - Cache failures
 
 ### Edge Cases
+
 - Deleted user display
 - Date serialization
 - Deep nesting styling
@@ -91,6 +99,7 @@ The comments feature in Head Shakers encompasses a comprehensive threading syste
 - Parent cache invalidation
 
 ## Validation Results
+
 - **Format**: Single paragraph ✓
 - **Word Count**: ~450 words (slightly over, acceptable)
 - **Focus**: Describes WHAT needs testing ✓

@@ -28,7 +28,7 @@ This ensures all recommended patterns follow project conventions.
 
 Your plan MUST follow this exact structure:
 
-```markdown
+````markdown
 # Test Implementation Plan: [Feature/Area Name]
 
 ## Overview
@@ -40,12 +40,12 @@ Your plan MUST follow this exact structure:
 
 ### Test Distribution
 
-| Test Type | Count | Priority |
-|-----------|-------|----------|
-| Unit | X | [Critical/High/Medium/Low] |
-| Component | X | [Critical/High/Medium/Low] |
-| Integration | X | [Critical/High/Medium/Low] |
-| E2E | X | [Critical/High/Medium/Low] |
+| Test Type   | Count | Priority                   |
+| ----------- | ----- | -------------------------- |
+| Unit        | X     | [Critical/High/Medium/Low] |
+| Component   | X     | [Critical/High/Medium/Low] |
+| Integration | X     | [Critical/High/Medium/Low] |
+| E2E         | X     | [Critical/High/Medium/Low] |
 
 ## Prerequisites
 
@@ -84,6 +84,7 @@ Your plan MUST follow this exact structure:
 npm run test:run -- tests/{path}/{filename}.test.{ts,tsx}
 npm run lint:fix && npm run typecheck
 ```
+````
 
 **Success Criteria:**
 
@@ -125,6 +126,7 @@ npm run lint:fix && npm run typecheck
 - [Important considerations]
 - [Assumptions made]
 - [Potential challenges]
+
 ```
 
 ## Test Type Guidelines
@@ -213,3 +215,4 @@ Order your steps logically:
 - Include confidence levels for each step
 - Ensure steps are independently completable
 - Order steps by logical dependencies
+```

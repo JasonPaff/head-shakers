@@ -21,12 +21,12 @@ When invoked, you:
 
 Classify missing tests into these categories:
 
-| Test Type | Location | Purpose | File Pattern |
-|-----------|----------|---------|--------------|
-| Unit | `tests/unit/` | Pure functions, utilities, validations | `*.test.ts` |
-| Component | `tests/components/` | React component rendering and interaction | `*.test.tsx` |
-| Integration | `tests/integration/` | Facades, actions, database operations | `*.test.ts` or `*.integration.test.ts` |
-| E2E | `tests/e2e/specs/` | User flows, page interactions | `*.spec.ts` |
+| Test Type   | Location             | Purpose                                   | File Pattern                           |
+| ----------- | -------------------- | ----------------------------------------- | -------------------------------------- |
+| Unit        | `tests/unit/`        | Pure functions, utilities, validations    | `*.test.ts`                            |
+| Component   | `tests/components/`  | React component rendering and interaction | `*.test.tsx`                           |
+| Integration | `tests/integration/` | Facades, actions, database operations     | `*.test.ts` or `*.integration.test.ts` |
+| E2E         | `tests/e2e/specs/`   | User flows, page interactions             | `*.spec.ts`                            |
 
 ## Coverage Analysis Process
 
@@ -62,12 +62,12 @@ For each source file, determine:
 
 Assign priority based on:
 
-| Priority | Criteria |
-|----------|----------|
+| Priority     | Criteria                                            |
+| ------------ | --------------------------------------------------- |
 | **Critical** | Core business logic, data mutations, authentication |
-| **High** | User-facing features, error handling, validations |
-| **Medium** | Supporting utilities, UI components, helpers |
-| **Low** | Configuration, types, simple wrappers |
+| **High**     | User-facing features, error handling, validations   |
+| **Medium**   | Supporting utilities, UI components, helpers        |
+| **Low**      | Configuration, types, simple wrappers               |
 
 ## Output Format
 
@@ -85,16 +85,17 @@ Return your analysis in this exact format:
 
 ## Coverage Matrix
 
-| Source File | Unit | Component | Integration | E2E | Gap Status |
-|-------------|------|-----------|-------------|-----|------------|
-| `path/to/file.ts` | ✅ | N/A | ❌ | ❌ | Partial |
-| `path/to/component.tsx` | N/A | ❌ | N/A | ❌ | Missing |
+| Source File             | Unit | Component | Integration | E2E | Gap Status |
+| ----------------------- | ---- | --------- | ----------- | --- | ---------- |
+| `path/to/file.ts`       | ✅   | N/A       | ❌          | ❌  | Partial    |
+| `path/to/component.tsx` | N/A  | ❌        | N/A         | ❌  | Missing    |
 
 ## Coverage Gaps by Priority
 
 ### Critical Priority
 
 **File**: `src/lib/actions/example.actions.ts`
+
 - **Current Coverage**: No tests
 - **Missing Test Types**: Unit, Integration
 - **Exports Requiring Tests**:
@@ -144,6 +145,7 @@ Return your analysis in this exact format:
 ## Analysis Guidelines
 
 **DO**:
+
 - Actually read source files to understand what needs testing
 - Search comprehensively for existing tests in all locations
 - Consider the full test pyramid (unit -> integration -> E2E)
@@ -151,6 +153,7 @@ Return your analysis in this exact format:
 - Note dependencies that affect test complexity
 
 **DON'T**:
+
 - Assume coverage based on file existence alone
 - Recommend tests for trivial code (type exports, re-exports)
 - Ignore existing partial coverage

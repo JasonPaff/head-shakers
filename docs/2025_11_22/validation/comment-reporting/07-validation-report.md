@@ -15,27 +15,27 @@ The comment-reporting feature demonstrates solid static analysis compliance and 
 
 ### Quick Stats
 
-| Metric          | Value       |
-| --------------- | ----------- |
-| Total Issues    | 14          |
-| Critical        | 1           |
-| High Priority   | 4           |
-| Medium Priority | 5           |
-| Low Priority    | 4           |
-| Auto-Fixable    | 0           |
-| Files Affected  | 8           |
-| Tests Passing   | 487/487     |
+| Metric          | Value   |
+| --------------- | ------- |
+| Total Issues    | 14      |
+| Critical        | 1       |
+| High Priority   | 4       |
+| Medium Priority | 5       |
+| Low Priority    | 4       |
+| Auto-Fixable    | 0       |
+| Files Affected  | 8       |
+| Tests Passing   | 487/487 |
 
 ### Status by Phase
 
-| Phase           | Status     | Issues | Duration |
-| --------------- | ---------- | ------ | -------- |
-| Static Analysis | PASS       | 0      | -        |
-| Conventions     | PASS       | 0      | -        |
-| Tests           | ISSUES     | 1      | 249.45s  |
-| Code Review     | ISSUES     | 14     | -        |
-| UI Validation   | SKIPPED    | 0      | -        |
-| Database        | PASS       | 0      | -        |
+| Phase           | Status  | Issues | Duration |
+| --------------- | ------- | ------ | -------- |
+| Static Analysis | PASS    | 0      | -        |
+| Conventions     | PASS    | 0      | -        |
+| Tests           | ISSUES  | 1      | 249.45s  |
+| Code Review     | ISSUES  | 14     | -        |
+| UI Validation   | SKIPPED | 0      | -        |
+| Database        | PASS    | 0      | -        |
 
 ---
 
@@ -111,12 +111,15 @@ const { targetType, targetId, reason, details } = ctx.sanitizedInput;
 
 ```typescript
 // Query actual report count for user in last 24 hours
-const count = await db.select({ count: sql`count(*)` })
+const count = await db
+  .select({ count: sql`count(*)` })
   .from(contentReports)
-  .where(and(
-    eq(contentReports.reporterId, userId),
-    gt(contentReports.createdAt, sql`now() - interval '24 hours'`)
-  ));
+  .where(
+    and(
+      eq(contentReports.reporterId, userId),
+      gt(contentReports.createdAt, sql`now() - interval '24 hours'`),
+    ),
+  );
 ```
 
 ### Issue 2: Dead Code in createReport Method
@@ -230,12 +233,12 @@ const handleReport = useCallback(() => {
 
 ## Low Priority Issues
 
-| File | Issue | Recommendation |
-| ---- | ----- | -------------- |
-| Various | Documentation gaps | Add JSDoc comments to public functions |
+| File                  | Issue                         | Recommendation                                            |
+| --------------------- | ----------------------------- | --------------------------------------------------------- |
+| Various               | Documentation gaps            | Add JSDoc comments to public functions                    |
 | reports-table.tsx:264 | TanStack Table ESLint warning | Expected behavior - document or suppress with explanation |
-| Various | Console.log statements | Remove or replace with proper logging |
-| Various | Magic numbers | Extract to named constants |
+| Various               | Console.log statements        | Remove or replace with proper logging                     |
+| Various               | Magic numbers                 | Extract to named constants                                |
 
 ---
 
@@ -247,16 +250,16 @@ The comment-reporting feature has **no dedicated test files**. While all 487 exi
 
 ### Files Requiring Test Coverage
 
-| Implementation File | Priority | Suggested Test Location |
-| ------------------- | -------- | ----------------------- |
-| `src/lib/validations/moderation.validation.ts` | High | `tests/unit/lib/validations/moderation.validation.spec.ts` |
-| `src/lib/actions/content-reports/content-reports.actions.ts` | Critical | `tests/unit/lib/actions/content-reports.actions.spec.ts` |
-| `src/lib/queries/content-reports/content-reports.query.ts` | High | `tests/unit/lib/queries/content-reports.query.spec.ts` |
-| `src/lib/facades/content-reports/content-reports.facade.ts` | High | `tests/unit/lib/facades/content-reports.facade.spec.ts` |
-| `src/components/feature/content-reports/report-button.tsx` | Medium | `tests/component/feature/content-reports/report-button.spec.tsx` |
-| `src/components/feature/comments/comment-item.tsx` | Medium | `tests/component/feature/comments/comment-item.spec.tsx` |
-| `src/components/admin/reports/reports-table.tsx` | Medium | `tests/component/admin/reports/reports-table.spec.tsx` |
-| `src/components/admin/reports/report-detail-dialog.tsx` | Medium | `tests/component/admin/reports/report-detail-dialog.spec.tsx` |
+| Implementation File                                          | Priority | Suggested Test Location                                          |
+| ------------------------------------------------------------ | -------- | ---------------------------------------------------------------- |
+| `src/lib/validations/moderation.validation.ts`               | High     | `tests/unit/lib/validations/moderation.validation.spec.ts`       |
+| `src/lib/actions/content-reports/content-reports.actions.ts` | Critical | `tests/unit/lib/actions/content-reports.actions.spec.ts`         |
+| `src/lib/queries/content-reports/content-reports.query.ts`   | High     | `tests/unit/lib/queries/content-reports.query.spec.ts`           |
+| `src/lib/facades/content-reports/content-reports.facade.ts`  | High     | `tests/unit/lib/facades/content-reports.facade.spec.ts`          |
+| `src/components/feature/content-reports/report-button.tsx`   | Medium   | `tests/component/feature/content-reports/report-button.spec.tsx` |
+| `src/components/feature/comments/comment-item.tsx`           | Medium   | `tests/component/feature/comments/comment-item.spec.tsx`         |
+| `src/components/admin/reports/reports-table.tsx`             | Medium   | `tests/component/admin/reports/reports-table.spec.tsx`           |
+| `src/components/admin/reports/report-detail-dialog.tsx`      | Medium   | `tests/component/admin/reports/report-detail-dialog.spec.tsx`    |
 
 ### Minimum Required Tests Before Merge
 
@@ -344,12 +347,12 @@ git add . && git commit -m "feat: implement comment reporting with validation fi
 
 **Overall Status**: PASS with 1 Expected Warning
 
-| Check | Status | Issues |
-| ----- | ------ | ------ |
-| ESLint Errors | PASS | 0 |
-| ESLint Warnings | PASS | 1 (expected - TanStack Table) |
-| TypeScript Errors | PASS | 0 |
-| Prettier Format | PASS | 0 |
+| Check             | Status | Issues                        |
+| ----------------- | ------ | ----------------------------- |
+| ESLint Errors     | PASS   | 0                             |
+| ESLint Warnings   | PASS   | 1 (expected - TanStack Table) |
+| TypeScript Errors | PASS   | 0                             |
+| Prettier Format   | PASS   | 0                             |
 
 **Note**: One unrelated ESLint error exists in `tests/e2e/fixtures/base.fixture.ts:75` (empty object pattern) - not part of this feature.
 
@@ -359,27 +362,27 @@ git add . && git commit -m "feat: implement comment reporting with validation fi
 
 All 5 React components scanned passed convention checks:
 
-| Convention | Status |
-| ---------- | ------ |
-| Boolean naming (is prefix) | PASS |
-| Derived variables (_ prefix) | PASS |
-| Named exports only | PASS |
-| Event handler naming (handle prefix) | PASS |
-| Type imports (import type) | PASS |
-| UI block comments | PASS |
-| No forwardRef usage | PASS |
-| No any types | PASS |
+| Convention                           | Status |
+| ------------------------------------ | ------ |
+| Boolean naming (is prefix)           | PASS   |
+| Derived variables (\_ prefix)        | PASS   |
+| Named exports only                   | PASS   |
+| Event handler naming (handle prefix) | PASS   |
+| Type imports (import type)           | PASS   |
+| UI block comments                    | PASS   |
+| No forwardRef usage                  | PASS   |
+| No any types                         | PASS   |
 
 ### Test Details
 
 **Overall Status**: PASS with Critical Coverage Gap
 
-| Test Suite | Passed | Failed | Duration |
-| ---------- | ------ | ------ | -------- |
-| Unit Tests | 214 | 0 | - |
-| Integration Tests | 44 | 0 | - |
-| Component Tests | 229 | 0 | - |
-| **Total** | **487** | **0** | **249.45s** |
+| Test Suite        | Passed  | Failed | Duration    |
+| ----------------- | ------- | ------ | ----------- |
+| Unit Tests        | 214     | 0      | -           |
+| Integration Tests | 44      | 0      | -           |
+| Component Tests   | 229     | 0      | -           |
+| **Total**         | **487** | **0**  | **249.45s** |
 
 **Critical Gap**: No test files exist specifically for the comment-reporting feature. All passes are from existing test suites.
 
@@ -388,12 +391,14 @@ All 5 React components scanned passed convention checks:
 **Quality Score**: 7.5/10
 
 **Issue Summary**:
+
 - 1 Critical issue (security)
 - 4 High priority issues (functional bugs)
 - 5 Medium priority issues (code quality)
 - 4 Low priority issues (polish)
 
 **Positive Highlights**:
+
 - Comprehensive Zod validation schemas
 - Well-structured query layer with retry logic
 - Proper database schema design with indexes
@@ -408,6 +413,7 @@ All 5 React components scanned passed convention checks:
 Dev server was not accessible for automated Playwright testing.
 
 **Manual Verification Required**:
+
 - [ ] Report button appears on comments for non-owners
 - [ ] Report button hidden for user's own comments
 - [ ] Report dialog opens and displays correct content
@@ -431,6 +437,7 @@ Dev server was not accessible for automated Playwright testing.
 | Critical target_idx exists | PASS |
 
 **Current Data**:
+
 - Total reports: 2
 - Comment reports: 0 (expected for new feature)
 
@@ -453,20 +460,20 @@ Dev server was not accessible for automated Playwright testing.
 
 ## Appendix: Issue Reference
 
-| ID | Severity | Category | File | Line | Status |
-| -- | -------- | -------- | ---- | ---- | ------ |
-| CRIT-1 | Critical | Security | content-reports.actions.ts | 36-50 | Open |
-| HIGH-1 | High | Logic | content-reports.facade.ts | 121-155 | Open |
-| HIGH-2 | High | Dead Code | content-reports.facade.ts | 192-237 | Open |
-| HIGH-3 | High | UX | report-reason-dialog.tsx | 107-131 | Open |
-| HIGH-4 | High | Memory | report-detail-dialog.tsx | 35-44 | Open |
-| MED-1 | Medium | DRY | Multiple | - | Open |
-| MED-2 | Medium | Performance | Schema | - | Open |
-| MED-3 | Medium | Performance | Query | - | Open |
-| MED-4 | Medium | Logic | Facade | - | Open |
-| MED-5 | Medium | Performance | Components | - | Open |
-| LOW-1 | Low | Docs | Various | - | Open |
-| LOW-2 | Low | Lint | reports-table.tsx | 264 | Expected |
-| LOW-3 | Low | Debug | Various | - | Open |
-| LOW-4 | Low | Style | Various | - | Open |
-| TEST-1 | Critical | Coverage | Feature | - | Open |
+| ID     | Severity | Category    | File                       | Line    | Status   |
+| ------ | -------- | ----------- | -------------------------- | ------- | -------- |
+| CRIT-1 | Critical | Security    | content-reports.actions.ts | 36-50   | Open     |
+| HIGH-1 | High     | Logic       | content-reports.facade.ts  | 121-155 | Open     |
+| HIGH-2 | High     | Dead Code   | content-reports.facade.ts  | 192-237 | Open     |
+| HIGH-3 | High     | UX          | report-reason-dialog.tsx   | 107-131 | Open     |
+| HIGH-4 | High     | Memory      | report-detail-dialog.tsx   | 35-44   | Open     |
+| MED-1  | Medium   | DRY         | Multiple                   | -       | Open     |
+| MED-2  | Medium   | Performance | Schema                     | -       | Open     |
+| MED-3  | Medium   | Performance | Query                      | -       | Open     |
+| MED-4  | Medium   | Logic       | Facade                     | -       | Open     |
+| MED-5  | Medium   | Performance | Components                 | -       | Open     |
+| LOW-1  | Low      | Docs        | Various                    | -       | Open     |
+| LOW-2  | Low      | Lint        | reports-table.tsx          | 264     | Expected |
+| LOW-3  | Low      | Debug       | Various                    | -       | Open     |
+| LOW-4  | Low      | Style       | Various                    | -       | Open     |
+| TEST-1 | Critical | Coverage    | Feature                    | -       | Open     |
