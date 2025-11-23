@@ -74,7 +74,15 @@ export const BobbleheadPhotoGalleryModal = ({
 
   return (
     <Dialog onOpenChange={(open) => !open && onClose()} open={isOpen}>
-      <DialogContent className={'h-[80vh] max-w-4xl border-0 bg-black p-0'} isShowCloseButton={false}>
+      <DialogContent
+        className={cn(
+          'h-[80vh] max-w-4xl border-0 bg-black p-0',
+          'data-[state=open]:animate-carousel-scale-in',
+        )}
+        data-slot={'photo-gallery-modal'}
+        data-testid={'feature-bobblehead-gallery-modal'}
+        isShowCloseButton={false}
+      >
         <div className={'relative flex h-full flex-col'}>
           {/* Header */}
           <div
@@ -85,7 +93,12 @@ export const BobbleheadPhotoGalleryModal = ({
                 {bobbleheadName || 'Bobblehead Photos'}
               </DialogTitle>
               <Button
-                className={'text-white hover:bg-white/20'}
+                aria-label={'Close photo gallery'}
+                className={cn(
+                  'text-white hover:bg-white/20',
+                  'transition-all duration-200 ease-out',
+                  'hover:scale-110',
+                )}
                 onClick={onClose}
                 size={'icon'}
                 variant={'ghost'}
@@ -118,9 +131,13 @@ export const BobbleheadPhotoGalleryModal = ({
             {/* Navigation arrows */}
             <Conditional isCondition={hasMultiplePhotos}>
               <Button
-                className={
-                  'absolute top-1/2 left-4 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70'
-                }
+                aria-label={'Previous photo'}
+                className={cn(
+                  'absolute top-1/2 left-4 z-10 -translate-y-1/2',
+                  'bg-black/50 text-white hover:bg-black/70',
+                  'transition-all duration-200 ease-out',
+                  'hover:scale-110',
+                )}
                 onClick={handlePrevious}
                 size={'icon'}
                 variant={'ghost'}
@@ -129,9 +146,13 @@ export const BobbleheadPhotoGalleryModal = ({
               </Button>
 
               <Button
-                className={
-                  'absolute top-1/2 right-4 -translate-y-1/2 bg-black/50 text-white hover:bg-black/70'
-                }
+                aria-label={'Next photo'}
+                className={cn(
+                  'absolute top-1/2 right-4 z-10 -translate-y-1/2',
+                  'bg-black/50 text-white hover:bg-black/70',
+                  'transition-all duration-200 ease-out',
+                  'hover:scale-110',
+                )}
                 onClick={handleNext}
                 size={'icon'}
                 variant={'ghost'}
@@ -151,7 +172,7 @@ export const BobbleheadPhotoGalleryModal = ({
                   <button
                     className={cn(
                       'size-2 rounded-full bg-white/50 transition-all hover:bg-white/80',
-                      index === currentPhotoIndex && 'scale-125 bg-white',
+                      index === currentPhotoIndex ? 'scale-125 animate-dot-pulse bg-white' : 'bg-white/40',
                     )}
                     key={index}
                     onClick={() => {

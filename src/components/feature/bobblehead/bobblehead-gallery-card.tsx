@@ -1,6 +1,6 @@
 'use client';
 
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { KeyboardEvent, MouseEvent, TouchEvent } from 'react';
 
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
@@ -15,8 +15,7 @@ import {
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-import { useMemo } from 'react';
-import { useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
@@ -38,7 +37,7 @@ import { useServerAction } from '@/hooks/use-server-action';
 import { useToggle } from '@/hooks/use-toggle';
 import { getBobbleheadPhotosAction } from '@/lib/actions/bobbleheads/bobbleheads.actions';
 import { generateTestId } from '@/lib/test-ids';
-import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
+import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
@@ -88,11 +87,16 @@ export const BobbleheadGalleryCard = ({
   const [loadedImageUrls, setLoadedImageUrls] = useState<Set<string>>(
     () => new Set(bobblehead.featurePhoto ? [bobblehead.featurePhoto] : []),
   );
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const [hasLoadedPhotos, setHasLoadedPhotos] = useToggle();
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useToggle();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
+
+  // Touch swipe refs
+  const touchStartXRef = useRef<number>(0);
+  const isTouchMoveRef = useRef<boolean>(false);
 
   const {
     execute: fetchPhotos,
@@ -128,21 +132,29 @@ export const BobbleheadGalleryCard = ({
     fetchPhotos({ bobbleheadId: bobblehead.id });
   };
 
-  const handlePrevPhoto = (e: MouseEvent) => {
+  const handlePrevPhoto = useCallback((e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsImageLoaded(false);
     setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
-  };
+  }, [photos.length]);
 
-  const handleNextPhoto = (e: MouseEvent) => {
+  const handleNextPhoto = useCallback((e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsImageLoaded(false);
     setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
-  };
+  }, [photos.length]);
 
-  const handlePhotoClick = (e: MouseEvent) => {
+  const handlePhotoClick = useCallback((e: MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Ignore click if this was a swipe gesture
+    if (isTouchMoveRef.current) {
+      isTouchMoveRef.current = false;
+      return;
+    }
 
     // ensure photos are loaded before opening the gallery
     if (!hasLoadedPhotos && !isLoadingPhotos) {
@@ -151,7 +163,7 @@ export const BobbleheadGalleryCard = ({
     }
 
     setIsPhotoGalleryOpen.on();
-  };
+  }, [hasLoadedPhotos, isLoadingPhotos, setHasLoadedPhotos, fetchPhotos, bobblehead.id, setIsPhotoGalleryOpen]);
 
   const handlePhotoKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -168,7 +180,15 @@ export const BobbleheadGalleryCard = ({
     }
   };
 
-  const handleImageLoad = () => {
+  const validPhotos = photos.filter(
+    (photo): photo is { altText: null | string; url: string } =>
+      photo !== undefined && typeof photo.url === 'string',
+  );
+
+  const currentPhoto = photos[currentPhotoIndex]?.url || bobblehead.featurePhoto;
+
+  const handleImageLoad = useCallback(() => {
+    setIsImageLoaded(true);
     if (!currentPhoto) return;
 
     setLoadedImageUrls((prev) => {
@@ -177,16 +197,55 @@ export const BobbleheadGalleryCard = ({
       newSet.add(currentPhoto);
       return newSet;
     });
-  };
+  }, [currentPhoto]);
 
-  const validPhotos = photos.filter(
-    (photo): photo is { altText: null | string; url: string } =>
-      photo !== undefined && typeof photo.url === 'string',
-  );
+  // Touch swipe handlers
+  const handleTouchStart = useCallback((e: TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch) {
+      touchStartXRef.current = touch.clientX;
+    }
+    isTouchMoveRef.current = false;
+  }, []);
 
-  const currentPhoto = photos[currentPhotoIndex]?.url || bobblehead.featurePhoto;
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch) {
+      const touchDiff = Math.abs(touch.clientX - touchStartXRef.current);
+      if (touchDiff > 10) {
+        isTouchMoveRef.current = true;
+      }
+    }
+  }, []);
+
+  const handleTouchEnd = useCallback((e: TouchEvent) => {
+    const touch = e.changedTouches[0];
+    if (!touch) return;
+
+    const touchEndX = touch.clientX;
+    const diff = touchStartXRef.current - touchEndX;
+    const threshold = 50;
+
+    if (Math.abs(diff) > threshold && photos.length > 1) {
+      setIsImageLoaded(false);
+      if (diff > 0) {
+        // Swipe left - next
+        setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
+      } else {
+        // Swipe right - prev
+        setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+      }
+    }
+  }, [photos.length]);
   const shouldShowControls = photos.length > 1 && isShowPhotoControls;
   const isCurrentImageLoaded = !currentPhoto || loadedImageUrls.has(currentPhoto ?? '');
+
+  // Generate blur placeholder for current photo
+  const _currentPublicId = currentPhoto ? extractPublicIdFromCloudinaryUrl(currentPhoto) : null;
+  const _blurDataUrl = useMemo(
+    () => (_currentPublicId ? generateBlurDataUrl(_currentPublicId) : undefined),
+    [_currentPublicId],
+  );
 
   // Check if there are actual photos (not just placeholder)
   const hasActualPhotos =
@@ -227,12 +286,16 @@ export const BobbleheadGalleryCard = ({
 
       {/* Photo */}
       <div
-        className={'group relative h-64 flex-shrink-0 cursor-pointer bg-muted'}
+        className={'group relative h-64 flex-shrink-0 cursor-pointer overflow-hidden bg-muted'}
+        data-slot={'photo-container'}
         data-testid={photoAreaTestId}
         onClick={handlePhotoClick}
         onKeyDown={handlePhotoKeyDown}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={setIsShowPhotoControls.off}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+        onTouchStart={handleTouchStart}
         role={'button'}
         tabIndex={0}
         title={'Click to view in gallery'}
@@ -241,14 +304,16 @@ export const BobbleheadGalleryCard = ({
         {hasImage ?
           <CldImage
             alt={bobblehead.name || 'Bobblehead'}
+            blurDataURL={_blurDataUrl}
             className={cn(
-              'size-full object-cover transition-all duration-300 group-hover:scale-105',
-              !isCurrentImageLoaded && 'opacity-50',
+              'size-full object-cover transition-all duration-500 ease-out group-hover:scale-105',
+              isImageLoaded ? 'animate-carousel-fade-in opacity-100' : 'opacity-0',
             )}
             crop={'fill'}
             format={'auto'}
             height={400}
             onLoad={handleImageLoad}
+            placeholder={'blur'}
             quality={'auto:good'}
             src={extractPublicIdFromCloudinaryUrl(currentPhoto)}
             width={400}
@@ -289,7 +354,8 @@ export const BobbleheadGalleryCard = ({
         <Conditional isCondition={shouldShowControls}>
           {/* Previous */}
           <Button
-            className={'absolute top-1/2 left-2 -translate-y-1/2 opacity-80 hover:opacity-100'}
+            aria-label={'Previous photo'}
+            className={'absolute top-1/2 left-2 z-10 -translate-y-1/2 opacity-80 transition-all duration-200 hover:scale-110 hover:opacity-100'}
             onClick={handlePrevPhoto}
             size={'icon'}
             testId={prevButtonTestId}
@@ -300,7 +366,8 @@ export const BobbleheadGalleryCard = ({
 
           {/* Next */}
           <Button
-            className={'absolute top-1/2 right-2 -translate-y-1/2 opacity-80 hover:opacity-100'}
+            aria-label={'Next photo'}
+            className={'absolute top-1/2 right-2 z-10 -translate-y-1/2 opacity-80 transition-all duration-200 hover:scale-110 hover:opacity-100'}
             onClick={handleNextPhoto}
             size={'icon'}
             testId={nextButtonTestId}
@@ -310,21 +377,29 @@ export const BobbleheadGalleryCard = ({
           </Button>
 
           {/* Dots */}
-          <div className={'absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1'}>
-            {photos.map((_, index) => (
-              <button
-                className={cn(
-                  'size-1.5 rounded-full bg-white/50 transition-colors',
-                  index === currentPhotoIndex && 'bg-white',
-                )}
-                key={index}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setCurrentPhotoIndex(index);
-                }}
-              />
-            ))}
+          <div className={'absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5'} data-slot={'dot-indicators'}>
+            {photos.map((_, index) => {
+              const _isActive = index === currentPhotoIndex;
+              return (
+                <button
+                  aria-label={`Go to photo ${index + 1}`}
+                  className={cn(
+                    'size-2 rounded-full transition-all duration-200',
+                    _isActive
+                      ? 'scale-125 animate-dot-pulse bg-white'
+                      : 'bg-white/50 hover:bg-white/70',
+                  )}
+                  key={index}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsImageLoaded(false);
+                    setCurrentPhotoIndex(index);
+                  }}
+                  type={'button'}
+                />
+              );
+            })}
           </div>
         </Conditional>
       </div>

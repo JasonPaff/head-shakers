@@ -3,7 +3,7 @@
 import type { ComponentProps } from 'react';
 
 import { CldImage } from 'next-cloudinary';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -32,7 +32,22 @@ export const FeatureCardImageGallery = ({
 }: FeatureCardImageGalleryProps) => {
   const galleryTestId = testId || generateTestId('feature', 'bobblehead-gallery', 'thumbnails');
 
+  // Refs for thumbnail buttons to enable scroll-into-view
+  const thumbnailRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+
   const _hasPhotos = photos.length > 0;
+
+  // Auto-scroll selected thumbnail into view when currentIndex changes
+  useEffect(() => {
+    const thumbnailElement = thumbnailRefs.current.get(currentIndex);
+    if (thumbnailElement) {
+      thumbnailElement.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+  }, [currentIndex]);
 
   const handleThumbnailClick = useCallback(
     (index: number) => {
@@ -50,6 +65,14 @@ export const FeatureCardImageGallery = ({
     },
     [onImageSelect],
   );
+
+  const setThumbnailRef = useCallback((index: number, element: HTMLButtonElement | null) => {
+    if (element) {
+      thumbnailRefs.current.set(index, element);
+    } else {
+      thumbnailRefs.current.delete(index);
+    }
+  }, []);
 
   return (
     <div
@@ -69,9 +92,9 @@ export const FeatureCardImageGallery = ({
         }
         isCondition={_hasPhotos}
       >
-        {/* Horizontal Scrollable Thumbnail Strip */}
+        {/* Horizontal Scrollable Thumbnail Strip with Scroll Snap */}
         <div
-          className={'flex gap-2 overflow-x-auto pb-2'}
+          className={'flex scroll-snap-x-mandatory gap-2 overflow-x-auto pb-2'}
           data-slot={'feature-card-image-gallery-strip'}
           role={'listbox'}
         >
@@ -86,15 +109,25 @@ export const FeatureCardImageGallery = ({
                 aria-label={_photoLabel}
                 aria-selected={_isSelected}
                 className={cn(
-                  'relative size-16 shrink-0 overflow-hidden rounded-md transition-all',
+                  // Base styles with scroll-snap alignment
+                  'relative size-16 shrink-0 scroll-snap-start overflow-hidden rounded-md',
+                  // Smooth transitions for all properties
+                  'transition-all duration-200',
+                  // Border for hover states
+                  'border-2 border-transparent',
+                  // Focus styles
                   'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
-                  _isSelected ? 'ring-2 ring-primary ring-offset-2' : 'opacity-70 hover:opacity-100',
+                  // Selected state: scale, shadow, and ring
+                  _isSelected ?
+                    'scale-105 opacity-100 shadow-lg ring-2 ring-primary ring-offset-2'
+                  : 'opacity-60 hover:scale-102 hover:border-primary/50 hover:opacity-100',
                 )}
                 data-slot={'feature-card-image-gallery-thumbnail'}
                 data-testid={thumbnailTestId}
                 key={photo.url}
                 onClick={() => handleThumbnailClick(index)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
+                ref={(el) => setThumbnailRef(index, el)}
                 role={'option'}
                 type={'button'}
               >
