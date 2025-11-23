@@ -85,6 +85,13 @@
       "when": 1763743822211,
       "tag": "20251121165022_dizzy_sunspot",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1763865355551,
+      "tag": "20251123023555_open_karma",
+      "breakpoints": true
     }
   ]
 }
