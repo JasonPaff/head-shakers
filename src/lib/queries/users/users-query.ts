@@ -80,18 +80,12 @@ export class UsersQuery extends BaseQuery {
    * Count users for admin listing with filters
    * Used for pagination metadata
    */
-  static async countUsersForAdminAsync(
-    filters: AdminUsersFilter,
-    context: QueryContext,
-  ): Promise<number> {
+  static async countUsersForAdminAsync(filters: AdminUsersFilter, context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
     const whereConditions = this._buildAdminFilterConditions(filters);
 
-    const result = await dbInstance
-      .select({ count: count() })
-      .from(users)
-      .where(whereConditions);
+    const result = await dbInstance.select({ count: count() }).from(users).where(whereConditions);
 
     return result[0]?.count || 0;
   }
@@ -233,18 +227,11 @@ export class UsersQuery extends BaseQuery {
    * Get user statistics for admin dashboard
    * Returns counts for collections, bobbleheads, and recent activity
    */
-  static async getUserStatsAsync(
-    userId: string,
-    context: QueryContext,
-  ): Promise<null | UserStats> {
+  static async getUserStatsAsync(userId: string, context: QueryContext): Promise<null | UserStats> {
     const dbInstance = this.getDbInstance(context);
 
     // Verify user exists first
-    const user = await dbInstance
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
+    const user = await dbInstance.select({ id: users.id }).from(users).where(eq(users.id, userId)).limit(1);
 
     if (!user[0]) {
       return null;
@@ -254,46 +241,46 @@ export class UsersQuery extends BaseQuery {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    const [collectionsResult, bobbleheadsResult, publicCollectionsResult, publicBobbleheadsResult, activityResult] =
-      await Promise.all([
-        // Total collections count
-        dbInstance
-          .select({ count: count() })
-          .from(collections)
-          .where(eq(collections.userId, userId)),
+    const [
+      collectionsResult,
+      bobbleheadsResult,
+      publicCollectionsResult,
+      publicBobbleheadsResult,
+      activityResult,
+    ] = await Promise.all([
+      // Total collections count
+      dbInstance.select({ count: count() }).from(collections).where(eq(collections.userId, userId)),
 
-        // Total bobbleheads count (non-deleted)
-        dbInstance
-          .select({ count: count() })
-          .from(bobbleheads)
-          .where(and(eq(bobbleheads.userId, userId), eq(bobbleheads.isDeleted, false))),
+      // Total bobbleheads count (non-deleted)
+      dbInstance
+        .select({ count: count() })
+        .from(bobbleheads)
+        .where(and(eq(bobbleheads.userId, userId), eq(bobbleheads.isDeleted, false))),
 
-        // Public collections count
-        dbInstance
-          .select({ count: count() })
-          .from(collections)
-          .where(and(eq(collections.userId, userId), eq(collections.isPublic, true))),
+      // Public collections count
+      dbInstance
+        .select({ count: count() })
+        .from(collections)
+        .where(and(eq(collections.userId, userId), eq(collections.isPublic, true))),
 
-        // Public bobbleheads count
-        dbInstance
-          .select({ count: count() })
-          .from(bobbleheads)
-          .where(
-            and(
-              eq(bobbleheads.userId, userId),
-              eq(bobbleheads.isDeleted, false),
-              eq(bobbleheads.isPublic, true),
-            ),
+      // Public bobbleheads count
+      dbInstance
+        .select({ count: count() })
+        .from(bobbleheads)
+        .where(
+          and(
+            eq(bobbleheads.userId, userId),
+            eq(bobbleheads.isDeleted, false),
+            eq(bobbleheads.isPublic, true),
           ),
+        ),
 
-        // Recent activity count (last 30 days)
-        dbInstance
-          .select({ count: count() })
-          .from(userActivity)
-          .where(
-            and(eq(userActivity.userId, userId), gt(userActivity.createdAt, thirtyDaysAgo)),
-          ),
-      ]);
+      // Recent activity count (last 30 days)
+      dbInstance
+        .select({ count: count() })
+        .from(userActivity)
+        .where(and(eq(userActivity.userId, userId), gt(userActivity.createdAt, thirtyDaysAgo))),
+    ]);
 
     return {
       bobbleheadsCount: bobbleheadsResult[0]?.count || 0,
@@ -316,11 +303,7 @@ export class UsersQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     // Get user data
-    const user = await dbInstance
-      .select()
-      .from(users)
-      .where(eq(users.id, userId))
-      .limit(1);
+    const user = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
 
     if (!user[0]) {
       return null;
@@ -369,12 +352,7 @@ export class UsersQuery extends BaseQuery {
       switch (filters.status) {
         case 'active':
           // Not locked (lockedUntil is null or in the past)
-          conditions.push(
-            or(
-              sql`${users.lockedUntil} IS NULL`,
-              sql`${users.lockedUntil} < ${now}`,
-            ),
-          );
+          conditions.push(or(sql`${users.lockedUntil} IS NULL`, sql`${users.lockedUntil} < ${now}`));
           break;
         case 'locked':
           // Currently locked (lockedUntil is in the future)
@@ -409,10 +387,7 @@ export class UsersQuery extends BaseQuery {
   /**
    * Get ORDER BY clause for admin user sorting
    */
-  private static _getAdminSortOrder(
-    sortBy?: string,
-    sortOrder?: 'asc' | 'desc',
-  ) {
+  private static _getAdminSortOrder(sortBy?: string, sortOrder?: 'asc' | 'desc') {
     const direction = sortOrder === 'asc' ? asc : desc;
 
     switch (sortBy) {
@@ -422,8 +397,8 @@ export class UsersQuery extends BaseQuery {
         return direction(sql`lower(${users.email})`);
       case 'lastActiveAt':
         // Handle nulls - put inactive users at the end
-        return sortOrder === 'asc'
-          ? sql`${users.lastActiveAt} ASC NULLS LAST`
+        return sortOrder === 'asc' ?
+            sql`${users.lastActiveAt} ASC NULLS LAST`
           : sql`${users.lastActiveAt} DESC NULLS LAST`;
       case 'role':
         return direction(users.role);

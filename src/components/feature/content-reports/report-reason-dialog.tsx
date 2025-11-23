@@ -110,6 +110,8 @@ export const ReportReasonDialog = withFocusManagement(
           return 'Report Bobblehead';
         case 'collection':
           return 'Report Collection';
+        case 'comment':
+          return 'Report Comment';
         case 'subcollection':
           return 'Report Subcollection';
         default:
@@ -123,6 +125,8 @@ export const ReportReasonDialog = withFocusManagement(
           return 'Help us maintain a positive community by reporting inappropriate bobbleheads. Your report will be reviewed by our moderation team.';
         case 'collection':
           return 'Help us maintain a positive community by reporting inappropriate collections. Your report will be reviewed by our moderation team.';
+        case 'comment':
+          return 'Help us maintain a respectful community by reporting comments that violate our guidelines.';
         case 'subcollection':
           return 'Help us maintain a positive community by reporting inappropriate subcollections. Your report will be reviewed by our moderation team.';
         default:

@@ -23,7 +23,7 @@ import { cn } from '@/utils/tailwind-utils';
 interface ReportDetailDialogProps extends ComponentPropsWithRef<'div'> {
   isOpen: boolean;
   onClose: () => void;
-  onStatusChange?: (reportId: string, status: 'dismissed' | 'resolved' | 'reviewed') => void;
+  onStatusChange?: (reportId: string, status: 'dismissed' | 'resolved' | 'reviewed') => Promise<void> | void;
   report: null | SelectContentReport;
 }
 
@@ -32,15 +32,15 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
   const [isUpdating, setIsUpdating] = useState(false);
 
   // Event handlers
-  const handleStatusChange = (status: 'dismissed' | 'resolved' | 'reviewed') => {
+  const handleStatusChange = async (status: 'dismissed' | 'resolved' | 'reviewed') => {
     if (!report) return;
 
     setIsUpdating(true);
-    onStatusChange?.(report.id, status);
-    // Reset updating state after a brief delay
-    setTimeout(() => {
+    try {
+      await onStatusChange?.(report.id, status);
+    } finally {
       setIsUpdating(false);
-    }, 500);
+    }
   };
 
   const handleClose = () => {
@@ -281,7 +281,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                 <Button
                   disabled={isUpdating}
                   onClick={() => {
-                    handleStatusChange('reviewed');
+                    void handleStatusChange('reviewed');
                   }}
                   size={'sm'}
                   variant={'outline'}
@@ -291,7 +291,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                 <Button
                   disabled={isUpdating}
                   onClick={() => {
-                    handleStatusChange('resolved');
+                    void handleStatusChange('resolved');
                   }}
                   size={'sm'}
                   variant={'default'}
@@ -301,7 +301,7 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                 <Button
                   disabled={isUpdating}
                   onClick={() => {
-                    handleStatusChange('dismissed');
+                    void handleStatusChange('dismissed');
                   }}
                   size={'sm'}
                   variant={'destructive'}

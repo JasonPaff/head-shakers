@@ -120,8 +120,12 @@ export class ContentReportsQuery extends BaseQuery {
     targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
     context: QueryContext,
   ): Promise<number> {
-    const reports = await this.getReportsByTargetAsync(targetId, targetType, {}, context);
-    return reports.length;
+    const dbInstance = this.getDbInstance(context);
+    const [result] = await dbInstance
+      .select({ count: count() })
+      .from(contentReports)
+      .where(and(eq(contentReports.targetId, targetId), eq(contentReports.targetType, targetType)));
+    return result?.count ?? 0;
   }
 
   /**

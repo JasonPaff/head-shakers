@@ -160,8 +160,8 @@ export const UserRoleDialog = ({ isOpen, onClose, onSuccess, user }: UserRoleDia
             {/* Admin Role Warning */}
             <Conditional isCondition={_isCurrentRoleAdmin}>
               <Alert variant={'warning'}>
-                <strong>Cannot Modify Admin Role:</strong> Admin roles cannot be changed through the UI for security
-                reasons. Contact a system administrator if role changes are required.
+                <strong>Cannot Modify Admin Role:</strong> Admin roles cannot be changed through the UI for
+                security reasons. Contact a system administrator if role changes are required.
               </Alert>
             </Conditional>
 
@@ -171,7 +171,11 @@ export const UserRoleDialog = ({ isOpen, onClose, onSuccess, user }: UserRoleDia
                 <label className={'text-sm font-medium'} htmlFor={'role-select'}>
                   New Role
                 </label>
-                <Select disabled={isExecuting} onValueChange={handleRoleChange} value={selectedRole ?? undefined}>
+                <Select
+                  disabled={isExecuting}
+                  onValueChange={handleRoleChange}
+                  value={selectedRole ?? undefined}
+                >
                   <SelectTrigger className={'w-full'} id={'role-select'}>
                     <SelectValue placeholder={'Select a role...'} />
                   </SelectTrigger>
@@ -195,24 +199,25 @@ export const UserRoleDialog = ({ isOpen, onClose, onSuccess, user }: UserRoleDia
               {/* Role Change Warning */}
               <Conditional isCondition={_isPromotingToModerator}>
                 <Alert variant={'warning'}>
-                  <strong>Promoting to Moderator:</strong> This user will gain moderator privileges including the
-                  ability to manage reports, moderate content, and access admin tools. Ensure this user is trusted
-                  before proceeding.
+                  <strong>Promoting to Moderator:</strong> This user will gain moderator privileges including
+                  the ability to manage reports, moderate content, and access admin tools. Ensure this user is
+                  trusted before proceeding.
                 </Alert>
               </Conditional>
 
               <Conditional isCondition={_isDemotingFromModerator}>
                 <Alert variant={'info'}>
-                  <strong>Demoting to User:</strong> This user will lose moderator privileges and will only have
-                  standard user capabilities. They will no longer be able to access admin tools or moderate content.
+                  <strong>Demoting to User:</strong> This user will lose moderator privileges and will only
+                  have standard user capabilities. They will no longer be able to access admin tools or
+                  moderate content.
                 </Alert>
               </Conditional>
 
               {/* Same Role Selection Warning */}
               <Conditional isCondition={_isSameRole && _hasSelectedRole}>
                 <Alert variant={'info'}>
-                  <strong>No Change Required:</strong> The selected role is the same as the user&apos;s current
-                  role. Please select a different role.
+                  <strong>No Change Required:</strong> The selected role is the same as the user&apos;s
+                  current role. Please select a different role.
                 </Alert>
               </Conditional>
             </Conditional>

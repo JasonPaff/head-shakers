@@ -54,7 +54,10 @@ async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   }
 
   // Add role filter if provided and valid
-  if (resolvedSearchParams.role && ENUMS.USER.ROLE.includes(resolvedSearchParams.role as 'admin' | 'moderator' | 'user')) {
+  if (
+    resolvedSearchParams.role &&
+    ENUMS.USER.ROLE.includes(resolvedSearchParams.role as 'admin' | 'moderator' | 'user')
+  ) {
     filterOptions.role = resolvedSearchParams.role as 'admin' | 'moderator' | 'user';
   }
 
@@ -65,8 +68,19 @@ async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   }
 
   // Add sort options if provided
-  const validSortByFields = ['createdAt', 'updatedAt', 'displayName', 'username', 'email', 'lastActiveAt', 'role'] as const;
-  if (resolvedSearchParams.sortBy && validSortByFields.includes(resolvedSearchParams.sortBy as (typeof validSortByFields)[number])) {
+  const validSortByFields = [
+    'createdAt',
+    'updatedAt',
+    'displayName',
+    'username',
+    'email',
+    'lastActiveAt',
+    'role',
+  ] as const;
+  if (
+    resolvedSearchParams.sortBy &&
+    validSortByFields.includes(resolvedSearchParams.sortBy as (typeof validSortByFields)[number])
+  ) {
     filterOptions.sortBy = resolvedSearchParams.sortBy as (typeof validSortByFields)[number];
   }
 

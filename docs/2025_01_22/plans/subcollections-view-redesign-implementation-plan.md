@@ -9,11 +9,11 @@
 
 ## Overview
 
-| Attribute | Value |
-|-----------|-------|
+| Attribute          | Value     |
+| ------------------ | --------- |
 | Estimated Duration | 4-6 hours |
-| Complexity | Medium |
-| Risk Level | Low |
+| Complexity         | Medium    |
+| Risk Level         | Low       |
 
 ## Quick Summary
 
@@ -43,9 +43,11 @@
 **Confidence**: High
 
 **Files:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` (CREATE)
 
 **Changes:**
+
 - Create a client component using the `'use client'` directive
 - Define props interface accepting subcollection data, collectionSlug, and isOwner flag
 - Implement card layout with aspect-ratio image container (using `aspect-[4/3]` or `aspect-square`)
@@ -60,11 +62,13 @@
 - Add appropriate `data-testid` attributes following project conventions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component file created in correct location
 - [ ] TypeScript interfaces properly defined for props
 - [ ] Component follows existing card patterns from reference files
@@ -81,9 +85,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx` (MODIFY)
 
 **Changes:**
+
 - Change container from `<ul>` with `space-y-3` to `<div>` with responsive grid classes
 - Use grid classes appropriate for sidebar: `grid grid-cols-1 gap-4 sm:grid-cols-2` (2 columns max due to sidebar width constraint)
 - Import and use the new `SubcollectionCard` component for each subcollection
@@ -93,11 +99,13 @@ npm run lint:fix && npm run typecheck
 - Pass required props (collectionSlug, isOwner, subcollection data) to each SubcollectionCard
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid layout renders correctly in sidebar context
 - [ ] Subcollections display in 1 column on mobile, 2 columns on larger screens
 - [ ] Gap spacing is consistent and visually balanced
@@ -114,9 +122,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx` (MODIFY)
 
 **Changes:**
+
 - Replace simple paragraph with the existing `EmptyState` component from `@/components/ui/empty-state`
 - Import `FolderOpen` or similar icon from `lucide-react` for the empty state
 - Set appropriate title ("No Subcollections") and description ("Organize your collection by creating subcollections")
@@ -124,11 +134,13 @@ npm run lint:fix && npm run typecheck
 - Apply custom className to adapt the empty state for smaller sidebar context
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Empty state uses the project's standard EmptyState component
 - [ ] Icon, title, and description are contextually appropriate
 - [ ] Empty state is sized appropriately for the sidebar
@@ -145,9 +157,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/subcollections-skeleton.tsx` (MODIFY)
 
 **Changes:**
+
 - Change inner container from `space-y-3` vertical list to grid with `grid grid-cols-1 gap-4 sm:grid-cols-2`
 - Update skeleton items to match the new card structure:
   - Add aspect-ratio container for image skeleton (`aspect-[4/3]`)
@@ -158,11 +172,13 @@ npm run lint:fix && npm run typecheck
 - Ensure skeleton dimensions match the actual card component dimensions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton layout matches the new grid structure
 - [ ] Skeleton card structure mirrors the actual SubcollectionCard
 - [ ] No layout shift occurs when content loads
@@ -179,20 +195,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections.tsx` (MODIFY)
 
 **Changes:**
+
 - Add a subcollection count badge next to the title showing total number of subcollections
 - Improve spacing between title and action button using `gap-2` or similar
 - Ensure the add button has proper touch target size (minimum 44x44px)
 - Consider adding a subtle subtitle or description below the title if beneficial
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Card header displays subcollection count
 - [ ] Spacing and alignment are visually balanced
 - [ ] Add button meets touch target requirements
@@ -209,9 +229,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/components/feature/subcollections/subcollection-actions.tsx` (MODIFY)
 
 **Changes:**
+
 - Increase button size from `sm` to ensure minimum 44x44px touch target
 - Add visual feedback on hover/focus states using appropriate Tailwind classes
 - Ensure dropdown menu items have adequate padding for touch interaction
@@ -219,11 +241,13 @@ npm run lint:fix && npm run typecheck
 - Add `aria-label` or improve accessibility labeling on the trigger button
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Button meets 44x44px minimum touch target
 - [ ] Dropdown items are easy to tap on mobile devices
 - [ ] Accessibility attributes are properly set
@@ -240,11 +264,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` (MODIFY)
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx` (MODIFY)
 - `src/components/feature/subcollections/subcollection-actions.tsx` (MODIFY)
 
 **Changes:**
+
 - Add `data-testid` using `generateTestId` function from `@/lib/test-ids`
 - Use pattern: `subcollection-card`, `subcollection-grid`, `subcollection-actions`
 - Add `role="list"` and `role="listitem"` semantics where appropriate for the grid
@@ -253,11 +279,13 @@ npm run lint:fix && npm run typecheck
 - Add `aria-label` attributes to action buttons and links
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All interactive elements have test IDs
 - [ ] Semantic HTML roles are properly applied
 - [ ] Keyboard navigation works through all elements
@@ -274,10 +302,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` (MODIFY)
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx` (MODIFY)
 
 **Changes:**
+
 - Add `transition-all` and `hover:shadow-lg` to cards following `featured-collections-display.tsx` pattern
 - Ensure `group-hover:scale-105` effect on images with `duration-300` transition
 - Verify color consistency using `text-muted-foreground` and `text-foreground` tokens
@@ -286,11 +316,13 @@ npm run lint:fix && npm run typecheck
 - Test and adjust gap values for optimal visual balance in sidebar context
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hover states are smooth and consistent with other project components
 - [ ] Color scheme matches the overall application theme
 - [ ] Transitions feel natural and performant
@@ -333,11 +365,13 @@ npm run lint:fix && npm run typecheck
 ## File Discovery Results Summary
 
 ### Critical Priority (3 files)
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx`
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections.tsx`
 - `src/components/feature/subcollections/subcollection-actions.tsx`
 
 ### High Priority (8 files)
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/subcollections-skeleton.tsx`
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-sidebar-subcollections-async.tsx`
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-add.tsx`
@@ -348,6 +382,7 @@ npm run lint:fix && npm run typecheck
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection.tsx`
 
 ### Reference Files (Patterns to Follow)
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Modern card grid, hover effects
 - `src/app/(app)/browse/components/browse-collections-table.tsx` - Responsive 2-4 column grid
 - `src/app/(app)/dashboard/collection/(collection)/components/collection-card.tsx` - Card design patterns

@@ -16,6 +16,7 @@ Design and implement a comprehensive homepage redesign for Head Shakers that cre
 ## File Discovery Results
 
 ### Critical Priority (Must Modify)
+
 - `src/app/(app)/(home)/page.tsx` - Current authenticated homepage
 - `src/app/(public)/coming-soon/page.tsx` - Current public landing page
 - `src/app/(public)/layout.tsx` - Public route layout
@@ -23,6 +24,7 @@ Design and implement a comprehensive homepage redesign for Head Shakers that cre
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Featured collections UI
 
 ### High Priority (Likely Modify)
+
 - `src/app/(app)/(home)/components/skeletons/featured-collections-skeleton.tsx` - Loading skeleton
 - `src/app/(app)/(home)/components/featured-collections-error-boundary.tsx` - Error boundary
 - `src/app/(app)/dashboard/feed/page.tsx` - Activity feed page
@@ -33,6 +35,7 @@ Design and implement a comprehensive homepage redesign for Head Shakers that cre
 - `src/lib/queries/collections/collections.query.ts` - Collections queries
 
 ### Medium Priority (Integration/Reference)
+
 - `src/components/layout/app-header/app-header.tsx` - Main header
 - `src/components/ui/auth.tsx` - AuthContent component
 - `src/components/ui/card.tsx`, `carousel.tsx`, `button.tsx`, `like-button.tsx` - UI components
@@ -68,23 +71,28 @@ This plan implements a comprehensive homepage redesign that creates distinct exp
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/types/homepage.types.ts` - Type definitions for homepage data structures
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Create type definitions for `PublicHomepageData`, `AuthenticatedHomepageData`
 - Create types for `TrendingBobblehead`, `FeaturedCollectionCard`, `CollectionSummary`
 - Create types for `ActivityFeedItem`, `RecommendedCollection`
 - Create type definitions for homepage section props
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All type definitions compile without errors
 - [ ] Types are exportable and usable in other files
 - [ ] All validation commands pass
@@ -98,12 +106,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/facades/homepage/homepage.facade.ts` - Main facade for homepage data operations
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Implement `getPublicHomepageData()` method aggregating featured content, trending items, and community stats
 - Implement `getAuthenticatedHomepageData(userId)` method aggregating user collections, activity feed, and recommendations
 - Implement `getTrendingBobbleheads(limit)` method for trending content section
@@ -113,11 +124,13 @@ npm run lint:fix && npm run typecheck
 - Add Sentry breadcrumbs for monitoring
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade methods return properly typed data
 - [ ] Caching is implemented following existing patterns
 - [ ] Error handling follows facade error context patterns
@@ -132,6 +145,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(public)/(home)/components/async/hero-section-async.tsx` - Server component for hero data
 - `src/app/(public)/(home)/components/display/hero-section-display.tsx` - Client display for hero section
 - `src/app/(public)/(home)/components/async/trending-bobbleheads-async.tsx` - Server component for trending data
@@ -143,9 +157,11 @@ npm run lint:fix && npm run typecheck
 - `src/app/(public)/(home)/components/skeletons/community-showcase-skeleton.tsx` - Loading skeleton
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Implement hero section with compelling headline, value proposition, and CTAs
 - Implement trending bobbleheads carousel using existing Carousel component
 - Implement community showcase with collector stats and featured users
@@ -154,11 +170,13 @@ npm run lint:fix && npm run typecheck
 - Use $path for all internal navigation links
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All components follow async/display pattern
 - [ ] Skeleton components match final component layouts
 - [ ] Components use proper TypeScript types
@@ -173,13 +191,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(public)/(home)/page.tsx` - Main public homepage page
 - `src/app/(public)/(home)/error-boundaries/homepage-error-boundary.tsx` - Error boundary for public homepage
 
 **Files to Modify:**
+
 - `src/app/(public)/layout.tsx` - Add public header/footer structure
 
 **Changes:**
+
 - Create page with generateMetadata function for SEO optimization
 - Add JSON-LD structured data using existing seo.constants
 - Implement Suspense boundaries with skeleton components
@@ -189,11 +210,13 @@ npm run lint:fix && npm run typecheck
 - Add clear CTAs directing to authentication
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page renders with proper SEO metadata
 - [ ] JSON-LD structured data is valid
 - [ ] Suspense boundaries show skeletons during loading
@@ -209,6 +232,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/async/collection-summary-async.tsx` - Server component for user's collections
 - `src/app/(app)/(home)/components/display/collection-summary-display.tsx` - Client display for collection summary
 - `src/app/(app)/(home)/components/async/activity-feed-async.tsx` - Server component for activity feed
@@ -223,9 +247,11 @@ npm run lint:fix && npm run typecheck
 - `src/app/(app)/(home)/components/skeletons/quick-actions-skeleton.tsx` - Loading skeleton
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Implement collection summary cards showing user's collections with metrics
 - Implement activity feed showing recent actions from followed collectors
 - Implement recommendations section based on user interests
@@ -235,11 +261,13 @@ npm run lint:fix && npm run typecheck
 - Use $path for all internal navigation links
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All components follow async/display pattern
 - [ ] Components properly fetch and display user-specific data
 - [ ] Skeleton components match final component layouts
@@ -254,9 +282,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Refactor authenticated homepage
 
 **Changes:**
+
 - Restructure page layout with personalized greeting section
 - Add collection summary section using new components
 - Add activity feed section for followed collectors
@@ -267,11 +297,13 @@ npm run lint:fix && npm run typecheck
 - Maintain username onboarding provider functionality
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page displays personalized content for authenticated users
 - [ ] Username onboarding continues to work correctly
 - [ ] All Suspense boundaries function properly
@@ -287,12 +319,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/lib/queries/activity/activity.query.ts` - Activity feed database queries
 
 **Files to Modify:**
+
 - `src/lib/facades/homepage/homepage.facade.ts` - Add activity feed methods
 
 **Changes:**
+
 - Create query to fetch recent activity from followed users
 - Query should aggregate: new bobbleheads added, collections created, likes given
 - Implement pagination support for activity feed
@@ -301,11 +336,13 @@ npm run lint:fix && npm run typecheck
 - Add activity type filtering capabilities
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Activity queries return properly typed data
 - [ ] Queries are performant with proper indexes
 - [ ] Caching is implemented for activity data
@@ -320,12 +357,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/lib/queries/recommendations/recommendations.query.ts` - Recommendation queries
 
 **Files to Modify:**
+
 - `src/lib/facades/homepage/homepage.facade.ts` - Add recommendation methods
 
 **Changes:**
+
 - Implement category-based collection recommendations
 - Implement similar collectors recommendations based on collection overlap
 - Implement trending in categories recommendations
@@ -334,11 +374,13 @@ npm run lint:fix && npm run typecheck
 - Add fallback recommendations for new users with limited data
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Recommendations are relevant to user's interests
 - [ ] New users receive appropriate fallback recommendations
 - [ ] Recommendation queries are performant
@@ -353,9 +395,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/homepage/homepage.facade.ts` - Add community stats methods
 
 **Changes:**
+
 - Implement total collectors count query
 - Implement total bobbleheads count query
 - Implement trending bobbleheads algorithm (based on recent likes, views)
@@ -364,11 +408,13 @@ npm run lint:fix && npm run typecheck
 - Add trending time window configuration
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Community stats are accurate and cached appropriately
 - [ ] Trending algorithm produces meaningful results
 - [ ] Statistics update at reasonable intervals
@@ -383,11 +429,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - All display component files created in previous steps
 - `src/app/(public)/(home)/page.tsx` - Visual refinements
 - `src/app/(app)/(home)/page.tsx` - Visual refinements
 
 **Changes:**
+
 - Apply consistent spacing using Tailwind CSS 4 utilities
 - Implement improved typography hierarchy
 - Add focus indicators for keyboard navigation
@@ -398,11 +446,13 @@ npm run lint:fix && npm run typecheck
 - Add skip navigation links
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All interactive elements are keyboard accessible
 - [ ] Color contrast ratios meet WCAG AA requirements
 - [ ] All images have descriptive alt text
@@ -418,10 +468,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/homepage/homepage.facade.ts` - Add performance monitoring
 - Display components - Add performance optimizations
 
 **Changes:**
+
 - Implement image lazy loading with Cloudinary transformations
 - Add Sentry breadcrumbs for key user interactions
 - Implement performance monitoring for data fetching
@@ -431,11 +483,13 @@ npm run lint:fix && npm run typecheck
 - Implement stale-while-revalidate caching patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page load time under 3 seconds on 3G connection
 - [ ] Largest Contentful Paint (LCP) under 2.5 seconds
 - [ ] Sentry captures meaningful breadcrumbs
@@ -451,9 +505,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/layout/app-header/app-header.tsx` - Update home link behavior
 
 **Changes:**
+
 - Update home link to properly route based on auth state
 - Ensure logo click navigates to appropriate homepage
 - Update any breadcrumb components to include new routes
@@ -461,11 +517,13 @@ npm run lint:fix && npm run typecheck
 - Add proper active state indicators for navigation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation correctly routes to appropriate homepage based on auth state
 - [ ] All internal links use $path routing
 - [ ] Breadcrumbs display correctly
@@ -488,17 +546,20 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Architecture Decisions:**
+
 - The plan follows the existing async/display component pattern for consistency
 - HomepageFacade centralizes all homepage-related business logic
 - Activity feed requires new database queries but uses existing follows schema
 - Recommendations are based on existing collection categories and social data
 
 **Potential Risks:**
+
 - Activity feed queries may need database index optimization for performance at scale
 - Recommendation algorithm quality depends on available user data
 - Public homepage content relies on having sufficient featured content in the database
 
 **Assumptions:**
+
 - The existing FeaturedContentFacade methods are working correctly
 - Cloudinary integration is properly configured and functional
 - The follows schema supports the activity feed requirements

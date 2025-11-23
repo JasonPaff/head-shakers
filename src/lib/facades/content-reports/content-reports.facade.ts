@@ -2,7 +2,7 @@ import type { z } from 'zod';
 
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type { InsertContentReport, SelectContentReport } from '@/lib/validations/moderation.validation';
+import type { SelectContentReport } from '@/lib/validations/moderation.validation';
 import type {
   adminBulkUpdateReportsSchema,
   adminReportsFilterSchema,
@@ -16,7 +16,6 @@ type AdminUpdateReportInput = z.infer<typeof adminUpdateReportSchema>;
 type CreateContentReportInput = z.infer<typeof createContentReportSchema>;
 
 import { ENUMS, OPERATIONS } from '@/lib/constants';
-import { db } from '@/lib/db';
 import { createProtectedQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
@@ -34,16 +33,6 @@ export interface RateLimitStatus {
   isAllowed: boolean;
   nextAllowedTime?: Date;
   reportsToday: number;
-}
-
-export interface ReportCreationResult {
-  report: SelectContentReport;
-  wasCreated: boolean;
-}
-
-export interface ReportExistenceResult {
-  existingReportId?: string;
-  isAlreadyReported: boolean;
 }
 
 export interface ReportValidationResult {
@@ -87,66 +76,40 @@ export class ContentReportsFacade {
   }
 
   /**
-   * check if the user has already reported this target
+   * Check if the user can create new reports (rate-limiting)
+   * Uses actual database query to count reports from last 24 hours
    */
-  static checkExistingReport(
-    targetId: string,
-    targetType: string,
-    userId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<ReportExistenceResult> {
+  static async checkRateLimitAsync(userId: string, dbInstance?: DatabaseExecutor): Promise<RateLimitStatus> {
     try {
-      createUserQueryContext(userId, { dbInstance });
+      const context = createUserQueryContext(userId, { dbInstance });
 
-      // this will be implemented when we create the queries
-      // for now, return default values
-      return Promise.resolve({
-        isAlreadyReported: false,
-      });
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { targetId, targetType },
-        facade: facadeName,
-        method: 'checkExistingReport',
-        operation: OPERATIONS.MODERATION.CHECK_EXISTING_REPORT,
-        userId,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  /**
-   * check if the user can create new reports (rate-limiting)
-   */
-  static checkRateLimit(userId: string, dbInstance?: DatabaseExecutor): Promise<RateLimitStatus> {
-    try {
-      createUserQueryContext(userId, { dbInstance });
-
-      // get reports from last 24 hours
-      const today = new Date();
-
-      // this will be implemented when we create the queries
-      // for now, return allowing reports
-      const reportsToday = 0;
+      // Get reports from last 24 hours using the query layer
+      const recentReports = await ContentReportsQuery.getRecentReportsByUserAsync(userId, 24, context);
+      const reportsToday = recentReports.length;
 
       if (reportsToday >= this.DAILY_REPORT_LIMIT) {
-        return Promise.resolve({
+        // Calculate next allowed time based on oldest report in window
+        const oldestReport = recentReports[recentReports.length - 1];
+        const oldestReportTime = oldestReport?.createdAt ?? new Date();
+        const nextAllowedTime = new Date(oldestReportTime.getTime() + 24 * 60 * 60 * 1000);
+
+        return {
           dailyLimit: this.DAILY_REPORT_LIMIT,
           isAllowed: false,
-          nextAllowedTime: new Date(today.getTime() + 24 * 60 * 60 * 1000),
+          nextAllowedTime,
           reportsToday,
-        });
+        };
       }
 
-      return Promise.resolve({
+      return {
         dailyLimit: this.DAILY_REPORT_LIMIT,
         isAllowed: true,
         reportsToday,
-      });
+      };
     } catch (error) {
       const context: FacadeErrorContext = {
         facade: facadeName,
-        method: 'checkRateLimit',
+        method: 'checkRateLimitAsync',
         operation: OPERATIONS.MODERATION.CHECK_RATE_LIMIT,
         userId,
       };
@@ -181,56 +144,6 @@ export class ContentReportsFacade {
         facade: facadeName,
         method: 'checkReportRateLimitAsync',
         operation: OPERATIONS.MODERATION.CHECK_RATE_LIMIT,
-      };
-      throw createFacadeError(context, error);
-    }
-  }
-
-  /**
-   * create a new content report with comprehensive validation
-   */
-  static async createReport(
-    data: InsertContentReport,
-    userId: string,
-    dbInstance: DatabaseExecutor = db,
-  ): Promise<ReportCreationResult> {
-    try {
-      return await (dbInstance ?? db).transaction(async (tx) => {
-        createProtectedQueryContext(userId, { dbInstance: tx });
-
-        // validate rate limiting
-        const rateLimitStatus = await this.checkRateLimit(userId, tx);
-        if (!rateLimitStatus.isAllowed) {
-          throw new Error(
-            `Daily report limit exceeded. You can create ${rateLimitStatus.dailyLimit} reports per day.`,
-          );
-        }
-
-        // validate target exists and can be reported
-        const validation = await this.validateReportTarget(data.targetId, data.targetType, userId, tx);
-
-        if (!validation.isValid) {
-          throw new Error(validation.reason || 'Invalid report target');
-        }
-
-        // check for an existing report
-        const existingReport = await this.checkExistingReport(data.targetId, data.targetType, userId, tx);
-
-        if (existingReport.isAlreadyReported) {
-          throw new Error('You have already reported this content');
-        }
-
-        // create the report - this will be implemented when we create the queries
-        // for now, throw an error indicating the query layer is needed
-        throw new Error('ContentReportsQuery not yet implemented');
-      });
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { reason: data.reason, targetId: data.targetId, targetType: data.targetType },
-        facade: facadeName,
-        method: 'createReport',
-        operation: OPERATIONS.MODERATION.CREATE_REPORT,
-        userId,
       };
       throw createFacadeError(context, error);
     }

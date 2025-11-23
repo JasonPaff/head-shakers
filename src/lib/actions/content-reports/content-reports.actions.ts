@@ -33,12 +33,12 @@ export const createContentReportAction = rateLimitedAuthClient
     isTransactionRequired: true,
   })
   .inputSchema(createContentReportSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const reportData = parsedInput;
+  .action(async ({ ctx }) => {
+    const reportData = createContentReportSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
     Sentry.setContext(SENTRY_CONTEXTS.CONTENT_REPORT, {
-      input: parsedInput,
+      input: reportData,
       reason: reportData.reason,
       targetId: reportData.targetId,
       targetType: reportData.targetType,
@@ -107,7 +107,7 @@ export const createContentReportAction = rateLimitedAuthClient
       }
 
       return handleActionError(error, {
-        input: parsedInput,
+        input: reportData,
         metadata: {
           actionName: ACTION_NAMES.MODERATION.CREATE_REPORT,
           reason: reportData.reason,
@@ -126,8 +126,9 @@ export const checkReportStatusAction = authActionClient
     isTransactionRequired: false,
   })
   .inputSchema(checkReportStatusSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { targetId, targetType } = parsedInput;
+  .action(async ({ ctx }) => {
+    const statusInput = checkReportStatusSchema.parse(ctx.sanitizedInput);
+    const { targetId, targetType } = statusInput;
     const userId = ctx.userId;
 
     try {
@@ -144,7 +145,7 @@ export const checkReportStatusAction = authActionClient
       };
     } catch (error) {
       return handleActionError(error, {
-        input: parsedInput,
+        input: statusInput,
         metadata: {
           actionName: ACTION_NAMES.MODERATION.CHECK_REPORT_STATUS,
         },

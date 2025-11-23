@@ -17,38 +17,38 @@ Implement a guided onboarding experience for new users that introduces them to t
 
 ### Critical - Must Create
 
-| File | Action |
-|------|--------|
-| `src/lib/db/schema/users.schema.ts` | MODIFY - add hasCompletedOnboarding |
-| `src/components/feature/onboarding/` | CREATE directory |
-| `src/components/feature/onboarding/onboarding-wizard.tsx` | CREATE |
-| `src/components/feature/onboarding/onboarding-provider.tsx` | CREATE |
-| `src/components/feature/onboarding/onboarding-progress.tsx` | CREATE |
-| `src/components/feature/onboarding/steps/create-collection-step.tsx` | CREATE |
-| `src/components/feature/onboarding/steps/subcollection-intro-step.tsx` | CREATE |
-| `src/components/feature/onboarding/steps/add-bobblehead-step.tsx` | CREATE |
-| `src/lib/actions/onboarding/onboarding.actions.ts` | CREATE |
-| `src/lib/facades/onboarding/onboarding.facade.ts` | CREATE |
-| `src/lib/validations/onboarding.validation.ts` | CREATE |
+| File                                                                   | Action                              |
+| ---------------------------------------------------------------------- | ----------------------------------- |
+| `src/lib/db/schema/users.schema.ts`                                    | MODIFY - add hasCompletedOnboarding |
+| `src/components/feature/onboarding/`                                   | CREATE directory                    |
+| `src/components/feature/onboarding/onboarding-wizard.tsx`              | CREATE                              |
+| `src/components/feature/onboarding/onboarding-provider.tsx`            | CREATE                              |
+| `src/components/feature/onboarding/onboarding-progress.tsx`            | CREATE                              |
+| `src/components/feature/onboarding/steps/create-collection-step.tsx`   | CREATE                              |
+| `src/components/feature/onboarding/steps/subcollection-intro-step.tsx` | CREATE                              |
+| `src/components/feature/onboarding/steps/add-bobblehead-step.tsx`      | CREATE                              |
+| `src/lib/actions/onboarding/onboarding.actions.ts`                     | CREATE                              |
+| `src/lib/facades/onboarding/onboarding.facade.ts`                      | CREATE                              |
+| `src/lib/validations/onboarding.validation.ts`                         | CREATE                              |
 
 ### High Priority - Pattern Reference
 
-| File | Relevance |
-|------|-----------|
-| `src/components/feature/users/username-onboarding-provider.tsx` | Provider pattern |
-| `src/components/feature/users/username-setup-dialog.tsx` | Multi-step dialog |
-| `src/components/feature/collections/collection-create-dialog.tsx` | Form patterns |
+| File                                                              | Relevance         |
+| ----------------------------------------------------------------- | ----------------- |
+| `src/components/feature/users/username-onboarding-provider.tsx`   | Provider pattern  |
+| `src/components/feature/users/username-setup-dialog.tsx`          | Multi-step dialog |
+| `src/components/feature/collections/collection-create-dialog.tsx` | Form patterns     |
 
 ### Medium Priority - Modify
 
-| File | Action |
-|------|--------|
-| `src/app/(app)/(home)/page.tsx` | Add OnboardingProvider |
-| `src/app/(app)/settings/profile/page.tsx` | Add restart option |
-| `src/lib/constants/action-names.ts` | Add ONBOARDING |
-| `src/lib/constants/operations.ts` | Add ONBOARDING |
-| `src/lib/constants/error-codes.ts` | Add ONBOARDING |
-| `src/lib/facades/users/users.facade.ts` | Add onboarding methods |
+| File                                      | Action                 |
+| ----------------------------------------- | ---------------------- |
+| `src/app/(app)/(home)/page.tsx`           | Add OnboardingProvider |
+| `src/app/(app)/settings/profile/page.tsx` | Add restart option     |
+| `src/lib/constants/action-names.ts`       | Add ONBOARDING         |
+| `src/lib/constants/operations.ts`         | Add ONBOARDING         |
+| `src/lib/constants/error-codes.ts`        | Add ONBOARDING         |
+| `src/lib/facades/users/users.facade.ts`   | Add onboarding methods |
 
 ---
 
@@ -81,6 +81,7 @@ Implement a guided onboarding experience for new users that introduces them to t
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/action-names.ts` - Add ONBOARDING action names
 - `src/lib/constants/operations.ts` - Add ONBOARDING operations
 - `src/lib/constants/error-codes.ts` - Add ONBOARDING error codes
@@ -88,6 +89,7 @@ Implement a guided onboarding experience for new users that introduces them to t
 - `src/lib/constants/defaults.ts` - Add ONBOARDING defaults
 
 **Changes:**
+
 - Add `ONBOARDING` section to ACTION_NAMES with: COMPLETE_ONBOARDING, RESET_ONBOARDING, GET_ONBOARDING_STATUS
 - Add `ONBOARDING` section to OPERATIONS with: complete_onboarding, reset_onboarding, get_onboarding_status
 - Add `ONBOARDING` section to ERROR_CODES with: COMPLETE_FAILED, RESET_FAILED, STATUS_CHECK_FAILED
@@ -95,11 +97,13 @@ Implement a guided onboarding experience for new users that introduces them to t
 - Add `ONBOARDING` section to DEFAULTS with: HAS_COMPLETED_ONBOARDING: false
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All constant files updated with ONBOARDING sections
 - [ ] Type exports updated to include new constants
 - [ ] All validation commands pass
@@ -113,18 +117,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/users.schema.ts` - Add hasCompletedOnboarding column to userSettings table
 
 **Changes:**
+
 - Add `hasCompletedOnboarding` boolean field to `userSettings` table with default value of `false`
 - Place field after existing boolean fields following alphabetical ordering convention
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] hasCompletedOnboarding column added to userSettings table schema
 - [ ] Default value set to false using DEFAULTS constant
 - [ ] All validation commands pass
@@ -138,19 +146,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - New migration file will be auto-generated in `src/lib/db/migrations/`
 
 **Changes:**
+
 - Run migration generation to create SQL migration file
 - Execute migration against development database
 - Verify migration applied successfully
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate && npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file generated successfully
 - [ ] Migration applied to development database
 - [ ] Column exists in userSettings table with correct default value
@@ -164,19 +176,23 @@ npm run db:generate && npm run db:migrate
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/onboarding.validation.ts`
 
 **Changes:**
+
 - Create schema for completing onboarding with step tracking
 - Create schema for resetting onboarding status
 - Export all necessary types using drizzle-zod patterns from collections.validation.ts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Validation schemas created following existing patterns
 - [ ] Type exports properly defined
 - [ ] All validation commands pass
@@ -190,20 +206,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/facades/onboarding/onboarding.facade.ts`
 
 **Changes:**
+
 - Create static methods: getOnboardingStatusAsync, completeOnboardingAsync, resetOnboardingAsync
 - Implement database queries to check and update hasCompletedOnboarding field
 - Add Sentry breadcrumbs and error handling following CollectionsFacade patterns
 - Use CacheService for caching onboarding status
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] OnboardingFacade class created with all required methods
 - [ ] Error handling matches existing facade patterns
 - [ ] Sentry integration added for observability
@@ -218,9 +238,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/onboarding/onboarding.actions.ts`
 
 **Changes:**
+
 - Create completeOnboardingAction using authActionClient
 - Create resetOnboardingAction using authActionClient
 - Create getOnboardingStatusAction using authActionClient
@@ -228,11 +250,13 @@ npm run lint:fix && npm run typecheck
 - Use ctx.sanitizedInput parsed through Zod schema per project rules
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All three server actions created
 - [ ] Actions use authActionClient for authentication
 - [ ] Error handling follows existing patterns
@@ -247,20 +271,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/onboarding/onboarding-progress.tsx`
 
 **Changes:**
+
 - Create client component with step indicators (3 steps total)
 - Style using Tailwind CSS 4 with proper responsive design
 - Accept current step and total steps as props
 - Add step labels: "Create Collection", "Subcollections", "Add Bobblehead"
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Progress component displays current step visually
 - [ ] Component is accessible with proper ARIA attributes
 - [ ] Styling matches existing UI patterns
@@ -275,9 +303,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/onboarding/steps/create-collection-step.tsx`
 
 **Changes:**
+
 - Create client component with TanStack React Form integration
 - Include name field (required), description field (optional), cover image upload via Cloudinary
 - Add isPublic toggle switch
@@ -285,11 +315,13 @@ npm run lint:fix && npm run typecheck
 - Add onComplete callback prop for advancing to next step
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form includes all required fields for collection creation
 - [ ] Cloudinary upload integration working
 - [ ] Form validation matches insertCollectionSchema
@@ -304,9 +336,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/onboarding/steps/subcollection-intro-step.tsx`
 
 **Changes:**
+
 - Create informational component explaining subcollection benefits
 - Include visual diagram or illustration of collection hierarchy
 - Add "Skip" and "Continue" buttons
@@ -314,11 +348,13 @@ npm run lint:fix && npm run typecheck
 - Make this step educational rather than action-required
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Clear explanation of subcollection purpose and benefits
 - [ ] User can proceed without creating a subcollection
 - [ ] Styling consistent with other wizard steps
@@ -333,9 +369,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/feature/onboarding/steps/add-bobblehead-step.tsx`
 
 **Changes:**
+
 - Create client component with TanStack React Form integration
 - Include essential fields: name, photos (Cloudinary), acquisition details, specifications
 - Pre-select the collection created in step 1
@@ -343,11 +381,13 @@ npm run lint:fix && npm run typecheck
 - Add skip option for users who want to add bobbleheads later
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form includes essential bobblehead fields
 - [ ] Collection from step 1 is pre-selected
 - [ ] Photo upload via Cloudinary works correctly
@@ -363,9 +403,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/onboarding/onboarding-wizard.tsx`
 
 **Changes:**
+
 - Create client component using Radix UI Dialog for modal overlay
 - Manage current step state and step data persistence
 - Implement navigation controls (Next, Back, Skip)
@@ -375,11 +417,13 @@ npm run lint:fix && npm run typecheck
 - Style with Tailwind CSS 4
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Wizard displays correct step content based on state
 - [ ] Navigation between steps works correctly
 - [ ] Completion triggers server action to update database
@@ -395,9 +439,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/feature/onboarding/onboarding-provider.tsx`
 
 **Changes:**
+
 - Create client component following username-onboarding-provider.tsx pattern
 - Accept hasCompletedOnboarding prop from server
 - Manage local state for wizard visibility
@@ -405,11 +451,13 @@ npm run lint:fix && npm run typecheck
 - Render OnboardingWizard when conditions are met
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Provider correctly determines when to show wizard
 - [ ] LocalStorage integration for session persistence
 - [ ] Follows existing username onboarding provider pattern
@@ -424,20 +472,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Add onboarding provider
 
 **Changes:**
+
 - Import OnboardingProvider component
 - Fetch hasCompletedOnboarding status from userSettings via UsersFacade
 - Add OnboardingProvider below UsernameOnboardingProvider (onboarding should occur after username setup)
 - Pass necessary props (hasCompletedOnboarding status)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] OnboardingProvider renders on home page for authenticated users
 - [ ] Onboarding shows after username onboarding completes
 - [ ] Page loads correctly without errors
@@ -452,9 +504,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/settings/profile/page.tsx` - Add restart onboarding card
 
 **Changes:**
+
 - Add new Card component section for "Onboarding"
 - Include button to trigger resetOnboardingAction
 - Add confirmation dialog before resetting
@@ -462,11 +516,13 @@ npm run lint:fix && npm run typecheck
 - Use useServerAction hook for reset action
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Restart onboarding card visible in profile settings
 - [ ] Reset button triggers server action correctly
 - [ ] Confirmation dialog prevents accidental resets
@@ -482,19 +538,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/users/users.facade.ts` - Add onboarding-related methods
 
 **Changes:**
+
 - Add getUserWithOnboardingStatus method to fetch user with settings including hasCompletedOnboarding
 - Add getOnboardingStatus helper method for quick status check
 - Update existing getUserById to optionally include settings
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New methods properly query userSettings table
 - [ ] Caching integrated for performance
 - [ ] Follows existing UsersFacade patterns
@@ -509,20 +569,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Verify:**
+
 - Directory structure: `src/components/feature/onboarding/`
 - Directory structure: `src/components/feature/onboarding/steps/`
 
 **Changes:**
+
 - Verify all component files are in correct locations
 - Ensure imports use direct file paths (not barrel imports)
 - Add appropriate JSDoc comments to main components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All files in correct directory structure
 - [ ] No index.ts barrel files created
 - [ ] Direct imports used throughout
@@ -537,23 +601,27 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Verify:**
+
 - All created onboarding files
 - Modified home page
 - Modified profile settings page
 - Database migration applied
 
 **Changes:**
+
 - Run full build to verify no compilation errors
 - Run type check across entire codebase
 - Run lint fix to ensure code style compliance
 - Verify development server starts correctly
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] Full build completes without errors
 - [ ] All TypeScript types resolve correctly
 - [ ] Lint passes with no warnings
