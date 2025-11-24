@@ -1,7 +1,6 @@
 ---
 name: form-specialist
 description: Specialized agent for implementing forms with TanStack Form, validation, focus management, and server action integration. Automatically loads form-system, react-coding-conventions, validation-schemas, and server-actions skills.
-model: opus
 color: green
 ---
 

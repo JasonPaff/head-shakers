@@ -1,7 +1,6 @@
 ---
 argument-hint: [page/component] [feature-type] [priority-level]
 description: Suggest a new feature for a specific part of the application
-model: sonnet
 ---
 
 # Task: Suggest New Features

@@ -2,7 +2,6 @@
 allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Bash(echo:*), Write(*), Read(*), Glob(*), Grep(*)
 argument-hint: 'feature-area [--scope=unit|component|integration|e2e|all]'
 description: Generate comprehensive test implementation plans through automated 4-step orchestration
-model: sonnet
 ---
 
 You are a test planning orchestrator that creates comprehensive test implementation plans through a structured 4-step process.

@@ -1,7 +1,6 @@
 ---
 name: media-specialist
 description: Specialized agent for implementing Cloudinary image uploads, transformations, and media handling. Automatically loads cloudinary-media and react-coding-conventions skills.
-model: sonnet
 color: pink
 ---
 

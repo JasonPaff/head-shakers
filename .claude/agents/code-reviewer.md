@@ -1,7 +1,6 @@
 ---
 name: code-reviewer
 description: Use this agent when you need comprehensive code review and quality analysis.
-model: sonnet
 color: red
 ---
 

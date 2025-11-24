@@ -1,7 +1,6 @@
 ---
 name: implementation-planner
 description: Use PROACTIVELY to create comprehensive implementation plans for new features, complex refactoring, or multi-step development tasks. Analyzes codebase architecture and creates detailed, actionable development plans with clear validation checkpoints.
-model: sonnet
 color: blue
 ---
 

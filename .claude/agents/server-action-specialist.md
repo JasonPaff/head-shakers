@@ -1,7 +1,6 @@
 ---
 name: server-action-specialist
 description: Specialized agent for implementing server actions with next-safe-action. Automatically loads server-actions, sentry-monitoring, and validation-schemas skills for consistent patterns.
-model: opus
 color: orange
 ---
 

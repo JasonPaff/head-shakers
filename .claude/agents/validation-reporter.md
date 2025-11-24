@@ -1,7 +1,6 @@
 ---
 name: validation-reporter
 description: Head Shakers validation report aggregator. Combines results from all validation phases (static analysis, conventions, tests, code review, UI, database) into a comprehensive scored report with prioritized recommendations.
-model: sonnet
 color: red
 allowed-tools: Read(*), Write(*), Bash(mkdir:*)
 ---

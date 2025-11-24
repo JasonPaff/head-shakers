@@ -1,7 +1,6 @@
 ---
 name: test-specialist
 description: Specialized agent for implementing tests with Vitest, Testing Library, and Playwright. Automatically loads testing-patterns skill for consistent test structure.
-model: opus
 color: red
 ---
 

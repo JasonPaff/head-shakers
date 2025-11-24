@@ -1,7 +1,6 @@
 ---
 name: react-component-specialist
 description: Specialized agent for implementing React components with proper conventions, Radix UI integration, and accessibility. Automatically loads react-coding-conventions and ui-components skills.
-model: opus
 color: blue
 ---
 

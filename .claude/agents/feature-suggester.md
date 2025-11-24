@@ -1,7 +1,6 @@
 ---
 name: feature-suggester
 description: Intelligent feature suggestion agent that analyzes codebase patterns, identifies gaps, and recommends high-impact features across quick-win, strategic, and experimental categories.
-model: sonnet
 color: purple
 ---
 

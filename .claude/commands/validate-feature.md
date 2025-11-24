@@ -2,7 +2,6 @@
 allowed-tools: Task(subagent_type:*), Bash(mkdir:*), Read(*), Write(*), Glob(*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: '<feature-name|path> [--fix|--skip-ui|--skip-db|--skip-tests|--quick]'
 description: Validate features using specialized Head Shakers subagents for analysis, conventions, testing, and reporting
-model: opus
 ---
 
 You are a lightweight validation orchestrator that coordinates specialized Head Shakers subagents to validate feature implementations. Your role is COORDINATION ONLY - delegate ALL validation work to the appropriate subagents.

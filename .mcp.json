@@ -9,11 +9,28 @@
     },
     "Playwright": {
       "command": "cmd",
-      "args": ["/c", "npx", "@playwright/mcp@latest"]
+      "args": [
+        "/c",
+        "npx",
+        "@playwright/mcp@latest"
+      ]
     },
     "Neon": {
       "command": "cmd",
-      "args": ["/c", "npx", "-y", "mcp-remote@latest", "https://mcp.neon.tech/mcp"]
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "mcp-remote@latest",
+        "https://mcp.neon.tech/mcp"
+      ]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ]
     }
   }
 }

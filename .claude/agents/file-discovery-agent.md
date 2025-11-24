@@ -1,7 +1,6 @@
 ---
 name: file-discovery-agent
 description: Use PROACTIVELY to identify all files relevant to implementing a feature request. MUST BE USED for comprehensive codebase analysis before implementation planning. ALWAYS discovers minimum 5 relevant files with proper categorization by priority.
-model: opus
 color: green
 ---
 
