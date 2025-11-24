@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/enums';
 import type { AdminReportsFilterOptions } from '@/lib/queries/content-reports/content-reports.query';
 
+import { AdminReportsClient } from '@/components/admin/reports/admin-reports-client';
 import { ReportFilters } from '@/components/admin/reports/report-filters';
-import { ReportsTable } from '@/components/admin/reports/reports-table';
 import { Card } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
@@ -137,7 +137,7 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
       {/* Reports Table Section */}
       <div className={'space-y-6'}>
         <Conditional isCondition={_hasReports}>
-          <ReportsTable data={reports} totalCount={totalCount} />
+          <AdminReportsClient initialData={reports} totalCount={totalCount} />
         </Conditional>
 
         {/* Empty State */}

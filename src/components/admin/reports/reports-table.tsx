@@ -4,7 +4,7 @@ import type { ColumnDef, RowSelectionState, SortingState } from '@tanstack/react
 import type { ComponentPropsWithRef } from 'react';
 
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowDownIcon, ArrowUpIcon, EyeIcon, MoreVerticalIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, EyeIcon, MoreVerticalIcon, XIcon } from 'lucide-react';
 import { parseAsInteger, useQueryStates } from 'nuqs';
 import { useMemo, useState } from 'react';
 
@@ -299,6 +299,10 @@ export const ReportsTable = ({
     setRowSelection({});
   };
 
+  const handleClearSelection = () => {
+    setRowSelection({});
+  };
+
   // Derived variables for conditional rendering
   const _hasNoResults = table.getRowModel().rows?.length === 0;
   const _hasSelectedRows = Object.keys(rowSelection).length > 0;
@@ -314,8 +318,19 @@ export const ReportsTable = ({
       {/* Bulk Actions Bar */}
       <Conditional isCondition={_hasSelectedRows}>
         <div className={'flex items-center justify-between rounded-lg border bg-muted/50 p-4'}>
-          <div className={'text-sm font-medium'}>
-            {_selectedCount} {_selectedCount === 1 ? 'report' : 'reports'} selected
+          <div className={'flex items-center gap-3'}>
+            <div className={'text-sm font-medium'}>
+              {_selectedCount} {_selectedCount === 1 ? 'report' : 'reports'} selected
+            </div>
+            <Button
+              aria-label={'Clear selection'}
+              onClick={handleClearSelection}
+              size={'sm'}
+              variant={'ghost'}
+            >
+              <XIcon aria-hidden className={'mr-1 size-4'} />
+              Clear
+            </Button>
           </div>
           <div className={'flex gap-2'}>
             <Button

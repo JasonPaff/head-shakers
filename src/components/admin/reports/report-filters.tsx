@@ -4,6 +4,7 @@ import type { ComponentPropsWithRef } from 'react';
 
 import { format } from 'date-fns';
 import { CalendarIcon, FilterIcon, XIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { parseAsArrayOf, parseAsIsoDateTime, parseAsStringEnum, useQueryStates } from 'nuqs';
 
 import { Badge } from '@/components/ui/badge';
@@ -26,6 +27,7 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
   // (none for this component - using nuqs for state)
 
   // Other hooks
+  const router = useRouter();
   const [filters, setFilters] = useQueryStates(
     {
       dateFrom: parseAsIsoDateTime,
@@ -46,14 +48,15 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
   // (none needed for this component)
 
   // Event handlers
-  const handleStatusChange = (value: string) => {
+  const handleStatusChange = async (value: string) => {
     const currentStatus = filters.status || [];
     const newStatus =
       currentStatus.includes(value as (typeof ENUMS.CONTENT_REPORT.STATUS)[number]) ?
         currentStatus.filter((s) => s !== value)
       : [...currentStatus, value as (typeof ENUMS.CONTENT_REPORT.STATUS)[number]];
 
-    void setFilters({ status: newStatus.length > 0 ? newStatus : null });
+    await setFilters({ status: newStatus.length > 0 ? newStatus : null });
+    router.refresh();
     onFiltersChange?.(
       newStatus.length > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -63,14 +66,15 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleTargetTypeChange = (value: string) => {
+  const handleTargetTypeChange = async (value: string) => {
     const currentTypes = filters.targetType || [];
     const newTypes =
       currentTypes.includes(value as 'bobblehead' | 'collection' | 'comment' | 'subcollection') ?
         currentTypes.filter((t) => t !== value)
       : [...currentTypes, value as 'bobblehead' | 'collection' | 'comment' | 'subcollection'];
 
-    void setFilters({ targetType: newTypes.length > 0 ? newTypes : null });
+    await setFilters({ targetType: newTypes.length > 0 ? newTypes : null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         newTypes.length > 0 ||
@@ -80,14 +84,15 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleReasonChange = (value: string) => {
+  const handleReasonChange = async (value: string) => {
     const currentReasons = filters.reason || [];
     const newReasons =
       currentReasons.includes(value as (typeof ENUMS.CONTENT_REPORT.REASON)[number]) ?
         currentReasons.filter((r) => r !== value)
       : [...currentReasons, value as (typeof ENUMS.CONTENT_REPORT.REASON)[number]];
 
-    void setFilters({ reason: newReasons.length > 0 ? newReasons : null });
+    await setFilters({ reason: newReasons.length > 0 ? newReasons : null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -97,8 +102,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleDateFromSelect = (date: Date | undefined) => {
-    void setFilters({ dateFrom: date || null });
+  const handleDateFromSelect = async (date: Date | undefined) => {
+    await setFilters({ dateFrom: date || null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -108,8 +114,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleDateToSelect = (date: Date | undefined) => {
-    void setFilters({ dateTo: date || null });
+  const handleDateToSelect = async (date: Date | undefined) => {
+    await setFilters({ dateTo: date || null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -119,20 +126,22 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleClearFilters = () => {
-    void setFilters({
+  const handleClearFilters = async () => {
+    await setFilters({
       dateFrom: null,
       dateTo: null,
       reason: null,
       status: null,
       targetType: null,
     });
+    router.refresh();
     onFiltersChange?.(false);
   };
 
-  const handleRemoveStatus = (value: string) => {
+  const handleRemoveStatus = async (value: string) => {
     const newStatus = (filters.status || []).filter((s) => s !== value);
-    void setFilters({ status: newStatus.length > 0 ? newStatus : null });
+    await setFilters({ status: newStatus.length > 0 ? newStatus : null });
+    router.refresh();
     onFiltersChange?.(
       newStatus.length > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -142,9 +151,10 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleRemoveTargetType = (value: string) => {
+  const handleRemoveTargetType = async (value: string) => {
     const newTypes = (filters.targetType || []).filter((t) => t !== value);
-    void setFilters({ targetType: newTypes.length > 0 ? newTypes : null });
+    await setFilters({ targetType: newTypes.length > 0 ? newTypes : null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         newTypes.length > 0 ||
@@ -154,9 +164,10 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleRemoveReason = (value: string) => {
+  const handleRemoveReason = async (value: string) => {
     const newReasons = (filters.reason || []).filter((r) => r !== value);
-    void setFilters({ reason: newReasons.length > 0 ? newReasons : null });
+    await setFilters({ reason: newReasons.length > 0 ? newReasons : null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -166,8 +177,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleClearDateFrom = () => {
-    void setFilters({ dateFrom: null });
+  const handleClearDateFrom = async () => {
+    await setFilters({ dateFrom: null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
@@ -176,8 +188,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
     );
   };
 
-  const handleClearDateTo = () => {
-    void setFilters({ dateTo: null });
+  const handleClearDateTo = async () => {
+    await setFilters({ dateTo: null });
+    router.refresh();
     onFiltersChange?.(
       (filters.status?.length ?? 0) > 0 ||
         (filters.targetType?.length ?? 0) > 0 ||
