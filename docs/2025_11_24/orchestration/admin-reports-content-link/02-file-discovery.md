@@ -19,41 +19,41 @@ The admin reports table should include a dedicated column that displays a dynami
 
 ### Critical (Must Modify)
 
-| File | Relevance | Action |
-|------|-----------|--------|
-| `src/components/admin/reports/reports-table.tsx` | Main table component - add new column | MODIFY |
-| `src/lib/queries/content-reports/content-reports.query.ts` | Query needs to return slug info | MODIFY |
+| File                                                       | Relevance                             | Action |
+| ---------------------------------------------------------- | ------------------------------------- | ------ |
+| `src/components/admin/reports/reports-table.tsx`           | Main table component - add new column | MODIFY |
+| `src/lib/queries/content-reports/content-reports.query.ts` | Query needs to return slug info       | MODIFY |
 
 ### High Priority (Understanding)
 
-| File | Relevance | Action |
-|------|-----------|--------|
-| `src/lib/validations/moderation.validation.ts` | SelectContentReport type definition | POSSIBLY MODIFY |
-| `src/lib/db/schema/moderation.schema.ts` | Schema with targetId/targetType | REFERENCE |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts` | Bobblehead route params | REFERENCE |
-| `src/app/(app)/collections/[collectionSlug]/(collection)/route-type.ts` | Collection route params | REFERENCE |
-| `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type.ts` | Subcollection route params | REFERENCE |
-| `src/app/(app)/users/[userId]/route-type.ts` | User profile route params | REFERENCE |
+| File                                                                                         | Relevance                           | Action          |
+| -------------------------------------------------------------------------------------------- | ----------------------------------- | --------------- |
+| `src/lib/validations/moderation.validation.ts`                                               | SelectContentReport type definition | POSSIBLY MODIFY |
+| `src/lib/db/schema/moderation.schema.ts`                                                     | Schema with targetId/targetType     | REFERENCE       |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/route-type.ts`                      | Bobblehead route params             | REFERENCE       |
+| `src/app/(app)/collections/[collectionSlug]/(collection)/route-type.ts`                      | Collection route params             | REFERENCE       |
+| `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type.ts` | Subcollection route params          | REFERENCE       |
+| `src/app/(app)/users/[userId]/route-type.ts`                                                 | User profile route params           | REFERENCE       |
 
 ### Medium Priority (Reference)
 
-| File | Relevance | Action |
-|------|-----------|--------|
-| `src/components/admin/analytics/trending-content-table.tsx` | **KEY PATTERN** - getContentLink() implementation | REFERENCE |
-| `src/components/admin/reports/admin-reports-client.tsx` | Parent component | POSSIBLY MODIFY |
-| `src/components/admin/reports/report-detail-dialog.tsx` | Could add link here too | POSSIBLY MODIFY |
-| `src/app/(app)/admin/reports/page.tsx` | Server component | POSSIBLY MODIFY |
-| `src/lib/facades/content-reports/content-reports.facade.ts` | Business logic layer | POSSIBLY MODIFY |
+| File                                                        | Relevance                                         | Action          |
+| ----------------------------------------------------------- | ------------------------------------------------- | --------------- |
+| `src/components/admin/analytics/trending-content-table.tsx` | **KEY PATTERN** - getContentLink() implementation | REFERENCE       |
+| `src/components/admin/reports/admin-reports-client.tsx`     | Parent component                                  | POSSIBLY MODIFY |
+| `src/components/admin/reports/report-detail-dialog.tsx`     | Could add link here too                           | POSSIBLY MODIFY |
+| `src/app/(app)/admin/reports/page.tsx`                      | Server component                                  | POSSIBLY MODIFY |
+| `src/lib/facades/content-reports/content-reports.facade.ts` | Business logic layer                              | POSSIBLY MODIFY |
 
 ### Low Priority (Context)
 
-| File | Relevance | Action |
-|------|-----------|--------|
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Query pattern reference | REFERENCE |
-| `src/lib/queries/collections/collections.query.ts` | Query pattern reference | REFERENCE |
+| File                                                  | Relevance               | Action    |
+| ----------------------------------------------------- | ----------------------- | --------- |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts`    | Query pattern reference | REFERENCE |
+| `src/lib/queries/collections/collections.query.ts`    | Query pattern reference | REFERENCE |
 | `src/lib/queries/collections/subcollections.query.ts` | Query pattern reference | REFERENCE |
-| `src/lib/db/schema/bobbleheads.schema.ts` | Slug field reference | REFERENCE |
-| `src/lib/db/schema/collections.schema.ts` | Slug field reference | REFERENCE |
+| `src/lib/db/schema/bobbleheads.schema.ts`             | Slug field reference    | REFERENCE |
+| `src/lib/db/schema/collections.schema.ts`             | Slug field reference    | REFERENCE |
 
 ## Key Pattern Discovered
 
@@ -64,9 +64,15 @@ const getContentLink = (item?: TrendingContentItem) => {
   if (!item) return '#';
   switch (item.targetType) {
     case 'bobblehead':
-      return $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: item.targetSlug } });
+      return $path({
+        route: '/bobbleheads/[bobbleheadSlug]',
+        routeParams: { bobbleheadSlug: item.targetSlug },
+      });
     case 'collection':
-      return $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: item.targetSlug } });
+      return $path({
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug: item.targetSlug },
+      });
     case 'user':
       return $path({ route: '/users/[userId]', routeParams: { userId: item.targetId } });
     default:

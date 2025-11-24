@@ -21,7 +21,13 @@ interface CollectionProps {
   subcollections: Array<{ id: string; name: string }>;
 }
 
-export const Collection = ({ collection, collectionId, likeData, searchParams, subcollections }: CollectionProps) => {
+export const Collection = ({
+  collection,
+  collectionId,
+  likeData,
+  searchParams,
+  subcollections,
+}: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -39,7 +45,11 @@ export const Collection = ({ collection, collectionId, likeData, searchParams, s
           <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
             {/* Main Content Area */}
             <div className={'lg:col-span-9'}>
-              <CollectionBobbleheads collection={collection} searchParams={searchParams} subcollections={subcollections} />
+              <CollectionBobbleheads
+                collection={collection}
+                searchParams={searchParams}
+                subcollections={subcollections}
+              />
             </div>
 
             {/* Sidebar */}

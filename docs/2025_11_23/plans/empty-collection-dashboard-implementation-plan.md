@@ -25,22 +25,25 @@ This plan transforms the sparse empty state in the collections dashboard into an
 ## File Discovery Results
 
 ### Critical Files
-| File | Purpose |
-|------|---------|
-| `src/app/(app)/dashboard/collection/(collection)/components/collections-tab-content.tsx` | PRIMARY TARGET - Current sparse empty state (lines 11-19) |
-| `src/components/ui/empty-state.tsx` | Existing reusable empty state component |
-| `src/components/feature/collections/collection-create-dialog.tsx` | Create collection dialog |
-| `src/app/(app)/dashboard/collection/(collection)/components/collection-create-button.tsx` | Create button pattern |
+
+| File                                                                                      | Purpose                                                   |
+| ----------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| `src/app/(app)/dashboard/collection/(collection)/components/collections-tab-content.tsx`  | PRIMARY TARGET - Current sparse empty state (lines 11-19) |
+| `src/components/ui/empty-state.tsx`                                                       | Existing reusable empty state component                   |
+| `src/components/feature/collections/collection-create-dialog.tsx`                         | Create collection dialog                                  |
+| `src/app/(app)/dashboard/collection/(collection)/components/collection-create-button.tsx` | Create button pattern                                     |
 
 ### Supporting Files
-| File | Purpose |
-|------|---------|
+
+| File                                    | Purpose                       |
+| --------------------------------------- | ----------------------------- |
 | `src/lib/facades/users/users.facade.ts` | User data for personalization |
-| `src/utils/user-utils.ts` | getUserId function |
-| `src/components/ui/button.tsx` | Button variants for CTA |
-| `src/lib/db/schema/users.schema.ts` | User displayName field |
+| `src/utils/user-utils.ts`               | getUserId function            |
+| `src/components/ui/button.tsx`          | Button variants for CTA       |
+| `src/lib/db/schema/users.schema.ts`     | User displayName field        |
 
 ### New File to Create
+
 - `src/app/(app)/dashboard/collection/(collection)/components/collections-empty-state.tsx`
 
 ---
@@ -64,9 +67,11 @@ This plan transforms the sparse empty state in the collections dashboard into an
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/dashboard/collection/(collection)/components/collections-empty-state.tsx` - New client component for the enhanced empty state
 
 **Changes:**
+
 - Create a new client component (`'use client'` directive) to handle dialog state
 - Import and use the existing `EmptyState` component from `@/components/ui/empty-state`
 - Import `useToggle` hook for managing the create collection dialog open/close state
@@ -82,11 +87,13 @@ This plan transforms the sparse empty state in the collections dashboard into an
 - Use the `ComponentTestIdProps` type for testId prop support
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New file created at the specified path
 - [ ] Component properly marked as client component
 - [ ] Component accepts optional `userName` prop with proper TypeScript typing
@@ -105,9 +112,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/dashboard/collection/(collection)/components/collections-tab-content.tsx` - Replace sparse empty state with new component
 
 **Changes:**
+
 - Import `UsersFacade` from `@/lib/facades/users/users.facade`
 - Import the new `CollectionsEmptyState` component
 - Within the existing `getUserId()` call, add a parallel fetch for user data using `UsersFacade.getUserById(userId)`
@@ -117,11 +126,13 @@ npm run lint:fix && npm run typecheck
 - Keep the existing `'server-only'` import at the top
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `UsersFacade` imported and used correctly
 - [ ] User displayName fetched in parallel with collections data
 - [ ] Empty state conditional renders the new `CollectionsEmptyState` component

@@ -19,6 +19,7 @@ Build new Radix UI Select component for choosing subcollection filter
 ### Files Created
 
 **src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollection-filter.tsx**
+
 - New client-side Radix UI Select component
 - Implements three filter options:
   1. "All Bobbleheads" (filter: null)
@@ -45,7 +46,7 @@ interface CollectionSubcollectionFilterProps extends ComponentTestIdProps {
 - ✓ Type imports with `import type`
 - ✓ Single quotes for strings and imports
 - ✓ JSX attributes with curly braces
-- ✓ Boolean naming with underscore prefix (_hasSubcollections)
+- ✓ Boolean naming with underscore prefix (\_hasSubcollections)
 - ✓ Event handler naming with 'handle' prefix
 - ✓ Callback prop naming with 'on' prefix
 - ✓ Test ID pattern with generateTestId
@@ -57,9 +58,11 @@ interface CollectionSubcollectionFilterProps extends ComponentTestIdProps {
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed - No errors
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria
@@ -72,11 +75,13 @@ interface CollectionSubcollectionFilterProps extends ComponentTestIdProps {
 ## Notes for Next Steps
 
 **Filter Values**:
+
 - `null` → "All Bobbleheads" (view all)
 - `"collection"` → "Main Collection Only" (main only)
 - `subcollectionId` → Specific subcollection name (filtered view)
 
 **Integration Requirements** (Step 5):
+
 - Connect to nuqs URL state management
 - Pass subcollections array from server
 - Wire up onFilterChange callback to update URL params

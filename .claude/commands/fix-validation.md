@@ -37,19 +37,19 @@ You are a lightweight fix orchestrator that takes a validation report and coordi
 
 ### Issue-to-Specialist Routing
 
-| Issue Category | File Pattern | Specialist Agent | Skills Auto-Loaded |
-|----------------|--------------|------------------|-------------------|
-| Security (actions) | `src/lib/actions/**` | `server-action-specialist` | server-actions, sentry-monitoring, validation-schemas |
-| Logic bugs (facades) | `src/lib/facades/**` | `facade-specialist` | facade-layer, caching, sentry-monitoring, drizzle-orm |
-| Logic bugs (queries) | `src/lib/queries/**` | `database-specialist` | database-schema, drizzle-orm, validation-schemas |
-| Schema/index issues | `src/lib/db/schema/**` | `database-specialist` | database-schema, drizzle-orm, validation-schemas |
-| Validation schemas | `src/lib/validations/**` | `validation-specialist` | validation-schemas |
-| React component bugs | `src/components/**/*.tsx` | `react-component-specialist` | react-coding-conventions, ui-components |
-| Form issues | `*form*.tsx`, `*dialog*.tsx` | `form-specialist` | form-system, validation-schemas, server-actions |
-| Page component bugs | `src/app/**/*.tsx` | `react-component-specialist` | react-coding-conventions, ui-components |
-| Performance (memo) | Components | `react-component-specialist` | react-coding-conventions, ui-components |
-| Test coverage gaps | `tests/**` | `test-specialist` | testing-patterns |
-| General/fallback | Any | `general-purpose` | None |
+| Issue Category       | File Pattern                 | Specialist Agent             | Skills Auto-Loaded                                    |
+| -------------------- | ---------------------------- | ---------------------------- | ----------------------------------------------------- |
+| Security (actions)   | `src/lib/actions/**`         | `server-action-specialist`   | server-actions, sentry-monitoring, validation-schemas |
+| Logic bugs (facades) | `src/lib/facades/**`         | `facade-specialist`          | facade-layer, caching, sentry-monitoring, drizzle-orm |
+| Logic bugs (queries) | `src/lib/queries/**`         | `database-specialist`        | database-schema, drizzle-orm, validation-schemas      |
+| Schema/index issues  | `src/lib/db/schema/**`       | `database-specialist`        | database-schema, drizzle-orm, validation-schemas      |
+| Validation schemas   | `src/lib/validations/**`     | `validation-specialist`      | validation-schemas                                    |
+| React component bugs | `src/components/**/*.tsx`    | `react-component-specialist` | react-coding-conventions, ui-components               |
+| Form issues          | `*form*.tsx`, `*dialog*.tsx` | `form-specialist`            | form-system, validation-schemas, server-actions       |
+| Page component bugs  | `src/app/**/*.tsx`           | `react-component-specialist` | react-coding-conventions, ui-components               |
+| Performance (memo)   | Components                   | `react-component-specialist` | react-coding-conventions, ui-components               |
+| Test coverage gaps   | `tests/**`                   | `test-specialist`            | testing-patterns                                      |
+| General/fallback     | Any                          | `general-purpose`            | None                                                  |
 
 ## Workflow Execution
 
@@ -102,6 +102,7 @@ You are a lightweight fix orchestrator that takes a validation report and coordi
      ```
 
 5. **Create Fix Directory**:
+
    ```bash
    mkdir -p docs/{YYYY_MM_DD}/fixes/{feature-name}/
    ```
@@ -111,6 +112,7 @@ You are a lightweight fix orchestrator that takes a validation report and coordi
 
 7. **Dry-Run Output** (if `--dry-run`):
    - Display fix plan and exit:
+
      ```
      ## Fix Plan for {feature-name}
 
@@ -141,6 +143,7 @@ You are a lightweight fix orchestrator that takes a validation report and coordi
 
      Estimated specialists to invoke: 5
      ```
+
    - Exit without making changes
 
 ### Phase 2: Critical & High Priority Fixes (Delegate)
@@ -153,6 +156,7 @@ For each fix group (grouped by specialist):
    - Mark current fix group as "in_progress"
 
 2. **Launch Specialist Subagent**:
+
    ```
    Use Task tool with subagent_type: "{specialist-type}"
    Model: sonnet (for complex fixes)
@@ -228,6 +232,7 @@ For each fix group (grouped by specialist):
    - Group by test type (unit, component, integration, e2e)
 
 2. **Launch Test Specialist**:
+
    ```
    Use Task tool with subagent_type: "test-specialist"
    Model: sonnet
@@ -291,6 +296,7 @@ Group low priority issues and delegate to appropriate specialists with lower pri
 **Skip if**: `--skip-revalidation` flag present
 
 1. **Run Static Analysis**:
+
    ```bash
    npm run lint:fix
    npm run typecheck
@@ -298,6 +304,7 @@ Group low priority issues and delegate to appropriate specialists with lower pri
    ```
 
 2. **Launch Validation Reporter**:
+
    ```
    Use Task tool with subagent_type: "validation-reporter"
    Model: sonnet
@@ -356,6 +363,7 @@ Group low priority issues and delegate to appropriate specialists with lower pri
 
 2. **Generate Fix Summary**:
    - Save to `docs/{YYYY_MM_DD}/fixes/{feature-name}/fix-summary.md`:
+
      ```markdown
      # Fix Summary: {feature-name}
 
@@ -365,36 +373,40 @@ Group low priority issues and delegate to appropriate specialists with lower pri
 
      ## Score Improvement
 
-     | Metric | Before | After | Change |
-     |--------|--------|-------|--------|
-     | Score | {old}/100 | {new}/100 | +{diff} |
-     | Critical | {old} | {new} | -{diff} |
-     | High | {old} | {new} | -{diff} |
-     | Medium | {old} | {new} | -{diff} |
-     | Low | {old} | {new} | -{diff} |
+     | Metric   | Before    | After     | Change  |
+     | -------- | --------- | --------- | ------- |
+     | Score    | {old}/100 | {new}/100 | +{diff} |
+     | Critical | {old}     | {new}     | -{diff} |
+     | High     | {old}     | {new}     | -{diff} |
+     | Medium   | {old}     | {new}     | -{diff} |
+     | Low      | {old}     | {new}     | -{diff} |
 
      ## Issues Fixed
 
      ### Critical Issues
+
      - [x] CRIT-1: {description} - FIXED by server-action-specialist
 
      ### High Priority Issues
+
      - [x] HIGH-1: {description} - FIXED by facade-specialist
      - [x] HIGH-2: {description} - FIXED by facade-specialist
-     ...
+           ...
 
      ## Files Modified
 
-     | File | Specialist | Changes |
-     |------|------------|---------|
+     | File   | Specialist   | Changes       |
+     | ------ | ------------ | ------------- |
      | {path} | {specialist} | {description} |
+
      ...
 
      ## Tests Added
 
-     | Test File | Tests | Coverage |
-     |-----------|-------|----------|
-     | {path} | {count} | {areas} |
+     | Test File | Tests   | Coverage |
+     | --------- | ------- | -------- |
+     | {path}    | {count} | {areas}  |
+
      ...
 
      ## Remaining Issues
@@ -412,6 +424,7 @@ Group low priority issues and delegate to appropriate specialists with lower pri
      ```
 
 3. **Final Output**:
+
    ```
    ## Fix Validation Complete
 

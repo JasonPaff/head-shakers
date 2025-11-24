@@ -47,6 +47,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 ## AI File Discovery Analysis
 
 ### Exploration Summary
+
 - **Directories Explored**: 8+ directories across collections, subcollections, components, and lib structures
 - **Candidate Files Examined**: 45+ files
 - **Relevant Files Found**: 28 highly relevant files
@@ -58,6 +59,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 ## Critical Priority Files (Core Implementation)
 
 ### 1. `src/components/feature/subcollections/subcollection-card.tsx`
+
 - **Priority**: Critical
 - **Category**: Component - Primary Target
 - **AI Analysis**: This is THE primary component requiring comprehensive visual redesign
@@ -71,6 +73,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Direct implementation target
 
 ### 2. `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx`
+
 - **Priority**: Critical
 - **Category**: Component - Layout Controller
 - **AI Analysis**: Controls grid layout and arrangement of subcollection cards
@@ -83,6 +86,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Layout restructuring required
 
 ### 3. `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections.tsx`
+
 - **Priority**: Critical
 - **Category**: Component - Container
 - **AI Analysis**: Server component wrapper for subcollections sidebar section
@@ -95,6 +99,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Container layout modifications
 
 ### 4. `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx`
+
 - **Priority**: Critical
 - **Category**: Page - Main Entry Point
 - **AI Analysis**: Main collections page with sidebar layout (9/3 column split)
@@ -109,6 +114,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 ## High Priority Files (Core Enhancements)
 
 ### 5. `src/lib/queries/collections/subcollections.query.ts`
+
 - **Priority**: High
 - **Category**: Data Layer - Query
 - **AI Analysis**: Database query layer returning subcollections data structure
@@ -121,6 +127,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Data structure verification
 
 ### 6. `src/lib/facades/collections/subcollections.facade.ts`
+
 - **Priority**: High
 - **Category**: Business Logic - Facade
 - **AI Analysis**: Business logic layer orchestrating subcollections operations
@@ -133,6 +140,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Data orchestration layer
 
 ### 7. `src/lib/utils/cloudinary.utils.ts`
+
 - **Priority**: High
 - **Category**: Utilities - Image Optimization
 - **AI Analysis**: Utility functions for Cloudinary URL generation and manipulation
@@ -146,6 +154,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Image optimization foundation
 
 ### 8. `src/lib/services/cloudinary.service.ts`
+
 - **Priority**: High
 - **Category**: Services - Image API
 - **AI Analysis**: Service layer for Cloudinary API operations with circuit breaker
@@ -159,6 +168,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: API integration layer
 
 ### 9. `src/lib/constants/cloudinary-paths.ts`
+
 - **Priority**: High
 - **Category**: Constants - Configuration
 - **AI Analysis**: Constants and path builders for Cloudinary folder structure
@@ -171,6 +181,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Path configuration
 
 ### 10. `src/components/ui/cloudinary-cover-upload.tsx`
+
 - **Priority**: High
 - **Category**: Component - Upload Widget
 - **AI Analysis**: Reusable Cloudinary upload widget for cover images
@@ -184,6 +195,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Upload experience enhancement
 
 ### 11. `src/lib/validations/subcollections.validation.ts`
+
 - **Priority**: High
 - **Category**: Validation - Type Safety
 - **AI Analysis**: Zod schemas for subcollection data validation
@@ -197,6 +209,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Type safety enforcement
 
 ### 12. `src/lib/db/schema/collections.schema.ts`
+
 - **Priority**: High
 - **Category**: Database - Schema Definition
 - **AI Analysis**: Drizzle ORM schema definition for subcollections table
@@ -210,6 +223,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 - **Impact**: Schema verification
 
 ### 13. `src/lib/actions/collections/subcollections.actions.ts`
+
 - **Priority**: High
 - **Category**: Server Actions - Mutations
 - **AI Analysis**: Server actions for subcollection CRUD operations
@@ -225,6 +239,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 ## Medium Priority Files (Supporting Components)
 
 ### 14-22. Supporting Components
+
 - `src/components/feature/subcollections/subcollection-edit-dialog.tsx` - Edit dialog (Medium)
 - `src/components/feature/subcollections/subcollection-create-dialog.tsx` - Create dialog (Medium)
 - `src/components/feature/subcollections/subcollection-actions.tsx` - Actions menu (Medium)
@@ -240,6 +255,7 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
 ## Low Priority Files (Infrastructure)
 
 ### 23-28. Infrastructure Files
+
 - `src/lib/services/cache-revalidation.service.ts` - Cache invalidation (Low)
 - `src/app/(app)/collections/[collectionSlug]/(collection)/route-type.ts` - Route types (Low)
 - `src/lib/seo/metadata.utils.ts` - SEO metadata (Low)
@@ -280,9 +296,11 @@ You MUST discover at least 5 relevant files. Categorize each file by priority (C
    - **Key Issue**: Limited visual prominence due to narrow sidebar constraint
 
 4. **Data Flow Pattern**
+
    ```
    Page → Async Component → Server Component → Facade → Query → Database
    ```
+
    - Clean separation of concerns
    - Type-safe data passing throughout
    - Query returns `featurePhoto` aliased to `coverImageUrl`

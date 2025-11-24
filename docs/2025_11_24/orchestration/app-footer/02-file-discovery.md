@@ -51,11 +51,13 @@ Return comprehensive file discovery with categorization by priority.
 ### High Priority (Critical - 20 files)
 
 #### Layout & Structure (3 files)
+
 1. `src/app/layout.tsx` - Root layout with providers (ClerkProvider, ThemeProvider, AblyProvider)
 2. `src/app/(app)/layout.tsx` - App layout containing AppHeader (primary integration point)
 3. `src/app/(public)/layout.tsx` - Public layout for About, Terms, Privacy pages
 
 #### Footer Component Files (7 files - TO CREATE)
+
 4. `src/components/layout/app-footer/app-footer.tsx` - Main footer component
 5. `src/components/layout/app-footer/components/app-footer-nav.tsx` - Navigation links section
 6. `src/components/layout/app-footer/components/app-footer-legal.tsx` - Legal/compliance links
@@ -65,28 +67,34 @@ Return comprehensive file discovery with categorization by priority.
 10. `src/components/layout/app-footer/components/app-footer-copyright.tsx` - Copyright information
 
 #### Reference Components (4 files)
+
 11. `src/components/layout/app-header/app-header.tsx` - Responsive patterns, test ID structure
 12. `src/components/layout/app-header/components/app-header-nav-menu.tsx` - Navigation menu pattern
 13. `src/components/layout/app-header/components/app-header-container.tsx` - Container pattern
 14. `src/components/layout/content-layout.tsx` - Content layout pattern
 
 #### Public Pages (3 files)
+
 15. `src/app/(public)/about/page.tsx` - About page (footer link target)
 16. `src/app/(public)/terms/page.tsx` - Terms page (footer link target)
 17. `src/app/(public)/privacy/page.tsx` - Privacy page (footer link target)
 
 #### Route Configuration (1 file)
+
 18. `_next-typesafe-url_.d.ts` - Type-safe routing configuration
 
 #### Documentation (1 file)
+
 19. `CLAUDE.md` - Project rules and conventions
 
 #### Global Styles (1 file)
+
 20. `src/app/globals.css` - Global Tailwind CSS configuration with theme variables
 
 ### Medium Priority (Supporting - 25 files)
 
 #### UI Components (10 files)
+
 21. `src/components/ui/navigation-menu.tsx` - Radix UI NavigationMenu
 22. `src/components/ui/button.tsx` - Button component
 23. `src/components/ui/separator.tsx` - Separator component
@@ -99,15 +107,18 @@ Return comprehensive file discovery with categorization by priority.
 30. `src/components/ui/form/field-components/text-field.tsx` - Text field component
 
 #### Server Actions & Forms (3 files)
+
 31. `src/lib/actions/featured-content/featured-content.actions.ts` - Server action pattern
 32. `src/lib/utils/next-safe-action.ts` - Server action client configuration
 33. `src/components/ui/form/field-components/submit-button.tsx` - Submit button component
 
 #### Featured Content Integration (2 files)
+
 34. `src/lib/queries/featured-content/featured-content-query.ts` - Featured content queries
 35. `src/lib/queries/featured-content/featured-content-transformer.ts` - Data transformation
 
 #### Utilities & Configuration (5 files)
+
 36. `src/utils/tailwind-utils.ts` - Tailwind CSS utilities (cn function)
 37. `src/lib/test-ids/index.ts` - Test ID generation system
 38. `src/lib/test-ids/generator.ts` - Test ID generator
@@ -115,16 +126,20 @@ Return comprehensive file discovery with categorization by priority.
 40. `src/lib/utils/cache.utils.ts` - Cache utility functions
 
 #### Sentry & Monitoring (2 files)
+
 41. `src/lib/constants/sentry.ts` - Sentry constants
 42. `src/lib/middleware/sentry.middleware.ts` - Sentry middleware pattern
 
 #### Type Definitions (1 file)
+
 43. `src/types/component-types.ts` - Global type definitions
 
 #### Validation (1 file)
+
 44. `src/lib/validations/admin.validation.ts` - Validation pattern reference
 
 #### Testing Infrastructure (3 files)
+
 45. `tests/components/ui/button.test.tsx` - Test pattern example
 46. `tests/setup/test-utils.tsx` - Test utilities
 47. `tests/setup/vitest.setup.ts` - Vitest configuration

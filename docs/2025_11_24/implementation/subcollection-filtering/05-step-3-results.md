@@ -21,6 +21,7 @@ Update facade functions to pass subcollection filter through to query layer with
 ### Files Modified
 
 **src/lib/facades/collections/collections.facade.ts**
+
 - Added optional `subcollectionId` parameter to options object in `getAllCollectionBobbleheadsWithPhotos`
 - Added optional `subcollectionId` parameter to options object in `getCollectionBobbleheadsWithPhotos`
 - Updated error context to include `subcollectionId` for improved debugging and Sentry tracking
@@ -40,6 +41,7 @@ Update facade functions to pass subcollection filter through to query layer with
 Cache keys automatically differentiate between different subcollection filters because the entire `options` object (including subcollectionId) is hashed via `createHashFromObject({ options, photos: true, viewerUserId })`.
 
 **Three-State Support**:
+
 - `subcollectionId: undefined` → All bobbleheads (no filter)
 - `subcollectionId: null` → Main collection only
 - `subcollectionId: "uuid-string"` → Specific subcollection
@@ -50,9 +52,11 @@ Existing CacheRevalidationService methods handle collection-level invalidation, 
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed with 3 expected warnings (TanStack Table)
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria

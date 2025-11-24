@@ -390,16 +390,18 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
 
             <Conditional isCondition={_hasReport && !_isResolved && !_isDismissed}>
               <div className={'flex gap-2'}>
-                <Button
-                  disabled={isUpdating}
-                  onClick={() => {
-                    void handleStatusChange('reviewed');
-                  }}
-                  size={'sm'}
-                  variant={'outline'}
-                >
-                  Mark as Reviewed
-                </Button>
+                <Conditional isCondition={_isPending}>
+                  <Button
+                    disabled={isUpdating}
+                    onClick={() => {
+                      void handleStatusChange('reviewed');
+                    }}
+                    size={'sm'}
+                    variant={'outline'}
+                  >
+                    Mark as Reviewed
+                  </Button>
+                </Conditional>
                 <Button
                   disabled={isUpdating}
                   onClick={() => {

@@ -17,8 +17,8 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                                     | Changes                                                                                                                   |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | src/lib/queries/content-reports/content-reports.query.ts | Added `getAllReportsWithSlugsForAdminAsync` method with LEFT JOINs to bobbleheads, collections, and subcollections tables |
 
 ## Conventions Applied
@@ -36,6 +36,7 @@
 ## Query Details
 
 The new method includes:
+
 - LEFT JOIN to `bobbleheads` table for bobblehead slugs
 - LEFT JOIN to `collections` table for collection slugs
 - LEFT JOIN to `subCollections` table for subcollection slugs
@@ -45,10 +46,10 @@ The new method includes:
 
 ## Validation Results
 
-| Command | Result |
-|---------|--------|
-| npm run lint:fix | PASS |
-| npm run typecheck | PASS |
+| Command           | Result |
+| ----------------- | ------ |
+| npm run lint:fix  | PASS   |
+| npm run typecheck | PASS   |
 
 ## Success Criteria
 

@@ -66,10 +66,12 @@ The collection page currently displays bobbleheads with a limited filtering mech
 ## Architecture Insights
 
 ### Current Filtering Mechanism
+
 - **'all'**: Fetches bobbleheads from collection AND all subcollections via `getAllCollectionBobbleheadsWithPhotosAsync`
 - **'collection'**: Fetches only main collection bobbleheads (where `subcollectionId IS NULL`) via `getCollectionBobbleheadsWithPhotosAsync`
 
 ### Database Relationships
+
 ```
 collections (1) ──→ (n) subCollections
      │                       │
@@ -81,15 +83,20 @@ bobbleheads.collectionId   bobbleheads.subcollectionId (nullable)
 **Key insight**: Bobbleheads have BOTH `collectionId` (required) and `subcollectionId` (optional), enabling filtering at both levels.
 
 ### Nuqs URL State Management Pattern
+
 ```typescript
-const [{ search, sort, view }, setParams] = useQueryStates({
-  search: parseAsString.withDefault(''),
-  sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
-  view: parseAsStringEnum([...viewOptions]).withDefault('all'),
-}, { shallow: false });
+const [{ search, sort, view }, setParams] = useQueryStates(
+  {
+    search: parseAsString.withDefault(''),
+    sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
+    view: parseAsStringEnum([...viewOptions]).withDefault('all'),
+  },
+  { shallow: false },
+);
 ```
 
 ### Query Layer Architecture
+
 1. **Base Query** - Permission filtering utilities
 2. **Domain Query** - Raw DB queries (CollectionsQuery, SubcollectionsQuery)
 3. **Facade Layer** - Business logic, caching, error handling
@@ -127,19 +134,23 @@ Enhance the collection page filtering system to support viewing bobbleheads from
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/route-type.ts` - Add subcollection filter option to search params type
 
 **Changes:**
+
 - Extend the search params type to accept subcollection identifier (string or null)
 - Update view parameter type from binary toggle to support 'all' | 'collection' | 'subcollection' states
 - Add subcollectionId parameter type definition for URL state
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Route type definitions compile without errors
 - [ ] Search param types support subcollection filtering
 - [ ] All validation commands pass
@@ -153,20 +164,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Add subcollection filtering logic to bobblehead queries
 
 **Changes:**
+
 - Add optional subcollectionId parameter to existing bobblehead query functions
 - Implement conditional where clause that filters by subcollectionId when provided
 - Maintain existing permission filtering and pagination logic
 - Ensure query handles null subcollectionId (main collection only) vs specific ID vs no filter (all)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query functions accept optional subcollectionId parameter
 - [ ] WHERE clause correctly filters by subcollectionId when provided
 - [ ] Permission filtering remains intact
@@ -181,20 +196,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/collections/collections.facade.ts` - Add subcollection filtering parameter to bobblehead fetch functions
 
 **Changes:**
+
 - Add optional subcollectionId parameter to facade functions that fetch bobbleheads
 - Pass subcollectionId through to query layer
 - Update cache key generation to include subcollectionId in cache tags
 - Ensure error handling covers subcollection filtering scenarios
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade functions accept and pass through subcollectionId parameter
 - [ ] Cache keys differentiate between different subcollection filters
 - [ ] Error handling remains comprehensive
@@ -209,9 +228,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollection-filter.tsx` - Client component for subcollection selection
 
 **Changes:**
+
 - Create client component using Radix Select pattern matching existing sort dropdown
 - Implement options for 'All Bobbleheads', 'Main Collection Only', and individual subcollections
 - Accept subcollections array and current filter state as props
@@ -219,11 +240,13 @@ npm run lint:fix && npm run typecheck
 - Include proper accessibility labels and keyboard navigation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders Radix Select with all filter options
 - [ ] Matches existing Radix Select styling patterns
 - [ ] Properly typed props interface
@@ -238,9 +261,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls.tsx` - Add subcollection filter to Nuqs state
 
 **Changes:**
+
 - Add subcollectionId to useQueryStates hook configuration
 - Implement state parser and serializer for subcollection filter
 - Update view state logic to coordinate with subcollection selection
@@ -248,11 +273,13 @@ npm run lint:fix && npm run typecheck
 - Handle state transitions between 'all', 'collection', and specific subcollection modes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Nuqs manages subcollectionId in URL query parameters
 - [ ] State updates propagate correctly to URL
 - [ ] View and subcollectionId states coordinate properly
@@ -267,20 +294,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobbleheads.tsx` - Extract subcollection filter from search params and fetch filtered data
 
 **Changes:**
+
 - Extract subcollectionId from search params in server component
 - Pass subcollectionId to facade function call
 - Handle loading states for subcollection filtering
 - Maintain existing pagination and sorting integration
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Server component reads subcollectionId from URL
 - [ ] Filtered data request includes subcollection parameter
 - [ ] Component renders filtered bobblehead list correctly
@@ -295,21 +326,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Fetch subcollections and pass to controls component
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls.tsx` - Accept and pass subcollections to selector
 
 **Changes:**
+
 - Add subcollection query to page component data fetching
 - Pass subcollections array through component props chain
 - Ensure permission filtering applies to subcollection list
 - Handle empty subcollections case gracefully
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page component fetches subcollections with proper permissions
 - [ ] Subcollections reach filter selector component
 - [ ] Empty state handled when no subcollections exist
@@ -324,20 +359,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/collections.validation.ts` - Add subcollection filter validation schema
 
 **Changes:**
+
 - Create Zod schema for subcollection filter parameter (nullable string with UUID format)
 - Add validation for view state that coordinates with subcollection selection
 - Export schema for use in server actions and API routes
 - Ensure schema handles 'all', 'collection', and specific subcollection ID cases
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Zod schema validates subcollection filter parameter correctly
 - [ ] Schema handles all filter modes (all/collection/specific)
 - [ ] Type exports available for use across application
@@ -352,20 +391,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls.tsx` - Add state coordination logic
 
 **Changes:**
+
 - When subcollection selected, automatically set view to appropriate mode
 - When view toggled to 'all' or 'collection', clear subcollection selection
 - Maintain URL state consistency during filter transitions
 - Preserve other filters (search, sort) during subcollection changes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Selecting subcollection updates view state appropriately
 - [ ] Toggling view clears subcollection when needed
 - [ ] No conflicting filter states possible
@@ -381,21 +424,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollection-filter.tsx` - Add visual active state indicator
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobbleheads.tsx` - Update empty state messaging
 
 **Changes:**
+
 - Add visual indicator (icon, badge, or styling) showing selected subcollection
 - Update empty state message to reflect subcollection filtering context
 - Provide clear action for users to clear filter when no results
 - Ensure accessibility for screen readers with filter status announcements
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Active filter clearly visible in UI
 - [ ] Empty state message context-appropriate
 - [ ] Clear action available to reset filter
@@ -420,22 +467,26 @@ npm run lint:fix && npm run typecheck
 ### Notes
 
 #### Assumptions Requiring Confirmation
+
 - Subcollection data is already accessible via existing queries (confidence: High - `subcollections.query.ts` exists)
 - Database has index on bobbleheads.subcollectionId for efficient filtering (confidence: Medium - should verify)
 - Current permission model applies same rules to subcollection filtering (confidence: High - existing patterns)
 
 #### Risk Mitigation
+
 - **Query performance**: Verify index exists on subcollectionId before deployment
 - **State management complexity**: Nuqs already handles complex state; following existing patterns minimizes risk
 - **Cache invalidation**: Include subcollectionId in cache keys to prevent stale data
 
 #### Edge Cases to Consider
+
 - User selects subcollection that gets deleted (handle gracefully with fallback to 'all')
 - Collection with no subcollections (hide/disable subcollection selector)
 - Very large number of subcollections (consider grouping or search if >20)
 - Subcollection with no bobbleheads (show appropriate empty state)
 
 #### Performance Considerations
+
 - Ensure database query plan uses index for subcollectionId filtering
 - Cache subcollection list to avoid repeated fetches
 - Consider pagination impact when filtering reduces result set
@@ -445,6 +496,7 @@ npm run lint:fix && npm run typecheck
 ## Orchestration Logs
 
 For detailed logs of the planning process, see:
+
 - `docs/2025_11_24/orchestration/subcollections-view-filter/00-orchestration-index.md` - Workflow overview
 - `docs/2025_11_24/orchestration/subcollections-view-filter/01-feature-refinement.md` - Feature refinement with project context
 - `docs/2025_11_24/orchestration/subcollections-view-filter/02-file-discovery.md` - AI-powered file discovery analysis

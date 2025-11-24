@@ -6,29 +6,31 @@
 
 ## Score Improvement
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Score | 95/100 | 100/100 | +5 |
-| Critical | 0 | 0 | 0 |
-| High | 0 | 0 | 0 |
-| Medium | 1 | 0 | -1 |
-| Low | 2 | 0 | -2 |
+| Metric   | Before | After   | Change |
+| -------- | ------ | ------- | ------ |
+| Score    | 95/100 | 100/100 | +5     |
+| Critical | 0      | 0       | 0      |
+| High     | 0      | 0       | 0      |
+| Medium   | 1      | 0       | -1     |
+| Low      | 2      | 0       | -2     |
 
 ## Issues Fixed
 
 ### Medium Priority Issues
+
 - [x] MED-1: Photo Gallery Dialog Missing aria-describedby Accessibility Attribute - FIXED by react-component-specialist
 
 ### Low Priority Issues
+
 - [x] LOW-1: LCP Image Missing loading="eager" Attribute - FIXED by react-component-specialist
 
 ## Files Modified
 
-| File | Specialist | Changes |
-|------|------------|---------|
-| `src/components/feature/bobblehead/bobblehead-photo-gallery-modal.tsx` | react-component-specialist | Added DialogDescription with sr-only class for accessibility |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery.tsx` | react-component-specialist | Added DialogDescription with sr-only class for accessibility |
-| `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-cover-photo.tsx` | react-component-specialist | Added loading='eager' prop to CldImage for LCP optimization |
+| File                                                                                                                    | Specialist                 | Changes                                                      |
+| ----------------------------------------------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------------ |
+| `src/components/feature/bobblehead/bobblehead-photo-gallery-modal.tsx`                                                  | react-component-specialist | Added DialogDescription with sr-only class for accessibility |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery.tsx`                       | react-component-specialist | Added DialogDescription with sr-only class for accessibility |
+| `src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/components/subcollection-cover-photo.tsx` | react-component-specialist | Added loading='eager' prop to CldImage for LCP optimization  |
 
 ## Remaining Issues
 

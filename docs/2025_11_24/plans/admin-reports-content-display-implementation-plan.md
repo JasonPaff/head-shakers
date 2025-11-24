@@ -11,12 +11,14 @@
 ## Analysis Summary
 
 **File Discovery Results**:
+
 - Discovered 18 files across 4 priority levels
 - Found existing reference implementation in reports-table.tsx (lines 47-121)
 - Data already includes all required fields via getAllReportsWithSlugsForAdminAsync
 - No additional database queries needed
 
 **Key Findings**:
+
 - The parent component already fetches data with `SelectContentReportWithSlugs` type
 - Existing link generation patterns available in reports-table.tsx
 - Comment display patterns available in reports-table.tsx (lines 305-367)
@@ -49,18 +51,22 @@ Update the report details dialog's content section to intelligently render diffe
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Update import and prop type
 
 **Changes:**
+
 - Change import from SelectContentReport to SelectContentReportWithSlugs
 - Update ReportDetailDialogProps interface report property type to SelectContentReportWithSlugs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Import statement updated to use SelectContentReportWithSlugs
 - [ ] ReportDetailDialogProps interface uses correct type
 - [ ] All validation commands pass
@@ -74,9 +80,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add helper functions before component
 
 **Changes:**
+
 - Add isContentLinkAvailable function to check if content can be linked
 - Add getContentLink function to generate $path URLs based on targetType
 - Add getContentTypeLabel function to format content type display names
@@ -85,11 +93,13 @@ npm run lint:fix && npm run typecheck
 - Import ExternalLinkIcon from lucide-react
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Helper functions correctly handle all target types
 - [ ] Functions match patterns from reports-table.tsx
 - [ ] Type safety maintained throughout
@@ -104,20 +114,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add derived variables after existing ones
 
 **Changes:**
-- Add _hasCommentContent variable checking for comment type and content availability
-- Add _isContentLinkable variable using isContentLinkAvailable helper
-- Add _contentLink variable using getContentLink helper
-- Add _showContentPreview variable to determine if any content can be shown
+
+- Add \_hasCommentContent variable checking for comment type and content availability
+- Add \_isContentLinkable variable using isContentLinkAvailable helper
+- Add \_contentLink variable using getContentLink helper
+- Add \_showContentPreview variable to determine if any content can be shown
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Derived variables follow existing naming pattern
 - [ ] Logic correctly determines content display state
 - [ ] All validation commands pass
@@ -131,9 +145,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Replace lines 201-209 in Reported Content section
 
 **Changes:**
+
 - Remove placeholder div with dashed border
 - Add Conditional component for comment content display with text content in muted paragraph
 - Add Conditional component for linkable content with Button asChild Link pattern
@@ -141,11 +157,13 @@ npm run lint:fix && npm run typecheck
 - Ensure all three conditions are mutually exclusive
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment text displays correctly when targetType is comment
 - [ ] Links generate correctly for bobblehead, collection, and subcollection
 - [ ] Unavailable content shows appropriate message
@@ -161,20 +179,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add content status row after Content Type badge
 
 **Changes:**
+
 - Add content status row showing contentExists boolean
 - Use CheckCircleIcon for existing content and XCircleIcon for deleted content
 - Import icons from lucide-react
 - Add appropriate color coding for status
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Content status displays correctly
 - [ ] Visual indicators match design system
 - [ ] Icons imported and used correctly
@@ -189,20 +211,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - verification step only
 
 **Changes:**
+
 - Verify bobblehead routes use bobbleheadSlug parameter
 - Verify collection routes use collectionSlug parameter
 - Verify subcollection routes use both collectionSlug and subcollectionSlug parameters
 - Confirm $path calls match existing patterns in reports-table.tsx
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All $path calls pass TypeScript validation
 - [ ] Route parameters match schema requirements
 - [ ] No type errors in generated routes
@@ -241,18 +267,21 @@ npm run lint:fix && npm run typecheck
 ### CRITICAL PRIORITY (Core Implementation)
 
 **`src/components/admin/reports/report-detail-dialog.tsx`**
+
 - The report details dialog component that must be modified to handle different content types with appropriate rendering
 - Current functionality: Displays report information with a placeholder for content preview (lines 201-209)
 - Key integration: Uses SelectContentReport type from validation schemas
 - Must be updated: Add conditional rendering logic based on targetType, fetch content data, and display comment text or type-safe links
 
 **`src/lib/queries/content-reports/content-reports.query.ts`**
+
 - Query layer for fetching report data with slug information
 - Current functionality: `getAllReportsWithSlugsForAdminAsync` method (lines 240-367) uses LEFT JOINs to fetch slug data for bobbleheads, collections, subcollections, and comment content
 - Key features: Returns `SelectContentReportWithSlugs` type with targetSlug, parentCollectionSlug, commentContent, and contentExists fields
 - Must be used: To fetch individual report details with content data when dialog opens
 
 **`src/lib/validations/moderation.validation.ts`**
+
 - Type definitions and validation schemas for content reports
 - Current types: `SelectContentReport`, `SelectContentReportWithSlugs` (lines 110-127)
 - Key fields in extended schema: commentContent (nullable string), contentExists (boolean), targetSlug (nullable string), parentCollectionSlug (nullable string)
@@ -261,11 +290,13 @@ npm run lint:fix && npm run typecheck
 ### HIGH PRIORITY (Supporting Implementation)
 
 **`src/components/admin/reports/admin-reports-client.tsx`**
+
 - Client component that manages report table and dialog state
 - Current functionality: Passes `SelectContentReportWithSlugs` to dialog component (line 211)
 - Integration point: Needs to ensure fetched data includes content information
 
 **`src/components/admin/reports/reports-table.tsx`**
+
 - Reports table with existing content link generation logic
 - Reference implementation: Lines 47-121 contain helper functions for link generation using $path
 - Key patterns: `getContentLink()`, `isContentLinkAvailable()`, type-safe routing with $path utility

@@ -7,9 +7,11 @@
 ## Input
 
 ### Refined Feature Request
+
 The admin reports table should include a dedicated column that displays a dynamic link to the reported content, allowing administrators to quickly navigate to and review the offending item. Uses Lucide React icon, $path utility for type-safe routing based on content type (bobblehead, collection, subcollection, comment, user). Handle unavailable content gracefully.
 
 ### Discovered Files Summary
+
 - **Critical**: reports-table.tsx, content-reports.query.ts
 - **High**: moderation.validation.ts, schema files, route-type files
 - **Reference**: trending-content-table.tsx (key pattern)

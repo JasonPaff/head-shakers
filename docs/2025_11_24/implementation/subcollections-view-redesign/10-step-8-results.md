@@ -13,6 +13,7 @@
 ## Implemented Features (from Step 2)
 
 ### Hover Effects
+
 - ✅ Image zoom/scale transform (scale-110)
 - ✅ Overlay gradient appears on hover
 - ✅ Title slides up from bottom
@@ -21,6 +22,7 @@
 - ✅ Transform-gpu for performance
 
 ### Interactive States
+
 - ✅ Focus-visible styles for keyboard navigation
 - ✅ Focus-within ring for accessibility
 - ✅ Hover state on entire card
@@ -28,12 +30,14 @@
 - ✅ Proper cursor changes
 
 ### Accessibility
+
 - ✅ Keyboard navigation support
 - ✅ Screen reader friendly
 - ✅ ARIA attributes
 - ✅ Semantic HTML (article element)
 
 ### Performance
+
 - ✅ CSS transitions (no layout shift)
 - ✅ GPU-accelerated transforms
 - ✅ Reduced-motion support respected
@@ -42,6 +46,7 @@
 ## Success Criteria
 
 All success criteria were met in Step 2:
+
 - [✅] Hover effects provide clear visual feedback
 - [✅] Transitions are smooth and performant
 - [✅] Keyboard focus states clearly visible

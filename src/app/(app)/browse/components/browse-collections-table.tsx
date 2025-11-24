@@ -33,7 +33,9 @@ type BrowseCollectionsTableProps = {
 const _hasSubcollections = (
   record: BrowseCollectionRecord | BrowseCollectionWithSubcollectionsRecord,
 ): record is BrowseCollectionWithSubcollectionsRecord => {
-  return 'subCollections' in record && Array.isArray(record.subCollections) && record.subCollections.length > 0;
+  return (
+    'subCollections' in record && Array.isArray(record.subCollections) && record.subCollections.length > 0
+  );
 };
 
 /**
@@ -123,7 +125,9 @@ const SubcollectionItem = ({ collectionSlug, isLast, subcollection }: Subcollect
       {/* Chevron Indicator */}
       <ChevronRight
         aria-hidden
-        className={'size-4 shrink-0 text-muted-foreground transition-transform group-hover/sub:translate-x-0.5'}
+        className={
+          'size-4 shrink-0 text-muted-foreground transition-transform group-hover/sub:translate-x-0.5'
+        }
       />
     </Link>
   );
@@ -158,11 +162,7 @@ export const BrowseCollectionsTable = ({ collections }: BrowseCollectionsTablePr
         const cardTestId = generateTestId('feature', 'browse-collection-card', record.collection.id);
 
         return (
-          <div
-            className={'flex flex-col'}
-            data-slot={'browse-collection-wrapper'}
-            key={record.collection.id}
-          >
+          <div className={'flex flex-col'} data-slot={'browse-collection-wrapper'} key={record.collection.id}>
             {/* Collection Card */}
             <Link data-slot={'browse-collection-link'} href={collectionPath}>
               <Card

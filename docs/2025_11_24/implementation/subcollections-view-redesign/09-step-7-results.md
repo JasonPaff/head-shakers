@@ -7,18 +7,22 @@
 **Timestamp**: 2025-11-24
 
 ## Skills Loaded
+
 - ✅ form-system
 - ✅ react-coding-conventions
 - ✅ validation-schemas
 - ✅ server-actions
 
 ## Files Modified
+
 **subcollection-create-dialog.tsx** - Cover image prioritization:
+
 - Moved cover photo to first field position
 - Added 16:9 aspect ratio guidance text
 - Updated label and helper text
 
 **subcollection-edit-dialog.tsx** - Cover image prioritization:
+
 - Moved cover photo to first field position
 - Added 16:9 aspect ratio guidance text
 - Updated label and helper text
@@ -26,17 +30,21 @@
 ## Key Changes
 
 ### Visual Hierarchy
+
 - Cover photo now first field users encounter
 - Emphasizes importance in image-first design
 - Consistent across both dialogs
 
 ### User Guidance
+
 - Descriptive text about 16:9 aspect ratio
 - Explains automatic cropping behavior
 - Helps users understand card design
 
 ### Upload Widget Integration
+
 Existing CloudinaryCoverUpload provides:
+
 - Live preview with CldImage
 - Upload progress indicators
 - Hover overlay with remove controls
@@ -44,6 +52,7 @@ Existing CloudinaryCoverUpload provides:
 - Error handling and feedback
 
 ## Conventions Applied
+
 ✅ useAppForm with proper validation
 ✅ withFocusManagement HOC
 ✅ Underscore prefix for derived variables
@@ -53,10 +62,12 @@ Existing CloudinaryCoverUpload provides:
 ✅ Form defaultValues match schema types
 
 ## Validation Results
+
 ✅ ESLint: PASS
 ✅ TypeScript: PASS
 
 ## Success Criteria
+
 - [✅] Cover image prominently featured (top position)
 - [✅] Live preview working (CloudinaryCoverUpload)
 - [✅] Upload widget provides clear feedback

@@ -18,6 +18,7 @@ Add validation schemas for subcollection filter parameters
 ### Files Modified
 
 **src/lib/validations/collections.validation.ts**
+
 - Added `subcollectionFilterSchema` with two fields:
   - `subcollectionId`: Uses `zodNullableUUID` utility for optional UUID with null default
   - `view`: Enum validation for three-state filtering ('all', 'collection', 'subcollection')
@@ -49,9 +50,11 @@ export type SubcollectionFilter = z.infer<typeof subcollectionFilterSchema>;
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed - No errors or warnings
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria
@@ -64,16 +67,19 @@ export type SubcollectionFilter = z.infer<typeof subcollectionFilterSchema>;
 ## Notes for Next Steps
 
 **Schema Usage**:
+
 - Server components reading URL search params
 - Client components managing filter state with Nuqs
 - Server actions accepting filter parameters
 
 **Three-State Support**:
+
 - `view: 'all'` + `subcollectionId: null` → All bobbleheads
 - `view: 'collection'` + `subcollectionId: null` → Main collection only
 - `view: 'subcollection'` + `subcollectionId: uuid` → Specific subcollection
 
 **Validation Benefits**:
+
 - Type-safe filter parameters throughout the stack
 - Consistent UUID validation using project utility
 - Clear error messages for invalid view states

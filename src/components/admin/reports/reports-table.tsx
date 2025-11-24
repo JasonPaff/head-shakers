@@ -7,10 +7,13 @@ import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@
 import {
   ArrowDownIcon,
   ArrowUpIcon,
+  CheckCircleIcon,
+  CheckIcon,
   ExternalLinkIcon,
   EyeIcon,
   MessageSquareIcon,
   MoreVerticalIcon,
+  XCircleIcon,
   XIcon,
 } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
@@ -175,6 +178,8 @@ export const ReportsTable = ({
       {
         cell: ({ row }) => {
           const report = row.original;
+          const _isPending = report.status === 'pending';
+          const _isTerminal = report.status === 'resolved' || report.status === 'dismissed';
 
           return (
             <DropdownMenu>
@@ -194,28 +199,35 @@ export const ReportsTable = ({
                   <EyeIcon className={'mr-2 size-4'} />
                   View Details
                 </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    onBulkAction?.([report.id], 'reviewed');
-                  }}
-                >
-                  Mark as Reviewed
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    onBulkAction?.([report.id], 'resolved');
-                  }}
-                >
-                  Mark as Resolved
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    onBulkAction?.([report.id], 'dismissed');
-                  }}
-                >
-                  Dismiss Report
-                </DropdownMenuItem>
+                <Conditional isCondition={!_isTerminal}>
+                  <DropdownMenuSeparator />
+                  <Conditional isCondition={_isPending}>
+                    <DropdownMenuItem
+                      onClick={() => {
+                        onBulkAction?.([report.id], 'reviewed');
+                      }}
+                    >
+                      <CheckIcon className={'mr-2 size-4'} />
+                      Mark as Reviewed
+                    </DropdownMenuItem>
+                  </Conditional>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      onBulkAction?.([report.id], 'resolved');
+                    }}
+                  >
+                    <CheckCircleIcon className={'mr-2 size-4'} />
+                    Mark as Resolved
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      onBulkAction?.([report.id], 'dismissed');
+                    }}
+                  >
+                    <XCircleIcon className={'mr-2 size-4'} />
+                    Dismiss Report
+                  </DropdownMenuItem>
+                </Conditional>
               </DropdownMenuContent>
             </DropdownMenu>
           );

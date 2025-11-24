@@ -14,14 +14,17 @@
 **Status**: SUCCESS
 
 **Skills Loaded**:
+
 - database-schema: `.claude/skills/database-schema/references/Database-Schema-Conventions.md`
 - drizzle-orm: `.claude/skills/drizzle-orm/references/Drizzle-ORM-Conventions.md`
 - validation-schemas: `.claude/skills/validation-schemas/references/Validation-Schemas-Conventions.md`
 
 **Files Modified**:
+
 - `src/lib/queries/content-reports/content-reports.query.ts` - Added `commentContent` computed field to SELECT clause using CASE statement
 
 **Conventions Applied**:
+
 - Type-safe SQL expression with `sql<null | string>` for proper TypeScript inference
 - CASE/WHEN pattern consistent with existing computed fields
 - Alphabetical field placement in select object

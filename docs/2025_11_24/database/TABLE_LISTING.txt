@@ -1,0 +1,300 @@
+================================================================================
+HEAD SHAKERS DATABASE - COMPLETE TABLE LISTING
+================================================================================
+Database: head-shakers (PostgreSQL on Neon)
+Project: Head Shakers Bobblehead Collection Platform
+Last Updated: November 24, 2025
+
+================================================================================
+USER MANAGEMENT TABLES (7 tables)
+================================================================================
+
+1. users
+   - Core user accounts and authentication
+   - Fields: id, clerkId, email, username, displayName, role, isDeleted, avatar
+   - Relationships: Referenced by ~15 other tables
+   - Indexes: 13 (auth covering, profile covering, text search)
+
+2. user_sessions
+   - Active session tracking for each user
+   - Fields: id, sessionToken, userId, isActive, expiresAt, deviceInfo
+   - Relationships: References users (cascade delete)
+   - Indexes: 4
+
+3. login_history
+   - Login audit trail and security tracking
+   - Fields: id, userId, loginAt, isSuccessful, loginMethod, deviceInfo
+   - Relationships: References users (cascade delete)
+   - Indexes: 4
+
+4. user_settings
+   - User preferences and configuration
+   - Fields: id, userId, language, timezone, currency, privacy level
+   - Relationships: References users (one-to-one, cascade delete)
+   - Indexes: 1
+
+5. notification_settings
+   - Notification preferences (email, push, in-app)
+   - Fields: id, userId, emailNewComments, pushNewLikes, etc.
+   - Relationships: References users (one-to-one, cascade delete)
+   - Indexes: 1
+
+6. user_blocks
+   - User blocking relationships (who blocked whom)
+   - Fields: id, blockerId, blockedId, createdAt
+   - Relationships: References users twice (cascade delete)
+   - Constraints: Unique (blockerId, blockedId), no self-blocks
+   - Indexes: 3
+
+7. user_activity
+   - User activity tracking and analytics
+   - Fields: id, userId, actionType, targetType, targetId, metadata
+   - Relationships: References users (cascade delete)
+   - Indexes: 4
+
+================================================================================
+COLLECTION & CONTENT TABLES (5 tables)
+================================================================================
+
+8. collections
+   - User bobblehead collections
+   - Fields: id, userId, name, slug, isPublic, totalItems, totalValue
+   - Relationships: References users (cascade delete)
+   - Constraints: Unique (userId, slug)
+   - Indexes: 9
+
+9. sub_collections
+   - Sections/categories within collections
+   - Fields: id, collectionId, name, slug, isPublic, itemCount, sortOrder
+   - Relationships: References collections (cascade delete)
+   - Constraints: Unique (collectionId, slug)
+   - Indexes: 8
+
+10. bobbleheads
+    - Individual bobblehead items
+    - Fields: id, collectionId, subcollectionId, name, slug, isPublic,
+              characterName, manufacturer, series, year, height, weight,
+              currentCondition, customFields (JSONB), likeCount, viewCount
+    - Relationships: References collections, subCollections, users (cascade)
+    - Constraints: Multiple validation checks for dates/numbers
+    - Indexes: 16 (including list, collection, public browse, search)
+
+11. bobblehead_photos
+    - Photo gallery for bobbleheads
+    - Fields: id, bobbleheadId, url, isPrimary, sortOrder, altText, caption
+    - Relationships: References bobbleheads (cascade delete)
+    - Indexes: 3
+
+12. bobblehead_tags
+    - Tags associated with bobbleheads
+    - Fields: id, bobbleheadId, tagId
+    - Relationships: References bobbleheads, tags (cascade delete)
+    - Constraints: Unique (bobbleheadId, tagId)
+    - Indexes: 3
+
+================================================================================
+TAGS & SOCIAL TABLES (4 tables)
+================================================================================
+
+13. tags
+    - Reusable tags for categorization
+    - Fields: id, userId, name, color, usageCount, createdAt
+    - Relationships: References users (cascade delete)
+    - Constraints: Unique (userId, name)
+    - Indexes: 8 (search, popularity)
+
+14. follows
+    - User following relationships
+    - Fields: id, followerId, followingId, followType, targetId
+    - Relationships: References users twice (cascade delete)
+    - Constraints: Unique combination, no self-follows
+    - Indexes: 5
+
+15. likes
+    - Likes on polymorphic content
+    - Fields: id, userId, targetId, targetType, createdAt, updatedAt
+    - TargetType: 'bobblehead' | 'collection' | 'comment'
+    - Relationships: References users (cascade delete)
+    - Constraints: Unique (userId, targetType, targetId)
+    - Indexes: 10 (including partial indexes per type)
+
+16. comments
+    - Comments on content (polymorphic)
+    - Fields: id, userId, targetId, targetType, content, isDeleted,
+              parentCommentId, likeCount, createdAt, editedAt
+    - TargetType: 'bobblehead' | 'collection' | 'subcollection'
+    - Relationships: References users (cascade), self-referencing (cascade)
+    - Indexes: 9
+
+================================================================================
+MODERATION & CONTENT REPORTS (1 table) - ADMIN REPORTS PAGE
+================================================================================
+
+17. content_reports
+    - User-submitted reports of content violations
+    - Fields: id, reporterId, moderatorId, targetId, targetType, status,
+              reason, description, moderatorNotes, resolvedAt
+    - Status: 'pending' | 'reviewed' | 'resolved' | 'dismissed'
+    - TargetType: 'bobblehead' | 'collection' | 'subcollection' | 'comment' | 'user'
+    - Reason: offensive_content, spam, copyright_violation, misinformation,
+              impersonation, harassment, inappropriate_content, low_quality
+    - Relationships: References users as reporter (cascade) and moderator (set null)
+    - Indexes: 8 (status, created_at, target, moderator queue)
+    - Admin Page: /admin/reports (list, filter, bulk actions, detail view)
+
+================================================================================
+FEATURED CONTENT & SYSTEM TABLES (4 tables)
+================================================================================
+
+18. featured_content
+    - Curated featured content for homepage
+    - Fields: id, contentId, contentType, featureType, isActive, sortOrder,
+              priority, title, description, imageUrl, curatorId, startDate, endDate
+    - Relationships: References users as curator (set null)
+    - Indexes: 14
+
+19. platform_settings
+    - Global platform configuration
+    - Fields: id, key (unique), value, valueType, isPublic, description,
+              updatedBy
+    - Relationships: References users (set null)
+    - Indexes: 4
+
+20. notifications
+    - In-app and email notifications for users
+    - Fields: id, userId, type, title, message, isRead, createdAt, readAt,
+              relatedType, relatedId, actionUrl
+    - Relationships: References users (cascade) and relatedUser (cascade)
+    - Indexes: 8
+
+21. content_metrics
+    - Analytics data for content performance
+    - Fields: id, contentId, contentType, metricType, date, metricValue,
+              metadata (JSONB)
+    - Indexes: 7
+
+================================================================================
+ANALYTICS TABLES (2 tables)
+================================================================================
+
+22. content_views
+    - View tracking for analytics and engagement
+    - Fields: id, viewerId, targetId, targetType, viewedAt, viewDuration,
+              ipAddress, userAgent, referrerUrl
+    - Relationships: References users (cascade)
+    - Indexes: 6
+
+23. search_queries
+    - Search analytics and trending searches
+    - Fields: id, userId, query, searchedAt, resultCount, filters, sessionId,
+              clickedResultId, clickedResultType
+    - Relationships: References users (cascade)
+    - Indexes: 6
+
+================================================================================
+LAUNCH & GROWTH TABLES (1 table)
+================================================================================
+
+24. launch_notifications
+    - Pre-launch email signup list
+    - Fields: id, email (unique), createdAt, notifiedAt
+    - Purpose: Early access and launch notifications
+    - Indexes: 1
+
+================================================================================
+SUMMARY STATISTICS
+================================================================================
+
+Total Tables:           24
+- User Management:       7
+- Collections/Content:   5
+- Tags/Social:           4
+- Moderation:            1
+- Featured/System:       4
+- Analytics:             2
+- Launch:                1
+
+Total Indexes:         ~120+ across all tables
+
+Primary Key Type:       UUID (all tables)
+Timestamp Fields:       createdAt, updatedAt, deletedAt (where applicable)
+JSONB Fields:           customFields, deviceInfo, filters, metadata
+
+Cascade Delete:         ~40+ foreign keys
+Set Null on Delete:     ~5 foreign keys
+Unique Constraints:     ~25+ constraints
+
+================================================================================
+KEY RELATIONSHIPS MAP
+================================================================================
+
+users (central hub)
+├── user_sessions (1:N)
+├── login_history (1:N)
+├── user_settings (1:1)
+├── notification_settings (1:1)
+├── user_blocks (N:N) self-referencing
+├── user_activity (1:N)
+├── collections (1:N)
+│   ├── bobbleheads (1:N)
+│   │   ├── bobblehead_photos (1:N)
+│   │   └── bobblehead_tags (N:N) -> tags
+│   └── sub_collections (1:N)
+│       └── bobbleheads (subcollectionId)
+├── tags (1:N)
+├── follows (1:N, N:N) self-referencing
+├── likes (1:N) polymorphic
+├── comments (1:N) polymorphic + self-referencing
+├── content_reports (1:N) as reporter + (1:N) as moderator
+├── featured_content (1:N) as curator
+├── platform_settings (1:N) as updatedBy
+├── notifications (1:N, N:N) as user + relatedUser
+├── content_views (1:N) as viewer
+└── search_queries (1:N)
+
+================================================================================
+SPECIAL FEATURES
+================================================================================
+
+Polymorphic Relationships:
+- likes: targetType + targetId (bobblehead, collection, comment)
+- comments: targetType + targetId (bobblehead, collection, subcollection)
+- content_reports: targetType + targetId (5 content types)
+- featured_content: contentType + contentId
+- content_metrics: contentType + contentId
+
+Self-Referencing:
+- user_blocks: blockerId + blockedId both reference users
+- follows: followerId + followingId both reference users
+- comments: parentCommentId references comments.id
+
+JSONB Columns:
+- user.deviceInfo - Browser/device information
+- bobblehead.customFields - Custom user-defined fields
+- user_activity.metadata - Activity metadata
+- search_queries.filters - Search filter data
+- content_metrics.metadata - Analytics metadata
+
+Text Search:
+- GIN trigram indexes on name, description, bio fields
+- Full-text search capabilities
+- Case-insensitive lookups
+
+Partial Indexes:
+- Likes filtered by targetType (bobblehead, collection, comment)
+- Comments filtered by targetType
+- Featured content filtered by isActive, date ranges
+
+================================================================================
+DOCUMENTATION FILES LOCATION
+================================================================================
+
+docs/2025_11_24/database/
+├── README.md                        - START HERE
+├── database-schema-overview.md      - Complete schema reference
+├── content-reports-analysis.md      - content_reports deep dive
+├── quick-reference.md               - Fast lookups
+├── test-queries.md                  - SQL examples for testing
+└── TABLE_LISTING.txt                - This file
+
+================================================================================

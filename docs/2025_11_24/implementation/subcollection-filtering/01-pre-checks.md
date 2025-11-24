@@ -28,6 +28,7 @@ added 1075 packages, and audited 1076 packages in 2m
 
 **Current Branch**: main
 **Uncommitted Changes**:
+
 - docs/pre-tool-use-log.txt (modified)
 - src/components/admin/reports/report-filters.tsx (modified)
 
@@ -58,6 +59,7 @@ added 1075 packages, and audited 1076 packages in 2m
 ## Files to be Modified (27 total)
 
 ### Critical Priority (13 files)
+
 1. src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx
 2. src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobbleheads.tsx
 3. src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls.tsx
@@ -67,6 +69,7 @@ added 1075 packages, and audited 1076 packages in 2m
 7. src/lib/validations/collections.validation.ts
 
 ### Files to be Created (1 file)
+
 - src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollection-filter.tsx
 
 ## Checkpoint

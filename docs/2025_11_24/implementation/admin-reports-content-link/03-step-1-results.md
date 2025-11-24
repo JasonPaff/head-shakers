@@ -15,8 +15,8 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
+| File                                         | Changes                                                                                   |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------- |
 | src/lib/validations/moderation.validation.ts | Added `selectContentReportWithSlugsSchema` and `SelectContentReportWithSlugs` type export |
 
 ## Conventions Applied
@@ -30,10 +30,10 @@
 
 ## Validation Results
 
-| Command | Result |
-|---------|--------|
-| npm run lint:fix | PASS |
-| npm run typecheck | PASS |
+| Command           | Result |
+| ----------------- | ------ |
+| npm run lint:fix  | PASS   |
+| npm run typecheck | PASS   |
 
 ## Success Criteria
 

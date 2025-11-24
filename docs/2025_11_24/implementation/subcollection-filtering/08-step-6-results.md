@@ -19,6 +19,7 @@ Modify server component to extract and pass subcollection filter to facade layer
 ### Files Modified
 
 **src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobbleheads.tsx**
+
 - Extracted `subcollectionId` from URL search params
 - Implemented view state mapping logic to facade parameters
 - Simplified facade call to use single method for all filtering states
@@ -27,20 +28,20 @@ Modify server component to extract and pass subcollection filter to facade layer
 ### View State Mapping
 
 **Implementation Logic**:
+
 ```typescript
 // Map view state to subcollection filter parameter:
 // - 'all': undefined (all bobbleheads)
 // - 'collection': null (main collection only)
 // - 'subcollection': subcollectionId value (specific subcollection)
 const subcollectionIdParam =
-  view === 'all'
-    ? undefined
-    : view === 'collection'
-      ? null
-      : subcollectionIdFromParams;
+  view === 'all' ? undefined
+  : view === 'collection' ? null
+  : subcollectionIdFromParams;
 ```
 
 **Three States Supported**:
+
 1. `view === 'all'` → `subcollectionId: undefined` (all bobbleheads)
 2. `view === 'collection'` → `subcollectionId: null` (main only)
 3. `view === 'subcollection'` → `subcollectionId: <uuid>` (specific)
@@ -58,9 +59,11 @@ const subcollectionIdParam =
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed - No errors or warnings
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria
@@ -73,6 +76,7 @@ const subcollectionIdParam =
 ## Notes for Next Steps
 
 **Simplified Facade Usage**:
+
 - Uses single `getAllCollectionBobbleheadsWithPhotos` method
 - Handles all three filtering states via `subcollectionId` parameter
 - No need for conditional method selection

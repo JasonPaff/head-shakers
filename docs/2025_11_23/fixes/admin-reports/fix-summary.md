@@ -6,13 +6,13 @@
 
 ## Score Improvement
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| Score | 42/100 | ~85/100 | +43 |
-| Critical | 5 | 0 | -5 |
-| High | 4 | 0 | -4 |
-| Medium | 2 | 0 | -2 |
-| Low | 1 | 0 | -1 |
+| Metric   | Before | After   | Change |
+| -------- | ------ | ------- | ------ |
+| Score    | 42/100 | ~85/100 | +43    |
+| Critical | 5      | 0       | -5     |
+| High     | 4      | 0       | -4     |
+| Medium   | 2      | 0       | -2     |
+| Low      | 1      | 0       | -1     |
 
 ## Issues Fixed
 
@@ -66,22 +66,24 @@
 
 ## Files Created
 
-| File | Description |
-|------|-------------|
+| File                                                    | Description                                                   |
+| ------------------------------------------------------- | ------------------------------------------------------------- |
 | `src/components/admin/reports/admin-reports-client.tsx` | Client wrapper component managing dialogs, actions, and state |
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| `src/app/(app)/admin/reports/page.tsx` | Updated to use `AdminReportsClient` instead of `ReportsTable` directly |
-| `src/components/admin/reports/reports-table.tsx` | Added clear selection button with XIcon to bulk actions bar |
+| File                                              | Changes                                                                                       |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `src/app/(app)/admin/reports/page.tsx`            | Updated to use `AdminReportsClient` instead of `ReportsTable` directly                        |
+| `src/components/admin/reports/reports-table.tsx`  | Added clear selection button with XIcon to bulk actions bar                                   |
 | `src/components/admin/reports/report-filters.tsx` | Added `router.refresh()` calls after all filter changes to trigger server component re-render |
 
 ## Technical Details
 
 ### Architecture Decision
+
 The fix creates a clean separation between:
+
 - **Server Component** (`page.tsx`): Fetches data with filter parameters from URL
 - **Client Component** (`AdminReportsClient`): Handles user interactions, state, dialogs, and server action calls
 
@@ -115,6 +117,7 @@ The fix creates a clean separation between:
 ## Next Steps
 
 Commit the changes:
+
 ```bash
 git add . && git commit -m "fix: resolve admin reports page validation issues
 

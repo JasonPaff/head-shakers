@@ -3,6 +3,7 @@
 ## All Tables in head-shakers Database
 
 ### User Management (7 tables)
+
 - **users** - Core user accounts
 - **user_sessions** - Active sessions
 - **login_history** - Login audit trail
@@ -12,6 +13,7 @@
 - **user_activity** - Activity tracking
 
 ### Collections & Content (5 tables)
+
 - **collections** - User bobblehead collections
 - **sub_collections** - Collection sections
 - **bobbleheads** - Individual bobblehead items
@@ -19,25 +21,30 @@
 - **bobblehead_tags** - Item tags
 
 ### Tags & Social (4 tables)
+
 - **tags** - Reusable tags
 - **follows** - User follow relationships
 - **likes** - Content likes (polymorphic)
 - **comments** - Content comments (polymorphic)
 
 ### Moderation & Reports (1 table)
+
 - **content_reports** - User content reports (Admin Reports Page)
 
 ### Featured & System (4 tables)
+
 - **featured_content** - Curated homepage content
 - **platform_settings** - Global config
 - **notifications** - User notifications
 - **content_metrics** - Analytics metrics
 
 ### Analytics (2 tables)
+
 - **content_views** - View tracking
 - **search_queries** - Search analytics
 
 ### Launch (1 table)
+
 - **launch_notifications** - Pre-launch email signups
 
 **TOTAL: 24 tables**
@@ -47,14 +54,17 @@
 ## content_reports Table - Testing Details
 
 ### Location
+
 Schema: `src/lib/db/schema/moderation.schema.ts`
 Query: `src/lib/queries/content-reports/content-reports.query.ts`
 Facade: `src/lib/facades/content-reports/content-reports.facade.ts`
 
 ### Current Record Count
+
 To check: Query the database directly or use the admin reports page at `/admin/reports`
 
 ### Key Fields
+
 ```typescript
 {
   id: UUID,                    // Unique identifier
@@ -72,6 +82,7 @@ To check: Query the database directly or use the admin reports page at `/admin/r
 ```
 
 ### Target Types Supported
+
 - `bobblehead` - Bobblehead items
 - `collection` - Collections
 - `subcollection` - Subcollections
@@ -79,6 +90,7 @@ To check: Query the database directly or use the admin reports page at `/admin/r
 - `user` - User profiles
 
 ### Report Reasons
+
 - offensive_content
 - spam
 - copyright_violation
@@ -89,8 +101,10 @@ To check: Query the database directly or use the admin reports page at `/admin/r
 - low_quality
 
 ### Admin Reports Page
+
 **URL**: `/admin/reports`
 **Components**:
+
 - Stats cards (total, pending, reviewed, resolved)
 - Filter panel (status, type, reason, date range)
 - Data table (sortable, pageable, selectable)
@@ -102,29 +116,33 @@ To check: Query the database directly or use the admin reports page at `/admin/r
 ## How to Test Admin Reports Functionality
 
 ### 1. Create Test Reports
+
 ```bash
 # Via UI: Hover over any content → Report button → Fill form → Submit
 # Via Direct Insert: See testing guide below
 ```
 
 ### 2. Access Admin Panel
+
 ```
 Route: /admin/reports
 Requires: Moderator or Admin role
 ```
 
 ### 3. Verify Table Data
+
 ```typescript
 // Check current data using facade
 const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
   {}, // no filters - get all
-  currentUser.id
+  currentUser.id,
 );
 
 console.log(`Total: ${stats.total}, Pending: ${stats.pending}`);
 ```
 
 ### 4. Test Features
+
 - [ ] Filter by status (pending/reviewed/resolved/dismissed)
 - [ ] Filter by target type (bobblehead/collection/comment/etc)
 - [ ] Filter by reason
@@ -141,6 +159,7 @@ console.log(`Total: ${stats.total}, Pending: ${stats.pending}`);
 ## Database Commands Reference
 
 ### List All Tables
+
 ```bash
 # Using Neon CLI or psql
 SELECT table_name FROM information_schema.tables
@@ -148,6 +167,7 @@ WHERE table_schema = 'public';
 ```
 
 ### Check content_reports Record Count
+
 ```sql
 SELECT
   COUNT(*) as total,
@@ -159,6 +179,7 @@ ORDER BY count DESC;
 ```
 
 ### Get Sample Reports
+
 ```sql
 SELECT
   cr.id,
@@ -174,6 +195,7 @@ LIMIT 5;
 ```
 
 ### Count by Target Type
+
 ```sql
 SELECT
   target_type,
@@ -187,39 +209,47 @@ ORDER BY count DESC;
 
 ## File Locations
 
-| Purpose | File |
-|---------|------|
-| Schema Definition | `src/lib/db/schema/moderation.schema.ts` |
-| Query Logic | `src/lib/queries/content-reports/content-reports.query.ts` |
-| Business Logic | `src/lib/facades/content-reports/content-reports.facade.ts` |
-| Server Actions | `src/lib/actions/admin/admin-content-reports.actions.ts` |
-| Components | `src/components/admin/reports/*` |
-| Admin Page | `src/app/(app)/admin/reports/page.tsx` |
+| Purpose           | File                                                        |
+| ----------------- | ----------------------------------------------------------- |
+| Schema Definition | `src/lib/db/schema/moderation.schema.ts`                    |
+| Query Logic       | `src/lib/queries/content-reports/content-reports.query.ts`  |
+| Business Logic    | `src/lib/facades/content-reports/content-reports.facade.ts` |
+| Server Actions    | `src/lib/actions/admin/admin-content-reports.actions.ts`    |
+| Components        | `src/components/admin/reports/*`                            |
+| Admin Page        | `src/app/(app)/admin/reports/page.tsx`                      |
 
 ---
 
 ## Key Component Files
 
 ### Admin Reports Client
+
 **File**: `src/components/admin/reports/admin-reports-client.tsx`
+
 - Handles report selection, status changes, confirmations
 - Manages detail dialog and bulk actions
 
 ### Reports Table
+
 **File**: `src/components/admin/reports/reports-table.tsx`
+
 - Displays reports in TanStack React Table
 - 8 columns: Actions, Summary, Status, Type, View, Submitted, ID, Reporter
 - Supports sorting, pagination, row selection
 - Handles bulk action bar
 
 ### Report Detail Dialog
+
 **File**: `src/components/admin/reports/report-detail-dialog.tsx`
+
 - Shows full report information
 - Allows status change
 - Input for moderator notes
 
 ### Report Filters
+
 **File**: `src/components/admin/reports/report-filters.tsx`
+
 - Multi-select filters
 - Date range picker
 - Status, type, reason checkboxes
@@ -229,12 +259,14 @@ ORDER BY count DESC;
 ## Performance Notes
 
 ### Indexes Used by Admin Reports Query
+
 1. `content_reports_status_idx` - Filter by status
 2. `content_reports_created_at_idx` - Order by created_at
 3. `content_reports_target_idx` - Join to get content
 4. `content_reports_reporter_id_idx` - Filter by reporter
 
 ### Query Optimization
+
 - Uses LEFT JOINs (not INNER) to show reports even if content deleted
 - Computed fields in SQL (CASE statements) for content info
 - Pagination with LIMIT/OFFSET
@@ -264,4 +296,3 @@ ORDER BY count DESC;
    - Check status changes update properly
    - Confirm resolved_at is set when closing
    - Verify foreign key constraints
-

@@ -14,17 +14,20 @@ The admin reports page displays a comprehensive table of all submitted reports w
 ## File Analysis Used as Input
 
 ### Critical Priority Files
+
 - `src/components/admin/reports/report-detail-dialog.tsx` - Main component to modify (lines 201-209 have placeholder)
 - `src/lib/queries/content-reports/content-reports.query.ts` - Query with getAllReportsWithSlugsForAdminAsync
 - `src/lib/validations/moderation.validation.ts` - SelectContentReportWithSlugs type
 
 ### High Priority Files
+
 - `src/components/admin/reports/admin-reports-client.tsx` - Passes data to dialog
 - `src/components/admin/reports/reports-table.tsx` - Reference implementation (lines 47-121 have link generation helpers)
 - `src/lib/facades/content-reports/content-reports.facade.ts` - Business logic layer
 - `src/app/(app)/admin/reports/page.tsx` - Admin page
 
 ### Existing Patterns
+
 - Type-safe routing with $path utility from next-typesafe-url
 - Content link generation logic exists in reports-table.tsx (lines 47-121)
 - Comment popover display exists in reports-table.tsx (lines 305-367)
@@ -75,7 +78,7 @@ MEDIUM PRIORITY:
 
 ## Full Agent Response (Implementation Plan)
 
-```markdown
+````markdown
 # Implementation Plan: Report Details Dialog Content Section Enhancement
 
 ## Overview
@@ -103,18 +106,23 @@ Update the report details dialog's content section to intelligently render diffe
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Update import and prop type
 
 **Changes:**
+
 - Change import from SelectContentReport to SelectContentReportWithSlugs
 - Update ReportDetailDialogProps interface report property type to SelectContentReportWithSlugs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
+````
 
 **Success Criteria:**
+
 - [ ] Import statement updated to use SelectContentReportWithSlugs
 - [ ] ReportDetailDialogProps interface uses correct type
 - [ ] All validation commands pass
@@ -128,9 +136,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add helper functions before component
 
 **Changes:**
+
 - Add isContentLinkAvailable function to check if content can be linked
 - Add getContentLink function to generate $path URLs based on targetType
 - Add getContentTypeLabel function to format content type display names
@@ -139,11 +149,13 @@ npm run lint:fix && npm run typecheck
 - Import ExternalLinkIcon from lucide-react
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Helper functions correctly handle all target types
 - [ ] Functions match patterns from reports-table.tsx
 - [ ] Type safety maintained throughout
@@ -158,20 +170,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add derived variables after existing ones
 
 **Changes:**
-- Add _hasCommentContent variable checking for comment type and content availability
-- Add _isContentLinkable variable using isContentLinkAvailable helper
-- Add _contentLink variable using getContentLink helper
-- Add _showContentPreview variable to determine if any content can be shown
+
+- Add \_hasCommentContent variable checking for comment type and content availability
+- Add \_isContentLinkable variable using isContentLinkAvailable helper
+- Add \_contentLink variable using getContentLink helper
+- Add \_showContentPreview variable to determine if any content can be shown
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Derived variables follow existing naming pattern
 - [ ] Logic correctly determines content display state
 - [ ] All validation commands pass
@@ -185,9 +201,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Replace lines 201-209 in Reported Content section
 
 **Changes:**
+
 - Remove placeholder div with dashed border
 - Add Conditional component for comment content display with text content in muted paragraph
 - Add Conditional component for linkable content with Button asChild Link pattern
@@ -195,11 +213,13 @@ npm run lint:fix && npm run typecheck
 - Ensure all three conditions are mutually exclusive
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comment text displays correctly when targetType is comment
 - [ ] Links generate correctly for bobblehead, collection, and subcollection
 - [ ] Unavailable content shows appropriate message
@@ -215,20 +235,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `C:\Users\JasonPaff\dev\head-shakers\src\components\admin\reports\report-detail-dialog.tsx` - Add content status row after Content Type badge
 
 **Changes:**
+
 - Add content status row showing contentExists boolean
 - Use CheckCircleIcon for existing content and XCircleIcon for deleted content
 - Import icons from lucide-react
 - Add appropriate color coding for status
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Content status displays correctly
 - [ ] Visual indicators match design system
 - [ ] Icons imported and used correctly
@@ -243,20 +267,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - verification step only
 
 **Changes:**
+
 - Verify bobblehead routes use bobbleheadSlug parameter
 - Verify collection routes use collectionSlug parameter
 - Verify subcollection routes use both collectionSlug and subcollectionSlug parameters
 - Confirm $path calls match existing patterns in reports-table.tsx
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All $path calls pass TypeScript validation
 - [ ] Route parameters match schema requirements
 - [ ] No type errors in generated routes
@@ -287,6 +315,7 @@ npm run lint:fix && npm run typecheck
 **Design System Consistency:** Use existing Radix UI components (Button, Badge, Conditional) and follow the established visual hierarchy in the dialog.
 
 **No Code Implementation Required:** This plan focuses on WHAT to do, not HOW to code it. The implementation will follow existing patterns from reports-table.tsx.
+
 ```
 
 ## Plan Format Validation Results
@@ -364,3 +393,4 @@ Each of the 6 implementation steps includes:
 - ✅ **Complete Coverage**: Plan addresses the refined feature request completely
 - ✅ **Quality Gates**: 9 quality gates defined for final validation
 - ✅ **Existing Patterns**: References existing code patterns from reports-table.tsx
+```

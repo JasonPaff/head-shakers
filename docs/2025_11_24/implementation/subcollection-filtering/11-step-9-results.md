@@ -23,23 +23,29 @@ Implement logic to coordinate between view toggle and subcollection selector
 ## Existing Coordination Logic (from Step 5)
 
 ### 1. handleViewChange (lines 42-44)
+
 When view buttons ('all' or 'collection') clicked:
+
 - Clears `subcollectionId` to `null`
 - Sets view to new value
 - Prevents conflicting states
 
 ### 2. handleSubcollectionFilterChange (lines 50-58)
+
 When subcollection filter changes:
+
 - `null` selected → sets both to `null`/`'all'`
 - `'collection'` selected → clears subcollectionId, sets view to `'collection'`
 - Specific ID selected → sets both to subcollection mode
 
 ### 3. URL State Consistency
+
 - Uses `nuqs` with `useQueryStates`
 - Manages all filter states in URL
 - Ensures consistency across navigation
 
 ### 4. Filter Preservation
+
 - `setParams` only updates specific parameters
 - Preserves other filters (search, sort)
 
@@ -55,9 +61,11 @@ When subcollection filter changes:
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed - No errors or warnings
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria
@@ -71,6 +79,7 @@ When subcollection filter changes:
 ## Notes for Next Steps
 
 **Coordination Complete**:
+
 - Bidirectional coordination between view toggle and subcollection selector
 - Automatic view state updates when subcollection selected
 - Automatic subcollection clearing when view buttons clicked

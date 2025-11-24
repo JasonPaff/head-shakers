@@ -15,22 +15,22 @@
 
 ## Test Coverage Summary
 
-| Test Unit | Route(s) | Scenarios | Passed | Failed | Status |
-|-----------|----------|-----------|--------|--------|--------|
-| Page Load & Header | /collections/baltimore-orioles | 28 | 27 | 1 | PASS |
-| Bobbleheads Grid & Controls | /collections/baltimore-orioles, /bobbleheads/[slug] | 35 | 33 | 2 | PASS |
-| Subcollections & Sidebar | /collections/baltimore-orioles/subcollection/[slug] | 32 | 31 | 1 | PASS |
-| Social Features & Comments | /collections/baltimore-orioles | 24 | 24 | 0 | PASS |
+| Test Unit                   | Route(s)                                            | Scenarios | Passed | Failed | Status |
+| --------------------------- | --------------------------------------------------- | --------- | ------ | ------ | ------ |
+| Page Load & Header          | /collections/baltimore-orioles                      | 28        | 27     | 1      | PASS   |
+| Bobbleheads Grid & Controls | /collections/baltimore-orioles, /bobbleheads/[slug] | 35        | 33     | 2      | PASS   |
+| Subcollections & Sidebar    | /collections/baltimore-orioles/subcollection/[slug] | 32        | 31     | 1      | PASS   |
+| Social Features & Comments  | /collections/baltimore-orioles                      | 24        | 24     | 0      | PASS   |
 
 ## Issue Summary
 
-| Severity | Count | Score Impact |
-|----------|-------|--------------|
-| Critical | 0 | -0 |
-| High | 0 | -0 |
-| Medium | 1 | -5 |
-| Low | 2 | -0 (deduplicated) |
-| **Total** | 3 | **-5** |
+| Severity  | Count | Score Impact      |
+| --------- | ----- | ----------------- |
+| Critical  | 0     | -0                |
+| High      | 0     | -0                |
+| Medium    | 1     | -5                |
+| Low       | 2     | -0 (deduplicated) |
+| **Total** | 3     | **-5**            |
 
 ## Medium Priority Issues
 
@@ -74,6 +74,7 @@
 **Pass Rate**: 96.4%
 
 **Key Findings**:
+
 - Page loads quickly with effective caching
 - Header displays collection name, description, cover photo correctly
 - Like button works with proper count updates
@@ -90,6 +91,7 @@
 **Pass Rate**: 94.3%
 
 **Key Findings**:
+
 - Grid displays cards with proper spacing and images
 - Search filtering works correctly with URL state persistence
 - Sort dropdown functions with multiple options
@@ -106,6 +108,7 @@
 **Pass Rate**: 96.9%
 
 **Key Findings**:
+
 - Stats card displays item count, views, last updated correctly
 - All 6 subcollections display with thumbnails and item counts
 - Navigation to subcollection pages works correctly
@@ -122,6 +125,7 @@
 **Pass Rate**: 100%
 
 **Key Findings**:
+
 - Like button toggles correctly with count updates
 - Share dropdown has Copy Link, X, Facebook options
 - Copy Link shows toast confirmation
@@ -139,6 +143,7 @@
 - **Performance**: PASS
 
 **Records Verified**:
+
 - Collections: 2 total, Baltimore Orioles found with correct data
 - Bobbleheads: 5 in collection (matches UI)
 - Subcollections: 6 in collection (matches UI)
@@ -146,6 +151,7 @@
 - Comments: 3 on collection (matches UI)
 
 **Minor Maintenance Items** (not blocking):
+
 - 2 orphaned likes referencing deleted bobbleheads
 - 1 orphaned comment referencing deleted content
 
@@ -157,18 +163,22 @@
 2. `Image detected as LCP without loading="eager"` - Performance warning (LOW)
 
 **Expected/Non-Issues**:
+
 - Sentry 429 rate limiting - Normal in development
 - Clerk development keys warning - Expected in dev environment
 
 ## Recommendations
 
 ### Immediate Fixes Required
+
 None - no critical or high priority issues found.
 
 ### Should Fix Before Merge
+
 1. Add `aria-describedby` to photo gallery DialogContent for accessibility compliance
 
 ### Consider Fixing
+
 1. Add `loading="eager"` to LCP images per Next.js recommendation
 2. Consider database cleanup job for orphaned likes/comments
 
@@ -185,6 +195,7 @@ None - no critical or high priority issues found.
 Feature is ready for production. The test score of 95/100 indicates high quality implementation with only minor accessibility and infrastructure improvements recommended.
 
 **Optional Fix Command** (for minor issues):
+
 ```
 /fix-validation docs/2025_11_23/testing/collection-page/test-report.md
 ```

@@ -29,5 +29,11 @@ export const CollectionBobbleheadsAsync = async ({
     notFound();
   }
 
-  return <CollectionBobbleheads collection={collection} searchParams={searchParams} subcollections={subcollections} />;
+  return (
+    <CollectionBobbleheads
+      collection={collection}
+      searchParams={searchParams}
+      subcollections={subcollections}
+    />
+  );
 };

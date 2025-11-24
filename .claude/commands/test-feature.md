@@ -42,13 +42,13 @@ You are a comprehensive feature testing orchestrator that validates newly implem
 
 **Subagent-Based Testing Pattern**: You are a lightweight coordinator that delegates ALL testing work to specialized subagents. This ensures deep, thorough testing because each subagent can make many tool calls to explore functionality comprehensively.
 
-| Phase | Component | Purpose |
-|-------|-----------|---------|
-| 0 | Orchestrator | **Pre-flight checks** (dev server, auth, test data) |
-| 1 | Orchestrator | Parse plan, extract routes, resolve dynamic params |
-| 2 | UI Subagents | Deep testing of each route/feature area |
-| 3 | Database Agent | Verify data persistence and integrity |
-| 4 | Orchestrator | Aggregate results into structured report |
+| Phase | Component      | Purpose                                             |
+| ----- | -------------- | --------------------------------------------------- |
+| 0     | Orchestrator   | **Pre-flight checks** (dev server, auth, test data) |
+| 1     | Orchestrator   | Parse plan, extract routes, resolve dynamic params  |
+| 2     | UI Subagents   | Deep testing of each route/feature area             |
+| 3     | Database Agent | Verify data persistence and integrity               |
+| 4     | Orchestrator   | Aggregate results into structured report            |
 
 **CRITICAL**: You must NEVER use Playwright tools directly. ALL UI testing is delegated to `ui-test-agent` subagents so they can perform extensive, thorough testing without context limitations.
 
@@ -61,9 +61,11 @@ You are a comprehensive feature testing orchestrator that validates newly implem
 **Process**:
 
 1. **Check Dev Server Running**:
+
    ```bash
    curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "FAILED"
    ```
+
    - If returns 200: Server is running ✓
    - If fails or returns other code:
      - Output: "❌ Dev server not running. Please start it with `npm run dev` and re-run this command."
@@ -171,6 +173,7 @@ You are a comprehensive feature testing orchestrator that validates newly implem
    - Group related routes and features into logical test units
    - Each test unit becomes a subagent task
    - Example breakdown:
+
      ```
      Test Unit 1: Add Bobblehead Form
        - Route: /bobbleheads/add
@@ -189,6 +192,7 @@ You are a comprehensive feature testing orchestrator that validates newly implem
      ```
 
 7. **Create Test Directory**:
+
    ```bash
    mkdir -p docs/{YYYY_MM_DD}/testing/{feature-name}/
    ```
@@ -212,6 +216,7 @@ You are a comprehensive feature testing orchestrator that validates newly implem
 **CRITICAL INSTRUCTIONS FOR SUBAGENT LAUNCHING**:
 
 Each UI subagent MUST be given:
+
 1. **Specific focus area** - What exactly to test (e.g., "filters functionality")
 2. **Comprehensive scenario list** - All scenarios to cover
 3. **Instructions to be exhaustive** - Test ALL combinations, edge cases, states
@@ -385,11 +390,13 @@ Return your results in this EXACT format:
 **Launch Strategy: SEQUENTIAL ONLY**
 
 **IMPORTANT**: UI test subagents MUST be launched sequentially, NOT in parallel. This is because:
+
 1. All subagents share the same Playwright MCP browser instance
 2. Parallel subagents would conflict and interfere with each other
 3. Each subagent needs exclusive browser access for reliable testing
 
 **Execution Flow:**
+
 ```
 1. Launch Test Unit 1 subagent → Wait for completion → Save results
 2. Launch Test Unit 2 subagent → Wait for completion → Save results
@@ -398,6 +405,7 @@ Return your results in this EXACT format:
 ```
 
 **After EACH Subagent Completes (before launching next):**
+
 - Capture the full output
 - Update todo list (mark completed, mark next as in_progress)
 - Save intermediate results to `docs/{YYYY_MM_DD}/testing/{feature-name}/0{N}-{test-unit-slug}.md`
@@ -536,24 +544,26 @@ Implementation Files:
 
    ## Test Coverage Summary
 
-   | Test Unit | Route(s) | Scenarios | Passed | Failed | Status |
-   |-----------|----------|-----------|--------|--------|--------|
-   | {name} | {routes} | {count} | {pass} | {fail} | {status} |
+   | Test Unit | Route(s) | Scenarios | Passed | Failed | Status   |
+   | --------- | -------- | --------- | ------ | ------ | -------- |
+   | {name}    | {routes} | {count}   | {pass} | {fail} | {status} |
+
    ...
 
    ## Issue Summary
 
-   | Severity | Count | Score Impact |
-   |----------|-------|--------------|
-   | Critical | {count} | -{impact} |
-   | High | {count} | -{impact} |
-   | Medium | {count} | -{impact} |
-   | Low | {count} | -{impact} |
+   | Severity  | Count   | Score Impact        |
+   | --------- | ------- | ------------------- |
+   | Critical  | {count} | -{impact}           |
+   | High      | {count} | -{impact}           |
+   | Medium    | {count} | -{impact}           |
+   | Low       | {count} | -{impact}           |
    | **Total** | {total} | **-{total_impact}** |
 
    ## Critical Issues
 
    {For each critical issue from ALL subagents}
+
    ### CRIT-{N}: {Title}
 
    - **Route**: {route}
@@ -605,6 +615,7 @@ Implementation Files:
    **SKIPPED**: Database verification was skipped
 
    {Otherwise}
+
    - **Data Integrity**: {PASS|FAIL}
    - **Authorization**: {PASS|FAIL}
    - **Performance**: {PASS|FAIL}
@@ -623,14 +634,17 @@ Implementation Files:
    ## Recommendations
 
    ### Immediate Fixes Required
+
    1. {Critical fix 1}
    2. {Critical fix 2}
 
    ### Should Fix Before Merge
+
    1. {High priority fix 1}
    2. {High priority fix 2}
 
    ### Consider Fixing
+
    1. {Medium priority fix 1}
 
    ## Testing Metrics
@@ -658,11 +672,15 @@ Implementation Files:
 
    **Fix Command**:
    ```
+
    /fix-validation {report_path}
+
    ```
+
    ```
 
 5. **Final Output**:
+
    ```
    ## Feature Testing Complete
 
@@ -697,26 +715,32 @@ Implementation Files:
 When defining test units, consider these specialization patterns:
 
 ### Form Testing Subagent
+
 Focus areas: Input validation, form submission, field interactions, error messages
 Scenarios: All field types, validation rules, submit flows, error recovery
 
 ### Filter/Search Testing Subagent
+
 Focus areas: Filter controls, search functionality, result updates, filter combinations
 Scenarios: Each filter individually, combinations, clear/reset, URL state, edge cases
 
 ### Navigation Testing Subagent
+
 Focus areas: Links, routing, breadcrumbs, back/forward behavior
 Scenarios: All navigation paths, deep links, invalid routes, history behavior
 
 ### Data Display Testing Subagent
+
 Focus areas: Tables, lists, cards, pagination, sorting
 Scenarios: Data accuracy, pagination edges, sort options, empty states, loading
 
 ### CRUD Operations Testing Subagent
+
 Focus areas: Create/Read/Update/Delete operations
 Scenarios: Full lifecycle, permissions, optimistic updates, error handling
 
 ### Dialog/Modal Testing Subagent
+
 Focus areas: Dialog opening/closing, form interactions within dialogs
 Scenarios: All trigger mechanisms, close behaviors, submission, nested dialogs
 
@@ -725,12 +749,14 @@ Scenarios: All trigger mechanisms, close behaviors, submission, nested dialogs
 When `--quick` flag is set, instruct subagents to test ONLY these scenarios per feature type:
 
 ### Forms (Quick Mode)
+
 - [ ] Page loads without errors
 - [ ] Submit with valid data → success
 - [ ] Submit with empty required fields → shows validation errors
 - **SKIP**: Individual field validation, edge cases, special characters, recovery flows
 
 ### Filters/Search (Quick Mode)
+
 - [ ] Page loads with default state
 - [ ] Apply one filter → results update
 - [ ] Clear filters → returns to default
@@ -738,17 +764,20 @@ When `--quick` flag is set, instruct subagents to test ONLY these scenarios per 
 - **SKIP**: Multi-filter combinations, URL state, pagination, edge cases
 
 ### Data Display (Quick Mode)
+
 - [ ] Page loads with data visible
 - [ ] Pagination works (if present)
 - [ ] Click item → navigates correctly
 - **SKIP**: All sorting options, empty states, loading states, edge cases
 
 ### Navigation (Quick Mode)
+
 - [ ] All main navigation links work
 - [ ] Browser back works
 - **SKIP**: Deep links, invalid routes, breadcrumbs, history edge cases
 
 ### Dialogs (Quick Mode)
+
 - [ ] Dialog opens when triggered
 - [ ] Dialog closes (X button or Escape)
 - [ ] Primary action works
@@ -761,6 +790,7 @@ When `--quick` flag is set, instruct subagents to test ONLY these scenarios per 
 ## Error Handling
 
 ### Pre-Flight Failures (Phase 0)
+
 - **Dev server not running**:
   - Output: "❌ Dev server not running at http://localhost:3000"
   - Action: **STOP EXECUTION**, instruct user to run `npm run dev`
@@ -771,6 +801,7 @@ When `--quick` flag is set, instruct subagents to test ONLY these scenarios per 
   - Action: Suggest `npm run db:seed`, ask if user wants to continue with static routes only
 
 ### Subagent Failures (Phase 2)
+
 - **Subagent timeout** (600s exceeded):
   - Log: "⏱️ Test unit '{name}' timed out after 600 seconds"
   - Action: Record partial results if available, mark unit as INCOMPLETE
@@ -788,6 +819,7 @@ When `--quick` flag is set, instruct subagents to test ONLY these scenarios per 
   - Each subagent is responsible for its own browser cleanup
 
 ### Page/Route Failures
+
 - **Page timeout** (page won't load):
   - Record as CRITICAL issue: "Page failed to load within timeout"
   - Include URL, any console errors captured
@@ -817,6 +849,7 @@ When `--quick` flag is set, instruct subagents to test ONLY these scenarios per 
 ## Report Compatibility
 
 The test report is designed to be consumed by `/fix-validation`:
+
 - Uses same severity categories (Critical, High, Medium, Low)
 - Uses same issue ID format (CRIT-N, HIGH-N, MED-N, LOW-N)
 - Includes file paths and recommended fixes
@@ -824,6 +857,7 @@ The test report is designed to be consumed by `/fix-validation`:
 - Provides clear next steps
 
 This enables a seamless workflow:
+
 ```bash
 /implement-plan docs/.../implementation-plan.md
 /test-feature docs/.../implementation-plan.md

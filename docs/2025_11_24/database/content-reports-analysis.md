@@ -3,6 +3,7 @@
 ## Table Structure
 
 ### Table: `content_reports`
+
 Location: `src/lib/db/schema/moderation.schema.ts`
 
 ```sql
@@ -27,7 +28,9 @@ CREATE TABLE content_reports (
 ## Enums
 
 ### content_report_reason
+
 Available reasons for reporting:
+
 - `offensive_content` - Content is offensive or inappropriate
 - `spam` - Content is spam or misleading
 - `copyright_violation` - Intellectual property violation
@@ -38,14 +41,18 @@ Available reasons for reporting:
 - `low_quality` - Low quality content
 
 ### content_report_status
+
 Report lifecycle states:
+
 - `pending` - Initial state, awaiting moderator review (DEFAULT)
 - `reviewed` - Moderator has reviewed but not closed
 - `resolved` - Action was taken (content removed/user warned)
 - `dismissed` - No violation found
 
 ### content_report_target_type
+
 Types of content that can be reported:
+
 - `bobblehead` - Individual bobblehead item
 - `collection` - User collection
 - `subcollection` - Subcollection within a collection
@@ -57,6 +64,7 @@ Types of content that can be reported:
 ## Key Relationships
 
 ### Foreign Keys
+
 1. **reporter_id** (NOT NULL) → users(id) [CASCADE DELETE]
    - User who submitted the report
    - If reporter is deleted, report is deleted
@@ -67,6 +75,7 @@ Types of content that can be reported:
    - If moderator is deleted, report remains with NULL moderator
 
 ### Polymorphic Relationship
+
 - `targetType` + `targetId` together identify the reported content
 - Not a direct foreign key (supports multiple content types)
 
@@ -89,6 +98,7 @@ content_reports_target_idx ON (target_type, target_id)
 ```
 
 ### Index Usage
+
 - **Filtering by status**: Gets pending/reviewed/resolved reports quickly
 - **Moderator queue**: Filters by status and date (status_created_idx)
 - **Target lookup**: Finds all reports for a specific content item
@@ -99,11 +109,13 @@ content_reports_target_idx ON (target_type, target_id)
 ## Admin Reports Query
 
 ### Main Query Method
+
 **Class**: `ContentReportsQuery` (extends `BaseQuery`)
 **File**: `src/lib/queries/content-reports/content-reports.query.ts`
 **Method**: `getAllReportsWithSlugsForAdminAsync`
 
 ### What the Query Does
+
 1. Selects all content_reports fields
 2. LEFT JOINs related content tables:
    - bobbleheads (for bobblehead reports)
@@ -118,6 +130,7 @@ content_reports_target_idx ON (target_type, target_id)
 4. Applies filters and pagination
 
 ### Filter Options
+
 ```typescript
 type AdminReportsFilterOptions = {
   limit?: number;
@@ -137,9 +150,11 @@ type AdminReportsFilterOptions = {
 ## Admin Reports Page Features
 
 ### Location
+
 `src/app/(app)/admin/reports/page.tsx`
 
 ### Display Components
+
 1. **Stats Cards** - Top of page showing counts:
    - Total Reports
    - Pending (awaiting review)
@@ -166,6 +181,7 @@ type AdminReportsFilterOptions = {
    - Status change action
 
 ### User Actions
+
 1. **Mark as Reviewed** - Indicates moderator has seen it
 2. **Mark as Resolved** - Action was taken, shows confirmation
 3. **Dismiss Report** - No violation found, shows confirmation
@@ -180,13 +196,16 @@ type AdminReportsFilterOptions = {
 ## Current Data Status
 
 ### Expected Usage
+
 Based on the code structure and schema, the application is ready to:
+
 - Accept user reports via `reportReasonDialog`
 - Store reports with complete metadata
 - Admin moderators can review and manage reports
 - Generate statistics from report data
 
 ### Testing the Table
+
 To verify content_reports has data:
 
 ```typescript
@@ -201,7 +220,7 @@ console.log('Breakdown:', {
   pending: stats.pending,
   reviewed: stats.reviewed,
   resolved: stats.resolved,
-  dismissed: stats.dismissed
+  dismissed: stats.dismissed,
 });
 console.log('Sample report:', reports[0]);
 ```
@@ -210,44 +229,49 @@ console.log('Sample report:', reports[0]);
 
 ## Field Descriptions
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| id | UUID | Yes | Unique report identifier |
-| created_at | TIMESTAMP | Yes | When report was submitted |
-| updated_at | TIMESTAMP | Yes | Last update timestamp |
-| reporter_id | UUID | Yes | Who submitted the report |
-| reason | enum | Yes | Why content was reported |
-| description | VARCHAR(1000) | No | Reporter's explanation |
-| target_type | enum | Yes | Type of reported content |
-| target_id | UUID | Yes | ID of reported content |
-| status | enum | Yes | Current review status |
-| moderator_id | UUID | No | Admin who reviewed (if any) |
-| moderator_notes | VARCHAR(1000) | No | Admin's notes |
-| resolved_at | TIMESTAMP | No | When report was closed |
+| Field           | Type          | Required | Description                 |
+| --------------- | ------------- | -------- | --------------------------- |
+| id              | UUID          | Yes      | Unique report identifier    |
+| created_at      | TIMESTAMP     | Yes      | When report was submitted   |
+| updated_at      | TIMESTAMP     | Yes      | Last update timestamp       |
+| reporter_id     | UUID          | Yes      | Who submitted the report    |
+| reason          | enum          | Yes      | Why content was reported    |
+| description     | VARCHAR(1000) | No       | Reporter's explanation      |
+| target_type     | enum          | Yes      | Type of reported content    |
+| target_id       | UUID          | Yes      | ID of reported content      |
+| status          | enum          | Yes      | Current review status       |
+| moderator_id    | UUID          | No       | Admin who reviewed (if any) |
+| moderator_notes | VARCHAR(1000) | No       | Admin's notes               |
+| resolved_at     | TIMESTAMP     | No       | When report was closed      |
 
 ---
 
 ## Data Insertion Points
 
 ### Creating Reports
+
 **Location**: Server Action
 `src/lib/actions/moderation/content-reports.actions.ts`
 
 **Flow**:
+
 1. User sees report button on content
 2. User fills `report_reason_dialog` with reason and description
 3. Server action validates and inserts into content_reports
 4. Report starts in 'pending' status
 
 ### Updating Reports
+
 **Location**: Server Action
 `src/lib/actions/admin/admin-content-reports.actions.ts`
 
 **Methods**:
+
 - `updateReportStatusAction` - Change single report status
 - `bulkUpdateReportsAction` - Change multiple reports at once
 
 **Operations**:
+
 1. Set moderator_id and moderator_notes
 2. Change status
 3. Set resolved_at if status is 'resolved' or 'dismissed'
@@ -257,18 +281,21 @@ console.log('Sample report:', reports[0]);
 ## Common Admin Workflows
 
 ### Review Pending Reports
+
 ```
 Filter: status = 'pending'
 Action: Click "View Details" -> Change status to "Reviewed"
 ```
 
 ### Close Resolved Cases
+
 ```
 Filter: status = 'resolved'
 Action: Confirm resolution is documented in moderator_notes
 ```
 
 ### Generate Report Statistics
+
 ```
 Group by status
 Count records in each group
@@ -276,6 +303,7 @@ Display in stats cards at top of page
 ```
 
 ### Find Content Issues
+
 ```
 Filter by: targetType = 'bobblehead' or 'collection'
 Filter by: reason = 'offensive_content' or 'spam'
@@ -300,4 +328,3 @@ Delete or flag content as needed
 - [ ] Test date range filtering
 - [ ] Verify moderator notes are saved
 - [ ] Check that resolved_at is set when closing report
-

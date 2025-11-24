@@ -16,18 +16,18 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Auto-Loaded |
-|------|------------|-------------------|
-| 1. Analyze Current Implementation | general-purpose | None (manual analysis) |
-| 2. Update Subcollection Card Component | react-component-specialist | react-coding-conventions, ui-components |
-| 3. Redesign Collection Subcollections List | react-component-specialist | react-coding-conventions, ui-components |
-| 4. Evaluate and Adjust Page Layout | react-component-specialist | react-coding-conventions, ui-components |
-| 5. Optimize Cloudinary Image Delivery | media-specialist | cloudinary-media, react-coding-conventions |
-| 6. Update Loading and Empty States | react-component-specialist | react-coding-conventions, ui-components |
-| 7. Enhance Subcollection Dialogs | form-specialist | form-system, react-coding-conventions, validation-schemas, server-actions |
-| 8. Add Hover and Interaction Effects | react-component-specialist | react-coding-conventions, ui-components |
-| 9. Implement Type-Safe Navigation | react-component-specialist | react-coding-conventions, ui-components |
-| 10. Comprehensive Testing and Accessibility | test-specialist | testing-patterns |
+| Step                                        | Specialist                 | Skills Auto-Loaded                                                        |
+| ------------------------------------------- | -------------------------- | ------------------------------------------------------------------------- |
+| 1. Analyze Current Implementation           | general-purpose            | None (manual analysis)                                                    |
+| 2. Update Subcollection Card Component      | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 3. Redesign Collection Subcollections List  | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 4. Evaluate and Adjust Page Layout          | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 5. Optimize Cloudinary Image Delivery       | media-specialist           | cloudinary-media, react-coding-conventions                                |
+| 6. Update Loading and Empty States          | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 7. Enhance Subcollection Dialogs            | form-specialist            | form-system, react-coding-conventions, validation-schemas, server-actions |
+| 8. Add Hover and Interaction Effects        | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 9. Implement Type-Safe Navigation           | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 10. Comprehensive Testing and Accessibility | test-specialist            | testing-patterns                                                          |
 
 ## Navigation
 
@@ -39,10 +39,10 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|-----------|--------|----------|--------|
-| Pre-Checks | Orchestrator | ⏳ | - | - |
-| Setup | Orchestrator | ⏳ | - | - |
+| Step       | Specialist   | Status | Duration | Issues |
+| ---------- | ------------ | ------ | -------- | ------ |
+| Pre-Checks | Orchestrator | ⏳     | -        | -      |
+| Setup      | Orchestrator | ⏳     | -        | -      |
 
 ## Summary
 

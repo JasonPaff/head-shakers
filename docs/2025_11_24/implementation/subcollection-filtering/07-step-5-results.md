@@ -21,6 +21,7 @@ Update controls component to manage subcollection filter state with Nuqs
 ### Files Modified
 
 **src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls.tsx**
+
 - Added `subcollectionId` to useQueryStates configuration with parseAsString parser
 - Extended viewOptions to include 'subcollection' mode
 - Implemented state coordination logic between view and subcollectionId
@@ -30,14 +31,17 @@ Update controls component to manage subcollection filter state with Nuqs
 ### State Coordination Logic
 
 **When subcollection selected**:
+
 - Sets subcollectionId to UUID
 - Automatically updates view to 'subcollection'
 
 **When view toggled to 'all' or 'collection'**:
+
 - Clears subcollectionId
 - Updates view accordingly
 
 **When view buttons clicked**:
+
 - Clears any active subcollection filter
 - Maintains search and sort filters
 
@@ -53,9 +57,11 @@ Update controls component to manage subcollection filter state with Nuqs
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed - No errors or warnings
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria
@@ -68,12 +74,14 @@ Update controls component to manage subcollection filter state with Nuqs
 ## Notes for Next Steps
 
 **State Coordination**:
+
 - URL always reflects current filter state
 - View mode auto-updates when subcollection selected
 - View buttons clear subcollection selection
 - Component accepts subcollections prop (will be populated in Step 7)
 
 **Filter Component Behavior**:
+
 - Renders null when no subcollections exist
 - Shows three options: All, Main Collection, and individual subcollections
 - Properly manages URL state through nuqs

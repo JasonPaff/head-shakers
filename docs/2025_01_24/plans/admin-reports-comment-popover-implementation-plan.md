@@ -30,17 +30,21 @@ Replace the disabled icon for comment reports in the admin reports table with a 
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/moderation.validation.ts` - Add commentContent field to schema
 
 **Changes:**
+
 - Add `commentContent: z.string().nullable()` to `selectContentReportWithSlugsSchema.extend()` (around line 102-106)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `SelectContentReportWithSlugs` type includes `commentContent: string | null`
 - [ ] All validation commands pass
 - [ ] No TypeScript errors in dependent files
@@ -54,18 +58,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-reports/content-reports.query.ts` - Add commentContent to SELECT clause
 
 **Changes:**
+
 - Add a new computed field in the select object (around lines 254-291) using a CASE statement similar to existing slug fields
 - The field should return `comments.content` when `targetType = 'comment'`, otherwise NULL
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query returns `commentContent` field for all reports
 - [ ] Comment reports include the actual comment text
 - [ ] Non-comment reports return null for commentContent
@@ -80,9 +88,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/admin/reports/reports-table.tsx` - Update View Content column cell renderer
 
 **Changes:**
+
 - Add imports for `Popover`, `PopoverContent`, `PopoverTrigger` from `@/components/ui/popover`
 - Add import for `MessageSquareIcon` from `lucide-react` (as the trigger icon for comment viewing)
 - Modify the `viewContent` column cell renderer (lines 268-304) to handle three cases:
@@ -94,11 +104,13 @@ npm run lint:fix && npm run typecheck
 - Include a header in the popover identifying it as "Reported Comment"
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Comments show a clickable message icon instead of disabled external link icon
 - [ ] Clicking the icon opens a popover with the full comment text
 - [ ] Popover displays "Comment content unavailable" when commentContent is null but targetType is comment
@@ -115,21 +127,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None
 
 **Changes:**
+
 - Test with existing comment reports to verify popover displays correct content
 - Test with non-comment reports to verify external links still work
 - Test with deleted content reports to verify disabled state handling
 - Test popover positioning and responsiveness
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] Comment reports show MessageSquare icon
 - [ ] Clicking icon opens popover with comment text
 - [ ] Popover closes when clicking outside
@@ -159,18 +175,20 @@ npm run build
 ## File Discovery Summary
 
 ### Files to Modify (4)
-| File | Purpose |
-|------|---------|
-| `src/lib/validations/moderation.validation.ts` | Add commentContent type |
-| `src/lib/queries/content-reports/content-reports.query.ts` | Fetch comment content |
-| `src/components/admin/reports/reports-table.tsx` | Add popover UI |
+
+| File                                                       | Purpose                 |
+| ---------------------------------------------------------- | ----------------------- |
+| `src/lib/validations/moderation.validation.ts`             | Add commentContent type |
+| `src/lib/queries/content-reports/content-reports.query.ts` | Fetch comment content   |
+| `src/components/admin/reports/reports-table.tsx`           | Add popover UI          |
 
 ### Reference Files (12)
-| File | Purpose |
-|------|---------|
-| `src/components/ui/popover.tsx` | Popover component to use |
-| `src/lib/db/schema/social.schema.ts` | Comments schema reference |
-| `src/components/admin/reports/report-filters.tsx` | Popover pattern reference |
-| `src/lib/facades/content-reports/content-reports.facade.ts` | Data flow reference |
-| `src/components/admin/reports/admin-reports-client.tsx` | Component structure |
-| `src/app/(app)/admin/reports/page.tsx` | Page structure |
+
+| File                                                        | Purpose                   |
+| ----------------------------------------------------------- | ------------------------- |
+| `src/components/ui/popover.tsx`                             | Popover component to use  |
+| `src/lib/db/schema/social.schema.ts`                        | Comments schema reference |
+| `src/components/admin/reports/report-filters.tsx`           | Popover pattern reference |
+| `src/lib/facades/content-reports/content-reports.facade.ts` | Data flow reference       |
+| `src/components/admin/reports/admin-reports-client.tsx`     | Component structure       |
+| `src/app/(app)/admin/reports/page.tsx`                      | Page structure            |

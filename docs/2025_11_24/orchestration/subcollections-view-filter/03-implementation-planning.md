@@ -53,6 +53,7 @@ The collection page currently displays bobbleheads with a limited filtering mech
 The agent generated a comprehensive implementation plan in proper markdown format with all required sections:
 
 ### Plan Overview
+
 - **Estimated Duration**: 4-6 hours
 - **Complexity**: Medium
 - **Risk Level**: Low
@@ -84,6 +85,7 @@ The plan includes 10 implementation steps:
 ### Validation Commands Compliance
 
 ✅ Every step touching JS/JSX/TS/TSX files includes:
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
@@ -107,6 +109,7 @@ npm run lint:fix && npm run typecheck
 ## Plan Complexity Assessment
 
 ### Duration Analysis
+
 - **Estimate**: 4-6 hours
 - **Reasoning**: Medium complexity with existing patterns to follow
 - **Breakdown**:
@@ -115,6 +118,7 @@ npm run lint:fix && npm run typecheck
   - Integration & Polish: 1 hour
 
 ### Risk Assessment
+
 - **Overall Risk**: Low
 - **Mitigation Strategies**:
   - Query performance verification (index check)
@@ -122,6 +126,7 @@ npm run lint:fix && npm run typecheck
   - Cache invalidation includes subcollectionId in keys
 
 ### Complexity Factors
+
 - **Architecture Familiarity**: Existing patterns reduce complexity
 - **State Coordination**: Medium complexity due to view toggle coordination
 - **Database Changes**: Low complexity (query modifications only)
@@ -140,22 +145,26 @@ npm run lint:fix && npm run typecheck
 ## Key Implementation Notes from Plan
 
 ### Assumptions Requiring Confirmation
+
 - Subcollection data accessible via existing queries (High confidence)
 - Database has index on bobbleheads.subcollectionId (Medium confidence - verify)
 - Permission model applies to subcollection filtering (High confidence)
 
 ### Risk Mitigation Strategies
+
 - Verify subcollectionId index exists before deployment
 - Follow existing Nuqs patterns to minimize state management risk
 - Include subcollectionId in cache keys to prevent stale data
 
 ### Edge Cases Identified
+
 - Subcollection deleted while user has it selected
 - Collection with no subcollections
 - Very large number of subcollections (>20)
 - Subcollection with no bobbleheads
 
 ### Performance Considerations
+
 - Ensure query plan uses subcollectionId index
 - Cache subcollection list to avoid repeated fetches
 - Consider pagination impact when filtering reduces results

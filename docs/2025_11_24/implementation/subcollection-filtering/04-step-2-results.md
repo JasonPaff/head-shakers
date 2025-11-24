@@ -20,6 +20,7 @@ Modify database queries to filter bobbleheads by specific subcollection ID
 ### Files Modified
 
 **src/lib/queries/collections/collections.query.ts**
+
 - Added optional `subcollectionId` parameter to `getAllCollectionBobbleheadsWithPhotosAsync`
 - Added optional `subcollectionId` parameter to `getCollectionBobbleheadsWithPhotosAsync`
 - Implemented conditional WHERE clause logic for three-state filtering:
@@ -32,11 +33,11 @@ Modify database queries to filter bobbleheads by specific subcollection ID
 ```typescript
 // Three-state filtering logic
 const subcollectionFilter =
-  subcollectionId === undefined
-    ? undefined // No filter - include all
-    : subcollectionId === null
-      ? isNull(bobbleheadsTable.subcollectionId) // Main collection only
-      : eq(bobbleheadsTable.subcollectionId, subcollectionId); // Specific subcollection
+  subcollectionId === undefined ?
+    undefined // No filter - include all
+  : subcollectionId === null ?
+    isNull(bobbleheadsTable.subcollectionId) // Main collection only
+  : eq(bobbleheadsTable.subcollectionId, subcollectionId); // Specific subcollection
 ```
 
 ## Conventions Applied
@@ -53,9 +54,11 @@ const subcollectionFilter =
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed with 3 pre-existing warnings (unrelated to this change)
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria
@@ -68,11 +71,13 @@ const subcollectionFilter =
 ## Notes for Next Steps
 
 The query layer now supports three distinct filtering modes ready for the facade layer:
+
 1. **All bobbleheads**: Pass `subcollectionId: undefined`
 2. **Main collection only**: Pass `subcollectionId: null`
 3. **Specific subcollection**: Pass `subcollectionId: "uuid-string"`
 
 The facade layer (Step 3) should map view states to these parameters:
+
 - `view: 'all'` → `subcollectionId: undefined`
 - `view: 'collection'` → `subcollectionId: null`
 - `view: 'subcollection'` → `subcollectionId: <actual-id-from-url>`

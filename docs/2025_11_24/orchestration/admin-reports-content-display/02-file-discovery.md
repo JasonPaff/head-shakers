@@ -54,6 +54,7 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 #### CRITICAL PRIORITY (Core Implementation)
 
 **`src/components/admin/reports/report-detail-dialog.tsx`**
+
 - **AI Reasoning**: The report details dialog component that must be modified to handle different content types with appropriate rendering
 - **Current Functionality**: Displays report information with a placeholder for content preview (lines 201-209)
 - **Key Integration**: Uses SelectContentReport type from validation schemas
@@ -62,6 +63,7 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/queries/content-reports/content-reports.query.ts`**
+
 - **AI Reasoning**: Query layer for fetching report data with slug information
 - **Current Functionality**: `getAllReportsWithSlugsForAdminAsync` method (lines 240-367) uses LEFT JOINs to fetch slug data for bobbleheads, collections, subcollections, and comment content
 - **Key Features**: Returns `SelectContentReportWithSlugs` type with targetSlug, parentCollectionSlug, commentContent, and contentExists fields
@@ -70,6 +72,7 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/validations/moderation.validation.ts`**
+
 - **AI Reasoning**: Type definitions and validation schemas for content reports
 - **Current Types**: `SelectContentReport`, `SelectContentReportWithSlugs` (lines 110-127)
 - **Key Fields**: commentContent (nullable string), contentExists (boolean), targetSlug (nullable string), parentCollectionSlug (nullable string)
@@ -80,6 +83,7 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 #### HIGH PRIORITY (Supporting Implementation)
 
 **`src/components/admin/reports/admin-reports-client.tsx`**
+
 - **AI Reasoning**: Client component that manages report table and dialog state
 - **Current Functionality**: Passes `SelectContentReportWithSlugs` to dialog component (line 211)
 - **Integration Point**: Needs to ensure fetched data includes content information
@@ -87,6 +91,7 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 - **Path Validation**: ✅ EXISTS
 
 **`src/components/admin/reports/reports-table.tsx`**
+
 - **AI Reasoning**: Reports table with existing content link generation logic
 - **Reference Implementation**: Lines 47-121 contain helper functions for link generation using $path
 - **Key Patterns**: `getContentLink()`, `isContentLinkAvailable()`, type-safe routing with $path utility
@@ -95,12 +100,14 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/facades/content-reports/content-reports.facade.ts`**
+
 - **AI Reasoning**: Business logic facade layer
 - **Current Method**: `getAllReportsWithSlugsForAdminAsync` (lines 243-265)
 - **May Need**: New method to fetch individual report with content details if not using existing data
 - **Path Validation**: ✅ EXISTS
 
 **`src/app/(app)/admin/reports/page.tsx`**
+
 - **AI Reasoning**: Admin reports page component
 - **Current Data Fetching**: Uses `ContentReportsFacade.getAllReportsWithSlugsForAdminAsync` (lines 101-104)
 - **Integration**: Already fetches data with slug information for routing
@@ -110,6 +117,7 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 #### MEDIUM PRIORITY (Database & Schema Reference)
 
 **`src/lib/db/schema/moderation.schema.ts`**
+
 - **AI Reasoning**: Content reports database schema
 - **Tables**: contentReports with targetType, targetId, reason, status, description fields
 - **Enums**: contentReportStatusEnum, contentReportTargetTypeEnum, contentReportReasonEnum
@@ -117,18 +125,21 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/db/schema/social.schema.ts`**
+
 - **AI Reasoning**: Comments database schema
 - **Table**: comments with content, userId, targetType, targetId, isDeleted fields
 - **Reference**: Understanding comment structure for content display
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/db/schema/collections.schema.ts`**
+
 - **AI Reasoning**: Collections and subcollections schema
 - **Tables**: collections and subCollections with slug fields
 - **Reference**: Understanding routing requirements for collections/subcollections
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/db/schema/bobbleheads.schema.ts`**
+
 - **AI Reasoning**: Bobbleheads database schema
 - **Table**: bobbleheads with slug, name, userId fields
 - **Reference**: Understanding bobblehead routing requirements
@@ -137,24 +148,28 @@ Please discover at minimum 5 relevant files with proper categorization by priori
 #### LOW PRIORITY (UI Components & Utilities)
 
 **`src/components/ui/dialog.tsx`**
+
 - **AI Reasoning**: Radix UI Dialog component wrapper
 - **Usage**: Base dialog components already used in report-detail-dialog.tsx
 - **Reference**: Understanding available dialog components and props
 - **Path Validation**: ✅ EXISTS
 
 **`src/components/ui/badge.tsx`**
+
 - **AI Reasoning**: Badge component
 - **Usage**: Already used in report-detail-dialog.tsx for status and content type badges
 - **Reference**: Understanding badge styling and variants
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/constants/enums.ts`**
+
 - **AI Reasoning**: Application-wide enums
 - **Key Enums**: CONTENT_REPORT.TARGET_TYPE, CONTENT_REPORT.STATUS, CONTENT_REPORT.REASON
 - **Reference**: Understanding valid content types and report statuses
 - **Path Validation**: ✅ EXISTS
 
 **`src/lib/actions/admin/admin-content-reports.actions.ts`**
+
 - **AI Reasoning**: Server actions for admin reports
 - **Actions**: updateReportStatusAction, bulkUpdateReportsAction, getAdminReportsAction
 - **Reference**: Understanding how report data flows from server to client
@@ -202,11 +217,12 @@ None - all discovered files exist in the codebase.
 #### Key Patterns
 
 1. **Type-Safe Routing with $path**: The codebase uses `next-typesafe-url` for generating type-safe route URLs
+
    ```typescript
    $path({
      route: '/bobbleheads/[bobbleheadSlug]',
-     routeParams: { bobbleheadSlug: report.targetSlug! }
-   })
+     routeParams: { bobbleheadSlug: report.targetSlug! },
+   });
    ```
 
 2. **Extended Query Pattern**: The query layer uses LEFT JOINs to fetch related data (slugs, parent collection slugs, comment content) in a single query, avoiding N+1 problems
@@ -220,6 +236,7 @@ None - all discovered files exist in the codebase.
 #### Existing Similar Functionality
 
 **Content Link Generation in Reports Table** (`reports-table.tsx`, lines 47-121):
+
 - Helper function `getContentLink()` generates type-safe URLs based on targetType
 - Helper function `isContentLinkAvailable()` checks if content exists and has required slug data
 - Pattern handles all content types: bobblehead, collection, subcollection, comment
@@ -227,6 +244,7 @@ None - all discovered files exist in the codebase.
 - **This exact pattern should be adapted for the dialog component**
 
 **Comment Content Display in Table** (`reports-table.tsx`, lines 305-367):
+
 - Uses Popover component to display comment content in table view
 - Shows MessageSquareIcon for comments
 - Displays comment text in scrollable popover

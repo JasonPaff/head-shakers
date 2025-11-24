@@ -14,6 +14,7 @@ Update type definitions to support subcollection filtering in URL state
 ### Files Modified
 
 **src/app/(app)/collections/[collectionSlug]/(collection)/route-type.ts**
+
 - Extended `searchParamsSchema` view enum to include 'subcollection' option
 - Added `subcollectionId` parameter with nullable string type
 - Updated from binary toggle ('all' | 'collection') to three-state system ('all' | 'collection' | 'subcollection')
@@ -32,10 +33,13 @@ subcollectionId: z.string().nullable().optional()
 ## Validation Results
 
 ### ESLint
+
 ✓ Passed with 3 pre-existing warnings (unrelated to this change)
+
 - Warnings in users-data-table.tsx, search-results-list.tsx, reports-table.tsx (TanStack Table React Compiler)
 
 ### TypeScript
+
 ✓ Passed - No compilation errors
 
 ## Success Criteria

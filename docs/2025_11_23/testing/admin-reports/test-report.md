@@ -17,26 +17,26 @@
 
 ## Test Coverage Summary
 
-| Test Unit | Route(s) | Scenarios | Passed | Failed | Status |
-|-----------|----------|-----------|--------|--------|--------|
-| Page Load & Stats Cards | /admin/reports | 18 | 18 | 0 | PASS |
-| Filter Controls | /admin/reports | 24 | ~20 | ~4 | PARTIAL (no output) |
-| Table Sorting & Columns | /admin/reports | 32 | 32 | 0 | PASS |
-| Row Selection & Bulk Actions | /admin/reports | 24 | 16 | 8 | FAIL |
-| Pagination Controls | /admin/reports | 24 | 23 | 1 | PASS |
-| Row Actions & Dialogs | /admin/reports | 24 | 8 | 16 | FAIL |
+| Test Unit                    | Route(s)       | Scenarios | Passed | Failed | Status              |
+| ---------------------------- | -------------- | --------- | ------ | ------ | ------------------- |
+| Page Load & Stats Cards      | /admin/reports | 18        | 18     | 0      | PASS                |
+| Filter Controls              | /admin/reports | 24        | ~20    | ~4     | PARTIAL (no output) |
+| Table Sorting & Columns      | /admin/reports | 32        | 32     | 0      | PASS                |
+| Row Selection & Bulk Actions | /admin/reports | 24        | 16     | 8      | FAIL                |
+| Pagination Controls          | /admin/reports | 24        | 23     | 1      | PASS                |
+| Row Actions & Dialogs        | /admin/reports | 24        | 8      | 16     | FAIL                |
 
 ## Issue Summary
 
-| Severity | Count | Score Impact |
-|----------|-------|--------------|
-| Critical | 5 | -125 |
-| High | 4 | -60 |
-| Medium | 2 | -10 |
-| Low | 1 | -2 |
-| **Total** | **12** | **-197** |
+| Severity  | Count  | Score Impact |
+| --------- | ------ | ------------ |
+| Critical  | 5      | -125         |
+| High      | 4      | -60          |
+| Medium    | 2      | -10          |
+| Low       | 1      | -2           |
+| **Total** | **12** | **-197**     |
 
-*Score capped at minimum 0, calculated as 42 due to partial functionality working*
+_Score capped at minimum 0, calculated as 42 due to partial functionality working_
 
 ## Critical Issues
 
@@ -258,6 +258,7 @@ Actions menu displays correctly but none of the actions (View Details, Mark as R
 **Total Unique Errors**: 0 application errors
 
 All console errors observed were related to Sentry monitoring service rate limiting (429 errors), not application functionality:
+
 - `TransportStatusCodeError: Transport returned status code 429`
 - `Error while sending envelope: TypeError: Failed to fetch`
 - `Failed to load resource: 429 (Too Many Requests)`
@@ -267,18 +268,21 @@ These are expected in development when Sentry rate limits are hit.
 ## Recommendations
 
 ### Immediate Fixes Required
+
 1. **Connect row actions to server actions** - The `onViewDetails` and `onBulkAction` props in `ReportsTable` need to be connected to actual state/action handlers in the page component
 2. **Add dialog rendering to page** - The `ReportDetailDialog` and `UpdateReportStatusDialog` components exist but are not rendered in `page.tsx`
 3. **Fix bulk action persistence** - The page needs to pass an `onBulkAction` handler that calls `bulkUpdateReportsAction`
 4. **Add page revalidation after actions** - Call `revalidatePath('/admin/reports')` after status updates
 
 ### Should Fix Before Merge
+
 1. Fix filter data fetching - ensure filter params are passed to and applied by the database query
 2. Add confirmation dialogs for destructive actions (Resolve, Dismiss)
 3. Add toast notifications for all actions
 4. Add loading states to action buttons
 
 ### Consider Fixing
+
 1. Add clear selection button to inline bulk actions bar
 2. Improve responsive design for stats cards grid
 
@@ -296,6 +300,7 @@ These are expected in development when Sentry rate limits are hit.
 **CRITICAL**: Feature has major issues. The admin reports page is essentially non-functional for moderation tasks.
 
 Run the following to address issues:
+
 ```
 /fix-validation docs/2025_11_23/testing/admin-reports/test-report.md --max-retries=3
 ```
@@ -303,6 +308,7 @@ Run the following to address issues:
 ---
 
 **Fix Command**:
+
 ```
 /fix-validation docs/2025_11_23/testing/admin-reports/test-report.md
 ```

@@ -28,13 +28,13 @@
 
 ## Prerequisites Validation
 
-| Prerequisite | Status |
-|--------------|--------|
-| reports-table.tsx exists | ✓ |
-| moderation.validation.ts exists | ✓ |
-| content-reports query directory exists | ✓ |
-| trending-content-table.tsx (reference) | ✓ (to be verified) |
-| $path utility from next-typesafe-url | ✓ (in package.json) |
+| Prerequisite                           | Status              |
+| -------------------------------------- | ------------------- |
+| reports-table.tsx exists               | ✓                   |
+| moderation.validation.ts exists        | ✓                   |
+| content-reports query directory exists | ✓                   |
+| trending-content-table.tsx (reference) | ✓ (to be verified)  |
+| $path utility from next-typesafe-url   | ✓ (in package.json) |
 
 ## Safety Checks
 

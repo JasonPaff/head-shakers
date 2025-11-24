@@ -7,6 +7,7 @@
 ## Workflow Overview
 
 This orchestration executes a 3-step feature planning process:
+
 1. **Feature Request Refinement** - Enhance request with project context
 2. **File Discovery** - Find all relevant implementation files
 3. **Implementation Planning** - Generate detailed markdown plan

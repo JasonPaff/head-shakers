@@ -29,6 +29,7 @@ Redesign the subcollections view to prioritize cover image display with an engag
 **Confidence**: High
 
 **Files to Review:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` - Current card implementation
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections.tsx` - Container layout
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Parent page structure
@@ -36,6 +37,7 @@ Redesign the subcollections view to prioritize cover image display with an engag
 - `src/lib/utils/cloudinary.utils.ts` - Available image utilities
 
 **Changes:**
+
 - Document current component props interface
 - Identify data requirements for new visual design
 - Map out responsive breakpoint strategy for image-first layout
@@ -43,11 +45,13 @@ Redesign the subcollections view to prioritize cover image display with an engag
 - Document Cloudinary transformation requirements for cover images
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Current component structure documented
 - [ ] Data flow from query to component mapped
 - [ ] Responsive strategy defined for new card layout
@@ -63,9 +67,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` - Complete visual redesign with new layout structure
 
 **Changes:**
+
 - Replace existing card structure with image-prominent layout using larger aspect ratio
 - Implement CldImage with optimized Cloudinary transformations (responsive sizing, lazy loading, auto format)
 - Add prominent subcollection name with appropriate typography hierarchy using Tailwind utilities
@@ -78,11 +84,13 @@ npm run lint:fix && npm run typecheck
 - Implement responsive text sizing across breakpoints
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover image takes visual prominence in card layout
 - [ ] Subcollection name clearly visible with proper typography
 - [ ] Hover and interactive states implemented with smooth transitions
@@ -100,9 +108,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx` - Grid layout controller
 
 **Changes:**
+
 - Update grid classes to support responsive breakpoints (mobile: 1 col, tablet: 2-3 cols, desktop: 3-4 cols)
 - Adjust gap spacing for visual breathing room between prominent cards
 - Consider masonry-style layout if card heights vary with content
@@ -112,11 +122,13 @@ npm run lint:fix && npm run typecheck
 - Ensure empty state handling integrates with new visual design
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid layout supports appropriate column counts per breakpoint
 - [ ] Spacing and gaps create visually balanced presentation
 - [ ] Layout adapts properly to sidebar width constraints
@@ -133,10 +145,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Main collections page layout
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections.tsx` - Sidebar container
 
 **Changes:**
+
 - Evaluate if 9/3 grid split allows sufficient width for subcollection cards
 - Consider adjusting to 8/4 or full-width layout with different organization if needed
 - Update responsive breakpoints for sidebar visibility and layout shifts
@@ -146,11 +160,13 @@ npm run lint:fix && npm run typecheck
 - Ensure layout works seamlessly on mobile with stacked sections
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Layout provides adequate space for prominent subcollection cards
 - [ ] Responsive behavior works across all device sizes
 - [ ] Visual balance maintained between main content and subcollections
@@ -167,13 +183,16 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/utils/cloudinary.utils.ts` - Add subcollection-specific transformation helpers
 - `src/lib/services/cloudinary.service.ts` - Ensure service methods support subcollection cover operations
 
 **Files to Review:**
+
 - `src/lib/constants/cloudinary-paths.ts` - Verify path constants for subcollection covers
 
 **Changes:**
+
 - Add utility function for subcollection cover image transformations with responsive sizing
 - Define optimal aspect ratios and crop modes for subcollection cards
 - Configure automatic format selection and quality optimization
@@ -183,11 +202,13 @@ npm run lint:fix && npm run typecheck
 - Validate proper integration with Next Cloudinary CldImage component
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Transformation utilities optimized for subcollection cover images
 - [ ] Responsive sizing configured for all breakpoints
 - [ ] Lazy loading and automatic format selection working
@@ -204,10 +225,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/subcollections-skeleton.tsx` - Loading state component
 - `src/components/ui/empty-state.tsx` - Review and potentially customize for subcollections context
 
 **Changes:**
+
 - Update skeleton loader to match new card dimensions and image prominence
 - Add skeleton placeholders for cover image area with appropriate aspect ratio
 - Include skeleton for subcollection name typography
@@ -217,11 +240,13 @@ npm run lint:fix && npm run typecheck
 - Ensure empty state includes clear call-to-action for adding subcollections
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton loader matches new card design dimensions
 - [ ] Loading animation provides smooth visual feedback
 - [ ] Empty state design aligns with overall visual approach
@@ -237,14 +262,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/subcollections/subcollection-create-dialog.tsx` - Create dialog with cover image emphasis
 - `src/components/feature/subcollections/subcollection-edit-dialog.tsx` - Edit dialog with cover image preview
 
 **Files to Review:**
+
 - `src/components/ui/cloudinary-cover-upload.tsx` - Upload widget integration
 - `src/lib/actions/collections/subcollections.actions.ts` - Server actions for subcollection mutations
 
 **Changes:**
+
 - Reorder form fields to prioritize cover image selection
 - Add live preview of selected cover image using CldImage
 - Enhance upload widget integration with better visual feedback
@@ -255,11 +283,13 @@ npm run lint:fix && npm run typecheck
 - Preserve server action integration for mutations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cover image selection prominently featured in dialogs
 - [ ] Live preview functionality working in both create and edit flows
 - [ ] Upload widget provides clear visual feedback
@@ -276,9 +306,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` - Add hover effects and transitions
 
 **Changes:**
+
 - Implement image zoom or subtle transform on hover using Tailwind utilities
 - Add overlay gradient or opacity changes for visual feedback
 - Create smooth transition animations for all interactive states
@@ -289,11 +321,13 @@ npm run lint:fix && npm run typecheck
 - Verify reduced-motion preferences are respected
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hover effects provide clear visual feedback
 - [ ] Transitions are smooth and performant
 - [ ] Keyboard focus states clearly visible
@@ -311,14 +345,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/subcollections/subcollection-card.tsx` - Verify $path integration for navigation links
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-sidebar-subcollections-async.tsx` - Verify data flow to redesigned components
 
 **Files to Review:**
+
 - `src/lib/facades/collections/subcollections.facade.ts` - Business logic layer
 - `src/lib/queries/collections/subcollections.query.ts` - Data fetching
 
 **Changes:**
+
 - Update all subcollection navigation links to use $path with proper type inference
 - Verify query parameters and route params are correctly typed
 - Ensure async component wrapper passes all required data to redesigned components
@@ -328,11 +365,13 @@ npm run lint:fix && npm run typecheck
 - Ensure cache invalidation works properly with CacheRevalidationService
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All navigation links use $path with correct typing
 - [ ] Async wrapper correctly passes data to redesigned components
 - [ ] Facade and query layers return complete data for new design
@@ -349,9 +388,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Test:**
+
 - All modified components and pages from previous steps
 
 **Changes:**
+
 - Test responsive layout across mobile, tablet, and desktop viewports
 - Verify image loading and Cloudinary optimizations working correctly
 - Test keyboard navigation through subcollection cards
@@ -366,12 +407,14 @@ npm run lint:fix && npm run typecheck
 - Verify touch interactions on mobile devices
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] Layout works correctly across all viewport sizes
 - [ ] Images load efficiently with proper Cloudinary transformations
 - [ ] Keyboard navigation fully functional
@@ -399,26 +442,31 @@ npm run test
 ## Notes
 
 **Architecture Considerations:**
+
 - The current 9/3 sidebar layout may need adjustment in Step 4 based on visual design requirements; alternative could be full-width subcollections section or 8/4 split
 - Consider if some subcollections should be featured more prominently than others based on criteria like recent activity or number of bobbleheads
 - Masonry layout option in Step 3 depends on whether card heights vary; uniform height cards work better with standard grid
 
 **Cloudinary Optimization:**
+
 - New image transformations should balance visual quality with load performance
 - Consider implementing blur-up placeholder technique for better perceived performance
 - Responsive images should include appropriate breakpoints matching Tailwind's responsive system
 
 **Accessibility:**
+
 - Image-heavy designs require extra attention to alt text quality
 - Ensure keyboard navigation provides clear focus indicators on prominent cards
 - Loading states should announce properly to screen readers
 
 **Risk Mitigation:**
+
 - Layout changes in Step 4 could impact other parts of the collection page; test thoroughly
 - Image-first design depends on users having quality cover images; empty state handling is critical
 - Performance on slower connections should be validated with network throttling
 
 **Future Enhancements:**
+
 - Consider adding infinite scroll or pagination if subcollection count grows large
 - Potential for user-customizable grid density or view modes (compact vs. spacious)
 - Analytics tracking for subcollection card interactions and engagement metrics
@@ -428,26 +476,31 @@ npm run test
 **Total Files Identified**: 28 files across all architectural layers
 
 **Critical Priority (4 files)**:
+
 - `src/components/feature/subcollections/subcollection-card.tsx` - Primary redesign target
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-subcollections-list.tsx` - Grid layout
 - `src/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections.tsx` - Container
 - `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` - Main page layout
 
 **High Priority (9 files)**:
+
 - Data layer: queries, facades
 - Services: Cloudinary service, utilities, constants
 - Upload components and validation schemas
 - Database schema and server actions
 
 **Medium Priority (9 files)**:
+
 - Supporting components: dialogs, actions, skeletons
 - UI foundation: cards, badges, empty states
 - Async wrappers
 
 **Low Priority (6 files)**:
+
 - Infrastructure: cache, routes, SEO, test IDs
 
 **Current Architecture Patterns**:
+
 - Server-first with App Router and Suspense boundaries
 - Type-safe routing with $path from next-typesafe-url
 - Cache invalidation via CacheRevalidationService

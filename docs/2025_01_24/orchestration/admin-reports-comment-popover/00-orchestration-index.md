@@ -24,11 +24,11 @@ This orchestration implements a popover to display reported comment content in t
 
 ## Execution Summary
 
-| Step | Status | Duration |
-|------|--------|----------|
-| Feature Refinement | Success | ~1s |
-| File Discovery | Success | ~2s |
-| Implementation Planning | Success | ~2s |
+| Step                    | Status  | Duration |
+| ----------------------- | ------- | -------- |
+| Feature Refinement      | Success | ~1s      |
+| File Discovery          | Success | ~2s      |
+| Implementation Planning | Success | ~2s      |
 
 **Total Files Discovered**: 15
 **Files to Modify**: 3

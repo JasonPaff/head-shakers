@@ -78,15 +78,18 @@
 ## ADDITIONAL OBSERVATIONS
 
 **UX Positives:**
+
 - "Public Subcollection" toggle in create form defaults to checked
 - Proper pluralization ("0 items", "1 item")
 - Sticky header appears when scrolling - good UX
 
 **Accessibility:**
+
 - All interactive elements have proper ARIA labels
 - Dialog has proper heading structure
 - Form fields have proper labels
 
 **Suggestions:**
+
 1. Fix the manifest.json syntax error
 2. Consider adding loading="eager" to subcollection placeholder images per Next.js recommendation

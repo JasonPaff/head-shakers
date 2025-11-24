@@ -8,6 +8,7 @@
 ## Extracted Implementation Steps
 
 ### Step 1: Update ReportDetailDialog Props Type
+
 - **What**: Change the report prop type from SelectContentReport to SelectContentReportWithSlugs
 - **Why**: The dialog needs access to slug data and comment content for proper rendering
 - **Files**: report-detail-dialog.tsx
@@ -15,6 +16,7 @@
 - **Confidence**: High
 
 ### Step 2: Create Content Link Generation Helper Functions
+
 - **What**: Add helper functions to generate type-safe links and check content availability
 - **Why**: Reuse existing pattern from reports-table.tsx for consistent behavior
 - **Files**: report-detail-dialog.tsx
@@ -22,6 +24,7 @@
 - **Confidence**: High
 
 ### Step 3: Add Content Display Section Component Logic
+
 - **What**: Create derived variables for conditional content rendering
 - **Why**: Follow existing component pattern for clean conditional rendering
 - **Files**: report-detail-dialog.tsx
@@ -29,6 +32,7 @@
 - **Confidence**: High
 
 ### Step 4: Replace Content Preview Placeholder Section
+
 - **What**: Replace the placeholder div with dynamic content rendering logic
 - **Why**: Implement the actual feature requirement for type-aware content display
 - **Files**: report-detail-dialog.tsx
@@ -36,6 +40,7 @@
 - **Confidence**: High
 
 ### Step 5: Add Content Status Indicator
+
 - **What**: Add a visual indicator showing whether content still exists or has been deleted
 - **Why**: Provide context to moderators about content availability
 - **Files**: report-detail-dialog.tsx
@@ -43,6 +48,7 @@
 - **Confidence**: High
 
 ### Step 6: Verify Type-Safe Routing Integration
+
 - **What**: Test that all $path calls generate correct route parameters
 - **Why**: Ensure type safety and correct routing behavior across all content types
 - **Files**: None (verification only)
@@ -55,14 +61,14 @@
 
 All steps analyzed using the detection algorithm:
 
-| Step | Files | Detection Rule | Specialist |
-|------|-------|----------------|------------|
-| 1 | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
-| 2 | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
-| 3 | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
-| 4 | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
-| 5 | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
-| 6 | None (verification) | Fallback | general-purpose |
+| Step | Files                    | Detection Rule          | Specialist                 |
+| ---- | ------------------------ | ----------------------- | -------------------------- |
+| 1    | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
+| 2    | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
+| 3    | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
+| 4    | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
+| 5    | report-detail-dialog.tsx | .tsx in src/components/ | react-component-specialist |
+| 6    | None (verification)      | Fallback                | general-purpose            |
 
 **Primary Domain**: React Components (UI Layer)
 **Single File Focus**: All changes to report-detail-dialog.tsx
@@ -73,10 +79,12 @@ All steps analyzed using the detection algorithm:
 ## Specialist Assignment Summary
 
 **react-component-specialist**: 5 steps
+
 - Skills auto-loaded: react-coding-conventions, ui-components
 - Will enforce: Component structure, naming conventions, Radix UI patterns
 
 **general-purpose**: 1 step
+
 - Verification only, no skill loading required
 
 ---
@@ -84,6 +92,7 @@ All steps analyzed using the detection algorithm:
 ## Todo List Created
 
 Created 7 todos (6 implementation steps + 1 quality gate):
+
 1. ⏳ Step 1: Update ReportDetailDialog Props Type [react-component-specialist]
 2. ⏳ Step 2: Create Content Link Generation Helper Functions [react-component-specialist]
 3. ⏳ Step 3: Add Content Display Section Component Logic [react-component-specialist]
@@ -97,6 +106,7 @@ Created 7 todos (6 implementation steps + 1 quality gate):
 ## Step Dependencies
 
 No explicit dependencies detected. All steps modify the same file sequentially, so natural ordering is:
+
 1. Type update (foundation)
 2. Helper functions (utilities)
 3. Component logic (state)

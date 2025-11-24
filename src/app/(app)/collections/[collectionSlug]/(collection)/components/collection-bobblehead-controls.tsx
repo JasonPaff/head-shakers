@@ -17,9 +17,7 @@ interface CollectionBobbleheadControlsProps {
   subcollections?: Array<{ id: string; name: string }>;
 }
 
-export const CollectionBobbleheadControls = ({
-  subcollections = [],
-}: CollectionBobbleheadControlsProps) => {
+export const CollectionBobbleheadControls = ({ subcollections = [] }: CollectionBobbleheadControlsProps) => {
   const [{ search, sort, subcollectionId, view }, setParams] = useQueryStates(
     {
       search: parseAsString.withDefault(''),

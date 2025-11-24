@@ -21,7 +21,11 @@ interface CollectionBobbleheadsProps {
   subcollections: Array<{ id: string; name: string }>;
 }
 
-export const CollectionBobbleheads = async ({ collection, searchParams, subcollections }: CollectionBobbleheadsProps) => {
+export const CollectionBobbleheads = async ({
+  collection,
+  searchParams,
+  subcollections,
+}: CollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
   const isOwner = await checkIsOwner(collection.userId);
 

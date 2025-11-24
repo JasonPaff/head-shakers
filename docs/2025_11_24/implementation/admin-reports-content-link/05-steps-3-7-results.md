@@ -19,12 +19,12 @@
 
 ## Files Modified
 
-| File | Changes |
-|------|---------|
-| src/components/admin/reports/reports-table.tsx | Updated props interface to use `SelectContentReportWithSlugs`, added imports for `$path`, `Link`, `ExternalLinkIcon`, Tooltip components, implemented helper functions, added new "View" column |
-| src/components/admin/reports/admin-reports-client.tsx | Updated type import to use `SelectContentReportWithSlugs` for props and state |
-| src/lib/facades/content-reports/content-reports.facade.ts | Added new facade method `getAllReportsWithSlugsForAdminAsync` |
-| src/app/(app)/admin/reports/page.tsx | Updated to use `getAllReportsWithSlugsForAdminAsync` |
+| File                                                      | Changes                                                                                                                                                                                         |
+| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| src/components/admin/reports/reports-table.tsx            | Updated props interface to use `SelectContentReportWithSlugs`, added imports for `$path`, `Link`, `ExternalLinkIcon`, Tooltip components, implemented helper functions, added new "View" column |
+| src/components/admin/reports/admin-reports-client.tsx     | Updated type import to use `SelectContentReportWithSlugs` for props and state                                                                                                                   |
+| src/lib/facades/content-reports/content-reports.facade.ts | Added new facade method `getAllReportsWithSlugsForAdminAsync`                                                                                                                                   |
+| src/app/(app)/admin/reports/page.tsx                      | Updated to use `getAllReportsWithSlugsForAdminAsync`                                                                                                                                            |
 
 ## Conventions Applied
 
@@ -68,10 +68,10 @@
 
 ## Validation Results
 
-| Command | Result |
-|---------|--------|
-| npm run lint:fix | PASS |
-| npm run typecheck | PASS |
+| Command           | Result |
+| ----------------- | ------ |
+| npm run lint:fix  | PASS   |
+| npm run typecheck | PASS   |
 
 ## Success Criteria
 

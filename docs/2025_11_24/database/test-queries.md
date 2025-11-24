@@ -5,12 +5,14 @@ These queries can be used to verify data in the content_reports table and unders
 ## Basic Count Queries
 
 ### Total Records in content_reports
+
 ```sql
 SELECT COUNT(*) as total_reports
 FROM content_reports;
 ```
 
 ### Reports by Status
+
 ```sql
 SELECT
   status,
@@ -21,6 +23,7 @@ ORDER BY count DESC;
 ```
 
 Expected output:
+
 ```
 status      | count
 ------------|-------
@@ -31,6 +34,7 @@ dismissed   | W
 ```
 
 ### Reports by Target Type
+
 ```sql
 SELECT
   target_type,
@@ -42,6 +46,7 @@ ORDER BY count DESC;
 ```
 
 ### Reports by Reason
+
 ```sql
 SELECT
   reason,
@@ -56,6 +61,7 @@ ORDER BY count DESC;
 ## Sample Reports Data
 
 ### Get Recent Reports with Reporter Info
+
 ```sql
 SELECT
   cr.id,
@@ -72,6 +78,7 @@ LIMIT 5;
 ```
 
 ### Get Pending Reports for Review
+
 ```sql
 SELECT
   cr.id,
@@ -89,6 +96,7 @@ LIMIT 20;
 ```
 
 ### Get Reports with Moderator Info
+
 ```sql
 SELECT
   cr.id,
@@ -111,6 +119,7 @@ ORDER BY cr.resolved_at DESC;
 ## Content-Specific Queries
 
 ### Get Reports on Deleted Content
+
 ```sql
 SELECT
   cr.id,
@@ -131,6 +140,7 @@ WHERE
 ```
 
 ### Get Bobblehead Reports with Content Info
+
 ```sql
 SELECT
   cr.id,
@@ -148,6 +158,7 @@ ORDER BY cr.created_at DESC;
 ```
 
 ### Get Collection Reports with Content Info
+
 ```sql
 SELECT
   cr.id,
@@ -165,6 +176,7 @@ ORDER BY cr.created_at DESC;
 ```
 
 ### Get Comment Reports with Content
+
 ```sql
 SELECT
   cr.id,
@@ -186,6 +198,7 @@ ORDER BY cr.created_at DESC;
 ## Analytics & Stats Queries
 
 ### Reports by Status and Target Type
+
 ```sql
 SELECT
   status,
@@ -197,6 +210,7 @@ ORDER BY status, count DESC;
 ```
 
 ### Average Time to Resolution
+
 ```sql
 SELECT
   ROUND(AVG(EXTRACT(EPOCH FROM (resolved_at - created_at)) / 3600)::numeric, 1) as avg_hours_to_resolve,
@@ -207,6 +221,7 @@ WHERE resolved_at IS NOT NULL AND status IN ('resolved', 'dismissed');
 ```
 
 ### Most Reported Reasons
+
 ```sql
 SELECT
   reason,
@@ -218,6 +233,7 @@ ORDER BY count DESC;
 ```
 
 ### Reports by Day
+
 ```sql
 SELECT
   DATE(created_at) as report_date,
@@ -232,6 +248,7 @@ ORDER BY report_date DESC;
 ```
 
 ### Moderator Activity
+
 ```sql
 SELECT
   u.display_name as moderator_name,
@@ -247,6 +264,7 @@ ORDER BY reports_handled DESC;
 ```
 
 ### Users with Most Reports
+
 ```sql
 SELECT
   u.display_name,
@@ -265,6 +283,7 @@ ORDER BY reports_submitted DESC;
 ## Admin Reports Page Equivalent Queries
 
 ### What the Admin Page Shows by Default
+
 ```sql
 -- Equivalent to: getAllReportsWithSlugsForAdminAsync() with no filters
 SELECT
@@ -313,6 +332,7 @@ OFFSET 0;
 ```
 
 ### With Status Filter (Pending)
+
 ```sql
 SELECT -- same as above
 FROM content_reports cr
@@ -323,6 +343,7 @@ LIMIT 25;
 ```
 
 ### With Date Filter
+
 ```sql
 SELECT -- same as above
 FROM content_reports cr
@@ -338,6 +359,7 @@ LIMIT 25;
 ## Test Data Verification Queries
 
 ### Verify Table Structure
+
 ```sql
 -- Check all columns and types
 SELECT
@@ -351,6 +373,7 @@ ORDER BY ordinal_position;
 ```
 
 ### Verify Indexes
+
 ```sql
 -- Check all indexes on table
 SELECT
@@ -362,6 +385,7 @@ ORDER BY indexname;
 ```
 
 ### Verify Constraints
+
 ```sql
 -- Check foreign keys and other constraints
 SELECT
@@ -378,6 +402,7 @@ WHERE tc.table_name = 'content_reports';
 ## Usage Examples in TypeScript
 
 ### Using the Facade (Recommended)
+
 ```typescript
 // From any server function or API route
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
@@ -385,17 +410,18 @@ import { ContentReportsFacade } from '@/lib/facades/content-reports/content-repo
 // Get all reports
 const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
   {}, // options
-  userId // current user
+  userId, // current user
 );
 
 console.log(`Total: ${stats.total}`);
 console.log(`Pending: ${stats.pending}`);
-reports.forEach(report => {
+reports.forEach((report) => {
   console.log(`Report ${report.id}: ${report.status}`);
 });
 ```
 
 ### With Filters
+
 ```typescript
 const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
   {
@@ -403,17 +429,18 @@ const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForA
     limit: 25,
     offset: 0,
   },
-  userId
+  userId,
 );
 ```
 
 ### Bulk Update
+
 ```typescript
 const updated = await ContentReportsFacade.bulkUpdateReportsStatusAsync(
   ['report-id-1', 'report-id-2'],
   'resolved',
   moderatorId,
-  moderatorNotes // optional
+  moderatorNotes, // optional
 );
 ```
 
@@ -428,4 +455,3 @@ const updated = await ContentReportsFacade.bulkUpdateReportsStatusAsync(
 5. **Test Status Changes**: Verify resolved_at is set appropriately
 6. **Bulk Operations**: Test selecting multiple reports and applying bulk actions
 7. **Performance**: Check query performance with large datasets using EXPLAIN ANALYZE
-

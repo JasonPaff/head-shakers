@@ -12,6 +12,7 @@
 ### Records Verified
 
 #### Collections Table
+
 - **Records checked**: 2 total collections in database
 - **Target collection**: Baltimore Orioles (ID: 7ce6e293-f529-47ac-8223-07eb4c5ea0f8)
   - Name: Baltimore Orioles
@@ -24,6 +25,7 @@
 - **Issues found**: None
 
 #### Bobbleheads Table
+
 - **Records checked**: 5 bobbleheads in Baltimore Orioles collection
 - **Expected count**: 5
 - **Actual count**: 5 ✓
@@ -36,6 +38,7 @@
 - **Issues found**: None
 
 #### Subcollections Table
+
 - **Records checked**: 6 subcollections in Baltimore Orioles collection
 - **Expected count**: 6
 - **Actual count**: 6 ✓
@@ -49,6 +52,7 @@
 - **Issues found**: None
 
 #### Likes Table
+
 - **Records checked**: 16 total likes in database
 - **Target likes for Baltimore Orioles**: 2 ✓
 - **Like records verified**:
@@ -58,6 +62,7 @@
 - **Issues found**: None
 
 #### Comments Table
+
 - **Records checked**: 13 total non-deleted comments in database
 - **Target comments for Baltimore Orioles**: 3 ✓
 - **Comment records verified**: All 3 comments target baltimore-orioles collection and are not deleted
@@ -68,6 +73,7 @@
 ## Integrity Checks
 
 ### Foreign Keys
+
 **Status**: PASS
 
 - Collections → Users FK: Collection user_id (7b929672-4764-4613-9ddf-24613c803253) exists in users table ✓
@@ -76,9 +82,11 @@
 - Comments → Users FK: All comment records reference valid users (verified for Baltimore Orioles comments) ✓
 
 ### Orphaned Records
+
 **Status**: FAIL (with caveat)
 
 **Findings**:
+
 - Orphaned Likes: 2 records found
   - Target ID: ece38507-9a82-40eb-a198-ac5a436be62f (type: bobblehead)
   - Issue: These likes reference a bobblehead that no longer exists in the database
@@ -96,6 +104,7 @@
 ## Data Consistency
 
 ### Collection Stats Match Actual Counts
+
 **Status**: PASS
 
 - **Like Count Consistency**: ✓
@@ -115,6 +124,7 @@
   - This is consistent with expected behavior
 
 ### Like Counts Accurate
+
 **Status**: PASS
 
 - Collection likes: 2 ✓
@@ -122,6 +132,7 @@
 - No discrepancies between stored counts and actual records
 
 ### Comment Counts Accurate
+
 **Status**: PASS
 
 - Collection comments: 3 ✓
@@ -134,6 +145,7 @@
 ## Schema Validation
 
 ### Collections Table Schema
+
 - All required columns present with correct types
 - Constraints validated:
   - CHECK constraints for non-negative counts ✓
@@ -142,17 +154,20 @@
 - Indexes optimized for filtering and sorting
 
 ### Likes Table Schema
+
 - Normalized design with like_target_type enum
 - Unique constraint prevents duplicate likes: (user_id, like_target_type, target_id) ✓
 - Indexes support efficient lookups by user, target, and type
 
 ### Comments Table Schema
+
 - Supports nested comments with parent_comment_id
 - Soft delete support with is_deleted flag
 - Tracking for edits with edited_at and is_edited
 - Indexes optimized for query patterns
 
 ### Subcollections Table Schema
+
 - Foreign key relationship to collections properly configured ✓
 - Sort order field for custom ordering
 - Like and comment counts tracked independently
@@ -162,6 +177,7 @@
 ## Summary of Findings
 
 ### Verified Data Points
+
 1. ✓ Baltimore Orioles collection exists with correct metadata
 2. ✓ Collection has exactly 5 bobbleheads as expected
 3. ✓ Collection has exactly 6 subcollections as expected
@@ -172,9 +188,11 @@
 8. ✓ No orphaned records related to this collection
 
 ### Data Integrity Assessment
+
 **Overall Status**: PASS
 
 The Baltimore Orioles collection and all associated data demonstrate strong data integrity with:
+
 - Correct relationship between collections, bobbleheads, and subcollections
 - Accurate like and comment counts
 - Valid foreign key relationships
@@ -182,6 +200,7 @@ The Baltimore Orioles collection and all associated data demonstrate strong data
 - No data corruption or inconsistencies
 
 ### Issues Found
+
 **Count**: 1 minor issue (not affecting Baltimore Orioles collection)
 
 1. **Orphaned Likes (2 records)**: References deleted bobbleheads

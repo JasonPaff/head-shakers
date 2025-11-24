@@ -22,11 +22,13 @@ The application needs a responsive footer component that appears consistently ac
 ### High Priority Files (20 files)
 
 #### Layout & Structure
+
 - `src/app/layout.tsx` - Root layout with providers
 - `src/app/(app)/layout.tsx` - App layout with header
 - `src/app/(public)/layout.tsx` - Public pages layout
 
 #### Footer Components (7 to create)
+
 - `src/components/layout/app-footer/app-footer.tsx` - Main footer component
 - `src/components/layout/app-footer/components/app-footer-nav.tsx` - Navigation section
 - `src/components/layout/app-footer/components/app-footer-legal.tsx` - Legal links
@@ -36,17 +38,20 @@ The application needs a responsive footer component that appears consistently ac
 - `src/components/layout/app-footer/components/app-footer-copyright.tsx` - Copyright section
 
 #### Reference Components
+
 - `src/components/layout/app-header/app-header.tsx` - Responsive patterns reference
 - `src/components/layout/app-header/components/app-header-nav-menu.tsx` - Navigation pattern
 - `src/components/layout/app-header/components/app-header-container.tsx` - Container pattern
 - `src/components/layout/content-layout.tsx` - Layout pattern reference
 
 #### Public Pages
+
 - `src/app/(public)/about/page.tsx` - About page (link target)
 - `src/app/(public)/terms/page.tsx` - Terms page (link target)
 - `src/app/(public)/privacy/page.tsx` - Privacy page (link target)
 
 #### Configuration & Styles
+
 - `src/app/globals.css` - Global Tailwind theme variables
 - `_next-typesafe-url_.d.ts` - Type-safe routing configuration
 - `CLAUDE.md` - Project rules and conventions
@@ -54,24 +59,30 @@ The application needs a responsive footer component that appears consistently ac
 ### Medium Priority Files (25 files)
 
 #### UI Components
+
 - Navigation menu, button, separator, input, label, form components
 - Auth content wrapper, tooltip, icons
 
 #### Server Actions & Forms
+
 - Featured content actions, next-safe-action configuration
 - Submit button, text field components
 
 #### Utilities & Configuration
+
 - Tailwind utilities (cn function), test ID generators
 - Config file for social links, cache utilities
 
 #### Sentry & Monitoring
+
 - Sentry constants and middleware patterns
 
 #### Type Definitions & Validation
+
 - Component types, validation schemas
 
 #### Testing Infrastructure
+
 - Test patterns, utilities, Vitest setup
 
 ---

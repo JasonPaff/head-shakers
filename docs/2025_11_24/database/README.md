@@ -5,9 +5,11 @@ This folder contains comprehensive documentation about the Head Shakers database
 ## Documentation Files
 
 ### 1. **database-schema-overview.md** (Main Reference)
+
 Complete overview of all 24 tables in the head-shakers database.
 
 **Contents**:
+
 - Database connection details
 - All tables organized by category (User Management, Content, Social, etc.)
 - Field descriptions for each table
@@ -20,9 +22,11 @@ Complete overview of all 24 tables in the head-shakers database.
 **Use this for**: Understanding the complete database structure, finding related tables, understanding relationships.
 
 ### 2. **content-reports-analysis.md** (Detailed Analysis)
+
 In-depth analysis of the `content_reports` table specifically.
 
 **Contents**:
+
 - Table structure with SQL definition
 - All enums (reasons, statuses, target types)
 - Foreign key relationships
@@ -37,9 +41,11 @@ In-depth analysis of the `content_reports` table specifically.
 **Use this for**: Understanding how content reports work, testing the admin reports page, understanding moderation workflow.
 
 ### 3. **quick-reference.md** (Fast Lookup)
+
 Quick reference guide for common needs.
 
 **Contents**:
+
 - All 24 tables listed
 - content_reports quick facts
 - Key fields summary
@@ -52,9 +58,11 @@ Quick reference guide for common needs.
 **Use this for**: Quick lookups, finding file locations, remembering enum values.
 
 ### 4. **test-queries.md** (SQL Testing)
+
 Complete set of SQL queries for testing and verification.
 
 **Contents**:
+
 - Basic count queries
 - Sample data queries with joins
 - Content-specific queries (by target type)
@@ -71,9 +79,11 @@ Complete set of SQL queries for testing and verification.
 ## Content Reports Table at a Glance
 
 ### Purpose
+
 The `content_reports` table stores user reports of content violations (offensive content, spam, copyright, etc.) for admin/moderator review and action.
 
 ### Location in Code
+
 ```
 Database Schema:     src/lib/db/schema/moderation.schema.ts
 Query Logic:         src/lib/queries/content-reports/content-reports.query.ts
@@ -84,6 +94,7 @@ Admin Page:          src/app/(app)/admin/reports/page.tsx
 ```
 
 ### Key Features
+
 - **Polymorphic Design**: Can report any content type (bobblehead, collection, comment, etc.)
 - **Status Tracking**: Reports flow through pending → reviewed → resolved/dismissed
 - **Moderation Workflow**: Tracks reporter, moderator, notes, and resolution timestamp
@@ -91,6 +102,7 @@ Admin Page:          src/app/(app)/admin/reports/page.tsx
 - **Content Linking**: Automatically handles deleted content with graceful fallbacks
 
 ### Testing
+
 To verify the table has data and test the admin reports functionality:
 
 1. **Access Admin Page**: Navigate to `/admin/reports` (requires admin/moderator role)
@@ -103,18 +115,19 @@ To verify the table has data and test the admin reports functionality:
 
 ## Quick Stats
 
-| Aspect | Count |
-|--------|-------|
-| Total Tables | 24 |
-| User Tables | 7 |
-| Content Tables | 5 |
-| Social Tables | 4 |
-| Report Tables | 1 |
-| System Tables | 4 |
-| Analytics Tables | 2 |
-| Launch Tables | 1 |
+| Aspect           | Count |
+| ---------------- | ----- |
+| Total Tables     | 24    |
+| User Tables      | 7     |
+| Content Tables   | 5     |
+| Social Tables    | 4     |
+| Report Tables    | 1     |
+| System Tables    | 4     |
+| Analytics Tables | 2     |
+| Launch Tables    | 1     |
 
 ### Table Dependencies
+
 ```
 content_reports references:
   - users (reporter_id) - CASCADE DELETE
@@ -125,6 +138,7 @@ Referenced by:
 ```
 
 ### Enum Values
+
 ```
 Report Status:    pending, reviewed, resolved, dismissed
 Target Type:      bobblehead, collection, subcollection, comment, user
@@ -138,16 +152,19 @@ Report Reason:    offensive_content, spam, copyright_violation,
 ## Key Queries Reference
 
 ### Count Total Reports
+
 ```sql
 SELECT COUNT(*) FROM content_reports;
 ```
 
 ### Get Reports by Status
+
 ```sql
 SELECT status, COUNT(*) FROM content_reports GROUP BY status;
 ```
 
 ### Get Sample Reports with Reporter
+
 ```sql
 SELECT cr.*, u.display_name as reporter_name
 FROM content_reports cr
@@ -174,21 +191,27 @@ Connection string uses environment variable: `DATABASE_URL`
 ## Common Tasks
 
 ### "I want to understand all the tables"
+
 → Read `database-schema-overview.md`
 
 ### "I need to test the admin reports page"
+
 → Read `content-reports-analysis.md` and use `test-queries.md`
 
 ### "I need to find where content_reports is used"
+
 → Check `content-reports-analysis.md` File Locations section or `quick-reference.md`
 
 ### "I need to verify data in the database"
+
 → Use queries from `test-queries.md`
 
 ### "I need the SQL to understand a feature"
+
 → Check `content-reports-analysis.md` or `test-queries.md` for specific queries
 
 ### "I'm new to the schema and need quick reference"
+
 → Start with `quick-reference.md` then dig into other docs as needed
 
 ---
@@ -196,19 +219,23 @@ Connection string uses environment variable: `DATABASE_URL`
 ## Related Files in Codebase
 
 **Schema Definitions**
+
 - `src/lib/db/schema/moderation.schema.ts` - content_reports table
 - `src/lib/db/schema/users.schema.ts` - users table (referenced)
 - `src/lib/db/schema/comments.schema.ts` - for comment reports
 
 **Query & Data Access**
+
 - `src/lib/queries/content-reports/content-reports.query.ts` - ContentReportsQuery class
 - `src/lib/facades/content-reports/content-reports.facade.ts` - Business logic
 
 **Actions & Mutations**
+
 - `src/lib/actions/moderation/content-reports.actions.ts` - Create reports
 - `src/lib/actions/admin/admin-content-reports.actions.ts` - Admin updates
 
 **UI Components**
+
 - `src/components/admin/reports/admin-reports-client.tsx` - Main client component
 - `src/components/admin/reports/reports-table.tsx` - Data table with sorting/pagination
 - `src/components/admin/reports/report-detail-dialog.tsx` - Detail view
@@ -216,9 +243,11 @@ Connection string uses environment variable: `DATABASE_URL`
 - `src/components/feature/content-reports/report-reason-dialog.tsx` - User report form
 
 **Validations & Types**
+
 - `src/lib/validations/moderation.validation.ts` - Zod schemas and types
 
 **Admin Pages**
+
 - `src/app/(app)/admin/reports/page.tsx` - Admin reports page
 
 ---
@@ -226,6 +255,7 @@ Connection string uses environment variable: `DATABASE_URL`
 ## Performance Considerations
 
 ### Indexes on content_reports
+
 ```
 content_reports_status_idx                  - Fast status filtering
 content_reports_created_at_idx              - Order by date
@@ -238,6 +268,7 @@ content_reports_target_idx                  - Find reports on content
 ```
 
 ### Query Optimization
+
 - Admin page uses LEFT JOINs to handle deleted content
 - Pagination with LIMIT/OFFSET (never full table scans)
 - Indexes on all common filter columns
@@ -246,6 +277,7 @@ content_reports_target_idx                  - Find reports on content
 ---
 
 ## Version Information
+
 Created: November 24, 2025
 Database: head-shakers (PostgreSQL on Neon)
 Schema Version: Current (as of above date)
@@ -272,4 +304,3 @@ Schema Version: Current (as of above date)
 ---
 
 **Questions?** Check the specific documentation file for your need or search for the content type/feature in the relevant doc.
-

@@ -16,6 +16,7 @@
 **Working Directory**: Changed to worktree
 
 ### npm Install Output
+
 ```
 added 1075 packages, and audited 1076 packages in 3m
 
@@ -49,6 +50,7 @@ added 1075 packages, and audited 1076 packages in 3m
 **Risk Level**: Low
 
 ### Quick Summary
+
 Update the report details dialog's content section to intelligently render different content types: display comment text directly for comment reports, and generate type-safe links using $path for bobblehead, collection, and subcollection reports. The data is already fetched with all required fields through getAllReportsWithSlugsForAdminAsync.
 
 ---
@@ -56,21 +58,25 @@ Update the report details dialog's content section to intelligently render diffe
 ## Prerequisites Validation
 
 ### ✅ SelectContentReportWithSlugs Type
+
 - **Status**: Confirmed
 - **Location**: src/lib/validations/moderation.validation.ts (lines 110-127)
 - **Fields Available**: commentContent, contentExists, targetSlug, parentCollectionSlug
 
 ### ✅ Dialog Props Type
+
 - **Current**: Uses SelectContentReport
 - **Required**: Must update to SelectContentReportWithSlugs
 - **Action**: Step 1 will handle this update
 
 ### ✅ $path Utility
+
 - **Status**: Available
 - **Source**: next-typesafe-url package
 - **Usage**: For type-safe routing to content
 
 ### ✅ Reference Implementation
+
 - **Location**: src/components/admin/reports/reports-table.tsx (lines 47-121, 305-367)
 - **Patterns**: Content link generation, comment display logic
 - **Action**: Will adapt existing patterns for dialog
@@ -80,11 +86,13 @@ Update the report details dialog's content section to intelligently render diffe
 ## Safety Checks
 
 ### Git Safety
+
 - ✅ New feature branch created (not on main)
 - ✅ Worktree isolation enabled
 - ✅ Changes won't affect main working directory
 
 ### Environment
+
 - ✅ Dependencies installed successfully
 - ✅ Working in isolated worktree
 - ✅ TypeScript and linting tools available
@@ -95,14 +103,14 @@ Update the report details dialog's content section to intelligently render diffe
 
 All steps analyzed based on file paths and content types:
 
-| Step | Files | Detected Specialist |
-|------|-------|---------------------|
-| 1 | report-detail-dialog.tsx | react-component-specialist |
-| 2 | report-detail-dialog.tsx | react-component-specialist |
-| 3 | report-detail-dialog.tsx | react-component-specialist |
-| 4 | report-detail-dialog.tsx | react-component-specialist |
-| 5 | report-detail-dialog.tsx | react-component-specialist |
-| 6 | Verification only | general-purpose |
+| Step | Files                    | Detected Specialist        |
+| ---- | ------------------------ | -------------------------- |
+| 1    | report-detail-dialog.tsx | react-component-specialist |
+| 2    | report-detail-dialog.tsx | react-component-specialist |
+| 3    | report-detail-dialog.tsx | react-component-specialist |
+| 4    | report-detail-dialog.tsx | react-component-specialist |
+| 5    | report-detail-dialog.tsx | react-component-specialist |
+| 6    | Verification only        | general-purpose            |
 
 **Primary Specialist**: react-component-specialist (5 of 6 steps)
 **Skills to Load**: react-coding-conventions, ui-components

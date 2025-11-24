@@ -1,7 +1,7 @@
 ---
 name: validation-specialist
 description: Specialized agent for implementing Zod validation schemas with drizzle-zod integration. Automatically loads validation-schemas skill for consistent schema patterns.
-model: sonnet
+model: opus
 color: purple
 ---
 

@@ -19,18 +19,18 @@ Enhance the collection page filtering system to support viewing bobbleheads from
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Loaded |
-|------|------------|---------------|
-| 1. Extend Route Types | general-purpose | (manual skill invocation) |
-| 2. Update Query Layer | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3. Extend Facade Layer | facade-specialist | facade-layer, caching, sentry-monitoring, drizzle-orm |
-| 4. Create Subcollection Selector | react-component-specialist | react-coding-conventions, ui-components |
-| 5. Integrate Nuqs State Management | form-specialist | form-system, react-coding-conventions, validation-schemas, server-actions |
-| 6. Update Server Component | react-component-specialist | react-coding-conventions, ui-components |
-| 7. Pass Subcollection Data | react-component-specialist | react-coding-conventions, ui-components |
-| 8. Update Validation Schemas | validation-specialist | validation-schemas |
-| 9. Handle Filter State Coordination | form-specialist | form-system, react-coding-conventions, validation-schemas, server-actions |
-| 10. Add Visual Feedback | react-component-specialist | react-coding-conventions, ui-components |
+| Step                                | Specialist                 | Skills Loaded                                                             |
+| ----------------------------------- | -------------------------- | ------------------------------------------------------------------------- |
+| 1. Extend Route Types               | general-purpose            | (manual skill invocation)                                                 |
+| 2. Update Query Layer               | database-specialist        | database-schema, drizzle-orm, validation-schemas                          |
+| 3. Extend Facade Layer              | facade-specialist          | facade-layer, caching, sentry-monitoring, drizzle-orm                     |
+| 4. Create Subcollection Selector    | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 5. Integrate Nuqs State Management  | form-specialist            | form-system, react-coding-conventions, validation-schemas, server-actions |
+| 6. Update Server Component          | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 7. Pass Subcollection Data          | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 8. Update Validation Schemas        | validation-specialist      | validation-schemas                                                        |
+| 9. Handle Filter State Coordination | form-specialist            | form-system, react-coding-conventions, validation-schemas, server-actions |
+| 10. Add Visual Feedback             | react-component-specialist | react-coding-conventions, ui-components                                   |
 
 ## Navigation
 
@@ -51,21 +51,21 @@ Enhance the collection page filtering system to support viewing bobbleheads from
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|------------|--------|----------|--------|
-| Pre-checks | orchestrator | ✓ | ~2m | None |
-| Setup | orchestrator | ✓ | ~1m | None |
-| 1. Route Types | general-purpose | ✓ | ~1m | None |
-| 2. Query Layer | database-specialist | ✓ | ~2m | None |
-| 3. Facade Layer | facade-specialist | ✓ | ~2m | None |
-| 4. Subcollection Selector | react-component-specialist | ✓ | ~2m | None |
-| 5. Nuqs State Management | form-specialist | ✓ | ~3m | None |
-| 6. Server Component | react-component-specialist | ✓ | ~2m | None |
-| 7. Subcollection Data | react-component-specialist | ✓ | ~3m | None |
-| 8. Validation Schemas | validation-specialist | ✓ | ~2m | None |
-| 9. Filter Coordination | form-specialist | ✓ | ~1m | None |
-| 10. Visual Feedback | react-component-specialist | ✓ | ~3m | None |
-| Quality Gates | orchestrator | ✓ | ~2m | None |
+| Step                      | Specialist                 | Status | Duration | Issues |
+| ------------------------- | -------------------------- | ------ | -------- | ------ |
+| Pre-checks                | orchestrator               | ✓      | ~2m      | None   |
+| Setup                     | orchestrator               | ✓      | ~1m      | None   |
+| 1. Route Types            | general-purpose            | ✓      | ~1m      | None   |
+| 2. Query Layer            | database-specialist        | ✓      | ~2m      | None   |
+| 3. Facade Layer           | facade-specialist          | ✓      | ~2m      | None   |
+| 4. Subcollection Selector | react-component-specialist | ✓      | ~2m      | None   |
+| 5. Nuqs State Management  | form-specialist            | ✓      | ~3m      | None   |
+| 6. Server Component       | react-component-specialist | ✓      | ~2m      | None   |
+| 7. Subcollection Data     | react-component-specialist | ✓      | ~3m      | None   |
+| 8. Validation Schemas     | validation-specialist      | ✓      | ~2m      | None   |
+| 9. Filter Coordination    | form-specialist            | ✓      | ~1m      | None   |
+| 10. Visual Feedback       | react-component-specialist | ✓      | ~3m      | None   |
+| Quality Gates             | orchestrator               | ✓      | ~2m      | None   |
 
 ## Summary
 

@@ -1,7 +1,7 @@
 ---
 name: facade-specialist
 description: Specialized agent for implementing business logic facades with transaction handling, caching, and Sentry monitoring. Automatically loads facade-layer, caching, sentry-monitoring, and drizzle-orm skills.
-model: sonnet
+model: opus
 color: yellow
 ---
 

@@ -64,6 +64,7 @@ None - All tested scenarios passed.
 ## ADDITIONAL OBSERVATIONS
 
 **UX Positives:**
+
 - Like button provides clear visual feedback (pressed state, count update, singular/plural grammar)
 - Share dropdown is well-organized with clear options
 - Copy Link shows helpful toast confirmation
@@ -74,12 +75,14 @@ None - All tested scenarios passed.
 - Report dialog has comprehensive reason options (8 categories)
 
 **Accessibility Notes:**
+
 - Like button has descriptive aria label: "Unlike this collection. 2 likes"
 - Comment textarea has proper label: "Comment content"
 - Buttons have descriptive names for screen readers
 - Report dialog has proper heading structure
 
 **Feature Completeness:**
+
 - All core social features are implemented and functional
 - Edit/Delete buttons appear appropriately on user's own comments
 - Report functionality has proper form validation (required reason field)

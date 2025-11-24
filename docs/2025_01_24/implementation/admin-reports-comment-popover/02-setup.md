@@ -5,31 +5,35 @@
 
 ## Step Routing Table
 
-| Step | Files | Specialist | Skills to Load |
-|------|-------|------------|----------------|
-| 1 | `src/lib/validations/moderation.validation.ts` | validation-specialist | validation-schemas |
-| 2 | `src/lib/queries/content-reports/content-reports.query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3 | `src/components/admin/reports/reports-table.tsx` | react-component-specialist | react-coding-conventions, ui-components |
-| 4 | None (verification only) | orchestrator | N/A |
+| Step | Files                                                      | Specialist                 | Skills to Load                                   |
+| ---- | ---------------------------------------------------------- | -------------------------- | ------------------------------------------------ |
+| 1    | `src/lib/validations/moderation.validation.ts`             | validation-specialist      | validation-schemas                               |
+| 2    | `src/lib/queries/content-reports/content-reports.query.ts` | database-specialist        | database-schema, drizzle-orm, validation-schemas |
+| 3    | `src/components/admin/reports/reports-table.tsx`           | react-component-specialist | react-coding-conventions, ui-components          |
+| 4    | None (verification only)                                   | orchestrator               | N/A                                              |
 
 ## Step Detection Analysis
 
 ### Step 1: Extend Validation Schema
+
 - **Files**: `src/lib/validations/*.validation.ts`
 - **Detection Rule**: Files end with `.validation.ts`
 - **Specialist**: `validation-specialist`
 
 ### Step 2: Update Database Query
+
 - **Files**: `src/lib/queries/**/*.query.ts`
 - **Detection Rule**: Files in `src/lib/queries/`
 - **Specialist**: `database-specialist`
 
 ### Step 3: Update Reports Table Component
+
 - **Files**: `src/components/**/*.tsx`
 - **Detection Rule**: Files in `src/components/` with `.tsx` extension
 - **Specialist**: `react-component-specialist`
 
 ### Step 4: Manual Testing and Verification
+
 - **Files**: None
 - **Detection Rule**: No file modifications, validation only
 - **Specialist**: Orchestrator runs validation commands directly

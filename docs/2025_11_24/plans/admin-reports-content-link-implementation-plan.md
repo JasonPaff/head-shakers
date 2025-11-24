@@ -28,23 +28,28 @@ This implementation adds a new "View Content" column to the admin reports table 
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/lib/validations/moderation.validation.ts` - Add new extended type for reports with slug data
 
 **Changes:**
+
 - Add new type `SelectContentReportWithSlugs` that extends SelectContentReport with optional slug fields:
   - `targetSlug: string | null` (for bobbleheads, collections, subcollections)
   - `parentCollectionSlug: string | null` (for subcollections only)
   - `contentExists: boolean` (to determine if content was deleted)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New type is exported from moderation.validation.ts
 - [ ] Type includes all necessary slug fields for routing
 - [ ] All validation commands pass
@@ -58,12 +63,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/lib/queries/content-reports/content-reports.query.ts` - Add new query method with JOINs
 
 **Changes:**
+
 - Create new method `getAllReportsWithSlugsForAdminAsync` that:
   - Uses LEFT JOINs to bobbleheads table for bobblehead slugs
   - Uses LEFT JOINs to collections table for collection slugs
@@ -75,11 +83,13 @@ npm run lint:fix && npm run typecheck
 - Use CASE expressions or COALESCE to determine the appropriate slug based on targetType
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New query method correctly fetches slug data for all target types
 - [ ] Subcollections correctly include parent collection slug
 - [ ] Query handles missing/deleted content gracefully (NULL slugs)
@@ -94,22 +104,27 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/components/admin/reports/reports-table.tsx` - Update component props and imports
 
 **Changes:**
+
 - Update import to use SelectContentReportWithSlugs instead of SelectContentReport
 - Update ReportsTableProps interface `data` prop type to use the new extended type
 - Update all type annotations within the component that reference the row data type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component accepts the new extended type
 - [ ] Type annotations are consistent throughout the component
 - [ ] All validation commands pass
@@ -123,12 +138,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/components/admin/reports/reports-table.tsx` - Add helper function and imports
 
 **Changes:**
+
 - Add import for $path from next-typesafe-url
 - Add import for Link from next/link
 - Add ExternalLinkIcon import from lucide-react (already has EyeIcon)
@@ -141,11 +159,13 @@ npm run lint:fix && npm run typecheck
 - Create isContentLinkAvailable helper to check if linking is possible (contentExists and has required slugs)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Helper function generates correct links for all target types
 - [ ] Subcollection links include both parent collection and subcollection slugs
 - [ ] Comment type returns null appropriately
@@ -160,12 +180,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/components/admin/reports/reports-table.tsx` - Add new column definition
 
 **Changes:**
+
 - Add new column definition in the columns useMemo array (after targetType column, before targetId column)
 - Column should have id 'viewContent' and header 'View'
 - Cell renderer should:
@@ -176,11 +199,13 @@ npm run lint:fix && npm run typecheck
 - Disable sorting for this column
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New column appears in the table between Content Type and Content ID
 - [ ] Clickable links work for bobbleheads, collections, subcollections, and users
 - [ ] Disabled state shows for comments and deleted content
@@ -195,12 +220,15 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - `src/components/admin/reports/reports-table.tsx` - Add Tooltip imports and usage
 
 **Changes:**
+
 - Add import for Tooltip, TooltipContent, TooltipTrigger from @/components/ui/tooltip
 - Wrap the disabled button in Tooltip components
 - Display appropriate message based on condition:
@@ -209,11 +237,13 @@ npm run lint:fix && npm run typecheck
 - Style the disabled button appropriately (reduced opacity, cursor-not-allowed)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Tooltip appears on hover for disabled states
 - [ ] Messages are contextually appropriate
 - [ ] Visual styling indicates disabled state clearly
@@ -228,22 +258,27 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - None
 
 **Files to Modify:**
+
 - Identify and modify files that call `getAllReportsForAdminAsync` to use `getAllReportsWithSlugsForAdminAsync` (likely in admin reports page or API route)
 
 **Changes:**
+
 - Search for usages of getAllReportsForAdminAsync
 - Update to use the new getAllReportsWithSlugsForAdminAsync method
 - Ensure the returned data is properly typed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All calling code uses the new query method
 - [ ] Data flows correctly from query to component
 - [ ] All validation commands pass

@@ -1,7 +1,7 @@
 ---
 name: database-specialist
 description: Specialized agent for implementing database schemas, queries, and migrations with Drizzle ORM. Automatically loads database-schema, drizzle-orm, and validation-schemas skills.
-model: sonnet
+model: opus
 color: cyan
 ---
 

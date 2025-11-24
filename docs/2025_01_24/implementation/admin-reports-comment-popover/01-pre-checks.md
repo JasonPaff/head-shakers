@@ -33,11 +33,11 @@
 
 ## Prerequisites Validation
 
-| Prerequisite | Status |
-|--------------|--------|
-| `src/lib/validations/moderation.validation.ts` | EXISTS |
+| Prerequisite                                               | Status |
+| ---------------------------------------------------------- | ------ |
+| `src/lib/validations/moderation.validation.ts`             | EXISTS |
 | `src/lib/queries/content-reports/content-reports.query.ts` | EXISTS |
-| `src/components/admin/reports/reports-table.tsx` | EXISTS |
+| `src/components/admin/reports/reports-table.tsx`           | EXISTS |
 
 ## Safety Check Results
 

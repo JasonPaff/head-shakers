@@ -16,15 +16,15 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills to Load |
-|------|------------|----------------|
-| 1. Extend Content Report Type | validation-specialist | validation-schemas |
-| 2. Enhance Content Reports Query | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3. Update Reports Table Props | react-component-specialist | react-coding-conventions, ui-components |
-| 4. Implement Content Link Helper | react-component-specialist | react-coding-conventions, ui-components |
-| 5. Add View Content Column | react-component-specialist | react-coding-conventions, ui-components |
-| 6. Add Tooltip Component | react-component-specialist | react-coding-conventions, ui-components |
-| 7. Update Calling Code | general-purpose | N/A |
+| Step                             | Specialist                 | Skills to Load                                   |
+| -------------------------------- | -------------------------- | ------------------------------------------------ |
+| 1. Extend Content Report Type    | validation-specialist      | validation-schemas                               |
+| 2. Enhance Content Reports Query | database-specialist        | database-schema, drizzle-orm, validation-schemas |
+| 3. Update Reports Table Props    | react-component-specialist | react-coding-conventions, ui-components          |
+| 4. Implement Content Link Helper | react-component-specialist | react-coding-conventions, ui-components          |
+| 5. Add View Content Column       | react-component-specialist | react-coding-conventions, ui-components          |
+| 6. Add Tooltip Component         | react-component-specialist | react-coding-conventions, ui-components          |
+| 7. Update Calling Code           | general-purpose            | N/A                                              |
 
 ## Navigation
 
@@ -36,15 +36,15 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|------------|--------|----------|--------|
-| 1. Extend Content Report Type | validation-specialist | Pending | - | - |
-| 2. Enhance Content Reports Query | database-specialist | Pending | - | - |
-| 3. Update Reports Table Props | react-component-specialist | Pending | - | - |
-| 4. Implement Content Link Helper | react-component-specialist | Pending | - | - |
-| 5. Add View Content Column | react-component-specialist | Pending | - | - |
-| 6. Add Tooltip Component | react-component-specialist | Pending | - | - |
-| 7. Update Calling Code | general-purpose | Pending | - | - |
+| Step                             | Specialist                 | Status  | Duration | Issues |
+| -------------------------------- | -------------------------- | ------- | -------- | ------ |
+| 1. Extend Content Report Type    | validation-specialist      | Pending | -        | -      |
+| 2. Enhance Content Reports Query | database-specialist        | Pending | -        | -      |
+| 3. Update Reports Table Props    | react-component-specialist | Pending | -        | -      |
+| 4. Implement Content Link Helper | react-component-specialist | Pending | -        | -      |
+| 5. Add View Content Column       | react-component-specialist | Pending | -        | -      |
+| 6. Add Tooltip Component         | react-component-specialist | Pending | -        | -      |
+| 7. Update Calling Code           | general-purpose            | Pending | -        | -      |
 
 ## Worktree Details
 

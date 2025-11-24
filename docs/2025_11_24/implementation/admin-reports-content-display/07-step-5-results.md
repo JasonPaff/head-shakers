@@ -22,6 +22,7 @@
 **Specialist Used**: react-component-specialist
 
 **Skills Auto-Loaded**:
+
 - react-coding-conventions: `.claude/skills/react-coding-conventions/references/React-Coding-Conventions.md`
 - ui-components: `.claude/skills/ui-components/references/UI-Components-Conventions.md`
 
@@ -30,6 +31,7 @@
 ## Implementation Details
 
 ### Files Modified
+
 - `src/components/admin/reports/report-detail-dialog.tsx`
   - Imported CheckCircleIcon and XCircleIcon from lucide-react
   - Added derived variable `_contentExists` for content availability status
@@ -38,6 +40,7 @@
   - Implemented conditional rendering with red XCircleIcon for deleted content
 
 ### Files Created
+
 None
 
 ---
@@ -60,13 +63,17 @@ None
 ## UI Implementation
 
 ### Derived Variable
+
 ```typescript
 const _contentExists = report.contentExists;
 ```
 
 ### Content Status Display
+
 ```jsx
-{/* Content Status */}
+{
+  /* Content Status */
+}
 <div className='flex items-center gap-2 text-sm'>
   <span className='text-muted-foreground'>Content Status:</span>
   <Conditional isCondition={_contentExists}>
@@ -81,10 +88,11 @@ const _contentExists = report.contentExists;
       Deleted
     </span>
   </Conditional>
-</div>
+</div>;
 ```
 
 **Visual Indicators**:
+
 - ✅ Green CheckCircleIcon + "Exists" text when content is available
 - ❌ Red XCircleIcon + "Deleted" text when content has been removed
 
@@ -93,6 +101,7 @@ const _contentExists = report.contentExists;
 ## Validation Results
 
 ### Command: npm run lint:fix && npm run typecheck
+
 **Result**: ✅ PASS
 **Exit Code**: 0
 **Output**: All ESLint checks passed with no issues. TypeScript compilation completed successfully with no type errors.
@@ -119,6 +128,7 @@ None
 ## Notes for Next Steps
 
 The content status indicator is now fully implemented and provides clear visual feedback to moderators about whether the reported content still exists or has been deleted. The implementation:
+
 - Uses semantic colors (green for exists, red for deleted)
 - Follows the existing dialog layout pattern
 - Provides immediate visual context alongside the content preview section

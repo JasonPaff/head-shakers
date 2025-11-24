@@ -209,11 +209,14 @@ Provide comprehensive file discovery with detailed reasoning for each file's rel
 ## Architecture Insights from AI Analysis
 
 ### Current Filtering Mechanism
+
 The AI identified a **two-state view toggle** in `collection-bobblehead-controls.tsx`:
+
 - **'all'**: Fetches bobbleheads from collection AND all subcollections via `getAllCollectionBobbleheadsWithPhotosAsync`
 - **'collection'**: Fetches only main collection bobbleheads (where `subcollectionId IS NULL`) via `getCollectionBobbleheadsWithPhotosAsync`
 
 ### Database Relationships Discovered
+
 ```
 collections (1) ──→ (n) subCollections
      │                       │
@@ -225,26 +228,33 @@ bobbleheads.collectionId   bobbleheads.subcollectionId (nullable)
 **Key insight**: Bobbleheads have BOTH `collectionId` (required) and `subcollectionId` (optional), allowing filtering at both levels.
 
 ### Nuqs URL State Management Pattern Identified
+
 ```typescript
-const [{ search, sort, view }, setParams] = useQueryStates({
-  search: parseAsString.withDefault(''),
-  sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
-  view: parseAsStringEnum([...viewOptions]).withDefault('all'),
-}, { shallow: false });
+const [{ search, sort, view }, setParams] = useQueryStates(
+  {
+    search: parseAsString.withDefault(''),
+    sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
+    view: parseAsStringEnum([...viewOptions]).withDefault('all'),
+  },
+  { shallow: false },
+);
 ```
 
 ### Query Layer Architecture Pattern
+
 1. **Base Query** (BaseQuery) - Permission filtering utilities
 2. **Domain Query** (CollectionsQuery, SubcollectionsQuery) - Raw DB queries
 3. **Facade Layer** (CollectionsFacade, SubcollectionsFacade) - Business logic, caching, error handling
 4. **Component Layer** - Consumes facade methods
 
 ### TanStack Integration Analysis
+
 **Important Finding**: AI discovered that **TanStack React Table is NOT currently used** in the bobblehead grid implementation. The grid uses a simple map over filtered results. TanStack Table exists in admin pages but is **NOT required** for this feature - the existing server-side query filtering approach is sufficient and more performant.
 
 ## File Path Validation Results
 
 ✅ **All 27 discovered files validated to exist**
+
 - Critical files: 13/13 exist ✅
 - High priority files: 8/8 exist ✅
 - Medium priority files: 4/4 exist ✅
@@ -261,21 +271,25 @@ const [{ search, sort, view }, setParams] = useQueryStates({
 ## Recommended Implementation Approach (AI-Generated)
 
 ### Phase 1: Update Route Types & Query Layer
+
 1. Extend `searchParamsSchema` in route-type.ts to include optional `subcollection` param
 2. Add new query method `getSubcollectionFilteredBobbleheadsWithPhotosAsync` to CollectionsQuery
 3. Update facade to add `getSubcollectionFilteredBobbleheadsWithPhotos` method
 
 ### Phase 2: UI Components
+
 1. Add subcollection selector to `collection-bobblehead-controls.tsx` using Radix Select pattern
 2. Update view toggle logic to include subcollection filtering
 3. Add subcollection to Nuqs state management
 
 ### Phase 3: Server Component Integration
+
 1. Update `collection-bobbleheads.tsx` to handle subcollection filter
 2. Update conditional query logic to support three modes: all, collection, subcollection-specific
 3. Ensure navigation context passes subcollection data to cards
 
 ### Phase 4: Testing & Polish
+
 1. Test all filter combinations (view + subcollection + search + sort)
 2. Verify URL state persistence and shareability
 3. Add loading states and empty states

@@ -4,15 +4,15 @@
 
 ## Step Routing Table
 
-| Step | Files | Primary Specialist | Skills Auto-Loaded |
-|------|-------|-------------------|-------------------|
-| 1 | src/lib/validations/moderation.validation.ts | validation-specialist | validation-schemas |
-| 2 | src/lib/queries/content-reports/*.ts | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3 | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 4 | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 5 | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 6 | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 7 | Admin page files (to be identified) | general-purpose | N/A |
+| Step | Files                                          | Primary Specialist         | Skills Auto-Loaded                               |
+| ---- | ---------------------------------------------- | -------------------------- | ------------------------------------------------ |
+| 1    | src/lib/validations/moderation.validation.ts   | validation-specialist      | validation-schemas                               |
+| 2    | src/lib/queries/content-reports/\*.ts          | database-specialist        | database-schema, drizzle-orm, validation-schemas |
+| 3    | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components          |
+| 4    | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components          |
+| 5    | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components          |
+| 6    | src/components/admin/reports/reports-table.tsx | react-component-specialist | react-coding-conventions, ui-components          |
+| 7    | Admin page files (to be identified)            | general-purpose            | N/A                                              |
 
 ## Detection Rules Applied
 

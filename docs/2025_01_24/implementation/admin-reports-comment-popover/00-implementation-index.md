@@ -17,12 +17,12 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills to Load |
-|------|------------|----------------|
-| 1. Extend Validation Schema | validation-specialist | validation-schemas |
-| 2. Update Database Query | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3. Update Reports Table Component | react-component-specialist | react-coding-conventions, ui-components |
-| 4. Manual Testing and Verification | orchestrator | (validation commands only) |
+| Step                               | Specialist                 | Skills to Load                                   |
+| ---------------------------------- | -------------------------- | ------------------------------------------------ |
+| 1. Extend Validation Schema        | validation-specialist      | validation-schemas                               |
+| 2. Update Database Query           | database-specialist        | database-schema, drizzle-orm, validation-schemas |
+| 3. Update Reports Table Component  | react-component-specialist | react-coding-conventions, ui-components          |
+| 4. Manual Testing and Verification | orchestrator               | (validation commands only)                       |
 
 ## Navigation
 
@@ -37,12 +37,12 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|------------|--------|----------|--------|
-| 1. Extend Validation Schema | validation-specialist | SUCCESS | ~1 min | None |
-| 2. Update Database Query | database-specialist | SUCCESS | ~2 min | None |
-| 3. Update Reports Table Component | react-component-specialist | SUCCESS | ~3 min | None |
-| 4. Manual Testing and Verification | orchestrator | SUCCESS | ~1 min | None |
+| Step                               | Specialist                 | Status  | Duration | Issues |
+| ---------------------------------- | -------------------------- | ------- | -------- | ------ |
+| 1. Extend Validation Schema        | validation-specialist      | SUCCESS | ~1 min   | None   |
+| 2. Update Database Query           | database-specialist        | SUCCESS | ~2 min   | None   |
+| 3. Update Reports Table Component  | react-component-specialist | SUCCESS | ~3 min   | None   |
+| 4. Manual Testing and Verification | orchestrator               | SUCCESS | ~1 min   | None   |
 
 ## Summary
 
