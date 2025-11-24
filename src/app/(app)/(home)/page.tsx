@@ -32,6 +32,7 @@ import {
   WEBSITE_SCHEMA,
 } from '@/lib/seo/seo.constants';
 import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { cn } from '@/utils/tailwind-utils';
 
 export const revalidate = 300;
 
@@ -101,11 +102,7 @@ export default async function HomePage() {
       )}
 
       {/* Hero Section */}
-      <section
-        className={
-          'relative overflow-hidden px-4 pt-16 pb-16 text-center md:pt-20 md:pb-20 lg:pt-24 lg:pb-24'
-        }
-      >
+      <section className={'relative overflow-hidden px-4 py-12 text-center'}>
         {/* Decorative Background Elements */}
         <div
           aria-hidden={'true'}
@@ -129,9 +126,11 @@ export default async function HomePage() {
         <div className={'container mx-auto max-w-4xl'}>
           {/* Hero Badge */}
           <div
-            className={
-              'mb-6 inline-flex items-center gap-2 rounded-full border border-warm-amber/30 bg-warm-amber-light/40 px-4 py-1.5 text-sm font-medium text-warm-amber-dark dark:border-warm-amber/50 dark:bg-warm-amber-dark/30 dark:text-warm-amber-light'
-            }
+            className={cn(
+              'mb-6 inline-flex items-center gap-2 rounded-full border border-warm-amber/30',
+              'bg-warm-amber-light/40 px-4 py-1.5 text-sm font-medium text-warm-amber-dark',
+              'dark:border-warm-amber/50 dark:bg-warm-amber-dark/30 dark:text-warm-amber-light',
+            )}
           >
             <SparklesIcon aria-hidden={'true'} className={'size-4'} />
             <span>The Premier Bobblehead Community</span>
@@ -185,9 +184,19 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Collections Section */}
-      <section className={'bg-card px-4 py-16 md:py-20'}>
+      <section className={'bg-card px-4 py-8'}>
         <div className={'container mx-auto max-w-7xl'}>
-          <div className={'mb-10 text-center'}>
+          <div className={'mb-10 flex flex-col items-center justify-center gap-3 text-center'}>
+            <div
+              className={
+                'flex size-14 items-center justify-center rounded-full bg-warm-orange-light/50 shadow-warm-sm'
+              }
+            >
+              <AwardIcon
+                aria-hidden={'true'}
+                className={'size-7 text-warm-orange-dark dark:text-warm-orange'}
+              />
+            </div>
             <h2 className={'mb-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl'}>
               Featured Collections
             </h2>
@@ -218,7 +227,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Bobbleheads Section */}
-      <section className={'relative px-4 py-16 md:py-20'}>
+      <section className={'relative px-4 py-8'}>
         {/* Subtle Background Accent */}
         <div
           aria-hidden={'true'}
