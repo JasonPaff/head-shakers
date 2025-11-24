@@ -18,33 +18,38 @@ import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 interface CollectionBobbleheadsProps {
   collection: NonNullable<PublicCollection>;
   searchParams?: CollectionSearchParams;
+  subcollections: Array<{ id: string; name: string }>;
 }
 
-export const CollectionBobbleheads = async ({ collection, searchParams }: CollectionBobbleheadsProps) => {
+export const CollectionBobbleheads = async ({ collection, searchParams, subcollections }: CollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
   const isOwner = await checkIsOwner(collection.userId);
 
   const view = searchParams?.view || 'all';
   const searchTerm = searchParams?.search || undefined;
   const sortBy = searchParams?.sort || 'newest';
+  const subcollectionIdFromParams = searchParams?.subcollectionId;
+
+  // Map view + subcollectionId to facade parameter
+  let subcollectionIdForFacade: null | string | undefined = undefined;
+  if (view === 'collection') {
+    subcollectionIdForFacade = null; // Main collection only
+  } else if (view === 'subcollection' && subcollectionIdFromParams) {
+    subcollectionIdForFacade = subcollectionIdFromParams; // Specific subcollection
+  }
+  // else: view === 'all' → subcollectionIdForFacade remains undefined (all bobbleheads)
 
   const options = {
     searchTerm,
     sortBy,
+    subcollectionId: subcollectionIdForFacade,
   };
 
-  const bobbleheads =
-    view === 'collection' ?
-      await CollectionsFacade.getCollectionBobbleheadsWithPhotos(
-        collection.id,
-        currentUserId || undefined,
-        options,
-      )
-    : await CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(
-        collection.id,
-        currentUserId || undefined,
-        options,
-      );
+  const bobbleheads = await CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(
+    collection.id,
+    currentUserId || undefined,
+    options,
+  );
 
   // Fetch user collections for edit dialog (only if owner)
   let collections: Array<ComboboxItem> = [];
@@ -59,6 +64,25 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
 
   const isEmpty = bobbleheads.length === 0;
   const hasActiveFilters = searchTerm || sortBy !== 'newest' || view !== 'all';
+  const _isSubcollectionFilter = view === 'subcollection' || view === 'collection';
+  const _selectedSubcollection = subcollections.find((sub) => sub.id === subcollectionIdFromParams);
+  const _subcollectionFilterLabel =
+    view === 'collection' ? 'Main Collection Only'
+    : _selectedSubcollection ? _selectedSubcollection.name
+    : '';
+
+  // Context-aware empty state messages
+  const _emptyStateTitle =
+    _isSubcollectionFilter ? 'No Bobbleheads in This View'
+    : hasActiveFilters ? 'No Results Found'
+    : 'No Bobbleheads Yet';
+
+  const _emptyStateDescription =
+    _isSubcollectionFilter ?
+      `No bobbleheads found in ${_subcollectionFilterLabel}. Try selecting a different view or clear the filter to see all bobbleheads.`
+    : hasActiveFilters ?
+      'No bobbleheads match your current search or filter criteria. Try adjusting your search terms or clearing filters.'
+    : "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead.";
 
   return (
     <div>
@@ -84,34 +108,41 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
 
       {/* Filter Controls */}
       <div className={'mb-4'}>
-        <CollectionBobbleheadControls />
+        <CollectionBobbleheadControls subcollections={subcollections} />
       </div>
 
       {/* Empty State */}
       <Conditional isCondition={isEmpty}>
         <EmptyState
           action={
-            <Conditional isCondition={isOwner && !hasActiveFilters}>
-              <Button asChild>
+            hasActiveFilters ?
+              <Button asChild variant={'outline'}>
                 <Link
                   href={$path({
-                    route: '/bobbleheads/add',
-                    searchParams: { collectionId: collection.id },
+                    route: '/collections/[collectionSlug]',
+                    routeParams: { collectionSlug: collection.slug },
                   })}
                 >
-                  <PlusIcon aria-hidden className={'mr-2 size-4'} />
-                  Add First Bobblehead
+                  Clear All Filters
                 </Link>
               </Button>
-            </Conditional>
+            : <Conditional isCondition={isOwner}>
+                <Button asChild>
+                  <Link
+                    href={$path({
+                      route: '/bobbleheads/add',
+                      searchParams: { collectionId: collection.id },
+                    })}
+                  >
+                    <PlusIcon aria-hidden className={'mr-2 size-4'} />
+                    Add First Bobblehead
+                  </Link>
+                </Button>
+              </Conditional>
           }
-          description={
-            hasActiveFilters ?
-              'No bobbleheads match your current search or filter criteria. Try adjusting your search terms or clearing filters.'
-            : "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead."
-          }
+          description={_emptyStateDescription}
           icon={Package2Icon}
-          title={hasActiveFilters ? 'No Results Found' : 'No Bobbleheads Yet'}
+          title={_emptyStateTitle}
         />
       </Conditional>
 

@@ -282,7 +282,9 @@ export const ReportsTable = ({
           const _hasCommentContent = _isComment && !!report.commentContent;
           const contentLink = getContentLink(report);
 
-          {/* Link available (for non-comment content types) */}
+          {
+            /* Link available (for non-comment content types) */
+          }
           if (_isLinkAvailable && contentLink) {
             return (
               <Button aria-label={'View content'} asChild className={'h-8 w-8 p-0'} variant={'ghost'}>
@@ -293,7 +295,9 @@ export const ReportsTable = ({
             );
           }
 
-          {/* Comment type with content available */}
+          {
+            /* Comment type with content available */
+          }
           if (_hasCommentContent) {
             return (
               <Popover>
@@ -312,7 +316,9 @@ export const ReportsTable = ({
             );
           }
 
-          {/* Content unavailable (deleted content or comment without content) */}
+          {
+            /* Content unavailable (deleted content or comment without content) */
+          }
           return (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -413,6 +419,7 @@ export const ReportsTable = ({
   );
 
   // TanStack Table instance - React Compiler warning is expected for this library
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     columns,
     data,

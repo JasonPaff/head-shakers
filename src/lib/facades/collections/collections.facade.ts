@@ -650,7 +650,7 @@ export class CollectionsFacade {
   static async getAllCollectionBobbleheadsWithPhotos(
     collectionId: string,
     viewerUserId?: string,
-    options?: { searchTerm?: string; sortBy?: string },
+    options?: { searchTerm?: string; sortBy?: string; subcollectionId?: null | string },
     dbInstance?: DatabaseExecutor,
   ): Promise<
     Array<
@@ -711,7 +711,7 @@ export class CollectionsFacade {
       );
     } catch (error) {
       const context: FacadeErrorContext = {
-        data: { collectionId },
+        data: { collectionId, subcollectionId: options?.subcollectionId },
         facade: 'CollectionsFacade',
         method: 'getAllCollectionBobbleheadsWithPhotos',
         operation: 'getAllBobbleheadsWithPhotos',
@@ -793,7 +793,7 @@ export class CollectionsFacade {
   static async getCollectionBobbleheadsWithPhotos(
     collectionId: string,
     viewerUserId?: string,
-    options?: { searchTerm?: string; sortBy?: string },
+    options?: { searchTerm?: string; sortBy?: string; subcollectionId?: null | string },
     dbInstance?: DatabaseExecutor,
   ): Promise<
     Array<
@@ -854,7 +854,7 @@ export class CollectionsFacade {
       );
     } catch (error) {
       const context: FacadeErrorContext = {
-        data: { collectionId },
+        data: { collectionId, subcollectionId: options?.subcollectionId },
         facade: 'CollectionsFacade',
         method: 'getCollectionBobbleheadsWithPhotos',
         operation: 'getBobbleheadsWithPhotos',

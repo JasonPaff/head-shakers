@@ -347,6 +347,7 @@ export const UsersDataTable = ({
   );
 
   // TanStack Table instance - React Compiler warning is expected for this library
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     columns,
     data,

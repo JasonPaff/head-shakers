@@ -25,6 +25,7 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
@@ -127,10 +128,11 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   const collectionId = collection.id;
   const currentUserId = await getOptionalUserId();
 
-  // Fetch collection data and like data for both headers
-  const [publicCollection, likeData] = await Promise.all([
+  // Fetch collection data, like data, and subcollections for filter
+  const [publicCollection, likeData, subcollections] = await Promise.all([
     CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined),
     SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId || undefined),
+    SubcollectionsFacade.getSubCollectionsByCollection(collectionId, currentUserId || undefined),
   ]);
 
   if (!publicCollection) {
@@ -215,6 +217,7 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
                     <CollectionBobbleheadsAsync
                       collectionId={collectionId}
                       searchParams={resolvedSearchParams}
+                      subcollections={subcollections}
                     />
                   </Suspense>
                 </CollectionErrorBoundary>
