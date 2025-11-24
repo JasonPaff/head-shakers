@@ -326,7 +326,7 @@ export class CollectionsQuery extends BaseQuery {
   static async getAllCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
-    options?: { searchTerm?: string; sortBy?: string },
+    options?: { searchTerm?: string; sortBy?: string; subcollectionId?: null | string },
   ): Promise<
     Array<
       BobbleheadListRecord & {
@@ -358,6 +358,15 @@ export class CollectionsQuery extends BaseQuery {
     const searchCondition = this._getSearchCondition(options?.searchTerm);
     const sortOrder = this._getSortOrder(options?.sortBy);
 
+    // build subcollection filter based on options
+    // undefined = all bobbleheads (no filter)
+    // null = main collection only (null subcollectionId)
+    // string = specific subcollection ID
+    const subcollectionFilter =
+      options?.subcollectionId === undefined ? undefined
+      : options.subcollectionId === null ? isNull(bobbleheads.subcollectionId)
+      : eq(bobbleheads.subcollectionId, options.subcollectionId);
+
     return dbInstance
       .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
@@ -373,6 +382,7 @@ export class CollectionsQuery extends BaseQuery {
           collectionFilter,
           bobbleheadFilter,
           searchCondition,
+          subcollectionFilter,
         ),
       )
       .orderBy(sortOrder);
@@ -880,7 +890,7 @@ export class CollectionsQuery extends BaseQuery {
   static async getCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
-    options?: { searchTerm?: string; sortBy?: string },
+    options?: { searchTerm?: string; sortBy?: string; subcollectionId?: null | string },
   ): Promise<
     Array<
       BobbleheadListRecord & {
@@ -913,6 +923,15 @@ export class CollectionsQuery extends BaseQuery {
     const searchCondition = this._getSearchCondition(options?.searchTerm);
     const sortOrder = this._getSortOrder(options?.sortBy);
 
+    // build subcollection filter based on options
+    // undefined = all bobbleheads (no filter)
+    // null = main collection only (null subcollectionId) - DEFAULT BEHAVIOR
+    // string = specific subcollection ID
+    const subcollectionFilter =
+      options?.subcollectionId === undefined ? isNull(bobbleheads.subcollectionId)
+      : options.subcollectionId === null ? isNull(bobbleheads.subcollectionId)
+      : eq(bobbleheads.subcollectionId, options.subcollectionId);
+
     return dbInstance
       .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
@@ -925,10 +944,10 @@ export class CollectionsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.collectionId, collectionId),
-          isNull(bobbleheads.subcollectionId),
           collectionFilter,
           bobbleheadFilter,
           searchCondition,
+          subcollectionFilter,
         ),
       )
       .orderBy(sortOrder);
