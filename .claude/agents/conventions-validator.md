@@ -1,7 +1,7 @@
 ---
 name: conventions-validator
 description: Head Shakers React conventions specialist. Validates code against project-specific React patterns, naming conventions, component structure, and architectural rules defined in the coding conventions.
-model: haiku
+model: sonnet
 color: cyan
 allowed-tools: Read(*), Grep(*), Glob(*)
 ---
