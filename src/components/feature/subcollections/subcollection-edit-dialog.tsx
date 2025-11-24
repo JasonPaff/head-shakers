@@ -32,6 +32,7 @@ interface SubcollectionEditDialogProps {
     coverImageUrl?: null | string;
     description: null | string;
     id: string;
+    isPublic: boolean;
     name: string;
   };
 }
@@ -61,6 +62,7 @@ export const SubcollectionEditDialog = withFocusManagement(
       defaultValues: {
         coverImageUrl: subcollection.coverImageUrl || undefined,
         description: subcollection.description || '',
+        isPublic: subcollection.isPublic,
         name: subcollection.name,
         subcollectionId: subcollection.id,
       } as UpdateSubCollectionInput,
@@ -113,7 +115,8 @@ export const SubcollectionEditDialog = withFocusManagement(
             <DialogHeader>
               <DialogTitle>Update Subcollection</DialogTitle>
               <DialogDescription>
-                Update the details of your subcollection below. You can change the name and description.
+                Update the details of your subcollection below. You can change the name, description, and
+                visibility.
               </DialogDescription>
             </DialogHeader>
 
@@ -149,6 +152,11 @@ export const SubcollectionEditDialog = withFocusManagement(
                   />
                 </div>
               )}
+
+              {/* Visibility */}
+              <form.AppField name={'isPublic'}>
+                {(field) => <field.SwitchField label={'Public Subcollection'} />}
+              </form.AppField>
             </div>
 
             {/* Action Buttons */}

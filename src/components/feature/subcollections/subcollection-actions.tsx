@@ -21,6 +21,7 @@ interface SubcollectionActionsProps {
   subcollection: {
     description: null | string;
     id: string;
+    isPublic: boolean;
     name: string;
   };
 }

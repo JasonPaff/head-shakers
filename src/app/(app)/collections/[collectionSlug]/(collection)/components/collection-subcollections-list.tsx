@@ -17,6 +17,7 @@ interface SubcollectionForList {
   coverImageUrl?: null | string;
   description: null | string;
   id: string;
+  isPublic: boolean;
   name: string;
   slug: string;
 }

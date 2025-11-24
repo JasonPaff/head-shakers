@@ -121,6 +121,35 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
           {bobbleheads.map((bobblehead) => (
             <BobbleheadGalleryCard
               bobblehead={bobblehead}
+              bobbleheadForEdit={
+                isOwner ?
+                  {
+                    acquisitionDate: bobblehead.acquisitionDate,
+                    acquisitionMethod: bobblehead.acquisitionMethod,
+                    category: bobblehead.category,
+                    characterName: bobblehead.characterName,
+                    collectionId: bobblehead.collectionId,
+                    currentCondition: bobblehead.condition,
+                    customFields: bobblehead.customFields,
+                    description: bobblehead.description,
+                    height: bobblehead.height,
+                    id: bobblehead.id,
+                    isFeatured: bobblehead.isFeatured,
+                    isPublic: bobblehead.isPublic,
+                    manufacturer: bobblehead.manufacturer,
+                    material: bobblehead.material,
+                    name: bobblehead.name,
+                    purchaseLocation: bobblehead.purchaseLocation,
+                    purchasePrice: bobblehead.purchasePrice,
+                    series: bobblehead.series,
+                    status: bobblehead.status,
+                    subcollectionId: bobblehead.subcollectionId,
+                    weight: bobblehead.weight,
+                    year: bobblehead.year,
+                  }
+                : undefined
+              }
+              collections={isOwner ? collections : undefined}
               isOwner={isOwner}
               key={bobblehead.id}
               navigationContext={{ collectionId: collection.id }}

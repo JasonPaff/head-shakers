@@ -151,6 +151,7 @@ export class SubcollectionsQuery extends BaseQuery {
     featuredBobbleheadCount: number;
     featurePhoto: null | string;
     id: string;
+    isPublic: boolean;
     lastUpdatedAt: Date;
     name: string;
     slug: string;
@@ -210,6 +211,7 @@ export class SubcollectionsQuery extends BaseQuery {
       featuredBobbleheadCount,
       featurePhoto: subCollection.coverImageUrl,
       id: subCollection.id,
+      isPublic: subCollection.isPublic,
       lastUpdatedAt: subCollection.updatedAt,
       name: subCollection.name,
       slug: subCollection.slug,
@@ -378,6 +380,7 @@ export class SubcollectionsQuery extends BaseQuery {
       collectionId: bobbleheads.collectionId,
       collectionSlug: collections.slug,
       condition: bobbleheads.currentCondition,
+      customFields: bobbleheads.customFields,
       description: bobbleheads.description,
       featurePhoto: bobbleheadPhotos.url,
       height: bobbleheads.height,
@@ -385,6 +388,7 @@ export class SubcollectionsQuery extends BaseQuery {
       isFeatured: bobbleheads.isFeatured,
       isPublic: bobbleheads.isPublic,
       manufacturer: bobbleheads.manufacturer,
+      material: bobbleheads.material,
       name: bobbleheads.name,
       purchaseLocation: bobbleheads.purchaseLocation,
       purchasePrice: bobbleheads.purchasePrice,
@@ -394,6 +398,7 @@ export class SubcollectionsQuery extends BaseQuery {
       subcollectionId: bobbleheads.subcollectionId,
       subcollectionSlug: subCollections.slug,
       weight: bobbleheads.weight,
+      year: bobbleheads.year,
     };
   }
 }

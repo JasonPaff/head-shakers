@@ -210,6 +210,7 @@ export class SubcollectionsFacade {
     featuredBobbleheadCount: number;
     featurePhoto: null | string;
     id: string;
+    isPublic: boolean;
     lastUpdatedAt: Date;
     name: string;
     slug: string;
