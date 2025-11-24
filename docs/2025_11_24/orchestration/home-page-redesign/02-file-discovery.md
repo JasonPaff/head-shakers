@@ -12,11 +12,13 @@
 ## Input Context
 
 ### Refined Feature Request
+
 ```
 The home page requires a comprehensive visual refresh to create a more engaging and inviting user experience for bobblehead collectors. The current featured collection cards lack visual depth and personality; they should be redesigned using Tailwind CSS 4's advanced styling capabilities combined with Radix UI components to include hover effects, gradient overlays, and shadow transitions that showcase collection imagery from Cloudinary with optimized aspect ratios. A new featured bobbleheads section should be implemented directly below the featured collections, displaying individual bobblehead items in an attractive grid layout that highlights high-resolution product images, key specifications, and collector engagement metrics through cards built with Class Variance Authority to support multiple visual states and responsive sizes. The overall home page should adopt a vibrant, cohesive color palette that reflects the playful nature of bobblehead collecting, incorporating warm accent colors, subtle gradients, and increased whitespace to improve visual hierarchy and readability. All interactive elements should leverage Lucide React icons strategically throughout the design to guide user attention and improve navigation intuitiveness. The redesigned cards should support dynamic content loading with smooth transitions, use Cloudinary's built-in image transformation capabilities to serve appropriately sized and formatted images for different breakpoints, and implement skeleton loading states for better perceived performance. Consider introducing subtle animations using Tailwind's animation utilities and custom keyframes to create a more polished, premium feel while maintaining performance standards. The layout should be fully responsive using Tailwind's mobile-first approach, ensuring the vibrant design translates beautifully across all device sizes from mobile to desktop, and the color scheme should include accessible contrast ratios while maintaining visual appeal and creating a warm, welcoming atmosphere that encourages users to explore and engage with the bobblehead community.
 ```
 
 ### Key Discovery Areas
+
 1. Home page route files (page.tsx, layout, etc.)
 2. Featured collection card components
 3. Any existing featured/trending sections
@@ -60,6 +62,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
 ### HIGH PRIORITY (Critical for Implementation)
 
 #### Home Page Route & Components (4 files)
+
 1. **`src/app/(app)/(home)/page.tsx`**
    - **Priority**: Critical
    - **Reason**: Main home page route requiring new featured bobbleheads section
@@ -85,6 +88,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
    - **Changes Needed**: Create matching skeleton for featured bobbleheads
 
 #### Card Components (2 files)
+
 5. **`src/app/(app)/dashboard/collection/(collection)/components/collection-card.tsx`**
    - **Priority**: High
    - **Reason**: Existing collection card with hover states and metrics
@@ -98,6 +102,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
    - **Changes Needed**: Create simplified featured variant
 
 #### Styling & Theme (1 file)
+
 7. **`src/app/globals.css`**
    - **Priority**: Critical
    - **Reason**: Global styles and custom animations
@@ -107,6 +112,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
 ### MEDIUM PRIORITY (Supporting Implementation)
 
 #### UI Components (4 files)
+
 8. **`src/components/ui/card.tsx`**
    - **Priority**: Medium
    - **Reason**: Base card component for consistent patterns
@@ -128,6 +134,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
     - **Integration**: Include in featured bobblehead cards
 
 #### Cloudinary Integration (5 files)
+
 12. **`src/lib/services/cloudinary.service.ts`**
     - **Priority**: High
     - **Reason**: Image operations and URL generation
@@ -154,6 +161,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
     - **Integration**: Reference only
 
 #### Data Layer (5 files)
+
 17. **`src/lib/facades/featured-content/featured-content.facade.ts`**
     - **Priority**: Critical
     - **Reason**: Business logic for featured content with caching
@@ -182,6 +190,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
 ### LOW PRIORITY (Reference/Configuration)
 
 #### Browse & Featured Pages (5 files)
+
 22. **`src/app/(app)/browse/featured/page.tsx`**
     - **Priority**: Low
     - **Reason**: Similar patterns for reference
@@ -208,6 +217,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
     - **Integration**: Reference for grid patterns
 
 #### Configuration & Constants (3 files)
+
 27. **`src/lib/constants/enums.ts`**
     - **Priority**: Low
     - **Reason**: Type definitions for featured content
@@ -224,6 +234,7 @@ Discover a minimum of 5 relevant files with proper prioritization.
     - **Integration**: Verify available packages
 
 #### Actions (2 files)
+
 30. **`src/lib/actions/featured-content/featured-content.actions.ts`**
     - **Priority**: Low
     - **Reason**: Server actions for mutations
@@ -237,20 +248,24 @@ Discover a minimum of 5 relevant files with proper prioritization.
 ## File Path Validation
 
 ### Validation Process
+
 - ✅ All file paths verified to exist
 - ✅ File permissions checked and accessible
 - ✅ No missing or inaccessible files
 - ✅ All paths use correct Windows format
 
 ### Files Requiring Creation
+
 None - all necessary files exist in the codebase
 
 ### Files Requiring Modification
+
 - `src/app/(app)/(home)/page.tsx` - Add featured bobbleheads section
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Enhance visual styling
 - `src/app/globals.css` - Add new animations and styling utilities
 
 ### Files to Create (New)
+
 - `src/app/(app)/(home)/components/async/featured-bobbleheads-async.tsx` - New async component
 - `src/app/(app)/(home)/components/display/featured-bobbleheads-display.tsx` - New display component
 - `src/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton.tsx` - New skeleton component
@@ -258,6 +273,7 @@ None - all necessary files exist in the codebase
 ## Architecture Insights from AI Analysis
 
 ### Current Patterns Discovered
+
 - **Component Architecture**: Server/Client split with async data fetching
 - **Styling System**: Tailwind CSS 4 with OKLCH colors, warm cream backgrounds
 - **Image Handling**: Next Cloudinary with automatic optimization
@@ -266,11 +282,13 @@ None - all necessary files exist in the codebase
 - **Loading States**: Suspense boundaries with skeleton components
 
 ### Existing Similar Functionality
+
 - Featured collections in 6-card grid (md:grid-cols-2 lg:grid-cols-3)
 - Collection cards with cover image, hover states, metrics, like button
 - Bobblehead gallery cards with similar patterns in collection pages
 
 ### Integration Points Identified
+
 - `FeaturedContentQuery.findActiveFeaturedContentAsync()` supports bobblehead type
 - `FeaturedContentTransformer.filterByType()` can filter trending/editor picks
 - `SocialFacade.getBatchContentLikeData()` supports both collections and bobbleheads

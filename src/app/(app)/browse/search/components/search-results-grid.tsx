@@ -35,13 +35,15 @@ export const SearchResults = ({
   bobbleheads,
   className,
   collections,
-  counts,
+  counts: _counts,
   onViewModeChange,
   subcollections,
   testId,
   viewMode = ENUMS.SEARCH.VIEW_MODE[0],
   ...props
 }: SearchResultsProps) => {
+  // Note: _counts is intentionally unused - we calculate displayed counts from actual array lengths
+  void _counts;
   // Generate testId
   const searchResultsTestId = testId || generateTestId('feature', 'search-results');
 

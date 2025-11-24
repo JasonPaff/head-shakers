@@ -19,12 +19,14 @@ The home page requires a comprehensive visual refresh to create a more engaging 
 ## Analysis Summary
 
 ### File Discovery Results
+
 - **Total Files Discovered**: 40 files across all architectural layers
 - **Critical Priority Files**: 7 files requiring modification
 - **New Components to Create**: 3 components
 - **Supporting Files**: 30 reference and integration files
 
 ### Architecture Insights
+
 - **Existing Patterns**: Server/Client component split with async data fetching
 - **Styling System**: Tailwind CSS 4 with OKLCH color variables and custom animations
 - **Image Handling**: Next Cloudinary with automatic optimization and transformations
@@ -34,12 +36,14 @@ The home page requires a comprehensive visual refresh to create a more engaging 
 ### Key Files Identified
 
 **Critical Files (Modify):**
+
 1. `src/app/(app)/(home)/page.tsx` - Main home page route
 2. `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Current collection cards
 3. `src/app/globals.css` - Global styles and animations
 4. `src/lib/facades/featured-content/featured-content.facade.ts` - Data fetching facade
 
 **New Components (Create):**
+
 1. `src/app/(app)/(home)/components/async/featured-bobbleheads-async.tsx` - Server component for data fetching
 2. `src/app/(app)/(home)/components/display/featured-bobbleheads-display.tsx` - Client component for display
 3. `src/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton.tsx` - Loading skeleton
@@ -75,23 +79,27 @@ This plan redesigns the home page with enhanced visual depth using Tailwind CSS 
 **Confidence**: High
 
 **Files to Review:**
+
 - `src/lib/facades/featured-content/featured-content.facade.ts` - Verify getFeaturedBobbleheads method exists or needs creation
 - `src/lib/queries/featured-content/featured-content.queries.ts` - Check available query methods for bobbleheads
 - `src/lib/db/schema/bobblehead.schema.ts` - Understand bobblehead data structure
 - `src/lib/db/schema/featured-content.schema.ts` - Verify featured content types support bobbleheads
 
 **Changes:**
+
 - Document available data fields for featured bobbleheads (images, specs, engagement metrics)
 - Identify if new facade methods or queries are needed for fetching featured bobbleheads
 - Confirm Cloudinary URL structure for bobblehead images
 - Note any missing data points required by design specifications
 
 **Validation Commands:**
+
 ```bash
 npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Data structure for featured bobbleheads is documented
 - [ ] Required facade methods identified or confirmed available
 - [ ] Cloudinary image transformation requirements understood
@@ -106,9 +114,11 @@ npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/globals.css` - Add new color variables and animation keyframes
 
 **Changes:**
+
 - Add warm accent color variables using OKLCH color space (oranges, warm yellows, coral tones)
 - Define gradient color stops for card overlays and backgrounds
 - Create custom keyframes for hover transitions, fade-ins, and shadow animations
@@ -117,11 +127,13 @@ npm run typecheck
 - Ensure all new colors meet WCAG AA contrast ratios for accessibility
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] New color variables added with accessible contrast ratios
 - [ ] Custom animation keyframes defined for smooth transitions
 - [ ] Gradient utilities created for card overlays
@@ -137,9 +149,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/ui/variants/featured-card-variants.ts` - CVA definitions for card states
 
 **Changes:**
+
 - Define card base styles with enhanced shadows and borders
 - Create hover state variants with gradient overlays and transforms
 - Define size variants (small, medium, large) for responsive layouts
@@ -148,11 +162,13 @@ npm run lint:fix && npm run typecheck
 - Define image overlay variants for different content types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] CVA variants created with proper TypeScript types
 - [ ] All visual states defined (default, hover, active, loading)
 - [ ] Size variants support responsive breakpoints
@@ -168,9 +184,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Apply new card styles
 
 **Changes:**
+
 - Replace existing card styling with CVA variants from Step 3
 - Add gradient overlay effects using new color palette
 - Implement hover transforms with shadow transitions
@@ -182,11 +200,13 @@ npm run lint:fix && npm run typecheck
 - Add engagement metrics display with icon integration
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Cards use new CVA variants with all states working
 - [ ] Hover effects and transitions render smoothly
 - [ ] Cloudinary images load with proper transformations
@@ -203,10 +223,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/facades/featured-content/featured-content.facade.ts` - Add bobblehead fetching method
 - `src/lib/queries/featured-content/featured-content.queries.ts` - Add supporting query if needed
 
 **Changes:**
+
 - Add getFeaturedBobbleheads method with proper error handling
 - Include cache integration with appropriate TTL
 - Add Sentry breadcrumbs for monitoring
@@ -216,11 +238,13 @@ npm run lint:fix && npm run typecheck
 - Include pagination parameters for future expansion
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] getFeaturedBobbleheads method created or verified
 - [ ] Method returns all required data fields
 - [ ] Cache integration implemented correctly
@@ -237,9 +261,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton.tsx` - Loading state component
 
 **Changes:**
+
 - Create skeleton component matching bobblehead card layout
 - Use Skeleton UI component from component library
 - Implement pulse animations using new keyframes
@@ -249,11 +275,13 @@ npm run lint:fix && npm run typecheck
 - Use CVA loading state variants
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton component matches bobblehead card dimensions
 - [ ] Pulse animations render smoothly
 - [ ] Accessibility attributes present
@@ -269,9 +297,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/display/featured-bobbleheads-display.tsx` - Client component for bobblehead cards
 
 **Changes:**
+
 - Create client component with 'use client' directive
 - Implement grid layout using Tailwind responsive utilities
 - Apply CVA card variants with all interaction states
@@ -286,11 +316,13 @@ npm run lint:fix && npm run typecheck
 - Integrate LikeButton component for engagement
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid layout renders responsively across breakpoints
 - [ ] All card states (default, hover, active) work correctly
 - [ ] Images load with proper Cloudinary transformations
@@ -308,9 +340,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/async/featured-bobbleheads-async.tsx` - Server component wrapper
 
 **Changes:**
+
 - Create async server component for data fetching
 - Call getFeaturedBobbleheads from FeaturedContentFacade
 - Implement Suspense boundary with skeleton fallback
@@ -321,11 +355,13 @@ npm run lint:fix && npm run typecheck
 - Implement conditional rendering based on data availability
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Server component fetches data correctly
 - [ ] Suspense boundary shows skeleton during loading
 - [ ] Empty state handled gracefully
@@ -342,9 +378,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Add featured bobbleheads section
 
 **Changes:**
+
 - Import FeaturedBobbleheadsAsync component
 - Position component below FeaturedCollectionsAsync
 - Add proper section spacing with increased whitespace
@@ -354,11 +392,13 @@ npm run lint:fix && npm run typecheck
 - Ensure proper page layout flow with new content
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Featured bobbleheads section renders below collections
 - [ ] Suspense streaming works correctly
 - [ ] Section spacing and whitespace appropriate
@@ -374,9 +414,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Update page-level layout and styling
 
 **Changes:**
+
 - Apply new warm accent colors to page background and containers
 - Increase section spacing for improved visual hierarchy
 - Update heading typography with new color palette
@@ -387,11 +429,13 @@ npm run lint:fix && npm run typecheck
 - Apply container max-widths for optimal readability
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page uses new color palette consistently
 - [ ] Visual hierarchy clear with proper spacing
 - [ ] Typography updated with accent colors
@@ -408,10 +452,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Review and Potentially Modify:**
+
 - `src/components/feature/cloudinary/cloudinary-image.tsx` - Verify transformation props
 - `src/lib/utils/cloudinary/cloudinary-url-utils.ts` - Check URL generation utilities
 
 **Changes:**
+
 - Define responsive breakpoint sizes for featured collections images
 - Define responsive breakpoint sizes for featured bobbleheads images
 - Configure quality settings for optimal balance
@@ -422,11 +468,13 @@ npm run lint:fix && npm run typecheck
 - Define transformation presets for different card sizes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Image transformations configured for all breakpoints
 - [ ] Quality settings balance file size and visual appeal
 - [ ] Modern formats (WebP, AVIF) implemented
@@ -443,11 +491,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Add micro-interactions
 - `src/app/(app)/(home)/components/display/featured-bobbleheads-display.tsx` - Add micro-interactions
 - `src/app/globals.css` - Add scroll behavior utilities
 
 **Changes:**
+
 - Add smooth scroll behavior to page navigation
 - Implement staggered fade-in animations for card grids
 - Add subtle scale transforms on card interactions
@@ -458,11 +508,13 @@ npm run lint:fix && npm run typecheck
 - Configure proper will-change properties for performance
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Smooth scroll behavior works across page sections
 - [ ] Card animations stagger naturally in grid
 - [ ] Transitions feel natural and responsive
@@ -480,12 +532,14 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Review:**
+
 - `src/app/globals.css` - Verify color contrast ratios
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Check ARIA attributes
 - `src/app/(app)/(home)/components/display/featured-bobbleheads-display.tsx` - Check ARIA attributes
 - `src/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton.tsx` - Verify loading states
 
 **Changes:**
+
 - Test all text on background color combinations for WCAG AA compliance
 - Add proper ARIA labels to interactive card elements
 - Ensure focus indicators have sufficient contrast
@@ -496,11 +550,13 @@ npm run lint:fix && npm run typecheck
 - Add skip links if needed for navigation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All color combinations meet WCAG AA contrast ratios
 - [ ] Interactive elements have proper ARIA attributes
 - [ ] Focus indicators visible and high contrast
@@ -528,29 +584,34 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 ### Critical Assumptions Requiring Confirmation
+
 - FeaturedContentFacade may need new method for fetching featured bobbleheads (Step 5)
 - Bobblehead schema includes all necessary fields for engagement metrics and specifications
 - Cloudinary configuration allows for the required image transformations
 - Current authentication and permission system supports featured content visibility filtering
 
 ### High-Risk Areas
+
 - **Performance Impact** (Medium Risk): Adding new animations and image-heavy section could impact page load times. Mitigation: Aggressive lazy loading, optimized Cloudinary transformations, and careful bundle size monitoring in Step 14.
 - **Cloudinary Configuration** (Medium Risk): Image transformations may need adjustment for optimal quality/performance balance. Mitigation: Test across multiple devices and network conditions in Step 11.
 - **Data Availability** (Low Risk): Featured bobbleheads content may not exist in database initially. Mitigation: Handle empty states gracefully in Step 8.
 
 ### Design Decisions Requiring User Input
+
 - Specific warm accent color values within OKLCH color space (Step 2)
 - Number of featured bobbleheads to display in grid (affects layout in Step 7)
 - Animation duration preferences for hover effects and transitions (Step 2)
 - Priority of specifications to display on bobblehead cards (Step 7)
 
 ### Progressive Enhancement Approach
+
 - All animations respect `prefers-reduced-motion` media query
 - Core content accessible even if JavaScript fails to load
 - Images have proper fallbacks and alt text
 - Skeleton states provide feedback during loading
 
 ### Testing Recommendations
+
 - Manual testing across Chrome, Firefox, Safari, and mobile browsers
 - Lighthouse audits for performance, accessibility, and SEO
 - Test with slow network throttling to verify loading states
@@ -562,16 +623,19 @@ npm run lint:fix && npm run typecheck
 ## Implementation Commands
 
 To implement this plan, use:
+
 ```bash
 /implement-plan docs/2025_11_24/plans/home-page-redesign-implementation-plan.md
 ```
 
 For step-by-step execution:
+
 ```bash
 /implement-plan docs/2025_11_24/plans/home-page-redesign-implementation-plan.md --step-by-step
 ```
 
 To review without implementing (dry run):
+
 ```bash
 /implement-plan docs/2025_11_24/plans/home-page-redesign-implementation-plan.md --dry-run
 ```

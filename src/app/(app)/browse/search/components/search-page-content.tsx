@@ -108,9 +108,9 @@ export const SearchPageContent = () => {
   };
 
   const handleFiltersChange = (filters: {
-    category?: string;
-    dateFrom?: string;
-    dateTo?: string;
+    category?: null | string;
+    dateFrom?: null | string;
+    dateTo?: null | string;
     entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;
     sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];
     sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];

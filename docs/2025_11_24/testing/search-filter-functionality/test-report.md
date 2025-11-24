@@ -15,19 +15,19 @@
 
 ## Test Coverage Summary
 
-| Test Unit | Route(s) | Scenarios | Passed | Failed | Status |
-| --------- | -------- | --------- | ------ | ------ | ------ |
-| Search and Filter | /browse/search | 47 | 43 | 4 | FAILED |
+| Test Unit         | Route(s)       | Scenarios | Passed | Failed | Status |
+| ----------------- | -------------- | --------- | ------ | ------ | ------ |
+| Search and Filter | /browse/search | 47        | 43     | 4      | FAILED |
 
 ## Issue Summary
 
-| Severity | Count | Score Impact |
-| -------- | ----- | ------------ |
-| Critical | 1 | -25 |
-| High | 1 | -15 |
-| Medium | 2 | -10 |
-| Low | 0 | 0 |
-| **Total** | 4 | **-50** |
+| Severity  | Count | Score Impact |
+| --------- | ----- | ------------ |
+| Critical  | 1     | -25          |
+| High      | 1     | -15          |
+| Medium    | 2     | -10          |
+| Low       | 0     | 0            |
+| **Total** | 4     | **-50**      |
 
 ## Critical Issues
 
@@ -109,7 +109,7 @@ const handleClearFilters = useCallback(() => {
 // Fixed - use null to explicitly remove params:
 const handleClearFilters = useCallback(() => {
   onFiltersChange({
-    category: null,  // null removes the param
+    category: null, // null removes the param
     dateFrom: null,
     dateTo: null,
     entityTypes: ['collection', 'subcollection', 'bobblehead'],
@@ -173,6 +173,7 @@ const handleClearFilters = useCallback(() => {
 **Pass Rate**: 91.5%
 
 **Passed Scenarios (43):**
+
 - Page loads without console errors
 - All expected UI elements visible (search input, filter button)
 - Search query "oriole" returns 11 results
@@ -206,6 +207,7 @@ const handleClearFilters = useCallback(() => {
 - Results display correctly in list format
 
 **Skipped Scenarios:**
+
 - Category filter selection - Cannot test due to crash (CRIT-1)
 - Category filter URL state - Cannot test due to crash
 - Pagination controls - All results fit on one page
@@ -221,12 +223,14 @@ const handleClearFilters = useCallback(() => {
 **Total Unique Errors**: 4 feature-related, 6+ infrastructure-related
 
 **Feature-Related Errors:**
+
 1. `Error: A <Select.Item /> must have a value prop that is not an empty string` - CRIT-1
 2. `The specified value "undefined" does not conform to the required format, "yyyy-MM-dd"` - HIGH-1, MED-2
 3. `The specified value "01/01/2024" does not conform to the required format, "yyyy-MM-dd"` - Date format validation working
 4. Browse page error boundary triggered - CRIT-1
 
 **Infrastructure Errors (not feature bugs):**
+
 - Sentry rate limiting (429 responses)
 - Cloudinary image 404s for temp/uploads paths
 - Clerk development key warnings
@@ -234,9 +238,9 @@ const handleClearFilters = useCallback(() => {
 
 ## Screenshots Captured
 
-| Filename | Description |
-|----------|-------------|
-| category-filter-crash.png | Application error boundary after clicking Category filter |
+| Filename                    | Description                                               |
+| --------------------------- | --------------------------------------------------------- |
+| category-filter-crash.png   | Application error boundary after clicking Category filter |
 | clear-all-undefined-bug.png | Active Filters showing "undefined" values after Clear All |
 
 ## Recommendations
@@ -276,6 +280,7 @@ Run `/fix-validation docs/2025_11_24/testing/search-filter-functionality/test-re
 ---
 
 **Fix Command**:
+
 ```
 /fix-validation docs/2025_11_24/testing/search-filter-functionality/test-report.md
 ```
