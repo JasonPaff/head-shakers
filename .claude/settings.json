@@ -1,36 +1,12 @@
 {
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["shared-server"],
-  "model": "sonnet",
+  "model": "opus",
   "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun ./.claude/hooks/pre-tool-use/logger.ts"
-          }
-        ]
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bun ./.claude/hooks/pre-tool-use/neon-validator.ts"
-          }
-        ]
-      }
-    ],
     "PostToolUse": [
       {
         "matcher": "Edit|MultiEdit|Write",
         "hooks": [
-          {
-            "type": "command",
-            "command": "bun ./.claude/hooks/post-tool-use/eslint-fixer.ts"
-          },
           {
             "type": "command",
             "command": "bun ./.claude/hooks/post-tool-use/prettier-formatter.ts"
