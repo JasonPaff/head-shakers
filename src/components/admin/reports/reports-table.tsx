@@ -248,6 +248,33 @@ export const ReportsTable = ({
         size: 250,
       },
       {
+        accessorKey: 'status',
+        cell: ({ row }) => {
+          const status = row.original.status;
+          const _isPending = status === 'pending';
+          const _isReviewed = status === 'reviewed';
+          const _isResolved = status === 'resolved';
+          const _isDismissed = status === 'dismissed';
+
+          return (
+            <Badge
+              className={cn(
+                _isPending && 'bg-yellow-100 text-yellow-800',
+                _isReviewed && 'bg-blue-100 text-blue-800',
+                _isResolved && 'bg-green-100 text-green-800',
+                _isDismissed && 'bg-gray-100 text-gray-800',
+              )}
+              variant={'secondary'}
+            >
+              {status.charAt(0).toUpperCase() + status.slice(1)}
+            </Badge>
+          );
+        },
+        enableSorting: true,
+        header: 'Status',
+        size: 120,
+      },
+      {
         accessorKey: 'targetType',
         cell: ({ row }) => {
           const targetType = row.original.targetType;
@@ -282,7 +309,9 @@ export const ReportsTable = ({
           const _hasCommentContent = _isComment && !!report.commentContent;
           const contentLink = getContentLink(report);
 
-          {/* Link available (for non-comment content types) */}
+          {
+            /* Link available (for non-comment content types) */
+          }
           if (_isLinkAvailable && contentLink) {
             return (
               <Button aria-label={'View content'} asChild className={'h-8 w-8 p-0'} variant={'ghost'}>
@@ -293,7 +322,9 @@ export const ReportsTable = ({
             );
           }
 
-          {/* Comment type with content available */}
+          {
+            /* Comment type with content available */
+          }
           if (_hasCommentContent) {
             return (
               <Popover>
@@ -312,7 +343,9 @@ export const ReportsTable = ({
             );
           }
 
-          {/* Content unavailable (deleted content or comment without content) */}
+          {
+            /* Content unavailable (deleted content or comment without content) */
+          }
           return (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -337,6 +370,21 @@ export const ReportsTable = ({
         header: 'View',
         id: 'viewContent',
         size: 70,
+      },
+      {
+        accessorKey: 'createdAt',
+        cell: ({ row }) => {
+          const date = new Date(row.original.createdAt);
+          return (
+            <div className={'space-y-0.5'}>
+              <div className={'text-sm'}>{date.toLocaleDateString()}</div>
+              <div className={'text-xs text-muted-foreground'}>{date.toLocaleTimeString()}</div>
+            </div>
+          );
+        },
+        enableSorting: true,
+        header: 'Submitted',
+        size: 150,
       },
       {
         accessorKey: 'targetId',
@@ -366,53 +414,12 @@ export const ReportsTable = ({
         header: 'Reporter',
         size: 200,
       },
-      {
-        accessorKey: 'createdAt',
-        cell: ({ row }) => {
-          const date = new Date(row.original.createdAt);
-          return (
-            <div className={'space-y-0.5'}>
-              <div className={'text-sm'}>{date.toLocaleDateString()}</div>
-              <div className={'text-xs text-muted-foreground'}>{date.toLocaleTimeString()}</div>
-            </div>
-          );
-        },
-        enableSorting: true,
-        header: 'Submitted',
-        size: 150,
-      },
-      {
-        accessorKey: 'status',
-        cell: ({ row }) => {
-          const status = row.original.status;
-          const _isPending = status === 'pending';
-          const _isReviewed = status === 'reviewed';
-          const _isResolved = status === 'resolved';
-          const _isDismissed = status === 'dismissed';
-
-          return (
-            <Badge
-              className={cn(
-                _isPending && 'bg-yellow-100 text-yellow-800',
-                _isReviewed && 'bg-blue-100 text-blue-800',
-                _isResolved && 'bg-green-100 text-green-800',
-                _isDismissed && 'bg-gray-100 text-gray-800',
-              )}
-              variant={'secondary'}
-            >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-            </Badge>
-          );
-        },
-        enableSorting: true,
-        header: 'Status',
-        size: 120,
-      },
     ],
     [onBulkAction, onViewDetails],
   );
 
   // TanStack Table instance - React Compiler warning is expected for this library
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     columns,
     data,
