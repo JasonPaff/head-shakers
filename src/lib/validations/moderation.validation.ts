@@ -85,10 +85,19 @@ export const adminReportsFilterSchema = z.object({
   limit: z.number().min(1).max(100).default(25).optional(),
   moderatorId: z.string().optional(),
   offset: z.number().min(0).default(0).optional(),
-  reason: z.enum(ENUMS.CONTENT_REPORT.REASON).optional(),
+  reason: z
+    .union([z.enum(ENUMS.CONTENT_REPORT.REASON), z.array(z.enum(ENUMS.CONTENT_REPORT.REASON))])
+    .optional(),
   reporterId: z.string().optional(),
-  status: z.enum(ENUMS.CONTENT_REPORT.STATUS).optional(),
-  targetType: z.enum(['bobblehead', 'collection', 'subcollection', 'comment']).optional(),
+  status: z
+    .union([z.enum(ENUMS.CONTENT_REPORT.STATUS), z.array(z.enum(ENUMS.CONTENT_REPORT.STATUS))])
+    .optional(),
+  targetType: z
+    .union([
+      z.enum(['bobblehead', 'collection', 'subcollection', 'comment']),
+      z.array(z.enum(['bobblehead', 'collection', 'subcollection', 'comment'])),
+    ])
+    .optional(),
 });
 
 export const adminReportsQuerySchema = z.object({

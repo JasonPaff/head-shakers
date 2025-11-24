@@ -13,10 +13,15 @@ import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type AdminReportsFilterOptions = FindOptions & {
   moderatorId?: string;
-  reason?: ContentReportReason;
+  reason?: Array<ContentReportReason> | ContentReportReason;
   reporterId?: string;
-  status?: ContentReportStatus;
-  targetType?: 'bobblehead' | 'collection' | 'comment' | 'subcollection';
+  status?: Array<ContentReportStatus> | ContentReportStatus;
+  targetType?:
+    | 'bobblehead'
+    | 'collection'
+    | 'comment'
+    | 'subcollection'
+    | Array<'bobblehead' | 'collection' | 'comment' | 'subcollection'>;
 };
 
 export type ContentReportRecord = typeof contentReports.$inferSelect;
@@ -175,15 +180,27 @@ export class ContentReportsQuery extends BaseQuery {
       const filters: Array<SQL | undefined> = [];
 
       if (options.status) {
-        filters.push(eq(contentReports.status, options.status));
+        if (Array.isArray(options.status)) {
+          filters.push(inArray(contentReports.status, options.status));
+        } else {
+          filters.push(eq(contentReports.status, options.status));
+        }
       }
 
       if (options.targetType) {
-        filters.push(eq(contentReports.targetType, options.targetType));
+        if (Array.isArray(options.targetType)) {
+          filters.push(inArray(contentReports.targetType, options.targetType));
+        } else {
+          filters.push(eq(contentReports.targetType, options.targetType));
+        }
       }
 
       if (options.reason) {
-        filters.push(eq(contentReports.reason, options.reason));
+        if (Array.isArray(options.reason)) {
+          filters.push(inArray(contentReports.reason, options.reason));
+        } else {
+          filters.push(eq(contentReports.reason, options.reason));
+        }
       }
 
       if (options.reporterId) {
@@ -231,15 +248,27 @@ export class ContentReportsQuery extends BaseQuery {
       const filters: Array<SQL | undefined> = [];
 
       if (options.status) {
-        filters.push(eq(contentReports.status, options.status));
+        if (Array.isArray(options.status)) {
+          filters.push(inArray(contentReports.status, options.status));
+        } else {
+          filters.push(eq(contentReports.status, options.status));
+        }
       }
 
       if (options.targetType) {
-        filters.push(eq(contentReports.targetType, options.targetType));
+        if (Array.isArray(options.targetType)) {
+          filters.push(inArray(contentReports.targetType, options.targetType));
+        } else {
+          filters.push(eq(contentReports.targetType, options.targetType));
+        }
       }
 
       if (options.reason) {
-        filters.push(eq(contentReports.reason, options.reason));
+        if (Array.isArray(options.reason)) {
+          filters.push(inArray(contentReports.reason, options.reason));
+        } else {
+          filters.push(eq(contentReports.reason, options.reason));
+        }
       }
 
       if (options.reporterId) {
@@ -299,26 +328,17 @@ export class ContentReportsQuery extends BaseQuery {
         // LEFT JOIN bobbleheads for bobblehead reports
         .leftJoin(
           bobbleheads,
-          and(
-            eq(contentReports.targetId, bobbleheads.id),
-            eq(contentReports.targetType, 'bobblehead'),
-          ),
+          and(eq(contentReports.targetId, bobbleheads.id), eq(contentReports.targetType, 'bobblehead')),
         )
         // LEFT JOIN collections for collection reports
         .leftJoin(
           collections,
-          and(
-            eq(contentReports.targetId, collections.id),
-            eq(contentReports.targetType, 'collection'),
-          ),
+          and(eq(contentReports.targetId, collections.id), eq(contentReports.targetType, 'collection')),
         )
         // LEFT JOIN subCollections for subcollection reports
         .leftJoin(
           subCollections,
-          and(
-            eq(contentReports.targetId, subCollections.id),
-            eq(contentReports.targetType, 'subcollection'),
-          ),
+          and(eq(contentReports.targetId, subCollections.id), eq(contentReports.targetType, 'subcollection')),
         )
         // LEFT JOIN parent collection for subcollection parent slug
         .leftJoin(
@@ -328,10 +348,7 @@ export class ContentReportsQuery extends BaseQuery {
         // LEFT JOIN comments for comment reports (to check existence)
         .leftJoin(
           comments,
-          and(
-            eq(contentReports.targetId, comments.id),
-            eq(contentReports.targetType, 'comment'),
-          ),
+          and(eq(contentReports.targetId, comments.id), eq(contentReports.targetType, 'comment')),
         )
         .where(filters.length > 0 ? and(...filters) : undefined)
         .orderBy(desc(contentReports.createdAt))

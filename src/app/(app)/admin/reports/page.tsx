@@ -57,14 +57,17 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     offset: (page - 1) * pageSize,
   };
 
-  // Extract single values from array filters (nuqs returns arrays for multi-select)
+  // Extract filter values (nuqs returns comma-separated strings for multi-select)
   if (resolvedSearchParams.status) {
     const statusArray =
       Array.isArray(resolvedSearchParams.status) ?
         resolvedSearchParams.status
-      : [resolvedSearchParams.status];
+      : resolvedSearchParams.status.split(',');
     if (statusArray.length > 0) {
-      filterOptions.status = statusArray[0] as ContentReportStatus;
+      filterOptions.status =
+        statusArray.length === 1 ?
+          (statusArray[0] as ContentReportStatus)
+        : (statusArray as Array<ContentReportStatus>);
     }
   }
 
@@ -72,9 +75,12 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     const targetTypeArray =
       Array.isArray(resolvedSearchParams.targetType) ?
         resolvedSearchParams.targetType
-      : [resolvedSearchParams.targetType];
+      : resolvedSearchParams.targetType.split(',');
     if (targetTypeArray.length > 0) {
-      filterOptions.targetType = targetTypeArray[0] as 'bobblehead' | 'collection' | 'subcollection';
+      filterOptions.targetType =
+        targetTypeArray.length === 1 ?
+          (targetTypeArray[0] as 'bobblehead' | 'collection' | 'subcollection')
+        : (targetTypeArray as Array<'bobblehead' | 'collection' | 'subcollection'>);
     }
   }
 
@@ -82,9 +88,12 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     const reasonArray =
       Array.isArray(resolvedSearchParams.reason) ?
         resolvedSearchParams.reason
-      : [resolvedSearchParams.reason];
+      : resolvedSearchParams.reason.split(',');
     if (reasonArray.length > 0) {
-      filterOptions.reason = reasonArray[0] as ContentReportReason;
+      filterOptions.reason =
+        reasonArray.length === 1 ?
+          (reasonArray[0] as ContentReportReason)
+        : (reasonArray as Array<ContentReportReason>);
     }
   }
 
