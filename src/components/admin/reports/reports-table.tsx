@@ -4,7 +4,15 @@ import type { ColumnDef, RowSelectionState, SortingState } from '@tanstack/react
 import type { ComponentPropsWithRef } from 'react';
 
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowDownIcon, ArrowUpIcon, ExternalLinkIcon, EyeIcon, MoreVerticalIcon, XIcon } from 'lucide-react';
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  ExternalLinkIcon,
+  EyeIcon,
+  MessageSquareIcon,
+  MoreVerticalIcon,
+  XIcon,
+} from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { parseAsInteger, useQueryStates } from 'nuqs';
@@ -24,6 +32,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/utils/tailwind-utils';
@@ -269,8 +278,11 @@ export const ReportsTable = ({
         cell: ({ row }) => {
           const report = row.original;
           const _isLinkAvailable = isContentLinkAvailable(report);
+          const _isComment = report.targetType === 'comment';
+          const _hasCommentContent = _isComment && !!report.commentContent;
           const contentLink = getContentLink(report);
 
+          {/* Link available (for non-comment content types) */}
           if (_isLinkAvailable && contentLink) {
             return (
               <Button aria-label={'View content'} asChild className={'h-8 w-8 p-0'} variant={'ghost'}>
@@ -281,6 +293,26 @@ export const ReportsTable = ({
             );
           }
 
+          {/* Comment type with content available */}
+          if (_hasCommentContent) {
+            return (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button aria-label={'View comment content'} className={'h-8 w-8 p-0'} variant={'ghost'}>
+                    <MessageSquareIcon aria-hidden className={'size-4'} />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className={'max-h-80 w-80 overflow-y-auto'}>
+                  <div className={'space-y-2'}>
+                    <h4 className={'text-sm font-semibold'}>Reported Comment</h4>
+                    <p className={'text-sm break-words text-muted-foreground'}>{report.commentContent}</p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            );
+          }
+
+          {/* Content unavailable (deleted content or comment without content) */}
           return (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -290,10 +322,14 @@ export const ReportsTable = ({
                   disabled
                   variant={'ghost'}
                 >
-                  <ExternalLinkIcon aria-hidden className={'size-4'} />
+                  {_isComment ?
+                    <MessageSquareIcon aria-hidden className={'size-4'} />
+                  : <ExternalLinkIcon aria-hidden className={'size-4'} />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{getDisabledTooltipMessage(report)}</TooltipContent>
+              <TooltipContent>
+                {_isComment ? 'Comment content unavailable' : getDisabledTooltipMessage(report)}
+              </TooltipContent>
             </Tooltip>
           );
         },
