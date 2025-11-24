@@ -100,6 +100,7 @@ export const SubcollectionsListItem = ({
               {/* Actions Dropdown */}
               <SubcollectionActions
                 subcollection={{
+                  coverImageUrl: subcollection.coverImageUrl,
                   description: subcollection.description,
                   id: subcollection.id,
                   isPublic: subcollection.isPublic,

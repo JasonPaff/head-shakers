@@ -125,6 +125,7 @@ export type CollectionWithRelations = CollectionRecord & {
       updatedAt: Date;
     }>;
     collectionId: string;
+    coverImageUrl: null | string;
     createdAt: Date;
     description: null | string;
     id: string;
@@ -1020,6 +1021,7 @@ export class CollectionsQuery extends BaseQuery {
         subCollections: {
           columns: {
             collectionId: true,
+            coverImageUrl: true,
             createdAt: true,
             description: true,
             id: true,

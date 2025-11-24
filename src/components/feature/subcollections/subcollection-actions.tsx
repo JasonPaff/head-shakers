@@ -19,6 +19,7 @@ import { generateTestId } from '@/lib/test-ids';
 
 interface SubcollectionActionsProps {
   subcollection: {
+    coverImageUrl?: null | string;
     description: null | string;
     id: string;
     isPublic: boolean;

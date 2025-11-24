@@ -16,6 +16,7 @@ export interface SubcollectionData {
   collectionId: string;
   collectionName: string;
   collectionSlug: string;
+  coverImageUrl: null | string;
   description: null | string;
   id: string;
   isCollectionPublic: boolean;

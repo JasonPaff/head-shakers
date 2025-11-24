@@ -47,6 +47,7 @@ export interface CollectionDashboardData {
   slug: string;
   subCollections: Array<{
     bobbleheadCount: number;
+    coverImageUrl: null | string;
     description: null | string;
     id: string;
     isPublic: boolean;
@@ -1235,6 +1236,7 @@ export class CollectionsFacade {
       slug: collection.slug,
       subCollections: collection.subCollections.map((sub) => ({
         bobbleheadCount: sub.bobbleheads.length,
+        coverImageUrl: sub.coverImageUrl,
         description: sub.description,
         id: sub.id,
         isPublic: sub.isPublic,
