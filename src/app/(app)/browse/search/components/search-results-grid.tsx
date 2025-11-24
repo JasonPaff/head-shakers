@@ -49,7 +49,10 @@ export const SearchResults = ({
   const _hasCollections = collections.length > 0;
   const _hasSubcollections = subcollections.length > 0;
   const _hasBobbleheads = bobbleheads.length > 0;
-  const _totalResults = counts.total;
+  // Calculate displayed results count based on actual array lengths (respects entityTypes filter)
+  const _displayedResultsCount = collections.length + subcollections.length + bobbleheads.length;
+  // Use displayed count for the header, but keep counts prop for individual badges
+  const _totalResults = _displayedResultsCount;
   const _isGridView = viewMode === ENUMS.SEARCH.VIEW_MODE[0];
   const _isListView = viewMode === ENUMS.SEARCH.VIEW_MODE[1];
   const _hasViewModeControl = !!onViewModeChange;
@@ -98,19 +101,19 @@ export const SearchResults = ({
             {_totalResults} {_totalResults === 1 ? 'Result' : 'Results'} Found
           </h2>
           <div className={'flex flex-wrap gap-1.5 sm:gap-2'}>
-            <Conditional isCondition={counts.collections > 0}>
+            <Conditional isCondition={_hasCollections}>
               <Badge className={'text-xs'} variant={'outline'}>
-                {counts.collections} Collections
+                {collections.length} Collections
               </Badge>
             </Conditional>
-            <Conditional isCondition={counts.subcollections > 0}>
+            <Conditional isCondition={_hasSubcollections}>
               <Badge className={'text-xs'} variant={'outline'}>
-                {counts.subcollections} Subcollections
+                {subcollections.length} Subcollections
               </Badge>
             </Conditional>
-            <Conditional isCondition={counts.bobbleheads > 0}>
+            <Conditional isCondition={_hasBobbleheads}>
               <Badge className={'text-xs'} variant={'outline'}>
-                {counts.bobbleheads} Bobbleheads
+                {bobbleheads.length} Bobbleheads
               </Badge>
             </Conditional>
           </div>

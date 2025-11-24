@@ -30,8 +30,9 @@ import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 // Category options for filtering
+// Note: 'all' is used instead of empty string because Radix UI Select does not allow empty string values
 const CATEGORY_OPTIONS = [
-  { label: 'All Categories', value: '' },
+  { label: 'All Categories', value: 'all' },
   { label: 'Sports', value: 'sports' },
   { label: 'Movies & TV', value: 'movies-tv' },
   { label: 'Music', value: 'music' },
@@ -47,9 +48,9 @@ type SearchFiltersProps = ComponentTestIdProps & {
   dateTo?: string;
   entityTypes: Array<'bobblehead' | 'collection' | 'subcollection'>;
   onFiltersChange: (filters: {
-    category?: string;
-    dateFrom?: string;
-    dateTo?: string;
+    category?: null | string;
+    dateFrom?: null | string;
+    dateTo?: null | string;
     entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;
     sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];
     sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];
@@ -154,30 +155,34 @@ export const SearchFilters = ({
 
   const handleDateFromChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      onFiltersChange({ dateFrom: e.target.value || undefined });
+      // Use null instead of undefined to properly remove URL params with nuqs
+      onFiltersChange({ dateFrom: e.target.value || null });
     },
     [onFiltersChange],
   );
 
   const handleDateToChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      onFiltersChange({ dateTo: e.target.value || undefined });
+      // Use null instead of undefined to properly remove URL params with nuqs
+      onFiltersChange({ dateTo: e.target.value || null });
     },
     [onFiltersChange],
   );
 
   const handleCategoryChange = useCallback(
     (value: string) => {
-      onFiltersChange({ category: value || undefined });
+      // Convert 'all' back to null to clear the category filter from URL params
+      onFiltersChange({ category: value === 'all' ? null : value });
     },
     [onFiltersChange],
   );
 
   const handleClearFilters = useCallback(() => {
+    // Use null instead of undefined to properly remove URL params with nuqs
     onFiltersChange({
-      category: undefined,
-      dateFrom: undefined,
-      dateTo: undefined,
+      category: null,
+      dateFrom: null,
+      dateTo: null,
       entityTypes: ['collection', 'subcollection', 'bobblehead'],
       sortBy: 'relevance',
       sortOrder: 'desc',
@@ -193,17 +198,26 @@ export const SearchFilters = ({
     setIsMobileDrawerOpen(isOpen);
   }, []);
 
+  // Utility functions
+  // Check if a string value is valid (not empty, not null, and not the literal string "undefined")
+  const isValidFilterValue = (value: string | undefined): boolean => {
+    return Boolean(value) && value !== 'undefined';
+  };
+
   // Derived variables for conditional rendering
+  const _hasValidCategory = isValidFilterValue(category);
+  const _hasValidDateFrom = isValidFilterValue(dateFrom);
+  const _hasValidDateTo = isValidFilterValue(dateTo);
   const _hasActiveFilters =
     entityTypes.length < 3 ||
     sortBy !== 'relevance' ||
     sortOrder !== 'desc' ||
     tagIds.length > 0 ||
-    Boolean(dateFrom) ||
-    Boolean(dateTo) ||
-    Boolean(category);
+    _hasValidDateFrom ||
+    _hasValidDateTo ||
+    _hasValidCategory;
 
-  const _hasDateFilters = Boolean(dateFrom) || Boolean(dateTo);
+  const _hasDateFilters = _hasValidDateFrom || _hasValidDateTo;
 
   // Filter content - shared between desktop and mobile
   const filterContent = (
@@ -288,7 +302,7 @@ export const SearchFilters = ({
           >
             <div className={'flex items-center gap-2'}>
               <Label className={'cursor-pointer text-sm font-medium'}>Category</Label>
-              <Conditional isCondition={Boolean(category)}>
+              <Conditional isCondition={_hasValidCategory}>
                 <Badge className={'px-1.5 py-0 text-xs'} variant={'secondary'}>
                   1
                 </Badge>
@@ -306,7 +320,7 @@ export const SearchFilters = ({
             data-slot={'search-filters-category'}
             data-testid={`${filtersTestId}-category`}
           >
-            <Select onValueChange={handleCategoryChange} value={category}>
+            <Select onValueChange={handleCategoryChange} value={category || 'all'}>
               <SelectTrigger
                 className={'min-h-11 w-full'}
                 data-testid={`${filtersTestId}-category-select`}
@@ -495,15 +509,15 @@ export const SearchFilters = ({
                 {entityTypes.length} {entityTypes.length === 1 ? 'type' : 'types'} selected
               </Badge>
             </Conditional>
-            <Conditional isCondition={Boolean(category)}>
+            <Conditional isCondition={_hasValidCategory}>
               <Badge variant={'secondary'}>
                 Category: {CATEGORY_OPTIONS.find((opt) => opt.value === category)?.label || category}
               </Badge>
             </Conditional>
-            <Conditional isCondition={Boolean(dateFrom)}>
+            <Conditional isCondition={_hasValidDateFrom}>
               <Badge variant={'secondary'}>From: {dateFrom}</Badge>
             </Conditional>
-            <Conditional isCondition={Boolean(dateTo)}>
+            <Conditional isCondition={_hasValidDateTo}>
               <Badge variant={'secondary'}>To: {dateTo}</Badge>
             </Conditional>
             <Conditional isCondition={sortBy !== 'relevance'}>
