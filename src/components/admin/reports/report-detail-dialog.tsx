@@ -2,10 +2,21 @@
 
 import type { ComponentPropsWithRef } from 'react';
 
-import { AlertCircleIcon, CalendarIcon, FileTextIcon, ShieldAlertIcon, UserIcon } from 'lucide-react';
+import {
+  AlertCircleIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  ExternalLinkIcon,
+  FileTextIcon,
+  ShieldAlertIcon,
+  UserIcon,
+  XCircleIcon,
+} from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 import { useState } from 'react';
 
-import type { SelectContentReport } from '@/lib/validations/moderation.validation';
+import type { SelectContentReportWithSlugs } from '@/lib/validations/moderation.validation';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,8 +35,68 @@ interface ReportDetailDialogProps extends ComponentPropsWithRef<'div'> {
   isOpen: boolean;
   onClose: () => void;
   onStatusChange?: (reportId: string, status: 'dismissed' | 'resolved' | 'reviewed') => Promise<void> | void;
-  report: null | SelectContentReport;
+  report: null | SelectContentReportWithSlugs;
 }
+
+// Helper function to check if content link is available
+const isContentLinkAvailable = (report: SelectContentReportWithSlugs): boolean => {
+  // Comments have no direct route
+  if (report.targetType === 'comment') {
+    return false;
+  }
+
+  // Content must exist and have the required slug data
+  if (!report.contentExists) {
+    return false;
+  }
+
+  // Subcollections need both targetSlug and parentCollectionSlug
+  if (report.targetType === 'subcollection') {
+    return !!report.targetSlug && !!report.parentCollectionSlug;
+  }
+
+  // Bobbleheads and collections need targetSlug
+  if (report.targetType === 'bobblehead' || report.targetType === 'collection') {
+    return !!report.targetSlug;
+  }
+
+  return false;
+};
+
+// Helper function to generate content link based on target type
+const getContentLink = (report: SelectContentReportWithSlugs): null | string => {
+  if (!isContentLinkAvailable(report)) {
+    return null;
+  }
+
+  switch (report.targetType) {
+    case 'bobblehead':
+      return $path({
+        route: '/bobbleheads/[bobbleheadSlug]',
+        routeParams: { bobbleheadSlug: report.targetSlug! },
+      });
+    case 'collection':
+      return $path({
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug: report.targetSlug! },
+      });
+    case 'subcollection':
+      return $path({
+        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+        routeParams: {
+          collectionSlug: report.parentCollectionSlug!,
+          subcollectionSlug: report.targetSlug!,
+        },
+      });
+    default:
+      return null;
+  }
+};
+
+// Helper function to format content type display names
+const getContentTypeLabel = (targetType: string): string => {
+  return targetType.charAt(0).toUpperCase() + targetType.slice(1);
+};
 
 export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: ReportDetailDialogProps) => {
   // useState hooks
@@ -61,6 +132,11 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
   const _isCollection = report?.targetType === 'collection';
   const _isSubcollection = report?.targetType === 'subcollection';
   const _isComment = report?.targetType === 'comment';
+  const _hasCommentContent = _isComment && !!report?.commentContent;
+  const _isContentLinkable = report ? isContentLinkAvailable(report) : false;
+  const _contentLink = report ? getContentLink(report) : null;
+  const _showContentPreview = _hasCommentContent || _isContentLinkable;
+  const _contentExists = report?.contentExists ?? false;
 
   // Utility functions
   const formatDate = (date: Date | string) => {
@@ -190,6 +266,21 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                   </Badge>
                 </div>
 
+                {/* Content Status */}
+                <div className={'flex items-center justify-between'}>
+                  <span className={'text-xs text-muted-foreground'}>Content Status</span>
+                  <div className={'flex items-center gap-2'}>
+                    <Conditional isCondition={_contentExists}>
+                      <CheckCircleIcon className={'size-4 text-green-600'} />
+                      <span className={'text-sm font-medium text-green-600'}>Exists</span>
+                    </Conditional>
+                    <Conditional isCondition={!_contentExists}>
+                      <XCircleIcon className={'size-4 text-red-600'} />
+                      <span className={'text-sm font-medium text-red-600'}>Deleted</span>
+                    </Conditional>
+                  </div>
+                </div>
+
                 {/* Content ID */}
                 <div className={'space-y-1'}>
                   <div className={'text-xs text-muted-foreground'}>Content ID</div>
@@ -198,15 +289,36 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                   </div>
                 </div>
 
-                {/* Content Preview Placeholder */}
-                <div className={'rounded-md border border-dashed bg-background p-4 text-center'}>
-                  <div className={'text-xs text-muted-foreground'}>
-                    Content preview will be loaded from the database
+                {/* Content Preview */}
+                <Conditional isCondition={_showContentPreview}>
+                  <div className={'space-y-2'}>
+                    <div className={'text-xs text-muted-foreground'}>Content Preview</div>
+
+                    {/* Comment Content Display */}
+                    <Conditional isCondition={_hasCommentContent}>
+                      <p className={'rounded-md bg-muted p-3 text-sm text-muted-foreground'}>
+                        {report?.commentContent}
+                      </p>
+                    </Conditional>
+
+                    {/* Linkable Content Display */}
+                    <Conditional isCondition={_isContentLinkable && !!_contentLink}>
+                      <Button asChild size={'sm'} variant={'outline'}>
+                        <Link href={_contentLink || ''}>
+                          View {report?.targetType && getContentTypeLabel(report.targetType)}
+                          <ExternalLinkIcon className={'ml-1 size-3.5'} />
+                        </Link>
+                      </Button>
+                    </Conditional>
                   </div>
-                  <div className={'mt-1 text-xs text-muted-foreground'}>
-                    (Implementation depends on target type and data availability)
+                </Conditional>
+
+                {/* Unavailable Content Display */}
+                <Conditional isCondition={!_showContentPreview}>
+                  <div className={'rounded-md bg-muted p-3 text-center'}>
+                    <p className={'text-sm text-muted-foreground'}>Content preview unavailable</p>
                   </div>
-                </div>
+                </Conditional>
               </div>
             </div>
 
