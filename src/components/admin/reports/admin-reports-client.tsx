@@ -2,13 +2,14 @@
 
 import type { ComponentProps } from 'react';
 
-import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
+import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/enums';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { SelectContentReportWithSlugs } from '@/lib/validations/moderation.validation';
 
 import { ReportDetailDialog } from '@/components/admin/reports/report-detail-dialog';
+import { ReportFilters } from '@/components/admin/reports/report-filters';
 import { ReportsTable } from '@/components/admin/reports/reports-table';
 import {
   AlertDialog,
@@ -24,14 +25,42 @@ import { Conditional } from '@/components/ui/conditional';
 import { useServerAction } from '@/hooks/use-server-action';
 import {
   bulkUpdateReportsAction,
+  getAdminReportsAction,
   updateReportStatusAction,
 } from '@/lib/actions/admin/admin-content-reports.actions';
 import { cn } from '@/utils/tailwind-utils';
 
+export type ReportFiltersState = {
+  dateFrom?: Date | null;
+  dateTo?: Date | null;
+  reason?: Array<ContentReportReason> | null;
+  status?: Array<ContentReportStatus> | null;
+  targetType?: Array<'bobblehead' | 'collection' | 'comment' | 'subcollection'> | null;
+};
+
 type AdminReportsClientProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
     initialData: Array<SelectContentReportWithSlugs>;
+    onFiltersChange?: (filters: ReportFiltersState) => void;
   };
+
+// Input type for server action - dates are serialized as ISO strings
+type AdminReportsFilterInput = {
+  dateFrom?: string;
+  dateTo?: string;
+  limit?: number;
+  moderatorId?: string;
+  offset?: number;
+  reason?: Array<ContentReportReason> | ContentReportReason;
+  reporterId?: string;
+  status?: Array<ContentReportStatus> | ContentReportStatus;
+  targetType?:
+    | 'bobblehead'
+    | 'collection'
+    | 'comment'
+    | 'subcollection'
+    | Array<'bobblehead' | 'collection' | 'comment' | 'subcollection'>;
+};
 
 type PendingAction = {
   reportIds: Array<string>;
@@ -42,14 +71,18 @@ type ReportActionStatus = 'dismissed' | 'resolved' | 'reviewed';
 
 export const AdminReportsClient = ({ className, initialData, testId, ...props }: AdminReportsClientProps) => {
   // useState hooks
+  const [reports, setReports] = useState<Array<SelectContentReportWithSlugs>>(initialData);
+  const [currentFilters, setCurrentFilters] = useState<ReportFiltersState>({});
   const [selectedReport, setSelectedReport] = useState<null | SelectContentReportWithSlugs>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<null | PendingAction>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Other hooks
-  const router = useRouter();
+  // Server action hooks
+  const { executeAsync: fetchReports } = useServerAction(getAdminReportsAction, {
+    isDisableToast: true,
+  });
 
   const { executeAsync: executeUpdateStatus } = useServerAction(updateReportStatusAction, {
     toastMessages: {
@@ -72,15 +105,73 @@ export const AdminReportsClient = ({ className, initialData, testId, ...props }:
   });
 
   // Event handlers
+  const handleRefresh = useCallback(
+    async (filters?: ReportFiltersState) => {
+      const filtersToUse = filters ?? currentFilters;
+
+      // Build filter options for the server action
+      const filterOptions: AdminReportsFilterInput = {};
+
+      if (filtersToUse.status && filtersToUse.status.length > 0) {
+        filterOptions.status =
+          filtersToUse.status.length === 1 ? filtersToUse.status[0] : filtersToUse.status;
+      }
+
+      if (filtersToUse.targetType && filtersToUse.targetType.length > 0) {
+        filterOptions.targetType =
+          filtersToUse.targetType.length === 1 ? filtersToUse.targetType[0] : filtersToUse.targetType;
+      }
+
+      if (filtersToUse.reason && filtersToUse.reason.length > 0) {
+        filterOptions.reason =
+          filtersToUse.reason.length === 1 ? filtersToUse.reason[0] : filtersToUse.reason;
+      }
+
+      if (filtersToUse.dateFrom) {
+        filterOptions.dateFrom = filtersToUse.dateFrom.toISOString();
+      }
+
+      if (filtersToUse.dateTo) {
+        filterOptions.dateTo = filtersToUse.dateTo.toISOString();
+      }
+
+      const result = await fetchReports(filterOptions);
+
+      if (
+        result &&
+        typeof result === 'object' &&
+        'data' in result &&
+        result.data &&
+        typeof result.data === 'object' &&
+        'success' in result.data &&
+        result.data.success === true &&
+        'data' in result.data &&
+        result.data.data
+      ) {
+        const responseData = result.data.data as { reports: Array<SelectContentReportWithSlugs> };
+        setReports(responseData.reports);
+      }
+    },
+    [currentFilters, fetchReports],
+  );
+
+  const handleFiltersChange = useCallback(
+    (filters: ReportFiltersState) => {
+      setCurrentFilters(filters);
+      void handleRefresh(filters);
+    },
+    [handleRefresh],
+  );
+
   const handleViewDetails = useCallback(
     (reportId: string) => {
-      const report = initialData.find((r) => r.id === reportId);
+      const report = reports.find((r) => r.id === reportId);
       if (report) {
         setSelectedReport(report);
         setIsDetailDialogOpen(true);
       }
     },
-    [initialData],
+    [reports],
   );
 
   const handleCloseDetailDialog = useCallback(() => {
@@ -101,13 +192,13 @@ export const AdminReportsClient = ({ className, initialData, testId, ...props }:
       setIsLoading(true);
       try {
         await executeUpdateStatus({ reportId, status });
-        router.refresh();
+        await handleRefresh();
         handleCloseDetailDialog();
       } finally {
         setIsLoading(false);
       }
     },
-    [executeUpdateStatus, router, handleCloseDetailDialog],
+    [executeUpdateStatus, handleRefresh, handleCloseDetailDialog],
   );
 
   const handleBulkAction = useCallback(
@@ -128,12 +219,12 @@ export const AdminReportsClient = ({ className, initialData, testId, ...props }:
         } else {
           await executeBulkUpdate({ reportIds, status: action });
         }
-        router.refresh();
+        await handleRefresh();
       } finally {
         setIsLoading(false);
       }
     },
-    [executeUpdateStatus, executeBulkUpdate, router],
+    [executeUpdateStatus, executeBulkUpdate, handleRefresh],
   );
 
   const handleConfirmAction = useCallback(async () => {
@@ -153,14 +244,14 @@ export const AdminReportsClient = ({ className, initialData, testId, ...props }:
           status: pendingAction.status,
         });
       }
-      router.refresh();
+      await handleRefresh();
       handleCloseDetailDialog();
     } finally {
       setIsLoading(false);
       setIsConfirmDialogOpen(false);
       setPendingAction(null);
     }
-  }, [pendingAction, executeUpdateStatus, executeBulkUpdate, router, handleCloseDetailDialog]);
+  }, [pendingAction, executeUpdateStatus, executeBulkUpdate, handleRefresh, handleCloseDetailDialog]);
 
   const handleCancelConfirm = useCallback(() => {
     setIsConfirmDialogOpen(false);
@@ -188,8 +279,11 @@ export const AdminReportsClient = ({ className, initialData, testId, ...props }:
       data-testid={adminReportsClientTestId}
       {...props}
     >
+      {/* Filters */}
+      <ReportFilters onFiltersChange={handleFiltersChange} />
+
       {/* Reports Table */}
-      <ReportsTable data={initialData} onBulkAction={handleBulkAction} onViewDetails={handleViewDetails} />
+      <ReportsTable data={reports} onBulkAction={handleBulkAction} onViewDetails={handleViewDetails} />
 
       {/* Report Detail Dialog */}
       <ReportDetailDialog

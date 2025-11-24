@@ -4,8 +4,9 @@ import type { ComponentPropsWithRef } from 'react';
 
 import { format } from 'date-fns';
 import { CalendarIcon, FilterIcon, XIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { parseAsArrayOf, parseAsIsoDateTime, parseAsStringEnum, useQueryStates } from 'nuqs';
+
+import type { ReportFiltersState } from '@/components/admin/reports/admin-reports-client';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ import { ENUMS } from '@/lib/constants';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ReportFiltersProps extends ComponentPropsWithRef<'div'> {
-  onFiltersChange?: (hasFilters: boolean) => void;
+  onFiltersChange?: (filters: ReportFiltersState) => void;
 }
 
 export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFiltersProps) => {
@@ -27,7 +28,6 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
   // (none for this component - using nuqs for state)
 
   // Other hooks
-  const router = useRouter();
   const [filters, setFilters] = useQueryStates(
     {
       dateFrom: parseAsIsoDateTime,
@@ -47,6 +47,17 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
   // useEffect hooks
   // (none needed for this component)
 
+  // Helper to notify parent of filter changes
+  const notifyFiltersChange = (updatedFilters: typeof filters) => {
+    onFiltersChange?.({
+      dateFrom: updatedFilters.dateFrom,
+      dateTo: updatedFilters.dateTo,
+      reason: updatedFilters.reason,
+      status: updatedFilters.status,
+      targetType: updatedFilters.targetType,
+    });
+  };
+
   // Event handlers
   const handleStatusChange = async (value: string) => {
     const currentStatus = filters.status || [];
@@ -55,15 +66,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
         currentStatus.filter((s) => s !== value)
       : [...currentStatus, value as (typeof ENUMS.CONTENT_REPORT.STATUS)[number]];
 
-    await setFilters({ status: newStatus.length > 0 ? newStatus : null });
-    router.refresh();
-    onFiltersChange?.(
-      newStatus.length > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateFrom ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, status: newStatus.length > 0 ? newStatus : null };
+    await setFilters({ status: newFilters.status });
+    notifyFiltersChange(newFilters);
   };
 
   const handleTargetTypeChange = async (value: string) => {
@@ -73,15 +78,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
         currentTypes.filter((t) => t !== value)
       : [...currentTypes, value as 'bobblehead' | 'collection' | 'comment' | 'subcollection'];
 
-    await setFilters({ targetType: newTypes.length > 0 ? newTypes : null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        newTypes.length > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateFrom ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, targetType: newTypes.length > 0 ? newTypes : null };
+    await setFilters({ targetType: newFilters.targetType });
+    notifyFiltersChange(newFilters);
   };
 
   const handleReasonChange = async (value: string) => {
@@ -91,112 +90,66 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
         currentReasons.filter((r) => r !== value)
       : [...currentReasons, value as (typeof ENUMS.CONTENT_REPORT.REASON)[number]];
 
-    await setFilters({ reason: newReasons.length > 0 ? newReasons : null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        newReasons.length > 0 ||
-        !!filters.dateFrom ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, reason: newReasons.length > 0 ? newReasons : null };
+    await setFilters({ reason: newFilters.reason });
+    notifyFiltersChange(newFilters);
   };
 
   const handleDateFromSelect = async (date: Date | undefined) => {
-    await setFilters({ dateFrom: date || null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!date ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, dateFrom: date || null };
+    await setFilters({ dateFrom: newFilters.dateFrom });
+    notifyFiltersChange(newFilters);
   };
 
   const handleDateToSelect = async (date: Date | undefined) => {
-    await setFilters({ dateTo: date || null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateFrom ||
-        !!date,
-    );
+    const newFilters = { ...filters, dateTo: date || null };
+    await setFilters({ dateTo: newFilters.dateTo });
+    notifyFiltersChange(newFilters);
   };
 
   const handleClearFilters = async () => {
-    await setFilters({
+    const newFilters = {
       dateFrom: null,
       dateTo: null,
       reason: null,
       status: null,
       targetType: null,
-    });
-    router.refresh();
-    onFiltersChange?.(false);
+    };
+    await setFilters(newFilters);
+    notifyFiltersChange(newFilters);
   };
 
   const handleRemoveStatus = async (value: string) => {
     const newStatus = (filters.status || []).filter((s) => s !== value);
-    await setFilters({ status: newStatus.length > 0 ? newStatus : null });
-    router.refresh();
-    onFiltersChange?.(
-      newStatus.length > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateFrom ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, status: newStatus.length > 0 ? newStatus : null };
+    await setFilters({ status: newFilters.status });
+    notifyFiltersChange(newFilters);
   };
 
   const handleRemoveTargetType = async (value: string) => {
     const newTypes = (filters.targetType || []).filter((t) => t !== value);
-    await setFilters({ targetType: newTypes.length > 0 ? newTypes : null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        newTypes.length > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateFrom ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, targetType: newTypes.length > 0 ? newTypes : null };
+    await setFilters({ targetType: newFilters.targetType });
+    notifyFiltersChange(newFilters);
   };
 
   const handleRemoveReason = async (value: string) => {
     const newReasons = (filters.reason || []).filter((r) => r !== value);
-    await setFilters({ reason: newReasons.length > 0 ? newReasons : null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        newReasons.length > 0 ||
-        !!filters.dateFrom ||
-        !!filters.dateTo,
-    );
+    const newFilters = { ...filters, reason: newReasons.length > 0 ? newReasons : null };
+    await setFilters({ reason: newFilters.reason });
+    notifyFiltersChange(newFilters);
   };
 
   const handleClearDateFrom = async () => {
+    const newFilters = { ...filters, dateFrom: null };
     await setFilters({ dateFrom: null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateTo,
-    );
+    notifyFiltersChange(newFilters);
   };
 
   const handleClearDateTo = async () => {
+    const newFilters = { ...filters, dateTo: null };
     await setFilters({ dateTo: null });
-    router.refresh();
-    onFiltersChange?.(
-      (filters.status?.length ?? 0) > 0 ||
-        (filters.targetType?.length ?? 0) > 0 ||
-        (filters.reason?.length ?? 0) > 0 ||
-        !!filters.dateFrom,
-    );
+    notifyFiltersChange(newFilters);
   };
 
   // Derived variables for conditional rendering

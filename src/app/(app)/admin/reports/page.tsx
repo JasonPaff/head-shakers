@@ -4,9 +4,7 @@ import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/e
 import type { AdminReportsFilterOptions } from '@/lib/queries/content-reports/content-reports.query';
 
 import { AdminReportsClient } from '@/components/admin/reports/admin-reports-client';
-import { ReportFilters } from '@/components/admin/reports/report-filters';
 import { Card } from '@/components/ui/card';
-import { Conditional } from '@/components/ui/conditional';
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
 import { getCurrentUserWithRole, requireModerator } from '@/lib/utils/admin.utils';
 
@@ -107,10 +105,6 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     currentUser.id,
   );
 
-  // Derived variables for conditional rendering
-  const _hasReports = reports.length > 0;
-  const _hasPendingReports = stats.pending > 0;
-
   return (
     <div className={'container mx-auto py-8'}>
       {/* Page Header */}
@@ -143,49 +137,8 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
         </Card>
       </div>
 
-      {/* Filters Section */}
-      <div className={'mb-6'}>
-        <ReportFilters />
-      </div>
-
-      {/* Reports Table Section */}
-      <div className={'space-y-6'}>
-        <Conditional isCondition={_hasReports}>
-          <AdminReportsClient initialData={reports} />
-        </Conditional>
-
-        {/* Empty State */}
-        <Conditional isCondition={!_hasReports}>
-          <Card className={'p-12 text-center'}>
-            <div className={'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-muted'}>
-              <svg
-                className={'size-8 text-muted-foreground'}
-                fill={'none'}
-                stroke={'currentColor'}
-                strokeWidth={1.5}
-                viewBox={'0 0 24 24'}
-              >
-                <path
-                  d={
-                    'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
-                  }
-                  strokeLinecap={'round'}
-                  strokeLinejoin={'round'}
-                />
-              </svg>
-            </div>
-            <h3 className={'mb-2 text-lg font-semibold'}>No reports found</h3>
-            <p className={'text-sm text-muted-foreground'}>
-              <Conditional isCondition={_hasPendingReports}>
-                Try adjusting your filters to see more results.
-              </Conditional>
-              <Conditional isCondition={!_hasPendingReports}>
-                There are no content reports to review at this time.
-              </Conditional>
-            </p>
-          </Card>
-        </Conditional>
-      </div>
+      {/* Reports Section - Filters and Table */}
+      <AdminReportsClient initialData={reports} />
     </div>
   );
 }

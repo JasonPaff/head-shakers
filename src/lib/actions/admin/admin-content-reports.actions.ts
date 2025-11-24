@@ -48,7 +48,7 @@ export const getAdminReportsAction = adminActionClient
     });
 
     try {
-      const { reports, stats } = await ContentReportsFacade.getAllReportsForAdminAsync(
+      const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
         input,
         userId,
         dbInstance,
