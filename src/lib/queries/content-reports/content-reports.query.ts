@@ -253,6 +253,12 @@ export class ContentReportsQuery extends BaseQuery {
       // Select all content report fields plus computed slug fields
       let query = dbInstance
         .select({
+          commentContent: sql<null | string>`
+            CASE
+              WHEN ${contentReports.targetType} = 'comment' THEN ${comments.content}
+              ELSE NULL
+            END
+          `.as('comment_content'),
           contentExists: sql<boolean>`
             CASE
               WHEN ${contentReports.targetType} = 'bobblehead' THEN ${bobbleheads.id} IS NOT NULL

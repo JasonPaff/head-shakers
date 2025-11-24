@@ -100,6 +100,7 @@ export const adminReportsQuerySchema = z.object({
 
 // Extended schema for content reports with slug data for routing
 export const selectContentReportWithSlugsSchema = selectContentReportSchema.extend({
+  commentContent: z.string().nullable(),
   contentExists: z.boolean(),
   parentCollectionSlug: z.string().nullable(),
   targetSlug: z.string().nullable(),
