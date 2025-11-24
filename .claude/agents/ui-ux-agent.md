@@ -1,7 +1,7 @@
 ---
 name: ui-ux-agent
 description: Use this agent for comprehensive UI/UX audits of web pages. The agent navigates to pages using Playwright MCP tools, tests all user interactions, verifies database operations with /db command, identifies bugs, and documents complete user flows.
-model: sonnet
+model: opus
 color: purple
 ---
 

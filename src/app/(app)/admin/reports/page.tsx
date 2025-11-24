@@ -47,15 +47,10 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
   // Await and parse search params
   const resolvedSearchParams = await searchParams;
 
-  // Extract pagination parameters
-  const page = resolvedSearchParams.page ? parseInt(resolvedSearchParams.page, 10) : 1;
-  const pageSize = resolvedSearchParams.pageSize ? parseInt(resolvedSearchParams.pageSize, 10) : 25;
-
   // Build filter options for the query
-  const filterOptions: AdminReportsFilterOptions = {
-    limit: pageSize,
-    offset: (page - 1) * pageSize,
-  };
+  // Note: Pagination is handled client-side in the table component
+  // We fetch all data matching the filters without pagination
+  const filterOptions: AdminReportsFilterOptions = {};
 
   // Extract filter values (nuqs returns comma-separated strings for multi-select)
   if (resolvedSearchParams.status) {
@@ -128,7 +123,7 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
       </div>
 
       {/* Quick Stats */}
-      <div className={'mb-6 grid gap-4 md:grid-cols-4'}>
+      <div className={'mb-6 grid gap-4 md:grid-cols-5'}>
         <Card className={'p-4'}>
           <div className={'text-sm font-medium text-muted-foreground'}>Total Reports</div>
           <div className={'mt-2 text-2xl font-bold'}>{stats.total}</div>
@@ -144,6 +139,10 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
         <Card className={'p-4'}>
           <div className={'text-sm font-medium text-muted-foreground'}>Resolved</div>
           <div className={'mt-2 text-2xl font-bold text-green-600'}>{stats.resolved}</div>
+        </Card>
+        <Card className={'p-4'}>
+          <div className={'text-sm font-medium text-muted-foreground'}>Dismissed</div>
+          <div className={'mt-2 text-2xl font-bold text-gray-600'}>{stats.dismissed}</div>
         </Card>
       </div>
 

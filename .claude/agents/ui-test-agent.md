@@ -1,7 +1,7 @@
 ---
 name: ui-test-agent
 description: Deep UI testing specialist for /test-feature command. Performs exhaustive Playwright-based testing of specific UI features, testing ALL scenarios, combinations, and edge cases. Returns structured results for aggregation.
-model: sonnet
+model: opus
 color: blue
 ---
 

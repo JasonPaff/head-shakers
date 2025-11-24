@@ -22,24 +22,24 @@
 
 ## Test Coverage Summary
 
-| Test Unit | Routes | Scenarios | Passed | Failed | Status |
-|-----------|--------|-----------|--------|--------|--------|
-| Pagination Controls | /admin/reports | 35 | 18 | 7 | CRITICAL FAILURES |
-| Page Size Controls | /admin/reports | 52 | 51 | 1 | CRITICAL FAILURE |
-| Column Sorting | /admin/reports | 78 | 78 | 0 | PASS ✓ |
-| **TOTAL** | - | **165** | **147** | **8** | **89.1% Pass Rate** |
+| Test Unit           | Routes         | Scenarios | Passed  | Failed | Status              |
+| ------------------- | -------------- | --------- | ------- | ------ | ------------------- |
+| Pagination Controls | /admin/reports | 35        | 18      | 7      | CRITICAL FAILURES   |
+| Page Size Controls  | /admin/reports | 52        | 51      | 1      | CRITICAL FAILURE    |
+| Column Sorting      | /admin/reports | 78        | 78      | 0      | PASS ✓              |
+| **TOTAL**           | -              | **165**   | **147** | **8**  | **89.1% Pass Rate** |
 
 ---
 
 ## Issue Summary
 
-| Severity | Count | Score Impact |
-|----------|-------|--------------|
-| Critical | 2 | -50 |
-| High | 1 | -15 |
-| Medium | 5 | -25 |
-| Low | 0 | 0 |
-| **Total** | **8** | **-90** |
+| Severity  | Count | Score Impact |
+| --------- | ----- | ------------ |
+| Critical  | 2     | -50          |
+| High      | 1     | -15          |
+| Medium    | 5     | -25          |
+| Low       | 0     | 0            |
+| **Total** | **8** | **-90**      |
 
 ---
 
@@ -79,7 +79,7 @@
 - **Scenarios Affected**: Server-side data fetching, page navigation
 - **File**: `src/app/(app)/admin/reports/page.tsx` (server component data fetching)
 - **Problem**: After certain navigation patterns, the server returns incorrect data. When navigating from page 2 back to page 1 (via Previous button), page 1 shows only 3 rows instead of 10 (when pageSize=10). This suggests a server-side bug with OFFSET/LIMIT calculation or data caching.
-- **Expected**: Page 1 with pageSize=10 should display the first 10 reports ordered by submission date descending. Page offset should be (1-1)*10=0, limit=10.
+- **Expected**: Page 1 with pageSize=10 should display the first 10 reports ordered by submission date descending. Page offset should be (1-1)\*10=0, limit=10.
 - **Actual**: Page 1 displays only 3 rows (same rows as page 2), suggesting incorrect offset or limit calculation.
 - **Steps to Reproduce**:
   1. Navigate directly to http://localhost:3000/admin/reports?pageSize=10&page=2
@@ -204,6 +204,7 @@
 **Status**: CRITICAL FAILURES
 
 **Issues Found**:
+
 - CRIT-1: Table data not paginated on client-side navigation
 - CRIT-2: Server returns wrong data after page load
 - HIGH-1: Inconsistent navigation behavior (full reload vs client-side)
@@ -212,6 +213,7 @@
 - MED-3: No validation for invalid page numbers
 
 **Key Findings**:
+
 - Pagination controls (buttons, indicators) work correctly from UI perspective
 - URL parameters update correctly
 - Button disabled states work correctly
@@ -229,9 +231,11 @@
 **Status**: CRITICAL FAILURE (1 scenario failed)
 
 **Issues Found**:
+
 - CRIT-1: Pagination not working - table displays all rows regardless of page size
 
 **Key Findings**:
+
 - Page size button UI works perfectly (highlighting, styling, keyboard access)
 - URL parameters update correctly
 - Page indicator and results counter calculate correctly
@@ -240,6 +244,7 @@
 - Critical failure: actual table data is not limited by page size
 
 **Success Metrics**:
+
 - 51/52 scenarios passed (98.1%)
 - All button interactions work
 - All URL updates correct
@@ -259,6 +264,7 @@
 **Issues Found**: None
 
 **Key Findings**:
+
 - All 4 sortable columns (reason, status, targetType, createdAt) work perfectly
 - Sort indicators (arrows) display correctly
 - Data reordering is accurate for all sort directions
@@ -270,6 +276,7 @@
 - TanStack React Table implementation is solid
 
 **Success Metrics**:
+
 - 78/78 scenarios passed (100%)
 - All data sorts correctly
 - All indicators display correctly
@@ -295,6 +302,7 @@ The ReportsTable component receives ALL data from the server (all 13 rows) via t
 ```
 
 **Root Cause**: With `manualPagination: true`, TanStack doesn't automatically slice the data. The component needs to either:
+
 1. Slice data before passing to useReactTable: `data.slice((page-1)*pageSize, page*pageSize)`
 2. Or ensure server returns only current page's data via proper LIMIT/OFFSET
 
@@ -303,6 +311,7 @@ The ReportsTable component receives ALL data from the server (all 13 rows) via t
 The server component in `src/app/(app)/admin/reports/page.tsx` fetches data with pagination parameters, but after certain navigation sequences, returns incorrect data.
 
 **Root Cause Suspected**:
+
 - Incorrect OFFSET calculation in the database query
 - Data caching issue where subsequent requests return cached data from previous request
 - The facade method `getAllReportsWithSlugsForAdminAsync()` may not be applying limits correctly
@@ -312,6 +321,7 @@ The server component in `src/app/(app)/admin/reports/page.tsx` fetches data with
 The pagination handlers use `nuqs` for URL state management via `setPagination()`. This should trigger Next.js router updates.
 
 **Root Cause Suspected**:
+
 - Some code paths may be using different routing methods
 - Possible shallow routing vs full routing inconsistency
 - May be related to CRIT-2 causing full page reloads in certain states
@@ -406,6 +416,7 @@ This will launch the validation specialist to address all identified issues.
 ### For Code Review
 
 **Minimum Requirements to Pass**:
+
 1. Fix CRIT-1 (pagination data slicing)
 2. Fix CRIT-2 (server-side data fetching)
 3. Address HIGH-1 (navigation consistency)
@@ -416,21 +427,21 @@ This will launch the validation specialist to address all identified issues.
 
 ## Testing Metrics
 
-| Metric | Value |
-|--------|-------|
-| Test Units Executed | 3 |
-| Total Scenarios | 165 |
-| Pass Rate | 89.1% |
-| Critical Issues | 2 |
-| High Priority Issues | 1 |
-| Medium Priority Issues | 5 |
-| Low Priority Issues | 0 |
-| Test Score | 42/100 (F) |
-| Execution Duration | ~45 minutes |
-| Browser | Playwright (Chromium) |
-| Base URL | http://localhost:3000 |
-| Authentication | Clerk test mode (moderator role) |
-| Test Data | 13 content reports with various statuses |
+| Metric                 | Value                                    |
+| ---------------------- | ---------------------------------------- |
+| Test Units Executed    | 3                                        |
+| Total Scenarios        | 165                                      |
+| Pass Rate              | 89.1%                                    |
+| Critical Issues        | 2                                        |
+| High Priority Issues   | 1                                        |
+| Medium Priority Issues | 5                                        |
+| Low Priority Issues    | 0                                        |
+| Test Score             | 42/100 (F)                               |
+| Execution Duration     | ~45 minutes                              |
+| Browser                | Playwright (Chromium)                    |
+| Base URL               | http://localhost:3000                    |
+| Authentication         | Clerk test mode (moderator role)         |
+| Test Data              | 13 content reports with various statuses |
 
 ---
 

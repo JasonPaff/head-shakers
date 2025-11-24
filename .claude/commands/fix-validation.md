@@ -2,7 +2,7 @@
 allowed-tools: Task(subagent_type:*), Bash(mkdir:*,npm:*), Read(*), Write(*), Glob(*), Grep(*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: '<validation-report-path> [--skip-tests|--skip-revalidation|--dry-run|--max-retries=N]'
 description: Fix all issues from a validation report using specialized subagents with automatic revalidation
-model: sonnet
+model: opus
 ---
 
 You are a lightweight fix orchestrator that takes a validation report and coordinates specialized subagents to fix all identified issues, then revalidates to confirm the fixes. Your role is COORDINATION ONLY - delegate ALL fix work to the appropriate specialists.

@@ -3,7 +3,13 @@
 import type { ColumnDef, RowSelectionState, SortingState } from '@tanstack/react-table';
 import type { ComponentPropsWithRef } from 'react';
 
-import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import {
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table';
 import {
   ArrowDownIcon,
   ArrowUpIcon,
@@ -19,7 +25,7 @@ import {
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { parseAsInteger, useQueryStates } from 'nuqs';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { SelectContentReportWithSlugs } from '@/lib/validations/moderation.validation';
 
@@ -146,6 +152,17 @@ export const ReportsTable = ({
       history: 'push',
     },
   );
+
+  // useEffect hooks
+  // Validate page number and clamp to valid range
+  useEffect(() => {
+    const maxPages = Math.ceil(data.length / pagination.pageSize);
+    if (pagination.page > maxPages && maxPages > 0) {
+      void setPagination({ page: maxPages });
+    } else if (pagination.page < 1) {
+      void setPagination({ page: 1 });
+    }
+  }, [pagination.page, pagination.pageSize, data.length, setPagination]);
 
   // useMemo hooks
   const columns = useMemo<Array<ColumnDef<SelectContentReportWithSlugs>>>(
@@ -437,11 +454,22 @@ export const ReportsTable = ({
     data,
     enableRowSelection: true,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    manualPagination: true,
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === 'function' ?
+          updater({ pageIndex: pagination.page - 1, pageSize: pagination.pageSize })
+        : updater;
+
+      void setPagination({
+        page: newPagination.pageIndex + 1,
+        pageSize: newPagination.pageSize,
+      });
+      setRowSelection({});
+    },
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    pageCount: Math.ceil(totalCount / pagination.pageSize),
     state: {
       pagination: {
         pageIndex: pagination.page - 1,
@@ -453,16 +481,6 @@ export const ReportsTable = ({
   });
 
   // Event handlers
-  const handlePageChange = (newPage: number) => {
-    void setPagination({ page: newPage });
-    setRowSelection({});
-  };
-
-  const handlePageSizeChange = (newPageSize: number) => {
-    void setPagination({ page: 1, pageSize: newPageSize });
-    setRowSelection({});
-  };
-
   const handleBulkAction = (action: 'dismissed' | 'resolved' | 'reviewed') => {
     const selectedRows = table.getFilteredSelectedRowModel().rows;
     const reportIds = selectedRows.map((row) => row.original.id);
@@ -478,11 +496,13 @@ export const ReportsTable = ({
   const _hasNoResults = table.getRowModel().rows?.length === 0;
   const _hasSelectedRows = Object.keys(rowSelection).length > 0;
   const _selectedCount = table.getFilteredSelectedRowModel().rows.length;
-  const _totalPages = Math.ceil(totalCount / pagination.pageSize);
-  const _hasPreviousPage = pagination.page > 1;
-  const _hasNextPage = pagination.page < _totalPages;
-  const _startIndex = (pagination.page - 1) * pagination.pageSize + 1;
-  const _endIndex = Math.min(pagination.page * pagination.pageSize, totalCount);
+  const _totalPages = table.getPageCount();
+  const _currentPage = table.getState().pagination.pageIndex + 1;
+  const _currentPageSize = table.getState().pagination.pageSize;
+  const _hasPreviousPage = table.getCanPreviousPage();
+  const _hasNextPage = table.getCanNextPage();
+  const _startIndex = table.getState().pagination.pageIndex * _currentPageSize + 1;
+  const _endIndex = Math.min(_currentPage * _currentPageSize, totalCount);
 
   return (
     <div className={cn('space-y-4', className)} {...props}>
@@ -620,10 +640,10 @@ export const ReportsTable = ({
                 className={cn('h-8 min-w-[2.5rem] px-2')}
                 key={size}
                 onClick={() => {
-                  handlePageSizeChange(size);
+                  table.setPageSize(size);
                 }}
                 size={'sm'}
-                variant={pagination.pageSize === size ? 'default' : 'outline'}
+                variant={_currentPageSize === size ? 'default' : 'outline'}
               >
                 {size}
               </Button>
@@ -636,7 +656,7 @@ export const ReportsTable = ({
           <Button
             disabled={!_hasPreviousPage}
             onClick={() => {
-              handlePageChange(pagination.page - 1);
+              table.previousPage();
             }}
             size={'sm'}
             variant={'outline'}
@@ -645,13 +665,13 @@ export const ReportsTable = ({
           </Button>
           <div className={'flex items-center gap-1'}>
             <span className={'text-sm font-medium'}>
-              Page {pagination.page} of {_totalPages}
+              Page {_currentPage} of {_totalPages}
             </span>
           </div>
           <Button
             disabled={!_hasNextPage}
             onClick={() => {
-              handlePageChange(pagination.page + 1);
+              table.nextPage();
             }}
             size={'sm'}
             variant={'outline'}
