@@ -85,6 +85,59 @@ export const ReportsTable = ({
         size: 50,
       },
       {
+        cell: ({ row }) => {
+          const report = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button className={'h-8 w-8 p-0'} variant={'ghost'}>
+                  <span className={'sr-only'}>Open menu</span>
+                  <MoreVerticalIcon className={'size-4'} />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align={'end'}>
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuItem
+                  onClick={() => {
+                    onViewDetails?.(report.id);
+                  }}
+                >
+                  <EyeIcon className={'mr-2 size-4'} />
+                  View Details
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={() => {
+                    onBulkAction?.([report.id], 'reviewed');
+                  }}
+                >
+                  Mark as Reviewed
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    onBulkAction?.([report.id], 'resolved');
+                  }}
+                >
+                  Mark as Resolved
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    onBulkAction?.([report.id], 'dismissed');
+                  }}
+                >
+                  Dismiss Report
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+        enableSorting: false,
+        header: 'Actions',
+        id: 'actions',
+        size: 80,
+      },
+      {
         accessorKey: 'reason',
         cell: ({ row }) => {
           const reason = row.original.reason;
@@ -202,59 +255,6 @@ export const ReportsTable = ({
         enableSorting: true,
         header: 'Status',
         size: 120,
-      },
-      {
-        cell: ({ row }) => {
-          const report = row.original;
-
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button className={'h-8 w-8 p-0'} variant={'ghost'}>
-                  <span className={'sr-only'}>Open menu</span>
-                  <MoreVerticalIcon className={'size-4'} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align={'end'}>
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => {
-                    onViewDetails?.(report.id);
-                  }}
-                >
-                  <EyeIcon className={'mr-2 size-4'} />
-                  View Details
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => {
-                    onBulkAction?.([report.id], 'reviewed');
-                  }}
-                >
-                  Mark as Reviewed
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    onBulkAction?.([report.id], 'resolved');
-                  }}
-                >
-                  Mark as Resolved
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => {
-                    onBulkAction?.([report.id], 'dismissed');
-                  }}
-                >
-                  Dismiss Report
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
-        enableSorting: false,
-        header: 'Actions',
-        id: 'actions',
-        size: 80,
       },
     ],
     [onBulkAction, onViewDetails],
