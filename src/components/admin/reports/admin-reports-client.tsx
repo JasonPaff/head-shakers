@@ -31,7 +31,6 @@ import { cn } from '@/utils/tailwind-utils';
 type AdminReportsClientProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
     initialData: Array<SelectContentReportWithSlugs>;
-    totalCount: number;
   };
 
 type PendingAction = {
@@ -41,13 +40,7 @@ type PendingAction = {
 
 type ReportActionStatus = 'dismissed' | 'resolved' | 'reviewed';
 
-export const AdminReportsClient = ({
-  className,
-  initialData,
-  testId,
-  totalCount,
-  ...props
-}: AdminReportsClientProps) => {
+export const AdminReportsClient = ({ className, initialData, testId, ...props }: AdminReportsClientProps) => {
   // useState hooks
   const [selectedReport, setSelectedReport] = useState<null | SelectContentReportWithSlugs>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
@@ -196,12 +189,7 @@ export const AdminReportsClient = ({
       {...props}
     >
       {/* Reports Table */}
-      <ReportsTable
-        data={initialData}
-        onBulkAction={handleBulkAction}
-        onViewDetails={handleViewDetails}
-        totalCount={totalCount}
-      />
+      <ReportsTable data={initialData} onBulkAction={handleBulkAction} onViewDetails={handleViewDetails} />
 
       {/* Report Detail Dialog */}
       <ReportDetailDialog

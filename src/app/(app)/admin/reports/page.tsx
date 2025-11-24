@@ -107,9 +107,6 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     currentUser.id,
   );
 
-  // Calculate total count from stats
-  const totalCount = stats.total;
-
   // Derived variables for conditional rendering
   const _hasReports = reports.length > 0;
   const _hasPendingReports = stats.pending > 0;
@@ -154,7 +151,7 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
       {/* Reports Table Section */}
       <div className={'space-y-6'}>
         <Conditional isCondition={_hasReports}>
-          <AdminReportsClient initialData={reports} totalCount={totalCount} />
+          <AdminReportsClient initialData={reports} />
         </Conditional>
 
         {/* Empty State */}

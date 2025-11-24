@@ -50,7 +50,6 @@ interface ReportsTableProps extends ComponentPropsWithRef<'div'> {
   data: Array<SelectContentReportWithSlugs>;
   onBulkAction?: (reportIds: Array<string>, action: 'dismissed' | 'resolved' | 'reviewed') => void;
   onViewDetails?: (reportId: string) => void;
-  totalCount?: number;
 }
 
 // Helper function to check if content link is available
@@ -134,7 +133,6 @@ export const ReportsTable = ({
   data,
   onBulkAction,
   onViewDetails,
-  totalCount = 0,
   ...props
 }: ReportsTableProps) => {
   // useState hooks
@@ -501,8 +499,8 @@ export const ReportsTable = ({
   const _currentPageSize = table.getState().pagination.pageSize;
   const _hasPreviousPage = table.getCanPreviousPage();
   const _hasNextPage = table.getCanNextPage();
-  const _startIndex = table.getState().pagination.pageIndex * _currentPageSize + 1;
-  const _endIndex = Math.min(_currentPage * _currentPageSize, totalCount);
+  const _startIndex = data.length === 0 ? 0 : table.getState().pagination.pageIndex * _currentPageSize + 1;
+  const _endIndex = Math.min(_currentPage * _currentPageSize, data.length);
 
   return (
     <div className={cn('space-y-4', className)} {...props}>
@@ -628,7 +626,7 @@ export const ReportsTable = ({
       <div className={'flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}>
         {/* Results Info */}
         <div className={'text-sm text-muted-foreground'}>
-          Showing {_startIndex} to {_endIndex} of {totalCount} results
+          Showing {_startIndex} to {_endIndex} of {data.length} results
         </div>
 
         {/* Page Size Selector */}
