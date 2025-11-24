@@ -17,10 +17,12 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
+import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { SelectBobbleheadPhoto } from '@/lib/validations/bobbleheads.validation';
 
 import { BobbleheadDeleteDialog } from '@/components/feature/bobblehead/bobblehead-delete-dialog';
+import { BobbleheadEditDialog } from '@/components/feature/bobblehead/bobblehead-edit-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
@@ -43,6 +45,32 @@ import { cn } from '@/utils/tailwind-utils';
 import { BobbleheadPhotoGalleryModal } from './bobblehead-photo-gallery-modal';
 import { BobbleheadShareMenu } from './bobblehead-share-menu';
 
+interface BobbleheadForEdit {
+  acquisitionDate: Date | null;
+  acquisitionMethod: null | string;
+  category: null | string;
+  characterName: null | string;
+  collectionId: string;
+  currentCondition: null | string;
+  customFields: Array<Record<string, string>> | null;
+  description: null | string;
+  height: null | number;
+  id: string;
+  isFeatured: boolean;
+  isPublic: boolean;
+  manufacturer: null | string;
+  material: null | string;
+  name: null | string;
+  purchaseLocation: null | string;
+  purchasePrice: null | number;
+  series: null | string;
+  status: null | string;
+  subcollectionId: null | string;
+  tags?: Array<{ id: string; name: string }>;
+  weight: null | number;
+  year: null | number;
+}
+
 interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
   bobblehead: {
     collectionId: string;
@@ -61,6 +89,8 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
     subcollectionName?: null | string;
     subcollectionSlug?: null | string;
   };
+  bobbleheadForEdit?: BobbleheadForEdit;
+  collections?: Array<ComboboxItem>;
   isOwner: boolean;
   navigationContext?: {
     collectionId?: string;
@@ -70,6 +100,8 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
 
 export const BobbleheadGalleryCard = ({
   bobblehead,
+  bobbleheadForEdit,
+  collections,
   isOwner,
   navigationContext,
   testId,
@@ -93,6 +125,7 @@ export const BobbleheadGalleryCard = ({
   const [isShowPhotoControls, setIsShowPhotoControls] = useToggle();
   const [isPhotoGalleryOpen, setIsPhotoGalleryOpen] = useToggle();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useToggle();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
   // Touch swipe refs
   const touchStartXRef = useRef<number>(0);
@@ -132,38 +165,47 @@ export const BobbleheadGalleryCard = ({
     fetchPhotos({ bobbleheadId: bobblehead.id });
   };
 
-  const handlePrevPhoto = useCallback((e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsImageLoaded(false);
-    setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
-  }, [photos.length]);
+  const handlePrevPhoto = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsImageLoaded(false);
+      setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+    },
+    [photos.length],
+  );
 
-  const handleNextPhoto = useCallback((e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsImageLoaded(false);
-    setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
-  }, [photos.length]);
+  const handleNextPhoto = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsImageLoaded(false);
+      setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
+    },
+    [photos.length],
+  );
 
-  const handlePhotoClick = useCallback((e: MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handlePhotoClick = useCallback(
+    (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
 
-    // Ignore click if this was a swipe gesture
-    if (isTouchMoveRef.current) {
-      isTouchMoveRef.current = false;
-      return;
-    }
+      // Ignore click if this was a swipe gesture
+      if (isTouchMoveRef.current) {
+        isTouchMoveRef.current = false;
+        return;
+      }
 
-    // ensure photos are loaded before opening the gallery
-    if (!hasLoadedPhotos && !isLoadingPhotos) {
-      setHasLoadedPhotos.on();
-      fetchPhotos({ bobbleheadId: bobblehead.id });
-    }
+      // ensure photos are loaded before opening the gallery
+      if (!hasLoadedPhotos && !isLoadingPhotos) {
+        setHasLoadedPhotos.on();
+        fetchPhotos({ bobbleheadId: bobblehead.id });
+      }
 
-    setIsPhotoGalleryOpen.on();
-  }, [hasLoadedPhotos, isLoadingPhotos, setHasLoadedPhotos, fetchPhotos, bobblehead.id, setIsPhotoGalleryOpen]);
+      setIsPhotoGalleryOpen.on();
+    },
+    [hasLoadedPhotos, isLoadingPhotos, setHasLoadedPhotos, fetchPhotos, bobblehead.id, setIsPhotoGalleryOpen],
+  );
 
   const handlePhotoKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -218,25 +260,28 @@ export const BobbleheadGalleryCard = ({
     }
   }, []);
 
-  const handleTouchEnd = useCallback((e: TouchEvent) => {
-    const touch = e.changedTouches[0];
-    if (!touch) return;
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      const touch = e.changedTouches[0];
+      if (!touch) return;
 
-    const touchEndX = touch.clientX;
-    const diff = touchStartXRef.current - touchEndX;
-    const threshold = 50;
+      const touchEndX = touch.clientX;
+      const diff = touchStartXRef.current - touchEndX;
+      const threshold = 50;
 
-    if (Math.abs(diff) > threshold && photos.length > 1) {
-      setIsImageLoaded(false);
-      if (diff > 0) {
-        // Swipe left - next
-        setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
-      } else {
-        // Swipe right - prev
-        setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+      if (Math.abs(diff) > threshold && photos.length > 1) {
+        setIsImageLoaded(false);
+        if (diff > 0) {
+          // Swipe left - next
+          setCurrentPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
+        } else {
+          // Swipe right - prev
+          setCurrentPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+        }
       }
-    }
-  }, [photos.length]);
+    },
+    [photos.length],
+  );
   const shouldShowControls = photos.length > 1 && isShowPhotoControls;
   const isCurrentImageLoaded = !currentPhoto || loadedImageUrls.has(currentPhoto ?? '');
 
@@ -355,7 +400,9 @@ export const BobbleheadGalleryCard = ({
           {/* Previous */}
           <Button
             aria-label={'Previous photo'}
-            className={'absolute top-1/2 left-2 z-10 -translate-y-1/2 opacity-80 transition-all duration-200 hover:scale-110 hover:opacity-100'}
+            className={
+              'absolute top-1/2 left-2 z-10 -translate-y-1/2 opacity-80 transition-all duration-200 hover:scale-110 hover:opacity-100'
+            }
             onClick={handlePrevPhoto}
             size={'icon'}
             testId={prevButtonTestId}
@@ -367,7 +414,9 @@ export const BobbleheadGalleryCard = ({
           {/* Next */}
           <Button
             aria-label={'Next photo'}
-            className={'absolute top-1/2 right-2 z-10 -translate-y-1/2 opacity-80 transition-all duration-200 hover:scale-110 hover:opacity-100'}
+            className={
+              'absolute top-1/2 right-2 z-10 -translate-y-1/2 opacity-80 transition-all duration-200 hover:scale-110 hover:opacity-100'
+            }
             onClick={handleNextPhoto}
             size={'icon'}
             testId={nextButtonTestId}
@@ -377,7 +426,10 @@ export const BobbleheadGalleryCard = ({
           </Button>
 
           {/* Dots */}
-          <div className={'absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5'} data-slot={'dot-indicators'}>
+          <div
+            className={'absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5'}
+            data-slot={'dot-indicators'}
+          >
             {photos.map((_, index) => {
               const _isActive = index === currentPhotoIndex;
               return (
@@ -385,9 +437,7 @@ export const BobbleheadGalleryCard = ({
                   aria-label={`Go to photo ${index + 1}`}
                   className={cn(
                     'size-2 rounded-full transition-all duration-200',
-                    _isActive
-                      ? 'scale-125 animate-dot-pulse bg-white'
-                      : 'bg-white/50 hover:bg-white/70',
+                    _isActive ? 'scale-125 animate-dot-pulse bg-white' : 'bg-white/50 hover:bg-white/70',
                   )}
                   key={index}
                   onClick={(e) => {
@@ -468,7 +518,10 @@ export const BobbleheadGalleryCard = ({
 
               <DropdownMenuContent align={'end'}>
                 {/* Edit */}
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={!bobbleheadForEdit || !collections}
+                  onClick={setIsEditDialogOpen.on}
+                >
                   <PencilIcon aria-hidden className={'mr-2 size-4'} />
                   Edit
                 </DropdownMenuItem>
@@ -503,6 +556,16 @@ export const BobbleheadGalleryCard = ({
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
           subcollectionSlug={bobblehead.subcollectionSlug}
+        />
+      </Conditional>
+
+      {/* Edit Dialog */}
+      <Conditional isCondition={isEditDialogOpen && !!bobbleheadForEdit && !!collections}>
+        <BobbleheadEditDialog
+          bobblehead={bobbleheadForEdit!}
+          collections={collections!}
+          isOpen={isEditDialogOpen}
+          onClose={setIsEditDialogOpen.off}
         />
       </Conditional>
     </Card>

@@ -20,6 +20,7 @@ export const SubCollectionCoverPhoto = ({ subcollection }: SubCollectionCoverPho
           alt={`${subcollection?.name} cover photo`}
           className={'object-cover'}
           fill
+          loading={'eager'}
           preload
           sizes={'(max-width: 768px) 100vw, (max-width: 1200px) 90vw, 1200px'}
           src={subcollection?.coverImageUrl ?? ''}

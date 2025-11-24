@@ -26,7 +26,6 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   description: FALLBACK_METADATA.description,
-  manifest: '/manifest.json',
   metadataBase: new URL(DEFAULT_SITE_METADATA.url),
   openGraph: {
     description: FALLBACK_METADATA.description,

@@ -4,6 +4,7 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
 import type { CollectionSearchParams } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
+import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionBobbleheadControls } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobblehead-controls';
@@ -23,7 +24,7 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
   const currentUserId = await getOptionalUserId();
   const isOwner = await checkIsOwner(collection.userId);
 
-  const view = searchParams?.view || 'collection';
+  const view = searchParams?.view || 'all';
   const searchTerm = searchParams?.search || undefined;
   const sortBy = searchParams?.sort || 'newest';
 
@@ -45,8 +46,19 @@ export const CollectionBobbleheads = async ({ collection, searchParams }: Collec
         options,
       );
 
+  // Fetch user collections for edit dialog (only if owner)
+  let collections: Array<ComboboxItem> = [];
+  if (isOwner && currentUserId) {
+    const userCollections =
+      (await CollectionsFacade.getCollectionsByUser(currentUserId, {}, currentUserId)) ?? [];
+    collections = userCollections.map((c) => ({
+      id: c.id,
+      name: c.name,
+    }));
+  }
+
   const isEmpty = bobbleheads.length === 0;
-  const hasActiveFilters = searchTerm || sortBy !== 'newest' || view !== 'collection';
+  const hasActiveFilters = searchTerm || sortBy !== 'newest' || view !== 'all';
 
   return (
     <div>

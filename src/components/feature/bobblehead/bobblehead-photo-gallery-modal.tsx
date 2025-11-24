@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -92,6 +92,10 @@ export const BobbleheadPhotoGalleryModal = ({
               <DialogTitle className={'truncate text-lg font-semibold text-white'}>
                 {bobbleheadName || 'Bobblehead Photos'}
               </DialogTitle>
+              <DialogDescription className={'sr-only'}>
+                Browse through the photo gallery. Use arrow keys or navigation buttons to view different
+                photos.
+              </DialogDescription>
               <Button
                 aria-label={'Close photo gallery'}
                 className={cn(

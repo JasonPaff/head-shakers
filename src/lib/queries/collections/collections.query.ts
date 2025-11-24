@@ -19,12 +19,14 @@ export type BobbleheadListRecord = {
   category: null | string;
   characterName: null | string;
   condition: null | string;
+  customFields: Array<Record<string, string>> | null;
   description: null | string;
   height: null | number;
   id: string;
   isFeatured: boolean;
   isPublic: boolean;
   manufacturer: null | string;
+  material: null | string;
   name: null | string;
   purchaseLocation: null | string;
   purchasePrice: null | number;
@@ -32,6 +34,7 @@ export type BobbleheadListRecord = {
   slug: string;
   status: null | string;
   weight: null | number;
+  year: null | number;
 };
 
 export type BrowseCategoriesResult = {
@@ -1194,12 +1197,14 @@ export class CollectionsQuery extends BaseQuery {
       category: bobbleheads.category,
       characterName: bobbleheads.characterName,
       condition: bobbleheads.currentCondition,
+      customFields: bobbleheads.customFields,
       description: bobbleheads.description,
       height: bobbleheads.height,
       id: bobbleheads.id,
       isFeatured: bobbleheads.isFeatured,
       isPublic: bobbleheads.isPublic,
       manufacturer: bobbleheads.manufacturer,
+      material: bobbleheads.material,
       name: bobbleheads.name,
       purchaseLocation: bobbleheads.purchaseLocation,
       purchasePrice: bobbleheads.purchasePrice,
@@ -1207,6 +1212,7 @@ export class CollectionsQuery extends BaseQuery {
       slug: bobbleheads.slug,
       status: bobbleheads.status,
       weight: bobbleheads.weight,
+      year: bobbleheads.year,
     };
   }
 

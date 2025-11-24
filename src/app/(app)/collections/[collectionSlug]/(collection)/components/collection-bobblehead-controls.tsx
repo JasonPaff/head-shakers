@@ -16,7 +16,7 @@ export const CollectionBobbleheadControls = () => {
     {
       search: parseAsString.withDefault(''),
       sort: parseAsStringEnum([...sortOptions]).withDefault('newest'),
-      view: parseAsStringEnum([...viewOptions]).withDefault('collection'),
+      view: parseAsStringEnum([...viewOptions]).withDefault('all'),
     },
     {
       shallow: false,

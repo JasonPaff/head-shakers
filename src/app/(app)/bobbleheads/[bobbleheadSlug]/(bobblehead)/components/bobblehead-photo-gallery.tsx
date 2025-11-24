@@ -11,7 +11,7 @@ import type { BobbleheadWithRelations } from '@/lib/queries/bobbleheads/bobblehe
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { useToggle } from '@/hooks/use-toggle';
 import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
@@ -199,6 +199,9 @@ export const BobbleheadPhotoGalleryCard = ({ bobblehead }: BobbleheadPhotoGaller
           onKeyDown={handleKeyDown}
         >
           <DialogTitle className={'sr-only'}>{_altText}</DialogTitle>
+          <DialogDescription className={'sr-only'}>
+            Browse through the photo gallery. Use arrow keys or navigation buttons to view different photos.
+          </DialogDescription>
           <div
             className={'relative flex items-center justify-center bg-black'}
             data-slot={'bobblehead-photo-gallery-modal-container'}
