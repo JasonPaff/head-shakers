@@ -97,6 +97,15 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     }
   }
 
+  // Extract date filter values
+  if (resolvedSearchParams.dateFrom) {
+    filterOptions.dateFrom = new Date(resolvedSearchParams.dateFrom);
+  }
+
+  if (resolvedSearchParams.dateTo) {
+    filterOptions.dateTo = new Date(resolvedSearchParams.dateTo);
+  }
+
   // Fetch reports data and stats with slug data for content linking
   const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
     filterOptions,

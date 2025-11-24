@@ -82,6 +82,8 @@ export const adminBulkUpdateReportsSchema = z.object({
 });
 
 export const adminReportsFilterSchema = z.object({
+  dateFrom: z.coerce.date().optional(),
+  dateTo: z.coerce.date().optional(),
   limit: z.number().min(1).max(100).default(25).optional(),
   moderatorId: z.string().optional(),
   offset: z.number().min(0).default(0).optional(),

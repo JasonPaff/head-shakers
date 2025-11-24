@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte, inArray, sql, type SQL } from 'drizzle-orm';
+import { and, count, desc, eq, gte, inArray, lte, sql, type SQL } from 'drizzle-orm';
 
 import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/enums';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
@@ -12,6 +12,8 @@ import { bobbleheads, collections, comments, contentReports, subCollections } fr
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type AdminReportsFilterOptions = FindOptions & {
+  dateFrom?: Date;
+  dateTo?: Date;
   moderatorId?: string;
   reason?: Array<ContentReportReason> | ContentReportReason;
   reporterId?: string;
@@ -211,6 +213,14 @@ export class ContentReportsQuery extends BaseQuery {
         filters.push(eq(contentReports.moderatorId, options.moderatorId));
       }
 
+      if (options.dateFrom) {
+        filters.push(gte(contentReports.createdAt, options.dateFrom));
+      }
+
+      if (options.dateTo) {
+        filters.push(lte(contentReports.createdAt, options.dateTo));
+      }
+
       let query = dbInstance
         .select()
         .from(contentReports)
@@ -277,6 +287,14 @@ export class ContentReportsQuery extends BaseQuery {
 
       if (options.moderatorId) {
         filters.push(eq(contentReports.moderatorId, options.moderatorId));
+      }
+
+      if (options.dateFrom) {
+        filters.push(gte(contentReports.createdAt, options.dateFrom));
+      }
+
+      if (options.dateTo) {
+        filters.push(lte(contentReports.createdAt, options.dateTo));
       }
 
       // Select all content report fields plus computed slug fields
