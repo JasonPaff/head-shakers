@@ -2,7 +2,11 @@ import { and, count, desc, eq, gte, inArray, sql, type SQL } from 'drizzle-orm';
 
 import type { ContentReportReason, ContentReportStatus } from '@/lib/constants/enums';
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
-import type { InsertContentReport, SelectContentReport } from '@/lib/validations/moderation.validation';
+import type {
+  InsertContentReport,
+  SelectContentReport,
+  SelectContentReportWithSlugs,
+} from '@/lib/validations/moderation.validation';
 
 import { bobbleheads, collections, comments, contentReports, subCollections } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
@@ -207,6 +211,136 @@ export class ContentReportsQuery extends BaseQuery {
 
       return query;
     }, 'getAllReportsForAdmin');
+  }
+
+  /**
+   * Get all reports for admin with slug data for generating type-safe links
+   * Uses LEFT JOINs to fetch slug information from related tables
+   * @param options - Filter and pagination options
+   * @param context - Query context for database access
+   * @returns Promise<SelectContentReportWithSlugs[]> - Reports with slug data
+   */
+  static async getAllReportsWithSlugsForAdminAsync(
+    options: AdminReportsFilterOptions = {},
+    context: QueryContext,
+  ): Promise<Array<SelectContentReportWithSlugs>> {
+    return this.executeWithRetry(async () => {
+      const dbInstance = this.getDbInstance(context);
+      const pagination = this.applyPagination(options);
+
+      const filters: Array<SQL | undefined> = [];
+
+      if (options.status) {
+        filters.push(eq(contentReports.status, options.status));
+      }
+
+      if (options.targetType) {
+        filters.push(eq(contentReports.targetType, options.targetType));
+      }
+
+      if (options.reason) {
+        filters.push(eq(contentReports.reason, options.reason));
+      }
+
+      if (options.reporterId) {
+        filters.push(eq(contentReports.reporterId, options.reporterId));
+      }
+
+      if (options.moderatorId) {
+        filters.push(eq(contentReports.moderatorId, options.moderatorId));
+      }
+
+      // Select all content report fields plus computed slug fields
+      let query = dbInstance
+        .select({
+          contentExists: sql<boolean>`
+            CASE
+              WHEN ${contentReports.targetType} = 'bobblehead' THEN ${bobbleheads.id} IS NOT NULL
+              WHEN ${contentReports.targetType} = 'collection' THEN ${collections.id} IS NOT NULL
+              WHEN ${contentReports.targetType} = 'subcollection' THEN ${subCollections.id} IS NOT NULL
+              WHEN ${contentReports.targetType} = 'comment' THEN ${comments.id} IS NOT NULL
+              ELSE false
+            END
+          `.as('content_exists'),
+          createdAt: contentReports.createdAt,
+          description: contentReports.description,
+          id: contentReports.id,
+          moderatorId: contentReports.moderatorId,
+          moderatorNotes: contentReports.moderatorNotes,
+          parentCollectionSlug: sql<null | string>`
+            CASE
+              WHEN ${contentReports.targetType} = 'subcollection' THEN "parent_collection"."slug"
+              ELSE NULL
+            END
+          `.as('parent_collection_slug'),
+          reason: contentReports.reason,
+          reporterId: contentReports.reporterId,
+          resolvedAt: contentReports.resolvedAt,
+          status: contentReports.status,
+          targetId: contentReports.targetId,
+          targetSlug: sql<null | string>`
+            CASE
+              WHEN ${contentReports.targetType} = 'bobblehead' THEN ${bobbleheads.slug}
+              WHEN ${contentReports.targetType} = 'collection' THEN ${collections.slug}
+              WHEN ${contentReports.targetType} = 'subcollection' THEN ${subCollections.slug}
+              ELSE NULL
+            END
+          `.as('target_slug'),
+          targetType: contentReports.targetType,
+          updatedAt: contentReports.updatedAt,
+        })
+        .from(contentReports)
+        // LEFT JOIN bobbleheads for bobblehead reports
+        .leftJoin(
+          bobbleheads,
+          and(
+            eq(contentReports.targetId, bobbleheads.id),
+            eq(contentReports.targetType, 'bobblehead'),
+          ),
+        )
+        // LEFT JOIN collections for collection reports
+        .leftJoin(
+          collections,
+          and(
+            eq(contentReports.targetId, collections.id),
+            eq(contentReports.targetType, 'collection'),
+          ),
+        )
+        // LEFT JOIN subCollections for subcollection reports
+        .leftJoin(
+          subCollections,
+          and(
+            eq(contentReports.targetId, subCollections.id),
+            eq(contentReports.targetType, 'subcollection'),
+          ),
+        )
+        // LEFT JOIN parent collection for subcollection parent slug
+        .leftJoin(
+          sql`${collections} AS "parent_collection"`,
+          sql`${subCollections.collectionId} = "parent_collection"."id"`,
+        )
+        // LEFT JOIN comments for comment reports (to check existence)
+        .leftJoin(
+          comments,
+          and(
+            eq(contentReports.targetId, comments.id),
+            eq(contentReports.targetType, 'comment'),
+          ),
+        )
+        .where(filters.length > 0 ? and(...filters) : undefined)
+        .orderBy(desc(contentReports.createdAt))
+        .$dynamic();
+
+      if (pagination.limit) {
+        query = query.limit(pagination.limit);
+      }
+
+      if (pagination.offset) {
+        query = query.offset(pagination.offset);
+      }
+
+      return query;
+    }, 'getAllReportsWithSlugsForAdmin');
   }
 
   /**

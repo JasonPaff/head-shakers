@@ -88,8 +88,8 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     }
   }
 
-  // Fetch reports data and stats
-  const { reports, stats } = await ContentReportsFacade.getAllReportsForAdminAsync(
+  // Fetch reports data and stats with slug data for content linking
+  const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
     filterOptions,
     currentUser.id,
   );

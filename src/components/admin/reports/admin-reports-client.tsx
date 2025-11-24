@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
-import type { SelectContentReport } from '@/lib/validations/moderation.validation';
+import type { SelectContentReportWithSlugs } from '@/lib/validations/moderation.validation';
 
 import { ReportDetailDialog } from '@/components/admin/reports/report-detail-dialog';
 import { ReportsTable } from '@/components/admin/reports/reports-table';
@@ -30,7 +30,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 type AdminReportsClientProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
-    initialData: Array<SelectContentReport>;
+    initialData: Array<SelectContentReportWithSlugs>;
     totalCount: number;
   };
 
@@ -49,7 +49,7 @@ export const AdminReportsClient = ({
   ...props
 }: AdminReportsClientProps) => {
   // useState hooks
-  const [selectedReport, setSelectedReport] = useState<null | SelectContentReport>(null);
+  const [selectedReport, setSelectedReport] = useState<null | SelectContentReportWithSlugs>(null);
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<null | PendingAction>(null);

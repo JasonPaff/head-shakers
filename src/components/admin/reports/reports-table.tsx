@@ -4,11 +4,13 @@ import type { ColumnDef, RowSelectionState, SortingState } from '@tanstack/react
 import type { ComponentPropsWithRef } from 'react';
 
 import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowDownIcon, ArrowUpIcon, EyeIcon, MoreVerticalIcon, XIcon } from 'lucide-react';
+import { ArrowDownIcon, ArrowUpIcon, ExternalLinkIcon, EyeIcon, MoreVerticalIcon, XIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 import { parseAsInteger, useQueryStates } from 'nuqs';
 import { useMemo, useState } from 'react';
 
-import type { SelectContentReport } from '@/lib/validations/moderation.validation';
+import type { SelectContentReportWithSlugs } from '@/lib/validations/moderation.validation';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,14 +25,91 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/utils/tailwind-utils';
 
 interface ReportsTableProps extends ComponentPropsWithRef<'div'> {
-  data: Array<SelectContentReport>;
+  data: Array<SelectContentReportWithSlugs>;
   onBulkAction?: (reportIds: Array<string>, action: 'dismissed' | 'resolved' | 'reviewed') => void;
   onViewDetails?: (reportId: string) => void;
   totalCount?: number;
 }
+
+// Helper function to check if content link is available
+const isContentLinkAvailable = (report: SelectContentReportWithSlugs): boolean => {
+  // Comments have no direct route
+  if (report.targetType === 'comment') {
+    return false;
+  }
+
+  // Content must exist and have the required slug data
+  if (!report.contentExists) {
+    return false;
+  }
+
+  // Subcollections need both targetSlug and parentCollectionSlug
+  if (report.targetType === 'subcollection') {
+    return !!report.targetSlug && !!report.parentCollectionSlug;
+  }
+
+  // Bobbleheads and collections need targetSlug
+  if (report.targetType === 'bobblehead' || report.targetType === 'collection') {
+    return !!report.targetSlug;
+  }
+
+  // Users use targetId directly, always available if content exists
+  if (report.targetType === 'user') {
+    return true;
+  }
+
+  return false;
+};
+
+// Helper function to generate content link based on target type
+const getContentLink = (report: SelectContentReportWithSlugs): null | string => {
+  if (!isContentLinkAvailable(report)) {
+    return null;
+  }
+
+  switch (report.targetType) {
+    case 'bobblehead':
+      return $path({
+        route: '/bobbleheads/[bobbleheadSlug]',
+        routeParams: { bobbleheadSlug: report.targetSlug! },
+      });
+    case 'collection':
+      return $path({
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug: report.targetSlug! },
+      });
+    case 'subcollection':
+      return $path({
+        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
+        routeParams: {
+          collectionSlug: report.parentCollectionSlug!,
+          subcollectionSlug: report.targetSlug!,
+        },
+      });
+    case 'user':
+      return $path({
+        route: '/users/[userId]',
+        routeParams: { userId: report.targetId },
+      });
+    default:
+      return null;
+  }
+};
+
+// Helper function to get tooltip message for disabled links
+const getDisabledTooltipMessage = (report: SelectContentReportWithSlugs): string => {
+  if (report.targetType === 'comment') {
+    return 'Comments cannot be viewed directly';
+  }
+  if (!report.contentExists) {
+    return 'Content no longer exists';
+  }
+  return 'Link unavailable';
+};
 
 export const ReportsTable = ({
   className,
@@ -57,7 +136,7 @@ export const ReportsTable = ({
   );
 
   // useMemo hooks
-  const columns = useMemo<Array<ColumnDef<SelectContentReport>>>(
+  const columns = useMemo<Array<ColumnDef<SelectContentReportWithSlugs>>>(
     () => [
       {
         cell: ({ row }) => (
@@ -185,6 +264,43 @@ export const ReportsTable = ({
         enableSorting: true,
         header: 'Content Type',
         size: 150,
+      },
+      {
+        cell: ({ row }) => {
+          const report = row.original;
+          const _isLinkAvailable = isContentLinkAvailable(report);
+          const contentLink = getContentLink(report);
+
+          if (_isLinkAvailable && contentLink) {
+            return (
+              <Button aria-label={'View content'} asChild className={'h-8 w-8 p-0'} variant={'ghost'}>
+                <Link href={contentLink}>
+                  <ExternalLinkIcon aria-hidden className={'size-4'} />
+                </Link>
+              </Button>
+            );
+          }
+
+          return (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  aria-label={'View content unavailable'}
+                  className={'h-8 w-8 cursor-not-allowed p-0 opacity-50'}
+                  disabled
+                  variant={'ghost'}
+                >
+                  <ExternalLinkIcon aria-hidden className={'size-4'} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{getDisabledTooltipMessage(report)}</TooltipContent>
+            </Tooltip>
+          );
+        },
+        enableSorting: false,
+        header: 'View',
+        id: 'viewContent',
+        size: 70,
       },
       {
         accessorKey: 'targetId',
