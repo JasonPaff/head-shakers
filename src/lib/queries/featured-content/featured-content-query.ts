@@ -9,7 +9,7 @@ import type {
 } from '@/lib/validations/system.validation';
 
 import { DEFAULTS } from '@/lib/constants';
-import { bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export interface FeaturedContentRecord {
@@ -72,15 +72,22 @@ export class FeaturedContentQuery extends BaseQuery {
 
   /**
    * get active featured content with related data (raw data for service layer transformation)
+   *
+   * joins with bobbleheads, collections, users (for user content type),
+   * bobbleheadPhotos (for primary image), and bobbleheadOwnerUsers (for owner display name)
    */
   static async findActiveFeaturedContentAsync(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
+    // create alias for users table to join for bobblehead owner display name
+    // we need separate joins: one for user content type, one for bobblehead owner
     const results = await dbInstance
       .select({
         bobbleheadLikes: bobbleheads.likeCount,
+        bobbleheadName: bobbleheads.name,
         bobbleheadOwner: bobbleheads.userId,
+        bobbleheadPrimaryPhotoUrl: bobbleheadPhotos.url,
         bobbleheadSlug: bobbleheads.slug,
         collectionCoverImageUrl: collections.coverImageUrl,
         collectionOwner: collections.userId,
@@ -105,6 +112,10 @@ export class FeaturedContentQuery extends BaseQuery {
       })
       .from(featuredContent)
       .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+      )
       .leftJoin(collections, eq(featuredContent.contentId, collections.id))
       .leftJoin(users, eq(featuredContent.contentId, users.id))
       .where(

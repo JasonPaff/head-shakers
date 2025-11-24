@@ -22,6 +22,7 @@ export type ComponentTestId =
   | 'bobblehead-edit-submit'
   | 'bobblehead-form'
   | 'bobblehead-gallery'
+  | 'bobblehead-grid'
   | 'bobblehead-nav'
   | 'bobblehead-photo'
   | 'bobbleheads-empty-state'

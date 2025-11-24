@@ -6,6 +6,8 @@
 export interface FeaturedContentData {
   comments?: number;
   contentId: string;
+  /** the name of the content (bobblehead name, collection name, etc.) */
+  contentName?: null | string;
   contentSlug?: null | string;
   contentType: 'bobblehead' | 'collection' | 'user';
   createdAt: Date;
@@ -29,7 +31,9 @@ export interface FeaturedContentData {
 
 export interface RawFeaturedContentData {
   bobbleheadLikes: null | number;
+  bobbleheadName: null | string;
   bobbleheadOwner: null | string;
+  bobbleheadPrimaryPhotoUrl: null | string;
   bobbleheadSlug: null | string;
   collectionCoverImageUrl: null | string;
   collectionOwner: null | string;
@@ -100,6 +104,7 @@ export class FeaturedContentTransformer {
     return rawData.map((row) => ({
       comments: 0, // TODO: implement comments count
       contentId: row.contentId,
+      contentName: this.determineContentName(row),
       contentSlug: this.determineContentSlug(row),
       contentType: row.contentType,
       createdAt: row.createdAt,
@@ -108,7 +113,7 @@ export class FeaturedContentTransformer {
       endDate: row.endDate,
       featureType: row.featureType,
       id: row.id,
-      imageUrl: row.imageUrl || (row.contentType === 'collection' ? row.collectionCoverImageUrl : null),
+      imageUrl: this.determineImageUrl(row),
       isActive: row.isActive,
       likes: row.bobbleheadLikes || 0,
       owner: this.determineContentOwner(row),
@@ -119,6 +124,21 @@ export class FeaturedContentTransformer {
       updatedAt: row.updatedAt,
       viewCount: row.viewCount,
     }));
+  }
+
+  /**
+   * business logic for determining the name of featured content
+   */
+  private static determineContentName(row: RawFeaturedContentData): null | string {
+    // return the appropriate name based on content type
+    if (row.contentType === 'bobblehead') {
+      return row.bobbleheadName;
+    }
+    if (row.contentType === 'user') {
+      return row.userDisplayName;
+    }
+    // for collections, we don't have the name joined yet - could be added if needed
+    return null;
   }
 
   /**
@@ -135,5 +155,28 @@ export class FeaturedContentTransformer {
   private static determineContentSlug(row: RawFeaturedContentData): null | string {
     // return the appropriate slug based on content type
     return row.bobbleheadSlug || row.collectionSlug || null;
+  }
+
+  /**
+   * business logic for determining the image URL of featured content
+   * priority: explicit imageUrl > bobblehead primary photo > collection cover image
+   */
+  private static determineImageUrl(row: RawFeaturedContentData): null | string {
+    // first check if there's an explicit image URL set on the featured content
+    if (row.imageUrl) {
+      return row.imageUrl;
+    }
+
+    // for bobbleheads, use the primary photo
+    if (row.contentType === 'bobblehead' && row.bobbleheadPrimaryPhotoUrl) {
+      return row.bobbleheadPrimaryPhotoUrl;
+    }
+
+    // for collections, use the cover image
+    if (row.contentType === 'collection' && row.collectionCoverImageUrl) {
+      return row.collectionCoverImageUrl;
+    }
+
+    return null;
   }
 }

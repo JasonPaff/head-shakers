@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/nextjs';
+
 import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -8,12 +10,15 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featured-content-transformer';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
+
+const facadeName = 'FeaturedContentFacade';
 
 /**
  * unified Featured Content Facade
@@ -101,6 +106,59 @@ export class FeaturedContentFacade {
   static async getEditorPicks(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
     const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
     return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
+  }
+
+  /**
+   * get featured bobbleheads with their primary photos, specs, and engagement metrics
+   *
+   * returns bobbleheads that have been marked as featured content, filtered by the
+   * 'bobblehead' content type. includes:
+   * - bobblehead name and slug
+   * - primary photo URL
+   * - like count and view count
+   * - owner information
+   *
+   * results are cached using the featured content cache with EXTENDED TTL
+   *
+   * @param limit - optional limit on number of results (default: 8)
+   * @param dbInstance - optional database executor for transactions
+   * @returns array of featured bobblehead content data
+   */
+  static async getFeaturedBobbleheads(
+    limit?: number,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<Array<FeaturedContentData>> {
+    try {
+      const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+
+      // filter to only bobblehead content type
+      const bobbleheadContent = allContent.filter((content) => content.contentType === 'bobblehead');
+
+      // apply limit (default 8 for homepage display)
+      const limitedContent = bobbleheadContent.slice(0, limit ?? 8);
+
+      // add breadcrumb for monitoring
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          limit: limit ?? 8,
+          requestedCount: bobbleheadContent.length,
+          returnedCount: limitedContent.length,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Fetched featured bobbleheads',
+      });
+
+      return limitedContent;
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { limit },
+        facade: facadeName,
+        method: 'getFeaturedBobbleheads',
+        operation: 'getFeaturedBobbleheads',
+      };
+      throw createFacadeError(context, error);
+    }
   }
 
   /**

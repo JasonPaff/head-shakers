@@ -170,6 +170,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'bobblehead-details',
     'bobblehead-form',
     'bobblehead-gallery',
+    'bobblehead-grid',
     'bobbleheads-empty-state',
     'bobbleheads-empty-state-cta',
     'breadcrumb',

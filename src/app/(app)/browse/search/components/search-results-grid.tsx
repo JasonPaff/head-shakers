@@ -35,7 +35,6 @@ export const SearchResults = ({
   bobbleheads,
   className,
   collections,
-  counts,
   onViewModeChange,
   subcollections,
   testId,
