@@ -1,22 +1,23 @@
 import 'server-only';
 
 import { CollectionCard } from '@/app/(app)/dashboard/collection/(collection)/components/collection-card';
+import { CollectionsEmptyState } from '@/app/(app)/dashboard/collection/(collection)/components/collections-empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { getUserId } from '@/utils/user-utils';
 
 export const CollectionsTabContent = async () => {
   const userId = await getUserId();
-  const collections = await CollectionsFacade.getUserCollectionsForDashboard(userId);
+
+  const [collections, user] = await Promise.all([
+    CollectionsFacade.getUserCollectionsForDashboard(userId),
+    UsersFacade.getUserById(userId),
+  ]);
+
+  const _displayName = user?.displayName ?? undefined;
 
   if (collections.length === 0) {
-    return (
-      <div className={'py-16 text-center'}>
-        <h3 className={'text-lg font-medium text-muted-foreground'}>No collections yet</h3>
-        <p className={'mt-2 text-sm text-muted-foreground'}>
-          Create your first collection to get started managing your bobbleheads.
-        </p>
-      </div>
-    );
+    return <CollectionsEmptyState userName={_displayName} />;
   }
 
   return (
