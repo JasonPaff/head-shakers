@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { SubcollectionsEmptyState } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-empty-state';
 import { SubcollectionsList } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-list';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getUserId } from '@/utils/user-utils';
@@ -22,14 +23,7 @@ export const SubcollectionsTabContent = async () => {
     .sort((a, b) => a.collectionName.localeCompare(b.collectionName));
 
   if (subcollections.length === 0) {
-    return (
-      <div className={'py-16 text-center'}>
-        <h3 className={'text-lg font-medium text-muted-foreground'}>No subcollections yet</h3>
-        <p className={'mt-2 text-sm text-muted-foreground'}>
-          Create subcollections within your collections to better organize your bobbleheads.
-        </p>
-      </div>
-    );
+    return <SubcollectionsEmptyState />;
   }
 
   const groupedSubcollections = subcollections.reduce(
