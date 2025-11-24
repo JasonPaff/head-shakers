@@ -20,6 +20,7 @@ Created client component for featured bobblehead cards with interactive elements
 ## Component Details
 
 ### Props Interface
+
 ```typescript
 interface FeaturedBobblehead {
   contentId: string;
@@ -41,9 +42,11 @@ interface FeaturedBobbleheadsDisplayProps {
 ```
 
 ### Grid Layout
+
 - `grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4`
 
 ### Features
+
 - CVA variants for all card states
 - Cloudinary images with responsive transformations
 - Stagger animation delays
@@ -54,6 +57,7 @@ interface FeaturedBobbleheadsDisplayProps {
 - $path for navigation links
 
 ### Lucide Icons
+
 - `ArrowRight` - View link arrow
 - `Award` - Empty state and badge
 - `Eye` - View count

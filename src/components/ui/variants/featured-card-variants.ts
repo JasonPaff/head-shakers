@@ -56,28 +56,16 @@ export const featuredCardVariants = cva(
         ],
       },
       state: {
-        active: [
-          'ring-2 ring-warm-orange ring-offset-2',
-          'shadow-warm-hover',
-        ],
+        active: ['ring-2 ring-warm-orange ring-offset-2', 'shadow-warm-hover'],
         default: [
           // Default hover transform - handled by transition-card
           'hover:-translate-y-1',
           'hover:shadow-warm-hover',
           'hover:border-warm-coral-light/50',
         ],
-        disabled: [
-          'opacity-60',
-          'cursor-not-allowed',
-        ],
-        hover: [
-          '-translate-y-1',
-          'shadow-warm-hover',
-          'border-warm-coral-light/50',
-        ],
-        loading: [
-          'animate-shimmer',
-        ],
+        disabled: ['opacity-60', 'cursor-not-allowed'],
+        hover: ['-translate-y-1', 'shadow-warm-hover', 'border-warm-coral-light/50'],
+        loading: ['animate-shimmer'],
       },
     },
   },
@@ -114,9 +102,7 @@ export const featuredCardImageVariants = cva(
           // Collections use cover fit
           'object-cover',
         ],
-        default: [
-          'object-cover',
-        ],
+        default: ['object-cover'],
       },
     },
   },
@@ -141,29 +127,17 @@ export const featuredCardOverlayVariants = cva(
     },
     variants: {
       intensity: {
-        dark: [
-          'bg-overlay-warm-dark',
-        ],
-        light: [
-          'bg-overlay-warm-light',
-        ],
-        medium: [
-          'bg-overlay-warm-medium',
-        ],
-        none: [
-          'bg-transparent',
-        ],
+        dark: ['bg-overlay-warm-dark'],
+        light: ['bg-overlay-warm-light'],
+        medium: ['bg-overlay-warm-medium'],
+        none: ['bg-transparent'],
       },
       position: {
-        bottom: [
-          'bg-gradient-card-overlay',
-        ],
+        bottom: ['bg-gradient-card-overlay'],
         full: [
           // Full overlay - no gradient, just solid
         ],
-        top: [
-          'bg-gradient-to-b from-black/40 to-transparent',
-        ],
+        top: ['bg-gradient-to-b from-black/40 to-transparent'],
       },
     },
   },
@@ -182,6 +156,10 @@ export const featuredCardContentVariants = cva(
     'p-4',
     // Z-index above overlay
     'z-10',
+    // Dark gradient background for text readability on any background
+    'bg-gradient-to-t from-black/80 via-black/60 to-transparent',
+    // Rounded bottom corners to match card
+    'rounded-b-xl',
   ],
   {
     defaultVariants: {
@@ -195,18 +173,9 @@ export const featuredCardContentVariants = cva(
         right: 'text-right',
       },
       size: {
-        large: [
-          'p-6',
-          'sm:p-8',
-        ],
-        medium: [
-          'p-4',
-          'sm:p-5',
-        ],
-        small: [
-          'p-3',
-          'sm:p-4',
-        ],
+        large: ['p-6', 'sm:p-8'],
+        medium: ['p-4', 'sm:p-5'],
+        small: ['p-3', 'sm:p-4'],
       },
     },
   },
@@ -234,19 +203,9 @@ export const featuredCardTitleVariants = cva(
     },
     variants: {
       size: {
-        large: [
-          'text-xl',
-          'sm:text-2xl',
-          'lg:text-3xl',
-        ],
-        medium: [
-          'text-lg',
-          'sm:text-xl',
-        ],
-        small: [
-          'text-base',
-          'sm:text-lg',
-        ],
+        large: ['text-xl', 'sm:text-2xl', 'lg:text-3xl'],
+        medium: ['text-lg', 'sm:text-xl'],
+        small: ['text-base', 'sm:text-lg'],
       },
     },
   },
@@ -272,21 +231,9 @@ export const featuredCardDescriptionVariants = cva(
     },
     variants: {
       size: {
-        large: [
-          'text-base',
-          'sm:text-lg',
-          'mt-2',
-        ],
-        medium: [
-          'text-sm',
-          'sm:text-base',
-          'mt-1.5',
-        ],
-        small: [
-          'text-xs',
-          'sm:text-sm',
-          'mt-1',
-        ],
+        large: ['text-base', 'sm:text-lg', 'mt-2'],
+        medium: ['text-sm', 'sm:text-base', 'mt-1.5'],
+        small: ['text-xs', 'sm:text-sm', 'mt-1'],
       },
     },
   },
@@ -314,18 +261,10 @@ export const featuredCardBadgeVariants = cva(
     },
     variants: {
       variant: {
-        featured: [
-          'text-white bg-gradient-sunset',
-        ],
-        new: [
-          'bg-warm-coral text-white',
-        ],
-        popular: [
-          'bg-warm-amber text-warm-amber-dark',
-        ],
-        trending: [
-          'bg-warm-orange text-white',
-        ],
+        featured: ['text-white bg-gradient-sunset'],
+        new: ['bg-warm-coral text-white'],
+        popular: ['bg-warm-amber text-warm-amber-dark'],
+        trending: ['bg-warm-orange text-white'],
       },
     },
   },
@@ -348,21 +287,9 @@ export const featuredCardSkeletonVariants = cva(
     },
     variants: {
       size: {
-        large: [
-          'h-[400px]',
-          'sm:h-[450px]',
-          'lg:h-[500px]',
-        ],
-        medium: [
-          'h-[300px]',
-          'sm:h-[340px]',
-          'lg:h-[380px]',
-        ],
-        small: [
-          'h-[200px]',
-          'sm:h-[220px]',
-          'lg:h-[240px]',
-        ],
+        large: ['h-[400px]', 'sm:h-[450px]', 'lg:h-[500px]'],
+        medium: ['h-[300px]', 'sm:h-[340px]', 'lg:h-[380px]'],
+        small: ['h-[200px]', 'sm:h-[220px]', 'lg:h-[240px]'],
       },
     },
   },
@@ -398,18 +325,9 @@ export const featuredCardActionVariants = cva(
     },
     variants: {
       size: {
-        large: [
-          'size-12',
-          '[&_svg]:size-6',
-        ],
-        medium: [
-          'size-10',
-          '[&_svg]:size-5',
-        ],
-        small: [
-          'size-8',
-          '[&_svg]:size-4',
-        ],
+        large: ['size-12', '[&_svg]:size-6'],
+        medium: ['size-10', '[&_svg]:size-5'],
+        small: ['size-8', '[&_svg]:size-4'],
       },
     },
   },

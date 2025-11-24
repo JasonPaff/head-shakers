@@ -15,10 +15,12 @@ Created async server component for fetching featured bobblehead data.
 ## Component Details
 
 ### Data Fetching
+
 - Uses `FeaturedContentFacade.getFeaturedBobbleheads()` for featured content
 - Uses `SocialFacade.getBatchContentLikeData()` for user like status (when authenticated)
 
 ### Data Transformation
+
 ```
 FeaturedContentData -> FeaturedBobblehead
 - contentId, contentName, contentSlug -> passed through
@@ -29,14 +31,17 @@ FeaturedContentData -> FeaturedBobblehead
 ```
 
 ### Empty State
+
 - Returns empty array to display component
 - Display component handles empty state UI
 
 ### Error Handling
+
 - Error boundaries expected at parent level
 - Facade methods have built-in error handling
 
 ## Conventions Applied
+
 - Server component (no 'use client')
 - Named export only
 - Type imports separated

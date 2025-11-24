@@ -14,14 +14,14 @@ Final accessibility audit verified WCAG AA compliance across all components.
 
 ## Audit Results
 
-| Category | Status | Notes |
-|----------|--------|-------|
-| Color Contrast | PASS | Dark text on light backgrounds, drop-shadow for text on gradients |
-| ARIA Attributes | PASS | All links have aria-label, icons have aria-hidden |
-| Focus Indicators | PASS | Warm-orange ring-2 with ring-offset-2 |
-| Alt Text | PASS | CldImage components use descriptive alt text |
-| Heading Hierarchy | PASS | h1 (hero) -> h2 (sections) -> h3 (subsections) |
-| Keyboard Navigation | PASS | All elements focusable, logical tab order |
+| Category            | Status | Notes                                                             |
+| ------------------- | ------ | ----------------------------------------------------------------- |
+| Color Contrast      | PASS   | Dark text on light backgrounds, drop-shadow for text on gradients |
+| ARIA Attributes     | PASS   | All links have aria-label, icons have aria-hidden                 |
+| Focus Indicators    | PASS   | Warm-orange ring-2 with ring-offset-2                             |
+| Alt Text            | PASS   | CldImage components use descriptive alt text                      |
+| Heading Hierarchy   | PASS   | h1 (hero) -> h2 (sections) -> h3 (subsections)                    |
+| Keyboard Navigation | PASS   | All elements focusable, logical tab order                         |
 
 ## Components Audited
 

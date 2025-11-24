@@ -11,17 +11,20 @@ Added micro-interactions, focus states, and performance optimizations.
 ## Files Modified
 
 ### `globals.css`
+
 - Extended animation delays (600-800ms)
 - `focus-ring-warm` utility for keyboard navigation
 - `will-change-*` utilities for GPU acceleration
 
 ### `featured-collections-display.tsx`
+
 - `will-change-card` on articles
 - Focus-visible states on all links
 - `transition-transform` on arrow icons
 - Extended stagger to 8 cards
 
 ### `featured-bobbleheads-display.tsx`
+
 - `will-change-card` on articles
 - Focus-visible states on all links
 - `transition-transform` on arrow icons
@@ -30,9 +33,15 @@ Added micro-interactions, focus states, and performance optimizations.
 
 ```css
 /* Animation delays */
-.animation-delay-600 { animation-delay: 600ms; }
-.animation-delay-700 { animation-delay: 700ms; }
-.animation-delay-800 { animation-delay: 800ms; }
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+.animation-delay-700 {
+  animation-delay: 700ms;
+}
+.animation-delay-800 {
+  animation-delay: 800ms;
+}
 
 /* Focus states */
 .focus-ring-warm {
@@ -40,9 +49,15 @@ Added micro-interactions, focus states, and performance optimizations.
 }
 
 /* Performance */
-.will-change-transform { will-change: transform; }
-.will-change-opacity { will-change: opacity; }
-.will-change-card { will-change: transform, box-shadow; }
+.will-change-transform {
+  will-change: transform;
+}
+.will-change-opacity {
+  will-change: opacity;
+}
+.will-change-card {
+  will-change: transform, box-shadow;
+}
 ```
 
 ## Accessibility

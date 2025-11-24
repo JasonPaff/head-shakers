@@ -5,11 +5,11 @@
 
 ## Quality Gate Results
 
-| Gate | Status | Notes |
-|------|--------|-------|
-| npm run lint:fix | PASS | No errors |
-| npm run typecheck | PASS | No errors |
-| npm run build | PASS | Compiled in 18.6s, 32 pages generated |
+| Gate              | Status | Notes                                 |
+| ----------------- | ------ | ------------------------------------- |
+| npm run lint:fix  | PASS   | No errors                             |
+| npm run typecheck | PASS   | No errors                             |
+| npm run build     | PASS   | Compiled in 18.6s, 32 pages generated |
 
 ## Build Output Summary
 

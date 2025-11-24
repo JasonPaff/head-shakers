@@ -33,10 +33,12 @@ export interface RawFeaturedContentData {
   bobbleheadLikes: null | number;
   bobbleheadName: null | string;
   bobbleheadOwner: null | string;
+  bobbleheadOwnerDisplayName: null | string;
   bobbleheadPrimaryPhotoUrl: null | string;
   bobbleheadSlug: null | string;
   collectionCoverImageUrl: null | string;
   collectionOwner: null | string;
+  collectionOwnerDisplayName: null | string;
   collectionSlug: null | string;
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
@@ -117,7 +119,7 @@ export class FeaturedContentTransformer {
       isActive: row.isActive,
       likes: row.bobbleheadLikes || 0,
       owner: this.determineContentOwner(row),
-      ownerDisplayName: row.userDisplayName,
+      ownerDisplayName: this.determineOwnerDisplayName(row),
       priority: row.priority,
       startDate: row.startDate,
       title: row.title,
@@ -178,5 +180,20 @@ export class FeaturedContentTransformer {
     }
 
     return null;
+  }
+
+  /**
+   * business logic for determining the owner display name based on content type
+   */
+  private static determineOwnerDisplayName(row: RawFeaturedContentData): null | string {
+    // return the appropriate owner display name based on content type
+    if (row.contentType === 'bobblehead') {
+      return row.bobbleheadOwnerDisplayName;
+    }
+    if (row.contentType === 'collection') {
+      return row.collectionOwnerDisplayName;
+    }
+    // for featured users, userDisplayName is the user's own display name
+    return row.userDisplayName;
   }
 }

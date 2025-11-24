@@ -54,10 +54,7 @@ const FeaturedBobbleheadSkeletonCard = ({
         />
 
         {/* Badge Skeleton */}
-        <div
-          className={'absolute top-3 left-3 z-10'}
-          data-slot={'featured-bobblehead-skeleton-badge'}
-        >
+        <div className={'absolute top-3 left-3 z-10'} data-slot={'featured-bobblehead-skeleton-badge'}>
           <Skeleton
             className={'h-6 w-20 rounded-full'}
             testId={generateTestId('ui', 'skeleton', `bobblehead-${index}-badge`)}
@@ -66,10 +63,7 @@ const FeaturedBobbleheadSkeletonCard = ({
       </div>
 
       {/* Content Area Skeleton */}
-      <div
-        className={'flex flex-col gap-2 p-4'}
-        data-slot={'featured-bobblehead-skeleton-content'}
-      >
+      <div className={'flex flex-col gap-2 p-4'} data-slot={'featured-bobblehead-skeleton-content'}>
         {/* Title Skeleton */}
         <Skeleton
           className={'h-5 w-3/4'}
@@ -138,11 +132,7 @@ export const FeaturedBobbleheadsSkeleton = ({
       <span className={'sr-only'}>Loading featured bobbleheads...</span>
 
       {Array.from({ length: count }).map((_, index) => (
-        <FeaturedBobbleheadSkeletonCard
-          index={index}
-          key={index}
-          size={size}
-        />
+        <FeaturedBobbleheadSkeletonCard index={index} key={index} size={size} />
       ))}
     </div>
   );

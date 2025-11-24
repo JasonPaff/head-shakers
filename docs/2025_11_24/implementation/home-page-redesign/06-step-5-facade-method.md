@@ -11,15 +11,18 @@ Added `getFeaturedBobbleheads` method to FeaturedContentFacade and enhanced quer
 ## Files Modified
 
 ### `src/lib/facades/featured-content/featured-content.facade.ts`
+
 - Added `getFeaturedBobbleheads(limit?, dbInstance?)` method
 - Added Sentry breadcrumb logging
 - Proper error handling with `createFacadeError`
 
 ### `src/lib/queries/featured-content/featured-content-query.ts`
+
 - Added LEFT JOIN with `bobbleheadPhotos` (where isPrimary = true)
 - Added `bobbleheadName` and `bobbleheadPrimaryPhotoUrl` to select
 
 ### `src/lib/queries/featured-content/featured-content-transformer.ts`
+
 - Added `contentName` field to `FeaturedContentData`
 - Added `determineContentName()` helper for bobblehead names
 - Enhanced `determineImageUrl()` with priority: explicit > bobblehead photo > collection cover
@@ -34,6 +37,7 @@ static async getFeaturedBobbleheads(
 ```
 
 **Returns**: Featured content filtered to bobblehead content type with:
+
 - `contentName` - bobblehead name
 - `contentSlug` - for URL generation
 - `imageUrl` - primary photo URL

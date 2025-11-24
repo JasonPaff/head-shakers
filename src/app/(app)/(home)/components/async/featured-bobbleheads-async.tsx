@@ -54,7 +54,7 @@ export async function FeaturedBobbleheadsAsync({ currentUserId }: FeaturedBobble
       imageUrl: content.imageUrl ?? null,
       isLiked: likeData?.isLiked ?? false,
       likeId: likeData?.likeId ?? null,
-      likes: likeData?.likeCount ?? (content.likes ?? 0),
+      likes: likeData?.likeCount ?? content.likes ?? 0,
       ownerDisplayName: content.ownerDisplayName ?? null,
       viewCount: content.viewCount,
     };

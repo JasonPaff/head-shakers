@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Eye, Layers, MessageCircle, User } from 'lucide-react';
+import { ArrowRight, Layers, User } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
@@ -49,13 +49,8 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
         data-slot={'featured-collections-empty'}
         data-testid={generateTestId('feature', 'collections-empty-state')}
       >
-        <Layers
-          aria-hidden
-          className={'mx-auto mb-4 size-12 text-muted-foreground/50'}
-        />
-        <p className={'text-muted-foreground'}>
-          No featured collections available at this time.
-        </p>
+        <Layers aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
+        <p className={'text-muted-foreground'}>No featured collections available at this time.</p>
       </div>
     );
   }
@@ -67,11 +62,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
       data-testid={generateTestId('feature', 'collection-grid')}
     >
       {collections.map((collection, index) => (
-        <FeaturedCollectionCard
-          collection={collection}
-          index={index}
-          key={collection.id}
-        />
+        <FeaturedCollectionCard collection={collection} index={index} key={collection.id} />
       ))}
     </div>
   );
@@ -154,10 +145,7 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
           />
 
           {/* Featured Badge */}
-          <div
-            className={'absolute top-3 left-3 z-10'}
-            data-slot={'featured-collection-badge'}
-          >
+          <div className={'absolute top-3 left-3 z-10'} data-slot={'featured-collection-badge'}>
             <span className={featuredCardBadgeVariants({ variant: 'featured' })}>
               <Layers aria-hidden className={'size-3'} />
               Featured
@@ -212,40 +200,16 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
         </Conditional>
 
         {/* Engagement Metrics */}
-        <div
-          className={'mt-4 flex items-center justify-between'}
-          data-slot={'featured-collection-metrics'}
-        >
-          {/* Left: Stats */}
-          <div className={'flex items-center gap-4'}>
-            {/* Like Button */}
-            <LikeCompactButton
-              className={'text-white/80 hover:text-white'}
-              initialLikeCount={collection.likes}
-              isInitiallyLiked={collection.isLiked}
-              targetId={collection.contentId}
-              targetType={'collection'}
-              testId={generateTestId('ui', 'like-button', `collection-${collection.id}`)}
-            />
-
-            {/* Comments */}
-            <div
-              className={'flex items-center gap-1.5 text-sm text-white/70'}
-              data-slot={'featured-collection-comments'}
-            >
-              <MessageCircle aria-hidden className={'size-4'} />
-              <span>{collection.comments}</span>
-            </div>
-
-            {/* Views */}
-            <div
-              className={'flex items-center gap-1.5 text-sm text-white/70'}
-              data-slot={'featured-collection-views'}
-            >
-              <Eye aria-hidden className={'size-4'} />
-              <span>{collection.viewCount}</span>
-            </div>
-          </div>
+        <div className={'mt-4 flex items-center justify-between'} data-slot={'featured-collection-metrics'}>
+          {/* Left: Like Button */}
+          <LikeCompactButton
+            className={'text-white/80 hover:text-white'}
+            initialLikeCount={collection.likes}
+            isInitiallyLiked={collection.isLiked}
+            targetId={collection.contentId}
+            targetType={'collection'}
+            testId={generateTestId('ui', 'like-button', `collection-${collection.id}`)}
+          />
 
           {/* Right: View Link */}
           <Link

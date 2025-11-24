@@ -130,7 +130,7 @@ export default async function HomePage() {
           {/* Hero Badge */}
           <div
             className={
-              'mb-6 inline-flex items-center gap-2 rounded-full border border-warm-amber/30 bg-warm-amber-light/40 px-4 py-1.5 text-sm font-medium text-warm-amber-dark'
+              'mb-6 inline-flex items-center gap-2 rounded-full border border-warm-amber/30 bg-warm-amber-light/40 px-4 py-1.5 text-sm font-medium text-warm-amber-dark dark:border-warm-amber/50 dark:bg-warm-amber-dark/30 dark:text-warm-amber-light'
             }
           >
             <SparklesIcon aria-hidden={'true'} className={'size-4'} />
@@ -234,7 +234,10 @@ export default async function HomePage() {
                 'flex size-14 items-center justify-center rounded-full bg-warm-orange-light/50 shadow-warm-sm'
               }
             >
-              <AwardIcon aria-hidden={'true'} className={'size-7 text-warm-orange-dark'} />
+              <AwardIcon
+                aria-hidden={'true'}
+                className={'size-7 text-warm-orange-dark dark:text-warm-orange'}
+              />
             </div>
             <h2 className={'text-3xl font-bold tracking-tight text-foreground md:text-4xl'}>
               Featured Bobbleheads
@@ -256,7 +259,7 @@ export default async function HomePage() {
           {/* Call to Action Card */}
           <div
             className={
-              'overflow-hidden rounded-3xl bg-gradient-to-br from-warm-amber-light/60 via-warm-coral-light/40 to-warm-orange-light/50 p-8 shadow-warm-lg md:p-12'
+              'overflow-hidden rounded-3xl bg-gradient-to-br from-warm-amber-light/60 via-warm-coral-light/40 to-warm-orange-light/50 p-8 shadow-warm-lg md:p-12 dark:from-warm-amber-dark/40 dark:via-warm-coral-dark/30 dark:to-warm-orange-dark/35'
             }
           >
             <div className={'mb-10 text-center'}>

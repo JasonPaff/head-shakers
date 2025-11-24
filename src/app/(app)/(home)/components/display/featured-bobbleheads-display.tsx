@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Award, Eye, User } from 'lucide-react';
+import { ArrowRight, Award, User } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
@@ -64,13 +64,8 @@ export const FeaturedBobbleheadsDisplay = ({ bobbleheads }: FeaturedBobbleheadsD
           data-slot={'featured-bobbleheads-empty'}
           data-testid={generateTestId('feature', 'bobbleheads-empty-state')}
         >
-          <Award
-            aria-hidden
-            className={'mx-auto mb-4 size-12 text-muted-foreground/50'}
-          />
-          <p className={'text-muted-foreground'}>
-            No featured bobbleheads available at this time.
-          </p>
+          <Award aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
+          <p className={'text-muted-foreground'}>No featured bobbleheads available at this time.</p>
         </div>
       </Conditional>
 
@@ -82,11 +77,7 @@ export const FeaturedBobbleheadsDisplay = ({ bobbleheads }: FeaturedBobbleheadsD
           data-testid={generateTestId('feature', 'bobblehead-grid')}
         >
           {bobbleheads.map((bobblehead, index) => (
-            <FeaturedBobbleheadCard
-              bobblehead={bobblehead}
-              index={index}
-              key={bobblehead.id}
-            />
+            <FeaturedBobbleheadCard bobblehead={bobblehead} index={index} key={bobblehead.id} />
           ))}
         </div>
       </Conditional>
@@ -121,8 +112,9 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
   const blurDataUrl = publicId ? generateBlurDataUrl(publicId) : undefined;
 
   // Build the href for navigation
-  const _href = _hasSlug
-    ? $path({
+  const _href =
+    _hasSlug ?
+      $path({
         route: '/bobbleheads/[bobbleheadSlug]',
         routeParams: { bobbleheadSlug: bobblehead.contentSlug as string },
       })
@@ -189,10 +181,7 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
           />
 
           {/* Featured Badge */}
-          <div
-            className={'absolute top-3 left-3 z-10'}
-            data-slot={'featured-bobblehead-badge'}
-          >
+          <div className={'absolute top-3 left-3 z-10'} data-slot={'featured-bobblehead-badge'}>
             <span className={featuredCardBadgeVariants({ variant: _badgeVariant })}>
               <Award aria-hidden className={'size-3'} />
               {getBadgeLabel(bobblehead.featureType)}
@@ -240,10 +229,7 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
         </Conditional>
 
         {/* Engagement Metrics */}
-        <div
-          className={'mt-2 flex items-center justify-between'}
-          data-slot={'featured-bobblehead-metrics'}
-        >
+        <div className={'mt-2 flex items-center justify-between'} data-slot={'featured-bobblehead-metrics'}>
           {/* Left: Stats */}
           <div className={'flex items-center gap-3'}>
             {/* Like Button */}
@@ -255,15 +241,6 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
               targetType={'bobblehead'}
               testId={generateTestId('ui', 'like-button', `bobblehead-${bobblehead.id}`)}
             />
-
-            {/* Views */}
-            <div
-              className={'flex items-center gap-1 text-xs text-muted-foreground'}
-              data-slot={'featured-bobblehead-views'}
-            >
-              <Eye aria-hidden className={'size-3.5'} />
-              <span>{bobblehead.viewCount}</span>
-            </div>
           </div>
 
           {/* Right: View Link */}
@@ -291,7 +268,9 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
 /**
  * Map feature type to badge variant
  */
-const getBadgeVariant = (featureType: FeaturedContentData['featureType']): 'featured' | 'new' | 'popular' | 'trending' => {
+const getBadgeVariant = (
+  featureType: FeaturedContentData['featureType'],
+): 'featured' | 'new' | 'popular' | 'trending' => {
   switch (featureType) {
     case 'collection_of_week':
       return 'popular';

@@ -11,15 +11,18 @@ Extended globals.css with warm accent colors, animation keyframes, and utility c
 ## Color Variables Added
 
 ### Warm Accents (OKLCH)
+
 - `--warm-orange`: oklch(0.7 0.18 45) - Primary accent
 - `--warm-coral`: oklch(0.72 0.15 35) - Secondary accent
 - `--warm-amber`: oklch(0.78 0.16 75) - Premium/highlight
 
 ### Gradients
+
 - `--gradient-sunset-start/mid/end` - For card overlays
 - `--overlay-warm-light/medium/dark` - With alpha transparency
 
 ### Shadows
+
 - `--shadow-warm` - Default card shadow
 - `--shadow-warm-hover` - Elevated hover state
 
@@ -34,23 +37,28 @@ Extended globals.css with warm accent colors, animation keyframes, and utility c
 ## Utility Classes
 
 ### Animations
+
 - `animate-card-lift`, `animate-fade-in-up`, `animate-shimmer`
 - `animation-delay-100` through `animation-delay-500`
 
 ### Transitions
+
 - `transition-card` - Card hover transition
 - `transition-all-smooth` - General smooth transition
 
 ### Shadows
+
 - `shadow-warm-sm/md/lg/hover`
 
 ### Spacing
+
 - `section-spacing-lg/xl`
 - `card-padding-comfortable/spacious`
 
 ## Tailwind Integration
 
 All color variables mapped to `--color-*` format for Tailwind class usage:
+
 - `bg-warm-orange`, `text-warm-coral`, `border-warm-amber`
 
 ## Accessibility

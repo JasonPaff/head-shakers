@@ -1,4 +1,5 @@
 import { and, desc, eq, gte, isNull, lte, or, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { RawFeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
@@ -74,23 +75,27 @@ export class FeaturedContentQuery extends BaseQuery {
    * get active featured content with related data (raw data for service layer transformation)
    *
    * joins with bobbleheads, collections, users (for user content type),
-   * bobbleheadPhotos (for primary image), and bobbleheadOwnerUsers (for owner display name)
+   * bobbleheadPhotos (for primary image), and owner users (for owner display names)
    */
   static async findActiveFeaturedContentAsync(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
-    // create alias for users table to join for bobblehead owner display name
-    // we need separate joins: one for user content type, one for bobblehead owner
+    // create aliases for users table to get owner display names
+    const bobbleheadOwnerUsers = alias(users, 'bobbleheadOwnerUsers');
+    const collectionOwnerUsers = alias(users, 'collectionOwnerUsers');
+
     const results = await dbInstance
       .select({
         bobbleheadLikes: bobbleheads.likeCount,
         bobbleheadName: bobbleheads.name,
         bobbleheadOwner: bobbleheads.userId,
+        bobbleheadOwnerDisplayName: bobbleheadOwnerUsers.displayName,
         bobbleheadPrimaryPhotoUrl: bobbleheadPhotos.url,
         bobbleheadSlug: bobbleheads.slug,
         collectionCoverImageUrl: collections.coverImageUrl,
         collectionOwner: collections.userId,
+        collectionOwnerDisplayName: collectionOwnerUsers.displayName,
         collectionSlug: collections.slug,
         contentId: featuredContent.contentId,
         contentType: featuredContent.contentType,
@@ -116,7 +121,9 @@ export class FeaturedContentQuery extends BaseQuery {
         bobbleheadPhotos,
         and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
       )
+      .leftJoin(bobbleheadOwnerUsers, eq(bobbleheads.userId, bobbleheadOwnerUsers.id))
       .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .leftJoin(collectionOwnerUsers, eq(collections.userId, collectionOwnerUsers.id))
       .leftJoin(users, eq(featuredContent.contentId, users.id))
       .where(
         and(

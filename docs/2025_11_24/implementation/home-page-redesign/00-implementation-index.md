@@ -22,21 +22,21 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Auto-Loaded |
-|------|------------|-------------------|
-| 1. Analyze architecture | facade-specialist | facade-layer, drizzle-orm |
-| 2. Design color palette | react-component-specialist | react-coding-conventions |
-| 3. Create CVA variants | react-component-specialist | react-coding-conventions, ui-components |
-| 4. Enhance collections display | react-component-specialist | react-coding-conventions, ui-components |
-| 5. Create facade method | facade-specialist | facade-layer, caching, sentry-monitoring |
-| 6. Create skeleton component | react-component-specialist | react-coding-conventions, ui-components |
-| 7. Create display component | react-component-specialist | react-coding-conventions, ui-components |
-| 8. Create async component | react-component-specialist | react-coding-conventions |
-| 9. Integrate into home page | react-component-specialist | react-coding-conventions |
-| 10. Enhance page layout | react-component-specialist | react-coding-conventions |
-| 11. Optimize Cloudinary | media-specialist | cloudinary-media |
-| 12. Add interactions | react-component-specialist | react-coding-conventions, ui-components |
-| 13. Accessibility audit | react-component-specialist | react-coding-conventions, ui-components |
+| Step                           | Specialist                 | Skills Auto-Loaded                       |
+| ------------------------------ | -------------------------- | ---------------------------------------- |
+| 1. Analyze architecture        | facade-specialist          | facade-layer, drizzle-orm                |
+| 2. Design color palette        | react-component-specialist | react-coding-conventions                 |
+| 3. Create CVA variants         | react-component-specialist | react-coding-conventions, ui-components  |
+| 4. Enhance collections display | react-component-specialist | react-coding-conventions, ui-components  |
+| 5. Create facade method        | facade-specialist          | facade-layer, caching, sentry-monitoring |
+| 6. Create skeleton component   | react-component-specialist | react-coding-conventions, ui-components  |
+| 7. Create display component    | react-component-specialist | react-coding-conventions, ui-components  |
+| 8. Create async component      | react-component-specialist | react-coding-conventions                 |
+| 9. Integrate into home page    | react-component-specialist | react-coding-conventions                 |
+| 10. Enhance page layout        | react-component-specialist | react-coding-conventions                 |
+| 11. Optimize Cloudinary        | media-specialist           | cloudinary-media                         |
+| 12. Add interactions           | react-component-specialist | react-coding-conventions, ui-components  |
+| 13. Accessibility audit        | react-component-specialist | react-coding-conventions, ui-components  |
 
 ## Navigation
 
@@ -59,22 +59,22 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Issues |
-|------|------------|--------|--------|
-| 1. Analyze architecture | facade-specialist | ✓ | None |
-| 2. Design color palette | react-component-specialist | ✓ | None |
-| 3. Create CVA variants | react-component-specialist | ✓ | None |
-| 4. Enhance collections display | react-component-specialist | ✓ | Fixed pre-existing issues |
-| 5. Create facade method | facade-specialist | ✓ | None |
-| 6. Create skeleton component | react-component-specialist | ✓ | None |
-| 7. Create display component | react-component-specialist | ✓ | None |
-| 8. Create async component | react-component-specialist | ✓ | None |
-| 9. Integrate into home page | react-component-specialist | ✓ | None |
-| 10. Enhance page layout | react-component-specialist | ✓ | None |
-| 11. Optimize Cloudinary | media-specialist | ✓ | None |
-| 12. Add interactions | react-component-specialist | ✓ | None |
-| 13. Accessibility audit | react-component-specialist | ✓ | Fixed skeleton accessibility |
-| Quality Gates | - | ✓ | All 3 passed |
+| Step                           | Specialist                 | Status | Issues                       |
+| ------------------------------ | -------------------------- | ------ | ---------------------------- |
+| 1. Analyze architecture        | facade-specialist          | ✓      | None                         |
+| 2. Design color palette        | react-component-specialist | ✓      | None                         |
+| 3. Create CVA variants         | react-component-specialist | ✓      | None                         |
+| 4. Enhance collections display | react-component-specialist | ✓      | Fixed pre-existing issues    |
+| 5. Create facade method        | facade-specialist          | ✓      | None                         |
+| 6. Create skeleton component   | react-component-specialist | ✓      | None                         |
+| 7. Create display component    | react-component-specialist | ✓      | None                         |
+| 8. Create async component      | react-component-specialist | ✓      | None                         |
+| 9. Integrate into home page    | react-component-specialist | ✓      | None                         |
+| 10. Enhance page layout        | react-component-specialist | ✓      | None                         |
+| 11. Optimize Cloudinary        | media-specialist           | ✓      | None                         |
+| 12. Add interactions           | react-component-specialist | ✓      | None                         |
+| 13. Accessibility audit        | react-component-specialist | ✓      | Fixed skeleton accessibility |
+| Quality Gates                  | -                          | ✓      | All 3 passed                 |
 
 ## Summary
 
