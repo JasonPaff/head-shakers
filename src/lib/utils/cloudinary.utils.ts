@@ -69,24 +69,28 @@ export function extractPublicIdFromCloudinaryUrl(url: string): string {
     // Get all parts after 'upload'
     const resourceParts = urlParts.slice(uploadIndex + 1);
 
-    // Filter out transformation parameters
-    // Transformation parameters typically contain underscores (e.g., 'c_fill', 'w_200')
-    // but folder paths may also contain slashes
-    // We keep parts that either don't contain underscores OR contain slashes (folder separators)
-    const cleanParts = resourceParts.filter((part) => {
+    // Filter out transformation parameters and version numbers
+    // Transformation parameters are: version numbers (v123456), and transformation strings (like c_fill,w_200)
+    // These always come before the resource path
+    const cleanParts: Array<string> = [];
+    let hasFoundResourcePath = false;
+
+    for (const part of resourceParts) {
       // Skip version parameters (e.g., 'v1234567890')
       if (/^v\d+$/.test(part)) {
-        return false;
+        continue;
       }
 
-      // Skip transformation parameters (contain underscore but not slash)
-      // Examples: c_fill, w_200, h_300, q_auto
-      if (part.includes('_') && !part.includes('/')) {
-        return false;
+      // Transformation parameters contain commas (e.g., 'c_fill,w_200,h_300')
+      // Once we encounter a part without comma, we've reached the resource path
+      if (!hasFoundResourcePath && part.includes(',')) {
+        continue;
       }
 
-      return true;
-    });
+      // Once we find a part without comma, we've reached the resource path
+      hasFoundResourcePath = true;
+      cleanParts.push(part);
+    }
 
     // Join the clean parts back together
     const pathWithExtension = cleanParts.join('/');
