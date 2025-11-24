@@ -353,7 +353,14 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
                 {filters.status?.map((status) => (
                   <Badge className={'gap-1'} key={status} variant={'secondary'}>
                     Status: {status.charAt(0).toUpperCase() + status.slice(1)}
-                    <XIcon className={'size-3 cursor-pointer'} onClick={() => handleRemoveStatus(status)} />
+                    <Button
+                      className={'size-4'}
+                      onClick={() => handleRemoveStatus(status)}
+                      size={'icon'}
+                      variant={'outline'}
+                    >
+                      <XIcon className={'size-3 cursor-pointer'} />
+                    </Button>
                   </Badge>
                 ))}
               </Conditional>
@@ -363,7 +370,14 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
                 {filters.targetType?.map((type) => (
                   <Badge className={'gap-1'} key={type} variant={'secondary'}>
                     Type: {type.charAt(0).toUpperCase() + type.slice(1)}
-                    <XIcon className={'size-3 cursor-pointer'} onClick={() => handleRemoveTargetType(type)} />
+                    <Button
+                      className={'size-4'}
+                      onClick={() => handleRemoveTargetType(type)}
+                      size={'icon'}
+                      variant={'outline'}
+                    >
+                      <XIcon className={'size-3 cursor-pointer'} />
+                    </Button>
                   </Badge>
                 ))}
               </Conditional>
@@ -377,7 +391,14 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
                       .split('_')
                       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                       .join(' ')}
-                    <XIcon className={'size-3 cursor-pointer'} onClick={() => handleRemoveReason(reason)} />
+                    <Button
+                      className={'size-4'}
+                      onClick={() => handleRemoveReason(reason)}
+                      size={'icon'}
+                      variant={'outline'}
+                    >
+                      <XIcon className={'size-3 cursor-pointer'} />
+                    </Button>
                   </Badge>
                 ))}
               </Conditional>
@@ -386,7 +407,14 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
               <Conditional isCondition={_hasDateFromFilter}>
                 <Badge className={'gap-1'} variant={'secondary'}>
                   From: {filters.dateFrom && format(filters.dateFrom, 'PP')}
-                  <XIcon className={'size-3 cursor-pointer'} onClick={handleClearDateFrom} />
+                  <Button
+                    className={'size-4'}
+                    onClick={handleClearDateFrom}
+                    size={'icon'}
+                    variant={'outline'}
+                  >
+                    <XIcon className={'size-3 cursor-pointer'} />
+                  </Button>
                 </Badge>
               </Conditional>
 
@@ -394,7 +422,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
               <Conditional isCondition={_hasDateToFilter}>
                 <Badge className={'gap-1'} variant={'secondary'}>
                   To: {filters.dateTo && format(filters.dateTo, 'PP')}
-                  <XIcon className={'size-3 cursor-pointer'} onClick={handleClearDateTo} />
+                  <Button className={'size-4'} onClick={handleClearDateTo} size={'icon'} variant={'outline'}>
+                    <XIcon className={'size-3 cursor-pointer'} />
+                  </Button>
                 </Badge>
               </Conditional>
             </div>
