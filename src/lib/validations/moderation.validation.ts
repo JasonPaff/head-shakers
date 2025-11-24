@@ -98,6 +98,13 @@ export const adminReportsQuerySchema = z.object({
   sortOrder: z.enum(['asc', 'desc']).default('desc').optional(),
 });
 
+// Extended schema for content reports with slug data for routing
+export const selectContentReportWithSlugsSchema = selectContentReportSchema.extend({
+  contentExists: z.boolean(),
+  parentCollectionSlug: z.string().nullable(),
+  targetSlug: z.string().nullable(),
+});
+
 export type AdminBulkUpdateReports = z.infer<typeof adminBulkUpdateReportsSchema>;
 export type AdminReportsFilter = z.infer<typeof adminReportsFilterSchema>;
 export type AdminReportsQuery = z.infer<typeof adminReportsQuerySchema>;
@@ -106,4 +113,5 @@ export type AdminUpdateReport = z.infer<typeof adminUpdateReportSchema>;
 export type InsertContentReport = z.infer<typeof insertContentReportSchema>;
 export type PublicContentReport = z.infer<typeof publicContentReportSchema>;
 export type SelectContentReport = z.infer<typeof selectContentReportSchema>;
+export type SelectContentReportWithSlugs = z.infer<typeof selectContentReportWithSlugsSchema>;
 export type UpdateContentReport = z.infer<typeof updateContentReportSchema>;

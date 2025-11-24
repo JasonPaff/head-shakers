@@ -2,7 +2,10 @@ import type { z } from 'zod';
 
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-import type { SelectContentReport } from '@/lib/validations/moderation.validation';
+import type {
+  SelectContentReport,
+  SelectContentReportWithSlugs,
+} from '@/lib/validations/moderation.validation';
 import type {
   adminBulkUpdateReportsSchema,
   adminReportsFilterSchema,
@@ -227,6 +230,33 @@ export class ContentReportsFacade {
         data: { filterOptions },
         facade: facadeName,
         method: 'getAllReportsForAdminAsync',
+        operation: OPERATIONS.ADMIN.GET_ADMIN_REPORTS,
+        userId,
+      };
+      throw createFacadeError(context, error);
+    }
+  }
+
+  /**
+   * Get all reports for the admin dashboard with filtering, pagination, and slug data for routing
+   */
+  static async getAllReportsWithSlugsForAdminAsync(
+    filterOptions: AdminReportsFilterInput,
+    userId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<{ reports: Array<SelectContentReportWithSlugs>; stats: ReportsStatsResult }> {
+    try {
+      const context = createProtectedQueryContext(userId, { dbInstance });
+
+      const reports = await ContentReportsQuery.getAllReportsWithSlugsForAdminAsync(filterOptions, context);
+      const stats = await ContentReportsQuery.getReportsStatsAsync(context);
+
+      return { reports, stats };
+    } catch (error) {
+      const context: FacadeErrorContext = {
+        data: { filterOptions },
+        facade: facadeName,
+        method: 'getAllReportsWithSlugsForAdminAsync',
         operation: OPERATIONS.ADMIN.GET_ADMIN_REPORTS,
         userId,
       };
