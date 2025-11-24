@@ -1,7 +1,7 @@
 ---
 name: static-analysis-validator
 description: Head Shakers static analysis specialist. Runs lint, typecheck, and format checks with deep understanding of project ESLint rules, TypeScript config, and Prettier settings. Returns structured issue reports.
-model: haiku
+model: sonnet
 color: yellow
 allowed-tools: Bash(npm:*,npx:*), Read(*), Grep(*), Glob(*)
 ---
