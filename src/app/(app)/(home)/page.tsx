@@ -1,15 +1,7 @@
 import type { Metadata } from 'next';
 
 import { SignUpButton } from '@clerk/nextjs';
-import {
-  ArrowRightIcon,
-  AwardIcon,
-  HeartIcon,
-  SearchIcon,
-  SparklesIcon,
-  TrendingUpIcon,
-  UsersIcon,
-} from 'lucide-react';
+import { AwardIcon, HeartIcon, SearchIcon, SparklesIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Suspense } from 'react';
@@ -210,19 +202,6 @@ export default async function HomePage() {
               <FeaturedCollectionsAsync currentUserId={currentUserId} />
             </Suspense>
           </FeaturedCollectionsErrorBoundary>
-
-          {/* View All Featured Link */}
-          <div className={'mt-10 flex justify-center'}>
-            <Button asChild className={'group transition-all-smooth'} size={'lg'} variant={'outline'}>
-              <Link href={$path({ route: '/browse/featured' })}>
-                View All Featured Content
-                <ArrowRightIcon
-                  aria-hidden={'true'}
-                  className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
-                />
-              </Link>
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -263,7 +242,7 @@ export default async function HomePage() {
       </section>
 
       {/* Join the Community Section */}
-      <section className={'px-4 py-16 md:py-20'}>
+      <section className={'bg-card px-4 py-16 md:py-20'}>
         <div className={'container mx-auto max-w-6xl'}>
           {/* Call to Action Card */}
           <div
