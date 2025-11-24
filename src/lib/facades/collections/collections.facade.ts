@@ -49,6 +49,7 @@ export interface CollectionDashboardData {
     bobbleheadCount: number;
     description: null | string;
     id: string;
+    isPublic: boolean;
     name: string;
     slug: string;
   }>;
@@ -1236,6 +1237,7 @@ export class CollectionsFacade {
         bobbleheadCount: sub.bobbleheads.length,
         description: sub.description,
         id: sub.id,
+        isPublic: sub.isPublic,
         name: sub.name,
         slug: sub.slug,
       })),

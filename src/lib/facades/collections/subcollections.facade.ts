@@ -275,6 +275,7 @@ export class SubcollectionsFacade {
       description: null | string;
       featurePhoto: null | string;
       id: string;
+      isPublic: boolean;
       name: string;
       slug: string;
     }>;

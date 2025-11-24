@@ -102,6 +102,7 @@ export const SubcollectionsListItem = ({
                 subcollection={{
                   description: subcollection.description,
                   id: subcollection.id,
+                  isPublic: subcollection.isPublic,
                   name: subcollection.name,
                 }}
               />

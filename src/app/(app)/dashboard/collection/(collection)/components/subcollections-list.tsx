@@ -19,6 +19,7 @@ export interface SubcollectionData {
   description: null | string;
   id: string;
   isCollectionPublic: boolean;
+  isPublic: boolean;
   name: string;
   slug: string;
 }

@@ -128,6 +128,7 @@ export type CollectionWithRelations = CollectionRecord & {
     createdAt: Date;
     description: null | string;
     id: string;
+    isPublic: boolean;
     name: string;
     slug: string;
     updatedAt: Date;
@@ -1022,6 +1023,7 @@ export class CollectionsQuery extends BaseQuery {
             createdAt: true,
             description: true,
             id: true,
+            isPublic: true,
             name: true,
             slug: true,
             updatedAt: true,

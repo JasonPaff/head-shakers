@@ -260,6 +260,7 @@ export class SubcollectionsQuery extends BaseQuery {
       description: null | string;
       featurePhoto: null | string;
       id: string;
+      isPublic: boolean;
       name: string;
       slug: string;
     }>;
@@ -308,6 +309,7 @@ export class SubcollectionsQuery extends BaseQuery {
         description: subCollection.description,
         featurePhoto: subCollection.coverImageUrl,
         id: subCollection.id,
+        isPublic: subCollection.isPublic,
         name: subCollection.name,
         slug: subCollection.slug,
       })),
