@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { eq } from 'drizzle-orm';
 
 import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.queries';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -6,6 +7,8 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import { AdminNotificationFacade } from '@/lib/facades/notifications/admin-notifications.facade';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
 import { AblyService } from '@/lib/services/ably.service';
@@ -238,6 +241,112 @@ export class NewsletterFacade {
             tags: {
               component: facadeName,
               operation: OPERATIONS.NEWSLETTER.NOTIFY_ADMIN_SIGNUP,
+            },
+          });
+        }
+
+        // Create database notification records for all admin users
+        // Wrapped in try-catch to ensure notification failures don't affect subscription
+        try {
+          // Get all admin users to notify
+          const adminUsersResult = await tx
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.role, 'admin'));
+
+          const adminUserIds = adminUsersResult.map((user) => user.id);
+
+          if (adminUserIds.length > 0) {
+            // Create notification for each admin user
+            const notificationCreationResults = await Promise.allSettled(
+              adminUserIds.map(async (adminUserId) => {
+                const notification = await AdminNotificationFacade.createNotificationAsync(
+                  {
+                    isEmailSent: false,
+                    isRead: false,
+                    message: `New newsletter subscriber: ${normalizedEmail.substring(0, 3)}***`,
+                    title: 'New Newsletter Signup',
+                    type: 'system',
+                    userId: adminUserId,
+                  },
+                  tx,
+                );
+
+                // Publish to Ably for real-time bell updates (fire and forget)
+                if (notification) {
+                  void AblyService.publishAdminNotificationAsync({
+                    notificationId: notification.id,
+                    notificationType: notification.type,
+                    timestamp: notification.createdAt.toISOString(),
+                    userId: adminUserId,
+                  }).catch((ablyError) => {
+                    Sentry.captureException(ablyError, {
+                      extra: {
+                        notificationId: notification.id,
+                        operation: 'publish_admin_notification_ably',
+                        userId: adminUserId,
+                      },
+                      level: 'warning',
+                      tags: {
+                        component: facadeName,
+                        operation: OPERATIONS.NOTIFICATIONS.CREATE,
+                      },
+                    });
+                  });
+                }
+
+                return notification;
+              }),
+            );
+
+            // Count successful notifications
+            const successfulNotifications = notificationCreationResults.filter(
+              (result) => result.status === 'fulfilled' && result.value !== null,
+            );
+
+            if (successfulNotifications.length > 0) {
+              Sentry.addBreadcrumb({
+                category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+                data: {
+                  adminCount: adminUserIds.length,
+                  email: normalizedEmail.substring(0, 3) + '***',
+                  signupId: newSignup.id,
+                  successCount: successfulNotifications.length,
+                },
+                level: SENTRY_LEVELS.INFO,
+                message: `Created ${successfulNotifications.length} notification records for admin users`,
+              });
+            }
+
+            // Log any failures
+            const failedNotifications = notificationCreationResults.filter(
+              (result) => result.status === 'rejected',
+            );
+            if (failedNotifications.length > 0) {
+              Sentry.addBreadcrumb({
+                category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+                data: {
+                  email: normalizedEmail.substring(0, 3) + '***',
+                  failureCount: failedNotifications.length,
+                  signupId: newSignup.id,
+                },
+                level: SENTRY_LEVELS.WARNING,
+                message: `Failed to create ${failedNotifications.length} notification records`,
+              });
+            }
+          }
+        } catch (dbNotificationError) {
+          // Log but don't throw - subscription should succeed even if notification creation fails
+          Sentry.captureException(dbNotificationError, {
+            extra: {
+              email: normalizedEmail.substring(0, 3) + '***',
+              operation: 'create_admin_notifications',
+              signupId: newSignup.id,
+            },
+            level: 'warning',
+            tags: {
+              component: facadeName,
+              operation: OPERATIONS.NOTIFICATIONS.CREATE,
             },
           });
         }

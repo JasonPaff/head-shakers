@@ -84,6 +84,18 @@ export const OPERATIONS = {
     SUBSCRIBE: 'subscribe_to_newsletter',
     UNSUBSCRIBE: 'unsubscribe_from_newsletter',
   },
+  NOTIFICATIONS: {
+    CREATE: 'create_notification',
+    DELETE: 'delete_notification',
+    GET_BY_ID: 'get_notification_by_id',
+    GET_BY_TYPE: 'get_notifications_by_type',
+    GET_BY_USER: 'get_notifications_by_user',
+    GET_UNREAD: 'get_unread_notifications',
+    GET_UNREAD_COUNT: 'get_unread_count',
+    MARK_ALL_AS_READ: 'mark_all_notifications_as_read',
+    MARK_AS_READ: 'mark_notification_as_read',
+    MARK_MULTIPLE_AS_READ: 'mark_multiple_notifications_as_read',
+  },
   SEARCH: {
     BOBBLEHEADS: 'search_bobbleheads',
     COLLECTIONS: 'search_collections',

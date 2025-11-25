@@ -1,0 +1,2 @@
+ALTER TABLE "notifications" ADD COLUMN "updated_at" timestamp DEFAULT now() NOT NULL;--> statement-breakpoint
+ALTER TABLE "notifications" ADD CONSTRAINT "notifications_dates_logic" CHECK ("notifications"."created_at" <= "notifications"."updated_at");

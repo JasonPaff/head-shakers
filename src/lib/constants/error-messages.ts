@@ -108,6 +108,13 @@ export const ERROR_MESSAGES = {
     REPORT_NOT_FOUND: 'Content report not found',
     REPORT_UPDATE_FAILED: 'Failed to update content report',
   },
+  NOTIFICATIONS: {
+    CREATE_FAILED: 'Failed to create notification',
+    DELETE_FAILED: 'Failed to delete notification',
+    MARK_AS_READ_FAILED: 'Failed to mark notification as read',
+    NOT_FOUND: 'Notification not found',
+    UNAUTHORIZED_ACCESS: 'You do not have permission to access this notification',
+  },
   RATE_LIMIT: {
     ACTION_LIMIT_EXCEEDED: 'Action limit exceeded for this time period',
     EXCEEDED: 'Rate limit exceeded',

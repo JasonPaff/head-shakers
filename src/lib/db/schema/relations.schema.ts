@@ -4,8 +4,9 @@ import { contentViews, searchQueries } from '@/lib/db/schema/analytics.schema';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads.schema';
 import { collections, subCollections } from '@/lib/db/schema/collections.schema';
 import { contentReports } from '@/lib/db/schema/moderation.schema';
+import { notifications } from '@/lib/db/schema/notifications.schema';
 import { comments, follows, likes } from '@/lib/db/schema/social.schema';
-import { featuredContent, notifications } from '@/lib/db/schema/system.schema';
+import { featuredContent } from '@/lib/db/schema/system.schema';
 import { tags } from '@/lib/db/schema/tags.schema';
 import {
   loginHistory,

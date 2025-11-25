@@ -4,6 +4,7 @@ export * from '@/lib/db/schema/collections.schema';
 export * from '@/lib/db/schema/launch.schema';
 export * from '@/lib/db/schema/moderation.schema';
 export * from '@/lib/db/schema/newsletter-signups.schema';
+export * from '@/lib/db/schema/notifications.schema';
 export * from '@/lib/db/schema/relations.schema';
 export * from '@/lib/db/schema/social.schema';
 export * from '@/lib/db/schema/system.schema';

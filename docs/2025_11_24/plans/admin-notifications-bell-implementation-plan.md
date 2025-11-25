@@ -32,9 +32,11 @@ Migrate the admin newsletter notification system from ephemeral real-time toast 
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/db/schema/notifications.schema.ts` - Notifications table schema with appropriate columns and indexes
 
 **Changes:**
+
 - Add table definition with id, type, content, userId, readAt, createdAt, updatedAt fields
 - Add index on userId for efficient queries
 - Add index on createdAt for timestamp-based sorting
@@ -42,11 +44,13 @@ Migrate the admin newsletter notification system from ephemeral real-time toast 
 - Export schema and type definitions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file passes TypeScript type checking
 - [ ] Schema follows project Drizzle ORM conventions
 - [ ] All indexes are properly defined for query optimization
@@ -61,19 +65,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - Generated migration file in `src/lib/db/migrations/` directory
 
 **Changes:**
+
 - Run db:generate command to create migration file
 - Review generated SQL for correctness
 - Run db:migrate to apply migration to database
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate && npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file is generated successfully
 - [ ] Migration applies cleanly to database
 - [ ] Notifications table exists in database with correct schema
@@ -88,20 +96,24 @@ npm run db:generate && npm run db:migrate
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/validations/admin-notifications.validation.ts` - Zod schemas for notifications
 
 **Changes:**
+
 - Add createNotificationSchema using drizzle-zod createInsertSchema
 - Add updateNotificationSchema for marking as read
 - Add getNotificationsSchema for query parameters
 - Export all schemas and their TypeScript types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All validation schemas follow drizzle-zod patterns
 - [ ] Schemas properly validate required and optional fields
 - [ ] TypeScript types are correctly inferred and exported
@@ -116,9 +128,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/queries/notifications/admin-notifications.query.ts` - Notification query class
 
 **Changes:**
+
 - Add AdminNotificationQuery class with static methods
 - Add getUnreadNotifications method with userId filter and ordering
 - Add getNotificationById method for single notification retrieval
@@ -127,11 +141,13 @@ npm run lint:fix && npm run typecheck
 - Include Sentry breadcrumbs for all operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Query class follows project query patterns from launch-notification-query
 - [ ] All methods include proper error handling
 - [ ] Sentry breadcrumbs are added for monitoring
@@ -147,9 +163,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/facades/notifications/admin-notifications.facade.ts` - Notification facade
 
 **Changes:**
+
 - Add AdminNotificationFacade class with static methods
 - Add createNotification method with validation and error handling
 - Add getUnreadNotifications method with user permission checks
@@ -159,11 +177,13 @@ npm run lint:fix && npm run typecheck
 - Add Sentry error capture and breadcrumbs
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Facade follows project facade patterns from launch-notification.facade
 - [ ] All methods validate inputs using Zod schemas
 - [ ] Business logic is properly encapsulated
@@ -179,20 +199,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/operations.ts` - Add NOTIFICATIONS operations
 - `src/lib/constants/action-names.ts` - Add NOTIFICATIONS action names
 
 **Changes:**
+
 - Add NOTIFICATIONS constant with CREATE, MARK_AS_READ, GET_UNREAD operations
 - Add corresponding action names for server actions
 - Follow existing naming patterns in both files
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constants follow existing naming conventions
 - [ ] All operation types are properly defined
 - [ ] No duplicate constant values
@@ -207,9 +231,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/notifications/admin-notifications.actions.ts` - Server actions
 
 **Changes:**
+
 - Add createAdminNotification action with admin role verification
 - Add markNotificationAsRead action with ownership verification
 - Add getUnreadNotifications action with admin role check
@@ -218,11 +244,13 @@ npm run lint:fix && npm run typecheck
 - Include Sentry monitoring for all actions
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All actions follow next-safe-action patterns
 - [ ] Admin role verification is properly implemented
 - [ ] Actions use facades for business logic
@@ -238,9 +266,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/layout/app-header/components/admin-notification-item.tsx` - Notification item component
 
 **Changes:**
+
 - Add NotificationItem component accepting notification data
 - Add click handler to mark notification as read
 - Add visual states for read vs unread using opacity and colors
@@ -249,11 +279,13 @@ npm run lint:fix && npm run typecheck
 - Use Tailwind CSS for styling with reduced opacity for read items
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component follows React 19 conventions without forwardRef
 - [ ] Visual states clearly distinguish read from unread
 - [ ] Click interactions call server actions properly
@@ -269,9 +301,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/layout/app-header/components/admin-notification-list.tsx` - Notification list component
 
 **Changes:**
+
 - Add NotificationList component accepting notifications array
 - Add scrollable container with max height
 - Render NotificationItem components for each notification
@@ -280,11 +314,13 @@ npm run lint:fix && npm run typecheck
 - Add loading state handling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] List handles empty arrays gracefully
 - [ ] Scrolling behavior works for long lists
 - [ ] Empty state is visually clear and informative
@@ -300,9 +336,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/layout/app-header/components/admin-notification-bell.tsx` - Bell component with popover
 
 **Changes:**
+
 - Add NotificationBell component with Radix Popover
 - Add Bell icon from Lucide React
 - Add Badge component showing unread count when greater than zero
@@ -313,11 +351,13 @@ npm run lint:fix && npm run typecheck
 - Include admin role verification
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Popover opens and closes properly
 - [ ] Badge displays correct unread count
 - [ ] Real-time updates work via Ably
@@ -333,9 +373,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Add notification creation
 
 **Changes:**
+
 - Import AdminNotificationFacade
 - Add notification creation call after successful newsletter signup
 - Include subscriber email and timestamp in notification content
@@ -344,11 +386,13 @@ npm run lint:fix && npm run typecheck
 - Add Sentry breadcrumb for notification creation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Notification is created for each newsletter signup
 - [ ] Newsletter signup flow is not disrupted by notification errors
 - [ ] Proper error handling is in place
@@ -364,9 +408,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/admin/newsletter-signup-notifications.tsx` - Add Ably publishing
 
 **Changes:**
+
 - Update Ably channel to dedicated admin-notifications channel
 - Include notification ID in published event payload
 - Include subscriber email and timestamp
@@ -375,11 +421,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for Ably publish failures
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Ably events are published to correct channel
 - [ ] Event payload includes all required notification data
 - [ ] Error handling prevents notification failures from breaking signup flow
@@ -395,9 +443,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/layout/app-header/components/app-header-notifications.tsx` - Replace with bell component
 
 **Changes:**
+
 - Remove placeholder implementation
 - Import and render AdminNotificationBell component
 - Add admin role check wrapper
@@ -406,11 +456,13 @@ npm run lint:fix && npm run typecheck
 - Maintain header styling consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bell icon appears in header for admin users only
 - [ ] Header layout remains visually consistent
 - [ ] Component is properly positioned and styled
@@ -426,9 +478,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/components/layout/app-header/components/admin-notification-bell.tsx` - Add Ably subscription logic
 
 **Changes:**
+
 - Add useEffect hook for Ably channel subscription
 - Subscribe to admin-notifications channel on component mount
 - Verify admin role via Clerk before subscribing
@@ -439,11 +493,13 @@ npm run lint:fix && npm run typecheck
 - Add error handling for connection issues
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subscription only activates for admin users
 - [ ] Real-time events properly update notification list
 - [ ] Unread count updates correctly
@@ -459,10 +515,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/layout/app-header/components/admin-notification-item.tsx` - Add click handler
 - `src/components/layout/app-header/components/admin-notification-bell.tsx` - Update state management
 
 **Changes:**
+
 - Add onClick handler to notification item
 - Call markNotificationAsRead server action
 - Update notification readAt timestamp optimistically in UI
@@ -472,11 +530,13 @@ npm run lint:fix && npm run typecheck
 - Update visual styling to faded state
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Clicking notification marks it as read immediately in UI
 - [ ] Server action updates database record
 - [ ] Badge count decrements correctly
@@ -493,6 +553,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Test newsletter signup creates database record
 - Verify offline admin sees notification on next login
 - Test notification list displays historical notifications
@@ -500,6 +561,7 @@ npm run lint:fix && npm run typecheck
 - Test marking notifications as read persists across sessions
 
 **Success Criteria:**
+
 - [ ] Notifications are stored in database
 - [ ] Admins see notifications created while offline
 - [ ] Unread count accurately reflects database state
@@ -515,20 +577,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/admin/newsletter-signup-notifications.tsx` - Remove toast logic
 
 **Changes:**
+
 - Remove toast notification creation code
 - Remove any toast-specific dependencies if no longer used elsewhere
 - Keep Ably publishing logic for bell notifications
 - Update any related comments or documentation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Toast notifications are completely removed
 - [ ] Bell notification system continues to work
 - [ ] No broken imports or unused dependencies
@@ -554,25 +620,30 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Confidence Level Rationale:**
+
 - High confidence steps involve well-established patterns in the codebase with clear reference implementations
 - Medium confidence for Ably integration due to potential edge cases with real-time subscription management
 
 **Architecture Considerations:**
+
 - The notification system follows the established query-facade-action pattern used throughout the codebase
 - Ably is used sparingly only for real-time delivery, with database as source of truth
 - Optimistic UI updates provide immediate feedback while server actions complete
 
 **Migration Strategy:**
+
 - Keep toast notifications temporarily during step 12 to ensure smooth transition
 - Remove toast system only after verifying bell system works correctly
 - Database persistence allows gradual migration without notification loss
 
 **Performance Considerations:**
+
 - Indexes on userId and readAt columns optimize unread queries
 - Badge count uses efficient COUNT query rather than fetching all records
 - Popover content loads on-demand rather than with initial page load
 
 **Security Considerations:**
+
 - All notification operations verify admin role via Clerk
 - Server actions validate ownership before marking notifications as read
 - Ably channel is restricted to admin users only

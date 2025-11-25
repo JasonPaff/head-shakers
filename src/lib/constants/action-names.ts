@@ -89,6 +89,18 @@ export const ACTION_NAMES = {
     SUBSCRIBE: 'subscribeToNewsletter',
     UNSUBSCRIBE: 'unsubscribeFromNewsletter',
   },
+  NOTIFICATIONS: {
+    CREATE: 'createNotification',
+    DELETE: 'deleteNotification',
+    GET_BY_ID: 'getNotificationById',
+    GET_BY_TYPE: 'getNotificationsByType',
+    GET_BY_USER: 'getNotificationsByUser',
+    GET_UNREAD: 'getUnreadNotifications',
+    GET_UNREAD_COUNT: 'getUnreadNotificationCount',
+    MARK_ALL_AS_READ: 'markAllNotificationsAsRead',
+    MARK_AS_READ: 'markNotificationAsRead',
+    MARK_MULTIPLE_AS_READ: 'markMultipleNotificationsAsRead',
+  },
   PHOTO: {
     GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',
   },

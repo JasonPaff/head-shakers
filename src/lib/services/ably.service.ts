@@ -1,7 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 import Ably from 'ably';
 
-import type { NewsletterSignupNotificationPayload } from '@/lib/constants/ably-channels';
+import type {
+  AdminNotificationPayload,
+  NewsletterSignupNotificationPayload,
+} from '@/lib/constants/ably-channels';
 
 import { ABLY_CHANNELS, ABLY_MESSAGE_TYPES } from '@/lib/constants/ably-channels';
 import { CONFIG } from '@/lib/constants/config';
@@ -30,6 +33,85 @@ const getAblyClient = (): Ably.Rest => {
  * Uses REST API (not Realtime) to avoid persistent connections in serverless environment
  */
 export class AblyService {
+  /**
+   * Publish a notification event to the admin notifications channel
+   * Used to trigger real-time updates in the notification bell
+   * Uses fire-and-forget pattern - failures are logged but don't throw
+   *
+   * @param payload - Admin notification data
+   * @returns boolean indicating if publish succeeded
+   */
+  static async publishAdminNotificationAsync(payload: AdminNotificationPayload): Promise<boolean> {
+    const operationName = OPERATIONS.NOTIFICATIONS.CREATE;
+
+    try {
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
+        data: {
+          channel: ABLY_CHANNELS.ADMIN_NOTIFICATIONS,
+          messageType: ABLY_MESSAGE_TYPES.NOTIFICATION_CREATED,
+          notificationId: payload.notificationId,
+          notificationType: payload.notificationType,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Publishing admin notification to Ably',
+      });
+
+      const circuitBreaker = circuitBreakers.externalService(operationName);
+
+      const result = await circuitBreaker.execute(async () => {
+        const retryResult = await withDatabaseRetry(
+          async () => {
+            const client = getAblyClient();
+            const channel = client.channels.get(ABLY_CHANNELS.ADMIN_NOTIFICATIONS);
+
+            await channel.publish(ABLY_MESSAGE_TYPES.NOTIFICATION_CREATED, payload);
+
+            return { success: true };
+          },
+          {
+            maxAttempts: CONFIG.EXTERNAL_SERVICES.ABLY.MAX_RETRIES,
+            operationName,
+          },
+        );
+
+        return retryResult.result;
+      });
+
+      if (result.result.success) {
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
+          data: {
+            channel: ABLY_CHANNELS.ADMIN_NOTIFICATIONS,
+            notificationId: payload.notificationId,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: 'Admin notification published successfully',
+        });
+
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      // Fire-and-forget: Log error but don't throw
+      Sentry.captureException(error, {
+        extra: {
+          channel: ABLY_CHANNELS.ADMIN_NOTIFICATIONS,
+          notificationId: payload.notificationId,
+          notificationType: payload.notificationType,
+          operationName,
+        },
+        tags: {
+          component: 'AblyService',
+          operation: operationName,
+        },
+      });
+
+      return false;
+    }
+  }
+
   /**
    * Publish a notification to admins about a new newsletter signup
    * Uses fire-and-forget pattern - failures are logged but don't throw
