@@ -108,6 +108,13 @@ export const ERROR_MESSAGES = {
     REPORT_NOT_FOUND: 'Content report not found',
     REPORT_UPDATE_FAILED: 'Failed to update content report',
   },
+  NEWSLETTER: {
+    INVALID_INPUT: 'Invalid input provided',
+    SEND_FAILED: 'Failed to send newsletter',
+    SUBSCRIBER_NOT_FOUND: 'Subscriber not found',
+    TEMPLATE_CREATE_FAILED: 'Failed to create newsletter template',
+    TEMPLATE_NOT_FOUND: 'Newsletter template not found',
+  },
   RATE_LIMIT: {
     ACTION_LIMIT_EXCEEDED: 'Action limit exceeded for this time period',
     EXCEEDED: 'Rate limit exceeded',

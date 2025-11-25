@@ -4,6 +4,7 @@ import {
   ChartSplineIcon,
   LayoutDashboardIcon,
   MailIcon,
+  NewspaperIcon,
   PackageIcon,
   PackagePlusIcon,
   ShieldHalfIcon,
@@ -50,6 +51,12 @@ const navigationLinks: Array<NavigationLink> = [
         href: $path({ route: '/admin/launch-notifications' }),
         icon: MailIcon,
         title: 'Launch Notifications',
+      },
+      {
+        description: 'Manage newsletter subscribers and campaigns',
+        href: $path({ route: '/admin/newsletter' }),
+        icon: NewspaperIcon,
+        title: 'Newsletter',
       },
       {
         description: 'Reports of inappropriate content or behavior',

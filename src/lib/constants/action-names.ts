@@ -89,6 +89,17 @@ export const ACTION_NAMES = {
     SUBSCRIBE: 'subscribeToNewsletter',
     UNSUBSCRIBE: 'unsubscribeFromNewsletter',
   },
+  NEWSLETTER_ADMIN: {
+    CREATE_TEMPLATE: 'createNewsletterTemplate',
+    DELETE_TEMPLATE: 'deleteNewsletterTemplate',
+    GET_NEWSLETTER_STATS: 'getNewsletterStats',
+    GET_SEND_HISTORY: 'getNewsletterSendHistory',
+    GET_SUBSCRIBERS: 'getNewsletterSubscribers',
+    GET_TEMPLATES: 'getNewsletterTemplates',
+    SEND_NEWSLETTER: 'sendNewsletter',
+    UNSUBSCRIBE_USER: 'adminUnsubscribeUser',
+    UPDATE_TEMPLATE: 'updateNewsletterTemplate',
+  },
   PHOTO: {
     GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',
   },

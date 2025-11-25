@@ -25,6 +25,7 @@ declare module "@@@next-typesafe-url" {
     "/admin/analytics": StaticRoute;
     "/admin/featured-content": StaticRoute;
     "/admin/launch-notifications": StaticRoute;
+    "/admin/newsletter": StaticRoute;
     "/admin": StaticRoute;
     "/admin/reports": StaticRoute;
     "/admin/users": StaticRoute;

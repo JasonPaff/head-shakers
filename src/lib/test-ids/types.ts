@@ -106,6 +106,7 @@ export type ComponentTestId =
   | 'menubar'
   | 'mobile-nav'
   | 'navigation-menu'
+  | 'newsletter-stats'
   | 'pagination'
   | 'popover'
   | 'progress'

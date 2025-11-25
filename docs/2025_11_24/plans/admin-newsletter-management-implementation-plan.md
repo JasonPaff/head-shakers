@@ -39,19 +39,23 @@ Create a comprehensive admin interface for managing the newsletter system includ
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/db/schema/newsletter-templates.schema.ts` - Define newsletter templates table with UUID primary key, title, subject, body, created/updated timestamps
 
 **Changes:**
+
 - Add newsletterTemplates pgTable with fields: id (uuid), title (varchar), subject (varchar), bodyHtml (text), bodyMarkdown (text), createdAt (timestamp), updatedAt (timestamp), createdBy (varchar for userId)
 - Include indexes on createdAt and createdBy
 - Add check constraints for non-empty title and subject
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file created with proper table definition
 - [ ] Schema follows project conventions (UUID primary key, timestamps)
 - [ ] All validation commands pass
@@ -65,20 +69,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/db/schema/newsletter-sends.schema.ts` - Define newsletter sends table for tracking each newsletter campaign
 
 **Changes:**
+
 - Add newsletterSends pgTable with fields: id (uuid), templateId (uuid nullable), subject (varchar), bodyHtml (text), sentAt (timestamp), sentBy (varchar for userId), recipientCount (integer), successCount (integer), failureCount (integer), status (varchar), errorDetails (text nullable)
 - Include foreign key reference to newsletterTemplates (optional)
 - Add indexes on sentAt, sentBy, and status
 - Add check constraints for valid counts and status values
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Schema file created with send history tracking fields
 - [ ] Schema includes proper foreign key relations
 - [ ] All validation commands pass
@@ -92,11 +100,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Generate migrations using `npm run db:generate` for newsletter-templates and newsletter-sends schemas
 - Review generated migration SQL files for correctness
 - Run migrations using `npm run db:migrate` to apply changes to database
 
 **Success Criteria:**
+
 - [ ] Migration files generated successfully
 - [ ] Migration SQL reviewed and correct
 - [ ] Migrations applied to database without errors
@@ -111,21 +121,26 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/action-names.ts` - Add NEWSLETTER_ADMIN action names
 - `src/lib/constants/operations.ts` - Add NEWSLETTER_ADMIN operation names
 
 **Changes in action-names.ts:**
+
 - Add NEWSLETTER_ADMIN section with actions: GET_SUBSCRIBERS, UNSUBSCRIBE_USER, GET_SEND_HISTORY, GET_NEWSLETTER_STATS, SEND_NEWSLETTER, CREATE_TEMPLATE, UPDATE_TEMPLATE, DELETE_TEMPLATE, GET_TEMPLATES
 
 **Changes in operations.ts:**
+
 - Add NEWSLETTER_ADMIN section with operations: get_newsletter_subscribers, admin_unsubscribe_user, get_newsletter_send_history, get_newsletter_stats, send_newsletter_bulk, create_newsletter_template, update_newsletter_template, delete_newsletter_template, get_newsletter_templates
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All newsletter admin action names added
 - [ ] All newsletter admin operations added
 - [ ] Type exports remain valid
@@ -140,9 +155,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/newsletter.validation.ts` - Add admin-specific schemas
 
 **Changes:**
+
 - Add newsletterSubscriberFilterSchema for filtering subscribers (search, status, dateRange, pagination)
 - Add unsubscribeByAdminSchema for admin unsubscribe actions (email or id)
 - Add createNewsletterTemplateSchema (title, subject, bodyHtml, bodyMarkdown)
@@ -151,11 +168,13 @@ npm run lint:fix && npm run typecheck
 - Export all type inferences for each schema
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All admin validation schemas added with proper field constraints
 - [ ] Schema limits referenced from SCHEMA_LIMITS constant
 - [ ] Type exports created for each schema
@@ -170,9 +189,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/newsletter/newsletter.queries.ts` - Add admin query methods
 
 **Changes:**
+
 - Add getSubscribersAsync method with filtering, sorting, and pagination (search by email, filter by status, date range)
 - Add getSubscriberCountAsync method for total and active counts
 - Add getRecentActivityAsync method for recent subscribe/unsubscribe activity
@@ -186,11 +207,13 @@ npm run lint:fix && npm run typecheck
 - Add getSendStatsAsync method for analytics
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All admin query methods added with proper types
 - [ ] Methods follow BaseQuery pattern and use QueryContext
 - [ ] Queries use proper indexes and are optimized
@@ -205,9 +228,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Add admin facade methods
 
 **Changes:**
+
 - Add getSubscribersForAdminAsync method (orchestrates filtering, pagination, counting)
 - Add unsubscribeByAdminAsync method (validates, unsubscribes, adds breadcrumb)
 - Add getNewsletterStatsAsync method (aggregates subscriber counts, recent activity, send history)
@@ -218,11 +243,13 @@ npm run lint:fix && npm run typecheck
 - All methods add Sentry breadcrumbs for tracking
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All facade methods implement proper business logic
 - [ ] Methods handle errors with createFacadeError
 - [ ] Sentry integration follows project patterns
@@ -237,9 +264,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/services/resend.service.ts` - Add bulk newsletter send method
 
 **Changes:**
+
 - Add sendNewsletterBulkAsync static method accepting subject, bodyHtml, and email array
 - Use batch processing similar to sendLaunchNotificationsAsync (batches of 10)
 - Return detailed results including sentCount, failedEmails array, and individual error details
@@ -248,11 +277,13 @@ npm run lint:fix && npm run typecheck
 - Add delay between batches to respect rate limits
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Bulk send method handles large recipient lists
 - [ ] Method respects Resend rate limits
 - [ ] Errors tracked properly in Sentry
@@ -267,9 +298,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/lib/actions/newsletter/newsletter-admin.actions.ts` - Admin server actions
 
 **Changes:**
+
 - Create getNewsletterSubscribersAction using adminActionClient (filters, sorts, paginates subscribers)
 - Create unsubscribeUserAction using adminActionClient (admin unsubscribes a user by email/id)
 - Create getNewsletterStatsAction using adminActionClient (returns stats object)
@@ -285,11 +318,13 @@ npm run lint:fix && npm run typecheck
 - All actions use handleActionError for error handling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All admin actions created with adminActionClient
 - [ ] Actions follow server-actions conventions
 - [ ] Sentry integration consistent with patterns
@@ -304,9 +339,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/newsletter/components/newsletter-subscribers-table.tsx` - Subscribers table component
 
 **Changes:**
+
 - Create NewsletterSubscribersTable component using TanStack Table
 - Define columns: email, subscribedAt, status (active/unsubscribed badge), unsubscribedAt, actions dropdown
 - Implement row selection with checkboxes
@@ -319,11 +356,13 @@ npm run lint:fix && npm run typecheck
 - Use consistent styling patterns from users-data-table.tsx reference
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Table displays subscriber data correctly
 - [ ] Sorting and filtering work as expected
 - [ ] Pagination controls function properly
@@ -338,14 +377,17 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/newsletter/components/newsletter-compose-form.tsx` - Newsletter composition form
 - `src/app/(app)/admin/newsletter/components/newsletter-compose-form-options.ts` - Form options configuration
 
 **Changes in newsletter-compose-form-options.ts:**
+
 - Define form default values for subject, bodyHtml, recipientFilter, templateId
 - Define form field validators for required fields and character limits
 
 **Changes in newsletter-compose-form.tsx:**
+
 - Create NewsletterComposeForm using useAppForm and withFocusManagement
 - Add subject TextField with character counter
 - Add bodyHtml TextareaField with markdown support and character counter
@@ -358,11 +400,13 @@ npm run lint:fix && npm run typecheck
 - Add loading states and error handling with toast notifications
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Form renders with all fields
 - [ ] Template loading populates form fields
 - [ ] Preview displays formatted email
@@ -378,9 +422,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/newsletter/components/newsletter-stats.tsx` - Statistics dashboard
 
 **Changes:**
+
 - Create NewsletterStats component fetching data from getNewsletterStatsAction
 - Display cards showing: Total Subscribers, Active Subscribers, Total Unsubscribed, Recent Activity (last 7 days)
 - Display recent subscription trends with simple visualization
@@ -390,11 +436,13 @@ npm run lint:fix && npm run typecheck
 - Add loading skeleton states
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Statistics display correctly
 - [ ] Auto-refresh updates data periodically
 - [ ] Loading states handle properly
@@ -409,9 +457,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/newsletter/components/newsletter-send-history-table.tsx` - Send history table
 
 **Changes:**
+
 - Create NewsletterSendHistoryTable component using TanStack Table
 - Define columns: sentAt, subject, recipientCount, successCount, failureCount, status badge, sent by user, actions
 - Implement sorting on sentAt column
@@ -421,11 +471,13 @@ npm run lint:fix && npm run typecheck
 - Use consistent styling with other admin tables
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Table displays send history correctly
 - [ ] Expandable rows show error details
 - [ ] Pagination works properly
@@ -440,9 +492,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/newsletter/page.tsx` - Main newsletter admin page
 
 **Changes:**
+
 - Create AdminNewsletterPage async server component
 - Call requireModerator at page entry for authentication
 - Parse searchParams for subscribers table (page, pageSize, search, status)
@@ -457,11 +511,13 @@ npm run lint:fix && npm run typecheck
 - Add metadata for SEO
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Page renders all sections correctly
 - [ ] Authentication prevents unauthorized access
 - [ ] Initial data loads properly
@@ -476,9 +532,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/admin/newsletter/components/newsletter-admin-client.tsx` - Client wrapper component
 
 **Changes:**
+
 - Create NewsletterAdminClient client component accepting initial data as props
 - Manage tab state for switching between sections (subscribers, compose, history)
 - Handle refresh triggers for tables after mutations
@@ -488,11 +546,13 @@ npm run lint:fix && npm run typecheck
 - Handle loading and error states
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Client wrapper manages state correctly
 - [ ] Tab switching works smoothly
 - [ ] Callbacks trigger proper data refreshes
@@ -507,19 +567,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/schema-limits.ts` - Add newsletter limits
 
 **Changes:**
+
 - Add NEWSLETTER_TEMPLATE section with limits: TITLE (MAX: 200, MIN: 1), SUBJECT (MAX: 255, MIN: 1), BODY_HTML (MAX: 50000), BODY_MARKDOWN (MAX: 50000)
 - Add NEWSLETTER_SEND section with limits: SUBJECT (MAX: 255), BODY_HTML (MAX: 50000), ERROR_DETAILS (MAX: 5000)
 - Ensure these limits match the database schema constraints
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constants added with appropriate limits
 - [ ] Limits align with database constraints
 - [ ] All validation commands pass
@@ -533,20 +597,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Admin navigation component file (locate with glob pattern admin/**/navigation** or admin/**/sidebar**)
 
 **Changes:**
+
 - Add "Newsletter" menu item in admin navigation
 - Use Mail or Newspaper icon from lucide-react
 - Link to /admin/newsletter using $path for type-safe routing
 - Ensure proper active state styling
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Navigation link appears in admin menu
 - [ ] Link routes to correct page
 - [ ] Active state highlights correctly
@@ -561,11 +629,13 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Run `npm run next-typesafe-url` to regenerate route types
 - Verify new /admin/newsletter route is included in generated types
 - Update any imports using the new route
 
 **Success Criteria:**
+
 - [ ] Type generation completes without errors
 - [ ] New route appears in generated types
 - [ ] TypeScript recognizes new route paths

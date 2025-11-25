@@ -83,6 +83,17 @@ export const OPERATIONS = {
     SUBSCRIBE: 'subscribe_to_newsletter',
     UNSUBSCRIBE: 'unsubscribe_from_newsletter',
   },
+  NEWSLETTER_ADMIN: {
+    ADMIN_UNSUBSCRIBE_USER: 'admin_unsubscribe_user',
+    CREATE_NEWSLETTER_TEMPLATE: 'create_newsletter_template',
+    DELETE_NEWSLETTER_TEMPLATE: 'delete_newsletter_template',
+    GET_NEWSLETTER_SEND_HISTORY: 'get_newsletter_send_history',
+    GET_NEWSLETTER_STATS: 'get_newsletter_stats',
+    GET_NEWSLETTER_SUBSCRIBERS: 'get_newsletter_subscribers',
+    GET_NEWSLETTER_TEMPLATES: 'get_newsletter_templates',
+    SEND_NEWSLETTER_BULK: 'send_newsletter_bulk',
+    UPDATE_NEWSLETTER_TEMPLATE: 'update_newsletter_template',
+  },
   SEARCH: {
     BOBBLEHEADS: 'search_bobbleheads',
     COLLECTIONS: 'search_collections',

@@ -77,6 +77,83 @@ export class ResendService {
   }
 
   /**
+   * send newsletter to multiple recipients with custom content
+   * returns sent count and list of failed emails with error details
+   */
+  static async sendNewsletterBulkAsync(
+    subject: string,
+    bodyHtml: string,
+    emails: Array<string>,
+  ): Promise<{
+    failedCount: number;
+    failedEmails: Array<{ email: string; error?: string }>;
+    sentCount: number;
+  }> {
+    const failedEmails: Array<{ email: string; error?: string }> = [];
+    let sentCount = 0;
+
+    // send in batches to respect rate limits
+    const batchSize = 10; // Resend allows 100 per second, but we'll be conservative
+    const batches = [];
+
+    for (let i = 0; i < emails.length; i += batchSize) {
+      batches.push(emails.slice(i, i + batchSize));
+    }
+
+    for (const batch of batches) {
+      const results = await Promise.allSettled(
+        batch.map((email) =>
+          this.sendEmailWithRetry(
+            async () => {
+              return resend.emails.send({
+                from: 'Head Shakers <noreply@send.head-shakers.com>',
+                html: bodyHtml,
+                subject,
+                to: email,
+              });
+            },
+            'sendNewsletterBulk',
+            { email: email.substring(0, 3) + '***' },
+          ),
+        ),
+      );
+
+      // track results
+      results.forEach((result, index) => {
+        const email = batch[index];
+        if (!email) return;
+
+        if (result.status === 'fulfilled' && result.value) {
+          sentCount++;
+        } else {
+          const errorMessage =
+            result.status === 'rejected' ?
+              result.reason instanceof Error ?
+                result.reason.message
+              : String(result.reason)
+            : 'Email send failed';
+
+          failedEmails.push({ email, error: errorMessage });
+
+          if (result.status === 'rejected') {
+            Sentry.captureException(result.reason, {
+              extra: { email: email.substring(0, 3) + '***', subject },
+              tags: { component: 'ResendService', operation: 'sendNewsletterBulk' },
+            });
+          }
+        }
+      });
+
+      // add delay between batches to avoid rate limiting
+      if (batches.indexOf(batch) < batches.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
+    }
+
+    return { failedCount: failedEmails.length, failedEmails, sentCount };
+  }
+
+  /**
    * send newsletter welcome email to new subscribers
    */
   static async sendNewsletterWelcomeAsync(email: string): Promise<boolean> {

@@ -238,6 +238,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'menubar',
     'mobile-nav',
     'navigation-menu',
+    'newsletter-stats',
     'pagination',
     'popover',
     'progress',

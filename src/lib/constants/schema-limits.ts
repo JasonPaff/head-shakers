@@ -63,9 +63,20 @@ export const SCHEMA_LIMITS = {
     IP_ADDRESS: { MAX: 50 },
     USER_AGENT: { MAX: 1000 },
   },
+  NEWSLETTER_SEND: {
+    BODY_HTML: { MAX: 50000 },
+    ERROR_DETAILS: { MAX: 5000 },
+    SUBJECT: { MAX: 255 },
+  },
   NEWSLETTER_SIGNUP: {
     EMAIL: { MAX: 255, MIN: 5 },
     USER_ID: { MAX: 255 },
+  },
+  NEWSLETTER_TEMPLATE: {
+    BODY_HTML: { MAX: 50000 },
+    BODY_MARKDOWN: { MAX: 50000 },
+    SUBJECT: { MAX: 255, MIN: 1 },
+    TITLE: { MAX: 200, MIN: 1 },
   },
   NOTIFICATION: {
     TITLE: { MAX: 255, MIN: 1 },

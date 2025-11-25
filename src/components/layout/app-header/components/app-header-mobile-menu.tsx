@@ -6,6 +6,7 @@ import {
   LayoutDashboardIcon,
   MailIcon,
   MenuIcon,
+  NewspaperIcon,
   PackagePlusIcon,
   ShieldHalfIcon,
   SparklesIcon,
@@ -88,6 +89,11 @@ const adminNavItems = [
     href: $path({ route: '/admin/launch-notifications' }),
     icon: MailIcon,
     label: 'Launch Notifications',
+  },
+  {
+    href: $path({ route: '/admin/newsletter' }),
+    icon: NewspaperIcon,
+    label: 'Newsletter',
   },
   {
     href: $path({ route: '/admin/reports' }),
