@@ -32,6 +32,7 @@ Implement real-time notifications to admin users when new newsletter signups occ
 
 **Documentation Lookup (Required):**
 Before implementing, use the Ref tool to look up the latest Ably documentation:
+
 ```
 1. Use mcp__Ref__ref_search_documentation with query: "Ably channels Next.js TypeScript"
 2. Use mcp__Ref__ref_read_url to read the relevant documentation URLs returned
@@ -39,20 +40,24 @@ Before implementing, use the Ref tool to look up the latest Ably documentation:
 ```
 
 **Files to Create:**
+
 - `src/lib/constants/ably-channels.ts` - Channel name constants, message type definitions, and TypeScript interfaces for notification payloads
 
 **Changes:**
+
 - Define ABLY_CHANNELS constant with ADMIN_NEWSLETTER_SIGNUPS channel name
 - Define ABLY_MESSAGE_TYPES constant with NEW_SIGNUP message type
 - Export NewsletterSignupNotificationPayload TypeScript interface with email (masked), signupId, timestamp, and optional userId fields
 - Add JSDoc comments explaining channel security model and payload structure
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constants file exports ABLY_CHANNELS and ABLY_MESSAGE_TYPES objects
 - [ ] NewsletterSignupNotificationPayload interface matches newsletter schema fields
 - [ ] All validation commands pass
@@ -66,18 +71,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/operations.ts` - Add new operation constant
 
 **Changes:**
+
 - Add NOTIFY_ADMIN_SIGNUP: 'notify_admin_newsletter_signup' to OPERATIONS.NEWSLETTER object (after SEND_WELCOME_EMAIL)
 - Maintain alphabetical ordering within the NEWSLETTER section
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] NOTIFY_ADMIN_SIGNUP constant is exported and accessible
 - [ ] TypeScript Operation type includes the new constant
 - [ ] All validation commands pass
@@ -92,6 +101,7 @@ npm run lint:fix && npm run typecheck
 
 **Documentation Lookup (Required):**
 Before implementing, use the Ref tool to look up the latest Ably REST API documentation:
+
 ```
 1. Use mcp__Ref__ref_search_documentation with query: "Ably REST API publish message Node.js server-side"
 2. Use mcp__Ref__ref_search_documentation with query: "Ably Next.js server components App Router"
@@ -104,9 +114,11 @@ Before implementing, use the Ref tool to look up the latest Ably REST API docume
 ```
 
 **Files to Create:**
+
 - `src/lib/services/ably.service.ts` - Server-side Ably REST client with publishNewsletterSignupNotification method
 
 **Changes:**
+
 - Import Ably REST client from ably package
 - Create AblyService class following ResendService pattern structure
 - Implement publishNewsletterSignupNotificationAsync static method accepting NewsletterSignupNotificationPayload
@@ -118,11 +130,13 @@ Before implementing, use the Ref tool to look up the latest Ably REST API docume
 - Mask email in all Sentry logs (first 3 characters only)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] AblyService class exports static publishNewsletterSignupNotificationAsync method
 - [ ] Method uses circuit breaker pattern matching ResendService
 - [ ] Sentry integration includes breadcrumbs and error capture
@@ -137,9 +151,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Add notification trigger after line 157
 
 **Changes:**
+
 - Import AblyService and OPERATIONS.NEWSLETTER.NOTIFY_ADMIN_SIGNUP
 - After new subscription creation (line 157), add try-catch block for notification
 - Add Sentry breadcrumb before notification attempt
@@ -149,11 +165,13 @@ npm run lint:fix && npm run typecheck
 - Place notification code between welcome email logic and return statement
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Notification fires only for new subscriptions (not resubscribes or duplicates)
 - [ ] Fire-and-forget pattern prevents notification failures from affecting subscription
 - [ ] Sentry tracking matches existing welcome email pattern
@@ -169,6 +187,7 @@ npm run lint:fix && npm run typecheck
 
 **Documentation Lookup (Required):**
 Before implementing, use the Ref tool to look up the latest Ably React documentation:
+
 ```
 1. Use mcp__Ref__ref_search_documentation with query: "Ably React hooks useChannel Next.js"
 2. Use mcp__Ref__ref_search_documentation with query: "Ably ably/react subscribe messages TypeScript"
@@ -182,9 +201,11 @@ Before implementing, use the Ref tool to look up the latest Ably React documenta
 ```
 
 **Files to Create:**
+
 - `src/components/admin/newsletter-signup-notifications.tsx` - Client component with Ably subscription and toast UI
 
 **Changes:**
+
 - Mark file as 'use client' directive
 - Import useChannel from ably/react, useAdminRole hook, and toast from sonner
 - Import channel constants from ably-channels
@@ -199,11 +220,13 @@ Before implementing, use the Ref tool to look up the latest Ably React documenta
 - Include component display name for debugging
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component only renders content for admin users
 - [ ] useChannel hook properly subscribes to correct channel and message type
 - [ ] Toast notifications display with appropriate formatting
@@ -218,20 +241,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/page.tsx` - Add notification component
 
 **Changes:**
+
 - Import NewsletterSignupNotifications component
 - Add component inside AdminLayout wrapper (before or after existing Cards grid)
 - Ensure component is within AblyProvider context (inherited from root layout)
 - Position component to not interfere with existing dashboard UI
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component renders on admin dashboard
 - [ ] Component is within AblyProvider context tree
 - [ ] UI layout is not disrupted by component addition
@@ -246,19 +273,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `.env` - Add ABLY_API_KEY variable
 
 **Changes:**
+
 - Add ABLY_API_KEY environment variable with appropriate API key value
 - Add comment explaining this is for server-side REST API publishing (distinct from NEXT_PUBLIC_ABLY_API_KEY)
 - Verify existing NEXT_PUBLIC_ABLY_API_KEY is present for client-side subscriptions
 
 **Validation Commands:**
+
 ```bash
 npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] ABLY_API_KEY environment variable is set
 - [ ] Both server and client Ably keys are configured
 - [ ] Type checking passes (no missing env var TypeScript errors)
@@ -273,6 +304,7 @@ npm run typecheck
 
 **Documentation Lookup (Required):**
 Before implementing, use the Ref tool to check the latest Ably package version:
+
 ```
 1. Use mcp__Ref__ref_search_documentation with query: "Ably npm package installation Next.js 2024"
 2. Use mcp__Ref__ref_read_url to read the relevant documentation URLs returned
@@ -283,19 +315,23 @@ Before implementing, use the Ref tool to check the latest Ably package version:
 ```
 
 **Files to Modify:**
+
 - None (verification step)
 
 **Changes:**
+
 - Check package.json for ably package dependency
 - Verify version supports both Realtime and REST clients
 - Run npm install if package is missing or outdated
 
 **Validation Commands:**
+
 ```bash
 npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] ably package is present in package.json dependencies
 - [ ] Package version is compatible with REST API (v2.x recommended)
 - [ ] Type checking passes without import errors
@@ -316,23 +352,27 @@ npm run typecheck
 ## Notes
 
 **Architecture Decisions:**
+
 - Using REST API for server-side publishing (not Realtime) to avoid persistent connections in serverless environment
 - Fire-and-forget pattern matches existing welcome email implementation for consistency
 - Notification component uses client-side role checking for immediate UI response; server-side publishing has no access control since facade runs in secure context
-- Email masking (first 3 chars + '***') balances admin usefulness with privacy best practices
+- Email masking (first 3 chars + '\*\*\*') balances admin usefulness with privacy best practices
 - Channel name uses 'admin:' prefix to clearly indicate privileged access channel
 
 **Security Considerations:**
+
 - Ably channel capabilities should restrict ADMIN_NEWSLETTER_SIGNUPS channel to admin users via Ably dashboard rules or token auth (future enhancement)
 - Current implementation relies on client-side role check; malicious users could subscribe but would need to know channel name
 - Email addresses are masked in transit to limit exposure
 
 **Potential Risks:**
+
 - Low: Ably service outage would prevent notifications but not impact subscriptions (by design)
 - Low: High signup volume could exceed Ably rate limits; circuit breaker will trip to protect system
 - Medium: Client-side only role check means channel security depends on obscurity; consider Ably capability tokens for production
 
 **Future Enhancements:**
+
 - Implement Ably token authentication with channel-specific capabilities for true server-side access control
 - Add notification preferences to admin user settings
 - Create notification history/log viewer in admin panel
@@ -343,17 +383,20 @@ npm run typecheck
 ## File Discovery Summary
 
 ### Files to Create (3)
+
 1. `src/lib/constants/ably-channels.ts` - Channel constants and payload types
 2. `src/lib/services/ably.service.ts` - Server-side Ably REST service
 3. `src/components/admin/newsletter-signup-notifications.tsx` - Admin notification component
 
 ### Files to Modify (4)
+
 1. `src/lib/constants/operations.ts` - Add NOTIFY_ADMIN_SIGNUP operation
 2. `src/lib/facades/newsletter/newsletter.facade.ts` - Add notification trigger
 3. `src/app/(app)/admin/page.tsx` - Add notification component
 4. `.env` - Add ABLY_API_KEY
 
 ### Reference Files (Key Patterns)
+
 - `src/lib/services/resend.service.ts` - Circuit breaker pattern
 - `src/components/layout/ably-provider.tsx` - Client Ably setup
 - `src/app/examples/ably/page.tsx` - useChannel hook usage

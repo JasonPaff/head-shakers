@@ -67,13 +67,13 @@ As an admin user with the appropriate role, I want to receive an Ably real-time 
 
 ## Validation Results
 
-| Check | Result | Notes |
-|-------|--------|-------|
-| Format | ✅ Pass | Single paragraph, no headers/sections |
-| Word Count | ✅ Pass | ~250 words (within 200-500 range) |
-| Length Ratio | ✅ Pass | ~15x original (17 → 250 words) |
-| Intent Preserved | ✅ Pass | Core notification requirement maintained |
-| Scope Control | ✅ Pass | No feature creep, focused on notification |
+| Check            | Result  | Notes                                     |
+| ---------------- | ------- | ----------------------------------------- |
+| Format           | ✅ Pass | Single paragraph, no headers/sections     |
+| Word Count       | ✅ Pass | ~250 words (within 200-500 range)         |
+| Length Ratio     | ✅ Pass | ~15x original (17 → 250 words)            |
+| Intent Preserved | ✅ Pass | Core notification requirement maintained  |
+| Scope Control    | ✅ Pass | No feature creep, focused on notification |
 
 ## Length Analysis
 
@@ -84,6 +84,7 @@ As an admin user with the appropriate role, I want to receive an Ably real-time 
 ## Scope Analysis
 
 The refined request:
+
 - ✅ Maintains core intent (admin notification on newsletter signup)
 - ✅ Adds relevant technical context (Ably, Clerk roles, Sentry)
 - ✅ Specifies integration points (server action, database)
