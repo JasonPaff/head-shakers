@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:react-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:react-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist), Task(subagent_type:resend-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
@@ -51,6 +51,7 @@ You are a lightweight implementation orchestrator that coordinates the execution
 | `media-specialist`           | Cloudinary        | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components          |
 | `test-specialist`            | Testing           | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`        |
 | `validation-specialist`      | Zod schemas       | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`        |
+| `resend-specialist`          | Email sending     | resend-email, sentry-monitoring                                           | `src/lib/services/resend*.ts`, `src/lib/email-templates/**/*.tsx` |
 | `general-purpose`            | Fallback          | None (manual skill invocation)                                            | Any other files                                 |
 
 ## Step-Type Detection Algorithm
@@ -87,7 +88,10 @@ You are a lightweight implementation orchestrator that coordinates the execution
 9. IF files are .tsx/.jsx in "src/components/" OR "src/app/"
    → Use: react-component-specialist
 
-10. ELSE (fallback)
+10. IF files contain "resend" (case-insensitive) OR contain "email-templates/" OR involve email sending
+    → Use: resend-specialist
+
+11. ELSE (fallback)
     → Use: general-purpose
 ```
 
