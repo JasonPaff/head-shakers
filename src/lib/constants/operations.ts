@@ -79,6 +79,7 @@ export const OPERATIONS = {
   },
   NEWSLETTER: {
     CHECK_SUBSCRIPTION: 'check_newsletter_subscription',
+    SEND_WELCOME_EMAIL: 'send_newsletter_welcome_email',
     SUBSCRIBE: 'subscribe_to_newsletter',
     UNSUBSCRIBE: 'unsubscribe_from_newsletter',
   },

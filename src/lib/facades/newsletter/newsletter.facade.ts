@@ -8,6 +8,7 @@ import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/c
 import { db } from '@/lib/db';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
+import { ResendService } from '@/lib/services/resend.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 const facadeName = 'NewsletterFacade';
@@ -154,6 +155,46 @@ export class NewsletterFacade {
           level: SENTRY_LEVELS.INFO,
           message: 'New newsletter subscription created',
         });
+
+        // Send welcome email asynchronously for new subscribers
+        // Wrapped in try-catch to ensure email failures don't affect subscription
+        try {
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: {
+              email: normalizedEmail.substring(0, 3) + '***',
+              operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
+            },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Sending newsletter welcome email',
+          });
+
+          // Fire and forget - don't await to avoid blocking subscription
+          void ResendService.sendNewsletterWelcomeAsync(normalizedEmail).catch((emailError) => {
+            Sentry.captureException(emailError, {
+              extra: {
+                email: normalizedEmail.substring(0, 3) + '***',
+                signupId: newSignup.id,
+              },
+              tags: {
+                component: facadeName,
+                operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
+              },
+            });
+          });
+        } catch (emailError) {
+          // Log but don't throw - subscription should succeed even if email fails
+          Sentry.captureException(emailError, {
+            extra: {
+              email: normalizedEmail.substring(0, 3) + '***',
+              signupId: newSignup.id,
+            },
+            tags: {
+              component: facadeName,
+              operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
+            },
+          });
+        }
 
         return {
           isAlreadySubscribed: false,
