@@ -197,18 +197,21 @@ export const LikeCompactButton = ({
     <button
       aria-label={`${isLiked ? 'Unlike' : 'Like'} this ${targetType}. ${likeCount} like${likeCount === 1 ? '' : 's'}`}
       aria-pressed={isLiked}
-      className={cn(
-        'inline-flex items-center gap-1 text-sm transition-colors',
-        isLiked ? 'text-destructive' : 'text-muted-foreground hover:text-destructive',
-        className,
-      )}
+      className={cn('inline-flex items-center gap-1 text-sm transition-colors', className)}
       data-testid={likeButtonTestId}
       disabled={disabled || isPending}
       onClick={handleClick}
       {...props}
     >
       <Conditional isCondition={shouldShowIcon}>
-        <HeartIcon aria-hidden className={cn('size-4', isLiked && 'fill-current')} />
+        <HeartIcon
+          aria-hidden
+          className={cn(
+            'size-4 text-red-500 transition-colors dark:text-red-400',
+            isLiked && 'fill-current',
+            !isLiked && 'hover:text-red-600 dark:hover:text-red-300',
+          )}
+        />
       </Conditional>
       <NumberFlow value={likeCount} />
     </button>

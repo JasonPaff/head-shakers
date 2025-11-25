@@ -93,7 +93,7 @@ const middleware = clerkMiddleware(async (auth, req) => {
 
     if (!isComingSoonPage && !isWebhook) {
       const isAuthorized =
-        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_32QMYObNpzxyI318lew9yTk9rZI';
+        userId === 'user_31kD3SV1UzjAJRhOiFw1DwvwOlH' || userId === 'user_35zTGtvaOMrBLqrLeax2e3oA4YN';
       if (!isAuthorized) {
         const comingSoonUrl = new URL($path({ route: '/coming-soon' }), req.url);
         return NextResponse.redirect(comingSoonUrl);
