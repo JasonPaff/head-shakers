@@ -85,6 +85,10 @@ export const ACTION_NAMES = {
     RESOLVE_REPORT: 'resolveContentReport',
     UPDATE_REPORT: 'updateContentReport',
   },
+  NEWSLETTER: {
+    SUBSCRIBE: 'subscribeToNewsletter',
+    UNSUBSCRIBE: 'unsubscribeFromNewsletter',
+  },
   PHOTO: {
     GENERATE_UPLOAD_SIGNATURE: 'generatePhotoUploadSignature',
   },

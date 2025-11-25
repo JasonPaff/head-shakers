@@ -77,6 +77,11 @@ export const OPERATIONS = {
     GET_REPORT_STATUS: 'get_report_status',
     VALIDATE_REPORT_TARGET: 'validate_report_target',
   },
+  NEWSLETTER: {
+    CHECK_SUBSCRIPTION: 'check_newsletter_subscription',
+    SUBSCRIBE: 'subscribe_to_newsletter',
+    UNSUBSCRIBE: 'unsubscribe_from_newsletter',
+  },
   SEARCH: {
     BOBBLEHEADS: 'search_bobbleheads',
     COLLECTIONS: 'search_collections',

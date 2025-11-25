@@ -134,14 +134,20 @@ export const seoConfig = {
   /**
    * Social media profile URLs
    *
-   * Used in Organization schema and social meta tags.
-   * Add profiles as they become available.
+   * Used in Organization schema, social meta tags, and footer social links.
+   * The footer component automatically displays icons for any platforms with
+   * configured URLs. Empty strings result in the platform being hidden from the footer.
+   *
+   * To enable a social platform in the footer:
+   * 1. Add the full URL to the corresponding property below
+   * 2. The icon and link will automatically appear in the footer
+   * 3. Supported platforms: Facebook, Twitter, Instagram, LinkedIn
    */
   socialProfiles: {
-    facebook: '', // Add when available: 'https://facebook.com/headshakers'
-    instagram: '', // Add when available: 'https://instagram.com/headshakers'
-    linkedin: '', // Add when available: 'https://linkedin.com/company/headshakers'
-    twitter: '', // Add when available: 'https://twitter.com/headshakers'
+    facebook: 'https://facebook.com/headshakers',
+    instagram: 'https://instagram.com/headshakers',
+    linkedin: 'https://linkedin.com/company/headshakers',
+    twitter: 'https://twitter.com/headshakers',
   },
 
   /**
