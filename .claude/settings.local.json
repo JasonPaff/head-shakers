@@ -67,7 +67,9 @@
       "mcp__Playwright__browser_navigate",
       "mcp__Playwright__browser_snapshot",
       "mcp__Playwright__browser_click",
-      "mcp__Playwright__browser_take_screenshot"
+      "mcp__Playwright__browser_take_screenshot",
+      "Bash(/dev/null --include=\"*.ts\" -l)",
+      "Bash(/dev/null --include=\"*.ts\" --include=\"*.tsx\" -l)"
     ],
     "deny": [],
     "ask": []
