@@ -162,6 +162,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'admin-dashboard',
     'alert',
     'alert-dialog',
+    'app-footer',
     'app-header',
     'app-sidebar',
     'avatar',

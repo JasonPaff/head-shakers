@@ -10,6 +10,7 @@ export type ComponentTestId =
   | 'admin-dashboard'
   | 'alert'
   | 'alert-dialog'
+  | 'app-footer'
   | 'app-header'
   | 'app-sidebar'
   | 'avatar'

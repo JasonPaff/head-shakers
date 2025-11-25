@@ -63,6 +63,10 @@ export const SCHEMA_LIMITS = {
     IP_ADDRESS: { MAX: 50 },
     USER_AGENT: { MAX: 1000 },
   },
+  NEWSLETTER_SIGNUP: {
+    EMAIL: { MAX: 255, MIN: 5 },
+    USER_ID: { MAX: 255 },
+  },
   NOTIFICATION: {
     TITLE: { MAX: 255, MIN: 1 },
   },
