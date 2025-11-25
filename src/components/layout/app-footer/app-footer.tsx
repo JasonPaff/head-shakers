@@ -1,5 +1,6 @@
 import 'server-only';
 import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { FooterContainer } from '@/components/layout/app-footer/components/footer-container';
@@ -30,7 +31,7 @@ export const AppFooter = () => {
           >
             {/* Brand */}
             <div>
-              <div className={'flex items-center gap-2 text-lg font-bold'}>
+              <Link className={'flex items-center gap-2 text-lg font-bold'} href={$path({ route: '/' })}>
                 <div
                   className={
                     'flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'
@@ -39,7 +40,7 @@ export const AppFooter = () => {
                   HS
                 </div>
                 <span>Head Shakers</span>
-              </div>
+              </Link>
               <p className={'mt-2 text-sm text-muted-foreground'}>
                 Your digital bobblehead collection platform.
               </p>

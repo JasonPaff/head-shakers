@@ -1,4 +1,5 @@
 import 'server-only';
+import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
 import { AppHeaderAuthNavMenu } from '@/components/layout/app-header/components/app-header-auth-nav-menu';
@@ -36,7 +37,7 @@ export const AppHeader = () => {
             <Link
               className={'flex items-center gap-2 text-xl font-bold'}
               data-testid={generateTestId('layout', 'app-header', 'logo-link')}
-              href={'/'}
+              href={$path({ route: '/' })}
             >
               <div
                 className={cn(
