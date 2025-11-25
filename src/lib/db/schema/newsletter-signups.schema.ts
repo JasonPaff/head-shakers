@@ -28,7 +28,7 @@ export const newsletterSignups = pgTable(
     // Data validation constraints
     check(
       'newsletter_signups_email_not_empty',
-      sql`length(trim(${table.email})) >= ${SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MIN}`,
+      sql`length(trim(${table.email})) >= ${sql.raw(String(SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MIN))}`,
     ),
     check('newsletter_signups_dates_logic', sql`${table.createdAt} <= ${table.updatedAt}`),
     check(

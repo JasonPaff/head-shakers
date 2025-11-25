@@ -1,5 +1,7 @@
 'use client';
 
+import type { FormEvent } from 'react';
+
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailIcon } from 'lucide-react';
 
@@ -54,7 +56,7 @@ export const FooterNewsletter = withFocusManagement(() => {
   });
 
   // Form submission handler
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
     void form.handleSubmit();
@@ -93,7 +95,9 @@ export const FooterNewsletter = withFocusManagement(() => {
                 />
                 <MailIcon
                   aria-hidden
-                  className={'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'}
+                  className={
+                    'pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'
+                  }
                 />
                 {/* Error Message */}
                 {_hasErrors && errorMessage && (
