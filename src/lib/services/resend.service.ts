@@ -77,6 +77,24 @@ export class ResendService {
   }
 
   /**
+   * send newsletter welcome email to new subscribers
+   */
+  static async sendNewsletterWelcomeAsync(email: string): Promise<boolean> {
+    return this.sendEmailWithRetry(
+      async () => {
+        return resend.emails.send({
+          from: 'Head Shakers <noreply@send.head-shakers.com>',
+          html: this.getNewsletterWelcomeEmailHtml(),
+          subject: 'Welcome to Head Shakers Newsletter! 👋',
+          to: email,
+        });
+      },
+      'sendNewsletterWelcome',
+      { email: email.substring(0, 3) + '***' },
+    );
+  }
+
+  /**
    * send waitlist confirmation email
    */
   static async sendWaitlistConfirmationAsync(email: string): Promise<boolean> {
@@ -171,6 +189,68 @@ export class ResendService {
             <div class="footer">
               <p>&copy; 2024 Head Shakers. All rights reserved.</p>
               <p>You received this email because you signed up for launch notifications.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+  }
+
+  /**
+   * get newsletter welcome email HTML
+   */
+  private static getNewsletterWelcomeEmailHtml(): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; color: #333; line-height: 1.6; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px 20px; border-radius: 8px; }
+            .header h1 { font-size: 28px; margin: 0; }
+            .content { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            .highlight { background: #fff; padding: 15px; border-left: 4px solid #667eea; margin: 15px 0; border-radius: 0 4px 4px 0; }
+            .footer { text-align: center; font-size: 12px; color: #999; border-top: 1px solid #ddd; padding-top: 20px; }
+            .button { display: inline-block; padding: 12px 24px; background: #667eea; color: #fff; text-decoration: none; border-radius: 4px; margin: 20px 0; font-weight: bold; }
+            ul { padding-left: 20px; margin: 10px 0; }
+            li { margin: 8px 0; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Welcome to Head Shakers! 👋</h1>
+            </div>
+            <div class="content">
+              <p>Thanks for subscribing to the Head Shakers newsletter!</p>
+              <p>You've just joined a community of bobblehead enthusiasts who love collecting, sharing, and discovering amazing bobbleheads from around the world.</p>
+
+              <div class="highlight">
+                <strong>What you can expect:</strong>
+                <ul>
+                  <li>🎯 Bobblehead trends and new releases</li>
+                  <li>⭐ Featured collector spotlights</li>
+                  <li>📰 Platform news and updates</li>
+                  <li>💡 Tips for building your collection</li>
+                </ul>
+              </div>
+
+              <p><strong>How often?</strong> We'll send updates approximately once per week — enough to keep you in the loop without overwhelming your inbox.</p>
+
+              <p>
+                <a href="https://head-shakers.com" class="button">Explore Head Shakers</a>
+              </p>
+
+              <p>Happy collecting!</p>
+              <p>— The Head Shakers Team</p>
+            </div>
+            <div class="footer">
+              <p>&copy; 2025 Head Shakers. All rights reserved.</p>
+              <p>You received this email because you subscribed to the Head Shakers newsletter.</p>
+              <p>To unsubscribe, visit your account settings or reply to this email.</p>
             </div>
           </div>
         </body>
