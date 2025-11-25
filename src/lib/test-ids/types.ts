@@ -109,6 +109,7 @@ export type ComponentTestId =
   | 'pagination'
   | 'popover'
   | 'progress'
+  | 'public-header'
   | 'radio-group'
   | 'resizable'
   | 'scroll-area'
