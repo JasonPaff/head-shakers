@@ -30,6 +30,14 @@ Implement real-time notifications to admin users when new newsletter signups occ
 **Why**: Ensures type safety and consistency between server-side publishers and client-side subscribers
 **Confidence**: High
 
+**Documentation Lookup (Required):**
+Before implementing, use the Ref tool to look up the latest Ably documentation:
+```
+1. Use mcp__Ref__ref_search_documentation with query: "Ably channels Next.js TypeScript"
+2. Use mcp__Ref__ref_read_url to read the relevant documentation URLs returned
+3. Focus on: channel naming conventions, message structure, and TypeScript types
+```
+
 **Files to Create:**
 - `src/lib/constants/ably-channels.ts` - Channel name constants, message type definitions, and TypeScript interfaces for notification payloads
 
@@ -81,6 +89,19 @@ npm run lint:fix && npm run typecheck
 **What**: Implement AblyService class for server-side REST API communication with circuit breaker and retry logic
 **Why**: Provides reliable, monitored notification delivery following project patterns for external services
 **Confidence**: High
+
+**Documentation Lookup (Required):**
+Before implementing, use the Ref tool to look up the latest Ably REST API documentation:
+```
+1. Use mcp__Ref__ref_search_documentation with query: "Ably REST API publish message Node.js server-side"
+2. Use mcp__Ref__ref_search_documentation with query: "Ably Next.js server components App Router"
+3. Use mcp__Ref__ref_read_url to read the relevant documentation URLs returned
+4. Focus on:
+   - REST client initialization and authentication
+   - Publishing messages to channels from server-side code
+   - Error handling and best practices for serverless environments
+   - TypeScript types for Ably REST client
+```
 
 **Files to Create:**
 - `src/lib/services/ably.service.ts` - Server-side Ably REST client with publishNewsletterSignupNotification method
@@ -145,6 +166,20 @@ npm run lint:fix && npm run typecheck
 **What**: Build React component that listens to Ably channel and displays toast notifications for admin users
 **Why**: Provides real-time UI feedback to admins monitoring dashboard
 **Confidence**: High
+
+**Documentation Lookup (Required):**
+Before implementing, use the Ref tool to look up the latest Ably React documentation:
+```
+1. Use mcp__Ref__ref_search_documentation with query: "Ably React hooks useChannel Next.js"
+2. Use mcp__Ref__ref_search_documentation with query: "Ably ably/react subscribe messages TypeScript"
+3. Use mcp__Ref__ref_read_url to read the relevant documentation URLs returned
+4. Focus on:
+   - useChannel hook API and usage patterns
+   - Message callback signature and types
+   - Connection state handling
+   - Best practices for React 19 and Next.js App Router
+   - Proper cleanup and unsubscription
+```
 
 **Files to Create:**
 - `src/components/admin/newsletter-signup-notifications.tsx` - Client component with Ably subscription and toast UI
@@ -230,11 +265,22 @@ npm run typecheck
 
 ---
 
-### Step 8: Install Ably Server-Side Package (If Needed)
+### Step 8: Verify Ably Package Installation
 
 **What**: Verify ably package is installed with REST client support
 **Why**: Server-side AblyService requires Ably REST client from ably package
 **Confidence**: High
+
+**Documentation Lookup (Required):**
+Before implementing, use the Ref tool to check the latest Ably package version:
+```
+1. Use mcp__Ref__ref_search_documentation with query: "Ably npm package installation Next.js 2024"
+2. Use mcp__Ref__ref_read_url to read the relevant documentation URLs returned
+3. Focus on:
+   - Current recommended package version
+   - Any breaking changes in recent versions
+   - Peer dependencies for Next.js/React
+```
 
 **Files to Modify:**
 - None (verification step)
@@ -312,3 +358,18 @@ npm run typecheck
 - `src/components/layout/ably-provider.tsx` - Client Ably setup
 - `src/app/examples/ably/page.tsx` - useChannel hook usage
 - `src/hooks/use-admin-role.ts` - Admin role checking
+
+---
+
+## Documentation Reference Summary
+
+**Ably Documentation to Consult:**
+| Step | Search Queries |
+|------|----------------|
+| Step 1 | "Ably channels Next.js TypeScript" |
+| Step 3 | "Ably REST API publish message Node.js server-side", "Ably Next.js server components App Router" |
+| Step 5 | "Ably React hooks useChannel Next.js", "Ably ably/react subscribe messages TypeScript" |
+| Step 7 | "Ably API key authentication REST server-side" |
+| Step 8 | "Ably npm package installation Next.js 2024" |
+
+Use `mcp__Ref__ref_search_documentation` to search and `mcp__Ref__ref_read_url` to read the documentation before implementing each Ably-related step.
