@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { useId } from 'react';
 
@@ -15,16 +15,26 @@ import { FieldItem } from '@/components/ui/form/field-components/field-item';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { generateFormFieldTestId } from '@/lib/test-ids';
+import { cn } from '@/utils/tailwind-utils';
 
 type TextFieldProps = ComponentProps<'input'> &
   ComponentTestIdProps & {
     description?: string;
     focusRef?: FocusRef;
+    icon?: ReactNode;
     isRequired?: boolean;
     label: string;
   };
 
-export const TextField = ({ description, focusRef, isRequired, label, testId, ...props }: TextFieldProps) => {
+export const TextField = ({
+  description,
+  focusRef,
+  icon,
+  isRequired,
+  label,
+  testId,
+  ...props
+}: TextFieldProps) => {
   const field = useFieldContext<string>();
   const id = useId();
 
@@ -41,16 +51,27 @@ export const TextField = ({ description, focusRef, isRequired, label, testId, ..
         {label}
       </Label>
       <FieldAria focusRef={focusRef}>
-        <Input
-          id={id}
-          onBlur={field.handleBlur}
-          onChange={(e) => {
-            field.handleChange(e.target.value);
-          }}
-          testId={inputTestId}
-          value={field.state.value}
-          {...props}
-        />
+        <div className={cn(!!icon && 'relative')}>
+          <Input
+            id={id}
+            onBlur={field.handleBlur}
+            onChange={(e) => {
+              field.handleChange(e.target.value);
+            }}
+            testId={inputTestId}
+            value={field.state.value}
+            {...props}
+          />
+
+          {/* Icon */}
+          {icon && (
+            <div
+              className={'pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'}
+            >
+              {icon}
+            </div>
+          )}
+        </div>
       </FieldAria>
       <FieldError testId={errorTestId} />
       <FieldDescription testId={descriptionTestId}>{description}</FieldDescription>
