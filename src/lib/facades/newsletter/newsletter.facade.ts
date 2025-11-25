@@ -8,6 +8,7 @@ import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/c
 import { db } from '@/lib/db';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
+import { AblyService } from '@/lib/services/ably.service';
 import { ResendService } from '@/lib/services/resend.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
@@ -192,6 +193,51 @@ export class NewsletterFacade {
             tags: {
               component: facadeName,
               operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
+            },
+          });
+        }
+
+        // Send admin notification asynchronously for new subscribers
+        // Wrapped in try-catch to ensure notification failures don't affect subscription
+        try {
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: {
+              email: normalizedEmail.substring(0, 3) + '***',
+              operation: OPERATIONS.NEWSLETTER.NOTIFY_ADMIN_SIGNUP,
+            },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Sending admin notification for new newsletter signup',
+          });
+
+          // Fire and forget - don't await to avoid blocking subscription
+          void AblyService.publishNewsletterSignupNotificationAsync({
+            email: normalizedEmail.substring(0, 3) + '***',
+            signupId: newSignup.id,
+            timestamp: new Date().toISOString(),
+            userId: userId ?? undefined,
+          }).catch((notificationError) => {
+            Sentry.captureException(notificationError, {
+              extra: {
+                email: normalizedEmail.substring(0, 3) + '***',
+                signupId: newSignup.id,
+              },
+              tags: {
+                component: facadeName,
+                operation: OPERATIONS.NEWSLETTER.NOTIFY_ADMIN_SIGNUP,
+              },
+            });
+          });
+        } catch (notificationError) {
+          // Log but don't throw - subscription should succeed even if notification fails
+          Sentry.captureException(notificationError, {
+            extra: {
+              email: normalizedEmail.substring(0, 3) + '***',
+              signupId: newSignup.id,
+            },
+            tags: {
+              component: facadeName,
+              operation: OPERATIONS.NEWSLETTER.NOTIFY_ADMIN_SIGNUP,
             },
           });
         }

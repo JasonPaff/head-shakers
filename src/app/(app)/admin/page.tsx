@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { NewsletterSignupNotifications } from '@/components/admin/newsletter-signup-notifications';
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -9,6 +10,8 @@ export const dynamic = 'force-dynamic';
 export default function AdminPage() {
   return (
     <AdminLayout isAdminRequired={false}>
+      {/* Real-time newsletter signup notifications for admins */}
+      <NewsletterSignupNotifications />
       <div className={'grid gap-6 md:grid-cols-2 lg:grid-cols-3'}>
         <Card>
           <CardHeader>
