@@ -100,14 +100,17 @@ export const subscribeToNewsletterAction = publicActionClient
           signupId: result.signup?.id,
         },
         level: SENTRY_LEVELS.INFO,
-        message: result.isAlreadySubscribed ? 'Newsletter signup (existing subscriber)' : 'Newsletter signup successful',
+        message:
+          result.isAlreadySubscribed ?
+            'Newsletter signup (existing subscriber)'
+          : 'Newsletter signup successful',
       });
 
       // 5. Return consistent response shape
       // Same message for both new and existing subscribers (privacy - prevents email enumeration)
       return {
         data: { signupId: result.signup?.id },
-        message: 'Thanks for subscribing! You\'ll receive our latest updates.',
+        message: "Thanks for subscribing! You'll receive our latest updates.",
         success: true,
       };
     } catch (error) {

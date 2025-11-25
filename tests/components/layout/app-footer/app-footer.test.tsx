@@ -233,11 +233,7 @@ describe('Footer Integration', () => {
         <FooterNavSection heading={'Browse'} testId={'footer-browse'}>
           <FooterNavLink href={'/browse'} label={'All Bobbleheads'} testId={'browse-all'} />
           <FooterNavLink href={'/browse/featured'} label={'Featured'} testId={'browse-featured'} />
-          <FooterNavLink
-            href={'/browse/categories'}
-            label={'Categories'}
-            testId={'browse-categories'}
-          />
+          <FooterNavLink href={'/browse/categories'} label={'Categories'} testId={'browse-categories'} />
         </FooterNavSection>,
       );
 
@@ -245,18 +241,9 @@ describe('Footer Integration', () => {
       expect(screen.getByRole('navigation', { name: 'Browse' })).toBeInTheDocument();
 
       // Check all links render with correct hrefs
-      expect(screen.getByRole('link', { name: 'All Bobbleheads' })).toHaveAttribute(
-        'href',
-        '/browse',
-      );
-      expect(screen.getByRole('link', { name: 'Featured' })).toHaveAttribute(
-        'href',
-        '/browse/featured',
-      );
-      expect(screen.getByRole('link', { name: 'Categories' })).toHaveAttribute(
-        'href',
-        '/browse/categories',
-      );
+      expect(screen.getByRole('link', { name: 'All Bobbleheads' })).toHaveAttribute('href', '/browse');
+      expect(screen.getByRole('link', { name: 'Featured' })).toHaveAttribute('href', '/browse/featured');
+      expect(screen.getByRole('link', { name: 'Categories' })).toHaveAttribute('href', '/browse/categories');
     });
 
     it('renders links as list items', () => {

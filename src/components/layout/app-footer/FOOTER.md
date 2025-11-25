@@ -15,24 +15,28 @@ The App Footer is a comprehensive footer component for the Head Shakers platform
 ### Sub-Components
 
 #### 1. FooterContainer
+
 - **File**: `components/footer-container.tsx`
 - **Type**: Client Component
 - **Purpose**: Responsive grid wrapper for footer content sections
 - **Layout**: Adapts from single column (mobile) to multi-column (desktop)
 
 #### 2. FooterNavSection
+
 - **File**: `components/footer-nav-section.tsx`
 - **Type**: Client Component
 - **Purpose**: Navigation section wrapper with heading and links
 - **Usage**: Groups related navigation links under a heading
 
 #### 3. FooterNavLink
+
 - **File**: `components/footer-nav-link.tsx`
 - **Type**: Client Component
 - **Purpose**: Individual navigation link with consistent styling
 - **Features**: Hover states, focus management, aria labels
 
 #### 4. FooterSocialLinks
+
 - **File**: `components/footer-social-links.tsx`
 - **Type**: Client Component
 - **Purpose**: Displays social media platform links with icons
@@ -41,6 +45,7 @@ The App Footer is a comprehensive footer component for the Head Shakers platform
 - **Behavior**: Only renders platforms with configured URLs
 
 #### 5. FooterNewsletter
+
 - **File**: `components/footer-newsletter.tsx`
 - **Type**: Client Component with Form
 - **Purpose**: Newsletter email signup form
@@ -52,6 +57,7 @@ The App Footer is a comprehensive footer component for the Head Shakers platform
   - Loading states during submission
 
 #### 6. FooterFeaturedSection
+
 - **File**: `components/footer-featured-section.tsx`
 - **Type**: Server Component (async)
 - **Purpose**: Displays up to 4 featured collections
@@ -62,6 +68,7 @@ The App Footer is a comprehensive footer component for the Head Shakers platform
   - Returns null if no featured collections available
 
 #### 7. FooterLegal
+
 - **File**: `components/footer-legal.tsx`
 - **Type**: Client Component
 - **Purpose**: Copyright notice and legal links (Terms, Privacy, etc.)
@@ -92,6 +99,7 @@ Located on the left side (desktop) or top (mobile), contains:
 ### Browse Section
 
 Navigation links for browsing content:
+
 - All Bobbleheads (`/browse`)
 - Featured (`/browse/featured`)
 - Categories (`/browse/categories`)
@@ -100,6 +108,7 @@ Navigation links for browsing content:
 ### Featured Collections Section
 
 Dynamically displays featured collections:
+
 - Server-side data fetching
 - Maximum 4 collections shown
 - Links to collection detail pages
@@ -108,6 +117,7 @@ Dynamically displays featured collections:
 ### Legal Bar
 
 Bottom section with:
+
 - Copyright notice with current year
 - Legal navigation links:
   - About
@@ -133,6 +143,7 @@ seoConfig: {
 ```
 
 To enable a social platform:
+
 1. Add the full URL to the corresponding property in `seoConfig.socialProfiles`
 2. The link will automatically appear in the footer
 3. Empty strings result in the platform being hidden
@@ -155,6 +166,7 @@ To change the limit, modify the `MAX_FEATURED_FOOTER_ITEMS` constant in the conf
 ### Newsletter Configuration
 
 Newsletter signup is handled by:
+
 - **Server Action**: `src/lib/actions/newsletter/newsletter.actions.ts`
 - **Validation Schema**: `src/lib/validations/newsletter.validation.ts`
 - **Form Hook**: Uses `useAppForm` from the project's form system
@@ -202,16 +214,8 @@ Add a new section to `app-footer.tsx`:
 
 ```tsx
 <FooterNavSection heading={'Community'} testId={'footer-nav-community'}>
-  <FooterNavLink
-    href={$path({ route: '/community' })}
-    label={'Forum'}
-    testId={'footer-nav-link-forum'}
-  />
-  <FooterNavLink
-    href={$path({ route: '/events' })}
-    label={'Events'}
-    testId={'footer-nav-link-events'}
-  />
+  <FooterNavLink href={$path({ route: '/community' })} label={'Forum'} testId={'footer-nav-link-forum'} />
+  <FooterNavLink href={$path({ route: '/events' })} label={'Events'} testId={'footer-nav-link-events'} />
 </FooterNavSection>
 ```
 
@@ -258,17 +262,20 @@ Add a new section to `app-footer.tsx`:
 ## Responsive Design
 
 ### Mobile (< 768px)
+
 - Single column layout
 - Brand section at top
 - Navigation sections stacked
 - Legal links stack vertically
 
 ### Tablet (768px - 1024px)
+
 - 2-column grid
 - Brand section spans 2 columns
 - Navigation sections in columns
 
 ### Desktop (> 1024px)
+
 - 4-column grid
 - Optimal spacing and alignment
 - Inline legal links
@@ -296,6 +303,7 @@ className={'focus-visible:ring-2 focus-visible:ring-ring'}
 ### Theme Support
 
 All colors use CSS variables that adapt to light/dark themes:
+
 - `bg-background` - Footer background
 - `text-foreground` - Primary text
 - `text-muted-foreground` - Secondary text
@@ -309,19 +317,20 @@ All colors use CSS variables that adapt to light/dark themes:
 All components include data-testid attributes:
 
 ```typescript
-generateTestId('layout', 'app-footer')
-generateTestId('layout', 'app-footer', 'brand-section')
-generateTestId('layout', 'app-footer', 'social-links')
-generateTestId('layout', 'app-footer', 'social-facebook')
-generateTestId('footer-newsletter-email')
-generateTestId('footer-newsletter-submit')
-generateTestId('footer-nav-browse')
-generateTestId('footer-nav-link-browse')
+generateTestId('layout', 'app-footer');
+generateTestId('layout', 'app-footer', 'brand-section');
+generateTestId('layout', 'app-footer', 'social-links');
+generateTestId('layout', 'app-footer', 'social-facebook');
+generateTestId('footer-newsletter-email');
+generateTestId('footer-newsletter-submit');
+generateTestId('footer-nav-browse');
+generateTestId('footer-nav-link-browse');
 ```
 
 ### Test Coverage
 
 Test files should cover:
+
 - Newsletter form submission and validation
 - Social links rendering based on config
 - Featured collections display
@@ -353,6 +362,7 @@ This prevents blocking footer render while fetching featured collections.
 ### Code Splitting
 
 Client components are automatically code-split:
+
 - Newsletter form only loads when needed
 - Social links component separate chunk
 - Navigation components isolated
@@ -405,6 +415,7 @@ CONFIG: {
 ### Updating Newsletter Action
 
 Newsletter functionality is in:
+
 - Action: `src/lib/actions/newsletter/newsletter.actions.ts`
 - Validation: `src/lib/validations/newsletter.validation.ts`
 

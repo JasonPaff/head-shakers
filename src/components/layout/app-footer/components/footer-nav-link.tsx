@@ -15,13 +15,7 @@ type FooterNavLinkProps = ComponentProps<typeof Link> &
     label: string;
   };
 
-export const FooterNavLink = ({
-  className,
-  href,
-  label,
-  testId,
-  ...props
-}: FooterNavLinkProps) => {
+export const FooterNavLink = ({ className, href, label, testId, ...props }: FooterNavLinkProps) => {
   const linkTestId = testId || generateTestId('layout', 'app-footer', 'nav-link');
 
   return (

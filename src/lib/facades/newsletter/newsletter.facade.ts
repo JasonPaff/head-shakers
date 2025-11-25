@@ -180,7 +180,10 @@ export class NewsletterFacade {
    * @param dbInstance - Optional database instance for transactions
    * @returns The unsubscribed signup record, or null if email not found
    */
-  static async unsubscribeAsync(email: string, dbInstance?: DatabaseExecutor): Promise<NewsletterSignupRecord | null> {
+  static async unsubscribeAsync(
+    email: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<NewsletterSignupRecord | null> {
     try {
       const context = createPublicQueryContext({ dbInstance });
       const normalizedEmail = email.toLowerCase().trim();

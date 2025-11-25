@@ -107,10 +107,7 @@ describe('FooterLegal', () => {
     it('has correct data-slot attribute on container', () => {
       render(<FooterLegal />);
 
-      expect(screen.getByTestId('layout-app-footer-legal')).toHaveAttribute(
-        'data-slot',
-        'footer-legal',
-      );
+      expect(screen.getByTestId('layout-app-footer-legal')).toHaveAttribute('data-slot', 'footer-legal');
     });
 
     it('has correct data-slot attribute on links', () => {

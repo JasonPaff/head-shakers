@@ -61,7 +61,10 @@ export class NewsletterQuery extends BaseQuery {
    * Find a newsletter signup by email address
    * Returns the signup record if found, null otherwise
    */
-  static async findByEmailAsync(email: string, context: QueryContext): Promise<NewsletterSignupRecord | null> {
+  static async findByEmailAsync(
+    email: string,
+    context: QueryContext,
+  ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -76,7 +79,10 @@ export class NewsletterQuery extends BaseQuery {
   /**
    * Get active subscriber by email (not unsubscribed)
    */
-  static async getActiveSubscriberAsync(email: string, context: QueryContext): Promise<NewsletterSignupRecord | null> {
+  static async getActiveSubscriberAsync(
+    email: string,
+    context: QueryContext,
+  ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -121,7 +127,10 @@ export class NewsletterQuery extends BaseQuery {
   /**
    * Resubscribe an existing email (clear unsubscribedAt)
    */
-  static async resubscribeAsync(email: string, context: QueryContext): Promise<NewsletterSignupRecord | null> {
+  static async resubscribeAsync(
+    email: string,
+    context: QueryContext,
+  ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -141,7 +150,10 @@ export class NewsletterQuery extends BaseQuery {
    * Soft delete (unsubscribe) a newsletter signup by email
    * Sets unsubscribedAt timestamp instead of hard delete
    */
-  static async unsubscribeAsync(email: string, context: QueryContext): Promise<NewsletterSignupRecord | null> {
+  static async unsubscribeAsync(
+    email: string,
+    context: QueryContext,
+  ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance

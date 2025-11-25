@@ -21,9 +21,8 @@ export const FooterNavSection = ({
   ...props
 }: FooterNavSectionProps) => {
   const sectionTestId = testId || generateTestId('layout', 'app-footer', 'nav-section');
-  const headingTestId = testId
-    ? `${testId}-heading`
-    : generateTestId('layout', 'app-footer', 'nav-section-heading');
+  const headingTestId =
+    testId ? `${testId}-heading` : generateTestId('layout', 'app-footer', 'nav-section-heading');
 
   return (
     <nav
@@ -43,10 +42,7 @@ export const FooterNavSection = ({
       </h3>
 
       {/* Navigation Links */}
-      <ul
-        className={'space-y-2'}
-        data-slot={'footer-nav-section-list'}
-      >
+      <ul className={'space-y-2'} data-slot={'footer-nav-section-list'}>
         {children}
       </ul>
     </nav>
