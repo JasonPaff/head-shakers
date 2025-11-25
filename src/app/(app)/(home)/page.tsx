@@ -99,19 +99,19 @@ export default async function HomePage() {
         <div
           aria-hidden={'true'}
           className={
-            'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-warm-amber-light/30 via-transparent to-transparent'
+            'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-amber-100/30 via-transparent to-transparent'
           }
         />
         <div
           aria-hidden={'true'}
           className={
-            'pointer-events-none absolute top-20 left-1/4 -z-10 size-64 rounded-full bg-warm-coral-light/20 blur-3xl'
+            'pointer-events-none absolute top-20 left-1/4 -z-10 size-64 rounded-full bg-orange-100/20 blur-3xl'
           }
         />
         <div
           aria-hidden={'true'}
           className={
-            'pointer-events-none absolute top-40 right-1/4 -z-10 size-48 rounded-full bg-warm-orange-light/20 blur-3xl'
+            'pointer-events-none absolute top-40 right-1/4 -z-10 size-48 rounded-full bg-orange-200/20 blur-3xl'
           }
         />
 
@@ -119,9 +119,9 @@ export default async function HomePage() {
           {/* Hero Badge */}
           <div
             className={cn(
-              'mb-6 inline-flex items-center gap-2 rounded-full border border-warm-amber/30',
-              'bg-warm-amber-light/40 px-4 py-1.5 text-sm font-medium text-warm-amber-dark',
-              'dark:border-warm-amber/50 dark:bg-warm-amber-dark/30 dark:text-warm-amber-light',
+              'mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/30',
+              'bg-amber-100/40 px-4 py-1.5 text-sm font-medium text-amber-700',
+              'dark:border-amber-400/50 dark:bg-amber-700/30 dark:text-amber-200',
             )}
           >
             <SparklesIcon aria-hidden={'true'} className={'size-4'} />
@@ -133,7 +133,7 @@ export default async function HomePage() {
               'mb-6 text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl md:text-6xl'
             }
           >
-            Collect, Share, and <span className={'text-gradient-sunset-start'}>Discover</span> Bobbleheads
+            Collect, Share, and <span className={'text-primary'}>Discover</span> Bobbleheads
           </h1>
           <p className={'mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl'}>
             Build your digital bobblehead collection, connect with other collectors, and discover rare finds
@@ -146,7 +146,7 @@ export default async function HomePage() {
               fallback={
                 <Button
                   asChild
-                  className={'shadow-warm-md transition-card hover:shadow-warm-hover'}
+                  className={'shadow-md transition-all duration-300 hover:shadow-xl'}
                   size={'lg'}
                 >
                   <SignUpButton mode={'modal'}>Start Collecting</SignUpButton>
@@ -154,18 +154,14 @@ export default async function HomePage() {
               }
               loadingSkeleton={<Skeleton className={'h-11 w-36 rounded-md'} />}
             >
-              <Button
-                asChild
-                className={'shadow-warm-md transition-card hover:shadow-warm-hover'}
-                size={'lg'}
-              >
+              <Button asChild className={'shadow-md transition-all duration-300 hover:shadow-xl'} size={'lg'}>
                 <Link href={$path({ route: '/dashboard/collection' })}>My Collection</Link>
               </Button>
             </AuthContent>
-            <Button asChild className={'transition-all-smooth'} size={'lg'} variant={'outline'}>
+            <Button asChild className={'transition-all duration-300'} size={'lg'} variant={'outline'}>
               <Link href={$path({ route: '/browse' })}>Browse Collections</Link>
             </Button>
-            <Button asChild className={'transition-all-smooth'} size={'lg'} variant={'outline'}>
+            <Button asChild className={'transition-all duration-300'} size={'lg'} variant={'outline'}>
               <Link href={$path({ route: '/browse/search' })}>
                 <SearchIcon aria-hidden={'true'} className={'mr-2 size-5'} />
                 Search
@@ -180,14 +176,9 @@ export default async function HomePage() {
         <div className={'container mx-auto max-w-7xl'}>
           <div className={'mb-10 flex flex-col items-center justify-center gap-3 text-center'}>
             <div
-              className={
-                'flex size-14 items-center justify-center rounded-full bg-warm-orange-light/50 shadow-warm-sm'
-              }
+              className={'flex size-14 items-center justify-center rounded-full bg-orange-200/50 shadow-sm'}
             >
-              <AwardIcon
-                aria-hidden={'true'}
-                className={'size-7 text-warm-orange-dark dark:text-warm-orange'}
-              />
+              <AwardIcon aria-hidden={'true'} className={'size-7 text-orange-700 dark:text-primary'} />
             </div>
             <h2 className={'mb-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl'}>
               Featured Collections
@@ -211,21 +202,16 @@ export default async function HomePage() {
         <div
           aria-hidden={'true'}
           className={
-            'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-warm-coral-light/10 to-transparent'
+            'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-orange-100/10 to-transparent'
           }
         />
 
         <div className={'container mx-auto max-w-7xl'}>
           <div className={'mb-10 flex flex-col items-center justify-center gap-3 text-center'}>
             <div
-              className={
-                'flex size-14 items-center justify-center rounded-full bg-warm-orange-light/50 shadow-warm-sm'
-              }
+              className={'flex size-14 items-center justify-center rounded-full bg-orange-200/50 shadow-sm'}
             >
-              <AwardIcon
-                aria-hidden={'true'}
-                className={'size-7 text-warm-orange-dark dark:text-warm-orange'}
-              />
+              <AwardIcon aria-hidden={'true'} className={'size-7 text-orange-700 dark:text-primary'} />
             </div>
             <h2 className={'text-3xl font-bold tracking-tight text-foreground md:text-4xl'}>
               Featured Bobbleheads
@@ -247,7 +233,7 @@ export default async function HomePage() {
           {/* Call to Action Card */}
           <div
             className={
-              'overflow-hidden rounded-3xl bg-gradient-to-br from-warm-amber-light/60 via-warm-coral-light/40 to-warm-orange-light/50 p-8 shadow-warm-lg md:p-12 dark:from-warm-amber-dark/40 dark:via-warm-coral-dark/30 dark:to-warm-orange-dark/35'
+              'overflow-hidden rounded-3xl bg-gradient-to-br from-amber-100/60 via-orange-100/40 to-orange-200/50 p-8 shadow-lg md:p-12 dark:from-amber-700/40 dark:via-orange-700/30 dark:to-orange-800/35'
             }
           >
             <div className={'mb-10 text-center'}>
@@ -265,15 +251,15 @@ export default async function HomePage() {
               {/* Connect Card */}
               <div
                 className={
-                  'rounded-2xl bg-card/80 p-6 text-center shadow-warm-sm backdrop-blur-sm transition-card hover:shadow-warm-md'
+                  'rounded-2xl bg-card/80 p-6 text-center shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md'
                 }
               >
                 <div
                   className={
-                    'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-warm-amber-light/70 shadow-warm-sm'
+                    'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-amber-100/70 shadow-sm'
                   }
                 >
-                  <UsersIcon aria-hidden={'true'} className={'size-8 text-warm-amber-dark'} />
+                  <UsersIcon aria-hidden={'true'} className={'size-8 text-amber-700'} />
                 </div>
                 <h3 className={'mb-2 text-lg font-semibold text-foreground'}>Connect</h3>
                 <p className={'text-sm text-muted-foreground'}>
@@ -284,15 +270,15 @@ export default async function HomePage() {
               {/* Discover Card */}
               <div
                 className={
-                  'rounded-2xl bg-card/80 p-6 text-center shadow-warm-sm backdrop-blur-sm transition-card hover:shadow-warm-md'
+                  'rounded-2xl bg-card/80 p-6 text-center shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md'
                 }
               >
                 <div
                   className={
-                    'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-warm-coral-light/70 shadow-warm-sm'
+                    'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-orange-100/70 shadow-sm'
                   }
                 >
-                  <TrendingUpIcon aria-hidden={'true'} className={'size-8 text-warm-coral-dark'} />
+                  <TrendingUpIcon aria-hidden={'true'} className={'size-8 text-orange-600'} />
                 </div>
                 <h3 className={'mb-2 text-lg font-semibold text-foreground'}>Discover</h3>
                 <p className={'text-sm text-muted-foreground'}>
@@ -303,15 +289,15 @@ export default async function HomePage() {
               {/* Share Card */}
               <div
                 className={
-                  'rounded-2xl bg-card/80 p-6 text-center shadow-warm-sm backdrop-blur-sm transition-card hover:shadow-warm-md'
+                  'rounded-2xl bg-card/80 p-6 text-center shadow-sm backdrop-blur-sm transition-all duration-300 hover:shadow-md'
                 }
               >
                 <div
                   className={
-                    'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-warm-orange-light/70 shadow-warm-sm'
+                    'mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-orange-200/70 shadow-sm'
                   }
                 >
-                  <HeartIcon aria-hidden={'true'} className={'size-8 text-warm-orange-dark'} />
+                  <HeartIcon aria-hidden={'true'} className={'size-8 text-orange-700'} />
                 </div>
                 <h3 className={'mb-2 text-lg font-semibold text-foreground'}>Share</h3>
                 <p className={'text-sm text-muted-foreground'}>Showcase your collection and get feedback</p>

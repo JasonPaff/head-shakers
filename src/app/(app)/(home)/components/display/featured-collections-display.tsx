@@ -61,8 +61,8 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
       data-slot={'featured-collections-grid'}
       data-testid={generateTestId('feature', 'collection-grid')}
     >
-      {collections.map((collection, index) => (
-        <FeaturedCollectionCard collection={collection} index={index} key={collection.id} />
+      {collections.map((collection) => (
+        <FeaturedCollectionCard collection={collection} key={collection.id} />
       ))}
     </div>
   );
@@ -70,14 +70,10 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
 
 interface FeaturedCollectionCardProps {
   collection: FeaturedCollection;
-  index: number;
 }
 
-const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardProps) => {
+const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => {
   const _hasImage = Boolean(collection.imageUrl && collection.imageUrl !== '/placeholder.jpg');
-
-  // Stagger animation delay based on index (extended to support more cards)
-  const _animationDelayClass = index < 8 ? `animation-delay-${(index + 1) * 100}` : '';
 
   // Extract publicId and generate blur placeholder for progressive loading
   const publicId = collection.imageUrl ? extractPublicIdFromCloudinaryUrl(collection.imageUrl) : '';
@@ -85,11 +81,7 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
 
   return (
     <article
-      className={cn(
-        featuredCardVariants({ size: 'medium', state: 'default' }),
-        'animate-stagger-in bg-card will-change-card',
-        _animationDelayClass,
-      )}
+      className={cn(featuredCardVariants({ size: 'medium', state: 'default' }), 'bg-card')}
       data-slot={'featured-collection-card'}
       data-testid={generateTestId('feature', 'collection-card', collection.id)}
     >
@@ -98,7 +90,7 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
         aria-label={`View ${collection.title} collection`}
         className={cn(
           'block rounded-t-xl',
-          'focus-visible:ring-2 focus-visible:ring-warm-orange focus-visible:ring-offset-2 focus-visible:outline-none',
+          'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
         )}
         href={$path({
           route: '/collections/[collectionSlug]',
@@ -163,7 +155,7 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
         <Link
           className={cn(
             'rounded-sm',
-            'focus-visible:ring-2 focus-visible:ring-warm-orange focus-visible:outline-none',
+            'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
           )}
           href={$path({
             route: '/collections/[collectionSlug]',
@@ -173,7 +165,7 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
           <h3
             className={cn(
               featuredCardTitleVariants({ size: 'medium' }),
-              'transition-colors duration-200 hover:text-warm-amber-light',
+              'transition-colors duration-200 hover:text-amber-200',
             )}
             data-slot={'featured-collection-title'}
           >
@@ -217,8 +209,8 @@ const FeaturedCollectionCard = ({ collection, index }: FeaturedCollectionCardPro
             className={cn(
               'inline-flex items-center gap-1 rounded-sm text-sm font-medium text-white/90',
               'transition-all duration-200',
-              'hover:gap-2 hover:text-warm-amber-light',
-              'focus-visible:ring-2 focus-visible:ring-warm-orange focus-visible:outline-none',
+              'hover:gap-2 hover:text-amber-200',
+              'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
             )}
             href={$path({
               route: '/collections/[collectionSlug]',

@@ -57,7 +57,6 @@ export const users = pgTable(
       .default(DEFAULTS.USER.FAILED_LOGIN_ATTEMPTS)
       .notNull(),
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(DEFAULTS.USER.IS_DELETED).notNull(),
     isVerified: boolean('is_verified').default(DEFAULTS.USER.IS_VERIFIED).notNull(),
     lastActiveAt: timestamp('last_active_at'),
     lastFailedLoginAt: timestamp('last_failed_login_at'),
@@ -72,7 +71,7 @@ export const users = pgTable(
   (table) => [
     // single column indexes
     index('users_clerk_id_idx').on(table.clerkId),
-    index('users_deleted_active_idx').on(table.isDeleted, table.lastActiveAt),
+    index('users_deleted_active_idx').on(table.deletedAt, table.lastActiveAt),
     index('users_email_idx').on(table.email),
     index('users_failed_attempts_idx').on(table.failedLoginAttempts, table.lastFailedLoginAt),
     index('users_role_idx').on(table.role),
@@ -87,7 +86,7 @@ export const users = pgTable(
       table.email,
       table.isVerified,
       table.role,
-      table.isDeleted,
+      table.deletedAt,
     ),
     // user profile query optimization - includes display fields
     index('users_profile_covering_idx').on(

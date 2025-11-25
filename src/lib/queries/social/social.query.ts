@@ -225,7 +225,7 @@ export class SocialQuery extends BaseQuery {
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
       .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
       .limit(1);
 
@@ -285,7 +285,7 @@ export class SocialQuery extends BaseQuery {
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
       .where(and(eq(comments.parentCommentId, parentCommentId), eq(comments.isDeleted, false)))
       .orderBy(desc(comments.createdAt));
 
@@ -344,7 +344,7 @@ export class SocialQuery extends BaseQuery {
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
       .where(
         and(
           eq(comments.targetId, targetId),
@@ -405,7 +405,7 @@ export class SocialQuery extends BaseQuery {
         userId: comments.userId,
       })
       .from(comments)
-      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
       .where(
         and(
           eq(comments.targetId, targetId),
@@ -644,7 +644,7 @@ export class SocialQuery extends BaseQuery {
         userId: likes.userId,
       })
       .from(likes)
-      .leftJoin(sql`users`, and(eq(likes.userId, sql`users.id`), eq(sql`users.is_deleted`, false)))
+      .leftJoin(sql`users`, and(eq(likes.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
       .where(and(eq(likes.targetId, targetId), eq(likes.targetType, targetType)))
       .orderBy(desc(likes.createdAt));
 

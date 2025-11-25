@@ -1,4 +1,4 @@
-import { and, count, eq, gte, ilike, inArray, lte, not, or, type SQL } from 'drizzle-orm';
+import { and, count, eq, gte, ilike, inArray, isNull, lte, not, or, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
@@ -152,7 +152,7 @@ export class ContentSearchQuery extends BaseQuery {
           eq(bobbleheads.id, id),
           eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
           eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+          isNull(users.deletedAt),
         ),
       )
       .limit(1);
@@ -187,7 +187,7 @@ export class ContentSearchQuery extends BaseQuery {
         and(
           eq(collections.id, id),
           eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+          isNull(users.deletedAt),
         ),
       )
       .limit(1);
@@ -213,7 +213,7 @@ export class ContentSearchQuery extends BaseQuery {
         username: users.username,
       })
       .from(users)
-      .where(and(eq(users.id, id), eq(users.isDeleted, DEFAULTS.USER.IS_DELETED)))
+      .where(and(eq(users.id, id), isNull(users.deletedAt)))
       .limit(1);
 
     return result[0] || null;
@@ -388,7 +388,7 @@ export class ContentSearchQuery extends BaseQuery {
     // Build collection count query
     const collectionConditions: Array<SQL> = [
       eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     if (query && query.trim()) {
@@ -434,7 +434,7 @@ export class ContentSearchQuery extends BaseQuery {
     const subcollectionConditions: Array<SQL> = [
       eq(subCollections.isPublic, DEFAULTS.SUB_COLLECTION.IS_PUBLIC),
       eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     if (query && query.trim()) {
@@ -481,7 +481,7 @@ export class ContentSearchQuery extends BaseQuery {
     const bobbleheadConditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
       eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     if (query && query.trim()) {
@@ -575,7 +575,7 @@ export class ContentSearchQuery extends BaseQuery {
     const conditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
       eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     // Add text search conditions if query is provided
@@ -669,7 +669,7 @@ export class ContentSearchQuery extends BaseQuery {
     // Build where conditions
     const conditions: Array<SQL> = [
       eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     // Add text search conditions if query is provided
@@ -775,7 +775,7 @@ export class ContentSearchQuery extends BaseQuery {
     const conditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
       eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     // Add text search conditions if query is provided
@@ -882,7 +882,7 @@ export class ContentSearchQuery extends BaseQuery {
     // Build where conditions - only public collections from non-deleted users
     const conditions: Array<SQL> = [
       eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     // Add text search conditions if query is provided
@@ -1007,7 +1007,7 @@ export class ContentSearchQuery extends BaseQuery {
     const conditions: Array<SQL> = [
       eq(subCollections.isPublic, DEFAULTS.SUB_COLLECTION.IS_PUBLIC),
       eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+      isNull(users.deletedAt),
     ];
 
     // Add text search conditions if query is provided
@@ -1106,7 +1106,7 @@ export class ContentSearchQuery extends BaseQuery {
       .from(users)
       .where(
         and(
-          eq(users.isDeleted, DEFAULTS.USER.IS_DELETED),
+          isNull(users.deletedAt),
           or(
             ilike(users.displayName, `%${query}%`),
             ilike(users.username, `%${query}%`),

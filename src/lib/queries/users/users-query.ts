@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, ilike, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, ilike, isNull, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { AdminUsersFilter } from '@/lib/validations/admin-users.validation';
@@ -171,7 +171,6 @@ export class UsersQuery extends BaseQuery {
         email: users.email,
         failedLoginAttempts: users.failedLoginAttempts,
         id: users.id,
-        isDeleted: users.isDeleted,
         isVerified: users.isVerified,
         lastActiveAt: users.lastActiveAt,
         lastFailedLoginAt: users.lastFailedLoginAt,
@@ -339,7 +338,7 @@ export class UsersQuery extends BaseQuery {
     const conditions = [];
 
     // Exclude deleted users by default (admin can still see them via status filter)
-    conditions.push(eq(users.isDeleted, false));
+    conditions.push(isNull(users.deletedAt));
 
     // Role filter - uses users_role_idx
     if (filters.role) {

@@ -94,7 +94,7 @@ export const FeatureCardImageGallery = ({
       >
         {/* Horizontal Scrollable Thumbnail Strip with Scroll Snap */}
         <div
-          className={'flex scroll-snap-x-mandatory gap-2 overflow-x-auto pb-2'}
+          className={'scroll-snap-x-mandatory flex gap-2 overflow-x-auto pb-2'}
           data-slot={'feature-card-image-gallery-strip'}
           role={'listbox'}
         >
@@ -110,7 +110,7 @@ export const FeatureCardImageGallery = ({
                 aria-selected={_isSelected}
                 className={cn(
                   // Base styles with scroll-snap alignment
-                  'relative size-16 shrink-0 scroll-snap-start overflow-hidden rounded-md',
+                  'scroll-snap-start relative size-16 shrink-0 overflow-hidden rounded-md',
                   // Smooth transitions for all properties
                   'transition-all duration-200',
                   // Border for hover states

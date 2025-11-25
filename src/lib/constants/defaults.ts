@@ -94,7 +94,6 @@ export const DEFAULTS = {
     CURRENCY: 'USD',
     DEFAULT_ITEM_PRIVACY: 'public',
     FAILED_LOGIN_ATTEMPTS: 0,
-    IS_DELETED: false,
     IS_VERIFIED: false,
     LANGUAGE: 'en',
     ROLE: 'user',

@@ -13,9 +13,9 @@ export const featuredCardVariants = cva(
     // Base structure
     'group relative overflow-hidden rounded-xl',
     // Default shadow and border
-    'border border-border/50 shadow-warm-md',
+    'border border-border/50 shadow-md',
     // Transition utilities for smooth interactions
-    'transition-card',
+    'transition-all duration-300 ease-out',
   ],
   {
     compoundVariants: [
@@ -56,15 +56,15 @@ export const featuredCardVariants = cva(
         ],
       },
       state: {
-        active: ['ring-2 ring-warm-orange ring-offset-2', 'shadow-warm-hover'],
+        active: ['ring-2 ring-primary ring-offset-2', 'shadow-xl'],
         default: [
-          // Default hover transform - handled by transition-card
+          // Default hover transform
           'hover:-translate-y-1',
-          'hover:shadow-warm-hover',
-          'hover:border-warm-coral-light/50',
+          'hover:shadow-xl',
+          'hover:border-orange-200/50',
         ],
         disabled: ['opacity-60', 'cursor-not-allowed'],
-        hover: ['-translate-y-1', 'shadow-warm-hover', 'border-warm-coral-light/50'],
+        hover: ['-translate-y-1', 'shadow-xl', 'border-orange-200/50'],
         loading: ['animate-shimmer'],
       },
     },
@@ -96,7 +96,7 @@ export const featuredCardImageVariants = cva(
         bobblehead: [
           // Bobbleheads may have transparent backgrounds
           'object-contain',
-          'bg-gradient-warm-vertical',
+          'bg-gradient-to-b from-amber-50 to-orange-100',
         ],
         collection: [
           // Collections use cover fit
@@ -127,13 +127,13 @@ export const featuredCardOverlayVariants = cva(
     },
     variants: {
       intensity: {
-        dark: ['bg-overlay-warm-dark'],
-        light: ['bg-overlay-warm-light'],
-        medium: ['bg-overlay-warm-medium'],
+        dark: ['bg-black/70'],
+        light: ['bg-white/80'],
+        medium: ['bg-black/50'],
         none: ['bg-transparent'],
       },
       position: {
-        bottom: ['bg-gradient-card-overlay'],
+        bottom: ['bg-gradient-to-t from-black/70 to-transparent'],
         full: [
           // Full overlay - no gradient, just solid
         ],
@@ -261,10 +261,10 @@ export const featuredCardBadgeVariants = cva(
     },
     variants: {
       variant: {
-        featured: ['text-white bg-gradient-sunset'],
-        new: ['bg-warm-coral text-white'],
-        popular: ['bg-warm-amber text-warm-amber-dark'],
-        trending: ['bg-warm-orange text-white'],
+        featured: ['bg-gradient-to-br from-orange-500 via-orange-400 to-orange-600 text-white'],
+        new: ['bg-orange-400 text-white'],
+        popular: ['bg-amber-400 text-amber-700'],
+        trending: ['bg-primary text-white'],
       },
     },
   },

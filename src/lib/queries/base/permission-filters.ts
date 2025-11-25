@@ -1,6 +1,6 @@
 import type { AnyColumn, SQL } from 'drizzle-orm';
 
-import { and, eq, or } from 'drizzle-orm';
+import { and, eq, isNull, or } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 
@@ -50,7 +50,7 @@ export function buildPermissionFilter(
 }
 
 /**
- * build soft delete filter
+ * build soft delete filter for boolean isDeleted columns
  */
 export function buildSoftDeleteFilter(isDeletedColumn: AnyColumn, context: QueryContext): SQL | undefined {
   if (context.shouldIncludeDeleted) {
@@ -58,6 +58,21 @@ export function buildSoftDeleteFilter(isDeletedColumn: AnyColumn, context: Query
   }
 
   return eq(isDeletedColumn, false);
+}
+
+/**
+ * build soft delete filter for timestamp deletedAt columns
+ * returns isNull check (NULL = not deleted)
+ */
+export function buildTimestampSoftDeleteFilter(
+  deletedAtColumn: AnyColumn,
+  context: QueryContext,
+): SQL | undefined {
+  if (context.shouldIncludeDeleted) {
+    return undefined;
+  }
+
+  return isNull(deletedAtColumn);
 }
 
 /**

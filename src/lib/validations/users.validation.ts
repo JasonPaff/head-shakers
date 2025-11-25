@@ -30,7 +30,6 @@ export const insertUserSchema = createInsertSchema(users, {
   deletedAt: true,
   failedLoginAttempts: true,
   id: true,
-  isDeleted: true,
   isVerified: true,
   lastActiveAt: true,
   lastFailedLoginAt: true,

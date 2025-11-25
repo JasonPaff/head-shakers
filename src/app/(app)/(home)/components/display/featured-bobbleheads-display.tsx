@@ -76,8 +76,8 @@ export const FeaturedBobbleheadsDisplay = ({ bobbleheads }: FeaturedBobbleheadsD
           data-slot={'featured-bobbleheads-grid'}
           data-testid={generateTestId('feature', 'bobblehead-grid')}
         >
-          {bobbleheads.map((bobblehead, index) => (
-            <FeaturedBobbleheadCard bobblehead={bobblehead} index={index} key={bobblehead.id} />
+          {bobbleheads.map((bobblehead) => (
+            <FeaturedBobbleheadCard bobblehead={bobblehead} key={bobblehead.id} />
           ))}
         </div>
       </Conditional>
@@ -87,7 +87,6 @@ export const FeaturedBobbleheadsDisplay = ({ bobbleheads }: FeaturedBobbleheadsD
 
 interface FeaturedBobbleheadCardProps {
   bobblehead: FeaturedBobblehead;
-  index: number;
 }
 
 /**
@@ -96,13 +95,10 @@ interface FeaturedBobbleheadCardProps {
  * Displays bobblehead image, name, owner, and engagement metrics
  * with hover animations and interactive elements.
  */
-const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardProps) => {
+const FeaturedBobbleheadCard = ({ bobblehead }: FeaturedBobbleheadCardProps) => {
   // Derived conditions
   const _hasImage = Boolean(bobblehead.imageUrl && bobblehead.imageUrl !== '/placeholder.jpg');
   const _hasSlug = Boolean(bobblehead.contentSlug);
-
-  // Stagger animation delay based on index
-  const _animationDelayClass = index < 8 ? `animation-delay-${(index + 1) * 100}` : '';
 
   // Map feature type to badge variant
   const _badgeVariant = getBadgeVariant(bobblehead.featureType);
@@ -122,11 +118,7 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
 
   return (
     <article
-      className={cn(
-        featuredCardVariants({ size: 'small', state: 'default' }),
-        'flex animate-stagger-in flex-col bg-card will-change-card',
-        _animationDelayClass,
-      )}
+      className={cn(featuredCardVariants({ size: 'small', state: 'default' }), 'flex flex-col bg-card')}
       data-slot={'featured-bobblehead-card'}
       data-testid={generateTestId('feature', 'bobblehead-card', bobblehead.id)}
     >
@@ -135,7 +127,7 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
         aria-label={`View ${bobblehead.contentName || 'bobblehead'} details`}
         className={cn(
           'block rounded-t-xl',
-          'focus-visible:ring-2 focus-visible:ring-warm-orange focus-visible:ring-offset-2 focus-visible:outline-none',
+          'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
         )}
         href={_href}
       >
@@ -202,14 +194,14 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
         <Link
           className={cn(
             'rounded-sm',
-            'focus-visible:ring-2 focus-visible:ring-warm-orange focus-visible:outline-none',
+            'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
           )}
           href={_href}
         >
           <h3
             className={cn(
               featuredCardTitleVariants({ size: 'small' }),
-              'text-foreground transition-colors duration-200 hover:text-warm-amber-light',
+              'text-foreground transition-colors duration-200 hover:text-amber-200',
             )}
             data-slot={'featured-bobblehead-title'}
           >
@@ -250,8 +242,8 @@ const FeaturedBobbleheadCard = ({ bobblehead, index }: FeaturedBobbleheadCardPro
               className={cn(
                 'inline-flex items-center gap-1 rounded-sm text-xs font-medium text-muted-foreground',
                 'transition-all duration-200',
-                'hover:gap-2 hover:text-warm-amber-light',
-                'focus-visible:ring-2 focus-visible:ring-warm-orange focus-visible:outline-none',
+                'hover:gap-2 hover:text-amber-200',
+                'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
               )}
               href={_href}
             >

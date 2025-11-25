@@ -18,7 +18,7 @@ type ClerkUser = User | UserJSON;
 export class UserSyncService {
   /**
    * soft delete user from database
-   * sets isDeleted flag and deletedAt timestamp
+   * sets deletedAt timestamp
    *
    * @param clerkId - Clerk user ID
    * @param txInstance - optional database transaction instance
@@ -34,7 +34,6 @@ export class UserSyncService {
         .update(users)
         .set({
           deletedAt: new Date(),
-          isDeleted: true,
           updatedAt: new Date(),
         })
         .where(eq(users.clerkId, clerkId))

@@ -29,7 +29,7 @@ const FeaturedBobbleheadSkeletonCard = ({
   size?: VariantProps<typeof featuredCardSkeletonVariants>['size'];
 }) => {
   // Stagger animation delay based on index for visual effect
-  const _animationDelayClass = index < 8 ? `animation-delay-${(index + 1) * 100}` : '';
+  const _animationDelayClass = index < 8 ? `delay-${(index + 1) * 100}` : '';
 
   return (
     <div
