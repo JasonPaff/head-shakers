@@ -19,9 +19,14 @@ export const createConfirmationSchema = (targetName: string) => {
       .string()
       .trim()
       .min(1, { message: 'Please type the name to confirm' })
-      .refine((value) => value === targetName, {
-        message: `Please type "${targetName}" exactly to confirm`,
-      }),
+      .refine(
+        (value) => {
+          return (value ?? '').length <= 1 || value === targetName;
+        },
+        {
+          message: `Please type "${targetName}" exactly to confirm`,
+        },
+      ),
   });
 };
 
