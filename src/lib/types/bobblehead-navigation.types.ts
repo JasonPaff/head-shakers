@@ -67,6 +67,10 @@ export type NavigationContext = {
   contextId: string;
   /** Display name of the collection or subcollection */
   contextName: string;
+  /** URL-friendly slug for the context */
+  contextSlug: string;
   /** Whether this is a collection or subcollection */
   contextType: 'collection' | 'subcollection';
+  /** Parent collection slug (only present for subcollections) */
+  parentCollectionSlug?: string;
 };

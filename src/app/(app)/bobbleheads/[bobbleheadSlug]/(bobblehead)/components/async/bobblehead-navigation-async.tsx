@@ -7,12 +7,14 @@ import { getOptionalUserId } from '@/utils/optional-auth-utils';
 interface BobbleheadNavigationAsyncProps {
   bobbleheadId: string;
   collectionId: null | string;
+  isKeyboardNavigationEnabled?: boolean;
   subcollectionId?: null | string;
 }
 
 export const BobbleheadNavigationAsync = async ({
   bobbleheadId,
   collectionId,
+  isKeyboardNavigationEnabled,
   subcollectionId,
 }: BobbleheadNavigationAsyncProps) => {
   // Navigation only applies within collection context
@@ -36,5 +38,10 @@ export const BobbleheadNavigationAsync = async ({
     return null;
   }
 
-  return <BobbleheadNavigation navigationData={navigationData} />;
+  return (
+    <BobbleheadNavigation
+      isKeyboardNavigationEnabled={isKeyboardNavigationEnabled}
+      navigationData={navigationData}
+    />
+  );
 };

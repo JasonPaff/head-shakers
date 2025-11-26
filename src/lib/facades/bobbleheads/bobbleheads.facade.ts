@@ -429,7 +429,9 @@ export class BobbleheadsFacade {
               contextData = {
                 contextId: subcollection.id,
                 contextName: subcollection.name,
+                contextSlug: subcollection.slug,
                 contextType: 'subcollection',
+                parentCollectionSlug: subcollection.collectionSlug,
               };
             }
           } else {
@@ -439,6 +441,7 @@ export class BobbleheadsFacade {
               contextData = {
                 contextId: collection.id,
                 contextName: collection.name,
+                contextSlug: collection.slug,
                 contextType: 'collection',
               };
             }

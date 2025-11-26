@@ -19,10 +19,14 @@ import { BobbleheadNavigationPreview } from './bobblehead-navigation-preview';
 import { CollectionContextIndicator } from './collection-context-indicator';
 
 type BobbleheadNavigationProps = {
+  isKeyboardNavigationEnabled?: boolean;
   navigationData: BobbleheadNavigationData;
 };
 
-export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationProps) => {
+export const BobbleheadNavigation = ({
+  isKeyboardNavigationEnabled = true,
+  navigationData,
+}: BobbleheadNavigationProps) => {
   // Other hooks
   const [{ collectionId, subcollectionId }] = useQueryStates(
     {
@@ -84,6 +88,8 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
 
   // Keyboard navigation (arrow keys)
   useEffect(() => {
+    if (!isKeyboardNavigationEnabled) return;
+
     const handleKeyDown = (event: KeyboardEvent) => {
       // Skip if user is typing in an input or textarea
       const target = event.target as HTMLElement;
@@ -110,6 +116,7 @@ export const BobbleheadNavigation = ({ navigationData }: BobbleheadNavigationPro
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [
+    isKeyboardNavigationEnabled,
     navigationData.previousBobblehead,
     navigationData.nextBobblehead,
     handleNavigatePrevious,

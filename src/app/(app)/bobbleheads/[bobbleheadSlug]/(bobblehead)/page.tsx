@@ -243,6 +243,24 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
             </BobbleheadErrorBoundary>
           </ContentLayout>
         </div>
+
+        {/* Bottom Navigation Section */}
+        <Conditional isCondition={!!collectionId}>
+          <div className={'mt-8'}>
+            <ContentLayout>
+              <BobbleheadErrorBoundary section={'navigation'}>
+                <Suspense fallback={<BobbleheadNavigationSkeleton />}>
+                  <BobbleheadNavigationAsync
+                    bobbleheadId={bobbleheadId}
+                    collectionId={collectionId ?? null}
+                    isKeyboardNavigationEnabled={false}
+                    subcollectionId={subcollectionId}
+                  />
+                </Suspense>
+              </BobbleheadErrorBoundary>
+            </ContentLayout>
+          </div>
+        </Conditional>
       </BobbleheadPageClientWrapper>
     </Fragment>
   );

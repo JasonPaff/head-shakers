@@ -39,10 +39,14 @@ export const navigationContextSchema = z.object({
   contextId: z.uuid({ message: 'Context ID must be a valid UUID' }),
   /** Display name of the collection or subcollection */
   contextName: z.string().min(1, { message: 'Context name is required' }),
+  /** URL-friendly slug for the context */
+  contextSlug: z.string().min(1, { message: 'Context slug is required' }),
   /** Whether this is a collection or subcollection */
   contextType: z.enum(['collection', 'subcollection'], {
     message: 'Context type must be either collection or subcollection',
   }),
+  /** Parent collection slug (only present for subcollections) */
+  parentCollectionSlug: z.string().min(1).optional(),
 });
 
 /**
