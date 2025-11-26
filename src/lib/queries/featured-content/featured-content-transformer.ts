@@ -33,12 +33,12 @@ export interface RawFeaturedContentData {
   bobbleheadLikes: null | number;
   bobbleheadName: null | string;
   bobbleheadOwner: null | string;
-  bobbleheadOwnerDisplayName: null | string;
+  bobbleheadOwnerUsername: null | string;
   bobbleheadPrimaryPhotoUrl: null | string;
   bobbleheadSlug: null | string;
   collectionCoverImageUrl: null | string;
   collectionOwner: null | string;
-  collectionOwnerDisplayName: null | string;
+  collectionOwnerUsername: null | string;
   collectionSlug: null | string;
   contentId: string;
   contentType: 'bobblehead' | 'collection' | 'user';
@@ -54,8 +54,8 @@ export interface RawFeaturedContentData {
   startDate: Date | null;
   title: null | string;
   updatedAt: Date;
-  userDisplayName: null | string;
   userId: null | string;
+  userUsername: null | string;
   viewCount: number;
 }
 
@@ -137,7 +137,7 @@ export class FeaturedContentTransformer {
       return row.bobbleheadName;
     }
     if (row.contentType === 'user') {
-      return row.userDisplayName;
+      return row.userUsername;
     }
     // for collections, we don't have the name joined yet - could be added if needed
     return null;
@@ -186,14 +186,14 @@ export class FeaturedContentTransformer {
    * business logic for determining the owner display name based on content type
    */
   private static determineOwnerDisplayName(row: RawFeaturedContentData): null | string {
-    // return the appropriate owner display name based on content type
+    // return the appropriate owner username based on content type
     if (row.contentType === 'bobblehead') {
-      return row.bobbleheadOwnerDisplayName;
+      return row.bobbleheadOwnerUsername;
     }
     if (row.contentType === 'collection') {
-      return row.collectionOwnerDisplayName;
+      return row.collectionOwnerUsername;
     }
-    // for featured users, userDisplayName is the user's own display name
-    return row.userDisplayName;
+    // for featured users, userUsername is the user's own username
+    return row.userUsername;
   }
 }

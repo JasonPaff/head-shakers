@@ -2,12 +2,12 @@
 
 ## Step Metadata
 
-| Field | Value |
-|-------|-------|
-| Started | 2025-01-25T00:00:30Z |
+| Field     | Value                |
+| --------- | -------------------- |
+| Started   | 2025-01-25T00:00:30Z |
 | Completed | 2025-01-25T00:01:30Z |
-| Duration | ~60 seconds |
-| Status | Success |
+| Duration  | ~60 seconds          |
+| Status    | Success              |
 
 ## Input
 
@@ -53,50 +53,51 @@ Discover at least 5-10 relevant files across different architectural layers.
 
 ### Critical Priority (Must Modify)
 
-| File | Reason | Action |
-|------|--------|--------|
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx` | Main header component displaying title, description, breadcrumb, like button, and metadata. This is the primary file that needs visual redesign. | **MODIFY** |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx` | Server component wrapper that fetches bobblehead data. Must be updated if header data requirements change. | **MODIFY** |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx` | Loading skeleton that mirrors header layout. Must be updated to match new header design. | **MODIFY** |
+| File                                                                                                          | Reason                                                                                                                                           | Action     |
+| ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ | ---------- |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`                    | Main header component displaying title, description, breadcrumb, like button, and metadata. This is the primary file that needs visual redesign. | **MODIFY** |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx`        | Server component wrapper that fetches bobblehead data. Must be updated if header data requirements change.                                       | **MODIFY** |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx` | Loading skeleton that mirrors header layout. Must be updated to match new header design.                                                         | **MODIFY** |
 
 ### High Priority (Likely Modify)
 
-| File | Reason | Action |
-|------|--------|--------|
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Main page component that renders the header within ContentLayout wrapper. May need layout adjustments. | **MODIFY** |
-| `src/app/globals.css` | Global stylesheet with Tailwind CSS custom utilities, color variables, and animations. Contains warm color palette, animations, and gradient utilities. | **REFERENCE/MODIFY** |
+| File                                                               | Reason                                                                                                                                                  | Action               |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Main page component that renders the header within ContentLayout wrapper. May need layout adjustments.                                                  | **MODIFY**           |
+| `src/app/globals.css`                                              | Global stylesheet with Tailwind CSS custom utilities, color variables, and animations. Contains warm color palette, animations, and gradient utilities. | **REFERENCE/MODIFY** |
 
 ### Medium Priority (Supporting)
 
-| File | Reason | Action |
-|------|--------|--------|
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb.tsx` | Breadcrumb navigation in header. May need visual styling updates. | **MODIFY** |
-| `src/components/layout/content-layout.tsx` | Container component wrapping header content. May need spacing adjustments. | **REFERENCE** |
-| `src/lib/utils/cloudinary.utils.ts` | Cloudinary utility functions for image transformations and blur placeholders. | **REFERENCE** |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/feature-card-primary-image.tsx` | Reference for CldImage with blur effects and overlays. | **REFERENCE** |
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Type definitions for BobbleheadWithRelations showing available data fields. | **REFERENCE** |
-| `src/components/ui/card.tsx` | Card component patterns for Radix-style composition. | **REFERENCE** |
-| `src/components/ui/badge.tsx` | Badge component with variants for category/status display. | **REFERENCE** |
-| `src/components/ui/button.tsx` | Button component for action buttons in header. | **REFERENCE** |
+| File                                                                                                             | Reason                                                                        | Action        |
+| ---------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------- |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb.tsx`                   | Breadcrumb navigation in header. May need visual styling updates.             | **MODIFY**    |
+| `src/components/layout/content-layout.tsx`                                                                       | Container component wrapping header content. May need spacing adjustments.    | **REFERENCE** |
+| `src/lib/utils/cloudinary.utils.ts`                                                                              | Cloudinary utility functions for image transformations and blur placeholders. | **REFERENCE** |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/feature-card-primary-image.tsx` | Reference for CldImage with blur effects and overlays.                        | **REFERENCE** |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts`                                                               | Type definitions for BobbleheadWithRelations showing available data fields.   | **REFERENCE** |
+| `src/components/ui/card.tsx`                                                                                     | Card component patterns for Radix-style composition.                          | **REFERENCE** |
+| `src/components/ui/badge.tsx`                                                                                    | Badge component with variants for category/status display.                    | **REFERENCE** |
+| `src/components/ui/button.tsx`                                                                                   | Button component for action buttons in header.                                | **REFERENCE** |
 
 ### Low Priority (Reference Only)
 
-| File | Reason | Action |
-|------|--------|--------|
-| `src/app/(app)/(home)/page.tsx` | Homepage hero section - excellent inspiration for bold header design. | **REFERENCE** |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-feature-card.tsx` | Feature card showing page visual hierarchy. | **REFERENCE** |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/feature-card-quick-info.tsx` | Typography and spacing patterns reference. | **REFERENCE** |
-| `src/components/ui/skeleton.tsx` | Skeleton loading component base. | **REFERENCE** |
-| `src/lib/validations/bobbleheads.validation.ts` | Validation schemas for data structure. | **REFERENCE** |
-| `src/lib/constants/enums.ts` | Enum definitions for conditions/statuses. | **REFERENCE** |
-| `components.json` | shadcn/ui configuration showing design system style. | **REFERENCE** |
-| `src/components/ui/cloudinary-photo-upload.tsx` | Cloudinary patterns reference. | **REFERENCE** |
+| File                                                                                                          | Reason                                                                | Action        |
+| ------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | ------------- |
+| `src/app/(app)/(home)/page.tsx`                                                                               | Homepage hero section - excellent inspiration for bold header design. | **REFERENCE** |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-feature-card.tsx`              | Feature card showing page visual hierarchy.                           | **REFERENCE** |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/feature-card/feature-card-quick-info.tsx` | Typography and spacing patterns reference.                            | **REFERENCE** |
+| `src/components/ui/skeleton.tsx`                                                                              | Skeleton loading component base.                                      | **REFERENCE** |
+| `src/lib/validations/bobbleheads.validation.ts`                                                               | Validation schemas for data structure.                                | **REFERENCE** |
+| `src/lib/constants/enums.ts`                                                                                  | Enum definitions for conditions/statuses.                             | **REFERENCE** |
+| `components.json`                                                                                             | shadcn/ui configuration showing design system style.                  | **REFERENCE** |
+| `src/components/ui/cloudinary-photo-upload.tsx`                                                               | Cloudinary patterns reference.                                        | **REFERENCE** |
 
 ## Architecture Insights
 
 ### Current Header Structure
 
 The existing header (bobblehead-header.tsx) has a straightforward structure:
+
 1. **Breadcrumb row** with collection navigation and action buttons (Share, Edit, Delete, Report)
 2. **Title section** with h1 text-4xl and text-lg description
 3. **Metadata row** with like button, creation date, and view count
@@ -112,6 +113,7 @@ The existing header (bobblehead-header.tsx) has a straightforward structure:
 ### BobbleheadWithRelations Type Fields
 
 Available data for header display:
+
 - id, name, description, category, slug
 - userId, collectionId, subcollectionId
 - isFeatured, currentCondition, currentStatus
@@ -121,19 +123,20 @@ Available data for header display:
 
 ## Discovery Statistics
 
-| Metric | Value |
-|--------|-------|
-| Directories Explored | 8 |
-| Candidate Files Examined | 35 |
-| Relevant Files Found | 22 |
-| Critical Priority Files | 3 |
-| High Priority Files | 2 |
-| Medium Priority Files | 9 |
-| Low Priority Files | 8 |
+| Metric                   | Value |
+| ------------------------ | ----- |
+| Directories Explored     | 8     |
+| Candidate Files Examined | 35    |
+| Relevant Files Found     | 22    |
+| Critical Priority Files  | 3     |
+| High Priority Files      | 2     |
+| Medium Priority Files    | 9     |
+| Low Priority Files       | 8     |
 
 ## File Validation Results
 
 All discovered file paths validated as existing in the codebase:
+
 - Critical files: 3/3 exist
 - High priority files: 2/2 exist
 - Medium priority files: 9/9 exist
@@ -141,4 +144,4 @@ All discovered file paths validated as existing in the codebase:
 
 ---
 
-*Step 2 completed successfully - 22 relevant files discovered across all architectural layers*
+_Step 2 completed successfully - 22 relevant files discovered across all architectural layers_

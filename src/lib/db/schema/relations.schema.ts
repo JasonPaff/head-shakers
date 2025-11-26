@@ -4,31 +4,19 @@ import { contentViews, searchQueries } from '@/lib/db/schema/analytics.schema';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads.schema';
 import { collections, subCollections } from '@/lib/db/schema/collections.schema';
 import { contentReports } from '@/lib/db/schema/moderation.schema';
-import { comments, follows, likes } from '@/lib/db/schema/social.schema';
+import { comments, likes } from '@/lib/db/schema/social.schema';
 import { featuredContent, notifications } from '@/lib/db/schema/system.schema';
 import { tags } from '@/lib/db/schema/tags.schema';
-import {
-  loginHistory,
-  notificationSettings,
-  userActivity,
-  userBlocks,
-  users,
-  userSessions,
-  userSettings,
-} from '@/lib/db/schema/users.schema';
+import { notificationSettings, userBlocks, users, userSettings } from '@/lib/db/schema/users.schema';
 
 export const usersRelations = relations(users, ({ many, one }) => ({
-  activity: many(userActivity),
   blockedBy: many(userBlocks, { relationName: 'blocked' }),
   blocks: many(userBlocks, { relationName: 'blocker' }),
   bobbleheads: many(bobbleheads),
   collections: many(collections),
   comments: many(comments),
   contentViews: many(contentViews),
-  followers: many(follows, { relationName: 'following' }),
-  following: many(follows, { relationName: 'follower' }),
   likes: many(likes),
-  loginHistory: many(loginHistory),
   moderatedReports: many(contentReports, { relationName: 'moderator' }),
   notifications: many(notifications),
   notificationSettings: one(notificationSettings, {
@@ -37,7 +25,6 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   }),
   reports: many(contentReports, { relationName: 'reporter' }),
   searchQueries: many(searchQueries),
-  sessions: many(userSessions),
   settings: one(userSettings, {
     fields: [users.id],
     references: [userSettings.userId],
@@ -113,19 +100,6 @@ export const bobbleheadTagsRelations = relations(bobbleheadTags, ({ one }) => ({
   }),
 }));
 
-export const followsRelations = relations(follows, ({ one }) => ({
-  follower: one(users, {
-    fields: [follows.followerId],
-    references: [users.id],
-    relationName: 'follower',
-  }),
-  following: one(users, {
-    fields: [follows.followingId],
-    references: [users.id],
-    relationName: 'following',
-  }),
-}));
-
 export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
   blocked: one(users, {
     fields: [userBlocks.blockedId],
@@ -173,13 +147,6 @@ export const notificationsRelations = relations(notifications, ({ one }) => ({
   }),
 }));
 
-export const userActivityRelations = relations(userActivity, ({ one }) => ({
-  user: one(users, {
-    fields: [userActivity.userId],
-    references: [users.id],
-  }),
-}));
-
 export const contentViewsRelations = relations(contentViews, ({ one }) => ({
   viewer: one(users, {
     fields: [contentViews.viewerId],
@@ -210,13 +177,6 @@ export const contentReportsRelations = relations(contentReports, ({ one }) => ({
 export const featuredContentRelations = relations(featuredContent, ({ one }) => ({
   curator: one(users, {
     fields: [featuredContent.curatorId],
-    references: [users.id],
-  }),
-}));
-
-export const userSessionsRelations = relations(userSessions, ({ one }) => ({
-  user: one(users, {
-    fields: [userSessions.userId],
     references: [users.id],
   }),
 }));

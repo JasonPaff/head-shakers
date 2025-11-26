@@ -85,7 +85,6 @@ export class UserSyncService {
     try {
       // extract and map Clerk user data to database schema
       const email = getEmail(clerkUser);
-      const isVerified = isEmailVerified(clerkUser);
 
       if (!email) {
         throw new Error('User email is required');
@@ -94,12 +93,6 @@ export class UserSyncService {
       // generate username from Clerk username or email
       const baseUsername = clerkUser.username || email.split('@')[0] || 'user';
       const username = await this.generateUniqueUsername(baseUsername, dbInstance);
-
-      // build display name from firstName + lastName or fallback to username
-      const firstName = getFirstName(clerkUser);
-      const lastName = getLastName(clerkUser);
-      const displayName =
-        firstName && lastName ? `${firstName} ${lastName}`.trim() : firstName || lastName || username;
 
       // perform transaction: create user + settings
       const result = await dbInstance.transaction(async (tx) => {
@@ -113,9 +106,7 @@ export class UserSyncService {
           .values({
             avatarUrl,
             clerkId: clerkUser.id,
-            displayName,
             email,
-            isVerified,
             username,
           })
           .returning();
@@ -209,17 +200,10 @@ export class UserSyncService {
 
     try {
       const email = getEmail(clerkUser);
-      const isVerified = isEmailVerified(clerkUser);
 
       if (!email) {
         throw new Error('User email is required');
       }
-
-      // build display name
-      const firstName = getFirstName(clerkUser);
-      const lastName = getLastName(clerkUser);
-      const displayName =
-        firstName && lastName ? `${firstName} ${lastName}`.trim() : firstName || lastName || null;
 
       // get avatar URL and handle length constraints
       const rawAvatarUrl = getImageUrl(clerkUser);
@@ -232,9 +216,7 @@ export class UserSyncService {
         .update(users)
         .set({
           avatarUrl,
-          displayName: displayName || undefined,
           email,
-          isVerified,
           updatedAt: new Date(),
         })
         .where(eq(users.clerkId, clerkUser.id))
@@ -331,16 +313,6 @@ function getEmail(user: ClerkUser): string | undefined {
 }
 
 /**
- * helper to extract first name
- */
-function getFirstName(user: ClerkUser): null | string {
-  if ('firstName' in user) {
-    return user.firstName;
-  }
-  return user.first_name;
-}
-
-/**
  * helper to extract image URL
  */
 function getImageUrl(user: ClerkUser): string | undefined {
@@ -348,24 +320,4 @@ function getImageUrl(user: ClerkUser): string | undefined {
     return user.imageUrl;
   }
   return user.image_url;
-}
-
-/**
- * helper to extract last name
- */
-function getLastName(user: ClerkUser): null | string {
-  if ('lastName' in user) {
-    return user.lastName;
-  }
-  return user.last_name;
-}
-
-/**
- * helper to check if email is verified
- */
-function isEmailVerified(user: ClerkUser): boolean {
-  if ('emailAddresses' in user) {
-    return user.emailAddresses?.[0]?.verification?.status === 'verified';
-  }
-  return user.email_addresses?.[0]?.verification?.status === 'verified';
 }

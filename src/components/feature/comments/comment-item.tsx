@@ -130,7 +130,7 @@ export const CommentItem = ({
   const _isDeeplyNested = depth >= 3;
 
   // Display values
-  const _displayName = comment.user?.displayName || 'Deleted User';
+  const _displayName = comment.user?.username || 'Deleted User';
   const _username = comment.user?.username || 'deleted';
   const _avatarUrl = comment.user?.avatarUrl;
 

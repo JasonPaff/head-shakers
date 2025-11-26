@@ -39,11 +39,7 @@ import {
 ### Sentry Constants
 
 ```typescript
-import {
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_LEVELS,
-  SENTRY_OPERATIONS,
-} from '@/lib/constants';
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS, SENTRY_OPERATIONS } from '@/lib/constants';
 ```
 
 ## Service Architecture
@@ -78,11 +74,11 @@ export class ResendService {
 
 ### Method Naming Conventions
 
-| Pattern | Example | Use Case |
-|---------|---------|----------|
-| `send{Type}Async` | `sendWaitlistConfirmationAsync` | Single email operations |
-| `send{Type}BatchAsync` | `sendLaunchNotificationsAsync` | Batch email operations |
-| `get{Type}EmailHtml` | `getConfirmationEmailHtml` | Private HTML template methods |
+| Pattern                | Example                         | Use Case                      |
+| ---------------------- | ------------------------------- | ----------------------------- |
+| `send{Type}Async`      | `sendWaitlistConfirmationAsync` | Single email operations       |
+| `send{Type}BatchAsync` | `sendLaunchNotificationsAsync`  | Batch email operations        |
+| `get{Type}EmailHtml`   | `getConfirmationEmailHtml`      | Private HTML template methods |
 
 ## Email Sending Patterns
 
@@ -192,16 +188,19 @@ const { data, error } = await resend.batch.send([
 
 ```typescript
 // Prevent duplicate sends with idempotency keys
-const { data, error } = await resend.emails.send({
-  from: 'Head Shakers <noreply@send.head-shakers.com>',
-  to: email,
-  subject: 'Order Confirmation',
-  html: this.getOrderConfirmationHtml(orderId),
-}, {
-  headers: {
-    'Idempotency-Key': `order-confirmation-${orderId}`,
+const { data, error } = await resend.emails.send(
+  {
+    from: 'Head Shakers <noreply@send.head-shakers.com>',
+    to: email,
+    subject: 'Order Confirmation',
+    html: this.getOrderConfirmationHtml(orderId),
   },
-});
+  {
+    headers: {
+      'Idempotency-Key': `order-confirmation-${orderId}`,
+    },
+  },
+);
 ```
 
 ## Resilience Patterns
@@ -314,16 +313,16 @@ private static getConfirmationEmailHtml(): string {
 
 ### Template Structure Guidelines
 
-| Section | Required | Purpose |
-|---------|----------|---------|
-| DOCTYPE | Yes | HTML5 document type |
-| meta charset | Yes | UTF-8 encoding |
-| meta viewport | Yes | Mobile responsiveness |
-| Inline CSS | Yes | Email client compatibility |
-| .container | Yes | Max-width 600px centering |
-| .header | Yes | Logo/title area |
-| .content | Yes | Main message body |
-| .footer | Yes | Copyright, unsubscribe |
+| Section       | Required | Purpose                    |
+| ------------- | -------- | -------------------------- |
+| DOCTYPE       | Yes      | HTML5 document type        |
+| meta charset  | Yes      | UTF-8 encoding             |
+| meta viewport | Yes      | Mobile responsiveness      |
+| Inline CSS    | Yes      | Email client compatibility |
+| .container    | Yes      | Max-width 600px centering  |
+| .header       | Yes      | Logo/title area            |
+| .content      | Yes      | Main message body          |
+| .footer       | Yes      | Copyright, unsubscribe     |
 
 ### React Email Templates (Complex Emails)
 
@@ -524,35 +523,32 @@ const { data: broadcast, error: createError } = await resend.broadcasts.create({
 });
 
 // Step 2: Send the broadcast
-const { data: sent, error: sendError } = await resend.broadcasts.send(
-  broadcast.id,
-  {
-    scheduledAt: 'in 1 hour', // Or ISO 8601: '2025-01-15T10:00:00Z'
-  },
-);
+const { data: sent, error: sendError } = await resend.broadcasts.send(broadcast.id, {
+  scheduledAt: 'in 1 hour', // Or ISO 8601: '2025-01-15T10:00:00Z'
+});
 ```
 
 ### Template Variable Syntax
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `{{{FIRST_NAME}}}` | Contact first name | John |
-| `{{{LAST_NAME}}}` | Contact last name | Doe |
-| `{{{EMAIL}}}` | Contact email | john@example.com |
-| `{{{VAR\|fallback}}}` | Variable with fallback | `{{{FIRST_NAME\|there}}}` |
-| `{{{RESEND_UNSUBSCRIBE_URL}}}` | Auto-generated unsubscribe link | Required in broadcasts |
+| Variable                       | Description                     | Example                   |
+| ------------------------------ | ------------------------------- | ------------------------- |
+| `{{{FIRST_NAME}}}`             | Contact first name              | John                      |
+| `{{{LAST_NAME}}}`              | Contact last name               | Doe                       |
+| `{{{EMAIL}}}`                  | Contact email                   | john@example.com          |
+| `{{{VAR\|fallback}}}`          | Variable with fallback          | `{{{FIRST_NAME\|there}}}` |
+| `{{{RESEND_UNSUBSCRIBE_URL}}}` | Auto-generated unsubscribe link | Required in broadcasts    |
 
 ### Scheduled Sending
 
 ```typescript
 // Natural language
-scheduledAt: 'in 1 min'
-scheduledAt: 'in 1 hour'
-scheduledAt: 'tomorrow at 9am'
+scheduledAt: 'in 1 min';
+scheduledAt: 'in 1 hour';
+scheduledAt: 'tomorrow at 9am';
 
 // ISO 8601
-scheduledAt: '2025-01-15T10:00:00Z'
-scheduledAt: '2025-01-15T10:00:00.000Z'
+scheduledAt: '2025-01-15T10:00:00Z';
+scheduledAt: '2025-01-15T10:00:00.000Z';
 ```
 
 ## Sentry Integration
@@ -587,25 +583,25 @@ Sentry.captureException(new Error(`Resend error: ${JSON.stringify(error)}`), {
 
 ### Context Guidelines
 
-| Include | Exclude |
-|---------|---------|
-| Operation name | Email addresses |
-| Recipient count | Email content |
+| Include                | Exclude              |
+| ---------------------- | -------------------- |
+| Operation name         | Email addresses      |
+| Recipient count        | Email content        |
 | Email ID (from Resend) | Personal information |
-| Error codes | Subject lines |
-| Batch index | Template data |
+| Error codes            | Subject lines        |
+| Batch index            | Template data        |
 
 ## From Address Configuration
 
 ```typescript
 // Standard transactional
-from: 'Head Shakers <noreply@send.head-shakers.com>'
+from: 'Head Shakers <noreply@send.head-shakers.com>';
 
 // Newsletter/Marketing
-from: 'Head Shakers Newsletter <newsletter@send.head-shakers.com>'
+from: 'Head Shakers Newsletter <newsletter@send.head-shakers.com>';
 
 // Support
-from: 'Head Shakers Support <support@send.head-shakers.com>'
+from: 'Head Shakers Support <support@send.head-shakers.com>';
 ```
 
 ## Result Patterns
@@ -614,19 +610,17 @@ from: 'Head Shakers Support <support@send.head-shakers.com>'
 
 ```typescript
 // Return boolean for single email
-async function sendEmailAsync(email: string): Promise<boolean>
+async function sendEmailAsync(email: string): Promise<boolean>;
 ```
 
 ### Bulk Operations
 
 ```typescript
 // Return detailed results for bulk operations
-async function sendBatchAsync(
-  emails: Array<string>
-): Promise<{
+async function sendBatchAsync(emails: Array<string>): Promise<{
   failedEmails: Array<string>;
   sentCount: number;
-}>
+}>;
 ```
 
 ### Broadcast Operations
@@ -640,7 +634,7 @@ async function sendBroadcastAsync(
   broadcastId: string;
   scheduledAt?: string;
   success: boolean;
-}>
+}>;
 ```
 
 ## File Organization
@@ -706,20 +700,20 @@ src/
 
    ```typescript
    // BAD
-   to: 'admin@company.com'
+   to: 'admin@company.com';
 
    // GOOD
-   to: process.env.ADMIN_EMAIL
+   to: process.env.ADMIN_EMAIL;
    ```
 
 5. **Never send broadcasts without unsubscribe link**
 
    ```typescript
    // BAD
-   html: '<p>Newsletter content</p>'
+   html: '<p>Newsletter content</p>';
 
    // GOOD
-   html: '<p>Newsletter content</p><a href="{{{RESEND_UNSUBSCRIBE_URL}}}">Unsubscribe</a>'
+   html: '<p>Newsletter content</p><a href="{{{RESEND_UNSUBSCRIBE_URL}}}">Unsubscribe</a>';
    ```
 
 6. **Never use external CSS in emails**
@@ -743,7 +737,7 @@ src/
 
    // GOOD - Track failures, continue processing
    const results = await Promise.allSettled(emails.map(sendEmail));
-   const failed = results.filter(r => r.status === 'rejected');
+   const failed = results.filter((r) => r.status === 'rejected');
    ```
 
 ## Testing Patterns
@@ -768,7 +762,7 @@ vi.mock('resend', () => ({
 
 ```typescript
 // Resend test addresses
-to: 'delivered@resend.dev'    // Always succeeds
-to: 'bounced@resend.dev'      // Always bounces
-to: 'complained@resend.dev'   // Always marks as spam
+to: 'delivered@resend.dev'; // Always succeeds
+to: 'bounced@resend.dev'; // Always bounces
+to: 'complained@resend.dev'; // Always marks as spam
 ```

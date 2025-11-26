@@ -4,22 +4,20 @@ import type { ComponentPropsWithRef } from 'react';
 
 import {
   CalendarIcon,
-  CheckCircleIcon,
   ClockIcon,
   FolderIcon,
   Loader2Icon,
   LockIcon,
-  MailCheckIcon,
+  MailIcon,
   MapPinIcon,
   PackageIcon,
   ShieldIcon,
   UnlockIcon,
   UserIcon,
-  XCircleIcon,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import type { UserStats, UserWithActivity } from '@/lib/queries/users/users-query';
+import type { UserRecord, UserStats } from '@/lib/queries/users/users-query';
 
 import { Alert } from '@/components/ui/alert';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -40,14 +38,13 @@ import {
   getUserDetailsAction,
   lockUserAction,
   unlockUserAction,
-  verifyUserEmailAction,
 } from '@/lib/actions/admin/admin-users.actions';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserDetailsData = {
   stats: UserStats;
-  user: UserWithActivity;
+  user: UserRecord;
 };
 
 type UserDetailsDialogProps = ComponentPropsWithRef<'div'> & {
@@ -94,18 +91,6 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
       error: 'Failed to unlock user account',
       loading: 'Unlocking user account...',
       success: 'User account unlocked successfully',
-    },
-  });
-
-  const { executeAsync: verifyEmail, isPending: isVerifying } = useServerAction(verifyUserEmailAction, {
-    onSuccess: () => {
-      onSuccess?.();
-      void refetchUserDetails();
-    },
-    toastMessages: {
-      error: 'Failed to verify user email',
-      loading: 'Verifying user email...',
-      success: 'User email verified successfully',
     },
   });
 
@@ -161,7 +146,7 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
 
   // Event handlers
   const handleClose = () => {
-    if (!isLocking && !isUnlocking && !isVerifying) {
+    if (!isLocking && !isUnlocking) {
       onClose();
     }
   };
@@ -182,26 +167,12 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
     await unlockUser({ userId });
   };
 
-  const handleVerifyEmail = async () => {
-    if (!userId) return;
-    await verifyEmail({ userId });
-  };
-
   // Derived variables
   const _hasUserDetails = !!userDetails;
   const _isUserLocked =
     userDetails?.user.lockedUntil ? new Date(userDetails.user.lockedUntil) > new Date() : false;
-  const _isUserVerified = userDetails?.user.isVerified ?? false;
-  const _isActionPending = isLocking || isUnlocking || isVerifying;
-  const _userInitials =
-    userDetails?.user.displayName ?
-      userDetails.user.displayName
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : (userDetails?.user.username?.slice(0, 2).toUpperCase() ?? 'U');
+  const _isActionPending = isLocking || isUnlocking;
+  const _userInitials = userDetails?.user.username?.slice(0, 2).toUpperCase() ?? 'U';
 
   const _getRoleBadgeClass = (role: string) => {
     switch (role) {
@@ -282,20 +253,18 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
               >
                 <Avatar className={'size-16'}>
                   <AvatarImage
-                    alt={userDetails?.user.displayName ?? userDetails?.user.username ?? 'User'}
+                    alt={userDetails?.user.username ?? 'User'}
                     src={userDetails?.user.avatarUrl ?? undefined}
                   />
                   <AvatarFallback className={'text-lg'}>{_userInitials}</AvatarFallback>
                 </Avatar>
                 <div className={'flex-1 space-y-2'}>
                   <div>
-                    <div className={'text-lg font-semibold'}>
-                      {userDetails?.user.displayName ?? userDetails?.user.username}
-                    </div>
+                    <div className={'text-lg font-semibold'}>{userDetails?.user.username}</div>
                     <div className={'text-sm text-muted-foreground'}>@{userDetails?.user.username}</div>
                   </div>
                   <div className={'flex items-center gap-2 text-sm text-muted-foreground'}>
-                    <MailCheckIcon aria-hidden className={'size-4'} />
+                    <MailIcon aria-hidden className={'size-4'} />
                     {userDetails?.user.email}
                   </div>
                   <Conditional isCondition={!!userDetails?.user.location}>
@@ -328,23 +297,6 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
                   >
                     {(userDetails?.user.role ?? 'user').charAt(0).toUpperCase() +
                       (userDetails?.user.role ?? 'user').slice(1)}
-                  </Badge>
-                </div>
-
-                {/* Verified Status */}
-                <div
-                  className={'flex flex-col items-center gap-2 rounded-lg border p-3'}
-                  data-slot={'user-details-verified'}
-                >
-                  <Conditional isCondition={_isUserVerified}>
-                    <CheckCircleIcon aria-hidden className={'size-5 text-green-500'} />
-                  </Conditional>
-                  <Conditional isCondition={!_isUserVerified}>
-                    <XCircleIcon aria-hidden className={'size-5 text-amber-500'} />
-                  </Conditional>
-                  <span className={'text-xs text-muted-foreground'}>Email</span>
-                  <Badge variant={_isUserVerified ? 'default' : 'outline'}>
-                    {_isUserVerified ? 'Verified' : 'Unverified'}
                   </Badge>
                 </div>
 
@@ -386,11 +338,6 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
                   <span className={'text-muted-foreground'}>Last Active:</span>
                   <span>{_formatDateTime(userDetails?.user.lastActiveAt)}</span>
                 </div>
-                <div className={'flex items-center gap-2 text-sm'} data-slot={'user-details-member-since'}>
-                  <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />
-                  <span className={'text-muted-foreground'}>Member Since:</span>
-                  <span>{_formatDate(userDetails?.user.memberSince)}</span>
-                </div>
               </div>
             </section>
 
@@ -424,30 +371,6 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
                 </div>
               </div>
             </section>
-
-            {/* Recent Activity Section */}
-            <Conditional
-              isCondition={!!userDetails?.user.recentActivity && userDetails.user.recentActivity.length > 0}
-            >
-              <section data-slot={'user-details-activity-section'}>
-                <h3 className={'mb-3 text-sm font-semibold text-muted-foreground'}>Recent Activity</h3>
-                <div
-                  className={'max-h-40 space-y-2 overflow-y-auto'}
-                  data-slot={'user-details-activity-list'}
-                >
-                  {userDetails?.user.recentActivity?.map((activity) => (
-                    <div
-                      className={'flex items-center justify-between rounded border px-3 py-2 text-sm'}
-                      data-slot={'user-details-activity-item'}
-                      key={activity.id}
-                    >
-                      <span className={'capitalize'}>{activity.actionType.replace(/_/g, ' ')}</span>
-                      <span className={'text-muted-foreground'}>{_formatDateTime(activity.createdAt)}</span>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </Conditional>
           </div>
         </Conditional>
 
@@ -487,25 +410,6 @@ export const UserDetailsDialog = ({ isOpen, onClose, onSuccess, userId }: UserDe
                   <LockIcon aria-hidden className={'mr-2 size-4'} />
                 </Conditional>
                 {isLocking ? 'Locking...' : 'Lock Account'}
-              </Button>
-            </Conditional>
-
-            {/* Verify Email Button */}
-            <Conditional isCondition={!_isUserVerified}>
-              <Button
-                disabled={_isActionPending}
-                onClick={() => {
-                  void handleVerifyEmail();
-                }}
-                variant={'outline'}
-              >
-                <Conditional isCondition={isVerifying}>
-                  <Loader2Icon aria-hidden className={'mr-2 size-4 animate-spin'} />
-                </Conditional>
-                <Conditional isCondition={!isVerifying}>
-                  <MailCheckIcon aria-hidden className={'mr-2 size-4'} />
-                </Conditional>
-                {isVerifying ? 'Verifying...' : 'Verify Email'}
               </Button>
             </Conditional>
 

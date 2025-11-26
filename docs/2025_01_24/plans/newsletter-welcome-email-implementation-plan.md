@@ -33,9 +33,11 @@ Add automated welcome email functionality for new newsletter subscribers that in
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/resend.service.ts` - Add `getNewsletterWelcomeEmailHtml()` private method
 
 **Changes:**
+
 - Add private `getNewsletterWelcomeEmailHtml()` method that returns HTML string
 - Follow the template structure used in `getLaunchNotificationEmailHtml()` and `getWaitlistConfirmationEmailHtml()`
 - Include welcome message, newsletter description (bobblehead trends, collector features, platform news), and frequency information (approximately once per week)
@@ -44,11 +46,13 @@ Add automated welcome email functionality for new newsletter subscribers that in
 - Include unsubscribe information/link placeholder consistent with newsletter requirements
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method returns properly formatted HTML string
 - [ ] Template follows existing email template patterns
 - [ ] All validation commands pass
@@ -63,9 +67,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/resend.service.ts` - Add `sendNewsletterWelcomeAsync()` public method
 
 **Changes:**
+
 - Add public `sendNewsletterWelcomeAsync(email: string)` method with email parameter
 - Use `sendEmailWithRetry()` wrapper with MAX_RETRIES (3) and TIMEOUT (10000ms)
 - Wrap send logic in `circuitBreakers.externalService()` for resilience
@@ -79,11 +85,13 @@ npm run lint:fix && npm run typecheck
 - Follow exact pattern from `sendLaunchNotificationEmailAsync()` and `sendWaitlistConfirmationEmailAsync()`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method signature matches established patterns
 - [ ] Circuit breaker protection is applied
 - [ ] Retry logic is implemented correctly
@@ -101,20 +109,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/operations.ts` - Add newsletter welcome email operation constant
 
 **Changes:**
+
 - Add `SEND_NEWSLETTER_WELCOME_EMAIL` constant to the NEWSLETTER operations group (if it exists) or create the group if needed
 - Follow naming convention of existing operation constants (e.g., `OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL`)
 - Ensure the constant is properly exported and typed
 - Use descriptive string value that clearly identifies the operation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Constant is added to appropriate operations group
 - [ ] Naming follows existing conventions
 - [ ] Constant is properly typed and exported
@@ -129,9 +141,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Add email sending in `subscribeAsync()` method
 
 **Changes:**
+
 - Import `resendService` from ResendService
 - After successful database insert in `subscribeAsync()`, check if `result.isAlreadySubscribed === false`
 - If true (new subscriber), call `resendService.sendNewsletterWelcomeAsync(email)` asynchronously
@@ -143,11 +157,13 @@ npm run lint:fix && npm run typecheck
 - Ensure the subscription still returns success even if email fails (graceful degradation)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Email is only sent when `isAlreadySubscribed === false`
 - [ ] Email failures are logged but don't affect subscription success
 - [ ] Sentry monitoring is properly configured
@@ -164,9 +180,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/services/resend.service.ts` - Verify exports and type definitions
 
 **Changes:**
+
 - Ensure `sendNewsletterWelcomeAsync()` is included in the ResendService class export
 - Verify return type is explicitly defined as `Promise<boolean>`
 - Confirm parameter type for email is `string`
@@ -174,11 +192,13 @@ npm run lint:fix && npm run typecheck
 - Ensure no breaking changes to existing ResendService interface
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method is properly exported from ResendService
 - [ ] Type definitions are explicit and correct
 - [ ] No breaking changes to existing service interface

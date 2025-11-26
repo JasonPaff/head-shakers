@@ -58,7 +58,7 @@ export const UsersDataTable = ({
 }: UsersDataTableProps) => {
   // useState hooks
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [sorting, setSorting] = useState<SortingState>([{ desc: true, id: 'memberSince' }]);
+  const [sorting, setSorting] = useState<SortingState>([{ desc: true, id: 'createdAt' }]);
 
   // Other hooks
   const [pagination, setPagination] = useQueryStates(
@@ -129,20 +129,6 @@ export const UsersDataTable = ({
         size: 200,
       },
       {
-        accessorKey: 'displayName',
-        cell: ({ row }) => {
-          const displayName = row.original.displayName;
-          return (
-            <div className={'text-sm'} data-slot={'users-table-display-name'}>
-              {displayName}
-            </div>
-          );
-        },
-        enableSorting: false,
-        header: 'Display Name',
-        size: 150,
-      },
-      {
         accessorKey: 'role',
         cell: ({ row }) => {
           const role = row.original.role;
@@ -173,7 +159,6 @@ export const UsersDataTable = ({
           const user = row.original;
           const now = new Date();
           const _isLocked = user.lockedUntil && new Date(user.lockedUntil) > now;
-          const _isVerified = user.isVerified;
           const _isActive = !_isLocked;
 
           return (
@@ -194,14 +179,6 @@ export const UsersDataTable = ({
                   Locked
                 </Badge>
               </Conditional>
-              <Conditional isCondition={!_isVerified}>
-                <Badge
-                  className={'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'}
-                  variant={'secondary'}
-                >
-                  Unverified
-                </Badge>
-              </Conditional>
             </div>
           );
         },
@@ -211,18 +188,18 @@ export const UsersDataTable = ({
         size: 180,
       },
       {
-        accessorKey: 'memberSince',
+        accessorKey: 'createdAt',
         cell: ({ row }) => {
-          const memberSince = row.original.memberSince;
-          const _hasDate = !!memberSince;
+          const createdAt = row.original.createdAt;
+          const _hasDate = !!createdAt;
 
           return (
-            <div data-slot={'users-table-member-since'}>
+            <div data-slot={'users-table-created-at'}>
               <Conditional isCondition={_hasDate}>
                 <div className={'space-y-0.5'}>
-                  <div className={'text-sm'}>{new Date(memberSince).toLocaleDateString()}</div>
+                  <div className={'text-sm'}>{new Date(createdAt).toLocaleDateString()}</div>
                   <div className={'text-xs text-muted-foreground'}>
-                    {new Date(memberSince).toLocaleTimeString()}
+                    {new Date(createdAt).toLocaleTimeString()}
                   </div>
                 </div>
               </Conditional>
@@ -233,7 +210,7 @@ export const UsersDataTable = ({
           );
         },
         enableSorting: true,
-        header: 'Member Since',
+        header: 'Created',
         size: 150,
       },
       {

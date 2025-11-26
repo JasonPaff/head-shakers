@@ -66,14 +66,9 @@ export const ENUMS = {
   USER: {
     ROLE: ['user', 'moderator', 'admin'] as const,
   },
-  USER_ACTIVITY: {
-    ACTION_TYPE: ['create', 'update', 'delete', 'like', 'comment', 'follow', 'unfollow', 'view'] as const,
-    TARGET_TYPE: ['bobblehead', 'collection', 'subcollection', 'user', 'comment'] as const,
-  },
   USER_SETTINGS: {
     COMMENT_PERMISSION: ['anyone', 'followers', 'none'] as const,
     DIGEST_FREQUENCY: ['daily', 'weekly', 'monthly', 'never'] as const,
-    DM_PERMISSION: ['anyone', 'followers', 'mutual', 'none'] as const,
     PRIVACY_LEVEL: ['public', 'followers', 'private'] as const,
     THEME: ['light', 'dark', 'auto'] as const,
   },

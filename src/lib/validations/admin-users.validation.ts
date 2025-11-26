@@ -7,10 +7,8 @@ import { zodMaxString } from '@/lib/utils/zod.utils';
  * Admin user status filter options
  * - active: Users not locked and not deleted
  * - locked: Users with lockedUntil in the future
- * - verified: Users with isVerified = true
- * - unverified: Users with isVerified = false
  */
-const adminUserStatusValues = ['active', 'locked', 'verified', 'unverified'] as const;
+const adminUserStatusValues = ['active', 'locked'] as const;
 
 /**
  * Sortable fields for admin user list
@@ -18,7 +16,6 @@ const adminUserStatusValues = ['active', 'locked', 'verified', 'unverified'] as 
 const adminUserSortByValues = [
   'createdAt',
   'updatedAt',
-  'displayName',
   'username',
   'email',
   'lastActiveAt',
@@ -80,7 +77,7 @@ export const adminLockUserSchema = z.object({
   reason: zodMaxString({
     fieldName: 'Reason',
     isRequired: false,
-    maxLength: SCHEMA_LIMITS.USER_BLOCK.REASON.MAX,
+    maxLength: SCHEMA_LIMITS.ADMIN_LOCK.REASON.MAX,
   }).optional(),
   userId: z.string().uuid('Invalid user ID'),
 });
@@ -89,13 +86,6 @@ export const adminLockUserSchema = z.object({
  * Schema for unlocking a user account
  */
 export const adminUnlockUserSchema = z.object({
-  userId: z.string().uuid('Invalid user ID'),
-});
-
-/**
- * Schema for manually verifying a user's email
- */
-export const adminVerifyUserEmailSchema = z.object({
   userId: z.string().uuid('Invalid user ID'),
 });
 
@@ -129,6 +119,4 @@ export type AdminUserSortBy = (typeof adminUserSortByValues)[number];
 // Enum type exports
 export type AdminUserStatus = (typeof adminUserStatusValues)[number];
 
-export type AdminVerifyUserEmail = z.infer<typeof adminVerifyUserEmailSchema>;
-export type AdminVerifyUserEmailInput = z.input<typeof adminVerifyUserEmailSchema>;
 export type AssignableRole = (typeof assignableRoleValues)[number];

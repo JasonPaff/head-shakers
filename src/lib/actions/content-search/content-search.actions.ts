@@ -290,7 +290,7 @@ export const getUserForFeaturingAction = adminActionClient
           user: result.user,
         },
         level: SENTRY_LEVELS.INFO,
-        message: `Retrieved user for featuring: ${result.user.displayName || result.user.username}`,
+        message: `Retrieved user for featuring: ${result.user.username}`,
       });
 
       return result;

@@ -5,7 +5,6 @@ export const mockUser = {
   bio: 'Passionate bobblehead collector',
   clerkId: 'clerk-test-user-id',
   createdAt: new Date('2024-01-01'),
-  displayName: 'Test User',
   email: 'test@example.com',
   id: 'test-user-id',
   imageUrl: 'https://example.com/avatar.jpg',
@@ -17,7 +16,6 @@ export const mockUser = {
 export const mockAdminUser = {
   ...mockUser,
   clerkId: 'clerk-admin-user-id',
-  displayName: 'Admin User',
   email: 'admin@example.com',
   id: 'admin-user-id',
   isAdmin: true,
@@ -29,7 +27,6 @@ export const mockNewUser = {
   bio: null,
   clerkId: 'clerk-new-user-id',
   createdAt: new Date(),
-  displayName: null,
   email: 'newuser@example.com',
   id: 'new-user-id',
   imageUrl: null,

@@ -1,11 +1,6 @@
 import { eq } from 'drizzle-orm';
 
-import type {
-  AdminUserListRecord,
-  UserRecord,
-  UserStats,
-  UserWithActivity,
-} from '@/lib/queries/users/users-query';
+import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { AdminUsersFilter, AssignableRole } from '@/lib/validations/admin-users.validation';
 
@@ -101,32 +96,32 @@ export class UsersFacade {
 
   /**
    * Get comprehensive user details for admin view
-   * Includes user data, recent activity, and statistics
+   * Includes user data and statistics
    *
    * @param userId - User ID to fetch details for
    * @param dbInstance - Optional database instance for transactions
-   * @returns User with activity and stats, or null if not found
+   * @returns User with stats, or null if not found
    */
   static async getUserDetailsForAdminAsync(
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | {
     stats: UserStats;
-    user: UserWithActivity;
+    user: UserRecord;
   }> {
     const context = createPublicQueryContext({ dbInstance });
 
-    // Fetch user with activity and stats in parallel
-    const [userWithActivity, stats] = await Promise.all([
-      UsersQuery.getUserWithActivityAsync(userId, context),
+    // Fetch user and stats in parallel
+    const [user, stats] = await Promise.all([
+      UsersQuery.getUserByIdForAdminAsync(userId, context),
       UsersQuery.getUserStatsAsync(userId, context),
     ]);
 
-    if (!userWithActivity || !stats) {
+    if (!user || !stats) {
       return null;
     }
 
-    return { stats, user: userWithActivity };
+    return { stats, user };
   }
 
   /**
@@ -147,7 +142,6 @@ export class UsersFacade {
   ): Promise<null | {
     avatarUrl: null | string;
     bio: null | string;
-    displayName: string;
     id: string;
     username: string;
   }> {
@@ -381,41 +375,6 @@ export class UsersFacade {
       .update(users)
       .set({
         role: newRole,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, targetUserId))
-      .returning();
-
-    const updatedUser = result[0];
-
-    if (!updatedUser) {
-      throw new Error('User not found');
-    }
-
-    // Invalidate cache for this user
-    const tags = CacheTagGenerators.user.update(targetUserId);
-    tags.forEach((tag) => CacheService.invalidateByTag(tag));
-
-    return updatedUser;
-  }
-
-  /**
-   * Manually verify a user's email
-   *
-   * @param targetUserId - User ID to verify
-   * @param dbInstance - Optional database instance for transactions
-   * @returns Updated user record
-   */
-  static async verifyUserEmailAsync(
-    targetUserId: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<UserRecord> {
-    const executor = dbInstance ?? db;
-
-    const result = await executor
-      .update(users)
-      .set({
-        isVerified: true,
         updatedAt: new Date(),
       })
       .where(eq(users.id, targetUserId))

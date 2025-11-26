@@ -41,19 +41,19 @@ This skill activates when:
 
 ### Email Sending
 
-| Operation | Method | Limit |
-|-----------|--------|-------|
-| Single email | `resend.emails.send()` | 1 per call |
-| Batch emails | `resend.batch.send()` | Up to 100 per call |
-| Broadcast | `resend.broadcasts.create()` + `send()` | Audience-based |
+| Operation    | Method                                  | Limit              |
+| ------------ | --------------------------------------- | ------------------ |
+| Single email | `resend.emails.send()`                  | 1 per call         |
+| Batch emails | `resend.batch.send()`                   | Up to 100 per call |
+| Broadcast    | `resend.broadcasts.create()` + `send()` | Audience-based     |
 
 ### Template Patterns
 
-| Type | Use Case | Location |
-|------|----------|----------|
-| Inline HTML | Simple confirmations, notifications | Private static methods |
-| React Email | Complex newsletters, rich content | `src/lib/email-templates/` |
-| Resend API Templates | Variable-based templates | Resend dashboard/API |
+| Type                 | Use Case                            | Location                   |
+| -------------------- | ----------------------------------- | -------------------------- |
+| Inline HTML          | Simple confirmations, notifications | Private static methods     |
+| React Email          | Complex newsletters, rich content   | `src/lib/email-templates/` |
+| Resend API Templates | Variable-based templates            | Resend dashboard/API       |
 
 ### Error Handling
 
@@ -80,13 +80,13 @@ This skill activates when:
 
 ## Usage Pattern Reference
 
-| Use Case | Method | Skills Needed |
-|----------|--------|---------------|
-| Waitlist confirmation | `sendWaitlistConfirmationAsync` | resend-email |
-| Welcome email | `sendNewsletterWelcomeAsync` | resend-email |
-| Bulk notifications | `sendLaunchNotificationsAsync` | resend-email |
-| Newsletter broadcast | `sendBroadcastAsync` | resend-email, sentry-monitoring |
-| React template email | `sendWithTemplateAsync` | resend-email |
+| Use Case              | Method                          | Skills Needed                   |
+| --------------------- | ------------------------------- | ------------------------------- |
+| Waitlist confirmation | `sendWaitlistConfirmationAsync` | resend-email                    |
+| Welcome email         | `sendNewsletterWelcomeAsync`    | resend-email                    |
+| Bulk notifications    | `sendLaunchNotificationsAsync`  | resend-email                    |
+| Newsletter broadcast  | `sendBroadcastAsync`            | resend-email, sentry-monitoring |
+| React template email  | `sendWithTemplateAsync`         | resend-email                    |
 
 ## References
 

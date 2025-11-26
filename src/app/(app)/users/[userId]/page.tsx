@@ -56,7 +56,7 @@ export async function generateMetadata({
 
   // Use bio as description or fallback to a default
   const description =
-    user.bio || `${user.displayName}'s profile on Head Shakers - Bobblehead Collection Platform`;
+    user.bio || `${user.username}'s profile on Head Shakers - Bobblehead Collection Platform`;
 
   // Generate page metadata with OG and Twitter cards
   return generatePageMetadata(
@@ -64,7 +64,7 @@ export async function generateMetadata({
     {
       description,
       images: [profileImage],
-      title: user.displayName,
+      title: user.username,
       url: canonicalUrl,
       userId: user.id,
     },
@@ -97,7 +97,7 @@ async function UserPage({ routeParams }: UserPageProps) {
   const personSchema = generatePersonSchema({
     description: user.bio || undefined,
     image: user.avatarUrl || undefined,
-    name: user.displayName,
+    name: user.username,
     url: profileUrl,
     userId: user.id,
   });
@@ -106,7 +106,7 @@ async function UserPage({ routeParams }: UserPageProps) {
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: DEFAULT_SITE_METADATA.url },
     { name: 'Users', url: `${DEFAULT_SITE_METADATA.url}/users` },
-    { name: user.displayName }, // Current page - no URL
+    { name: user.username }, // Current page - no URL
   ]);
 
   return (
@@ -136,11 +136,11 @@ async function UserPage({ routeParams }: UserPageProps) {
                       )}
                     >
                       <span className={'text-2xl font-semibold'}>
-                        {user.displayName.charAt(0).toUpperCase()}
+                        {user.username.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <div>
-                      <CardTitle className={'mb-2 text-3xl'}>{user.displayName}</CardTitle>
+                      <CardTitle className={'mb-2 text-3xl'}>{user.username}</CardTitle>
                       {user.username && (
                         <p className={'mb-2 text-sm text-muted-foreground'}>@{user.username}</p>
                       )}

@@ -35,12 +35,12 @@
 
 ## Prerequisites Validation
 
-| Prerequisite | Status | Notes |
-|--------------|--------|-------|
-| Resend API key configured | Assumed | Environment variables |
-| Admin/moderator accounts | Assumed | Database configured |
-| Newsletter signup system | ✓ | `newsletter-signups.schema.ts` exists |
-| Database migration tools | ✓ | Drizzle Kit available |
+| Prerequisite              | Status  | Notes                                 |
+| ------------------------- | ------- | ------------------------------------- |
+| Resend API key configured | Assumed | Environment variables                 |
+| Admin/moderator accounts  | Assumed | Database configured                   |
+| Newsletter signup system  | ✓       | `newsletter-signups.schema.ts` exists |
+| Database migration tools  | ✓       | Drizzle Kit available                 |
 
 ## Existing Infrastructure
 

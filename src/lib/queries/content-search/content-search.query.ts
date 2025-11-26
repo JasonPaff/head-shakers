@@ -101,11 +101,8 @@ export type SubcollectionSearchResult = {
 export type UserSearchResult = {
   avatarUrl: null | string;
   bio: null | string;
-  displayName: null | string;
   id: string;
-  isVerified: boolean;
   location: null | string;
-  memberSince: Date;
   username: null | string;
 };
 
@@ -133,7 +130,7 @@ export class ContentSearchQuery extends BaseQuery {
         isPublic: bobbleheads.isPublic,
         manufacturer: bobbleheads.manufacturer,
         name: bobbleheads.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         primaryPhotoUrl: bobbleheadPhotos.url,
         series: bobbleheads.series,
@@ -176,7 +173,7 @@ export class ContentSearchQuery extends BaseQuery {
         id: collections.id,
         isPublic: collections.isPublic,
         name: collections.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         slug: collections.slug,
         totalItems: collections.totalItems,
@@ -205,11 +202,8 @@ export class ContentSearchQuery extends BaseQuery {
       .select({
         avatarUrl: users.avatarUrl,
         bio: users.bio,
-        displayName: users.displayName,
         id: users.id,
-        isVerified: users.isVerified,
         location: users.location,
-        memberSince: users.memberSince,
         username: users.username,
       })
       .from(users)
@@ -395,7 +389,7 @@ export class ContentSearchQuery extends BaseQuery {
       const textSearch = or(
         ilike(collections.name, `%${query}%`),
         ilike(collections.description, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
       );
       if (textSearch) collectionConditions.push(textSearch);
@@ -442,7 +436,7 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(subCollections.name, `%${query}%`),
         ilike(subCollections.description, `%${query}%`),
         ilike(collections.name, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
       );
       if (textSearch) subcollectionConditions.push(textSearch);
@@ -492,7 +486,7 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(bobbleheads.manufacturer, `%${query}%`),
         ilike(bobbleheads.series, `%${query}%`),
         ilike(bobbleheads.category, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
         ilike(collections.name, `%${query}%`),
       );
@@ -586,7 +580,7 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(bobbleheads.characterName, `%${query}%`),
         ilike(bobbleheads.manufacturer, `%${query}%`),
         ilike(bobbleheads.series, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
         ilike(collections.name, `%${query}%`),
       );
@@ -605,7 +599,7 @@ export class ContentSearchQuery extends BaseQuery {
         isPublic: bobbleheads.isPublic,
         manufacturer: bobbleheads.manufacturer,
         name: bobbleheads.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         primaryPhotoUrl: bobbleheadPhotos.url,
         series: bobbleheads.series,
@@ -677,7 +671,7 @@ export class ContentSearchQuery extends BaseQuery {
       const textSearchCondition = or(
         ilike(collections.name, `%${query}%`),
         ilike(collections.description, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
       );
       if (textSearchCondition) {
@@ -692,7 +686,7 @@ export class ContentSearchQuery extends BaseQuery {
         id: collections.id,
         isPublic: collections.isPublic,
         name: collections.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         slug: collections.slug,
         totalItems: collections.totalItems,
@@ -788,7 +782,7 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(bobbleheads.manufacturer, `%${query}%`),
         ilike(bobbleheads.series, `%${query}%`),
         ilike(bobbleheads.category, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
         ilike(collections.name, `%${query}%`),
       );
@@ -818,7 +812,7 @@ export class ContentSearchQuery extends BaseQuery {
         isPublic: bobbleheads.isPublic,
         manufacturer: bobbleheads.manufacturer,
         name: bobbleheads.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         primaryPhotoUrl: bobbleheadPhotos.url,
         series: bobbleheads.series,
@@ -891,7 +885,7 @@ export class ContentSearchQuery extends BaseQuery {
       const textSearchCondition = or(
         ilike(collections.name, `%${query}%`),
         ilike(collections.description, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
       );
       if (textSearchCondition) {
@@ -914,7 +908,7 @@ export class ContentSearchQuery extends BaseQuery {
         id: collections.id,
         isPublic: collections.isPublic,
         name: collections.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         slug: collections.slug,
         totalItems: collections.totalItems,
@@ -1016,7 +1010,7 @@ export class ContentSearchQuery extends BaseQuery {
         ilike(subCollections.name, `%${query}%`),
         ilike(subCollections.description, `%${query}%`),
         ilike(collections.name, `%${query}%`),
-        ilike(users.displayName, `%${query}%`),
+        ilike(users.username, `%${query}%`),
         ilike(users.username, `%${query}%`),
       );
       if (textSearchCondition) {
@@ -1043,7 +1037,7 @@ export class ContentSearchQuery extends BaseQuery {
         isPublic: subCollections.isPublic,
         itemCount: subCollections.itemCount,
         name: subCollections.name,
-        ownerName: users.displayName,
+        ownerName: users.username,
         ownerUsername: users.username,
         slug: subCollections.slug,
       })
@@ -1096,11 +1090,8 @@ export class ContentSearchQuery extends BaseQuery {
       .select({
         avatarUrl: users.avatarUrl,
         bio: users.bio,
-        displayName: users.displayName,
         id: users.id,
-        isVerified: users.isVerified,
         location: users.location,
-        memberSince: users.memberSince,
         username: users.username,
       })
       .from(users)
@@ -1108,7 +1099,6 @@ export class ContentSearchQuery extends BaseQuery {
         and(
           isNull(users.deletedAt),
           or(
-            ilike(users.displayName, `%${query}%`),
             ilike(users.username, `%${query}%`),
             ilike(users.bio, `%${query}%`),
             ilike(users.location, `%${query}%`),

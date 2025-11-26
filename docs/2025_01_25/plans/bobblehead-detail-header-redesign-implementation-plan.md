@@ -33,18 +33,21 @@ Transform the bobblehead detail page header from a functional text-based compone
 **Confidence**: High
 
 **Files to Read:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx`
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts`
 - `src/app/globals.css`
 
 **Changes:**
+
 - Document current component props and data structure
 - Identify all child components used in header
 - Map out current spacing, typography, and layout patterns
 - Note any conditional rendering logic
 
 **Success Criteria:**
+
 - [ ] Complete understanding of current header structure documented
 - [ ] All data dependencies identified
 - [ ] Current layout patterns mapped
@@ -59,11 +62,13 @@ Transform the bobblehead detail page header from a functional text-based compone
 **Confidence**: High
 
 **Files to Review:**
+
 - `src/app/(app)/(home)/page.tsx` (reference for hero section patterns)
 - `src/lib/utils/cloudinary.utils.ts` (image optimization utilities)
 - `src/components/ui/badge.tsx` (component variants)
 
 **Design Decisions to Document:**
+
 - Hero image placement and aspect ratio strategy
 - Title positioning (overlay vs below image)
 - Gradient overlay approach for text readability
@@ -72,6 +77,7 @@ Transform the bobblehead detail page header from a functional text-based compone
 - Spacing and padding system using Tailwind scale
 
 **Success Criteria:**
+
 - [ ] Hero section layout architecture defined
 - [ ] Responsive breakpoint strategy documented
 - [ ] Typography hierarchy planned (title, subtitle, metadata)
@@ -87,20 +93,24 @@ Transform the bobblehead detail page header from a functional text-based compone
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx`
 
 **Changes:**
+
 - Verify query returns primary photo with Cloudinary URL
 - Ensure photo dimensions are available for responsive sizing
 - Add fallback logic for bobbleheads without photos
 - Pass photo data to bobblehead-header component via props
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Primary photo data confirmed in query results
 - [ ] Photo data properly typed and passed to child component
 - [ ] Fallback strategy implemented for missing photos
@@ -115,9 +125,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
 
 **Changes:**
+
 - Add hero image section with Cloudinary CldImage component
 - Implement gradient overlay using bg-gradient-warm-vertical or custom gradient
 - Increase title size from text-4xl to text-5xl/text-6xl with font-bold
@@ -129,11 +141,13 @@ npm run lint:fix && npm run typecheck
 - Add conditional rendering for no-image fallback state
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Hero image displays with proper aspect ratio and optimization
 - [ ] Title typography is significantly bolder and larger
 - [ ] Gradient overlay ensures text readability
@@ -150,9 +164,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
 
 **Changes:**
+
 - Apply warm-orange, warm-coral, or warm-amber colors to accent elements
 - Use bg-gradient-sunset or bg-gradient-warm-vertical for background sections
 - Add shadow-warm-md or shadow-warm-lg to create elevation
@@ -162,11 +178,13 @@ npm run lint:fix && npm run typecheck
 - Apply subtle border-warm utilities if needed for separation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Warm color palette applied consistently
 - [ ] Gradients enhance visual appeal without overwhelming content
 - [ ] Shadows create appropriate depth and elevation
@@ -182,9 +200,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`
 
 **Changes:**
+
 - Apply animate-fade-in-up to header content for entrance animation
 - Add animate-fade-in-scale to hero image for visual impact
 - Use animate-card-lift on interactive elements like like button
@@ -194,11 +214,13 @@ npm run lint:fix && npm run typecheck
 - Consider prefers-reduced-motion media query for accessibility
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Entrance animations create polished loading experience
 - [ ] Hover states are smooth and responsive
 - [ ] Animations do not cause layout shifts or jank
@@ -214,9 +236,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb.tsx`
 
 **Changes:**
+
 - Increase font size and weight for better visibility
 - Apply warm color palette to breadcrumb links and separators
 - Add hover states with warm color transitions
@@ -226,11 +250,13 @@ npm run lint:fix && npm run typecheck
 - Apply text shadows or backgrounds for readability on hero images
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Breadcrumb typography enhanced and aligned with header
 - [ ] Warm colors applied to links and separators
 - [ ] Hover states are smooth and visually appealing
@@ -247,9 +273,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx`
 
 **Changes:**
+
 - Add skeleton for hero image section with appropriate aspect ratio
 - Update skeleton blocks to match new title size and spacing
 - Include skeleton elements for all new visual sections
@@ -258,11 +286,13 @@ npm run lint:fix && npm run typecheck
 - Add gradient or background colors consistent with design
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton layout mirrors redesigned header structure
 - [ ] Skeleton dimensions match actual content at all breakpoints
 - [ ] Pulse animation creates clear loading indication
@@ -278,9 +308,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`
 
 **Changes:**
+
 - Review ContentLayout wrapper for any spacing conflicts
 - Adjust container widths if hero image should extend full-width
 - Verify proper spacing between header and subsequent page sections
@@ -289,11 +321,13 @@ npm run lint:fix && npm run typecheck
 - Test scroll behavior and sticky elements if applicable
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Header integrates seamlessly with page layout
 - [ ] No unwanted spacing or overflow issues
 - [ ] Responsive behavior works correctly across devices
@@ -309,6 +343,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Testing Checklist:**
+
 - Test on Chrome, Firefox, Safari, and Edge
 - Test mobile viewports (375px, 414px)
 - Test tablet viewports (768px, 1024px)
@@ -321,6 +356,7 @@ npm run lint:fix && npm run typecheck
 - Test keyboard navigation and accessibility
 
 **Success Criteria:**
+
 - [ ] Header renders consistently across all major browsers
 - [ ] Responsive breakpoints work smoothly
 - [ ] Images load optimally at all sizes
@@ -352,24 +388,28 @@ npm run lint:fix && npm run typecheck
 **Design Philosophy**: This redesign transforms the header from purely informational to a visually engaging hero section that reflects the collectible nature of bobbleheads. The implementation prioritizes bold typography, strategic use of the platform's warm color palette, and high-quality imagery to create a premium user experience.
 
 **Key Assumptions**:
+
 - Primary bobblehead photo is available in most cases; fallback design needed for missing images
 - Cloudinary optimization handles image performance across devices
 - Warm gradient overlays ensure text readability without heavy opacity
 - Existing component patterns and utilities are sufficient; no new dependencies required
 
 **Risk Mitigation**:
+
 - Confidence level: High - The redesign uses existing design tokens, components, and utilities from the codebase
 - Low risk: Changes are primarily visual and do not affect data flow or business logic
 - Fallback strategy: Maintain graceful degradation for bobbleheads without images
 - Performance: Cloudinary optimization prevents large image file sizes
 
 **Accessibility Considerations**:
+
 - Ensure text contrast meets WCAG AA standards on gradient backgrounds
 - Respect prefers-reduced-motion for animations
 - Maintain semantic HTML structure and ARIA labels
 - Preserve keyboard navigation for interactive elements
 
 **Future Enhancements** (not in scope):
+
 - A/B testing different hero layouts for engagement metrics
 - Dynamic gradient colors based on bobblehead category
 - Parallax scrolling effects for hero image
@@ -381,21 +421,21 @@ npm run lint:fix && npm run typecheck
 
 ### Files to Modify
 
-| Priority | File | Action |
-|----------|------|--------|
-| Critical | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx` | Primary redesign target |
-| Critical | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx` | Image data pass-through |
-| Critical | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx` | Loading state update |
-| High | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Layout integration |
-| High | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb.tsx` | Styling updates |
+| Priority | File                                                                                                          | Action                  |
+| -------- | ------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| Critical | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-header.tsx`                    | Primary redesign target |
+| Critical | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async.tsx`        | Image data pass-through |
+| Critical | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton.tsx` | Loading state update    |
+| High     | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx`                                            | Layout integration      |
+| High     | `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/collection-breadcrumb.tsx`                | Styling updates         |
 
 ### Reference Files
 
-| File | Purpose |
-|------|---------|
-| `src/app/globals.css` | Warm colors, gradients, animations |
-| `src/app/(app)/(home)/page.tsx` | Hero section patterns |
-| `src/lib/utils/cloudinary.utils.ts` | Image optimization utilities |
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Data type definitions |
-| `src/components/ui/badge.tsx` | Component variants |
-| `src/components/ui/button.tsx` | Button patterns |
+| File                                               | Purpose                            |
+| -------------------------------------------------- | ---------------------------------- |
+| `src/app/globals.css`                              | Warm colors, gradients, animations |
+| `src/app/(app)/(home)/page.tsx`                    | Hero section patterns              |
+| `src/lib/utils/cloudinary.utils.ts`                | Image optimization utilities       |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | Data type definitions              |
+| `src/components/ui/badge.tsx`                      | Component variants                 |
+| `src/components/ui/button.tsx`                     | Button patterns                    |

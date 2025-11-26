@@ -46,7 +46,6 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.88 0.02 75);
   --sidebar-ring: oklch(0.705 0.213 47.604);
-
 }
 
 .dark {
@@ -209,7 +208,6 @@
 @utility animate-dot-pulse {
   animation: dot-pulse 1.5s ease-in-out infinite;
 }
-
 
 /* Shimmer effect for loading states */
 @keyframes shimmer {

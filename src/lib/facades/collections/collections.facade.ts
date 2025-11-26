@@ -1022,7 +1022,6 @@ export class CollectionsFacade {
     itemCount: number;
     name: string;
     owner: {
-      displayName: string;
       username: string;
     };
     slug: string;

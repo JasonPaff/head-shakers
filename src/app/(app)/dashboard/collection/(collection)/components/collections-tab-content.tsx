@@ -14,10 +14,10 @@ export const CollectionsTabContent = async () => {
     UsersFacade.getUserById(userId),
   ]);
 
-  const _displayName = user?.displayName ?? undefined;
+  const _username = user?.username ?? undefined;
 
   if (collections.length === 0) {
-    return <CollectionsEmptyState userName={_displayName} />;
+    return <CollectionsEmptyState userName={_username} />;
   }
 
   return (

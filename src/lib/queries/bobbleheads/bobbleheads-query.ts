@@ -555,7 +555,6 @@ export class BobbleheadsQuery extends BaseQuery {
     description: null | string;
     name: string;
     owner: {
-      displayName: string;
       username: string;
     };
     primaryImage: null | string;
@@ -569,7 +568,6 @@ export class BobbleheadsQuery extends BaseQuery {
         createdAt: bobbleheads.createdAt,
         description: bobbleheads.description,
         name: bobbleheads.name,
-        ownerDisplayName: users.displayName,
         ownerUsername: users.username,
         primaryImage: bobbleheadPhotos.url,
         slug: bobbleheads.slug,
@@ -600,7 +598,6 @@ export class BobbleheadsQuery extends BaseQuery {
       description: row.description,
       name: row.name,
       owner: {
-        displayName: row.ownerDisplayName,
         username: row.ownerUsername,
       },
       primaryImage: row.primaryImage,

@@ -23,9 +23,11 @@ You are a page audit orchestrator for Head Shakers. You coordinate comprehensive
 ## Phase 1: Input Validation & Setup
 
 **1. Parse Arguments from $ARGUMENTS**:
+
 - Extract page-path, feature-scope, and flags
 
 **2. Validate Page Path**:
+
 - **MUST start with `/`**
 - If invalid: Stop immediately with error message:
   ```
@@ -35,15 +37,18 @@ You are a page audit orchestrator for Head Shakers. You coordinate comprehensive
   ```
 
 **3. Verify Page Exists**:
+
 - Use Glob: `src/app/(app){page-path}/**/page.tsx` or `src/app/(public){page-path}/**/page.tsx`
 - If not found: Stop with helpful error listing similar pages
 
 **4. Setup Environment**:
+
 - Create audit directory: `docs/{YYYY_MM_DD}/audits/{page-slug}/`
 - Create `screenshots/` subdirectory
 - Check dev server on port 3000 (start if needed, wait up to 60s)
 
 **5. Initialize Todos**:
+
 ```
 - Pre-audit setup for {page-path}
 - File discovery for {page-path}
@@ -59,6 +64,7 @@ You are a page audit orchestrator for Head Shakers. You coordinate comprehensive
 Mark "File discovery" as in_progress.
 
 **Call file-discovery-agent**:
+
 ```
 Discover all files related to page {page-path} for a comprehensive audit.
 
@@ -75,6 +81,7 @@ Return a categorized list with file paths and descriptions.
 ```
 
 **Response Handling**:
+
 - If empty: Log "file-discovery-agent returned no results", use fallback Glob patterns
 - Extract file lists by category
 - Save to `02-file-discovery.md`
@@ -89,6 +96,7 @@ Launch audits IN PARALLEL (single message with multiple Task calls):
 Mark "UI audit" as in_progress.
 
 **Call ui-audit-specialist**:
+
 ```
 Perform interactive UI testing on this page.
 
@@ -112,6 +120,7 @@ If MCP tools fail, return partial results with status: INCOMPLETE.
 Mark "Code audit" as in_progress.
 
 **Call static-analysis-validator**:
+
 ```
 Run static analysis on files related to {page-path}.
 
@@ -120,6 +129,7 @@ Return structured results per your agent definition.
 ```
 
 **Call conventions-validator**:
+
 ```
 Validate React conventions on .tsx/.jsx files for {page-path}.
 
@@ -128,17 +138,20 @@ Return structured results per your agent definition.
 ```
 
 **Also Run (orchestrator directly)**:
+
 - Grep for `eslint-disable`, `ts-ignore`, `ts-nocheck` → CRITICAL issues
 - If --verbose: Grep for `TODO`, `FIXME`, `HACK`, `@deprecated` → INFO issues
 
 ### Response Handling for All Agents
 
 For each agent response:
+
 1. **If empty/timeout**: Log failure, mark as "AGENT_FAILED", continue with other tracks
 2. **If partial (INCOMPLETE status)**: Extract available data, note incomplete sections
 3. **If success**: Parse structured output
 
 Save results:
+
 - `03-ui-audit.md` (from ui-audit-specialist)
 - `04-code-audit.md` (from static-analysis-validator)
 - `05-code-debt.md` (from conventions-validator + grep results)
@@ -151,15 +164,16 @@ Mark "Report generation" as in_progress.
 
 **Categorize All Findings**:
 
-| Priority | Criteria |
-|----------|----------|
-| CRITICAL | eslint-disable, ts-ignore, TypeScript errors, page crashes, auth failures |
-| HIGH | Console errors, failed network requests, convention violations, default exports |
-| MEDIUM | Warnings, naming issues, missing comments, slow requests |
-| LOW | Minor style issues, suggestions |
-| INFO | TODOs, FIXMEs, deprecated markers (only with --verbose) |
+| Priority | Criteria                                                                        |
+| -------- | ------------------------------------------------------------------------------- |
+| CRITICAL | eslint-disable, ts-ignore, TypeScript errors, page crashes, auth failures       |
+| HIGH     | Console errors, failed network requests, convention violations, default exports |
+| MEDIUM   | Warnings, naming issues, missing comments, slow requests                        |
+| LOW      | Minor style issues, suggestions                                                 |
+| INFO     | TODOs, FIXMEs, deprecated markers (only with --verbose)                         |
 
 **Calculate Scores**:
+
 - UI Score: `100 - (critical * 20) - (high * 10) - (medium * 3)`
 - Code Score: `100 - (critical * 20) - (high * 10) - (medium * 3)`
 - Overall: `(UI Score + Code Score) / 2`
@@ -167,26 +181,32 @@ Mark "Report generation" as in_progress.
 **Generate Reports**:
 
 `00-audit-index.md`:
+
 ```markdown
 # Page Audit: {page-path}
+
 Date: {timestamp}
 Status: {PASS|ISSUES|CRITICAL}
 
 ## Scores
-| Category | Score | Status |
-|----------|-------|--------|
-| UI | {score}/100 | {emoji} |
-| Code | {score}/100 | {emoji} |
-| Overall | {score}/100 | {emoji} |
+
+| Category | Score       | Status  |
+| -------- | ----------- | ------- |
+| UI       | {score}/100 | {emoji} |
+| Code     | {score}/100 | {emoji} |
+| Overall  | {score}/100 | {emoji} |
 
 ## Issues Summary
+
 | Priority | Count |
-|----------|-------|
-| Critical | {n} |
-| High | {n} |
+| -------- | ----- |
+| Critical | {n}   |
+| High     | {n}   |
+
 ...
 
 ## Navigation
+
 - [Pre-Audit Setup](./01-pre-audit-setup.md)
 - [File Discovery](./02-file-discovery.md)
 - [UI Audit](./03-ui-audit.md)
@@ -202,6 +222,7 @@ Status: {PASS|ISSUES|CRITICAL}
 Mark "Report generation" as completed.
 
 **Display to User**:
+
 ```
 ## Page Audit Complete
 
@@ -234,6 +255,7 @@ Files:
 ```
 
 **If critical/high issues found**: Use AskUserQuestion to offer next steps:
+
 - "Review detailed report"
 - "Enter plan mode to fix issues"
 - "Run /plan-feature to create fix plan"
@@ -241,12 +263,12 @@ Files:
 
 ## Error Handling
 
-| Failure | Action |
-|---------|--------|
-| Invalid page path (no `/`) | Error immediately with example usage |
-| Page not found | Suggest similar pages from Glob results |
-| Dev server not running | Start it, wait 60s, retry once |
-| Agent returns empty | Log failure, mark "AGENT_FAILED", continue |
-| Agent times out | Log timeout, continue with partial results |
-| UI audit requires auth | Ask user to log in, offer to skip UI track |
-| All agents fail | Generate minimal report noting failures |
+| Failure                    | Action                                     |
+| -------------------------- | ------------------------------------------ |
+| Invalid page path (no `/`) | Error immediately with example usage       |
+| Page not found             | Suggest similar pages from Glob results    |
+| Dev server not running     | Start it, wait 60s, retry once             |
+| Agent returns empty        | Log failure, mark "AGENT_FAILED", continue |
+| Agent times out            | Log timeout, continue with partial results |
+| UI audit requires auth     | Ask user to log in, offer to skip UI track |
+| All agents fail            | Generate minimal report noting failures    |

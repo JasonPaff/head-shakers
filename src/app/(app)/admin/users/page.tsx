@@ -62,21 +62,13 @@ async function AdminUsersPage({ searchParams }: AdminUsersPageProps) {
   }
 
   // Add status filter if provided and valid
-  const validStatuses: Array<AdminUserStatus> = ['active', 'locked', 'verified', 'unverified'];
+  const validStatuses: Array<AdminUserStatus> = ['active', 'locked'];
   if (resolvedSearchParams.status && validStatuses.includes(resolvedSearchParams.status as AdminUserStatus)) {
     filterOptions.status = resolvedSearchParams.status as AdminUserStatus;
   }
 
   // Add sort options if provided
-  const validSortByFields = [
-    'createdAt',
-    'updatedAt',
-    'displayName',
-    'username',
-    'email',
-    'lastActiveAt',
-    'role',
-  ] as const;
+  const validSortByFields = ['createdAt', 'updatedAt', 'username', 'email', 'lastActiveAt', 'role'] as const;
   if (
     resolvedSearchParams.sortBy &&
     validSortByFields.includes(resolvedSearchParams.sortBy as (typeof validSortByFields)[number])

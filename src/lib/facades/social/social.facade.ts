@@ -59,7 +59,6 @@ export interface LikeActivity {
   targetId: string;
   targetType: LikeTargetType;
   user: {
-    displayName: null | string;
     id: string;
     username: null | string;
   };

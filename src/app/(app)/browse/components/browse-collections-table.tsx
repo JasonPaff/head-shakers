@@ -203,14 +203,14 @@ export const BrowseCollectionsTable = ({ collections }: BrowseCollectionsTablePr
                   <div className={'flex items-center gap-2'}>
                     <Avatar className={'size-6'}>
                       {record.owner.avatarUrl && (
-                        <AvatarImage alt={record.owner.displayName} src={record.owner.avatarUrl} />
+                        <AvatarImage alt={record.owner.username} src={record.owner.avatarUrl} />
                       )}
                       <AvatarFallback className={'text-xs'}>
                         <User className={'size-3'} />
                       </AvatarFallback>
                     </Avatar>
                     <span className={'text-sm text-muted-foreground'}>
-                      by <span className={'font-medium text-foreground'}>{record.owner.displayName}</span>
+                      by <span className={'font-medium text-foreground'}>{record.owner.username}</span>
                     </span>
                   </div>
 

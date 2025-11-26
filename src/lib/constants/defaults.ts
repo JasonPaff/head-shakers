@@ -91,28 +91,15 @@ export const DEFAULTS = {
     USAGE_COUNT: 0,
   },
   USER: {
-    CURRENCY: 'USD',
-    DEFAULT_ITEM_PRIVACY: 'public',
     FAILED_LOGIN_ATTEMPTS: 0,
     IS_VERIFIED: false,
     LANGUAGE: 'en',
     ROLE: 'user',
     THEME: 'light',
-    TIMEZONE: 'UTC',
-  },
-  USER_SESSION: {
-    IS_ACTIVE: true,
   },
   USER_SETTINGS: {
     ALLOW_COMMENTS: 'anyone',
-    ALLOW_DIRECT_MESSAGES: 'followers',
-    IS_MODERATE_COMMENTS: false,
-    IS_SHOW_COLLECTION_STATS: true,
-    IS_SHOW_COLLECTION_VALUE: false,
-    IS_SHOW_JOIN_DATE: true,
-    IS_SHOW_LAST_ACTIVE: false,
     IS_SHOW_LOCATION: false,
-    IS_SHOW_REAL_NAME: false,
     PROFILE_VISIBILITY: 'public',
   },
 } as const;

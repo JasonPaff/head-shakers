@@ -73,8 +73,7 @@ export const CommentSection = ({
   const _isProcessing = isSubmitting || isLoading;
   const _isReplyMode = !!replyParentComment;
   const _isAtMaxDepth = _isReplyMode && replyParentComment.depth + 1 >= MAX_COMMENT_NESTING_DEPTH;
-  const _parentCommentAuthor =
-    replyParentComment?.user?.displayName ?? replyParentComment?.user?.username ?? undefined;
+  const _parentCommentAuthor = replyParentComment?.user?.username ?? undefined;
   const _parentCommentContent = replyParentComment?.content ?? undefined;
 
   // Helper function to find comment by ID in nested tree

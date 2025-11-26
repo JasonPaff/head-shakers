@@ -84,10 +84,10 @@ export default async function ProfileSettingsPage() {
           </CardHeader>
           <CardContent>
             <div className={'space-y-4'}>
-              {/* Display Name */}
+              {/* Username */}
               <div>
-                <p className={'text-sm font-medium text-muted-foreground'}>Display Name</p>
-                <p className={'mt-1 text-base'}>{user.displayName}</p>
+                <p className={'text-sm font-medium text-muted-foreground'}>Username</p>
+                <p className={'mt-1 text-base'}>{user.username}</p>
               </div>
 
               {/* Email */}

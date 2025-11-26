@@ -24,19 +24,16 @@ dotenv.config({ path: '.env.local' });
 // Test user configuration - matches .env.e2e.example
 const TEST_USERS = [
   {
-    displayName: 'Test Admin',
     email: process.env.E2E_CLERK_ADMIN_USERNAME || 'admin@test.headshakers.com',
     role: 'admin' as const,
     username: 'testadmin',
   },
   {
-    displayName: 'Test User',
     email: process.env.E2E_CLERK_USER_USERNAME || 'user@test.headshakers.com',
     role: 'user' as const,
     username: 'testuser',
   },
   {
-    displayName: 'New Test User',
     email: process.env.E2E_CLERK_NEW_USER_USERNAME || 'newuser@test.headshakers.com',
     role: 'user' as const,
     username: 'testnewuser',
@@ -175,7 +172,6 @@ async function main() {
       clerkUser.id,
       testUser.email,
       testUser.username,
-      testUser.displayName,
       testUser.role,
       clerkUser.imageUrl,
     );
@@ -209,17 +205,15 @@ async function seedUser(
   clerkId: string,
   email: string,
   username: string,
-  displayName: string,
   role: 'admin' | 'user',
   avatarUrl?: string,
 ): Promise<boolean> {
   const query = `
-    INSERT INTO users (clerk_id, email, username, display_name, role, avatar_url, is_verified)
-    VALUES ($1, $2, $3, $4, $5::user_role, $6, true)
+    INSERT INTO users (clerk_id, email, username, role, avatar_url)
+    VALUES ($1, $2, $3, $4::user_role, $5)
     ON CONFLICT (clerk_id) DO UPDATE SET
       email = EXCLUDED.email,
       username = EXCLUDED.username,
-      display_name = EXCLUDED.display_name,
       role = EXCLUDED.role,
       avatar_url = EXCLUDED.avatar_url,
       updated_at = now()
@@ -227,14 +221,7 @@ async function seedUser(
   `;
 
   try {
-    const result = await pool.query<UserRow>(query, [
-      clerkId,
-      email,
-      username,
-      displayName,
-      role,
-      avatarUrl || null,
-    ]);
+    const result = await pool.query<UserRow>(query, [clerkId, email, username, role, avatarUrl || null]);
     const row = result.rows[0];
     if (row) {
       console.log(`  ✓ Seeded user: ${row.email} (${row.role})`);

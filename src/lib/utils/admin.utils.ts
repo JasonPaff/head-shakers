@@ -34,7 +34,6 @@ export const getCurrentUserWithRole = async () => {
 
     const [dbUser] = await db
       .select({
-        displayName: users.displayName,
         email: users.email,
         id: users.id,
         role: users.role,

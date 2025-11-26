@@ -55,7 +55,6 @@ export type BrowseCollectionRecord = {
   followerCount: number;
   owner: {
     avatarUrl: null | string;
-    displayName: string;
     id: string;
     username: string;
   };
@@ -512,7 +511,6 @@ export class CollectionsQuery extends BaseQuery {
           coverImageUrl: collections.coverImageUrl,
           createdAt: collections.createdAt,
           description: collections.description,
-          displayName: users.displayName,
           firstBobbleheadPhoto: sql<null | string>`(
             SELECT ${bobbleheadPhotos.url}
             FROM ${bobbleheads}
@@ -541,6 +539,7 @@ export class CollectionsQuery extends BaseQuery {
           totalValue: collections.totalValue,
           updatedAt: collections.updatedAt,
           userId: collections.userId,
+          username: users.username,
         })
         .from(collections)
         .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))
@@ -572,7 +571,6 @@ export class CollectionsQuery extends BaseQuery {
         followerCount: row.followerCount,
         owner: {
           avatarUrl: row.avatarUrl,
-          displayName: row.displayName,
           id: row.ownerId,
           username: row.ownerUsername,
         },
@@ -607,7 +605,6 @@ export class CollectionsQuery extends BaseQuery {
         coverImageUrl: collections.coverImageUrl,
         createdAt: collections.createdAt,
         description: collections.description,
-        displayName: users.displayName,
         firstBobbleheadPhoto: sql<null | string>`(
           SELECT ${bobbleheadPhotos.url}
           FROM ${bobbleheads}
@@ -636,6 +633,7 @@ export class CollectionsQuery extends BaseQuery {
         totalValue: collections.totalValue,
         updatedAt: collections.updatedAt,
         userId: collections.userId,
+        username: users.username,
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id))
@@ -666,7 +664,6 @@ export class CollectionsQuery extends BaseQuery {
       followerCount: row.followerCount,
       owner: {
         avatarUrl: row.avatarUrl,
-        displayName: row.displayName,
         id: row.ownerId,
         username: row.ownerUsername,
       },
@@ -763,7 +760,6 @@ export class CollectionsQuery extends BaseQuery {
         coverImageUrl: collections.coverImageUrl,
         createdAt: collections.createdAt,
         description: collections.description,
-        displayName: users.displayName,
         firstBobbleheadPhoto: sql<null | string>`(
           SELECT ${bobbleheadPhotos.url}
           FROM ${bobbleheads}
@@ -792,6 +788,7 @@ export class CollectionsQuery extends BaseQuery {
         totalValue: collections.totalValue,
         updatedAt: collections.updatedAt,
         userId: collections.userId,
+        username: users.username,
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id))
@@ -830,7 +827,6 @@ export class CollectionsQuery extends BaseQuery {
         followerCount: row.followerCount,
         owner: {
           avatarUrl: row.avatarUrl,
-          displayName: row.displayName,
           id: row.ownerId,
           username: row.ownerUsername,
         },
@@ -870,7 +866,6 @@ export class CollectionsQuery extends BaseQuery {
       followerCount: row.followerCount,
       owner: {
         avatarUrl: row.avatarUrl,
-        displayName: row.displayName,
         id: row.ownerId,
         username: row.ownerUsername,
       },
@@ -968,7 +963,6 @@ export class CollectionsQuery extends BaseQuery {
     itemCount: number;
     name: string;
     owner: {
-      displayName: string;
       username: string;
     };
     slug: string;
@@ -982,7 +976,6 @@ export class CollectionsQuery extends BaseQuery {
         isPublic: collections.isPublic,
         itemCount: collections.totalItems,
         name: collections.name,
-        ownerDisplayName: users.displayName,
         ownerUsername: users.username,
         slug: collections.slug,
       })
@@ -1010,7 +1003,6 @@ export class CollectionsQuery extends BaseQuery {
       itemCount: row.itemCount,
       name: row.name,
       owner: {
-        displayName: row.ownerDisplayName,
         username: row.ownerUsername,
       },
       slug: row.slug,

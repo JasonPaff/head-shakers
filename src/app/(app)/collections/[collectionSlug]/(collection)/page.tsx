@@ -86,7 +86,7 @@ export async function generateMetadata({
   // Use collection description or fallback to a default
   const description =
     seoData.description ||
-    `${seoData.name} by ${seoData.owner.displayName} - Browse ${seoData.itemCount} bobbleheads in this collection`;
+    `${seoData.name} by ${seoData.owner.username} - Browse ${seoData.itemCount} bobbleheads in this collection`;
 
   // Private collections should not be indexed
   const isPublic = seoData.isPublic;

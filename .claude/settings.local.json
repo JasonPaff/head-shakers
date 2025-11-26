@@ -72,7 +72,8 @@
       "Bash(/dev/null --include=\"*.ts\" --include=\"*.tsx\" -l)",
       "mcp__chrome-devtools__navigate_page",
       "mcp__chrome-devtools__take_screenshot",
-      "mcp__chrome-devtools__click"
+      "mcp__chrome-devtools__click",
+      "Bash(npm run db:info:*)"
     ],
     "deny": [],
     "ask": []

@@ -29,14 +29,12 @@ describe('Database Integration Tests', () => {
   describe('User Factory', () => {
     it('should create a user in the database', async () => {
       const user = await createTestUser({
-        displayName: 'John Doe',
         username: 'johndoe',
       });
 
       expect(user).toBeDefined();
       expect(user!.id).toBeDefined();
       expect(user!.username).toBe('johndoe');
-      expect(user!.displayName).toBe('John Doe');
       expect(user!.role).toBe('user');
     });
 

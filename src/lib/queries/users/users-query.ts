@@ -1,9 +1,9 @@
-import { and, asc, count, desc, eq, gt, ilike, isNull, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { AdminUsersFilter } from '@/lib/validations/admin-users.validation';
 
-import { bobbleheads, collections, userActivity, users } from '@/lib/db/schema';
+import { bobbleheads, collections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 /**
@@ -24,20 +24,7 @@ export type UserStats = {
   collectionsCount: number;
   publicBobbleheadsCount: number;
   publicCollectionsCount: number;
-  recentActivityCount: number;
   userId: string;
-};
-
-/**
- * User with recent activity for admin detail view
- */
-export type UserWithActivity = UserRecord & {
-  recentActivity: Array<{
-    actionType: string;
-    createdAt: Date;
-    id: string;
-    targetType: null | string;
-  }>;
 };
 
 export class UsersQuery extends BaseQuery {
@@ -167,16 +154,11 @@ export class UsersQuery extends BaseQuery {
         )`,
         createdAt: users.createdAt,
         deletedAt: users.deletedAt,
-        displayName: users.displayName,
         email: users.email,
-        failedLoginAttempts: users.failedLoginAttempts,
         id: users.id,
-        isVerified: users.isVerified,
         lastActiveAt: users.lastActiveAt,
-        lastFailedLoginAt: users.lastFailedLoginAt,
         location: users.location,
         lockedUntil: users.lockedUntil,
-        memberSince: users.memberSince,
         role: users.role,
         updatedAt: users.updatedAt,
         username: users.username,
@@ -192,6 +174,17 @@ export class UsersQuery extends BaseQuery {
   }
 
   /**
+   * Get user by ID for admin detail view
+   */
+  static async getUserByIdForAdminAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {
+    const dbInstance = this.getDbInstance(context);
+
+    const user = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
+
+    return user[0] || null;
+  }
+
+  /**
    * get user metadata for SEO and social sharing
    * returns minimal fields needed for metadata generation
    */
@@ -201,7 +194,6 @@ export class UsersQuery extends BaseQuery {
   ): Promise<null | {
     avatarUrl: null | string;
     bio: null | string;
-    displayName: string;
     id: string;
     username: string;
   }> {
@@ -211,7 +203,6 @@ export class UsersQuery extends BaseQuery {
       .select({
         avatarUrl: users.avatarUrl,
         bio: users.bio,
-        displayName: users.displayName,
         id: users.id,
         username: users.username,
       })
@@ -224,7 +215,7 @@ export class UsersQuery extends BaseQuery {
 
   /**
    * Get user statistics for admin dashboard
-   * Returns counts for collections, bobbleheads, and recent activity
+   * Returns counts for collections and bobbleheads
    */
   static async getUserStatsAsync(userId: string, context: QueryContext): Promise<null | UserStats> {
     const dbInstance = this.getDbInstance(context);
@@ -237,93 +228,42 @@ export class UsersQuery extends BaseQuery {
     }
 
     // Get all stats in parallel using subqueries
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const [collectionsResult, bobbleheadsResult, publicCollectionsResult, publicBobbleheadsResult] =
+      await Promise.all([
+        // Total collections count
+        dbInstance.select({ count: count() }).from(collections).where(eq(collections.userId, userId)),
 
-    const [
-      collectionsResult,
-      bobbleheadsResult,
-      publicCollectionsResult,
-      publicBobbleheadsResult,
-      activityResult,
-    ] = await Promise.all([
-      // Total collections count
-      dbInstance.select({ count: count() }).from(collections).where(eq(collections.userId, userId)),
+        // Total bobbleheads count (non-deleted)
+        dbInstance
+          .select({ count: count() })
+          .from(bobbleheads)
+          .where(and(eq(bobbleheads.userId, userId), eq(bobbleheads.isDeleted, false))),
 
-      // Total bobbleheads count (non-deleted)
-      dbInstance
-        .select({ count: count() })
-        .from(bobbleheads)
-        .where(and(eq(bobbleheads.userId, userId), eq(bobbleheads.isDeleted, false))),
+        // Public collections count
+        dbInstance
+          .select({ count: count() })
+          .from(collections)
+          .where(and(eq(collections.userId, userId), eq(collections.isPublic, true))),
 
-      // Public collections count
-      dbInstance
-        .select({ count: count() })
-        .from(collections)
-        .where(and(eq(collections.userId, userId), eq(collections.isPublic, true))),
-
-      // Public bobbleheads count
-      dbInstance
-        .select({ count: count() })
-        .from(bobbleheads)
-        .where(
-          and(
-            eq(bobbleheads.userId, userId),
-            eq(bobbleheads.isDeleted, false),
-            eq(bobbleheads.isPublic, true),
+        // Public bobbleheads count
+        dbInstance
+          .select({ count: count() })
+          .from(bobbleheads)
+          .where(
+            and(
+              eq(bobbleheads.userId, userId),
+              eq(bobbleheads.isDeleted, false),
+              eq(bobbleheads.isPublic, true),
+            ),
           ),
-        ),
-
-      // Recent activity count (last 30 days)
-      dbInstance
-        .select({ count: count() })
-        .from(userActivity)
-        .where(and(eq(userActivity.userId, userId), gt(userActivity.createdAt, thirtyDaysAgo))),
-    ]);
+      ]);
 
     return {
       bobbleheadsCount: bobbleheadsResult[0]?.count || 0,
       collectionsCount: collectionsResult[0]?.count || 0,
       publicBobbleheadsCount: publicBobbleheadsResult[0]?.count || 0,
       publicCollectionsCount: publicCollectionsResult[0]?.count || 0,
-      recentActivityCount: activityResult[0]?.count || 0,
       userId,
-    };
-  }
-
-  /**
-   * Get user with recent activity for admin detail view
-   * Returns user data with last 10 activity entries
-   */
-  static async getUserWithActivityAsync(
-    userId: string,
-    context: QueryContext,
-  ): Promise<null | UserWithActivity> {
-    const dbInstance = this.getDbInstance(context);
-
-    // Get user data
-    const user = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
-
-    if (!user[0]) {
-      return null;
-    }
-
-    // Get recent activity (last 10 entries)
-    const activity = await dbInstance
-      .select({
-        actionType: userActivity.actionType,
-        createdAt: userActivity.createdAt,
-        id: userActivity.id,
-        targetType: userActivity.targetType,
-      })
-      .from(userActivity)
-      .where(eq(userActivity.userId, userId))
-      .orderBy(desc(userActivity.createdAt))
-      .limit(10);
-
-    return {
-      ...user[0],
-      recentActivity: activity,
     };
   }
 
@@ -357,27 +297,14 @@ export class UsersQuery extends BaseQuery {
           // Currently locked (lockedUntil is in the future)
           conditions.push(sql`${users.lockedUntil} > ${now}`);
           break;
-        case 'unverified':
-          conditions.push(eq(users.isVerified, false));
-          break;
-        case 'verified':
-          // Uses users_verified_created_idx
-          conditions.push(eq(users.isVerified, true));
-          break;
       }
     }
 
-    // Search filter - searches across username, email, and displayName
-    // Uses users_username_lower_idx, users_email_lower_idx, and users_display_name_search_idx
+    // Search filter - searches across username and email
+    // Uses users_username_search_idx (GIN trigram) and users_email_lower_idx
     if (filters.search && filters.search.trim()) {
       const searchTerm = `%${filters.search.trim()}%`;
-      conditions.push(
-        or(
-          ilike(users.username, searchTerm),
-          ilike(users.email, searchTerm),
-          ilike(users.displayName, searchTerm),
-        ),
-      );
+      conditions.push(or(ilike(users.username, searchTerm), ilike(users.email, searchTerm)));
     }
 
     return this.combineFilters(...conditions);
@@ -390,8 +317,6 @@ export class UsersQuery extends BaseQuery {
     const direction = sortOrder === 'asc' ? asc : desc;
 
     switch (sortBy) {
-      case 'displayName':
-        return direction(sql`lower(${users.displayName})`);
       case 'email':
         return direction(sql`lower(${users.email})`);
       case 'lastActiveAt':

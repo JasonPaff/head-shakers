@@ -643,7 +643,6 @@ export class BobbleheadsFacade {
     description: null | string;
     name: string;
     owner: {
-      displayName: string;
       username: string;
     };
     primaryImage: null | string;

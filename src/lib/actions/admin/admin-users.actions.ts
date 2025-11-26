@@ -22,7 +22,6 @@ import {
   adminUpdateUserRoleSchema,
   adminUserDetailsSchema,
   adminUsersFilterSchema,
-  adminVerifyUserEmailSchema,
 } from '@/lib/validations/admin-users.validation';
 
 /**
@@ -398,84 +397,6 @@ export const unlockUserAction = adminActionClient
           targetUserId,
         },
         operation: OPERATIONS.ADMIN_USERS.UNLOCK_USER,
-      });
-    }
-  });
-
-/**
- * Manually verify a user's email address
- * Bypasses the normal email verification flow for admin use cases
- */
-export const verifyUserEmailAction = adminActionClient
-  .metadata({
-    actionName: ACTION_NAMES.ADMIN_USERS.VERIFY_USER_EMAIL,
-    isTransactionRequired: true,
-  })
-  .inputSchema(adminVerifyUserEmailSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { isAdmin, isModerator, userId } = ctx;
-    const { userId: targetUserId } = adminVerifyUserEmailSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
-
-    // Only admins can manually verify email
-    if (!isAdmin) {
-      throw new ActionError(
-        ErrorType.AUTHORIZATION,
-        ERROR_CODES.ADMIN.INSUFFICIENT_PRIVILEGES,
-        'Admin privileges required to manually verify email',
-        { ctx, operation: OPERATIONS.ADMIN_USERS.VERIFY_USER_EMAIL },
-        false,
-        403,
-      );
-    }
-
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {
-      isAdmin,
-      isModerator,
-      operation: 'verify_user_email',
-      targetUserId,
-      userId,
-    });
-
-    try {
-      const updatedUser = await UsersFacade.verifyUserEmailAsync(targetUserId, dbInstance);
-
-      // Audit log breadcrumb for email verification
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          actingAdmin: userId,
-          targetUserId,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `User email manually verified`,
-      });
-
-      return {
-        data: updatedUser,
-        message: 'User email verified',
-        success: true,
-      };
-    } catch (error) {
-      // Handle specific errors from facade
-      if (error instanceof Error && error.message.includes('User not found')) {
-        throw new ActionError(
-          ErrorType.NOT_FOUND,
-          ERROR_CODES.USERS.NOT_FOUND,
-          ERROR_MESSAGES.USER.NOT_FOUND,
-          { operation: OPERATIONS.ADMIN_USERS.VERIFY_USER_EMAIL, targetUserId },
-          false,
-          404,
-        );
-      }
-
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.ADMIN_USERS.VERIFY_USER_EMAIL,
-          targetUserId,
-        },
-        operation: OPERATIONS.ADMIN_USERS.VERIFY_USER_EMAIL,
       });
     }
   });

@@ -107,7 +107,6 @@ describe('users validation schemas', () => {
   describe('insertUserSchema', () => {
     it('should validate a valid user', () => {
       const input = {
-        displayName: 'John Doe',
         email: 'john@example.com',
         username: 'johndoe',
       };
@@ -115,7 +114,6 @@ describe('users validation schemas', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.displayName).toBe('John Doe');
         expect(result.data.email).toBe('john@example.com');
         expect(result.data.username).toBe('johndoe');
       }
@@ -123,19 +121,7 @@ describe('users validation schemas', () => {
 
     it('should reject invalid email format', () => {
       const input = {
-        displayName: 'John Doe',
         email: 'not-an-email',
-        username: 'johndoe',
-      };
-      const result = insertUserSchema.safeParse(input);
-
-      expect(result.success).toBe(false);
-    });
-
-    it('should reject empty display name', () => {
-      const input = {
-        displayName: '',
-        email: 'john@example.com',
         username: 'johndoe',
       };
       const result = insertUserSchema.safeParse(input);
@@ -146,7 +132,6 @@ describe('users validation schemas', () => {
     it('should accept optional bio field', () => {
       const input = {
         bio: 'Bobblehead collector since 2010',
-        displayName: 'John Doe',
         email: 'john@example.com',
         username: 'johndoe',
       };
@@ -161,7 +146,6 @@ describe('users validation schemas', () => {
     it('should reject bio exceeding maximum length', () => {
       const input = {
         bio: 'a'.repeat(501), // max is 500
-        displayName: 'John Doe',
         email: 'john@example.com',
         username: 'johndoe',
       };
@@ -172,7 +156,6 @@ describe('users validation schemas', () => {
 
     it('should accept optional location field', () => {
       const input = {
-        displayName: 'John Doe',
         email: 'john@example.com',
         location: 'New York, NY',
         username: 'johndoe',

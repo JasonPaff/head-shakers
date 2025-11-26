@@ -20,46 +20,46 @@ As an admin user with the appropriate role, I want to receive an Ably real-time 
 
 ### Critical Priority (Core Implementation)
 
-| File | Relevance |
-|------|-----------|
-| `src/lib/actions/newsletter/newsletter.actions.ts` | Current newsletter subscription server action - where Ably notification trigger will be added |
-| `src/lib/facades/newsletter/newsletter.facade.ts` | Business logic for subscriptions - perfect location for Ably notifications after successful subscription |
-| `src/lib/db/schema/newsletter-signups.schema.ts` | Database schema - defines data structure for notification payload |
-| `src/components/layout/ably-provider.tsx` | Client-side Ably provider wrapper - pattern to follow |
-| `src/app/examples/ably/page.tsx` | Example showing useChannel hook and message publishing patterns |
-| `src/lib/utils/admin.utils.ts` | Server-side admin role checking utilities |
-| `src/lib/middleware/admin.middleware.ts` | Admin middleware pattern for server actions |
-| `src/hooks/use-admin-role.ts` | Client-side hook for checking admin/moderator role |
-| `src/components/ui/admin/admin-route-guard.tsx` | Admin route protection component pattern |
+| File                                               | Relevance                                                                                                |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `src/lib/actions/newsletter/newsletter.actions.ts` | Current newsletter subscription server action - where Ably notification trigger will be added            |
+| `src/lib/facades/newsletter/newsletter.facade.ts`  | Business logic for subscriptions - perfect location for Ably notifications after successful subscription |
+| `src/lib/db/schema/newsletter-signups.schema.ts`   | Database schema - defines data structure for notification payload                                        |
+| `src/components/layout/ably-provider.tsx`          | Client-side Ably provider wrapper - pattern to follow                                                    |
+| `src/app/examples/ably/page.tsx`                   | Example showing useChannel hook and message publishing patterns                                          |
+| `src/lib/utils/admin.utils.ts`                     | Server-side admin role checking utilities                                                                |
+| `src/lib/middleware/admin.middleware.ts`           | Admin middleware pattern for server actions                                                              |
+| `src/hooks/use-admin-role.ts`                      | Client-side hook for checking admin/moderator role                                                       |
+| `src/components/ui/admin/admin-route-guard.tsx`    | Admin route protection component pattern                                                                 |
 
 ### High Priority (Supporting Implementation)
 
-| File | Relevance |
-|------|-----------|
-| `src/lib/constants/operations.ts` | Operation name constants - add NEWSLETTER.NOTIFY_ADMIN_SIGNUP |
-| `src/lib/constants/action-names.ts` | Centralized action names |
-| `src/lib/constants/sentry.ts` | Sentry configuration constants |
-| `src/lib/constants/config.ts` | Application config including EXTERNAL_SERVICES.ABLY |
-| `src/lib/utils/next-safe-action.ts` | Server action client patterns |
-| `src/lib/utils/action-error-handler.ts` | Error handling utilities |
-| `src/lib/queries/newsletter/newsletter.queries.ts` | Newsletter database queries |
-| `src/lib/validations/newsletter.validation.ts` | Zod schemas for newsletter |
+| File                                               | Relevance                                                     |
+| -------------------------------------------------- | ------------------------------------------------------------- |
+| `src/lib/constants/operations.ts`                  | Operation name constants - add NEWSLETTER.NOTIFY_ADMIN_SIGNUP |
+| `src/lib/constants/action-names.ts`                | Centralized action names                                      |
+| `src/lib/constants/sentry.ts`                      | Sentry configuration constants                                |
+| `src/lib/constants/config.ts`                      | Application config including EXTERNAL_SERVICES.ABLY           |
+| `src/lib/utils/next-safe-action.ts`                | Server action client patterns                                 |
+| `src/lib/utils/action-error-handler.ts`            | Error handling utilities                                      |
+| `src/lib/queries/newsletter/newsletter.queries.ts` | Newsletter database queries                                   |
+| `src/lib/validations/newsletter.validation.ts`     | Zod schemas for newsletter                                    |
 
 ### Medium Priority (Admin Dashboard Integration)
 
-| File | Relevance |
-|------|-----------|
-| `src/app/(app)/admin/page.tsx` | Main admin dashboard - add notification widget |
-| `src/components/layout/admin/admin-layout.tsx` | Admin layout wrapper |
-| `src/lib/actions/admin/admin-users.actions.ts` | Example admin action patterns |
+| File                                           | Relevance                                      |
+| ---------------------------------------------- | ---------------------------------------------- |
+| `src/app/(app)/admin/page.tsx`                 | Main admin dashboard - add notification widget |
+| `src/components/layout/admin/admin-layout.tsx` | Admin layout wrapper                           |
+| `src/lib/actions/admin/admin-users.actions.ts` | Example admin action patterns                  |
 
 ### Low Priority (Reference & Utilities)
 
-| File | Relevance |
-|------|-----------|
-| `src/lib/services/resend.service.ts` | Pattern for external service integration |
+| File                                 | Relevance                                  |
+| ------------------------------------ | ------------------------------------------ |
+| `src/lib/services/resend.service.ts` | Pattern for external service integration   |
 | `src/lib/db/schema/system.schema.ts` | Existing notification schema for reference |
-| `src/lib/db/schema/users.schema.ts` | User role structure |
+| `src/lib/db/schema/users.schema.ts`  | User role structure                        |
 
 ## Architecture Insights
 
@@ -130,11 +130,11 @@ As an admin user with the appropriate role, I want to receive an Ably real-time 
 
 ## Validation Results
 
-| Check | Result | Notes |
-|-------|--------|-------|
-| Minimum Files | ✅ Pass | 18 highly relevant files discovered |
-| AI Analysis Quality | ✅ Pass | Detailed reasoning for each file |
-| File Validation | ✅ Pass | All paths validated |
-| Smart Categorization | ✅ Pass | Files categorized by priority |
-| Comprehensive Coverage | ✅ Pass | Covers all architectural layers |
-| Pattern Recognition | ✅ Pass | Identified existing patterns to follow |
+| Check                  | Result  | Notes                                  |
+| ---------------------- | ------- | -------------------------------------- |
+| Minimum Files          | ✅ Pass | 18 highly relevant files discovered    |
+| AI Analysis Quality    | ✅ Pass | Detailed reasoning for each file       |
+| File Validation        | ✅ Pass | All paths validated                    |
+| Smart Categorization   | ✅ Pass | Files categorized by priority          |
+| Comprehensive Coverage | ✅ Pass | Covers all architectural layers        |
+| Pattern Recognition    | ✅ Pass | Identified existing patterns to follow |

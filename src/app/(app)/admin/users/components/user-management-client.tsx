@@ -2,7 +2,7 @@
 
 import type { ComponentPropsWithRef } from 'react';
 
-import { LockIcon, RefreshCwIcon, SearchIcon, ShieldAlertIcon, UserIcon, UsersIcon } from 'lucide-react';
+import { LockIcon, RefreshCwIcon, SearchIcon, ShieldAlertIcon, UsersIcon } from 'lucide-react';
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs';
 import { useCallback, useMemo, useState } from 'react';
 
@@ -124,12 +124,6 @@ export const UserManagementClient = ({ className, initialData, ...props }: UserM
     const now = new Date();
     return users.filter((user) => {
       return user.lockedUntil && new Date(user.lockedUntil) > now;
-    }).length;
-  }, [users]);
-
-  const unverifiedUsersCount = useMemo(() => {
-    return users.filter((user) => {
-      return !user.isVerified;
     }).length;
   }, [users]);
 
@@ -291,16 +285,6 @@ export const UserManagementClient = ({ className, initialData, ...props }: UserM
           <CardContent>
             <div className={'text-2xl font-bold'}>{lockedAccountsCount}</div>
             <p className={'text-xs text-muted-foreground'}>Currently locked</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className={'flex flex-row items-center justify-between space-y-0 pb-2'}>
-            <CardTitle className={'text-sm font-medium'}>Unverified Users</CardTitle>
-            <UserIcon aria-hidden className={'size-4 text-muted-foreground'} />
-          </CardHeader>
-          <CardContent>
-            <div className={'text-2xl font-bold'}>{unverifiedUsersCount}</div>
-            <p className={'text-xs text-muted-foreground'}>Pending verification</p>
           </CardContent>
         </Card>
       </div>

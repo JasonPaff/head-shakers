@@ -5,7 +5,6 @@ export const REDIS_KEYS = {
   ANALYTICS: {
     DAILY_VIEWS: (date: string) => `analytics:views:${date}`,
     POPULAR_SEARCHES: (date: string) => `analytics:searches:${date}`,
-    USER_ACTIVITY: (userId: string, date: string) => `analytics:user:${userId}:${date}`,
   },
   CACHE: {
     BOBBLEHEAD: (bobbleheadId: string) => `cache:bobblehead:${bobbleheadId}`,
@@ -35,8 +34,6 @@ export const REDIS_KEYS = {
     PASSWORD_RESET: (token: string) => `temp:password_reset:${token}`,
     UPLOAD_SESSION: (sessionId: string) => `temp:upload:${sessionId}`,
   },
-  USER_ACTIVE_SESSIONS: (userId: string) => `sessions:${userId}`,
-  USER_SESSION: (sessionId: string) => `session:${sessionId}`,
   VIEW_TRACKING: {
     BATCH_QUEUE: (batchId: string) => `view_tracking:batch_queue:${batchId}`,
     DEDUPLICATION: (targetType: string, targetId: string, viewerId: string) =>

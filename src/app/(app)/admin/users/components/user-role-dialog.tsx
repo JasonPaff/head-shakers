@@ -149,7 +149,7 @@ export const UserRoleDialog = ({ isOpen, onClose, onSuccess, user }: UserRoleDia
               data-slot={'user-role-dialog-user-info'}
             >
               <div className={'flex-1 space-y-1'}>
-                <div className={'font-medium'}>{user?.displayName ?? user?.username}</div>
+                <div className={'font-medium'}>{user?.username}</div>
                 <div className={'text-sm text-muted-foreground'}>{user?.email}</div>
               </div>
               <Badge className={cn(_getRoleBadgeClass(_currentRole))} variant={'secondary'}>

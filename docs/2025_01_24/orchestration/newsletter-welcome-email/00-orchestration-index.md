@@ -29,21 +29,27 @@ When signing up for the newsletter the person should, if a new sign-up, receive 
 ## Summary
 
 ### Feature Refinement
+
 Expanded original 42-word request to ~180 words with technical context including:
+
 - Resend service integration with retry and circuit breaker patterns
 - Server action flow (subscribeToNewsletterAction -> NewsletterFacade)
 - Conditional sending based on `isAlreadySubscribed` flag
 - Sentry monitoring and privacy (email masking)
 
 ### File Discovery
+
 Identified 23 relevant files:
+
 - **Critical (3)**: ResendService, NewsletterFacade, NewsletterActions
 - **High (8)**: Queries, validations, schemas, constants
 - **Medium (10)**: Utils, middleware, error handling
 - **Low (4)**: UI components, reference patterns
 
 ### Implementation Plan
+
 5-step plan with 2-3 hour estimated duration:
+
 1. Add email template method to ResendService
 2. Add email sending method to ResendService
 3. Add operation constants

@@ -121,11 +121,11 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             if (response?.data?.user) {
               const user = response.data.user;
               setSelectedItem({
-                additionalInfo: `Member since ${new Date(user.memberSince).getFullYear()}${user.isVerified ? ' ✓' : ''}`,
+                additionalInfo: user.location ?? undefined,
                 description: user.bio,
                 id: user.id,
                 imageUrl: user.avatarUrl,
-                name: user.displayName || '',
+                name: user.username || '',
                 ownerName: undefined,
                 ownerUsername: user.username || undefined,
               });
@@ -209,11 +209,11 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
           const response = await searchUsers({ query: searchQuery || '' });
           if (response?.data?.users) {
             searchResults = response.data.users.map((user) => ({
-              additionalInfo: `Member since ${new Date(user.memberSince).getFullYear()}${user.isVerified ? ' ✓' : ''}`,
+              additionalInfo: user.location ?? undefined,
               description: user.bio,
               id: user.id,
               imageUrl: user.avatarUrl,
-              name: user.displayName || '',
+              name: user.username || '',
               ownerName: undefined,
               ownerUsername: user.username || undefined,
             }));

@@ -14,7 +14,6 @@ export interface CreateTestUserOptions {
   avatarUrl?: null | string;
   bio?: null | string;
   clerkId?: string;
-  displayName?: string;
   email?: string;
   id?: string;
   location?: null | string;
@@ -58,7 +57,6 @@ export async function createTestUser(overrides: CreateTestUserOptions = {}) {
     avatarUrl: overrides.avatarUrl ?? null,
     bio: overrides.bio ?? null,
     clerkId: overrides.clerkId ?? `clerk-${uniqueId}`,
-    displayName: overrides.displayName ?? 'Test User',
     email: overrides.email ?? `test-${uniqueId}@example.com`,
     location: overrides.location ?? null,
     role: overrides.role ?? 'user',

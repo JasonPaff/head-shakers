@@ -67,7 +67,7 @@ export async function generateMetadata({
   // Use description or generate fallback with owner attribution
   const description =
     bobblehead.description ||
-    `${bobblehead.name} - From ${bobblehead.owner.displayName}'s collection on Head Shakers`;
+    `${bobblehead.name} - From ${bobblehead.owner.username}'s collection on Head Shakers`;
 
   // Generate page metadata with OG and Twitter cards
   return generatePageMetadata(

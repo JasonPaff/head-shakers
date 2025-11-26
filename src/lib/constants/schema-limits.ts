@@ -3,6 +3,9 @@
  * Single source of truth for all field length limits
  */
 export const SCHEMA_LIMITS = {
+  ADMIN_LOCK: {
+    REASON: { MAX: 100 },
+  },
   BOBBLEHEAD: {
     ACQUISITION_METHOD: { MAX: 50 },
     CATEGORY: { MAX: 50 },
@@ -89,28 +92,15 @@ export const SCHEMA_LIMITS = {
     AVATAR_URL: { MAX: 500 },
     BIO: { MAX: 500 },
     CLERK_ID: { MAX: 255 },
-    DISPLAY_NAME: { MAX: 100, MIN: 1 },
     EMAIL: { MAX: 255 },
     LOCATION: { MAX: 100 },
     USERNAME: { MAX: 50, MIN: 3 },
     USERNAME_CHANGE_COOLDOWN_DAYS: 90,
   },
-  USER_ACTIVITY: {
-    IP_ADDRESS: { MAX: 45 },
-    USER_AGENT: { MAX: 1000 },
-  },
   USER_BLOCK: {
     REASON: { MAX: 100 },
   },
-  USER_SESSION: {
-    IP_ADDRESS: { MAX: 50 },
-    SESSION_TOKEN: { MAX: 255 },
-    USER_AGENT: { MAX: 1000 },
-  },
   USER_SETTINGS: {
-    CURRENCY: { LENGTH: 3 },
-    DEFAULT_ITEM_PRIVACY: { MAX: 20 },
     LANGUAGE: { MAX: 10, MIN: 2 },
-    TIMEZONE: { MAX: 50, MIN: 3 },
   },
 } as const;

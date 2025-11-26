@@ -23,7 +23,6 @@ export const notificationRelatedTypeEnum = pgEnum(
 );
 export const featuredContentTypeEnum = pgEnum('featured_content_type', ENUMS.FEATURED_CONTENT.TYPE);
 export const featureTypeEnum = pgEnum('feature_type', ENUMS.FEATURED_CONTENT.FEATURE_TYPE);
-export const valueTypeEnum = pgEnum('value_type', ENUMS.PLATFORM_SETTING.VALUE_TYPE);
 export const contentMetricTypeEnum = pgEnum('content_metric_type', ENUMS.CONTENT_METRIC.TYPE);
 
 export const notifications = pgTable(
@@ -133,38 +132,6 @@ export const featuredContent = pgTable(
       sql`${table.startDate} IS NULL OR ${table.endDate} IS NULL OR ${table.startDate} <= ${table.endDate}`,
     ),
     check('featured_content_description_not_empty', sql`length(${table.description}) > 0`),
-  ],
-);
-
-export const platformSettings = pgTable(
-  'platform_settings',
-  {
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    description: text('description'),
-    id: uuid('id').primaryKey().defaultRandom(),
-    isPublic: boolean('is_public').default(DEFAULTS.PLATFORM_SETTING.IS_PUBLIC).notNull(),
-    key: varchar('key', { length: SCHEMA_LIMITS.PLATFORM_SETTING.KEY.MAX }).notNull().unique(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    updatedBy: uuid('updated_by').references(() => users.id, { onDelete: 'set null' }),
-    value: text('value'),
-    valueType: valueTypeEnum('value_type').default(DEFAULTS.PLATFORM_SETTING.VALUE_TYPE).notNull(),
-  },
-  (table) => [
-    // single column indexes
-    index('platform_settings_key_idx').on(table.key),
-    index('platform_settings_is_public_idx').on(table.isPublic),
-    index('platform_settings_value_type_idx').on(table.valueType),
-    index('platform_settings_updated_by_idx').on(table.updatedBy),
-
-    // composite indexes for common query patterns
-    index('platform_settings_public_key_idx').on(table.isPublic, table.key),
-
-    // check constraints
-    check('platform_settings_key_not_empty', sql`length(${table.key}) > 0`),
-    check(
-      'platform_settings_key_length',
-      sql`length(${table.key}) <= ${SCHEMA_LIMITS.PLATFORM_SETTING.KEY.MAX}`,
-    ),
   ],
 );
 

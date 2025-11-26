@@ -28,7 +28,6 @@ export type CommentWithDepth = CommentWithUser & {
 export type CommentWithUser = PublicComment & {
   user: null | {
     avatarUrl: null | string;
-    displayName: null | string;
     id: string;
     username: null | string;
   };
@@ -218,7 +217,6 @@ export class SocialQuery extends BaseQuery {
         targetType: comments.targetType,
         user: {
           avatarUrl: sql<null | string>`users.avatar_url`,
-          displayName: sql<null | string>`users.display_name`,
           id: sql<string>`users.id`,
           username: sql<null | string>`users.username`,
         },
@@ -278,7 +276,6 @@ export class SocialQuery extends BaseQuery {
         targetType: comments.targetType,
         user: {
           avatarUrl: sql<null | string>`users.avatar_url`,
-          displayName: sql<null | string>`users.display_name`,
           id: sql<string>`users.id`,
           username: sql<null | string>`users.username`,
         },
@@ -337,7 +334,6 @@ export class SocialQuery extends BaseQuery {
         targetType: comments.targetType,
         user: {
           avatarUrl: sql<null | string>`users.avatar_url`,
-          displayName: sql<null | string>`users.display_name`,
           id: sql<string>`users.id`,
           username: sql<null | string>`users.username`,
         },
@@ -398,7 +394,6 @@ export class SocialQuery extends BaseQuery {
         targetType: comments.targetType,
         user: {
           avatarUrl: sql<null | string>`users.avatar_url`,
-          displayName: sql<null | string>`users.display_name`,
           id: sql<string>`users.id`,
           username: sql<null | string>`users.username`,
         },
@@ -624,9 +619,7 @@ export class SocialQuery extends BaseQuery {
     targetType: LikeTargetType,
     options: FindOptions = {},
     context: QueryContext,
-  ): Promise<
-    Array<PublicLike & { user: { displayName: null | string; id: string; username: null | string } }>
-  > {
+  ): Promise<Array<PublicLike & { user: { id: string; username: null | string } }>> {
     const dbInstance = this.getDbInstance(context);
     const pagination = this.applyPagination(options);
 
@@ -637,7 +630,6 @@ export class SocialQuery extends BaseQuery {
         targetId: likes.targetId,
         targetType: likes.targetType,
         user: {
-          displayName: sql<null | string>`users.display_name`,
           id: sql<string>`users.id`,
           username: sql<null | string>`users.username`,
         },

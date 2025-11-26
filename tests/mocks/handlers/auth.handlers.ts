@@ -25,7 +25,6 @@ export const authHandlers = [
     return HttpResponse.json({
       bio: 'Bobblehead collector',
       createdAt: '2024-01-01T00:00:00Z',
-      displayName: 'Test User',
       email: 'test@example.com',
       id: 'test-user-id',
       isAdmin: false,
