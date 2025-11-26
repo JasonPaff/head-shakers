@@ -17,7 +17,7 @@ export interface FeaturedBobbleheadsAsyncProps {
  */
 export async function FeaturedBobbleheadsAsync({ currentUserId }: FeaturedBobbleheadsAsyncProps) {
   // Fetch featured bobbleheads from facade (default limit: 8)
-  const bobbleheadsData = await FeaturedContentFacade.getFeaturedBobbleheads();
+  const bobbleheadsData = await FeaturedContentFacade.getFeaturedBobbleheadsAsync();
 
   // Initialize like data map for efficient lookup
   const likeDataMap = new Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>();
@@ -29,7 +29,7 @@ export async function FeaturedBobbleheadsAsync({ currentUserId }: FeaturedBobble
       targetType: 'bobblehead' as const,
     }));
 
-    const likeDataResults = await SocialFacade.getBatchContentLikeData(likeDataTargets, currentUserId);
+    const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(likeDataTargets, currentUserId);
     likeDataResults.forEach((likeData) => {
       const key = `bobblehead:${likeData.targetId}`;
       likeDataMap.set(key, {

@@ -1,7 +1,7 @@
 import type { ContentViewTargetType } from '@/lib/facades/analytics/view-tracking.facade';
 
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 export interface ViewCountAsyncProps {
   isShowingLabel?: boolean;
@@ -23,7 +23,7 @@ export async function ViewCountAsync({
   let formattedCount = '--';
 
   try {
-    const currentUserId = (await getOptionalUserId()) || undefined;
+    const currentUserId = (await getOptionalUserIdAsync()) || undefined;
 
     const viewCount = await ViewTrackingFacade.getViewCountAsync(
       targetType,

@@ -38,7 +38,7 @@ export async function FeaturedCollectionsAsync({ currentUserId }: FeaturedCollec
       targetType: 'collection' as const,
     }));
 
-    const likeDataResults = await SocialFacade.getBatchContentLikeData(likeDataTargets, currentUserId);
+    const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(likeDataTargets, currentUserId);
     likeDataResults.forEach((likeData) => {
       const key = `collection:${likeData.targetId}`;
       likeDataMap.set(key, {

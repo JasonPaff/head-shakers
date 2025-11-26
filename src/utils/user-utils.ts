@@ -15,7 +15,7 @@ export const getUserId = cache(async (): Promise<string> => {
   if (!clerkUserId) redirect($path({ route: '/' }));
 
   // get the database user record using Clerk ID
-  const dbUser = await UsersFacade.getUserByClerkId(clerkUserId);
+  const dbUser = await UsersFacade.getUserByClerkIdAsync(clerkUserId);
   if (!dbUser) redirect($path({ route: '/' }));
 
   return dbUser.id;

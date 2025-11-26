@@ -33,6 +33,7 @@ export const CACHE_CONFIG = {
     BOBBLEHEADS: 'bobbleheads',
     COLLECTIONS: 'collections',
     FEATURED: 'featured',
+    PLATFORM: 'platform',
     SEARCH: 'search',
     SOCIAL: 'social',
     TAGS: 'tags',
@@ -55,6 +56,7 @@ export const CACHE_CONFIG = {
     // feature-based tags
     FEATURED_CONTENT: 'featured-content',
     GLOBAL_STATS: 'global-stats',
+    PLATFORM_STATS: 'platform-stats',
     POPULAR_CONTENT: 'popular-content',
     PUBLIC_CONTENT: 'public-content',
     PUBLIC_SEARCH: 'public-search',
@@ -166,6 +168,13 @@ export const CACHE_KEYS = {
     BOBBLEHEADS: () => `${CACHE_CONFIG.NAMESPACES.FEATURED}:bobbleheads`,
     COLLECTIONS: () => `${CACHE_CONFIG.NAMESPACES.FEATURED}:collections`,
     CONTENT: (type: string) => `${CACHE_CONFIG.NAMESPACES.FEATURED}:${type}`,
+  },
+
+  /**
+   * platform-level cache keys
+   */
+  PLATFORM: {
+    STATS: () => `${CACHE_CONFIG.NAMESPACES.PLATFORM}:stats`,
   },
 
   /**

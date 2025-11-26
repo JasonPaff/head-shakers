@@ -10,11 +10,11 @@ This orchestration migrated the Hero Section from the `/home-page-demo` route (u
 
 ## Step Logs
 
-| Step | File | Status | Duration |
-|------|------|--------|----------|
-| 1. Feature Refinement | [01-feature-refinement.md](./01-feature-refinement.md) | Completed | ~1 min |
-| 2. File Discovery | [02-file-discovery.md](./02-file-discovery.md) | Completed | ~2 min |
-| 3. Implementation Planning | [03-implementation-planning.md](./03-implementation-planning.md) | Completed | ~2 min |
+| Step                       | File                                                             | Status    | Duration |
+| -------------------------- | ---------------------------------------------------------------- | --------- | -------- |
+| 1. Feature Refinement      | [01-feature-refinement.md](./01-feature-refinement.md)           | Completed | ~1 min   |
+| 2. File Discovery          | [02-file-discovery.md](./02-file-discovery.md)                   | Completed | ~2 min   |
+| 3. Implementation Planning | [03-implementation-planning.md](./03-implementation-planning.md) | Completed | ~2 min   |
 
 ## Output Files
 
@@ -27,6 +27,7 @@ This orchestration migrated the Hero Section from the `/home-page-demo` route (u
 ## Refined Request Summary
 
 Replace the simple hero section on the main home page with the elaborate HeroSection from home-page-demo, including:
+
 - Animated gradient orbs with staggered pulse animations
 - Grid pattern background
 - Two-column layout (content + featured bobblehead showcase)
@@ -54,6 +55,7 @@ Replace the simple hero section on the main home page with the elaborate HeroSec
 ## Execution
 
 To execute this plan, use:
+
 ```
 /implement-plan docs/2025_11_26/plans/hero-section-migration-implementation-plan.md
 ```

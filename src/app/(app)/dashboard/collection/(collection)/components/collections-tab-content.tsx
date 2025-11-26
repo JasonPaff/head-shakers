@@ -11,7 +11,7 @@ export const CollectionsTabContent = async () => {
 
   const [collections, user] = await Promise.all([
     CollectionsFacade.getUserCollectionsForDashboard(userId),
-    UsersFacade.getUserById(userId),
+    UsersFacade.getUserByIdAsync(userId),
   ]);
 
   const _username = user?.username ?? undefined;

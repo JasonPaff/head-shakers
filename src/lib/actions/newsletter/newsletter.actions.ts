@@ -14,7 +14,7 @@ import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { publicActionClient } from '@/lib/utils/next-safe-action';
 import { newsletterSignupSchema } from '@/lib/validations/newsletter.validation';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 /**
  * Helper function to mask email for privacy in Sentry context
@@ -62,7 +62,7 @@ export const subscribeToNewsletterAction = publicActionClient
     const maskedEmail = maskEmail(input.email);
 
     // Get userId if user is authenticated (optional - works for both logged in and anonymous users)
-    const userId = await getOptionalUserId();
+    const userId = await getOptionalUserIdAsync();
 
     // 1. Set Sentry context at start of action (following server-actions convention)
     Sentry.setContext(SENTRY_CONTEXTS.NEWSLETTER_DATA, {

@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, gte, ilike, isNull, lte, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, ilike, isNull, lte, or, sql } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';
@@ -85,6 +85,17 @@ export type CollectionWithRelations = CollectionRecord & {
 };
 
 export class CollectionsQuery extends BaseQuery {
+  /**
+   * count total collections across all users
+   */
+  static async countTotalCollectionsAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance.select({ count: count() }).from(collections);
+
+    return result[0]?.count || 0;
+  }
+
   static async createAsync(data: InsertCollection & { slug: string }, userId: string, context: QueryContext) {
     const dbInstance = this.getDbInstance(context);
 

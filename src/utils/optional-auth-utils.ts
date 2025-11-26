@@ -28,7 +28,7 @@ export const getOptionalUserId = cache(async (): Promise<null | string> => {
     if (!clerkUserId) return null;
 
     // get the database user record using Clerk ID
-    const dbUser = await UsersFacade.getUserByClerkId(clerkUserId);
+    const dbUser = await UsersFacade.getUserByClerkIdAsync(clerkUserId);
     if (!dbUser) return null;
 
     return dbUser.id;
@@ -45,3 +45,7 @@ export const checkIsOwner = async (resourceUserId?: null | string): Promise<bool
 
   return currentUserId === resourceUserId;
 };
+
+// Aliases for backward compatibility
+export const getOptionalUserIdAsync = getOptionalUserId;
+export const checkIsOwnerAsync = checkIsOwner;

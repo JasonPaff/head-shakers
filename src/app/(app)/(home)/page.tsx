@@ -1,20 +1,15 @@
 import type { Metadata } from 'next';
 
-import { SignUpButton } from '@clerk/nextjs';
-import { AwardIcon, HeartIcon, SearchIcon, SparklesIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
-import Link from 'next/link';
+import { AwardIcon, HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { Suspense } from 'react';
 
 import { FeaturedBobbleheadsAsync } from '@/app/(app)/(home)/components/async/featured-bobbleheads-async';
 import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/featured-collections-async';
 import { FeaturedCollectionsErrorBoundary } from '@/app/(app)/(home)/components/featured-collections-error-boundary';
+import { HeroSection } from '@/app/(app)/(home)/components/hero-section';
 import { FeaturedBobbleheadsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton';
 import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
 import { UsernameOnboardingProvider } from '@/components/feature/users/username-onboarding-provider';
-import { AuthContent } from '@/components/ui/auth';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { serializeJsonLd } from '@/lib/seo/metadata.utils';
 import {
@@ -23,8 +18,7 @@ import {
   ORGANIZATION_SCHEMA,
   WEBSITE_SCHEMA,
 } from '@/lib/seo/seo.constants';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
-import { cn } from '@/utils/tailwind-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 export const revalidate = 300;
 
@@ -63,13 +57,13 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function HomePage() {
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
 
   // Check if user needs username onboarding
   let shouldShowOnboarding = false;
   let currentUsername = '';
   if (currentUserId) {
-    const user = await UsersFacade.getUserById(currentUserId);
+    const user = await UsersFacade.getUserByIdAsync(currentUserId);
     if (user) {
       currentUsername = user.username;
       shouldShowOnboarding = !user.usernameChangedAt;
@@ -94,82 +88,7 @@ export default async function HomePage() {
       )}
 
       {/* Hero Section */}
-      <section className={'relative overflow-hidden px-4 py-12 text-center'}>
-        {/* Decorative Background Elements */}
-        <div
-          aria-hidden={'true'}
-          className={
-            'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-amber-100/30 via-transparent to-transparent'
-          }
-        />
-        <div
-          aria-hidden={'true'}
-          className={
-            'pointer-events-none absolute top-20 left-1/4 -z-10 size-64 rounded-full bg-orange-100/20 blur-3xl'
-          }
-        />
-        <div
-          aria-hidden={'true'}
-          className={
-            'pointer-events-none absolute top-40 right-1/4 -z-10 size-48 rounded-full bg-orange-200/20 blur-3xl'
-          }
-        />
-
-        <div className={'container mx-auto max-w-4xl'}>
-          {/* Hero Badge */}
-          <div
-            className={cn(
-              'mb-6 inline-flex items-center gap-2 rounded-full border border-amber-400/30',
-              'bg-amber-100/40 px-4 py-1.5 text-sm font-medium text-amber-700',
-              'dark:border-amber-400/50 dark:bg-amber-700/30 dark:text-amber-200',
-            )}
-          >
-            <SparklesIcon aria-hidden={'true'} className={'size-4'} />
-            <span>The Premier Bobblehead Community</span>
-          </div>
-
-          <h1
-            className={
-              'mb-6 text-4xl font-bold tracking-tight text-balance text-foreground sm:text-5xl md:text-6xl'
-            }
-          >
-            Collect, Share, and <span className={'text-primary'}>Discover</span> Bobbleheads
-          </h1>
-          <p className={'mx-auto mb-10 max-w-2xl text-lg text-muted-foreground md:text-xl'}>
-            Build your digital bobblehead collection, connect with other collectors, and discover rare finds
-            from around the world.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className={'flex flex-wrap justify-center gap-4'}>
-            <AuthContent
-              fallback={
-                <Button
-                  asChild
-                  className={'shadow-md transition-all duration-300 hover:shadow-xl'}
-                  size={'lg'}
-                >
-                  <SignUpButton mode={'modal'}>Start Collecting</SignUpButton>
-                </Button>
-              }
-              loadingSkeleton={<Skeleton className={'h-11 w-36 rounded-md'} />}
-            >
-              <Button asChild className={'shadow-md transition-all duration-300 hover:shadow-xl'} size={'lg'}>
-                <Link href={$path({ route: '/dashboard/collection' })}>My Collection</Link>
-              </Button>
-            </AuthContent>
-            <Button asChild className={'transition-all duration-300'} size={'lg'} variant={'outline'}>
-              <Link href={$path({ route: '/browse' })}>Browse Collections</Link>
-            </Button>
-            <Button asChild className={'transition-all duration-300'} size={'lg'} variant={'outline'}>
-              <Link href={$path({ route: '/browse/search' })}>
-                <SearchIcon aria-hidden={'true'} className={'mr-2 size-5'} />
-                Search
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Featured Collections Section */}
       <section className={'bg-card px-4 py-8'}>

@@ -18,7 +18,7 @@ import { generateBreadcrumbSchema, generatePersonSchema } from '@/lib/seo/jsonld
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { checkIsOwner } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync } from '@/utils/optional-auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
@@ -31,7 +31,7 @@ export async function generateMetadata({
   const { userId } = await params;
 
   // Fetch user data
-  const user = await UsersFacade.getUserByClerkId(userId);
+  const user = await UsersFacade.getUserByClerkIdAsync(userId);
 
   // Handle user not found
   if (!user) {
@@ -81,14 +81,14 @@ async function UserPage({ routeParams }: UserPageProps) {
   const { userId } = await routeParams;
 
   // fetch user data
-  const user = await UsersFacade.getUserByClerkId(userId);
+  const user = await UsersFacade.getUserByClerkIdAsync(userId);
 
   if (!user) {
     notFound();
   }
 
   // Check if current user is viewing their own profile
-  const isOwner = await checkIsOwner(user.id);
+  const isOwner = await checkIsOwnerAsync(user.id);
 
   // Generate canonical URL for JSON-LD schemas
   const profileUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/[userId]', routeParams: { userId } })}`;

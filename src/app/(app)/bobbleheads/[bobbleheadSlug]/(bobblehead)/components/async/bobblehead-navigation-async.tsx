@@ -2,7 +2,7 @@ import 'server-only';
 
 import { BobbleheadNavigation } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface BobbleheadNavigationAsyncProps {
   bobbleheadId: string;
@@ -20,7 +20,7 @@ export const BobbleheadNavigationAsync = async ({
     return null;
   }
 
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
 
   const navigationData = await BobbleheadsFacade.getBobbleheadNavigationData(
     bobbleheadId,

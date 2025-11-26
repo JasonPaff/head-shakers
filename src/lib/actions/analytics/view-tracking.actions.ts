@@ -42,7 +42,7 @@ export const recordViewAction = publicActionClient
     if (viewData.viewerId) {
       // check if it's already a UUID (36 chars with hyphens) or a Clerk ID (starts with user_)
       if (viewData.viewerId.startsWith('user_')) {
-        const user = await UsersFacade.getUserByClerkId(viewData.viewerId, ctx.db);
+        const user = await UsersFacade.getUserByClerkIdAsync(viewData.viewerId, ctx.db);
         if (user) resolvedViewerId = user.id;
       } else {
         // assume it's already a UUID

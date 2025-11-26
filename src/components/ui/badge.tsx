@@ -27,8 +27,24 @@ const badgeVariants = cva(
           'border-transparent bg-destructive text-white focus-visible:ring-destructive/20',
           'dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 [a&]:hover:bg-destructive/90',
         ],
+        editor_pick: [
+          'border-transparent bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg',
+          '[a&]:hover:shadow-xl',
+        ],
+        new_badge: [
+          'border-transparent bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg',
+          '[a&]:hover:shadow-xl',
+        ],
         outline: 'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
+        popular: [
+          'border-transparent bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg',
+          '[a&]:hover:shadow-xl',
+        ],
         secondary: 'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
+        trending: [
+          'border-transparent bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg',
+          '[a&]:hover:shadow-xl',
+        ],
       },
     },
   },
@@ -36,9 +52,9 @@ const badgeVariants = cva(
 
 type BadgeProps = ComponentProps<'span'> &
   ComponentTestIdProps &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean };
+  VariantProps<typeof badgeVariants> & { asChild?: boolean; icon?: React.ReactNode };
 
-export const Badge = ({ asChild = false, className, testId, variant, ...props }: BadgeProps) => {
+export const Badge = ({ asChild = false, className, icon, testId, variant, ...props }: BadgeProps) => {
   const Comp = asChild ? Slot : 'span';
   const badgeTestId = testId || generateTestId('ui', 'badge');
 
@@ -48,6 +64,9 @@ export const Badge = ({ asChild = false, className, testId, variant, ...props }:
       data-slot={'badge'}
       data-testid={badgeTestId}
       {...props}
-    />
+    >
+      {icon && <span className={'size-3'}>{icon}</span>}
+      {props.children}
+    </Comp>
   );
 };

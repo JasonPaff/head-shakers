@@ -20,7 +20,7 @@ export default async function ProfileSettingsPage() {
   const userId = await getUserId();
 
   // Fetch current user data
-  const user = await UsersFacade.getUserById(userId);
+  const user = await UsersFacade.getUserByIdAsync(userId);
 
   if (!user) {
     notFound();

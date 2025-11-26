@@ -76,7 +76,10 @@ export async function FeaturedTabbedContentAsync({
 
       if (likeDataTargets.length > 0) {
         try {
-          const likeDataResults = await SocialFacade.getBatchContentLikeData(likeDataTargets, currentUserId);
+          const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(
+            likeDataTargets,
+            currentUserId,
+          );
           likeDataResults.forEach((likeData) => {
             const key = `${likeData.targetType}:${likeData.targetId}`;
             likeDataMap.set(key, {

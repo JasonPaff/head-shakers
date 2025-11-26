@@ -3,7 +3,7 @@ import type { FeaturedContentData } from '@/lib/queries/featured-content/feature
 import { FeaturedContentDisplay } from '@/app/(app)/browse/featured/components/featured-content-display';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 export interface FeaturedContentServerProps {
   isTrackViews?: boolean;
@@ -98,7 +98,7 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     console.log('FeaturedContentServer: Fetching featured content data');
 
     // get current user ID for like data
-    const currentUserId = await getOptionalUserId();
+    const currentUserId = await getOptionalUserIdAsync();
 
     // fetch all featured content sections in parallel
     const [homepageBanner, editorPicks, collectionOfWeek, trending] = await Promise.all([
@@ -129,7 +129,10 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
 
     if (currentUserId && likeDataTargets.length > 0) {
       try {
-        const likeDataResults = await SocialFacade.getBatchContentLikeData(likeDataTargets, currentUserId);
+        const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(
+          likeDataTargets,
+          currentUserId,
+        );
         likeDataResults.forEach((likeData) => {
           const key = `${likeData.targetType}:${likeData.targetId}`;
           likeDataMap.set(key, {

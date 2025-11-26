@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, gt, gte, like, lt, ne, or } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gt, gte, isNull, like, lt, ne, or } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
@@ -118,6 +118,20 @@ export class BobbleheadsQuery extends BaseQuery {
     return results
       .map((result) => result[0])
       .filter((photo): photo is typeof bobbleheadPhotos.$inferSelect => photo !== undefined);
+  }
+
+  /**
+   * count total bobbleheads across all users excluding deleted records
+   */
+  static async countTotalBobbleheadsAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(bobbleheads)
+      .where(isNull(bobbleheads.deletedAt));
+
+    return result[0]?.count || 0;
   }
 
   /**
