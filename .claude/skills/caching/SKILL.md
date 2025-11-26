@@ -1,24 +1,31 @@
 ---
 name: caching
-description: Enforces Head Shakers caching conventions when implementing cache layers using Next.js unstable_cache and Upstash Redis. This skill ensures consistent patterns for cache keys, tags, TTL configuration, cache invalidation, and domain-specific CacheService helpers.
+description: Enforces Head Shakers caching conventions when implementing cache layers using React cache(), Next.js unstable_cache, Upstash Redis, and Cloudinary. This skill ensures consistent patterns for cache keys, tags, TTL configuration, cache invalidation, and domain-specific CacheService helpers.
 ---
 
 # Caching Skill
 
 ## Purpose
 
-This skill enforces the Head Shakers caching conventions automatically during cache implementation. It ensures consistent patterns for domain-specific CacheService helpers, cache keys, tags, TTL configuration, and coordinated cache invalidation with CacheRevalidationService.
+This skill enforces the Head Shakers caching conventions automatically during cache implementation. It ensures consistent patterns across the 4-layer caching strategy:
+
+1. **React `cache()`** - Same-request deduplication (e.g., getCurrentUserId)
+2. **Next.js `unstable_cache()`** - Cross-request caching with tag-based invalidation (primary)
+3. **Upstash Redis** - High-traffic public data, distributed locks, rate limiting, view tracking
+4. **Cloudinary** - Image transformation and CDN-level caching
 
 ## Activation
 
 This skill activates when:
 
-- Working with `CacheService` domain-specific helpers (`.bobbleheads`, `.collections`, `.users`, `.search`, `.analytics`, `.featured`)
+- Working with `CacheService` domain-specific helpers (`.bobbleheads`, `.collections`, `.users`, `.search`, `.redisSearch`, `.analytics`, `.featured`)
 - Implementing cached data fetching in facades
 - Setting up cache invalidation after mutations using `CacheRevalidationService`
-- Working with Redis operations for high-traffic public search caching
+- Working with Redis operations via `RedisOperations` class
+- Using `REDIS_KEYS` for view tracking, locks, or rate limiting
 - Configuring cache tags and TTL values
-- Using `CACHE_KEYS`, `CACHE_CONFIG`, or `CacheTagGenerators`
+- Using `CACHE_KEYS`, `CACHE_CONFIG`, `REDIS_TTL`, or `CacheTagGenerators`
+- Implementing request-level deduplication with React `cache()`
 
 ## Workflow
 
@@ -52,7 +59,11 @@ This skill activates when:
 
 - Use `CACHE_KEYS.{DOMAIN}.{METHOD}()` for cache key generation
 - Use `CacheTagGenerators.{domain}.{method}()` for tag generation
-- Use `CACHE_CONFIG.TTL.{LEVEL}` for TTL values (SHORT, MEDIUM, LONG, EXTENDED, PUBLIC_SEARCH)
+- Use `CACHE_CONFIG.TTL.{LEVEL}` for TTL values:
+    - `REALTIME` (30s), `SHORT` (5 min), `MEDIUM` (30 min), `LONG` (1 hr)
+    - `EXTENDED` (4 hr), `PUBLIC_SEARCH` (10 min), `DAILY` (24 hr), `WEEKLY` (7 days)
+- Use `REDIS_KEYS.{NAMESPACE}.{METHOD}()` for Redis-specific keys (VIEW_TRACKING, LOCKS, RATE_LIMIT)
+- Use `REDIS_TTL.{CATEGORY}` for Redis-specific TTL values
 - Use `createHashFromObject()` for generating option hashes in cache keys
 
 ## Usage Pattern Reference
@@ -64,7 +75,20 @@ This skill activates when:
 | User profile     | `CacheService.users.profile()`              | `CacheRevalidationService.users.onProfileUpdate()`  |
 | Public search    | `CacheService.redisSearch.publicDropdown()` | `CacheService.search.invalidatePublic()`            |
 | Analytics        | `CacheService.analytics.viewCounts()`       | `CacheRevalidationService.analytics.onViewRecord()` |
-| Social (likes)   | N/A (use tag generators)                    | `CacheRevalidationService.social.onLikeChange()`    |
+| Social (likes)   | Tag-based via `CacheTagGenerators`          | `CacheRevalidationService.social.onLikeChange()`    |
+| View tracking    | `REDIS_KEYS.VIEW_TRACKING.*` + Redis ops    | TTL-based expiry (no explicit invalidation)         |
+
+## Caching Layer Selection Guide
+
+| Use Case | Recommended Layer | Rationale |
+|----------|------------------|-----------|
+| Same-request deduplication | React `cache()` | Prevents redundant calls within single render |
+| Entity data (bobbleheads, collections) | `unstable_cache` | Tag-based invalidation, automatic revalidation |
+| High-traffic public search | Redis | Distributed, fast, handles scale |
+| View tracking deduplication | Redis | Distributed, TTL-based expiry |
+| Rate limiting | Redis | Distributed counters, automatic TTL expiry |
+| Distributed locks | Redis | Prevents concurrent updates |
+| Image transformations | Cloudinary | CDN-level caching, on-the-fly transforms |
 
 ## References
 
