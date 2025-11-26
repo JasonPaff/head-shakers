@@ -1,11 +1,16 @@
-import { auth } from '@clerk/nextjs/server';
 import { $path } from 'next-typesafe-url';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { UsersFacade } from '@/lib/facades/users/users.facade';
+import { getCurrentClerkUserId } from '@/utils/optional-auth-utils';
 
-export const getUserId = async (): Promise<string> => {
-  const { userId: clerkUserId } = await auth();
+/**
+ * Get the current database user ID with request-level deduplication.
+ * Redirects to home if not authenticated or user not found in database.
+ */
+export const getUserId = cache(async (): Promise<string> => {
+  const clerkUserId = await getCurrentClerkUserId();
 
   if (!clerkUserId) redirect($path({ route: '/' }));
 
@@ -14,4 +19,4 @@ export const getUserId = async (): Promise<string> => {
   if (!dbUser) redirect($path({ route: '/' }));
 
   return dbUser.id;
-};
+});

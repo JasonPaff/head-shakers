@@ -1,15 +1,17 @@
-import { auth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
+import { cache } from 'react';
 
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
+import { getCurrentClerkUserId } from '@/utils/optional-auth-utils';
 
 /**
- * Check if the current user has moderator or admin privileges
+ * Check if the current user has moderator or admin privileges.
+ * Uses React cache() for request-level deduplication.
  */
-export const checkIsModerator = async (): Promise<boolean> => {
+export const checkIsModerator = cache(async (): Promise<boolean> => {
   try {
-    const { userId: clerkUserId } = await auth();
+    const clerkUserId = await getCurrentClerkUserId();
     if (!clerkUserId) return false;
 
     const [dbUser] = await db
@@ -22,14 +24,15 @@ export const checkIsModerator = async (): Promise<boolean> => {
   } catch {
     return false;
   }
-};
+});
 
 /**
- * Get the current user with role information
+ * Get the current user with role information.
+ * Uses React cache() for request-level deduplication.
  */
-export const getCurrentUserWithRole = async () => {
+export const getCurrentUserWithRole = cache(async () => {
   try {
-    const { userId: clerkUserId } = await auth();
+    const clerkUserId = await getCurrentClerkUserId();
     if (!clerkUserId) return null;
 
     const [dbUser] = await db
@@ -54,7 +57,7 @@ export const getCurrentUserWithRole = async () => {
   } catch {
     return null;
   }
-};
+});
 
 /**
  * Moderator action wrapper that throws if a user doesn't have moderator privileges

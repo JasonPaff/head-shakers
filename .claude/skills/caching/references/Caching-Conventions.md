@@ -46,7 +46,7 @@ import { RedisOperations } from '@/lib/utils/redis-client';
 
 ## Layer 1: React cache() - Request-Level Caching
 
-> **STATUS: RECOMMENDED - Not yet implemented in codebase**
+> **STATUS: IMPLEMENTED**
 
 Use React's `cache()` for deduplicating expensive operations within a single request/render cycle.
 
@@ -56,23 +56,49 @@ Use React's `cache()` for deduplicating expensive operations within a single req
 - Fetching the same data in layout and page components
 - Deduplicating auth checks across nested components
 
+### Implemented Functions
+
+The following auth-related functions use React `cache()` for request-level deduplication:
+
+| Function | Location | Description |
+|----------|----------|-------------|
+| `getCurrentClerkUserId` | `@/utils/optional-auth-utils` | Returns Clerk user ID (cached) |
+| `getOptionalUserId` | `@/utils/optional-auth-utils` | Returns DB user ID or null (cached) |
+| `getUserId` | `@/utils/user-utils` | Returns DB user ID, redirects if unauthenticated (cached) |
+| `checkIsModerator` | `@/lib/utils/admin.utils` | Checks moderator/admin role (cached) |
+| `getCurrentUserWithRole` | `@/lib/utils/admin.utils` | Returns user with role info (cached) |
+
 ### Pattern
 
 ```typescript
 import { cache } from 'react';
+import { auth } from '@clerk/nextjs/server';
 
 // Wrap expensive operations that may be called multiple times per request
-export const getCurrentUserId = cache(async (): Promise<string | null> => {
-  const { userId } = await auth();
-  return userId;
+export const getCurrentClerkUserId = cache(async (): Promise<string | null> => {
+  try {
+    const { userId } = await auth();
+    return userId;
+  } catch {
+    return null;
+  }
+});
+
+// Build on cached functions for derived data
+export const getOptionalUserId = cache(async (): Promise<string | null> => {
+  const clerkUserId = await getCurrentClerkUserId();
+  if (!clerkUserId) return null;
+
+  const dbUser = await UsersFacade.getUserByClerkId(clerkUserId);
+  return dbUser?.id ?? null;
 });
 
 // Usage in multiple server components - only executes once per request
 // layout.tsx
-const userId = await getCurrentUserId();
+const userId = await getOptionalUserId();
 
 // page.tsx (same request)
-const userId = await getCurrentUserId(); // Returns cached result
+const userId = await getOptionalUserId(); // Returns cached result
 ```
 
 ### When to Use

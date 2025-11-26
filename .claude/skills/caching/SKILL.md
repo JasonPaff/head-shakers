@@ -9,7 +9,7 @@ description: Enforces Head Shakers caching conventions when implementing cache l
 
 This skill enforces the Head Shakers caching conventions automatically during cache implementation. It ensures consistent patterns across the 4-layer caching strategy:
 
-1. **React `cache()`** - Same-request deduplication (e.g., getCurrentUserId)
+1. **React `cache()`** - Same-request deduplication (e.g., `getCurrentClerkUserId`, `getOptionalUserId`)
 2. **Next.js `unstable_cache()`** - Cross-request caching with tag-based invalidation (primary)
 3. **Upstash Redis** - High-traffic public data, distributed locks, rate limiting, view tracking
 4. **Cloudinary** - Image transformation and CDN-level caching
@@ -82,7 +82,7 @@ This skill activates when:
 
 | Use Case | Recommended Layer | Rationale |
 |----------|------------------|-----------|
-| Same-request deduplication | React `cache()` | Prevents redundant calls within single render |
+| Same-request deduplication | React `cache()` | Prevents redundant calls within single render (implemented for auth) |
 | Entity data (bobbleheads, collections) | `unstable_cache` | Tag-based invalidation, automatic revalidation |
 | High-traffic public search | Redis | Distributed, fast, handles scale |
 | View tracking deduplication | Redis | Distributed, TTL-based expiry |
