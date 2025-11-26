@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
+import { CameraIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -9,9 +9,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 
 import type { BobbleheadNavigationData } from '@/lib/types/bobblehead-navigation.types';
 
-import { buttonVariants } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { generateTestId } from '@/lib/test-ids';
 import { cn } from '@/utils/tailwind-utils';
 
@@ -137,105 +135,224 @@ export const BobbleheadNavigation = ({
   const prevLinkTestId = generateTestId('feature', 'bobblehead-nav', 'previous');
   const nextLinkTestId = generateTestId('feature', 'bobblehead-nav', 'next');
   const positionTestId = generateTestId('feature', 'bobblehead-nav', 'position');
-  const prevHoverCardTestId = generateTestId('feature', 'bobblehead-nav', 'previous-hover');
-  const nextHoverCardTestId = generateTestId('feature', 'bobblehead-nav', 'next-hover');
 
-  // Shared button styling
-  const linkClassName = cn(buttonVariants({ size: 'sm', variant: 'outline' }), 'gap-2');
-  const disabledClassName = cn(linkClassName, 'pointer-events-none opacity-50');
+  // Shared card base styling
+  const cardBaseClassName = cn(
+    'flex flex-1 rounded-lg border bg-card transition-colors',
+    'hover:border-accent-foreground/20 hover:bg-accent',
+    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+  );
+  // Previous card - content aligned left
+  const prevCardClassName = cn(cardBaseClassName, 'justify-start');
+  const disabledPrevCardClassName = cn(prevCardClassName, 'pointer-events-none opacity-50');
+  // Next card - content aligned right
+  const nextCardClassName = cn(cardBaseClassName, 'justify-end');
+  const disabledNextCardClassName = cn(nextCardClassName, 'pointer-events-none opacity-50');
+
+  // Compact button styling for mobile
+  const compactClassName = cn(
+    'flex flex-1 items-center rounded-md border bg-card transition-colors',
+    'hover:border-accent-foreground/20 hover:bg-accent',
+    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none',
+  );
+  const disabledCompactClassName = cn(compactClassName, 'pointer-events-none opacity-50');
 
   return (
     <Conditional isCondition={_hasNavigation}>
       <nav
         aria-label={'Bobblehead navigation'}
-        className={'flex items-center justify-between gap-4'}
+        className={'flex flex-col gap-4'}
         data-slot={'bobblehead-navigation'}
         data-testid={navTestId}
       >
-        {/* Previous Link */}
-        {_canNavigatePrevious ?
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <Link
-                aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
-                className={linkClassName}
-                data-slot={'bobblehead-navigation-previous'}
-                data-testid={prevLinkTestId}
-                href={previousUrl}
-              >
-                <ChevronLeftIcon aria-hidden className={'size-4'} />
-                <span className={'hidden sm:inline'}>Previous</span>
-              </Link>
-            </HoverCardTrigger>
-            <HoverCardContent data-testid={prevHoverCardTestId} side={'bottom'}>
-              <BobbleheadNavigationPreview bobblehead={navigationData.previousBobblehead!} />
-            </HoverCardContent>
-          </HoverCard>
-        : <span
-            aria-disabled={'true'}
-            aria-label={'No previous bobblehead'}
-            className={disabledClassName}
-            data-slot={'bobblehead-navigation-previous'}
-            data-testid={prevLinkTestId}
-          >
-            <ChevronLeftIcon aria-hidden className={'size-4'} />
-            <span className={'hidden sm:inline'}>Previous</span>
-          </span>
-        }
-
-        {/* Center Content - Context and Position */}
-        <div className={'flex flex-col items-center gap-1'}>
-          {/* Collection Context Indicator */}
-          <Conditional isCondition={_hasContext}>
-            <div className={'hidden sm:block'}>
-              <CollectionContextIndicator context={navigationData.context!} />
+        {/* Desktop Layout - Card Style */}
+        <div className={'hidden items-stretch justify-between gap-4 sm:flex'}>
+          {/* Previous Card */}
+          {_canNavigatePrevious ?
+            <Link
+              aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
+              className={prevCardClassName}
+              data-slot={'bobblehead-navigation-previous'}
+              data-testid={prevLinkTestId}
+              href={previousUrl}
+            >
+              <BobbleheadNavigationPreview
+                bobblehead={navigationData.previousBobblehead!}
+                direction={'previous'}
+                variant={'card'}
+              />
+            </Link>
+          : <div
+              aria-disabled={'true'}
+              aria-label={'No previous bobblehead'}
+              className={disabledPrevCardClassName}
+              data-slot={'bobblehead-navigation-previous'}
+              data-testid={prevLinkTestId}
+            >
+              <DisabledCardPlaceholder direction={'previous'} />
             </div>
-          </Conditional>
+          }
 
-          {/* Position Indicator */}
+          {/* Center Content - Context and Position */}
+          <div className={'flex flex-col items-center justify-center gap-1'}>
+            {/* Collection Context Indicator */}
+            <Conditional isCondition={_hasContext}>
+              <CollectionContextIndicator context={navigationData.context!} />
+            </Conditional>
+
+            {/* Position Indicator */}
+            <Conditional isCondition={_hasPositionInfo}>
+              <span
+                aria-label={`Bobblehead ${navigationData.currentPosition} of ${navigationData.totalCount} in collection`}
+                className={'text-sm text-muted-foreground'}
+                data-slot={'bobblehead-navigation-position'}
+                data-testid={positionTestId}
+              >
+                {navigationData.currentPosition} of {navigationData.totalCount}
+              </span>
+            </Conditional>
+          </div>
+
+          {/* Next Card */}
+          {_canNavigateNext ?
+            <Link
+              aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
+              className={nextCardClassName}
+              data-slot={'bobblehead-navigation-next'}
+              data-testid={nextLinkTestId}
+              href={nextUrl}
+            >
+              <BobbleheadNavigationPreview
+                bobblehead={navigationData.nextBobblehead!}
+                direction={'next'}
+                variant={'card'}
+              />
+            </Link>
+          : <div
+              aria-disabled={'true'}
+              aria-label={'No next bobblehead'}
+              className={disabledNextCardClassName}
+              data-slot={'bobblehead-navigation-next'}
+              data-testid={nextLinkTestId}
+            >
+              <DisabledCardPlaceholder direction={'next'} />
+            </div>
+          }
+        </div>
+
+        {/* Mobile Layout - Compact Horizontal */}
+        <div className={'flex items-center gap-2 sm:hidden'}>
+          {/* Previous Compact */}
+          {_canNavigatePrevious ?
+            <Link
+              aria-label={`Previous: ${navigationData.previousBobblehead?.name}`}
+              className={compactClassName}
+              data-slot={'bobblehead-navigation-previous'}
+              href={previousUrl}
+            >
+              <BobbleheadNavigationPreview
+                bobblehead={navigationData.previousBobblehead!}
+                direction={'previous'}
+                variant={'compact'}
+              />
+            </Link>
+          : <div
+              aria-disabled={'true'}
+              aria-label={'No previous bobblehead'}
+              className={disabledCompactClassName}
+              data-slot={'bobblehead-navigation-previous'}
+            >
+              <DisabledCompactPlaceholder direction={'previous'} />
+            </div>
+          }
+
+          {/* Position Indicator - Mobile */}
           <Conditional isCondition={_hasPositionInfo}>
             <span
               aria-label={`Bobblehead ${navigationData.currentPosition} of ${navigationData.totalCount} in collection`}
-              className={'text-sm text-muted-foreground'}
+              className={'shrink-0 text-xs text-muted-foreground'}
               data-slot={'bobblehead-navigation-position'}
-              data-testid={positionTestId}
             >
-              {navigationData.currentPosition} of {navigationData.totalCount}
+              {navigationData.currentPosition}/{navigationData.totalCount}
             </span>
           </Conditional>
-        </div>
 
-        {/* Next Link */}
-        {_canNavigateNext ?
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <Link
-                aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
-                className={linkClassName}
-                data-slot={'bobblehead-navigation-next'}
-                data-testid={nextLinkTestId}
-                href={nextUrl}
-              >
-                <span className={'hidden sm:inline'}>Next</span>
-                <ChevronRightIcon aria-hidden className={'size-4'} />
-              </Link>
-            </HoverCardTrigger>
-            <HoverCardContent data-testid={nextHoverCardTestId} side={'bottom'}>
-              <BobbleheadNavigationPreview bobblehead={navigationData.nextBobblehead!} />
-            </HoverCardContent>
-          </HoverCard>
-        : <span
-            aria-disabled={'true'}
-            aria-label={'No next bobblehead'}
-            className={disabledClassName}
-            data-slot={'bobblehead-navigation-next'}
-            data-testid={nextLinkTestId}
-          >
-            <span className={'hidden sm:inline'}>Next</span>
-            <ChevronRightIcon aria-hidden className={'size-4'} />
-          </span>
-        }
+          {/* Next Compact */}
+          {_canNavigateNext ?
+            <Link
+              aria-label={`Next: ${navigationData.nextBobblehead?.name}`}
+              className={compactClassName}
+              data-slot={'bobblehead-navigation-next'}
+              href={nextUrl}
+            >
+              <BobbleheadNavigationPreview
+                bobblehead={navigationData.nextBobblehead!}
+                direction={'next'}
+                variant={'compact'}
+              />
+            </Link>
+          : <div
+              aria-disabled={'true'}
+              aria-label={'No next bobblehead'}
+              className={disabledCompactClassName}
+              data-slot={'bobblehead-navigation-next'}
+            >
+              <DisabledCompactPlaceholder direction={'next'} />
+            </div>
+          }
+        </div>
       </nav>
     </Conditional>
+  );
+};
+
+// Disabled state placeholder for card variant
+const DisabledCardPlaceholder = ({ direction }: { direction: 'next' | 'previous' }) => {
+  const _isPrevious = direction === 'previous';
+
+  return (
+    <div className={cn('flex items-center gap-3 p-3', _isPrevious ? 'flex-row' : 'flex-row-reverse')}>
+      {/* Chevron Icon */}
+      {_isPrevious ?
+        <ChevronLeftIcon aria-hidden className={'size-5 shrink-0 text-muted-foreground'} />
+      : <ChevronRightIcon aria-hidden className={'size-5 shrink-0 text-muted-foreground'} />}
+
+      {/* Placeholder Image */}
+      <div className={'flex size-14 shrink-0 items-center justify-center rounded-md bg-muted'}>
+        <CameraIcon aria-hidden className={'size-6 text-muted-foreground'} />
+      </div>
+
+      {/* Text Content */}
+      <div className={cn('flex min-w-0 flex-col gap-0.5', _isPrevious ? 'items-start' : 'items-end')}>
+        {/* Direction Label */}
+        <span className={'text-xs font-medium text-muted-foreground'}>
+          {_isPrevious ? 'Previous' : 'Next'}
+        </span>
+        {/* Placeholder Text */}
+        <p className={cn('text-sm text-muted-foreground', _isPrevious ? 'text-left' : 'text-right')}>None</p>
+      </div>
+    </div>
+  );
+};
+
+// Disabled state placeholder for compact variant
+const DisabledCompactPlaceholder = ({ direction }: { direction: 'next' | 'previous' }) => {
+  const _isPrevious = direction === 'previous';
+
+  return (
+    <div className={cn('flex items-center gap-2 px-2 py-1.5', _isPrevious ? 'flex-row' : 'flex-row-reverse')}>
+      {/* Chevron Icon */}
+      {_isPrevious ?
+        <ChevronLeftIcon aria-hidden className={'size-4 shrink-0 text-muted-foreground'} />
+      : <ChevronRightIcon aria-hidden className={'size-4 shrink-0 text-muted-foreground'} />}
+
+      {/* Placeholder Image */}
+      <div className={'flex size-8 shrink-0 items-center justify-center rounded bg-muted'}>
+        <CameraIcon aria-hidden className={'size-4 text-muted-foreground'} />
+      </div>
+
+      {/* Placeholder Text */}
+      <p className={cn('text-xs text-muted-foreground', _isPrevious ? 'text-left' : 'text-right')}>None</p>
+    </div>
   );
 };
