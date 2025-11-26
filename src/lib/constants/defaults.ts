@@ -8,7 +8,6 @@ export const DEFAULTS = {
   BOBBLEHEAD: {
     COMMENT_COUNT: 0,
     CONDITION: 'excellent',
-    IS_DELETED: false,
     IS_FEATURED: false,
     IS_PUBLIC: true,
     LIKE_COUNT: 0,
@@ -28,8 +27,6 @@ export const DEFAULTS = {
     TOTAL_VALUE: '0.00',
   },
   COMMENT: {
-    IS_DELETED: false,
-    IS_EDITED: false,
     LIKE_COUNT: 0,
   },
   CONTENT_REPORT: {

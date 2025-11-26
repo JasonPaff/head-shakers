@@ -9,7 +9,6 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { DEFAULTS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, collections, subCollections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -199,7 +198,7 @@ export class CollectionsQuery extends BaseQuery {
             subcollectionId: true,
             updatedAt: true,
           },
-          where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          where: isNull(bobbleheads.deletedAt),
         },
         subCollections: {
           with: {
@@ -209,7 +208,7 @@ export class CollectionsQuery extends BaseQuery {
                 isFeatured: true,
                 updatedAt: true,
               },
-              where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+              where: isNull(bobbleheads.deletedAt),
             },
           },
         },
@@ -271,7 +270,7 @@ export class CollectionsQuery extends BaseQuery {
             subcollectionId: true,
             updatedAt: true,
           },
-          where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          where: isNull(bobbleheads.deletedAt),
         },
         subCollections: {
           with: {
@@ -281,7 +280,7 @@ export class CollectionsQuery extends BaseQuery {
                 isFeatured: true,
                 updatedAt: true,
               },
-              where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+              where: isNull(bobbleheads.deletedAt),
             },
           },
         },
@@ -349,7 +348,7 @@ export class CollectionsQuery extends BaseQuery {
     const bobbleheadFilter = this.buildBaseFilters(
       bobbleheads.isPublic,
       bobbleheads.userId,
-      bobbleheads.isDeleted,
+      bobbleheads.deletedAt,
       context,
     );
 
@@ -403,7 +402,7 @@ export class CollectionsQuery extends BaseQuery {
     const bobbleheadFilter = this.buildBaseFilters(
       bobbleheads.isPublic,
       bobbleheads.userId,
-      bobbleheads.isDeleted,
+      bobbleheads.deletedAt,
       context,
     );
 
@@ -488,7 +487,7 @@ export class CollectionsQuery extends BaseQuery {
           collectionId: bobbleheads.collectionId,
         })
         .from(bobbleheads)
-        .where(this.combineFilters(categoryFilter, eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED)))
+        .where(this.combineFilters(categoryFilter, isNull(bobbleheads.deletedAt)))
         .as('collections_with_category');
 
       // get total count for pagination metadata
@@ -516,7 +515,7 @@ export class CollectionsQuery extends BaseQuery {
             LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
               AND ${bobbleheadPhotos.isPrimary} = true
             WHERE ${bobbleheads.collectionId} = ${collections.id}
-              AND ${bobbleheads.isDeleted} = false
+              AND ${bobbleheads.deletedAt} IS NULL
             ORDER BY ${bobbleheads.createdAt} ASC
             LIMIT 1
           )`,
@@ -603,7 +602,7 @@ export class CollectionsQuery extends BaseQuery {
           LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
             AND ${bobbleheadPhotos.isPrimary} = true
           WHERE ${bobbleheads.collectionId} = ${collections.id}
-            AND ${bobbleheads.isDeleted} = false
+            AND ${bobbleheads.deletedAt} IS NULL
           ORDER BY ${bobbleheads.createdAt} ASC
           LIMIT 1
         )`,
@@ -751,7 +750,7 @@ export class CollectionsQuery extends BaseQuery {
           LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
             AND ${bobbleheadPhotos.isPrimary} = true
           WHERE ${bobbleheads.collectionId} = ${collections.id}
-            AND ${bobbleheads.isDeleted} = false
+            AND ${bobbleheads.deletedAt} IS NULL
           ORDER BY ${bobbleheads.createdAt} ASC
           LIMIT 1
         )`,
@@ -888,7 +887,7 @@ export class CollectionsQuery extends BaseQuery {
     const bobbleheadFilter = this.buildBaseFilters(
       bobbleheads.isPublic,
       bobbleheads.userId,
-      bobbleheads.isDeleted,
+      bobbleheads.deletedAt,
       context,
     );
 
@@ -1004,7 +1003,7 @@ export class CollectionsQuery extends BaseQuery {
             subcollectionId: true,
             updatedAt: true,
           },
-          where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          where: isNull(bobbleheads.deletedAt),
         },
         subCollections: {
           columns: {
@@ -1025,7 +1024,7 @@ export class CollectionsQuery extends BaseQuery {
                 isFeatured: true,
                 updatedAt: true,
               },
-              where: eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+              where: isNull(bobbleheads.deletedAt),
             },
           },
         },
@@ -1048,7 +1047,7 @@ export class CollectionsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           sql`${bobbleheads.category} IS NOT NULL`,
-          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          isNull(bobbleheads.deletedAt),
           this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
         ),
       )
@@ -1101,7 +1100,7 @@ export class CollectionsQuery extends BaseQuery {
           SELECT COUNT(*)::int
           FROM ${bobbleheads}
           WHERE ${bobbleheads.subcollectionId} = ${subCollections.id}
-            AND ${bobbleheads.isDeleted} = false
+            AND ${bobbleheads.deletedAt} IS NULL
         )`.as('item_count'),
         name: subCollections.name,
         slug: subCollections.slug,

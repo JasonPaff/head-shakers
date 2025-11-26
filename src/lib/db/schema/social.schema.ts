@@ -1,7 +1,6 @@
 import { sql } from 'drizzle-orm';
 import {
   type AnyPgColumn,
-  boolean,
   check,
   index,
   integer,
@@ -68,8 +67,6 @@ export const comments = pgTable(
     deletedAt: timestamp('deleted_at'),
     editedAt: timestamp('edited_at'),
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(DEFAULTS.COMMENT.IS_DELETED).notNull(),
-    isEdited: boolean('is_edited').default(DEFAULTS.COMMENT.IS_EDITED).notNull(),
     likeCount: integer('like_count').default(DEFAULTS.COMMENT.LIKE_COUNT).notNull(),
     parentCommentId: uuid('parent_comment_id').references((): AnyPgColumn => comments.id, {
       onDelete: 'cascade',
@@ -91,8 +88,8 @@ export const comments = pgTable(
     // composite indexes
     index('comments_target_idx').on(table.targetType, table.targetId),
     index('comments_user_created_idx').on(table.userId, table.createdAt),
-    index('comments_deleted_created_idx').on(table.isDeleted, table.createdAt),
-    index('comments_target_deleted_idx').on(table.targetType, table.targetId, table.isDeleted),
+    index('comments_deleted_created_idx').on(table.deletedAt, table.createdAt),
+    index('comments_target_deleted_idx').on(table.targetType, table.targetId, table.deletedAt),
     index('comments_parent_created_idx').on(table.parentCommentId, table.createdAt),
 
     // partial indexes for polymorphic relationships
@@ -110,7 +107,7 @@ export const comments = pgTable(
     index('comments_target_active_created_idx').on(
       table.targetType,
       table.targetId,
-      table.isDeleted,
+      table.deletedAt,
       sql`${table.createdAt} DESC`,
     ),
     index('comments_content_search_idx').using('gin', sql`${table.content} gin_trgm_ops`),

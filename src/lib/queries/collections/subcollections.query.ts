@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, ilike, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, ilike, isNull, or, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { BobbleheadListRecord } from '@/lib/queries/collections/collections.query';
@@ -107,7 +107,7 @@ export class SubcollectionsQuery extends BaseQuery {
     const bobbleheadFilter = this.buildBaseFilters(
       bobbleheads.isPublic,
       bobbleheads.userId,
-      bobbleheads.isDeleted,
+      bobbleheads.deletedAt,
       context,
     );
 
@@ -184,7 +184,7 @@ export class SubcollectionsQuery extends BaseQuery {
       with: {
         bobbleheads: {
           where: and(
-            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+            isNull(bobbleheads.deletedAt),
             this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, undefined, context) ||
               eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
           ),
@@ -294,7 +294,7 @@ export class SubcollectionsQuery extends BaseQuery {
       with: {
         bobbleheads: {
           where: and(
-            eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+            isNull(bobbleheads.deletedAt),
             this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, undefined, context) ||
               eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
           ),

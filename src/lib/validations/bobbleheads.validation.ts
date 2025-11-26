@@ -123,7 +123,6 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   createdAt: true,
   deletedAt: true,
   id: true,
-  isDeleted: true,
   likeCount: true,
   slug: true,
   updatedAt: true,

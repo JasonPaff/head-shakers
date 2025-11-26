@@ -148,7 +148,7 @@ export class ContentSearchQuery extends BaseQuery {
         and(
           eq(bobbleheads.id, id),
           eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          isNull(bobbleheads.deletedAt),
           isNull(users.deletedAt),
         ),
       )
@@ -334,7 +334,7 @@ export class ContentSearchQuery extends BaseQuery {
         and(
           inArray(bobbleheads.collectionId, collectionIds),
           eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-          eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+          isNull(bobbleheads.deletedAt),
         ),
       )
       .orderBy(tags.name);
@@ -416,7 +416,7 @@ export class ContentSearchQuery extends BaseQuery {
                 and(
                   eq(bobbleheadTags.tagId, tagId),
                   eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                  isNull(bobbleheads.deletedAt),
                 ),
               ),
           ),
@@ -463,7 +463,7 @@ export class ContentSearchQuery extends BaseQuery {
                 and(
                   eq(bobbleheadTags.tagId, tagId),
                   eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                  isNull(bobbleheads.deletedAt),
                 ),
               ),
           ),
@@ -474,7 +474,7 @@ export class ContentSearchQuery extends BaseQuery {
     // Build bobblehead count query
     const bobbleheadConditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-      eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+      isNull(bobbleheads.deletedAt),
       isNull(users.deletedAt),
     ];
 
@@ -568,7 +568,7 @@ export class ContentSearchQuery extends BaseQuery {
     // Build where conditions
     const conditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-      eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+      isNull(bobbleheads.deletedAt),
       isNull(users.deletedAt),
     ];
 
@@ -709,7 +709,7 @@ export class ContentSearchQuery extends BaseQuery {
                 and(
                   eq(bobbleheadTags.tagId, tagId),
                   eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                  isNull(bobbleheads.deletedAt),
                 ),
               ),
           ),
@@ -731,7 +731,7 @@ export class ContentSearchQuery extends BaseQuery {
                 and(
                   inArray(bobbleheadTags.tagId, excludeTags),
                   eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                  isNull(bobbleheads.deletedAt),
                 ),
               ),
           ),
@@ -768,7 +768,7 @@ export class ContentSearchQuery extends BaseQuery {
     // Build where conditions - only public, non-deleted bobbleheads
     const conditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-      eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+      isNull(bobbleheads.deletedAt),
       isNull(users.deletedAt),
     ];
 
@@ -930,7 +930,7 @@ export class ContentSearchQuery extends BaseQuery {
                 and(
                   eq(bobbleheadTags.tagId, tagId),
                   eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                  isNull(bobbleheads.deletedAt),
                 ),
               ),
           ),
@@ -1059,7 +1059,7 @@ export class ContentSearchQuery extends BaseQuery {
                 and(
                   eq(bobbleheadTags.tagId, tagId),
                   eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  eq(bobbleheads.isDeleted, DEFAULTS.BOBBLEHEAD.IS_DELETED),
+                  isNull(bobbleheads.deletedAt),
                 ),
               ),
           ),

@@ -162,7 +162,6 @@ export class SocialQuery extends BaseQuery {
       .update(comments)
       .set({
         deletedAt: new Date(),
-        isDeleted: true,
       })
       .where(eq(comments.id, commentId))
       .returning();
@@ -192,7 +191,7 @@ export class SocialQuery extends BaseQuery {
     const result = await dbInstance
       .select()
       .from(comments)
-      .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
+      .where(and(eq(comments.id, commentId), isNull(comments.deletedAt)))
       .limit(1);
 
     return result?.[0] || null;
@@ -210,7 +209,6 @@ export class SocialQuery extends BaseQuery {
         createdAt: comments.createdAt,
         editedAt: comments.editedAt,
         id: comments.id,
-        isEdited: comments.isEdited,
         likeCount: comments.likeCount,
         parentCommentId: comments.parentCommentId,
         targetId: comments.targetId,
@@ -224,7 +222,7 @@ export class SocialQuery extends BaseQuery {
       })
       .from(comments)
       .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
-      .where(and(eq(comments.id, commentId), eq(comments.isDeleted, false)))
+      .where(and(eq(comments.id, commentId), isNull(comments.deletedAt)))
       .limit(1);
 
     return result?.[0] || null;
@@ -241,11 +239,7 @@ export class SocialQuery extends BaseQuery {
       .select({ count: count() })
       .from(comments)
       .where(
-        and(
-          eq(comments.targetId, targetId),
-          eq(comments.targetType, targetType),
-          eq(comments.isDeleted, false),
-        ),
+        and(eq(comments.targetId, targetId), eq(comments.targetType, targetType), isNull(comments.deletedAt)),
       );
 
     return result[0]?.count || 0;
@@ -269,7 +263,6 @@ export class SocialQuery extends BaseQuery {
         createdAt: comments.createdAt,
         editedAt: comments.editedAt,
         id: comments.id,
-        isEdited: comments.isEdited,
         likeCount: comments.likeCount,
         parentCommentId: comments.parentCommentId,
         targetId: comments.targetId,
@@ -283,7 +276,7 @@ export class SocialQuery extends BaseQuery {
       })
       .from(comments)
       .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
-      .where(and(eq(comments.parentCommentId, parentCommentId), eq(comments.isDeleted, false)))
+      .where(and(eq(comments.parentCommentId, parentCommentId), isNull(comments.deletedAt)))
       .orderBy(desc(comments.createdAt));
 
     if (pagination.limit) {
@@ -307,7 +300,7 @@ export class SocialQuery extends BaseQuery {
     const result = await dbInstance
       .select({ count: count() })
       .from(comments)
-      .where(and(eq(comments.parentCommentId, parentCommentId), eq(comments.isDeleted, false)));
+      .where(and(eq(comments.parentCommentId, parentCommentId), isNull(comments.deletedAt)));
 
     return result[0]?.count || 0;
   }
@@ -327,7 +320,6 @@ export class SocialQuery extends BaseQuery {
         createdAt: comments.createdAt,
         editedAt: comments.editedAt,
         id: comments.id,
-        isEdited: comments.isEdited,
         likeCount: comments.likeCount,
         parentCommentId: comments.parentCommentId,
         targetId: comments.targetId,
@@ -342,11 +334,7 @@ export class SocialQuery extends BaseQuery {
       .from(comments)
       .leftJoin(sql`users`, and(eq(comments.userId, sql`users.id`), sql`users.deleted_at IS NULL`))
       .where(
-        and(
-          eq(comments.targetId, targetId),
-          eq(comments.targetType, targetType),
-          eq(comments.isDeleted, false),
-        ),
+        and(eq(comments.targetId, targetId), eq(comments.targetType, targetType), isNull(comments.deletedAt)),
       )
       .orderBy(desc(comments.createdAt));
 
@@ -387,7 +375,6 @@ export class SocialQuery extends BaseQuery {
         createdAt: comments.createdAt,
         editedAt: comments.editedAt,
         id: comments.id,
-        isEdited: comments.isEdited,
         likeCount: comments.likeCount,
         parentCommentId: comments.parentCommentId,
         targetId: comments.targetId,
@@ -406,7 +393,7 @@ export class SocialQuery extends BaseQuery {
           eq(comments.targetId, targetId),
           eq(comments.targetType, targetType),
           isNull(comments.parentCommentId),
-          eq(comments.isDeleted, false),
+          isNull(comments.deletedAt),
         ),
       )
       .orderBy(desc(comments.createdAt));
@@ -762,7 +749,7 @@ export class SocialQuery extends BaseQuery {
     const result = await dbInstance
       .select({ id: comments.id })
       .from(comments)
-      .where(and(eq(comments.parentCommentId, commentId), eq(comments.isDeleted, false)))
+      .where(and(eq(comments.parentCommentId, commentId), isNull(comments.deletedAt)))
       .limit(1);
 
     return result.length > 0;
@@ -862,7 +849,6 @@ export class SocialQuery extends BaseQuery {
       .set({
         content,
         editedAt: new Date(),
-        isEdited: true,
       })
       .where(eq(comments.id, commentId))
       .returning();

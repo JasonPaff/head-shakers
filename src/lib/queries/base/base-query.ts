@@ -32,7 +32,7 @@ export abstract class BaseQuery {
   protected static buildBaseFilters(
     isPublicColumn: AnyColumn | undefined,
     userIdColumn: AnyColumn,
-    isDeletedColumn: AnyColumn | undefined,
+    deletedAtColumn: AnyColumn | undefined,
     context: QueryContext,
   ): SQL | undefined {
     const filters: Array<SQL | undefined> = [];
@@ -42,9 +42,9 @@ export abstract class BaseQuery {
       filters.push(buildPermissionFilter(isPublicColumn, userIdColumn, context));
     }
 
-    // add soft delete filter if isDeleted column exists
-    if (isDeletedColumn) {
-      filters.push(buildSoftDeleteFilter(isDeletedColumn, context));
+    // add soft delete filter if deletedAt column exists
+    if (deletedAtColumn) {
+      filters.push(buildSoftDeleteFilter(deletedAtColumn, context));
     }
 
     return combineFilters(...filters);

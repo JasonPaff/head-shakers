@@ -218,7 +218,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.collectionId, collectionId),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .orderBy(desc(bobbleheads.createdAt));
@@ -246,7 +246,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -276,7 +276,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -328,7 +328,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -358,7 +358,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -424,7 +424,7 @@ export class BobbleheadsQuery extends BaseQuery {
           this.buildBaseFilters(
             bobbleheads.isPublic,
             bobbleheads.userId,
-            bobbleheads.isDeleted,
+            bobbleheads.deletedAt,
             finalContext,
           ),
         ),
@@ -461,7 +461,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.id, bobbleheadId),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -475,7 +475,7 @@ export class BobbleheadsQuery extends BaseQuery {
     // build base filter conditions for collection context
     const baseConditions = [
       eq(bobbleheads.collectionId, collectionId),
-      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
 
     // add subcollection filter when provided
@@ -581,7 +581,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -634,7 +634,7 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(
         this.combineFilters(
           eq(bobbleheads.id, bobbleheadId),
-          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+          this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .limit(1);
@@ -648,7 +648,7 @@ export class BobbleheadsQuery extends BaseQuery {
     // build base filter conditions for collection context
     const baseConditions = [
       eq(bobbleheads.collectionId, collectionId),
-      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
 
     // add subcollection filter when provided
@@ -744,7 +744,7 @@ export class BobbleheadsQuery extends BaseQuery {
     const pagination = this.applyPagination(options);
 
     const conditions = [
-      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.isDeleted, context),
+      this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
 
     // add search term conditions

@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import type { CommentTargetType } from '@/lib/constants';
-import type { CommentWithDepth } from '@/lib/queries/social/social.query';
+import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
 
 import { CommentSection } from '@/components/feature/comments/comment-section';
 import {
@@ -28,6 +28,38 @@ interface CommentSectionClientProps extends Omit<ComponentProps<'div'>, 'childre
 }
 
 const DEFAULT_COMMENTS_LIMIT = 10;
+
+/**
+ * Helper function to insert a reply into the correct position in the nested comment tree
+ */
+const addReplyToComment = (
+  comments: Array<CommentWithDepth>,
+  parentCommentId: string,
+  newComment: CommentWithUser,
+): Array<CommentWithDepth> => {
+  return comments.map((comment) => {
+    if (comment.id === parentCommentId) {
+      // Found the parent, add reply to its replies array
+      const newReply: CommentWithDepth = {
+        ...newComment,
+        depth: comment.depth + 1,
+        replies: [],
+      };
+      return {
+        ...comment,
+        replies: [...(comment.replies || []), newReply],
+      };
+    }
+    // Recursively search in replies
+    if (comment.replies && comment.replies.length > 0) {
+      return {
+        ...comment,
+        replies: addReplyToComment(comment.replies, parentCommentId, newComment),
+      };
+    }
+    return comment;
+  });
+};
 
 /**
  * Client wrapper for CommentSection that wires up server actions
@@ -98,7 +130,22 @@ export const CommentSectionClient = ({
       if (result?.serverError) {
         throw new Error(result.serverError);
       }
-      // Refresh the page to fetch updated comments from server
+
+      // Get the created comment from the action result for optimistic update
+      const createdComment = result?.data?.data;
+
+      if (createdComment) {
+        // Optimistically add the new comment to local state
+        if (parentCommentId) {
+          // For replies, insert into the correct parent in the nested structure
+          setLoadedComments((prev) => addReplyToComment(prev, parentCommentId, createdComment));
+        } else {
+          // For top-level comments, prepend to the list
+          setLoadedComments((prev) => [{ ...createdComment, depth: 0, replies: [] }, ...prev]);
+        }
+      }
+
+      // Still refresh for eventual consistency with server
       router.refresh();
     },
     [targetId, targetType, router],

@@ -47,7 +47,6 @@ export const bobbleheads = pgTable(
       scale: SCHEMA_LIMITS.BOBBLEHEAD.HEIGHT.SCALE,
     }),
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(DEFAULTS.BOBBLEHEAD.IS_DELETED).notNull(),
     isFeatured: boolean('is_featured').default(DEFAULTS.BOBBLEHEAD.IS_FEATURED).notNull(),
     isPublic: boolean('is_public').default(DEFAULTS.BOBBLEHEAD.IS_PUBLIC).notNull(),
     likeCount: integer('like_count').default(DEFAULTS.BOBBLEHEAD.LIKE_COUNT).notNull(),

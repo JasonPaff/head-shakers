@@ -30,8 +30,6 @@ export const insertCommentSchema = createInsertSchema(comments, {
   deletedAt: true,
   editedAt: true,
   id: true,
-  isDeleted: true,
-  isEdited: true,
   likeCount: true,
   updatedAt: true,
   userId: true,
@@ -42,7 +40,6 @@ export const updateCommentSchema = insertCommentSchema
   })
   .extend({
     editedAt: z.date().default(() => new Date()),
-    isEdited: z.boolean().default(DEFAULTS.COMMENT.IS_EDITED),
   });
 
 export const publicLikeSchema = selectLikeSchema.omit({
@@ -50,7 +47,6 @@ export const publicLikeSchema = selectLikeSchema.omit({
 });
 export const publicCommentSchema = selectCommentSchema.omit({
   deletedAt: true,
-  isDeleted: true,
   updatedAt: true,
 });
 

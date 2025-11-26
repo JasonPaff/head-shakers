@@ -123,7 +123,7 @@ export const CommentItem = ({
   // Derived conditional rendering variables
   const _isCommentOwner = currentUserId === comment.userId;
   const _shouldShowActions = isEditable && _isCommentOwner && isHovered;
-  const _hasEditedIndicator = comment.isEdited && !!comment.editedAt;
+  const _hasEditedIndicator = !!comment.editedAt;
   const _canReply = depth < MAX_COMMENT_NESTING_DEPTH && !!onReply;
   const _canReport = !!currentUserId && !_isCommentOwner;
   const _isNested = depth > 0;

@@ -144,7 +144,7 @@ export class UsersQuery extends BaseQuery {
           SELECT COUNT(*)::int
           FROM ${bobbleheads}
           WHERE ${bobbleheads.userId} = ${users.id}
-            AND ${bobbleheads.isDeleted} = false
+            AND ${bobbleheads.deletedAt} IS NULL
         )`,
         clerkId: users.clerkId,
         collectionsCount: sql<number>`(
@@ -237,7 +237,7 @@ export class UsersQuery extends BaseQuery {
         dbInstance
           .select({ count: count() })
           .from(bobbleheads)
-          .where(and(eq(bobbleheads.userId, userId), eq(bobbleheads.isDeleted, false))),
+          .where(and(eq(bobbleheads.userId, userId), isNull(bobbleheads.deletedAt))),
 
         // Public collections count
         dbInstance
@@ -252,7 +252,7 @@ export class UsersQuery extends BaseQuery {
           .where(
             and(
               eq(bobbleheads.userId, userId),
-              eq(bobbleheads.isDeleted, false),
+              isNull(bobbleheads.deletedAt),
               eq(bobbleheads.isPublic, true),
             ),
           ),
