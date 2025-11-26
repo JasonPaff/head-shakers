@@ -40,7 +40,7 @@ export class PlatformStatsFacade {
    * @param dbInstance - Optional database instance for transactions
    * @returns Platform statistics with total counts
    */
-  static async getPlatformStats(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
     try {
       return await CacheService.cached(
         async () => {

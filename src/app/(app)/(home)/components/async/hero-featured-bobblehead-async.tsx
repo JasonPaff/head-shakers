@@ -19,7 +19,7 @@ export async function HeroFeaturedBobbleheadAsync() {
   const featuredData = bobbleheadsData[0]!;
   let likeCount = featuredData.likes ?? 0;
 
-  const likeDataResults = await SocialFacade.getBatchContentLikeData(
+  const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(
     [
       {
         targetId: featuredData.contentId,

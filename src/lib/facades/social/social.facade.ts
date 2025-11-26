@@ -88,6 +88,8 @@ export interface TrendingContent {
   targetId: string;
 }
 
+const facadeName = 'SocialFacade';
+
 export class SocialFacade {
   static async createComment(
     data: InsertComment,
@@ -122,7 +124,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { commentData: data },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'createComment',
         operation: OPERATIONS.COMMENTS.CREATE_COMMENT,
         userId,
@@ -213,7 +215,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { commentData: data },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'createCommentReply',
         operation: OPERATIONS.COMMENTS.CREATE_COMMENT,
         userId,
@@ -272,7 +274,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { commentId },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'deleteComment',
         operation: OPERATIONS.COMMENTS.DELETE_COMMENT,
         userId,
@@ -281,7 +283,7 @@ export class SocialFacade {
     }
   }
 
-  static async getBatchContentLikeData(
+  static async getBatchContentLikeDataAsync(
     targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
@@ -349,7 +351,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetCount: targets.length },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getBatchContentLikeData',
         operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
         userId: viewerUserId,
@@ -386,7 +388,7 @@ export class SocialFacade {
           context: {
             entityId: commentWithUser.targetId,
             entityType: 'social',
-            facade: 'SocialFacade',
+            facade: facadeName,
             operation: 'getCommentById',
           },
           tags: CacheTagGenerators.social.comment(commentId, userId),
@@ -395,7 +397,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { commentId },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getCommentById',
         operation: OPERATIONS.COMMENTS.GET_COMMENTS,
         userId,
@@ -444,7 +446,7 @@ export class SocialFacade {
           context: {
             entityId: targetId,
             entityType: 'social',
-            facade: 'SocialFacade',
+            facade: facadeName,
             operation: 'getComments',
           },
           tags: CacheTagGenerators.social.comments(
@@ -456,7 +458,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { options, targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getComments',
         operation: OPERATIONS.COMMENTS.GET_COMMENTS,
         userId: viewerUserId,
@@ -515,7 +517,7 @@ export class SocialFacade {
           context: {
             entityId: targetId,
             entityType: 'social',
-            facade: 'SocialFacade',
+            facade: facadeName,
             operation: 'getCommentsWithReplies',
           },
           tags: CacheTagGenerators.social.comments(
@@ -527,7 +529,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { options, targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getCommentsWithReplies',
         operation: OPERATIONS.COMMENTS.GET_COMMENTS,
         userId: viewerUserId,
@@ -566,7 +568,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getContentLikeData',
         operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
         userId: viewerUserId,
@@ -591,7 +593,7 @@ export class SocialFacade {
           context: {
             entityId: targetId,
             entityType: 'social',
-            facade: 'SocialFacade',
+            facade: facadeName,
             operation: 'getLikeCount',
           },
           tags: CacheTagGenerators.social.like(
@@ -604,7 +606,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getLikeCount',
         operation: OPERATIONS.SOCIAL.GET_LIKE_COUNT,
       };
@@ -628,7 +630,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { contentIds, contentType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getLikesForMultipleContentItems',
         operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUSES,
         userId: viewerUserId,
@@ -663,7 +665,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getRecentLikeActivity',
         operation: OPERATIONS.SOCIAL.GET_RECENT_LIKES,
         userId: viewerUserId,
@@ -688,7 +690,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { options, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getTrendingContent',
         operation: OPERATIONS.SOCIAL.GET_TRENDING_CONTENT,
         userId: viewerUserId,
@@ -711,7 +713,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'getUserLikeStatus',
         operation: OPERATIONS.SOCIAL.GET_USER_LIKE_STATUS,
         userId,
@@ -777,7 +779,7 @@ export class SocialFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetId, targetType },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'toggleLike',
         operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
         userId,
@@ -846,7 +848,7 @@ export class SocialFacade {
     } catch (error) {
       const errorContext: FacadeErrorContext = {
         data: { commentId, content },
-        facade: 'SocialFacade',
+        facade: facadeName,
         method: 'updateComment',
         operation: OPERATIONS.COMMENTS.UPDATE_COMMENT,
         userId,

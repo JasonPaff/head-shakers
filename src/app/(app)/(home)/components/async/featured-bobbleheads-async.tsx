@@ -29,7 +29,7 @@ export async function FeaturedBobbleheadsAsync({ currentUserId }: FeaturedBobble
       targetType: 'bobblehead' as const,
     }));
 
-    const likeDataResults = await SocialFacade.getBatchContentLikeData(likeDataTargets, currentUserId);
+    const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(likeDataTargets, currentUserId);
     likeDataResults.forEach((likeData) => {
       const key = `bobblehead:${likeData.targetId}`;
       likeDataMap.set(key, {
