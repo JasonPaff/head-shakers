@@ -6,14 +6,14 @@ import { generateTestId } from '@/lib/test-ids';
  *
  * Displays three skeleton blocks representing platform stats (Bobbleheads, Collectors, Collections)
  * with shimmer animations to indicate loading state.
- * Matches the layout of HeroStatsAsync component.
+ * Matches the layout of HeroStatsAsync component with light/dark mode support.
  */
 export const HeroStatsSkeleton = () => {
   return (
     <div
       aria-busy={'true'}
       aria-label={'Loading platform statistics'}
-      className={'flex flex-wrap gap-8 border-t border-slate-700/50 pt-8'}
+      className={'flex flex-wrap gap-8 border-t border-orange-200/50 pt-8 dark:border-slate-700/50'}
       data-slot={'hero-stats-skeleton'}
       data-testid={generateTestId('ui', 'skeleton', 'hero-stats')}
       role={'status'}

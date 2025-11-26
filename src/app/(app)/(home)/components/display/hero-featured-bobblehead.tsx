@@ -56,7 +56,7 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
       <div className={'relative'}>
         <Link
           className={
-            'group relative block overflow-hidden rounded-3xl border border-slate-700/50 bg-gradient-to-br from-slate-800/80 to-slate-900/80 p-2 shadow-2xl backdrop-blur-sm'
+            'group relative block overflow-hidden rounded-3xl border border-orange-200/50 bg-gradient-to-br from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm dark:border-slate-700/50 dark:from-slate-800/80 dark:to-slate-900/80'
           }
           data-slot={'hero-featured-card'}
           data-testid={cardTestId}
@@ -71,10 +71,10 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
               fallback={
                 <div
                   className={
-                    'absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-700 to-slate-800'
+                    'absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200 dark:from-slate-700 dark:to-slate-800'
                   }
                 >
-                  <Trophy aria-hidden className={'size-20 text-slate-600'} />
+                  <Trophy aria-hidden className={'size-20 text-orange-300 dark:text-slate-600'} />
                 </div>
               }
               isCondition={_hasPhotoAndPublicId}
@@ -135,7 +135,7 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
         <div
           aria-hidden
           className={
-            'absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border border-slate-600/50 bg-slate-800/90 p-3 shadow-xl backdrop-blur-sm'
+            'absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/90'
           }
           data-slot={'hero-floating-card'}
           data-testid={topRatedCardTestId}
@@ -146,8 +146,8 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
               <Trophy aria-hidden className={'size-5 text-white'} />
             </div>
             <div>
-              <div className={'text-sm font-semibold text-white'}>Top Rated</div>
-              <div className={'text-xs text-slate-400'}>This Week</div>
+              <div className={'text-sm font-semibold text-slate-900 dark:text-white'}>Top Rated</div>
+              <div className={'text-xs text-slate-500 dark:text-slate-400'}>This Week</div>
             </div>
           </div>
         </div>
@@ -156,7 +156,7 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
         <div
           aria-hidden
           className={
-            'absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border border-slate-600/50 bg-slate-800/90 p-3 shadow-xl backdrop-blur-sm'
+            'absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/90'
           }
           data-slot={'hero-floating-card'}
           data-testid={valueGrowthCardTestId}
@@ -167,8 +167,8 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
               <TrendingUp aria-hidden className={'size-5 text-white'} />
             </div>
             <div>
-              <div className={'text-sm font-semibold text-white'}>+23%</div>
-              <div className={'text-xs text-slate-400'}>Value Growth</div>
+              <div className={'text-sm font-semibold text-slate-900 dark:text-white'}>+23%</div>
+              <div className={'text-xs text-slate-500 dark:text-slate-400'}>Value Growth</div>
             </div>
           </div>
         </div>

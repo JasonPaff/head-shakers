@@ -17,7 +17,7 @@ export interface HeroSectionProps {
 }
 
 /**
- * Hero section for home page with modern dark theme design
+ * Hero section for home page with orange accent color scheme
  *
  * Server-side component that displays:
  * - Animated background with gradient orbs and grid pattern
@@ -25,13 +25,16 @@ export interface HeroSectionProps {
  * - CTA buttons with auth-aware rendering
  * - Platform statistics via async component
  * - Featured bobblehead showcase via async component
- * - Wave divider with dark mode support
+ * - Wave divider with light/dark mode support
+ *
+ * Light mode: white/cream background with orange accents
+ * Dark mode: dark slate background with orange accents
  */
 export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
   return (
     <section
       className={
-        'relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900'
+        'relative overflow-hidden bg-gradient-to-b from-orange-50 via-white to-orange-50/50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900'
       }
       data-slot={'hero-section'}
     >
@@ -39,25 +42,25 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
       <div
         aria-hidden={'true'}
         className={
-          'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-900/20 via-transparent to-transparent'
+          'pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-200/40 via-transparent to-transparent dark:from-orange-900/20'
         }
       />
       <div
         aria-hidden={'true'}
         className={
-          'pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]'
+          'pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#f9731620_1px,transparent_1px),linear-gradient(to_bottom,#f9731620_1px,transparent_1px)] bg-[size:24px_24px] dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]'
         }
       />
       <div
         aria-hidden={'true'}
         className={
-          'pointer-events-none absolute top-20 left-1/4 size-96 rounded-full bg-gradient-to-r from-orange-500/30 to-amber-500/30 blur-3xl'
+          'pointer-events-none absolute top-20 left-1/4 size-96 rounded-full bg-gradient-to-r from-orange-300/40 to-amber-300/40 blur-3xl dark:from-orange-500/30 dark:to-amber-500/30'
         }
       />
       <div
         aria-hidden={'true'}
         className={
-          'pointer-events-none absolute top-60 right-1/4 size-96 rounded-full bg-gradient-to-l from-amber-500/20 to-orange-500/20 blur-3xl'
+          'pointer-events-none absolute top-60 right-1/4 size-96 rounded-full bg-gradient-to-l from-amber-300/30 to-orange-300/30 blur-3xl dark:from-amber-500/20 dark:to-orange-500/20'
         }
       />
 
@@ -68,11 +71,11 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
             {/* Badge */}
             <div
               className={
-                'inline-flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 backdrop-blur-sm'
+                'inline-flex items-center gap-2 rounded-full border border-orange-300 bg-orange-100/80 px-4 py-2 backdrop-blur-sm dark:border-orange-500/30 dark:bg-orange-500/10'
               }
             >
-              <Sparkles className={'size-4 text-orange-400'} />
-              <span className={'text-sm font-medium text-orange-300'}>
+              <Sparkles className={'size-4 text-orange-600 dark:text-orange-400'} />
+              <span className={'text-sm font-medium text-orange-700 dark:text-orange-300'}>
                 The Premier Bobblehead Community
               </span>
             </div>
@@ -80,13 +83,13 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
             {/* Main Heading */}
             <h1
               className={
-                'text-5xl leading-tight font-extrabold tracking-tight text-white md:text-6xl lg:text-7xl'
+                'text-5xl leading-tight font-extrabold tracking-tight text-slate-900 md:text-6xl lg:text-7xl dark:text-white'
               }
             >
               Collect, Share, and{' '}
               <span
                 className={
-                  'bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400 bg-clip-text text-transparent'
+                  'bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text text-transparent dark:from-orange-400 dark:via-amber-400 dark:to-yellow-400'
                 }
               >
                 Discover
@@ -96,7 +99,7 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
             </h1>
 
             {/* Description */}
-            <p className={'max-w-xl text-lg text-slate-300 md:text-xl'}>
+            <p className={'max-w-xl text-lg text-slate-600 md:text-xl dark:text-slate-300'}>
               Build your digital bobblehead collection, connect with other collectors, and discover
               rare finds from around the world.
             </p>
@@ -108,7 +111,7 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
                   <Button
                     asChild
                     className={
-                      'group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg font-semibold shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-amber-600'
+                      'group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg font-semibold text-white shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-amber-600'
                     }
                     size={'lg'}
                   >
@@ -125,7 +128,7 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
                 <Button
                   asChild
                   className={
-                    'group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg font-semibold shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-amber-600'
+                    'group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg font-semibold text-white shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-amber-600'
                   }
                   size={'lg'}
                 >
@@ -141,7 +144,7 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
               <Button
                 asChild
                 className={
-                  'border-slate-600 bg-slate-800/50 px-8 text-lg text-white backdrop-blur-sm hover:bg-slate-700/50'
+                  'border-orange-300 bg-white/80 px-8 text-lg text-slate-700 backdrop-blur-sm hover:bg-orange-50 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white dark:hover:bg-slate-700/50'
                 }
                 size={'lg'}
                 variant={'outline'}
@@ -155,7 +158,7 @@ export const HeroSection = ({ currentUserId }: HeroSectionProps) => {
               <Button
                 asChild
                 className={
-                  'border-slate-600 bg-slate-800/50 px-8 text-lg text-white backdrop-blur-sm hover:bg-slate-700/50'
+                  'border-orange-300 bg-white/80 px-8 text-lg text-slate-700 backdrop-blur-sm hover:bg-orange-50 dark:border-slate-600 dark:bg-slate-800/50 dark:text-white dark:hover:bg-slate-700/50'
                 }
                 size={'lg'}
                 variant={'outline'}
