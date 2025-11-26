@@ -56,6 +56,7 @@ export const CommentSectionAsync = async ({
       hasMore={hasMore}
       initialCommentCount={total}
       initialComments={comments}
+      initialLimit={initialLimit}
       isAuthenticated={isAuthenticated}
       targetId={targetId}
       targetType={targetType}

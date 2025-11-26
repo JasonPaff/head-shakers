@@ -19,10 +19,11 @@ import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient, type DatabaseExecutor } from '@/lib/utils/next-safe-action';
+import { authActionClient, type DatabaseExecutor, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   createCommentSchema,
   deleteCommentSchema,
+  getCommentsSchema,
   updateCommentSchema,
 } from '@/lib/validations/comment.validation';
 import { toggleLikeSchema } from '@/lib/validations/like.validation';
@@ -434,6 +435,65 @@ export const deleteCommentAction = authActionClient
         },
         operation: OPERATIONS.COMMENTS.DELETE_COMMENT,
         userId: ctx.userId,
+      });
+    }
+  });
+
+// ==================== Get Comments Action ====================
+
+/**
+ * Public action to fetch comments with pagination
+ * Does not require authentication since comments are publicly viewable
+ */
+export const getCommentsAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.COMMENTS.GET_LIST,
+    isTransactionRequired: false,
+  })
+  .inputSchema(getCommentsSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const input = getCommentsSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.db;
+
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      data: {
+        limit: input.pagination?.limit,
+        offset: input.pagination?.offset,
+        targetId: input.targetId,
+        targetType: input.targetType,
+      },
+      level: SENTRY_LEVELS.INFO,
+      message: `Loading comments for ${input.targetType} ${input.targetId}`,
+    });
+
+    try {
+      const result = await SocialFacade.getCommentsWithReplies(
+        input.targetId,
+        input.targetType,
+        {
+          limit: input.pagination?.limit,
+          offset: input.pagination?.offset,
+        },
+        undefined, // viewerUserId - public access
+        dbInstance,
+      );
+
+      return {
+        data: {
+          comments: result.comments,
+          hasMore: result.hasMore,
+          total: result.total,
+        },
+        success: true,
+      };
+    } catch (error) {
+      handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.COMMENTS.GET_LIST,
+        },
+        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
       });
     }
   });
