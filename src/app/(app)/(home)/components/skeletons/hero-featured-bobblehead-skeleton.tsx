@@ -5,7 +5,7 @@ import { generateTestId } from '@/lib/test-ids';
  * Skeleton loading state for featured bobblehead showcase in hero section
  *
  * Displays skeleton blocks matching the HeroFeaturedBobblehead component layout
- * including main card with image, badge, title, description, stats, and two floating cards
+ * including a main card with image, badge, title, description, stats, and two floating cards
  * with shimmer animations to indicate loading state.
  * Supports light/dark mode with orange accent colors.
  */
@@ -25,9 +25,9 @@ export const HeroFeaturedBobbleheadSkeleton = () => {
       {/* Main Featured Card Container */}
       <div className={'relative'}>
         <div
-          className={
-            'relative overflow-hidden rounded-3xl border border-orange-200/50 bg-gradient-to-br from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm dark:border-slate-700/50 dark:from-slate-800/80 dark:to-slate-900/80'
-          }
+          className={`relative overflow-hidden rounded-3xl border border-orange-200/50 bg-gradient-to-br
+            from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm dark:border-slate-700/50
+            dark:from-slate-800/80 dark:to-slate-900/80`}
           data-slot={'hero-featured-bobblehead-skeleton-card'}
         >
           {/* Main Image Area Skeleton */}
@@ -75,9 +75,9 @@ export const HeroFeaturedBobbleheadSkeleton = () => {
         {/* Floating Card Skeleton - Top Left */}
         <div
           aria-hidden={'true'}
-          className={
-            'absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/90'
-          }
+          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
+            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
+            dark:bg-slate-800/90`}
           data-slot={'hero-featured-bobblehead-skeleton-float-card'}
           style={{ animationDuration: '3s' }}
         >
@@ -102,9 +102,9 @@ export const HeroFeaturedBobbleheadSkeleton = () => {
         {/* Floating Card Skeleton - Bottom Right */}
         <div
           aria-hidden={'true'}
-          className={
-            'absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/90'
-          }
+          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
+            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
+            dark:bg-slate-800/90`}
           data-slot={'hero-featured-bobblehead-skeleton-float-card'}
           style={{ animationDelay: '1s', animationDuration: '4s' }}
         >

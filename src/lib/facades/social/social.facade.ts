@@ -276,7 +276,7 @@ export class SocialFacade {
   static async getBatchContentLikeData(
     targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<Array<ContentLikeData>> {
     try {
       if (targets.length === 0) return [];

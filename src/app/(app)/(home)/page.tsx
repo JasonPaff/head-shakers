@@ -88,7 +88,7 @@ export default async function HomePage() {
       )}
 
       {/* Hero Section */}
-      <HeroSection currentUserId={currentUserId} />
+      <HeroSection />
 
       {/* Featured Collections Section */}
       <section className={'bg-card px-4 py-8'}>

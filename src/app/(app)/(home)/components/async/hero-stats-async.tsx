@@ -1,10 +1,4 @@
-import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
-
 import { PlatformStatsFacade } from '@/lib/facades/platform/platform-stats.facade';
-
-export interface HeroStatsAsyncProps {
-  dbInstance?: DatabaseExecutor;
-}
 
 /**
  * Async server component for fetching and displaying platform statistics
@@ -13,16 +7,13 @@ export interface HeroStatsAsyncProps {
  * them in a horizontal layout matching the hero section design.
  * Supports light/dark mode with orange accent colors.
  */
-export async function HeroStatsAsync({ dbInstance }: HeroStatsAsyncProps) {
-  // Fetch platform statistics from facade
-  const stats = await PlatformStatsFacade.getPlatformStats(dbInstance);
+export async function HeroStatsAsync() {
+  const stats = await PlatformStatsFacade.getPlatformStats();
 
   return (
     <div
       aria-label={'Platform statistics'}
-      className={
-        'flex flex-wrap gap-8 border-t border-orange-200/50 pt-8 dark:border-slate-700/50'
-      }
+      className={'flex flex-wrap gap-8 border-t border-orange-200/50 pt-8 dark:border-slate-700/50'}
     >
       {/* Bobbleheads Stat */}
       <div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Crown, Eye, Heart, TrendingUp, Trophy } from 'lucide-react';
+import { CrownIcon, EyeIcon, HeartIcon, TrendingUpIcon, TrophyIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
@@ -25,19 +25,6 @@ interface HeroFeaturedBobbleheadProps extends ComponentTestIdProps {
 }
 
 export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbleheadProps) => {
-  // 1. useState hooks
-
-  // 2. Other hooks
-
-  // 3. useMemo hooks
-
-  // 4. useEffect hooks
-
-  // 5. Utility functions
-
-  // 6. Event handlers
-
-  // 7. Derived variables
   const _hasPhoto = Boolean(bobblehead.photoUrl);
   const _publicId = _hasPhoto ? extractPublicIdFromCloudinaryUrl(bobblehead.photoUrl!) : null;
   const _blurDataUrl = _publicId ? generateBlurDataUrl(_publicId) : undefined;
@@ -52,12 +39,12 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
 
   return (
     <div className={'relative lg:pl-8'} data-slot={'hero-featured-bobblehead'} data-testid={heroTestId}>
-      {/* Main Featured Card */}
+      {/* Main Feature Card */}
       <div className={'relative'}>
         <Link
-          className={
-            'group relative block overflow-hidden rounded-3xl border border-orange-200/50 bg-gradient-to-br from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm dark:border-slate-700/50 dark:from-slate-800/80 dark:to-slate-900/80'
-          }
+          className={`group relative block overflow-hidden rounded-3xl border border-orange-200/50
+            bg-gradient-to-br from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm
+            dark:border-slate-700/50 dark:from-slate-800/80 dark:to-slate-900/80`}
           data-slot={'hero-featured-card'}
           data-testid={cardTestId}
           href={$path({
@@ -70,11 +57,10 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
             <Conditional
               fallback={
                 <div
-                  className={
-                    'absolute inset-0 flex items-center justify-center bg-gradient-to-br from-orange-100 to-orange-200 dark:from-slate-700 dark:to-slate-800'
-                  }
+                  className={`absolute inset-0 flex items-center justify-center bg-gradient-to-br
+                    from-orange-100 to-orange-200 dark:from-slate-700 dark:to-slate-800`}
                 >
-                  <Trophy aria-hidden className={'size-20 text-orange-300 dark:text-slate-600'} />
+                  <TrophyIcon aria-hidden className={'size-20 text-orange-300 dark:text-slate-600'} />
                 </div>
               }
               isCondition={_hasPhotoAndPublicId}
@@ -102,7 +88,7 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
               <Badge
                 data-slot={'hero-featured-badge'}
                 data-testid={badgeTestId}
-                icon={<Crown />}
+                icon={<CrownIcon aria-hidden />}
                 variant={'editor_pick'}
               >
                 Editor&apos;s Pick
@@ -118,11 +104,11 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
               {/* Stats */}
               <div className={'mt-4 flex items-center gap-4 text-sm text-slate-300'}>
                 <span className={'flex items-center gap-1'}>
-                  <Heart aria-hidden className={'size-4 text-red-400'} />
+                  <HeartIcon aria-hidden className={'size-4 text-red-400'} />
                   {bobblehead.likeCount.toLocaleString()}
                 </span>
                 <span className={'flex items-center gap-1'}>
-                  <Eye aria-hidden className={'size-4'} />
+                  <EyeIcon aria-hidden className={'size-4'} />
                   {bobblehead.viewCount.toLocaleString()}
                 </span>
               </div>
@@ -134,16 +120,16 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
         {/* Top Rated This Week Card */}
         <div
           aria-hidden
-          className={
-            'absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/90'
-          }
+          className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
+            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
+            dark:bg-slate-800/90`}
           data-slot={'hero-floating-card'}
           data-testid={topRatedCardTestId}
           style={{ animationDuration: '3s' }}
         >
           <div className={'flex items-center gap-3'}>
             <div className={'rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 p-2'}>
-              <Trophy aria-hidden className={'size-5 text-white'} />
+              <TrophyIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>
               <div className={'text-sm font-semibold text-slate-900 dark:text-white'}>Top Rated</div>
@@ -155,16 +141,16 @@ export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbl
         {/* Value Growth Card */}
         <div
           aria-hidden
-          className={
-            'absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50 dark:bg-slate-800/90'
-          }
+          className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
+            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
+            dark:bg-slate-800/90`}
           data-slot={'hero-floating-card'}
           data-testid={valueGrowthCardTestId}
           style={{ animationDelay: '1s', animationDuration: '4s' }}
         >
           <div className={'flex items-center gap-3'}>
             <div className={'rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 p-2'}>
-              <TrendingUp aria-hidden className={'size-5 text-white'} />
+              <TrendingUpIcon aria-hidden className={'size-5 text-white'} />
             </div>
             <div>
               <div className={'text-sm font-semibold text-slate-900 dark:text-white'}>+23%</div>
