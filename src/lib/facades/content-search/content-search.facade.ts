@@ -5,7 +5,6 @@ import type {
   ConsolidatedSearchResults,
   PublicSearchCounts,
   PublicSearchFilterOptions,
-  SubcollectionSearchResult,
   UserSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
@@ -48,7 +47,6 @@ export interface PublicSearchDropdownResponse {
   bobbleheads: Array<BobbleheadSearchResult>;
   collections: Array<CollectionSearchResult>;
   message: string;
-  subcollections: Array<SubcollectionSearchResult>;
   totalResults: number;
 }
 
@@ -67,7 +65,6 @@ export interface PublicSearchPageResponse {
     pageSize: number;
     totalPages: number;
   };
-  subcollections: Array<SubcollectionSearchResult>;
 }
 
 /**
@@ -168,7 +165,7 @@ export class ContentSearchFacade {
 
   /**
    * Search across all public entity types for dropdown (unauthenticated access)
-   * Returns top 5 consolidated results across collections, subcollections, and bobbleheads
+   * Returns top 5 consolidated results across collections and bobbleheads
    * Implements Redis caching with 10-minute TTL for performance optimization
    *
    * @param query - Search text to match across entity types
@@ -186,36 +183,30 @@ export class ContentSearchFacade {
       async () => {
         const context = createPublicQueryContext({ dbInstance });
 
-        // Get top 2 results per entity type (total max 6, but we'll limit to 5)
-        const limitPerType = 2;
+        // Get top 3 results per entity type (total max 6, but we'll limit to 5)
+        const limitPerType = 3;
         const consolidated = await ContentSearchQuery.searchPublicConsolidated(query, limitPerType, context);
 
         // Enrich results with tags
         const enrichedResults = await this.enrichPublicSearchResults(consolidated, context);
 
         // Calculate total results
-        const totalResults =
-          enrichedResults.collections.length +
-          enrichedResults.subcollections.length +
-          enrichedResults.bobbleheads.length;
+        const totalResults = enrichedResults.collections.length + enrichedResults.bobbleheads.length;
 
         // Limit to maximum 5 total results if needed
         let collections = enrichedResults.collections;
-        let subcollections = enrichedResults.subcollections;
         let bobbleheads = enrichedResults.bobbleheads;
 
         if (totalResults > 5) {
           // Distribute the 5 slots proportionally
-          const collectionsCount = Math.min(collections.length, 2);
-          const subcollectionsCount = Math.min(subcollections.length, 2);
-          const bobbleheadsCount = Math.min(bobbleheads.length, 5 - collectionsCount - subcollectionsCount);
+          const collectionsCount = Math.min(collections.length, 3);
+          const bobbleheadsCount = Math.min(bobbleheads.length, 5 - collectionsCount);
 
           collections = collections.slice(0, collectionsCount);
-          subcollections = subcollections.slice(0, subcollectionsCount);
           bobbleheads = bobbleheads.slice(0, bobbleheadsCount);
         }
 
-        const resultCount = collections.length + subcollections.length + bobbleheads.length;
+        const resultCount = collections.length + bobbleheads.length;
 
         return {
           bobbleheads,
@@ -224,7 +215,6 @@ export class ContentSearchFacade {
             resultCount > 0 ?
               `Found ${resultCount} result${resultCount !== 1 ? 's' : ''} for "${query}"`
             : `No results found for "${query}"`,
-          subcollections,
           totalResults: resultCount,
         };
       },
@@ -296,22 +286,12 @@ export class ContentSearchFacade {
         );
 
         // Determine which entity types to search based on filters
-        const entityTypes = filters?.entityTypes || ['collection', 'subcollection', 'bobblehead'];
+        const entityTypes = filters?.entityTypes || ['collection', 'bobblehead'];
 
         // Execute searches for requested entity types with pagination
-        const [collections, subcollections, bobbleheads] = await Promise.all([
+        const [collections, bobbleheads] = await Promise.all([
           entityTypes.includes('collection') ?
             ContentSearchQuery.searchPublicCollections(
-              query,
-              pageSize,
-              context,
-              filters?.tagIds && filters.tagIds.length > 0 ? filters.tagIds : undefined,
-              offset,
-              filterOptions,
-            )
-          : Promise.resolve([]),
-          entityTypes.includes('subcollection') ?
-            ContentSearchQuery.searchPublicSubcollections(
               query,
               pageSize,
               context,
@@ -333,10 +313,7 @@ export class ContentSearchFacade {
         ]);
 
         // Enrich results with tags
-        const enrichedResults = await this.enrichPublicSearchResults(
-          { bobbleheads, collections, subcollections },
-          context,
-        );
+        const enrichedResults = await this.enrichPublicSearchResults({ bobbleheads, collections }, context);
 
         // Calculate pagination metadata
         const totalPages = Math.ceil(counts.total / pageSize);
@@ -358,7 +335,6 @@ export class ContentSearchFacade {
             pageSize,
             totalPages,
           },
-          subcollections: enrichedResults.subcollections,
         };
       },
       queryHash,
@@ -609,7 +585,6 @@ export class ContentSearchFacade {
     return {
       bobbleheads: enrichedBobbleheads,
       collections: enrichedCollections,
-      subcollections: results.subcollections,
     };
   }
 

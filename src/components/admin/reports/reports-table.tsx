@@ -64,11 +64,6 @@ const isContentLinkAvailable = (report: SelectContentReportWithSlugs): boolean =
     return false;
   }
 
-  // Subcollections need both targetSlug and parentCollectionSlug
-  if (report.targetType === 'subcollection') {
-    return !!report.targetSlug && !!report.parentCollectionSlug;
-  }
-
   // Bobbleheads and collections need targetSlug
   if (report.targetType === 'bobblehead' || report.targetType === 'collection') {
     return !!report.targetSlug;
@@ -98,14 +93,6 @@ const getContentLink = (report: SelectContentReportWithSlugs): null | string => 
       return $path({
         route: '/collections/[collectionSlug]',
         routeParams: { collectionSlug: report.targetSlug! },
-      });
-    case 'subcollection':
-      return $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug: report.parentCollectionSlug!,
-          subcollectionSlug: report.targetSlug!,
-        },
       });
     case 'user':
       return $path({
@@ -307,7 +294,6 @@ export const ReportsTable = ({
           const targetType = row.original.targetType;
           const _isBobblehead = targetType === 'bobblehead';
           const _isCollection = targetType === 'collection';
-          const _isSubcollection = targetType === 'subcollection';
           const _isComment = targetType === 'comment';
 
           return (
@@ -315,7 +301,6 @@ export const ReportsTable = ({
               className={cn(
                 _isBobblehead && 'bg-green-100 text-green-800',
                 _isCollection && 'bg-blue-100 text-blue-800',
-                _isSubcollection && 'bg-purple-100 text-purple-800',
                 _isComment && 'bg-orange-100 text-orange-800',
               )}
               variant={'secondary'}

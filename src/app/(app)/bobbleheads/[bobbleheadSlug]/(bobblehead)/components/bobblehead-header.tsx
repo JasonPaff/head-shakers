@@ -40,8 +40,6 @@ export const BobbleheadHeader = ({
             <CollectionBreadcrumb
               collectionName={bobblehead.collectionName}
               collectionSlug={bobblehead.collectionSlug}
-              subcollectionName={bobblehead.subcollectionName}
-              subcollectionSlug={bobblehead.subcollectionSlug}
             />
           )}
         </div>
@@ -66,7 +64,6 @@ export const BobbleheadHeader = ({
               <BobbleheadHeaderDelete
                 bobbleheadId={bobblehead.id}
                 collectionSlug={bobblehead.collectionSlug ?? undefined}
-                subcollectionSlug={bobblehead.subcollectionSlug ?? undefined}
               >
                 Delete
               </BobbleheadHeaderDelete>

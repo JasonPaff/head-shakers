@@ -6,7 +6,6 @@ import type {
   BobbleheadListRecord,
   BrowseCategoriesResult,
   BrowseCollectionsResult,
-  BrowseCollectionsWithSubcollectionsResult,
   CategoryRecord,
   CollectionRecord,
   CollectionWithRelations,
@@ -45,23 +44,11 @@ export interface CollectionDashboardData {
   metrics: CollectionMetrics;
   name: string;
   slug: string;
-  subCollections: Array<{
-    bobbleheadCount: number;
-    coverImageUrl: null | string;
-    description: null | string;
-    id: string;
-    isPublic: boolean;
-    name: string;
-    slug: string;
-  }>;
 }
 
 export interface CollectionMetrics {
-  directBobbleheads: number;
   featuredBobbleheads: number;
-  hasSubcollections: boolean;
   lastUpdated: Date;
-  subcollectionBobbleheads: number;
   totalBobbleheads: number;
   viewCount?: number;
   viewStats?: {
@@ -286,7 +273,7 @@ export class CollectionsFacade {
     input: BrowseCollectionsInput,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
-  ): Promise<BrowseCollectionsResult | BrowseCollectionsWithSubcollectionsResult> {
+  ): Promise<BrowseCollectionsResult> {
     const startTime = performance.now();
 
     // Track filter usage patterns
@@ -295,7 +282,6 @@ export class CollectionsFacade {
     if (input.filters?.categoryId) activeFilters.push('category');
     if (input.filters?.ownerId) activeFilters.push('owner');
     if (input.filters?.dateFrom || input.filters?.dateTo) activeFilters.push('dateRange');
-    if (input.filters?.includeSubcollections) activeFilters.push('includeSubcollections');
 
     Sentry.addBreadcrumb({
       category: 'browse_filters',
@@ -304,7 +290,6 @@ export class CollectionsFacade {
         categoryId: input.filters?.categoryId ? 'set' : 'unset',
         dateFrom: input.filters?.dateFrom ? 'set' : 'unset',
         dateTo: input.filters?.dateTo ? 'set' : 'unset',
-        includeSubcollections: input.filters?.includeSubcollections ? 'enabled' : 'disabled',
         ownerId: input.filters?.ownerId ? 'set' : 'unset',
         query:
           input.filters?.query ?
@@ -361,44 +346,19 @@ export class CollectionsFacade {
           }
 
           // transform results to include Cloudinary URLs for first bobblehead photos
-          // and subcollection cover images when includeSubcollections is enabled
-          const transformedCollections = result.collections.map((record) => {
-            const baseTransform = {
-              ...record,
-              firstBobbleheadPhoto:
-                record.firstBobbleheadPhoto ?
-                  CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
-                    crop: 'fill',
-                    gravity: 'auto',
-                    height: 300,
-                    quality: 'auto',
-                    width: 300,
-                  })
-                : null,
-            };
-
-            // Transform subcollection cover images if present (when includeSubcollections is enabled)
-            if ('subCollections' in record && Array.isArray(record.subCollections)) {
-              return {
-                ...baseTransform,
-                subCollections: record.subCollections.map((subCollection) => ({
-                  ...subCollection,
-                  coverImageUrl:
-                    subCollection.coverImageUrl ?
-                      CloudinaryService.getOptimizedUrl(subCollection.coverImageUrl, {
-                        crop: 'fill',
-                        gravity: 'auto',
-                        height: 200,
-                        quality: 'auto',
-                        width: 200,
-                      })
-                    : null,
-                })),
-              };
-            }
-
-            return baseTransform;
-          });
+          const transformedCollections = result.collections.map((record) => ({
+            ...record,
+            firstBobbleheadPhoto:
+              record.firstBobbleheadPhoto ?
+                CloudinaryService.getOptimizedUrl(record.firstBobbleheadPhoto, {
+                  crop: 'fill',
+                  gravity: 'auto',
+                  height: 300,
+                  quality: 'auto',
+                  width: 300,
+                })
+              : null,
+          }));
 
           return {
             ...result,
@@ -483,7 +443,6 @@ export class CollectionsFacade {
           filters: {
             category: input.filters?.categoryId ? 'set' : 'unset',
             dateRange: input.filters?.dateFrom || input.filters?.dateTo ? 'set' : 'unset',
-            includeSubcollections: input.filters?.includeSubcollections ? 'enabled' : 'disabled',
             owner: input.filters?.ownerId ? 'set' : 'unset',
             query: input.filters?.query ? `[${input.filters.query.substring(0, 100)}]` : 'empty',
           },
@@ -512,37 +471,16 @@ export class CollectionsFacade {
   }
 
   static computeMetrics(collection: CollectionWithRelations): CollectionMetrics {
-    // count direct bobbleheads (not in subcollections)
-    const directBobbleheads = collection.bobbleheads.filter(
-      (bobblehead) => bobblehead.subcollectionId === null,
-    );
+    // count featured bobbleheads
+    const featuredBobbleheads = collection.bobbleheads.filter((b) => b.isFeatured).length;
 
-    // count bobbleheads in subcollections
-    const subcollectionBobbleheads = collection.subCollections.reduce(
-      (sum, subCollection) => sum + subCollection.bobbleheads.length,
-      0,
-    );
-
-    // count featured bobbleheads across collection and subcollections
-    const directFeatured = directBobbleheads.filter((b) => b.isFeatured).length;
-    const subcollectionFeatured = collection.subCollections.reduce(
-      (sum, sub) => sum + sub.bobbleheads.filter((b) => b.isFeatured).length,
-      0,
-    );
-
-    // find the most recent update across a collection and subcollections
-    const lastUpdated = [collection.updatedAt, ...collection.subCollections.map((sc) => sc.updatedAt)].reduce(
-      (latest, date) => (date > latest ? date : latest),
-      collection.updatedAt,
-    );
+    // find the most recent update
+    const lastUpdated = collection.updatedAt;
 
     return {
-      directBobbleheads: directBobbleheads.length,
-      featuredBobbleheads: directFeatured + subcollectionFeatured,
-      hasSubcollections: collection.subCollections.length > 0,
+      featuredBobbleheads,
       lastUpdated,
-      subcollectionBobbleheads,
-      totalBobbleheads: directBobbleheads.length + subcollectionBobbleheads,
+      totalBobbleheads: collection.bobbleheads.length,
     };
   }
 
@@ -650,7 +588,7 @@ export class CollectionsFacade {
   static async getAllCollectionBobbleheadsWithPhotos(
     collectionId: string,
     viewerUserId?: string,
-    options?: { searchTerm?: string; sortBy?: string; subcollectionId?: null | string },
+    options?: { searchTerm?: string; sortBy?: string },
     dbInstance?: DatabaseExecutor,
   ): Promise<
     Array<
@@ -659,9 +597,6 @@ export class CollectionsFacade {
         collectionSlug: string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
-        subcollectionId: null | string;
-        subcollectionName: null | string;
-        subcollectionSlug: null | string;
       }
     >
   > {
@@ -711,7 +646,7 @@ export class CollectionsFacade {
       );
     } catch (error) {
       const context: FacadeErrorContext = {
-        data: { collectionId, subcollectionId: options?.subcollectionId },
+        data: { collectionId },
         facade: 'CollectionsFacade',
         method: 'getAllCollectionBobbleheadsWithPhotos',
         operation: 'getAllBobbleheadsWithPhotos',
@@ -793,7 +728,7 @@ export class CollectionsFacade {
   static async getCollectionBobbleheadsWithPhotos(
     collectionId: string,
     viewerUserId?: string,
-    options?: { searchTerm?: string; sortBy?: string; subcollectionId?: null | string },
+    options?: { searchTerm?: string; sortBy?: string },
     dbInstance?: DatabaseExecutor,
   ): Promise<
     Array<
@@ -802,9 +737,6 @@ export class CollectionsFacade {
         collectionSlug: string;
         featurePhoto?: null | string;
         likeData?: { isLiked: boolean; likeCount: number; likeId: null | string };
-        subcollectionId: null | string;
-        subcollectionName: null | string;
-        subcollectionSlug: null | string;
       }
     >
   > {
@@ -854,7 +786,7 @@ export class CollectionsFacade {
       );
     } catch (error) {
       const context: FacadeErrorContext = {
-        data: { collectionId, subcollectionId: options?.subcollectionId },
+        data: { collectionId },
         facade: 'CollectionsFacade',
         method: 'getCollectionBobbleheadsWithPhotos',
         operation: 'getBobbleheadsWithPhotos',
@@ -956,7 +888,6 @@ export class CollectionsFacade {
       lastUpdatedAt: metrics.lastUpdated,
       name: collection.name,
       slug: collection.slug,
-      subCollectionCount: collection.subCollections.length,
       totalBobbleheadCount: metrics.totalBobbleheads,
       userId: collection.userId,
     };
@@ -1233,15 +1164,6 @@ export class CollectionsFacade {
       metrics,
       name: collection.name,
       slug: collection.slug,
-      subCollections: collection.subCollections.map((sub) => ({
-        bobbleheadCount: sub.bobbleheads.length,
-        coverImageUrl: sub.coverImageUrl,
-        description: sub.description,
-        id: sub.id,
-        isPublic: sub.isPublic,
-        name: sub.name,
-        slug: sub.slug,
-      })),
     };
   }
 

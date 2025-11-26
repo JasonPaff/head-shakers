@@ -11,15 +11,7 @@ import type {
   UpdateBobbleheadPhotoMetadata,
 } from '@/lib/validations/bobbleheads.validation';
 
-import {
-  bobbleheadPhotos,
-  bobbleheads,
-  bobbleheadTags,
-  collections,
-  subCollections,
-  tags,
-  users,
-} from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 /**
@@ -61,8 +53,6 @@ export type BobbleheadWithRelations = BobbleheadRecord & {
   collectionName: null | string;
   collectionSlug: null | string;
   photos: Array<typeof bobbleheadPhotos.$inferSelect>;
-  subcollectionName: null | string;
-  subcollectionSlug: null | string;
   tags: Array<typeof tags.$inferSelect>;
 };
 
@@ -263,16 +253,14 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead with collection/subcollection info
+    // get the bobblehead with collection info
     const result = await dbInstance
       .select({
         bobblehead: bobbleheads,
         collection: collections,
-        subcollection: subCollections,
       })
       .from(bobbleheads)
       .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
-      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
@@ -310,8 +298,6 @@ export class BobbleheadsQuery extends BaseQuery {
       collectionName: result[0].collection?.name || null,
       collectionSlug: result[0].collection?.slug || null,
       photos,
-      subcollectionName: result[0].subcollection?.name || null,
-      subcollectionSlug: result[0].subcollection?.slug || null,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
   }
@@ -345,16 +331,14 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead with collection/subcollection info
+    // get the bobblehead with collection info
     const result = await dbInstance
       .select({
         bobblehead: bobbleheads,
         collection: collections,
-        subcollection: subCollections,
       })
       .from(bobbleheads)
       .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
-      .leftJoin(subCollections, eq(bobbleheads.subcollectionId, subCollections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
@@ -394,8 +378,6 @@ export class BobbleheadsQuery extends BaseQuery {
       collectionName: result[0].collection?.name || null,
       collectionSlug: result[0].collection?.slug || null,
       photos,
-      subcollectionName: result[0].subcollection?.name || null,
-      subcollectionSlug: result[0].subcollection?.slug || null,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
   }
@@ -443,13 +425,12 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * get adjacent bobbleheads (previous and next) within a collection/subcollection context
+   * get adjacent bobbleheads (previous and next) within a collection context
    * uses createdAt DESC ordering where "previous" = newer item, "next" = older item
    */
   static async getAdjacentBobbleheadsInCollectionAsync(
     bobbleheadId: string,
     collectionId: string,
-    subcollectionId: null | string,
     context: QueryContext,
   ): Promise<AdjacentBobbleheadsResult> {
     const dbInstance = this.getDbInstance(context);
@@ -477,11 +458,6 @@ export class BobbleheadsQuery extends BaseQuery {
       eq(bobbleheads.collectionId, collectionId),
       this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
-
-    // add subcollection filter when provided
-    if (subcollectionId) {
-      baseConditions.push(eq(bobbleheads.subcollectionId, subcollectionId));
-    }
 
     // find previous bobblehead (newer = createdAt > current, order by createdAt ASC to get closest)
     // explicitly exclude current bobblehead to prevent self-reference
@@ -606,7 +582,7 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * get the position of a bobblehead within a collection/subcollection context
+   * get the position of a bobblehead within a collection context
    *
    * position calculation:
    * - uses createdAt DESC ordering where position 1 = newest bobblehead
@@ -615,14 +591,12 @@ export class BobbleheadsQuery extends BaseQuery {
    *
    * @param bobbleheadId - the ID of the bobblehead to find position for
    * @param collectionId - the collection to scope the position calculation
-   * @param subcollectionId - optional subcollection to further narrow the scope
    * @param context - query context for permissions and database instance
    * @returns position result with currentPosition (1-indexed) and totalCount, or null if bobblehead not found
    */
   static async getBobbleheadPositionInCollectionAsync(
     bobbleheadId: string,
     collectionId: string,
-    subcollectionId: null | string,
     context: QueryContext,
   ): Promise<BobbleheadPositionResult | null> {
     const dbInstance = this.getDbInstance(context);
@@ -650,11 +624,6 @@ export class BobbleheadsQuery extends BaseQuery {
       eq(bobbleheads.collectionId, collectionId),
       this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
-
-    // add subcollection filter when provided
-    if (subcollectionId) {
-      baseConditions.push(eq(bobbleheads.subcollectionId, subcollectionId));
-    }
 
     // count total bobbleheads in the collection context
     const totalResult = await dbInstance

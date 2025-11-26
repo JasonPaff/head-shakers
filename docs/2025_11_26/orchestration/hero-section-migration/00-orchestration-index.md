@@ -10,11 +10,11 @@ This orchestration migrates the Hero Section from the `/home-page-demo` route (u
 
 ## Step Logs
 
-| Step | File | Status | Duration |
-|------|------|--------|----------|
-| 1. Feature Refinement | [01-feature-refinement.md](./01-feature-refinement.md) | Pending | - |
-| 2. File Discovery | [02-file-discovery.md](./02-file-discovery.md) | Pending | - |
-| 3. Implementation Planning | [03-implementation-planning.md](./03-implementation-planning.md) | Pending | - |
+| Step                       | File                                                             | Status  | Duration |
+| -------------------------- | ---------------------------------------------------------------- | ------- | -------- |
+| 1. Feature Refinement      | [01-feature-refinement.md](./01-feature-refinement.md)           | Pending | -        |
+| 2. File Discovery          | [02-file-discovery.md](./02-file-discovery.md)                   | Pending | -        |
+| 3. Implementation Planning | [03-implementation-planning.md](./03-implementation-planning.md) | Pending | -        |
 
 ## Output Files
 

@@ -10,9 +10,9 @@ export const Route = {
     dateFrom: z.string().optional(),
     dateTo: z.string().optional(),
     entityTypes: z
-      .array(z.enum(['collection', 'subcollection', 'bobblehead']))
+      .array(z.enum(['collection', 'bobblehead']))
       .optional()
-      .default(['collection', 'subcollection', 'bobblehead']),
+      .default(['collection', 'bobblehead']),
     page: z.coerce.number().int().positive().optional().default(1),
     pageSize: z.coerce.number().int().positive().optional(),
     q: z.string().optional().default(''),

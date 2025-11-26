@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const Route = {
   searchParams: z.object({
-    tab: z.enum(['collections', 'subcollections', 'bobbleheads']).optional(),
+    tab: z.enum(['collections', 'bobbleheads']).optional(),
   }),
 } satisfies DynamicRoute;
 

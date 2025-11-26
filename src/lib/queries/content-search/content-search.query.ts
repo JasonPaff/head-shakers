@@ -4,15 +4,7 @@ import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
 
 import { DEFAULTS } from '@/lib/constants';
-import {
-  bobbleheadPhotos,
-  bobbleheads,
-  bobbleheadTags,
-  collections,
-  subCollections,
-  tags,
-  users,
-} from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadPhoto = {
@@ -60,13 +52,11 @@ export type CollectionSearchResult = {
 export type ConsolidatedSearchResults = {
   bobbleheads: Array<BobbleheadSearchResult>;
   collections: Array<CollectionSearchResult>;
-  subcollections: Array<SubcollectionSearchResult>;
 };
 
 export type PublicSearchCounts = {
   bobbleheads: number;
   collections: number;
-  subcollections: number;
   total: number;
 };
 
@@ -81,21 +71,6 @@ export type PublicSearchFilterOptions = {
   dateFrom?: string;
   /** Filter results created on or before this date */
   dateTo?: string;
-};
-
-export type SubcollectionSearchResult = {
-  collectionId: string;
-  collectionName: null | string;
-  collectionSlug: string;
-  coverImageUrl: null | string;
-  description: null | string;
-  id: string;
-  isPublic: boolean;
-  itemCount: null | number;
-  name: string;
-  ownerName: null | string;
-  ownerUsername: null | string;
-  slug: string;
 };
 
 export type UserSearchResult = {
@@ -424,53 +399,6 @@ export class ContentSearchQuery extends BaseQuery {
       }
     }
 
-    // Build subcollection count query
-    const subcollectionConditions: Array<SQL> = [
-      eq(subCollections.isPublic, DEFAULTS.SUB_COLLECTION.IS_PUBLIC),
-      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      isNull(users.deletedAt),
-    ];
-
-    if (query && query.trim()) {
-      const textSearch = or(
-        ilike(subCollections.name, `%${query}%`),
-        ilike(subCollections.description, `%${query}%`),
-        ilike(collections.name, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-      );
-      if (textSearch) subcollectionConditions.push(textSearch);
-    }
-
-    // Apply date range filters to subcollections
-    if (filterOptions?.dateFrom) {
-      subcollectionConditions.push(gte(subCollections.createdAt, new Date(filterOptions.dateFrom)));
-    }
-    if (filterOptions?.dateTo) {
-      subcollectionConditions.push(lte(subCollections.createdAt, new Date(filterOptions.dateTo)));
-    }
-
-    if (tagIds && tagIds.length > 0) {
-      for (const tagId of tagIds) {
-        subcollectionConditions.push(
-          inArray(
-            subCollections.id,
-            dbInstance
-              .select({ subcollectionId: bobbleheads.subcollectionId })
-              .from(bobbleheads)
-              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
-              .where(
-                and(
-                  eq(bobbleheadTags.tagId, tagId),
-                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  isNull(bobbleheads.deletedAt),
-                ),
-              ),
-          ),
-        );
-      }
-    }
-
     // Build bobblehead count query
     const bobbleheadConditions: Array<SQL> = [
       eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
@@ -519,19 +447,12 @@ export class ContentSearchQuery extends BaseQuery {
     }
 
     // Execute count queries in parallel
-    const [collectionsCountResult, subcollectionsCountResult, bobbleheadsCountResult] = await Promise.all([
+    const [collectionsCountResult, bobbleheadsCountResult] = await Promise.all([
       dbInstance
         .select({ count: count() })
         .from(collections)
         .innerJoin(users, eq(collections.userId, users.id))
         .where(and(...collectionConditions)),
-
-      dbInstance
-        .select({ count: count() })
-        .from(subCollections)
-        .innerJoin(collections, eq(subCollections.collectionId, collections.id))
-        .innerJoin(users, eq(collections.userId, users.id))
-        .where(and(...subcollectionConditions)),
 
       dbInstance
         .select({ count: count() })
@@ -542,14 +463,12 @@ export class ContentSearchQuery extends BaseQuery {
     ]);
 
     const collectionsCount = Number(collectionsCountResult[0]?.count) || 0;
-    const subcollectionsCount = Number(subcollectionsCountResult[0]?.count) || 0;
     const bobbleheadsCount = Number(bobbleheadsCountResult[0]?.count) || 0;
 
     return {
       bobbleheads: bobbleheadsCount,
       collections: collectionsCount,
-      subcollections: subcollectionsCount,
-      total: collectionsCount + subcollectionsCount + bobbleheadsCount,
+      total: collectionsCount + bobbleheadsCount,
     };
   }
 
@@ -948,7 +867,7 @@ export class ContentSearchQuery extends BaseQuery {
   }
 
   /**
-   * Search across all public entity types (collections, subcollections, bobbleheads)
+   * Search across all public entity types (collections, bobbleheads)
    * Returns consolidated results with top N from each entity type
    * Used for header dropdown instant search with limited results
    *
@@ -961,119 +880,16 @@ export class ContentSearchQuery extends BaseQuery {
     limitPerType: number,
     context: QueryContext,
   ): Promise<ConsolidatedSearchResults> {
-    // Execute all three searches in parallel for optimal performance
-    const [collections, subcollections, bobbleheads] = await Promise.all([
+    // Execute both searches in parallel for optimal performance
+    const [collections, bobbleheads] = await Promise.all([
       this.searchPublicCollections(query, limitPerType, context),
-      this.searchPublicSubcollections(query, limitPerType, context),
       this.searchPublicBobbleheads(query, limitPerType, context),
     ]);
 
     return {
       bobbleheads,
       collections,
-      subcollections,
     };
-  }
-
-  /**
-   * Search public subcollections for unauthenticated users
-   * Filters by parent collection visibility (both subcollection and parent must be public)
-   * Supports tag filtering via bobblehead tags within the subcollection and date range filtering
-   *
-   * @param query - Search text to match against name, description, collection name, and owner information
-   * @param limit - Maximum number of results to return
-   * @param context - Query context with database instance
-   * @param tagIds - Optional array of tag IDs to filter by (include only logic)
-   * @param offset - Optional offset for pagination
-   * @param filterOptions - Optional additional filters (dateFrom, dateTo)
-   */
-  static async searchPublicSubcollections(
-    query: string,
-    limit: number,
-    context: QueryContext,
-    tagIds?: Array<string>,
-    offset?: number,
-    filterOptions?: PublicSearchFilterOptions,
-  ): Promise<Array<SubcollectionSearchResult>> {
-    const dbInstance = this.getDbInstance(context);
-
-    // Build where conditions - both subcollection and parent collection must be public
-    const conditions: Array<SQL> = [
-      eq(subCollections.isPublic, DEFAULTS.SUB_COLLECTION.IS_PUBLIC),
-      eq(collections.isPublic, DEFAULTS.COLLECTION.IS_PUBLIC),
-      isNull(users.deletedAt),
-    ];
-
-    // Add text search conditions if query is provided
-    if (query && query.trim()) {
-      const textSearchCondition = or(
-        ilike(subCollections.name, `%${query}%`),
-        ilike(subCollections.description, `%${query}%`),
-        ilike(collections.name, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-        ilike(users.username, `%${query}%`),
-      );
-      if (textSearchCondition) {
-        conditions.push(textSearchCondition);
-      }
-    }
-
-    // Apply date range filters
-    if (filterOptions?.dateFrom) {
-      conditions.push(gte(subCollections.createdAt, new Date(filterOptions.dateFrom)));
-    }
-    if (filterOptions?.dateTo) {
-      conditions.push(lte(subCollections.createdAt, new Date(filterOptions.dateTo)));
-    }
-
-    const queryBuilder = dbInstance
-      .select({
-        collectionId: subCollections.collectionId,
-        collectionName: collections.name,
-        collectionSlug: collections.slug,
-        coverImageUrl: subCollections.coverImageUrl,
-        description: subCollections.description,
-        id: subCollections.id,
-        isPublic: subCollections.isPublic,
-        itemCount: subCollections.itemCount,
-        name: subCollections.name,
-        ownerName: users.username,
-        ownerUsername: users.username,
-        slug: subCollections.slug,
-      })
-      .from(subCollections)
-      .innerJoin(collections, eq(subCollections.collectionId, collections.id))
-      .innerJoin(users, eq(collections.userId, users.id));
-
-    // Tag filtering: find subcollections containing bobbleheads with ALL specified tags
-    if (tagIds && tagIds.length > 0) {
-      for (const tagId of tagIds) {
-        conditions.push(
-          inArray(
-            subCollections.id,
-            dbInstance
-              .select({ subcollectionId: bobbleheads.subcollectionId })
-              .from(bobbleheads)
-              .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
-              .where(
-                and(
-                  eq(bobbleheadTags.tagId, tagId),
-                  eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
-                  isNull(bobbleheads.deletedAt),
-                ),
-              ),
-          ),
-        );
-      }
-    }
-
-    const baseQuery = queryBuilder.where(and(...conditions)).limit(limit);
-
-    if (offset !== undefined && offset > 0) {
-      return baseQuery.offset(offset);
-    }
-
-    return baseQuery;
   }
 
   /**

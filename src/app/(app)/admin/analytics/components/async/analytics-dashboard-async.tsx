@@ -5,7 +5,7 @@ import { AnalyticsFacade } from '@/lib/facades/analytics/analytics.facade';
 
 interface AnalyticsDashboardAsyncProps {
   isIncludeAnonymous?: boolean;
-  targetType?: 'bobblehead' | 'collection' | 'profile' | 'subcollection';
+  targetType?: 'bobblehead' | 'collection' | 'profile';
   timeRange?: 'day' | 'month' | 'week';
 }
 

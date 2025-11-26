@@ -31,7 +31,6 @@ export const SENTRY_CONTEXTS = {
   NEWSLETTER_DATA: 'newsletter_data',
   PERFORMANCE: 'performance',
   SEARCH_DATA: 'search_data',
-  SUBCOLLECTION_DATA: 'subcollection_data',
   TAG_DATA: 'tag_data',
   USER_DATA: 'user_data',
   VIEW_DATA: 'view_data',

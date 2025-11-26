@@ -426,10 +426,7 @@ export class SocialFacade {
             facade: 'SocialFacade',
             operation: 'getComments',
           },
-          tags: CacheTagGenerators.social.comments(
-            targetType === 'subcollection' ? 'collection' : targetType,
-            targetId,
-          ),
+          tags: CacheTagGenerators.social.comments(targetType, targetId),
         },
       );
     } catch (error) {
@@ -497,10 +494,7 @@ export class SocialFacade {
             facade: 'SocialFacade',
             operation: 'getCommentsWithReplies',
           },
-          tags: CacheTagGenerators.social.comments(
-            targetType === 'subcollection' ? 'collection' : targetType,
-            targetId,
-          ),
+          tags: CacheTagGenerators.social.comments(targetType, targetId),
         },
       );
     } catch (error) {
@@ -573,11 +567,7 @@ export class SocialFacade {
             facade: 'SocialFacade',
             operation: 'getLikeCount',
           },
-          tags: CacheTagGenerators.social.like(
-            targetType === 'subcollection' ? 'collection' : targetType,
-            targetId,
-            'system',
-          ),
+          tags: CacheTagGenerators.social.like(targetType, targetId, 'system'),
         },
       );
     } catch (error) {

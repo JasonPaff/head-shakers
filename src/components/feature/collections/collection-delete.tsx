@@ -20,7 +20,12 @@ type CollectionDeleteProps = Children<{
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
-export const CollectionDelete = ({ children, collectionId, collectionName, ...props }: CollectionDeleteProps) => {
+export const CollectionDelete = ({
+  children,
+  collectionId,
+  collectionName,
+  ...props
+}: CollectionDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const router = useRouter();
@@ -62,7 +67,7 @@ export const CollectionDelete = ({ children, collectionId, collectionName, ...pr
         onClose={setIsConfirmDeleteDialogOpen.off}
         onDeleteAsync={handleDeleteAsync}
       >
-        This will permanently delete this collection and any subcollections and bobbleheads within.
+        This will permanently delete this collection and all bobbleheads within.
       </ConfirmDeleteAlertDialog>
     </Fragment>
   );

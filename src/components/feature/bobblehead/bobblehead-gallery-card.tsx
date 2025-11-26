@@ -6,7 +6,6 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  FolderIcon,
   MoreVerticalIcon,
   PencilIcon,
   ShareIcon,
@@ -65,7 +64,6 @@ interface BobbleheadForEdit {
   purchasePrice: null | number;
   series: null | string;
   status: null | string;
-  subcollectionId: null | string;
   tags?: Array<{ id: string; name: string }>;
   weight: null | number;
   year: null | number;
@@ -85,16 +83,12 @@ interface BobbleheadGalleryCardProps extends ComponentTestIdProps {
     };
     name: null | string;
     slug: string;
-    subcollectionId?: null | string;
-    subcollectionName?: null | string;
-    subcollectionSlug?: null | string;
   };
   bobbleheadForEdit?: BobbleheadForEdit;
   collections?: Array<ComboboxItem>;
   isOwner: boolean;
   navigationContext?: {
     collectionId?: string;
-    subcollectionId?: string;
   };
 }
 
@@ -306,27 +300,6 @@ export const BobbleheadGalleryCard = ({
       {/* Name */}
       <CardHeader className={'h-14 flex-shrink-0 pb-2'}>
         <h3 className={'line-clamp-1 text-lg font-semibold'}>{bobblehead.name || 'Unnamed Bobblehead'}</h3>
-        <Conditional isCondition={!!bobblehead.subcollectionId && !!bobblehead.subcollectionName}>
-          <div className={'flex items-center text-xs text-muted-foreground'}>
-            <FolderIcon aria-hidden className={'mr-1.5 size-3.5 flex-shrink-0'} />
-            <Link
-              className={'truncate hover:underline'}
-              href={$path({
-                route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-                routeParams: {
-                  collectionSlug: bobblehead.collectionSlug!,
-                  subcollectionSlug: bobblehead.subcollectionSlug!,
-                },
-              })}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-              title={bobblehead.subcollectionName ?? ''}
-            >
-              {bobblehead.subcollectionName}
-            </Link>
-          </div>
-        </Conditional>
       </CardHeader>
 
       {/* Photo */}
@@ -498,7 +471,6 @@ export const BobbleheadGalleryCard = ({
                 routeParams: { bobbleheadSlug: bobblehead.slug },
                 searchParams: {
                   collectionId: navigationContext?.collectionId,
-                  subcollectionId: navigationContext?.subcollectionId,
                 },
               })}
             >
@@ -555,7 +527,6 @@ export const BobbleheadGalleryCard = ({
           collectionSlug={bobblehead.collectionSlug!}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
-          subcollectionSlug={bobblehead.subcollectionSlug}
         />
       </Conditional>
 

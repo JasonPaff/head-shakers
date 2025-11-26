@@ -9,7 +9,7 @@ import { ENUMS } from '@/lib/constants';
 export const toggleLikeSchema = z.object({
   targetId: z.string().uuid('Target ID must be a valid UUID'),
   targetType: z.enum(ENUMS.LIKE.TARGET_TYPE, {
-    message: 'Target type must be bobblehead, collection, or subcollection',
+    message: 'Target type must be bobblehead or collection',
   }),
 });
 

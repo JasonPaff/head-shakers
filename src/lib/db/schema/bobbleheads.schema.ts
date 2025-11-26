@@ -17,7 +17,7 @@ import type { CustomFields } from '@/lib/validations/bobbleheads.validation';
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { SLUG_MAX_LENGTH } from '@/lib/constants/slug';
-import { collections, subCollections } from '@/lib/db/schema/collections.schema';
+import { collections } from '@/lib/db/schema/collections.schema';
 import { tags } from '@/lib/db/schema/tags.schema';
 import { users } from '@/lib/db/schema/users.schema';
 
@@ -66,7 +66,6 @@ export const bobbleheads = pgTable(
     status: varchar('status', { length: SCHEMA_LIMITS.BOBBLEHEAD.STATUS.MAX })
       .default(DEFAULTS.BOBBLEHEAD.STATUS)
       .notNull(),
-    subcollectionId: uuid('sub_collection_id').references(() => subCollections.id, { onDelete: 'set null' }),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
       .references(() => users.id, { onDelete: 'cascade' })
@@ -103,7 +102,6 @@ export const bobbleheads = pgTable(
     index('bobbleheads_is_public_idx').on(table.isPublic),
     index('bobbleheads_slug_idx').on(table.slug),
     index('bobbleheads_status_idx').on(table.status),
-    index('bobbleheads_sub_collection_id_idx').on(table.subcollectionId),
     index('bobbleheads_user_id_idx').on(table.userId),
 
     // composite indexes

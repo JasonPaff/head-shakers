@@ -21,7 +21,7 @@ export function generateMetadata(): Metadata {
 }
 
 async function AddItemPage({ searchParams }: AddItemPageProps) {
-  const { collectionId, subcollectionId } = await searchParams;
+  const { collectionId } = await searchParams;
 
   return (
     <PageContent>
@@ -30,7 +30,7 @@ async function AddItemPage({ searchParams }: AddItemPageProps) {
 
       {/* Form Section */}
       <Suspense fallback={<AddItemFormSkeleton />}>
-        <AddItemFormServer initialCollectionId={collectionId} initialSubcollectionId={subcollectionId} />
+        <AddItemFormServer initialCollectionId={collectionId} />
       </Suspense>
     </PageContent>
   );

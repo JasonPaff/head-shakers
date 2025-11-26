@@ -12,7 +12,7 @@ import type {
 } from '@/lib/validations/social.validation';
 
 import { ENUMS, MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants';
-import { bobbleheads, collections, comments, likes, subCollections, userBlocks } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, likes, userBlocks } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type CommentRecord = SelectComment;
@@ -113,12 +113,6 @@ export class SocialQuery extends BaseQuery {
           .set({ commentCount: sql`GREATEST(0, ${collections.commentCount} - 1)` })
           .where(eq(collections.id, targetId));
         break;
-      case ENUMS.COMMENT.TARGET_TYPE[2]:
-        await dbInstance
-          .update(subCollections)
-          .set({ commentCount: sql`GREATEST(0, ${subCollections.commentCount} - 1)` })
-          .where(eq(subCollections.id, targetId));
-        break;
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);
     }
@@ -143,12 +137,6 @@ export class SocialQuery extends BaseQuery {
           .update(collections)
           .set({ likeCount: sql`GREATEST(0, ${collections.likeCount} - 1)` })
           .where(eq(collections.id, targetId));
-        break;
-      case ENUMS.LIKE.TARGET_TYPE[2]:
-        await dbInstance
-          .update(subCollections)
-          .set({ likeCount: sql`GREATEST(0, ${subCollections.likeCount} - 1)` })
-          .where(eq(subCollections.id, targetId));
         break;
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);
@@ -353,7 +341,7 @@ export class SocialQuery extends BaseQuery {
    * Get top-level comments for a target with nested replies
    * Fetches root comments (parentCommentId is null) and recursively loads replies
    *
-   * @param targetId - The target entity ID (bobblehead, collection, subcollection)
+   * @param targetId - The target entity ID (bobblehead, collection)
    * @param targetType - The type of target entity
    * @param options - Pagination and filtering options
    * @param context - Query context with database instance
@@ -698,7 +686,7 @@ export class SocialQuery extends BaseQuery {
   }
 
   static async getUserLikeStatusesAsync(
-    targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' | 'subcollection' }>,
+    targets: Array<{ targetId: string; targetType: 'bobblehead' | 'collection' }>,
     userId: string,
     context: QueryContext,
   ): Promise<Array<UserLikeStatus>> {
@@ -775,12 +763,6 @@ export class SocialQuery extends BaseQuery {
           .set({ commentCount: sql`${collections.commentCount} + 1` })
           .where(eq(collections.id, targetId));
         break;
-      case ENUMS.COMMENT.TARGET_TYPE[2]:
-        await dbInstance
-          .update(subCollections)
-          .set({ commentCount: sql`${subCollections.commentCount} + 1` })
-          .where(eq(subCollections.id, targetId));
-        break;
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);
     }
@@ -805,12 +787,6 @@ export class SocialQuery extends BaseQuery {
           .update(collections)
           .set({ likeCount: sql`${collections.likeCount} + 1` })
           .where(eq(collections.id, targetId));
-        break;
-      case ENUMS.LIKE.TARGET_TYPE[2]:
-        await dbInstance
-          .update(subCollections)
-          .set({ likeCount: sql`${subCollections.likeCount} + 1` })
-          .where(eq(subCollections.id, targetId));
         break;
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);

@@ -226,7 +226,6 @@ export const browseCollectionsAction = publicActionClient
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       filters: browseInput.filters,
-      includeSubcollections: browseInput.filters?.includeSubcollections ?? true,
       pagination: browseInput.pagination,
       sort: browseInput.sort,
     });
@@ -238,7 +237,6 @@ export const browseCollectionsAction = publicActionClient
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           filters: browseInput.filters,
-          includeSubcollections: browseInput.filters?.includeSubcollections ?? true,
           resultCount: result.collections.length,
           totalCount: result.pagination.totalCount,
         },

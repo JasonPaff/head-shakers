@@ -118,10 +118,10 @@ export async function FeaturedContentServer({ isTrackViews = false }: FeaturedCo
     // collect all content items for batch like data fetch
     const allContent = [...homepageBanner, ...editorPicks, ...collectionOfWeek, ...trending];
     const likeDataTargets = allContent
-      .filter((content) => ['bobblehead', 'collection', 'subcollection'].includes(content.contentType))
+      .filter((content) => ['bobblehead', 'collection'].includes(content.contentType))
       .map((content) => ({
         targetId: content.contentId,
-        targetType: content.contentType as 'bobblehead' | 'collection' | 'subcollection',
+        targetType: content.contentType as 'bobblehead' | 'collection',
       }));
 
     // fetch like data for all content items if user is authenticated

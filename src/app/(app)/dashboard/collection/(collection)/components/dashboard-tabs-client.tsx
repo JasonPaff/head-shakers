@@ -9,7 +9,7 @@ type DashboardTabsClientProps = Children;
 
 type DataTab = { 'data-tab'?: string };
 
-const VALID_TABS = ['collections', 'subcollections', 'bobbleheads'] as const;
+const VALID_TABS = ['collections', 'bobbleheads'] as const;
 type ValidTab = (typeof VALID_TABS)[number];
 
 export const DashboardTabsClient = ({ children }: DashboardTabsClientProps) => {
@@ -36,9 +36,8 @@ export const DashboardTabsClient = ({ children }: DashboardTabsClientProps) => {
 
   return (
     <Tabs className={'w-full'} onValueChange={handleTabChange} value={activeTab}>
-      <TabsList className={'grid w-full grid-cols-3'}>
+      <TabsList className={'grid w-full grid-cols-2'}>
         <TabsTrigger value={'collections'}>Collections</TabsTrigger>
-        <TabsTrigger value={'subcollections'}>Subcollections</TabsTrigger>
         <TabsTrigger value={'bobbleheads'}>Bobbleheads</TabsTrigger>
       </TabsList>
 

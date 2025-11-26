@@ -78,10 +78,6 @@ export const SCHEMA_LIMITS = {
     IP_ADDRESS: { MAX: 50 },
     QUERY: { MAX: 500, MIN: 1 },
   },
-  SUB_COLLECTION: {
-    DESCRIPTION: { MAX: 1000 },
-    NAME: { MAX: 100, MIN: 1 },
-  },
   TAG: {
     COLOR: { LENGTH: 7 }, // Hex color format
     NAME: { MAX: 50, MIN: 1 },

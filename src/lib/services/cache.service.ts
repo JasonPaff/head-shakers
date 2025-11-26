@@ -669,7 +669,7 @@ export class CacheService {
      *
      * @example
      * ```typescript
-     * // After updating a collection, bobblehead, or subcollection
+     * // After updating a collection or bobblehead
      * CacheService.search.invalidatePublic();
      * ```
      *

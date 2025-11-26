@@ -29,12 +29,14 @@ Complete removal of the subcollection entity from the Head Shakers bobblehead co
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/collections.schema.ts` - Remove entire subCollections table definition (lines 76-123)
 - `src/lib/db/schema/bobbleheads.schema.ts` - Remove subcollectionId column and its import, index
 - `src/lib/db/schema/relations.schema.ts` - Remove subCollectionsRelations export and all subcollection relation references
 - `src/lib/db/schema/social.schema.ts` - Remove subcollection partial index from comments table
 
 **Changes:**
+
 - Remove subCollections table definition from collections.schema.ts
 - Remove subCollections import from bobbleheads.schema.ts
 - Remove subcollectionId column from bobbleheads table definition
@@ -45,11 +47,13 @@ Complete removal of the subcollection entity from the Head Shakers bobblehead co
 - Remove comments_subcollection_target_idx partial index from social.schema.ts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] subCollections table definition completely removed
 - [ ] subcollectionId column removed from bobbleheads table
 - [ ] All subcollection relations removed from relations.schema.ts
@@ -65,19 +69,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - Migration file in `src/lib/db/migrations/` (auto-generated)
 
 **Changes:**
+
 - Run drizzle-kit generate to create migration
 - Review generated SQL to ensure it drops sub_collections table and removes subcollectionId column from bobbleheads table
 - Verify migration includes proper DROP statements
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file generated successfully
 - [ ] Migration includes DROP TABLE sub_collections statement
 - [ ] Migration includes ALTER TABLE bobbleheads DROP COLUMN sub_collection_id statement
@@ -93,6 +101,7 @@ npm run db:generate
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/defaults.ts` - Remove SUB_COLLECTION object
 - `src/lib/constants/schema-limits.ts` - Remove SUB_COLLECTION limits
 - `src/lib/constants/error-codes.ts` - Remove SUBCOLLECTIONS error codes
@@ -104,6 +113,7 @@ npm run db:generate
 - `src/lib/constants/cloudinary-paths.ts` - Remove subcollection image paths
 
 **Changes:**
+
 - Remove SUB_COLLECTION object from DEFAULTS constant
 - Remove SUB_COLLECTION object from SCHEMA_LIMITS constant
 - Remove SUBCOLLECTIONS error code section from ERROR_CODES constant
@@ -120,11 +130,13 @@ npm run db:generate
 - Remove subcollection path generation from cloudinary-paths.ts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All SUB_COLLECTION references removed from constants
 - [ ] All 'subcollection' string literals removed from enums
 - [ ] Subcollection error codes and messages removed
@@ -138,23 +150,27 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to DELETE:**
+
 - `src/lib/validations/subcollections.validation.ts`
 - `src/lib/actions/collections/subcollections.actions.ts`
 - `src/lib/queries/collections/subcollections.query.ts`
 - `src/lib/facades/collections/subcollections.facade.ts`
 
 **Changes:**
+
 - Delete subcollections.validation.ts entirely
 - Delete subcollections.actions.ts entirely
 - Delete subcollections.query.ts entirely
 - Delete subcollections.facade.ts entirely
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All four files successfully deleted
 - [ ] No remaining imports of these files in the codebase
 
@@ -167,10 +183,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts`
 - `src/lib/facades/collections/collections.facade.ts`
 
 **Changes:**
+
 - Remove any subcollection joins, filters, or selections from query methods
 - Remove subcollection count calculations
 - Remove subcollection-related return type properties
@@ -178,11 +196,13 @@ npm run lint:fix && npm run typecheck
 - Remove any subcollection imports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No subcollection references in collections.query.ts
 - [ ] No subcollection references in collections.facade.ts
 - [ ] Collection types no longer include subcollection properties
@@ -196,10 +216,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/bobbleheads/bobbleheads-query.ts`
 - `src/lib/facades/bobbleheads/bobbleheads.facade.ts`
 
 **Changes:**
+
 - Remove subcollectionId from bobblehead creation input schemas
 - Remove subcollectionId from bobblehead update input schemas
 - Remove subcollectionId from bobblehead selection/projection
@@ -208,11 +230,13 @@ npm run lint:fix && npm run typecheck
 - Remove subcollection validation logic
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] subcollectionId removed from all bobblehead query methods
 - [ ] subcollectionId removed from all bobblehead facade methods
 - [ ] No subcollection joins in bobblehead queries
@@ -226,10 +250,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/social/social.query.ts`
 - `src/lib/facades/social/social.facade.ts`
 
 **Changes:**
+
 - Remove 'subcollection' case from like target type handling
 - Remove 'subcollection' case from comment target type handling
 - Remove subcollection target validation
@@ -237,11 +263,13 @@ npm run lint:fix && npm run typecheck
 - Update type unions to exclude subcollection
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] 'subcollection' removed from like target type logic
 - [ ] 'subcollection' removed from comment target type logic
 - [ ] No subcollection validation in social.query.ts or social.facade.ts
@@ -255,21 +283,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-search/content-search.query.ts`
 - `src/lib/facades/content-search/content-search.facade.ts`
 
 **Changes:**
+
 - Remove subcollection search logic
 - Remove subcollection result type handling
 - Remove subcollection from search aggregation
 - Remove subcollection filters
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection search removed from content-search.query.ts
 - [ ] Subcollection result type removed from search results
 
@@ -282,20 +314,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-reports/content-reports.query.ts`
 - `src/lib/facades/content-reports/content-reports.facade.ts`
 
 **Changes:**
+
 - Remove 'subcollection' case from report target type handling
 - Remove subcollection target validation
 - Remove subcollection content lookup for reports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] 'subcollection' removed from report target type logic
 - [ ] No subcollection validation in content-reports files
 
@@ -308,21 +344,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/lib/utils/cache-tags.utils.ts`
 - `src/lib/types/bobblehead-navigation.types.ts`
 - Any other utility files that reference subcollections
 
 **Changes:**
+
 - Remove subcollection cache tag generation
 - Remove subcollection from navigation type definitions
 - Remove any subcollection-related type utilities
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection cache tags removed
 - [ ] Subcollection types removed from navigation
 
@@ -335,17 +375,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to DELETE:**
+
 - Entire directory: `src/app/(app)/collections/[collectionSlug]/subcollection/` (19 files)
 
 **Changes:**
+
 - Delete the subcollection directory and all nested files/folders
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection route directory completely removed
 - [ ] No broken route references in navigation
 
@@ -358,17 +402,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to DELETE:**
+
 - Entire directory: `src/components/feature/subcollections/` (8 files)
 
 **Changes:**
+
 - Delete the subcollections feature components directory and all files
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollections feature components directory removed
 - [ ] No imports of these components remain
 
@@ -381,6 +429,7 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to DELETE:**
+
 - `src/app/(app)/dashboard/collection/(collection)/components/subcollections-list.tsx`
 - `src/app/(app)/dashboard/collection/(collection)/components/subcollections-list-item.tsx`
 - `src/app/(app)/dashboard/collection/(collection)/components/subcollections-empty-state.tsx`
@@ -388,14 +437,17 @@ npm run lint:fix && npm run typecheck
 - `src/app/(app)/dashboard/collection/(collection)/components/skeletons/subcollections-tab-skeleton.tsx`
 
 **Changes:**
+
 - Delete all five subcollection dashboard component files
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All subcollection dashboard components deleted
 - [ ] No imports of these components in dashboard pages
 
@@ -408,19 +460,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/feature/collections/collection-delete.tsx`
 
 **Changes:**
+
 - Remove subcollection count display
 - Remove subcollection deletion warning messages
 - Simplify deletion confirmation (may still require name confirmation for collections with bobbleheads)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection references removed from collection-delete.tsx
 - [ ] Component still properly handles collection deletion
 
@@ -433,19 +489,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/dashboard/collection/(collection)/components/collection-actions.tsx`
 
 **Changes:**
+
 - Remove create subcollection button/action
 - Remove manage subcollections button/action
 - Remove subcollection-related imports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection actions removed from collection-actions.tsx
 - [ ] Component renders properly without subcollection actions
 
@@ -458,19 +518,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation.tsx`
 
 **Changes:**
+
 - Remove subcollection breadcrumb segment
 - Update navigation to show only collection
 - Remove subcollection-related props and types
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection navigation removed from bobblehead-navigation.tsx
 - [ ] Navigation shows collection without subcollection
 
@@ -483,20 +547,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/dashboard/collection/(collection)/page.tsx`
 
 **Changes:**
+
 - Remove subcollections tab from tab list
 - Remove subcollections tab panel
 - Remove subcollection component imports
 - Update tab state management if needed
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollections tab removed from collection page
 - [ ] Only bobbleheads tab remains
 - [ ] Page renders correctly without subcollections
@@ -510,18 +578,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/middleware.ts`
 
 **Changes:**
+
 - Remove subcollection route patterns from middleware
 - Remove subcollection-specific authentication/authorization checks
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Subcollection routes removed from middleware
 - [ ] Middleware still properly handles collection routes
 
@@ -534,19 +606,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - Any files found containing subcollection references
 
 **Changes:**
+
 - Search for 'subcollection', 'subCollection', 'sub_collection', 'sub-collection' across entire codebase
 - Remove any remaining references found in components, pages, utilities, types, etc.
 - Update any interfaces or types that reference subcollections
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No 'subcollection' string found in source files (case-insensitive)
 - [ ] No 'subCollection' string found in source files
 - [ ] No 'sub_collection' string found in source files
@@ -561,18 +637,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Auto-generated route types (will be regenerated)
 
 **Changes:**
+
 - Run next-typesafe-url generator
 - Verify subcollection routes are removed from generated types
 
 **Validation Commands:**
+
 ```bash
 npm run next-typesafe-url && npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Type-safe routes regenerated successfully
 - [ ] No subcollection routes in generated types
 
@@ -585,18 +665,22 @@ npm run next-typesafe-url && npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - Database schema (via migration)
 
 **Changes:**
+
 - Run database migration to drop sub_collections table and subcollectionId column
 - Verify migration completes successfully
 
 **Validation Commands:**
+
 ```bash
 npm run db:migrate && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Migration applied successfully
 - [ ] sub_collections table dropped from database
 - [ ] subcollectionId column removed from bobbleheads table
@@ -611,20 +695,24 @@ npm run db:migrate && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None (testing only)
 
 **Changes:**
+
 - Run full linting
 - Run type checking
 - Run test suite
 - Run production build
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test:run && npm run build
 ```
 
 **Success Criteria:**
+
 - [ ] All linting passes with no errors
 - [ ] All type checking passes with no errors
 - [ ] All tests pass
@@ -670,6 +758,7 @@ npm run lint:fix && npm run typecheck && npm run test:run && npm run build
 ### Post-Implementation Verification
 
 After completing all steps, manually verify:
+
 1. Collection creation and management still works
 2. Bobblehead creation and assignment to collections works
 3. Dashboard collection view displays correctly

@@ -108,9 +108,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
   const _isLoading = isExecuting;
   const _hasResults =
     searchResultsData &&
-    (searchResultsData.collections.length > 0 ||
-      searchResultsData.subcollections.length > 0 ||
-      searchResultsData.bobbleheads.length > 0);
+    (searchResultsData.collections.length > 0 || searchResultsData.bobbleheads.length > 0);
   const _shouldShowEmptyState = !_isLoading && _isQueryValid && !_hasResults;
   const _shouldShowResults = !_isLoading && _hasResults;
 
@@ -134,7 +132,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
               className={'absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'}
             />
             <Input
-              aria-label={'Search collections, subcollections, and bobbleheads'}
+              aria-label={'Search collections and bobbleheads'}
               className={'w-full pr-4 pl-9'}
               isClearable
               onChange={handleInputChange}
@@ -182,18 +180,6 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
                       key={collection.id}
                       onClick={handleResultClick}
                       result={collection}
-                    />
-                  ))}
-                </Conditional>
-
-                {/* Subcollections Section */}
-                <Conditional isCondition={!!searchResultsData && searchResultsData.subcollections.length > 0}>
-                  {searchResultsData?.subcollections.map((subcollection) => (
-                    <SearchResultItem
-                      entityType={'subcollection'}
-                      key={subcollection.id}
-                      onClick={handleResultClick}
-                      result={subcollection}
                     />
                   ))}
                 </Conditional>

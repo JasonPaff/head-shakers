@@ -5,7 +5,6 @@ import { z } from 'zod';
 export const Route = {
   searchParams: z.object({
     collectionId: z.string().optional(),
-    subcollectionId: z.string().optional(),
   }),
 } satisfies DynamicRoute;
 

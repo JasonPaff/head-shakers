@@ -33,7 +33,7 @@ export interface MetadataCacheStats {
 /**
  * Content types that can have metadata cached
  */
-export type MetadataContentType = 'bobblehead' | 'collection' | 'subcollection' | 'user';
+export type MetadataContentType = 'bobblehead' | 'collection' | 'user';
 
 /**
  * Statistics tracking for metadata cache operations
@@ -131,10 +131,6 @@ export async function batchCacheMetadata<T, TItem extends { id: string }>(
           break;
         case 'collection':
           key = getCollectionMetadataKey(item.id);
-          tags = CacheTagGenerators.collection.read(item.id);
-          break;
-        case 'subcollection':
-          key = getSubcollectionMetadataKey(item.id);
           tags = CacheTagGenerators.collection.read(item.id);
           break;
         case 'user':
@@ -272,22 +268,6 @@ export function getMetadataCacheStats(): MetadataCacheStats {
 }
 
 /**
- * Generate cache key for subcollection metadata
- *
- * @param subcollectionId - Subcollection ID to generate key for
- * @returns Cache key following the pattern: `seo:metadata:subcollection:{subcollectionId}`
- *
- * @example
- * ```typescript
- * const key = getSubcollectionMetadataKey('subcollection_123');
- * // Returns: 'seo:metadata:subcollection:subcollection_123'
- * ```
- */
-export function getSubcollectionMetadataKey(subcollectionId: string): string {
-  return `seo:metadata:subcollection:${subcollectionId}`;
-}
-
-/**
  * Generate cache key for user metadata
  *
  * @param userId - User ID to generate key for
@@ -334,9 +314,6 @@ export function invalidateMetadataCache(contentType: MetadataContentType, conten
         CacheService.invalidateByTag(CACHE_CONFIG.TAGS.BOBBLEHEAD(contentId));
         break;
       case 'collection':
-        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.COLLECTION(contentId));
-        break;
-      case 'subcollection':
         CacheService.invalidateByTag(CACHE_CONFIG.TAGS.COLLECTION(contentId));
         break;
       case 'user':
@@ -420,10 +397,6 @@ export async function warmMetadataCache<T>(
           break;
         case 'collection':
           key = getCollectionMetadataKey(id);
-          tags = CacheTagGenerators.collection.read(id);
-          break;
-        case 'subcollection':
-          key = getSubcollectionMetadataKey(id);
           tags = CacheTagGenerators.collection.read(id);
           break;
         case 'user':

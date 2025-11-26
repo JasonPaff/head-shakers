@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { zodNullableUUID } from '@/lib/utils/zod.utils';
-
 /**
  * Type exports for navigation schemas
  */
@@ -31,22 +29,20 @@ export const adjacentBobbleheadSchema = z.object({
 export const nullableAdjacentBobbleheadSchema = adjacentBobbleheadSchema.nullable();
 
 /**
- * Schema for navigation context (collection or subcollection info)
- * Contains information about the collection/subcollection that bounds navigation
+ * Schema for navigation context (collection info)
+ * Contains information about the collection that bounds navigation
  */
 export const navigationContextSchema = z.object({
-  /** Unique identifier for the collection or subcollection */
+  /** Unique identifier for the collection */
   contextId: z.uuid({ message: 'Context ID must be a valid UUID' }),
-  /** Display name of the collection or subcollection */
+  /** Display name of the collection */
   contextName: z.string().min(1, { message: 'Context name is required' }),
   /** URL-friendly slug for the context */
   contextSlug: z.string().min(1, { message: 'Context slug is required' }),
-  /** Whether this is a collection or subcollection */
-  contextType: z.enum(['collection', 'subcollection'], {
-    message: 'Context type must be either collection or subcollection',
+  /** Type is always collection */
+  contextType: z.literal('collection', {
+    message: 'Context type must be collection',
   }),
-  /** Parent collection slug (only present for subcollections) */
-  parentCollectionSlug: z.string().min(1).optional(),
 });
 
 /**
@@ -60,7 +56,7 @@ export const nullableNavigationContextSchema = navigationContextSchema.nullable(
  * and position information for "X of Y" display
  */
 export const bobbleheadNavigationDataSchema = z.object({
-  /** Optional context information about the collection/subcollection being navigated */
+  /** Optional context information about the collection being navigated */
   context: nullableNavigationContextSchema,
   /**
    * 1-indexed ordinal position of the current bobblehead within the filtered context.
@@ -76,9 +72,7 @@ export const bobbleheadNavigationDataSchema = z.object({
   /** The previous bobblehead in the collection (newer by createdAt) */
   previousBobblehead: nullableAdjacentBobbleheadSchema,
   /**
-   * Total count of bobbleheads in the filtered context.
-   * When subcollectionId is provided, this is the count within that subcollection.
-   * Otherwise, this is the count within the entire collection.
+   * Total count of bobbleheads in the collection.
    */
   totalCount: z
     .number({ message: 'Total count is required' })
@@ -95,6 +89,4 @@ export const getBobbleheadNavigationSchema = z.object({
   bobbleheadId: z.uuid({ message: 'Bobblehead ID is required' }),
   /** The ID of the collection containing the bobblehead */
   collectionId: z.uuid({ message: 'Collection ID is required' }),
-  /** Optional subcollection ID for filtered navigation */
-  subcollectionId: zodNullableUUID('Subcollection ID'),
 });

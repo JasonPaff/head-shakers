@@ -11,7 +11,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type {
   BobbleheadSearchResult,
   CollectionSearchResult,
-  SubcollectionSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -61,16 +60,12 @@ export const SearchAutocomplete = ({
     if (!searchResultsData) return [];
 
     const results: Array<{
-      entityType: 'bobblehead' | 'collection' | 'subcollection';
-      item: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;
+      entityType: 'bobblehead' | 'collection';
+      item: BobbleheadSearchResult | CollectionSearchResult;
     }> = [];
 
     searchResultsData.collections.forEach((collection) => {
       results.push({ entityType: 'collection', item: collection });
-    });
-
-    searchResultsData.subcollections.forEach((subcollection) => {
-      results.push({ entityType: 'subcollection', item: subcollection });
     });
 
     searchResultsData.bobbleheads.forEach((bobblehead) => {
@@ -115,20 +110,11 @@ export const SearchAutocomplete = ({
 
   // 5. Utility functions
   const getEntityUrl = (
-    entityType: 'bobblehead' | 'collection' | 'subcollection',
-    item: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult,
+    entityType: 'bobblehead' | 'collection',
+    item: BobbleheadSearchResult | CollectionSearchResult,
   ): string => {
     if (entityType === 'collection') {
       return $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: item.slug } });
-    }
-    if (entityType === 'subcollection') {
-      return $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug: (item as SubcollectionSearchResult).collectionSlug,
-          subcollectionSlug: item.slug,
-        },
-      });
     }
     return $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: item.slug } });
   };
@@ -137,17 +123,14 @@ export const SearchAutocomplete = ({
     return $path({ route: '/browse/search', searchParams: { q: searchQuery } });
   };
 
-  const getDisplayName = (
-    item: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult,
-  ): string => {
+  const getDisplayName = (item: BobbleheadSearchResult | CollectionSearchResult): string => {
     if ('name' in item && item.name) return item.name;
     if ('characterName' in item && item.characterName) return item.characterName;
     return 'Unknown';
   };
 
-  const getEntityLabel = (entityType: 'bobblehead' | 'collection' | 'subcollection'): string => {
+  const getEntityLabel = (entityType: 'bobblehead' | 'collection'): string => {
     if (entityType === 'collection') return 'Collection';
-    if (entityType === 'subcollection') return 'Subcollection';
     return 'Bobblehead';
   };
 
@@ -227,13 +210,10 @@ export const SearchAutocomplete = ({
   const _isLoading = isExecuting;
   const _hasResults =
     searchResultsData &&
-    (searchResultsData.collections.length > 0 ||
-      searchResultsData.subcollections.length > 0 ||
-      searchResultsData.bobbleheads.length > 0);
+    (searchResultsData.collections.length > 0 || searchResultsData.bobbleheads.length > 0);
   const _shouldShowEmptyState = !_isLoading && _isQueryValid && !_hasResults;
   const _shouldShowResults = !_isLoading && _hasResults;
   const _hasCollections = searchResultsData && searchResultsData.collections.length > 0;
-  const _hasSubcollections = searchResultsData && searchResultsData.subcollections.length > 0;
   const _hasBobbleheads = searchResultsData && searchResultsData.bobbleheads.length > 0;
 
   const searchAutocompleteTestId = testId || generateTestId('feature', 'search-command', 'autocomplete');
@@ -261,7 +241,7 @@ export const SearchAutocomplete = ({
               aria-autocomplete={'list'}
               aria-expanded={isOpen}
               aria-haspopup={'listbox'}
-              aria-label={'Search collections, subcollections, and bobbleheads'}
+              aria-label={'Search collections and bobbleheads'}
               className={'w-full pr-4 pl-9'}
               isClearable
               onChange={handleInputChange}
@@ -332,45 +312,11 @@ export const SearchAutocomplete = ({
                     </CommandGroup>
                   </Conditional>
 
-                  {/* Subcollections Group */}
-                  <Conditional isCondition={_hasSubcollections}>
-                    <CommandGroup heading={'Subcollections'}>
-                      {searchResultsData?.subcollections.map((subcollection, index) => {
-                        const resultIndex = (searchResultsData?.collections.length || 0) + index;
-                        const _isSelected = selectedIndex === resultIndex;
-
-                        return (
-                          <CommandItem
-                            aria-selected={_isSelected}
-                            asChild
-                            className={cn(_isSelected && 'bg-accent')}
-                            key={subcollection.id}
-                            onSelect={() => handleResultClick()}
-                            value={`subcollection-${subcollection.id}`}
-                          >
-                            <Link
-                              className={'flex w-full cursor-pointer items-center gap-2'}
-                              href={getEntityUrl('subcollection', subcollection)}
-                            >
-                              <span className={'flex-1 truncate'}>{getDisplayName(subcollection)}</span>
-                              <span className={'text-xs text-muted-foreground'}>
-                                {getEntityLabel('subcollection')}
-                              </span>
-                            </Link>
-                          </CommandItem>
-                        );
-                      })}
-                    </CommandGroup>
-                  </Conditional>
-
                   {/* Bobbleheads Group */}
                   <Conditional isCondition={_hasBobbleheads}>
                     <CommandGroup heading={'Bobbleheads'}>
                       {searchResultsData?.bobbleheads.map((bobblehead, index) => {
-                        const resultIndex =
-                          (searchResultsData?.collections.length || 0) +
-                          (searchResultsData?.subcollections.length || 0) +
-                          index;
+                        const resultIndex = (searchResultsData?.collections.length || 0) + index;
                         const _isSelected = selectedIndex === resultIndex;
 
                         return (

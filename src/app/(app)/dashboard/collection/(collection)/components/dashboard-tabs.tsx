@@ -6,8 +6,6 @@ import { CollectionsTabContent } from '@/app/(app)/dashboard/collection/(collect
 import { DashboardTabsClient } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-tabs-client';
 import { BobbleheadsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/bobbleheads-tab-skeleton';
 import { CollectionsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/collections-tab-skeleton';
-import { SubcollectionsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/subcollections-tab-skeleton';
-import { SubcollectionsTabContent } from '@/app/(app)/dashboard/collection/(collection)/components/subcollections-tab-content';
 
 export const DashboardTabs = () => {
   return (
@@ -15,12 +13,6 @@ export const DashboardTabs = () => {
       <div data-tab={'collections'}>
         <Suspense fallback={<CollectionsTabSkeleton />}>
           <CollectionsTabContent />
-        </Suspense>
-      </div>
-
-      <div data-tab={'subcollections'}>
-        <Suspense fallback={<SubcollectionsTabSkeleton />}>
-          <SubcollectionsTabContent />
         </Suspense>
       </div>
 

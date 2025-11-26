@@ -50,11 +50,6 @@ const isContentLinkAvailable = (report: SelectContentReportWithSlugs): boolean =
     return false;
   }
 
-  // Subcollections need both targetSlug and parentCollectionSlug
-  if (report.targetType === 'subcollection') {
-    return !!report.targetSlug && !!report.parentCollectionSlug;
-  }
-
   // Bobbleheads and collections need targetSlug
   if (report.targetType === 'bobblehead' || report.targetType === 'collection') {
     return !!report.targetSlug;
@@ -79,14 +74,6 @@ const getContentLink = (report: SelectContentReportWithSlugs): null | string => 
       return $path({
         route: '/collections/[collectionSlug]',
         routeParams: { collectionSlug: report.targetSlug! },
-      });
-    case 'subcollection':
-      return $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug: report.parentCollectionSlug!,
-          subcollectionSlug: report.targetSlug!,
-        },
       });
     default:
       return null;
@@ -130,7 +117,6 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
   const _isReviewed = report?.status === 'reviewed';
   const _isBobblehead = report?.targetType === 'bobblehead';
   const _isCollection = report?.targetType === 'collection';
-  const _isSubcollection = report?.targetType === 'subcollection';
   const _isComment = report?.targetType === 'comment';
   const _hasCommentContent = _isComment && !!report?.commentContent;
   const _isContentLinkable = report ? isContentLinkAvailable(report) : false;
@@ -257,7 +243,6 @@ export const ReportDetailDialog = ({ isOpen, onClose, onStatusChange, report }: 
                       className={cn(
                         _isBobblehead && 'bg-green-100 text-green-800',
                         _isCollection && 'bg-blue-100 text-blue-800',
-                        _isSubcollection && 'bg-purple-100 text-purple-800',
                         _isComment && 'bg-orange-100 text-orange-800',
                       )}
                       variant={'secondary'}

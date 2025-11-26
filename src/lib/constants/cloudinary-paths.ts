@@ -15,14 +15,11 @@ export const CLOUDINARY_PATHS = {
     COLLECTION_COVER_PHOTOS: 'users/{userId}/collections/{collectionId}/cover',
     COLLECTION_ROOT: 'users/{userId}/collections/{collectionId}',
     PROFILE_PHOTOS: 'users/{userId}/profile',
-    SUBCOLLECTION_COVER_PHOTOS:
-      'users/{userId}/collections/{collectionId}/subcollections/{subcollectionId}/cover',
     TEMP_UPLOADS: 'temp/uploads/{userId}',
     USER_ROOT: 'users/{userId}',
   },
   PLACEHOLDERS: {
     COLLECTION_COVER: '/images/placeholders/collection-cover-placeholder.png',
-    SUBCOLLECTION_COVER: '/images/placeholders/subcollection-cover-placeholder.png',
   },
 } as const;
 
@@ -56,13 +53,6 @@ export const CloudinaryPathBuilder = {
    */
   profilePath: (userId: string): string => {
     return `users/${userId}/profile`;
-  },
-
-  /**
-   * build a path for subcollection cover photos
-   */
-  subcollectionCoverPath: (userId: string, collectionId: string, subcollectionId: string): string => {
-    return `users/${userId}/collections/${collectionId}/subcollections/${subcollectionId}/cover`;
   },
 
   /**

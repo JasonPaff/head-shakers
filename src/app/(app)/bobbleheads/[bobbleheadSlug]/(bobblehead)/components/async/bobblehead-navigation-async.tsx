@@ -8,14 +8,12 @@ interface BobbleheadNavigationAsyncProps {
   bobbleheadId: string;
   collectionId: null | string;
   isKeyboardNavigationEnabled?: boolean;
-  subcollectionId?: null | string;
 }
 
 export const BobbleheadNavigationAsync = async ({
   bobbleheadId,
   collectionId,
   isKeyboardNavigationEnabled,
-  subcollectionId,
 }: BobbleheadNavigationAsyncProps) => {
   // Navigation only applies within collection context
   if (!collectionId) {
@@ -27,7 +25,6 @@ export const BobbleheadNavigationAsync = async ({
   const navigationData = await BobbleheadsFacade.getBobbleheadNavigationData(
     bobbleheadId,
     collectionId,
-    subcollectionId,
     currentUserId || undefined,
   );
 

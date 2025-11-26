@@ -90,7 +90,7 @@ export const CollectionActions = ({ collection }: CollectionActionsProps) => {
           onClose={setIsDeleteDialogOpen.off}
           onDeleteAsync={handleDeleteCollectionAsync}
         >
-          This will permanently delete this collection and any subcollections.
+          This will permanently delete this collection.
         </ConfirmDeleteAlertDialog>
       </Conditional>
     </Fragment>

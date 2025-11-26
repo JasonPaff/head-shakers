@@ -4,14 +4,7 @@ import z from 'zod';
 import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/slug';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema';
-import {
-  zodDateString,
-  zodDecimal,
-  zodMaxString,
-  zodMinMaxString,
-  zodNullableUUID,
-  zodYear,
-} from '@/lib/utils/zod.utils';
+import { zodDateString, zodDecimal, zodMaxString, zodMinMaxString, zodYear } from '@/lib/utils/zod.utils';
 import { cloudinaryPhotosValidationSchema } from '@/lib/validations/photo-upload.validation';
 
 export const customFieldsSchema = z.record(z.string(), z.string());
@@ -115,7 +108,6 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
     maxLength: SCHEMA_LIMITS.BOBBLEHEAD.SERIES.MAX,
   }).optional(),
   status: z.enum(ENUMS.BOBBLEHEAD.STATUS).default(DEFAULTS.BOBBLEHEAD.STATUS),
-  subcollectionId: zodNullableUUID('Subcollection ID'),
   weight: zodDecimal({ fieldName: 'Weight' }).optional(),
   year: zodYear({ fieldName: 'Year' }).optional(),
 }).omit({

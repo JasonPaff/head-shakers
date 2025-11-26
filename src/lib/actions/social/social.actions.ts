@@ -32,13 +32,13 @@ import { toggleLikeSchema } from '@/lib/validations/like.validation';
  * Fetch the slug for an entity based on its type and ID.
  * Used for cache path-based revalidation after comment operations.
  *
- * @param targetType - The type of entity ('bobblehead' | 'collection' | 'subcollection')
+ * @param targetType - The type of entity ('bobblehead' | 'collection')
  * @param targetId - The ID of the entity
  * @param dbInstance - Database instance to use for the query
  * @returns The entity slug if found, undefined otherwise
  */
 async function getEntitySlugByTypeAndId(
-  targetType: 'bobblehead' | 'collection' | 'subcollection',
+  targetType: 'bobblehead' | 'collection',
   targetId: string,
   dbInstance: DatabaseExecutor,
 ): Promise<string | undefined> {
@@ -54,9 +54,6 @@ async function getEntitySlugByTypeAndId(
         const collection = await CollectionsQuery.findByIdAsync(targetId, publicContext);
         return collection?.slug;
       }
-      case 'subcollection':
-        // Subcollections use layout-based revalidation, no specific slug needed
-        return undefined;
       default:
         return undefined;
     }
@@ -117,7 +114,7 @@ export const toggleLikeAction = authActionClient
 
       // Perform cache invalidation synchronously and check result
       const revalidationResult = CacheRevalidationService.social.onLikeChange(
-        likeData.targetType === 'subcollection' ? 'collection' : likeData.targetType,
+        likeData.targetType,
         likeData.targetId,
         ctx.userId,
         result.isLiked ? 'like' : 'unlike',
@@ -252,7 +249,7 @@ export const createCommentAction = authActionClient
       });
 
       CacheRevalidationService.social.onCommentChange(
-        commentData.targetType === 'subcollection' ? 'collection' : commentData.targetType,
+        commentData.targetType,
         commentData.targetId,
         ctx.userId,
         'add',
@@ -341,7 +338,7 @@ export const updateCommentAction = authActionClient
 
       if (result.comment) {
         CacheRevalidationService.social.onCommentChange(
-          result.comment.targetType === 'subcollection' ? 'collection' : result.comment.targetType,
+          result.comment.targetType,
           result.comment.targetId,
           ctx.userId,
           'update',
@@ -418,9 +415,7 @@ export const deleteCommentAction = authActionClient
 
       if (commentResult?.comment) {
         CacheRevalidationService.social.onCommentChange(
-          commentResult.comment.targetType === 'subcollection' ?
-            'collection'
-          : commentResult.comment.targetType,
+          commentResult.comment.targetType,
           commentResult.comment.targetId,
           ctx.userId,
           'delete',

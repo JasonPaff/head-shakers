@@ -3,7 +3,6 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { CollectionBobbleheadsSkeleton } from './components/skeletons/collection-bobbleheads-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeletons/collection-header-skeleton';
 import { CollectionStatsSkeleton } from './components/skeletons/collection-stats-skeleton';
-import { SubcollectionsSkeleton } from './components/skeletons/subcollections-skeleton';
 
 export default function CollectionLoading() {
   return (
@@ -27,7 +26,6 @@ export default function CollectionLoading() {
             {/* Sidebar */}
             <aside className={'flex flex-col gap-6 lg:col-span-3'}>
               <CollectionStatsSkeleton />
-              <SubcollectionsSkeleton />
             </aside>
           </div>
         </ContentLayout>

@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client';
 
-import { useStore } from '@tanstack/react-form';
 import { FolderIcon, StarIcon } from 'lucide-react';
-import { useAction } from 'next-safe-action/hooks';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 
@@ -12,11 +10,9 @@ import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-i
 import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
-import { SubcollectionCreateDialog } from '@/components/feature/subcollections/subcollection-create-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
-import { getSubCollectionsByCollectionAction } from '@/lib/actions/collections/subcollections.actions';
 
 export const CollectionAssignment = withForm({
   ...addItemFormOptions,
@@ -25,60 +21,21 @@ export const CollectionAssignment = withForm({
   },
   render: function ({ collections, form }) {
     const [isCreateCollectionDialogOpen, setIsCreateCollectionDialogOpen] = useToggle();
-    const [isCreateSubCollectionDialogOpen, setIsCreateSubCollectionDialogOpen] = useToggle();
-    const [isLoadingSubCollections, setIsLoadingSubCollections] = useToggle();
 
     const [collectionsList, setCollectionsList] = useState<Array<ComboboxItem>>(collections);
-    const [subCollectionsList, setSubCollectionsList] = useState<Array<ComboboxItem>>([]);
 
     const collectionRef = useRef<HTMLElement | null>(null);
-    const subcollectionRef = useRef<HTMLElement | null>(null);
-
-    const collectionId = useStore(form.store, (state) => state.values.collectionId);
-
-    const { executeAsync: getSubCollections } = useAction(getSubCollectionsByCollectionAction);
 
     const { shouldShowMessage } = useMotivationalMessage(form, {
       requiredFields: ['collectionId'],
     });
 
-    // load the subcollections when the collectionId changes
-    useEffect(() => {
-      const loadSubCollections = async () => {
-        if (!collectionId) {
-          setSubCollectionsList([]);
-          return;
-        }
-
-        setIsLoadingSubCollections.on();
-        try {
-          const result = await getSubCollections({ collectionId });
-          if (result?.data) {
-            setSubCollectionsList(result.data.data);
-          }
-        } catch (error) {
-          console.error('Failed to load sub-collections:', error);
-          setSubCollectionsList([]);
-        } finally {
-          setIsLoadingSubCollections.off();
-        }
-      };
-
-      void loadSubCollections();
-    }, [collectionId, getSubCollections, setIsLoadingSubCollections]);
-
     const handleCollectionCreated = (newCollection: ComboboxItem) => {
       setCollectionsList((prev) => [...prev, newCollection]);
       form.setFieldValue('collectionId', newCollection.id);
-      form.setFieldValue('subcollectionId', '');
       if (!form.getFieldMeta('collectionId')?.isValid) {
         void form.validateField('collectionId', 'change');
       }
-    };
-
-    const handleSubCollectionCreated = (newCollection: ComboboxItem) => {
-      setSubCollectionsList((prev) => [...prev, newCollection]);
-      form.setFieldValue('subcollectionId', newCollection.id);
     };
 
     return (
@@ -105,56 +62,23 @@ export const CollectionAssignment = withForm({
         </CardHeader>
 
         <CardContent className={'space-y-6'}>
-          <div className={'grid grid-cols-1 gap-6 md:grid-cols-2'}>
-            {/* Collection */}
-            <div className={'space-y-2'}>
-              <form.AppField
-                listeners={{
-                  onChange: () => {
-                    form.setFieldValue('subcollectionId', '');
-                  },
-                }}
-                name={'collectionId'}
-              >
-                {(field) => (
-                  <field.ComboboxField
-                    createNewLabel={'Create new collection'}
-                    description={'Choose an existing collection or create a new one'}
-                    focusRef={collectionRef}
-                    isRequired
-                    items={collectionsList}
-                    label={'Collection'}
-                    onCreateNewSelect={setIsCreateCollectionDialogOpen.on}
-                    placeholder={'Select a collection...'}
-                    searchPlaceholder={'Search collections...'}
-                  />
-                )}
-              </form.AppField>
-            </div>
-
-            {/* Sub-Collection */}
-            <div className={'space-y-2'}>
-              <form.AppField name={'subcollectionId'}>
-                {(field) => (
-                  <field.ComboboxField
-                    createNewLabel={'Create new sub-collection'}
-                    description={'Optional: Further organize within your collection'}
-                    focusRef={subcollectionRef}
-                    isDisabled={!collectionId || isLoadingSubCollections}
-                    items={subCollectionsList}
-                    label={'Sub-Collection'}
-                    onCreateNewSelect={setIsCreateSubCollectionDialogOpen.on}
-                    placeholder={
-                      isLoadingSubCollections ? 'Loading sub-collections...'
-                      : !collectionId ?
-                        'Select a collection first...'
-                      : 'Select a sub-collection...'
-                    }
-                    searchPlaceholder={'Search sub-collections...'}
-                  />
-                )}
-              </form.AppField>
-            </div>
+          {/* Collection */}
+          <div className={'space-y-2'}>
+            <form.AppField name={'collectionId'}>
+              {(field) => (
+                <field.ComboboxField
+                  createNewLabel={'Create new collection'}
+                  description={'Choose an existing collection or create a new one'}
+                  focusRef={collectionRef}
+                  isRequired
+                  items={collectionsList}
+                  label={'Collection'}
+                  onCreateNewSelect={setIsCreateCollectionDialogOpen.on}
+                  placeholder={'Select a collection...'}
+                  searchPlaceholder={'Search collections...'}
+                />
+              )}
+            </form.AppField>
           </div>
 
           {/* Progress indicator */}
@@ -173,13 +97,6 @@ export const CollectionAssignment = withForm({
           isOpen={isCreateCollectionDialogOpen}
           onClose={setIsCreateCollectionDialogOpen.off}
           onCollectionCreated={handleCollectionCreated}
-        />
-
-        <SubcollectionCreateDialog
-          collectionId={collectionId}
-          isOpen={isCreateSubCollectionDialogOpen}
-          onClose={setIsCreateSubCollectionDialogOpen.off}
-          onSubCollectionCreated={handleSubCollectionCreated}
         />
       </Card>
     );

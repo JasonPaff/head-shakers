@@ -34,9 +34,7 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
       dateTo: parseAsIsoDateTime,
       reason: parseAsArrayOf(parseAsStringEnum([...ENUMS.CONTENT_REPORT.REASON])),
       status: parseAsArrayOf(parseAsStringEnum([...ENUMS.CONTENT_REPORT.STATUS])),
-      targetType: parseAsArrayOf(
-        parseAsStringEnum(['bobblehead', 'collection', 'subcollection', 'comment'] as const),
-      ),
+      targetType: parseAsArrayOf(parseAsStringEnum(['bobblehead', 'collection', 'comment'] as const)),
     },
     {
       clearOnDefault: true,
@@ -74,9 +72,9 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
   const handleTargetTypeChange = async (value: string) => {
     const currentTypes = filters.targetType || [];
     const newTypes =
-      currentTypes.includes(value as 'bobblehead' | 'collection' | 'comment' | 'subcollection') ?
+      currentTypes.includes(value as 'bobblehead' | 'collection' | 'comment') ?
         currentTypes.filter((t) => t !== value)
-      : [...currentTypes, value as 'bobblehead' | 'collection' | 'comment' | 'subcollection'];
+      : [...currentTypes, value as 'bobblehead' | 'collection' | 'comment'];
 
     const newFilters = { ...filters, targetType: newTypes.length > 0 ? newTypes : null };
     await setFilters({ targetType: newFilters.targetType });
@@ -215,7 +213,6 @@ export const ReportFilters = ({ className, onFiltersChange, ...props }: ReportFi
               <SelectContent>
                 <SelectItem value={'bobblehead'}>Bobblehead</SelectItem>
                 <SelectItem value={'collection'}>Collection</SelectItem>
-                <SelectItem value={'subcollection'}>Subcollection</SelectItem>
                 <SelectItem value={'comment'}>Comment</SelectItem>
               </SelectContent>
             </Select>

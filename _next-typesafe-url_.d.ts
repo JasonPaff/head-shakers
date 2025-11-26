@@ -15,7 +15,6 @@ declare module "@@@next-typesafe-url" {
     "/browse/categories/[category]": InferRoute<import("./src/app/(app)/browse/categories/[category]/route-type").RouteType>;
     "/browse/search": InferRoute<import("./src/app/(app)/browse/search/route-type").RouteType>;
     "/collections/[collectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/(collection)/route-type").RouteType>;
-    "/collections/[collectionSlug]/subcollection/[subcollectionSlug]": InferRoute<import("./src/app/(app)/collections/[collectionSlug]/subcollection/[subcollectionSlug]/route-type").RouteType>;
     "/dashboard/collection": InferRoute<import("./src/app/(app)/dashboard/collection/(collection)/route-type").RouteType>;
     "/users/[userId]": InferRoute<import("./src/app/(app)/users/[userId]/route-type").RouteType>;
   }
@@ -51,7 +50,6 @@ declare module "@@@next-typesafe-url" {
     "/coming-soon": StaticRoute;
     "/privacy": StaticRoute;
     "/terms": StaticRoute;
-    "/examples/ably": StaticRoute;
-    "/examples/sentry": StaticRoute;
+    "/home-page-demo": StaticRoute;
   }
 }

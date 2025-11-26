@@ -18,7 +18,7 @@ export interface AnalyticsFacadeInterface {
     options?: { batchId?: string; deduplicationWindow?: number; shouldRespectPrivacySettings?: boolean },
   ) => Promise<BatchViewRecordResult>;
   getTrendingContent: (
-    targetType: 'bobblehead' | 'collection' | 'profile' | 'subcollection',
+    targetType: 'bobblehead' | 'collection',
     options?: {
       isIncludingAnonymous?: boolean;
       limit?: number;
@@ -186,7 +186,7 @@ export const AnalyticsFacade = {
   async getDashboardData(
     options: {
       isIncludingAnonymous?: boolean;
-      targetType?: 'bobblehead' | 'collection' | 'profile' | 'subcollection';
+      targetType?: 'bobblehead' | 'collection' | 'profile';
       timeframe?: 'day' | 'month' | 'week';
     } = {},
     dbInstance?: DatabaseExecutor,
@@ -215,7 +215,7 @@ export const AnalyticsFacade = {
    * Get trending content
    */
   async getTrendingContent(
-    targetType: 'bobblehead' | 'collection' | 'profile' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'profile',
     options: {
       isIncludingAnonymous?: boolean;
       limit?: number;
@@ -254,7 +254,7 @@ export const AnalyticsFacade = {
     const { shouldIncludeAnonymous = true, timeframe = 'week' } = options;
 
     const stats = await ViewTrackingFacade.getViewStatsAsync(
-      targetType as 'bobblehead' | 'collection' | 'profile' | 'subcollection',
+      targetType as 'bobblehead' | 'collection',
       targetId,
       {
         shouldIncludeAnonymous,
@@ -280,7 +280,7 @@ export const AnalyticsFacade = {
       groupBy?: 'day' | 'hour' | 'month' | 'week';
       isIncludingAnonymous?: boolean;
       startDate?: Date;
-      targetType?: 'bobblehead' | 'collection' | 'profile' | 'subcollection';
+      targetType?: 'bobblehead' | 'collection' | 'profile';
     } = {},
     dbInstance?: DatabaseExecutor,
   ): Promise<

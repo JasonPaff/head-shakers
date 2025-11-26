@@ -85,9 +85,7 @@ export const BobbleheadMetrics = ({ bobblehead, bobbleheadId }: BobbleheadMetric
           <div className={'flex items-center justify-between'}>
             <div>
               <p className={'text-sm text-muted-foreground'}>Collection</p>
-              <p className={'truncate text-sm font-medium'}>
-                {bobblehead.subcollectionName || bobblehead.collectionName}
-              </p>
+              <p className={'truncate text-sm font-medium'}>{bobblehead.collectionName}</p>
             </div>
             <PackageIcon aria-hidden className={'size-8 text-muted-foreground'} />
           </div>

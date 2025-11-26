@@ -30,27 +30,16 @@ import { createBobbleheadWithPhotosSchema } from '@/lib/validations/bobbleheads.
 interface AddItemFormClientProps {
   collections: Array<ComboboxItem>;
   initialCollectionId?: string;
-  initialSubcollectionId?: string;
 }
 
 export const AddItemFormClient = withFocusManagement(
-  ({ collections, initialCollectionId, initialSubcollectionId }: AddItemFormClientProps) => {
+  ({ collections, initialCollectionId }: AddItemFormClientProps) => {
     const router = useRouter();
     const { focusFirstError } = useFocusContext();
 
     const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
       onSuccess: ({ data }) => {
-        if (data?.data?.subcollectionSlug && data?.data?.collectionSlug) {
-          router.push(
-            $path({
-              route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-              routeParams: {
-                collectionSlug: data.data.collectionSlug,
-                subcollectionSlug: data.data.subcollectionSlug,
-              },
-            }),
-          );
-        } else if (data?.data?.collectionSlug) {
+        if (data?.data?.collectionSlug) {
           router.push(
             $path({
               route: '/collections/[collectionSlug]',
@@ -72,7 +61,6 @@ export const AddItemFormClient = withFocusManagement(
       defaultValues: {
         ...addItemFormOptions.defaultValues,
         collectionId: initialCollectionId || '',
-        subcollectionId: initialSubcollectionId || '',
       } as z.input<typeof createBobbleheadWithPhotosSchema>,
       onSubmit: async ({ value }) => {
         await executeAsync(value);

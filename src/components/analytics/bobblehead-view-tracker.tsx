@@ -14,8 +14,6 @@ type BobbleheadViewTrackerProps = Children<{
   collectionSlug?: string;
   onViewRecorded?: (viewData: { isDuplicate: boolean; totalViews: number; viewId: string }) => void;
   sessionId?: string;
-  subcollectionId?: string;
-  subcollectionSlug?: string;
   viewThreshold?: number;
   viewTimeThreshold?: number;
 }> &
@@ -30,8 +28,6 @@ export const BobbleheadViewTracker = ({
   collectionSlug,
   onViewRecorded,
   sessionId,
-  subcollectionId,
-  subcollectionSlug,
   testId,
   viewThreshold = 0.1,
   viewTimeThreshold = 3000,
@@ -45,8 +41,6 @@ export const BobbleheadViewTracker = ({
     ...(bobbleheadSlug && { bobbleheadSlug }),
     ...(collectionId && { collectionId }),
     ...(collectionSlug && { collectionSlug }),
-    ...(subcollectionId && { subcollectionId }),
-    ...(subcollectionSlug && { subcollectionSlug }),
   };
 
   return (

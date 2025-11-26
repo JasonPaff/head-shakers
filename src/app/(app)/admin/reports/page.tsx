@@ -72,8 +72,8 @@ async function AdminReportsPage({ searchParams }: AdminReportsPageProps) {
     if (targetTypeArray.length > 0) {
       filterOptions.targetType =
         targetTypeArray.length === 1 ?
-          (targetTypeArray[0] as 'bobblehead' | 'collection' | 'subcollection')
-        : (targetTypeArray as Array<'bobblehead' | 'collection' | 'subcollection'>);
+          (targetTypeArray[0] as 'bobblehead' | 'collection' | 'comment')
+        : (targetTypeArray as Array<'bobblehead' | 'collection' | 'comment'>);
     }
   }
 

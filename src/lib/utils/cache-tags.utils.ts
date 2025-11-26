@@ -13,7 +13,7 @@ export type CacheAggregateType = 'global-stats' | 'trending' | 'user-stats';
 /**
  * valid entity types for cache operations
  */
-export type CacheEntityType = 'bobblehead' | 'collection' | 'comment' | 'subcollection' | 'tag' | 'user';
+export type CacheEntityType = 'bobblehead' | 'collection' | 'comment' | 'tag' | 'user';
 
 /**
  * valid feature types for cache operations
@@ -93,9 +93,6 @@ export class CacheTagBuilder {
         break;
       case 'comment':
         this.tags.add(this.validateTag(`comment:${id}`));
-        break;
-      case 'subcollection':
-        this.tags.add(this.validateTag(`subcollection:${id}`));
         break;
       case 'tag':
         this.tags.add(this.validateTag(CACHE_CONFIG.TAGS.TAG(id)));
@@ -372,9 +369,9 @@ export const CacheTagGenerators = {
     },
 
     comments: (entityType: CacheEntityType, entityId: string) => {
-      if (entityType !== 'bobblehead' && entityType !== 'collection' && entityType !== 'subcollection') {
+      if (entityType !== 'bobblehead' && entityType !== 'collection') {
         throw new Error(
-          `Social comments only supports 'bobblehead', 'collection', or 'subcollection' entities, got: ${entityType}`,
+          `Social comments only supports 'bobblehead' or 'collection' entities, got: ${entityType}`,
         );
       }
       return new CacheTagBuilder()
@@ -399,14 +396,9 @@ export const CacheTagGenerators = {
         .build(),
 
     like: (entityType: CacheEntityType, entityId: string, userId: string) => {
-      if (
-        entityType !== 'bobblehead' &&
-        entityType !== 'collection' &&
-        entityType !== 'subcollection' &&
-        entityType !== 'comment'
-      ) {
+      if (entityType !== 'bobblehead' && entityType !== 'collection' && entityType !== 'comment') {
         throw new Error(
-          `Social like only supports 'bobblehead', 'collection', 'subcollection', or 'comment' entities, got: ${entityType}`,
+          `Social like only supports 'bobblehead', 'collection', or 'comment' entities, got: ${entityType}`,
         );
       }
       return new CacheTagBuilder()
@@ -516,14 +508,9 @@ export const CacheTagInvalidation = {
    * get tags to invalidate when social interactions occur
    */
   onSocialInteraction: (entityType: CacheEntityType, entityId: string, userId: string) => {
-    if (
-      entityType !== 'bobblehead' &&
-      entityType !== 'collection' &&
-      entityType !== 'subcollection' &&
-      entityType !== 'comment'
-    ) {
+    if (entityType !== 'bobblehead' && entityType !== 'collection' && entityType !== 'comment') {
       throw new Error(
-        `Social interaction invalidation only supports 'bobblehead', 'collection', 'subcollection', or 'comment' entities, got: ${entityType}`,
+        `Social interaction invalidation only supports 'bobblehead', 'collection', or 'comment' entities, got: ${entityType}`,
       );
     }
     return CacheTagGenerators.social.like(entityType, entityId, userId);

@@ -17,7 +17,6 @@ import { cn } from '@/utils/tailwind-utils';
 type BobbleheadDeleteProps = Children<{
   bobbleheadId: string;
   collectionSlug: string;
-  subcollectionSlug?: null | string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
@@ -25,7 +24,6 @@ export const BobbleheadDelete = ({
   bobbleheadId,
   children,
   collectionSlug,
-  subcollectionSlug,
   ...props
 }: BobbleheadDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
@@ -42,27 +40,15 @@ export const BobbleheadDelete = ({
 
   const handleDeleteAsync = async () => {
     await executeAsync({ bobbleheadId }).then(() => {
-      // redirect to parent collection or subcollection
-      if (subcollectionSlug)
-        router.push(
-          $path({
-            route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-            routeParams: {
-              collectionSlug,
-              subcollectionSlug,
-            },
-          }),
-        );
-      else {
-        router.push(
-          $path({
-            route: '/collections/[collectionSlug]',
-            routeParams: {
-              collectionSlug,
-            },
-          }),
-        );
-      }
+      // redirect to parent collection
+      router.push(
+        $path({
+          route: '/collections/[collectionSlug]',
+          routeParams: {
+            collectionSlug,
+          },
+        }),
+      );
     });
   };
 

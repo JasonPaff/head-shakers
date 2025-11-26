@@ -13,7 +13,6 @@ import { useMemo, useState } from 'react';
 import type {
   BobbleheadSearchResult,
   CollectionSearchResult,
-  SubcollectionSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -25,11 +24,11 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
-type SearchResultEntityType = 'bobblehead' | 'collection' | 'subcollection';
+type SearchResultEntityType = 'bobblehead' | 'collection';
 
 type SearchResultListItem = {
   entityType: SearchResultEntityType;
-  result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;
+  result: BobbleheadSearchResult | CollectionSearchResult;
 };
 
 type SearchResultsListProps = ComponentProps<'div'> &
@@ -155,16 +154,9 @@ export const SearchResultsList = ({
         cell: ({ row }) => {
           const entityType = row.original.entityType;
           const _isCollection = entityType === 'collection';
-          const _isSubcollection = entityType === 'subcollection';
 
-          const badgeVariant =
-            _isCollection ? 'default'
-            : _isSubcollection ? 'secondary'
-            : 'outline';
-          const label =
-            _isCollection ? 'Collection'
-            : _isSubcollection ? 'Subcollection'
-            : 'Bobblehead';
+          const badgeVariant = _isCollection ? 'default' : 'outline';
+          const label = _isCollection ? 'Collection' : 'Bobblehead';
 
           return (
             <Badge data-slot={'search-results-list-type-badge'} variant={badgeVariant}>
@@ -331,21 +323,10 @@ export const SearchResultsList = ({
  */
 const getEntityUrl = (
   entityType: SearchResultEntityType,
-  result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult,
+  result: BobbleheadSearchResult | CollectionSearchResult,
 ): string => {
   if (entityType === 'collection') {
     return $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: result.slug } });
-  }
-
-  if (entityType === 'subcollection') {
-    const subcollectionResult = result as SubcollectionSearchResult;
-    return $path({
-      route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-      routeParams: {
-        collectionSlug: subcollectionResult.collectionSlug,
-        subcollectionSlug: result.slug,
-      },
-    });
   }
 
   return $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: result.slug } });

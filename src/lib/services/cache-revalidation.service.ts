@@ -486,12 +486,6 @@ export class CacheRevalidationService {
             case 'collection':
               revalidatePath(`/collections/${entitySlug}`, 'page');
               break;
-            case 'subcollection':
-              // For subcollections, we need to revalidate the subcollection page
-              // The path pattern is /collections/[collectionSlug]/subcollection/[subcollectionSlug]
-              // Since we don't have collectionSlug here, we'll use a layout revalidation
-              revalidatePath(`/collections`, 'layout');
-              break;
           }
         } catch (error) {
           console.error('[CacheRevalidation] Path revalidation error:', error);
