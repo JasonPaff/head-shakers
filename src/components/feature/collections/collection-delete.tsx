@@ -16,10 +16,11 @@ import { cn } from '@/utils/tailwind-utils';
 
 type CollectionDeleteProps = Children<{
   collectionId: string;
+  collectionName: string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
-export const CollectionDelete = ({ children, collectionId, ...props }: CollectionDeleteProps) => {
+export const CollectionDelete = ({ children, collectionId, collectionName, ...props }: CollectionDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const router = useRouter();
@@ -56,6 +57,7 @@ export const CollectionDelete = ({ children, collectionId, ...props }: Collectio
       </Button>
 
       <ConfirmDeleteAlertDialog
+        confirmationText={collectionName}
         isOpen={isConfirmDeleteDialogOpen}
         onClose={setIsConfirmDeleteDialogOpen.off}
         onDeleteAsync={handleDeleteAsync}

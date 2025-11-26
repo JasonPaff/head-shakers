@@ -89,6 +89,7 @@ export const SubcollectionActions = ({ subcollection }: SubcollectionActionsProp
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
           subcollectionId={subcollection.id}
+          subcollectionName={subcollection.name}
         />
       </Conditional>
     </div>
