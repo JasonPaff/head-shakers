@@ -85,6 +85,7 @@ export const CollectionActions = ({ collection }: CollectionActionsProps) => {
       {/* Confirm Delete Dialog */}
       <Conditional isCondition={isDeleteDialogOpen}>
         <ConfirmDeleteAlertDialog
+          confirmationText={collection.name}
           isOpen={isDeleteDialogOpen}
           onClose={setIsDeleteDialogOpen.off}
           onDeleteAsync={handleDeleteCollectionAsync}

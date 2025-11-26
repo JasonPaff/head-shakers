@@ -61,7 +61,9 @@ export const CollectionHeader = async ({ collection, likeData }: CollectionHeade
               <CollectionEditSection collection={collection} isOwner={isOwner} />
 
               {/* Delete Collection Button */}
-              <CollectionDelete collectionId={collection.id}>Delete</CollectionDelete>
+              <CollectionDelete collectionId={collection.id} collectionName={collection.name}>
+                Delete
+              </CollectionDelete>
             </Fragment>
           </Conditional>
 

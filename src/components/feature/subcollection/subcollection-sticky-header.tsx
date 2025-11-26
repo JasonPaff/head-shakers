@@ -120,7 +120,12 @@ export const SubcollectionStickyHeader = ({
 
                   {/* Delete Button */}
                   <Conditional isCondition={canDelete}>
-                    <SubcollectionDelete size={'icon'} subcollectionId={subcollectionId} variant={'ghost'} />
+                    <SubcollectionDelete
+                      size={'icon'}
+                      subcollectionId={subcollectionId}
+                      subcollectionName={title}
+                      variant={'ghost'}
+                    />
                   </Conditional>
                 </Fragment>
               </Conditional>

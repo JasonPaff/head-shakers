@@ -8,12 +8,14 @@ interface SubcollectionDeleteDialogProps {
   isOpen: boolean;
   onClose: () => void;
   subcollectionId: string;
+  subcollectionName: string;
 }
 
 export const SubcollectionDeleteDialog = ({
   isOpen,
   onClose,
   subcollectionId,
+  subcollectionName,
 }: SubcollectionDeleteDialogProps) => {
   const { executeAsync } = useServerAction(deleteSubCollectionAction, {
     toastMessages: {
@@ -29,7 +31,12 @@ export const SubcollectionDeleteDialog = ({
   };
 
   return (
-    <ConfirmDeleteAlertDialog isOpen={isOpen} onClose={onClose} onDeleteAsync={handleDeleteAsync}>
+    <ConfirmDeleteAlertDialog
+      confirmationText={subcollectionName}
+      isOpen={isOpen}
+      onClose={onClose}
+      onDeleteAsync={handleDeleteAsync}
+    >
       This will permanently delete this subcollection and any bobbleheads assigned to it.
     </ConfirmDeleteAlertDialog>
   );

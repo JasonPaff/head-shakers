@@ -66,7 +66,9 @@ export const SubcollectionHeader = async ({ likeData, subcollection }: Subcollec
               <SubcollectionEditSection isOwner={isOwner} subcollection={subcollection} />
 
               {/* Delete Button */}
-              <SubcollectionDelete subcollectionId={subcollection.id}>Delete</SubcollectionDelete>
+              <SubcollectionDelete subcollectionId={subcollection.id} subcollectionName={subcollection.name}>
+                Delete
+              </SubcollectionDelete>
             </Fragment>
           </Conditional>
 

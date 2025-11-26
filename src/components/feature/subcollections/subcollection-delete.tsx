@@ -14,10 +14,16 @@ import { cn } from '@/utils/tailwind-utils';
 
 type SubcollectionDeleteProps = Children<{
   subcollectionId: string;
+  subcollectionName: string;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
-export const SubcollectionDelete = ({ children, subcollectionId, ...props }: SubcollectionDeleteProps) => {
+export const SubcollectionDelete = ({
+  children,
+  subcollectionId,
+  subcollectionName,
+  ...props
+}: SubcollectionDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const { executeAsync, isExecuting } = useServerAction(deleteSubCollectionAction, {
@@ -52,6 +58,7 @@ export const SubcollectionDelete = ({ children, subcollectionId, ...props }: Sub
 
       {/* Confirm Delete Dialog */}
       <ConfirmDeleteAlertDialog
+        confirmationText={subcollectionName}
         isOpen={isConfirmDeleteDialogOpen}
         onClose={setIsConfirmDeleteDialogOpen.off}
         onDeleteAsync={handleDeleteAsync}

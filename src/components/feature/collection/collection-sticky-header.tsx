@@ -91,7 +91,12 @@ export const CollectionStickyHeader = ({
 
                   {/* Delete Button */}
                   <Conditional isCondition={canDelete}>
-                    <CollectionDelete collectionId={collectionId} size={'icon'} variant={'ghost'} />
+                    <CollectionDelete
+                      collectionId={collectionId}
+                      collectionName={title}
+                      size={'icon'}
+                      variant={'ghost'}
+                    />
                   </Conditional>
                 </Fragment>
               </Conditional>
