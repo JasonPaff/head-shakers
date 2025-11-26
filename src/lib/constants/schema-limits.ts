@@ -36,6 +36,12 @@ export const SCHEMA_LIMITS = {
   COMMENT: {
     CONTENT: { MAX: 5000, MIN: 1 },
     /**
+     * Time window (in minutes) during which a comment can be edited after creation
+     * After this period, comments become immutable to preserve discussion integrity
+     * Admins can bypass this restriction
+     */
+    EDIT_WINDOW_MINUTES: 5,
+    /**
      * Maximum depth for nested comment replies
      * Rationale: Balances functionality with UI usability
      * - Allows meaningful threaded discussions (2-3 levels typical)

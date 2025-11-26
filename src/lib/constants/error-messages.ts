@@ -44,6 +44,7 @@ export const ERROR_MESSAGES = {
   },
   COMMENTS: {
     COMMENT_DELETE_FAILED: 'Failed to delete comment',
+    COMMENT_EDIT_WINDOW_EXPIRED: 'Comments can only be edited within 5 minutes of posting',
     COMMENT_FAILED: 'Failed to process comment',
     COMMENT_NOT_FOUND: 'Comment not found',
     COMMENT_UPDATE_FAILED: 'Failed to update comment',

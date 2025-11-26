@@ -9,6 +9,7 @@ import type { CommentTargetType } from '@/lib/constants';
 import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
 
 import { CommentSection } from '@/components/feature/comments/comment-section';
+import { useAdminRole } from '@/hooks/use-admin-role';
 import {
   createCommentAction,
   deleteCommentAction,
@@ -77,6 +78,7 @@ export const CommentSectionClient = ({
   ...props
 }: CommentSectionClientProps) => {
   const router = useRouter();
+  const { isAdmin } = useAdminRole();
 
   // State for pagination
   const [loadedComments, setLoadedComments] = useState(initialComments);
@@ -186,6 +188,7 @@ export const CommentSectionClient = ({
       currentUserId={currentUserId}
       hasMore={hasMoreComments}
       initialCommentCount={initialCommentCount}
+      isAdmin={isAdmin}
       isAuthenticated={isAuthenticated}
       isLoading={isLoadingMore}
       onCommentCreate={handleCommentCreate}

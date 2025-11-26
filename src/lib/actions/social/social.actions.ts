@@ -314,10 +314,16 @@ export const updateCommentAction = authActionClient
       );
 
       if (!result.isSuccessful) {
+        const isEditWindowExpired = result.error === 'Edit window expired';
+
         throw new ActionError(
           ErrorType.BUSINESS_RULE,
-          ERROR_CODES.COMMENTS.COMMENT_UPDATE_FAILED,
-          ERROR_MESSAGES.COMMENTS.COMMENT_UPDATE_FAILED,
+          isEditWindowExpired ?
+            ERROR_CODES.COMMENTS.COMMENT_EDIT_WINDOW_EXPIRED
+          : ERROR_CODES.COMMENTS.COMMENT_UPDATE_FAILED,
+          isEditWindowExpired ?
+            ERROR_MESSAGES.COMMENTS.COMMENT_EDIT_WINDOW_EXPIRED
+          : ERROR_MESSAGES.COMMENTS.COMMENT_UPDATE_FAILED,
           { ctx, operation: OPERATIONS.COMMENTS.UPDATE_COMMENT },
           true, // recoverable
           400,

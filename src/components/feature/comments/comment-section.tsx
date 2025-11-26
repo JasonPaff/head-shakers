@@ -25,11 +25,30 @@ const countAllReplies = (comment: CommentWithDepth): number => {
   }, 0);
 };
 
+// Helper function to find comment by ID in nested tree
+const findCommentById = (commentList: Array<CommentWithDepth>, id: string): CommentWithDepth | null => {
+  for (const comment of commentList) {
+    if (comment.id === id) return comment;
+    if (comment.replies && comment.replies.length > 0) {
+      const found = findCommentById(comment.replies, id);
+      if (found) return found;
+    }
+  }
+  return null;
+};
+
+// Helper to count all descendants recursively
+const countTotalReplies = (comment: CommentWithDepth): number => {
+  if (!comment.replies || comment.replies.length === 0) return 0;
+  return comment.replies.reduce((sum, reply) => sum + 1 + countTotalReplies(reply), 0);
+};
+
 interface CommentSectionProps extends ComponentProps<'div'> {
   comments: Array<CommentWithDepth>;
   currentUserId?: string;
   hasMore?: boolean;
   initialCommentCount?: number;
+  isAdmin?: boolean;
   isAuthenticated?: boolean;
   isEditable?: boolean;
   isLoading?: boolean;
@@ -49,6 +68,7 @@ export const CommentSection = ({
   currentUserId,
   hasMore = false,
   initialCommentCount = 0,
+  isAdmin = false,
   isAuthenticated = false,
   isEditable = true,
   isLoading = false,
@@ -75,24 +95,6 @@ export const CommentSection = ({
   const _isAtMaxDepth = _isReplyMode && replyParentComment.depth + 1 >= MAX_COMMENT_NESTING_DEPTH;
   const _parentCommentAuthor = replyParentComment?.user?.username ?? undefined;
   const _parentCommentContent = replyParentComment?.content ?? undefined;
-
-  // Helper function to find comment by ID in nested tree
-  const findCommentById = (commentList: Array<CommentWithDepth>, id: string): CommentWithDepth | null => {
-    for (const comment of commentList) {
-      if (comment.id === id) return comment;
-      if (comment.replies && comment.replies.length > 0) {
-        const found = findCommentById(comment.replies, id);
-        if (found) return found;
-      }
-    }
-    return null;
-  };
-
-  // Helper to count all descendants recursively
-  const countTotalReplies = (comment: CommentWithDepth): number => {
-    if (!comment.replies || comment.replies.length === 0) return 0;
-    return comment.replies.reduce((sum, reply) => sum + 1 + countTotalReplies(reply), 0);
-  };
 
   // Derived values for delete dialog
   const _selectedDeleteComment = selectedCommentId ? findCommentById(comments, selectedCommentId) : null;
@@ -215,6 +217,7 @@ export const CommentSection = ({
         comments={comments}
         currentUserId={currentUserId}
         hasMore={hasMore}
+        isAdmin={isAdmin}
         isEditable={isEditable}
         isLoading={isLoading}
         onDeleteClick={handleDeleteClick}

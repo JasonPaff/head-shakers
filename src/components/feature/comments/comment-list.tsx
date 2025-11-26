@@ -45,6 +45,7 @@ interface CommentListProps extends ComponentProps<'div'> {
   comments: Array<CommentWithDepth | CommentWithUser>;
   currentUserId?: string;
   hasMore?: boolean;
+  isAdmin?: boolean;
   isEditable?: boolean;
   isLoading?: boolean;
   onDeleteClick?: (commentId: string) => void;
@@ -59,6 +60,7 @@ interface CommentListProps extends ComponentProps<'div'> {
 interface CommentThreadProps {
   comment: CommentWithDepth;
   currentUserId?: string;
+  isAdmin?: boolean;
   isEditable?: boolean;
   onDeleteClick?: (commentId: string) => void;
   onEditClick?: (comment: CommentWithDepth) => void;
@@ -70,7 +72,15 @@ interface CommentThreadProps {
  * Memoized for performance optimization with deeply nested comment trees
  */
 const CommentThread = memo(
-  ({ comment, currentUserId, isEditable, onDeleteClick, onEditClick, onReply }: CommentThreadProps) => {
+  ({
+    comment,
+    currentUserId,
+    isAdmin,
+    isEditable,
+    onDeleteClick,
+    onEditClick,
+    onReply,
+  }: CommentThreadProps) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     // Derived conditional rendering variables
@@ -96,6 +106,7 @@ const CommentThread = memo(
           comment={comment}
           currentUserId={currentUserId}
           depth={comment.depth}
+          isAdmin={isAdmin}
           isEditable={isEditable}
           onDeleteClick={onDeleteClick}
           onEditClick={onEditClick}
@@ -114,6 +125,7 @@ const CommentThread = memo(
               <CommentThread
                 comment={reply}
                 currentUserId={currentUserId}
+                isAdmin={isAdmin}
                 isEditable={isEditable}
                 key={reply.id}
                 onDeleteClick={onDeleteClick}
@@ -169,6 +181,7 @@ export const CommentList = ({
   comments,
   currentUserId,
   hasMore = false,
+  isAdmin = false,
   isEditable = true,
   isLoading = false,
   onDeleteClick,
@@ -201,6 +214,7 @@ export const CommentList = ({
             <CommentThread
               comment={comment}
               currentUserId={currentUserId}
+              isAdmin={isAdmin}
               isEditable={isEditable}
               key={comment.id}
               onDeleteClick={onDeleteClick}

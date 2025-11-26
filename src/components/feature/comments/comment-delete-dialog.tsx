@@ -3,7 +3,6 @@
 import type { ComponentProps } from 'react';
 
 import { LoaderIcon, TriangleAlertIcon } from 'lucide-react';
-import { useState } from 'react';
 
 import {
   AlertDialog,
@@ -16,6 +15,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Conditional } from '@/components/ui/conditional';
+import { useToggle } from '@/hooks/use-toggle';
 import { cn } from '@/utils/tailwind-utils';
 
 interface CommentDeleteDialogProps extends ComponentProps<typeof AlertDialog> {
@@ -43,7 +43,7 @@ export const CommentDeleteDialog = ({
   replyCount = 0,
   ...props
 }: CommentDeleteDialogProps) => {
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [isProcessing, setIsProcessing] = useToggle();
 
   const _isDialogOpen = isOpen && commentId !== null;
   const _isLoading = isSubmitting || isProcessing;
@@ -53,14 +53,14 @@ export const CommentDeleteDialog = ({
   const handleConfirm = async () => {
     if (!commentId) return;
 
-    setIsProcessing(true);
+    setIsProcessing.on();
     try {
       await onConfirm(commentId);
       onClose();
     } catch (error) {
       console.error('Failed to delete comment:', error);
     } finally {
-      setIsProcessing(false);
+      setIsProcessing.off();
     }
   };
 

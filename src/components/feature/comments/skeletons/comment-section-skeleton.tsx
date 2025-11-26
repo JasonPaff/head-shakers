@@ -68,6 +68,22 @@ export const CommentSectionSkeleton = ({
   );
 };
 
+// Background classes matching CommentItem depth styling
+const _depthBackgrounds = [
+  'bg-card', // depth 0
+  'bg-muted/20', // depth 1
+  'bg-muted/30', // depth 2
+  'bg-muted/40', // depth 3+
+] as const;
+
+// Border classes for nested comments
+const _depthBorders = [
+  '', // depth 0
+  'border-l-4 border-l-primary/60', // depth 1
+  'border-l-4 border-l-primary/45', // depth 2
+  'border-l-4 border-l-primary/30', // depth 3+
+] as const;
+
 interface CommentItemSkeletonProps {
   /**
    * Nesting depth level - affects sizing and background
@@ -85,22 +101,6 @@ const CommentItemSkeleton = ({ depth = 0 }: CommentItemSkeletonProps) => {
   const _isDeeplyNested = depth >= 3;
   const _avatarSize = _isDeeplyNested ? 'size-6' : 'size-8';
   const _padding = _isDeeplyNested ? 'p-3' : 'p-4';
-
-  // Background classes matching CommentItem depth styling
-  const _depthBackgrounds = [
-    'bg-card', // depth 0
-    'bg-muted/20', // depth 1
-    'bg-muted/30', // depth 2
-    'bg-muted/40', // depth 3+
-  ] as const;
-
-  // Border classes for nested comments
-  const _depthBorders = [
-    '', // depth 0
-    'border-l-4 border-l-primary/60', // depth 1
-    'border-l-4 border-l-primary/45', // depth 2
-    'border-l-4 border-l-primary/30', // depth 3+
-  ] as const;
 
   const _backgroundClass = _depthBackgrounds[Math.min(depth, 3)] ?? 'bg-muted/40';
   const _borderClass =

@@ -18,8 +18,10 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { SocialQuery } from '@/lib/queries/social/social.query';
+import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
+import { isCommentEditable } from '@/lib/utils/comment.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
 export interface CommentData {
@@ -786,6 +788,18 @@ export class SocialFacade {
         if (existingComment.userId !== userId) {
           return {
             comment: null,
+            isSuccessful: false,
+          };
+        }
+
+        // Check if comment is within edit window (admins bypass this restriction)
+        const user = await UsersQuery.getUserByIdForAdminAsync(userId, context);
+        const isAdmin = user?.role === 'admin';
+
+        if (!isAdmin && !isCommentEditable(existingComment.createdAt)) {
+          return {
+            comment: null,
+            error: 'Edit window expired',
             isSuccessful: false,
           };
         }

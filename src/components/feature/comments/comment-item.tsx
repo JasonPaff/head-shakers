@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants/enums';
+import { isCommentEditable } from '@/lib/utils/comment.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 // Re-export for convenience
@@ -21,6 +22,7 @@ interface CommentItemProps extends Omit<ComponentProps<'div'>, 'content'> {
   comment: CommentWithDepth;
   currentUserId?: string;
   depth?: number;
+  isAdmin?: boolean;
   isEditable?: boolean;
   onDeleteClick?: (commentId: string) => void;
   onEditClick?: (comment: CommentWithDepth) => void;
@@ -112,6 +114,7 @@ export const CommentItem = ({
   comment,
   currentUserId,
   depth = 0,
+  isAdmin = false,
   isEditable = true,
   onDeleteClick,
   onEditClick,
@@ -122,7 +125,10 @@ export const CommentItem = ({
 
   // Derived conditional rendering variables
   const _isCommentOwner = currentUserId === comment.userId;
-  const _shouldShowActions = isEditable && _isCommentOwner && isHovered;
+  const _isWithinEditWindow = isCommentEditable(comment.createdAt);
+  const _canEdit = isEditable && _isCommentOwner && (_isWithinEditWindow || isAdmin);
+  const _canDelete = _isCommentOwner;
+  const _shouldShowActions = _isCommentOwner && isHovered && (_canEdit || _canDelete);
   const _hasEditedIndicator = !!comment.editedAt;
   const _canReply = depth < MAX_COMMENT_NESTING_DEPTH && !!onReply;
   const _canReport = !!currentUserId && !_isCommentOwner;
@@ -202,12 +208,16 @@ export const CommentItem = ({
         {/* Action Buttons */}
         <Conditional isCondition={_shouldShowActions}>
           <div className={'flex gap-1'}>
-            <Button aria-label={'Edit comment'} onClick={handleEditClick} size={'sm'} variant={'ghost'}>
-              <EditIcon aria-hidden className={'size-4'} />
-            </Button>
-            <Button aria-label={'Delete comment'} onClick={handleDeleteClick} size={'sm'} variant={'ghost'}>
-              <TrashIcon aria-hidden className={'size-4'} />
-            </Button>
+            <Conditional isCondition={_canEdit}>
+              <Button aria-label={'Edit comment'} onClick={handleEditClick} size={'sm'} variant={'ghost'}>
+                <EditIcon aria-hidden className={'size-4'} />
+              </Button>
+            </Conditional>
+            <Conditional isCondition={_canDelete}>
+              <Button aria-label={'Delete comment'} onClick={handleDeleteClick} size={'sm'} variant={'ghost'}>
+                <TrashIcon aria-hidden className={'size-4'} />
+              </Button>
+            </Conditional>
           </div>
         </Conditional>
       </div>
