@@ -529,3 +529,62 @@ return await Sentry.startSpan(
 8. **Never fail operations for non-critical errors** - Capture and continue
 9. **Never use string literals for tags** - Use `SENTRY_TAGS.*`
 10. **Never use string literals for operations** - Use `SENTRY_OPERATIONS.*`
+
+## Facade Integration Requirements (MANDATORY)
+
+When implementing facades, Sentry monitoring is NOT optional:
+
+### Breadcrumb Requirements
+
+**ALL facade methods MUST add Sentry breadcrumbs** for successful operations:
+
+```typescript
+static async updateAsync(data: UpdateEntity, userId: string, dbInstance?: DatabaseExecutor) {
+  try {
+    const result = await (dbInstance ?? db).transaction(async (tx) => {
+      // ... operation
+    });
+
+    // REQUIRED: Add breadcrumb on success
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      data: {
+        entityId: result.id,
+        operation: 'update',
+        userId,
+      },
+      level: SENTRY_LEVELS.INFO,
+      message: `Updated entity ${result.id}`,
+    });
+
+    return result;
+  } catch (error) {
+    throw createFacadeError({ /* ... */ }, error);
+  }
+}
+```
+
+### Non-Blocking Failure Pattern
+
+For non-critical operations (cleanup, cache invalidation), use warning-level capture:
+
+```typescript
+// Non-blocking cleanup - don't fail main operation
+try {
+  await CloudinaryService.deletePhotosFromCloudinary([publicId]);
+} catch (error) {
+  Sentry.captureException(error, {
+    extra: { entityId, publicId, operation: 'cloudinary-cleanup' },
+    level: 'warning',  // WARNING, not error
+  });
+  // Continue execution - don't throw
+}
+```
+
+### Checklist for Facades
+
+- [ ] ALL facade methods add breadcrumb on success
+- [ ] Use `SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC` for facade operations
+- [ ] Include relevant IDs in breadcrumb data (entityId, userId, operation)
+- [ ] Non-critical failures captured with `level: 'warning'`
+- [ ] Never fail main operations due to Sentry/monitoring errors

@@ -660,3 +660,51 @@ export const updateBobbleheadAction = authActionClient
 8. **Never ignore cache invalidation failures** - Log to Sentry as warnings
 9. **Never use Redis for all caching** - Only use for high-traffic public search
 10. **Never skip Sentry logging on cache errors** - Always capture exceptions with appropriate context
+
+## Facade Integration Requirements (MANDATORY)
+
+When implementing facades, caching is NOT optional:
+
+### Read Operations
+- **ALL facade read methods MUST use domain-specific CacheService helpers**
+- Example: `CacheService.bobbleheads.byId()`, NOT raw query calls
+
+### Write Operations
+- **ALL facade write methods MUST invalidate cache after mutation**
+- Use `CacheRevalidationService.{domain}.on{Action}()` methods
+- Cache invalidation must happen AFTER successful database operation
+- Cache invalidation failures should be logged to Sentry but NOT fail the operation
+
+### Example Pattern
+
+```typescript
+// In facade - READ operation
+static async getBobbleheadByIdAsync(...) {
+  return CacheService.bobbleheads.byId(  // REQUIRED: Use domain helper
+    () => BobbleheadsQuery.findByIdAsync(id, context),
+    id,
+    { context: { /* ... */ } },
+  );
+}
+
+// In facade - WRITE operation
+static async updateAsync(...) {
+  try {
+    const result = await (dbInstance ?? db).transaction(async (tx) => {
+      // ... mutation logic
+    });
+
+    // REQUIRED: Invalidate cache after successful mutation
+    CacheRevalidationService.bobbleheads.onUpdate(
+      result.id,
+      userId,
+      result.collectionId,
+      result.slug,
+    );
+
+    return result;
+  } catch (error) {
+    throw createFacadeError({ /* ... */ }, error);
+  }
+}
+```

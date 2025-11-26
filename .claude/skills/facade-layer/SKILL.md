@@ -28,19 +28,59 @@ This skill activates when:
 5. Auto-fix all violations (no permission needed)
 6. Report fixes applied
 
-## Key Patterns
+## Key Patterns (REQUIRED)
 
+### Naming Conventions (Strict)
+- **ALL async methods MUST use `Async` suffix** (e.g., `createAsync`, `updateAsync`, `deleteAsync`, `getByIdAsync`)
+- No exceptions - this ensures consistent API across all facades
+
+### Structure Requirements
 - Use static class methods (no instantiation needed)
-- Define `const facadeName = '{Domain}Facade'` for error context
-- Accept optional `DatabaseExecutor` (`dbInstance?: DatabaseExecutor`)
+- Define `const facadeName = '{Domain}Facade'` at file top for error context
+- Accept optional `DatabaseExecutor` (`dbInstance?: DatabaseExecutor`) as last parameter
 - Create appropriate query context (`createProtectedQueryContext`, `createUserQueryContext`, `createPublicQueryContext`)
-- Wrap write operations in transactions: `(dbInstance ?? db).transaction(async (tx) => { ... })`
-- Use domain-specific CacheService helpers (`CacheService.bobbleheads.byId()`, etc.)
-- Use CacheRevalidationService for invalidation (`CacheRevalidationService.bobbleheads.onPhotoChange()`)
-- Handle errors with `createFacadeError(errorContext, error)`
-- Use Sentry for breadcrumbs and non-blocking error capture
-- Coordinate across facades when business logic spans domains
+
+### Transaction Requirements (MANDATORY for mutations)
+- **ALL multi-step mutations MUST use transactions**: `(dbInstance ?? db).transaction(async (tx) => { ... })`
+- Pass transaction executor (`tx`) to all nested query calls
+- Single-step reads do NOT need transactions
+
+### Caching Requirements (MANDATORY)
+- **ALL read operations MUST use domain-specific CacheService** (`CacheService.bobbleheads.byId()`, etc.)
+- **ALL write operations MUST invalidate cache** via `CacheRevalidationService`
+- Never use generic `CacheService.cached()` when domain helper exists
+
+### Error Handling (MANDATORY)
+- **ALL methods MUST wrap in try-catch** with `createFacadeError(errorContext, error)`
+- Use consistent return patterns (see Return Type Decision Matrix in conventions)
+
+### Sentry Monitoring (MANDATORY)
+- **ALL facade methods MUST add Sentry breadcrumbs** for successful operations
+- Use `Sentry.captureException` with `level: 'warning'` for non-blocking failures
+- Never fail main operations due to monitoring failures
+
+### Documentation Requirements (MANDATORY)
+- **ALL public methods MUST have JSDoc** with:
+  - Description of what the method does
+  - `@param` for each parameter
+  - `@returns` describing the return value
+  - Cache behavior notes (TTL, invalidation triggers)
+
+### Method Complexity Limits
+- Methods should not exceed 50-60 lines
+- Extract helpers for complex transformations
 - Use `Promise.all` for parallel independent data fetching
+
+## Anti-Patterns to Detect and Fix
+
+1. **Missing `Async` suffix** on async methods
+2. **Missing transactions** on multi-step mutations
+3. **Missing cache invalidation** after write operations
+4. **Missing Sentry breadcrumbs** in facade methods
+5. **Missing JSDoc documentation** on public methods
+6. **Stub/incomplete methods** that return hardcoded values
+7. **Duplicate methods** with different naming (e.g., `getX` and `getXAsync`)
+8. **Silent failures** that log errors but don't handle them properly
 
 ## References
 

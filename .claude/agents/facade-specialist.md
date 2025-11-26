@@ -16,6 +16,7 @@ When implementing facade-related steps, you:
 4. **Handle transactions** properly with database executors
 5. **Integrate caching** with CacheService and CacheRevalidationService
 6. **Add Sentry monitoring** for breadcrumbs and error capture
+7. **Validate against anti-patterns** before completing
 
 ## Required Skills - MUST LOAD BEFORE IMPLEMENTATION
 
@@ -30,39 +31,80 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 
 ## Implementation Checklist
 
+### Naming Convention Requirements (STRICT)
+
+- [ ] **ALL async methods use `Async` suffix** (e.g., `createAsync`, `getByIdAsync`, `deleteAsync`)
+- [ ] No duplicate methods with/without suffix (e.g., don't have both `getX` and `getXAsync`)
+- [ ] Method names follow `{verb}{Entity}Async` pattern
+
 ### Facade Structure Requirements
 
 - [ ] Use static class methods (no instantiation)
-- [ ] Define `const facadeName = '{Domain}Facade'` for error context
-- [ ] Accept optional `DatabaseExecutor` (`dbInstance?: DatabaseExecutor`)
-- [ ] Create appropriate query context (`createProtectedQueryContext`, etc.)
-- [ ] Use `createFacadeError(errorContext, error)` for error handling
+- [ ] Define `const facadeName = '{Domain}Facade'` at file top for error context
+- [ ] Accept optional `DatabaseExecutor` (`dbInstance?: DatabaseExecutor`) as LAST parameter
+- [ ] Create appropriate query context (`createProtectedQueryContext`, `createUserQueryContext`, `createPublicQueryContext`)
+- [ ] Use `createFacadeError(errorContext, error)` for ALL error handling
 
-### Transaction Requirements
+### Transaction Requirements (MANDATORY for multi-step mutations)
 
-- [ ] Wrap write operations in transactions: `(dbInstance ?? db).transaction(async (tx) => { ... })`
-- [ ] Pass transaction executor to nested queries
-- [ ] Ensure proper rollback on failure
+- [ ] **ALL multi-step mutations wrapped in transactions**: `(dbInstance ?? db).transaction(async (tx) => { ... })`
+- [ ] Pass transaction executor (`tx`) to ALL nested query calls
+- [ ] Verify ownership INSIDE transaction before mutations
+- [ ] Update counts/related data INSIDE same transaction
+- [ ] Single-step reads do NOT need transactions
 
-### Caching Requirements
+### Caching Requirements (MANDATORY)
 
-- [ ] Use `CacheService.{domain}.{method}` for domain-specific caching
+- [ ] **ALL read operations use domain-specific CacheService** (`CacheService.bobbleheads.byId()`, etc.)
+- [ ] **ALL write operations invalidate cache** via `CacheRevalidationService`
+- [ ] Use `createHashFromObject` for cache keys with complex inputs
 - [ ] Use `CacheTagGenerators` for consistent tag generation
-- [ ] Use `CACHE_CONFIG.TTL` for TTL values
-- [ ] Use `CacheRevalidationService` for coordinated invalidation after mutations
+- [ ] Use `CACHE_CONFIG.TTL` for TTL values (never hardcode)
+- [ ] Never use generic `CacheService.cached()` when domain helper exists
 
-### Sentry Requirements
+### Sentry Requirements (MANDATORY)
 
-- [ ] Add breadcrumbs for non-blocking operations
-- [ ] Capture non-critical exceptions without failing the operation
-- [ ] Use appropriate levels: `'warning'` for recoverable, `'error'` for critical
-- [ ] Use Sentry constants from `@/lib/constants`
+- [ ] **ALL facade methods add Sentry breadcrumbs** on successful operations
+- [ ] Use `SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC` for facade operations
+- [ ] Capture non-critical exceptions with `level: 'warning'` without failing operation
+- [ ] Use Sentry constants from `@/lib/constants` (never hardcode strings)
+- [ ] Include relevant IDs in breadcrumb data (entityId, userId, operation)
+
+### JSDoc Documentation Requirements (MANDATORY)
+
+- [ ] **ALL public methods have JSDoc** with:
+  - [ ] One-line summary of what method does
+  - [ ] Cache behavior (TTL, invalidation triggers)
+  - [ ] `@param` for each parameter
+  - [ ] `@returns` with edge cases (null scenarios, empty arrays)
+
+### Method Complexity Requirements
+
+- [ ] Methods do NOT exceed 60 lines (extract helpers if needed)
+- [ ] Use `Promise.all` for parallel independent data fetching
+- [ ] Extract repeated patterns to private helper methods
 
 ### Coordination Requirements
 
-- [ ] Use `Promise.all` for parallel independent data fetching
 - [ ] Coordinate across facades when business logic spans domains
 - [ ] Keep facades focused on orchestration, not business rules
+- [ ] Non-blocking cleanup (Cloudinary, etc.) uses try-catch with Sentry warning
+
+## Anti-Pattern Detection Checklist
+
+Before completing, verify NONE of these exist:
+
+- [ ] ❌ Missing `Async` suffix on async methods
+- [ ] ❌ Duplicate methods (e.g., `getX()` and `getXAsync()`)
+- [ ] ❌ Stub methods returning hardcoded values (e.g., `return Promise.resolve({})`)
+- [ ] ❌ Missing transactions on multi-step mutations
+- [ ] ❌ Missing cache invalidation after write operations
+- [ ] ❌ Missing Sentry breadcrumbs in facade methods
+- [ ] ❌ Missing JSDoc on public methods
+- [ ] ❌ Silent failures (errors logged but not handled)
+- [ ] ❌ Generic `CacheService.cached()` when domain helper exists
+- [ ] ❌ Hardcoded Sentry strings instead of constants
+- [ ] ❌ Methods exceeding 60 lines without extracted helpers
 
 ## File Patterns
 
@@ -76,6 +118,7 @@ This agent handles files matching:
 - Follow exact patterns from loaded skill references
 - Facades should be thin orchestrators
 - Proper error propagation with context
+- No anti-patterns from checklist above
 
 ## Output Format
 
@@ -104,6 +147,17 @@ When completing a step, provide:
 **Caching Strategy**:
 - Cache keys/tags used
 - Invalidation triggers
+
+**Anti-Pattern Check**:
+- [✓] No missing Async suffixes
+- [✓] No duplicate methods
+- [✓] No stub methods
+- [✓] All multi-step mutations use transactions
+- [✓] All writes invalidate cache
+- [✓] All methods have Sentry breadcrumbs
+- [✓] All public methods have JSDoc
+- [✓] No silent failures
+- [✓] No methods exceed 60 lines
 
 **Validation Results**:
 - Command: npm run lint:fix && npm run typecheck

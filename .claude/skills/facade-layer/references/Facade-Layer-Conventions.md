@@ -16,7 +16,9 @@ src/lib/facades/
 
 - **Files**: `{domain}.facade.ts` (e.g., `social.facade.ts`, `bobbleheads.facade.ts`)
 - **Classes**: `{Domain}Facade` (e.g., `SocialFacade`, `BobbleheadsFacade`)
-- **Methods**: `{verb}{Entity}Async` or `{verb}{Entity}` (e.g., `createAsync`, `getBobbleheadById`, `toggleLike`)
+- **Methods**: `{verb}{Entity}Async` - **ALL async methods MUST use `Async` suffix** (e.g., `createAsync`, `getBobbleheadByIdAsync`, `toggleLikeAsync`)
+
+> **IMPORTANT**: The `Async` suffix is REQUIRED for all async methods. This ensures consistent API across all facades and makes it clear which methods are asynchronous.
 
 ## Facade Class Structure
 
@@ -558,3 +560,244 @@ if (currentDepth >= MAX_NESTING_DEPTH) {
 8. **Never use generic `CacheService.cached()`** - Use domain-specific helpers
 9. **Never skip cache invalidation after writes** - Use CacheRevalidationService
 10. **Never fetch sequential independent data** - Use `Promise.all` for parallel fetching
+11. **Never omit `Async` suffix** - ALL async methods must have `Async` suffix
+12. **Never skip Sentry breadcrumbs** - ALL facade methods must add breadcrumbs on success
+13. **Never skip JSDoc documentation** - ALL public methods must have JSDoc
+14. **Never create duplicate methods** - Don't have both `getX()` and `getXAsync()`
+15. **Never create stub methods** - Don't return hardcoded values (e.g., `return Promise.resolve({})`)
+16. **Never skip transactions for multi-step mutations** - ALL multi-step writes need transactions
+
+## Return Type Decision Matrix
+
+Use this matrix to determine the appropriate return type for facade methods:
+
+| Operation Type | Return Type | When to Use |
+|---------------|-------------|-------------|
+| Find single entity | `Promise<Entity \| null>` | Simple lookups where not found is expected |
+| Find many entities | `Promise<Array<Entity>>` | List queries (empty array if none) |
+| Paginated queries | `Promise<{ items, hasMore, total }>` | When pagination is needed |
+| Create/Update mutations | `Promise<MutationResult>` | Complex mutations with potential failures |
+| Simple mutations | `Promise<Entity \| null>` | Simple single-step mutations |
+| Delete operations | `Promise<boolean>` | When only success/failure matters |
+| Validation checks | `Promise<ValidationResult>` | Pre-flight validation |
+
+### MutationResult Pattern (for complex operations)
+
+```typescript
+export interface {Entity}MutationResult {
+  entity: {EntityType} | null;
+  error?: string;
+  isSuccessful: boolean;
+}
+```
+
+### When to throw vs. return error
+
+- **THROW**: Unexpected errors, database failures, programming errors
+- **RETURN error object**: Business rule violations, validation failures, "not found" scenarios
+
+## Transaction Requirements
+
+### Operations that REQUIRE transactions
+
+1. **Multi-table mutations** - Creating/updating related records
+2. **Cascading deletes** - Deleting entity with related data
+3. **Count updates** - Incrementing/decrementing counters with main operation
+4. **Ownership transfers** - Moving items between collections
+5. **Batch operations** - Multiple related changes that must succeed together
+
+### Operations that DON'T need transactions
+
+1. **Single-table reads** - Simple SELECT queries
+2. **Single-row inserts** - Creating one record with no side effects
+3. **Cache-only operations** - No database writes
+
+### Transaction Pattern
+
+```typescript
+static async deleteWithRelatedAsync(
+  entityId: string,
+  userId: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<boolean> {
+  try {
+    return await (dbInstance ?? db).transaction(async (tx) => {
+      const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+      // Step 1: Verify ownership
+      const entity = await EntityQuery.findByIdAsync(entityId, context);
+      if (!entity || entity.userId !== userId) {
+        return false;
+      }
+
+      // Step 2: Delete related records (within transaction)
+      await RelatedQuery.deleteByEntityIdAsync(entityId, context);
+
+      // Step 3: Delete main entity
+      await EntityQuery.deleteAsync(entityId, context);
+
+      // Step 4: Update counts
+      await ParentQuery.decrementCountAsync(entity.parentId, context);
+
+      return true;
+    });
+  } catch (error) {
+    throw createFacadeError({ /* context */ }, error);
+  }
+}
+```
+
+## JSDoc Documentation Requirements
+
+ALL public facade methods MUST have JSDoc documentation:
+
+```typescript
+/**
+ * Get a bobblehead by ID with optional viewer context.
+ * Returns null if not found or if viewer lacks permission.
+ *
+ * Caching: Uses LONG TTL (15 min) with bobblehead-based invalidation.
+ * Invalidated by: bobblehead updates, photo changes, tag changes.
+ *
+ * @param bobbleheadId - The unique identifier of the bobblehead
+ * @param viewerUserId - Optional viewer for permission context (sees own + public)
+ * @param dbInstance - Optional database instance for transaction support
+ * @returns The bobblehead record or null if not found/unauthorized
+ */
+static async getBobbleheadByIdAsync(
+  bobbleheadId: string,
+  viewerUserId?: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<BobbleheadRecord | null>
+```
+
+### JSDoc Checklist
+
+- [ ] One-line summary of what the method does
+- [ ] Cache behavior (TTL, invalidation triggers)
+- [ ] `@param` for each parameter with description
+- [ ] `@returns` describing the return value and edge cases
+- [ ] `@throws` if the method can throw (most should via `createFacadeError`)
+
+## Method Complexity Guidelines
+
+### Maximum Method Length
+
+- **Target**: 30-50 lines
+- **Maximum**: 60 lines
+- **If exceeding**: Extract helper methods
+
+### Extracting Helpers
+
+```typescript
+// BAD: 150+ line method doing everything
+static async browseCollectionsAsync(...) {
+  // 150 lines of validation, transformation, caching, error handling
+}
+
+// GOOD: Main method orchestrates, helpers do work
+static async browseCollectionsAsync(...) {
+  const filters = this.validateAndNormalizeFilters(input);
+  const cacheKey = this.buildCacheKey(filters);
+
+  return CacheService.collections.public(
+    () => this.executeBrowseQuery(filters, context),
+    cacheKey,
+    { context: { /* ... */ } },
+  );
+}
+
+private static validateAndNormalizeFilters(input: BrowseInput): NormalizedFilters { /* ... */ }
+private static buildCacheKey(filters: NormalizedFilters): string { /* ... */ }
+private static async executeBrowseQuery(filters: NormalizedFilters, context: QueryContext) { /* ... */ }
+```
+
+## Sentry Breadcrumb Requirements
+
+ALL facade methods MUST add Sentry breadcrumbs for:
+
+1. **Successful operations** - Track what happened
+2. **Partial failures** - Non-critical issues that didn't fail the operation
+3. **Business logic decisions** - Important branching logic
+
+### Required Breadcrumb Pattern
+
+```typescript
+static async updateAsync(data: UpdateEntity, userId: string, dbInstance?: DatabaseExecutor) {
+  try {
+    const result = await (dbInstance ?? db).transaction(async (tx) => {
+      // ... operation
+    });
+
+    // REQUIRED: Add breadcrumb on success
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      data: {
+        entityId: result.id,
+        operation: 'update',
+        userId,
+      },
+      level: SENTRY_LEVELS.INFO,
+      message: `Updated entity ${result.id}`,
+    });
+
+    return result;
+  } catch (error) {
+    throw createFacadeError({ /* ... */ }, error);
+  }
+}
+```
+
+## Common Facade Patterns
+
+### Cloudinary Cleanup Helper (extract to avoid duplication)
+
+```typescript
+/**
+ * Safely delete cover image from Cloudinary.
+ * Non-blocking - logs to Sentry on failure but doesn't throw.
+ */
+private static async cleanupCoverImageAsync(imageUrl: string | null, entityId: string): Promise<void> {
+  if (!imageUrl) return;
+
+  try {
+    const publicId = CloudinaryService.extractPublicIdFromUrl(imageUrl);
+    if (publicId) {
+      await CloudinaryService.deletePhotosFromCloudinary([publicId]);
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
+        data: { entityId, publicId },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Deleted cover image from Cloudinary',
+      });
+    }
+  } catch (error) {
+    Sentry.captureException(error, {
+      extra: { entityId, imageUrl, operation: 'cloudinary-cleanup' },
+      level: 'warning',
+    });
+  }
+}
+```
+
+### Ownership Verification Pattern
+
+```typescript
+/**
+ * Verify entity ownership before mutation.
+ * Returns entity if owned by user, null otherwise.
+ */
+private static async verifyOwnershipAsync<T extends { userId: string }>(
+  entityId: string,
+  userId: string,
+  findFn: (id: string, context: QueryContext) => Promise<T | null>,
+  context: QueryContext,
+): Promise<T | null> {
+  const entity = await findFn(entityId, context);
+  if (!entity || entity.userId !== userId) {
+    return null;
+  }
+  return entity;
+}
+```
