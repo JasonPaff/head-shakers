@@ -63,7 +63,7 @@ export default async function HomePage() {
   let shouldShowOnboarding = false;
   let currentUsername = '';
   if (currentUserId) {
-    const user = await UsersFacade.getUserById(currentUserId);
+    const user = await UsersFacade.getUserByIdAsync(currentUserId);
     if (user) {
       currentUsername = user.username;
       shouldShowOnboarding = !user.usernameChangedAt;

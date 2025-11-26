@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/nextjs';
+
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
   CommentTargetType,
@@ -9,7 +11,13 @@ import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';
 
-import { type LikeTargetType, MAX_COMMENT_NESTING_DEPTH, OPERATIONS } from '@/lib/constants';
+import {
+  type LikeTargetType,
+  MAX_COMMENT_NESTING_DEPTH,
+  OPERATIONS,
+  SENTRY_BREADCRUMB_CATEGORIES,
+  SENTRY_LEVELS,
+} from '@/lib/constants';
 import { CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import {
@@ -312,7 +320,7 @@ export class SocialFacade {
       );
 
       // combine data for each target
-      return targets.map(({ targetId, targetType }) => {
+      const results = targets.map(({ targetId, targetType }) => {
         const key = `${targetType}:${targetId}`;
         const likeCount = likeCountMap.get(key) || 0;
         const userStatus = userStatusMap.get(key) || { isLiked: false, likeId: null };
@@ -325,6 +333,19 @@ export class SocialFacade {
           targetType,
         };
       });
+
+      // add breadcrumb for monitoring
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          hasViewerUser: !!viewerUserId,
+          targetCount: targets.length,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Batch content like data fetched',
+      });
+
+      return results;
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetCount: targets.length },

@@ -1,10 +1,11 @@
+import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 
 import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { AdminUsersFilter, AssignableRole } from '@/lib/validations/admin-users.validation';
 
-import { SCHEMA_LIMITS } from '@/lib/constants';
+import { SCHEMA_LIMITS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { isReservedUsername } from '@/lib/constants/reserved-usernames';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
@@ -23,7 +24,7 @@ export class UsersFacade {
    * check if user can change their username (cooldown period has passed)
    */
   static async canChangeUsername(userId: string, dbInstance?: DatabaseExecutor): Promise<boolean> {
-    const user = await this.getUserById(userId, dbInstance);
+    const user = await this.getUserByIdAsync(userId, dbInstance);
 
     if (!user) {
       return false;
@@ -70,10 +71,20 @@ export class UsersFacade {
   }
 
   /**
-   * get user by user ID
+   * Get user by user ID
+   *
+   * Retrieves a user record by their unique ID, with caching for performance.
+   *
+   * Cache behavior:
+   * - TTL: 5 minutes (default from CacheService.users.profile)
+   * - Invalidation: User profile updates, username changes, role changes
+   *
+   * @param userId - The unique ID of the user to fetch
+   * @param dbInstance - Optional database instance for transactions
+   * @returns User record if found, null otherwise
    */
-  static async getUserById(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {
-    return CacheService.users.profile(
+  static async getUserByIdAsync(userId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {
+    const user = await CacheService.users.profile(
       () => {
         const context = createPublicQueryContext({ dbInstance });
         return UsersQuery.findByIdAsync(userId, context);
@@ -81,6 +92,17 @@ export class UsersFacade {
       userId,
       { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },
     );
+
+    if (user) {
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: { ...user },
+        level: SENTRY_LEVELS.INFO,
+        message: 'User fetched by ID successfully',
+      });
+    }
+
+    return user;
   }
 
   /**

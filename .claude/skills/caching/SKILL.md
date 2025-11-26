@@ -60,8 +60,8 @@ This skill activates when:
 - Use `CACHE_KEYS.{DOMAIN}.{METHOD}()` for cache key generation
 - Use `CacheTagGenerators.{domain}.{method}()` for tag generation
 - Use `CACHE_CONFIG.TTL.{LEVEL}` for TTL values:
-    - `REALTIME` (30s), `SHORT` (5 min), `MEDIUM` (30 min), `LONG` (1 hr)
-    - `EXTENDED` (4 hr), `PUBLIC_SEARCH` (10 min), `DAILY` (24 hr), `WEEKLY` (7 days)
+  - `REALTIME` (30s), `SHORT` (5 min), `MEDIUM` (30 min), `LONG` (1 hr)
+  - `EXTENDED` (4 hr), `PUBLIC_SEARCH` (10 min), `DAILY` (24 hr), `WEEKLY` (7 days)
 - Use `REDIS_KEYS.{NAMESPACE}.{METHOD}()` for Redis-specific keys (VIEW_TRACKING, LOCKS, RATE_LIMIT)
 - Use `REDIS_TTL.{CATEGORY}` for Redis-specific TTL values
 - Use `createHashFromObject()` for generating option hashes in cache keys
@@ -80,15 +80,15 @@ This skill activates when:
 
 ## Caching Layer Selection Guide
 
-| Use Case | Recommended Layer | Rationale |
-|----------|------------------|-----------|
-| Same-request deduplication | React `cache()` | Prevents redundant calls within single render |
-| Entity data (bobbleheads, collections) | `unstable_cache` | Tag-based invalidation, automatic revalidation |
-| High-traffic public search | Redis | Distributed, fast, handles scale |
-| View tracking deduplication | Redis | Distributed, TTL-based expiry |
-| Rate limiting | Redis | Distributed counters, automatic TTL expiry |
-| Distributed locks | Redis | Prevents concurrent updates |
-| Image transformations | Cloudinary | CDN-level caching, on-the-fly transforms |
+| Use Case                               | Recommended Layer | Rationale                                      |
+| -------------------------------------- | ----------------- | ---------------------------------------------- |
+| Same-request deduplication             | React `cache()`   | Prevents redundant calls within single render  |
+| Entity data (bobbleheads, collections) | `unstable_cache`  | Tag-based invalidation, automatic revalidation |
+| High-traffic public search             | Redis             | Distributed, fast, handles scale               |
+| View tracking deduplication            | Redis             | Distributed, TTL-based expiry                  |
+| Rate limiting                          | Redis             | Distributed counters, automatic TTL expiry     |
+| Distributed locks                      | Redis             | Prevents concurrent updates                    |
+| Image transformations                  | Cloudinary        | CDN-level caching, on-the-fly transforms       |
 
 ## References
 
