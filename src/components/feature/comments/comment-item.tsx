@@ -130,7 +130,6 @@ export const CommentItem = ({
   const _isDeeplyNested = depth >= 3;
 
   // Display values
-  const _displayName = comment.user?.username || 'Deleted User';
   const _username = comment.user?.username || 'deleted';
   const _avatarUrl = comment.user?.avatarUrl;
 
@@ -180,26 +179,14 @@ export const CommentItem = ({
           {/* Avatar - smaller for deeply nested comments */}
           <Avatar className={_isDeeplyNested ? 'size-6' : 'size-8'}>
             <Conditional isCondition={!!_avatarUrl}>
-              <AvatarImage alt={_displayName} src={_avatarUrl || ''} />
+              <AvatarImage alt={_username} src={_avatarUrl || ''} />
             </Conditional>
             <AvatarFallback className={_isDeeplyNested ? 'text-xs' : 'text-sm'}>
-              {_displayName
-                .split(' ')
-                .map((n) => n[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2)}
+              {_username.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
 
-          <div className={'flex flex-col'}>
-            <span className={cn('font-semibold', _isDeeplyNested ? 'text-xs' : 'text-sm')}>
-              {_displayName}
-            </span>
-            <span className={cn('text-muted-foreground', _isDeeplyNested ? 'text-[10px]' : 'text-xs')}>
-              @{_username}
-            </span>
-          </div>
+          <span className={cn('font-semibold', _isDeeplyNested ? 'text-xs' : 'text-sm')}>@{_username}</span>
 
           {/* Nested Reply Indicator */}
           <Conditional isCondition={_isNested}>
