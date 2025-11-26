@@ -32,30 +32,30 @@ Do NOT include code examples.
 
 ### Plan Overview
 
-| Metric | Value |
-|--------|-------|
+| Metric             | Value     |
+| ------------------ | --------- |
 | Estimated Duration | 4-6 hours |
-| Complexity | Medium |
-| Risk Level | Medium |
-| Total Steps | 13 |
+| Complexity         | Medium    |
+| Risk Level         | Medium    |
+| Total Steps        | 13        |
 
 ### Implementation Steps Summary
 
-| Step | Description | Confidence |
-|------|-------------|------------|
-| 1 | Create Platform Statistics Facade | High |
-| 2 | Create Platform Statistics Query Methods | High |
-| 3 | Create Hero Stats Async Component | High |
-| 4 | Create Hero Stats Skeleton Component | High |
-| 5 | Extract and Adapt Badge Component Variants | Medium |
-| 6 | Create Hero Featured Bobblehead Showcase Component | High |
-| 7 | Create Hero Featured Bobblehead Async Component | High |
-| 8 | Create Hero Featured Bobblehead Skeleton | High |
-| 9 | Create New Hero Section Component | High |
-| 10 | Integrate New Hero Section into Home Page | High |
-| 11 | Update Badge Icon Support | Medium |
-| 12 | Create Cache Service Methods for Platform Stats | High |
-| 13 | Add Cache Revalidation for Platform Stats | Medium |
+| Step | Description                                        | Confidence |
+| ---- | -------------------------------------------------- | ---------- |
+| 1    | Create Platform Statistics Facade                  | High       |
+| 2    | Create Platform Statistics Query Methods           | High       |
+| 3    | Create Hero Stats Async Component                  | High       |
+| 4    | Create Hero Stats Skeleton Component               | High       |
+| 5    | Extract and Adapt Badge Component Variants         | Medium     |
+| 6    | Create Hero Featured Bobblehead Showcase Component | High       |
+| 7    | Create Hero Featured Bobblehead Async Component    | High       |
+| 8    | Create Hero Featured Bobblehead Skeleton           | High       |
+| 9    | Create New Hero Section Component                  | High       |
+| 10   | Integrate New Hero Section into Home Page          | High       |
+| 11   | Update Badge Icon Support                          | Medium     |
+| 12   | Create Cache Service Methods for Platform Stats    | High       |
+| 13   | Add Cache Revalidation for Platform Stats          | Medium     |
 
 ### Files to Create (7)
 

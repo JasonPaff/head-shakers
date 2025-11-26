@@ -16,19 +16,19 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Auto-Loaded |
-|------|------------|--------------------|
-| 1. Create confirmation validation schema | validation-specialist | validation-schemas |
-| 2. Extend ConfirmDeleteAlertDialog | form-specialist | form-system, react-coding-conventions, validation-schemas, server-actions |
-| 3. Update CollectionDelete Component | react-component-specialist | react-coding-conventions, ui-components |
-| 4. Update Collection Sticky Header | react-component-specialist | react-coding-conventions, ui-components |
-| 5. Update Collection Header | react-component-specialist | react-coding-conventions, ui-components |
-| 6. Update CollectionActions | react-component-specialist | react-coding-conventions, ui-components |
-| 7. Update SubcollectionDelete | react-component-specialist | react-coding-conventions, ui-components |
-| 8. Update SubcollectionDeleteDialog | react-component-specialist | react-coding-conventions, ui-components |
-| 9. Update SubcollectionActions | react-component-specialist | react-coding-conventions, ui-components |
-| 10. Find/Update SubcollectionDelete usages | react-component-specialist | react-coding-conventions, ui-components |
-| 11. Comprehensive Testing | test-specialist | testing-patterns |
+| Step                                       | Specialist                 | Skills Auto-Loaded                                                        |
+| ------------------------------------------ | -------------------------- | ------------------------------------------------------------------------- |
+| 1. Create confirmation validation schema   | validation-specialist      | validation-schemas                                                        |
+| 2. Extend ConfirmDeleteAlertDialog         | form-specialist            | form-system, react-coding-conventions, validation-schemas, server-actions |
+| 3. Update CollectionDelete Component       | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 4. Update Collection Sticky Header         | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 5. Update Collection Header                | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 6. Update CollectionActions                | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 7. Update SubcollectionDelete              | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 8. Update SubcollectionDeleteDialog        | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 9. Update SubcollectionActions             | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 10. Find/Update SubcollectionDelete usages | react-component-specialist | react-coding-conventions, ui-components                                   |
+| 11. Comprehensive Testing                  | test-specialist            | testing-patterns                                                          |
 
 ## Navigation
 

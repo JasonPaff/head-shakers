@@ -20,7 +20,12 @@ type CollectionDeleteProps = Children<{
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
-export const CollectionDelete = ({ children, collectionId, collectionName, ...props }: CollectionDeleteProps) => {
+export const CollectionDelete = ({
+  children,
+  collectionId,
+  collectionName,
+  ...props
+}: CollectionDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
 
   const router = useRouter();

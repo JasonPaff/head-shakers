@@ -39,46 +39,46 @@ Categorize discovered files by priority:
 
 ### Critical Priority (6 files)
 
-| File | Path | Required Changes |
-|------|------|-----------------|
-| ConfirmDeleteAlertDialog | `src/components/ui/alert-dialogs/confirm-delete-alert-dialog.tsx` | Add confirmationText prop, integrate TextField with validation |
-| CollectionDelete | `src/components/feature/collections/collection-delete.tsx` | Pass collection name to dialog |
-| SubcollectionDelete | `src/components/feature/subcollections/subcollection-delete.tsx` | Pass subcollection name to dialog |
-| SubcollectionDeleteDialog | `src/components/feature/subcollections/subcollection-delete-dialog.tsx` | Pass subcollection name to dialog |
-| CollectionActions | `src/app/(app)/dashboard/collection/(collection)/components/collection-actions.tsx` | Pass collection.name to dialog |
-| SubcollectionActions | `src/components/feature/subcollections/subcollection-actions.tsx` | Pass subcollection.name to dialog |
+| File                      | Path                                                                                | Required Changes                                               |
+| ------------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| ConfirmDeleteAlertDialog  | `src/components/ui/alert-dialogs/confirm-delete-alert-dialog.tsx`                   | Add confirmationText prop, integrate TextField with validation |
+| CollectionDelete          | `src/components/feature/collections/collection-delete.tsx`                          | Pass collection name to dialog                                 |
+| SubcollectionDelete       | `src/components/feature/subcollections/subcollection-delete.tsx`                    | Pass subcollection name to dialog                              |
+| SubcollectionDeleteDialog | `src/components/feature/subcollections/subcollection-delete-dialog.tsx`             | Pass subcollection name to dialog                              |
+| CollectionActions         | `src/app/(app)/dashboard/collection/(collection)/components/collection-actions.tsx` | Pass collection.name to dialog                                 |
+| SubcollectionActions      | `src/components/feature/subcollections/subcollection-actions.tsx`                   | Pass subcollection.name to dialog                              |
 
 ### High Priority (8 files)
 
-| File | Path | Purpose |
-|------|------|---------|
-| TextField | `src/components/ui/form/field-components/text-field.tsx` | Form field component for name input |
-| Form Index | `src/components/ui/form/index.tsx` | useAppForm hook export |
-| Collections Validation | `src/lib/validations/collections.validation.ts` | May add confirmation schema |
-| Subcollections Validation | `src/lib/validations/subcollections.validation.ts` | May add confirmation schema |
-| Zod Utils | `src/lib/utils/zod.utils.ts` | Reference for refine patterns |
-| Input | `src/components/ui/input.tsx` | Base input component |
-| Label | `src/components/ui/label.tsx` | Label component |
-| AlertDialog | `src/components/ui/alert-dialog.tsx` | Base Radix primitives |
+| File                      | Path                                                     | Purpose                             |
+| ------------------------- | -------------------------------------------------------- | ----------------------------------- |
+| TextField                 | `src/components/ui/form/field-components/text-field.tsx` | Form field component for name input |
+| Form Index                | `src/components/ui/form/index.tsx`                       | useAppForm hook export              |
+| Collections Validation    | `src/lib/validations/collections.validation.ts`          | May add confirmation schema         |
+| Subcollections Validation | `src/lib/validations/subcollections.validation.ts`       | May add confirmation schema         |
+| Zod Utils                 | `src/lib/utils/zod.utils.ts`                             | Reference for refine patterns       |
+| Input                     | `src/components/ui/input.tsx`                            | Base input component                |
+| Label                     | `src/components/ui/label.tsx`                            | Label component                     |
+| AlertDialog               | `src/components/ui/alert-dialog.tsx`                     | Base Radix primitives               |
 
 ### Medium Priority (4 files)
 
-| File | Path | Purpose |
-|------|------|---------|
+| File                    | Path                                                                  | Purpose                               |
+| ----------------------- | --------------------------------------------------------------------- | ------------------------------------- |
 | SubcollectionEditDialog | `src/components/feature/subcollections/subcollection-edit-dialog.tsx` | Pattern reference for form validation |
-| CollectionEditDialog | `src/components/feature/collections/collection-edit-dialog.tsx` | Pattern reference for dialog forms |
-| Collections Actions | `src/lib/actions/collections/collections.actions.ts` | Server action (no changes needed) |
-| Subcollections Actions | `src/lib/actions/collections/subcollections.actions.ts` | Server action (no changes needed) |
+| CollectionEditDialog    | `src/components/feature/collections/collection-edit-dialog.tsx`       | Pattern reference for dialog forms    |
+| Collections Actions     | `src/lib/actions/collections/collections.actions.ts`                  | Server action (no changes needed)     |
+| Subcollections Actions  | `src/lib/actions/collections/subcollections.actions.ts`               | Server action (no changes needed)     |
 
 ### Low Priority (5 files)
 
-| File | Path | Purpose |
-|------|------|---------|
-| Collections Schema | `src/lib/db/schema/collections.schema.ts` | Database schema reference |
-| BobbleheadDelete | `src/components/feature/bobblehead/bobblehead-delete.tsx` | Similar pattern reference |
+| File                   | Path                                                             | Purpose                   |
+| ---------------------- | ---------------------------------------------------------------- | ------------------------- |
+| Collections Schema     | `src/lib/db/schema/collections.schema.ts`                        | Database schema reference |
+| BobbleheadDelete       | `src/components/feature/bobblehead/bobblehead-delete.tsx`        | Similar pattern reference |
 | BobbleheadDeleteDialog | `src/components/feature/bobblehead/bobblehead-delete-dialog.tsx` | Similar pattern reference |
-| Collections Facade | `src/lib/facades/collections/collections.facade.ts` | Backend context |
-| Subcollections Facade | `src/lib/facades/collections/subcollections.facade.ts` | Backend context |
+| Collections Facade     | `src/lib/facades/collections/collections.facade.ts`              | Backend context           |
+| Subcollections Facade  | `src/lib/facades/collections/subcollections.facade.ts`           | Backend context           |
 
 ## Discovery Statistics
 

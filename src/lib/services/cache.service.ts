@@ -560,6 +560,26 @@ export class CacheService {
   };
 
   /**
+   * platform-level cache utilities
+   */
+  static readonly platform = {
+    /**
+     * cache platform statistics
+     */
+    stats: async <T>(fn: () => Promise<T>, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.PLATFORM.STATS();
+      const tags = [CACHE_CONFIG.TAGS.PLATFORM_STATS];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'platform', operation: 'platform:stats' },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
+      });
+    },
+  };
+
+  /**
    * Redis-based search cache utilities for public search
    *
    * Provides distributed caching via Redis for high-traffic public search queries.

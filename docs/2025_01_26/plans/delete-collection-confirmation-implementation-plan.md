@@ -423,27 +423,27 @@ npm run build
 
 ### Critical Priority (Must Modify)
 
-| File | Purpose |
-|------|---------|
-| `src/components/ui/alert-dialogs/confirm-delete-alert-dialog.tsx` | Core dialog component - add confirmationText prop |
-| `src/components/feature/collections/collection-delete.tsx` | Collection delete - pass name to dialog |
-| `src/components/feature/subcollections/subcollection-delete.tsx` | Subcollection delete - pass name to dialog |
-| `src/components/feature/subcollections/subcollection-delete-dialog.tsx` | Subcollection dialog - pass name |
-| `src/app/(app)/dashboard/collection/(collection)/components/collection-actions.tsx` | Dashboard actions - pass collection.name |
-| `src/components/feature/subcollections/subcollection-actions.tsx` | Subcollection actions - pass subcollection.name |
+| File                                                                                | Purpose                                           |
+| ----------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `src/components/ui/alert-dialogs/confirm-delete-alert-dialog.tsx`                   | Core dialog component - add confirmationText prop |
+| `src/components/feature/collections/collection-delete.tsx`                          | Collection delete - pass name to dialog           |
+| `src/components/feature/subcollections/subcollection-delete.tsx`                    | Subcollection delete - pass name to dialog        |
+| `src/components/feature/subcollections/subcollection-delete-dialog.tsx`             | Subcollection dialog - pass name                  |
+| `src/app/(app)/dashboard/collection/(collection)/components/collection-actions.tsx` | Dashboard actions - pass collection.name          |
+| `src/components/feature/subcollections/subcollection-actions.tsx`                   | Subcollection actions - pass subcollection.name   |
 
 ### High Priority (Integration)
 
-| File | Purpose |
-|------|---------|
+| File                                                     | Purpose                       |
+| -------------------------------------------------------- | ----------------------------- |
 | `src/components/ui/form/field-components/text-field.tsx` | TextField component for input |
-| `src/components/ui/form/index.tsx` | useAppForm hook |
-| `src/lib/validations/collections.validation.ts` | Validation patterns reference |
-| `src/lib/utils/zod.utils.ts` | Zod refine patterns |
+| `src/components/ui/form/index.tsx`                       | useAppForm hook               |
+| `src/lib/validations/collections.validation.ts`          | Validation patterns reference |
+| `src/lib/utils/zod.utils.ts`                             | Zod refine patterns           |
 
 ### Pattern Reference
 
-| File | Purpose |
-|------|---------|
+| File                                                                  | Purpose                           |
+| --------------------------------------------------------------------- | --------------------------------- |
 | `src/components/feature/subcollections/subcollection-edit-dialog.tsx` | Form validation in dialog example |
-| `src/components/feature/collections/collection-edit-dialog.tsx` | Dialog form patterns |
+| `src/components/feature/collections/collection-edit-dialog.tsx`       | Dialog form patterns              |

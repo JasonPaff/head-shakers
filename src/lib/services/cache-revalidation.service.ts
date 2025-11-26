@@ -459,6 +459,23 @@ export class CacheRevalidationService {
   };
 
   /**
+   * platform-level revalidation utilities
+   */
+  static readonly platform = {
+    /**
+     * revalidate platform statistics
+     */
+    onStatsChange: (): RevalidationResult => {
+      const tags = [CACHE_CONFIG.TAGS.PLATFORM_STATS];
+      return CacheRevalidationService.revalidateTags(tags, {
+        entityType: 'platform',
+        operation: 'platform:stats:change',
+        reason: 'Platform statistics changed',
+      });
+    },
+  };
+
+  /**
    * social interaction revalidation utilities
    */
   static readonly social = {

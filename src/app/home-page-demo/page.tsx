@@ -341,7 +341,7 @@ function CollectorSpotlightSection() {
               {/* Left - Profile */}
               <div className={'flex flex-col items-center text-center md:items-start md:text-left'}>
                 <div className={'relative'}>
-                  { }
+                  {}
                   <img
                     alt={collector.username}
                     className={
@@ -400,7 +400,7 @@ function CollectorSpotlightSection() {
 
                 <Link className={'group relative flex-1 overflow-hidden rounded-2xl shadow-lg'} href={'#'}>
                   <div className={'relative aspect-[4/3] md:aspect-auto md:h-full'}>
-                    { }
+                    {}
                     <img
                       alt={collector.featuredCollection.name}
                       className={
@@ -540,7 +540,7 @@ function FeaturedCollectionsSection() {
             >
               {/* Image */}
               <div className={'relative aspect-[4/3] overflow-hidden'}>
-                { }
+                {}
                 <img
                   alt={collection.name}
                   className={
@@ -570,7 +570,7 @@ function FeaturedCollectionsSection() {
               <div className={'p-5'}>
                 <div className={'flex items-center justify-between'}>
                   <div className={'flex items-center gap-3'}>
-                    { }
+                    {}
                     <img
                       alt={collection.ownerUsername}
                       className={'size-9 rounded-full object-cover ring-2 ring-orange-500/20'}
@@ -769,7 +769,7 @@ function HeroSection() {
                 }
               >
                 <div className={'relative aspect-square overflow-hidden rounded-2xl'}>
-                  { }
+                  {}
                   <img
                     alt={'Featured Bobblehead'}
                     className={
@@ -901,7 +901,7 @@ function TrendingBobbleheadsSection() {
                   'relative aspect-square overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800'
                 }
               >
-                { }
+                {}
                 <img
                   alt={bobblehead.name}
                   className={
