@@ -20,8 +20,8 @@ export const BobbleheadsEmptyState = ({ testId }: BobbleheadsEmptyStateProps) =>
   // Derived variables
   const _title = 'No Bobbleheads Yet';
   const _description =
-    'Bobbleheads are added to subcollections within your collections. ' +
-    'Start by creating a collection, add some subcollections, then fill them with your bobblehead treasures!';
+    'Bobbleheads are added to your collections. ' +
+    'Start by creating a collection, then fill it with your bobblehead treasures!';
 
   return (
     <Fragment>

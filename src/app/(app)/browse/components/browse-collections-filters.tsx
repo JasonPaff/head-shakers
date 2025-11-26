@@ -1,15 +1,13 @@
 'use client';
 
 import { Search, X } from 'lucide-react';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import type { CategoryRecord } from '@/lib/queries/collections/collections.query';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { CONFIG } from '@/lib/constants';
 
 interface BrowseCollectionsFiltersProps {
@@ -17,7 +15,6 @@ interface BrowseCollectionsFiltersProps {
   categoryId?: string;
   dateFrom?: string;
   dateTo?: string;
-  isIncludeSubcollections?: boolean;
   onCategoryChange?: (category: string) => void;
   onClearFilters: () => void;
   onFiltersChange: (filters: {
@@ -26,7 +23,6 @@ interface BrowseCollectionsFiltersProps {
     dateTo?: string;
     ownerId?: string;
   }) => void;
-  onIncludeSubcollectionsChange?: (isIncludeSubcollections: boolean) => void;
   onSearchChange: (search: string) => void;
   ownerId?: string;
   searchQuery: string;
@@ -35,18 +31,13 @@ interface BrowseCollectionsFiltersProps {
 export const BrowseCollectionsFilters = ({
   categories,
   categoryId,
-  isIncludeSubcollections = true,
   onCategoryChange,
   onClearFilters,
-  onIncludeSubcollectionsChange,
   onSearchChange,
   searchQuery,
 }: BrowseCollectionsFiltersProps) => {
   // 1. useState hooks
   const [localSearch, setLocalSearch] = useState(searchQuery);
-
-  // 2. Other hooks
-  const switchId = useId();
 
   // 4. useEffect hooks - Debounce search input
   useEffect(() => {
@@ -64,13 +55,8 @@ export const BrowseCollectionsFilters = ({
     setLocalSearch(searchQuery);
   }, [searchQuery]);
 
-  // 6. Event handlers
-  const handleSubcollectionsToggle = (isChecked: boolean) => {
-    onIncludeSubcollectionsChange?.(isChecked);
-  };
-
-  // 7. Derived variables
-  const _hasFilters = searchQuery.length > 0 || !!categoryId || !isIncludeSubcollections;
+  // 6. Derived variables
+  const _hasFilters = searchQuery.length > 0 || !!categoryId;
   const _shouldShowCategoryDropdown = categories && categories.length > 0 && onCategoryChange;
 
   return (
@@ -97,18 +83,6 @@ export const BrowseCollectionsFilters = ({
               <X className={'size-4'} />
             </button>
           )}
-        </div>
-
-        {/* Subcollections Toggle */}
-        <div className={'flex items-center gap-2'}>
-          <Switch
-            checked={isIncludeSubcollections}
-            id={switchId}
-            onCheckedChange={handleSubcollectionsToggle}
-          />
-          <Label className={'cursor-pointer whitespace-nowrap'} htmlFor={switchId}>
-            Include Subcollections
-          </Label>
         </div>
 
         {/* Category Dropdown - Only show if categories prop is provided */}

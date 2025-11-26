@@ -15,7 +15,7 @@ interface CommentSectionAsyncProps extends Omit<ComponentProps<'div'>, 'children
    */
   initialLimit?: number;
   /**
-   * ID of the target entity (bobblehead, collection, or subcollection)
+   * ID of the target entity (bobblehead or collection)
    */
   targetId: string;
   /**

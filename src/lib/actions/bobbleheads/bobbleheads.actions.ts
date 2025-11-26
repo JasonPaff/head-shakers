@@ -202,7 +202,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
         newBobblehead.slug,
       );
 
-      // fetch collection and subcollection slugs for navigation
+      // fetch collection slug for navigation
       const collection = await CollectionsFacade.getCollectionById(
         newBobblehead.collectionId,
         userId,
@@ -210,20 +210,11 @@ export const createBobbleheadWithPhotosAction = authActionClient
       );
       const collectionSlug = collection?.slug ?? null;
 
-      let subcollectionSlug: null | string = null;
-      if (newBobblehead.subcollectionId) {
-        const subcollection = await ctx.tx.query.subCollections.findFirst({
-          where: (sc, { eq }) => eq(sc.id, newBobblehead.subcollectionId!),
-        });
-        subcollectionSlug = subcollection?.slug ?? null;
-      }
-
       return {
         data: {
           bobblehead: newBobblehead,
           collectionSlug,
           photos: uploadedPhotos,
-          subcollectionSlug,
           tags: createdTags,
         },
         success: true,

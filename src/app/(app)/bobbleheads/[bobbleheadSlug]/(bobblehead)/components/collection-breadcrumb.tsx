@@ -1,9 +1,7 @@
 'use client';
 
-import { ChevronRightIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-import { Fragment } from 'react';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { generateTestId } from '@/lib/test-ids';
@@ -15,8 +13,6 @@ type CollectionBreadcrumbProps = {
   maxLength?: number;
   /** Maximum characters for mobile truncation (default: 15) */
   maxLengthMobile?: number;
-  subcollectionName?: null | string;
-  subcollectionSlug?: null | string;
 };
 
 /**
@@ -35,66 +31,39 @@ const linkClassName =
 
 /**
  * Displays collection hierarchy as navigable breadcrumbs in the header.
- * Shows: Collection > Subcollection with links and proper truncation.
- * On mobile: Shows only collection name (with full path tooltip if subcollection exists)
+ * Shows: Collection with link and proper truncation.
  */
 export const CollectionBreadcrumb = ({
   collectionName,
   collectionSlug,
   maxLength = 25,
   maxLengthMobile = 15,
-  subcollectionName,
-  subcollectionSlug,
 }: CollectionBreadcrumbProps) => {
   // Don't render if no collection data
   if (!collectionSlug || !collectionName) {
     return null;
   }
 
-  const _hasSubcollection = !!subcollectionSlug && !!subcollectionName;
-
   // Test IDs
   const breadcrumbTestId = generateTestId('feature', 'breadcrumb', 'collection');
   const collectionLinkTestId = generateTestId('feature', 'breadcrumb', 'collection-link');
-  const subcollectionLinkTestId = generateTestId('feature', 'breadcrumb', 'subcollection-link');
 
   // Calculate truncation for desktop and mobile
   const collectionTruncated = truncateName(collectionName, maxLength);
   const collectionTruncatedMobile = truncateName(collectionName, maxLengthMobile);
-  const subcollectionTruncated = subcollectionName ? truncateName(subcollectionName, maxLength) : null;
 
-  // Full path for mobile tooltip when subcollection exists
-  const fullPath = _hasSubcollection ? `${collectionName} > ${subcollectionName}` : collectionName;
+  // Determine if mobile view needs tooltip (for truncated text)
+  const needsMobileTooltip = collectionTruncatedMobile.isTruncated;
 
-  // Determine if mobile view needs tooltip (for truncated text or hidden subcollection)
-  const _needsMobileTooltip = _hasSubcollection || collectionTruncatedMobile.isTruncated;
+  const linkHref = $path({
+    route: '/collections/[collectionSlug]',
+    routeParams: { collectionSlug },
+  });
 
-  // Determine mobile link target
-  const _shouldLinkToSubcollection = _hasSubcollection && !!subcollectionSlug;
-  const mobileLinkHref =
-    _shouldLinkToSubcollection ?
-      $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug,
-          subcollectionSlug: subcollectionSlug,
-        },
-      })
-    : $path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug },
-      });
-
-  // Mobile collection link - navigates to subcollection if present, otherwise collection
+  // Mobile collection link
   const mobileLink = (
-    <Link
-      aria-label={`Go to ${_hasSubcollection ? 'subcollection' : 'collection'}: ${_hasSubcollection ? subcollectionName : collectionName}`}
-      className={linkClassName}
-      href={mobileLinkHref}
-    >
-      {/* Show collection name, truncated for mobile */}
+    <Link aria-label={`Go to collection: ${collectionName}`} className={linkClassName} href={linkHref}>
       {collectionTruncatedMobile.displayName}
-      {_hasSubcollection && <span className={'ml-1 text-muted-foreground/60'}>...</span>}
     </Link>
   );
 
@@ -104,33 +73,11 @@ export const CollectionBreadcrumb = ({
       aria-label={`Go to collection: ${collectionName}`}
       className={linkClassName}
       data-testid={collectionLinkTestId}
-      href={$path({
-        route: '/collections/[collectionSlug]',
-        routeParams: { collectionSlug },
-      })}
+      href={linkHref}
     >
       {collectionTruncated.displayName}
     </Link>
   );
-
-  // Subcollection link element (if exists)
-  const subcollectionLink =
-    _hasSubcollection && subcollectionTruncated ?
-      <Link
-        aria-label={`Go to subcollection: ${subcollectionName}`}
-        className={linkClassName}
-        data-testid={subcollectionLinkTestId}
-        href={$path({
-          route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-          routeParams: {
-            collectionSlug,
-            subcollectionSlug: subcollectionSlug,
-          },
-        })}
-      >
-        {subcollectionTruncated.displayName}
-      </Link>
-    : null;
 
   return (
     <nav
@@ -141,15 +88,15 @@ export const CollectionBreadcrumb = ({
     >
       {/* Mobile: Show abbreviated path with tooltip */}
       <div className={'sm:hidden'}>
-        {_needsMobileTooltip ?
+        {needsMobileTooltip ?
           <Tooltip>
             <TooltipTrigger asChild>{mobileLink}</TooltipTrigger>
-            <TooltipContent>{fullPath}</TooltipContent>
+            <TooltipContent>{collectionName}</TooltipContent>
           </Tooltip>
         : mobileLink}
       </div>
 
-      {/* Desktop: Full breadcrumb with Collection > Subcollection */}
+      {/* Desktop: Full breadcrumb */}
       <div className={'hidden items-center gap-1.5 sm:flex'}>
         {/* Collection link - with tooltip if truncated */}
         {collectionTruncated.isTruncated ?
@@ -158,19 +105,6 @@ export const CollectionBreadcrumb = ({
             <TooltipContent>{collectionName}</TooltipContent>
           </Tooltip>
         : collectionLink}
-
-        {/* Separator and subcollection - only if subcollection exists */}
-        {_hasSubcollection && subcollectionLink && (
-          <Fragment>
-            <ChevronRightIcon aria-hidden className={'size-3.5 text-muted-foreground/60'} />
-            {subcollectionTruncated?.isTruncated ?
-              <Tooltip>
-                <TooltipTrigger asChild>{subcollectionLink}</TooltipTrigger>
-                <TooltipContent>{subcollectionName}</TooltipContent>
-              </Tooltip>
-            : subcollectionLink}
-          </Fragment>
-        )}
       </div>
     </nav>
   );

@@ -12,8 +12,6 @@ type CollectionViewTrackerProps = Children<{
   collectionSlug?: string;
   onViewRecorded?: (viewData: { isDuplicate: boolean; totalViews: number; viewId: string }) => void;
   sessionId?: string;
-  subcollectionId?: string;
-  subcollectionSlug?: string;
   viewThreshold?: number;
   viewTimeThreshold?: number;
 }> &
@@ -26,25 +24,17 @@ export const CollectionViewTracker = ({
   collectionSlug,
   onViewRecorded,
   sessionId,
-  subcollectionId,
-  subcollectionSlug,
   testId,
   viewThreshold = 0.6, // higher threshold for collections
   viewTimeThreshold = 2000, // longer threshold for meaningful engagement
 }: CollectionViewTrackerProps) => {
   const collectionTrackerTestId = testId || generateTestId('feature', 'collection-card');
 
-  // determine the target type and ID based on whether it's a collection or subcollection
-  const targetType = subcollectionId ? 'subcollection' : 'collection';
-  const targetId = subcollectionId || collectionId;
-
   // add collection-specific metadata with both IDs and slugs for comprehensive tracking
   const metadata = {
     collectionId,
-    pageType: targetType,
+    pageType: 'collection',
     ...(collectionSlug && { collectionSlug }),
-    ...(subcollectionId && { subcollectionId }),
-    ...(subcollectionSlug && { subcollectionSlug }),
   };
 
   return (
@@ -53,8 +43,8 @@ export const CollectionViewTracker = ({
       metadata={metadata}
       onViewRecorded={onViewRecorded}
       sessionId={sessionId}
-      targetId={targetId}
-      targetType={targetType}
+      targetId={collectionId}
+      targetType={'collection'}
       testId={collectionTrackerTestId}
       viewThreshold={viewThreshold}
       viewTimeThreshold={viewTimeThreshold}

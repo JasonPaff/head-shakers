@@ -68,10 +68,10 @@ export async function FeaturedTabbedContentAsync({
 
     if (currentUserId && tabbedContent.length > 0) {
       const likeDataTargets = tabbedContent
-        .filter((content) => ['bobblehead', 'collection', 'subcollection'].includes(content.contentType))
+        .filter((content) => ['bobblehead', 'collection'].includes(content.contentType))
         .map((content) => ({
           targetId: content.contentId,
-          targetType: content.contentType as 'bobblehead' | 'collection' | 'subcollection',
+          targetType: content.contentType as 'bobblehead' | 'collection',
         }));
 
       if (likeDataTargets.length > 0) {

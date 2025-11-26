@@ -28,8 +28,6 @@ interface BobbleheadStickyHeaderProps {
   isLiked: boolean;
   isOwner: boolean;
   likeCount: number;
-  subcollectionName?: null | string;
-  subcollectionSlug?: null | string;
   thumbnailUrl?: null | string;
   title: string;
 }
@@ -45,8 +43,6 @@ export const BobbleheadStickyHeader = ({
   isLiked,
   isOwner,
   likeCount,
-  subcollectionName,
-  subcollectionSlug,
   thumbnailUrl,
   title,
 }: BobbleheadStickyHeaderProps) => {
@@ -73,7 +69,6 @@ export const BobbleheadStickyHeader = ({
   };
 
   // derived variables
-  const _hasSubcollection = !!subcollectionName && !!subcollectionSlug;
   const _hasThumbnail = !!thumbnailUrl;
 
   return (
@@ -103,28 +98,6 @@ export const BobbleheadStickyHeader = ({
                 <ArrowLeftIcon aria-hidden className={'size-3'} />
                 <span className={'hidden truncate sm:inline'}>{collectionName}</span>
               </Link>
-
-              {/* Subcollection Link (if exists) */}
-              <Conditional isCondition={_hasSubcollection}>
-                <Fragment>
-                  {/* Separator */}
-                  <span className={'hidden text-muted-foreground sm:inline'}>{'/'}</span>
-
-                  {/* Subcollection Link */}
-                  <Link
-                    aria-label={`Back to ${subcollectionName} subcollection`}
-                    className={
-                      'hidden items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground sm:flex md:text-sm'
-                    }
-                    href={$path({
-                      route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-                      routeParams: { collectionSlug, subcollectionSlug: subcollectionSlug as string },
-                    })}
-                  >
-                    <span className={'truncate'}>{subcollectionName}</span>
-                  </Link>
-                </Fragment>
-              </Conditional>
 
               {/* Separator */}
               <span className={'hidden text-muted-foreground sm:inline'}>{'/'}</span>
@@ -198,7 +171,6 @@ export const BobbleheadStickyHeader = ({
                       bobbleheadId={bobblehead.id}
                       collectionSlug={collectionSlug}
                       size={'icon'}
-                      subcollectionSlug={subcollectionSlug}
                       variant={'ghost'}
                     />
                   </Conditional>

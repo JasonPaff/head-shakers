@@ -17,33 +17,23 @@ type CollectionContextIndicatorProps = {
 };
 
 /**
- * Displays the collection or subcollection context for bobblehead navigation.
- * Shows a badge with the context name, truncating long names with a tooltip.
- * The badge is a link to the collection or subcollection page.
+ * Displays the collection context for bobblehead navigation.
+ * Shows a badge with the collection name, truncating long names with a tooltip.
+ * The badge is a link to the collection page.
  */
 export const CollectionContextIndicator = ({ context, maxLength = 25 }: CollectionContextIndicatorProps) => {
-  const { contextName, contextSlug, contextType, parentCollectionSlug } = context;
+  const { contextName, contextSlug } = context;
   const _isTruncated = contextName.length > maxLength;
   const displayName = _isTruncated ? `${contextName.slice(0, maxLength)}...` : contextName;
-  const typeLabel = contextType === 'subcollection' ? 'Subcollection' : 'Collection';
   const fullLabel = `Navigating: ${contextName}`;
 
-  // Build the URL based on context type
+  // Build the URL for the collection
   const contextUrl = useMemo(() => {
-    if (contextType === 'subcollection' && parentCollectionSlug) {
-      return $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug: parentCollectionSlug,
-          subcollectionSlug: contextSlug,
-        },
-      });
-    }
     return $path({
       route: '/collections/[collectionSlug]',
       routeParams: { collectionSlug: contextSlug },
     });
-  }, [contextType, contextSlug, parentCollectionSlug]);
+  }, [contextSlug]);
 
   // Test IDs - using bobblehead-nav namespace for consistency with navigation components
   const indicatorTestId = generateTestId('feature', 'bobblehead-nav', 'context');
@@ -52,13 +42,12 @@ export const CollectionContextIndicator = ({ context, maxLength = 25 }: Collecti
 
   const badgeContent = (
     <Link
-      aria-label={`Go to ${typeLabel}: ${contextName}`}
+      aria-label={`Go to Collection: ${contextName}`}
       className={'transition-opacity hover:opacity-80'}
       href={contextUrl}
     >
       <Badge
         className={'max-w-48 cursor-pointer sm:max-w-64'}
-        data-context-type={contextType}
         data-slot={'collection-context-indicator-badge'}
         testId={badgeTestId}
         variant={'secondary'}
@@ -73,7 +62,7 @@ export const CollectionContextIndicator = ({ context, maxLength = 25 }: Collecti
   if (_isTruncated) {
     return (
       <div
-        aria-label={`Navigating within ${typeLabel}: ${contextName}`}
+        aria-label={`Navigating within Collection: ${contextName}`}
         data-slot={'collection-context-indicator'}
         data-testid={indicatorTestId}
       >
@@ -87,7 +76,7 @@ export const CollectionContextIndicator = ({ context, maxLength = 25 }: Collecti
 
   return (
     <div
-      aria-label={`Navigating within ${typeLabel}: ${contextName}`}
+      aria-label={`Navigating within Collection: ${contextName}`}
       data-slot={'collection-context-indicator'}
       data-testid={indicatorTestId}
     >

@@ -26,10 +26,9 @@ export const BobbleheadNavigation = ({
   navigationData,
 }: BobbleheadNavigationProps) => {
   // Other hooks
-  const [{ collectionId, subcollectionId }] = useQueryStates(
+  const [{ collectionId }] = useQueryStates(
     {
       collectionId: parseAsString,
-      subcollectionId: parseAsString,
     },
     {
       shallow: false,
@@ -46,9 +45,6 @@ export const BobbleheadNavigation = ({
       if (collectionId) {
         searchParams.collectionId = collectionId;
       }
-      if (subcollectionId) {
-        searchParams.subcollectionId = subcollectionId;
-      }
 
       return $path({
         route: '/bobbleheads/[bobbleheadSlug]',
@@ -56,7 +52,7 @@ export const BobbleheadNavigation = ({
         searchParams: Object.keys(searchParams).length > 0 ? searchParams : undefined,
       });
     },
-    [collectionId, subcollectionId],
+    [collectionId],
   );
 
   // Memoize URLs for links

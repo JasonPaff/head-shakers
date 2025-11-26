@@ -9,7 +9,6 @@ import { Fragment, Suspense } from 'react';
 import type { PageProps } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
 
 import { CollectionBobbleheadsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-bobbleheads-async';
-import { CollectionSidebarSubcollectionsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-sidebar-subcollections-async';
 import { CollectionStatsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-stats-async';
 import { CollectionErrorBoundary } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-error-boundary';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-header';
@@ -17,7 +16,6 @@ import { CollectionPageClientWrapper } from '@/app/(app)/collections/[collection
 import { CollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-bobbleheads-skeleton';
 import { CollectionHeaderSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-header-skeleton';
 import { CollectionStatsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-stats-skeleton';
-import { SubcollectionsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/subcollections-skeleton';
 import { Route } from '@/app/(app)/collections/[collectionSlug]/(collection)/route-type';
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
@@ -25,7 +23,6 @@ import { ContentLayout } from '@/components/layout/content-layout';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
@@ -128,11 +125,10 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
   const collectionId = collection.id;
   const currentUserId = await getOptionalUserId();
 
-  // Fetch collection data, like data, and subcollections for filter
-  const [publicCollection, likeData, subcollections] = await Promise.all([
+  // Fetch collection data and like data
+  const [publicCollection, likeData] = await Promise.all([
     CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined),
     SocialFacade.getContentLikeData(collectionId, 'collection', currentUserId || undefined),
-    SubcollectionsFacade.getSubCollectionsByCollection(collectionId, currentUserId || undefined),
   ]);
 
   if (!publicCollection) {
@@ -217,7 +213,6 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
                     <CollectionBobbleheadsAsync
                       collectionId={collectionId}
                       searchParams={resolvedSearchParams}
-                      subcollections={subcollections}
                     />
                   </Suspense>
                 </CollectionErrorBoundary>
@@ -228,12 +223,6 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
                 <CollectionErrorBoundary section={'stats'}>
                   <Suspense fallback={<CollectionStatsSkeleton />}>
                     <CollectionStatsAsync collectionId={collectionId} />
-                  </Suspense>
-                </CollectionErrorBoundary>
-
-                <CollectionErrorBoundary section={'subcollections'}>
-                  <Suspense fallback={<SubcollectionsSkeleton />}>
-                    <CollectionSidebarSubcollectionsAsync collectionId={collectionId} />
                   </Suspense>
                 </CollectionErrorBoundary>
               </aside>

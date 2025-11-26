@@ -29,7 +29,7 @@ export const CollectionCardSkeleton = () => {
             <Skeleton className={'h-6 w-24'} />
           </div>
 
-          {/* Subcollections Section */}
+          {/* Additional Info Section */}
           <div className={'space-y-2'}>
             <Skeleton className={'h-8 w-full'} />
             <div className={'space-y-1'}>
@@ -39,7 +39,7 @@ export const CollectionCardSkeleton = () => {
             </div>
           </div>
 
-          {/* Add Subcollection Button */}
+          {/* Action Button */}
           <Skeleton className={'h-8 w-full'} />
         </div>
 

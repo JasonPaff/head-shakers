@@ -11,13 +11,11 @@ import { CollectionBobbleheads } from '../collection-bobbleheads';
 interface CollectionBobbleheadsAsyncProps {
   collectionId: string;
   searchParams?: CollectionSearchParams;
-  subcollections: Array<{ id: string; name: string }>;
 }
 
 export const CollectionBobbleheadsAsync = async ({
   collectionId,
   searchParams,
-  subcollections,
 }: CollectionBobbleheadsAsyncProps) => {
   const currentUserId = await getOptionalUserId();
   const collection = await CollectionsFacade.getCollectionForPublicView(
@@ -29,11 +27,5 @@ export const CollectionBobbleheadsAsync = async ({
     notFound();
   }
 
-  return (
-    <CollectionBobbleheads
-      collection={collection}
-      searchParams={searchParams}
-      subcollections={subcollections}
-    />
-  );
+  return <CollectionBobbleheads collection={collection} searchParams={searchParams} />;
 };

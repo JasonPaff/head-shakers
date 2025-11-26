@@ -25,7 +25,6 @@ export const addItemFormOptions = formOptions({
     purchasePrice: '',
     series: '',
     status: DEFAULTS.BOBBLEHEAD.STATUS,
-    subcollectionId: '',
     tags: [],
     weight: '',
     year: '',

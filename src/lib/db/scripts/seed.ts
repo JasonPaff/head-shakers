@@ -10,7 +10,6 @@ import {
   comments,
   likes,
   notificationSettings,
-  subCollections,
   tags,
   users,
   userSettings,
@@ -408,7 +407,6 @@ async function main() {
    👥 Users: ${insertedUsers.length}
    🏷️  Tags: ${insertedTags.length}
    📚 Collections: ${collectionsData.collections.length}
-   📂 Sub-collections: ${collectionsData.subCollections.length}
    🪆 Bobbleheads: ${insertedBobbleheads.length}
    📸 Photos: 3
    💬 Social interactions: Various likes and comments
@@ -432,7 +430,6 @@ async function resetDatabase() {
   await db.delete(bobbleheadTags);
   await db.delete(bobbleheadPhotos);
   await db.delete(bobbleheads);
-  await db.delete(subCollections);
   await db.delete(collections);
   await db.delete(tags);
   await db.delete(notificationSettings);
@@ -446,7 +443,6 @@ async function seedBobbleheads(
   insertedUsers: (typeof users.$inferSelect)[],
   collectionsData: {
     collections: (typeof collections.$inferSelect)[];
-    subCollections: (typeof subCollections.$inferSelect)[];
   },
   insertedTags: (typeof tags.$inferSelect)[],
 ) {
@@ -456,16 +452,6 @@ async function seedBobbleheads(
     const collection = collectionsData.collections[index % collectionsData.collections.length];
     const user = insertedUsers.find((u) => u.id === collection?.userId)!;
 
-    // Assign sub-collection based on bobblehead type
-    let subcollectionId = null;
-    if (bobblehead.characterName === 'Babe Ruth') {
-      subcollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Yankees Legends')?.id;
-    } else if (bobblehead.characterName === 'Luke Skywalker' || bobblehead.characterName === 'Darth Vader') {
-      subcollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Original Trilogy')?.id;
-    } else if (bobblehead.characterName === 'Spider-Man') {
-      subcollectionId = collectionsData.subCollections.find((sc) => sc.name === 'Spider-Verse')?.id;
-    }
-
     return {
       ...bobblehead,
       acquisitionDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
@@ -473,7 +459,6 @@ async function seedBobbleheads(
       commentCount: Math.floor(Math.random() * 10),
       likeCount: Math.floor(Math.random() * 25),
       slug: generateSlug(bobblehead.name),
-      subcollectionId,
       userId: user.id,
       viewCount: Math.floor(Math.random() * 100),
     };
@@ -565,35 +550,7 @@ async function seedCollections(insertedUsers: (typeof users.$inferSelect)[]) {
   const insertedCollections = await db.insert(collections).values(collectionsWithUsers).returning();
   console.log(`✅ Created ${insertedCollections.length} collections`);
 
-  // Create some sub-collections
-  const subCollectionsData = [
-    {
-      collectionId: insertedCollections.find((c) => c.name === 'MLB Hall of Fame')!.id,
-      description: 'Hall of Fame Yankees players',
-      name: 'Yankees Legends',
-      slug: generateSlug('Yankees Legends'),
-      sortOrder: 1,
-    },
-    {
-      collectionId: insertedCollections.find((c) => c.name === 'Star Wars Universe')!.id,
-      description: 'Characters from Episodes IV-VI',
-      name: 'Original Trilogy',
-      slug: generateSlug('Original Trilogy'),
-      sortOrder: 1,
-    },
-    {
-      collectionId: insertedCollections.find((c) => c.name === 'Marvel Heroes')!.id,
-      description: 'All Spider-Man related characters',
-      name: 'Spider-Verse',
-      slug: generateSlug('Spider-Verse'),
-      sortOrder: 1,
-    },
-  ];
-
-  const insertedSubCollections = await db.insert(subCollections).values(subCollectionsData).returning();
-  console.log(`✅ Created ${insertedSubCollections.length} sub-collections`);
-
-  return { collections: insertedCollections, subCollections: insertedSubCollections };
+  return { collections: insertedCollections };
 }
 
 async function seedSocialData(

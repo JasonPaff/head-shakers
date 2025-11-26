@@ -33,7 +33,7 @@ export const generateMetadata = async ({ searchParams }: GenerateMetadataProps):
 
   // Base title and description
   let title = 'Search';
-  let description = 'Search for collections, subcollections, and bobbleheads in the Head Shakers community';
+  let description = 'Search for collections and bobbleheads in the Head Shakers community';
 
   // Enhance title with query if present
   if (_hasQuery) {
@@ -46,7 +46,6 @@ export const generateMetadata = async ({ searchParams }: GenerateMetadataProps):
     const entityLabels: Record<string, string> = {
       bobblehead: 'bobbleheads',
       collection: 'collections',
-      subcollection: 'subcollections',
     };
     const formattedTypes = entityTypes.map((type) => entityLabels[type] ?? type);
     const entityLabel = formattedTypes.join(', ');
@@ -92,7 +91,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
       <header className={'mb-6 sm:mb-8'} data-slot={'search-page-header'}>
         <h1 className={'text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl'}>Search</h1>
         <p className={'mt-1.5 text-sm text-muted-foreground sm:mt-2 sm:text-base'}>
-          Discover collections, subcollections, and bobbleheads from the community
+          Discover collections and bobbleheads from the community
         </p>
       </header>
 

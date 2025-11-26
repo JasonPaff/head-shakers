@@ -80,7 +80,6 @@ interface BobbleheadForEdit {
   purchasePrice: null | number;
   series: null | string;
   status: null | string;
-  subcollectionId: null | string;
   tags?: Array<{ id: string; name: string }>;
   weight: null | number;
   year: null | number;
@@ -285,7 +284,6 @@ export const BobbleheadEditDialog = withFocusManagement(
         purchasePrice: bobblehead.purchasePrice?.toString() || '',
         series: bobblehead.series || '',
         status: bobblehead.status || DEFAULTS.BOBBLEHEAD.STATUS,
-        subcollectionId: bobblehead.subcollectionId || '',
         tags: bobblehead.tags?.map((tag) => tag.name) || [],
         weight: bobblehead.weight?.toString() || '',
         year: bobblehead.year?.toString() || '',

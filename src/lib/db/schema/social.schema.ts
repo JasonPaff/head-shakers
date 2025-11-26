@@ -99,9 +99,6 @@ export const comments = pgTable(
     index('comments_collection_target_idx')
       .on(table.targetId)
       .where(sql`${table.targetType} = 'collection'`),
-    index('comments_subcollection_target_idx')
-      .on(table.targetId)
-      .where(sql`${table.targetType} = 'subcollection'`),
 
     // performance indexes
     index('comments_target_active_created_idx').on(

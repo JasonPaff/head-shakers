@@ -90,7 +90,7 @@ export async function generateMetadata({
 
 async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
   const { bobbleheadSlug } = await routeParams;
-  const { collectionId, subcollectionId } = await searchParams;
+  const { collectionId } = await searchParams;
   const currentUserId = await getOptionalUserId();
 
   const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(
@@ -205,7 +205,6 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
                   <BobbleheadNavigationAsync
                     bobbleheadId={bobbleheadId}
                     collectionId={collectionId ?? null}
-                    subcollectionId={subcollectionId}
                   />
                 </Suspense>
               </BobbleheadErrorBoundary>
@@ -254,7 +253,6 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
                     bobbleheadId={bobbleheadId}
                     collectionId={collectionId ?? null}
                     isKeyboardNavigationEnabled={false}
-                    subcollectionId={subcollectionId}
                   />
                 </Suspense>
               </BobbleheadErrorBoundary>

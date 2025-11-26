@@ -57,8 +57,6 @@ export function BobbleheadPageClientWrapper({
                 isLiked={likeData?.isLiked ?? false}
                 isOwner={isOwner}
                 likeCount={likeData?.likeCount ?? 0}
-                subcollectionName={bobblehead.subcollectionName}
-                subcollectionSlug={bobblehead.subcollectionSlug}
                 thumbnailUrl={bobblehead.photos?.[0]?.url}
                 title={bobblehead.name}
               />

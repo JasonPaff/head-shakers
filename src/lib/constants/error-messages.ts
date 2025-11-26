@@ -37,9 +37,6 @@ export const ERROR_MESSAGES = {
     NAME_REQUIRED: 'Collection name is required',
     NOT_FOUND: 'Collection not found',
     NOT_FOUND_OR_NOT_PUBLIC: 'Collection not found or not public',
-    SUB_COLLECTION_CREATE_FAILED: 'Failed to create sub-collection',
-    SUB_COLLECTION_DELETE_FAILED: 'Failed to delete sub-collection',
-    SUB_COLLECTION_UPDATE_FAILED: 'Failed to update sub-collection',
     UPDATE_FAILED: 'Failed to update collection',
   },
   COMMENTS: {

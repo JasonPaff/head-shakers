@@ -1,4 +1,4 @@
-import { FolderIcon, PackageIcon, ViewIcon } from 'lucide-react';
+import { PackageIcon, ViewIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,7 +7,6 @@ interface DashboardStatsProps {
   stats: {
     bobbleheads: number;
     collections: number;
-    subcollections: number;
   };
 }
 
@@ -19,11 +18,6 @@ export const DashboardStats = ({ stats }: DashboardStatsProps) => {
       value: stats.collections,
     },
     {
-      icon: FolderIcon,
-      label: 'Subcollections',
-      value: stats.subcollections,
-    },
-    {
       icon: PackageIcon,
       label: 'Bobbleheads',
       value: stats.bobbleheads,
@@ -31,7 +25,7 @@ export const DashboardStats = ({ stats }: DashboardStatsProps) => {
   ];
 
   return (
-    <div className={'grid grid-cols-1 gap-4 sm:grid-cols-3'}>
+    <div className={'grid grid-cols-1 gap-4 sm:grid-cols-2'}>
       {statItems.map((item) => {
         const Icon = item.icon;
         return (

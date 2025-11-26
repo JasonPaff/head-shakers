@@ -2,7 +2,7 @@ import { relations } from 'drizzle-orm';
 
 import { contentViews, searchQueries } from '@/lib/db/schema/analytics.schema';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads.schema';
-import { collections, subCollections } from '@/lib/db/schema/collections.schema';
+import { collections } from '@/lib/db/schema/collections.schema';
 import { contentReports } from '@/lib/db/schema/moderation.schema';
 import { comments, likes } from '@/lib/db/schema/social.schema';
 import { featuredContent, notifications } from '@/lib/db/schema/system.schema';
@@ -34,18 +34,9 @@ export const usersRelations = relations(users, ({ many, one }) => ({
 
 export const collectionsRelations = relations(collections, ({ many, one }) => ({
   bobbleheads: many(bobbleheads),
-  subCollections: many(subCollections),
   user: one(users, {
     fields: [collections.userId],
     references: [users.id],
-  }),
-}));
-
-export const subCollectionsRelations = relations(subCollections, ({ many, one }) => ({
-  bobbleheads: many(bobbleheads),
-  collection: one(collections, {
-    fields: [subCollections.collectionId],
-    references: [collections.id],
   }),
 }));
 
@@ -58,10 +49,6 @@ export const bobbleheadsRelations = relations(bobbleheads, ({ many, one }) => ({
   comments: many(comments),
   likes: many(likes),
   photos: many(bobbleheadPhotos),
-  subCollection: one(subCollections, {
-    fields: [bobbleheads.subcollectionId],
-    references: [subCollections.id],
-  }),
   tags: many(tags, {
     relationName: 'bobbleheadToTags',
   }),

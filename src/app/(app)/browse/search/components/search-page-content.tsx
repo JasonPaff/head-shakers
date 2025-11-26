@@ -28,9 +28,10 @@ export const SearchPageContent = () => {
       category: parseAsString.withDefault(''),
       dateFrom: parseAsString.withDefault(''),
       dateTo: parseAsString.withDefault(''),
-      entityTypes: parseAsArrayOf(
-        parseAsStringEnum(['collection', 'subcollection', 'bobblehead'] as const),
-      ).withDefault(['collection', 'subcollection', 'bobblehead']),
+      entityTypes: parseAsArrayOf(parseAsStringEnum(['collection', 'bobblehead'] as const)).withDefault([
+        'collection',
+        'bobblehead',
+      ]),
       page: parseAsInteger.withDefault(1),
       pageSize: parseAsInteger.withDefault(CONFIG.PAGINATION.SEARCH_RESULTS.DEFAULT),
       q: parseAsString.withDefault(''),
@@ -111,7 +112,7 @@ export const SearchPageContent = () => {
     category?: null | string;
     dateFrom?: null | string;
     dateTo?: null | string;
-    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;
+    entityTypes?: Array<'bobblehead' | 'collection'>;
     sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];
     sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];
     tagIds?: Array<string>;
@@ -163,7 +164,7 @@ export const SearchPageContent = () => {
       {/* Empty State - No Query */}
       {_isShowEmptyState && (
         <EmptyState
-          description={'Enter a search query to find collections, subcollections, and bobbleheads'}
+          description={'Enter a search query to find collections and bobbleheads'}
           icon={Search}
           title={'Start Searching'}
         />
@@ -187,7 +188,6 @@ export const SearchPageContent = () => {
             collections={searchResults.collections}
             counts={searchResults.counts}
             onViewModeChange={handleViewModeChange}
-            subcollections={searchResults.subcollections}
             viewMode={queryParams.viewMode}
           />
 

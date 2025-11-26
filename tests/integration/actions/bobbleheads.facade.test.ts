@@ -117,7 +117,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
           isPublic: true,
           name: 'Michael Jordan',
           status: 'owned',
-          subcollectionId: null,
         },
         user!.id,
       );
@@ -141,7 +140,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
           isPublic: true,
           name: 'Test Bobblehead',
           status: 'owned',
-          subcollectionId: null,
         },
         user!.id,
       );
@@ -154,7 +152,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
           isPublic: true,
           name: 'Test Bobblehead',
           status: 'owned',
-          subcollectionId: null,
         },
         user!.id,
       );
@@ -177,7 +174,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
           name: 'Rare Bobblehead',
           purchasePrice: 100,
           status: 'owned',
-          subcollectionId: null,
           year: 2024,
         },
         user!.id,
@@ -210,7 +206,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
           isPublic: true,
           name: 'Updated Name',
           status: 'owned',
-          subcollectionId: null,
         },
         user!.id,
       );
@@ -237,7 +232,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
           isPublic: true,
           name: 'Hacked Name',
           status: 'owned',
-          subcollectionId: null,
         },
         user2!.id,
       );

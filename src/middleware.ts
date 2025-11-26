@@ -23,13 +23,12 @@ const isPublicRoute = createRouteMatcher([
   '/browse(.*)',
 
   // public search - anyone can search content
-  // allows unauthenticated users to discover collections, subcollections, and bobbleheads
+  // allows unauthenticated users to discover collections and bobbleheads
   // search functionality uses publicActionClient with rate limiting to prevent abuse
   '/search(.*)',
 
   // public collection views (read-only)
   '/collections/:slug', // matches /collections/[collectionSlug]
-  '/collections/:slug/subcollection(.*)', // matches subcollection routes
   '/collections/:slug/share(.*)', // sharing routes
 
   // public bobblehead views (read-only)

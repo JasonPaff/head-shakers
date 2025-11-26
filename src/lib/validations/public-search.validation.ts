@@ -8,7 +8,7 @@ import { CONFIG, ENUMS } from '@/lib/constants';
  */
 
 // Entity types that can be searched (excluding user from ENUMS.SEARCH.RESULT_TYPE)
-const SEARCHABLE_ENTITY_TYPES = ['collection', 'subcollection', 'bobblehead'] as const;
+const SEARCHABLE_ENTITY_TYPES = ['collection', 'bobblehead'] as const;
 
 /**
  * Schema for search query text validation
@@ -43,7 +43,7 @@ export const searchFiltersSchema = z.object({
   entityTypes: z
     .array(z.enum(SEARCHABLE_ENTITY_TYPES))
     .optional()
-    .default(SEARCHABLE_ENTITY_TYPES as unknown as ['collection', 'subcollection', 'bobblehead'])
+    .default(SEARCHABLE_ENTITY_TYPES as unknown as ['collection', 'bobblehead'])
     .refine((types) => types.length > 0, 'At least one entity type must be selected'),
 
   // Sort options

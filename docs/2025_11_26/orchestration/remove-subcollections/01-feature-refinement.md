@@ -57,10 +57,10 @@ This feature request requires the complete removal of the subcollection concept 
 
 ## Length Analysis
 
-| Metric | Value |
-|--------|-------|
-| Original Words | 31 |
-| Refined Words | ~415 |
+| Metric          | Value |
+| --------------- | ----- |
+| Original Words  | 31    |
+| Refined Words   | ~415  |
 | Expansion Ratio | 13.4x |
 
 Note: The expansion ratio exceeds the 2-4x guideline but is justified given the comprehensive architectural scope of the removal task.

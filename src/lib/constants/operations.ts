@@ -99,13 +99,6 @@ export const OPERATIONS = {
     GET_USER_LIKE_STATUSES: 'get_user_like_statuses',
     TOGGLE_LIKE: 'toggle_like',
   },
-  SUBCOLLECTIONS: {
-    CREATE: 'create_subcollection',
-    CREATE_ALT: 'create_sub_collection',
-    DELETE: 'delete_subcollection',
-    GET: 'get_sub_collections',
-    UPDATE: 'update_subcollection',
-  },
   TAGS: {
     ADD: 'add_tag',
     ATTACH_TO_BOBBLEHEAD: 'attach_tags_to_bobblehead',

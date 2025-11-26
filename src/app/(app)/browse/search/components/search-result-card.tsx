@@ -10,7 +10,6 @@ import { useMemo } from 'react';
 import type {
   BobbleheadSearchResult,
   CollectionSearchResult,
-  SubcollectionSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -21,13 +20,13 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
-type SearchResultCardEntityType = 'bobblehead' | 'collection' | 'subcollection';
+type SearchResultCardEntityType = 'bobblehead' | 'collection';
 
 type SearchResultCardProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
     entityType: SearchResultCardEntityType;
     onClick?: () => void;
-    result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;
+    result: BobbleheadSearchResult | CollectionSearchResult;
   };
 
 export const SearchResultCard = ({
@@ -46,17 +45,6 @@ export const SearchResultCard = ({
   const entityUrl = useMemo(() => {
     if (entityType === 'collection') {
       return $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: result.slug } });
-    }
-
-    if (entityType === 'subcollection') {
-      const subcollectionResult = result as SubcollectionSearchResult;
-      return $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug: subcollectionResult.collectionSlug,
-          subcollectionSlug: result.slug,
-        },
-      });
     }
 
     return $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: result.slug } });
@@ -95,7 +83,6 @@ export const SearchResultCard = ({
     > = {
       bobblehead: { label: 'Bobblehead', variant: 'outline' },
       collection: { label: 'Collection', variant: 'default' },
-      subcollection: { label: 'Subcollection', variant: 'secondary' },
     };
 
     return configMap[entityType];
@@ -155,7 +142,7 @@ export const SearchResultCard = ({
                 gravity={'auto'}
                 quality={'auto:good'}
                 sizes={'(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
-                src={extractPublicIdFromCloudinaryUrl(displayData.imageUrl!)}
+                src={extractPublicIdFromCloudinaryUrl(displayData.imageUrl ?? '')}
               />
             : <div
                 className={'flex size-full items-center justify-center bg-muted'}

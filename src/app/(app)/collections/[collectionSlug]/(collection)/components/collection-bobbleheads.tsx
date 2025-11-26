@@ -18,35 +18,18 @@ import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
 interface CollectionBobbleheadsProps {
   collection: NonNullable<PublicCollection>;
   searchParams?: CollectionSearchParams;
-  subcollections: Array<{ id: string; name: string }>;
 }
 
-export const CollectionBobbleheads = async ({
-  collection,
-  searchParams,
-  subcollections,
-}: CollectionBobbleheadsProps) => {
+export const CollectionBobbleheads = async ({ collection, searchParams }: CollectionBobbleheadsProps) => {
   const currentUserId = await getOptionalUserId();
   const isOwner = await checkIsOwner(collection.userId);
 
-  const view = searchParams?.view || 'all';
   const searchTerm = searchParams?.search || undefined;
   const sortBy = searchParams?.sort || 'newest';
-  const subcollectionIdFromParams = searchParams?.subcollectionId;
-
-  // Map view + subcollectionId to facade parameter
-  let subcollectionIdForFacade: null | string | undefined = undefined;
-  if (view === 'collection') {
-    subcollectionIdForFacade = null; // Main collection only
-  } else if (view === 'subcollection' && subcollectionIdFromParams) {
-    subcollectionIdForFacade = subcollectionIdFromParams; // Specific subcollection
-  }
-  // else: view === 'all' → subcollectionIdForFacade remains undefined (all bobbleheads)
 
   const options = {
     searchTerm,
     sortBy,
-    subcollectionId: subcollectionIdForFacade,
   };
 
   const bobbleheads = await CollectionsFacade.getAllCollectionBobbleheadsWithPhotos(
@@ -67,24 +50,13 @@ export const CollectionBobbleheads = async ({
   }
 
   const isEmpty = bobbleheads.length === 0;
-  const hasActiveFilters = searchTerm || sortBy !== 'newest' || view !== 'all';
-  const _isSubcollectionFilter = view === 'subcollection' || view === 'collection';
-  const _selectedSubcollection = subcollections.find((sub) => sub.id === subcollectionIdFromParams);
-  const _subcollectionFilterLabel =
-    view === 'collection' ? 'Main Collection Only'
-    : _selectedSubcollection ? _selectedSubcollection.name
-    : '';
+  const hasActiveFilters = searchTerm || sortBy !== 'newest';
 
   // Context-aware empty state messages
-  const _emptyStateTitle =
-    _isSubcollectionFilter ? 'No Bobbleheads in This View'
-    : hasActiveFilters ? 'No Results Found'
-    : 'No Bobbleheads Yet';
+  const _emptyStateTitle = hasActiveFilters ? 'No Results Found' : 'No Bobbleheads Yet';
 
   const _emptyStateDescription =
-    _isSubcollectionFilter ?
-      `No bobbleheads found in ${_subcollectionFilterLabel}. Try selecting a different view or clear the filter to see all bobbleheads.`
-    : hasActiveFilters ?
+    hasActiveFilters ?
       'No bobbleheads match your current search or filter criteria. Try adjusting your search terms or clearing filters.'
     : "This collection doesn't have any bobbleheads. Start building your collection by adding your first bobblehead.";
 
@@ -112,7 +84,7 @@ export const CollectionBobbleheads = async ({
 
       {/* Filter Controls */}
       <div className={'mb-4'}>
-        <CollectionBobbleheadControls subcollections={subcollections} />
+        <CollectionBobbleheadControls />
       </div>
 
       {/* Empty State */}
@@ -178,7 +150,6 @@ export const CollectionBobbleheads = async ({
                     purchasePrice: bobblehead.purchasePrice,
                     series: bobblehead.series,
                     status: bobblehead.status,
-                    subcollectionId: bobblehead.subcollectionId,
                     weight: bobblehead.weight,
                     year: bobblehead.year,
                   }

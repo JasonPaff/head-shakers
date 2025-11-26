@@ -4,14 +4,13 @@ import { z } from 'zod';
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/slug';
 import { collections } from '@/lib/db/schema';
-import { zodMaxString, zodMinMaxString, zodNullableUUID } from '@/lib/utils/zod.utils';
+import { zodMaxString, zodMinMaxString } from '@/lib/utils/zod.utils';
 
 export type DeleteCollection = z.infer<typeof deleteCollectionSchema>;
 export type InsertCollection = z.infer<typeof insertCollectionSchema>;
 export type InsertCollectionInput = z.input<typeof insertCollectionSchema>;
 export type PublicCollection = z.infer<typeof publicCollectionSchema>;
 export type SelectCollection = z.infer<typeof selectCollectionSchema>;
-export type SubcollectionFilter = z.infer<typeof subcollectionFilterSchema>;
 export type UpdateCollection = z.infer<typeof updateCollectionSchema>;
 export type UpdateCollectionInput = z.input<typeof updateCollectionSchema>;
 
@@ -52,11 +51,4 @@ export const getCollectionBySlugSchema = z.object({
       message: 'Slug must contain only lowercase letters, numbers, and hyphens',
     }),
   userId: z.string().uuid({ message: 'User ID is required' }),
-});
-
-export const subcollectionFilterSchema = z.object({
-  subcollectionId: zodNullableUUID('Subcollection ID'),
-  view: z.enum(['all', 'collection', 'subcollection'], {
-    message: 'View must be all, collection, or subcollection',
-  }),
 });

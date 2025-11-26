@@ -8,7 +8,7 @@ import type {
   SelectContentReportWithSlugs,
 } from '@/lib/validations/moderation.validation';
 
-import { bobbleheads, collections, comments, contentReports, subCollections } from '@/lib/db/schema';
+import { bobbleheads, collections, comments, contentReports } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type AdminReportsFilterOptions = FindOptions & {
@@ -18,12 +18,7 @@ export type AdminReportsFilterOptions = FindOptions & {
   reason?: Array<ContentReportReason> | ContentReportReason;
   reporterId?: string;
   status?: Array<ContentReportStatus> | ContentReportStatus;
-  targetType?:
-    | 'bobblehead'
-    | 'collection'
-    | 'comment'
-    | 'subcollection'
-    | Array<'bobblehead' | 'collection' | 'comment' | 'subcollection'>;
+  targetType?: 'bobblehead' | 'collection' | 'comment' | Array<'bobblehead' | 'collection' | 'comment'>;
 };
 
 export type ContentReportRecord = typeof contentReports.$inferSelect;
@@ -107,7 +102,7 @@ export class ContentReportsQuery extends BaseQuery {
   static async checkExistingReportAsync(
     userId: string,
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     context: QueryContext,
   ): Promise<null | SelectContentReport> {
     const dbInstance = this.getDbInstance(context);
@@ -128,7 +123,7 @@ export class ContentReportsQuery extends BaseQuery {
    */
   static async countReportsForTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     context: QueryContext,
   ): Promise<number> {
     const dbInstance = this.getDbInstance(context);
@@ -310,7 +305,6 @@ export class ContentReportsQuery extends BaseQuery {
             CASE
               WHEN ${contentReports.targetType} = 'bobblehead' THEN ${bobbleheads.id} IS NOT NULL
               WHEN ${contentReports.targetType} = 'collection' THEN ${collections.id} IS NOT NULL
-              WHEN ${contentReports.targetType} = 'subcollection' THEN ${subCollections.id} IS NOT NULL
               WHEN ${contentReports.targetType} = 'comment' THEN ${comments.id} IS NOT NULL
               ELSE false
             END
@@ -320,12 +314,6 @@ export class ContentReportsQuery extends BaseQuery {
           id: contentReports.id,
           moderatorId: contentReports.moderatorId,
           moderatorNotes: contentReports.moderatorNotes,
-          parentCollectionSlug: sql<null | string>`
-            CASE
-              WHEN ${contentReports.targetType} = 'subcollection' THEN "parent_collection"."slug"
-              ELSE NULL
-            END
-          `.as('parent_collection_slug'),
           reason: contentReports.reason,
           reporterId: contentReports.reporterId,
           resolvedAt: contentReports.resolvedAt,
@@ -335,7 +323,6 @@ export class ContentReportsQuery extends BaseQuery {
             CASE
               WHEN ${contentReports.targetType} = 'bobblehead' THEN ${bobbleheads.slug}
               WHEN ${contentReports.targetType} = 'collection' THEN ${collections.slug}
-              WHEN ${contentReports.targetType} = 'subcollection' THEN ${subCollections.slug}
               ELSE NULL
             END
           `.as('target_slug'),
@@ -352,16 +339,6 @@ export class ContentReportsQuery extends BaseQuery {
         .leftJoin(
           collections,
           and(eq(contentReports.targetId, collections.id), eq(contentReports.targetType, 'collection')),
-        )
-        // LEFT JOIN subCollections for subcollection reports
-        .leftJoin(
-          subCollections,
-          and(eq(contentReports.targetId, subCollections.id), eq(contentReports.targetType, 'subcollection')),
-        )
-        // LEFT JOIN parent collection for subcollection parent slug
-        .leftJoin(
-          sql`${collections} AS "parent_collection"`,
-          sql`${subCollections.collectionId} = "parent_collection"."id"`,
         )
         // LEFT JOIN comments for comment reports (to check existence)
         .leftJoin(
@@ -441,7 +418,7 @@ export class ContentReportsQuery extends BaseQuery {
    */
   static async getReportsByTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     options: FindOptions = {},
     context: QueryContext,
   ): Promise<Array<SelectContentReport>> {
@@ -511,7 +488,7 @@ export class ContentReportsQuery extends BaseQuery {
   static async getReportStatusAsync(
     userId: string,
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     context: QueryContext,
   ): Promise<{ hasReported: boolean; report: null | SelectContentReport }> {
     const report = await this.checkExistingReportAsync(userId, targetId, targetType, context);
@@ -559,7 +536,7 @@ export class ContentReportsQuery extends BaseQuery {
    */
   static async validateTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     context: QueryContext,
   ): Promise<ContentReportTargetInfo> {
     const dbInstance = this.getDbInstance(context);
@@ -607,27 +584,6 @@ export class ContentReportsQuery extends BaseQuery {
         return {
           isExists: !!comment,
           ownerId: comment?.userId || null,
-        };
-      }
-
-      case 'subcollection': {
-        const subcollection = await dbInstance.query.subCollections.findFirst({
-          columns: {
-            id: true,
-          },
-          where: eq(subCollections.id, targetId),
-          with: {
-            collection: {
-              columns: {
-                userId: true,
-              },
-            },
-          },
-        });
-
-        return {
-          isExists: !!(subcollection && subcollection.collection),
-          ownerId: subcollection?.collection?.userId || null,
         };
       }
 

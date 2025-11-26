@@ -7,8 +7,6 @@ import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/
 const searchParamsSchema = z.object({
   search: z.string().optional(),
   sort: z.enum(['newest', 'oldest', 'name_asc', 'name_desc']).optional(),
-  subcollectionId: z.string().nullable().optional(),
-  view: z.enum(['all', 'collection', 'subcollection']).optional(),
 });
 
 export type CollectionSearchParams = z.infer<typeof searchParamsSchema>;

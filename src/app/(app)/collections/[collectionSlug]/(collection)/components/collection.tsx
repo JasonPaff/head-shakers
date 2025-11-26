@@ -5,7 +5,6 @@ import type { PublicCollection } from '@/lib/facades/collections/collections.fac
 
 import { CollectionBobbleheads } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-bobbleheads';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-header';
-import { CollectionSidebarSubcollections } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-sidebar-subcollections';
 import { CollectionStats } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-stats';
 import { ContentLayout } from '@/components/layout/content-layout';
 
@@ -18,16 +17,9 @@ interface CollectionProps {
     likeId: null | string;
   };
   searchParams?: CollectionSearchParams;
-  subcollections: Array<{ id: string; name: string }>;
 }
 
-export const Collection = ({
-  collection,
-  collectionId,
-  likeData,
-  searchParams,
-  subcollections,
-}: CollectionProps) => {
+export const Collection = ({ collection, collectionId, likeData, searchParams }: CollectionProps) => {
   if (!collection) throw new Error('Collection is required');
 
   return (
@@ -45,17 +37,12 @@ export const Collection = ({
           <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
             {/* Main Content Area */}
             <div className={'lg:col-span-9'}>
-              <CollectionBobbleheads
-                collection={collection}
-                searchParams={searchParams}
-                subcollections={subcollections}
-              />
+              <CollectionBobbleheads collection={collection} searchParams={searchParams} />
             </div>
 
             {/* Sidebar */}
             <aside className={'flex flex-col gap-6 lg:col-span-3'}>
               <CollectionStats collection={collection} collectionId={collectionId} />
-              <CollectionSidebarSubcollections collection={collection} />
             </aside>
           </div>
         </ContentLayout>

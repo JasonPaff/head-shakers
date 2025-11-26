@@ -80,7 +80,7 @@ export const getCommentsSchema = z.object({
   // Target entity filtering
   targetId: z.string().uuid('Invalid target ID'),
   targetType: z.enum(ENUMS.COMMENT.TARGET_TYPE, {
-    message: 'Target must be a bobblehead, collection, or subcollection',
+    message: 'Target must be a bobblehead or collection',
   }),
 });
 
@@ -91,7 +91,7 @@ export const getCommentsSchema = z.object({
 export const getCommentCountSchema = z.object({
   targetId: z.string().uuid('Invalid target ID'),
   targetType: z.enum(ENUMS.COMMENT.TARGET_TYPE, {
-    message: 'Target must be a bobblehead, collection, or subcollection',
+    message: 'Target must be a bobblehead or collection',
   }),
 });
 

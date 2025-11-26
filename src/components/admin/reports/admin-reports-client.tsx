@@ -35,7 +35,7 @@ export type ReportFiltersState = {
   dateTo?: Date | null;
   reason?: Array<ContentReportReason> | null;
   status?: Array<ContentReportStatus> | null;
-  targetType?: Array<'bobblehead' | 'collection' | 'comment' | 'subcollection'> | null;
+  targetType?: Array<'bobblehead' | 'collection' | 'comment'> | null;
 };
 
 type AdminReportsClientProps = ComponentProps<'div'> &
@@ -54,12 +54,7 @@ type AdminReportsFilterInput = {
   reason?: Array<ContentReportReason> | ContentReportReason;
   reporterId?: string;
   status?: Array<ContentReportStatus> | ContentReportStatus;
-  targetType?:
-    | 'bobblehead'
-    | 'collection'
-    | 'comment'
-    | 'subcollection'
-    | Array<'bobblehead' | 'collection' | 'comment' | 'subcollection'>;
+  targetType?: 'bobblehead' | 'collection' | 'comment' | Array<'bobblehead' | 'collection' | 'comment'>;
 };
 
 type PendingAction = {

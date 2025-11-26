@@ -324,7 +324,7 @@ export class ContentReportsFacade {
   static async getReportStatusAsync(
     userId: string,
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     dbInstance?: DatabaseExecutor,
   ): Promise<{ hasReported: boolean; report: null | SelectContentReport }> {
     try {
@@ -433,17 +433,6 @@ export class ContentReportsFacade {
           }
           break;
         }
-        case 'subcollection': {
-          // TODO: Implement subcollection validation when findByIdAsync method is available
-          // const subcollection = await SubcollectionsQuery.findByIdAsync(targetId, context);
-          // isTargetExists = !!subcollection;
-          // if (subcollection?.userId === userId) {
-          //   canReport = false;
-          //   reason = 'Cannot report your own content';
-          // }
-          isTargetExists = true; // temporarily allow for implementation
-          break;
-        }
         case 'user':
           // these will be implemented in future phases
           isTargetExists = false;
@@ -479,7 +468,7 @@ export class ContentReportsFacade {
    */
   static async validateReportTargetAsync(
     targetId: string,
-    targetType: 'bobblehead' | 'collection' | 'comment' | 'subcollection',
+    targetType: 'bobblehead' | 'collection' | 'comment',
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<{ canReport: boolean; reason?: string }> {

@@ -307,7 +307,7 @@ export const getUserForFeaturingAction = adminActionClient
 /**
  * Search public content with full pagination and filtering (unauthenticated access)
  *
- * Returns paginated search results across collections, subcollections, and bobbleheads
+ * Returns paginated search results across collections and bobbleheads
  * with advanced filtering options including entity types, tag filtering, and sorting.
  * Results are cached in Redis with 10-minute TTL for performance optimization.
  *
@@ -388,8 +388,8 @@ export const searchPublicContentAction = publicActionClient
 /**
  * Get public search dropdown results for header search (unauthenticated access)
  *
- * Returns top 5 consolidated search results across collections, subcollections,
- * and bobbleheads for instant search feedback in the application header.
+ * Returns top 5 consolidated search results across collections and bobbleheads
+ * for instant search feedback in the application header.
  * Results are cached in Redis with 10-minute TTL for optimal performance.
  *
  * @param query - Search text to match across entity types
@@ -397,7 +397,7 @@ export const searchPublicContentAction = publicActionClient
  *
  * @example
  * const result = await getPublicSearchDropdownAction({ query: "baseball" });
- * // Returns: { collections: [...], subcollections: [...], bobbleheads: [...], totalResults: 5 }
+ * // Returns: { collections: [...], bobbleheads: [...], totalResults: 5 }
  *
  * @public
  * @note Rate limiting should be implemented for dropdown search to prevent abuse
@@ -428,7 +428,6 @@ export const getPublicSearchDropdownAction = publicActionClient
           bobbleheadsCount: result.bobbleheads.length,
           collectionsCount: result.collections.length,
           query: input.query,
-          subcollectionsCount: result.subcollections.length,
           totalResults: result.totalResults,
         },
         level: SENTRY_LEVELS.INFO,

@@ -11,13 +11,11 @@ export const DashboardHeader = async () => {
   const collections = await CollectionsFacade.getUserCollectionsForDashboard(userId);
 
   const totalCollections = collections.length;
-  const totalSubcollections = collections.reduce((acc, col) => acc + col.subCollections.length, 0);
   const totalBobbleheads = collections.reduce((acc, col) => acc + col.metrics.totalBobbleheads, 0);
 
   const stats = {
     bobbleheads: totalBobbleheads,
     collections: totalCollections,
-    subcollections: totalSubcollections,
   };
 
   const dataTestId = generateTestId('layout', 'app-header', 'dashboard');
@@ -29,7 +27,7 @@ export const DashboardHeader = async () => {
           <h1 className={'text-2xl font-bold text-foreground'} data-testid={dataTestId}>
             My Collections Dashboard
           </h1>
-          <p className={'text-muted-foreground'}>Manage your collections, subcollections, and bobbleheads</p>
+          <p className={'text-muted-foreground'}>Manage your collections and bobbleheads</p>
         </div>
         <CollectionCreateButton />
       </div>

@@ -1,5 +1,5 @@
 import 'server-only';
-import { CalendarIcon, EyeIcon, FolderIcon, StarIcon } from 'lucide-react';
+import { CalendarIcon, EyeIcon, StarIcon } from 'lucide-react';
 import { Suspense } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
@@ -35,11 +35,6 @@ export const CollectionStats = ({ collection, collectionId }: CollectionStatsPro
             <StarIcon aria-hidden className={'size-4 text-muted-foreground'} />
             <span className={'text-sm text-muted-foreground'}>Total Bobbleheads:</span>
             <span className={'font-medium'}>{collection.totalBobbleheadCount}</span>
-          </li>
-          <li className={'flex items-center gap-3'}>
-            <FolderIcon aria-hidden className={'size-4 text-muted-foreground'} />
-            <span className={'text-sm text-muted-foreground'}>Subcollections:</span>
-            <span className={'font-medium'}>{collection.subCollectionCount}</span>
           </li>
           <li className={'flex items-center gap-3'}>
             <CalendarIcon aria-hidden className={'size-4 text-muted-foreground'} />

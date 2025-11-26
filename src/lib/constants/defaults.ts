@@ -62,13 +62,6 @@ export const DEFAULTS = {
     MAX_LIMIT: 100,
     OFFSET: 0,
   },
-  SUB_COLLECTION: {
-    COMMENT_COUNT: 0,
-    IS_PUBLIC: true,
-    ITEM_COUNT: 0,
-    LIKE_COUNT: 0,
-    SORT_ORDER: 0,
-  },
   SYSTEM: {
     CONTENT_METRIC_PRIORITY: 0,
     CONTENT_METRIC_VIEW_COUNT: 0,

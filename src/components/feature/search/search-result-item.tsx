@@ -8,7 +8,6 @@ import { useMemo } from 'react';
 import type {
   BobbleheadSearchResult,
   CollectionSearchResult,
-  SubcollectionSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -18,7 +17,7 @@ import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl } from '@/lib/utils/cloudinary.utils';
 import { cn } from '@/utils/tailwind-utils';
 
-type SearchResultItemEntityType = 'bobblehead' | 'collection' | 'subcollection';
+type SearchResultItemEntityType = 'bobblehead' | 'collection';
 
 type SearchResultItemProps = ComponentTestIdProps & {
   className?: string;
@@ -28,7 +27,7 @@ type SearchResultItemProps = ComponentTestIdProps & {
   isCompact?: boolean;
   linkClassName?: string;
   onClick?: () => void;
-  result: BobbleheadSearchResult | CollectionSearchResult | SubcollectionSearchResult;
+  result: BobbleheadSearchResult | CollectionSearchResult;
 };
 
 export const SearchResultItem = ({
@@ -49,17 +48,6 @@ export const SearchResultItem = ({
   const entityUrl = useMemo(() => {
     if (entityType === 'collection') {
       return $path({ route: '/collections/[collectionSlug]', routeParams: { collectionSlug: result.slug } });
-    }
-
-    if (entityType === 'subcollection') {
-      const subcollectionResult = result as SubcollectionSearchResult;
-      return $path({
-        route: '/collections/[collectionSlug]/subcollection/[subcollectionSlug]',
-        routeParams: {
-          collectionSlug: subcollectionResult.collectionSlug,
-          subcollectionSlug: result.slug,
-        },
-      });
     }
 
     return $path({ route: '/bobbleheads/[bobbleheadSlug]', routeParams: { bobbleheadSlug: result.slug } });
@@ -98,7 +86,6 @@ export const SearchResultItem = ({
     > = {
       bobblehead: { label: 'Bobblehead', variant: 'outline' },
       collection: { label: 'Collection', variant: 'default' },
-      subcollection: { label: 'Subcollection', variant: 'secondary' },
     };
 
     return configMap[entityType];
@@ -153,7 +140,7 @@ export const SearchResultItem = ({
               height={48}
               quality={'auto:good'}
               sizes={'48px'}
-              src={extractPublicIdFromCloudinaryUrl(displayData.imageUrl!)}
+              src={extractPublicIdFromCloudinaryUrl(displayData.imageUrl ?? '')}
               width={48}
             />
           : <div

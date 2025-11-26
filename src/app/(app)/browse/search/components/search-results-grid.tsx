@@ -6,7 +6,6 @@ import type {
   BobbleheadSearchResult,
   CollectionSearchResult,
   PublicSearchCounts,
-  SubcollectionSearchResult,
 } from '@/lib/queries/content-search/content-search.query';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -27,7 +26,6 @@ type SearchResultsProps = ComponentProps<'div'> &
     collections: Array<CollectionSearchResult>;
     counts: PublicSearchCounts;
     onViewModeChange?: (viewMode: SearchViewMode) => void;
-    subcollections: Array<SubcollectionSearchResult>;
     viewMode?: SearchViewMode;
   };
 
@@ -37,7 +35,6 @@ export const SearchResults = ({
   collections,
   counts: _counts,
   onViewModeChange,
-  subcollections,
   testId,
   viewMode = ENUMS.SEARCH.VIEW_MODE[0],
   ...props
@@ -49,17 +46,14 @@ export const SearchResults = ({
 
   // Derived variables for conditional rendering
   const _hasCollections = collections.length > 0;
-  const _hasSubcollections = subcollections.length > 0;
   const _hasBobbleheads = bobbleheads.length > 0;
   // Calculate displayed results count based on actual array lengths (respects entityTypes filter)
-  const _displayedResultsCount = collections.length + subcollections.length + bobbleheads.length;
+  const _displayedResultsCount = collections.length + bobbleheads.length;
   // Use displayed count for the header, but keep counts prop for individual badges
   const _totalResults = _displayedResultsCount;
   const _isGridView = viewMode === ENUMS.SEARCH.VIEW_MODE[0];
   const _isListView = viewMode === ENUMS.SEARCH.VIEW_MODE[1];
   const _hasViewModeControl = !!onViewModeChange;
-  const _hasMultipleSections =
-    (_hasCollections ? 1 : 0) + (_hasSubcollections ? 1 : 0) + (_hasBobbleheads ? 1 : 0) > 1;
 
   // Event handlers
   const handleViewModeChange = (newViewMode: SearchViewMode) => {
@@ -71,10 +65,6 @@ export const SearchResults = ({
     ...collections.map((collection) => ({
       entityType: 'collection' as const,
       result: collection,
-    })),
-    ...subcollections.map((subcollection) => ({
-      entityType: 'subcollection' as const,
-      result: subcollection,
     })),
     ...bobbleheads.map((bobblehead) => ({
       entityType: 'bobblehead' as const,
@@ -106,11 +96,6 @@ export const SearchResults = ({
             <Conditional isCondition={_hasCollections}>
               <Badge className={'text-xs'} variant={'outline'}>
                 {collections.length} Collections
-              </Badge>
-            </Conditional>
-            <Conditional isCondition={_hasSubcollections}>
-              <Badge className={'text-xs'} variant={'outline'}>
-                {subcollections.length} Subcollections
               </Badge>
             </Conditional>
             <Conditional isCondition={_hasBobbleheads}>
@@ -159,35 +144,8 @@ export const SearchResults = ({
             </div>
           </Conditional>
 
-          {/* Separator between Collections and Subcollections */}
-          <Conditional isCondition={_hasCollections && _hasMultipleSections}>
-            <Separator />
-          </Conditional>
-
-          {/* Subcollections Section */}
-          <Conditional isCondition={_hasSubcollections}>
-            <div className={'space-y-3 sm:space-y-4'} data-slot={'search-results-subcollections-section'}>
-              <div className={'flex items-center gap-2'}>
-                <h3 className={'text-base font-semibold sm:text-lg'}>Subcollections</h3>
-                <Badge className={'text-xs'} variant={'secondary'}>
-                  {subcollections.length}
-                </Badge>
-              </div>
-              <div className={'grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4'}>
-                {subcollections.map((subcollection) => (
-                  <SearchResultCard
-                    entityType={'subcollection'}
-                    key={subcollection.id}
-                    result={subcollection}
-                    testId={`${searchResultsTestId}-card-subcollection-${subcollection.id}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </Conditional>
-
-          {/* Separator between Subcollections and Bobbleheads */}
-          <Conditional isCondition={_hasSubcollections && _hasBobbleheads}>
+          {/* Separator between Collections and Bobbleheads */}
+          <Conditional isCondition={_hasCollections && _hasBobbleheads}>
             <Separator />
           </Conditional>
 

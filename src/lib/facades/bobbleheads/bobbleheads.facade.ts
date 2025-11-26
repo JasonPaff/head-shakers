@@ -26,7 +26,6 @@ import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
 import {
   createProtectedQueryContext,
@@ -361,7 +360,6 @@ export class BobbleheadsFacade {
    *
    * @param bobbleheadId - The ID of the current bobblehead
    * @param collectionId - The ID of the collection containing the bobblehead
-   * @param subcollectionId - Optional subcollection ID for filtered navigation
    * @param viewerUserId - Optional viewer user ID for permission context
    * @param dbInstance - Optional database instance for transactions
    * @returns Navigation data with previous and next bobbleheads
@@ -369,7 +367,6 @@ export class BobbleheadsFacade {
   static async getBobbleheadNavigationData(
     bobbleheadId: string,
     collectionId: string,
-    subcollectionId?: null | string,
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadNavigationDataSchema> {
@@ -377,7 +374,6 @@ export class BobbleheadsFacade {
       // Create unique cache key incorporating all parameters
       const cacheKey = createFacadeCacheKey('bobblehead', 'navigation', bobbleheadId, {
         collectionId,
-        subcollectionId: subcollectionId || null,
         viewerUserId,
       });
 
@@ -397,18 +393,8 @@ export class BobbleheadsFacade {
 
           // Execute both queries in parallel for optimal performance
           const [adjacentResult, positionResult] = await Promise.all([
-            BobbleheadsQuery.getAdjacentBobbleheadsInCollectionAsync(
-              bobbleheadId,
-              collectionId,
-              subcollectionId || null,
-              context,
-            ),
-            BobbleheadsQuery.getBobbleheadPositionInCollectionAsync(
-              bobbleheadId,
-              collectionId,
-              subcollectionId || null,
-              context,
-            ),
+            BobbleheadsQuery.getAdjacentBobbleheadsInCollectionAsync(bobbleheadId, collectionId, context),
+            BobbleheadsQuery.getBobbleheadPositionInCollectionAsync(bobbleheadId, collectionId, context),
           ]);
 
           // Handle edge case where position query returns null (bobblehead not found in collection)
@@ -416,35 +402,16 @@ export class BobbleheadsFacade {
           const currentPosition = positionResult?.currentPosition ?? 0;
           const totalCount = positionResult?.totalCount ?? 0;
 
-          // Fetch context information (collection or subcollection name)
+          // Fetch collection information
           let contextData: BobbleheadNavigationDataSchema['context'] = null;
-          if (subcollectionId) {
-            // Fetch subcollection name
-            const subcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
-              collectionId,
-              subcollectionId,
-              viewerUserId,
-            );
-            if (subcollection) {
-              contextData = {
-                contextId: subcollection.id,
-                contextName: subcollection.name,
-                contextSlug: subcollection.slug,
-                contextType: 'subcollection',
-                parentCollectionSlug: subcollection.collectionSlug,
-              };
-            }
-          } else {
-            // Fetch collection name
-            const collection = await CollectionsFacade.getCollectionById(collectionId, viewerUserId);
-            if (collection) {
-              contextData = {
-                contextId: collection.id,
-                contextName: collection.name,
-                contextSlug: collection.slug,
-                contextType: 'collection',
-              };
-            }
+          const collection = await CollectionsFacade.getCollectionById(collectionId, viewerUserId);
+          if (collection) {
+            contextData = {
+              contextId: collection.id,
+              contextName: collection.name,
+              contextSlug: collection.slug,
+              contextType: 'collection',
+            };
           }
 
           // Transform result to match the expected schema (minimal navigation data)
@@ -473,7 +440,6 @@ export class BobbleheadsFacade {
               currentPosition,
               hasNext: !!adjacentResult.nextBobblehead,
               hasPrevious: !!adjacentResult.previousBobblehead,
-              subcollectionId: subcollectionId || null,
               totalCount,
             },
             level: SENTRY_LEVELS.INFO,
@@ -503,7 +469,7 @@ export class BobbleheadsFacade {
       );
     } catch (error) {
       const errorContext: FacadeErrorContext = {
-        data: { bobbleheadId, collectionId, subcollectionId },
+        data: { bobbleheadId, collectionId },
         facade: facadeName,
         method: 'getBobbleheadNavigationData',
         operation: 'getNavigationData',

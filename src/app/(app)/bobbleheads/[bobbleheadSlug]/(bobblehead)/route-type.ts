@@ -7,7 +7,6 @@ import { SLUG_MAX_LENGTH, SLUG_MIN_LENGTH, SLUG_PATTERN } from '@/lib/constants/
 const searchParamsSchema = z.object({
   // Use .catch(undefined) to handle empty strings gracefully - they fail UUID validation but we want them treated as undefined
   collectionId: z.uuid('Invalid collection ID').optional().catch(undefined),
-  subcollectionId: z.uuid('Invalid subcollection ID').optional().catch(undefined),
 });
 
 export type BobbleheadNavigationContext = z.infer<typeof searchParamsSchema>;

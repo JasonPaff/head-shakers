@@ -46,12 +46,12 @@ type SearchFiltersProps = ComponentTestIdProps & {
   category?: string;
   dateFrom?: string;
   dateTo?: string;
-  entityTypes: Array<'bobblehead' | 'collection' | 'subcollection'>;
+  entityTypes: Array<'bobblehead' | 'collection'>;
   onFiltersChange: (filters: {
     category?: null | string;
     dateFrom?: null | string;
     dateTo?: null | string;
-    entityTypes?: Array<'bobblehead' | 'collection' | 'subcollection'>;
+    entityTypes?: Array<'bobblehead' | 'collection'>;
     sortBy?: (typeof ENUMS.SEARCH.SORT_BY)[number];
     sortOrder?: (typeof ENUMS.SEARCH.SORT_ORDER)[number];
     tagIds?: Array<string>;
@@ -106,7 +106,7 @@ export const SearchFilters = ({
   // useMemo hooks - Calculate active filter count
   const activeFilterCount = useMemo(() => {
     let count = 0;
-    if (entityTypes.length < 3) count += 1;
+    if (entityTypes.length < 2) count += 1;
     if (sortBy !== 'relevance') count += 1;
     if (sortOrder !== 'desc') count += 1;
     if (tagIds.length > 0) count += 1;
@@ -122,7 +122,7 @@ export const SearchFilters = ({
   }, []);
 
   const handleEntityTypeToggle = useCallback(
-    (entityType: 'bobblehead' | 'collection' | 'subcollection') => {
+    (entityType: 'bobblehead' | 'collection') => {
       const _isSelected = entityTypes.includes(entityType);
       const newEntityTypes =
         _isSelected ? entityTypes.filter((type) => type !== entityType) : [...entityTypes, entityType];
@@ -183,7 +183,7 @@ export const SearchFilters = ({
       category: null,
       dateFrom: null,
       dateTo: null,
-      entityTypes: ['collection', 'subcollection', 'bobblehead'],
+      entityTypes: ['collection', 'bobblehead'],
       sortBy: 'relevance',
       sortOrder: 'desc',
       tagIds: [],
@@ -209,7 +209,7 @@ export const SearchFilters = ({
   const _hasValidDateFrom = isValidFilterValue(dateFrom);
   const _hasValidDateTo = isValidFilterValue(dateTo);
   const _hasActiveFilters =
-    entityTypes.length < 3 ||
+    entityTypes.length < 2 ||
     sortBy !== 'relevance' ||
     sortOrder !== 'desc' ||
     tagIds.length > 0 ||
@@ -258,17 +258,6 @@ export const SearchFilters = ({
               />
               <Label className={'cursor-pointer text-sm font-normal'} htmlFor={'filter-collection'}>
                 Collections
-              </Label>
-            </div>
-            <div className={'flex min-h-11 items-center space-x-2'}>
-              <Checkbox
-                checked={entityTypes.includes('subcollection')}
-                data-testid={`${filtersTestId}-subcollection`}
-                id={'filter-subcollection'}
-                onCheckedChange={() => handleEntityTypeToggle('subcollection')}
-              />
-              <Label className={'cursor-pointer text-sm font-normal'} htmlFor={'filter-subcollection'}>
-                Subcollections
               </Label>
             </div>
             <div className={'flex min-h-11 items-center space-x-2'}>
@@ -504,7 +493,7 @@ export const SearchFilters = ({
         >
           <Label className={'text-sm font-medium'}>Active Filters</Label>
           <div className={'flex flex-wrap gap-2'}>
-            <Conditional isCondition={entityTypes.length < 3}>
+            <Conditional isCondition={entityTypes.length < 2}>
               <Badge variant={'secondary'}>
                 {entityTypes.length} {entityTypes.length === 1 ? 'type' : 'types'} selected
               </Badge>
@@ -544,7 +533,7 @@ export const SearchFilters = ({
           data-slot={'search-filters-input'}
           data-testid={`${filtersTestId}-input`}
           onChange={handleSearchInputChange}
-          placeholder={'Search for collections, subcollections, or bobbleheads...'}
+          placeholder={'Search for collections or bobbleheads...'}
           type={'search'}
           value={searchInput}
         />
