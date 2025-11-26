@@ -2,10 +2,12 @@
 
 ## Overview
 
-Head Shakers uses a dual-layer caching strategy:
+Head Shakers uses a 4-layer caching strategy:
 
-1. **Next.js unstable_cache** - For most cached data with tag-based invalidation
-2. **Upstash Redis** - For high-traffic public search queries
+1. **React `cache()`** - Same-request deduplication for server components
+2. **Next.js `unstable_cache()`** - Cross-request caching with tag-based invalidation (primary)
+3. **Upstash Redis** - High-traffic public data, distributed locks, rate limiting, view tracking
+4. **Cloudinary** - Image transformation and CDN-level caching
 
 ## File Structure
 
@@ -18,13 +20,14 @@ src/lib/services/
 ```
 src/lib/constants/
 ├── cache.ts                      # Cache keys, tags, TTL config
+├── redis-keys.ts                 # Redis-specific keys and TTL
 ```
 
 ```
 src/lib/utils/
 ├── cache-tags.utils.ts           # Tag generator functions
 ├── cache.utils.ts                # createHashFromObject utility
-├── redis-client.ts               # Redis operations
+├── redis-client.ts               # Redis operations wrapper
 ```
 
 ## Required Imports
@@ -33,15 +36,63 @@ src/lib/utils/
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CACHE_CONFIG, CACHE_KEYS } from '@/lib/constants/cache';
+import { REDIS_KEYS, REDIS_TTL } from '@/lib/constants/redis-keys';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
+import { RedisOperations } from '@/lib/utils/redis-client';
 ```
 
-## CacheService Domain Helpers
+---
 
-The `CacheService` provides domain-specific caching methods. Always prefer these over the generic `CacheService.cached()`:
+## Layer 1: React cache() - Request-Level Caching
 
-### Bobblehead Caching
+> **STATUS: RECOMMENDED - Not yet implemented in codebase**
+
+Use React's `cache()` for deduplicating expensive operations within a single request/render cycle.
+
+### Use Cases
+
+- Getting current user ID multiple times in server component tree
+- Fetching the same data in layout and page components
+- Deduplicating auth checks across nested components
+
+### Pattern
+
+```typescript
+import { cache } from 'react';
+
+// Wrap expensive operations that may be called multiple times per request
+export const getCurrentUserId = cache(async (): Promise<string | null> => {
+  const { userId } = await auth();
+  return userId;
+});
+
+// Usage in multiple server components - only executes once per request
+// layout.tsx
+const userId = await getCurrentUserId();
+
+// page.tsx (same request)
+const userId = await getCurrentUserId(); // Returns cached result
+```
+
+### When to Use
+
+- Function is called multiple times during single request
+- Function has side effects that should only happen once
+- Expensive auth/session lookups
+- Data needed in both layout and page components
+
+---
+
+## Layer 2: Next.js unstable_cache() - Cross-Request Caching
+
+This is the **primary caching mechanism** for the application. Use `CacheService` domain helpers.
+
+### CacheService Domain Helpers
+
+Always prefer domain-specific helpers over the generic `CacheService.cached()`:
+
+#### Bobblehead Caching
 
 ```typescript
 // Cache single bobblehead by ID
@@ -63,7 +114,7 @@ CacheService.bobbleheads.photos(fn, bobbleheadId, options);
 CacheService.bobbleheads.search(fn, query, filtersHash, options);
 ```
 
-### Collection Caching
+#### Collection Caching
 
 ```typescript
 // Cache single collection by ID
@@ -85,7 +136,7 @@ CacheService.collections.metrics(fn, collectionId, options);
 CacheService.collections.public(fn, optionsHash, options);
 ```
 
-### User Caching
+#### User Caching
 
 ```typescript
 // Cache user profile
@@ -95,7 +146,7 @@ CacheService.users.profile(fn, userId, options);
 CacheService.users.stats(fn, userId, options);
 ```
 
-### Search Caching (Next.js unstable_cache)
+#### Search Caching (Next.js unstable_cache)
 
 ```typescript
 // Cache search results
@@ -114,19 +165,7 @@ CacheService.search.publicPage(fn, queryHash, filtersHash, options);
 CacheService.search.invalidatePublic();
 ```
 
-### Redis Search Caching (High-Traffic)
-
-For high-traffic public search queries, use Redis-backed caching:
-
-```typescript
-// Cache public search dropdown in Redis
-CacheService.redisSearch.publicDropdown(fn, queryHash, options);
-
-// Cache public search page in Redis
-CacheService.redisSearch.publicPage(fn, queryHash, filtersHash, options);
-```
-
-### Analytics Caching
+#### Analytics Caching
 
 ```typescript
 // Cache view counts
@@ -151,14 +190,14 @@ CacheService.analytics.engagement(fn, targetType, targetIds, optionsHash, option
 CacheService.analytics.performance(fn, targetType, targetIds, options);
 ```
 
-### Featured Content Caching
+#### Featured Content Caching
 
 ```typescript
 // Cache featured content by type
 CacheService.featured.content(fn, type, options);
 ```
 
-## Generic Cache Method
+### Generic Cache Method
 
 For custom caching needs not covered by domain helpers:
 
@@ -179,6 +218,88 @@ const result = await CacheService.cached(
   },
 );
 ```
+
+---
+
+## Layer 3: Upstash Redis - High-Traffic & Distributed Caching
+
+Use Redis for high-traffic public endpoints, distributed operations, and features requiring TTL-based expiry.
+
+### Redis Search Caching (High-Traffic)
+
+For high-traffic public search queries:
+
+```typescript
+import { createHashFromObject } from '@/lib/utils/cache.utils';
+
+// Public search dropdown
+const results = await CacheService.redisSearch.publicDropdown(
+  () => searchPublicConsolidated(query),
+  createHashFromObject({ query }),
+);
+
+// Public search page with filters
+const results = await CacheService.redisSearch.publicPage(
+  () => searchPublicWithFilters(query, filters),
+  createHashFromObject({ query }),
+  createHashFromObject({ filters, pagination }),
+);
+```
+
+### Redis Keys Structure
+
+Use `REDIS_KEYS` for Redis-specific operations:
+
+```typescript
+import { REDIS_KEYS } from '@/lib/constants/redis-keys';
+
+// View tracking
+REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION(targetType, targetId, viewerId);
+REDIS_KEYS.VIEW_TRACKING.DEDUPLICATION_ANONYMOUS(targetType, targetId, ipAddress);
+REDIS_KEYS.VIEW_TRACKING.VIEW_COUNTS(targetType, targetId);
+REDIS_KEYS.VIEW_TRACKING.VIEW_AGGREGATES(targetType, targetId, period);
+REDIS_KEYS.VIEW_TRACKING.TRENDING_CACHE(targetType, timeframe);
+REDIS_KEYS.VIEW_TRACKING.RECENT_VIEWS(targetType, targetId);
+
+// Distributed locks
+REDIS_KEYS.LOCKS.AGGREGATE_UPDATE(type, id);
+REDIS_KEYS.LOCKS.BOBBLEHEAD_UPDATE(bobbleheadId);
+REDIS_KEYS.LOCKS.COLLECTION_UPDATE(collectionId);
+REDIS_KEYS.LOCKS.USER_UPDATE(userId);
+
+// Rate limiting
+REDIS_KEYS.RATE_LIMIT(userId);
+REDIS_KEYS.RATE_LIMIT_ACTION(userId, action);
+
+// Entity caching
+REDIS_KEYS.CACHE.BOBBLEHEAD(bobbleheadId);
+REDIS_KEYS.CACHE.COLLECTION(collectionId);
+REDIS_KEYS.CACHE.USER_PROFILE(userId);
+REDIS_KEYS.CACHE.FEATURED_CONTENT(type);
+```
+
+### RedisOperations API
+
+```typescript
+import { RedisOperations } from '@/lib/utils/redis-client';
+
+// Basic operations
+await RedisOperations.get<T>(key);           // Auto-deserializes JSON
+await RedisOperations.set<T>(key, value, ttlSeconds);  // Auto-serializes
+await RedisOperations.del(key);
+await RedisOperations.exists(key);
+await RedisOperations.expire(key, ttlSeconds);
+
+// Hash operations
+await RedisOperations.hset(key, { field1: 'value1', field2: 123 });
+await RedisOperations.hgetall(key);
+await RedisOperations.hincrby(key, field, increment);
+
+// Counter operations
+await RedisOperations.incr(key);
+```
+
+---
 
 ## Cache Keys
 
@@ -226,6 +347,8 @@ CACHE_KEYS.ANALYTICS.PERFORMANCE(targetType, targetIds);
 CACHE_KEYS.FEATURED.CONTENT(type);
 ```
 
+---
+
 ## Cache Tags
 
 Use `CacheTagGenerators` for consistent tag generation:
@@ -252,27 +375,60 @@ CacheTagGenerators.search.popular();
 CacheTagGenerators.featured.content(type);
 ```
 
+---
+
 ## TTL Configuration
 
-Use `CACHE_CONFIG.TTL` for consistent TTL values:
+### CACHE_CONFIG.TTL (for unstable_cache)
 
 ```typescript
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 
-CACHE_CONFIG.TTL.SHORT; // 60 seconds - Frequently changing data
-CACHE_CONFIG.TTL.MEDIUM; // 300 seconds (5 min) - Standard data
-CACHE_CONFIG.TTL.LONG; // 900 seconds (15 min) - Stable entity data
-CACHE_CONFIG.TTL.EXTENDED; // 3600 seconds (1 hour) - Rarely changing data
+CACHE_CONFIG.TTL.REALTIME;      // 30 seconds - Ultra-fast changing data (trending)
+CACHE_CONFIG.TTL.SHORT;         // 300 seconds (5 min) - User-specific, frequent updates
+CACHE_CONFIG.TTL.MEDIUM;        // 1800 seconds (30 min) - Semi-static list data
+CACHE_CONFIG.TTL.LONG;          // 3600 seconds (1 hour) - Stable entity data
+CACHE_CONFIG.TTL.EXTENDED;      // 14400 seconds (4 hours) - Rarely changing
 CACHE_CONFIG.TTL.PUBLIC_SEARCH; // 600 seconds (10 min) - Public search results
+CACHE_CONFIG.TTL.DAILY;         // 86400 seconds (24 hours) - Aggregated data
+CACHE_CONFIG.TTL.WEEKLY;        // 604800 seconds (7 days) - Statistical data
 ```
 
 | TTL Type      | Duration | Use Case                                        |
 | ------------- | -------- | ----------------------------------------------- |
-| SHORT         | 1 min    | Dashboard stats, trending content, recent views |
-| MEDIUM        | 5 min    | List results, user stats, analytics             |
-| LONG          | 15 min   | Single entity data, user profiles               |
-| EXTENDED      | 1 hour   | Featured content, photos, popular searches      |
-| PUBLIC_SEARCH | 10 min   | Public search results (dropdown and page)       |
+| REALTIME      | 30s      | Trending content, live metrics                  |
+| SHORT         | 5 min    | User dashboards, recent activity                |
+| MEDIUM        | 30 min   | Collection lists, search results                |
+| LONG          | 1 hour   | Entity details, user profiles                   |
+| EXTENDED      | 4 hours  | Photos, rarely changing data                    |
+| PUBLIC_SEARCH | 10 min   | Public search dropdown and page results         |
+| DAILY         | 24 hours | Aggregated statistics, historical data          |
+| WEEKLY        | 7 days   | Long-term statistics, global metrics            |
+
+### REDIS_TTL (for Redis operations)
+
+```typescript
+import { REDIS_TTL } from '@/lib/constants/redis-keys';
+
+REDIS_TTL.ANALYTICS;           // 604800 (1 week)
+REDIS_TTL.CACHE.SHORT;         // 300 (5 min)
+REDIS_TTL.CACHE.MEDIUM;        // 1800 (30 min)
+REDIS_TTL.CACHE.LONG;          // 3600 (1 hour)
+REDIS_TTL.CACHE.DAILY;         // 86400 (24 hours)
+REDIS_TTL.LOCK;                // 30 seconds
+REDIS_TTL.RATE_LIMIT;          // 60 seconds
+REDIS_TTL.SESSION;             // 86400 (24 hours)
+REDIS_TTL.TEMP;                // 3600 (1 hour)
+
+// View tracking specific
+REDIS_TTL.VIEW_TRACKING.DEDUPLICATION;  // 300 (5 min)
+REDIS_TTL.VIEW_TRACKING.COUNTS;         // 3600 (1 hour)
+REDIS_TTL.VIEW_TRACKING.AGGREGATES;     // 86400 (24 hours)
+REDIS_TTL.VIEW_TRACKING.TRENDING;       // 900 (15 min)
+REDIS_TTL.VIEW_TRACKING.STATS;          // 1800 (30 min)
+```
+
+---
 
 ## Caching in Facades
 
@@ -360,45 +516,7 @@ static async getCollectionsByUser(
 }
 ```
 
-### Search Cache Pattern
-
-```typescript
-static async searchBobbleheads(
-  query: string,
-  filters: SearchFilters = {},
-  viewerUserId?: string,
-  dbInstance?: DatabaseExecutor,
-): Promise<Array<BobbleheadRecord>> {
-  try {
-    // 1. Create hash from filters for cache key
-    const filtersHash = createHashFromObject(filters);
-
-    // 2. Use search-specific cache helper
-    return CacheService.bobbleheads.search(
-      () => {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
-
-        return BobbleheadsQuery.searchAsync(query, filters, context);
-      },
-      query,
-      filtersHash,
-      {
-        context: {
-          entityType: 'search',
-          facade: facadeName,
-          operation: 'searchBobbleheads',
-          userId: viewerUserId,
-        },
-      },
-    );
-  } catch (error) {
-    throw createFacadeError(errorContext, error);
-  }
-}
-```
+---
 
 ## Cache Invalidation
 
@@ -517,17 +635,6 @@ CacheRevalidationService.admin.onFullRevalidation(reason);
 CacheRevalidationService.admin.onSystemChange(reason);
 ```
 
-### Direct Tag Invalidation
-
-```typescript
-// Invalidate specific tag
-CacheService.invalidateByTag(CACHE_CONFIG.TAGS.COLLECTION(collectionId));
-
-// Invalidate multiple tags
-const cacheTags = CacheTagGenerators.social.comments(entityType, entityId);
-cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
-```
-
 ### Handling Invalidation Results
 
 ```typescript
@@ -552,41 +659,7 @@ if (!revalidationResult.isSuccess) {
 }
 ```
 
-## Redis Caching (High-Traffic)
-
-For high-traffic public search queries, use Redis-backed caching:
-
-```typescript
-import { createHashFromObject } from '@/lib/utils/cache.utils';
-
-// Public search dropdown
-const results = await CacheService.redisSearch.publicDropdown(
-  () => searchPublicConsolidated(query),
-  createHashFromObject({ query }),
-);
-
-// Public search page with filters
-const results = await CacheService.redisSearch.publicPage(
-  () => searchPublicWithFilters(query, filters),
-  createHashFromObject({ query }),
-  createHashFromObject({ filters, pagination }),
-);
-```
-
-### Redis Operations
-
-```typescript
-import { RedisOperations } from '@/lib/utils/redis-client';
-
-// Set with TTL
-await RedisOperations.set(key, data, ttlSeconds);
-
-// Get (auto-deserializes)
-const data = await RedisOperations.get<DataType>(key);
-
-// Delete
-await RedisOperations.delete(key);
-```
+---
 
 ## Cache Options
 
@@ -607,6 +680,8 @@ interface CacheContext {
   userId?: string;
 }
 ```
+
+---
 
 ## Server Action Integration
 
@@ -648,18 +723,39 @@ export const updateBobbleheadAction = authActionClient
   });
 ```
 
+---
+
+## When to Use Each Caching Layer
+
+| Use Case | Recommended Layer | Rationale |
+|----------|------------------|-----------|
+| Same-request deduplication | React `cache()` | Prevents redundant calls within single render |
+| Entity data (bobbleheads, collections) | `unstable_cache` | Tag-based invalidation, automatic revalidation |
+| User-specific dashboard | `unstable_cache` | Privacy separation, tag invalidation |
+| Public search results (high traffic) | Redis | Distributed, fast, handles scale |
+| View tracking deduplication | Redis | Distributed, TTL-based expiry, prevents duplicate counts |
+| Rate limiting | Redis | Distributed counters, automatic TTL expiry |
+| Distributed locks | Redis | Prevents concurrent updates across instances |
+| Image transformations | Cloudinary | CDN-level caching, on-the-fly transforms |
+
+---
+
 ## Anti-Patterns to Avoid
 
 1. **Never cache write operations** - Only cache reads
 2. **Never use generic `CacheService.cached()` when domain helper exists** - Use `CacheService.{domain}.{method}()`
-3. **Never use hardcoded cache keys** - Use `CACHE_KEYS` constants
-4. **Never use hardcoded TTL values** - Use `CACHE_CONFIG.TTL`
+3. **Never use hardcoded cache keys** - Use `CACHE_KEYS` or `REDIS_KEYS` constants
+4. **Never use hardcoded TTL values** - Use `CACHE_CONFIG.TTL` or `REDIS_TTL`
 5. **Never skip cache invalidation** - Always invalidate after mutations
 6. **Never cache user-specific data without user ID in key** - Include userId in cache key or options hash
 7. **Never cache paginated data without pagination in key** - Include limit/offset in options hash
 8. **Never ignore cache invalidation failures** - Log to Sentry as warnings
-9. **Never use Redis for all caching** - Only use for high-traffic public search
-10. **Never skip Sentry logging on cache errors** - Always capture exceptions with appropriate context
+9. **Never use Redis for all caching** - Redis is expensive; use unstable_cache for most entity data
+10. **Never use unstable_cache without tags** - Makes invalidation impossible
+11. **Never skip deduplication for view tracking** - Causes inflated counts
+12. **Never skip Sentry logging on cache errors** - Always capture exceptions with appropriate context
+
+---
 
 ## Facade Integration Requirements (MANDATORY)
 
@@ -674,37 +770,3 @@ When implementing facades, caching is NOT optional:
 - Use `CacheRevalidationService.{domain}.on{Action}()` methods
 - Cache invalidation must happen AFTER successful database operation
 - Cache invalidation failures should be logged to Sentry but NOT fail the operation
-
-### Example Pattern
-
-```typescript
-// In facade - READ operation
-static async getBobbleheadByIdAsync(...) {
-  return CacheService.bobbleheads.byId(  // REQUIRED: Use domain helper
-    () => BobbleheadsQuery.findByIdAsync(id, context),
-    id,
-    { context: { /* ... */ } },
-  );
-}
-
-// In facade - WRITE operation
-static async updateAsync(...) {
-  try {
-    const result = await (dbInstance ?? db).transaction(async (tx) => {
-      // ... mutation logic
-    });
-
-    // REQUIRED: Invalidate cache after successful mutation
-    CacheRevalidationService.bobbleheads.onUpdate(
-      result.id,
-      userId,
-      result.collectionId,
-      result.slug,
-    );
-
-    return result;
-  } catch (error) {
-    throw createFacadeError({ /* ... */ }, error);
-  }
-}
-```
