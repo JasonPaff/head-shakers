@@ -181,13 +181,6 @@ export const featuredContentRelations = relations(featuredContent, ({ one }) => 
   }),
 }));
 
-export const loginHistoryRelations = relations(loginHistory, ({ one }) => ({
-  user: one(users, {
-    fields: [loginHistory.userId],
-    references: [users.id],
-  }),
-}));
-
 export const userSettingsRelations = relations(userSettings, ({ one }) => ({
   user: one(users, {
     fields: [userSettings.userId],

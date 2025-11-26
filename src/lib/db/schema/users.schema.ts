@@ -1,5 +1,6 @@
 import { sql } from 'drizzle-orm';
 import { boolean, index, pgEnum, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
+
 import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 
 export const commentPermissionEnum = pgEnum('comment_permission', ENUMS.USER_SETTINGS.COMMENT_PERMISSION);

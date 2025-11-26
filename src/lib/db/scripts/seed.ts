@@ -8,7 +8,6 @@ import {
   bobbleheadTags,
   collections,
   comments,
-  follows,
   likes,
   notificationSettings,
   subCollections,
@@ -412,7 +411,7 @@ async function main() {
    📂 Sub-collections: ${collectionsData.subCollections.length}
    🪆 Bobbleheads: ${insertedBobbleheads.length}
    📸 Photos: 3
-   💬 Social interactions: Various likes, follows, and comments
+   💬 Social interactions: Various likes and comments
     `);
   } catch (error) {
     console.error('❌ Seeding failed:', error);
@@ -430,7 +429,6 @@ async function resetDatabase() {
   // Delete all data in reverse dependency order
   await db.delete(comments);
   await db.delete(likes);
-  await db.delete(follows);
   await db.delete(bobbleheadTags);
   await db.delete(bobbleheadPhotos);
   await db.delete(bobbleheads);
@@ -604,26 +602,6 @@ async function seedSocialData(
   collectionsData: { collections: (typeof collections.$inferSelect)[] },
 ) {
   console.log('💬 Seeding social data...');
-
-  // Create some follows between users
-  const followsData = [];
-  for (let i = 0; i < insertedUsers.length; i++) {
-    for (let j = 0; j < insertedUsers.length; j++) {
-      if (i !== j && Math.random() < 0.4) {
-        // 40% chance of following
-        followsData.push({
-          followerId: insertedUsers[i]!.id,
-          followingId: insertedUsers[j]!.id,
-          followType: 'user' as const,
-        });
-      }
-    }
-  }
-
-  if (followsData.length > 0) {
-    await db.insert(follows).values(followsData);
-    console.log(`✅ Created ${followsData.length} follows`);
-  }
 
   // Create some likes
   const likesData = [];

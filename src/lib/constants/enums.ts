@@ -41,9 +41,6 @@ export const ENUMS = {
     FEATURE_TYPE: ['homepage_banner', 'collection_of_week', 'trending', 'editor_pick'] as const,
     TYPE: ['bobblehead', 'collection', 'user'] as const,
   },
-  FOLLOW: {
-    TYPE: ['user', 'collection'] as const,
-  },
   LIKE: {
     TARGET_TYPE: ['bobblehead', 'collection', 'subcollection'] as const,
   },
@@ -53,9 +50,6 @@ export const ENUMS = {
   NOTIFICATION: {
     RELATED_TYPE: ['bobblehead', 'collection', 'subcollection', 'comment', 'user'] as const,
     TYPE: ['comment', 'like', 'follow', 'mention', 'system'] as const,
-  },
-  PLATFORM_SETTING: {
-    VALUE_TYPE: ['string', 'number', 'boolean', 'json'] as const,
   },
   SEARCH: {
     RESULT_TYPE: ['bobblehead', 'collection', 'subcollection', 'user'] as const,
@@ -81,7 +75,6 @@ export type CommentTargetType = (typeof ENUMS.COMMENT.TARGET_TYPE)[number];
 export type ContentMetricType = (typeof ENUMS.CONTENT_METRIC.TYPE)[number];
 export type ContentReportReason = (typeof ENUMS.CONTENT_REPORT.REASON)[number];
 export type ContentReportStatus = (typeof ENUMS.CONTENT_REPORT.STATUS)[number];
-export type FollowType = (typeof ENUMS.FOLLOW.TYPE)[number];
 export type LikeTargetType = (typeof ENUMS.LIKE.TARGET_TYPE)[number];
 export type NotificationType = (typeof ENUMS.NOTIFICATION.TYPE)[number];
 export type PrivacyLevel = (typeof ENUMS.USER_SETTINGS.PRIVACY_LEVEL)[number];

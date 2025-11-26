@@ -61,20 +61,12 @@ export const SCHEMA_LIMITS = {
     DESCRIPTION: { MAX: 5000, MIN: 10 },
     TITLE: { MAX: 255, MIN: 10 },
   },
-  LOGIN_HISTORY: {
-    FAILURE_REASON: { MAX: 255 },
-    IP_ADDRESS: { MAX: 50 },
-    USER_AGENT: { MAX: 1000 },
-  },
   NEWSLETTER_SIGNUP: {
     EMAIL: { MAX: 255, MIN: 5 },
     USER_ID: { MAX: 255 },
   },
   NOTIFICATION: {
     TITLE: { MAX: 255, MIN: 1 },
-  },
-  PLATFORM_SETTING: {
-    KEY: { MAX: 100, MIN: 1 },
   },
   SEARCH_QUERY: {
     IP_ADDRESS: { MAX: 50 },

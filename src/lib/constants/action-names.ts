@@ -101,10 +101,8 @@ export const ACTION_NAMES = {
     BLOCK_USER: 'blockUser',
     CREATE_COMMENT: 'createComment',
     DELETE_COMMENT: 'deleteComment',
-    FOLLOW: 'followUser',
     LIKE: 'likeContent',
     UNBLOCK_USER: 'unblockUser',
-    UNFOLLOW: 'unfollowUser',
     UNLIKE: 'unlikeContent',
     UPDATE_COMMENT: 'updateComment',
   },
@@ -116,7 +114,6 @@ export const ACTION_NAMES = {
     MARK_NOTIFICATION_READ: 'markNotificationRead',
     TOGGLE_FEATURED_CONTENT_STATUS: 'toggleFeaturedContentStatus',
     UPDATE_FEATURED_CONTENT: 'updateFeaturedContent',
-    UPDATE_PLATFORM_SETTING: 'updatePlatformSetting',
   },
   TAGS: {
     ASSIGN: 'assignTag',

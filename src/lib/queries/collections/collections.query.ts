@@ -10,7 +10,7 @@ import type {
 } from '@/lib/validations/collections.validation';
 
 import { DEFAULTS } from '@/lib/constants';
-import { bobbleheadPhotos, bobbleheads, collections, follows, subCollections, users } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, collections, subCollections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadListRecord = {
@@ -52,7 +52,6 @@ export type BrowseCollectionRecord = {
     slug: string;
   };
   firstBobbleheadPhoto: null | string;
-  followerCount: number;
   owner: {
     avatarUrl: null | string;
     id: string;
@@ -521,12 +520,6 @@ export class CollectionsQuery extends BaseQuery {
             ORDER BY ${bobbleheads.createdAt} ASC
             LIMIT 1
           )`,
-          followerCount: sql<number>`(
-            SELECT COUNT(*)::int
-            FROM ${follows}
-            WHERE ${follows.targetId} = ${collections.id}
-              AND ${follows.followType} = 'collection'
-          )`,
           id: collections.id,
           isPublic: collections.isPublic,
           lastItemAddedAt: collections.lastItemAddedAt,
@@ -568,7 +561,6 @@ export class CollectionsQuery extends BaseQuery {
           userId: row.userId,
         },
         firstBobbleheadPhoto: row.firstBobbleheadPhoto,
-        followerCount: row.followerCount,
         owner: {
           avatarUrl: row.avatarUrl,
           id: row.ownerId,
@@ -615,12 +607,6 @@ export class CollectionsQuery extends BaseQuery {
           ORDER BY ${bobbleheads.createdAt} ASC
           LIMIT 1
         )`,
-        followerCount: sql<number>`(
-          SELECT COUNT(*)::int
-          FROM ${follows}
-          WHERE ${follows.targetId} = ${collections.id}
-            AND ${follows.followType} = 'collection'
-        )`,
         id: collections.id,
         isPublic: collections.isPublic,
         lastItemAddedAt: collections.lastItemAddedAt,
@@ -661,7 +647,6 @@ export class CollectionsQuery extends BaseQuery {
         userId: row.userId,
       },
       firstBobbleheadPhoto: row.firstBobbleheadPhoto,
-      followerCount: row.followerCount,
       owner: {
         avatarUrl: row.avatarUrl,
         id: row.ownerId,
@@ -770,12 +755,6 @@ export class CollectionsQuery extends BaseQuery {
           ORDER BY ${bobbleheads.createdAt} ASC
           LIMIT 1
         )`,
-        followerCount: sql<number>`(
-          SELECT COUNT(*)::int
-          FROM ${follows}
-          WHERE ${follows.targetId} = ${collections.id}
-            AND ${follows.followType} = 'collection'
-        )`,
         id: collections.id,
         isPublic: collections.isPublic,
         lastItemAddedAt: collections.lastItemAddedAt,
@@ -824,7 +803,6 @@ export class CollectionsQuery extends BaseQuery {
           userId: row.userId,
         },
         firstBobbleheadPhoto: row.firstBobbleheadPhoto,
-        followerCount: row.followerCount,
         owner: {
           avatarUrl: row.avatarUrl,
           id: row.ownerId,
@@ -863,7 +841,6 @@ export class CollectionsQuery extends BaseQuery {
         userId: row.userId,
       },
       firstBobbleheadPhoto: row.firstBobbleheadPhoto,
-      followerCount: row.followerCount,
       owner: {
         avatarUrl: row.avatarUrl,
         id: row.ownerId,
@@ -1161,14 +1138,6 @@ export class CollectionsQuery extends BaseQuery {
   private static _getBrowseSortOrder(sortBy: string, sortOrder: string) {
     const column = (() => {
       switch (sortBy) {
-        case 'followerCount':
-          // use the subquery for sorting by follower count
-          return sql`(
-            SELECT COUNT(*)::int
-            FROM ${follows}
-            WHERE ${follows.targetId} = ${collections.id}
-              AND ${follows.followType} = 'collection'
-          )`;
         case 'likeCount':
           return collections.likeCount;
         case 'name':

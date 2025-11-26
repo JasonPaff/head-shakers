@@ -41,12 +41,6 @@ export const DEFAULTS = {
     PRIORITY: 0,
     SORT_ORDER: 0,
   },
-  FOLLOW: {
-    TYPE: 'user',
-  },
-  LOGIN_HISTORY: {
-    LOGIN_METHOD: 'email',
-  },
   NOTIFICATION: {
     IS_EMAIL_SENT: false,
     IS_READ: false,
@@ -70,10 +64,6 @@ export const DEFAULTS = {
     LIMIT: 20,
     MAX_LIMIT: 100,
     OFFSET: 0,
-  },
-  PLATFORM_SETTING: {
-    IS_PUBLIC: false,
-    VALUE_TYPE: 'string',
   },
   SUB_COLLECTION: {
     COMMENT_COUNT: 0,

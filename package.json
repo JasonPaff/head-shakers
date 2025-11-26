@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "build": "next build",
-    "db:fresh": "npm run db:reset && npm run db:migrate && npm run db:seed",
     "db:generate": "npx drizzle-kit generate",
     "db:migrate": "npx drizzle-kit migrate",
     "dev": "next dev --turbopack",

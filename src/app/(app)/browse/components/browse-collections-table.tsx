@@ -2,7 +2,7 @@
 
 import type { Route } from 'next';
 
-import { ChevronRight, FolderOpen, Heart, ImageIcon, User, Users } from 'lucide-react';
+import { ChevronRight, FolderOpen, Heart, ImageIcon, User } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
@@ -220,15 +220,9 @@ export const BrowseCollectionsTable = ({ collections }: BrowseCollectionsTablePr
                       <ImageIcon className={'size-4'} />
                       <span>{record.collection.totalItems || 0}</span>
                     </div>
-                    <div className={'flex items-center gap-3'}>
-                      <div className={'flex items-center gap-1'}>
-                        <Heart className={'size-4'} />
-                        <span>{record.collection.likeCount || 0}</span>
-                      </div>
-                      <div className={'flex items-center gap-1'}>
-                        <Users className={'size-4'} />
-                        <span>{record.followerCount}</span>
-                      </div>
+                    <div className={'flex items-center gap-1'}>
+                      <Heart className={'size-4'} />
+                      <span>{record.collection.likeCount || 0}</span>
                     </div>
                   </div>
                 </CardContent>

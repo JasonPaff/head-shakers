@@ -27,7 +27,6 @@ import * as schema from '@/lib/db/schema/index';
 // This is more reliable than trying to dynamically detect tables
 const KNOWN_TABLES = [
   'users',
-  'login_history',
   'user_settings',
   'notification_settings',
   'user_blocks',
@@ -39,10 +38,8 @@ const KNOWN_TABLES = [
   'tags',
   'comments',
   'likes',
-  'follows',
   'notifications',
   'featured_content',
-  'platform_settings',
   'content_metrics',
   'launch_notifications',
   'content_reports',
