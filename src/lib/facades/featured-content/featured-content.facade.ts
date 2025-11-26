@@ -124,7 +124,7 @@ export class FeaturedContentFacade {
    * @param dbInstance - optional database executor for transactions
    * @returns array of featured bobblehead content data
    */
-  static async getFeaturedBobbleheads(
+  static async getFeaturedBobbleheadsAsync(
     limit?: number,
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<FeaturedContentData>> {

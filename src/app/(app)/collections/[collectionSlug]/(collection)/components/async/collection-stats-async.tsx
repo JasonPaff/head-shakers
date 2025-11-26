@@ -2,7 +2,7 @@ import 'server-only';
 import { notFound } from 'next/navigation';
 
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 import { CollectionStats } from '../collection-stats';
 
@@ -11,7 +11,7 @@ interface CollectionStatsAsyncProps {
 }
 
 export const CollectionStatsAsync = async ({ collectionId }: CollectionStatsAsyncProps) => {
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
   const collection = await CollectionsFacade.getCollectionForPublicView(
     collectionId,
     currentUserId || undefined,

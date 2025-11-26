@@ -18,7 +18,7 @@ import {
   SENTRY_BREADCRUMB_CATEGORIES,
   SENTRY_LEVELS,
 } from '@/lib/constants';
-import { CACHE_KEYS } from '@/lib/constants/cache';
+import { CACHE_CONFIG, CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import {
   createProtectedQueryContext,
@@ -29,6 +29,7 @@ import { SocialQuery } from '@/lib/queries/social/social.query';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
+import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { isCommentEditable } from '@/lib/utils/comment.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
 
@@ -283,6 +284,16 @@ export class SocialFacade {
     }
   }
 
+  /**
+   * Get batch content like data for multiple targets
+   * Fetches like counts and user like statuses for multiple content items in parallel
+   * Cache behavior: Cached with 5-minute TTL, invalidated when likes are toggled
+   *
+   * @param targets - Array of target objects with targetId and targetType
+   * @param viewerUserId - Optional user ID for personalized like status
+   * @param dbInstance - Optional database executor (for transactions)
+   * @returns Array of ContentLikeData with like counts and user status for each target
+   */
   static async getBatchContentLikeDataAsync(
     targets: Array<{ targetId: string; targetType: LikeTargetType }>,
     viewerUserId?: string,
@@ -291,63 +302,91 @@ export class SocialFacade {
     try {
       if (targets.length === 0) return [];
 
-      const context =
-        viewerUserId ?
-          createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
+      // Create cache key with hashed targets array
+      const targetsHash = createHashFromObject(targets);
+      const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES('batch', 'data')}:${targetsHash}:${viewerUserId || 'public'}`;
 
-      // get like counts and user statuses in parallel
-      const [likeCounts, userStatuses] = await Promise.all([
-        SocialQuery.getLikeCountsAsync(targets, context),
-        viewerUserId ?
-          SocialQuery.getUserLikeStatusesAsync(targets, viewerUserId, context)
-        : Promise.resolve(
-            targets.map(
-              ({ targetId, targetType }): UserLikeStatus => ({
-                isLiked: false,
-                likeId: null,
-                targetId,
-                targetType,
-              }),
-            ),
-          ),
-      ]);
-
-      // create maps for efficient lookup
-      const likeCountMap = new Map(
-        likeCounts.map((item) => [`${item.targetType}:${item.targetId}`, item.likeCount]),
-      );
-      const userStatusMap = new Map(
-        userStatuses.map((status) => [`${status.targetType}:${status.targetId}`, status]),
-      );
-
-      // combine data for each target
-      const results = targets.map(({ targetId, targetType }) => {
-        const key = `${targetType}:${targetId}`;
-        const likeCount = likeCountMap.get(key) || 0;
-        const userStatus = userStatusMap.get(key) || { isLiked: false, likeId: null };
-
-        return {
-          isLiked: userStatus.isLiked,
-          likeCount,
-          likeId: userStatus.likeId,
+      // Generate cache tags for each target entity
+      const cacheTags = targets.flatMap(({ targetId, targetType }) =>
+        CacheTagGenerators.social.like(
+          targetType === 'subcollection' ? 'collection' : targetType,
           targetId,
-          targetType,
-        };
-      });
+          viewerUserId || 'system',
+        ),
+      );
 
-      // add breadcrumb for monitoring
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          hasViewerUser: !!viewerUserId,
-          targetCount: targets.length,
+      return CacheService.cached(
+        async () => {
+          const context =
+            viewerUserId ?
+              createUserQueryContext(viewerUserId, { dbInstance })
+            : createPublicQueryContext({ dbInstance });
+
+          // get like counts and user statuses in parallel
+          const [likeCounts, userStatuses] = await Promise.all([
+            SocialQuery.getLikeCountsAsync(targets, context),
+            viewerUserId ?
+              SocialQuery.getUserLikeStatusesAsync(targets, viewerUserId, context)
+            : Promise.resolve(
+                targets.map(
+                  ({ targetId, targetType }): UserLikeStatus => ({
+                    isLiked: false,
+                    likeId: null,
+                    targetId,
+                    targetType,
+                  }),
+                ),
+              ),
+          ]);
+
+          // create maps for efficient lookup
+          const likeCountMap = new Map(
+            likeCounts.map((item) => [`${item.targetType}:${item.targetId}`, item.likeCount]),
+          );
+          const userStatusMap = new Map(
+            userStatuses.map((status) => [`${status.targetType}:${status.targetId}`, status]),
+          );
+
+          // combine data for each target
+          const results = targets.map(({ targetId, targetType }) => {
+            const key = `${targetType}:${targetId}`;
+            const likeCount = likeCountMap.get(key) || 0;
+            const userStatus = userStatusMap.get(key) || { isLiked: false, likeId: null };
+
+            return {
+              isLiked: userStatus.isLiked,
+              likeCount,
+              likeId: userStatus.likeId,
+              targetId,
+              targetType,
+            };
+          });
+
+          // add breadcrumb for monitoring
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: {
+              hasViewerUser: !!viewerUserId,
+              targetCount: targets.length,
+            },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Batch content like data fetched',
+          });
+
+          return results;
         },
-        level: SENTRY_LEVELS.INFO,
-        message: 'Batch content like data fetched',
-      });
-
-      return results;
+        cacheKey,
+        {
+          context: {
+            entityType: 'social',
+            facade: facadeName,
+            operation: 'getBatchContentLikeData',
+            userId: viewerUserId,
+          },
+          tags: cacheTags,
+          ttl: CACHE_CONFIG.TTL.SHORT,
+        },
+      );
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { targetCount: targets.length },

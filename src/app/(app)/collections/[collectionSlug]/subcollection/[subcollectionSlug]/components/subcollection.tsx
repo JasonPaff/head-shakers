@@ -9,7 +9,7 @@ import { SubcollectionMetrics } from '@/app/(app)/collections/[collectionSlug]/s
 import { ContentLayout } from '@/components/layout/content-layout';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface SubcollectionProps {
   collectionId: string;
@@ -18,7 +18,7 @@ interface SubcollectionProps {
 }
 
 export const Subcollection = async ({ collectionId, searchParams, subcollectionId }: SubcollectionProps) => {
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
   const subcollection = await SubcollectionsFacade.getSubCollectionForPublicView(
     collectionId,
     subcollectionId,

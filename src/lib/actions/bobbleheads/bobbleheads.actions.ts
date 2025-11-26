@@ -34,7 +34,7 @@ import {
   updateBobbleheadPhotoMetadataSchema,
   updateBobbleheadWithPhotosSchema,
 } from '@/lib/validations/bobbleheads.validation';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 export const createBobbleheadWithPhotosAction = authActionClient
   .metadata({
@@ -510,7 +510,7 @@ export const getBobbleheadPhotosAction = publicActionClient
   .inputSchema(getBobbleheadPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { bobbleheadId } = getBobbleheadPhotosSchema.parse(ctx.sanitizedInput);
-    const userId = (await getOptionalUserId()) ?? undefined;
+    const userId = (await getOptionalUserIdAsync()) ?? undefined;
 
     try {
       const photos = await BobbleheadsFacade.getBobbleheadPhotos(bobbleheadId, userId ?? undefined, ctx.db);

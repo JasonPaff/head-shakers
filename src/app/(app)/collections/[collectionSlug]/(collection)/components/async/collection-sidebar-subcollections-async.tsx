@@ -2,7 +2,7 @@ import 'server-only';
 import { notFound } from 'next/navigation';
 
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 import { CollectionSidebarSubcollections } from '../collection-sidebar-subcollections';
 
@@ -13,7 +13,7 @@ interface CollectionSidebarSubcollectionsAsyncProps {
 export const CollectionSidebarSubcollectionsAsync = async ({
   collectionId,
 }: CollectionSidebarSubcollectionsAsyncProps) => {
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
   const collection = await CollectionsFacade.getCollectionForPublicView(
     collectionId,
     currentUserId || undefined,

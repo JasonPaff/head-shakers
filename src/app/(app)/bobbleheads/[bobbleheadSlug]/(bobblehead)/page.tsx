@@ -29,7 +29,7 @@ import { generateBreadcrumbSchema, generateProductSchema } from '@/lib/seo/jsonl
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 type ItemPageProps = PageProps;
 
@@ -91,7 +91,7 @@ export async function generateMetadata({
 async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
   const { bobbleheadSlug } = await routeParams;
   const { collectionId, subcollectionId } = await searchParams;
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
 
   const basicBobblehead = await BobbleheadsFacade.getBobbleheadBySlug(
     bobbleheadSlug,
@@ -115,7 +115,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
   }
 
   // Compute permission flags
-  const isOwner = await checkIsOwner(bobblehead.userId);
+  const isOwner = await checkIsOwnerAsync(bobblehead.userId);
   const canEdit = isOwner;
   const canDelete = isOwner;
 

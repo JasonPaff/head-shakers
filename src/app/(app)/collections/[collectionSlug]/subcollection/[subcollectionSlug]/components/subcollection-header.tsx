@@ -14,7 +14,7 @@ import { SubcollectionShareMenu } from '@/components/feature/subcollections/subc
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
-import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface SubcollectionHeaderProps {
   likeData?: {
@@ -28,8 +28,8 @@ interface SubcollectionHeaderProps {
 export const SubcollectionHeader = async ({ likeData, subcollection }: SubcollectionHeaderProps) => {
   if (!subcollection) throw new Error('Subcollection is required');
 
-  const isOwner = await checkIsOwner(subcollection.userId);
-  const currentUserId = await getOptionalUserId();
+  const isOwner = await checkIsOwnerAsync(subcollection.userId);
+  const currentUserId = await getOptionalUserIdAsync();
 
   return (
     <Fragment>

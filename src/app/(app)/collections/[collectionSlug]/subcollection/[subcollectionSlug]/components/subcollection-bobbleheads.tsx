@@ -14,7 +14,7 @@ import { Conditional } from '@/components/ui/conditional';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
-import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface SubcollectionBobbleheadsProps {
   collectionId: string;
@@ -27,8 +27,8 @@ export const SubcollectionBobbleheads = async ({
   searchParams,
   subcollection,
 }: SubcollectionBobbleheadsProps) => {
-  const currentUserId = await getOptionalUserId();
-  const isOwner = await checkIsOwner(subcollection.userId);
+  const currentUserId = await getOptionalUserIdAsync();
+  const isOwner = await checkIsOwnerAsync(subcollection.userId);
 
   const searchTerm = searchParams?.search || undefined;
   const sortBy = searchParams?.sort || 'newest';

@@ -15,13 +15,13 @@ import { Button } from '@/components/ui/button';
 import { generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA } from '@/lib/seo/seo.constants';
-import { getOptionalUserId } from '@/utils/optional-auth-utils';
+import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 // enable ISR with 5-minute revalidation
 export const revalidate = 300;
 
 export default async function FeaturedPage() {
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
 
   // Generate JSON-LD schema for the featured content listing page
   const collectionPageSchema = generateCollectionPageSchema({

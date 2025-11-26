@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
 import { SubcollectionsFacade } from '@/lib/facades/collections/subcollections.facade';
-import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface CollectionSidebarSubcollectionsProps {
   collection: NonNullable<PublicCollection>;
@@ -17,8 +17,8 @@ interface CollectionSidebarSubcollectionsProps {
 export const CollectionSidebarSubcollections = async ({
   collection,
 }: CollectionSidebarSubcollectionsProps) => {
-  const currentUserId = await getOptionalUserId();
-  const isOwner = await checkIsOwner(collection.userId);
+  const currentUserId = await getOptionalUserIdAsync();
+  const isOwner = await checkIsOwnerAsync(collection.userId);
 
   const result = await SubcollectionsFacade.getSubCollectionsForPublicView(
     collection.id,

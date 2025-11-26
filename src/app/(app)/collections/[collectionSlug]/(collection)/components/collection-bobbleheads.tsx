@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface CollectionBobbleheadsProps {
   collection: NonNullable<PublicCollection>;
@@ -26,8 +26,8 @@ export const CollectionBobbleheads = async ({
   searchParams,
   subcollections,
 }: CollectionBobbleheadsProps) => {
-  const currentUserId = await getOptionalUserId();
-  const isOwner = await checkIsOwner(collection.userId);
+  const currentUserId = await getOptionalUserIdAsync();
+  const isOwner = await checkIsOwnerAsync(collection.userId);
 
   const view = searchParams?.view || 'all';
   const searchTerm = searchParams?.search || undefined;

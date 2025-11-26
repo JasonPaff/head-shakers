@@ -28,7 +28,7 @@ import { generateBreadcrumbSchema, generateCollectionPageSchema } from '@/lib/se
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { checkIsOwner, getOptionalUserId } from '@/utils/optional-auth-utils';
+import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
 
 type SubcollectionPageProps = PageProps;
 
@@ -165,7 +165,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
     notFound();
   }
 
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getOptionalUserIdAsync();
 
   // Fetch subcollection data and like data for both headers
   const [publicSubcollection, likeData] = await Promise.all([
@@ -182,7 +182,7 @@ async function SubcollectionPage({ routeParams, searchParams }: SubcollectionPag
   }
 
   // Compute permission flags
-  const isOwner = await checkIsOwner(collection.userId);
+  const isOwner = await checkIsOwnerAsync(collection.userId);
   const canEdit = isOwner;
   const canDelete = isOwner;
 

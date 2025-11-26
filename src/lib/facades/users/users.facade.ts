@@ -59,7 +59,10 @@ export class UsersFacade {
   /**
    * get user by Clerk ID
    */
-  static async getUserByClerkId(clerkId: string, dbInstance?: DatabaseExecutor): Promise<null | UserRecord> {
+  static async getUserByClerkIdAsync(
+    clerkId: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<null | UserRecord> {
     return CacheService.users.profile(
       () => {
         const context = createPublicQueryContext({ dbInstance });

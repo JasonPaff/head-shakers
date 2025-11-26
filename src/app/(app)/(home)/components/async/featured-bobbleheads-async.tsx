@@ -17,7 +17,7 @@ export interface FeaturedBobbleheadsAsyncProps {
  */
 export async function FeaturedBobbleheadsAsync({ currentUserId }: FeaturedBobbleheadsAsyncProps) {
   // Fetch featured bobbleheads from facade (default limit: 8)
-  const bobbleheadsData = await FeaturedContentFacade.getFeaturedBobbleheads();
+  const bobbleheadsData = await FeaturedContentFacade.getFeaturedBobbleheadsAsync();
 
   // Initialize like data map for efficient lookup
   const likeDataMap = new Map<string, { isLiked: boolean; likeCount: number; likeId: null | string }>();
