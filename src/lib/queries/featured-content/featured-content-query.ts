@@ -10,8 +10,30 @@ import type {
 } from '@/lib/validations/system.validation';
 
 import { CONFIG, DEFAULTS } from '@/lib/constants';
-import { bobbleheadPhotos, bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, collections, featuredContent, likes, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+
+/**
+ * data needed for featured collections display
+ */
+export type FeaturedCollectionData = {
+  comments: number;
+  contentId: string;
+  contentSlug: string;
+  description: null | string;
+  id: string;
+  imageUrl: null | string;
+  isLiked: boolean;
+  isTrending: boolean;
+  likeId: null | string;
+  likes: number;
+  ownerAvatarUrl: null | string;
+  ownerDisplayName: null | string;
+  title: null | string;
+  totalItems: number;
+  totalValue: null | string;
+  viewCount: number;
+};
 
 export interface FeaturedContentRecord {
   contentId: string;
@@ -295,6 +317,66 @@ export class FeaturedContentQuery extends BaseQuery {
         ),
       )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
+
+    return results;
+  }
+
+  /**
+   * get featured collections data
+   *
+   * returns up to 6 active featured collections with all fields needed for the
+   * FeaturedCollectionsDisplay component. uses innerJoin to ensure collection exists.
+   * optionally includes like status for authenticated users.
+   */
+  static async getFeaturedCollectionsAsync(
+    context: QueryContext,
+    userId?: null | string,
+  ): Promise<Array<FeaturedCollectionData>> {
+    const dbInstance = this.getDbInstance(context);
+    const now = new Date();
+
+    const results = await dbInstance
+      .select({
+        comments: collections.commentCount,
+        contentId: featuredContent.contentId,
+        contentSlug: collections.slug,
+        description: featuredContent.description,
+        id: featuredContent.id,
+        imageUrl: sql<null | string>`COALESCE(${featuredContent.imageUrl}, ${collections.coverImageUrl})`,
+        isLiked: sql<boolean>`${likes.id} IS NOT NULL`,
+        isTrending: sql<boolean>`${featuredContent.featureType} = 'trending'`,
+        likeId: likes.id,
+        likes: collections.likeCount,
+        ownerAvatarUrl: users.avatarUrl,
+        ownerDisplayName: users.username,
+        title: featuredContent.title,
+        totalItems: collections.totalItems,
+        totalValue: collections.totalValue,
+        viewCount: featuredContent.viewCount,
+      })
+      .from(featuredContent)
+      .innerJoin(collections, eq(featuredContent.contentId, collections.id))
+      .innerJoin(users, eq(collections.userId, users.id))
+      .leftJoin(
+        likes,
+        userId ?
+          and(
+            eq(likes.targetId, collections.id),
+            eq(likes.targetType, 'collection'),
+            eq(likes.userId, userId),
+          )
+        : undefined,
+      )
+      .where(
+        and(
+          eq(featuredContent.contentType, 'collection'),
+          eq(featuredContent.isActive, true),
+          or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
+          or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
+        ),
+      )
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
+      .limit(6);
 
     return results;
   }

@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 
 import type {
+  FeaturedCollectionData,
   FeaturedContentRecord,
   FooterFeaturedContentData,
   HeroFeaturedBobbleheadData,
@@ -148,55 +149,63 @@ export class FeaturedContentFacade {
   }
 
   /**
-   * get featured bobbleheads with their primary photos, specs, and engagement metrics
+   * get featured collections for homepage display
    *
-   * returns bobbleheads that have been marked as featured content, filtered by the
-   * 'bobblehead' content type. includes:
-   * - bobblehead name and slug
-   * - primary photo URL
-   * - like count and view count
-   * - owner information
+   * returns up to 6 active featured collections with engagement metrics.
+   * includes collection metadata, owner information, and user-specific like status
+   * when userId is provided. uses Redis caching for fast access with user-specific
+   * cache keys to cache like data separately per user.
    *
-   * results are cached using the featured content cache with EXTENDED TTL
+   * caching: uses LONG TTL (1 hour) with Redis caching
+   * invalidated by: featured content changes, collection updates
    *
-   * @param limit - optional limit on number of results (default: 8)
+   * @param userId - optional user ID for like status (null for public access)
    * @param dbInstance - optional database executor for transactions
-   * @returns array of featured bobblehead content data
+   * @returns array of featured collection data (limit 6, ordered by priority)
    */
-  static async getFeaturedBobbleheadsAsync(
-    limit?: number,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<Array<FeaturedContentData>> {
+  static async getFeaturedCollectionsAsync(
+    userId?: null | string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<FeaturedCollectionData>> {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching featured collections',
+    });
+
     try {
-      const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
+      return await CacheService.featured.collections(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          const data = await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
 
-      // filter to only bobblehead content type
-      const bobbleheadContent = allContent.filter((content) => content.contentType === 'bobblehead');
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { count: data.length, userId: userId || 'public' },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Featured collections fetched successfully',
+          });
 
-      // apply limit (default 8 for homepage display)
-      const limitedContent = bobbleheadContent.slice(0, limit ?? 8);
-
-      // add breadcrumb for monitoring
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          limit: limit ?? 8,
-          requestedCount: bobbleheadContent.length,
-          returnedCount: limitedContent.length,
+          return data;
         },
-        level: SENTRY_LEVELS.INFO,
-        message: 'Fetched featured bobbleheads',
-      });
-
-      return limitedContent;
+        userId,
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.FEATURED,
+            facade: facadeName,
+            operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
+          },
+        },
+      );
     } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { limit },
+      const errorContext: FacadeErrorContext = {
+        data: { userId },
         facade: facadeName,
-        method: 'getFeaturedBobbleheads',
-        operation: 'getFeaturedBobbleheads',
+        method: 'getFeaturedCollectionsAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
+        userId: userId || undefined,
       };
-      throw createFacadeError(context, error);
+      throw createFacadeError(errorContext, error);
     }
   }
 

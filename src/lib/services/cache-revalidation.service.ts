@@ -436,7 +436,7 @@ export class CacheRevalidationService {
   static readonly featured = {
     /**
      * revalidate after featured content changes
-     * also invalidates Redis cache for hero bobblehead
+     * also invalidates Redis cache for hero bobblehead and featured collections
      */
     onContentChange: (type?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onFeaturedContentChange();
@@ -444,6 +444,11 @@ export class CacheRevalidationService {
       // Invalidate hero bobblehead Redis cache
       void RedisOperations.del(CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD()).catch((error) => {
         console.error('[CacheRevalidation] Failed to invalidate hero bobblehead Redis cache:', error);
+      });
+
+      // Invalidate featured collections Redis cache (all user-specific keys)
+      void RedisOperations.delByPattern(`${CACHE_KEYS.FEATURED.COLLECTIONS()}:*`).catch((error) => {
+        console.error('[CacheRevalidation] Failed to invalidate featured collections Redis cache:', error);
       });
 
       return CacheRevalidationService.revalidateTags(tags, {
@@ -455,7 +460,7 @@ export class CacheRevalidationService {
 
     /**
      * revalidate all featured content
-     * also invalidates Redis cache for hero bobblehead
+     * also invalidates Redis cache for hero bobblehead and featured collections
      */
     onMajorUpdate: (): RevalidationResult => {
       const tags = CacheTagInvalidation.onMajorDataChange();
@@ -463,6 +468,11 @@ export class CacheRevalidationService {
       // Invalidate hero bobblehead Redis cache
       void RedisOperations.del(CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD()).catch((error) => {
         console.error('[CacheRevalidation] Failed to invalidate hero bobblehead Redis cache:', error);
+      });
+
+      // Invalidate featured collections Redis cache (all user-specific keys)
+      void RedisOperations.delByPattern(`${CACHE_KEYS.FEATURED.COLLECTIONS()}:*`).catch((error) => {
+        console.error('[CacheRevalidation] Failed to invalidate featured collections Redis cache:', error);
       });
 
       return CacheRevalidationService.revalidateTags(tags, {

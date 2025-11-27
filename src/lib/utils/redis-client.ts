@@ -43,6 +43,36 @@ export class RedisOperations {
   }
 
   /**
+   * Delete all keys matching a pattern using SCAN
+   * Uses SCAN to avoid blocking the server with KEYS command
+   */
+  static async delByPattern(pattern: string): Promise<number> {
+    try {
+      let cursor = 0;
+      let deletedCount = 0;
+
+      do {
+        const [nextCursor, keys] = await this.client.scan(cursor, { count: 100, match: pattern });
+        cursor = typeof nextCursor === 'number' ? nextCursor : Number.parseInt(nextCursor, 10);
+
+        if (keys.length > 0) {
+          const pipeline = this.client.pipeline();
+          for (const key of keys) {
+            pipeline.del(key);
+          }
+          await pipeline.exec();
+          deletedCount += keys.length;
+        }
+      } while (cursor !== 0);
+
+      return deletedCount;
+    } catch (error) {
+      console.error(`Redis DEL by pattern error for pattern ${pattern}:`, error);
+      return 0;
+    }
+  }
+
+  /**
    * Check if a key exists in Redis
    */
   static async exists(key: string): Promise<boolean> {

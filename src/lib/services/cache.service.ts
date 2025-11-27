@@ -544,6 +544,32 @@ export class CacheService {
    */
   static readonly featured = {
     /**
+     * cache featured collections data in Redis with user-specific keys
+     *
+     * uses Redis for distributed caching of featured collections display data.
+     * supports user-specific cache keys to cache like data separately per user.
+     * this is high-traffic homepage content that benefits from fast Redis access.
+     */
+    collections: async <T>(
+      fn: () => Promise<T>,
+      userId: null | string | undefined,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = `${CACHE_KEYS.FEATURED.COLLECTIONS()}:${userId || 'public'}`;
+
+      return CacheService.cachedWithRedis(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: 'featured',
+          operation: 'featured:collections',
+          userId: userId || undefined,
+        },
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+
+    /**
      * cache featured content by type
      */
     content: async <T>(fn: () => Promise<T>, type: string, options: Omit<CacheOptions, 'tags'> = {}) => {
