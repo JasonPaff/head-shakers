@@ -22,8 +22,8 @@ export const FooterNavLink = ({ className, href, label, testId, ...props }: Foot
     <li data-slot={'footer-nav-link-item'}>
       <Link
         className={cn(
-          'text-sm text-muted-foreground transition-colors',
-          'hover:text-foreground focus:text-foreground',
+          'text-sm text-slate-600 transition-colors dark:text-slate-400',
+          'hover:text-orange-600 focus:text-orange-600 dark:hover:text-orange-400 dark:focus:text-orange-400',
           'focus:outline-none focus-visible:underline focus-visible:underline-offset-4',
           className,
         )}

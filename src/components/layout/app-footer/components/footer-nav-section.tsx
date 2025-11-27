@@ -34,7 +34,7 @@ export const FooterNavSection = ({
     >
       {/* Section Heading */}
       <h3
-        className={'text-sm font-semibold text-foreground'}
+        className={'text-sm font-semibold text-slate-900 dark:text-white'}
         data-slot={'footer-nav-section-heading'}
         data-testid={headingTestId}
       >

@@ -62,24 +62,32 @@ export const FooterNewsletter = withFocusManagement(() => {
   };
 
   return (
-    <div className={'space-y-3'}>
+    <div className={'flex flex-col items-center gap-4 md:flex-row md:justify-between'}>
       {/* Newsletter Header */}
-      <div className={'space-y-1'}>
-        <h3 className={'text-sm font-semibold text-foreground'}>Stay Updated</h3>
-        <p className={'text-xs text-muted-foreground'}>Get the latest bobblehead news and updates.</p>
+      <div className={'text-center md:text-left'}>
+        <h3 className={'text-lg font-semibold text-white'}>Stay Updated</h3>
+        <p className={'text-sm text-orange-100'}>
+          Get the latest bobblehead news and updates.
+          <br />
+          Join our community of collectors today.
+        </p>
       </div>
 
       {/* Newsletter Form */}
-      <form className={'flex gap-2'} onSubmit={handleSubmit}>
+      <form className={'flex w-full gap-2 md:w-auto'} onSubmit={handleSubmit}>
         {/* Email Field */}
         <form.AppField name={'email'}>
           {(field) => {
             return (
-              <div className={'relative flex-1'}>
+              <div className={'relative flex-1 md:w-64'}>
                 <field.TextField
-                  className={'pr-3 pl-9'}
+                  className={`border-white/20 bg-white pr-3 pl-9 text-slate-900
+                    placeholder:text-slate-600 dark:placeholder:text-slate-300`}
                   disabled={isExecuting}
-                  icon={<MailIcon aria-hidden className={'size-4'} />}
+                  fieldErrorProps={{
+                    className: 'dark:text-white text-white',
+                  }}
+                  icon={<MailIcon aria-hidden className={'size-4 text-slate-600 dark:text-slate-300'} />}
                   label={''}
                   placeholder={'Enter your email'}
                 />
@@ -90,7 +98,8 @@ export const FooterNewsletter = withFocusManagement(() => {
 
         {/* Submit Button */}
         <Button
-          className={'h-9 shrink-0 px-4'}
+          className={`h-9 shrink-0 bg-slate-900 px-4 font-semibold text-white
+            hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100`}
           disabled={isExecuting}
           testId={'footer-newsletter-submit'}
           type={'submit'}

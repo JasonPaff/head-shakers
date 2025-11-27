@@ -85,9 +85,9 @@ export const FooterSocialLinks = ({ className, testId, ...props }: FooterSocialL
           <a
             aria-label={platform.label}
             className={cn(
-              'text-muted-foreground transition-colors',
-              'hover:text-foreground focus:text-foreground',
-              'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+              'text-slate-500 transition-colors dark:text-slate-400',
+              'hover:text-orange-600 focus:text-orange-600 dark:hover:text-orange-400 dark:focus:text-orange-400',
+              'focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2',
               'rounded-sm',
             )}
             data-slot={'footer-social-link'}

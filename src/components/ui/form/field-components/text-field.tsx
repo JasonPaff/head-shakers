@@ -20,6 +20,7 @@ import { cn } from '@/utils/tailwind-utils';
 type TextFieldProps = ComponentProps<'input'> &
   ComponentTestIdProps & {
     description?: string;
+    fieldErrorProps?: ComponentProps<typeof FieldError>;
     focusRef?: FocusRef;
     icon?: ReactNode;
     isRequired?: boolean;
@@ -28,6 +29,7 @@ type TextFieldProps = ComponentProps<'input'> &
 
 export const TextField = ({
   description,
+  fieldErrorProps,
   focusRef,
   icon,
   isRequired,
@@ -73,7 +75,7 @@ export const TextField = ({
           )}
         </div>
       </FieldAria>
-      <FieldError testId={errorTestId} />
+      <FieldError testId={errorTestId} {...fieldErrorProps} />
       <FieldDescription testId={descriptionTestId}>{description}</FieldDescription>
     </FieldItem>
   );
