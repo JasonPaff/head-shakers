@@ -57,19 +57,21 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
       data-testid={generateTestId('feature', 'collection-grid')}
     >
       {collections.map((collection, index) => (
-        <div className={index >= 3 ? 'hidden md:block' : undefined} key={collection.id}>
-          <FeaturedCollectionCard collection={collection} />
-        </div>
+        <FeaturedCollectionCard
+          className={index >= 3 ? 'hidden md:block' : undefined}
+          collection={collection}
+          key={collection.id}
+        />
       ))}
     </div>
   );
 };
 
-interface FeaturedCollectionCardProps {
+type FeaturedCollectionCardProps = ClassName<{
   collection: FeaturedCollection;
-}
+}>;
 
-const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => {
+const FeaturedCollectionCard = ({ className, collection }: FeaturedCollectionCardProps) => {
   const _hasImage = Boolean(collection.imageUrl && collection.imageUrl !== '/placeholder.jpg');
 
   // Extract publicId and generate blur placeholder for progressive loading
@@ -85,6 +87,7 @@ const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => 
         'group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg',
         'transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl',
         'dark:border-slate-800 dark:bg-slate-900',
+        className,
       )}
       data-slot={'featured-collection-card'}
       data-testid={generateTestId('feature', 'collection-card', collection.id)}
