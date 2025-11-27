@@ -25,6 +25,7 @@ type TextFieldProps = ComponentProps<'input'> &
     icon?: ReactNode;
     isRequired?: boolean;
     label: string;
+    labelClassName?: string;
   };
 
 export const TextField = ({
@@ -34,6 +35,7 @@ export const TextField = ({
   icon,
   isRequired,
   label,
+  labelClassName,
   testId,
   ...props
 }: TextFieldProps) => {
@@ -49,7 +51,12 @@ export const TextField = ({
 
   return (
     <FieldItem>
-      <Label htmlFor={id} testId={labelTestId} variant={isRequired ? 'required' : undefined}>
+      <Label
+        className={labelClassName}
+        htmlFor={id}
+        testId={labelTestId}
+        variant={isRequired ? 'required' : undefined}
+      >
         {label}
       </Label>
       <FieldAria focusRef={focusRef}>
