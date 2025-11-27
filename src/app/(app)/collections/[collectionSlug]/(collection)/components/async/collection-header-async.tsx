@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/optional-auth-utils';
 
 import { CollectionHeader } from '../collection-header';
 
@@ -12,7 +12,7 @@ interface CollectionHeaderAsyncProps {
 }
 
 export const CollectionHeaderAsync = async ({ collectionId }: CollectionHeaderAsyncProps) => {
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
 
   const [collection, likeData] = await Promise.all([
     CollectionsFacade.getCollectionForPublicView(collectionId, currentUserId || undefined),

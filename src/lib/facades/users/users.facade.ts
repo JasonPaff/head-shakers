@@ -2,10 +2,17 @@ import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 
 import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
+import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { AdminUsersFilter, AssignableRole } from '@/lib/validations/admin-users.validation';
 
-import { SCHEMA_LIMITS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import {
+  CACHE_ENTITY_TYPE,
+  OPERATIONS,
+  SCHEMA_LIMITS,
+  SENTRY_BREADCRUMB_CATEGORIES,
+  SENTRY_LEVELS,
+} from '@/lib/constants';
 import { isReservedUsername } from '@/lib/constants/reserved-usernames';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
@@ -13,6 +20,9 @@ import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
+import { createFacadeError } from '@/lib/utils/error-builders';
+
+const facadeName = 'UsersFacade';
 
 /**
  * unified Users Facade
@@ -58,19 +68,46 @@ export class UsersFacade {
 
   /**
    * get user by Clerk ID
+   * @param clerkId
+   * @param dbInstance
    */
   static async getUserByClerkIdAsync(
     clerkId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | UserRecord> {
-    return CacheService.users.profile(
-      () => {
-        const context = createPublicQueryContext({ dbInstance });
-        return UsersQuery.findByClerkIdAsync(clerkId, context);
-      },
-      clerkId,
-      { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByClerkId', userId: clerkId } },
-    );
+    const methodName = 'getUserByClerkIdAsync';
+
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching user by Clerk ID',
+    });
+
+    try {
+      return CacheService.users.profile(
+        () => {
+          const context = createPublicQueryContext({ dbInstance });
+          return UsersQuery.findByClerkIdAsync(clerkId, context);
+        },
+        clerkId,
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.USER,
+            facade: facadeName,
+            operation: methodName,
+            userId: clerkId,
+          },
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: { clerkId },
+        facade: facadeName,
+        method: methodName,
+        operation: OPERATIONS.PLATFORM.GET_STATS,
+      };
+      throw createFacadeError(errorContext, error);
+    }
   }
 
   /**

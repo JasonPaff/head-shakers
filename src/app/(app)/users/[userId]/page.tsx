@@ -18,7 +18,7 @@ import { generateBreadcrumbSchema, generatePersonSchema } from '@/lib/seo/jsonld
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { checkIsOwnerAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync } from '@/utils/optional-auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
@@ -88,7 +88,7 @@ async function UserPage({ routeParams }: UserPageProps) {
   }
 
   // Check if current user is viewing their own profile
-  const isOwner = await checkIsOwnerAsync(user.id);
+  const isOwner = await getIsOwnerAsync(user.id);
 
   // Generate canonical URL for JSON-LD schemas
   const profileUrl = `${DEFAULT_SITE_METADATA.url}${$path({ route: '/users/[userId]', routeParams: { userId } })}`;

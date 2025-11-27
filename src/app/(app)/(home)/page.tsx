@@ -18,7 +18,7 @@ import {
   ORGANIZATION_SCHEMA,
   WEBSITE_SCHEMA,
 } from '@/lib/seo/seo.constants';
-import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/optional-auth-utils';
 
 export const revalidate = 300;
 
@@ -57,7 +57,7 @@ export function generateMetadata(): Metadata {
 }
 
 export default async function HomePage() {
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
 
   // Check if user needs username onboarding
   let shouldShowOnboarding = false;

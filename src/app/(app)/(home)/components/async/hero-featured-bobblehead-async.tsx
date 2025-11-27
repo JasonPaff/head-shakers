@@ -1,7 +1,7 @@
 import { HeroFeaturedBobblehead } from '@/app/(app)/(home)/components/display/hero-featured-bobblehead';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/optional-auth-utils';
 
 /**
  * Async server component for fetching and displaying a single featured bobblehead in the hero section
@@ -14,7 +14,7 @@ export async function HeroFeaturedBobbleheadAsync() {
   const bobbleheadsData = await FeaturedContentFacade.getFeaturedBobbleheadsAsync(1);
   if (bobbleheadsData.length === 0) return null;
 
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
 
   const featuredData = bobbleheadsData[0]!;
   let likeCount = featuredData.likes ?? 0;

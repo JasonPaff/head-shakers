@@ -6,6 +6,7 @@ import { Suspense } from 'react';
 
 import { HeroFeaturedBobbleheadAsync } from '@/app/(app)/(home)/components/async/hero-featured-bobblehead-async';
 import { HeroStatsAsync } from '@/app/(app)/(home)/components/async/hero-stats-async';
+import { HeroStatsErrorBoundary } from '@/app/(app)/(home)/components/hero-stats-error-boundary';
 import { HeroFeaturedBobbleheadSkeleton } from '@/app/(app)/(home)/components/skeletons/hero-featured-bobblehead-skeleton';
 import { HeroStatsSkeleton } from '@/app/(app)/(home)/components/skeletons/hero-stats-skeleton';
 import { AuthContent } from '@/components/ui/auth';
@@ -136,7 +137,7 @@ export const HeroSection = () => {
                 variant={'outline'}
               >
                 <Link href={$path({ route: '/browse' })}>
-                  <SearchIcon className={'mr-2 size-5'} />
+                  <SearchIcon aria-hidden className={'mr-2 size-5'} />
                   Browse Collections
                 </Link>
               </Button>
@@ -154,9 +155,11 @@ export const HeroSection = () => {
             </div>
 
             {/* Stats Row */}
-            <Suspense fallback={<HeroStatsSkeleton />}>
-              <HeroStatsAsync />
-            </Suspense>
+            <HeroStatsErrorBoundary>
+              <Suspense fallback={<HeroStatsSkeleton />}>
+                <HeroStatsAsync />
+              </Suspense>
+            </HeroStatsErrorBoundary>
           </div>
 
           {/* Right Content - Featured Bobblehead Showcase */}

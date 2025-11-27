@@ -5,14 +5,14 @@ import { BobbleheadHeader } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobb
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync, getUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface BobbleheadHeaderAsyncProps {
   bobbleheadId: string;
 }
 
 export const BobbleheadHeaderAsync = async ({ bobbleheadId }: BobbleheadHeaderAsyncProps) => {
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
   const [bobblehead, likeData] = await Promise.all([
     BobbleheadsFacade.getBobbleheadWithRelations(bobbleheadId, currentUserId || undefined),
     SocialFacade.getContentLikeData(bobbleheadId, 'bobblehead', currentUserId || undefined),
@@ -22,7 +22,7 @@ export const BobbleheadHeaderAsync = async ({ bobbleheadId }: BobbleheadHeaderAs
     notFound();
   }
 
-  const isOwner = await checkIsOwnerAsync(bobblehead.userId);
+  const isOwner = await getIsOwnerAsync(bobblehead.userId);
 
   // Fetch user collections for edit dialog (only if owner)
   let collections: Array<{ id: string; name: string }> = [];

@@ -2,7 +2,7 @@ import 'server-only';
 import { notFound } from 'next/navigation';
 
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/optional-auth-utils';
 
 import type { CollectionSearchParams } from '../../route-type';
 
@@ -17,7 +17,7 @@ export const CollectionBobbleheadsAsync = async ({
   collectionId,
   searchParams,
 }: CollectionBobbleheadsAsyncProps) => {
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
   const collection = await CollectionsFacade.getCollectionForPublicView(
     collectionId,
     currentUserId || undefined,

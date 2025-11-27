@@ -21,7 +21,7 @@ export const getCurrentClerkUserId = cache(async (): Promise<null | string> => {
  * Get the current database user ID with request-level deduplication.
  * Combines Clerk auth lookup with database user resolution.
  */
-export const getOptionalUserId = cache(async (): Promise<null | string> => {
+export const getUserIdAsync = cache(async (): Promise<null | string> => {
   try {
     const clerkUserId = await getCurrentClerkUserId();
 
@@ -37,15 +37,16 @@ export const getOptionalUserId = cache(async (): Promise<null | string> => {
   }
 });
 
-export const checkIsOwner = async (resourceUserId?: null | string): Promise<boolean> => {
+/**
+ * Check if the current user is the owner of a resource
+ * @param resourceUserId - The user ID of the resource owner
+ * @returns True if the current user is the owner, false otherwise
+ */
+export const getIsOwnerAsync = async (resourceUserId?: null | string): Promise<boolean> => {
   if (!resourceUserId) return false;
 
-  const currentUserId = await getOptionalUserId();
+  const currentUserId = await getUserIdAsync();
   if (!currentUserId) return false;
 
   return currentUserId === resourceUserId;
 };
-
-// Aliases for backward compatibility
-export const getOptionalUserIdAsync = getOptionalUserId;
-export const checkIsOwnerAsync = checkIsOwner;

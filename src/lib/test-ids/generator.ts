@@ -212,6 +212,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'form-field',
     'form-label',
     'form-submit',
+    'hero-stats',
     'hover-card',
     'icon',
     'icon-apple',

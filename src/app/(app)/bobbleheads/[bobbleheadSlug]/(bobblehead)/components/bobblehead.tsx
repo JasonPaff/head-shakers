@@ -11,14 +11,14 @@ import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { checkIsOwnerAsync, getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync, getUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface BobbleheadProps {
   bobbleheadId: string;
 }
 
 export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
 
   const bobblehead = await BobbleheadsFacade.getBobbleheadWithRelations(
     bobbleheadId,
@@ -29,7 +29,7 @@ export const Bobblehead = async ({ bobbleheadId }: BobbleheadProps) => {
     notFound();
   }
 
-  const isOwner = await checkIsOwnerAsync(bobblehead.userId);
+  const isOwner = await getIsOwnerAsync(bobblehead.userId);
 
   const likeData = await SocialFacade.getContentLikeData(
     bobbleheadId,

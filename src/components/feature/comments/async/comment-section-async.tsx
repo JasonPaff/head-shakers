@@ -6,7 +6,7 @@ import type { CommentTargetType } from '@/lib/constants';
 
 import { CommentSectionClient } from '@/components/feature/comments/async/comment-section-client';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getOptionalUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/optional-auth-utils';
 
 interface CommentSectionAsyncProps extends Omit<ComponentProps<'div'>, 'children'> {
   /**
@@ -36,7 +36,7 @@ export const CommentSectionAsync = async ({
   ...props
 }: CommentSectionAsyncProps) => {
   // Get current user ID if authenticated
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getUserIdAsync();
   const isAuthenticated = !!currentUserId;
 
   // Fetch initial comments with nested replies for threaded display

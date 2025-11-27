@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/nextjs';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { CACHE_ENTITY_TYPE, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
@@ -78,7 +78,7 @@ export class PlatformStatsFacade {
         },
         {
           context: {
-            entityType: 'platform',
+            entityType: CACHE_ENTITY_TYPE.PLATFORM,
             facade: facadeName,
             operation: OPERATIONS.PLATFORM.GET_STATS,
           },
@@ -89,7 +89,7 @@ export class PlatformStatsFacade {
       const errorContext: FacadeErrorContext = {
         data: {},
         facade: facadeName,
-        method: 'getPlatformStats',
+        method: 'getHomePageHeroStatsAsync',
         operation: OPERATIONS.PLATFORM.GET_STATS,
       };
       throw createFacadeError(errorContext, error);

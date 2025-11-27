@@ -224,6 +224,13 @@ export const CACHE_KEYS = {
   },
 } as const;
 
+export const CACHE_ENTITY_TYPE = {
+  BOBBLEHEAD: 'bobblehead',
+  COLLECTION: 'collection',
+  PLATFORM: 'platform',
+  USER: 'user',
+};
+
 export type CacheEnvironment = keyof typeof CACHE_CONFIG.ENVIRONMENT;
 /**
  * type definitions for cache operations
