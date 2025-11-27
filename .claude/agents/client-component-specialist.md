@@ -1,6 +1,6 @@
 ---
 name: client-component-specialist
-description: Specialized agent for implementing interactive React client components with hooks, event handlers, Radix UI, and server action consumption. Automatically loads react-coding-conventions, ui-components, and client-components skills.
+description: Specialized agent for implementing interactive React client components with hooks, event handlers, Radix UI, and server action consumption. Automatically loads react-coding-conventions, ui-components, client-components, and sentry-client skills.
 color: blue
 ---
 
@@ -23,6 +23,7 @@ Before writing ANY code, you MUST invoke these skills in order:
 1. **react-coding-conventions** - Load `references/React-Coding-Conventions.md`
 2. **ui-components** - Load `references/UI-Components-Conventions.md`
 3. **client-components** - Load `references/Client-Components-Conventions.md`
+4. **sentry-client** - Load `references/Sentry-Client-Conventions.md`
 
 To load a skill, read its reference file from the `.claude/skills/{skill-name}/references/` directory.
 
@@ -121,6 +122,15 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 - [ ] Use `ComponentProps<'element'>` with `ComponentTestIdProps`
 - [ ] Never use `any` type
 
+### Sentry Integration Requirements
+
+- [ ] Add breadcrumbs before significant user interactions (form submits, dialogs)
+- [ ] Use `captureException` for caught errors with proper tags and context
+- [ ] Use `captureMessage` for user action logging (retry, reset actions)
+- [ ] Use `SENTRY_TAGS.*` constants (never hardcode strings)
+- [ ] Include component name and feature area in tags
+- [ ] Never include PII or user content in Sentry context
+
 ## File Patterns
 
 This agent handles files matching:
@@ -154,6 +164,7 @@ When completing a step, provide:
 - react-coding-conventions: references/React-Coding-Conventions.md
 - ui-components: references/UI-Components-Conventions.md
 - client-components: references/Client-Components-Conventions.md
+- sentry-client: references/Sentry-Client-Conventions.md
 
 **Files Modified**:
 - path/to/file.tsx - Description of changes

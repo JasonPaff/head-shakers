@@ -1,8 +1,10 @@
-# Sentry Monitoring Conventions
+# Sentry Server-Side Conventions
 
 ## Overview
 
-Head Shakers uses Sentry for error tracking, performance monitoring, and debugging. Sentry integration is used across server actions, middleware, facades, error boundaries, and utility functions with consistent patterns for context, breadcrumbs, and error capture.
+Head Shakers uses Sentry for error tracking, performance monitoring, and debugging. This document covers **server-side** Sentry integration patterns used across server actions, middleware, facades, and API routes with consistent patterns for context, breadcrumbs, and error capture.
+
+**Note:** For client-side/front-end Sentry patterns, see the `sentry-client` skill.
 
 ## Required Imports
 
@@ -55,9 +57,9 @@ export const SENTRY_CONTEXTS = {
   FEATURED_CONTENT_DATA: 'featured_content_data',
   INPUT_INFO: 'input_info',
   LIKE_DATA: 'like_data',
+  NEWSLETTER_DATA: 'newsletter_data',
   PERFORMANCE: 'performance',
   SEARCH_DATA: 'search_data',
-  SUBCOLLECTION_DATA: 'subcollection_data',
   TAG_DATA: 'tag_data',
   USER_DATA: 'user_data',
   VIEW_DATA: 'view_data',
@@ -242,9 +244,6 @@ Sentry.addBreadcrumb({
 | `DATABASE`         | Database operations             |
 | `AUTH`             | Authentication events           |
 | `EXTERNAL_SERVICE` | Third-party API calls           |
-| `NAVIGATION`       | Route changes                   |
-| `USER_INTERACTION` | User-initiated actions          |
-| `VALIDATION`       | Input validation                |
 
 ### Breadcrumb Levels
 
@@ -303,32 +302,6 @@ try {
 }
 ```
 
-### Utility Function Pattern
-
-```typescript
-export async function copyToClipboard(text: string): Promise<boolean> {
-  try {
-    if (!navigator?.clipboard) {
-      const error = new Error('Clipboard API not available');
-      Sentry.captureException(error, {
-        extra: { operation: 'copy-to-clipboard' },
-        level: 'warning',
-      });
-      return false;
-    }
-
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch (error) {
-    Sentry.captureException(error, {
-      extra: { operation: 'copy-to-clipboard', textLength: text.length },
-      level: 'warning',
-    });
-    return false;
-  }
-}
-```
-
 ### Extra Data Guidelines
 
 ```typescript
@@ -353,8 +326,8 @@ Sentry.captureException(error, {
   },
   level: 'warning', // or 'error', 'fatal'
   tags: {
-    domain: 'social',
-    feature: 'comments',
+    [SENTRY_TAGS.FEATURE]: 'comments',
+    [SENTRY_TAGS.OPERATION]: 'create',
   },
 });
 ```
@@ -438,57 +411,6 @@ export const sentryMiddleware = createMiddleware<{
 });
 ```
 
-## Error Boundary Pattern
-
-For React error boundaries:
-
-```typescript
-componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-  Sentry.captureException(error, {
-    contexts: {
-      react: {
-        componentStack: errorInfo.componentStack,
-      },
-    },
-    extra: {
-      componentStack: errorInfo.componentStack,
-      errorBoundary: 'PhotoManagementErrorBoundary',
-      errorMessage: error.message,
-      errorName: error.name,
-      errorStack: error.stack,
-      errorType: this.getErrorType(error),
-    },
-    level: 'error',
-    tags: {
-      component: 'photo-management',
-      errorBoundary: 'true',
-    },
-  });
-}
-```
-
-### User Action Logging in Error Boundaries
-
-```typescript
-// Log when user chooses to continue without photos
-Sentry.captureMessage('User continued editing without photos', {
-  extra: {
-    action: 'continue-without-photos',
-    previousError: this.state.error?.message,
-  },
-  level: 'info',
-});
-
-// Log when user retries after error
-Sentry.captureMessage('Photo management error boundary reset', {
-  extra: {
-    action: 'retry',
-    previousError: this.state.error?.message,
-  },
-  level: 'info',
-});
-```
-
 ## Performance Monitoring
 
 For long-running operations:
@@ -515,6 +437,26 @@ return await Sentry.startSpan(
     }
   },
 );
+```
+
+## Instrumentation Configuration
+
+### Server Instrumentation (`src/instrumentation.ts`)
+
+```typescript
+import * as Sentry from '@sentry/nextjs';
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    await import('../sentry.server.config');
+  }
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    await import('../sentry.edge.config');
+  }
+}
+
+// REQUIRED: Captures React Server Component errors
+export const onRequestError = Sentry.captureRequestError;
 ```
 
 ## Anti-Patterns to Avoid

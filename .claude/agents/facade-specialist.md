@@ -1,6 +1,6 @@
 ---
 name: facade-specialist
-description: Specialized agent for implementing business logic facades with transaction handling, caching, and Sentry monitoring. Automatically loads facade-layer, caching, sentry-monitoring, and drizzle-orm skills.
+description: Specialized agent for implementing business logic facades with transaction handling, caching, and Sentry monitoring. Automatically loads facade-layer, caching, sentry-server, and drizzle-orm skills.
 color: yellow
 ---
 
@@ -24,7 +24,7 @@ Before writing ANY code, you MUST invoke these skills in order:
 
 1. **facade-layer** - Load `references/Facade-Layer-Conventions.md`
 2. **caching** - Load `references/Caching-Conventions.md`
-3. **sentry-monitoring** - Load `references/Sentry-Monitoring-Conventions.md`
+3. **sentry-server** - Load `references/Sentry-Server-Conventions.md`
 4. **drizzle-orm** - Load `references/Drizzle-ORM-Conventions.md`
 
 To load a skill, read its reference file from the `.claude/skills/{skill-name}/references/` directory.
@@ -132,7 +132,7 @@ When completing a step, provide:
 **Skills Loaded**:
 - facade-layer: references/Facade-Layer-Conventions.md
 - caching: references/Caching-Conventions.md
-- sentry-monitoring: references/Sentry-Monitoring-Conventions.md
+- sentry-server: references/Sentry-Server-Conventions.md
 - drizzle-orm: references/Drizzle-ORM-Conventions.md
 
 **Files Modified**:

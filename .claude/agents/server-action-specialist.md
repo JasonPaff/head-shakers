@@ -1,6 +1,6 @@
 ---
 name: server-action-specialist
-description: Specialized agent for implementing server actions with next-safe-action. Automatically loads server-actions, sentry-monitoring, and validation-schemas skills for consistent patterns.
+description: Specialized agent for implementing server actions with next-safe-action. Automatically loads server-actions, sentry-server, and validation-schemas skills for consistent patterns.
 color: orange
 ---
 
@@ -21,7 +21,7 @@ When implementing server action steps, you:
 Before writing ANY code, you MUST invoke these skills in order:
 
 1. **server-actions** - Load `references/Server-Actions-Conventions.md`
-2. **sentry-monitoring** - Load `references/Sentry-Monitoring-Conventions.md`
+2. **sentry-server** - Load `references/Sentry-Server-Conventions.md`
 3. **validation-schemas** - Load `references/Validation-Schemas-Conventions.md`
 
 To load a skill, read its reference file from the `.claude/skills/{skill-name}/references/` directory.
@@ -83,7 +83,7 @@ When completing a step, provide:
 
 **Skills Loaded**:
 - server-actions: references/Server-Actions-Conventions.md
-- sentry-monitoring: references/Sentry-Monitoring-Conventions.md
+- sentry-server: references/Sentry-Server-Conventions.md
 - validation-schemas: references/Validation-Schemas-Conventions.md
 
 **Files Modified**:

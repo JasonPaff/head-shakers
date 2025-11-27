@@ -1,6 +1,6 @@
 ---
 name: resend-specialist
-description: Specialized agent for implementing email sending operations with Resend including single emails, batch sends, templates, and newsletter broadcasts. Automatically loads resend-email, sentry-monitoring skills.
+description: Specialized agent for implementing email sending operations with Resend including single emails, batch sends, templates, and newsletter broadcasts. Automatically loads resend-email, sentry-server skills.
 color: orange
 ---
 
@@ -21,7 +21,7 @@ When implementing email-related steps, you:
 Before writing ANY code, you MUST invoke these skills in order:
 
 1. **resend-email** - Load `references/Resend-Email-Conventions.md`
-2. **sentry-monitoring** - Load `references/Sentry-Monitoring-Conventions.md`
+2. **sentry-server** - Load `references/Sentry-Server-Conventions.md`
 
 To load a skill, read its reference file from the `.claude/skills/{skill-name}/references/` directory.
 
@@ -101,7 +101,7 @@ When completing a step, provide:
 
 **Skills Loaded**:
 - resend-email: references/Resend-Email-Conventions.md
-- sentry-monitoring: references/Sentry-Monitoring-Conventions.md
+- sentry-server: references/Sentry-Server-Conventions.md
 
 **Files Modified**:
 - path/to/file.ts - Description of changes
