@@ -25,17 +25,17 @@ export const FooterFeaturedSection = async () => {
     <FooterNavSection heading={'Featured Collections'}>
       {/* Featured Collection Links */}
       {featuredCollections.map((collection) => {
-        const _hasValidSlug = collection.contentSlug !== null;
+        const _hasValidSlug = collection.collectionSlug !== null;
         if (!_hasValidSlug) return null;
 
         return (
           <FooterNavLink
             href={$path({
               route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug: collection.contentSlug as string },
+              routeParams: { collectionSlug: collection.collectionSlug ?? '' },
             })}
             key={collection.id}
-            label={collection.title || collection.contentName || 'Untitled Collection'}
+            label={collection.title || collection.collectionName || 'Untitled Collection'}
           />
         );
       })}

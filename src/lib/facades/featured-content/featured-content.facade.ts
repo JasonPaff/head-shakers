@@ -1,6 +1,9 @@
 import * as Sentry from '@sentry/nextjs';
 
-import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type {
+  FeaturedContentRecord,
+  FooterFeaturedContentData,
+} from '@/lib/queries/featured-content/featured-content-query';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
@@ -223,32 +226,31 @@ export class FeaturedContentFacade {
    */
   static async getFooterFeaturedContentAsync(
     dbInstance: DatabaseExecutor = db,
-  ): Promise<Array<FeaturedContentData>> {
+  ): Promise<Array<FooterFeaturedContentData>> {
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
       level: SENTRY_LEVELS.INFO,
-      message: 'Fetching active featured content',
+      message: 'Fetching footer featured content',
     });
 
     try {
       return await CacheService.featured.content(
         async () => {
           const context = createPublicQueryContext({ dbInstance });
-          // TODO: replace with footer-specific query that only returns exactly the data needed
-          const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
+          const data = await FeaturedContentQuery.getFooterFeaturedContentAsync(context);
 
           // Add breadcrumb for successful fetch
           Sentry.addBreadcrumb({
             category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {},
+            data: { ...data },
             level: SENTRY_LEVELS.INFO,
-            message: 'Active featured content fetched successfully',
+            message: 'Footer featured content fetched successfully',
           });
 
-          return FeaturedContentTransformer.transformFeaturedContent(rawData);
+          return data;
         },
-        // TODO: move to a constant
-        'active',
+        // TODO: move to constants
+        'footer',
         {
           context: {
             entityType: CACHE_ENTITY_TYPE.FEATURED,
@@ -261,7 +263,7 @@ export class FeaturedContentFacade {
       const errorContext: FacadeErrorContext = {
         data: {},
         facade: facadeName,
-        method: 'getActiveFeaturedContentAsync',
+        method: 'getFooterFeaturedContentAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
       };
       throw createFacadeError(errorContext, error);

@@ -286,6 +286,41 @@ export class FeaturedContentQuery extends BaseQuery {
   }
 
   /**
+   * get minimal featured content data for footer display
+   *
+   * only joins with the collection's table and selects minimal fields
+   * filters for active content within the date range
+   */
+  static async getFooterFeaturedContentAsync(
+    context: QueryContext,
+  ): Promise<Array<FooterFeaturedContentData>> {
+    const dbInstance = this.getDbInstance(context);
+    const now = new Date();
+
+    const results = await dbInstance
+      .select({
+        collectionName: collections.name,
+        collectionSlug: collections.slug,
+        contentId: featuredContent.contentId,
+        contentType: featuredContent.contentType,
+        id: featuredContent.id,
+        title: featuredContent.title,
+      })
+      .from(featuredContent)
+      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .where(
+        and(
+          eq(featuredContent.isActive, true),
+          or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
+          or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
+        ),
+      )
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
+
+    return results;
+  }
+
+  /**
    * increment view count for featured content
    */
   static async incrementViewCountAsync(contentId: string, context: QueryContext): Promise<void> {
