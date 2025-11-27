@@ -17,7 +17,7 @@ const facadeName = 'PlatformStatsFacade';
 /**
  * Platform-wide statistics result
  */
-export interface PlatformStats {
+export interface HomePageHeroStats {
   totalBobbleheads: number;
   totalCollections: number;
   totalCollectors: number;
@@ -31,15 +31,15 @@ export class PlatformStatsFacade {
   /**
    * Get platform-wide statistics
    *
-   * Returns total counts of:
-   * - Bobbleheads (excluding deleted)
-   * - Collections (all collections)
-   * - Collectors (total users)
+   * Returns total active counts of:
+   * - Bobbleheads
+   * - Collections
+   * - Collectors
    *
    * @param dbInstance - Optional database instance for transactions
    * @returns Platform statistics with total counts
    */
-  static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  static async getHomePageHeroStatsAsync(dbInstance?: DatabaseExecutor): Promise<HomePageHeroStats> {
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
       level: SENTRY_LEVELS.INFO,
@@ -53,7 +53,7 @@ export class PlatformStatsFacade {
 
           // Fetch all counts in parallel for performance
           const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
-            BobbleheadsQuery.getBobbleheadsCountAsync(context),
+            BobbleheadsQuery.getTotalBobbleheadCountAsync(context),
             CollectionsQuery.getCollectionsCountAsync(context),
             UsersQuery.getUsersCountAsync(context),
           ]);

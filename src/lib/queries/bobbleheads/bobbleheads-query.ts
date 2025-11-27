@@ -663,22 +663,6 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
-   * get total bobblehead count excluding deleted records
-   * @param context
-   */
-  static async getBobbleheadsCountAsync(context: QueryContext): Promise<number> {
-    const dbInstance = this.getDbInstance(context);
-
-    const result = await dbInstance
-      .select({ count: count() })
-      .from(bobbleheads)
-      .where(isNull(bobbleheads.deletedAt))
-      .then((result) => result[0]?.count || 0);
-
-    return result;
-  }
-
-  /**
    * get a photo by id with ownership validation
    */
   static async getPhotoByIdAsync(
@@ -720,6 +704,22 @@ export class BobbleheadsQuery extends BaseQuery {
       .from(bobbleheadPhotos)
       .where(eq(bobbleheadPhotos.bobbleheadId, bobbleheadId))
       .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
+  }
+
+  /**
+   * get total bobblehead count excluding deleted records
+   * @param context
+   */
+  static async getTotalBobbleheadCountAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(bobbleheads)
+      .where(isNull(bobbleheads.deletedAt))
+      .then((result) => result[0]?.count || 0);
+
+    return result;
   }
 
   /**

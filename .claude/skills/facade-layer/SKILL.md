@@ -81,6 +81,11 @@ This skill activates when:
 6. **Stub/incomplete methods** that return hardcoded values
 7. **Duplicate methods** with different naming (e.g., `getX` and `getXAsync`)
 8. **Silent failures** that log errors but don't handle them properly
+9. **Raw SQL/Drizzle queries in facades** - delegate to query classes that handle soft-delete
+10. **Wrong operation constants** - use semantically correct operations (add new ones if needed)
+11. **Hardcoded cache keys** - use `CACHE_KEYS.*` constants
+12. **Mixed executor/context usage** - use single shared context for parallel queries
+13. **Breadcrumbs only inside cache callbacks** - add pre-operation breadcrumb outside for visibility
 
 ## References
 

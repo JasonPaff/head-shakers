@@ -288,6 +288,155 @@ const cacheTags = CacheTagGenerators.social.comments(targetType, targetId);
 cacheTags.forEach((tag) => CacheService.invalidateByTag(tag));
 ```
 
+## Query Delegation Pattern
+
+Facades should NEVER write raw SQL or Drizzle queries directly. Always delegate to query classes that properly handle soft-delete filters, permissions, and other concerns.
+
+### Why Query Delegation Matters
+
+1. **Soft-delete consistency** - Query methods handle `deletedAt IS NULL` filters
+2. **Permission enforcement** - Query methods apply visibility rules
+3. **Single source of truth** - Changes to filters propagate automatically
+4. **Testability** - Query methods can be mocked independently
+
+### Correct Pattern
+
+```typescript
+// CORRECT: Delegate to query methods that handle soft-delete
+static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  const context = createPublicQueryContext({ dbInstance });
+
+  const [bobbleheadsCount, collectionsCount, usersCount] = await Promise.all([
+    BobbleheadsQuery.getBobbleheadsCountAsync(context),   // Handles deletedAt filter
+    CollectionsQuery.getCollectionsCountAsync(context),   // Handles deletedAt filter
+    UsersQuery.getUsersCountAsync(context),               // Handles deletedAt filter
+  ]);
+
+  return { totalBobbleheads: bobbleheadsCount, totalCollections: collectionsCount, totalCollectors: usersCount };
+}
+```
+
+### Incorrect Pattern
+
+```typescript
+// INCORRECT: Raw SQL in facade - bypasses soft-delete, permissions, etc.
+static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  const executor = dbInstance ?? db;
+
+  const [bobbleheadsCount, collectionsCount, usersCount] = await Promise.all([
+    // BAD: Missing soft-delete filter!
+    executor.select({ count: count() }).from(bobbleheads).then(r => r[0]?.count || 0),
+    // BAD: Missing soft-delete filter!
+    executor.select({ count: count() }).from(collections).then(r => r[0]?.count || 0),
+    // BAD: Using admin method for public query!
+    UsersQuery.countUsersForAdminAsync({}, context),
+  ]);
+}
+```
+
+## Operation Constants
+
+Always use semantically correct operation constants from `OPERATIONS` in `@/lib/constants/operations`. If an appropriate operation doesn't exist, ADD it rather than using an incorrect one.
+
+### Correct Usage
+
+```typescript
+// CORRECT: Using semantically matching operation
+const errorContext: FacadeErrorContext = {
+  facade: facadeName,
+  method: 'getPlatformStats',
+  operation: OPERATIONS.PLATFORM.GET_STATS,  // Matches the actual operation
+};
+
+// If OPERATIONS.PLATFORM.GET_STATS doesn't exist, ADD it to operations.ts:
+// PLATFORM: {
+//   GET_STATS: 'get_platform_stats',
+// },
+```
+
+### Incorrect Usage
+
+```typescript
+// INCORRECT: Using unrelated operation constant
+const errorContext: FacadeErrorContext = {
+  facade: facadeName,
+  method: 'getPlatformStats',
+  operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,  // Wrong! This is for view analytics
+};
+```
+
+## Query Method Naming Semantics
+
+Use query methods whose names match the access context. Don't use admin-named methods for public queries or vice versa.
+
+### Method Naming Guidelines
+
+| Access Context | Method Naming Pattern | Example |
+|---------------|----------------------|---------|
+| Public (no auth) | `get{Entity}CountAsync`, `find{Entity}sAsync` | `getUsersCountAsync()` |
+| User (authenticated) | `get{Entity}ByUserAsync`, `findUserOwnedAsync` | `getBobbleheadsByUserAsync()` |
+| Admin (elevated) | `{action}ForAdminAsync`, `get{Entity}sForAdminAsync` | `countUsersForAdminAsync()` |
+
+### Correct Usage
+
+```typescript
+// CORRECT: Public query using public-named method
+const context = createPublicQueryContext({ dbInstance });
+const count = await UsersQuery.getUsersCountAsync(context);
+
+// CORRECT: Admin query using admin-named method
+const context = createAdminQueryContext(adminUserId, { dbInstance });
+const users = await UsersQuery.findUsersForAdminAsync(filters, context);
+```
+
+### Incorrect Usage
+
+```typescript
+// INCORRECT: Public query using admin-named method
+const context = createPublicQueryContext({ dbInstance });
+const count = await UsersQuery.countUsersForAdminAsync({}, context);  // Semantically wrong!
+```
+
+## Consistent Context Usage
+
+When making parallel queries, create ONE shared context and pass it to ALL queries. Never mix raw executor access with context-based queries.
+
+### Correct Pattern
+
+```typescript
+// CORRECT: Single context shared across all parallel queries
+static async getAggregateDataAsync(userId: string, dbInstance?: DatabaseExecutor) {
+  const context = createUserQueryContext(userId, { dbInstance });
+
+  const [bobbleheads, collections, stats] = await Promise.all([
+    BobbleheadsQuery.findByUserAsync(userId, context),    // Uses context
+    CollectionsQuery.findByUserAsync(userId, context),    // Uses same context
+    UsersQuery.getUserStatsAsync(userId, context),        // Uses same context
+  ]);
+
+  return { bobbleheads, collections, stats };
+}
+```
+
+### Incorrect Pattern
+
+```typescript
+// INCORRECT: Mixing raw executor with context-based queries
+static async getAggregateDataAsync(userId: string, dbInstance?: DatabaseExecutor) {
+  const context = createUserQueryContext(userId, { dbInstance });
+  const executor = dbInstance ?? db;  // Redundant - context already has this
+
+  const [bobbleheads, collections, stats] = await Promise.all([
+    // BAD: Raw executor bypasses context
+    executor.select().from(bobbleheads).where(eq(bobbleheads.userId, userId)),
+    // OK: Uses context
+    CollectionsQuery.findByUserAsync(userId, context),
+    // BAD: Uses context but also has separate executor variable
+    UsersQuery.getUserStatsAsync(userId, context),
+  ]);
+}
+```
+
 ## Sentry Integration
 
 ### Breadcrumbs for Business Logic
@@ -566,6 +715,11 @@ if (currentDepth >= MAX_NESTING_DEPTH) {
 14. **Never create duplicate methods** - Don't have both `getX()` and `getXAsync()`
 15. **Never create stub methods** - Don't return hardcoded values (e.g., `return Promise.resolve({})`)
 16. **Never skip transactions for multi-step mutations** - ALL multi-step writes need transactions
+17. **Never write raw SQL in facades** - Delegate to query methods that handle soft-delete and other filters
+18. **Never use semantically incorrect operation constants** - Use/create operations that match the actual operation
+19. **Never hardcode cache keys** - Use `CACHE_KEYS.*` constants from `@/lib/constants/cache`
+20. **Never use admin-named methods for public queries** - Use appropriately named query methods
+21. **Never mix raw executor with context** - All parallel queries should use the same shared context
 
 ## Return Type Decision Matrix
 
@@ -719,6 +873,56 @@ ALL facade methods MUST add Sentry breadcrumbs for:
 1. **Successful operations** - Track what happened
 2. **Partial failures** - Non-critical issues that didn't fail the operation
 3. **Business logic decisions** - Important branching logic
+
+### Breadcrumb Placement with Cached Operations
+
+When using `CacheService` helpers, breadcrumbs placed INSIDE the cache callback only execute on cache misses. To ensure observability for ALL requests (including cache hits), add a pre-operation breadcrumb OUTSIDE the cache callback:
+
+```typescript
+// CORRECT: Pre-operation breadcrumb outside cache callback
+static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  // This breadcrumb fires on EVERY request (cache hit or miss)
+  Sentry.addBreadcrumb({
+    category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+    level: SENTRY_LEVELS.INFO,
+    message: 'Fetching platform statistics',
+  });
+
+  try {
+    return await CacheService.platform.stats(
+      async () => {
+        // ... fetch data ...
+
+        // This breadcrumb only fires on cache MISS (fresh data fetch)
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: { bobbleheadsCount, collectionsCount },
+          level: SENTRY_LEVELS.INFO,
+          message: 'Platform statistics fetched from database',
+        });
+
+        return result;
+      },
+      { /* options */ },
+    );
+  } catch (error) {
+    // ... error handling
+  }
+}
+
+// INCORRECT: Only breadcrumb inside cache callback - invisible on cache hits
+static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  try {
+    return await CacheService.platform.stats(
+      async () => {
+        // This ONLY fires on cache miss - no visibility into cache hits!
+        Sentry.addBreadcrumb({ /* ... */ });
+        return result;
+      },
+    );
+  } catch (error) { /* ... */ }
+}
+```
 
 ### Required Breadcrumb Pattern
 

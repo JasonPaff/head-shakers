@@ -8,7 +8,7 @@ import { PlatformStatsFacade } from '@/lib/facades/platform/platform-stats.facad
  * Supports light/dark mode with orange accent colors.
  */
 export async function HeroStatsAsync() {
-  const stats = await PlatformStatsFacade.getPlatformStatsAsync();
+  const stats = await PlatformStatsFacade.getHomePageHeroStatsAsync();
 
   return (
     <div
