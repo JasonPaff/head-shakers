@@ -22,7 +22,7 @@ You are a code review orchestrator for Head Shakers. You coordinate comprehensiv
   - Domain: `"all facade layer code for collections"`
 - `--skip-static`: Skip static analysis (lint/typecheck/format)
 - `--verbose`: Include INFO-level findings and detailed analysis
-- `--quick`: Review only HIGH priority files (faster but less comprehensive)
+- `--quick`: Review only HIGH priority methods/components (faster but less comprehensive)
 
 **Examples**:
 ```
@@ -74,7 +74,7 @@ Examples:
 - Flags parsed
 - Directory structure created
 
-### Phase 2: Scope Analysis
+### Phase 2: Scope Analysis (Surgical Precision)
 
 Mark "Scope analysis" as in_progress.
 
@@ -83,201 +83,322 @@ Mark "Scope analysis" as in_progress.
 Use Task tool with `subagent_type: "code-review-analyzer"`:
 
 ```
-Analyze the following code area for a comprehensive code review:
+Analyze the following code area for a comprehensive code review with SURGICAL PRECISION:
 
 Target: $ARGUMENTS
 
 Your task:
-1. Identify the entry point files for this target area
-2. Map all feature sections and UI components
-3. Trace all dependencies (components, hooks, facades, actions, queries, schemas)
-4. Categorize files by review domain
-5. Determine which specialist agents need to review which files
-6. Prioritize files as HIGH, MEDIUM, or LOW based on complexity and risk
+1. Identify the entry point files and trace the EXACT methods/functions called
+2. Build a complete call graph showing which methods call which other methods
+3. For each file, identify ONLY the specific methods/functions relevant to this review
+4. Files may have 30-50 methods - you must identify the 2-5 that are actually in the call path
+5. Categorize by review domain with file + method pairs
+6. Prioritize as HIGH, MEDIUM, or LOW based on complexity and position in call graph
+
+CRITICAL REQUIREMENTS:
+- DO NOT just list files - list file + specific methods/functions
+- A facade with 40 methods might only have 2 relevant methods - identify those 2
+- A cache service with 50 methods might only have 3 called - identify those 3
+- Read file contents to trace actual call chains
+- Note methods that exist but are NOT relevant (so reviewers can skip them)
 
 Quick Mode: {true if --quick flag, else false}
-- If quick mode, only include HIGH priority files
+- If quick mode, only include HIGH priority methods/components
 
-Return the structured analysis following your output format specification.
+Return the structured analysis following your output format specification with:
+- Complete call graph visualization
+- File + method pairs for each specialist domain
+- Explicit notes on which methods to SKIP in large files
 ```
 
 **Response Handling**:
 - If empty/failed: Log failure, attempt fallback using Glob patterns to discover files
-- Extract file lists by category and specialist assignment
+- Extract file + method assignments by specialist domain
+- **CRITICAL**: Parse the specific methods for each file, not just file lists
 - Save to `01-scope-analysis.md`
 - Mark "Scope analysis" as completed
 
-### Phase 3: Parallel Specialist Reviews
+### Phase 3: Parallel Specialist Reviews (Method-Focused)
 
 Mark "Dispatch specialist reviewers" as in_progress.
 
 Based on the scope analysis, launch ALL relevant specialist agents IN PARALLEL (single message with multiple Task calls).
 
-**CRITICAL: Use a single message with multiple Task tool invocations to run agents in parallel.**
+**CRITICAL**: Pass the specific methods/functions to each specialist, not just files. Each specialist should know exactly which methods to focus on and which to skip.
 
-For each specialist domain with files to review:
+For each specialist domain with methods to review:
 
-#### Server Component Review (if server component files found)
+#### Server Component Review (if server component methods found)
 ```
 subagent_type: "server-component-specialist"
 
-Review these server component files for code quality, conventions, and best practices:
+Review these specific server components and methods for code quality, conventions, and best practices:
 
-Files to review:
-{list of server component files from scope analysis}
+## Files and Methods to Review
 
-Focus areas:
-- Async component patterns
-- Data fetching through facades
-- Caching integration
-- Suspense boundaries and streaming
-- SEO metadata generation
-- Proper authentication handling
+{From scope analysis - include the exact table with file + method pairs}
+
+Example format:
+### `src/app/(app)/(home)/page.tsx`
+| Export | Type | Purpose | Priority |
+|--------|------|---------|----------|
+| `HomePage` | Page Component | Entry point | HIGH |
+
+Focus on: `HomePage` function, data fetching calls
+
+### `src/components/feature/collections/featured-collections-section.tsx`
+| Export | Type | Purpose | Priority |
+|--------|------|---------|----------|
+| `FeaturedCollectionsSection` | Server Component | Displays featured | HIGH |
+
+**Note**: This file may have other exports - only review the ones listed above.
+
+## Call Graph Context
+{Include relevant portion of call graph showing data flow}
+
+## Review Checklist
+- [ ] Async component patterns correct
+- [ ] Data fetching through facades (not direct queries)
+- [ ] Caching integration present
+- [ ] Suspense boundaries for async children
+- [ ] SEO metadata generation (for pages)
+- [ ] Proper authentication handling
+- [ ] Error boundaries/handling
 
 DO NOT IMPLEMENT CHANGES. Only identify issues.
+The methods NOT listed are out of scope - do not review them.
 
-Return findings in your standard output format with:
-- Files reviewed
-- Issues found (with severity, file, line, description)
-- Recommendations
+Return findings with:
+- File:line for each issue
+- Severity (CRITICAL/HIGH/MEDIUM/LOW)
+- Description of the problem
+- Recommendation to fix
 ```
 
-#### Client Component Review (if client component files found)
+#### Client Component Review (if client component methods found)
 ```
 subagent_type: "client-component-specialist"
 
-Review these client component files for code quality, conventions, and best practices:
+Review these specific client components for code quality, conventions, and best practices:
 
-Files to review:
-{list of client component files from scope analysis}
+## Files and Methods to Review
 
-Focus areas:
-- 'use client' directive usage
-- Hook organization and patterns
-- Event handler naming and implementation
-- Server action consumption via useServerAction
-- Accessibility (ARIA, keyboard navigation)
-- Radix UI integration patterns
+{From scope analysis - include exact table with components, hooks, handlers}
+
+Example format:
+### `src/components/feature/newsletter/newsletter-form.tsx`
+| Export | Type | Purpose | Priority | Hooks/Handlers |
+|--------|------|---------|----------|----------------|
+| `NewsletterForm` | Form Component | Email subscription | HIGH | `useServerAction`, `handleSubmit` |
+
+**Note**: Only review `NewsletterForm` - other exports in this file are out of scope.
+
+## Call Graph Context
+{Show how this component fits in the page and what actions it calls}
+
+## Review Checklist
+- [ ] 'use client' directive present and necessary
+- [ ] Hook organization follows project order (useState → other hooks → useMemo → useEffect → handlers)
+- [ ] Event handlers use `handle` prefix
+- [ ] Server action consumption via `useServerAction` (not `useAction`)
+- [ ] Accessibility (ARIA attributes, keyboard navigation)
+- [ ] Boolean state uses `is` prefix
+- [ ] Derived variables use `_` prefix
 
 DO NOT IMPLEMENT CHANGES. Only identify issues.
+Focus ONLY on the listed components/hooks/handlers.
 
-Return findings in your standard output format.
+Return findings with file:line, severity, description, and recommendation.
 ```
 
-#### Facade Review (if facade files found)
+#### Facade Review (if facade methods found)
 ```
 subagent_type: "facade-specialist"
 
-Review these facade files for code quality, conventions, and best practices:
+Review these specific facade methods for code quality, conventions, and best practices:
 
-Files to review:
-{list of facade files from scope analysis}
+## Files and Methods to Review
 
-Focus areas:
-- Async method naming (must have Async suffix)
-- Transaction handling for multi-step mutations
-- Cache integration (CacheService, CacheRevalidationService)
-- Sentry breadcrumb logging
-- JSDoc documentation
-- Method complexity (max 60 lines)
-- Anti-patterns (stubs, silent failures, missing invalidation)
+{From scope analysis - include exact table with methods}
+
+Example format:
+### `src/lib/facades/collections.facade.ts`
+| Method | Purpose | Calls | Cache | Priority |
+|--------|---------|-------|-------|----------|
+| `getFeaturedAsync(limit)` | Get featured collections | `CacheService.collections.featured()` | TTL: 5min | HIGH |
+
+**IMPORTANT**: This facade has ~25 methods. Only review `getFeaturedAsync`.
+Skip: `createAsync`, `updateAsync`, `deleteAsync`, `getBySlugAsync`, etc.
+
+### Cache Service Methods (secondary review)
+| Method | Called By | Key Pattern | Priority |
+|--------|-----------|-------------|----------|
+| `collections.featured()` | `CollectionsFacade.getFeaturedAsync` | `collections:featured:{limit}` | MEDIUM |
+
+## Call Graph Context
+{Show the method's position: who calls it, what it calls}
+
+## Review Checklist for Each Method
+- [ ] Method has `Async` suffix
+- [ ] Transaction wrapping for multi-step mutations (if applicable)
+- [ ] Uses `CacheService.{domain}.{method}()` for reads
+- [ ] Uses `CacheRevalidationService` for invalidation after writes
+- [ ] Sentry breadcrumb added for successful operations
+- [ ] JSDoc documentation present
+- [ ] Method under 60 lines (extract helpers if needed)
+- [ ] No anti-patterns: stubs, silent failures, hardcoded Sentry strings
 
 DO NOT IMPLEMENT CHANGES. Only identify issues.
+ONLY review the specific methods listed - others are out of scope.
 
-Return findings in your standard output format.
+Return findings with file:line, severity, description, and recommendation.
 ```
 
-#### Server Action Review (if action files found)
+#### Server Action Review (if action methods found)
 ```
 subagent_type: "server-action-specialist"
 
-Review these server action files for code quality, conventions, and best practices:
+Review these specific server actions for code quality, conventions, and best practices:
 
-Files to review:
-{list of action files from scope analysis}
+## Actions to Review
 
-Focus areas:
-- Correct auth client usage
-- Input validation with Zod
-- Use of ctx.sanitizedInput (not parsedInput)
-- Sentry context and error handling
-- Cache invalidation after mutations
-- Consistent return shape
+{From scope analysis - include exact table with actions}
+
+Example format:
+### `src/lib/actions/newsletter.actions.ts`
+| Action | Auth Level | Input Schema | Purpose | Priority |
+|--------|-----------|--------------|---------|----------|
+| `subscribeNewsletterAction` | public | `newsletterSubscribeSchema` | Newsletter signup | HIGH |
+
+**IMPORTANT**: This file may have multiple actions. Only review `subscribeNewsletterAction`.
+
+## Call Graph Context
+{Show: which component calls this action, what facade it uses}
+
+## Review Checklist
+- [ ] Correct auth client (`authActionClient`, `adminActionClient`, `publicActionClient`)
+- [ ] Input validation schema defined
+- [ ] Uses `ctx.sanitizedInput` (never `parsedInput`)
+- [ ] Metadata includes `actionName` and `isTransactionRequired`
+- [ ] Sentry context set at action start
+- [ ] Business logic delegated to facade
+- [ ] Error handling via `handleActionError`
+- [ ] Cache invalidation after successful mutations
+- [ ] Consistent return shape: `{ success, message, data }`
 
 DO NOT IMPLEMENT CHANGES. Only identify issues.
 
-Return findings in your standard output format.
+Return findings with file:line, severity, description, and recommendation.
 ```
 
-#### Database/Query Review (if query or schema files found)
+#### Database/Query Review (if query methods found)
 ```
 subagent_type: "database-specialist"
 
-Review these database-related files for code quality, conventions, and best practices:
+Review these specific query methods and schemas for code quality, conventions, and best practices:
 
-Files to review:
-{list of query and schema files from scope analysis}
+## Query Methods to Review
 
-Focus areas:
-- Query patterns (BaseQuery extension, permission filtering)
-- Schema design (constraints, indexes, relations)
-- Type inference and safety
-- Async method naming
-- QueryContext usage
+{From scope analysis - include exact table}
+
+Example format:
+### `src/lib/queries/collections/collections.queries.ts`
+| Method | Called By | Tables | Filters | Priority |
+|--------|-----------|--------|---------|----------|
+| `getFeaturedAsync(limit, context)` | `CacheService.collections.featured` | `collections`, `users` | `isFeatured = true` | MEDIUM |
+
+**IMPORTANT**: This query class has ~15 methods. Only review `getFeaturedAsync`.
+
+## Schema Tables Referenced
+| Table | Relevant Columns | Priority |
+|-------|------------------|----------|
+| `collections` | `id`, `name`, `slug`, `isFeatured`, `userId` | LOW |
+
+## Call Graph Context
+{Show where in the stack this query is called from}
+
+## Review Checklist
+- [ ] Extends `BaseQuery` class
+- [ ] Uses `QueryContext` for database instance
+- [ ] Permission filters applied via `buildBaseFilters`
+- [ ] Method has `Async` suffix
+- [ ] Returns `null` for single items when not found
+- [ ] Uses `getDbInstance(context)` for database access
+- [ ] Pagination via `applyPagination(options)` when applicable
+- [ ] Proper type inference from Drizzle schemas
 
 DO NOT IMPLEMENT CHANGES. Only identify issues.
 
-Return findings in your standard output format.
+Return findings with file:line, severity, description, and recommendation.
 ```
 
-#### Validation Review (if validation files found)
+#### Validation Review (if validation schemas found)
 ```
 subagent_type: "validation-specialist"
 
-Review these validation schema files for code quality, conventions, and best practices:
+Review these specific validation schemas for code quality, conventions, and best practices:
 
-Files to review:
-{list of validation files from scope analysis}
+## Schemas to Review
 
-Focus areas:
-- drizzle-zod integration
-- Custom zod utility usage
-- Type exports (input vs infer)
-- Proper field omission (id, createdAt, etc.)
-- Schema composition patterns
+{From scope analysis - include exact table}
+
+Example format:
+### `src/lib/validations/newsletter.validation.ts`
+| Schema | Used By | Key Fields | Priority |
+|--------|---------|------------|----------|
+| `newsletterSubscribeSchema` | `subscribeNewsletterAction` | `email` | LOW |
+
+## Review Checklist
+- [ ] Uses drizzle-zod for base schema generation (when applicable)
+- [ ] Custom zod utilities used (`zodMinMaxString`, `zodMaxString`, etc.)
+- [ ] Auto-generated fields omitted (id, createdAt, updatedAt, userId)
+- [ ] Type exports present (`z.infer` and `z.input`)
+- [ ] Naming follows pattern: `{entity}{Action}Schema`
 
 DO NOT IMPLEMENT CHANGES. Only identify issues.
 
-Return findings in your standard output format.
+Return findings with file:line, severity, description, and recommendation.
 ```
 
-#### Conventions Review (all tsx/jsx files)
+#### Conventions Review (specific components only)
 ```
 subagent_type: "conventions-validator"
 
-Validate React conventions on these files:
+Validate React conventions on these specific components:
 
-Files to review:
-{list of all .tsx/.jsx files from scope analysis}
+## Components to Review
 
-Check for:
+{From scope analysis - include all tsx/jsx files with their specific exports}
+
+Example format:
+### `src/app/(app)/(home)/page.tsx`
+- Review: `HomePage` component
+
+### `src/components/feature/newsletter/newsletter-form.tsx`
+- Review: `NewsletterForm` component only
+- Skip: Other exports in this file
+
+## Convention Checklist
 - Boolean naming (must start with 'is')
 - Derived variable naming (must use '_' prefix)
-- Export style (named exports only)
-- Handler naming (handle prefix)
-- Component order violations
-- Type import patterns
+- Export style (named exports only, no default)
+- Handler naming (`handle` prefix for internal, `on` prefix for props)
+- Component internal order (useState → hooks → useMemo → useEffect → handlers → derived)
+- Type import patterns (`import type`)
 
-Return findings in your standard output format.
+Focus ONLY on the listed components.
+
+Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Static Analysis (unless --skip-static)
 ```
 subagent_type: "static-analysis-validator"
 
-Run static analysis on files related to this review:
+Run static analysis focused on files from this code review:
 
-Target area: {target description}
+## Files in Scope
+{List all files from scope analysis}
 
 Run:
 - ESLint checks
@@ -305,12 +426,16 @@ Create summary tracking which agents completed:
 ```markdown
 ## Agent Completion Status
 
-| Agent | Status | Files Reviewed | Issues Found |
-|-------|--------|----------------|--------------|
-| server-component-specialist | SUCCESS | 5 | 3 |
-| client-component-specialist | SUCCESS | 8 | 7 |
-| facade-specialist | INCOMPLETE | 2 | 1 |
-| static-analysis-validator | FAILED | 0 | 0 |
+| Agent | Status | Methods Reviewed | Issues Found |
+|-------|--------|------------------|--------------|
+| server-component-specialist | SUCCESS | 6 components | 3 |
+| client-component-specialist | SUCCESS | 3 components | 7 |
+| facade-specialist | SUCCESS | 4 methods | 2 |
+| server-action-specialist | SUCCESS | 1 action | 1 |
+| database-specialist | INCOMPLETE | 2 methods | 1 |
+| validation-specialist | SUCCESS | 1 schema | 0 |
+| conventions-validator | SUCCESS | 8 components | 4 |
+| static-analysis-validator | SUCCESS | 21 files | 5 |
 ```
 
 Save to `02-agent-status.md`
@@ -332,6 +457,9 @@ Target Area: {target description}
 Review ID: {review-id}
 Review Date: {timestamp}
 Flags: {--skip-static, --verbose, --quick as applicable}
+
+## Scope Analysis Summary
+{Include the call graph and method-level breakdown from Phase 2}
 
 ## Agent Findings
 
@@ -363,6 +491,7 @@ Verbose Mode: {true if --verbose flag, else false}
 - If verbose, include INFO-level issues
 
 Generate the comprehensive report following your output format specification.
+Include the call graph in the report to show code relationships.
 ```
 
 **Response Handling**:
@@ -392,10 +521,16 @@ Mark "Save and display results" as in_progress.
 - **High Priority**: {count}
 - **Total Issues**: {count}
 
+## Review Scope
+
+- **Files Analyzed**: {count}
+- **Methods/Components Reviewed**: {count}
+- **Methods Skipped (out of scope)**: {count}
+
 ## Navigation
 
 - [Review Setup](./00-review-setup.md)
-- [Scope Analysis](./01-scope-analysis.md)
+- [Scope Analysis](./01-scope-analysis.md) - Call graph and method mapping
 - [Agent Status](./02-agent-status.md)
 - [Full Report](./03-code-review-report.md)
 
@@ -434,14 +569,15 @@ Overall: {Grade} ({Score}/100)
 
 ## Review Coverage
 - Agents Run: {n}/{total}
-- Files Reviewed: {n}
-- Files Skipped: {n}
+- Methods/Components Reviewed: {n}
+- Files Touched: {n}
 
 ## Report Location
 docs/{YYYY_MM_DD}/code-reviews/{review-slug}/
 
 Files:
 - 00-review-index.md (start here)
+- 01-scope-analysis.md (call graph)
 - 03-code-review-report.md (full report)
 - agent-reports/ (raw agent outputs)
 ```
@@ -458,7 +594,7 @@ Mark all todos as completed.
 | Failure | Action |
 |---------|--------|
 | No target provided | Show usage and examples |
-| Scope analysis failed | Use fallback Glob patterns |
+| Scope analysis failed | Use fallback Glob patterns, note reduced precision |
 | All agents failed | Generate minimal report noting failures |
 | Some agents failed | Continue with available results, note gaps |
 | Reporter failed | Output raw agent results as fallback |
@@ -469,7 +605,8 @@ Mark all todos as completed.
 - **Parallel execution is critical**: All specialist agents MUST be launched in a single message with multiple Task calls
 - **Timeout handling**: Allow up to 120 seconds per agent
 - **Memory efficient**: Save results incrementally, don't hold all in memory
-- **Quick mode**: Significantly faster by only reviewing HIGH priority files
+- **Quick mode**: Significantly faster by only reviewing HIGH priority methods/components
+- **Method-focused**: Specialists review specific methods, not entire files
 
 ## Review Quality Standards
 
@@ -481,4 +618,4 @@ A good code review identifies:
 5. **Best practice deviations** - Code quality issues
 6. **Documentation gaps** - Missing JSDoc, comments
 
-The goal is actionable feedback that improves code quality.
+The goal is actionable feedback that improves code quality, focused on the code paths that actually matter.
