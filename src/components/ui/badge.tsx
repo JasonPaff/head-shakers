@@ -54,9 +54,32 @@ type BadgeProps = ComponentProps<'span'> &
   ComponentTestIdProps &
   VariantProps<typeof badgeVariants> & { asChild?: boolean; icon?: React.ReactNode };
 
-export const Badge = ({ asChild = false, className, icon, testId, variant, ...props }: BadgeProps) => {
+export const Badge = ({
+  asChild = false,
+  children,
+  className,
+  icon,
+  testId,
+  variant,
+  ...props
+}: BadgeProps) => {
   const Comp = asChild ? Slot : 'span';
   const badgeTestId = testId || generateTestId('ui', 'badge');
+
+  // When asChild is true, Slot expects exactly one child element
+  // Icon is not supported with asChild - the child element should contain any icons
+  if (asChild) {
+    return (
+      <Comp
+        className={cn(badgeVariants({ variant }), className)}
+        data-slot={'badge'}
+        data-testid={badgeTestId}
+        {...props}
+      >
+        {children}
+      </Comp>
+    );
+  }
 
   return (
     <Comp
@@ -66,7 +89,7 @@ export const Badge = ({ asChild = false, className, icon, testId, variant, ...pr
       {...props}
     >
       {icon && <span className={'size-3'}>{icon}</span>}
-      {props.children}
+      {children}
     </Comp>
   );
 };
