@@ -146,18 +146,12 @@ export const JoinCommunitySection = () => {
                 <div className={'flex flex-wrap justify-center gap-4'}>
                   <Button
                     asChild
-                    className={`group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg
+                    className={`bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg
                       font-semibold text-white shadow-lg shadow-orange-500/25
                       hover:from-orange-600 hover:to-amber-600`}
                     size={'lg'}
                   >
-                    <SignUpButton mode={'modal'}>
-                      <span>Get Started Free</span>
-                      <ArrowRightIcon
-                        aria-hidden
-                        className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
-                      />
-                    </SignUpButton>
+                    <SignUpButton mode={'modal'}>Get Started Free</SignUpButton>
                   </Button>
                   <Button
                     asChild
