@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/nextjs';
 import type {
   FeaturedContentRecord,
   FooterFeaturedContentData,
+  HeroFeaturedBobbleheadData,
 } from '@/lib/queries/featured-content/featured-content-query';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -265,6 +266,58 @@ export class FeaturedContentFacade {
         facade: facadeName,
         method: 'getFooterFeaturedContentAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
+   * get hero featured bobblehead for homepage display
+   *
+   * returns the single highest-priority featured bobblehead with only the fields
+   * needed for the hero section. uses Redis caching for fast access.
+   *
+   * @param dbInstance - optional database executor for transactions
+   * @returns the hero featured bobblehead data or null if none exists
+   */
+  static async getHeroFeaturedBobbleheadAsync(
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<HeroFeaturedBobbleheadData | null> {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching hero featured bobblehead',
+    });
+
+    try {
+      return await CacheService.featured.heroBobblehead(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          const data = await FeaturedContentQuery.getHeroFeaturedBobbleheadAsync(context);
+
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { found: data !== null },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Hero featured bobblehead fetched successfully',
+          });
+
+          return data;
+        },
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.FEATURED,
+            facade: facadeName,
+            operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+          },
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: {},
+        facade: facadeName,
+        method: 'getHeroFeaturedBobbleheadAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
       };
       throw createFacadeError(errorContext, error);
     }

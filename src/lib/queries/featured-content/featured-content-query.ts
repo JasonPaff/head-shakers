@@ -47,6 +47,20 @@ export interface FooterFeaturedContentData {
   title: null | string;
 }
 
+/**
+ * minimal data needed for hero featured bobblehead display
+ */
+export interface HeroFeaturedBobbleheadData {
+  contentId: string;
+  contentName: null | string;
+  contentSlug: null | string;
+  description: null | string;
+  imageUrl: null | string;
+  likes: number;
+  owner: null | string;
+  viewCount: number;
+}
+
 export class FeaturedContentQuery extends BaseQuery {
   /**
    * create a new featured content entry
@@ -319,6 +333,49 @@ export class FeaturedContentQuery extends BaseQuery {
       .limit(CONFIG.CONTENT.MAX_FEATURED_FOOTER_ITEMS + 1);
 
     return results;
+  }
+
+  /**
+   * get hero featured bobblehead data
+   *
+   * returns the single highest-priority active featured bobblehead with only the fields
+   * needed for the hero display component. uses innerJoin to ensure bobblehead exists.
+   */
+  static async getHeroFeaturedBobbleheadAsync(
+    context: QueryContext,
+  ): Promise<HeroFeaturedBobbleheadData | null> {
+    const dbInstance = this.getDbInstance(context);
+    const now = new Date();
+
+    const results = await dbInstance
+      .select({
+        contentId: featuredContent.contentId,
+        contentName: bobbleheads.name,
+        contentSlug: bobbleheads.slug,
+        description: featuredContent.description,
+        imageUrl: bobbleheadPhotos.url,
+        likes: bobbleheads.likeCount,
+        owner: bobbleheads.userId,
+        viewCount: featuredContent.viewCount,
+      })
+      .from(featuredContent)
+      .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        and(
+          eq(featuredContent.contentType, 'bobblehead'),
+          eq(featuredContent.isActive, true),
+          or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
+          or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
+        ),
+      )
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
+      .limit(1);
+
+    return results[0] ?? null;
   }
 
   /**

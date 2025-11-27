@@ -8,17 +8,15 @@ import { getUserIdAsync } from '@/utils/optional-auth-utils';
 /**
  * Async server component for fetching and displaying a single featured bobblehead in the hero section
  *
- * Fetches a single featured bobblehead from the FeaturedContentFacade,
- * retrieves like data for authenticated users, and transforms the data
- * for the hero display component.
+ * Fetches a single featured bobblehead from the FeaturedContentFacade using a dedicated
+ * Redis-cached query that returns only the fields needed for the hero display.
  */
 export async function HeroFeaturedBobbleheadAsync() {
-  const bobbleheadsData = await FeaturedContentFacade.getFeaturedBobbleheadsAsync(1);
-  if (bobbleheadsData.length === 0) return null;
+  const featuredData = await FeaturedContentFacade.getHeroFeaturedBobbleheadAsync();
+  if (!featuredData) return null;
 
   const currentUserId = await getUserIdAsync();
 
-  const featuredData = bobbleheadsData[0]!;
   let likeCount = featuredData.likes ?? 0;
 
   const likeDataResults = await SocialFacade.getBatchContentLikeDataAsync(

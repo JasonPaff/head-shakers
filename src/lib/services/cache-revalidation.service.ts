@@ -5,8 +5,9 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-import { CACHE_CONFIG, isCacheEnabled, isCacheLoggingEnabled } from '@/lib/constants/cache';
+import { CACHE_CONFIG, CACHE_KEYS, isCacheEnabled, isCacheLoggingEnabled } from '@/lib/constants/cache';
 import { type CacheEntityType, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
+import { RedisOperations } from '@/lib/utils/redis-client';
 
 /**
  * revalidation context for tracking and logging
@@ -435,9 +436,16 @@ export class CacheRevalidationService {
   static readonly featured = {
     /**
      * revalidate after featured content changes
+     * also invalidates Redis cache for hero bobblehead
      */
     onContentChange: (type?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onFeaturedContentChange();
+
+      // Invalidate hero bobblehead Redis cache
+      void RedisOperations.del(CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD()).catch((error) => {
+        console.error('[CacheRevalidation] Failed to invalidate hero bobblehead Redis cache:', error);
+      });
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityType: 'featured',
         operation: 'featured:content:change',
@@ -447,9 +455,16 @@ export class CacheRevalidationService {
 
     /**
      * revalidate all featured content
+     * also invalidates Redis cache for hero bobblehead
      */
     onMajorUpdate: (): RevalidationResult => {
       const tags = CacheTagInvalidation.onMajorDataChange();
+
+      // Invalidate hero bobblehead Redis cache
+      void RedisOperations.del(CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD()).catch((error) => {
+        console.error('[CacheRevalidation] Failed to invalidate hero bobblehead Redis cache:', error);
+      });
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityType: 'featured',
         operation: 'featured:major:update',

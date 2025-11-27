@@ -67,6 +67,7 @@ export const OPERATIONS = {
     DELETE: 'delete_featured_content',
     GET_ACTIVE: 'get_active_featured_content',
     GET_BY_ID: 'get_featured_content_by_id',
+    GET_HERO_BOBBLEHEAD: 'get_hero_featured_bobblehead',
     TOGGLE_ACTIVE: 'toggle_featured_content_active',
     TOGGLE_STATUS: 'toggle_featured_content_status',
     UPDATE: 'update_featured_content',
