@@ -53,7 +53,7 @@ describe('FooterNavLink', () => {
       render(<FooterNavLink href={'/test'} label={'Test'} />);
 
       const link = screen.getByRole('link', { name: 'Test' });
-      expect(link).toHaveClass('text-sm', 'text-muted-foreground', 'transition-colors');
+      expect(link).toHaveClass('text-sm', 'text-slate-600', 'transition-colors');
     });
   });
 

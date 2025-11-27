@@ -244,7 +244,7 @@ describe('comment validation schemas', () => {
       const input = {
         pagination: { limit: 30, offset: 20 },
         targetId: '123e4567-e89b-12d3-a456-426614174000',
-        targetType: 'subcollection',
+        targetType: 'bobblehead',
       };
       const result = getCommentsSchema.safeParse(input);
 

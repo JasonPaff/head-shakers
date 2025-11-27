@@ -174,7 +174,7 @@ describe('FooterNavSection', () => {
       );
 
       const heading = screen.getByRole('heading', { level: 3 });
-      expect(heading).toHaveClass('text-sm', 'font-semibold', 'text-foreground');
+      expect(heading).toHaveClass('text-sm', 'font-semibold', 'text-slate-900');
     });
   });
 

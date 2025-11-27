@@ -33,7 +33,7 @@ describe('Social Validation Schemas', () => {
     });
 
     it('should validate all target types', () => {
-      const targetTypes = ['bobblehead', 'collection', 'subcollection'];
+      const targetTypes = ['bobblehead', 'collection'];
 
       targetTypes.forEach((targetType) => {
         const result = toggleLikeSchema.safeParse({
@@ -165,7 +165,7 @@ describe('Social Validation Schemas', () => {
     });
 
     it('should validate all target types for comments', () => {
-      const targetTypes = ['bobblehead', 'collection', 'subcollection'];
+      const targetTypes = ['bobblehead', 'collection'];
 
       targetTypes.forEach((targetType) => {
         const result = createCommentSchema.safeParse({

@@ -33,16 +33,6 @@ describe('like validation schemas', () => {
       expect(result.success).toBe(true);
     });
 
-    it('should validate a valid like toggle for subcollection', () => {
-      const input = {
-        targetId: '123e4567-e89b-12d3-a456-426614174000',
-        targetType: 'subcollection',
-      };
-      const result = toggleLikeSchema.safeParse(input);
-
-      expect(result.success).toBe(true);
-    });
-
     it('should reject invalid target type', () => {
       const input = {
         targetId: '123e4567-e89b-12d3-a456-426614174000',
@@ -52,7 +42,7 @@ describe('like validation schemas', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0]?.message).toContain('bobblehead, collection, or subcollection');
+        expect(result.error.issues[0]?.message).toContain('bobblehead or collection');
       }
     });
 
@@ -153,17 +143,13 @@ describe('like validation schemas', () => {
             targetId: '223e4567-e89b-12d3-a456-426614174001',
             targetType: 'collection',
           },
-          {
-            targetId: '323e4567-e89b-12d3-a456-426614174002',
-            targetType: 'subcollection',
-          },
         ],
       };
       const result = getBatchLikeDataSchema.safeParse(input);
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.targets).toHaveLength(3);
+        expect(result.data.targets).toHaveLength(2);
       }
     });
 
