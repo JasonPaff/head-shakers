@@ -46,7 +46,6 @@ type FooterLegalProps = ComponentProps<'div'> & ComponentTestIdProps;
 export const FooterLegal = ({ className, testId, ...props }: FooterLegalProps) => {
   const containerTestId = testId || generateTestId('layout', 'app-footer', 'legal');
 
-  // Get current year for copyright notice
   const currentYear = new Date().getFullYear();
 
   return (

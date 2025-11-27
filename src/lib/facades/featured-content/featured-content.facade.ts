@@ -171,7 +171,7 @@ export class FeaturedContentFacade {
       return await CacheService.featured.featuredBobblehead(
         async () => {
           const context = createPublicQueryContext({ dbInstance });
-          const data = await FeaturedContentQuery.getHeroFeaturedBobbleheadAsync(context);
+          const data = await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
 
           Sentry.addBreadcrumb({
             category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,

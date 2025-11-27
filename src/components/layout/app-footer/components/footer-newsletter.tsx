@@ -20,10 +20,8 @@ import { newsletterSignupSchema } from '@/lib/validations/newsletter.validation'
 export const FooterNewsletter = withFocusManagement(() => {
   const { focusFirstError } = useFocusContext();
 
-  // Setup server action with toast messages
   const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
     onSuccess: () => {
-      // Reset form on success
       form.reset();
     },
     toastMessages: {
@@ -33,7 +31,6 @@ export const FooterNewsletter = withFocusManagement(() => {
     },
   });
 
-  // Setup form with useAppForm
   const form = useAppForm({
     canSubmitWhenInvalid: true,
     defaultValues: {
@@ -54,7 +51,6 @@ export const FooterNewsletter = withFocusManagement(() => {
     },
   });
 
-  // Form submission handler
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();

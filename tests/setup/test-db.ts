@@ -17,7 +17,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import fs from 'fs';
 import path from 'path';
 import { Pool } from 'pg';
 
@@ -25,13 +25,13 @@ import * as schema from '@/lib/db/schema/index';
 
 // Known table names from the schema - used for truncation
 // This is more reliable than trying to dynamically detect tables
+// NOTE: Keep this in sync with the current database schema
 const KNOWN_TABLES = [
   'users',
   'user_settings',
   'notification_settings',
   'user_blocks',
   'collections',
-  'sub_collections',
   'bobbleheads',
   'bobblehead_photos',
   'bobblehead_tags',
@@ -45,6 +45,7 @@ const KNOWN_TABLES = [
   'content_reports',
   'content_views',
   'search_queries',
+  'newsletter_signups',
 ];
 
 // Container instance (only used in global setup)
@@ -137,10 +138,16 @@ export async function startTestDatabase(): Promise<string> {
 
   const migrationDb = drizzle(migrationPool, { schema });
 
-  // Run migrations
+  // Enable required extensions
+  console.log('[TestDB] Enabling required extensions...');
+  await migrationDb.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`);
+
+  // Run migrations manually to handle ALTER TYPE ADD VALUE
+  // PostgreSQL doesn't allow ALTER TYPE ADD VALUE inside transactions,
+  // so we run each migration file separately with auto-commit
   console.log('[TestDB] Running migrations...');
   const migrationsFolder = path.resolve(process.cwd(), 'src/lib/db/migrations');
-  await migrate(migrationDb, { migrationsFolder });
+  await runMigrationsWithAutoCommit(migrationPool, migrationsFolder);
   console.log('[TestDB] Migrations complete');
 
   // Close migration connection
@@ -190,3 +197,81 @@ function initializeTestDb(): void {
 
 // Export schema for convenience in tests
 export { schema };
+
+/**
+ * Custom migration runner that handles PostgreSQL's ALTER TYPE ADD VALUE limitation.
+ * PostgreSQL doesn't allow ALTER TYPE ADD VALUE inside a transaction, so we must
+ * run each migration statement with auto-commit enabled.
+ */
+async function runMigrationsWithAutoCommit(pool: Pool, migrationsFolder: string): Promise<void> {
+  // Read the migration journal to get ordered list of migrations
+  const journalPath = path.join(migrationsFolder, 'meta', '_journal.json');
+  const journalContent = fs.readFileSync(journalPath, 'utf-8');
+  const journal = JSON.parse(journalContent) as {
+    entries: Array<{ idx: number; tag: string; when: number }>;
+  };
+
+  // Create migration tracking table
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS "__drizzle_migrations" (
+        id SERIAL PRIMARY KEY,
+        hash TEXT NOT NULL,
+        created_at BIGINT
+      )
+    `);
+
+    // Get already applied migrations
+    const { rows: appliedMigrations } = await client.query<{ hash: string }>(
+      'SELECT hash FROM "__drizzle_migrations"',
+    );
+    const appliedHashes = new Set(appliedMigrations.map((r) => r.hash));
+
+    // Process each migration
+    for (const entry of journal.entries) {
+      const migrationFile = `${entry.tag}.sql`;
+      const migrationHash = entry.tag;
+
+      if (appliedHashes.has(migrationHash)) {
+        continue;
+      }
+
+      const migrationPath = path.join(migrationsFolder, migrationFile);
+      if (!fs.existsSync(migrationPath)) {
+        console.warn(`[TestDB] Migration file not found: ${migrationFile}`);
+        continue;
+      }
+
+      const migrationSql = fs.readFileSync(migrationPath, 'utf-8');
+
+      // Split by statement breakpoint and execute each statement separately
+      // Normalize line endings for Windows compatibility
+      const normalizedSql = migrationSql.replace(/\r\n/g, '\n');
+      const statements = normalizedSql
+        .split('--> statement-breakpoint')
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      for (const statement of statements) {
+        try {
+          await client.query(statement);
+        } catch (error) {
+          // Ignore "already exists" errors for enum values
+          if (error instanceof Error && error.message.includes('already exists')) {
+            continue;
+          }
+          throw error;
+        }
+      }
+
+      // Record migration as applied
+      await client.query('INSERT INTO "__drizzle_migrations" (hash, created_at) VALUES ($1, $2)', [
+        migrationHash,
+        Date.now(),
+      ]);
+    }
+  } finally {
+    client.release();
+  }
+}

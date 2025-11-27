@@ -163,9 +163,11 @@ export const HeroSection = () => {
           </div>
 
           {/* Right Content - Featured Bobblehead Showcase */}
-          <Suspense fallback={<FeaturedBobbleheadSkeleton />}>
-            <FeaturedBobbleheadAsync />
-          </Suspense>
+          <ErrorBoundary name={'featured-bobblehead-showcase'}>
+            <Suspense fallback={<FeaturedBobbleheadSkeleton />}>
+              <FeaturedBobbleheadAsync />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
 
