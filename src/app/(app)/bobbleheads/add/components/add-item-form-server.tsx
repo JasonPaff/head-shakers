@@ -2,14 +2,14 @@ import 'server-only';
 
 import { AddItemFormClient } from '@/app/(app)/bobbleheads/add/components/add-item-form-client';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getUserId } from '@/utils/user-utils';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 interface AddItemFormServerProps {
   initialCollectionId?: string;
 }
 
 export async function AddItemFormServer({ initialCollectionId }: AddItemFormServerProps) {
-  const userId = await getUserId();
+  const userId = await getRequiredUserIdAsync();
 
   const userCollections = (await CollectionsFacade.getCollectionsByUser(userId, {}, userId)) ?? [];
 

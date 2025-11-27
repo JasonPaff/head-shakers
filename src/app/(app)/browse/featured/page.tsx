@@ -15,7 +15,7 @@ import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA } from '@/lib/seo/seo.constants';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 export default async function FeaturedPage() {
   const currentUserId = await getUserIdAsync();

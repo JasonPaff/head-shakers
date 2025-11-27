@@ -51,8 +51,8 @@ Before creating or modifying server components:
 - Use Promise.all for parallel data fetching
 
 **Authentication**:
-- Use `getOptionalUserIdAsync()` for optional auth
-- Use `getUserIdAsync()` for required auth
+- Use `getUserIdAsync()` for optional user auth
+- Use `getRequiredUserIdAsync()` for required user auth (redirect if unauthenticated or user not found)
 - Use `checkIsOwnerAsync()` for ownership checks
 
 **Streaming with Suspense**:

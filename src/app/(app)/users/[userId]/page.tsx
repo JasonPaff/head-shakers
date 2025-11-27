@@ -18,7 +18,7 @@ import { generateBreadcrumbSchema, generatePersonSchema } from '@/lib/seo/jsonld
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA, FALLBACK_METADATA } from '@/lib/seo/seo.constants';
 import { extractPublicIdFromCloudinaryUrl, generateOpenGraphImageUrl } from '@/lib/utils/cloudinary.utils';
-import { getIsOwnerAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync } from '@/utils/auth-utils';
 import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;

@@ -1,7 +1,7 @@
 import type { ContentViewTargetType } from '@/lib/facades/analytics/view-tracking.facade';
 
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 export interface ViewCountAsyncProps {
   isShowingLabel?: boolean;

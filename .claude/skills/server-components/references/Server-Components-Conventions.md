@@ -28,7 +28,7 @@ interface MyComponentAsyncProps extends ComponentTestIdProps {
 }
 
 export const MyComponentAsync = async ({ entityId, testId }: MyComponentAsyncProps) => {
-  const currentUserId = await getOptionalUserIdAsync();
+  const currentUserId = await getRequiredUserIdAsync();
   const data = await MyFacade.getByIdAsync(entityId, currentUserId);
 
   if (!data) {

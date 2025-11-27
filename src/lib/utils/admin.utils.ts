@@ -3,7 +3,7 @@ import { cache } from 'react';
 
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
-import { getCurrentClerkUserId } from '@/utils/optional-auth-utils';
+import { getCurrentClerkUserId } from '@/utils/auth-utils';
 
 /**
  * Check if the current user has moderator or admin privileges.

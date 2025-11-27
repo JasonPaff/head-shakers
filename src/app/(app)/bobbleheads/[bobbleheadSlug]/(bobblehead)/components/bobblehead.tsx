@@ -11,7 +11,7 @@ import { Conditional } from '@/components/ui/conditional';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
-import { getIsOwnerAsync, getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
 interface BobbleheadProps {
   bobbleheadId: string;

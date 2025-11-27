@@ -4,10 +4,10 @@ import { CollectionCard } from '@/app/(app)/dashboard/collection/(collection)/co
 import { CollectionsEmptyState } from '@/app/(app)/dashboard/collection/(collection)/components/collections-empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
-import { getUserId } from '@/utils/user-utils';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 export const CollectionsTabContent = async () => {
-  const userId = await getUserId();
+  const userId = await getRequiredUserIdAsync();
 
   const [collections, user] = await Promise.all([
     CollectionsFacade.getUserCollectionsForDashboard(userId),

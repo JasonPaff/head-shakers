@@ -46,8 +46,8 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 
 ### Authentication
 
-- [ ] Use `getOptionalUserIdAsync()` for optional auth
-- [ ] Use `getUserIdAsync()` for required auth (redirects if unauthenticated)
+- [ ] Use `getUserIdAsync()` for optional auth
+- [ ] Use `getRequiredUserIdAsync()` for required auth (redirects if unauthenticated or user not found)
 - [ ] Use `checkIsOwnerAsync()` for ownership checks
 - [ ] Use `checkIsModeratorAsync()` for admin checks
 

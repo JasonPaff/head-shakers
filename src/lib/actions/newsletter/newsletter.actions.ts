@@ -14,7 +14,7 @@ import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { publicActionClient } from '@/lib/utils/next-safe-action';
 import { newsletterSignupSchema } from '@/lib/validations/newsletter.validation';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 /**
  * Helper function to mask email for privacy in Sentry context

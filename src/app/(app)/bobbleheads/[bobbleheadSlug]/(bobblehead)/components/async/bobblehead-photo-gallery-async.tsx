@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { BobbleheadPhotoGalleryCard } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-photo-gallery';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 interface BobbleheadPhotoGalleryAsyncProps {
   bobbleheadId: string;

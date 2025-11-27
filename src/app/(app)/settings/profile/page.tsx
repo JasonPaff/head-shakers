@@ -6,7 +6,7 @@ import { UsernameEditForm } from '@/components/feature/users/username-edit-form'
 import { ContentLayout } from '@/components/layout/content-layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
-import { getUserId } from '@/utils/user-utils';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 export function generateMetadata(): Metadata {
   return {
@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 
 export default async function ProfileSettingsPage() {
   // Get current user ID
-  const userId = await getUserId();
+  const userId = await getRequiredUserIdAsync();
 
   // Fetch current user data
   const user = await UsersFacade.getUserByIdAsync(userId);

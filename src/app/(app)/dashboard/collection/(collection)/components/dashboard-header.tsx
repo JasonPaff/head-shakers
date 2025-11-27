@@ -4,10 +4,10 @@ import { CollectionCreateButton } from '@/app/(app)/dashboard/collection/(collec
 import { DashboardStats } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-stats';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { generateTestId } from '@/lib/test-ids';
-import { getUserId } from '@/utils/user-utils';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 export const DashboardHeader = async () => {
-  const userId = await getUserId();
+  const userId = await getRequiredUserIdAsync();
   const collections = await CollectionsFacade.getUserCollectionsForDashboard(userId);
 
   const totalCollections = collections.length;

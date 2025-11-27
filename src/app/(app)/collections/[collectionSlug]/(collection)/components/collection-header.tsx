@@ -14,7 +14,7 @@ import { ReportButton } from '@/components/feature/content-reports/report-button
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeIconButton } from '@/components/ui/like-button';
-import { getIsOwnerAsync, getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
 interface CollectionHeaderProps {
   collection: PublicCollection;

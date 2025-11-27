@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { EmptyState } from '@/components/ui/empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { getIsOwnerAsync, getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getIsOwnerAsync, getUserIdAsync } from '@/utils/auth-utils';
 
 interface CollectionBobbleheadsProps {
   collection: NonNullable<PublicCollection>;

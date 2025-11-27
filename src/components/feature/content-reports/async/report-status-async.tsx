@@ -3,7 +3,7 @@ import 'server-only';
 import type { ReportTargetType } from '@/components/feature/content-reports/report-button';
 
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
-import { getUserId } from '@/utils/user-utils';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 
 import { ReportStatusIndicator } from '../report-status-indicator';
 
@@ -13,7 +13,7 @@ interface ReportStatusAsyncProps {
 }
 
 export const ReportStatusAsync = async ({ targetId, targetType }: ReportStatusAsyncProps) => {
-  const currentUserId = await getUserId();
+  const currentUserId = await getRequiredUserIdAsync();
 
   const reportStatus = await ContentReportsFacade.getReportStatusAsync(currentUserId, targetId, targetType);
 

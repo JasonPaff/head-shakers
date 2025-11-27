@@ -34,7 +34,7 @@ import {
   updateBobbleheadPhotoMetadataSchema,
   updateBobbleheadWithPhotosSchema,
 } from '@/lib/validations/bobbleheads.validation';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 export const createBobbleheadWithPhotosAction = authActionClient
   .metadata({

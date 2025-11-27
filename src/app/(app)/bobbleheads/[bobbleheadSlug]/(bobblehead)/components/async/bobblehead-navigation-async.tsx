@@ -2,7 +2,7 @@ import 'server-only';
 
 import { BobbleheadNavigation } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-navigation';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
+import { getUserIdAsync } from '@/utils/auth-utils';
 
 interface BobbleheadNavigationAsyncProps {
   bobbleheadId: string;
