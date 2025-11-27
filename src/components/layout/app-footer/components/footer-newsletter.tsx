@@ -70,29 +70,32 @@ export const FooterNewsletter = withFocusManagement(() => {
 
       {/* Newsletter Form */}
       <form className={'flex w-full gap-2 md:w-auto'} onSubmit={handleSubmit}>
-        <form.AppForm>
-          {/* Email Field */}
-          <form.AppField name={'email'}>
-            {(field) => {
-              return (
-                <div className={'relative flex-1 md:w-64'}>
-                  <field.TextField
-                    className={`border-white/20 bg-white pr-3 pl-9 text-slate-900 placeholder:text-slate-600
+        {/* Email Field */}
+        <form.AppField name={'email'}>
+          {(field) => {
+            return (
+              <div className={'relative flex-1 md:w-64'}>
+                <field.TextField
+                  className={`border-white/20 bg-white pr-3 pl-9 text-slate-900 placeholder:text-slate-600
                     dark:text-white dark:placeholder:text-slate-300`}
-                    disabled={isExecuting}
-                    fieldErrorProps={{
-                      className: 'dark:text-white text-slate-800',
-                    }}
-                    icon={<MailIcon aria-hidden className={'size-4 text-slate-600 dark:text-slate-300'} />}
-                    label={''}
-                    placeholder={'Enter your email'}
-                  />
-                </div>
-              );
-            }}
-          </form.AppField>
+                  disabled={isExecuting}
+                  fieldErrorProps={{
+                    className: 'dark:text-white text-slate-800',
+                  }}
+                  icon={<MailIcon aria-hidden className={'size-4 text-slate-600 dark:text-slate-300'} />}
+                  isRequired
+                  label={'Email Address'}
+                  labelClassName={'sr-only'}
+                  placeholder={'Enter your email'}
+                  testId={'footer-newsletter-email'}
+                />
+              </div>
+            );
+          }}
+        </form.AppField>
 
-          {/* Submit Button */}
+        {/* Submit Button */}
+        <form.AppForm>
           <form.SubmitButton
             className={`bg-slate-900 font-semibold text-white hover:bg-slate-800
               dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100`}
