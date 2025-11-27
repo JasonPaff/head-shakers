@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:react-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist), Task(subagent_type:resend-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:client-component-specialist), Task(subagent_type:server-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist), Task(subagent_type:resend-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
@@ -41,18 +41,19 @@ You are a lightweight implementation orchestrator that coordinates the execution
 
 ## Available Specialist Agents
 
-| Agent                        | Domain            | Skills Auto-Loaded                                                        | File Patterns                                                     |
-| ---------------------------- | ----------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| `server-action-specialist`   | Server actions    | server-actions, sentry-monitoring, validation-schemas                     | `src/lib/actions/**/*.actions.ts`                                 |
-| `database-specialist`        | Schemas & queries | database-schema, drizzle-orm, validation-schemas                          | `src/lib/db/schema/**`, `src/lib/queries/**`                      |
-| `facade-specialist`          | Business logic    | facade-layer, caching, sentry-monitoring, drizzle-orm                     | `src/lib/facades/**/*.facade.ts`                                  |
-| `react-component-specialist` | UI components     | react-coding-conventions, ui-components                                   | `src/components/**/*.tsx`, `src/app/**/*.tsx`                     |
-| `form-specialist`            | Forms             | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx`                   |
-| `media-specialist`           | Cloudinary        | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components                            |
-| `test-specialist`            | Testing           | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`                          |
-| `validation-specialist`      | Zod schemas       | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`                          |
-| `resend-specialist`          | Email sending     | resend-email, sentry-monitoring                                           | `src/lib/services/resend*.ts`, `src/lib/email-templates/**/*.tsx` |
-| `general-purpose`            | Fallback          | None (manual skill invocation)                                            | Any other files                                                   |
+| Agent                          | Domain              | Skills Auto-Loaded                                                        | File Patterns                                                           |
+| ------------------------------ | ------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `server-action-specialist`     | Server actions      | server-actions, sentry-monitoring, validation-schemas                     | `src/lib/actions/**/*.actions.ts`                                       |
+| `database-specialist`          | Schemas & queries   | database-schema, drizzle-orm, validation-schemas                          | `src/lib/db/schema/**`, `src/lib/queries/**`                            |
+| `facade-specialist`            | Business logic      | facade-layer, caching, sentry-monitoring, drizzle-orm                     | `src/lib/facades/**/*.facade.ts`                                        |
+| `server-component-specialist`  | Server components   | react-coding-conventions, ui-components, server-components, caching       | `src/app/**/page.tsx`, `layout.tsx`, `*-async.tsx`, `*-skeleton.tsx`    |
+| `client-component-specialist`  | Client components   | react-coding-conventions, ui-components, client-components                | `src/components/**/*.tsx` (with hooks/events), `*-client.tsx`           |
+| `form-specialist`              | Forms               | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx`                         |
+| `media-specialist`             | Cloudinary          | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components                                  |
+| `test-specialist`              | Testing             | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`                                |
+| `validation-specialist`        | Zod schemas         | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`                                |
+| `resend-specialist`            | Email sending       | resend-email, sentry-monitoring                                           | `src/lib/services/resend*.ts`, `src/lib/email-templates/**/*.tsx`       |
+| `general-purpose`              | Fallback            | None (manual skill invocation)                                            | Any other files                                                         |
 
 ## Step-Type Detection Algorithm
 
@@ -85,13 +86,16 @@ You are a lightweight implementation orchestrator that coordinates the execution
 8. IF files are .tsx/.jsx AND (contain "form" OR "dialog" OR use "useAppForm")
    → Use: form-specialist
 
-9. IF files are .tsx/.jsx in "src/components/" OR "src/app/"
-   → Use: react-component-specialist
+9. IF files are page.tsx, layout.tsx, loading.tsx, error.tsx, OR contain "-async.tsx", "-server.tsx", OR "-skeleton.tsx"
+   → Use: server-component-specialist
 
-10. IF files contain "resend" (case-insensitive) OR contain "email-templates/" OR involve email sending
+10. IF files are .tsx/.jsx in "src/components/" OR "src/app/**/components/" with hooks/events
+    → Use: client-component-specialist
+
+11. IF files contain "resend" (case-insensitive) OR contain "email-templates/" OR involve email sending
     → Use: resend-specialist
 
-11. ELSE (fallback)
+12. ELSE (fallback)
     → Use: general-purpose
 ```
 
@@ -218,8 +222,9 @@ When the user runs this command, execute this comprehensive workflow:
      Step 3: facade-specialist (files in src/lib/facades/)
      Step 4: server-action-specialist (files in src/lib/actions/)
      Step 5: form-specialist (form component files)
-     Step 6: react-component-specialist (page component)
-     Step 7: test-specialist (test files)
+     Step 6: server-component-specialist (page.tsx, async components)
+     Step 7: client-component-specialist (interactive components with hooks)
+     Step 8: test-specialist (test files)
      ```
    - Log any steps that span multiple domains
 4. **Create Todo List**:
@@ -517,7 +522,7 @@ When the user runs this command, execute this comprehensive workflow:
    - Number of files modified/created
    - Number of validation commands run
    - Quality gates status (X/Y passed)
-   - **Specialist usage breakdown** (e.g., "3 steps: database-specialist, 2 steps: react-component-specialist")
+   - **Specialist usage breakdown** (e.g., "3 steps: database-specialist, 2 steps: server-component-specialist, 1 step: client-component-specialist")
 3. **Generate Change Summary**:
    - List all files modified with brief descriptions
    - List all files created
