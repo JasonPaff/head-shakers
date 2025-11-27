@@ -53,7 +53,7 @@ When writing schema code, ensure strict adherence to all conventions:
 - Use `pgTable` with constraints/indexes in the callback function
 - Order columns alphabetically within the column definition object
 - Always include standard columns: `id`, `createdAt`, `updatedAt`
-- Include soft delete columns when applicable: `isDeleted`, `deletedAt`
+- Include soft delete column when applicable: `deletedAt` (timestamp, null = not deleted)
 
 **Column Patterns**:
 
@@ -99,7 +99,7 @@ After generating or modifying schema code, immediately perform automatic validat
    - Missing check constraints
    - Using `text` instead of `varchar`
    - Using auto-increment instead of UUID
-   - Missing soft delete columns when needed
+   - Missing soft delete column (`deletedAt`) when needed
    - Incorrect column naming (snake_case in DB, camelCase in code)
 
 3. **Fix automatically**: Apply corrections immediately without asking for permission:
@@ -109,7 +109,7 @@ After generating or modifying schema code, immediately perform automatic validat
    - Add appropriate check constraints
    - Fix column type issues
    - Reorder columns alphabetically
-   - Add missing soft delete columns
+   - Add missing soft delete column (`deletedAt`)
 
 4. **Verify completeness**: Ensure all conventions are satisfied before presenting code to user
 
@@ -121,7 +121,7 @@ After automatically fixing violations, provide a brief summary:
 ✓ Database schema conventions enforced:
   - Added missing timestamp columns (createdAt, updatedAt)
   - Replaced hardcoded length with SCHEMA_LIMITS.ENTITY.NAME.MAX
-  - Added soft delete columns (isDeleted, deletedAt)
+  - Added soft delete column (deletedAt)
   - Added foreign key index: collection_user_id_idx
   - Added check constraint: collection_name_not_empty
 ```

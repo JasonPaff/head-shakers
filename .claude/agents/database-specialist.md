@@ -33,7 +33,7 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 - [ ] Use `pgTable` with constraint and index definitions in callback
 - [ ] Apply check constraints for data validation
 - [ ] Use multi-tier indexing strategy (single, composite, covering, GIN)
-- [ ] Implement soft delete with `isDeleted` and `deletedAt` columns
+- [ ] Implement soft delete with `deletedAt` timestamp column
 - [ ] Use `SCHEMA_LIMITS` and `DEFAULTS` constants
 - [ ] Define foreign keys with appropriate cascade rules
 - [ ] Use snake_case for database column names

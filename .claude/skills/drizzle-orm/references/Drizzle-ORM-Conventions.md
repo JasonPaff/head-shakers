@@ -48,7 +48,7 @@ export class {Domain}Query extends BaseQuery {
       .where(
         this.combineFilters(
           eq({table}.id, id),
-          this.buildBaseFilters({table}.isPublic, {table}.userId, {table}.isDeleted, context),
+          this.buildBaseFilters({table}.isPublic, {table}.userId, {table}.deletedAt, context),
         ),
       )
       .limit(1);
@@ -68,7 +68,7 @@ export class {Domain}Query extends BaseQuery {
       .select()
       .from({table})
       .where(
-        this.buildBaseFilters({table}.isPublic, {table}.userId, {table}.isDeleted, context),
+        this.buildBaseFilters({table}.isPublic, {table}.userId, {table}.deletedAt, context),
       )
       .orderBy(desc({table}.createdAt));
 
@@ -127,10 +127,7 @@ export class {Domain}Query extends BaseQuery {
 
     const result = await dbInstance
       .update({table})
-      .set({
-        deletedAt: new Date(),
-        isDeleted: true,
-      })
+      .set({ deletedAt: new Date() })
       .where(and(eq({table}.id, id), eq({table}.userId, userId)))
       .returning();
 
@@ -211,7 +208,7 @@ const result = await dbInstance
       this.buildBaseFilters(
         { table }.isPublic, // isPublic column (or undefined if not applicable)
         { table }.userId, // userId column for ownership check
-        { table }.isDeleted, // isDeleted column (or undefined if no soft delete)
+        { table }.deletedAt, // deletedAt column (or undefined if no soft delete)
         context,
       ),
     ),
@@ -232,8 +229,8 @@ import {
 // Permission filter only
 const permFilter = buildPermissionFilter({ table }.isPublic, { table }.userId, context);
 
-// Soft delete filter only
-const deleteFilter = buildSoftDeleteFilter({ table }.isDeleted, context);
+// Soft delete filter only (returns isNull(deletedAt) unless shouldIncludeDeleted is true)
+const deleteFilter = buildSoftDeleteFilter({ table }.deletedAt, context);
 
 // Ownership filter only
 const ownerFilter = buildOwnershipFilter({ table }.userId, context);
@@ -300,11 +297,16 @@ static async findWithRetryAsync(
       const result = await dbInstance
         .select()
         .from({table})
-        .where(eq({table}.id, id))
+        .where(
+          this.combineFilters(
+            eq({table}.id, id),
+            this.buildBaseFilters({table}.isPublic, {table}.userId, {table}.deletedAt, context),
+          ),
+        )
         .limit(1);
       return result[0] || null;
     },
-    'findById',
+    '{Domain}Query.findWithRetryAsync',
   );
 }
 ```
@@ -324,11 +326,16 @@ static async findWithMetadataAsync(
       const result = await dbInstance
         .select()
         .from({table})
-        .where(eq({table}.id, id))
+        .where(
+          this.combineFilters(
+            eq({table}.id, id),
+            this.buildBaseFilters({table}.isPublic, {table}.userId, {table}.deletedAt, context),
+          ),
+        )
         .limit(1);
       return result[0] || null;
     },
-    'findByIdWithMetadata',
+    '{Domain}Query.findWithMetadataAsync',
   );
 }
 ```
@@ -354,7 +361,7 @@ static async findByIdWithRelationsAsync(
     .where(
       this.combineFilters(
         eq(entities.id, id),
-        this.buildBaseFilters(entities.isPublic, entities.userId, entities.isDeleted, context),
+        this.buildBaseFilters(entities.isPublic, entities.userId, entities.deletedAt, context),
       ),
     )
     .limit(1);
@@ -394,9 +401,9 @@ static async getWithUserAsync(
     .from(entities)
     .leftJoin(
       sql`users`,
-      and(eq(entities.userId, sql`users.id`), eq(sql`users.is_deleted`, false)),
+      and(eq(entities.userId, sql`users.id`), isNull(sql`users.deleted_at`)),
     )
-    .where(and(eq(entities.id, id), eq(entities.isDeleted, false)))
+    .where(and(eq(entities.id, id), isNull(entities.deletedAt)))
     .limit(1);
 
   return result?.[0] || null;
@@ -509,7 +516,7 @@ static async searchAsync(
   const pagination = this.applyPagination(options);
 
   const conditions = [
-    this.buildBaseFilters(table.isPublic, table.userId, table.isDeleted, context),
+    this.buildBaseFilters(table.isPublic, table.userId, table.deletedAt, context),
   ];
 
   // Escape special characters in search term
@@ -609,7 +616,7 @@ export type EntityWithUser = PublicEntity & {
 3. **Never return undefined** - Return `null` for missing single items
 4. **Never use raw strings in queries** - Use parameterized queries via Drizzle
 5. **Never skip pagination limits** - Always apply `applyPagination`
-6. **Never hard delete** - Use soft delete with `isDeleted` and `deletedAt` flags
+6. **Never hard delete** - Use soft delete with `deletedAt` timestamp column (set to `new Date()`)
 7. **Never allow negative counts** - Use `GREATEST(0, count - 1)` for decrements
 8. **Never skip ownership checks** - Verify `userId` on update/delete operations
 9. **Never ignore circuit breaker** - Use `executeWithRetry` for operations prone to transient failures

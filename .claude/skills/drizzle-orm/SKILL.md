@@ -47,10 +47,10 @@ This skill activates when:
 
 ### Permission Filtering
 
-- Use `this.buildBaseFilters(isPublicCol, userIdCol, isDeletedCol, context)` for permission + soft delete
+- Use `this.buildBaseFilters(isPublicCol, userIdCol, deletedAtCol, context)` for permission + soft delete
 - Import standalone filters from `@/lib/queries/base/permission-filters`:
   - `buildPermissionFilter()` - handles public/user/owner visibility
-  - `buildSoftDeleteFilter()` - handles isDeleted filtering
+  - `buildSoftDeleteFilter()` - handles deletedAt filtering (returns `isNull(deletedAt)`)
   - `buildOwnershipFilter()` - handles owner-only access
   - `combineFilters()` - combines multiple SQL conditions with AND
 
@@ -74,7 +74,7 @@ This skill activates when:
 3. **Never return undefined** - Return `null` for missing single items
 4. **Never use raw strings in queries** - Use parameterized queries via Drizzle
 5. **Never skip pagination limits** - Always apply `applyPagination`
-6. **Never hard delete** - Use soft delete with `isDeleted` flag
+6. **Never hard delete** - Use soft delete with `deletedAt` timestamp column
 7. **Never ignore circuit breaker** - Use `executeWithRetry` for external calls
 
 ## References

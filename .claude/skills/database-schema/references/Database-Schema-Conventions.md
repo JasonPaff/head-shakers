@@ -37,9 +37,8 @@ export const tableName = pgTable(
   {
     // Columns (alphabetically ordered)
     createdAt: timestamp('created_at').defaultNow().notNull(),
-    deletedAt: timestamp('deleted_at'),
+    deletedAt: timestamp('deleted_at'), // Soft delete - null means not deleted
     id: uuid('id').primaryKey().defaultRandom(),
-    isDeleted: boolean('is_deleted').default(DEFAULTS.ENTITY.IS_DELETED).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.ENTITY.NAME.MAX }).notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: uuid('user_id')
@@ -81,13 +80,14 @@ createdAt: timestamp('created_at').defaultNow().notNull(),
 updatedAt: timestamp('updated_at').defaultNow().notNull(),
 ```
 
-### Soft Delete Columns
+### Soft Delete Column
 
 ```typescript
-// For entities that support soft delete
-isDeleted: boolean('is_deleted').default(DEFAULTS.ENTITY.IS_DELETED).notNull(),
+// For entities that support soft delete (null = not deleted, timestamp = when deleted)
 deletedAt: timestamp('deleted_at'),
 ```
+
+**Note:** The project uses only `deletedAt` timestamp for soft deletes (not a separate boolean flag). Query filters check `isNull(deletedAt)` to find non-deleted records.
 
 ### Counter Columns
 
@@ -307,7 +307,7 @@ export const entityTags = pgTable(
 | --------------- | ------------------------ | ---------------------- |
 | `snake_case`    | `created_at`             | All database columns   |
 | `{entity}Id`    | `collectionId`           | Foreign key references |
-| `is{Adjective}` | `isPublic`, `isDeleted`  | Boolean flags          |
+| `is{Adjective}` | `isPublic`, `isFeatured` | Boolean flags          |
 | `{noun}Count`   | `likeCount`, `viewCount` | Counter columns        |
 | `{noun}At`      | `createdAt`, `deletedAt` | Timestamp columns      |
 
