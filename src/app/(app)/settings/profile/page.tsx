@@ -15,6 +15,8 @@ export function generateMetadata(): Metadata {
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProfileSettingsPage() {
   // Get current user ID
   const userId = await getUserId();

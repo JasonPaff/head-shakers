@@ -6,6 +6,8 @@ import { Suspense } from 'react';
 import { BrowseCategoriesContent } from '@/app/(app)/browse/categories/components/browse-categories-content';
 import { Spinner } from '@/components/ui/spinner';
 
+export const dynamic = 'force-static';
+
 export default function CategoriesPage() {
   // Set Sentry context for this page
   Sentry.setContext('browse_categories_page', {

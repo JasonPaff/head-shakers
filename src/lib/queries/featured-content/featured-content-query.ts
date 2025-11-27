@@ -382,7 +382,7 @@ export class FeaturedContentQuery extends BaseQuery {
             eq(likes.targetType, 'collection'),
             eq(likes.userId, userId),
           )
-        : undefined,
+        : sql`false`,
       )
       .where(
         and(

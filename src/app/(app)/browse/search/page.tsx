@@ -19,6 +19,8 @@ type SearchPageProps = PageProps;
 // Infer the search params type from the Route schema
 type SearchParamsType = z.infer<(typeof Route)['searchParams']>;
 
+export const dynamic = 'force-static';
+
 export const generateMetadata = async ({ searchParams }: GenerateMetadataProps): Promise<Metadata> => {
   const params = await searchParams;
 

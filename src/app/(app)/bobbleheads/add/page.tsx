@@ -20,6 +20,8 @@ export function generateMetadata(): Metadata {
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 async function AddItemPage({ searchParams }: AddItemPageProps) {
   const { collectionId } = await searchParams;
 

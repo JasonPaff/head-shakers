@@ -18,6 +18,8 @@ export function generateMetadata(): Metadata {
   };
 }
 
+export const dynamic = 'force-dynamic';
+
 function DashboardCollectionPage() {
   return (
     <ContentLayout>

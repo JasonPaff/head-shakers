@@ -5,8 +5,8 @@ export const CACHE_CONFIG = {
   ENVIRONMENT: {
     development: {
       IS_CACHE_ENABLED: true,
-      IS_CACHE_LOGGING_ENABLED: true,
-      TTL_MULTIPLIER: 0.1, // 10% of production TTL
+      IS_CACHE_LOGGING_ENABLED: false,
+      TTL_MULTIPLIER: 0.2, // 20% of production TTL
     },
     edge: {
       IS_CACHE_ENABLED: true,

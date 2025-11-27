@@ -23,6 +23,8 @@ import { cn } from '@/utils/tailwind-utils';
 
 type UserPageProps = PageProps;
 
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {

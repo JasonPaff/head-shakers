@@ -34,6 +34,8 @@ type CollectionPageProps = PageProps;
 
 export default withParamValidation(CollectionPage, Route);
 
+export const revalidate = 60;
+
 export async function generateMetadata({
   params,
 }: {

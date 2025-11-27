@@ -88,6 +88,8 @@ export async function generateMetadata({
   );
 }
 
+export const revalidate = 60;
+
 async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
   const { bobbleheadSlug } = await routeParams;
   const { collectionId } = await searchParams;
