@@ -83,6 +83,9 @@ export const OPERATIONS = {
     SUBSCRIBE: 'subscribe_to_newsletter',
     UNSUBSCRIBE: 'unsubscribe_from_newsletter',
   },
+  PLATFORM: {
+    GET_STATS: 'get_platform_stats',
+  },
   SEARCH: {
     BOBBLEHEADS: 'search_bobbleheads',
     COLLECTIONS: 'search_collections',

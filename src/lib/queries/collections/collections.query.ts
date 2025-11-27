@@ -381,6 +381,8 @@ export class CollectionsQuery extends BaseQuery {
     const dateFromFilter = filters?.dateFrom ? gte(collections.createdAt, filters.dateFrom) : undefined;
     const dateToFilter = filters?.dateTo ? lte(collections.createdAt, filters.dateTo) : undefined;
 
+    const isNotDeleted = isNull(collections.deletedAt);
+
     // combine all filters for collections
     const collectionFilters = this.combineFilters(
       permissionFilter,
@@ -388,6 +390,7 @@ export class CollectionsQuery extends BaseQuery {
       ownerFilter,
       dateFromFilter,
       dateToFilter,
+      isNotDeleted,
     );
 
     // build sort order
@@ -425,6 +428,7 @@ export class CollectionsQuery extends BaseQuery {
           commentCount: collections.commentCount,
           coverImageUrl: collections.coverImageUrl,
           createdAt: collections.createdAt,
+          deletedAt: collections.deletedAt,
           description: collections.description,
           firstBobbleheadPhoto: sql<null | string>`(
             SELECT ${bobbleheadPhotos.url}
@@ -464,6 +468,7 @@ export class CollectionsQuery extends BaseQuery {
           commentCount: row.commentCount,
           coverImageUrl: row.coverImageUrl,
           createdAt: row.createdAt,
+          deletedAt: row.deletedAt,
           description: row.description,
           id: row.id,
           isPublic: row.isPublic,
@@ -550,6 +555,7 @@ export class CollectionsQuery extends BaseQuery {
         commentCount: row.commentCount,
         coverImageUrl: row.coverImageUrl,
         createdAt: row.createdAt,
+        deletedAt: null,
         description: row.description,
         id: row.id,
         isPublic: row.isPublic,
@@ -695,6 +701,7 @@ export class CollectionsQuery extends BaseQuery {
         commentCount: row.commentCount,
         coverImageUrl: row.coverImageUrl,
         createdAt: row.createdAt,
+        deletedAt: null,
         description: row.description,
         id: row.id,
         isPublic: row.isPublic,
@@ -837,6 +844,18 @@ export class CollectionsQuery extends BaseQuery {
       },
       slug: row.slug,
     };
+  }
+
+  static async getCollectionsCountAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(collections)
+      .where(isNull(collections.deletedAt))
+      .then((result) => result[0]?.count || 0);
+
+    return result;
   }
 
   static async getDashboardDataAsync(

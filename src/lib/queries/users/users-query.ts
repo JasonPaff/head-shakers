@@ -214,6 +214,22 @@ export class UsersQuery extends BaseQuery {
   }
 
   /**
+   * Get total users count (excluding deleted)
+   * @param context
+   */
+  static async getUsersCountAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(users)
+      .where(isNull(users.deletedAt))
+      .then((result) => result[0]?.count || 0);
+
+    return result;
+  }
+
+  /**
    * Get user statistics for admin dashboard
    * Returns counts for collections and bobbleheads
    */

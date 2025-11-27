@@ -22,6 +22,7 @@ export const collections = pgTable(
     commentCount: integer('comment_count').default(DEFAULTS.COLLECTION.COMMENT_COUNT).notNull(),
     coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
+    deletedAt: timestamp('deleted_at'),
     description: varchar('description', { length: SCHEMA_LIMITS.COLLECTION.DESCRIPTION.MAX }),
     id: uuid('id').primaryKey().defaultRandom(),
     isPublic: boolean('is_public').default(DEFAULTS.COLLECTION.IS_PUBLIC).notNull(),
@@ -44,6 +45,8 @@ export const collections = pgTable(
     index('collections_is_public_idx').on(table.isPublic),
     index('collections_slug_idx').on(table.slug),
     index('collections_user_id_idx').on(table.userId),
+    index('collections_created_at_idx').on(table.createdAt),
+    index('collections_deleted_at_idx').on(table.deletedAt),
 
     // composite indexes
     index('collections_last_item_added_at_idx').on(table.lastItemAddedAt),
