@@ -9,7 +9,7 @@ import { generateTestId } from '@/lib/test-ids';
  * with shimmer animations to indicate loading state.
  * Supports light/dark mode with orange accent colors.
  */
-export const HeroFeaturedBobbleheadSkeleton = () => {
+export const FeaturedBobbleheadSkeleton = () => {
   return (
     <div
       aria-busy={'true'}

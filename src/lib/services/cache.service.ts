@@ -590,12 +590,12 @@ export class CacheService {
      * uses Redis for distributed caching of the hero bobblehead display data.
      * this is high-traffic homepage content that benefits from fast Redis access.
      */
-    heroBobblehead: async <T>(fn: () => Promise<T>, options: Omit<CacheOptions, 'tags'> = {}) => {
-      const key = CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD();
+    featuredBobblehead: async <T>(fn: () => Promise<T>, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.FEATURED.FEATURED_BOBBLEHEAD();
 
       return CacheService.cachedWithRedis(fn, key, {
         ...options,
-        context: { ...options.context, entityType: 'featured', operation: 'featured:hero-bobblehead' },
+        context: { ...options.context, entityType: 'featured', operation: 'featured:bobblehead' },
         ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
       });
     },

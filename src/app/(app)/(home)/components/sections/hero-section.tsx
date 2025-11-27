@@ -5,10 +5,10 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { HeroFeaturedBobbleheadAsync } from '@/app/(app)/(home)/components/async/hero-featured-bobblehead-async';
-import { HeroPlatformStatsAsync } from '@/app/(app)/(home)/components/async/hero-platform-stats-async';
-import { HeroFeaturedBobbleheadSkeleton } from '@/app/(app)/(home)/components/skeleton/hero-featured-bobblehead-skeleton';
-import { HeroPlatformStatsSkeleton } from '@/app/(app)/(home)/components/skeleton/hero-platform-stats-skeleton';
+import { FeaturedBobbleheadAsync } from '@/app/(app)/(home)/components/async/featured-bobblehead-async';
+import { PlatformStatsAsync } from '@/app/(app)/(home)/components/async/platform-stats-async';
+import { FeaturedBobbleheadSkeleton } from '@/app/(app)/(home)/components/skeleton/featured-bobblehead-skeleton';
+import { PlatformStatsSkeleton } from '@/app/(app)/(home)/components/skeleton/platform-stats-skeleton';
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
@@ -157,15 +157,15 @@ export const HeroSection = () => {
 
             {/* Stats Row */}
             <ErrorBoundary name={'hero-platform-stats'}>
-              <Suspense fallback={<HeroPlatformStatsSkeleton />}>
-                <HeroPlatformStatsAsync />
+              <Suspense fallback={<PlatformStatsSkeleton />}>
+                <PlatformStatsAsync />
               </Suspense>
             </ErrorBoundary>
           </div>
 
           {/* Right Content - Featured Bobblehead Showcase */}
-          <Suspense fallback={<HeroFeaturedBobbleheadSkeleton />}>
-            <HeroFeaturedBobbleheadAsync />
+          <Suspense fallback={<FeaturedBobbleheadSkeleton />}>
+            <FeaturedBobbleheadAsync />
           </Suspense>
         </div>
       </div>

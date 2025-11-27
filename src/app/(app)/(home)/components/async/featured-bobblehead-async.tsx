@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { HeroFeaturedBobblehead } from '@/app/(app)/(home)/components/display/hero-featured-bobblehead';
+import { FeaturedBobbleheadDisplay } from '@/app/(app)/(home)/components/display/featured-bobblehead-display';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 
 /**
@@ -9,8 +9,8 @@ import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-c
  * Fetches a single featured bobblehead from the FeaturedContentFacade using a dedicated
  * Redis-cached query that returns only the fields needed for the hero display.
  */
-export async function HeroFeaturedBobbleheadAsync() {
-  const featuredData = await FeaturedContentFacade.getHeroFeaturedBobbleheadAsync();
+export async function FeaturedBobbleheadAsync() {
+  const featuredData = await FeaturedContentFacade.getFeaturedBobbleheadAsync();
   if (!featuredData) return null;
 
   const bobblehead = {
@@ -23,5 +23,5 @@ export async function HeroFeaturedBobbleheadAsync() {
     viewCount: featuredData.viewCount,
   };
 
-  return <HeroFeaturedBobblehead bobblehead={bobblehead} />;
+  return <FeaturedBobbleheadDisplay bobblehead={bobblehead} />;
 }

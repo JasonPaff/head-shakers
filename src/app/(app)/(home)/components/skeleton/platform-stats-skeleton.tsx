@@ -8,7 +8,7 @@ import { generateTestId } from '@/lib/test-ids';
  * with shimmer animations to indicate the loading state.
  * Matches the layout of HeroPlatformStatsAsync component with light/dark mode support.
  */
-export const HeroPlatformStatsSkeleton = () => {
+export const PlatformStatsSkeleton = () => {
   return (
     <div
       aria-busy={'true'}

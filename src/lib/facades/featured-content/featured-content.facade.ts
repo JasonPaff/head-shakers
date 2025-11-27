@@ -150,6 +150,58 @@ export class FeaturedContentFacade {
   }
 
   /**
+   * get hero featured bobblehead for homepage display
+   *
+   * returns the single highest-priority featured bobblehead with only the fields
+   * needed for the hero section. uses Redis caching for fast access.
+   *
+   * @param dbInstance - optional database executor for transactions
+   * @returns the hero featured bobblehead data or null if none exists
+   */
+  static async getFeaturedBobbleheadAsync(
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<HeroFeaturedBobbleheadData | null> {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching featured bobblehead',
+    });
+
+    try {
+      return await CacheService.featured.featuredBobblehead(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          const data = await FeaturedContentQuery.getHeroFeaturedBobbleheadAsync(context);
+
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { found: data !== null },
+            level: SENTRY_LEVELS.INFO,
+            message: 'Featured bobblehead fetched successfully',
+          });
+
+          return data;
+        },
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.FEATURED,
+            facade: facadeName,
+            operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+          },
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: {},
+        facade: facadeName,
+        method: 'getHeroFeaturedBobbleheadAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
    * get featured collections for homepage display
    *
    * returns up to 6 active featured collections with engagement metrics.
@@ -276,58 +328,6 @@ export class FeaturedContentFacade {
         facade: facadeName,
         method: 'getFooterFeaturedContentAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
-      };
-      throw createFacadeError(errorContext, error);
-    }
-  }
-
-  /**
-   * get hero featured bobblehead for homepage display
-   *
-   * returns the single highest-priority featured bobblehead with only the fields
-   * needed for the hero section. uses Redis caching for fast access.
-   *
-   * @param dbInstance - optional database executor for transactions
-   * @returns the hero featured bobblehead data or null if none exists
-   */
-  static async getHeroFeaturedBobbleheadAsync(
-    dbInstance: DatabaseExecutor = db,
-  ): Promise<HeroFeaturedBobbleheadData | null> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching hero featured bobblehead',
-    });
-
-    try {
-      return await CacheService.featured.heroBobblehead(
-        async () => {
-          const context = createPublicQueryContext({ dbInstance });
-          const data = await FeaturedContentQuery.getHeroFeaturedBobbleheadAsync(context);
-
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: { found: data !== null },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Hero featured bobblehead fetched successfully',
-          });
-
-          return data;
-        },
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.FEATURED,
-            facade: facadeName,
-            operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
-          },
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: {},
-        facade: facadeName,
-        method: 'getHeroFeaturedBobbleheadAsync',
-        operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
       };
       throw createFacadeError(errorContext, error);
     }

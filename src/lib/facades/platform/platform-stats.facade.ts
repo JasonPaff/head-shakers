@@ -5,6 +5,7 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { CACHE_ENTITY_TYPE, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
+import { db } from '@/lib/db';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
@@ -17,7 +18,7 @@ const facadeName = 'PlatformStatsFacade';
 /**
  * Platform-wide statistics result
  */
-export interface HomePageHeroPlatformStats {
+export interface PlatformStats {
   totalBobbleheads: number;
   totalCollections: number;
   totalCollectors: number;
@@ -39,9 +40,7 @@ export class PlatformStatsFacade {
    * @param dbInstance - Optional database instance for transactions
    * @returns Platform statistics with total counts
    */
-  static async getHomePageHeroPlatformStatsAsync(
-    dbInstance?: DatabaseExecutor,
-  ): Promise<HomePageHeroPlatformStats> {
+  static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
       level: SENTRY_LEVELS.INFO,
@@ -91,7 +90,7 @@ export class PlatformStatsFacade {
       const errorContext: FacadeErrorContext = {
         data: {},
         facade: facadeName,
-        method: 'getHomePageHeroStatsAsync',
+        method: 'getPlatformStatsAsync',
         operation: OPERATIONS.PLATFORM.GET_STATS,
       };
       throw createFacadeError(errorContext, error);

@@ -12,7 +12,7 @@ import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
 
-interface HeroFeaturedBobbleheadProps extends ComponentTestIdProps {
+interface FeaturedBobbleheadDisplayProps extends ComponentTestIdProps {
   bobblehead: {
     description: null | string;
     id: string;
@@ -24,7 +24,7 @@ interface HeroFeaturedBobbleheadProps extends ComponentTestIdProps {
   };
 }
 
-export const HeroFeaturedBobblehead = ({ bobblehead, testId }: HeroFeaturedBobbleheadProps) => {
+export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobbleheadDisplayProps) => {
   const _hasPhoto = Boolean(bobblehead.photoUrl);
   const _publicId = _hasPhoto ? extractPublicIdFromCloudinaryUrl(bobblehead.photoUrl!) : null;
   const _blurDataUrl = _publicId ? generateBlurDataUrl(_publicId) : undefined;

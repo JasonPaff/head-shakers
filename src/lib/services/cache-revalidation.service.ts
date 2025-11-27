@@ -442,7 +442,7 @@ export class CacheRevalidationService {
       const tags = CacheTagInvalidation.onFeaturedContentChange();
 
       // Invalidate hero bobblehead Redis cache
-      void RedisOperations.del(CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD()).catch((error) => {
+      void RedisOperations.del(CACHE_KEYS.FEATURED.FEATURED_BOBBLEHEAD()).catch((error) => {
         console.error('[CacheRevalidation] Failed to invalidate hero bobblehead Redis cache:', error);
       });
 
@@ -471,7 +471,7 @@ export class CacheRevalidationService {
       const tags = CacheTagInvalidation.onMajorDataChange();
 
       // Invalidate hero bobblehead Redis cache
-      void RedisOperations.del(CACHE_KEYS.FEATURED.HERO_BOBBLEHEAD()).catch((error) => {
+      void RedisOperations.del(CACHE_KEYS.FEATURED.FEATURED_BOBBLEHEAD()).catch((error) => {
         console.error('[CacheRevalidation] Failed to invalidate hero bobblehead Redis cache:', error);
       });
 
