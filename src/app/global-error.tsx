@@ -6,7 +6,19 @@ import { useEffect } from 'react';
 
 export default function GlobalError({ error }: { error: Error & { digest?: string } }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    Sentry.captureException(error, {
+      contexts: {
+        error_details: {
+          digest: error.digest,
+          route: 'global',
+        },
+      },
+      tags: {
+        error_boundary: 'global',
+        has_digest: String(!!error.digest),
+      },
+      level: 'fatal',
+    });
   }, [error]);
 
   return (
