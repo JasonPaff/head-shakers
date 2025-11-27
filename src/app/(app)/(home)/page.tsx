@@ -13,7 +13,7 @@ import {
 
 import { HeroSection } from './components/sections/hero-section';
 
-export const revalidate = 300;
+export const dynamic = 'force-dynamic';
 
 export function generateMetadata(): Metadata {
   return {
