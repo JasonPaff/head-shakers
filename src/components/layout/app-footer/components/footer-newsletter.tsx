@@ -77,8 +77,8 @@ export const FooterNewsletter = withFocusManagement(() => {
               return (
                 <div className={'relative flex-1 md:w-64'}>
                   <field.TextField
-                    className={`border-white/20 bg-white pr-3 pl-9 text-slate-900
-                    placeholder:text-slate-600 dark:placeholder:text-slate-300`}
+                    className={`border-white/20 bg-white pr-3 pl-9 text-slate-900 placeholder:text-slate-600
+                    dark:text-white dark:placeholder:text-slate-300`}
                     disabled={isExecuting}
                     fieldErrorProps={{
                       className: 'dark:text-white text-slate-800',
