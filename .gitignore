@@ -52,7 +52,7 @@ next-env.d.ts
 playwright/.clerk
 playwright/.auth
 playwright/.e2e-branch.json
-/nul
+playwright-report
 
 # docs
 # /docs
@@ -62,3 +62,6 @@ playwright/.e2e-branch.json
 # worktrees
 /.worktrees/
 .worktrees/
+
+# testing
+/test-results/
