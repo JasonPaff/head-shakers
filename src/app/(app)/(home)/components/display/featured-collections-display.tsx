@@ -56,8 +56,10 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
       data-slot={'featured-collections-grid'}
       data-testid={generateTestId('feature', 'collection-grid')}
     >
-      {collections.map((collection) => (
-        <FeaturedCollectionCard collection={collection} key={collection.id} />
+      {collections.map((collection, index) => (
+        <div className={index >= 3 ? 'hidden md:block' : undefined} key={collection.id}>
+          <FeaturedCollectionCard collection={collection} />
+        </div>
       ))}
     </div>
   );

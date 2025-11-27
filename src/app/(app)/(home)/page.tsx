@@ -57,6 +57,8 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(ORGANIZATION_SCHEMA) }}
         type={'application/ld+json'}
       />
+
+      {/* JSON-LD structured data for homepage */}
       <script
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(WEBSITE_SCHEMA) }}
         type={'application/ld+json'}

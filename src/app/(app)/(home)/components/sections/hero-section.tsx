@@ -1,4 +1,3 @@
-import 'server-only';
 import { SignUpButton } from '@clerk/nextjs';
 import { ArrowRightIcon, SearchIcon, SparklesIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
@@ -103,9 +102,9 @@ export const HeroSection = () => {
                 fallback={
                   <Button
                     asChild
-                    className={`group hover:from- orange-600 bg-gradient-to-r from-orange-500 to-amber-500
-                      px-8 text-lg font-semibold text-white shadow-lg
-                      shadow-orange-500/25 hover:to-amber-600`}
+                    className={`group bg-gradient-to-r from-orange-500 to-amber-500 px-8
+                      text-lg font-semibold text-white shadow-lg shadow-orange-500/25
+                      hover:from-orange-600 hover:to-amber-600`}
                     size={'lg'}
                   >
                     <SignUpButton mode={'modal'}>Start Your Collection</SignUpButton>
