@@ -83,7 +83,7 @@ export class PlatformStatsFacade {
             facade: facadeName,
             operation: OPERATIONS.PLATFORM.GET_STATS,
           },
-          ttl: CACHE_CONFIG.TTL.MEDIUM,
+          ttl: CACHE_CONFIG.TTL.EXTENDED,
         },
       );
     } catch (error) {

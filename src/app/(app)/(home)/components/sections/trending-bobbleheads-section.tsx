@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
+import { generateTestId } from '@/lib/test-ids';
 
 import { TrendingBobbleheadsAsync } from '../async/trending-bobbleheads-async';
 import { TrendingBobbleheadsSkeleton } from '../skeleton/trending-bobbleheads-skeleton';
@@ -15,6 +16,8 @@ export const TrendingBobbleheadsSection = () => {
       className={
         'bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/30 py-20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900'
       }
+      data-slot={'trending-bobbleheads-section'}
+      data-testid={generateTestId('layout', 'trending-bobbleheads-section')}
     >
       <div className={'container mx-auto px-6'}>
         {/* Section Header */}

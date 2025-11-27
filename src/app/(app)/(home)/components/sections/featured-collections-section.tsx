@@ -7,10 +7,14 @@ import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/fe
 import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeleton/featured-collections-skeleton';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
+import { generateTestId } from '@/lib/test-ids';
 
 export const FeaturedCollectionsSection = () => {
   return (
-    <section className={'bg-white py-20 dark:bg-slate-950'}>
+    <section
+      className={'bg-white py-20 dark:bg-slate-950'}
+      data-testid={generateTestId('layout', 'featured-collections-section')}
+    >
       <div className={'container mx-auto px-6'}>
         <div className={'mb-12 flex flex-col items-center text-center'}>
           <div

@@ -6,6 +6,8 @@ import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids/types';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -33,11 +35,11 @@ export interface FeaturedCollection {
   viewCount: number;
 }
 
-export interface FeaturedCollectionsDisplayProps {
+export interface FeaturedCollectionsDisplayProps extends ComponentTestIdProps {
   collections: Array<FeaturedCollection>;
 }
 
-export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsDisplayProps) => {
+export const FeaturedCollectionsDisplay = ({ collections, testId }: FeaturedCollectionsDisplayProps) => {
   if (collections.length === 0) {
     return (
       <div
@@ -58,7 +60,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
     <div
       className={'grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3'}
       data-slot={'featured-collections-grid'}
-      data-testid={generateTestId('feature', 'collection-grid')}
+      data-testid={testId ?? generateTestId('feature', 'collection-grid')}
     >
       {collections.map((collection, index) => (
         <FeaturedCollectionCard
@@ -71,11 +73,13 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
   );
 };
 
-type FeaturedCollectionCardProps = ClassName<{
-  collection: FeaturedCollection;
-}>;
+type FeaturedCollectionCardProps = ClassName<
+  ComponentTestIdProps & {
+    collection: FeaturedCollection;
+  }
+>;
 
-const FeaturedCollectionCard = ({ className, collection }: FeaturedCollectionCardProps) => {
+const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedCollectionCardProps) => {
   const _hasImage = Boolean(collection.imageUrl && collection.imageUrl !== '/placeholder.jpg');
 
   // Extract publicId and generate blur placeholder for progressive loading
@@ -94,7 +98,7 @@ const FeaturedCollectionCard = ({ className, collection }: FeaturedCollectionCar
         className,
       )}
       data-slot={'featured-collection-card'}
-      data-testid={generateTestId('feature', 'collection-card', collection.id)}
+      data-testid={testId ?? generateTestId('feature', 'collection-card', collection.id)}
       href={$path({
         route: '/collections/[collectionSlug]',
         routeParams: { collectionSlug: collection.contentSlug },

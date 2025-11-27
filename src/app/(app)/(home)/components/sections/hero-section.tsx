@@ -12,6 +12,7 @@ import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
+import { generateTestId } from '@/lib/test-ids';
 
 /**
  * Hero section for home page with orange accent color scheme
@@ -33,6 +34,7 @@ export const HeroSection = () => {
       className={`relative overflow-hidden bg-gradient-to-b from-orange-50 via-white to-orange-50/50
         dark:from-slate-900 dark:via-slate-800 dark:to-slate-900`}
       data-slot={'hero-section'}
+      data-testid={generateTestId('feature', 'hero-section')}
     >
       {/* Animated Background Elements */}
       <div

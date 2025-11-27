@@ -5,6 +5,8 @@ import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
+import type { ComponentTestIdProps } from '@/lib/test-ids';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -25,17 +27,19 @@ export interface TrendingBobblehead {
   year: number;
 }
 
-export interface TrendingBobbleheadsDisplayProps {
+export interface TrendingBobbleheadsDisplayProps extends ComponentTestIdProps {
   bobbleheads: Array<TrendingBobblehead>;
 }
 
-export const TrendingBobbleheadsDisplay = ({ bobbleheads }: TrendingBobbleheadsDisplayProps) => {
+export const TrendingBobbleheadsDisplay = ({ bobbleheads, testId }: TrendingBobbleheadsDisplayProps) => {
+  const displayTestId = testId || generateTestId('feature', 'trending-bobbleheads-grid');
+
   if (bobbleheads.length === 0) {
     return (
       <div
         className={'py-12 text-center'}
         data-slot={'trending-bobbleheads-empty'}
-        data-testid={generateTestId('feature', 'trending-bobbleheads-empty-state')}
+        data-testid={displayTestId}
       >
         <TrendingUpIcon aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
         <p className={'mb-4 text-muted-foreground'}>No trending bobbleheads available at this time.</p>
@@ -50,7 +54,7 @@ export const TrendingBobbleheadsDisplay = ({ bobbleheads }: TrendingBobbleheadsD
     <div
       className={'grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-6'}
       data-slot={'trending-bobbleheads-grid'}
-      data-testid={generateTestId('feature', 'trending-bobbleheads-grid')}
+      data-testid={displayTestId}
     >
       {bobbleheads.map((bobblehead) => (
         <TrendingBobbleheadCard bobblehead={bobblehead} key={bobblehead.id} />
@@ -59,11 +63,11 @@ export const TrendingBobbleheadsDisplay = ({ bobbleheads }: TrendingBobbleheadsD
   );
 };
 
-interface TrendingBobbleheadCardProps {
+interface TrendingBobbleheadCardProps extends ComponentTestIdProps {
   bobblehead: TrendingBobblehead;
 }
 
-const TrendingBobbleheadCard = ({ bobblehead }: TrendingBobbleheadCardProps) => {
+const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardProps) => {
   const _hasImage = Boolean(bobblehead.imageUrl);
 
   // Extract publicId and generate blur placeholder for progressive loading
@@ -76,6 +80,8 @@ const TrendingBobbleheadCard = ({ bobblehead }: TrendingBobbleheadCardProps) => 
     : bobblehead.badge === 'new_badge' ? 'New'
     : bobblehead.badge.charAt(0).toUpperCase() + bobblehead.badge.slice(1);
 
+  const cardTestId = testId || generateTestId('feature', 'trending-bobblehead-card', bobblehead.id);
+
   return (
     <Link
       className={cn(
@@ -84,7 +90,7 @@ const TrendingBobbleheadCard = ({ bobblehead }: TrendingBobbleheadCardProps) => 
         'dark:border-slate-700/50 dark:bg-slate-800',
       )}
       data-slot={'trending-bobblehead-card'}
-      data-testid={generateTestId('feature', 'trending-bobblehead-card', bobblehead.id)}
+      data-testid={cardTestId}
       href={$path({
         route: '/bobbleheads/[bobbleheadSlug]',
         routeParams: { bobbleheadSlug: bobblehead.contentSlug },
