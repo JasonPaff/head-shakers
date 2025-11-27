@@ -17,7 +17,7 @@ const facadeName = 'PlatformStatsFacade';
 /**
  * Platform-wide statistics result
  */
-export interface HomePageHeroStats {
+export interface HomePageHeroPlatformStats {
   totalBobbleheads: number;
   totalCollections: number;
   totalCollectors: number;
@@ -39,7 +39,9 @@ export class PlatformStatsFacade {
    * @param dbInstance - Optional database instance for transactions
    * @returns Platform statistics with total counts
    */
-  static async getHomePageHeroStatsAsync(dbInstance?: DatabaseExecutor): Promise<HomePageHeroStats> {
+  static async getHomePageHeroPlatformStatsAsync(
+    dbInstance?: DatabaseExecutor,
+  ): Promise<HomePageHeroPlatformStats> {
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
       level: SENTRY_LEVELS.INFO,

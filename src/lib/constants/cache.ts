@@ -227,6 +227,7 @@ export const CACHE_KEYS = {
 export const CACHE_ENTITY_TYPE = {
   BOBBLEHEAD: 'bobblehead',
   COLLECTION: 'collection',
+  FEATURED: 'featured',
   PLATFORM: 'platform',
   USER: 'user',
 };

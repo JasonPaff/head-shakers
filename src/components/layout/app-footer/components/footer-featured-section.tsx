@@ -10,17 +10,14 @@ import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-c
  * Returns null if no featured collections are available
  */
 export const FooterFeaturedSection = async () => {
-  const featuredContent = await FeaturedContentFacade.getActiveFeaturedContent();
+  const featuredContent = await FeaturedContentFacade.getFooterFeaturedContentAsync();
 
   // Filter for collection content type and limit to configured max items
   const featuredCollections = featuredContent
     .filter((content) => content.contentType === 'collection')
     .slice(0, CONFIG.CONTENT.MAX_FEATURED_FOOTER_ITEMS);
 
-  // Return null for empty state - no featured collections to display
-  const _hasFeaturedCollections = featuredCollections.length > 0;
-
-  if (!_hasFeaturedCollections) {
+  if (!featuredCollections.length || featuredCollections.length === 0) {
     return null;
   }
 
@@ -29,10 +26,7 @@ export const FooterFeaturedSection = async () => {
       {/* Featured Collection Links */}
       {featuredCollections.map((collection) => {
         const _hasValidSlug = collection.contentSlug !== null;
-
-        if (!_hasValidSlug) {
-          return null;
-        }
+        if (!_hasValidSlug) return null;
 
         return (
           <FooterNavLink

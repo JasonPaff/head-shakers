@@ -65,6 +65,7 @@ export const OPERATIONS = {
   FEATURED_CONTENT: {
     CREATE: 'create_featured_content',
     DELETE: 'delete_featured_content',
+    GET_ACTIVE: 'get_active_featured_content',
     GET_BY_ID: 'get_featured_content_by_id',
     TOGGLE_ACTIVE: 'toggle_featured_content_active',
     TOGGLE_STATUS: 'toggle_featured_content_status',

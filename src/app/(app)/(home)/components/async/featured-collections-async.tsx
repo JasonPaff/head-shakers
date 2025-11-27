@@ -1,3 +1,6 @@
+import 'server-only';
+
+import type { FeaturedCollection } from '@/app/(app)/(home)/components/display/featured-collections-display';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 
 import { FeaturedCollectionsDisplay } from '@/app/(app)/(home)/components/display/featured-collections-display';
@@ -11,7 +14,7 @@ export interface FeaturedCollectionsAsyncProps {
 export async function FeaturedCollectionsAsync({ currentUserId }: FeaturedCollectionsAsyncProps) {
   let collections: Array<FeaturedCollection> = [];
 
-  const featuredContent = await FeaturedContentFacade.getActiveFeaturedContent();
+  const featuredContent = await FeaturedContentFacade.getActiveFeaturedContentAsync();
 
   // filter for collections only and sort by priority, limit to 6
   const collectionsData = featuredContent

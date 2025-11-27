@@ -10,8 +10,8 @@ import { generateTestId } from '@/lib/test-ids';
  * them in a horizontal layout matching the hero section design.
  * Supports light/dark mode with orange accent colors.
  */
-export async function HeroStatsAsync() {
-  const stats = await PlatformStatsFacade.getHomePageHeroStatsAsync();
+export async function HeroPlatformStatsAsync() {
+  const stats = await PlatformStatsFacade.getHomePageHeroPlatformStatsAsync();
 
   return (
     <dl

@@ -35,6 +35,18 @@ export interface FeaturedContentRecord {
   viewCount: number;
 }
 
+/**
+ * minimal data needed for footer featured collections display
+ */
+export interface FooterFeaturedContentData {
+  collectionName: null | string;
+  collectionSlug: null | string;
+  contentId: string;
+  contentType: 'bobblehead' | 'collection' | 'user';
+  id: string;
+  title: null | string;
+}
+
 export class FeaturedContentQuery extends BaseQuery {
   /**
    * create a new featured content entry
@@ -69,72 +81,6 @@ export class FeaturedContentQuery extends BaseQuery {
     const result = await dbInstance.delete(featuredContent).where(eq(featuredContent.id, id)).returning();
 
     return result?.[0] || null;
-  }
-
-  /**
-   * get active featured content with related data (raw data for service layer transformation)
-   *
-   * joins with bobbleheads, collections, users (for user content type),
-   * bobbleheadPhotos (for primary image), and owner users (for owner display names)
-   */
-  static async findActiveFeaturedContentAsync(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
-    const dbInstance = this.getDbInstance(context);
-    const now = new Date();
-
-    // create aliases for users table to get owner display names
-    const bobbleheadOwnerUsers = alias(users, 'bobbleheadOwnerUsers');
-    const collectionOwnerUsers = alias(users, 'collectionOwnerUsers');
-
-    const results = await dbInstance
-      .select({
-        bobbleheadLikes: bobbleheads.likeCount,
-        bobbleheadName: bobbleheads.name,
-        bobbleheadOwner: bobbleheads.userId,
-        bobbleheadOwnerUsername: bobbleheadOwnerUsers.username,
-        bobbleheadPrimaryPhotoUrl: bobbleheadPhotos.url,
-        bobbleheadSlug: bobbleheads.slug,
-        collectionCoverImageUrl: collections.coverImageUrl,
-        collectionOwner: collections.userId,
-        collectionOwnerUsername: collectionOwnerUsers.username,
-        collectionSlug: collections.slug,
-        contentId: featuredContent.contentId,
-        contentType: featuredContent.contentType,
-        createdAt: featuredContent.createdAt,
-        curatorNotes: featuredContent.curatorNotes,
-        description: featuredContent.description,
-        endDate: featuredContent.endDate,
-        featureType: featuredContent.featureType,
-        id: featuredContent.id,
-        imageUrl: featuredContent.imageUrl,
-        isActive: featuredContent.isActive,
-        priority: featuredContent.priority,
-        startDate: featuredContent.startDate,
-        title: featuredContent.title,
-        updatedAt: featuredContent.updatedAt,
-        userId: users.id,
-        userUsername: users.username,
-        viewCount: featuredContent.viewCount,
-      })
-      .from(featuredContent)
-      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
-      .leftJoin(
-        bobbleheadPhotos,
-        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
-      )
-      .leftJoin(bobbleheadOwnerUsers, eq(bobbleheads.userId, bobbleheadOwnerUsers.id))
-      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
-      .leftJoin(collectionOwnerUsers, eq(collections.userId, collectionOwnerUsers.id))
-      .leftJoin(users, eq(featuredContent.contentId, users.id))
-      .where(
-        and(
-          eq(featuredContent.isActive, DEFAULTS.FEATURED_CONTENT.IS_ACTIVE),
-          or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
-          or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
-        ),
-      )
-      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
-
-    return results;
   }
 
   /**
@@ -271,6 +217,72 @@ export class FeaturedContentQuery extends BaseQuery {
       updatedAt: row.updatedAt,
       viewCount: row.viewCount,
     };
+  }
+
+  /**
+   * get active featured content with related data (raw data for service layer transformation)
+   *
+   * joins with bobbleheads, collections, users (for user content type),
+   * bobbleheadPhotos (for primary image), and owner users (for owner display names)
+   */
+  static async getActiveFeaturedContentAsync(context: QueryContext): Promise<Array<RawFeaturedContentData>> {
+    const dbInstance = this.getDbInstance(context);
+    const now = new Date();
+
+    // create aliases for users table to get owner display names
+    const bobbleheadOwnerUsers = alias(users, 'bobbleheadOwnerUsers');
+    const collectionOwnerUsers = alias(users, 'collectionOwnerUsers');
+
+    const results = await dbInstance
+      .select({
+        bobbleheadLikes: bobbleheads.likeCount,
+        bobbleheadName: bobbleheads.name,
+        bobbleheadOwner: bobbleheads.userId,
+        bobbleheadOwnerUsername: bobbleheadOwnerUsers.username,
+        bobbleheadPrimaryPhotoUrl: bobbleheadPhotos.url,
+        bobbleheadSlug: bobbleheads.slug,
+        collectionCoverImageUrl: collections.coverImageUrl,
+        collectionOwner: collections.userId,
+        collectionOwnerUsername: collectionOwnerUsers.username,
+        collectionSlug: collections.slug,
+        contentId: featuredContent.contentId,
+        contentType: featuredContent.contentType,
+        createdAt: featuredContent.createdAt,
+        curatorNotes: featuredContent.curatorNotes,
+        description: featuredContent.description,
+        endDate: featuredContent.endDate,
+        featureType: featuredContent.featureType,
+        id: featuredContent.id,
+        imageUrl: featuredContent.imageUrl,
+        isActive: featuredContent.isActive,
+        priority: featuredContent.priority,
+        startDate: featuredContent.startDate,
+        title: featuredContent.title,
+        updatedAt: featuredContent.updatedAt,
+        userId: users.id,
+        userUsername: users.username,
+        viewCount: featuredContent.viewCount,
+      })
+      .from(featuredContent)
+      .leftJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .leftJoin(bobbleheadOwnerUsers, eq(bobbleheads.userId, bobbleheadOwnerUsers.id))
+      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .leftJoin(collectionOwnerUsers, eq(collections.userId, collectionOwnerUsers.id))
+      .leftJoin(users, eq(featuredContent.contentId, users.id))
+      .where(
+        and(
+          eq(featuredContent.isActive, DEFAULTS.FEATURED_CONTENT.IS_ACTIVE),
+          or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
+          or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
+        ),
+      )
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
+
+    return results;
   }
 
   /**

@@ -4,7 +4,7 @@ import { generateTestId } from '@/lib/test-ids';
 /**
  * Skeleton loading state for featured bobblehead showcase in hero section
  *
- * Displays skeleton blocks matching the HeroFeaturedBobblehead component layout
+ * Displays skeleton blocks matching the FeaturedBobblehead component layout
  * including a main card with image, badge, title, description, stats, and two floating cards
  * with shimmer animations to indicate loading state.
  * Supports light/dark mode with orange accent colors.

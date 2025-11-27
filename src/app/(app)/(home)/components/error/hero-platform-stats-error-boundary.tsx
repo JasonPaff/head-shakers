@@ -22,11 +22,11 @@ interface ErrorBoundaryState {
 /**
  * Error boundary for the hero stats section
  *
- * Catches errors from the HeroStatsAsync component and displays
+ * Catches errors from the PlatformStatsAsync component and displays
  * a user-friendly error message with a retry option.
  * Matches the styling of the hero section with light/dark mode support.
  */
-export class HeroStatsErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class HeroPlatformStatsErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };

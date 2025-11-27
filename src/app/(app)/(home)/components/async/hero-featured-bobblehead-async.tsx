@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { HeroFeaturedBobblehead } from '@/app/(app)/(home)/components/display/hero-featured-bobblehead';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';

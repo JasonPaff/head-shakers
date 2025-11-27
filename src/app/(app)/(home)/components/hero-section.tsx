@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { HeroFeaturedBobbleheadAsync } from '@/app/(app)/(home)/components/async/hero-featured-bobblehead-async';
-import { HeroStatsAsync } from '@/app/(app)/(home)/components/async/hero-stats-async';
-import { HeroStatsErrorBoundary } from '@/app/(app)/(home)/components/error/hero-stats-error-boundary';
+import { HeroPlatformStatsAsync } from '@/app/(app)/(home)/components/async/hero-platform-stats-async';
+import { HeroPlatformStatsErrorBoundary } from '@/app/(app)/(home)/components/error/hero-platform-stats-error-boundary';
 import { HeroFeaturedBobbleheadSkeleton } from '@/app/(app)/(home)/components/skeletons/hero-featured-bobblehead-skeleton';
-import { HeroStatsSkeleton } from '@/app/(app)/(home)/components/skeletons/hero-stats-skeleton';
+import { HeroPlatformStatsSkeleton } from '@/app/(app)/(home)/components/skeletons/hero-platform-stats-skeleton';
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -156,11 +156,11 @@ export const HeroSection = () => {
             </div>
 
             {/* Stats Row */}
-            <HeroStatsErrorBoundary>
-              <Suspense fallback={<HeroStatsSkeleton />}>
-                <HeroStatsAsync />
+            <HeroPlatformStatsErrorBoundary>
+              <Suspense fallback={<HeroPlatformStatsSkeleton />}>
+                <HeroPlatformStatsAsync />
               </Suspense>
-            </HeroStatsErrorBoundary>
+            </HeroPlatformStatsErrorBoundary>
           </div>
 
           {/* Right Content - Featured Bobblehead Showcase */}

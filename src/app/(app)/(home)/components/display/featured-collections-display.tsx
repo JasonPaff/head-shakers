@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  ArrowRightIcon,
-  EyeIcon,
-  FlameIcon,
-  HeartIcon,
-  LayersIcon,
-  MessageCircleIcon,
-  UserIcon,
-} from 'lucide-react';
+import { EyeIcon, FlameIcon, HeartIcon, LayersIcon, MessageCircleIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
@@ -16,16 +8,6 @@ import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
 import { Conditional } from '@/components/ui/conditional';
-import { LikeCompactButton } from '@/components/ui/like-button';
-import {
-  featuredCardBadgeVariants,
-  featuredCardContentVariants,
-  featuredCardDescriptionVariants,
-  featuredCardImageVariants,
-  featuredCardOverlayVariants,
-  featuredCardTitleVariants,
-  featuredCardVariants,
-} from '@/components/ui/variants/featured-card-variants';
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';

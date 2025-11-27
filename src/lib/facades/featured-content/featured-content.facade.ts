@@ -10,7 +10,8 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
-import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { CACHE_ENTITY_TYPE, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { db } from '@/lib/db';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featured-content-transformer';
@@ -40,7 +41,7 @@ export class FeaturedContentFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { contentId: data.contentId, contentType: data.contentType },
-        facade: 'FeaturedContentFacade',
+        facade: facadeName,
         method: 'createAsync',
         operation: 'create',
         userId: curatorId,
@@ -59,7 +60,7 @@ export class FeaturedContentFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id },
-        facade: 'FeaturedContentFacade',
+        facade: facadeName,
         method: 'deleteAsync',
         operation: 'delete',
       };
@@ -70,16 +71,50 @@ export class FeaturedContentFacade {
   /**
    * get active featured content
    */
-  static async getActiveFeaturedContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    return CacheService.featured.content(
-      async () => {
-        const context = createPublicQueryContext({ dbInstance });
-        const rawData = await FeaturedContentQuery.findActiveFeaturedContentAsync(context);
-        return FeaturedContentTransformer.transformFeaturedContent(rawData);
-      },
-      'active',
-      { context: { entityType: 'featured', facade: 'FeaturedContentFacade', operation: 'getActive' } },
-    );
+  static async getActiveFeaturedContentAsync(
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<FeaturedContentData>> {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching active featured content',
+    });
+
+    try {
+      return await CacheService.featured.content(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
+
+          // Add breadcrumb for successful fetch
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: {},
+            level: SENTRY_LEVELS.INFO,
+            message: 'Active featured content fetched successfully',
+          });
+
+          return FeaturedContentTransformer.transformFeaturedContent(rawData);
+        },
+        // TODO: move to constants
+        'active',
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.FEATURED,
+            facade: facadeName,
+            operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
+          },
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: {},
+        facade: facadeName,
+        method: 'getActiveFeaturedContentAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
+      };
+      throw createFacadeError(errorContext, error);
+    }
   }
 
   /**
@@ -96,7 +131,7 @@ export class FeaturedContentFacade {
    * get the collection of the weeks
    */
   static async getCollectionOfWeek(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
     return FeaturedContentTransformer.filterByType(allContent, 'collection_of_week');
   }
 
@@ -104,7 +139,7 @@ export class FeaturedContentFacade {
    * get editor picks
    */
   static async getEditorPicks(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
     return FeaturedContentTransformer.filterByType(allContent, 'editor_pick');
   }
 
@@ -129,7 +164,7 @@ export class FeaturedContentFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<FeaturedContentData>> {
     try {
-      const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+      const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
 
       // filter to only bobblehead content type
       const bobbleheadContent = allContent.filter((content) => content.contentType === 'bobblehead');
@@ -184,10 +219,60 @@ export class FeaturedContentFacade {
   }
 
   /**
+   * get featured content for the footer section
+   */
+  static async getFooterFeaturedContentAsync(
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<FeaturedContentData>> {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching active featured content',
+    });
+
+    try {
+      return await CacheService.featured.content(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          // TODO: replace with footer-specific query that only returns exactly the data needed
+          const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
+
+          // Add breadcrumb for successful fetch
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: {},
+            level: SENTRY_LEVELS.INFO,
+            message: 'Active featured content fetched successfully',
+          });
+
+          return FeaturedContentTransformer.transformFeaturedContent(rawData);
+        },
+        // TODO: move to a constant
+        'active',
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.FEATURED,
+            facade: facadeName,
+            operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
+          },
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: {},
+        facade: facadeName,
+        method: 'getActiveFeaturedContentAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
+      };
+      throw createFacadeError(errorContext, error);
+    }
+  }
+
+  /**
    * get homepage banner content
    */
   static async getHomepageBanner(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
     return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
   }
 
@@ -195,7 +280,7 @@ export class FeaturedContentFacade {
    * get trending content sorted by view count
    */
   static async getTrendingContent(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
-    const allContent = await FeaturedContentFacade.getActiveFeaturedContent(dbInstance);
+    const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
     return FeaturedContentTransformer.filterByType(allContent, 'trending');
   }
 
@@ -228,7 +313,7 @@ export class FeaturedContentFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id, isActive },
-        facade: 'FeaturedContentFacade',
+        facade: facadeName,
         method: 'toggleActiveAsync',
         operation: 'toggle',
       };
@@ -250,7 +335,7 @@ export class FeaturedContentFacade {
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id },
-        facade: 'FeaturedContentFacade',
+        facade: facadeName,
         method: 'updateAsync',
         operation: 'update',
       };

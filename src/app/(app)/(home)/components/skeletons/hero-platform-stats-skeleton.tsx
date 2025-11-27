@@ -2,13 +2,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 
 /**
- * Skeleton loading state for platform statistics in hero section
+ * Skeleton loading state for platform statistics in the hero section
  *
  * Displays three skeleton blocks representing platform stats (Bobbleheads, Collectors, Collections)
- * with shimmer animations to indicate loading state.
- * Matches the layout of HeroStatsAsync component with light/dark mode support.
+ * with shimmer animations to indicate the loading state.
+ * Matches the layout of HeroPlatformStatsAsync component with light/dark mode support.
  */
-export const HeroStatsSkeleton = () => {
+export const HeroPlatformStatsSkeleton = () => {
   return (
     <div
       aria-busy={'true'}
