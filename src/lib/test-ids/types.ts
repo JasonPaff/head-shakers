@@ -69,6 +69,7 @@ export type ComponentTestId =
   | 'dropdown-menu-sub-trigger'
   | 'dropdown-menu-trigger'
   | 'empty-state'
+  | 'error-boundary'
   | 'follow-button'
   | 'form'
   | 'form-description'

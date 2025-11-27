@@ -11,7 +11,6 @@ import { BobbleheadFeatureCardAsync } from '@/app/(app)/bobbleheads/[bobbleheadS
 import { BobbleheadHeaderAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-header-async';
 import { BobbleheadNavigationAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-navigation-async';
 import { BobbleheadPhotoGalleryAsync } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/async/bobblehead-photo-gallery-async';
-import { BobbleheadErrorBoundary } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-error-boundary';
 import { BobbleheadPageClientWrapper } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/bobblehead-page-client-wrapper';
 import { BobbleheadFeatureCardSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-feature-card-skeleton';
 import { BobbleheadHeaderSkeleton } from '@/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/components/skeletons/bobblehead-header-skeleton';
@@ -22,6 +21,7 @@ import { CommentSectionAsync } from '@/components/feature/comments/async/comment
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { Conditional } from '@/components/ui/conditional';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
@@ -188,11 +188,11 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         {/* Header Section */}
         <div className={'border-b border-border'}>
           <ContentLayout>
-            <BobbleheadErrorBoundary section={'header'}>
+            <ErrorBoundary name={'bobblehead-header'}>
               <Suspense fallback={<BobbleheadHeaderSkeleton />}>
                 <BobbleheadHeaderAsync bobbleheadId={bobbleheadId} />
               </Suspense>
-            </BobbleheadErrorBoundary>
+            </ErrorBoundary>
           </ContentLayout>
         </div>
 
@@ -200,14 +200,14 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         <Conditional isCondition={!!collectionId}>
           <div className={'mt-4'}>
             <ContentLayout>
-              <BobbleheadErrorBoundary section={'navigation'}>
+              <ErrorBoundary name={'bobblehead-navigation'}>
                 <Suspense fallback={<BobbleheadNavigationSkeleton />}>
                   <BobbleheadNavigationAsync
                     bobbleheadId={bobbleheadId}
                     collectionId={collectionId ?? null}
                   />
                 </Suspense>
-              </BobbleheadErrorBoundary>
+              </ErrorBoundary>
             </ContentLayout>
           </div>
         </Conditional>
@@ -215,31 +215,31 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         {/* Feature Card Section */}
         <div className={'mt-4'}>
           <ContentLayout>
-            <BobbleheadErrorBoundary section={'feature'}>
+            <ErrorBoundary name={'bobblehead-feature'}>
               <Suspense fallback={<BobbleheadFeatureCardSkeleton />}>
                 <BobbleheadFeatureCardAsync bobbleheadId={bobbleheadId} />
               </Suspense>
-            </BobbleheadErrorBoundary>
+            </ErrorBoundary>
           </ContentLayout>
         </div>
 
         {/* Photo Gallery Section */}
         <ContentLayout>
-          <BobbleheadErrorBoundary section={'gallery'}>
+          <ErrorBoundary name={'bobblehead-gallery'}>
             <Suspense fallback={<BobbleheadPhotoGallerySkeleton />}>
               <BobbleheadPhotoGalleryAsync bobbleheadId={bobbleheadId} />
             </Suspense>
-          </BobbleheadErrorBoundary>
+          </ErrorBoundary>
         </ContentLayout>
 
         {/* Comments Section */}
         <div className={'mt-8'}>
           <ContentLayout>
-            <BobbleheadErrorBoundary section={'comments'}>
+            <ErrorBoundary name={'bobblehead-comments'}>
               <Suspense fallback={<CommentSectionSkeleton />}>
                 <CommentSectionAsync targetId={bobbleheadId} targetType={'bobblehead'} />
               </Suspense>
-            </BobbleheadErrorBoundary>
+            </ErrorBoundary>
           </ContentLayout>
         </div>
 
@@ -247,7 +247,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         <Conditional isCondition={!!collectionId}>
           <div className={'mt-8'}>
             <ContentLayout>
-              <BobbleheadErrorBoundary section={'navigation'}>
+              <ErrorBoundary name={'bobblehead-navigation'}>
                 <Suspense fallback={<BobbleheadNavigationSkeleton />}>
                   <BobbleheadNavigationAsync
                     bobbleheadId={bobbleheadId}
@@ -255,7 +255,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
                     isKeyboardNavigationEnabled={false}
                   />
                 </Suspense>
-              </BobbleheadErrorBoundary>
+              </ErrorBoundary>
             </ContentLayout>
           </div>
         </Conditional>

@@ -190,6 +190,7 @@ function isValidComponentTestId(component: string): component is ComponentTestId
     'context-menu',
     'dialog',
     'empty-state',
+    'error-boundary',
     'dropdown-menu',
     'dropdown-menu-checkbox-item',
     'dropdown-menu-content',

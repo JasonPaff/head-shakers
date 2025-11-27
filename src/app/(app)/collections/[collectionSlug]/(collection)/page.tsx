@@ -10,7 +10,6 @@ import type { PageProps } from '@/app/(app)/collections/[collectionSlug]/(collec
 
 import { CollectionBobbleheadsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-bobbleheads-async';
 import { CollectionStatsAsync } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/async/collection-stats-async';
-import { CollectionErrorBoundary } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-error-boundary';
 import { CollectionHeader } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-header';
 import { CollectionPageClientWrapper } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/collection-page-client-wrapper';
 import { CollectionBobbleheadsSkeleton } from '@/app/(app)/collections/[collectionSlug]/(collection)/components/skeletons/collection-bobbleheads-skeleton';
@@ -20,6 +19,7 @@ import { Route } from '@/app/(app)/collections/[collectionSlug]/(collection)/rou
 import { CommentSectionAsync } from '@/components/feature/comments/async/comment-section-async';
 import { CommentSectionSkeleton } from '@/components/feature/comments/skeletons/comment-section-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
@@ -194,11 +194,11 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
         {/* Header Section with Suspense */}
         <div className={'mt-3 border-b border-border'}>
           <ContentLayout>
-            <CollectionErrorBoundary section={'header'}>
+            <ErrorBoundary name={'collection-header'}>
               <Suspense fallback={<CollectionHeaderSkeleton />}>
                 <CollectionHeader collection={publicCollection} likeData={likeData} />
               </Suspense>
-            </CollectionErrorBoundary>
+            </ErrorBoundary>
           </ContentLayout>
         </div>
 
@@ -208,23 +208,23 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
             <div className={'grid grid-cols-1 gap-8 lg:grid-cols-12'}>
               {/* Main Content Area */}
               <div className={'lg:col-span-9'}>
-                <CollectionErrorBoundary section={'bobbleheads'}>
+                <ErrorBoundary name={'collection-bobbleheads'}>
                   <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
                     <CollectionBobbleheadsAsync
                       collectionId={collectionId}
                       searchParams={resolvedSearchParams}
                     />
                   </Suspense>
-                </CollectionErrorBoundary>
+                </ErrorBoundary>
               </div>
 
               {/* Sidebar */}
               <aside className={'flex flex-col gap-6 lg:col-span-3'}>
-                <CollectionErrorBoundary section={'stats'}>
+                <ErrorBoundary name={'collection-stats'}>
                   <Suspense fallback={<CollectionStatsSkeleton />}>
                     <CollectionStatsAsync collectionId={collectionId} />
                   </Suspense>
-                </CollectionErrorBoundary>
+                </ErrorBoundary>
               </aside>
             </div>
           </ContentLayout>
@@ -233,11 +233,11 @@ async function CollectionPage({ routeParams, searchParams }: CollectionPageProps
         {/* Comments Section */}
         <div className={'mt-8'}>
           <ContentLayout>
-            <CollectionErrorBoundary section={'comments'}>
+            <ErrorBoundary name={'collection-comments'}>
               <Suspense fallback={<CommentSectionSkeleton />}>
                 <CommentSectionAsync targetId={collectionId} targetType={'collection'} />
               </Suspense>
-            </CollectionErrorBoundary>
+            </ErrorBoundary>
           </ContentLayout>
         </div>
       </CollectionPageClientWrapper>

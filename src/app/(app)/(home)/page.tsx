@@ -7,12 +7,12 @@ import { Suspense } from 'react';
 
 import { FeaturedBobbleheadsAsync } from '@/app/(app)/(home)/components/async/featured-bobbleheads-async';
 import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/featured-collections-async';
-import { FeaturedCollectionsErrorBoundary } from '@/app/(app)/(home)/components/error/featured-collections-error-boundary';
 import { HeroSection } from '@/app/(app)/(home)/components/hero-section';
 import { FeaturedBobbleheadsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton';
 import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
 import { UsernameOnboardingProvider } from '@/components/feature/users/username-onboarding-provider';
 import { Button } from '@/components/ui/button';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { serializeJsonLd } from '@/lib/seo/metadata.utils';
 import {
@@ -111,11 +111,11 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <FeaturedCollectionsErrorBoundary>
+          <ErrorBoundary name={'featured-collections'}>
             <Suspense fallback={<FeaturedCollectionsSkeleton />}>
               <FeaturedCollectionsAsync currentUserId={currentUserId} />
             </Suspense>
-          </FeaturedCollectionsErrorBoundary>
+          </ErrorBoundary>
 
           {/* View All Button */}
           <div className={'mt-12 text-center'}>

@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 
-import { AnalyticsErrorBoundary } from '@/app/(app)/admin/analytics/components/analytics-error-boundary';
 import { AnalyticsDashboardAsync } from '@/app/(app)/admin/analytics/components/async/analytics-dashboard-async';
 import AnalyticsLoading from '@/app/(app)/admin/analytics/loading';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { requireModerator } from '@/lib/utils/admin.utils';
 
 export const dynamic = 'force-dynamic';
@@ -20,11 +20,11 @@ export default async function AdminAnalyticsPage() {
         </p>
       </div>
 
-      <AnalyticsErrorBoundary section={'dashboard'}>
+      <ErrorBoundary name={'analytics-dashboard'}>
         <Suspense fallback={<AnalyticsLoading />}>
           <AnalyticsDashboardAsync />
         </Suspense>
-      </AnalyticsErrorBoundary>
+      </ErrorBoundary>
     </div>
   );
 }

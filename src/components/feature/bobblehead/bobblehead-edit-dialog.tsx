@@ -29,7 +29,7 @@ import { CustomFields } from '@/app/(app)/bobbleheads/add/components/custom-fiel
 import { ItemSettings } from '@/app/(app)/bobbleheads/add/components/item-settings';
 import { ItemTags } from '@/app/(app)/bobbleheads/add/components/item-tags';
 import { PhysicalAttributes } from '@/app/(app)/bobbleheads/add/components/physical-attributes';
-import { PhotoManagementErrorBoundary } from '@/components/feature/bobblehead/photo-management-error-boundary';
+import { PhotoManagementFallback } from '@/components/feature/bobblehead/photo-management-fallback';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -46,6 +46,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
@@ -583,10 +584,19 @@ export const BobbleheadEditDialog = withFocusManagement(
               */}
               <BasicInformation form={form as never} />
               <CollectionAssignment collections={collections} form={form as never} />
-              <PhotoManagementErrorBoundary
+              <ErrorBoundary
+                fallback={(error, reset) => (
+                  <PhotoManagementFallback
+                    error={error}
+                    onContinueWithoutPhotos={handleContinueWithoutPhotos}
+                    onReset={() => {
+                      reset();
+                      handlePhotoErrorBoundaryReset();
+                    }}
+                  />
+                )}
                 key={errorBoundaryKey}
-                onContinueWithoutPhotos={handleContinueWithoutPhotos}
-                onReset={handlePhotoErrorBoundaryReset}
+                name={'photo-management'}
               >
                 <ItemPhotosEditComponent
                   bobbleheadId={bobblehead.id}
@@ -597,7 +607,7 @@ export const BobbleheadEditDialog = withFocusManagement(
                   photoCount={photoCount}
                   photoUploadRef={photoUploadRef}
                 />
-              </PhotoManagementErrorBoundary>
+              </ErrorBoundary>
               <PhysicalAttributes form={form as never} />
               <AcquisitionDetails form={form as never} />
               <ItemTags form={form as never} />

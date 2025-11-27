@@ -7,11 +7,11 @@ import { Fragment, Suspense } from 'react';
 
 import { FeaturedHeroAsync } from '@/app/(app)/browse/featured/components/async/featured-hero-async';
 import { FeaturedTabbedContentAsync } from '@/app/(app)/browse/featured/components/async/featured-tabbed-content-async';
-import { FeaturedContentErrorBoundary } from '@/app/(app)/browse/featured/components/featured-content-error-boundary';
 import { FeaturedHeroSkeleton } from '@/app/(app)/browse/featured/components/skeletons/featured-hero-skeleton';
 import { FeaturedTabbedContentSkeleton } from '@/app/(app)/browse/featured/components/skeletons/featured-tabbed-content-skeleton';
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { generateCollectionPageSchema } from '@/lib/seo/jsonld.utils';
 import { generatePageMetadata, serializeJsonLd } from '@/lib/seo/metadata.utils';
 import { DEFAULT_SITE_METADATA } from '@/lib/seo/seo.constants';
@@ -49,18 +49,18 @@ export default async function FeaturedPage() {
 
         <div className={'space-y-8'}>
           {/* Hero Banner Section with Suspense */}
-          <FeaturedContentErrorBoundary section={'hero'}>
+          <ErrorBoundary name={'featured-hero'}>
             <Suspense fallback={<FeaturedHeroSkeleton />}>
               <FeaturedHeroAsync currentUserId={currentUserId} isTrackViews={true} />
             </Suspense>
-          </FeaturedContentErrorBoundary>
+          </ErrorBoundary>
 
           {/* Tabbed Content Section with Suspense */}
-          <FeaturedContentErrorBoundary section={'tabbed'}>
+          <ErrorBoundary name={'featured-tabbed-content'}>
             <Suspense fallback={<FeaturedTabbedContentSkeleton />}>
               <FeaturedTabbedContentAsync currentUserId={currentUserId} isTrackViews={true} />
             </Suspense>
-          </FeaturedContentErrorBoundary>
+          </ErrorBoundary>
 
           {/* Static Call to Action - renders immediately */}
           <section className={'rounded-lg bg-muted/30 p-8 text-center'}>
