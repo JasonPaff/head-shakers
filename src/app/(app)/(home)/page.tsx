@@ -1,19 +1,17 @@
 import type { Metadata } from 'next';
 
-import { ArrowRightIcon, AwardIcon, HeartIcon, LayersIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { ArrowRightIcon, FlameIcon, HeartIcon, LayersIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
-import { FeaturedBobbleheadsAsync } from '@/app/(app)/(home)/components/async/featured-bobbleheads-async';
 import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/featured-collections-async';
+import { TrendingBobbleheadsAsync } from '@/app/(app)/(home)/components/async/trending-bobbleheads-async';
 import { HeroSection } from '@/app/(app)/(home)/components/hero-section';
-import { FeaturedBobbleheadsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton';
-import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
-import { UsernameOnboardingProvider } from '@/components/feature/users/username-onboarding-provider';
+import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeleton/featured-collections-skeleton';
+import { TrendingBobbleheadsSkeleton } from '@/app/(app)/(home)/components/skeleton/trending-bobbleheads-skeleton';
 import { Button } from '@/components/ui/button';
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
-import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { serializeJsonLd } from '@/lib/seo/metadata.utils';
 import {
   DEFAULT_SITE_METADATA,
@@ -21,7 +19,6 @@ import {
   ORGANIZATION_SCHEMA,
   WEBSITE_SCHEMA,
 } from '@/lib/seo/seo.constants';
-import { getUserIdAsync } from '@/utils/optional-auth-utils';
 
 export const revalidate = 300;
 
@@ -59,20 +56,7 @@ export function generateMetadata(): Metadata {
   };
 }
 
-export default async function HomePage() {
-  const currentUserId = await getUserIdAsync();
-
-  // Check if user needs username onboarding
-  let shouldShowOnboarding = false;
-  let currentUsername = '';
-  if (currentUserId) {
-    const user = await UsersFacade.getUserByIdAsync(currentUserId);
-    if (user) {
-      currentUsername = user.username;
-      shouldShowOnboarding = !user.usernameChangedAt;
-    }
-  }
-
+export default function HomePage() {
   return (
     <div className={'min-h-screen'}>
       {/* JSON-LD structured data for homepage */}
@@ -84,11 +68,6 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(WEBSITE_SCHEMA) }}
         type={'application/ld+json'}
       />
-
-      {/* Username Onboarding */}
-      {shouldShowOnboarding && (
-        <UsernameOnboardingProvider currentUsername={currentUsername} shouldShow={shouldShowOnboarding} />
-      )}
 
       {/* Hero Section */}
       <HeroSection />
@@ -113,7 +92,7 @@ export default async function HomePage() {
 
           <ErrorBoundary name={'featured-collections'}>
             <Suspense fallback={<FeaturedCollectionsSkeleton />}>
-              <FeaturedCollectionsAsync currentUserId={currentUserId} />
+              <FeaturedCollectionsAsync />
             </Suspense>
           </ErrorBoundary>
 
@@ -138,34 +117,55 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured Bobbleheads Section */}
-      <section className={'relative px-4 py-8'}>
-        {/* Subtle Background Accent */}
-        <div
-          aria-hidden={'true'}
-          className={
-            'pointer-events-none absolute inset-0 -z-10 bg-gradient-to-b from-transparent via-orange-100/10 to-transparent'
-          }
-        />
-
-        <div className={'container mx-auto max-w-7xl'}>
-          <div className={'mb-10 flex flex-col items-center justify-center gap-3 text-center'}>
+      {/* Trending Bobbleheads Section */}
+      <section
+        className={
+          'bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/30 py-20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900'
+        }
+      >
+        <div className={'container mx-auto px-6'}>
+          {/* Section Header */}
+          <div className={'mb-12 flex flex-col items-center text-center'}>
             <div
-              className={'flex size-14 items-center justify-center rounded-full bg-orange-200/50 shadow-sm'}
+              className={
+                'mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30'
+              }
             >
-              <AwardIcon aria-hidden={'true'} className={'size-7 text-orange-700 dark:text-primary'} />
+              <FlameIcon aria-hidden className={'size-8 text-red-600 dark:text-red-400'} />
             </div>
-            <h2 className={'text-3xl font-bold tracking-tight text-foreground md:text-4xl'}>
-              Featured Bobbleheads
+            <h2 className={'text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white'}>
+              Trending Now
             </h2>
-            <p className={'max-w-2xl text-muted-foreground'}>
-              Discover standout pieces that collectors are showcasing this week
+            <p className={'mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400'}>
+              The most popular bobbleheads this week from collectors worldwide
             </p>
           </div>
 
-          <Suspense fallback={<FeaturedBobbleheadsSkeleton />}>
-            <FeaturedBobbleheadsAsync currentUserId={currentUserId} />
-          </Suspense>
+          {/* Trending Bobbleheads Grid */}
+          <ErrorBoundary name={'trending-bobbleheads'}>
+            <Suspense fallback={<TrendingBobbleheadsSkeleton />}>
+              <TrendingBobbleheadsAsync />
+            </Suspense>
+          </ErrorBoundary>
+
+          {/* View All Button */}
+          <div className={'mt-12 text-center'}>
+            <Button
+              asChild
+              className={
+                'group bg-gradient-to-r from-orange-500 to-red-500 px-8 text-lg font-semibold shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-red-600'
+              }
+              size={'lg'}
+            >
+              <Link href={$path({ route: '/browse/search' })}>
+                Explore All Bobbleheads
+                <ArrowRightIcon
+                  aria-hidden
+                  className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
+                />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 

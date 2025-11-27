@@ -24,7 +24,6 @@ export const getCurrentClerkUserId = cache(async (): Promise<null | string> => {
 export const getUserIdAsync = cache(async (): Promise<null | string> => {
   try {
     const clerkUserId = await getCurrentClerkUserId();
-
     if (!clerkUserId) return null;
 
     // get the database user record using Clerk ID

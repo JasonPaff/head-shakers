@@ -67,6 +67,7 @@ export const OPERATIONS = {
     DELETE: 'delete_featured_content',
     GET_ACTIVE: 'get_active_featured_content',
     GET_BY_ID: 'get_featured_content_by_id',
+    GET_FEATURED_COLLECTIONS: 'get_featured_collections',
     GET_HERO_BOBBLEHEAD: 'get_hero_featured_bobblehead',
     TOGGLE_ACTIVE: 'toggle_featured_content_active',
     TOGGLE_STATUS: 'toggle_featured_content_status',
@@ -129,10 +130,3 @@ export const OPERATIONS = {
 
 export type Operation =
   (typeof OPERATIONS)[keyof typeof OPERATIONS][keyof (typeof OPERATIONS)[keyof typeof OPERATIONS]];
-
-export const getOperationName = <T extends keyof typeof OPERATIONS>(
-  category: T,
-  operation: keyof (typeof OPERATIONS)[T],
-): string => {
-  return OPERATIONS[category][operation] as string;
-};

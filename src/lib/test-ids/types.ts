@@ -137,9 +137,10 @@ export type ComponentTestId =
   | 'toast'
   | 'toggle'
   | 'toggle-group'
-
-  // Form Components
   | 'tooltip'
+  | 'trending-bobblehead-card'
+  | 'trending-bobbleheads-empty-state'
+  | 'trending-bobbleheads-grid'
   | 'user-avatar'
   | 'user-nav'
   | 'user-profile'

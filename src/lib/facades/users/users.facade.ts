@@ -73,10 +73,8 @@ export class UsersFacade {
    */
   static async getUserByClerkIdAsync(
     clerkId: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<null | UserRecord> {
-    const methodName = 'getUserByClerkIdAsync';
-
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
       level: SENTRY_LEVELS.INFO,
@@ -94,7 +92,7 @@ export class UsersFacade {
           context: {
             entityType: CACHE_ENTITY_TYPE.USER,
             facade: facadeName,
-            operation: methodName,
+            operation: 'getUserByClerkIdAsync',
             userId: clerkId,
           },
         },
@@ -103,7 +101,7 @@ export class UsersFacade {
       const errorContext: FacadeErrorContext = {
         data: { clerkId },
         facade: facadeName,
-        method: methodName,
+        method: 'getUserByClerkIdAsync',
         operation: OPERATIONS.PLATFORM.GET_STATS,
       };
       throw createFacadeError(errorContext, error);
