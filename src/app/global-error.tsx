@@ -13,11 +13,11 @@ export default function GlobalError({ error }: { error: Error & { digest?: strin
           route: 'global',
         },
       },
+      level: 'fatal',
       tags: {
         error_boundary: 'global',
         has_digest: String(!!error.digest),
       },
-      level: 'fatal',
     });
   }, [error]);
 
