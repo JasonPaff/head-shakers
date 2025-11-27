@@ -1,3 +1,5 @@
+import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
+
 import { FeaturedCollectionsDisplay } from '@/app/(app)/(home)/components/display/featured-collections-display';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
@@ -7,20 +9,7 @@ export interface FeaturedCollectionsAsyncProps {
 }
 
 export async function FeaturedCollectionsAsync({ currentUserId }: FeaturedCollectionsAsyncProps) {
-  let collections: Array<{
-    comments: number;
-    contentId: string;
-    contentSlug: string;
-    description: string;
-    id: string;
-    imageUrl: null | string;
-    isLiked: boolean;
-    likeId: null | string;
-    likes: number;
-    ownerDisplayName: string;
-    title: string;
-    viewCount: number;
-  }> = [];
+  let collections: Array<FeaturedCollection> = [];
 
   const featuredContent = await FeaturedContentFacade.getActiveFeaturedContent();
 
@@ -53,18 +42,29 @@ export async function FeaturedCollectionsAsync({ currentUserId }: FeaturedCollec
     const likeKey = `collection:${content.contentId}`;
     const likeData = likeDataMap.get(likeKey);
 
+    const contentWithExtras = content as FeaturedContentData & {
+      isTrending?: boolean;
+      ownerAvatarUrl?: null | string;
+      totalItems?: number;
+      totalValue?: number;
+    };
+
     return {
-      comments: content.comments || 0,
+      comments: content.comments ?? 0,
       contentId: content.contentId,
       contentSlug: content.contentSlug ?? content.contentId,
-      description: content.description || '',
+      description: content.description ?? '',
       id: content.id,
-      imageUrl: content.imageUrl || null,
+      imageUrl: content.imageUrl ?? null,
       isLiked: likeData?.isLiked ?? false,
+      isTrending: contentWithExtras.isTrending ?? false,
       likeId: likeData?.likeId ?? null,
       likes: likeData?.likeCount ?? (content.likes || 0),
-      ownerDisplayName: content.ownerDisplayName || 'Unknown',
-      title: content.title || '',
+      ownerAvatarUrl: contentWithExtras.ownerAvatarUrl ?? null,
+      ownerDisplayName: content.ownerDisplayName ?? 'Unknown',
+      title: content.title ?? '',
+      totalItems: contentWithExtras.totalItems ?? 0,
+      totalValue: contentWithExtras.totalValue ?? 0,
       viewCount: content.viewCount,
     };
   });

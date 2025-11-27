@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 
-import { AwardIcon, HeartIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { ArrowRightIcon, AwardIcon, HeartIcon, LayersIcon, TrendingUpIcon, UsersIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { FeaturedBobbleheadsAsync } from '@/app/(app)/(home)/components/async/featured-bobbleheads-async';
@@ -10,6 +12,7 @@ import { HeroSection } from '@/app/(app)/(home)/components/hero-section';
 import { FeaturedBobbleheadsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton';
 import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
 import { UsernameOnboardingProvider } from '@/components/feature/users/username-onboarding-provider';
+import { Button } from '@/components/ui/button';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { serializeJsonLd } from '@/lib/seo/metadata.utils';
 import {
@@ -91,19 +94,20 @@ export default async function HomePage() {
       <HeroSection />
 
       {/* Featured Collections Section */}
-      <section className={'bg-card px-4 py-8'}>
-        <div className={'container mx-auto max-w-7xl'}>
-          <div className={'mb-10 flex flex-col items-center justify-center gap-3 text-center'}>
+      <section className={'bg-white py-20 dark:bg-slate-950'}>
+        <div className={'container mx-auto px-6'}>
+          <div className={'mb-12 flex flex-col items-center text-center'}>
             <div
-              className={'flex size-14 items-center justify-center rounded-full bg-orange-200/50 shadow-sm'}
+              className={`mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br
+                from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30`}
             >
-              <AwardIcon aria-hidden={'true'} className={'size-7 text-orange-700 dark:text-primary'} />
+              <LayersIcon aria-hidden className={'size-8 text-orange-600 dark:text-orange-400'} />
             </div>
-            <h2 className={'mb-3 text-3xl font-bold tracking-tight text-foreground md:text-4xl'}>
+            <h2 className={'text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white'}>
               Featured Collections
             </h2>
-            <p className={'mx-auto max-w-2xl text-muted-foreground'}>
-              Explore handpicked collections from our community of passionate collectors
+            <p className={'mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400'}>
+              Explore curated collections from our most passionate collectors
             </p>
           </div>
 
@@ -112,6 +116,25 @@ export default async function HomePage() {
               <FeaturedCollectionsAsync currentUserId={currentUserId} />
             </Suspense>
           </FeaturedCollectionsErrorBoundary>
+
+          {/* View All Button */}
+          <div className={'mt-12 text-center'}>
+            <Button
+              asChild
+              className={`group border-orange-500/30 text-orange-600 hover:bg-orange-50
+                hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/50`}
+              size={'lg'}
+              variant={'outline'}
+            >
+              <Link href={$path({ route: '/browse' })}>
+                View All Collections
+                <ArrowRightIcon
+                  aria-hidden
+                  className={'ml-2 size-5 transition-transform group-hover:translate-x-1'}
+                />
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 

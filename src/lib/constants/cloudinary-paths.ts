@@ -19,6 +19,7 @@ export const CLOUDINARY_PATHS = {
     USER_ROOT: 'users/{userId}',
   },
   PLACEHOLDERS: {
+    AVATAR: '/images/placeholders/avatar-placeholder.png',
     COLLECTION_COVER: '/images/placeholders/collection-cover-placeholder.png',
   },
 } as const;

@@ -1,11 +1,20 @@
 'use client';
 
-import { ArrowRightIcon, LayersIcon, UserIcon } from 'lucide-react';
+import {
+  ArrowRightIcon,
+  EyeIcon,
+  FlameIcon,
+  HeartIcon,
+  LayersIcon,
+  MessageCircleIcon,
+  UserIcon,
+} from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { Badge } from '@/components/ui/badge';
 import { Conditional } from '@/components/ui/conditional';
 import { LikeCompactButton } from '@/components/ui/like-button';
 import {
@@ -30,10 +39,14 @@ export interface FeaturedCollection {
   id: string;
   imageUrl: null | string;
   isLiked: boolean;
+  isTrending?: boolean;
   likeId: null | string;
   likes: number;
+  ownerAvatarUrl?: null | string;
   ownerDisplayName: string;
   title: string;
+  totalItems?: number;
+  totalValue?: number;
   viewCount: number;
 }
 
@@ -79,149 +92,152 @@ const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => 
   const publicId = collection.imageUrl ? extractPublicIdFromCloudinaryUrl(collection.imageUrl) : '';
   const blurDataUrl = publicId ? generateBlurDataUrl(publicId) : undefined;
 
+  // Placeholder avatar URL if owner avatar not available
+  const avatarUrl = collection.ownerAvatarUrl || CLOUDINARY_PATHS.PLACEHOLDERS.AVATAR;
+
   return (
-    <article
-      className={cn(featuredCardVariants({ size: 'medium', state: 'default' }), 'bg-card')}
+    <Link
+      className={cn(
+        'group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg',
+        'transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl',
+        'dark:border-slate-800 dark:bg-slate-900',
+      )}
       data-slot={'featured-collection-card'}
       data-testid={generateTestId('feature', 'collection-card', collection.id)}
+      href={$path({
+        route: '/collections/[collectionSlug]',
+        routeParams: { collectionSlug: collection.contentSlug },
+      })}
     >
-      {/* Image Container */}
-      <Link
-        aria-label={`View ${collection.title} collection`}
-        className={cn(
-          'block rounded-t-xl',
-          'focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:outline-none',
-        )}
-        href={$path({
-          route: '/collections/[collectionSlug]',
-          routeParams: { collectionSlug: collection.contentSlug },
-        })}
-      >
-        <div
-          className={'relative aspect-[4/3] w-full overflow-hidden'}
-          data-slot={'featured-collection-image-container'}
-        >
-          <Conditional isCondition={_hasImage}>
-            <CldImage
-              alt={collection.title}
-              blurDataURL={blurDataUrl}
-              className={featuredCardImageVariants({ contentType: 'collection' })}
-              crop={'fill'}
-              format={'auto'}
-              gravity={'auto'}
-              height={400}
-              loading={'lazy'}
-              placeholder={blurDataUrl ? 'blur' : 'empty'}
-              quality={'auto:good'}
-              sizes={'(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
-              src={publicId}
-              width={533}
-            />
-          </Conditional>
-
-          <Conditional isCondition={!_hasImage}>
-            <Image
-              alt={'Collection placeholder'}
-              className={featuredCardImageVariants({ contentType: 'collection' })}
-              height={400}
-              src={CLOUDINARY_PATHS.PLACEHOLDERS.COLLECTION_COVER}
-              width={533}
-            />
-          </Conditional>
-
-          {/* Gradient Overlay */}
-          <div
-            aria-hidden
-            className={featuredCardOverlayVariants({ intensity: 'medium', position: 'bottom' })}
-            data-slot={'featured-collection-overlay'}
-          />
-
-          {/* Featured Badge */}
-          <div className={'absolute top-3 left-3 z-10'} data-slot={'featured-collection-badge'}>
-            <span className={featuredCardBadgeVariants({ variant: 'featured' })}>
-              <LayersIcon aria-hidden className={'size-3'} />
-              Featured
-            </span>
-          </div>
-        </div>
-      </Link>
-
-      {/* Content Overlay */}
+      {/* Image Section */}
       <div
-        className={featuredCardContentVariants({ alignment: 'left', size: 'medium' })}
-        data-slot={'featured-collection-content'}
+        className={'relative aspect-[4/3] overflow-hidden'}
+        data-slot={'featured-collection-image-container'}
       >
-        {/* Title and Owner */}
-        <Link
-          className={cn(
-            'rounded-sm',
-            'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
-          )}
-          href={$path({
-            route: '/collections/[collectionSlug]',
-            routeParams: { collectionSlug: collection.contentSlug },
-          })}
+        <Conditional isCondition={_hasImage}>
+          <CldImage
+            alt={collection.title}
+            blurDataURL={blurDataUrl}
+            className={
+              'absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110'
+            }
+            crop={'fill'}
+            format={'auto'}
+            gravity={'auto'}
+            height={400}
+            loading={'lazy'}
+            placeholder={blurDataUrl ? 'blur' : 'empty'}
+            quality={'auto:good'}
+            sizes={'(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw'}
+            src={publicId}
+            width={533}
+          />
+        </Conditional>
+
+        <Conditional isCondition={!_hasImage}>
+          <Image
+            alt={'Collection placeholder'}
+            className={
+              'absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-110'
+            }
+            height={400}
+            src={CLOUDINARY_PATHS.PLACEHOLDERS.COLLECTION_COVER}
+            width={533}
+          />
+        </Conditional>
+
+        {/* Gradient Overlay */}
+        <div
+          aria-hidden
+          className={'absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent'}
+          data-slot={'featured-collection-overlay'}
+        />
+
+        {/* Trending Badge */}
+        <Conditional isCondition={Boolean(collection.isTrending)}>
+          <div className={'absolute top-4 right-4'} data-slot={'featured-collection-trending-badge'}>
+            <Badge
+              className={
+                'border-transparent bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+              }
+            >
+              <FlameIcon aria-hidden className={'size-3'} />
+              Trending
+            </Badge>
+          </div>
+        </Conditional>
+
+        {/* Collection Info Overlay */}
+        <div
+          className={'absolute right-0 bottom-0 left-0 p-6'}
+          data-slot={'featured-collection-overlay-content'}
         >
           <h3
-            className={cn(
-              featuredCardTitleVariants({ size: 'medium' }),
-              'transition-colors duration-200 hover:text-amber-200',
-            )}
+            className={'text-xl font-bold text-white drop-shadow-lg'}
             data-slot={'featured-collection-title'}
           >
             {collection.title}
           </h3>
-        </Link>
-
-        <p
-          className={'mt-1 flex items-center gap-1.5 text-sm text-white/70'}
-          data-slot={'featured-collection-owner'}
-        >
-          <UserIcon aria-hidden className={'size-3.5'} />
-          {collection.ownerDisplayName}
-        </p>
-
-        {/* Description */}
-        <Conditional isCondition={Boolean(collection.description)}>
-          <p
-            className={featuredCardDescriptionVariants({ size: 'medium' })}
-            data-slot={'featured-collection-description'}
-          >
-            {collection.description}
-          </p>
-        </Conditional>
-
-        {/* Engagement Metrics */}
-        <div className={'mt-4 flex items-center justify-between'} data-slot={'featured-collection-metrics'}>
-          {/* Left: Like Button */}
-          <LikeCompactButton
-            className={'text-white/80 hover:text-white'}
-            initialLikeCount={collection.likes}
-            isInitiallyLiked={collection.isLiked}
-            targetId={collection.contentId}
-            targetType={'collection'}
-            testId={generateTestId('ui', 'like-button', `collection-${collection.id}`)}
-          />
-
-          {/* Right: View Link */}
-          <Link
-            aria-label={`View ${collection.title} collection`}
-            className={cn(
-              'inline-flex items-center gap-1 rounded-sm text-sm font-medium text-white/90',
-              'transition-all duration-200',
-              'hover:gap-2 hover:text-amber-200',
-              'focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none',
-            )}
-            href={$path({
-              route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug: collection.contentSlug },
-            })}
-          >
-            View
-            <ArrowRightIcon aria-hidden className={'size-4 transition-transform duration-200'} />
-          </Link>
+          <Conditional isCondition={Boolean(collection.description)}>
+            <p
+              className={'mt-2 line-clamp-2 text-sm text-white/80'}
+              data-slot={'featured-collection-description'}
+            >
+              {collection.description}
+            </p>
+          </Conditional>
         </div>
       </div>
-    </article>
+
+      {/* Footer Section */}
+      <div className={'p-5'} data-slot={'featured-collection-footer'}>
+        {/* Owner Section */}
+        <div className={'flex items-center justify-between'} data-slot={'featured-collection-owner-section'}>
+          <div className={'flex items-center gap-3'}>
+            <Image
+              alt={collection.ownerDisplayName}
+              className={'size-9 rounded-full object-cover ring-2 ring-orange-500/20'}
+              height={36}
+              src={avatarUrl}
+              width={36}
+            />
+            <div>
+              <div className={'text-sm font-medium text-slate-900 dark:text-white'}>
+                @{collection.ownerDisplayName}
+              </div>
+              <div className={'text-xs text-slate-500'}>{collection.totalItems || 0} items</div>
+            </div>
+          </div>
+          <div className={'text-right'}>
+            <div className={'text-sm font-semibold text-orange-600 dark:text-orange-400'}>
+              ${(collection.totalValue || 0).toLocaleString()}
+            </div>
+            <div className={'text-xs text-slate-500'}>Est. Value</div>
+          </div>
+        </div>
+
+        {/* Stats Row */}
+        <div
+          className={cn(
+            'mt-4 flex items-center gap-4 border-t border-slate-100 pt-4',
+            'text-sm text-slate-500 dark:border-slate-800',
+          )}
+          data-slot={'featured-collection-stats'}
+        >
+          <span className={'flex items-center gap-1'}>
+            <HeartIcon aria-hidden className={'size-4 text-red-400'} />
+            {collection.likes.toLocaleString()}
+          </span>
+          <span className={'flex items-center gap-1'}>
+            <EyeIcon aria-hidden className={'size-4'} />
+            {collection.viewCount.toLocaleString()}
+          </span>
+          <span className={'flex items-center gap-1'}>
+            <MessageCircleIcon aria-hidden className={'size-4'} />
+            {collection.comments}
+          </span>
+        </div>
+      </div>
+    </Link>
   );
 };
