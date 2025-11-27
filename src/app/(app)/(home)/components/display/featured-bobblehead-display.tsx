@@ -121,8 +121,8 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         <div
           aria-hidden
           className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
-            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
-            dark:bg-slate-800/90`}
+            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
+            dark:border-slate-600/50 dark:bg-slate-800/90`}
           data-slot={'hero-floating-card'}
           data-testid={topRatedCardTestId}
           style={{ animationDuration: '3s' }}
@@ -142,8 +142,8 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         <div
           aria-hidden
           className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
-            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm dark:border-slate-600/50
-            dark:bg-slate-800/90`}
+            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
+            dark:border-slate-600/50 dark:bg-slate-800/90`}
           data-slot={'hero-floating-card'}
           data-testid={valueGrowthCardTestId}
           style={{ animationDelay: '1s', animationDuration: '4s' }}

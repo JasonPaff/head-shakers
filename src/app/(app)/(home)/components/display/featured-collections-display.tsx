@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { CLOUDINARY_PATHS } from '@/lib/constants/cloudinary-paths';
 import { generateTestId } from '@/lib/test-ids';
@@ -45,7 +46,10 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
         data-testid={generateTestId('feature', 'collections-empty-state')}
       >
         <LayersIcon aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
-        <p className={'text-muted-foreground'}>No featured collections available at this time.</p>
+        <p className={'mb-4 text-muted-foreground'}>No featured collections available at this time.</p>
+        <Button asChild variant={'outline'}>
+          <Link href={$path({ route: '/browse' })}>Browse All Collections</Link>
+        </Button>
       </div>
     );
   }

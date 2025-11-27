@@ -1,0 +1,1 @@
+CREATE INDEX "bobbleheads_category_browse_idx" ON "bobbleheads" USING btree ("category","deleted_at","collection_id");

@@ -106,6 +106,7 @@ export const bobbleheads = pgTable(
     index('bobbleheads_user_id_idx').on(table.userId),
 
     // composite indexes
+    index('bobbleheads_category_browse_idx').on(table.category, table.deletedAt, table.collectionId),
     index('bobbleheads_collection_public_idx').on(table.collectionId, table.isPublic),
     index('bobbleheads_public_featured_idx').on(table.isPublic, table.isFeatured),
     index('bobbleheads_user_created_idx').on(table.userId, table.createdAt),

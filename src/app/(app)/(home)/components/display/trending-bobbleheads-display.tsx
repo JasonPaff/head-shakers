@@ -6,6 +6,7 @@ import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
 import { extractPublicIdFromCloudinaryUrl, generateBlurDataUrl } from '@/lib/utils/cloudinary.utils';
@@ -37,7 +38,10 @@ export const TrendingBobbleheadsDisplay = ({ bobbleheads }: TrendingBobbleheadsD
         data-testid={generateTestId('feature', 'trending-bobbleheads-empty-state')}
       >
         <TrendingUpIcon aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
-        <p className={'text-muted-foreground'}>No trending bobbleheads available at this time.</p>
+        <p className={'mb-4 text-muted-foreground'}>No trending bobbleheads available at this time.</p>
+        <Button asChild variant={'outline'}>
+          <Link href={$path({ route: '/browse' })}>Browse All Bobbleheads</Link>
+        </Button>
       </div>
     );
   }

@@ -290,11 +290,21 @@ export const SearchResultsList = ({
             <Conditional isCondition={_hasNoResults}>
               <TableRow>
                 <TableCell
-                  className={'h-24 text-center text-muted-foreground'}
+                  className={'h-32 text-center'}
                   colSpan={columns.length}
                   data-slot={'search-results-list-empty-state'}
                 >
-                  No results found.
+                  <p className={'mb-2 text-muted-foreground'}>No results found.</p>
+                  <p className={'text-sm text-muted-foreground/70'}>
+                    Try adjusting your search terms or{' '}
+                    <Link
+                      className={'text-primary underline-offset-4 hover:underline'}
+                      href={$path({ route: '/browse' })}
+                    >
+                      browse all content
+                    </Link>
+                    .
+                  </p>
                 </TableCell>
               </TableRow>
             </Conditional>
