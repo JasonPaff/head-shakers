@@ -5,7 +5,6 @@ import type { FormEvent } from 'react';
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
@@ -71,37 +70,38 @@ export const FooterNewsletter = withFocusManagement(() => {
 
       {/* Newsletter Form */}
       <form className={'flex w-full gap-2 md:w-auto'} onSubmit={handleSubmit}>
-        {/* Email Field */}
-        <form.AppField name={'email'}>
-          {(field) => {
-            return (
-              <div className={'relative flex-1 md:w-64'}>
-                <field.TextField
-                  className={`border-white/20 bg-white pr-3 pl-9 text-slate-900
+        <form.AppForm>
+          {/* Email Field */}
+          <form.AppField name={'email'}>
+            {(field) => {
+              return (
+                <div className={'relative flex-1 md:w-64'}>
+                  <field.TextField
+                    className={`border-white/20 bg-white pr-3 pl-9 text-slate-900
                     placeholder:text-slate-600 dark:placeholder:text-slate-300`}
-                  disabled={isExecuting}
-                  fieldErrorProps={{
-                    className: 'dark:text-white text-white',
-                  }}
-                  icon={<MailIcon aria-hidden className={'size-4 text-slate-600 dark:text-slate-300'} />}
-                  label={''}
-                  placeholder={'Enter your email'}
-                />
-              </div>
-            );
-          }}
-        </form.AppField>
+                    disabled={isExecuting}
+                    fieldErrorProps={{
+                      className: 'dark:text-white text-slate-800',
+                    }}
+                    icon={<MailIcon aria-hidden className={'size-4 text-slate-600 dark:text-slate-300'} />}
+                    label={''}
+                    placeholder={'Enter your email'}
+                  />
+                </div>
+              );
+            }}
+          </form.AppField>
 
-        {/* Submit Button */}
-        <Button
-          className={`h-9 shrink-0 bg-slate-900 px-4 font-semibold text-white
-            hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100`}
-          disabled={isExecuting}
-          testId={'footer-newsletter-submit'}
-          type={'submit'}
-        >
-          {isExecuting ? 'Subscribing...' : 'Subscribe'}
-        </Button>
+          {/* Submit Button */}
+          <form.SubmitButton
+            className={`bg-slate-900 font-semibold text-white hover:bg-slate-800
+              dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100`}
+            isDisabled={isExecuting}
+            testId={'footer-newsletter-submit'}
+          >
+            {isExecuting ? 'Subscribing...' : 'Subscribe'}
+          </form.SubmitButton>
+        </form.AppForm>
       </form>
     </div>
   );
