@@ -5,6 +5,7 @@ import type {
   FeaturedContentRecord,
   FooterFeaturedContentData,
   HeroFeaturedBobbleheadData,
+  TrendingBobbleheadData,
 } from '@/lib/queries/featured-content/featured-content-query';
 import type { FeaturedContentData } from '@/lib/queries/featured-content/featured-content-transformer';
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
@@ -338,6 +339,53 @@ export class FeaturedContentFacade {
   static async getHomepageBanner(dbInstance?: DatabaseExecutor): Promise<Array<FeaturedContentData>> {
     const allContent = await FeaturedContentFacade.getActiveFeaturedContentAsync(dbInstance);
     return FeaturedContentTransformer.filterByType(allContent, 'homepage_banner');
+  }
+
+  /**
+   * get trending bobbleheads for homepage display
+   *
+   * returns up to 12 active featured bobbleheads with feature_type 'trending' or 'editor_pick'.
+   * includes bobblehead-specific fields (category, year) from the bobbleheads table.
+   * uses Redis caching for fast access.
+   *
+   * caching: uses LONG TTL (1 hour) with Redis caching
+   * invalidated by: featured content changes
+   *
+   * @param dbInstance - optional database executor for transactions
+   * @returns array of trending bobblehead data (limit 12, ordered by priority)
+   */
+  static async getTrendingBobbleheadsAsync(
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<TrendingBobbleheadData>> {
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+      level: SENTRY_LEVELS.INFO,
+      message: 'Fetching trending bobbleheads',
+    });
+
+    try {
+      return await CacheService.featured.trendingBobbleheads(
+        async () => {
+          const context = createPublicQueryContext({ dbInstance });
+          return await FeaturedContentQuery.getTrendingBobbleheadsAsync(context);
+        },
+        {
+          context: {
+            entityType: CACHE_ENTITY_TYPE.FEATURED,
+            facade: facadeName,
+            operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
+          },
+        },
+      );
+    } catch (error) {
+      const errorContext: FacadeErrorContext = {
+        data: {},
+        facade: facadeName,
+        method: 'getTrendingBobbleheadsAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
+      };
+      throw createFacadeError(errorContext, error);
+    }
   }
 
   /**

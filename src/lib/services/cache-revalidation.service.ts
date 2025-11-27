@@ -436,7 +436,7 @@ export class CacheRevalidationService {
   static readonly featured = {
     /**
      * revalidate after featured content changes
-     * also invalidates Redis cache for hero bobblehead and featured collections
+     * also invalidates Redis cache for hero bobblehead, featured collections, and trending bobbleheads
      */
     onContentChange: (type?: string): RevalidationResult => {
       const tags = CacheTagInvalidation.onFeaturedContentChange();
@@ -451,6 +451,11 @@ export class CacheRevalidationService {
         console.error('[CacheRevalidation] Failed to invalidate featured collections Redis cache:', error);
       });
 
+      // Invalidate trending bobbleheads Redis cache
+      void RedisOperations.del(CACHE_KEYS.FEATURED.TRENDING_BOBBLEHEADS()).catch((error) => {
+        console.error('[CacheRevalidation] Failed to invalidate trending bobbleheads Redis cache:', error);
+      });
+
       return CacheRevalidationService.revalidateTags(tags, {
         entityType: 'featured',
         operation: 'featured:content:change',
@@ -460,7 +465,7 @@ export class CacheRevalidationService {
 
     /**
      * revalidate all featured content
-     * also invalidates Redis cache for hero bobblehead and featured collections
+     * also invalidates Redis cache for hero bobblehead, featured collections, and trending bobbleheads
      */
     onMajorUpdate: (): RevalidationResult => {
       const tags = CacheTagInvalidation.onMajorDataChange();
@@ -473,6 +478,11 @@ export class CacheRevalidationService {
       // Invalidate featured collections Redis cache (all user-specific keys)
       void RedisOperations.delByPattern(`${CACHE_KEYS.FEATURED.COLLECTIONS()}:*`).catch((error) => {
         console.error('[CacheRevalidation] Failed to invalidate featured collections Redis cache:', error);
+      });
+
+      // Invalidate trending bobbleheads Redis cache
+      void RedisOperations.del(CACHE_KEYS.FEATURED.TRENDING_BOBBLEHEADS()).catch((error) => {
+        console.error('[CacheRevalidation] Failed to invalidate trending bobbleheads Redis cache:', error);
       });
 
       return CacheRevalidationService.revalidateTags(tags, {

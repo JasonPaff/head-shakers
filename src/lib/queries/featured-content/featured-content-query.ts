@@ -1,4 +1,4 @@
-import { and, desc, eq, gte, isNull, lte, or, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNull, lte, or, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
@@ -81,6 +81,23 @@ export interface HeroFeaturedBobbleheadData {
   likes: number;
   owner: null | string;
   viewCount: number;
+}
+
+/**
+ * data needed for trending bobbleheads display on homepage
+ */
+export interface TrendingBobbleheadData {
+  category: null | string;
+  contentId: string;
+  contentSlug: null | string;
+  featureType: 'editor_pick' | 'trending';
+  id: string;
+  imageUrl: null | string;
+  likeCount: number;
+  name: null | string;
+  title: null | string;
+  viewCount: number;
+  year: null | number;
 }
 
 export class FeaturedContentQuery extends BaseQuery {
@@ -458,6 +475,53 @@ export class FeaturedContentQuery extends BaseQuery {
       .limit(1);
 
     return results[0] ?? null;
+  }
+
+  /**
+   * get trending bobbleheads data for homepage display
+   *
+   * returns active featured bobbleheads with feature_type 'trending' or 'editor_pick',
+   * ordered by priority (ascending) and limited to 12 items. uses innerJoin to ensure bobblehead exists.
+   * returns only the fields needed for the TrendingBobbleheadsDisplay component.
+   *
+   * @param context - query context with database instance
+   * @returns array of trending bobblehead data (limit 12, ordered by priority asc)
+   */
+  static async getTrendingBobbleheadsAsync(context: QueryContext): Promise<Array<TrendingBobbleheadData>> {
+    const dbInstance = this.getDbInstance(context);
+    const now = new Date();
+
+    return dbInstance
+      .select({
+        category: bobbleheads.category,
+        contentId: featuredContent.contentId,
+        contentSlug: bobbleheads.slug,
+        featureType: sql<'editor_pick' | 'trending'>`${featuredContent.featureType}`,
+        id: featuredContent.id,
+        imageUrl: sql<null | string>`COALESCE(${featuredContent.imageUrl}, ${bobbleheadPhotos.url})`,
+        likeCount: bobbleheads.likeCount,
+        name: bobbleheads.name,
+        title: featuredContent.title,
+        viewCount: featuredContent.viewCount,
+        year: bobbleheads.year,
+      })
+      .from(featuredContent)
+      .innerJoin(bobbleheads, eq(featuredContent.contentId, bobbleheads.id))
+      .leftJoin(
+        bobbleheadPhotos,
+        and(eq(bobbleheadPhotos.bobbleheadId, bobbleheads.id), eq(bobbleheadPhotos.isPrimary, true)),
+      )
+      .where(
+        and(
+          eq(featuredContent.contentType, 'bobblehead'),
+          eq(featuredContent.isActive, true),
+          inArray(featuredContent.featureType, ['trending', 'editor_pick']),
+          or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
+          or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
+        ),
+      )
+      .orderBy(asc(featuredContent.priority), desc(featuredContent.createdAt))
+      .limit(12);
   }
 
   /**

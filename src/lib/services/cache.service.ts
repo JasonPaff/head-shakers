@@ -599,6 +599,23 @@ export class CacheService {
         ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
       });
     },
+
+    /**
+     * cache trending bobbleheads data in Redis
+     *
+     * uses Redis for distributed caching of trending bobbleheads display data.
+     * this is high-traffic homepage content that benefits from fast Redis access.
+     * uses LONG TTL (4 hour) as trending content doesn't need real-time updates.
+     */
+    trendingBobbleheads: async <T>(fn: () => Promise<T>, options: Omit<CacheOptions, 'tags'> = {}) => {
+      const key = CACHE_KEYS.FEATURED.TRENDING_BOBBLEHEADS();
+
+      return CacheService.cachedWithRedis(fn, key, {
+        ...options,
+        context: { ...options.context, entityType: 'featured', operation: 'featured:trending-bobbleheads' },
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
   };
 
   /**

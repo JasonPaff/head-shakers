@@ -69,6 +69,7 @@ export const OPERATIONS = {
     GET_BY_ID: 'get_featured_content_by_id',
     GET_FEATURED_COLLECTIONS: 'get_featured_collections',
     GET_HERO_BOBBLEHEAD: 'get_hero_featured_bobblehead',
+    GET_TRENDING_BOBBLEHEADS: 'get_trending_bobbleheads',
     TOGGLE_ACTIVE: 'toggle_featured_content_active',
     TOGGLE_STATUS: 'toggle_featured_content_status',
     UPDATE: 'update_featured_content',
