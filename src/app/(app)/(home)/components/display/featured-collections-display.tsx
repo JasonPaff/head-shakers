@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Layers, User } from 'lucide-react';
+import { ArrowRightIcon, LayersIcon, UserIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
@@ -49,7 +49,7 @@ export const FeaturedCollectionsDisplay = ({ collections }: FeaturedCollectionsD
         data-slot={'featured-collections-empty'}
         data-testid={generateTestId('feature', 'collections-empty-state')}
       >
-        <Layers aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
+        <LayersIcon aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
         <p className={'text-muted-foreground'}>No featured collections available at this time.</p>
       </div>
     );
@@ -139,7 +139,7 @@ const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => 
           {/* Featured Badge */}
           <div className={'absolute top-3 left-3 z-10'} data-slot={'featured-collection-badge'}>
             <span className={featuredCardBadgeVariants({ variant: 'featured' })}>
-              <Layers aria-hidden className={'size-3'} />
+              <LayersIcon aria-hidden className={'size-3'} />
               Featured
             </span>
           </div>
@@ -177,7 +177,7 @@ const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => 
           className={'mt-1 flex items-center gap-1.5 text-sm text-white/70'}
           data-slot={'featured-collection-owner'}
         >
-          <User aria-hidden className={'size-3.5'} />
+          <UserIcon aria-hidden className={'size-3.5'} />
           {collection.ownerDisplayName}
         </p>
 
@@ -218,7 +218,7 @@ const FeaturedCollectionCard = ({ collection }: FeaturedCollectionCardProps) => 
             })}
           >
             View
-            <ArrowRight aria-hidden className={'size-4 transition-transform duration-200'} />
+            <ArrowRightIcon aria-hidden className={'size-4 transition-transform duration-200'} />
           </Link>
         </div>
       </div>

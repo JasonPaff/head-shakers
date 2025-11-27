@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowRight, Award, User } from 'lucide-react';
+import { ArrowRightIcon, AwardIcon, UserIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
 import { $path } from 'next-typesafe-url';
 import Image from 'next/image';
@@ -64,7 +64,7 @@ export const FeaturedBobbleheadsDisplay = ({ bobbleheads }: FeaturedBobbleheadsD
           data-slot={'featured-bobbleheads-empty'}
           data-testid={generateTestId('feature', 'bobbleheads-empty-state')}
         >
-          <Award aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
+          <AwardIcon aria-hidden className={'mx-auto mb-4 size-12 text-muted-foreground/50'} />
           <p className={'text-muted-foreground'}>No featured bobbleheads available at this time.</p>
         </div>
       </Conditional>
@@ -112,7 +112,7 @@ const FeaturedBobbleheadCard = ({ bobblehead }: FeaturedBobbleheadCardProps) => 
     _hasSlug ?
       $path({
         route: '/bobbleheads/[bobbleheadSlug]',
-        routeParams: { bobbleheadSlug: bobblehead.contentSlug as string },
+        routeParams: { bobbleheadSlug: bobblehead.contentSlug! },
       })
     : '#';
 
@@ -175,7 +175,7 @@ const FeaturedBobbleheadCard = ({ bobblehead }: FeaturedBobbleheadCardProps) => 
           {/* Featured Badge */}
           <div className={'absolute top-3 left-3 z-10'} data-slot={'featured-bobblehead-badge'}>
             <span className={featuredCardBadgeVariants({ variant: _badgeVariant })}>
-              <Award aria-hidden className={'size-3'} />
+              <AwardIcon aria-hidden className={'size-3'} />
               {getBadgeLabel(bobblehead.featureType)}
             </span>
           </div>
@@ -215,7 +215,7 @@ const FeaturedBobbleheadCard = ({ bobblehead }: FeaturedBobbleheadCardProps) => 
             className={'flex items-center gap-1.5 text-xs text-muted-foreground'}
             data-slot={'featured-bobblehead-owner'}
           >
-            <User aria-hidden className={'size-3'} />
+            <UserIcon aria-hidden className={'size-3'} />
             {bobblehead.ownerDisplayName}
           </p>
         </Conditional>
@@ -248,7 +248,7 @@ const FeaturedBobbleheadCard = ({ bobblehead }: FeaturedBobbleheadCardProps) => 
               href={_href}
             >
               View
-              <ArrowRight aria-hidden className={'size-3.5 transition-transform duration-200'} />
+              <ArrowRightIcon aria-hidden className={'size-3.5 transition-transform duration-200'} />
             </Link>
           </Conditional>
         </div>

@@ -78,6 +78,7 @@ export type ComponentTestId =
   | 'form-field'
   | 'form-label'
   | 'form-submit'
+  | 'hero-featured'
   | 'hero-stats'
   | 'hover-card'
   | 'icon'

@@ -302,7 +302,7 @@ export class SocialFacade {
     try {
       if (targets.length === 0) return [];
 
-      // Create cache key with hashed targets array
+      // Create a cache key with the hashed targets array
       const targetsHash = createHashFromObject(targets);
       const cacheKey = `${CACHE_KEYS.SOCIAL.LIKES('batch', 'data')}:${targetsHash}:${viewerUserId || 'public'}`;
 

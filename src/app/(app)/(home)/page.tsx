@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import { FeaturedBobbleheadsAsync } from '@/app/(app)/(home)/components/async/featured-bobbleheads-async';
 import { FeaturedCollectionsAsync } from '@/app/(app)/(home)/components/async/featured-collections-async';
-import { FeaturedCollectionsErrorBoundary } from '@/app/(app)/(home)/components/featured-collections-error-boundary';
+import { FeaturedCollectionsErrorBoundary } from '@/app/(app)/(home)/components/error/featured-collections-error-boundary';
 import { HeroSection } from '@/app/(app)/(home)/components/hero-section';
 import { FeaturedBobbleheadsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-bobbleheads-skeleton';
 import { FeaturedCollectionsSkeleton } from '@/app/(app)/(home)/components/skeletons/featured-collections-skeleton';
