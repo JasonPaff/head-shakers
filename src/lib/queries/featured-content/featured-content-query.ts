@@ -9,7 +9,7 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
-import { DEFAULTS } from '@/lib/constants';
+import { CONFIG, DEFAULTS } from '@/lib/constants';
 import { bobbleheadPhotos, bobbleheads, collections, featuredContent, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
@@ -315,7 +315,8 @@ export class FeaturedContentQuery extends BaseQuery {
           or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
         ),
       )
-      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
+      .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
+      .limit(CONFIG.CONTENT.MAX_FEATURED_FOOTER_ITEMS + 1);
 
     return results;
   }

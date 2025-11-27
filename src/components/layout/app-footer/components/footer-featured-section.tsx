@@ -1,8 +1,8 @@
+import 'server-only';
 import { $path } from 'next-typesafe-url';
 
 import { FooterNavLink } from '@/components/layout/app-footer/components/footer-nav-link';
 import { FooterNavSection } from '@/components/layout/app-footer/components/footer-nav-section';
-import { CONFIG } from '@/lib/constants/config';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 
 /**
@@ -12,19 +12,13 @@ import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-c
 export const FooterFeaturedSection = async () => {
   const featuredContent = await FeaturedContentFacade.getFooterFeaturedContentAsync();
 
-  // Filter for collection content type and limit to configured max items
-  const featuredCollections = featuredContent
-    .filter((content) => content.contentType === 'collection')
-    .slice(0, CONFIG.CONTENT.MAX_FEATURED_FOOTER_ITEMS);
-
-  if (!featuredCollections.length || featuredCollections.length === 0) {
+  if (!featuredContent.length || featuredContent.length === 0) {
     return null;
   }
 
   return (
     <FooterNavSection heading={'Featured Collections'}>
-      {/* Featured Collection Links */}
-      {featuredCollections.map((collection) => {
+      {featuredContent.map((collection) => {
         const _hasValidSlug = collection.collectionSlug !== null;
         if (!_hasValidSlug) return null;
 
