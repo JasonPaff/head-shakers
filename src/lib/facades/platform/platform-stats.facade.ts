@@ -53,9 +53,9 @@ export class PlatformStatsFacade {
 
           // Fetch all counts in parallel for performance
           const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
-            BobbleheadsQuery.getTotalBobbleheadCountAsync(context),
-            CollectionsQuery.getCollectionsCountAsync(context),
-            UsersQuery.getUsersCountAsync(context),
+            BobbleheadsQuery.getBobbleheadCountAsync(context),
+            CollectionsQuery.getCollectionCountAsync(context),
+            UsersQuery.getUserCountAsync(context),
           ]);
 
           // Add breadcrumb for successful stats fetch

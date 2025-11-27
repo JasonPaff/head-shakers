@@ -11,6 +11,7 @@ import type {
 
 import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
 export type BobbleheadListRecord = {
   acquisitionDate: Date | null;
@@ -785,6 +786,18 @@ export class CollectionsQuery extends BaseQuery {
       .orderBy(sortOrder);
   }
 
+  static async getCollectionCountAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(collections)
+      .where(buildSoftDeleteFilter(collections.deletedAt, context))
+      .then((result) => result[0]?.count || 0);
+
+    return result;
+  }
+
   /**
    * get collection metadata for SEO and social sharing
    * returns minimal fields needed for metadata generation with owner info
@@ -844,18 +857,6 @@ export class CollectionsQuery extends BaseQuery {
       },
       slug: row.slug,
     };
-  }
-
-  static async getCollectionsCountAsync(context: QueryContext): Promise<number> {
-    const dbInstance = this.getDbInstance(context);
-
-    const result = await dbInstance
-      .select({ count: count() })
-      .from(collections)
-      .where(isNull(collections.deletedAt))
-      .then((result) => result[0]?.count || 0);
-
-    return result;
   }
 
   static async getDashboardDataAsync(

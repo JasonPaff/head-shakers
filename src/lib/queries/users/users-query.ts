@@ -5,6 +5,7 @@ import type { AdminUsersFilter } from '@/lib/validations/admin-users.validation'
 
 import { bobbleheads, collections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
 /**
  * Admin user list record with computed fields for admin listing
@@ -185,6 +186,22 @@ export class UsersQuery extends BaseQuery {
   }
 
   /**
+   * Get total users count (excluding deleted)
+   * @param context
+   */
+  static async getUserCountAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(users)
+      .where(buildSoftDeleteFilter(users.deletedAt, context))
+      .then((result) => result[0]?.count || 0);
+
+    return result;
+  }
+
+  /**
    * get user metadata for SEO and social sharing
    * returns minimal fields needed for metadata generation
    */
@@ -211,22 +228,6 @@ export class UsersQuery extends BaseQuery {
       .limit(1);
 
     return result[0] || null;
-  }
-
-  /**
-   * Get total users count (excluding deleted)
-   * @param context
-   */
-  static async getUsersCountAsync(context: QueryContext): Promise<number> {
-    const dbInstance = this.getDbInstance(context);
-
-    const result = await dbInstance
-      .select({ count: count() })
-      .from(users)
-      .where(isNull(users.deletedAt))
-      .then((result) => result[0]?.count || 0);
-
-    return result;
   }
 
   /**

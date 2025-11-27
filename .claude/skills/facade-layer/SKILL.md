@@ -38,7 +38,13 @@ This skill activates when:
 - Use static class methods (no instantiation needed)
 - Define `const facadeName = '{Domain}Facade'` at file top for error context
 - Accept optional `DatabaseExecutor` (`dbInstance?: DatabaseExecutor`) as last parameter
-- Create appropriate query context (`createProtectedQueryContext`, `createUserQueryContext`, `createPublicQueryContext`)
+- Create appropriate query context (`createProtectedQueryContext`, `createUserQueryContext`, `createPublicQueryContext`, `createAdminQueryContext`)
+
+### QueryContext and Automatic Filtering (IMPORTANT)
+- **Context drives filtering**: Query methods automatically apply permission and soft-delete filters based on context flags
+- **Trust query methods**: Don't manually add filters that queries handle via `buildBaseFilters()`
+- **Context factories set flags**: `createPublicQueryContext()` sets `isPublic: true`, etc.
+- **Override when needed**: Pass `shouldIncludeDeleted: true` for admin restore features
 
 ### Transaction Requirements (MANDATORY for mutations)
 - **ALL multi-step mutations MUST use transactions**: `(dbInstance ?? db).transaction(async (tx) => { ... })`

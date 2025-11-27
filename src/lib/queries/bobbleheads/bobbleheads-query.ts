@@ -13,6 +13,7 @@ import type {
 
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
 /**
  * adjacent bobblehead with primary photo URL for navigation previews
@@ -533,6 +534,22 @@ export class BobbleheadsQuery extends BaseQuery {
   }
 
   /**
+   * get total bobblehead count excluding deleted records
+   * @param context
+   */
+  static async getBobbleheadCountAsync(context: QueryContext): Promise<number> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ count: count() })
+      .from(bobbleheads)
+      .where(buildSoftDeleteFilter(bobbleheads.deletedAt, context))
+      .then((result) => result[0]?.count || 0);
+
+    return result;
+  }
+
+  /**
    * get bobblehead metadata for SEO and social sharing
    * returns minimal fields needed for metadata generation with owner info
    */
@@ -704,22 +721,6 @@ export class BobbleheadsQuery extends BaseQuery {
       .from(bobbleheadPhotos)
       .where(eq(bobbleheadPhotos.bobbleheadId, bobbleheadId))
       .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
-  }
-
-  /**
-   * get total bobblehead count excluding deleted records
-   * @param context
-   */
-  static async getTotalBobbleheadCountAsync(context: QueryContext): Promise<number> {
-    const dbInstance = this.getDbInstance(context);
-
-    const result = await dbInstance
-      .select({ count: count() })
-      .from(bobbleheads)
-      .where(isNull(bobbleheads.deletedAt))
-      .then((result) => result[0]?.count || 0);
-
-    return result;
   }
 
   /**

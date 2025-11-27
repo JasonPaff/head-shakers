@@ -117,6 +117,7 @@ export class {Domain}Facade {
 | Public reads     | `createPublicQueryContext`    | Unauthenticated data access              |
 | User reads       | `createUserQueryContext`      | Authenticated reads with ownership       |
 | Protected writes | `createProtectedQueryContext` | All write operations within transactions |
+| Admin reads      | `createAdminQueryContext`     | Admin/moderator access to all content    |
 
 ```typescript
 // Public read - no auth required
@@ -127,6 +128,79 @@ const context = createUserQueryContext(viewerUserId, { dbInstance });
 
 // Protected write - requires auth, typically within transaction
 const context = createProtectedQueryContext(userId, { dbInstance: tx });
+
+// Admin read - sees all content regardless of visibility
+const context = createAdminQueryContext(adminUserId, { dbInstance });
+```
+
+## QueryContext and Automatic Filtering
+
+The `QueryContext` drives automatic filtering in query methods. Query classes extend `BaseQuery` which provides filter utilities that respect context flags.
+
+### QueryContext Interface
+
+```typescript
+interface QueryContext {
+  dbInstance?: DatabaseExecutor;    // Transaction or main db
+  isPublic?: boolean;               // Public access mode - only public content
+  requiredUserId?: string;          // For protected operations - must be owner
+  shouldIncludeDeleted?: boolean;   // Include soft-deleted records
+  userId?: string;                  // Current user ID
+}
+```
+
+### How Context Flags Affect Filtering
+
+Query methods internally use `buildBaseFilters()` which applies:
+1. **Permission filter** - Based on `isPublic`, `userId`, `requiredUserId`
+2. **Soft-delete filter** - Based on `shouldIncludeDeleted`
+
+| Context Factory | Flags Set | Permission Behavior | Soft-Delete Behavior |
+|-----------------|-----------|---------------------|----------------------|
+| `createPublicQueryContext()` | `isPublic: true` | Only `isPublic = true` records | Excludes deleted |
+| `createUserQueryContext(id)` | `userId: id` | Public OR owned by user | Excludes deleted |
+| `createProtectedQueryContext(id)` | `requiredUserId: id` | Only owned by user | Excludes deleted |
+| `createAdminQueryContext(id)` | `userId: id` | All content (no filter) | Excludes deleted |
+
+### Why This Matters for Facades
+
+**Facades should trust query methods to handle filtering.** When you:
+1. Create the correct context type
+2. Pass it to query methods
+3. The query layer automatically applies appropriate filters
+
+```typescript
+// CORRECT: Let query handle filtering
+const context = createPublicQueryContext({ dbInstance });
+const count = await BobbleheadsQuery.getTotalBobbleheadCountAsync(context);
+// Query internally applies: WHERE deleted_at IS NULL (based on context)
+
+// INCORRECT: Manually adding filters that query already handles
+const context = createPublicQueryContext({ dbInstance });
+const count = await dbInstance
+  .select({ count: count() })
+  .from(bobbleheads)
+  .where(and(
+    eq(bobbleheads.isPublic, true),      // Redundant - context handles this
+    isNull(bobbleheads.deletedAt)         // Redundant - context handles this
+  ));
+```
+
+### Override Flags When Needed
+
+You can override default flags for special cases:
+
+```typescript
+// Include soft-deleted records (e.g., for admin restore feature)
+const context = createAdminQueryContext(adminUserId, {
+  dbInstance,
+  shouldIncludeDeleted: true,  // Override to see deleted records
+});
+
+// Public context with transaction support
+const context = createPublicQueryContext({
+  dbInstance: tx,  // Use transaction executor
+});
 ```
 
 ## Transaction Handling
@@ -307,9 +381,9 @@ static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<Platf
   const context = createPublicQueryContext({ dbInstance });
 
   const [bobbleheadsCount, collectionsCount, usersCount] = await Promise.all([
-    BobbleheadsQuery.getBobbleheadsCountAsync(context),   // Handles deletedAt filter
-    CollectionsQuery.getCollectionsCountAsync(context),   // Handles deletedAt filter
-    UsersQuery.getUsersCountAsync(context),               // Handles deletedAt filter
+    BobbleheadsQuery.getTotalBobbleheadCountAsync(context),  // Handles deletedAt filter
+    CollectionsQuery.getCollectionsCountAsync(context),      // Handles deletedAt filter
+    UsersQuery.getUsersCountAsync(context),                  // Handles deletedAt filter
   ]);
 
   return { totalBobbleheads: bobbleheadsCount, totalCollections: collectionsCount, totalCollectors: usersCount };
