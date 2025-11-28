@@ -294,7 +294,7 @@ export class FeaturedContentQuery extends BaseQuery {
     const bobbleheadOwnerUsers = alias(users, 'bobbleheadOwnerUsers');
     const collectionOwnerUsers = alias(users, 'collectionOwnerUsers');
 
-    const results = await dbInstance
+    return dbInstance
       .select({
         bobbleheadLikes: bobbleheads.likeCount,
         bobbleheadName: bobbleheads.name,
@@ -342,8 +342,6 @@ export class FeaturedContentQuery extends BaseQuery {
         ),
       )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt));
-
-    return results;
   }
 
   /**
@@ -423,7 +421,7 @@ export class FeaturedContentQuery extends BaseQuery {
           SELECT COUNT(*)::integer
           FROM likes
           WHERE target_id = ${collections.id}
-          AND target_type = 'collection'
+          AND like_target_type = 'collection'
         )`.as('likes'),
         ownerAvatarUrl: users.avatarUrl,
         ownerDisplayName: users.username,

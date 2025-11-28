@@ -448,7 +448,7 @@ export class CollectionsQuery extends BaseQuery {
             SELECT COUNT(*)::integer
             FROM ${comments}
             WHERE target_id = ${collections.id}
-            AND target_type = 'collection'
+            AND comment_target_type = 'collection'
             AND deleted_at IS NULL
           )`.as('comment_count'),
           coverImageUrl: collections.coverImageUrl,
@@ -550,7 +550,7 @@ export class CollectionsQuery extends BaseQuery {
           SELECT COUNT(*)::integer
           FROM ${comments}
           WHERE target_id = ${collections.id}
-          AND target_type = 'collection'
+          AND comment_target_type = 'collection'
           AND deleted_at IS NULL
         )`.as('comment_count'),
         coverImageUrl: collections.coverImageUrl,
@@ -709,7 +709,7 @@ export class CollectionsQuery extends BaseQuery {
           SELECT COUNT(*)::integer
           FROM ${comments}
           WHERE target_id = ${collections.id}
-          AND target_type = 'collection'
+          AND comment_target_type = 'collection'
           AND deleted_at IS NULL
         )`.as('comment_count'),
         coverImageUrl: collections.coverImageUrl,
