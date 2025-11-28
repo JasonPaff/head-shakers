@@ -34,9 +34,12 @@ vi.mock('@/lib/db', () => ({
 }));
 
 // Mock Sentry to track breadcrumbs and error handling
-const mockAddBreadcrumb = vi.fn();
-const mockCaptureException = vi.fn();
-const mockSetContext = vi.fn();
+// Use vi.hoisted() to ensure mock functions are available when vi.mock is hoisted
+const { mockAddBreadcrumb, mockCaptureException, mockSetContext } = vi.hoisted(() => ({
+  mockAddBreadcrumb: vi.fn(),
+  mockCaptureException: vi.fn(),
+  mockSetContext: vi.fn(),
+}));
 
 vi.mock('@sentry/nextjs', () => ({
   addBreadcrumb: mockAddBreadcrumb,
