@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist-xml), Task(subagent_type:database-specialist-xml), Task(subagent_type:facade-specialist-xml), Task(subagent_type:client-component-specialist-xml), Task(subagent_type:server-component-specialist-xml), Task(subagent_type:form-specialist-xml), Task(subagent_type:media-specialist-xml), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist-xml), Task(subagent_type:resend-specialist-xml), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist-xml), Task(subagent_type:database-specialist-xml), Task(subagent_type:facade-specialist-xml), Task(subagent_type:client-component-specialist-xml), Task(subagent_type:server-component-specialist-xml), Task(subagent_type:form-specialist-xml), Task(subagent_type:media-specialist-xml), Task(subagent_type:unit-test-specialist), Task(subagent_type:component-test-specialist), Task(subagent_type:integration-test-specialist), Task(subagent_type:e2e-test-specialist), Task(subagent_type:test-infrastructure-specialist), Task(subagent_type:test-executor), Task(subagent_type:validation-specialist-xml), Task(subagent_type:resend-specialist-xml), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture (XML-structured version)
 ---
@@ -133,10 +133,34 @@ description: Execute implementation plan with structured tracking and validation
         <cell>Cloudinary utilities, image components</cell>
       </row>
       <row>
-        <cell>test-specialist</cell>
-        <cell>Testing</cell>
-        <cell>testing-patterns</cell>
-        <cell>tests/**/*.test.ts, e2e/**/*.spec.ts</cell>
+        <cell>unit-test-specialist</cell>
+        <cell>Unit tests</cell>
+        <cell>unit-testing, testing-base</cell>
+        <cell>tests/unit/**/*.test.ts</cell>
+      </row>
+      <row>
+        <cell>component-test-specialist</cell>
+        <cell>Component tests</cell>
+        <cell>component-testing, testing-base</cell>
+        <cell>tests/components/**/*.test.tsx</cell>
+      </row>
+      <row>
+        <cell>integration-test-specialist</cell>
+        <cell>Integration tests</cell>
+        <cell>integration-testing, testing-base</cell>
+        <cell>tests/integration/**/*.test.ts</cell>
+      </row>
+      <row>
+        <cell>e2e-test-specialist</cell>
+        <cell>E2E tests</cell>
+        <cell>e2e-testing, testing-base</cell>
+        <cell>tests/e2e/specs/**/*.spec.ts</cell>
+      </row>
+      <row>
+        <cell>test-infrastructure-specialist</cell>
+        <cell>Test infra</cell>
+        <cell>test-infrastructure, testing-base</cell>
+        <cell>tests/**/fixtures/**, tests/**/mocks/**, tests/e2e/pages/**</cell>
       </row>
       <row>
         <cell>validation-specialist-xml</cell>
@@ -164,50 +188,66 @@ description: Execute implementation plan with structured tracking and validation
 
     <detection-rules priority-order="true">
       <rule priority="1">
-        <condition>files contain "tests/" OR end with ".test.ts" OR ".spec.ts"</condition>
-        <result>test-specialist</result>
+        <condition>files contain "tests/unit/" AND end with ".test.ts"</condition>
+        <result>unit-test-specialist</result>
       </rule>
       <rule priority="2">
+        <condition>files contain "tests/components/" AND end with ".test.tsx"</condition>
+        <result>component-test-specialist</result>
+      </rule>
+      <rule priority="3">
+        <condition>files contain "tests/integration/" AND end with ".test.ts"</condition>
+        <result>integration-test-specialist</result>
+      </rule>
+      <rule priority="4">
+        <condition>files contain "tests/e2e/specs/" AND end with ".spec.ts"</condition>
+        <result>e2e-test-specialist</result>
+      </rule>
+      <rule priority="5">
+        <condition>files contain "tests/**/fixtures/" OR "tests/**/mocks/" OR "tests/e2e/pages/"</condition>
+        <result>test-infrastructure-specialist</result>
+      </rule>
+      <rule priority="6">
         <condition>files contain "src/lib/actions/" OR end with ".actions.ts"</condition>
         <result>server-action-specialist-xml</result>
       </rule>
-      <rule priority="3">
+      <rule priority="7">
         <condition>files contain "src/lib/db/schema/"</condition>
         <result>database-specialist-xml</result>
       </rule>
-      <rule priority="4">
+      <rule priority="8">
         <condition>files contain "src/lib/queries/" OR end with ".queries.ts"</condition>
         <result>database-specialist-xml</result>
       </rule>
-      <rule priority="5">
+      <rule priority="9">
         <condition>files contain "src/lib/facades/" OR end with ".facade.ts"</condition>
         <result>facade-specialist-xml</result>
       </rule>
-      <rule priority="6">
+      <rule priority="10">
         <condition>files contain "src/lib/validations/" OR end with ".validation.ts"</condition>
         <result>validation-specialist-xml</result>
       </rule>
-      <rule priority="7">
+      <rule priority="11">
         <condition>files contain "cloudinary" (case-insensitive) OR involve image upload/media</condition>
         <result>media-specialist-xml</result>
       </rule>
-      <rule priority="8">
+      <rule priority="12">
         <condition>files are .tsx/.jsx AND (contain "form" OR "dialog" OR use "useAppForm")</condition>
         <result>form-specialist-xml</result>
       </rule>
-      <rule priority="9">
+      <rule priority="13">
         <condition>files are page.tsx, layout.tsx, loading.tsx, error.tsx, OR contain "-async.tsx", "-server.tsx", OR "-skeleton.tsx"</condition>
         <result>server-component-specialist-xml</result>
       </rule>
-      <rule priority="10">
+      <rule priority="14">
         <condition>files are .tsx/.jsx in "src/components/" OR "src/app/**/components/" with hooks/events</condition>
         <result>client-component-specialist-xml</result>
       </rule>
-      <rule priority="11">
+      <rule priority="15">
         <condition>files contain "resend" (case-insensitive) OR contain "email-templates/" OR involve email sending</condition>
         <result>resend-specialist-xml</result>
       </rule>
-      <rule priority="12">
+      <rule priority="16">
         <condition>ELSE (fallback)</condition>
         <result>general-purpose</result>
       </rule>
@@ -378,7 +418,8 @@ description: Execute implementation plan with structured tracking and validation
             <route step="5" specialist="form-specialist-xml" reason="form component files" />
             <route step="6" specialist="server-component-specialist-xml" reason="page.tsx, async components" />
             <route step="7" specialist="client-component-specialist-xml" reason="interactive components with hooks" />
-            <route step="8" specialist="test-specialist" reason="test files" />
+            <route step="8" specialist="unit-test-specialist" reason="unit test files" />
+            <route step="9" specialist="e2e-test-specialist" reason="E2E spec files" />
           </routing-table-example>
           <action>Log any steps that span multiple domains</action>
         </step>
@@ -665,7 +706,7 @@ IMPORTANT:
 
     <phase number="4" name="Quality Gates Execution">
       <objective>Run all quality gates from the plan to ensure implementation quality.</objective>
-      <architecture>Quality gates can run in orchestrator (simple) or delegated to test-specialist (complex tests).</architecture>
+      <architecture>Quality gates can run in orchestrator (simple) or delegated to test-executor (complex tests).</architecture>
 
       <process>
         <step order="1">
@@ -691,10 +732,10 @@ IMPORTANT:
               <action>Check pass/fail status</action>
             </actions>
           </option>
-          <option name="B" label="Complex Testing" executor="Delegate to test-specialist">
+          <option name="B" label="Complex Testing" executor="Delegate to test-executor">
             <condition>For comprehensive test suites (unit, integration, e2e)</condition>
             <actions>
-              <action>Use Task tool with subagent_type: "test-specialist"</action>
+              <action>Use Task tool with subagent_type: "test-executor"</action>
               <description>Run quality gates and test suites</description>
               <subagent-handles>
                 <item>Running tests</item>
@@ -1164,7 +1205,7 @@ Execution time: X.X minutes
   <notes>
     <note>This command is designed to work seamlessly with plans generated by /plan-feature</note>
     <note type="architecture">Uses orchestrator + specialist subagent pattern with automatic skill loading</note>
-    <note type="specialists">9 domain-specific agents with pre-configured skills for their area (XML versions)</note>
+    <note type="specialists">14 domain-specific agents with pre-configured skills for their area (XML versions for non-test specialists, standard test specialists)</note>
     <note>Always review the implementation plan before executing to ensure it's current</note>
     <note>Use --step-by-step mode for complex or risky implementations</note>
     <note>Use --dry-run mode to preview changes and specialist routing before applying them</note>
