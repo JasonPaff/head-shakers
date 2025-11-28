@@ -1,4 +1,3 @@
-import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
@@ -10,7 +9,7 @@ import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
-import { trackFacadeEntry, trackFacadeSuccess } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { withFacadeBreadcrumbs } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'PlatformStatsFacade';
 
@@ -38,47 +37,56 @@ export class PlatformStatsFacade extends BaseFacade {
    */
   static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
     const methodName = 'getPlatformStatsAsync';
-    trackFacadeEntry(facadeName, methodName);
 
-    try {
-      return await CacheService.platform.stats(
-        async () => {
-          const context = this.publicContext(dbInstance);
+    return withFacadeBreadcrumbs(
+      { facade: facadeName, method: methodName },
+      async () => {
+        try {
+          return await CacheService.platform.stats(
+            async () => {
+              const context = this.publicContext(dbInstance);
 
-          // Fetch all counts in parallel for performance
-          const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
-            BobbleheadsQuery.getBobbleheadCountAsync(context),
-            CollectionsQuery.getCollectionCountAsync(context),
-            UsersQuery.getUserCountAsync(context),
-          ]);
+              // Fetch all counts in parallel for performance
+              const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
+                BobbleheadsQuery.getBobbleheadCountAsync(context),
+                CollectionsQuery.getCollectionCountAsync(context),
+                UsersQuery.getUserCountAsync(context),
+              ]);
 
-          const stats: PlatformStats = {
-            totalBobbleheads: bobbleheadsCount,
-            totalCollections: collectionsCount,
-            totalCollectors: collectorsCount,
-          };
-
-          trackFacadeSuccess(facadeName, methodName, { ...stats });
-
-          return stats;
-        },
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.PLATFORM,
-            facade: facadeName,
-            operation: OPERATIONS.PLATFORM.GET_STATS,
-          },
-          ttl: CACHE_CONFIG.TTL.EXTENDED,
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: {},
-        facade: facadeName,
-        method: methodName,
-        operation: OPERATIONS.PLATFORM.GET_STATS,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+              return {
+                totalBobbleheads: bobbleheadsCount,
+                totalCollections: collectionsCount,
+                totalCollectors: collectorsCount,
+              };
+            },
+            {
+              context: {
+                entityType: CACHE_ENTITY_TYPE.PLATFORM,
+                facade: facadeName,
+                operation: OPERATIONS.PLATFORM.GET_STATS,
+              },
+              ttl: CACHE_CONFIG.TTL.EXTENDED,
+            },
+          );
+        } catch (error) {
+          throw createFacadeError(
+            {
+              data: {},
+              facade: facadeName,
+              method: methodName,
+              operation: OPERATIONS.PLATFORM.GET_STATS,
+            },
+            error,
+          );
+        }
+      },
+      {
+        includeResultSummary: (stats) => ({
+          totalBobbleheads: stats.totalBobbleheads,
+          totalCollections: stats.totalCollections,
+          totalCollectors: stats.totalCollectors,
+        }),
+      },
+    );
   }
 }
