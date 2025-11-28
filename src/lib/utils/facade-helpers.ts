@@ -1,5 +1,5 @@
 import type { FacadeErrorContext } from './error-types';
-import type { WithFacadeBreadcrumbsOptions } from './sentry-server/types';
+import type { FacadeBreadcrumbData, WithFacadeBreadcrumbsOptions } from './sentry-server/types';
 
 import { createFacadeError } from './error-builders';
 
@@ -151,4 +151,24 @@ export async function executeFacadeOperationWithoutBreadcrumbs<T>(
     };
     throw createFacadeError(errorContext, error);
   }
+}
+
+/**
+ * Helper for includeResultSummary that spreads the entire result.
+ * Use when you want all result data included in breadcrumbs.
+ *
+ * Handles various result types:
+ * - Objects: spreads all properties
+ * - Arrays: converts to object with numeric string keys
+ * - null/undefined: returns empty object
+ *
+ * @example
+ * return executeFacadeOperation(
+ *   { facade: facadeName, method: 'getDataAsync', operation: 'getData' },
+ *   async () => fetchData(),
+ *   { includeResultSummary: includeFullResult },
+ * );
+ */
+export function includeFullResult<T>(result: T): FacadeBreadcrumbData {
+  return { ...result } as FacadeBreadcrumbData;
 }

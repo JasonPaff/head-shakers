@@ -68,11 +68,6 @@ export class PlatformStatsFacade extends BaseFacade {
           },
         );
       },
-      {
-        includeResultSummary: (data) => ({
-          ...data,
-        }),
-      },
     );
   }
 }

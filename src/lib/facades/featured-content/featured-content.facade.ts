@@ -172,9 +172,6 @@ export class FeaturedContentFacade extends BaseFacade {
           },
         );
       },
-      {
-        includeResultSummary: (data) => ({ ...data }),
-      },
     );
   }
 
@@ -220,7 +217,6 @@ export class FeaturedContentFacade extends BaseFacade {
           },
         );
       },
-      { includeResultSummary: (data) => ({ ...data }) },
     );
   }
 
@@ -274,7 +270,6 @@ export class FeaturedContentFacade extends BaseFacade {
           },
         );
       },
-      { includeResultSummary: (data) => ({ ...data }) },
     );
   }
 
@@ -322,9 +317,6 @@ export class FeaturedContentFacade extends BaseFacade {
             },
           },
         );
-      },
-      {
-        includeResultSummary: (data) => ({ ...data }),
       },
     );
   }

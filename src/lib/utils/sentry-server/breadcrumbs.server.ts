@@ -4,6 +4,7 @@ import type { RevalidationResult } from '@/lib/services/cache-revalidation.servi
 
 import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS } from '@/lib/constants';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { includeFullResult } from '@/lib/utils/facade-helpers';
 
 import type {
   ActionBreadcrumbData,
@@ -500,8 +501,9 @@ export async function withFacadeBreadcrumbs<T>(
   try {
     const result = await operation();
 
-    // Success breadcrumb with optional result summary
-    const resultData = options?.includeResultSummary?.(result);
+    // Success breadcrumb with result summary (defaults to the full result)
+    const summarize = options?.includeResultSummary ?? includeFullResult;
+    const resultData = summarize(result);
     facadeBreadcrumb(successMessage, {
       facade,
       method,
