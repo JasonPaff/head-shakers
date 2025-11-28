@@ -14,20 +14,6 @@ import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { Skeleton } from '@/components/ui/skeleton';
 import { generateTestId } from '@/lib/test-ids';
 
-/**
- * Hero section for home page with orange accent color scheme
- *
- * Server-side component that displays:
- * - Animated background with gradient orbs and grid pattern
- * - Main heading and description
- * - CTA buttons with auth-aware rendering
- * - Platform statistics via async component
- * - Featured bobblehead showcase via async component
- * - Wave divider with light/dark mode support
- *
- * Light mode: white/cream background with orange accents
- * Dark mode: dark slate background with orange accents
- */
 export const HeroSection = () => {
   return (
     <section
@@ -46,7 +32,7 @@ export const HeroSection = () => {
       <div
         aria-hidden
         className={`pointer-events-none absolute inset-0
-          bg-[linear-gradient(to_right,#f9731620_1px,transparent_1px),linear-gradient(to_bottom,#f9731620_1px,transparent_1px)]
+         bg-[linear-gradient(to_right,#f9731620_1px,transparent_1px),linear-gradient(to_bottom,#f9731620_1px,transparent_1px)]
           bg-[size:24px_24px]
           dark:bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)]`}
       />
