@@ -2,24 +2,25 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-import { EarthIcon, GridIcon, SearchIcon, StarIcon, TrophyIcon } from 'lucide-react';
+import { FilterIcon, LayoutGridIcon, SearchIcon, StarIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
-import { AppHeaderNavMenuLink } from '@/components/layout/app-header/components/app-header-nav-menu-link';
+import { Button } from '@/components/ui/button';
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from '@/components/ui/navigation-menu';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export interface NavigationLink {
   icon: LucideIcon;
   isAdminRequired?: boolean;
   isAuthRequired?: boolean;
   items: Array<{
-    description: string;
     href: string;
     icon: LucideIcon;
     title: string;
@@ -29,30 +30,26 @@ export interface NavigationLink {
 
 const navigationLinks: Array<NavigationLink> = [
   {
-    icon: GridIcon,
+    icon: LayoutGridIcon,
     items: [
       {
-        description: 'Browse all public collections in the community',
         href: $path({ route: '/browse' }),
-        icon: EarthIcon,
+        icon: LayoutGridIcon,
         title: 'All Collections',
       },
       {
-        description: 'Curated collections and collector spotlights',
         href: $path({ route: '/browse/featured' }),
         icon: StarIcon,
         title: 'Featured',
       },
       {
-        description: 'Search for bobbleheads, collections, and collectors',
         href: $path({ route: '/browse/search' }),
         icon: SearchIcon,
         title: 'Search',
       },
       {
-        description: 'Browse by category - sports, entertainment, vintage and more',
         href: $path({ route: '/browse/categories' }),
-        icon: TrophyIcon,
+        icon: FilterIcon,
         title: 'Categories',
       },
     ],
@@ -62,37 +59,29 @@ const navigationLinks: Array<NavigationLink> = [
 
 export const AppHeaderNavMenu = () => {
   return (
-    <NavigationMenu className={'max-md:hidden'}>
-      <NavigationMenuList className={'gap-2'}>
-        {navigationLinks.map((link, index) => {
-          return (
-            <NavigationMenuItem key={index}>
-              <NavigationMenuTrigger>
-                <link.icon aria-hidden className={'mr-2 size-4'} />
-                {link.label}
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className={'grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]'}>
-                  {link.items.map((item, itemIndex) => (
-                    <AppHeaderNavMenuLink
-                      href={item.href}
-                      key={itemIndex}
-                      title={
-                        <div className={'flex items-center gap-2'}>
-                          <item.icon aria-hidden className={'size-4'} />
-                          {item.title}
-                        </div>
-                      }
-                    >
-                      {item.description}
-                    </AppHeaderNavMenuLink>
-                  ))}
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          );
-        })}
-      </NavigationMenuList>
-    </NavigationMenu>
+    <div className={'max-md:hidden'}>
+      {navigationLinks.map((link, index) => (
+        <DropdownMenu key={index}>
+          <DropdownMenuTrigger asChild>
+            <Button className={'gap-2'} variant={'ghost'}>
+              <link.icon className={'h-4 w-4'} />
+              {link.label}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align={'start'} className={'w-48'}>
+            <DropdownMenuLabel>Explore Collections</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {link.items.map((item, itemIndex) => (
+              <DropdownMenuItem asChild key={itemIndex}>
+                <Link className={'cursor-pointer'} href={item.href}>
+                  <item.icon className={'mr-2 h-4 w-4'} />
+                  {item.title}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ))}
+    </div>
   );
 };

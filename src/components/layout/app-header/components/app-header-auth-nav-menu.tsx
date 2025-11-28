@@ -13,8 +13,8 @@ import {
   StarIcon,
   UsersIcon,
 } from 'lucide-react';
-import Link from 'next/link';
 import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
@@ -44,6 +44,23 @@ interface NavMenu {
 }
 
 const navigationLinks: Array<NavMenu> = [
+  {
+    icon: PackageIcon,
+    items: [
+      {
+        href: $path({ route: '/dashboard/collection' }),
+        icon: LayoutDashboardIcon,
+        title: 'Dashboard',
+      },
+      {
+        href: $path({ route: '/bobbleheads/add' }),
+        icon: PackagePlusIcon,
+        title: 'Add Bobblehead',
+      },
+    ],
+    label: 'My Collection',
+    menuLabel: 'My Collection',
+  },
   {
     icon: SettingsIcon,
     isAdminRequired: true,
@@ -76,23 +93,6 @@ const navigationLinks: Array<NavMenu> = [
     ],
     label: 'Admin',
     menuLabel: 'Administration',
-  },
-  {
-    icon: PackageIcon,
-    items: [
-      {
-        href: $path({ route: '/dashboard/collection' }),
-        icon: LayoutDashboardIcon,
-        title: 'Dashboard',
-      },
-      {
-        href: $path({ route: '/bobbleheads/add' }),
-        icon: PackagePlusIcon,
-        title: 'Add Bobblehead',
-      },
-    ],
-    label: 'My Collection',
-    menuLabel: 'My Collection',
   },
 ];
 
