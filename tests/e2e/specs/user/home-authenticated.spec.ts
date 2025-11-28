@@ -64,7 +64,9 @@ test.describe('Home Page - Authenticated User', () => {
 
     // Verify section header within the featured collections section (not footer)
     await expect(
-      userFinder.layout('featured-collections-section').getByRole('heading', { name: /featured collections/i }),
+      userFinder
+        .layout('featured-collections-section')
+        .getByRole('heading', { name: /featured collections/i }),
     ).toBeVisible();
 
     // Collections should load (async component)
