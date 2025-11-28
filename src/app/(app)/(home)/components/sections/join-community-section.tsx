@@ -22,8 +22,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 export const JoinCommunitySection = () => {
   return (
     <section
-      className={`relative overflow-hidden bg-gradient-to-br from-slate-50 via-orange-50/30
-        to-amber-50/30 py-20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900`}
+      className={`relative overflow-hidden bg-gradient-to-br from-muted via-background
+        to-background py-20 dark:from-secondary dark:via-background dark:to-background`}
     >
       {/* Animated Background Elements */}
       <div
@@ -57,12 +57,12 @@ export const JoinCommunitySection = () => {
             className={`mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br
               from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30`}
           >
-            <UsersIcon aria-hidden className={'size-8 text-orange-600 dark:text-orange-400'} />
+            <UsersIcon aria-hidden className={'size-8 text-primary'} />
           </div>
-          <h2 className={'text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white'}>
+          <h2 className={'text-4xl font-bold tracking-tight text-foreground md:text-5xl'}>
             Join the Community
           </h2>
-          <p className={'mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400'}>
+          <p className={'mt-4 max-w-2xl text-lg text-muted-foreground'}>
             Connect with fellow collectors, share your finds, and discover new additions to your collection.
           </p>
         </div>
@@ -71,59 +71,53 @@ export const JoinCommunitySection = () => {
         <div className={'grid gap-6 md:grid-cols-3 md:gap-8'}>
           {/* Connect Card */}
           <div
-            className={`rounded-2xl border border-slate-200/50 bg-white p-6 text-center shadow-md
+            className={`rounded-2xl border border-border/50 bg-card p-6 text-center shadow-md
               transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
-              dark:border-slate-700/50 dark:bg-slate-800`}
+              dark:border-border/50 dark:bg-secondary`}
           >
             <div
               className={`mx-auto mb-4 flex size-16 items-center justify-center rounded-full
                 bg-gradient-to-br from-orange-100 to-amber-100
                 dark:from-orange-900/30 dark:to-amber-900/30`}
             >
-              <UsersIcon aria-hidden className={'size-8 text-orange-600 dark:text-orange-400'} />
+              <UsersIcon aria-hidden className={'size-8 text-primary'} />
             </div>
-            <h3 className={'mb-2 text-lg font-semibold text-slate-900 dark:text-white'}>Connect</h3>
-            <p className={'text-sm text-slate-600 dark:text-slate-400'}>
-              Follow other collectors and build your network
-            </p>
+            <h3 className={'mb-2 text-lg font-semibold text-foreground'}>Connect</h3>
+            <p className={'text-sm text-muted-foreground'}>Follow other collectors and build your network</p>
           </div>
 
           {/* Discover Card */}
           <div
-            className={`rounded-2xl border border-slate-200/50 bg-white p-6 text-center shadow-md
+            className={`rounded-2xl border border-border/50 bg-card p-6 text-center shadow-md
               transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
-              dark:border-slate-700/50 dark:bg-slate-800`}
+              dark:border-border/50 dark:bg-secondary`}
           >
             <div
               className={`mx-auto mb-4 flex size-16 items-center justify-center rounded-full
                 bg-gradient-to-br from-amber-100 to-yellow-100
                 dark:from-amber-900/30 dark:to-yellow-900/30`}
             >
-              <TrendingUpIcon aria-hidden className={'size-8 text-amber-600 dark:text-amber-400'} />
+              <TrendingUpIcon aria-hidden className={'size-8 text-warning'} />
             </div>
-            <h3 className={'mb-2 text-lg font-semibold text-slate-900 dark:text-white'}>Discover</h3>
-            <p className={'text-sm text-slate-600 dark:text-slate-400'}>
-              Find trending bobbleheads and rare collectibles
-            </p>
+            <h3 className={'mb-2 text-lg font-semibold text-foreground'}>Discover</h3>
+            <p className={'text-sm text-muted-foreground'}>Find trending bobbleheads and rare collectibles</p>
           </div>
 
           {/* Share Card */}
           <div
-            className={`rounded-2xl border border-slate-200/50 bg-white p-6 text-center shadow-md
+            className={`rounded-2xl border border-border/50 bg-card p-6 text-center shadow-md
               transition-all duration-300 hover:-translate-y-2 hover:shadow-xl
-              dark:border-slate-700/50 dark:bg-slate-800`}
+              dark:border-border/50 dark:bg-secondary`}
           >
             <div
               className={`mx-auto mb-4 flex size-16 items-center justify-center rounded-full
                 bg-gradient-to-br from-red-100 to-orange-100
                 dark:from-red-900/30 dark:to-orange-900/30`}
             >
-              <HeartIcon aria-hidden className={'size-8 text-red-600 dark:text-red-400'} />
+              <HeartIcon aria-hidden className={'size-8 text-trending'} />
             </div>
-            <h3 className={'mb-2 text-lg font-semibold text-slate-900 dark:text-white'}>Share</h3>
-            <p className={'text-sm text-slate-600 dark:text-slate-400'}>
-              Showcase your collection and get feedback
-            </p>
+            <h3 className={'mb-2 text-lg font-semibold text-foreground'}>Share</h3>
+            <p className={'text-sm text-muted-foreground'}>Showcase your collection and get feedback</p>
           </div>
         </div>
 
@@ -135,19 +129,17 @@ export const JoinCommunitySection = () => {
                 {/* Sign Up Push */}
                 <div
                   className={`mx-auto mb-6 inline-flex items-center gap-2 rounded-full border
-                    border-orange-300 bg-orange-100/80 px-4 py-2 backdrop-blur-sm
-                    dark:border-orange-500/30 dark:bg-orange-500/10`}
+                    border-primary/30 bg-accent/80 px-4 py-2 backdrop-blur-sm
+                    dark:border-primary/30 dark:bg-primary/10`}
                 >
-                  <SparklesIcon aria-hidden className={'size-4 text-orange-600 dark:text-orange-400'} />
-                  <span className={'text-sm font-medium text-orange-700 dark:text-orange-300'}>
-                    Create your free account today
-                  </span>
+                  <SparklesIcon aria-hidden className={'size-4 text-primary'} />
+                  <span className={'text-sm font-medium text-primary'}>Create your free account today</span>
                 </div>
                 <div className={'flex flex-wrap justify-center gap-4'}>
                   <Button
                     asChild
-                    className={`bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg
-                      font-semibold text-white shadow-lg shadow-orange-500/25
+                    className={`bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
+                      font-semibold text-primary-foreground shadow-lg shadow-primary/25
                       hover:from-orange-600 hover:to-amber-600`}
                     size={'lg'}
                   >
@@ -155,9 +147,9 @@ export const JoinCommunitySection = () => {
                   </Button>
                   <Button
                     asChild
-                    className={`border-orange-300 bg-white/80 px-8 text-lg text-slate-700
-                      backdrop-blur-sm hover:bg-orange-50 dark:border-slate-600
-                      dark:bg-slate-800/50 dark:text-white dark:hover:bg-slate-700/50`}
+                    className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground
+                      backdrop-blur-sm hover:bg-accent dark:border-border
+                      dark:bg-secondary/50 dark:hover:bg-secondary`}
                     size={'lg'}
                     variant={'outline'}
                   >
@@ -176,8 +168,8 @@ export const JoinCommunitySection = () => {
             <div className={'flex flex-wrap justify-center gap-4'}>
               <Button
                 asChild
-                className={`group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg
-                  font-semibold text-white shadow-lg shadow-orange-500/25
+                className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
+                  font-semibold text-primary-foreground shadow-lg shadow-primary/25
                   hover:from-orange-600 hover:to-amber-600`}
                 size={'lg'}
               >
@@ -191,9 +183,9 @@ export const JoinCommunitySection = () => {
               </Button>
               <Button
                 asChild
-                className={`border-orange-300 bg-white/80 px-8 text-lg text-slate-700
-                  backdrop-blur-sm hover:bg-orange-50 dark:border-slate-600
-                  dark:bg-slate-800/50 dark:text-white dark:hover:bg-slate-700/50`}
+                className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground
+                  backdrop-blur-sm hover:bg-accent dark:border-border
+                  dark:bg-secondary/50 dark:hover:bg-secondary`}
                 size={'lg'}
                 variant={'outline'}
               >

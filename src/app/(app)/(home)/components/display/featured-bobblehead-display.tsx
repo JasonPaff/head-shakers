@@ -42,9 +42,9 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
       {/* Main Feature Card */}
       <div className={'relative'}>
         <Link
-          className={`group relative block overflow-hidden rounded-3xl border border-orange-200/50
-            bg-gradient-to-br from-white/80 to-orange-50/50 p-2 shadow-2xl backdrop-blur-sm
-            dark:border-slate-700/50 dark:from-slate-800/80 dark:to-slate-900/80`}
+          className={`group relative block overflow-hidden rounded-3xl border border-primary/20
+            bg-gradient-to-br from-card/80 to-background/50 p-2 shadow-2xl backdrop-blur-sm
+            dark:border-border/50 dark:from-secondary/80 dark:to-background/80`}
           data-slot={'hero-featured-card'}
           data-testid={cardTestId}
           href={$path({
@@ -121,19 +121,19 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         <div
           aria-hidden
           className={`absolute top-8 -left-8 -rotate-12 transform animate-bounce rounded-2xl border
-            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
-            dark:border-slate-600/50 dark:bg-slate-800/90`}
+            border-primary/20 bg-card/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
+            dark:border-border/50 dark:bg-secondary/90`}
           data-slot={'hero-floating-card'}
           data-testid={topRatedCardTestId}
           style={{ animationDuration: '3s' }}
         >
           <div className={'flex items-center gap-3'}>
-            <div className={'rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 p-2'}>
-              <TrophyIcon aria-hidden className={'size-5 text-white'} />
+            <div className={'rounded-xl bg-gradient-to-br from-gradient-from to-gradient-to p-2'}>
+              <TrophyIcon aria-hidden className={'size-5 text-primary-foreground'} />
             </div>
             <div>
-              <div className={'text-sm font-semibold text-slate-900 dark:text-white'}>Top Rated</div>
-              <div className={'text-xs text-slate-500 dark:text-slate-400'}>This Week</div>
+              <div className={'text-sm font-semibold text-foreground'}>Top Rated</div>
+              <div className={'text-xs text-muted-foreground'}>This Week</div>
             </div>
           </div>
         </div>
@@ -142,19 +142,19 @@ export const FeaturedBobbleheadDisplay = ({ bobblehead, testId }: FeaturedBobble
         <div
           aria-hidden
           className={`absolute -right-4 bottom-20 rotate-6 transform animate-bounce rounded-2xl border
-            border-orange-200/50 bg-white/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
-            dark:border-slate-600/50 dark:bg-slate-800/90`}
+            border-primary/20 bg-card/90 p-3 shadow-xl backdrop-blur-sm motion-reduce:animate-none
+            dark:border-border/50 dark:bg-secondary/90`}
           data-slot={'hero-floating-card'}
           data-testid={valueGrowthCardTestId}
           style={{ animationDelay: '1s', animationDuration: '4s' }}
         >
           <div className={'flex items-center gap-3'}>
-            <div className={'rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 p-2'}>
-              <TrendingUpIcon aria-hidden className={'size-5 text-white'} />
+            <div className={'rounded-xl bg-gradient-to-br from-success to-new p-2'}>
+              <TrendingUpIcon aria-hidden className={'size-5 text-success-foreground'} />
             </div>
             <div>
-              <div className={'text-sm font-semibold text-slate-900 dark:text-white'}>+23%</div>
-              <div className={'text-xs text-slate-500 dark:text-slate-400'}>Value Growth</div>
+              <div className={'text-sm font-semibold text-foreground'}>+23%</div>
+              <div className={'text-xs text-muted-foreground'}>Value Growth</div>
             </div>
           </div>
         </div>

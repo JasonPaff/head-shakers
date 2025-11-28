@@ -28,21 +28,21 @@ const badgeVariants = cva(
           'dark:bg-destructive/60 dark:focus-visible:ring-destructive/40 [a&]:hover:bg-destructive/90',
         ],
         editor_pick: [
-          'border-transparent bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg',
+          'border-transparent bg-gradient-to-r from-warning to-yellow-500 text-warning-foreground shadow-lg',
           '[a&]:hover:shadow-xl',
         ],
         new_badge: [
-          'border-transparent bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-lg',
+          'border-transparent bg-gradient-to-r from-success to-new text-new-foreground shadow-lg',
           '[a&]:hover:shadow-xl',
         ],
         outline: 'text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground',
         popular: [
-          'border-transparent bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg',
+          'border-transparent bg-gradient-to-r from-popular to-pink-500 text-popular-foreground shadow-lg',
           '[a&]:hover:shadow-xl',
         ],
         secondary: 'border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90',
         trending: [
-          'border-transparent bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg',
+          'border-transparent bg-gradient-to-r from-gradient-from to-trending text-trending-foreground shadow-lg',
           '[a&]:hover:shadow-xl',
         ],
       },

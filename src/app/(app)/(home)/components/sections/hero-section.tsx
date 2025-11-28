@@ -79,7 +79,7 @@ export const HeroSection = () => {
             {/* Main Heading */}
             <h1
               className={`text-5xl leading-tight font-extrabold tracking-tight
-                text-slate-900 md:text-6xl lg:text-7xl dark:text-white`}
+                text-foreground md:text-6xl lg:text-7xl`}
             >
               Collect, Share, and{' '}
               <span
@@ -93,7 +93,7 @@ export const HeroSection = () => {
             </h1>
 
             {/* Description */}
-            <p className={'max-w-xl text-lg text-slate-600 md:text-xl dark:text-slate-300'}>
+            <p className={'max-w-xl text-lg text-muted-foreground md:text-xl'}>
               Build your digital bobblehead collection, connect with other collectors, and discover rare finds
               from around the world.
             </p>
@@ -104,8 +104,8 @@ export const HeroSection = () => {
                 fallback={
                   <Button
                     asChild
-                    className={`group bg-gradient-to-r from-orange-500 to-amber-500 px-8
-                      text-lg font-semibold text-white shadow-lg shadow-orange-500/25
+                    className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8
+                      text-lg font-semibold text-primary-foreground shadow-lg shadow-primary/25
                       hover:from-orange-600 hover:to-amber-600`}
                     size={'lg'}
                   >
@@ -116,8 +116,8 @@ export const HeroSection = () => {
               >
                 <Button
                   asChild
-                  className={`group bg-gradient-to-r from-orange-500 to-amber-500 px-8 text-lg
-                    font-semibold text-white shadow-lg shadow-orange-500/25
+                  className={`group bg-gradient-to-r from-gradient-from to-gradient-to px-8 text-lg
+                    font-semibold text-primary-foreground shadow-lg shadow-primary/25
                     hover:from-orange-600 hover:to-amber-600`}
                   size={'lg'}
                 >
@@ -132,9 +132,9 @@ export const HeroSection = () => {
 
               <Button
                 asChild
-                className={`border-orange-300 bg-white/80 px-8 text-lg text-slate-700
-                  backdrop-blur-sm hover:bg-orange-50 dark:border-slate-600
-                  dark:bg-slate-800/50 dark:text-white dark:hover:bg-slate-700/50`}
+                className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground
+                  backdrop-blur-sm hover:bg-accent dark:border-border
+                  dark:bg-secondary/50 dark:hover:bg-secondary`}
                 size={'lg'}
                 variant={'outline'}
               >
@@ -146,9 +146,9 @@ export const HeroSection = () => {
 
               <Button
                 asChild
-                className={`border-orange-300 bg-white/80 px-8 text-lg text-slate-700
-                  backdrop-blur-sm hover:bg-orange-50 dark:border-slate-600
-                  dark:bg-slate-800/50 dark:text-white dark:hover:bg-slate-700/50`}
+                className={`border-primary/30 bg-card/80 px-8 text-lg text-foreground
+                  backdrop-blur-sm hover:bg-accent dark:border-border
+                  dark:bg-secondary/50 dark:hover:bg-secondary`}
                 size={'lg'}
                 variant={'outline'}
               >
@@ -177,9 +177,9 @@ export const HeroSection = () => {
       <div className={'absolute right-0 bottom-0 left-0'}>
         <svg className={'w-full'} fill={'none'} viewBox={'0 0 1440 120'} xmlns={'http://www.w3.org/2000/svg'}>
           <path
-            className={'fill-white dark:fill-slate-950'}
-            d={`M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960 
-              60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120 
+            className={'fill-card dark:fill-background'}
+            d={`M0 120L60 105C120 90 240 60 360 45C480 30 600 30 720 37.5C840 45 960
+              60 1080 67.5C1200 75 1320 75 1380 75L1440 75V120H1380C1320 120 1200 120
               1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z`}
           />
         </svg>

@@ -12,7 +12,7 @@ import { generateTestId } from '@/lib/test-ids';
 export const FeaturedCollectionsSection = () => {
   return (
     <section
-      className={'bg-white py-20 dark:bg-slate-950'}
+      className={'bg-card py-20 dark:bg-background'}
       data-testid={generateTestId('layout', 'featured-collections-section')}
     >
       <div className={'container mx-auto px-6'}>
@@ -21,12 +21,12 @@ export const FeaturedCollectionsSection = () => {
             className={`mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br
                 from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30`}
           >
-            <LayersIcon aria-hidden className={'size-8 text-orange-600 dark:text-orange-400'} />
+            <LayersIcon aria-hidden className={'size-8 text-primary'} />
           </div>
-          <h2 className={'text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white'}>
+          <h2 className={'text-4xl font-bold tracking-tight text-foreground md:text-5xl'}>
             Featured Collections
           </h2>
-          <p className={'mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400'}>
+          <p className={'mt-4 max-w-2xl text-lg text-muted-foreground'}>
             Explore curated collections from our most passionate collectors
           </p>
         </div>
@@ -41,8 +41,8 @@ export const FeaturedCollectionsSection = () => {
         <div className={'mt-12 text-center'}>
           <Button
             asChild
-            className={`group border-orange-500/30 text-orange-600 hover:bg-orange-50
-                hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/50`}
+            className={`group border-primary/30 text-primary hover:bg-accent
+                hover:text-primary dark:hover:bg-secondary`}
             size={'lg'}
             variant={'outline'}
           >

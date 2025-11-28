@@ -14,7 +14,7 @@ export const TrendingBobbleheadsSection = () => {
   return (
     <section
       className={
-        'bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/30 py-20 dark:from-slate-900 dark:via-slate-900 dark:to-slate-900'
+        'bg-gradient-to-br from-muted via-background to-background py-20 dark:from-secondary dark:via-background dark:to-background'
       }
       data-slot={'trending-bobbleheads-section'}
       data-testid={generateTestId('layout', 'trending-bobbleheads-section')}
@@ -27,12 +27,10 @@ export const TrendingBobbleheadsSection = () => {
               'mb-4 flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-red-100 to-orange-100 dark:from-red-900/30 dark:to-orange-900/30'
             }
           >
-            <FlameIcon aria-hidden className={'size-8 text-red-600 dark:text-red-400'} />
+            <FlameIcon aria-hidden className={'size-8 text-trending'} />
           </div>
-          <h2 className={'text-4xl font-bold tracking-tight text-slate-900 md:text-5xl dark:text-white'}>
-            Trending Now
-          </h2>
-          <p className={'mt-4 max-w-2xl text-lg text-slate-600 dark:text-slate-400'}>
+          <h2 className={'text-4xl font-bold tracking-tight text-foreground md:text-5xl'}>Trending Now</h2>
+          <p className={'mt-4 max-w-2xl text-lg text-muted-foreground'}>
             The most popular bobbleheads this week from collectors worldwide
           </p>
         </div>
@@ -49,7 +47,7 @@ export const TrendingBobbleheadsSection = () => {
           <Button
             asChild
             className={
-              'group bg-gradient-to-r from-orange-500 to-red-500 px-8 text-lg font-semibold shadow-lg shadow-orange-500/25 hover:from-orange-600 hover:to-red-600'
+              'group bg-gradient-to-r from-gradient-from to-trending px-8 text-lg font-semibold text-primary-foreground shadow-lg shadow-primary/25 hover:from-orange-600 hover:to-red-600'
             }
             size={'lg'}
           >

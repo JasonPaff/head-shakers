@@ -85,9 +85,9 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
   return (
     <Link
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-slate-200/50 bg-white shadow-md',
+        'group relative overflow-hidden rounded-2xl border border-border/50 bg-card shadow-md',
         'transition-all duration-300 hover:-translate-y-2 hover:shadow-xl',
-        'dark:border-slate-700/50 dark:bg-slate-800',
+        'dark:border-border/50 dark:bg-secondary',
       )}
       data-slot={'trending-bobblehead-card'}
       data-testid={cardTestId}
@@ -99,7 +99,7 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       {/* Image Section */}
       <div
         className={
-          'relative aspect-square overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800'
+          'relative aspect-square overflow-hidden bg-gradient-to-br from-muted to-secondary dark:from-secondary dark:to-muted'
         }
         data-slot={'trending-bobblehead-image-container'}
       >
@@ -160,13 +160,13 @@ const TrendingBobbleheadCard = ({ bobblehead, testId }: TrendingBobbleheadCardPr
       {/* Footer Section */}
       <div className={'p-3'} data-slot={'trending-bobblehead-footer'}>
         <h3
-          className={'line-clamp-1 text-sm font-semibold text-slate-900 dark:text-white'}
+          className={'line-clamp-1 text-sm font-semibold text-foreground'}
           data-slot={'trending-bobblehead-name'}
         >
           {bobblehead.characterName}
         </h3>
         <div
-          className={'mt-1 flex items-center justify-between text-xs text-slate-500'}
+          className={'mt-1 flex items-center justify-between text-xs text-muted-foreground'}
           data-slot={'trending-bobblehead-meta'}
         >
           <span data-slot={'trending-bobblehead-category'}>{bobblehead.category}</span>

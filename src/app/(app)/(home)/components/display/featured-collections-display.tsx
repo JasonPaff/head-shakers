@@ -92,9 +92,9 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
   return (
     <Link
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg',
+        'group relative overflow-hidden rounded-2xl border border-border bg-card shadow-lg',
         'transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl',
-        'dark:border-slate-800 dark:bg-slate-900',
+        'dark:border-border dark:bg-card',
         className,
       )}
       data-slot={'featured-collection-card'}
@@ -153,7 +153,7 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
           <div className={'absolute top-4 right-4'} data-slot={'featured-collection-trending-badge'}>
             <Badge
               className={
-                'border-transparent bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg'
+                'border-transparent bg-gradient-to-r from-gradient-from to-trending text-trending-foreground shadow-lg'
               }
             >
               <FlameIcon aria-hidden className={'size-3'} />
@@ -191,36 +191,34 @@ const FeaturedCollectionCard = ({ className, collection, testId }: FeaturedColle
           <div className={'flex items-center gap-3'}>
             <Image
               alt={collection.ownerDisplayName}
-              className={'size-9 rounded-full object-cover ring-2 ring-orange-500/20'}
+              className={'size-9 rounded-full object-cover ring-2 ring-primary/20'}
               height={36}
               src={avatarUrl}
               width={36}
             />
             <div>
-              <div className={'text-sm font-medium text-slate-900 dark:text-white'}>
-                @{collection.ownerDisplayName}
-              </div>
-              <div className={'text-xs text-slate-500'}>{collection.totalItems || 0} items</div>
+              <div className={'text-sm font-medium text-foreground'}>@{collection.ownerDisplayName}</div>
+              <div className={'text-xs text-muted-foreground'}>{collection.totalItems || 0} items</div>
             </div>
           </div>
           <div className={'text-right'}>
-            <div className={'text-sm font-semibold text-orange-600 dark:text-orange-400'}>
+            <div className={'text-sm font-semibold text-primary'}>
               ${(collection.totalValue || 0).toLocaleString()}
             </div>
-            <div className={'text-xs text-slate-500'}>Est. Value</div>
+            <div className={'text-xs text-muted-foreground'}>Est. Value</div>
           </div>
         </div>
 
         {/* Stats Row */}
         <div
           className={cn(
-            'mt-4 flex items-center gap-4 border-t border-slate-100 pt-4',
-            'text-sm text-slate-500 dark:border-slate-800',
+            'mt-4 flex items-center gap-4 border-t border-border pt-4',
+            'text-sm text-muted-foreground',
           )}
           data-slot={'featured-collection-stats'}
         >
           <span className={'flex items-center gap-1'}>
-            <HeartIcon aria-hidden className={'size-4 text-red-400'} />
+            <HeartIcon aria-hidden className={'size-4 text-trending'} />
             {collection.likes.toLocaleString()}
           </span>
           <span className={'flex items-center gap-1'}>
