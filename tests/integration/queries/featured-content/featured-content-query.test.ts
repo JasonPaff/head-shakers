@@ -400,7 +400,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.imageUrl).toBe('https://example.com/featured.jpg'); // Uses featuredContent.imageUrl
       expect(featured.ownerDisplayName).toBe('owner');
       expect(featured.totalItems).toBe(0); // Default total items
-      expect(featured.totalValue).toBe('0.00'); // Default total value (decimal returned as string)
+      expect(featured.totalValue).toBe('0'); // Default total value (decimal returned as string)
       expect(featured.likes).toBe(0); // Default like count
       expect(featured.comments).toBe(0); // Default comment count
       expect(featured.viewCount).toBe(0);
@@ -757,7 +757,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.likes).toBe(0); // Default like count
       expect(featured.comments).toBe(0); // Default comment count
       expect(featured.totalItems).toBe(0); // Default total items
-      expect(featured.totalValue).toBe('0.00'); // Default total value (decimal returned as string)
+      expect(featured.totalValue).toBe('0'); // Default total value (decimal returned as string)
     });
   });
 });

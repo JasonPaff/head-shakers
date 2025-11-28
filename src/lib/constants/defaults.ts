@@ -23,7 +23,6 @@ export const DEFAULTS = {
     COMMENT_COUNT: 0,
     IS_PUBLIC: true,
     LIKE_COUNT: 0,
-    TOTAL_VALUE: '0.00',
   },
   COMMENT: {
     LIKE_COUNT: 0,

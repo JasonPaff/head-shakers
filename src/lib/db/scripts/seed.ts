@@ -163,49 +163,41 @@ const sampleCollections = [
     description: 'My collection of Hall of Fame baseball players bobbleheads.',
     isPublic: true,
     name: 'MLB Hall of Fame',
-    totalValue: '0.00',
   },
   {
     description: 'Complete collection of Star Wars character bobbleheads.',
     isPublic: true,
     name: 'Star Wars Universe',
-    totalValue: '0.00',
   },
   {
     description: 'Superhero bobbleheads from the Marvel universe.',
     isPublic: true,
     name: 'Marvel Heroes',
-    totalValue: '0.00',
   },
   {
     description: 'Famous NFL quarterbacks throughout history.',
     isPublic: true,
     name: 'NFL Quarterbacks',
-    totalValue: '0.00',
   },
   {
     description: 'Rare and vintage bobbleheads from the 1960s-1980s.',
     isPublic: false,
     name: 'Vintage Collection',
-    totalValue: '0.00',
   },
   {
     description: 'Iconic movie characters in bobblehead form.',
     isPublic: true,
     name: 'Movie Characters',
-    totalValue: '0.00',
   },
   {
     description: 'Basketball legends and current superstars.',
     isPublic: true,
     name: 'NBA Legends',
-    totalValue: '0.00',
   },
   {
     description: 'Classic and modern Disney character bobbleheads.',
     isPublic: true,
     name: 'Disney Characters',
-    totalValue: '0.00',
   },
 ];
 
@@ -685,6 +677,5 @@ async function seedUsers() {
 
   return allUsers;
 }
-
 
 void main();

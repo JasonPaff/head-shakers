@@ -31,7 +31,6 @@ export const SCHEMA_LIMITS = {
     COVER_IMAGE_URL: { MAX: 500 },
     DESCRIPTION: { MAX: 500 },
     NAME: { MAX: 50, MIN: 1 },
-    TOTAL_VALUE: { PRECISION: 15, SCALE: 2 },
   },
   COMMENT: {
     CONTENT: { MAX: 5000, MIN: 1 },

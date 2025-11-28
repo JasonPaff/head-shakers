@@ -414,7 +414,12 @@ export class FeaturedContentQuery extends BaseQuery {
           WHERE ${bobbleheads.collectionId} = ${collections.id}
           AND ${bobbleheads.deletedAt} IS NULL
         )`.as('total_items'),
-        totalValue: collections.totalValue,
+        totalValue: sql<null | string>`(
+          SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+            AND ${bobbleheads.deletedAt} IS NULL
+        )`,
         viewCount: featuredContent.viewCount,
       })
       .from(featuredContent)

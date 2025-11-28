@@ -470,7 +470,12 @@ export class CollectionsQuery extends BaseQuery {
             WHERE ${bobbleheads.collectionId} = ${collections.id}
             AND ${bobbleheads.deletedAt} IS NULL
           )`.as('total_items'),
-          totalValue: collections.totalValue,
+          totalValue: sql<number>`(
+            SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
+            FROM ${bobbleheads}
+            WHERE ${bobbleheads.collectionId} = ${collections.id}
+              AND ${bobbleheads.deletedAt} IS NULL
+          )`,
           updatedAt: collections.updatedAt,
           userId: collections.userId,
           username: users.username,
@@ -558,7 +563,12 @@ export class CollectionsQuery extends BaseQuery {
           WHERE ${bobbleheads.collectionId} = ${collections.id}
           AND ${bobbleheads.deletedAt} IS NULL
         )`.as('total_items'),
-        totalValue: collections.totalValue,
+        totalValue: sql<number>`(
+          SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+            AND ${bobbleheads.deletedAt} IS NULL
+        )`,
         updatedAt: collections.updatedAt,
         userId: collections.userId,
         username: users.username,
@@ -704,7 +714,12 @@ export class CollectionsQuery extends BaseQuery {
           WHERE ${bobbleheads.collectionId} = ${collections.id}
           AND ${bobbleheads.deletedAt} IS NULL
         )`.as('total_items'),
-        totalValue: collections.totalValue,
+        totalValue: sql<number>`(
+          SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+            AND ${bobbleheads.deletedAt} IS NULL
+        )`,
         updatedAt: collections.updatedAt,
         userId: collections.userId,
         username: users.username,
