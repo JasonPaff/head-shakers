@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import { FooterContainer } from '@/components/layout/app-footer/components/footer-container';
 import { FooterFeaturedSection } from '@/components/layout/app-footer/components/footer-featured-section';
+import { FooterFeaturedSectionSkeleton } from '@/components/layout/app-footer/components/footer-featured-section-skeleton';
 import { FooterLegal } from '@/components/layout/app-footer/components/footer-legal';
 import { FooterNavLink } from '@/components/layout/app-footer/components/footer-nav-link';
 import { FooterNavSection } from '@/components/layout/app-footer/components/footer-nav-section';
@@ -87,7 +88,7 @@ export const AppFooter = () => {
 
             {/* Featured Collections Section */}
             <ErrorBoundary name={'footer-featured-section'}>
-              <Suspense fallback={null}>
+              <Suspense fallback={<FooterFeaturedSectionSkeleton />}>
                 <FooterFeaturedSection />
               </Suspense>
             </ErrorBoundary>

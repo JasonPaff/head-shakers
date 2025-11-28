@@ -4,32 +4,38 @@ import { $path } from 'next-typesafe-url';
 import { FooterNavLink } from '@/components/layout/app-footer/components/footer-nav-link';
 import { FooterNavSection } from '@/components/layout/app-footer/components/footer-nav-section';
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
+import { generateTestId } from '@/lib/test-ids';
 
 /**
  * Server component that fetches and displays featured collections in the footer
  * Returns null if no featured collections are available
  * Caching: Uses CacheService.featured.content() via FeaturedContentFacade.getFooterFeaturedContentAsync()
+ * with CACHE_KEYS.FEATURED.CONTENT_TYPES.FOOTER key
  */
 export const FooterFeaturedSection = async () => {
   const featuredContent = await FeaturedContentFacade.getFooterFeaturedContentAsync();
+  if (featuredContent.length === 0) return null;
 
-  if (featuredContent.length === 0) {
-    return null;
-  }
+  // Filter out collections without slugs before mapping
+  const validCollections = featuredContent.filter((collection) => collection.collectionSlug);
 
   return (
-    <FooterNavSection heading={'Featured Collections'}>
-      {featuredContent.map((collection) => {
-        if (!collection.collectionSlug) return null;
+    <FooterNavSection
+      heading={'Featured Collections'}
+      testId={generateTestId('layout', 'app-footer', 'featured-section')}
+    >
+      {validCollections.map((collection) => {
+        const label = collection.title || collection.collectionName || 'Untitled Collection';
+        const collectionSlug = collection.collectionSlug!;
 
         return (
           <FooterNavLink
             href={$path({
               route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug: collection.collectionSlug },
+              routeParams: { collectionSlug },
             })}
             key={collection.id}
-            label={collection.title || collection.collectionName || 'Untitled Collection'}
+            label={label}
           />
         );
       })}

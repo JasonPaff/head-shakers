@@ -25,6 +25,9 @@ export class NewsletterQuery extends BaseQuery {
    *
    * Note: userId can be undefined for anonymous signups. The null to undefined conversion
    * ensures compatibility with the database schema which uses varchar (allowing undefined but not null).
+   *
+   * Email normalization: Email addresses are normalized by converting to lowercase and trimming
+   * whitespace to ensure case-insensitive matching and prevent duplicates from spacing differences.
    */
   static async createSignupAsync(
     email: string,
@@ -32,11 +35,12 @@ export class NewsletterQuery extends BaseQuery {
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
+    const normalizedEmail = this.normalizeEmail(email);
 
     const result = await dbInstance
       .insert(newsletterSignups)
       .values({
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         userId,
       })
       .onConflictDoNothing()
@@ -44,17 +48,18 @@ export class NewsletterQuery extends BaseQuery {
 
     return result?.[0] || null;
   }
-
   /**
    * Check if email exists (regardless of subscription status)
    */
   static async emailExistsAsync(email: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
+    const normalizedEmail = this.normalizeEmail(email);
+
     const result = await dbInstance
       .select({ id: newsletterSignups.id })
       .from(newsletterSignups)
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
+      .where(eq(newsletterSignups.email, normalizedEmail))
       .limit(1);
 
     return result.length > 0;
@@ -70,10 +75,12 @@ export class NewsletterQuery extends BaseQuery {
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
+    const normalizedEmail = this.normalizeEmail(email);
+
     const result = await dbInstance
       .select()
       .from(newsletterSignups)
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
+      .where(eq(newsletterSignups.email, normalizedEmail))
       .limit(1);
 
     return result?.[0] || null;
@@ -88,10 +95,12 @@ export class NewsletterQuery extends BaseQuery {
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
+    const normalizedEmail = this.normalizeEmail(email);
+
     const result = await dbInstance
       .select()
       .from(newsletterSignups)
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
+      .where(eq(newsletterSignups.email, normalizedEmail))
       .limit(1);
 
     const signup = result?.[0];
@@ -104,7 +113,7 @@ export class NewsletterQuery extends BaseQuery {
 
   /**
    * Check if an email is actively subscribed (not unsubscribed)
-   * Combined query that checks existence and subscription status in one operation
+   * Uses single query via getActiveSubscriberAsync to efficiently check both existence and subscription status
    */
   static async isActiveSubscriberAsync(email: string, context: QueryContext): Promise<boolean> {
     const signup = await this.getActiveSubscriberAsync(email, context);
@@ -114,6 +123,11 @@ export class NewsletterQuery extends BaseQuery {
   /**
    * Resubscribe an existing email (clear unsubscribedAt)
    * Returns null if the email doesn't exist in the system
+   *
+   * Note on subscribedAt behavior: We intentionally update subscribedAt to the current timestamp
+   * when a user resubscribes. This decision prioritizes the most recent subscription intent over
+   * preserving historical data. If original subscription date tracking is needed in the future,
+   * consider adding a separate firstSubscribedAt field to the schema.
    */
   static async resubscribeAsync(
     email: string,
@@ -125,6 +139,8 @@ export class NewsletterQuery extends BaseQuery {
     const existing = await this.findByEmailAsync(email, context);
     if (!existing) return null;
 
+    const normalizedEmail = this.normalizeEmail(email);
+
     const result = await dbInstance
       .update(newsletterSignups)
       .set({
@@ -132,7 +148,7 @@ export class NewsletterQuery extends BaseQuery {
         unsubscribedAt: null,
         updatedAt: new Date(),
       })
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
+      .where(eq(newsletterSignups.email, normalizedEmail))
       .returning();
 
     return result?.[0] || null;
@@ -148,13 +164,15 @@ export class NewsletterQuery extends BaseQuery {
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
+    const normalizedEmail = this.normalizeEmail(email);
+
     const result = await dbInstance
       .update(newsletterSignups)
       .set({
         unsubscribedAt: new Date(),
         updatedAt: new Date(),
       })
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
+      .where(eq(newsletterSignups.email, normalizedEmail))
       .returning();
 
     return result?.[0] || null;
@@ -162,7 +180,7 @@ export class NewsletterQuery extends BaseQuery {
 
   /**
    * Update user ID for an existing signup (for linking anonymous signup to user)
-   * Idempotent: Only updates if userId is currently undefined (prevents overwriting existing userId)
+   * Idempotent: Only updates if userId is currently null (prevents overwriting existing userId)
    * Returns null if email doesn't exist or userId is already set
    */
   static async updateUserIdAsync(
@@ -178,13 +196,15 @@ export class NewsletterQuery extends BaseQuery {
       return null;
     }
 
+    const normalizedEmail = this.normalizeEmail(email);
+
     const result = await dbInstance
       .update(newsletterSignups)
       .set({
         updatedAt: new Date(),
         userId,
       })
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
+      .where(eq(newsletterSignups.email, normalizedEmail))
       .returning();
 
     return result?.[0] || null;

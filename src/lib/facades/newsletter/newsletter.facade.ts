@@ -158,45 +158,31 @@ export class NewsletterFacade {
         });
 
         // Send welcome email asynchronously for new subscribers
-        // Wrapped in try-catch to ensure email failures don't affect subscription
-        try {
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {
-              email: normalizedEmail.substring(0, 3) + '***',
-              operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
-            },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Sending newsletter welcome email',
-          });
+        // Fire-and-forget pattern with error handling in .catch()
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            email: normalizedEmail.substring(0, 3) + '***',
+            operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: 'Sending newsletter welcome email',
+        });
 
-          // Fire and forget - don't await to avoid blocking subscription
-          void ResendService.sendNewsletterWelcomeAsync(normalizedEmail).catch((emailError) => {
-            Sentry.captureException(emailError, {
-              extra: {
-                email: normalizedEmail.substring(0, 3) + '***',
-                signupId: newSignup.id,
-              },
-              level: 'warning',
-              tags: {
-                component: facadeName,
-                operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
-              },
-            });
-          });
-        } catch (emailError) {
-          // Log but don't throw - subscription should succeed even if email fails
+        // Fire and forget - don't await to avoid blocking subscription
+        void ResendService.sendNewsletterWelcomeAsync(normalizedEmail).catch((emailError) => {
           Sentry.captureException(emailError, {
             extra: {
               email: normalizedEmail.substring(0, 3) + '***',
               signupId: newSignup.id,
             },
+            level: 'warning',
             tags: {
               component: facadeName,
               operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
             },
           });
-        }
+        });
 
         return {
           isAlreadySubscribed: false,

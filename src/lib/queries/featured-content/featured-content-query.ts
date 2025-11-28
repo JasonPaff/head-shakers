@@ -449,6 +449,11 @@ export class FeaturedContentQuery extends BaseQuery {
    * permission filtering is required as featured content is curated by admins and intended
    * for public display. The query filters by isActive status and date range to ensure only
    * currently active featured content is returned.
+   *
+   * Note on NULL handling: collectionName and collectionSlug can be null when:
+   * - The featured content references a non-collection entity (user or bobblehead)
+   * - The collection has been soft-deleted (deletedAt is not null)
+   * In these cases, the title field from featured_content provides fallback display text.
    */
   static async getFooterFeaturedContentAsync(
     context: QueryContext,

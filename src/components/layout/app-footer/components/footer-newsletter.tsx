@@ -2,14 +2,17 @@
 
 import type { FormEvent } from 'react';
 
+import * as Sentry from '@sentry/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailIcon } from 'lucide-react';
+import { useCallback } from 'react';
 
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
 
@@ -46,6 +49,15 @@ export const FooterNewsletter = withFocusManagement(() => {
       component: 'footer-newsletter',
     },
     onSuccess: () => {
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          action: 'newsletter-subscribe',
+          component: 'footer-newsletter',
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Newsletter subscription successful',
+      });
       form.reset();
     },
     toastMessages: {
@@ -55,11 +67,26 @@ export const FooterNewsletter = withFocusManagement(() => {
     },
   });
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    void form.handleSubmit();
-  };
+  const handleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.USER_INTERACTION,
+        data: {
+          action: 'form-submit',
+          component: 'footer-newsletter',
+          formName: 'newsletter-signup',
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Newsletter form submitted',
+      });
+
+      void form.handleSubmit();
+    },
+    [form],
+  );
 
   const _submitButtonText = isExecuting ? 'Subscribing...' : 'Subscribe';
 
