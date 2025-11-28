@@ -17,7 +17,6 @@ import type { CustomFields } from '@/lib/validations/bobbleheads.validation';
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { SLUG_MAX_LENGTH } from '@/lib/constants/slug';
-import { collections } from '@/lib/db/schema/collections.schema';
 import { tags } from '@/lib/db/schema/tags.schema';
 import { users } from '@/lib/db/schema/users.schema';
 
@@ -30,9 +29,6 @@ export const bobbleheads = pgTable(
     }),
     category: varchar('category', { length: SCHEMA_LIMITS.BOBBLEHEAD.CATEGORY.MAX }),
     characterName: varchar('character_name', { length: SCHEMA_LIMITS.BOBBLEHEAD.CHARACTER_NAME.MAX }),
-    collectionId: uuid('collection_id')
-      .references(() => collections.id, { onDelete: 'cascade' })
-      .notNull(),
     commentCount: integer('comment_count').default(DEFAULTS.BOBBLEHEAD.COMMENT_COUNT).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     currentCondition: varchar('current_condition', { length: SCHEMA_LIMITS.BOBBLEHEAD.CURRENT_CONDITION.MAX })
@@ -96,7 +92,6 @@ export const bobbleheads = pgTable(
 
     // single column indexes
     index('bobbleheads_category_idx').on(table.category),
-    index('bobbleheads_collection_id_idx').on(table.collectionId),
     index('bobbleheads_created_at_idx').on(table.createdAt),
     index('bobbleheads_deleted_at_idx').on(table.deletedAt),
     index('bobbleheads_is_featured_idx').on(table.isFeatured),
@@ -106,8 +101,6 @@ export const bobbleheads = pgTable(
     index('bobbleheads_user_id_idx').on(table.userId),
 
     // composite indexes
-    index('bobbleheads_category_browse_idx').on(table.category, table.deletedAt, table.collectionId),
-    index('bobbleheads_collection_public_idx').on(table.collectionId, table.isPublic),
     index('bobbleheads_public_featured_idx').on(table.isPublic, table.isFeatured),
     index('bobbleheads_user_created_idx').on(table.userId, table.createdAt),
     index('bobbleheads_user_public_idx').on(table.userId, table.isPublic),
@@ -124,15 +117,6 @@ export const bobbleheads = pgTable(
       table.likeCount,
       table.viewCount,
       table.commentCount,
-    ),
-    // collection view optimization
-    index('bobbleheads_collection_covering_idx').on(
-      table.collectionId,
-      table.isPublic,
-      table.id,
-      table.name,
-      table.createdAt,
-      table.deletedAt,
     ),
     // public browse optimization - for homepage/explore views
     index('bobbleheads_public_browse_covering_idx').on(
