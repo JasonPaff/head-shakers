@@ -9,7 +9,6 @@ export const mockCollection = {
   isPublic: true,
   name: 'Sports Collection',
   slug: 'sports-collection',
-  totalItems: 5,
   updatedAt: new Date('2024-01-15'),
   userId: 'test-user-id',
 };
@@ -29,7 +28,6 @@ export const mockEmptyCollection = {
   id: 'collection-empty',
   name: 'Empty Collection',
   slug: 'empty-collection',
-  totalItems: 0,
 };
 
 /**

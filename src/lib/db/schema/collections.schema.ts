@@ -29,7 +29,6 @@ export const collections = pgTable(
     likeCount: integer('like_count').default(DEFAULTS.COLLECTION.LIKE_COUNT).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.COLLECTION.NAME.MAX }).notNull(),
     slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull(),
-    totalItems: integer('total_items').default(DEFAULTS.COLLECTION.TOTAL_ITEMS).notNull(),
     totalValue: decimal('total_value', {
       precision: SCHEMA_LIMITS.COLLECTION.TOTAL_VALUE.PRECISION,
       scale: SCHEMA_LIMITS.COLLECTION.TOTAL_VALUE.SCALE,
@@ -64,7 +63,6 @@ export const collections = pgTable(
     // constraints
     check('collections_name_length', sql`length(${table.name}) <= ${SCHEMA_LIMITS.COLLECTION.NAME.MAX}`),
     check('collections_name_not_empty', sql`length(${table.name}) >= ${SCHEMA_LIMITS.COLLECTION.NAME.MIN}`),
-    check('collections_total_items_non_negative', sql`${table.totalItems} >= 0`),
     check('collections_total_value_non_negative', sql`${table.totalValue} >= 0`),
     check('collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
     check('collections_comment_count_non_negative', sql`${table.commentCount} >= 0`),

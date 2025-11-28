@@ -31,7 +31,6 @@ export const insertCollectionSchema = createInsertSchema(collections, {
   createdAt: true,
   id: true,
   slug: true,
-  totalItems: true,
   updatedAt: true,
   userId: true,
 });
