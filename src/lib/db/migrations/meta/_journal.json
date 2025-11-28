@@ -169,6 +169,13 @@
       "when": 1764276110498,
       "tag": "20251127204150_closed_the_hood",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1764339388000,
+      "tag": "20251128093628_revert_bobblehead_collections",
+      "breakpoints": true
     }
   ]
 }
