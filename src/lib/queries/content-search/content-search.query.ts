@@ -1,4 +1,4 @@
-import { and, count, eq, gte, ilike, inArray, isNull, lte, not, or, type SQL } from 'drizzle-orm';
+import { and, count, eq, gte, ilike, inArray, isNull, lte, not, or, sql, type SQL } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
@@ -151,7 +151,12 @@ export class ContentSearchQuery extends BaseQuery {
         ownerName: users.username,
         ownerUsername: users.username,
         slug: collections.slug,
-        totalItems: collections.totalItems,
+        totalItems: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('total_items'),
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id))
@@ -608,7 +613,12 @@ export class ContentSearchQuery extends BaseQuery {
         ownerName: users.username,
         ownerUsername: users.username,
         slug: collections.slug,
-        totalItems: collections.totalItems,
+        totalItems: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('total_items'),
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id));
@@ -830,7 +840,12 @@ export class ContentSearchQuery extends BaseQuery {
         ownerName: users.username,
         ownerUsername: users.username,
         slug: collections.slug,
-        totalItems: collections.totalItems,
+        totalItems: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('total_items'),
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id));

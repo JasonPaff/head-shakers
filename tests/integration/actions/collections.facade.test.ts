@@ -140,7 +140,7 @@ describe('CollectionsFacade Integration Tests', () => {
 
       expect(result!.description).toBeNull();
       expect(result!.coverImageUrl).toBeNull();
-      expect(result!.totalItems).toBe(0);
+      // totalItems is no longer stored on collections - it's computed dynamically from bobbleheads count
     });
   });
 

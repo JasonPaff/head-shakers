@@ -408,7 +408,12 @@ export class FeaturedContentQuery extends BaseQuery {
         ownerAvatarUrl: users.avatarUrl,
         ownerDisplayName: users.username,
         title: featuredContent.title,
-        totalItems: collections.totalItems,
+        totalItems: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('total_items'),
         totalValue: collections.totalValue,
         viewCount: featuredContent.viewCount,
       })

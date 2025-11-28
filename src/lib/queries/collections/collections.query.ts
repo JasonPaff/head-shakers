@@ -64,6 +64,8 @@ export type BrowseCategoriesResult = {
 export type BrowseCollectionRecord = {
   collection: CollectionRecord & {
     slug: string;
+    /** Computed count of non-deleted bobbleheads in this collection */
+    totalItems: number;
   };
   firstBobbleheadPhoto: null | string;
   owner: {
@@ -462,7 +464,12 @@ export class CollectionsQuery extends BaseQuery {
           ownerId: users.id,
           ownerUsername: users.username,
           slug: collections.slug,
-          totalItems: collections.totalItems,
+          totalItems: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM ${bobbleheads}
+            WHERE ${bobbleheads.collectionId} = ${collections.id}
+            AND ${bobbleheads.deletedAt} IS NULL
+          )`.as('total_items'),
           totalValue: collections.totalValue,
           updatedAt: collections.updatedAt,
           userId: collections.userId,
@@ -545,7 +552,12 @@ export class CollectionsQuery extends BaseQuery {
         ownerId: users.id,
         ownerUsername: users.username,
         slug: collections.slug,
-        totalItems: collections.totalItems,
+        totalItems: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('total_items'),
         totalValue: collections.totalValue,
         updatedAt: collections.updatedAt,
         userId: collections.userId,
@@ -686,7 +698,12 @@ export class CollectionsQuery extends BaseQuery {
         ownerId: users.id,
         ownerUsername: users.username,
         slug: collections.slug,
-        totalItems: collections.totalItems,
+        totalItems: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('total_items'),
         totalValue: collections.totalValue,
         updatedAt: collections.updatedAt,
         userId: collections.userId,
@@ -824,7 +841,12 @@ export class CollectionsQuery extends BaseQuery {
         coverImage: collections.coverImageUrl,
         description: collections.description,
         isPublic: collections.isPublic,
-        itemCount: collections.totalItems,
+        itemCount: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${bobbleheads}
+          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          AND ${bobbleheads.deletedAt} IS NULL
+        )`.as('item_count'),
         name: collections.name,
         ownerUsername: users.username,
         slug: collections.slug,

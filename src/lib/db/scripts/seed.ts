@@ -1,4 +1,3 @@
-import { sql } from 'drizzle-orm';
 import 'dotenv/config';
 
 import { db } from '@/lib/db';
@@ -164,56 +163,48 @@ const sampleCollections = [
     description: 'My collection of Hall of Fame baseball players bobbleheads.',
     isPublic: true,
     name: 'MLB Hall of Fame',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Complete collection of Star Wars character bobbleheads.',
     isPublic: true,
     name: 'Star Wars Universe',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Superhero bobbleheads from the Marvel universe.',
     isPublic: true,
     name: 'Marvel Heroes',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Famous NFL quarterbacks throughout history.',
     isPublic: true,
     name: 'NFL Quarterbacks',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Rare and vintage bobbleheads from the 1960s-1980s.',
     isPublic: false,
     name: 'Vintage Collection',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Iconic movie characters in bobblehead form.',
     isPublic: true,
     name: 'Movie Characters',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Basketball legends and current superstars.',
     isPublic: true,
     name: 'NBA Legends',
-    totalItems: 0,
     totalValue: '0.00',
   },
   {
     description: 'Classic and modern Disney character bobbleheads.',
     isPublic: true,
     name: 'Disney Characters',
-    totalItems: 0,
     totalValue: '0.00',
   },
 ];
@@ -399,7 +390,6 @@ async function main() {
     const collectionsData = await seedCollections(insertedUsers);
     const insertedBobbleheads = await seedBobbleheads(insertedUsers, collectionsData, insertedTags);
     await seedSocialData(insertedUsers, insertedBobbleheads, collectionsData);
-    await updateAggregates();
 
     console.log('\n🎉 Database seeding completed successfully!');
     console.log(`
@@ -696,55 +686,5 @@ async function seedUsers() {
   return allUsers;
 }
 
-async function updateAggregates() {
-  console.log('🔄 Updating aggregates...');
-
-  // Update collection totals
-  await db.execute(sql`
-    UPDATE collections 
-    SET 
-      total_items = (
-        SELECT COUNT(*) 
-        FROM bobbleheads 
-        WHERE bobbleheads.collection_id = collections.id 
-        AND is_deleted = false
-      ),
-      total_value = (
-        SELECT COALESCE(SUM(purchase_price::decimal), 0) 
-        FROM bobbleheads 
-        WHERE bobbleheads.collection_id = collections.id 
-        AND is_deleted = false
-        AND purchase_price IS NOT NULL
-      ),
-      last_item_added_at = (
-        SELECT MAX(created_at) 
-        FROM bobbleheads 
-        WHERE bobbleheads.collection_id = collections.id
-      )
-  `);
-
-  // Update sub-collection item counts
-  await db.execute(sql`
-    UPDATE sub_collections 
-    SET item_count = (
-      SELECT COUNT(*) 
-      FROM bobbleheads 
-      WHERE bobbleheads.sub_collection_id = sub_collections.id 
-      AND is_deleted = false
-    )
-  `);
-
-  // Update tag usage counts
-  await db.execute(sql`
-    UPDATE tags 
-    SET usage_count = (
-      SELECT COUNT(*) 
-      FROM bobblehead_tags 
-      WHERE bobblehead_tags.tag_id = tags.id
-    )
-  `);
-
-  console.log('✅ Aggregates updated');
-}
 
 void main();
