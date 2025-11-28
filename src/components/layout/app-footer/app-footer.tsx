@@ -20,21 +20,10 @@ export const AppFooter = () => {
       data-slot={'app-footer'}
       data-testid={generateTestId('layout', 'app-footer')}
     >
-      {/* Newsletter Highlight Bar */}
-      <div
-        className={`bg-gradient-to-r from-orange-500 to-amber-500
-          dark:from-orange-600 dark:to-amber-600`}
-        data-slot={'app-footer-newsletter-bar'}
-      >
-        <div className={'mx-auto max-w-7xl px-6 py-3'}>
-          <FooterNewsletter />
-        </div>
-      </div>
-
       {/* Main Footer Content */}
       <div
-        className={`bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/30
-          dark:from-slate-900 dark:via-slate-900 dark:to-slate-900`}
+        className={`bg-gradient-to-br from-slate-50 to-slate-100
+          dark:from-slate-900 dark:to-slate-800`}
         data-slot={'app-footer-main'}
       >
         <div className={'px-2 sm:px-4 md:px-6 lg:px-10'}>
@@ -66,6 +55,9 @@ export const AppFooter = () => {
 
               {/* Social Links */}
               <FooterSocialLinks />
+
+              {/* Newsletter Signup */}
+              <FooterNewsletter />
             </div>
 
             {/* Browse Section */}

@@ -10,6 +10,7 @@ import { useFocusContext } from '@/components/ui/form/focus-management/focus-con
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
+import { generateTestId } from '@/lib/test-ids';
 import { newsletterSignupSchema } from '@/lib/validations/newsletter.validation';
 
 /**
@@ -57,32 +58,41 @@ export const FooterNewsletter = withFocusManagement(() => {
   };
 
   return (
-    <div className={'flex flex-col items-center gap-4 md:flex-row md:justify-between'}>
+    <div
+      aria-labelledby={'footer-newsletter-heading'}
+      className={
+        'rounded-lg border border-slate-200 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800'
+      }
+      data-slot={'footer-newsletter'}
+      data-testid={generateTestId('layout', 'app-footer', 'newsletter')}
+      role={'region'}
+    >
       {/* Newsletter Header */}
-      <div className={'text-center md:text-left'}>
-        <h3 className={'text-lg font-semibold text-white'}>Stay Updated</h3>
-        <p className={'text-sm text-orange-100'}>
-          Get the latest bobblehead news and updates.
-          <br />
-          Join our community of collectors today.
-        </p>
+      <div className={'mb-3'}>
+        <h3
+          className={'text-sm font-semibold text-slate-700 dark:text-slate-200'}
+          id={'footer-newsletter-heading'}
+        >
+          Stay Updated
+        </h3>
+        <p className={'text-xs text-slate-600 dark:text-slate-400'}>Get the latest bobblehead news.</p>
       </div>
 
       {/* Newsletter Form */}
-      <form className={'flex w-full gap-2 md:w-auto'} onSubmit={handleSubmit}>
+      <form className={'flex gap-2'} onSubmit={handleSubmit}>
         {/* Email Field */}
         <form.AppField name={'email'}>
           {(field) => {
             return (
-              <div className={'relative flex-1 md:w-64'}>
+              <div className={'relative flex-1'}>
                 <field.TextField
-                  className={`border-white/20 bg-white pr-3 pl-9 text-slate-900 placeholder:text-slate-600
-                    dark:text-white dark:placeholder:text-slate-300`}
+                  className={`border-slate-300 bg-white pr-3 pl-9 text-slate-900 placeholder:text-slate-500
+                    dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400`}
                   disabled={isExecuting}
                   fieldErrorProps={{
-                    className: 'dark:text-white text-slate-800',
+                    className: 'mt-1 text-xs text-red-600 dark:text-red-400',
                   }}
-                  icon={<MailIcon aria-hidden className={'size-4 text-slate-600 dark:text-slate-300'} />}
+                  icon={<MailIcon aria-hidden className={'size-4 text-slate-500 dark:text-slate-400'} />}
                   isRequired
                   label={'Email Address'}
                   labelClassName={'sr-only'}
@@ -97,8 +107,8 @@ export const FooterNewsletter = withFocusManagement(() => {
         {/* Submit Button */}
         <form.AppForm>
           <form.SubmitButton
-            className={`bg-slate-900 font-semibold text-white hover:bg-slate-800
-              dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100`}
+            className={`bg-slate-700 font-semibold text-white hover:bg-slate-800
+              dark:bg-slate-600 dark:hover:bg-slate-500`}
             isDisabled={isExecuting}
             testId={'footer-newsletter-submit'}
           >
