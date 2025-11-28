@@ -402,7 +402,6 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.totalItems).toBe(0); // Default total items
       expect(featured.totalValue).toBe('0'); // Default total value (decimal returned as string)
       expect(featured.likes).toBe(0); // Default like count
-      expect(featured.comments).toBe(0); // Default comment count
       expect(featured.viewCount).toBe(0);
       expect(featured.isLiked).toBe(false);
       expect(featured.likeId).toBeNull();
@@ -755,7 +754,6 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.isLiked).toBe(true);
       expect(featured.likeId).toBe(like!.id);
       expect(featured.likes).toBe(0); // Default like count
-      expect(featured.comments).toBe(0); // Default comment count
       expect(featured.totalItems).toBe(0); // Default total items
       expect(featured.totalValue).toBe('0'); // Default total value (decimal returned as string)
     });

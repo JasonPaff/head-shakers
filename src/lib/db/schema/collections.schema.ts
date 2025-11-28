@@ -18,7 +18,6 @@ import { users } from '@/lib/db/schema/users.schema';
 export const collections = pgTable(
   'collections',
   {
-    commentCount: integer('comment_count').default(DEFAULTS.COLLECTION.COMMENT_COUNT).notNull(),
     coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     deletedAt: timestamp('deleted_at'),
@@ -51,14 +50,11 @@ export const collections = pgTable(
     index('collections_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
     index('collections_public_created_desc_idx').on(table.isPublic, sql`${table.createdAt} DESC`),
     index('collections_public_like_count_idx').on(table.isPublic, sql`${table.likeCount} DESC`),
-    index('collections_comment_count_desc_idx').on(sql`${table.commentCount} DESC`),
-    index('collections_public_comment_count_idx').on(table.isPublic, sql`${table.commentCount} DESC`),
 
     // constraints
     check('collections_name_length', sql`length(${table.name}) <= ${SCHEMA_LIMITS.COLLECTION.NAME.MAX}`),
     check('collections_name_not_empty', sql`length(${table.name}) >= ${SCHEMA_LIMITS.COLLECTION.NAME.MIN}`),
     check('collections_like_count_non_negative', sql`${table.likeCount} >= 0`),
-    check('collections_comment_count_non_negative', sql`${table.commentCount} >= 0`),
 
     // unique constraints
     uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug),

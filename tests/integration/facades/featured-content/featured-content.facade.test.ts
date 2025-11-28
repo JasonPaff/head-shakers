@@ -412,7 +412,6 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(featured.ownerDisplayName).toBe('collector');
       expect(featured.totalItems).toBe(0);
       expect(featured.likes).toBe(0);
-      expect(featured.comments).toBe(0);
       expect(featured.viewCount).toBe(0);
     });
   });

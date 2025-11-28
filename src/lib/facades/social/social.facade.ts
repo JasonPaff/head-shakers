@@ -9,7 +9,7 @@ import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';
 
-import { type LikeTargetType, MAX_COMMENT_NESTING_DEPTH, OPERATIONS } from '@/lib/constants';
+import { ENUMS, type LikeTargetType, MAX_COMMENT_NESTING_DEPTH, OPERATIONS } from '@/lib/constants';
 import { CACHE_CONFIG, CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import {
@@ -98,8 +98,11 @@ export class SocialFacade {
         const newComment = await SocialQuery.createCommentAsync(data, userId, context);
 
         if (newComment) {
-          // increment comment count on the target entity
-          await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
+          // increment comment count on the target entity (only for bobblehead targets)
+          // collections use dynamic counts calculated from comment table
+          if (data.targetType === ENUMS.COMMENT.TARGET_TYPE[0]) {
+            await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
+          }
 
           // fetch the comment with user data using efficient method
           const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(newComment.id, context);
@@ -187,8 +190,11 @@ export class SocialFacade {
         const newComment = await SocialQuery.createCommentAsync(data, userId, context);
 
         if (newComment) {
-          // increment comment count on the target entity
-          await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
+          // increment comment count on the target entity (only for bobblehead targets)
+          // collections use dynamic counts calculated from comment table
+          if (data.targetType === ENUMS.COMMENT.TARGET_TYPE[0]) {
+            await SocialQuery.incrementCommentCountAsync(data.targetId, data.targetType, context);
+          }
 
           // fetch the comment with user data using efficient method
           const commentWithUser = await SocialQuery.getCommentByIdWithUserAsync(newComment.id, context);
@@ -251,12 +257,15 @@ export class SocialFacade {
         const deletedComment = await SocialQuery.deleteCommentAsync(commentId, context);
 
         if (deletedComment) {
-          // decrement comment count on the target entity
-          await SocialQuery.decrementCommentCountAsync(
-            deletedComment.targetId,
-            deletedComment.targetType,
-            context,
-          );
+          // decrement comment count on the target entity (only for bobblehead targets)
+          // collections use dynamic counts calculated from comment table
+          if (deletedComment.targetType === ENUMS.COMMENT.TARGET_TYPE[0]) {
+            await SocialQuery.decrementCommentCountAsync(
+              deletedComment.targetId,
+              deletedComment.targetType,
+              context,
+            );
+          }
 
           // Note: Cache invalidation is handled at the action layer via CacheRevalidationService
 
@@ -908,8 +917,11 @@ export class SocialFacade {
       const deletedReply = await SocialQuery.deleteCommentAsync(reply.id, context);
 
       if (deletedReply) {
-        // decrement comment count for each deleted reply
-        await SocialQuery.decrementCommentCountAsync(deletedReply.targetId, deletedReply.targetType, context);
+        // decrement comment count for each deleted reply (only for bobblehead targets)
+        // collections use dynamic counts calculated from comment table
+        if (deletedReply.targetType === ENUMS.COMMENT.TARGET_TYPE[0]) {
+          await SocialQuery.decrementCommentCountAsync(deletedReply.targetId, deletedReply.targetType, context);
+        }
       }
     }
   }
