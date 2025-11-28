@@ -68,7 +68,9 @@ This skill activates when:
 
 ### Sentry Monitoring (MANDATORY)
 
-- **ALL facade methods MUST add Sentry breadcrumbs** for successful operations
+- **Use `withFacadeBreadcrumbs()` wrapper** to add automatic entry/success/error breadcrumbs (recommended)
+- Alternatively, use `trackFacadeEntry()` and `trackFacadeSuccess()` for manual control
+- Use `trackFacadeWarning()` for non-critical failures that shouldn't fail the operation
 - Use `Sentry.captureException` with `level: 'warning'` for non-blocking failures
 - Never fail main operations due to monitoring failures
 

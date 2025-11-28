@@ -184,7 +184,79 @@ throw new ActionError(
 
 ## Sentry Integration
 
-### Setting Context (Start of Action)
+### Using Helper Utilities (Recommended)
+
+The recommended approach is to use the helper utilities from `@/lib/utils/sentry-server/breadcrumbs.server`:
+
+#### `withActionErrorHandling()` - Full Wrapper (Recommended for Mutations)
+
+Wraps your action with automatic context setting, entry/success/error breadcrumbs, and error handling:
+
+```typescript
+import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+export const createCollectionAction = authActionClient
+  .metadata({ actionName: ACTION_NAMES.COLLECTIONS.CREATE, isTransactionRequired: true })
+  .inputSchema(insertCollectionSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const data = insertCollectionSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.COLLECTIONS.CREATE,
+        operation: OPERATIONS.COLLECTIONS.CREATE,
+        userId: ctx.userId,
+        input: parsedInput,
+        contextType: 'COLLECTION_DATA',
+        contextData: { name: data.name, userId: ctx.userId },
+      },
+      async () => {
+        const newCollection = await CollectionsFacade.createAsync(data, ctx.userId, dbInstance);
+        if (!newCollection) {
+          throw new ActionError(ErrorType.INTERNAL, 'CREATE_FAILED', 'Failed to create collection');
+        }
+        return { data: newCollection, success: true, message: 'Collection created' };
+      },
+      { includeResultSummary: (r) => ({ collectionId: r.data.id }) },
+    );
+  });
+```
+
+#### `trackCacheInvalidation()` - For Cache Operations
+
+Tracks cache invalidation and automatically logs failures as warnings (non-throwing):
+
+```typescript
+import { trackCacheInvalidation } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+// After successful mutation
+trackCacheInvalidation(
+  CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId),
+  { entityType: 'collection', entityId: newCollection.id, operation: 'onCreate', userId: ctx.userId }
+);
+```
+
+#### `withActionBreadcrumbs()` - For Read-Only Actions
+
+Wraps action with breadcrumbs only (no error handling, errors propagate):
+
+```typescript
+import { withActionBreadcrumbs } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+return withActionBreadcrumbs(
+  { actionName: 'GET_CATEGORIES', operation: 'collections.getCategories' },
+  async () => {
+    return await CollectionsFacade.getCategories(dbInstance);
+  },
+);
+```
+
+### Manual Pattern (Fallback)
+
+For cases requiring fine-grained control, use the manual pattern:
+
+#### Setting Context (Start of Action)
 
 ```typescript
 Sentry.setContext(SENTRY_CONTEXTS.{CONTEXT_NAME}, {
@@ -194,7 +266,7 @@ Sentry.setContext(SENTRY_CONTEXTS.{CONTEXT_NAME}, {
 });
 ```
 
-### Adding Breadcrumbs (After Success)
+#### Adding Breadcrumbs (After Success)
 
 ```typescript
 Sentry.addBreadcrumb({
@@ -208,7 +280,7 @@ Sentry.addBreadcrumb({
 });
 ```
 
-### Capturing Warnings (Non-Fatal Issues)
+#### Capturing Warnings (Non-Fatal Issues)
 
 ```typescript
 Sentry.captureException(new Error('Cache invalidation failed'), {

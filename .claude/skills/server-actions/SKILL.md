@@ -34,9 +34,11 @@ This skill activates when:
 - Use `authActionClient`, `adminActionClient`, or `publicActionClient` based on auth requirements
 - Always use `ctx.sanitizedInput` parsed through Zod schema (never use `parsedInput` directly)
 - Include proper metadata with `actionName` and `isTransactionRequired`
-- Set Sentry context at the start of each action
+- **Use `withActionErrorHandling()` wrapper** for automatic Sentry context, breadcrumbs, and error handling (recommended)
+- Alternatively, use `withActionBreadcrumbs()` for breadcrumbs without error handling
+- Use `trackCacheInvalidation()` to log cache failures as warnings without throwing
 - Use facades for business logic (actions should be thin orchestrators)
-- Handle errors with `handleActionError` utility
+- Handle errors with `handleActionError` utility (automatic with `withActionErrorHandling`)
 - Invalidate cache after mutations using `CacheRevalidationService`
 - Return consistent response shape: `{ success, message, data }`
 

@@ -64,8 +64,10 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 
 ### Sentry Requirements (MANDATORY)
 
-- [ ] **ALL facade methods add Sentry breadcrumbs** on successful operations
-- [ ] Use `SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC` for facade operations
+- [ ] **Use `withFacadeBreadcrumbs()` wrapper** for automatic entry/success/error breadcrumbs (recommended)
+- [ ] Alternatively, use `trackFacadeEntry()` + `trackFacadeSuccess()` for manual control
+- [ ] Use `trackFacadeWarning()` for non-critical failures that shouldn't fail the operation
+- [ ] Use `SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC` for facade operations (automatic with helpers)
 - [ ] Capture non-critical exceptions with `level: 'warning'` without failing operation
 - [ ] Use Sentry constants from `@/lib/constants` (never hardcode strings)
 - [ ] Include relevant IDs in breadcrumb data (entityId, userId, operation)
@@ -99,7 +101,7 @@ Before completing, verify NONE of these exist:
 - [ ] ❌ Stub methods returning hardcoded values (e.g., `return Promise.resolve({})`)
 - [ ] ❌ Missing transactions on multi-step mutations
 - [ ] ❌ Missing cache invalidation after write operations
-- [ ] ❌ Missing Sentry breadcrumbs in facade methods
+- [ ] ❌ Missing Sentry breadcrumbs in facade methods (use `withFacadeBreadcrumbs` or tracking helpers)
 - [ ] ❌ Missing JSDoc on public methods
 - [ ] ❌ Silent failures (errors logged but not handled)
 - [ ] ❌ Generic `CacheService.cached()` when domain helper exists

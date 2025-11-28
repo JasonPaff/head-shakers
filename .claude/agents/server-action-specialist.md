@@ -34,12 +34,12 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 - [ ] Define Zod schema for input validation
 - [ ] Use `ctx.sanitizedInput` (never `parsedInput` directly)
 - [ ] Include metadata with `actionName` and `isTransactionRequired`
-- [ ] Set Sentry context at action start with `Sentry.setContext`
+- [ ] **Use `withActionErrorHandling()` wrapper** for automatic Sentry context, breadcrumbs, and error handling (recommended)
+- [ ] Alternatively, use `withActionBreadcrumbs()` for breadcrumbs without error handling
 - [ ] Use facades for business logic (actions are thin orchestrators)
-- [ ] Handle errors with `handleActionError` utility
-- [ ] Invalidate cache after mutations using `CacheRevalidationService`
+- [ ] Handle errors with `handleActionError` utility (automatic with `withActionErrorHandling`)
+- [ ] Use `trackCacheInvalidation()` after mutations for automatic failure logging
 - [ ] Return consistent shape: `{ success, message, data }`
-- [ ] Add breadcrumbs for successful operations
 
 ### Client-Side Consumption Requirements
 

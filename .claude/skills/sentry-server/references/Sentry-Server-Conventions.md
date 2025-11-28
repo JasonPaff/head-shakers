@@ -530,3 +530,263 @@ try {
 - [ ] Include relevant IDs in breadcrumb data (entityId, userId, operation)
 - [ ] Non-critical failures captured with `level: 'warning'`
 - [ ] Never fail main operations due to Sentry/monitoring errors
+
+## Breadcrumb Helper Utilities (Recommended)
+
+The project provides helper utilities that simplify Sentry integration with consistent patterns. These are the **recommended approach** for new code.
+
+### Import
+
+```typescript
+import {
+  // Action helpers
+  setActionContext,
+  trackActionEntry,
+  trackActionSuccess,
+  trackActionWarning,
+  trackCacheInvalidation,
+  withActionBreadcrumbs,
+  withActionErrorHandling,
+  // Facade helpers
+  facadeBreadcrumb,
+  trackFacadeEntry,
+  trackFacadeError,
+  trackFacadeSuccess,
+  trackFacadeWarning,
+  withFacadeBreadcrumbs,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
+```
+
+### Layer 1: Basic Functions
+
+#### `setActionContext()`
+
+Set Sentry context with type-safe context keys:
+
+```typescript
+setActionContext('BOBBLEHEAD_DATA', {
+  bobbleheadId: data.id,
+  collectionId: data.collectionId,
+  userId: ctx.userId,
+});
+
+// Supported context types: ACTION_METADATA, BOBBLEHEAD_DATA, COLLECTION_DATA,
+// COMMENT_DATA, FEATURED_CONTENT_DATA, INPUT_INFO, LIKE_DATA, NEWSLETTER_DATA,
+// SEARCH_DATA, TAG_DATA, USER_DATA, VIEW_DATA, etc.
+```
+
+#### `actionBreadcrumb()` / `facadeBreadcrumb()`
+
+Add simple breadcrumbs with optional data and level:
+
+```typescript
+actionBreadcrumb('Processing payment');
+actionBreadcrumb('Payment completed', { orderId, amount });
+actionBreadcrumb('Partial failure in batch', { failedCount: 3 }, 'warning');
+
+facadeBreadcrumb('Fetching user data');
+facadeBreadcrumb('User data fetched', { userId, count: 5 });
+```
+
+### Layer 1: Tracking Functions
+
+#### `trackActionEntry()` / `trackActionSuccess()` / `trackActionWarning()`
+
+Track server action lifecycle:
+
+```typescript
+// At operation start
+trackActionEntry('CREATE_BOBBLEHEAD', 'bobbleheads.create');
+
+// On success
+trackActionSuccess('CREATE_BOBBLEHEAD', 'bobbleheads.create', { bobbleheadId });
+
+// On partial failure (non-fatal)
+trackActionWarning('CREATE_BOBBLEHEAD', 'photo.move', 'Some photos failed to move', {
+  failedCount: 2,
+  totalCount: 10,
+});
+```
+
+#### `trackCacheInvalidation()`
+
+Track cache invalidation and automatically log failures as warnings (non-throwing):
+
+```typescript
+trackCacheInvalidation(
+  CacheRevalidationService.social.onLikeChange(targetType, targetId, userId, 'like'),
+  { entityType: 'like', entityId: targetId, operation: 'onLikeChange', userId }
+);
+
+// Can chain for conditional handling
+const result = trackCacheInvalidation(
+  CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId),
+  { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'onDelete', userId }
+);
+if (!result.isSuccess) {
+  // Handle manually if needed
+}
+```
+
+#### `trackFacadeEntry()` / `trackFacadeSuccess()` / `trackFacadeWarning()` / `trackFacadeError()`
+
+Track facade lifecycle:
+
+```typescript
+// At operation start
+trackFacadeEntry('UsersFacade', 'getUserByIdAsync');
+
+// On success
+trackFacadeSuccess('UsersFacade', 'getUserByIdAsync', { found: true });
+
+// On partial failure (non-fatal)
+trackFacadeWarning('BobbleheadsFacade', 'deleteAsync', 'Failed to delete 2 photos from Cloudinary', {
+  bobbleheadId,
+  failedCount: 2,
+});
+
+// On error
+trackFacadeError('BobbleheadsFacade', 'createAsync', 'Database transaction failed', {
+  errorType: 'TransactionError',
+});
+```
+
+### Layer 2: Wrapper Functions (Recommended)
+
+#### `withActionErrorHandling()` - For Server Actions
+
+Wrap a server action with automatic breadcrumbs AND error handling. This is the **recommended approach** for most server actions:
+
+```typescript
+export const createBobbleheadAction = authActionClient
+  .metadata({ actionName: ACTION_NAMES.BOBBLEHEADS.CREATE, isTransactionRequired: true })
+  .inputSchema(insertBobbleheadSchema)
+  .action(async ({ ctx, parsedInput }) => {
+    const data = insertBobbleheadSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.tx ?? ctx.db;
+
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.BOBBLEHEADS.CREATE,
+        operation: OPERATIONS.BOBBLEHEADS.CREATE,
+        userId: ctx.userId,
+        input: parsedInput,
+        contextType: 'BOBBLEHEAD_DATA',
+        contextData: { name: data.name, collectionId: data.collectionId },
+      },
+      async () => {
+        const newBobblehead = await BobbleheadsFacade.createAsync(data, ctx.userId, dbInstance);
+        if (!newBobblehead) {
+          throw new ActionError(ErrorType.INTERNAL, 'CREATE_FAILED', 'Failed to create bobblehead');
+        }
+        return { data: newBobblehead, success: true, message: 'Bobblehead created' };
+      },
+      { includeResultSummary: (r) => ({ bobbleheadId: r.data.id }) },
+    );
+  });
+```
+
+#### `withActionBreadcrumbs()` - For Actions Without Error Handling
+
+Wrap a server action with breadcrumbs only (errors propagate, no handling):
+
+```typescript
+return withActionBreadcrumbs(
+  { actionName: 'GET_CATEGORIES', operation: 'collections.getCategories' },
+  async () => {
+    return await CollectionsFacade.getCategories(dbInstance);
+  },
+);
+```
+
+#### `withFacadeBreadcrumbs()` - For Facades
+
+Wrap a facade method with automatic breadcrumbs:
+
+```typescript
+static async getUserByIdAsync(
+  id: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<UserRecord | null> {
+  return withFacadeBreadcrumbs(
+    { facade: 'UsersFacade', method: 'getUserByIdAsync' },
+    async () => {
+      const context = createPublicQueryContext({ dbInstance });
+      return await UsersQuery.getUserByIdAsync(id, context);
+    },
+  );
+}
+
+// With result summary
+static async getStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  return withFacadeBreadcrumbs(
+    { facade: 'PlatformStatsFacade', method: 'getStatsAsync' },
+    async () => {
+      const stats = await fetchStats();
+      return stats;
+    },
+    {
+      includeResultSummary: (stats) => ({
+        totalBobbleheads: stats.totalBobbleheads,
+        totalCollections: stats.totalCollections,
+      }),
+    },
+  );
+}
+```
+
+### Type Definitions
+
+```typescript
+interface ActionOperationContext {
+  actionName: string;              // From ACTION_NAMES constant
+  operation: string;               // From OPERATIONS constant
+  userId?: string;                 // Optional: user ID if authenticated
+  contextType?: keyof typeof SENTRY_CONTEXTS;  // Optional: Sentry context type
+  contextData?: Record<string, unknown>;       // Optional: data for context
+}
+
+interface ActionErrorContext extends ActionOperationContext {
+  input?: unknown;                 // Original input data for error context
+  metadata?: Record<string, unknown>;  // Additional metadata
+}
+
+interface FacadeOperationContext {
+  facade: string;                  // Facade class name
+  method: string;                  // Method name
+  userId?: string;                 // Optional: user ID
+}
+
+interface CacheInvalidationConfig {
+  entityType: string;              // e.g., 'bobblehead', 'collection', 'like'
+  entityId: string;                // ID of the entity being invalidated
+  operation: string;               // Operation that triggered invalidation
+  userId?: string;                 // Optional: user ID if available
+}
+
+interface WithActionBreadcrumbsOptions<T> {
+  entryMessage?: string;           // Custom entry message
+  successMessage?: string;         // Custom success message
+  includeResultSummary?: (result: T) => Record<string, unknown>;
+}
+```
+
+### When to Use Each Pattern
+
+| Scenario | Recommended Helper |
+|----------|-------------------|
+| Server action with mutations | `withActionErrorHandling()` |
+| Server action read-only | `withActionBreadcrumbs()` |
+| Facade method (any) | `withFacadeBreadcrumbs()` |
+| Cache invalidation | `trackCacheInvalidation()` |
+| Manual control needed | `trackActionEntry()` + `trackActionSuccess()` |
+| Simple breadcrumb | `actionBreadcrumb()` / `facadeBreadcrumb()` |
+
+### Benefits Over Manual Patterns
+
+1. **Consistency** - Standardized message formats and data structure
+2. **Less Boilerplate** - Single wrapper replaces multiple Sentry calls
+3. **Type Safety** - Context types are validated at compile time
+4. **Result Summarization** - Extract relevant data from operation results
+5. **Non-Throwing Cache Tracking** - `trackCacheInvalidation` handles failures gracefully
+6. **Integrated Error Handling** - `withActionErrorHandling` combines breadcrumbs with error handling

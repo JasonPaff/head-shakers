@@ -64,6 +64,35 @@ This skill activates when working on **server-side code**:
 | `SENTRY_TAGS`                  | `@/lib/constants/sentry` | Tag names for `setTag`         |
 | `SENTRY_OPERATIONS`            | `@/lib/constants/sentry` | Operation names for spans      |
 
+## Helper Utilities (Recommended)
+
+Import from `@/lib/utils/sentry-server/breadcrumbs.server`:
+
+### For Server Actions
+
+| Function                    | Purpose                                                    |
+| --------------------------- | ---------------------------------------------------------- |
+| `withActionErrorHandling()` | Wrap action with automatic breadcrumbs + error handling    |
+| `withActionBreadcrumbs()`   | Wrap action with breadcrumbs only (no error handling)      |
+| `trackActionEntry()`        | Track action operation start                               |
+| `trackActionSuccess()`      | Track action success with optional result data             |
+| `trackActionWarning()`      | Track action warning for partial failures                  |
+| `trackCacheInvalidation()`  | Track cache invalidation with automatic warning on failure |
+| `setActionContext()`        | Set Sentry context with type-safe keys                     |
+
+### For Facades
+
+| Function                   | Purpose                                           |
+| -------------------------- | ------------------------------------------------- |
+| `withFacadeBreadcrumbs()`  | Wrap facade method with automatic breadcrumbs     |
+| `trackFacadeEntry()`       | Track facade operation start                      |
+| `trackFacadeSuccess()`     | Track facade success with optional result data    |
+| `trackFacadeWarning()`     | Track facade warning for partial failures         |
+| `trackFacadeError()`       | Track facade error                                |
+| `facadeBreadcrumb()`       | Add a simple breadcrumb for facade operations     |
+
+See `references/Sentry-Server-Conventions.md` for complete documentation with examples.
+
 ## Usage Pattern Reference
 
 | Use Case             | Primary Method            | Level     |

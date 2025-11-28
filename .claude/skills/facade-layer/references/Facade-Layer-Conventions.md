@@ -517,7 +517,91 @@ static async getAggregateDataAsync(userId: string, dbInstance?: DatabaseExecutor
 
 ## Sentry Integration
 
-### Breadcrumbs for Business Logic
+### Using Helper Utilities (Recommended)
+
+The recommended approach is to use helper utilities from `@/lib/utils/sentry-server/breadcrumbs.server`:
+
+#### `withFacadeBreadcrumbs()` - Full Wrapper (Recommended)
+
+Wraps facade methods with automatic entry/success/error breadcrumbs:
+
+```typescript
+import { withFacadeBreadcrumbs } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+static async getUserByIdAsync(
+  id: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<UserRecord | null> {
+  return withFacadeBreadcrumbs(
+    { facade: 'UsersFacade', method: 'getUserByIdAsync' },
+    async () => {
+      const context = createPublicQueryContext({ dbInstance });
+      return await UsersQuery.getUserByIdAsync(id, context);
+    },
+  );
+}
+
+// With result summary for richer breadcrumbs
+static async getStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  return withFacadeBreadcrumbs(
+    { facade: 'PlatformStatsFacade', method: 'getStatsAsync' },
+    async () => {
+      const stats = await fetchStats();
+      return stats;
+    },
+    {
+      includeResultSummary: (stats) => ({
+        totalBobbleheads: stats.totalBobbleheads,
+        totalCollections: stats.totalCollections,
+      }),
+    },
+  );
+}
+```
+
+#### Tracking Functions - For Manual Control
+
+Use tracking functions when you need fine-grained control:
+
+```typescript
+import {
+  trackFacadeEntry,
+  trackFacadeSuccess,
+  trackFacadeWarning,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+static async deleteAsync(entityId: string, userId: string, dbInstance?: DatabaseExecutor) {
+  trackFacadeEntry('BobbleheadsFacade', 'deleteAsync', { entityId });
+
+  try {
+    const result = await (dbInstance ?? db).transaction(async (tx) => {
+      // ... deletion logic
+    });
+
+    trackFacadeSuccess('BobbleheadsFacade', 'deleteAsync', { entityId, deleted: true });
+
+    // Non-blocking cleanup
+    try {
+      await CloudinaryService.deletePhotos(photoUrls);
+    } catch (error) {
+      trackFacadeWarning('BobbleheadsFacade', 'deleteAsync', 'Failed to delete photos from Cloudinary', {
+        entityId,
+        failedCount: photoUrls.length,
+      });
+    }
+
+    return result;
+  } catch (error) {
+    throw createFacadeError({ /* ... */ }, error);
+  }
+}
+```
+
+### Manual Pattern (Fallback)
+
+For cases requiring direct Sentry access:
+
+#### Breadcrumbs for Business Logic
 
 ```typescript
 Sentry.addBreadcrumb({
@@ -528,7 +612,7 @@ Sentry.addBreadcrumb({
 });
 ```
 
-### Non-Blocking Error Capture
+#### Non-Blocking Error Capture
 
 ```typescript
 // For non-critical operations that shouldn't fail the main operation
