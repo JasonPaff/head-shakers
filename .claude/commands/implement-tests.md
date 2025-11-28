@@ -347,38 +347,148 @@ When the user runs this command, execute this comprehensive workflow:
      - Success criteria verification
      - Errors/warnings
      - Notes for next steps
-9. **Step Logging** (Orchestrator):
-   - Create `docs/{YYYY_MM_DD}/test-implementation/{feature-name}/0{N+2}-step-{N}-results.md`:
-     - Step metadata (number, title, test type, timestamp, duration)
-     - Specialist used and skills loaded
-     - Subagent input (what was asked)
-     - Subagent output (full response)
-     - Files created
-     - Test cases implemented
-     - Test results (passed/failed)
-     - Any errors or warnings
-10. **Update Todo Status** (Orchestrator):
-    - If step succeeded: Mark todo as "completed"
-    - If step failed: Keep as "in_progress" and log error
-11. **Error Handling** (Orchestrator):
+9. **MANDATORY: Orchestrator Test Verification** (Orchestrator - CRITICAL):
+   - **DO NOT TRUST SUBAGENT SELF-REPORTED TEST RESULTS**
+   - The orchestrator MUST independently run the test commands to verify tests pass
+   - Extract the list of test files created by the subagent
+   - Run the appropriate test command based on test type:
+     - Unit tests: `npm run test -- --run {test-file-path}`
+     - Component tests: `npm run test -- --run {test-file-path}`
+     - Integration tests: `npm run test -- --run {test-file-path}`
+     - E2E tests: `npm run test:e2e -- {test-file-path}`
+   - Capture full test output including pass/fail counts
+   - **IF ALL TESTS PASS**: Proceed to step logging (step 10)
+   - **IF ANY TESTS FAIL**: Enter the Test Fix Loop (step 9a)
+
+   **9a. Test Fix Loop** (Orchestrator - MANDATORY):
+
+   **CRITICAL**: The orchestrator MUST NOT proceed to the next step while tests from the current step are failing. This loop continues until ALL tests pass.
+
+   ```
+   WHILE tests are failing:
+     1. Log fix attempt number (starting at 1)
+     2. Collect failing test details:
+        - Test file path
+        - Test name(s) that failed
+        - Error messages and stack traces
+        - Expected vs actual values (if assertion failure)
+     3. Launch NEW subagent (same type as original) with fix prompt:
+
+        **Fix Subagent Prompt**:
+        ```
+        You are fixing failing tests from Step {N} of a test implementation plan.
+
+        **IMPORTANT**: This is attempt {X} to fix these tests. You MUST fix them.
+
+        ## Failing Test Details
+
+        **Test File(s)**:
+        {List of test files with failures}
+
+        **Failing Tests**:
+        {List of specific test names that failed}
+
+        **Error Output**:
+        ```
+        {Full error output from test run}
+        ```
+
+        **Original Step Context**:
+        - Step: {N}/{Total} - {Step Title}
+        - Test Type: {unit|component|integration|e2e}
+        - What was implemented: {Brief description}
+
+        ## Instructions
+
+        1. **Analyze the Failures**: Understand WHY each test is failing
+        2. **Read Source Files**: If needed, read the source code being tested
+        3. **Fix the Tests**:
+           - Edit the test files to fix the failures
+           - Do NOT delete tests to make them pass - fix the actual issue
+           - If the test expectation is wrong, fix the expectation
+           - If the test setup is wrong, fix the setup
+           - If the source code has a bug, note it but fix the test to match current behavior
+        4. **Run Validation**:
+           - Run: npm run lint:fix && npm run typecheck
+           - Run: npm run test -- --run {test-file-path}
+        5. **Return Results**:
+
+        ## FIX RESULTS
+
+        **Status**: success | failure
+        **Attempt**: {X}
+
+        **Changes Made**:
+        - {Description of each change}
+
+        **Root Cause**:
+        - {Why the tests were failing}
+
+        **Validation Results**:
+        - Lint/Typecheck: PASS | FAIL
+        - Tests: X passed, Y failed
+
+        **Remaining Issues** (if any):
+        - {List any tests still failing}
+        ```
+
+     4. Process fix subagent results
+     5. Run test command AGAIN to verify independently
+     6. IF tests pass: Exit loop, proceed to step logging
+     7. IF tests still fail AND attempt < 3: Continue loop
+     8. IF tests still fail AND attempt >= 3:
+        - Log all attempts and failures
+        - Use AskUserQuestion:
+          - "Tests for Step {N} have failed after 3 fix attempts. How to proceed?"
+          - Options:
+            - "Try 3 more fix attempts"
+            - "Skip this step and continue (NOT RECOMMENDED)"
+            - "Abort implementation"
+            - "I'll fix manually, then continue"
+        - Handle user response accordingly
+   END WHILE
+   ```
+
+   **Fix Loop Logging**:
+   - Each fix attempt is logged in the step results file
+   - Include: attempt number, error details, changes made, outcome
+
+10. **Step Logging** (Orchestrator):
+    - Create `docs/{YYYY_MM_DD}/test-implementation/{feature-name}/0{N+2}-step-{N}-results.md`:
+      - Step metadata (number, title, test type, timestamp, duration)
+      - Specialist used and skills loaded
+      - Subagent input (what was asked)
+      - Subagent output (full response)
+      - Files created
+      - Test cases implemented
+      - **Orchestrator verification results** (independent test run output)
+      - **Fix attempts** (if any): number of attempts, changes made per attempt
+      - Test results (passed/failed) - from ORCHESTRATOR verification
+      - Any errors or warnings
+11. **Update Todo Status** (Orchestrator):
+    - If step succeeded (tests verified passing by orchestrator): Mark todo as "completed"
+    - If step failed after all fix attempts exhausted: Keep as "in_progress" and log error
+12. **Error Handling** (Orchestrator):
     - If subagent times out:
       - Log timeout error
-      - Mark step as failed
-      - Continue or abort based on severity
-    - If subagent returns failure:
+      - Run tests independently to check current state
+      - If tests pass: Proceed (subagent may have completed before timeout)
+      - If tests fail: Enter fix loop (step 9a)
+    - If subagent returns failure (non-test related):
       - Log detailed error information
-      - If test failures: Show failing tests and suggest fixes
       - If `--step-by-step` mode: Ask user how to proceed
-      - Otherwise: Continue or abort based on severity
-12. **Step-by-Step Mode Check** (Orchestrator):
+      - Otherwise: Attempt recovery or abort based on severity
+    - **NOTE**: Test failures are handled by the mandatory fix loop (step 9a), NOT here
+13. **Step-by-Step Mode Check** (Orchestrator):
     - If `--step-by-step` flag present:
       - Use AskUserQuestion to ask user:
-        - "Step {N} [{test-type}] completed {successfully/with errors}. Continue to next step?"
-        - Options: "Continue", "Skip next step", "Retry this step", "Abort implementation"
+        - "Step {N} [{test-type}] completed with all tests passing. Continue to next step?"
+        - Options: "Continue", "Skip next step", "Abort implementation"
       - Handle user response accordingly
-13. **UPDATE INDEX** (Orchestrator): Append step summary to implementation index
-14. **Progress Report** (Orchestrator):
-    - Output concise progress: "Completed step {N}/{Total} - {step title} [{test-type}] (X tests passed)"
+    - **NOTE**: This check only happens AFTER tests are verified passing
+14. **UPDATE INDEX** (Orchestrator): Append step summary to implementation index
+15. **Progress Report** (Orchestrator):
+    - Output concise progress: "✓ Completed step {N}/{Total} - {step title} [{test-type}] (X tests passed, verified by orchestrator)"
 
 **Resume Mode**: If `--resume-from=N` flag present, skip to step N and begin execution there.
 
@@ -434,7 +544,9 @@ When the user runs this command, execute this comprehensive workflow:
    - Number of test files created
    - Number of test cases implemented
    - Tests by type (unit, component, integration, e2e)
-   - Pass/fail rates
+   - Pass/fail rates (from orchestrator verification)
+   - Total fix attempts across all steps
+   - Steps that required fixes vs steps that passed first try
    - Coverage metrics (if applicable)
 3. **Generate Change Summary**:
    - List all test files created with descriptions
@@ -452,7 +564,8 @@ When the user runs this command, execute this comprehensive workflow:
      - Steps completed (N/Total)
      - Test files created summary
      - Test cases implemented by type
-     - Test results summary
+     - Test results summary (from orchestrator verification)
+     - **Fix attempt summary**: total attempts, which steps required fixes
      - Coverage report (if applicable)
      - Known issues or warnings
      - Recommendations for next steps
@@ -496,7 +609,8 @@ When the user runs this command, execute this comprehensive workflow:
    ✓ Completed {N}/{Total} steps successfully
    ✓ Created {X} test files
    ✓ Implemented {Y} test cases
-   ✓ Tests: {Z} passed, {W} failed
+   ✓ Tests: {Z} passed, {W} failed (verified by orchestrator)
+   ✓ Fix attempts required: {F} (across all steps)
 
    Test breakdown:
    - Unit: {A} tests
@@ -508,7 +622,8 @@ When the user runs this command, execute this comprehensive workflow:
    - 📄 00-implementation-index.md - Navigation and overview
    - 📄 01-pre-checks.md - Pre-implementation validation
    - 📄 02-setup.md - Setup and test type routing
-   - 📄 03-step-1-results.md - Step 1 execution log [unit]
+   - 📄 03-step-1-results.md - Step 1 execution log [unit] (0 fix attempts)
+   - 📄 04-step-2-results.md - Step 2 execution log [component] (1 fix attempt)
    ...
    - 📄 XX-test-validation.md - Full test run results
    - 📄 YY-implementation-summary.md - Complete summary
@@ -565,6 +680,16 @@ When the user runs this command, execute this comprehensive workflow:
 - **ERROR RECOVERY**: Handle subagent errors gracefully with clear user guidance
 - **QUALITY ASSURANCE**: Enforce test validation before completion
 
+**MANDATORY TEST VERIFICATION** (NON-NEGOTIABLE):
+
+- **NEVER TRUST SUBAGENT SELF-REPORTS**: The orchestrator MUST independently run tests after each step
+- **BLOCKING PROGRESSION**: The orchestrator MUST NOT proceed to the next step if tests from the current step are failing
+- **INDEPENDENT VERIFICATION**: Run `npm run test -- --run {file}` or `npm run test:e2e -- {file}` directly
+- **FIX LOOP REQUIRED**: If tests fail, spawn a new subagent to fix them - repeat until passing
+- **NO EXCEPTIONS**: Even if a subagent reports "all tests passing", the orchestrator MUST verify independently
+- **STEP GATE**: Each step is a gate - tests must pass the orchestrator's verification to unlock the next step
+- **AUDIT TRAIL**: Log both subagent-reported results AND orchestrator-verified results separately
+
 **Quality Standards**:
 
 - All test code must pass lint and typecheck
@@ -617,6 +742,7 @@ YY-implementation-summary.md        # Final summary with test breakdown
 - Test Files Created: {Y}
 - Test Cases Implemented: {Z}
 - Tests Passed: {P} / Failed: {F}
+- Total Fix Attempts: {A} (across all steps)
 - Total Duration: {X.X} minutes
 
 ## Test Type Routing
@@ -640,10 +766,10 @@ YY-implementation-summary.md        # Final summary with test breakdown
 
 ## Quick Status
 
-| Step       | Test Type  | Status | Tests   | Duration |
-| ---------- | ---------- | ------ | ------- | -------- |
-| 1. {title} | infra      | ✓      | N/A     | 2.3s     |
-| 2. {title} | unit       | ✓      | 5/5     | 5.1s     |
+| Step       | Test Type  | Status | Tests   | Fix Attempts | Duration |
+| ---------- | ---------- | ------ | ------- | ------------ | -------- |
+| 1. {title} | infra      | ✓      | N/A     | 0            | 2.3s     |
+| 2. {title} | unit       | ✓      | 5/5     | 1            | 8.2s     |
 
 ...
 
