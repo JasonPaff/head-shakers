@@ -305,14 +305,13 @@ export class FeaturedContentFacade {
           // Add breadcrumb for successful fetch
           Sentry.addBreadcrumb({
             category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: { ...data },
+            data: { count: data.length },
             level: SENTRY_LEVELS.INFO,
             message: 'Footer featured content fetched successfully',
           });
 
           return data;
         },
-        // TODO: move to constants
         'footer',
         {
           context: {

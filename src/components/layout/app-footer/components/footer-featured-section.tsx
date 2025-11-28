@@ -8,11 +8,12 @@ import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-c
 /**
  * Server component that fetches and displays featured collections in the footer
  * Returns null if no featured collections are available
+ * Caching: Uses CacheService.featured.content() via FeaturedContentFacade.getFooterFeaturedContentAsync()
  */
 export const FooterFeaturedSection = async () => {
   const featuredContent = await FeaturedContentFacade.getFooterFeaturedContentAsync();
 
-  if (!featuredContent.length || featuredContent.length === 0) {
+  if (featuredContent.length === 0) {
     return null;
   }
 

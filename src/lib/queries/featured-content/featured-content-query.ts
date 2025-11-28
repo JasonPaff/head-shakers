@@ -461,7 +461,10 @@ export class FeaturedContentQuery extends BaseQuery {
         title: featuredContent.title,
       })
       .from(featuredContent)
-      .leftJoin(collections, eq(featuredContent.contentId, collections.id))
+      .leftJoin(
+        collections,
+        and(eq(featuredContent.contentId, collections.id), isNull(collections.deletedAt)),
+      )
       .where(
         and(
           eq(featuredContent.isActive, true),

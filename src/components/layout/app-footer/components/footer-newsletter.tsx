@@ -2,6 +2,7 @@
 
 import type { FormEvent } from 'react';
 
+import * as Sentry from '@sentry/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailIcon } from 'lucide-react';
 
@@ -10,8 +11,9 @@ import { useFocusContext } from '@/components/ui/form/focus-management/focus-con
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
-import { newsletterSignupSchema } from '@/lib/validations/newsletter.validation';
+import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
 
 /**
  * Newsletter signup form component for the footer
@@ -22,6 +24,15 @@ export const FooterNewsletter = withFocusManagement(() => {
 
   const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
     onSuccess: () => {
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.USER_INTERACTION,
+        data: {
+          action: 'newsletter-subscribe',
+          component: 'footer-newsletter',
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: 'Newsletter subscription successful',
+      });
       form.reset();
     },
     toastMessages: {
@@ -47,13 +58,22 @@ export const FooterNewsletter = withFocusManagement(() => {
       modeAfterSubmission: 'change',
     }),
     validators: {
-      onSubmit: newsletterSignupSchema,
+      onSubmit: insertNewsletterSignupSchema,
     },
   });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    Sentry.addBreadcrumb({
+      category: SENTRY_BREADCRUMB_CATEGORIES.USER_INTERACTION,
+      data: {
+        action: 'newsletter-form-submit',
+        component: 'footer-newsletter',
+      },
+      level: SENTRY_LEVELS.INFO,
+      message: 'Newsletter form submitted',
+    });
     void form.handleSubmit();
   };
 

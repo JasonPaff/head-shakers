@@ -106,7 +106,7 @@ export class NewsletterQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
-      .select({ id: newsletterSignups.id })
+      .select({ unsubscribedAt: newsletterSignups.unsubscribedAt })
       .from(newsletterSignups)
       .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
       .limit(1);
@@ -114,14 +114,7 @@ export class NewsletterQuery extends BaseQuery {
     const signup = result?.[0];
     if (!signup) return false;
 
-    // Check if unsubscribed
-    const fullRecord = await dbInstance
-      .select()
-      .from(newsletterSignups)
-      .where(eq(newsletterSignups.id, signup.id))
-      .limit(1);
-
-    return fullRecord?.[0]?.unsubscribedAt === null;
+    return signup.unsubscribedAt === null;
   }
 
   /**
