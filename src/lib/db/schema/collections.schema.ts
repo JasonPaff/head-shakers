@@ -1,15 +1,5 @@
 import { sql } from 'drizzle-orm';
-import {
-  boolean,
-  check,
-  index,
-  integer,
-  pgTable,
-  timestamp,
-  uniqueIndex,
-  uuid,
-  varchar,
-} from 'drizzle-orm/pg-core';
+import { boolean, check, index, pgTable, timestamp, uniqueIndex, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { DEFAULTS, SCHEMA_LIMITS } from '@/lib/constants';
 import { SLUG_MAX_LENGTH } from '@/lib/constants/slug';
@@ -18,7 +8,6 @@ import { users } from '@/lib/db/schema/users.schema';
 export const collections = pgTable(
   'collections',
   {
-    commentCount: integer('comment_count').default(DEFAULTS.COLLECTION.COMMENT_COUNT).notNull(),
     coverImageUrl: varchar('cover_image_url', { length: SCHEMA_LIMITS.COLLECTION.COVER_IMAGE_URL.MAX }),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     deletedAt: timestamp('deleted_at'),
@@ -49,13 +38,10 @@ export const collections = pgTable(
     index('collections_description_search_idx').using('gin', sql`${table.description} gin_trgm_ops`),
     index('collections_user_created_desc_idx').on(table.userId, sql`${table.createdAt} DESC`),
     index('collections_public_created_desc_idx').on(table.isPublic, sql`${table.createdAt} DESC`),
-    index('collections_comment_count_desc_idx').on(sql`${table.commentCount} DESC`),
-    index('collections_public_comment_count_idx').on(table.isPublic, sql`${table.commentCount} DESC`),
 
     // constraints
     check('collections_name_length', sql`length(${table.name}) <= ${SCHEMA_LIMITS.COLLECTION.NAME.MAX}`),
     check('collections_name_not_empty', sql`length(${table.name}) >= ${SCHEMA_LIMITS.COLLECTION.NAME.MIN}`),
-    check('collections_comment_count_non_negative', sql`${table.commentCount} >= 0`),
 
     // unique constraints
     uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug),

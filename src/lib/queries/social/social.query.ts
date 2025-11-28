@@ -12,7 +12,7 @@ import type {
 } from '@/lib/validations/social.validation';
 
 import { ENUMS, MAX_COMMENT_NESTING_DEPTH } from '@/lib/constants';
-import { bobbleheads, collections, comments, likes, userBlocks } from '@/lib/db/schema';
+import { bobbleheads, comments, likes, userBlocks } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type CommentRecord = SelectComment;
@@ -106,12 +106,6 @@ export class SocialQuery extends BaseQuery {
           .update(bobbleheads)
           .set({ commentCount: sql`GREATEST(0, ${bobbleheads.commentCount} - 1)` })
           .where(eq(bobbleheads.id, targetId));
-        break;
-      case ENUMS.COMMENT.TARGET_TYPE[1]:
-        await dbInstance
-          .update(collections)
-          .set({ commentCount: sql`GREATEST(0, ${collections.commentCount} - 1)` })
-          .where(eq(collections.id, targetId));
         break;
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);
@@ -750,12 +744,6 @@ export class SocialQuery extends BaseQuery {
           .update(bobbleheads)
           .set({ commentCount: sql`${bobbleheads.commentCount} + 1` })
           .where(eq(bobbleheads.id, targetId));
-        break;
-      case ENUMS.COMMENT.TARGET_TYPE[1]:
-        await dbInstance
-          .update(collections)
-          .set({ commentCount: sql`${collections.commentCount} + 1` })
-          .where(eq(collections.id, targetId));
         break;
       default:
         throw new Error(`Unknown target type: ${targetType as string}`);

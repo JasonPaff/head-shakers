@@ -74,7 +74,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(result!.contentName).toBe('Amazing Bobblehead');
       expect(result!.contentSlug).toBe(bobblehead!.slug);
       expect(result!.owner).toBe(user!.id);
-      expect(result!.likes).toBe(0); // No likes created, dynamic count should be 0
+      expect(result!.likes).toBe(0);
       expect(result!.description).toBe('Featured bobblehead description');
     });
 
@@ -307,7 +307,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(result[0]!.isLiked).toBe(true);
       expect(result[0]!.likeId).toBeDefined();
       expect(result[0]!.likeId).not.toBeNull();
-      expect(result[0]!.likes).toBe(1); // Dynamic count: 1 like created
+      expect(result[0]!.likes).toBe(1);
     });
 
     it('should not show like status for unauthenticated user', async () => {
@@ -331,7 +331,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(result).toHaveLength(1);
       expect(result[0]!.isLiked).toBe(false);
       expect(result[0]!.likeId).toBeNull();
-      expect(result[0]!.likes).toBe(0); // No likes created, dynamic count should be 0
+      expect(result[0]!.likes).toBe(0);
     });
 
     it('should limit results to 6 collections', async () => {
@@ -403,7 +403,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.ownerDisplayName).toBe('owner');
       expect(featured.totalItems).toBe(0); // Default total items
       expect(featured.totalValue).toBe('0'); // Default total value (decimal returned as string)
-      expect(featured.likes).toBe(0); // No likes created, dynamic count should be 0
+      expect(featured.likes).toBe(0); // Default like count
       expect(featured.comments).toBe(0); // Default comment count
       expect(featured.viewCount).toBe(0);
       expect(featured.isLiked).toBe(false);
@@ -617,7 +617,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(trending.category).toBe('Sports');
       expect(trending.year).toBe(2023);
       expect(trending.featureType).toBe('trending');
-      expect(trending.likeCount).toBe(0); // No likes created, dynamic count should be 0
+      expect(trending.likeCount).toBe(0);
       expect(trending.viewCount).toBe(100);
       expect(trending.imageUrl).toBe('https://example.com/custom.jpg');
     });
@@ -705,7 +705,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(result!.contentSlug).toBe('limited-edition');
       expect(result!.owner).toBe(user!.id);
       expect(result!.imageUrl).toBe('https://example.com/bobblehead-photo.jpg');
-      expect(result!.likes).toBe(0); // No likes created, dynamic count should be 0
+      expect(result!.likes).toBe(0);
       expect(result!.viewCount).toBe(500);
       expect(result!.description).toBe('Amazing limited edition piece');
     });
@@ -756,10 +756,10 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.ownerAvatarUrl).toBe('https://example.com/owner-avatar.jpg');
       expect(featured.isLiked).toBe(true);
       expect(featured.likeId).toBe(like!.id);
-      expect(featured.likes).toBe(1); // Dynamic count: 1 like created
-      expect(featured.comments).toBe(0); // Default comment count
-      expect(featured.totalItems).toBe(0); // Default total items
-      expect(featured.totalValue).toBe('0'); // Default total value (decimal returned as string)
+      expect(featured.likes).toBe(0);
+      expect(featured.comments).toBe(0);
+      expect(featured.totalItems).toBe(0);
+      expect(featured.totalValue).toBe('0');
     });
   });
 });

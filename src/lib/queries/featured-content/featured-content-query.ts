@@ -10,7 +10,15 @@ import type {
 } from '@/lib/validations/system.validation';
 
 import { CONFIG, DEFAULTS } from '@/lib/constants';
-import { bobbleheadPhotos, bobbleheads, collections, featuredContent, likes, users } from '@/lib/db/schema';
+import {
+  bobbleheadPhotos,
+  bobbleheads,
+  collections,
+  comments,
+  featuredContent,
+  likes,
+  users,
+} from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 /**
@@ -395,7 +403,13 @@ export class FeaturedContentQuery extends BaseQuery {
 
     return dbInstance
       .select({
-        comments: collections.commentCount,
+        comments: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${comments}
+          WHERE ${comments.targetId} = ${collections.id}
+          AND ${comments.targetType} = 'collection'
+          AND ${comments.deletedAt} IS NULL
+        )`.as('comments'),
         contentId: featuredContent.contentId,
         contentSlug: collections.slug,
         description: featuredContent.description,
@@ -405,7 +419,12 @@ export class FeaturedContentQuery extends BaseQuery {
         isLiked: sql<boolean>`${likes.id} IS NOT NULL`,
         isTrending: sql<boolean>`${featuredContent.featureType} = 'trending'`,
         likeId: likes.id,
-        likes: collections.likeCount,
+        likes: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM likes
+          WHERE target_id = ${collections.id}
+          AND target_type = 'collection'
+        )`.as('likes'),
         ownerAvatarUrl: users.avatarUrl,
         ownerDisplayName: users.username,
         title: featuredContent.title,

@@ -23,8 +23,7 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
-import { likes } from '@/lib/db/schema/social.schema';
+import { bobbleheadPhotos, bobbleheads, collections, comments, likes, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
@@ -445,7 +444,13 @@ export class CollectionsQuery extends BaseQuery {
       const results = await dbInstance
         .select({
           avatarUrl: users.avatarUrl,
-          commentCount: collections.commentCount,
+          commentCount: sql<number>`(
+            SELECT COUNT(*)::integer
+            FROM ${comments}
+            WHERE target_id = ${collections.id}
+            AND target_type = 'collection'
+            AND deleted_at IS NULL
+          )`.as('comment_count'),
           coverImageUrl: collections.coverImageUrl,
           createdAt: collections.createdAt,
           deletedAt: collections.deletedAt,
@@ -541,7 +546,13 @@ export class CollectionsQuery extends BaseQuery {
     const results = await dbInstance
       .select({
         avatarUrl: users.avatarUrl,
-        commentCount: collections.commentCount,
+        commentCount: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${comments}
+          WHERE target_id = ${collections.id}
+          AND target_type = 'collection'
+          AND deleted_at IS NULL
+        )`.as('comment_count'),
         coverImageUrl: collections.coverImageUrl,
         createdAt: collections.createdAt,
         description: collections.description,
@@ -694,7 +705,13 @@ export class CollectionsQuery extends BaseQuery {
     const results = await dbInstance
       .select({
         avatarUrl: users.avatarUrl,
-        commentCount: collections.commentCount,
+        commentCount: sql<number>`(
+          SELECT COUNT(*)::integer
+          FROM ${comments}
+          WHERE target_id = ${collections.id}
+          AND target_type = 'collection'
+          AND deleted_at IS NULL
+        )`.as('comment_count'),
         coverImageUrl: collections.coverImageUrl,
         createdAt: collections.createdAt,
         description: collections.description,

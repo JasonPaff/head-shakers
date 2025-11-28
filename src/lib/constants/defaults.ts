@@ -20,7 +20,6 @@ export const DEFAULTS = {
     SORT_ORDER: 0,
   },
   COLLECTION: {
-    COMMENT_COUNT: 0,
     IS_PUBLIC: true,
   },
   COMMENT: {
