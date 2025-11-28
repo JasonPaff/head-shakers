@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:client-component-specialist), Task(subagent_type:server-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:test-specialist), Task(subagent_type:validation-specialist), Task(subagent_type:resend-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:general-purpose), Task(subagent_type:server-action-specialist), Task(subagent_type:database-specialist), Task(subagent_type:facade-specialist), Task(subagent_type:client-component-specialist), Task(subagent_type:server-component-specialist), Task(subagent_type:form-specialist), Task(subagent_type:media-specialist), Task(subagent_type:unit-test-specialist), Task(subagent_type:component-test-specialist), Task(subagent_type:integration-test-specialist), Task(subagent_type:e2e-test-specialist), Task(subagent_type:test-infrastructure-specialist), Task(subagent_type:validation-specialist), Task(subagent_type:resend-specialist), Read(*), Write(*), Bash(git:*,mkdir:*,npm:*,cd:*), TodoWrite(*), AskUserQuestion(*)
 argument-hint: 'path/to/implementation-plan.md [--step-by-step|--dry-run|--resume-from=N|--worktree]'
 description: Execute implementation plan with structured tracking and validation using subagent architecture
 ---
@@ -50,7 +50,11 @@ You are a lightweight implementation orchestrator that coordinates the execution
 | `client-component-specialist` | Client components | react-coding-conventions, ui-components, client-components                | `src/components/**/*.tsx` (with hooks/events), `*-client.tsx`        |
 | `form-specialist`             | Forms             | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx`                      |
 | `media-specialist`            | Cloudinary        | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components                               |
-| `test-specialist`             | Testing           | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`                             |
+| `unit-test-specialist`        | Unit tests        | unit-testing, testing-base                                                | `tests/unit/**/*.test.ts`                                            |
+| `component-test-specialist`   | Component tests   | component-testing, testing-base                                           | `tests/components/**/*.test.tsx`                                     |
+| `integration-test-specialist` | Integration tests | integration-testing, testing-base                                         | `tests/integration/**/*.test.ts`                                     |
+| `e2e-test-specialist`         | E2E tests         | e2e-testing, testing-base                                                 | `tests/e2e/specs/**/*.spec.ts`                                       |
+| `test-infrastructure-specialist` | Test infra     | test-infrastructure, testing-base                                         | `tests/**/fixtures/**`, `tests/**/mocks/**`, `tests/e2e/pages/**`    |
 | `validation-specialist`       | Zod schemas       | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`                             |
 | `resend-specialist`           | Email sending     | resend-email, sentry-monitoring                                           | `src/lib/services/resend*.ts`, `src/lib/email-templates/**/*.tsx`    |
 | `general-purpose`             | Fallback          | None (manual skill invocation)                                            | Any other files                                                      |
@@ -62,40 +66,52 @@ You are a lightweight implementation orchestrator that coordinates the execution
 ### Detection Rules (in priority order)
 
 ```
-1. IF files contain "tests/" OR end with ".test.ts" OR ".spec.ts"
-   → Use: test-specialist
+1. IF files contain "tests/unit/" AND end with ".test.ts"
+   → Use: unit-test-specialist
 
-2. IF files contain "src/lib/actions/" OR end with ".actions.ts"
+2. IF files contain "tests/components/" AND end with ".test.tsx"
+   → Use: component-test-specialist
+
+3. IF files contain "tests/integration/" AND end with ".test.ts"
+   → Use: integration-test-specialist
+
+4. IF files contain "tests/e2e/specs/" AND end with ".spec.ts"
+   → Use: e2e-test-specialist
+
+5. IF files contain "tests/**/fixtures/" OR "tests/**/mocks/" OR "tests/e2e/pages/"
+   → Use: test-infrastructure-specialist
+
+6. IF files contain "src/lib/actions/" OR end with ".actions.ts"
    → Use: server-action-specialist
 
-3. IF files contain "src/lib/db/schema/"
+7. IF files contain "src/lib/db/schema/"
    → Use: database-specialist
 
-4. IF files contain "src/lib/queries/" OR end with ".queries.ts"
+8. IF files contain "src/lib/queries/" OR end with ".queries.ts"
    → Use: database-specialist
 
-5. IF files contain "src/lib/facades/" OR end with ".facade.ts"
+9. IF files contain "src/lib/facades/" OR end with ".facade.ts"
    → Use: facade-specialist
 
-6. IF files contain "src/lib/validations/" OR end with ".validation.ts"
-   → Use: validation-specialist
+10. IF files contain "src/lib/validations/" OR end with ".validation.ts"
+    → Use: validation-specialist
 
-7. IF files contain "cloudinary" (case-insensitive) OR involve image upload/media
-   → Use: media-specialist
+11. IF files contain "cloudinary" (case-insensitive) OR involve image upload/media
+    → Use: media-specialist
 
-8. IF files are .tsx/.jsx AND (contain "form" OR "dialog" OR use "useAppForm")
-   → Use: form-specialist
+12. IF files are .tsx/.jsx AND (contain "form" OR "dialog" OR use "useAppForm")
+    → Use: form-specialist
 
-9. IF files are page.tsx, layout.tsx, loading.tsx, error.tsx, OR contain "-async.tsx", "-server.tsx", OR "-skeleton.tsx"
-   → Use: server-component-specialist
+13. IF files are page.tsx, layout.tsx, loading.tsx, error.tsx, OR contain "-async.tsx", "-server.tsx", OR "-skeleton.tsx"
+    → Use: server-component-specialist
 
-10. IF files are .tsx/.jsx in "src/components/" OR "src/app/**/components/" with hooks/events
+14. IF files are .tsx/.jsx in "src/components/" OR "src/app/**/components/" with hooks/events
     → Use: client-component-specialist
 
-11. IF files contain "resend" (case-insensitive) OR contain "email-templates/" OR involve email sending
+15. IF files contain "resend" (case-insensitive) OR contain "email-templates/" OR involve email sending
     → Use: resend-specialist
 
-12. ELSE (fallback)
+16. ELSE (fallback)
     → Use: general-purpose
 ```
 
@@ -224,7 +240,8 @@ When the user runs this command, execute this comprehensive workflow:
      Step 5: form-specialist (form component files)
      Step 6: server-component-specialist (page.tsx, async components)
      Step 7: client-component-specialist (interactive components with hooks)
-     Step 8: test-specialist (test files)
+     Step 8: unit-test-specialist (unit test files)
+     Step 9: e2e-test-specialist (E2E spec files)
      ```
    - Log any steps that span multiple domains
 4. **Create Todo List**:
@@ -478,9 +495,9 @@ When the user runs this command, execute this comprehensive workflow:
      - Capture all output
      - Check pass/fail status
 
-   **Option B - Complex Testing** (Delegate to test-specialist):
+   **Option B - Complex Testing** (Delegate to test-executor):
    - For comprehensive test suites (unit, integration, e2e):
-     - Use Task tool with `subagent_type: "test-specialist"`
+     - Use Task tool with `subagent_type: "test-executor"`
      - Description: "Run quality gates and test suites"
      - **Subagent handles**: Running tests, analyzing failures, suggesting fixes
      - **Returns**: Test results, coverage reports, failure analysis

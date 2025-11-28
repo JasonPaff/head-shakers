@@ -167,7 +167,7 @@ When the user runs this command, execute this 4-step workflow:
 **Process**:
 
 1. Record step start time with ISO timestamp
-2. Use Task tool with `subagent_type: "test-planner"`:
+2. Use Task tool with `subagent_type: "general-purpose"`:
    - Description: "Generate test implementation plan"
    - **CRITICAL**: Request MARKDOWN format following the agent's template
    - Pass coverage gap analysis from Step 3
@@ -284,7 +284,7 @@ The generated test plan can be executed using:
 /implement-plan docs/{date}/plans/{feature-name}-test-plan.md
 ```
 
-This routes each step to the `test-specialist` agent for implementation.
+This routes each step to the appropriate test specialist agent (unit-test-specialist, component-test-specialist, integration-test-specialist, or e2e-test-specialist) based on the test type.
 
 ## Example Output File Structure
 
