@@ -6,6 +6,7 @@ import type { RetryResult } from '@/lib/utils/retry';
 
 import { DEFAULTS } from '@/lib/constants';
 import { db } from '@/lib/db';
+import { BaseContextHelpers } from '@/lib/queries/base/base-context-helpers';
 import {
   buildPermissionFilter,
   buildSoftDeleteFilter,
@@ -15,9 +16,10 @@ import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
 import { withDatabaseRetry } from '@/lib/utils/retry';
 
 /**
- * abstract base class for all query operations
+ * Abstract base class for all query operations
+ * Extends BaseContextHelpers for query context utilities
  */
-export abstract class BaseQuery {
+export abstract class BaseQuery extends BaseContextHelpers {
   protected static combineFilters = combineFilters;
 
   protected static applyPagination(options: FindOptions): { limit?: number; offset?: number } {

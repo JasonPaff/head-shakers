@@ -4,7 +4,7 @@ import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
-import { createPublicQueryContext } from '@/lib/queries/base/query-context';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { UsersQuery } from '@/lib/queries/users/users-query';
@@ -24,7 +24,7 @@ export interface PlatformStats {
  * Platform Statistics Facade
  * Provides aggregated platform-wide statistics for public display
  */
-export class PlatformStatsFacade {
+export class PlatformStatsFacade extends BaseFacade {
   /**
    * Get platform-wide statistics
    *
@@ -43,7 +43,7 @@ export class PlatformStatsFacade {
     try {
       return await CacheService.platform.stats(
         async () => {
-          const context = createPublicQueryContext({ dbInstance });
+          const context = this.publicContext(dbInstance);
 
           // Fetch all counts in parallel for performance
           const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([

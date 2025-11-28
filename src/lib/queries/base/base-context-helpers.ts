@@ -1,0 +1,71 @@
+import type { QueryContext } from '@/lib/queries/base/query-context';
+import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
+
+import {
+  createAdminQueryContext,
+  createProtectedQueryContext,
+  createPublicQueryContext,
+  createUserQueryContext,
+} from '@/lib/queries/base/query-context';
+
+/**
+ * Abstract base class providing query context helper methods
+ * Extended by both BaseQuery and BaseFacade
+ */
+export abstract class BaseContextHelpers {
+  /**
+   * Create a QueryContext for admin access
+   */
+  protected static adminContext(adminUserId: string, dbInstance?: DatabaseExecutor): QueryContext {
+    return createAdminQueryContext(adminUserId, { dbInstance });
+  }
+
+  /**
+   * Create a QueryContext for owner-or-viewer access
+   * Returns protected context if viewer is the owner, otherwise viewer context
+   */
+  protected static ownerOrViewerContext(
+    ownerId: string,
+    viewerUserId: string | undefined,
+    dbInstance?: DatabaseExecutor,
+  ): QueryContext {
+    if (viewerUserId && viewerUserId === ownerId) {
+      return createProtectedQueryContext(ownerId, { dbInstance });
+    }
+    return this.viewerContext(viewerUserId, dbInstance);
+  }
+
+  /**
+   * Create a QueryContext for protected/owner-only operations
+   */
+  protected static protectedContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
+    return createProtectedQueryContext(userId, { dbInstance });
+  }
+
+  /**
+   * Create a QueryContext for public access only
+   */
+  protected static publicContext(dbInstance?: DatabaseExecutor): QueryContext {
+    return createPublicQueryContext({ dbInstance });
+  }
+
+  /**
+   * Create a QueryContext for authenticated user access
+   */
+  protected static userContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
+    return createUserQueryContext(userId, { dbInstance });
+  }
+
+  /**
+   * Create a QueryContext for viewer-based access
+   * Returns user context if viewerUserId is provided, otherwise public context
+   */
+  protected static viewerContext(
+    viewerUserId: string | undefined,
+    dbInstance?: DatabaseExecutor,
+  ): QueryContext {
+    return viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
+      : createPublicQueryContext({ dbInstance });
+  }
+}
