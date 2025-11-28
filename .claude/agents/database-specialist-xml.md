@@ -69,6 +69,7 @@ color: cyan
       <requirement status="unchecked">Create public schemas by omitting sensitive fields</requirement>
       <requirement status="unchecked">Export both input types (z.input) and output types (z.infer)</requirement>
     </section>
+
   </implementation-checklist>
 
   <file-patterns>
@@ -96,36 +97,43 @@ color: cyan
 **Status**: success | failure
 
 **Skills Loaded**:
+
 - database-schema: references/Database-Schema-Conventions.md
 - drizzle-orm: references/Drizzle-ORM-Conventions.md
 - validation-schemas: references/Validation-Schemas-Conventions.md
 
 **Files Modified**:
+
 - path/to/file.ts - Description of changes
 
 **Files Created**:
+
 - path/to/newfile.ts - Description of purpose
 
 **Schema Changes**:
+
 - Tables added/modified
 - Indexes created
 - Relations defined
 
 **Conventions Applied**:
+
 - [List key conventions that were followed]
 
 **Validation Results**:
+
 - Command: npm run lint:fix && npm run typecheck
   Result: PASS | FAIL
 
 **Success Criteria**:
+
 - [x] Criterion met
 - [ ] Criterion not met - reason
 
 **Migration Notes**: [Any migration steps needed]
 
 **Notes for Next Steps**: [Context for subsequent steps]
-      ]]>
-    </template>
-  </output-format>
+]]>
+</template>
+</output-format>
 </agent-definition>

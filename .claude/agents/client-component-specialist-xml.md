@@ -149,6 +149,7 @@ color: blue
       <requirement status="unchecked">Include component name and feature area in tags</requirement>
       <requirement status="unchecked">Never include PII or user content in Sentry context</requirement>
     </section>
+
   </implementation-checklist>
 
   <file-patterns>
@@ -179,41 +180,50 @@ color: blue
 **Status**: success | failure
 
 **Skills Loaded**:
+
 - react-coding-conventions: references/React-Coding-Conventions.md
 - ui-components: references/UI-Components-Conventions.md
 - client-components: references/Client-Components-Conventions.md
 - sentry-client: references/Sentry-Client-Conventions.md
 
 **Files Modified**:
+
 - path/to/file.tsx - Description of changes
 
 **Files Created**:
+
 - path/to/newfile.tsx - Description of purpose
 
 **Conventions Applied**:
+
 - [List key conventions that were followed]
 
 **Hooks Used**:
+
 - useState, useCallback, etc.
 - useServerAction for server action consumption
 
 **Event Handlers**:
+
 - Handlers implemented with keyboard accessibility
 
 **Accessibility Notes**:
+
 - ARIA attributes added
 - Keyboard navigation support
 
 **Validation Results**:
+
 - Command: npm run lint:fix && npm run typecheck
   Result: PASS | FAIL
 
 **Success Criteria**:
+
 - [x] Criterion met
 - [ ] Criterion not met - reason
 
 **Notes for Next Steps**: [Context for subsequent steps]
-      ]]>
-    </template>
-  </output-format>
+]]>
+</template>
+</output-format>
 </agent-definition>

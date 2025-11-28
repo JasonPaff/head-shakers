@@ -85,6 +85,7 @@ color: green
       <requirement status="unchecked">Use executeAsync for form submissions</requirement>
       <requirement status="unchecked">Access results via data.data in onSuccess callback</requirement>
     </section>
+
   </implementation-checklist>
 
   <file-patterns>
@@ -111,35 +112,42 @@ color: green
 **Status**: success | failure
 
 **Skills Loaded**:
+
 - form-system: references/Form-System-Conventions.md
 - react-coding-conventions: references/React-Coding-Conventions.md
 - validation-schemas: references/Validation-Schemas-Conventions.md
 - server-actions: references/Server-Actions-Conventions.md
 
 **Files Modified**:
+
 - path/to/file.tsx - Description of changes
 
 **Files Created**:
+
 - path/to/newfile.tsx - Description of purpose
 
 **Form Details**:
+
 - Fields implemented
 - Validation schema used
 - Server action integrated
 
 **Conventions Applied**:
+
 - [List key conventions that were followed]
 
 **Validation Results**:
+
 - Command: npm run lint:fix && npm run typecheck
   Result: PASS | FAIL
 
 **Success Criteria**:
+
 - [x] Criterion met
 - [ ] Criterion not met - reason
 
 **Notes for Next Steps**: [Context for subsequent steps]
-      ]]>
-    </template>
-  </output-format>
+]]>
+</template>
+</output-format>
 </agent-definition>

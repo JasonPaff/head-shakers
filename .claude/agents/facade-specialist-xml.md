@@ -105,6 +105,7 @@ color: yellow
       <requirement status="unchecked">Keep facades focused on orchestration, not business rules</requirement>
       <requirement status="unchecked">Non-blocking cleanup (Cloudinary, etc.) uses try-catch with Sentry warning</requirement>
     </section>
+
   </implementation-checklist>
 
   <anti-pattern-detection>
@@ -144,25 +145,31 @@ color: yellow
 **Status**: success | failure
 
 **Skills Loaded**:
+
 - facade-layer: references/Facade-Layer-Conventions.md
 - caching: references/Caching-Conventions.md
 - sentry-server: references/Sentry-Server-Conventions.md
 - drizzle-orm: references/Drizzle-ORM-Conventions.md
 
 **Files Modified**:
+
 - path/to/file.ts - Description of changes
 
 **Files Created**:
+
 - path/to/newfile.ts - Description of purpose
 
 **Conventions Applied**:
+
 - [List key conventions that were followed]
 
 **Caching Strategy**:
+
 - Cache keys/tags used
 - Invalidation triggers
 
 **Anti-Pattern Check**:
+
 - [x] No missing Async suffixes
 - [x] No duplicate methods
 - [x] No stub methods
@@ -174,15 +181,17 @@ color: yellow
 - [x] No methods exceed 60 lines
 
 **Validation Results**:
+
 - Command: npm run lint:fix && npm run typecheck
   Result: PASS | FAIL
 
 **Success Criteria**:
+
 - [x] Criterion met
 - [ ] Criterion not met - reason
 
 **Notes for Next Steps**: [Context for subsequent steps]
-      ]]>
-    </template>
-  </output-format>
+]]>
+</template>
+</output-format>
 </agent-definition>
