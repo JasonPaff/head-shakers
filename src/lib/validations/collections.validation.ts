@@ -30,7 +30,6 @@ export const insertCollectionSchema = createInsertSchema(collections, {
 }).omit({
   createdAt: true,
   id: true,
-  lastItemAddedAt: true,
   slug: true,
   totalItems: true,
   updatedAt: true,
@@ -50,5 +49,5 @@ export const getCollectionBySlugSchema = z.object({
     .regex(SLUG_PATTERN, {
       message: 'Slug must contain only lowercase letters, numbers, and hyphens',
     }),
-  userId: z.string().uuid({ message: 'User ID is required' }),
+  userId: z.uuid({ message: 'User ID is required' }),
 });

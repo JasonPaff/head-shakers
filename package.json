@@ -53,7 +53,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@radix-ui/react-visually-hidden": "^1.2.3",
-    "@sentry/nextjs": "^10.22.0",
+    "@sentry/nextjs": "^10.27.0",
     "@tanstack/react-form": "^1.23.8",
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/react-virtual": "^3.13.12",

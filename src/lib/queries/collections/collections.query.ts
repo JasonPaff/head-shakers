@@ -1,4 +1,18 @@
-import { and, asc, count, desc, eq, gte, ilike, isNull, lte, or, sql } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  countDistinct,
+  desc,
+  eq,
+  gte,
+  ilike,
+  isNotNull,
+  isNull,
+  lte,
+  or,
+  sql,
+} from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type { BrowseCategoriesInput } from '@/lib/validations/browse-categories.validation';
@@ -413,7 +427,7 @@ export class CollectionsQuery extends BaseQuery {
 
       // get total count for pagination metadata
       const countQuery = dbInstance
-        .select({ count: sql<number>`count(*)::int` })
+        .select({ count: count() })
         .from(collections)
         .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))
         .where(collectionFilters);
@@ -438,12 +452,11 @@ export class CollectionsQuery extends BaseQuery {
               AND ${bobbleheadPhotos.isPrimary} = true
             WHERE ${bobbleheads.collectionId} = ${collections.id}
               AND ${bobbleheads.deletedAt} IS NULL
-            ORDER BY ${bobbleheads.createdAt} ASC
+            ORDER BY ${bobbleheads.createdAt}
             LIMIT 1
           )`,
           id: collections.id,
           isPublic: collections.isPublic,
-          lastItemAddedAt: collections.lastItemAddedAt,
           likeCount: collections.likeCount,
           name: collections.name,
           ownerId: users.id,
@@ -473,7 +486,6 @@ export class CollectionsQuery extends BaseQuery {
           description: row.description,
           id: row.id,
           isPublic: row.isPublic,
-          lastItemAddedAt: row.lastItemAddedAt,
           likeCount: row.likeCount,
           name: row.name,
           slug: row.slug,
@@ -502,10 +514,7 @@ export class CollectionsQuery extends BaseQuery {
     }
 
     // if no category filter, just return all collections (same as browse collections)
-    const countQuery = dbInstance
-      .select({ count: sql<number>`count(*)::int` })
-      .from(collections)
-      .where(collectionFilters);
+    const countQuery = dbInstance.select({ count: count() }).from(collections).where(collectionFilters);
 
     const countResult = await countQuery;
     const totalCount = countResult[0]?.count || 0;
@@ -526,12 +535,11 @@ export class CollectionsQuery extends BaseQuery {
             AND ${bobbleheadPhotos.isPrimary} = true
           WHERE ${bobbleheads.collectionId} = ${collections.id}
             AND ${bobbleheads.deletedAt} IS NULL
-          ORDER BY ${bobbleheads.createdAt} ASC
+          ORDER BY ${bobbleheads.createdAt} 
           LIMIT 1
         )`,
         id: collections.id,
         isPublic: collections.isPublic,
-        lastItemAddedAt: collections.lastItemAddedAt,
         likeCount: collections.likeCount,
         name: collections.name,
         ownerId: users.id,
@@ -550,7 +558,7 @@ export class CollectionsQuery extends BaseQuery {
       .limit(pageSize)
       .offset(offset);
 
-    // transform results to match BrowseCollectionRecord type
+    // transform results to match the BrowseCollectionRecord type
     const transformedResults: Array<BrowseCollectionRecord> = results.map((row) => ({
       collection: {
         commentCount: row.commentCount,
@@ -560,7 +568,6 @@ export class CollectionsQuery extends BaseQuery {
         description: row.description,
         id: row.id,
         isPublic: row.isPublic,
-        lastItemAddedAt: row.lastItemAddedAt,
         likeCount: row.likeCount,
         name: row.name,
         slug: row.slug,
@@ -648,10 +655,7 @@ export class CollectionsQuery extends BaseQuery {
     const offset = (page - 1) * pageSize;
 
     // get total count for pagination metadata
-    const countQuery = dbInstance
-      .select({ count: sql<number>`count(*)::int` })
-      .from(collections)
-      .where(whereConditions);
+    const countQuery = dbInstance.select({ count: count() }).from(collections).where(whereConditions);
 
     const countResult = await countQuery;
     const totalCount = countResult[0]?.count || 0;
@@ -672,12 +676,11 @@ export class CollectionsQuery extends BaseQuery {
             AND ${bobbleheadPhotos.isPrimary} = true
           WHERE ${bobbleheads.collectionId} = ${collections.id}
             AND ${bobbleheads.deletedAt} IS NULL
-          ORDER BY ${bobbleheads.createdAt} ASC
+          ORDER BY ${bobbleheads.createdAt} 
           LIMIT 1
         )`,
         id: collections.id,
         isPublic: collections.isPublic,
-        lastItemAddedAt: collections.lastItemAddedAt,
         likeCount: collections.likeCount,
         name: collections.name,
         ownerId: users.id,
@@ -706,7 +709,6 @@ export class CollectionsQuery extends BaseQuery {
         description: row.description,
         id: row.id,
         isPublic: row.isPublic,
-        lastItemAddedAt: row.lastItemAddedAt,
         likeCount: row.likeCount,
         name: row.name,
         slug: row.slug,
@@ -789,13 +791,11 @@ export class CollectionsQuery extends BaseQuery {
   static async getCollectionCountAsync(context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
+    return await dbInstance
       .select({ count: count() })
       .from(collections)
       .where(buildSoftDeleteFilter(collections.deletedAt, context))
       .then((result) => result[0]?.count || 0);
-
-    return result;
   }
 
   /**
@@ -888,15 +888,15 @@ export class CollectionsQuery extends BaseQuery {
     // get distinct categories with counts from bobbleheads that belong to public collections
     const results = await dbInstance
       .selectDistinct({
-        bobbleheadCount: sql<number>`COUNT(DISTINCT ${bobbleheads.id})::int`,
+        bobbleheadCount: countDistinct(bobbleheads.id),
         category: bobbleheads.category,
-        collectionCount: sql<number>`COUNT(DISTINCT ${bobbleheads.collectionId})::int`,
+        collectionCount: countDistinct(bobbleheads.collectionId),
       })
       .from(bobbleheads)
       .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .where(
         this.combineFilters(
-          sql`${bobbleheads.category} IS NOT NULL`,
+          isNotNull(bobbleheads.category),
           isNull(bobbleheads.deletedAt),
           this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
         ),

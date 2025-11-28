@@ -26,7 +26,6 @@ export const collections = pgTable(
     description: varchar('description', { length: SCHEMA_LIMITS.COLLECTION.DESCRIPTION.MAX }),
     id: uuid('id').primaryKey().defaultRandom(),
     isPublic: boolean('is_public').default(DEFAULTS.COLLECTION.IS_PUBLIC).notNull(),
-    lastItemAddedAt: timestamp('last_item_added_at'),
     likeCount: integer('like_count').default(DEFAULTS.COLLECTION.LIKE_COUNT).notNull(),
     name: varchar('name', { length: SCHEMA_LIMITS.COLLECTION.NAME.MAX }).notNull(),
     slug: varchar('slug', { length: SLUG_MAX_LENGTH }).notNull(),
@@ -49,7 +48,6 @@ export const collections = pgTable(
     index('collections_deleted_at_idx').on(table.deletedAt),
 
     // composite indexes
-    index('collections_last_item_added_at_idx').on(table.lastItemAddedAt),
     index('collections_public_updated_idx').on(table.isPublic, table.updatedAt),
     index('collections_user_public_idx').on(table.userId, table.isPublic),
 
