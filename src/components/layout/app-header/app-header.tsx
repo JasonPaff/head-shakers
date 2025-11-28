@@ -52,14 +52,6 @@ export const AppHeader = () => {
             </Link>
           </div>
 
-          {/* Navigation Menus - Hidden on mobile */}
-          <div
-            className={'hidden items-center md:flex'}
-            data-testid={generateTestId('layout', 'app-header', 'navigation-section')}
-          >
-            <AppHeaderNavMenu />
-          </div>
-
           {/* Search - In navbar on mobile and desktop, hidden on tablet */}
           <div
             className={'flex flex-1 items-center gap-2 px-2 md:hidden lg:flex lg:gap-4 lg:px-4'}
@@ -68,14 +60,22 @@ export const AppHeader = () => {
             <div className={'w-full min-w-0'}>
               <AppHeaderSearch />
             </div>
-
-            {/* Auth Nav Menus - Hidden on mobile and tablet */}
-            <AuthContent loadingSkeleton={<Skeleton className={'h-[35px] w-7'} />}>
-              <div className={'hidden lg:block'}>
-                <AppHeaderAuthNavMenu />
-              </div>
-            </AuthContent>
           </div>
+
+          {/* Navigation Menus - Hidden on mobile */}
+          <div
+            className={'hidden items-center md:flex'}
+            data-testid={generateTestId('layout', 'app-header', 'navigation-section')}
+          >
+            <AppHeaderNavMenu />
+          </div>
+
+          {/* Auth Nav Menus (Collections) - Hidden on mobile and tablet, shown on desktop */}
+          <AuthContent loadingSkeleton={<Skeleton className={'h-[35px] w-7'} />}>
+            <div className={'hidden lg:block'}>
+              <AppHeaderAuthNavMenu />
+            </div>
+          </AuthContent>
 
           {/* Auth Nav Menus - Show on tablet only when search is below */}
           <AuthContent loadingSkeleton={<Skeleton className={'h-[35px] w-7'} />}>

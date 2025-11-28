@@ -50,6 +50,5 @@ declare module "@@@next-typesafe-url" {
     "/coming-soon": StaticRoute;
     "/privacy": StaticRoute;
     "/terms": StaticRoute;
-    "/home-page-demo": StaticRoute;
   }
 }

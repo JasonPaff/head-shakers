@@ -2,17 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 
-import {
-  BarChartIcon,
-  BellRingIcon,
-  FileTextIcon,
-  LayoutDashboardIcon,
-  PackageIcon,
-  PackagePlusIcon,
-  SettingsIcon,
-  StarIcon,
-  UsersIcon,
-} from 'lucide-react';
+import { LayoutDashboardIcon, PackageIcon, PackagePlusIcon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 
@@ -26,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAdminRole } from '@/hooks/use-admin-role';
 import { generateTestId } from '@/lib/test-ids';
 
 interface NavItem {
@@ -35,109 +24,47 @@ interface NavItem {
   title: string;
 }
 
-interface NavMenu {
-  icon: LucideIcon;
-  isAdminRequired?: boolean;
-  items: Array<NavItem>;
-  label: string;
-  menuLabel: string;
-}
-
-const navigationLinks: Array<NavMenu> = [
+const collectionNavItems: Array<NavItem> = [
   {
-    icon: PackageIcon,
-    items: [
-      {
-        href: $path({ route: '/dashboard/collection' }),
-        icon: LayoutDashboardIcon,
-        title: 'Dashboard',
-      },
-      {
-        href: $path({ route: '/bobbleheads/add' }),
-        icon: PackagePlusIcon,
-        title: 'Add Bobblehead',
-      },
-    ],
-    label: 'My Collection',
-    menuLabel: 'My Collection',
+    href: $path({ route: '/dashboard/collection' }),
+    icon: LayoutDashboardIcon,
+    title: 'Dashboard',
   },
   {
-    icon: SettingsIcon,
-    isAdminRequired: true,
-    items: [
-      {
-        href: $path({ route: '/admin/featured-content' }),
-        icon: StarIcon,
-        title: 'Featured Content',
-      },
-      {
-        href: $path({ route: '/admin/analytics' }),
-        icon: BarChartIcon,
-        title: 'Analytics',
-      },
-      {
-        href: $path({ route: '/admin/launch-notifications' }),
-        icon: BellRingIcon,
-        title: 'Notifications',
-      },
-      {
-        href: $path({ route: '/admin/reports' }),
-        icon: FileTextIcon,
-        title: 'Reports',
-      },
-      {
-        href: $path({ route: '/admin/users' }),
-        icon: UsersIcon,
-        title: 'Users',
-      },
-    ],
-    label: 'Admin',
-    menuLabel: 'Administration',
+    href: $path({ route: '/bobbleheads/add' }),
+    icon: PackagePlusIcon,
+    title: 'Add Bobblehead',
   },
 ];
 
 export const AppHeaderAuthNavMenu = () => {
-  const { isAdmin, isLoading, isModerator } = useAdminRole();
-
-  // filter navigation links based on user role
-  const filteredNavigationLinks = navigationLinks.filter((link) => {
-    // if admin required, check if user has moderator or admin role
-    if (link.isAdminRequired) {
-      return !isLoading && (isModerator || isAdmin);
-    }
-    // show non-admin links to all authenticated users
-    return true;
-  });
-
   return (
     <div
       className={'flex items-center gap-2 max-md:hidden'}
       data-testid={generateTestId('layout', 'app-header', 'auth-section')}
     >
-      {filteredNavigationLinks.map((link, index) => (
-        <AuthContent key={index}>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className={'gap-2'} variant={'ghost'}>
-                <link.icon className={'h-4 w-4'} />
-                {link.label}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align={'start'} className={'w-48'}>
-              <DropdownMenuLabel>{link.menuLabel}</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {link.items.map((item, itemIndex) => (
-                <DropdownMenuItem asChild key={itemIndex}>
-                  <Link className={'cursor-pointer'} href={item.href}>
-                    <item.icon className={'mr-2 h-4 w-4'} />
-                    {item.title}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </AuthContent>
-      ))}
+      <AuthContent>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button className={'gap-2'} variant={'ghost'}>
+              <PackageIcon aria-hidden className={'size-4'} />
+              My Collection
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align={'start'} className={'w-48'}>
+            <DropdownMenuLabel>My Collection</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {collectionNavItems.map((item) => (
+              <DropdownMenuItem asChild key={item.href}>
+                <Link className={'cursor-pointer'} href={item.href}>
+                  <item.icon aria-hidden className={'mr-2 size-4'} />
+                  {item.title}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </AuthContent>
     </div>
   );
 };
