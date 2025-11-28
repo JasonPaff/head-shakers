@@ -23,7 +23,9 @@ test.describe('Home Page - Authenticated User', () => {
   test('should navigate to dashboard from hero My Collection button', async ({ userPage }) => {
     // Click My Collection button in hero section
     const myCollectionButton = userPage.getByRole('link', { name: /my collection/i }).first();
-    await myCollectionButton.click();
+
+    // Wait for navigation to complete
+    await Promise.all([userPage.waitForURL(/\/dashboard\/collection/), myCollectionButton.click()]);
 
     // Verify navigation to dashboard collection page
     await expect(userPage).toHaveURL(/\/dashboard\/collection/);
@@ -48,7 +50,9 @@ test.describe('Home Page - Authenticated User', () => {
 
     // Click My Collection button in join community section
     const myCollectionButton = userPage.getByRole('link', { name: /my collection/i }).last();
-    await myCollectionButton.click();
+
+    // Wait for navigation to complete
+    await Promise.all([userPage.waitForURL(/\/dashboard\/collection/), myCollectionButton.click()]);
 
     // Verify navigation to dashboard collection page
     await expect(userPage).toHaveURL(/\/dashboard\/collection/);
@@ -58,8 +62,10 @@ test.describe('Home Page - Authenticated User', () => {
     // Verify featured collections section is visible
     await expect(userFinder.layout('featured-collections-section')).toBeVisible();
 
-    // Verify section header
-    await expect(userPage.getByRole('heading', { name: /featured collections/i })).toBeVisible();
+    // Verify section header within the featured collections section (not footer)
+    await expect(
+      userFinder.layout('featured-collections-section').getByRole('heading', { name: /featured collections/i }),
+    ).toBeVisible();
 
     // Collections should load (async component)
     await userPage.waitForTimeout(2000);
