@@ -1,7 +1,6 @@
 import { relations } from 'drizzle-orm';
 
 import { contentViews, searchQueries } from '@/lib/db/schema/analytics.schema';
-import { bobbleheadCollections } from '@/lib/db/schema/bobblehead-collections.schema';
 import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/bobbleheads.schema';
 import { collections } from '@/lib/db/schema/collections.schema';
 import { contentReports } from '@/lib/db/schema/moderation.schema';
@@ -42,8 +41,11 @@ export const collectionsRelations = relations(collections, ({ many, one }) => ({
 }));
 
 export const bobbleheadsRelations = relations(bobbleheads, ({ many, one }) => ({
-  bobbleheadCollections: many(bobbleheadCollections),
   bobbleheadTags: many(bobbleheadTags),
+  collection: one(collections, {
+    fields: [bobbleheads.collectionId],
+    references: [collections.id],
+  }),
   comments: many(comments),
   likes: many(likes),
   photos: many(bobbleheadPhotos),
@@ -82,17 +84,6 @@ export const bobbleheadTagsRelations = relations(bobbleheadTags, ({ one }) => ({
   tag: one(tags, {
     fields: [bobbleheadTags.tagId],
     references: [tags.id],
-  }),
-}));
-
-export const bobbleheadCollectionsRelations = relations(bobbleheadCollections, ({ one }) => ({
-  bobblehead: one(bobbleheads, {
-    fields: [bobbleheadCollections.bobbleheadId],
-    references: [bobbleheads.id],
-  }),
-  collection: one(collections, {
-    fields: [bobbleheadCollections.collectionId],
-    references: [collections.id],
   }),
 }));
 
