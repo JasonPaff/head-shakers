@@ -24,6 +24,7 @@ import type {
 } from '@/lib/validations/collections.validation';
 
 import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
+import { likes } from '@/lib/db/schema/social.schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
@@ -63,6 +64,8 @@ export type BrowseCategoriesResult = {
 
 export type BrowseCollectionRecord = {
   collection: CollectionRecord & {
+    /** Dynamic count of likes from the likes table via JOIN aggregation */
+    likeCount: number;
     slug: string;
     /** Computed count of non-deleted bobbleheads in this collection */
     totalItems: number;
@@ -459,7 +462,7 @@ export class CollectionsQuery extends BaseQuery {
           )`,
           id: collections.id,
           isPublic: collections.isPublic,
-          likeCount: collections.likeCount,
+          likeCount: count(likes.id).as('like_count'),
           name: collections.name,
           ownerId: users.id,
           ownerUsername: users.username,
@@ -483,7 +486,9 @@ export class CollectionsQuery extends BaseQuery {
         .from(collections)
         .innerJoin(collectionsWithCategory, eq(collections.id, collectionsWithCategory.collectionId))
         .innerJoin(users, eq(collections.userId, users.id))
+        .leftJoin(likes, and(eq(likes.targetId, collections.id), eq(likes.targetType, 'collection')))
         .where(collectionFilters)
+        .groupBy(collections.id, users.id)
         .orderBy(orderByClause)
         .limit(pageSize)
         .offset(offset);
@@ -552,7 +557,7 @@ export class CollectionsQuery extends BaseQuery {
         )`,
         id: collections.id,
         isPublic: collections.isPublic,
-        likeCount: collections.likeCount,
+        likeCount: count(likes.id).as('like_count'),
         name: collections.name,
         ownerId: users.id,
         ownerUsername: users.username,
@@ -575,7 +580,9 @@ export class CollectionsQuery extends BaseQuery {
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id))
+      .leftJoin(likes, and(eq(likes.targetId, collections.id), eq(likes.targetType, 'collection')))
       .where(collectionFilters)
+      .groupBy(collections.id, users.id)
       .orderBy(orderByClause)
       .limit(pageSize)
       .offset(offset);
@@ -703,7 +710,7 @@ export class CollectionsQuery extends BaseQuery {
         )`,
         id: collections.id,
         isPublic: collections.isPublic,
-        likeCount: collections.likeCount,
+        likeCount: count(likes.id).as('like_count'),
         name: collections.name,
         ownerId: users.id,
         ownerUsername: users.username,
@@ -726,7 +733,9 @@ export class CollectionsQuery extends BaseQuery {
       })
       .from(collections)
       .innerJoin(users, eq(collections.userId, users.id))
+      .leftJoin(likes, and(eq(likes.targetId, collections.id), eq(likes.targetType, 'collection')))
       .where(whereConditions)
+      .groupBy(collections.id, users.id)
       .orderBy(orderByClause)
       .limit(pageSize)
       .offset(offset);
@@ -964,7 +973,7 @@ export class CollectionsQuery extends BaseQuery {
     const column = (() => {
       switch (sortBy) {
         case 'likeCount':
-          return collections.likeCount;
+          return sql`like_count`;
         case 'name':
           return sql`lower(${collections.name})`;
         case 'createdAt':

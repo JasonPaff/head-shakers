@@ -751,7 +751,7 @@ export class SocialFacade {
           // unlike: delete the like and decrement count
           const deletedLike = await SocialQuery.deleteLikeAsync(targetId, targetType, userId, context);
 
-          if (deletedLike) {
+          if (deletedLike && targetType !== 'collection') {
             await SocialQuery.decrementLikeCountAsync(targetId, targetType, context);
           }
 
@@ -773,7 +773,7 @@ export class SocialFacade {
 
           const newLike = await SocialQuery.createLikeAsync(likeData, userId, context);
 
-          if (newLike) {
+          if (newLike && targetType !== 'collection') {
             await SocialQuery.incrementLikeCountAsync(targetId, targetType, context);
           }
 

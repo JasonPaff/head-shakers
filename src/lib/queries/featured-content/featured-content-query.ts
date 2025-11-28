@@ -393,6 +393,10 @@ export class FeaturedContentQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
+    // create aliases for likes table - one for user like status, one for like counts
+    const userLikes = alias(likes, 'userLikes');
+    const collectionLikes = alias(likes, 'collectionLikes');
+
     const results = await dbInstance
       .select({
         comments: collections.commentCount,
@@ -401,10 +405,10 @@ export class FeaturedContentQuery extends BaseQuery {
         description: featuredContent.description,
         id: featuredContent.id,
         imageUrl: sql<null | string>`COALESCE(${featuredContent.imageUrl}, ${collections.coverImageUrl})`,
-        isLiked: sql<boolean>`${likes.id} IS NOT NULL`,
+        isLiked: sql<boolean>`${userLikes.id} IS NOT NULL`,
         isTrending: sql<boolean>`${featuredContent.featureType} = 'trending'`,
-        likeId: likes.id,
-        likes: collections.likeCount,
+        likeId: userLikes.id,
+        likes: sql<number>`COUNT(${collectionLikes.id})::integer`,
         ownerAvatarUrl: users.avatarUrl,
         ownerDisplayName: users.username,
         title: featuredContent.title,
@@ -426,14 +430,18 @@ export class FeaturedContentQuery extends BaseQuery {
       .innerJoin(collections, eq(featuredContent.contentId, collections.id))
       .innerJoin(users, eq(collections.userId, users.id))
       .leftJoin(
-        likes,
+        userLikes,
         userId ?
           and(
-            eq(likes.targetId, collections.id),
-            eq(likes.targetType, 'collection'),
-            eq(likes.userId, userId),
+            eq(userLikes.targetId, collections.id),
+            eq(userLikes.targetType, 'collection'),
+            eq(userLikes.userId, userId),
           )
         : sql`false`,
+      )
+      .leftJoin(
+        collectionLikes,
+        and(eq(collectionLikes.targetId, collections.id), eq(collectionLikes.targetType, 'collection')),
       )
       .where(
         and(
@@ -442,6 +450,25 @@ export class FeaturedContentQuery extends BaseQuery {
           or(isNull(featuredContent.startDate), lte(featuredContent.startDate, now)),
           or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
         ),
+      )
+      .groupBy(
+        featuredContent.id,
+        featuredContent.contentId,
+        featuredContent.description,
+        featuredContent.imageUrl,
+        featuredContent.title,
+        featuredContent.viewCount,
+        featuredContent.featureType,
+        featuredContent.priority,
+        featuredContent.createdAt,
+        collections.id,
+        collections.slug,
+        collections.commentCount,
+        collections.coverImageUrl,
+        users.id,
+        users.avatarUrl,
+        users.username,
+        userLikes.id,
       )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
       .limit(6);
