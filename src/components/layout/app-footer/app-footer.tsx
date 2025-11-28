@@ -10,6 +10,7 @@ import { FooterNavLink } from '@/components/layout/app-footer/components/footer-
 import { FooterNavSection } from '@/components/layout/app-footer/components/footer-nav-section';
 import { FooterNewsletter } from '@/components/layout/app-footer/components/footer-newsletter';
 import { FooterSocialLinks } from '@/components/layout/app-footer/components/footer-social-links';
+import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 import { generateTestId } from '@/lib/test-ids';
 
 export const AppFooter = () => {
@@ -84,10 +85,12 @@ export const AppFooter = () => {
               />
             </FooterNavSection>
 
-            {/* Featured Collections Section (async server component) */}
-            <Suspense fallback={null}>
-              <FooterFeaturedSection />
-            </Suspense>
+            {/* Featured Collections Section */}
+            <ErrorBoundary name={'footer-featured-section'}>
+              <Suspense fallback={null}>
+                <FooterFeaturedSection />
+              </Suspense>
+            </ErrorBoundary>
           </FooterContainer>
         </div>
       </div>
