@@ -39,7 +39,9 @@ export abstract class BasePage {
 
   // Common actions
   async goto(): Promise<void> {
-    await this.page.goto(this.url);
+    // Use 'domcontentloaded' instead of default 'load' event
+    // External services (Clerk, Sentry, Cloudinary) may prevent 'load' event from firing
+    await this.page.goto(this.url, { waitUntil: 'domcontentloaded' });
   }
 
   async isAuthenticated(): Promise<boolean> {
