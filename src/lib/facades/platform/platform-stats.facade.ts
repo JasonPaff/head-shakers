@@ -8,8 +8,7 @@ import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
-import { createFacadeError } from '@/lib/utils/error-builders';
-import { withFacadeBreadcrumbs } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { executeFacadeOperationWithBreadcrumbs } from '@/lib/utils/facade-helpers';
 
 const facadeName = 'PlatformStatsFacade';
 
@@ -36,49 +35,38 @@ export class PlatformStatsFacade extends BaseFacade {
    * @returns Platform statistics with total counts
    */
   static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
-    const methodName = 'getPlatformStatsAsync';
-
-    return withFacadeBreadcrumbs(
-      { facade: facadeName, method: methodName },
+    return executeFacadeOperationWithBreadcrumbs(
+      {
+        facade: facadeName,
+        method: 'getPlatformStatsAsync',
+        operation: OPERATIONS.PLATFORM.GET_STATS,
+      },
       async () => {
-        try {
-          return await CacheService.platform.stats(
-            async () => {
-              const context = this.publicContext(dbInstance);
+        return await CacheService.platform.stats(
+          async () => {
+            const context = this.publicContext(dbInstance);
 
-              // Fetch all counts in parallel for performance
-              const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
-                BobbleheadsQuery.getBobbleheadCountAsync(context),
-                CollectionsQuery.getCollectionCountAsync(context),
-                UsersQuery.getUserCountAsync(context),
-              ]);
+            const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
+              BobbleheadsQuery.getBobbleheadCountAsync(context),
+              CollectionsQuery.getCollectionCountAsync(context),
+              UsersQuery.getUserCountAsync(context),
+            ]);
 
-              return {
-                totalBobbleheads: bobbleheadsCount,
-                totalCollections: collectionsCount,
-                totalCollectors: collectorsCount,
-              };
-            },
-            {
-              context: {
-                entityType: CACHE_ENTITY_TYPE.PLATFORM,
-                facade: facadeName,
-                operation: OPERATIONS.PLATFORM.GET_STATS,
-              },
-              ttl: CACHE_CONFIG.TTL.EXTENDED,
-            },
-          );
-        } catch (error) {
-          throw createFacadeError(
-            {
-              data: {},
+            return {
+              totalBobbleheads: bobbleheadsCount,
+              totalCollections: collectionsCount,
+              totalCollectors: collectorsCount,
+            };
+          },
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.PLATFORM,
               facade: facadeName,
-              method: methodName,
               operation: OPERATIONS.PLATFORM.GET_STATS,
             },
-            error,
-          );
-        }
+            ttl: CACHE_CONFIG.TTL.EXTENDED,
+          },
+        );
       },
       {
         includeResultSummary: (stats) => ({
