@@ -11,15 +11,7 @@ import type {
   UpdateBobbleheadPhotoMetadata,
 } from '@/lib/validations/bobbleheads.validation';
 
-import {
-  bobbleheadCollections,
-  bobbleheadPhotos,
-  bobbleheads,
-  bobbleheadTags,
-  collections,
-  tags,
-  users,
-} from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
@@ -147,7 +139,7 @@ export class BobbleheadsQuery extends BaseQuery {
    * create a new bobblehead
    */
   static async createAsync(
-    data: Omit<InsertBobblehead, 'collectionIds'> & { slug: string },
+    data: InsertBobblehead & { slug: string },
     userId: string,
     context: QueryContext,
   ): Promise<BobbleheadRecord | null> {
@@ -226,22 +218,25 @@ export class BobbleheadsQuery extends BaseQuery {
     const pagination = this.applyPagination(options);
 
     const query = dbInstance
-      .select({ bobblehead: bobbleheads })
+      .select()
       .from(bobbleheads)
-      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
       .where(
         this.combineFilters(
-          eq(bobbleheadCollections.collectionId, collectionId),
+          eq(bobbleheads.collectionId, collectionId),
           this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
         ),
       )
       .orderBy(desc(bobbleheads.createdAt));
 
-    if (pagination.limit) query.limit(pagination.limit);
-    if (pagination.offset) query.offset(pagination.offset);
+    if (pagination.limit) {
+      query.limit(pagination.limit);
+    }
 
-    const results = await query;
-    return results.map((r) => r.bobblehead);
+    if (pagination.offset) {
+      query.offset(pagination.offset);
+    }
+
+    return query;
   }
 
   /**
@@ -266,7 +261,6 @@ export class BobbleheadsQuery extends BaseQuery {
 
   /**
    * find bobblehead by ID with all related data (photos, tags, collections)
-   * note: returns the first accessible collection if bobblehead belongs to multiple collections
    */
   static async findByIdWithRelationsAsync(
     id: string,
@@ -275,9 +269,13 @@ export class BobbleheadsQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
 
     // get the bobblehead with collection info
-    const bobbleheadResult = await dbInstance
-      .select()
+    const result = await dbInstance
+      .select({
+        bobblehead: bobbleheads,
+        collection: collections,
+      })
       .from(bobbleheads)
+      .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.id, id),
@@ -286,36 +284,12 @@ export class BobbleheadsQuery extends BaseQuery {
       )
       .limit(1);
 
-    if (!bobbleheadResult[0]) return null;
+    if (!result[0]) return null;
 
-    const bobblehead = bobbleheadResult[0];
-
-    // get the first accessible collection through the junction table
-    const collectionResult = await dbInstance
-      .select({
-        collection: collections,
-      })
-      .from(bobbleheadCollections)
-      .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
-      .where(
-        this.combineFilters(
-          eq(bobbleheadCollections.bobbleheadId, id),
-          buildSoftDeleteFilter(collections.deletedAt, context),
-        ),
-      )
-      .limit(1);
-
-    const collection = collectionResult[0]?.collection || null;
-
-    // check if the collection is accessible (unless the viewer is an owner)
+    // check if a collection is accessible (unless viewer is an owner)
+    const collection = result[0].collection;
     if (collection && context.userId !== collection.userId && !collection.isPublic) {
-      return {
-        ...bobblehead,
-        collectionName: collection?.name || null,
-        collectionSlug: collection?.slug || null,
-        photos: [],
-        tags: [],
-      };
+      return null;
     }
 
     // get photos
@@ -335,9 +309,9 @@ export class BobbleheadsQuery extends BaseQuery {
       .where(eq(bobbleheadTags.bobbleheadId, id));
 
     return {
-      ...bobblehead,
-      collectionName: collection?.name || null,
-      collectionSlug: collection?.slug || null,
+      ...result[0].bobblehead,
+      collectionName: result[0].collection?.name || null,
+      collectionSlug: result[0].collection?.slug || null,
       photos,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
@@ -365,7 +339,6 @@ export class BobbleheadsQuery extends BaseQuery {
 
   /**
    * find bobblehead by slug with all related data (photos, tags, collections)
-   * note: returns first accessible collection if bobblehead belongs to multiple collections
    */
   static async findBySlugWithRelationsAsync(
     slug: string,
@@ -373,10 +346,14 @@ export class BobbleheadsQuery extends BaseQuery {
   ): Promise<BobbleheadWithRelations | null> {
     const dbInstance = this.getDbInstance(context);
 
-    // get the bobblehead
-    const bobbleheadResult = await dbInstance
-      .select()
+    // get the bobblehead with collection info
+    const result = await dbInstance
+      .select({
+        bobblehead: bobbleheads,
+        collection: collections,
+      })
       .from(bobbleheads)
+      .leftJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .where(
         this.combineFilters(
           eq(bobbleheads.slug, slug),
@@ -385,43 +362,21 @@ export class BobbleheadsQuery extends BaseQuery {
       )
       .limit(1);
 
-    if (!bobbleheadResult[0]) return null;
+    if (!result[0]) return null;
 
-    const bobblehead = bobbleheadResult[0];
-
-    // get the first accessible collection through junction table
-    const collectionResult = await dbInstance
-      .select({
-        collection: collections,
-      })
-      .from(bobbleheadCollections)
-      .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
-      .where(
-        this.combineFilters(
-          eq(bobbleheadCollections.bobbleheadId, bobblehead.id),
-          buildSoftDeleteFilter(collections.deletedAt, context),
-        ),
-      )
-      .limit(1);
-
-    const collection = collectionResult[0]?.collection || null;
-
-    // check if collection is accessible (unless viewer is an owner)
+    // check if a collection is accessible (unless viewer is an owner)
+    const collection = result[0].collection;
     if (collection && context.userId !== collection.userId && !collection.isPublic) {
-      return {
-        ...bobblehead,
-        collectionName: null,
-        collectionSlug: null,
-        photos: [],
-        tags: [],
-      };
+      return null;
     }
+
+    const bobbleheadId = result[0].bobblehead.id;
 
     // get photos
     const photos = await dbInstance
       .select()
       .from(bobbleheadPhotos)
-      .where(eq(bobbleheadPhotos.bobbleheadId, bobblehead.id))
+      .where(eq(bobbleheadPhotos.bobbleheadId, bobbleheadId))
       .orderBy(bobbleheadPhotos.sortOrder, bobbleheadPhotos.uploadedAt);
 
     // get tags
@@ -431,12 +386,12 @@ export class BobbleheadsQuery extends BaseQuery {
       })
       .from(bobbleheadTags)
       .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
-      .where(eq(bobbleheadTags.bobbleheadId, bobblehead.id));
+      .where(eq(bobbleheadTags.bobbleheadId, bobbleheadId));
 
     return {
-      ...bobblehead,
-      collectionName: collection?.name || null,
-      collectionSlug: collection?.slug || null,
+      ...result[0].bobblehead,
+      collectionName: result[0].collection?.name || null,
+      collectionSlug: result[0].collection?.slug || null,
       photos,
       tags: bobbleheadTagsData.map((t) => t.tag),
     };
@@ -515,26 +470,25 @@ export class BobbleheadsQuery extends BaseQuery {
 
     // build base filter conditions for collection context
     const baseConditions = [
+      eq(bobbleheads.collectionId, collectionId),
       this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
 
     // find previous bobblehead (newer = createdAt > current, order by createdAt ASC to get closest)
     // explicitly exclude current bobblehead to prevent self-reference
-    // join through junction table and LEFT JOIN with bobbleheadPhotos to get primary photo URL
+    // LEFT JOIN with bobbleheadPhotos to get primary photo URL
     const previousResult = await dbInstance
       .select({
         bobblehead: bobbleheads,
         photoUrl: bobbleheadPhotos.url,
       })
       .from(bobbleheads)
-      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
         this.combineFilters(
-          eq(bobbleheadCollections.collectionId, collectionId),
           ne(bobbleheads.id, bobbleheadId),
           gt(bobbleheads.createdAt, currentCreatedAt),
           ...baseConditions,
@@ -543,23 +497,21 @@ export class BobbleheadsQuery extends BaseQuery {
       .orderBy(asc(bobbleheads.createdAt))
       .limit(1);
 
-    // find the next bobblehead (older = createdAt < current, order by createdAt DESC to get closest)
+    // find next bobblehead (older = createdAt < current, order by createdAt DESC to get closest)
     // explicitly exclude current bobblehead to prevent self-reference
-    // join through junction table and LEFT JOIN with bobbleheadPhotos to get primary photo URL
+    // LEFT JOIN with bobbleheadPhotos to get primary photo URL
     const nextResult = await dbInstance
       .select({
         bobblehead: bobbleheads,
         photoUrl: bobbleheadPhotos.url,
       })
       .from(bobbleheads)
-      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
         this.combineFilters(
-          eq(bobbleheadCollections.collectionId, collectionId),
           ne(bobbleheads.id, bobbleheadId),
           lt(bobbleheads.createdAt, currentCreatedAt),
           ...baseConditions,
@@ -700,6 +652,7 @@ export class BobbleheadsQuery extends BaseQuery {
 
     // build base filter conditions for collection context
     const baseConditions = [
+      eq(bobbleheads.collectionId, collectionId),
       this.buildBaseFilters(bobbleheads.isPublic, bobbleheads.userId, bobbleheads.deletedAt, context),
     ];
 
@@ -707,8 +660,7 @@ export class BobbleheadsQuery extends BaseQuery {
     const totalResult = await dbInstance
       .select({ count: count() })
       .from(bobbleheads)
-      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-      .where(this.combineFilters(eq(bobbleheadCollections.collectionId, collectionId), ...baseConditions));
+      .where(this.combineFilters(...baseConditions));
 
     const totalCount = totalResult[0]?.count || 0;
 
@@ -717,14 +669,7 @@ export class BobbleheadsQuery extends BaseQuery {
     const positionResult = await dbInstance
       .select({ count: count() })
       .from(bobbleheads)
-      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-      .where(
-        this.combineFilters(
-          eq(bobbleheadCollections.collectionId, collectionId),
-          gte(bobbleheads.createdAt, currentCreatedAt),
-          ...baseConditions,
-        ),
-      );
+      .where(this.combineFilters(gte(bobbleheads.createdAt, currentCreatedAt), ...baseConditions));
 
     const currentPosition = positionResult[0]?.count || 0;
 
@@ -818,34 +763,13 @@ export class BobbleheadsQuery extends BaseQuery {
 
     // add filters
     if (filters.userId) conditions.push(eq(bobbleheads.userId, filters.userId));
+    if (filters.collectionId) conditions.push(eq(bobbleheads.collectionId, filters.collectionId));
     if (filters.category) conditions.push(eq(bobbleheads.category, filters.category));
     if (filters.manufacturer) conditions.push(eq(bobbleheads.manufacturer, filters.manufacturer));
     if (filters.status) conditions.push(eq(bobbleheads.status, filters.status));
     if (filters.minYear) conditions.push(eq(bobbleheads.year, filters.minYear));
     if (filters.maxYear) conditions.push(eq(bobbleheads.year, filters.maxYear));
 
-    // handle collection filter through junction table
-    if (filters.collectionId) {
-      const query = dbInstance
-        .select({ bobblehead: bobbleheads })
-        .from(bobbleheads)
-        .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-        .where(
-          this.combineFilters(
-            eq(bobbleheadCollections.collectionId, filters.collectionId),
-            ...conditions.filter(Boolean),
-          ),
-        )
-        .orderBy(desc(bobbleheads.createdAt));
-
-      if (pagination.limit) query.limit(pagination.limit);
-      if (pagination.offset) query.offset(pagination.offset);
-
-      const results = await query;
-      return results.map((r) => r.bobblehead);
-    }
-
-    // no collection filter - direct query
     const query = dbInstance
       .select()
       .from(bobbleheads)
@@ -867,7 +791,7 @@ export class BobbleheadsQuery extends BaseQuery {
    * update an existing bobblehead
    */
   static async updateAsync(
-    data: Omit<UpdateBobblehead, 'collectionIds'>,
+    data: UpdateBobblehead,
     userId: string,
     context: QueryContext,
   ): Promise<BobbleheadRecord | null> {

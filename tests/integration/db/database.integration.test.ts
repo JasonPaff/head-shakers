@@ -8,7 +8,7 @@
 import { eq } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { bobbleheadCollections, bobbleheads, collections, users } from '@/lib/db/schema/index';
+import { bobbleheads, collections, users } from '@/lib/db/schema/index';
 
 import { createTestBobblehead, createTestBobbleheads } from '../../fixtures/bobblehead.factory';
 import { createTestCollection, createTestCollections } from '../../fixtures/collection.factory';
@@ -123,6 +123,7 @@ describe('Database Integration Tests', () => {
       expect(bobblehead).toBeDefined();
       expect(bobblehead!.id).toBeDefined();
       expect(bobblehead!.name).toBe('Baseball Star');
+      expect(bobblehead!.collectionId).toBe(collection!.id);
       expect(bobblehead!.userId).toBe(user!.id);
     });
 
@@ -133,6 +134,7 @@ describe('Database Integration Tests', () => {
 
       expect(testBobbleheads).toHaveLength(5);
       testBobbleheads.forEach((bobblehead) => {
+        expect(bobblehead!.collectionId).toBe(collection!.id);
         expect(bobblehead!.userId).toBe(user!.id);
       });
     });
@@ -152,6 +154,7 @@ describe('Database Integration Tests', () => {
 
       expect(foundBobblehead).toBeDefined();
       expect(foundBobblehead!.name).toBe('Persisted Bobblehead');
+      expect(foundBobblehead!.collectionId).toBe(collection!.id);
       expect(foundBobblehead!.userId).toBe(user!.id);
     });
   });
@@ -192,7 +195,7 @@ describe('Database Integration Tests', () => {
       });
       await createTestBobbleheads(user!.id, collection!.id, 3);
 
-      // Query with join using junction table
+      // Query with join
       const result = await db
         .select({
           bobbleheadId: bobbleheads.id,
@@ -201,8 +204,7 @@ describe('Database Integration Tests', () => {
           username: users.username,
         })
         .from(bobbleheads)
-        .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-        .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
+        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
         .innerJoin(users, eq(bobbleheads.userId, users.id))
         .where(eq(users.username, 'complex-query-user'));
 

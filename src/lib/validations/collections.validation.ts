@@ -40,7 +40,7 @@ export const updateCollectionSchema = insertCollectionSchema.extend({
   collectionId: z.uuid(),
 });
 export const publicCollectionSchema = selectCollectionSchema;
-export const deleteCollectionSchema = z.object({ collectionId: z.uuid() });
+export const deleteCollectionSchema = z.object({ collectionId: z.string() });
 
 export const getCollectionBySlugSchema = z.object({
   slug: z

@@ -14,7 +14,6 @@ export type CustomFields = Array<z.infer<typeof customFieldsSchema>>;
 export type DeleteBobblehead = z.infer<typeof deleteBobbleheadSchema>;
 export type DeleteBobbleheadPhoto = z.infer<typeof deleteBobbleheadPhotoSchema>;
 export type InsertBobblehead = z.infer<typeof insertBobbleheadSchema>;
-export type InsertBobbleheadInput = z.input<typeof insertBobbleheadSchema>;
 export type InsertBobbleheadPhoto = z.infer<typeof insertBobbleheadPhotoSchema>;
 export type InsertBobbleheadTag = z.infer<typeof insertBobbleheadTagSchema>;
 export type ReorderBobbleheadPhotos = z.infer<typeof reorderBobbleheadPhotosSchema>;
@@ -22,7 +21,6 @@ export type SelectBobblehead = z.infer<typeof selectBobbleheadSchema>;
 export type SelectBobbleheadPhoto = z.infer<typeof selectBobbleheadPhotoSchema>;
 export type SelectBobbleheadTag = z.infer<typeof selectBobbleheadTagSchema>;
 export type UpdateBobblehead = z.infer<typeof updateBobbleheadSchema>;
-export type UpdateBobbleheadInput = z.input<typeof updateBobbleheadSchema>;
 export type UpdateBobbleheadPhoto = z.infer<typeof updateBobbleheadPhotoSchema>;
 export type UpdateBobbleheadPhotoMetadata = z.infer<typeof updateBobbleheadPhotoMetadataSchema>;
 export type UpdateBobbleheadWithPhotos = z.infer<typeof updateBobbleheadWithPhotosSchema>;
@@ -71,6 +69,7 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
     fieldName: 'Character Name',
     maxLength: SCHEMA_LIMITS.BOBBLEHEAD.CHARACTER_NAME.MAX,
   }).optional(),
+  collectionId: z.uuid('Collection is required'),
   currentCondition: z.enum(ENUMS.BOBBLEHEAD.CONDITION).default(DEFAULTS.BOBBLEHEAD.CONDITION),
   customFields: customFieldsSchema
     .array()
@@ -111,24 +110,17 @@ export const insertBobbleheadSchema = createInsertSchema(bobbleheads, {
   status: z.enum(ENUMS.BOBBLEHEAD.STATUS).default(DEFAULTS.BOBBLEHEAD.STATUS),
   weight: zodDecimal({ fieldName: 'Weight' }).optional(),
   year: zodYear({ fieldName: 'Year' }).optional(),
-})
-  .omit({
-    commentCount: true,
-    createdAt: true,
-    deletedAt: true,
-    id: true,
-    likeCount: true,
-    slug: true,
-    updatedAt: true,
-    userId: true,
-    viewCount: true,
-  })
-  .extend({
-    collectionIds: z
-      .array(z.uuid({ message: 'Each collection ID must be a valid UUID' }))
-      .min(1, { message: 'At least one collection is required' }),
-  });
-
+}).omit({
+  commentCount: true,
+  createdAt: true,
+  deletedAt: true,
+  id: true,
+  likeCount: true,
+  slug: true,
+  updatedAt: true,
+  userId: true,
+  viewCount: true,
+});
 export const createBobbleheadWithPhotosSchema = insertBobbleheadSchema.extend({
   photos: cloudinaryPhotosValidationSchema.default([]),
   tags: z.array(z.string()).default([]).optional(),

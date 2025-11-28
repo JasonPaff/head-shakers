@@ -10,7 +10,7 @@ export const addItemFormOptions = formOptions({
     acquisitionMethod: '',
     category: '',
     characterName: '',
-    collectionIds: [],
+    collectionId: '',
     currentCondition: DEFAULTS.BOBBLEHEAD.CONDITION,
     customFields: [],
     description: '',

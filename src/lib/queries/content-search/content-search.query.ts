@@ -4,15 +4,7 @@ import type { QueryContext } from '@/lib/queries/base/query-context';
 import type { TagRecord } from '@/lib/queries/tags/tags-query';
 
 import { DEFAULTS } from '@/lib/constants';
-import {
-  bobbleheadCollections,
-  bobbleheadPhotos,
-  bobbleheads,
-  bobbleheadTags,
-  collections,
-  tags,
-  users,
-} from '@/lib/db/schema';
+import { bobbleheadPhotos, bobbleheads, bobbleheadTags, collections, tags, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 
 export type BobbleheadPhoto = {
@@ -122,8 +114,7 @@ export class ContentSearchQuery extends BaseQuery {
       })
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
-      .leftJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-      .leftJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
@@ -302,7 +293,7 @@ export class ContentSearchQuery extends BaseQuery {
 
     const results = await dbInstance
       .select({
-        collectionId: bobbleheadCollections.collectionId,
+        collectionId: bobbleheads.collectionId,
         color: tags.color,
         createdAt: tags.createdAt,
         id: tags.id,
@@ -311,13 +302,12 @@ export class ContentSearchQuery extends BaseQuery {
         usageCount: tags.usageCount,
         userId: tags.userId,
       })
-      .from(bobbleheadCollections)
-      .innerJoin(bobbleheads, eq(bobbleheadCollections.bobbleheadId, bobbleheads.id))
+      .from(bobbleheads)
       .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
       .innerJoin(tags, eq(bobbleheadTags.tagId, tags.id))
       .where(
         and(
-          inArray(bobbleheadCollections.collectionId, collectionIds),
+          inArray(bobbleheads.collectionId, collectionIds),
           eq(bobbleheads.isPublic, DEFAULTS.BOBBLEHEAD.IS_PUBLIC),
           isNull(bobbleheads.deletedAt),
         ),
@@ -394,9 +384,8 @@ export class ContentSearchQuery extends BaseQuery {
           inArray(
             collections.id,
             dbInstance
-              .select({ collectionId: bobbleheadCollections.collectionId })
-              .from(bobbleheadCollections)
-              .innerJoin(bobbleheads, eq(bobbleheadCollections.bobbleheadId, bobbleheads.id))
+              .select({ collectionId: bobbleheads.collectionId })
+              .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
               .where(
                 and(
@@ -469,8 +458,7 @@ export class ContentSearchQuery extends BaseQuery {
         .select({ count: count() })
         .from(bobbleheads)
         .innerJoin(users, eq(bobbleheads.userId, users.id))
-        .leftJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-        .leftJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
+        .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
         .where(and(...bobbleheadConditions)),
     ]);
 
@@ -539,8 +527,7 @@ export class ContentSearchQuery extends BaseQuery {
       })
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
-      .leftJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-      .leftJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
@@ -634,9 +621,8 @@ export class ContentSearchQuery extends BaseQuery {
           inArray(
             collections.id,
             dbInstance
-              .select({ collectionId: bobbleheadCollections.collectionId })
-              .from(bobbleheadCollections)
-              .innerJoin(bobbleheads, eq(bobbleheadCollections.bobbleheadId, bobbleheads.id))
+              .select({ collectionId: bobbleheads.collectionId })
+              .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
               .where(
                 and(
@@ -657,9 +643,8 @@ export class ContentSearchQuery extends BaseQuery {
           inArray(
             collections.id,
             dbInstance
-              .select({ collectionId: bobbleheadCollections.collectionId })
-              .from(bobbleheadCollections)
-              .innerJoin(bobbleheads, eq(bobbleheadCollections.bobbleheadId, bobbleheads.id))
+              .select({ collectionId: bobbleheads.collectionId })
+              .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
               .where(
                 and(
@@ -755,8 +740,7 @@ export class ContentSearchQuery extends BaseQuery {
       })
       .from(bobbleheads)
       .innerJoin(users, eq(bobbleheads.userId, users.id))
-      .leftJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
-      .leftJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
+      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
@@ -858,9 +842,8 @@ export class ContentSearchQuery extends BaseQuery {
           inArray(
             collections.id,
             dbInstance
-              .select({ collectionId: bobbleheadCollections.collectionId })
-              .from(bobbleheadCollections)
-              .innerJoin(bobbleheads, eq(bobbleheadCollections.bobbleheadId, bobbleheads.id))
+              .select({ collectionId: bobbleheads.collectionId })
+              .from(bobbleheads)
               .innerJoin(bobbleheadTags, eq(bobbleheads.id, bobbleheadTags.bobbleheadId))
               .where(
                 and(

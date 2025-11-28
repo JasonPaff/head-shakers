@@ -20,9 +20,8 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { bobbleheadCollections, collections } from '@/lib/db/schema';
+import { collections } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
@@ -31,7 +30,6 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
-import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
@@ -558,88 +556,23 @@ export class CollectionsFacade {
 
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {
     try {
-      return await (dbInstance ?? db).transaction(async (tx) => {
-        const context = createUserQueryContext(userId, { dbInstance: tx });
-        const txInstance = context.dbInstance ?? tx;
+      const context = createUserQueryContext(userId, { dbInstance });
+      const deletedCollection = await CollectionsQuery.deleteAsync(data, userId, context);
 
-        // Query junction table BEFORE deletion to get affected bobbleheadIds
-        // This is needed for cache invalidation since cascade delete will remove junction entries
-        const affectedBobbleheads = await txInstance
-          .select({ bobbleheadId: bobbleheadCollections.bobbleheadId })
-          .from(bobbleheadCollections)
-          .where(eq(bobbleheadCollections.collectionId, data.collectionId));
-
-        const affectedBobbleheadIds = affectedBobbleheads.map((jc) => jc.bobbleheadId);
-
-        // Delete the collection - cascade will automatically remove junction table entries
-        const deletedCollection = await CollectionsQuery.deleteAsync(data, userId, context);
-
-        if (!deletedCollection) {
-          return null;
-        }
-
-        // Non-blocking: cleanup cover photo from Cloudinary if it exists
-        if (deletedCollection.coverImageUrl) {
-          try {
-            const publicId = CloudinaryService.extractPublicIdFromUrl(deletedCollection.coverImageUrl);
-            if (publicId) {
-              await CloudinaryService.deletePhotosFromCloudinary([publicId]);
-
-              Sentry.addBreadcrumb({
-                category: SENTRY_BREADCRUMB_CATEGORIES.EXTERNAL_SERVICE,
-                data: { collectionId: deletedCollection.id, publicId },
-                level: SENTRY_LEVELS.INFO,
-                message: 'Deleted collection cover image from Cloudinary',
-              });
-            }
-          } catch (cloudinaryError) {
-            // Don't fail deletion if Cloudinary cleanup fails
-            Sentry.captureException(cloudinaryError, {
-              extra: {
-                collectionId: deletedCollection.id,
-                imageUrl: deletedCollection.coverImageUrl,
-                operation: 'cloudinary-cleanup',
-              },
-              level: 'warning',
-            });
+      // cleanup cover photo from Cloudinary if it exists
+      if (deletedCollection?.coverImageUrl) {
+        try {
+          const publicId = CloudinaryService.extractPublicIdFromUrl(deletedCollection.coverImageUrl);
+          if (publicId) {
+            await CloudinaryService.deletePhotosFromCloudinary([publicId]);
           }
+        } catch (cloudinaryError) {
+          // log the error but don't fail the deletion operation
+          console.error('Failed to delete collection cover photo from Cloudinary:', cloudinaryError);
         }
+      }
 
-        // Invalidate cache for the deleted collection
-        CacheRevalidationService.collections.onDelete(deletedCollection.id, userId, deletedCollection.slug);
-
-        // Invalidate cache for affected bobbleheads
-        // These bobbleheads were part of the deleted collection and need cache refresh
-        if (affectedBobbleheadIds.length > 0) {
-          affectedBobbleheadIds.forEach((bobbleheadId) => {
-            CacheRevalidationService.bobbleheads.onUpdate(bobbleheadId, userId);
-          });
-
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {
-              bobbleheadCount: affectedBobbleheadIds.length,
-              collectionId: deletedCollection.id,
-            },
-            level: SENTRY_LEVELS.INFO,
-            message: `Invalidated cache for ${affectedBobbleheadIds.length} bobbleheads affected by collection deletion`,
-          });
-        }
-
-        // Add success breadcrumb
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            affectedBobbleheads: affectedBobbleheadIds.length,
-            collectionId: deletedCollection.id,
-            userId,
-          },
-          level: SENTRY_LEVELS.INFO,
-          message: `Collection ${deletedCollection.id} deleted successfully`,
-        });
-
-        return deletedCollection;
-      });
+      return deletedCollection;
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId },

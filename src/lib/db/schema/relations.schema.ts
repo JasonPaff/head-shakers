@@ -34,7 +34,6 @@ export const usersRelations = relations(users, ({ many, one }) => ({
 }));
 
 export const collectionsRelations = relations(collections, ({ many, one }) => ({
-  bobbleheadCollections: many(bobbleheadCollections),
   bobbleheads: many(bobbleheads),
   user: one(users, {
     fields: [collections.userId],

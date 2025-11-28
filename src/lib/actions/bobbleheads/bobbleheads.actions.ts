@@ -49,22 +49,13 @@ export const createBobbleheadWithPhotosAction = authActionClient
   )
   .inputSchema(createBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { collectionIds, photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(
-      ctx.sanitizedInput,
-    );
+    const { photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
-      ...bobbleheadData,
-      collectionCount: collectionIds.length,
-    });
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
     try {
-      const newBobblehead = await BobbleheadsFacade.createAsync(
-        { ...bobbleheadData, collectionIds },
-        userId,
-        ctx.tx,
-      );
+      const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.tx);
 
       if (!newBobblehead) {
         throw new ActionError(
@@ -81,11 +72,10 @@ export const createBobbleheadWithPhotosAction = authActionClient
       let uploadedPhotos: Array<unknown> = [];
       if (photos && photos.length > 0) {
         try {
-          // Use the first collection ID for the Cloudinary path (bobblehead can belong to multiple collections)
-          const primaryCollectionId = collectionIds[0] as string;
+          // move photos from temp folder to permanent location in Cloudinary
           const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
             userId,
-            primaryCollectionId,
+            newBobblehead.collectionId,
             newBobblehead.id,
           );
           const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
@@ -195,20 +185,29 @@ export const createBobbleheadWithPhotosAction = authActionClient
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           bobblehead: newBobblehead,
-          collectionCount: collectionIds.length,
           photosCount: uploadedPhotos.length,
           tagsCount: createdTags.length,
         },
         level: SENTRY_LEVELS.INFO,
-        message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos, ${createdTags.length} tags, and ${collectionIds.length} collection(s)`,
+        message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
       });
 
       // invalidate metadata cache for the new bobblehead
       invalidateMetadataCache('bobblehead', newBobblehead.id);
 
-      // fetch first collection slug for navigation (use the primary collection)
-      const primaryCollectionId = collectionIds[0] as string;
-      const collection = await CollectionsFacade.getCollectionById(primaryCollectionId, userId, ctx.tx);
+      CacheRevalidationService.bobbleheads.onCreate(
+        newBobblehead.id,
+        userId,
+        newBobblehead.collectionId,
+        newBobblehead.slug,
+      );
+
+      // fetch collection slug for navigation
+      const collection = await CollectionsFacade.getCollectionById(
+        newBobblehead.collectionId,
+        userId,
+        ctx.tx,
+      );
       const collectionSlug = collection?.slug ?? null;
 
       return {
@@ -269,6 +268,13 @@ export const deleteBobbleheadAction = authActionClient
       // invalidate metadata cache for the deleted bobblehead
       invalidateMetadataCache('bobblehead', bobbleheadData.bobbleheadId);
 
+      CacheRevalidationService.bobbleheads.onDelete(
+        bobbleheadData.bobbleheadId,
+        ctx.userId,
+        deletedBobblehead?.collectionId,
+        deletedBobblehead?.slug,
+      );
+
       return {
         data: null,
         success: true,
@@ -298,20 +304,16 @@ export const updateBobbleheadWithPhotosAction = authActionClient
   )
   .inputSchema(updateBobbleheadWithPhotosSchema)
   .action(async ({ ctx, parsedInput }) => {
-    const { collectionIds, id, photos, tags, ...bobbleheadData } = updateBobbleheadWithPhotosSchema.parse(
+    const { id, photos, tags, ...bobbleheadData } = updateBobbleheadWithPhotosSchema.parse(
       ctx.sanitizedInput,
     );
     const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, {
-      ...bobbleheadData,
-      collectionCount: collectionIds?.length ?? 0,
-      id,
-    });
+    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { ...bobbleheadData, id });
 
     try {
       const updatedBobblehead = await BobbleheadsFacade.updateAsync(
-        { ...bobbleheadData, collectionIds, id },
+        { id, ...bobbleheadData },
         userId,
         ctx.tx,
       );
@@ -336,11 +338,10 @@ export const updateBobbleheadWithPhotosAction = authActionClient
 
         if (newPhotos.length > 0) {
           try {
-            // Use first collection ID for Cloudinary path (bobblehead can belong to multiple collections)
-            const primaryCollectionId = collectionIds?.[0] ?? '';
+            // move photos from temp folder to permanent location in Cloudinary
             const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
               userId,
-              primaryCollectionId,
+              updatedBobblehead.collectionId,
               updatedBobblehead.id,
             );
             const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
@@ -454,18 +455,22 @@ export const updateBobbleheadWithPhotosAction = authActionClient
         category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
         data: {
           bobblehead: updatedBobblehead,
-          collectionCount: collectionIds?.length ?? 0,
           photosCount: uploadedPhotos.length,
           tagsCount: updatedTags.length,
         },
         level: SENTRY_LEVELS.INFO,
-        message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos, ${updatedTags.length} tags, and ${collectionIds?.length ?? 0} collection(s)`,
+        message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos and ${updatedTags.length} tags`,
       });
 
       // invalidate metadata cache for the updated bobblehead
       invalidateMetadataCache('bobblehead', updatedBobblehead.id);
 
-      // Note: Cache invalidation for collections is already handled by the facade
+      CacheRevalidationService.bobbleheads.onUpdate(
+        updatedBobblehead.id,
+        userId,
+        updatedBobblehead.collectionId,
+        updatedBobblehead.slug,
+      );
 
       return {
         data: {

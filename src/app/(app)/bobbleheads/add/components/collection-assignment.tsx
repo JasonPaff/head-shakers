@@ -11,8 +11,6 @@ import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/compone
 import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
 import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Combobox } from '@/components/ui/combo-box';
-import { Conditional } from '@/components/ui/conditional';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
 
@@ -29,21 +27,16 @@ export const CollectionAssignment = withForm({
     const collectionRef = useRef<HTMLElement | null>(null);
 
     const { shouldShowMessage } = useMotivationalMessage(form, {
-      requiredFields: ['collectionIds'],
+      requiredFields: ['collectionId'],
     });
 
     const handleCollectionCreated = (newCollection: ComboboxItem) => {
       setCollectionsList((prev) => [...prev, newCollection]);
-      form.setFieldValue('collectionIds', [newCollection.id]);
-      if (!form.getFieldMeta('collectionIds')?.isValid) {
-        void form.validateField('collectionIds', 'change');
+      form.setFieldValue('collectionId', newCollection.id);
+      if (!form.getFieldMeta('collectionId')?.isValid) {
+        void form.validateField('collectionId', 'change');
       }
     };
-
-    // Derived variables
-    const _hasValidationError =
-      !!form.getFieldMeta('collectionIds')?.errors &&
-      (form.getFieldMeta('collectionIds')?.errors?.length ?? 0) > 0;
 
     return (
       <Card>
@@ -69,36 +62,23 @@ export const CollectionAssignment = withForm({
         </CardHeader>
 
         <CardContent className={'space-y-6'}>
-          {/* Collection - UI shows single select, but stores as array for backend */}
+          {/* Collection */}
           <div className={'space-y-2'}>
-            <Combobox
-              createNewLabel={'Create new collection'}
-              focusRef={collectionRef}
-              items={collectionsList}
-              label={'Collection'}
-              onCreateNewSelect={setIsCreateCollectionDialogOpen.on}
-              onValueChange={(value) => {
-                // Store as array for backend schema validation
-                form.setFieldValue('collectionIds', value ? [value] : []);
-                void form.validateField('collectionIds', 'change');
-              }}
-              placeholder={'Select a collection...'}
-              searchPlaceholder={'Search collections...'}
-              value={
-                Array.isArray(form.getFieldValue('collectionIds')) ?
-                  form.getFieldValue('collectionIds')[0] || ''
-                : ''
-              }
-            />
-            <p className={'text-sm text-muted-foreground'}>
-              Choose an existing collection or create a new one
-            </p>
-            {/* Show validation error for collectionIds */}
-            <Conditional isCondition={_hasValidationError}>
-              <p className={'text-sm font-medium text-destructive'}>
-                {form.getFieldMeta('collectionIds')?.errors?.[0]}
-              </p>
-            </Conditional>
+            <form.AppField name={'collectionId'}>
+              {(field) => (
+                <field.ComboboxField
+                  createNewLabel={'Create new collection'}
+                  description={'Choose an existing collection or create a new one'}
+                  focusRef={collectionRef}
+                  isRequired
+                  items={collectionsList}
+                  label={'Collection'}
+                  onCreateNewSelect={setIsCreateCollectionDialogOpen.on}
+                  placeholder={'Select a collection...'}
+                  searchPlaceholder={'Search collections...'}
+                />
+              )}
+            </form.AppField>
           </div>
 
           {/* Progress indicator */}

@@ -182,7 +182,7 @@ async function ItemPage({ routeParams, searchParams }: ItemPageProps) {
         bobbleheadSlug={bobbleheadSlug}
         canDelete={canDelete}
         canEdit={canEdit}
-        collectionId={collectionId ?? undefined}
+        collectionId={basicBobblehead.collectionId ?? undefined}
         collections={collections}
         isOwner={isOwner}
         likeData={likeData}
