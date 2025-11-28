@@ -2,7 +2,6 @@
 
 import type { FormEvent } from 'react';
 
-import * as Sentry from '@sentry/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailIcon } from 'lucide-react';
 
@@ -11,7 +10,6 @@ import { useFocusContext } from '@/components/ui/form/focus-management/focus-con
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
-import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { generateTestId } from '@/lib/test-ids';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
 
@@ -21,26 +19,6 @@ import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.valid
  */
 export const FooterNewsletter = withFocusManagement(() => {
   const { focusFirstError } = useFocusContext();
-
-  const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
-    onSuccess: () => {
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.USER_INTERACTION,
-        data: {
-          action: 'newsletter-subscribe',
-          component: 'footer-newsletter',
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: 'Newsletter subscription successful',
-      });
-      form.reset();
-    },
-    toastMessages: {
-      error: 'Failed to subscribe. Please try again.',
-      loading: 'Subscribing...',
-      success: 'Thanks for subscribing!',
-    },
-  });
 
   const form = useAppForm({
     canSubmitWhenInvalid: true,
@@ -62,20 +40,28 @@ export const FooterNewsletter = withFocusManagement(() => {
     },
   });
 
+  const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
+    breadcrumbContext: {
+      action: 'newsletter-subscribe',
+      component: 'footer-newsletter',
+    },
+    onSuccess: () => {
+      form.reset();
+    },
+    toastMessages: {
+      error: 'Failed to subscribe. Please try again.',
+      loading: 'Subscribing...',
+      success: 'Thanks for subscribing!',
+    },
+  });
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.USER_INTERACTION,
-      data: {
-        action: 'newsletter-form-submit',
-        component: 'footer-newsletter',
-      },
-      level: SENTRY_LEVELS.INFO,
-      message: 'Newsletter form submitted',
-    });
     void form.handleSubmit();
   };
+
+  const _submitButtonText = isExecuting ? 'Subscribing...' : 'Subscribe';
 
   return (
     <div
@@ -132,7 +118,7 @@ export const FooterNewsletter = withFocusManagement(() => {
             isDisabled={isExecuting}
             testId={'footer-newsletter-submit'}
           >
-            {isExecuting ? 'Subscribing...' : 'Subscribe'}
+            {_submitButtonText}
           </form.SubmitButton>
         </form.AppForm>
       </form>

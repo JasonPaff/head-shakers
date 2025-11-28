@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
+import { trackDialog } from '@/lib/utils/sentry-breadcrumbs';
 import { createConfirmationSchema } from '@/lib/validations/confirmation.validation';
 
 type ConfirmDeleteAlertDialogProps = Children<{
@@ -59,11 +60,13 @@ export const ConfirmDeleteAlertDialog = withFocusManagement(
     });
 
     const handleCancel = () => {
+      trackDialog('confirm-delete', 'cancelled');
       form.reset();
       onClose();
     };
 
     const handleConfirm = async () => {
+      trackDialog('confirm-delete', 'confirmed');
       onDelete?.();
       await onDeleteAsync?.();
       form.reset();
@@ -81,7 +84,7 @@ export const ConfirmDeleteAlertDialog = withFocusManagement(
     const _isDeleteDisabled = confirmationText ? !canSubmit || isSubmitting : isSubmitting;
 
     return (
-      <AlertDialog onOpenChange={handleOpenChange} open={isOpen}>
+      <AlertDialog onOpenChange={handleOpenChange} open={isOpen} trackingName={'confirm-delete'}>
         <AlertDialogContent>
           <form
             onSubmit={(e) => {

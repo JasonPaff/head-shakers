@@ -168,6 +168,10 @@ export const CACHE_KEYS = {
     BOBBLEHEADS: () => `${CACHE_CONFIG.NAMESPACES.FEATURED}:bobbleheads`,
     COLLECTIONS: () => `${CACHE_CONFIG.NAMESPACES.FEATURED}:collections`,
     CONTENT: (type: string) => `${CACHE_CONFIG.NAMESPACES.FEATURED}:${type}`,
+    CONTENT_TYPES: {
+      ACTIVE: 'active',
+      FOOTER: 'footer',
+    },
     FEATURED_BOBBLEHEAD: () => `${CACHE_CONFIG.NAMESPACES.FEATURED}:featured:bobblehead`,
     TRENDING_BOBBLEHEADS: () => `${CACHE_CONFIG.NAMESPACES.FEATURED}:trending:bobbleheads`,
   },

@@ -3,11 +3,13 @@
 import type { ComponentProps } from 'react';
 
 import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
+import { useCallback } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { buttonVariants } from '@/components/ui/button';
 import { generateTestId } from '@/lib/test-ids';
+import { trackDialog } from '@/lib/utils/sentry-breadcrumbs';
 import { cn } from '@/utils/tailwind-utils';
 
 type AlertDialogActionProps = ComponentProps<typeof AlertDialogPrimitive.Action> & ComponentTestIdProps;
@@ -19,14 +21,35 @@ type AlertDialogFooterProps = ComponentProps<'div'> & ComponentTestIdProps;
 type AlertDialogHeaderProps = ComponentProps<'div'> & ComponentTestIdProps;
 type AlertDialogOverlayProps = ComponentProps<typeof AlertDialogPrimitive.Overlay> & ComponentTestIdProps;
 type AlertDialogPortalProps = ComponentProps<typeof AlertDialogPrimitive.Portal> & ComponentTestIdProps;
-type AlertDialogProps = ComponentProps<typeof AlertDialogPrimitive.Root> & ComponentTestIdProps;
+type AlertDialogProps = ComponentProps<typeof AlertDialogPrimitive.Root> &
+  ComponentTestIdProps & {
+    /** When provided, automatically tracks dialog open/close with Sentry breadcrumbs */
+    trackingName?: string;
+  };
 type AlertDialogTitleProps = ComponentProps<typeof AlertDialogPrimitive.Title> & ComponentTestIdProps;
 type AlertDialogTriggerProps = ComponentProps<typeof AlertDialogPrimitive.Trigger> & ComponentTestIdProps;
 
-export const AlertDialog = ({ testId, ...props }: AlertDialogProps) => {
+export const AlertDialog = ({ onOpenChange, testId, trackingName, ...props }: AlertDialogProps) => {
   const alertDialogTestId = testId || generateTestId('ui', 'alert-dialog');
 
-  return <AlertDialogPrimitive.Root data-slot={'alert-dialog'} data-testid={alertDialogTestId} {...props} />;
+  const handleOpenChange = useCallback(
+    (open: boolean) => {
+      if (trackingName) {
+        trackDialog(trackingName, open ? 'opened' : 'closed');
+      }
+      onOpenChange?.(open);
+    },
+    [onOpenChange, trackingName],
+  );
+
+  return (
+    <AlertDialogPrimitive.Root
+      data-slot={'alert-dialog'}
+      data-testid={alertDialogTestId}
+      onOpenChange={handleOpenChange}
+      {...props}
+    />
+  );
 };
 
 export const AlertDialogAction = ({ className, testId, ...props }: AlertDialogActionProps) => {

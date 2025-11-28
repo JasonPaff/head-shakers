@@ -22,10 +22,13 @@ export class NewsletterQuery extends BaseQuery {
   /**
    * Create a new newsletter subscription
    * Uses onConflictDoNothing to handle duplicate emails gracefully
+   *
+   * Note: userId can be undefined for anonymous signups. The null to undefined conversion
+   * ensures compatibility with the database schema which uses varchar (allowing undefined but not null).
    */
   static async createSignupAsync(
     email: string,
-    userId: null | string,
+    userId: string | undefined,
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
@@ -34,7 +37,7 @@ export class NewsletterQuery extends BaseQuery {
       .insert(newsletterSignups)
       .values({
         email: email.toLowerCase().trim(),
-        userId: userId ?? undefined,
+        userId,
       })
       .onConflictDoNothing()
       .returning();
@@ -101,30 +104,26 @@ export class NewsletterQuery extends BaseQuery {
 
   /**
    * Check if an email is actively subscribed (not unsubscribed)
+   * Combined query that checks existence and subscription status in one operation
    */
   static async isActiveSubscriberAsync(email: string, context: QueryContext): Promise<boolean> {
-    const dbInstance = this.getDbInstance(context);
-
-    const result = await dbInstance
-      .select({ unsubscribedAt: newsletterSignups.unsubscribedAt })
-      .from(newsletterSignups)
-      .where(eq(newsletterSignups.email, email.toLowerCase().trim()))
-      .limit(1);
-
-    const signup = result?.[0];
-    if (!signup) return false;
-
-    return signup.unsubscribedAt === null;
+    const signup = await this.getActiveSubscriberAsync(email, context);
+    return signup !== null;
   }
 
   /**
    * Resubscribe an existing email (clear unsubscribedAt)
+   * Returns null if the email doesn't exist in the system
    */
   static async resubscribeAsync(
     email: string,
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
+
+    // Verify record exists before updating
+    const existing = await this.findByEmailAsync(email, context);
+    if (!existing) return null;
 
     const result = await dbInstance
       .update(newsletterSignups)
@@ -163,6 +162,8 @@ export class NewsletterQuery extends BaseQuery {
 
   /**
    * Update user ID for an existing signup (for linking anonymous signup to user)
+   * Idempotent: Only updates if userId is currently undefined (prevents overwriting existing userId)
+   * Returns null if email doesn't exist or userId is already set
    */
   static async updateUserIdAsync(
     email: string,
@@ -170,6 +171,12 @@ export class NewsletterQuery extends BaseQuery {
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
+
+    // Verify record exists and userId is not already set
+    const existing = await this.findByEmailAsync(email, context);
+    if (!existing || existing.userId !== null) {
+      return null;
+    }
 
     const result = await dbInstance
       .update(newsletterSignups)

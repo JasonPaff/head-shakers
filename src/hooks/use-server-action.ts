@@ -7,6 +7,15 @@ import { useAction } from 'next-safe-action/hooks';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 
+import { trackServerAction } from '@/lib/utils/sentry-breadcrumbs';
+
+type BreadcrumbContext = {
+  /** Name of the action being executed (e.g., 'newsletter-subscribe', 'update-bobblehead') */
+  action: string;
+  /** Component initiating the action (e.g., 'footer-newsletter', 'edit-form') */
+  component: string;
+};
+
 type ToastMessages = {
   error?: ((error: unknown) => string) | string;
   loading?: string;
@@ -14,6 +23,8 @@ type ToastMessages = {
 };
 
 type UseServerActionOptions = {
+  /** When provided, automatically tracks action execution with Sentry breadcrumbs */
+  breadcrumbContext?: BreadcrumbContext;
   isDisableToast?: boolean;
   onAfterError?: () => void;
   onAfterSuccess?: () => void;
@@ -30,8 +41,26 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
 
   const executeAsync = useCallback(
     async (input: Parameters<typeof originalExecuteAsync>[0]) => {
+      const { breadcrumbContext } = options ?? {};
+
+      // Track action start if breadcrumb context is provided
+      if (breadcrumbContext) {
+        trackServerAction(breadcrumbContext.action, 'started', breadcrumbContext.component);
+      }
+
       if (options?.isDisableToast) {
-        return originalExecuteAsync(input);
+        try {
+          const result = await originalExecuteAsync(input);
+          if (breadcrumbContext) {
+            trackServerAction(breadcrumbContext.action, 'success', breadcrumbContext.component);
+          }
+          return result;
+        } catch (error) {
+          if (breadcrumbContext) {
+            trackServerAction(breadcrumbContext.action, 'error', breadcrumbContext.component);
+          }
+          throw error;
+        }
       }
 
       return toast.promise(
@@ -43,6 +72,10 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
         {
           error: (error) => {
             options?.onBeforeError?.();
+            // Track action error
+            if (breadcrumbContext) {
+              trackServerAction(breadcrumbContext.action, 'error', breadcrumbContext.component);
+            }
             const message =
               typeof options?.toastMessages?.error === 'function' ?
                 options.toastMessages.error(error)
@@ -56,6 +89,10 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
           loading: options?.toastMessages?.loading || 'Processing...',
           success: (data) => {
             options?.onBeforeSuccess?.();
+            // Track action success
+            if (breadcrumbContext) {
+              trackServerAction(breadcrumbContext.action, 'success', breadcrumbContext.component);
+            }
             const message =
               typeof options?.toastMessages?.success === 'function' ?
                 options?.toastMessages.success(data)

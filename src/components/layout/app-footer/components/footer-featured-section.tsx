@@ -20,14 +20,13 @@ export const FooterFeaturedSection = async () => {
   return (
     <FooterNavSection heading={'Featured Collections'}>
       {featuredContent.map((collection) => {
-        const _hasValidSlug = collection.collectionSlug !== null;
-        if (!_hasValidSlug) return null;
+        if (!collection.collectionSlug) return null;
 
         return (
           <FooterNavLink
             href={$path({
               route: '/collections/[collectionSlug]',
-              routeParams: { collectionSlug: collection.collectionSlug ?? '' },
+              routeParams: { collectionSlug: collection.collectionSlug },
             })}
             key={collection.id}
             label={collection.title || collection.collectionName || 'Untitled Collection'}

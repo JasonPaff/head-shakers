@@ -73,9 +73,10 @@ export class NewsletterFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<NewsletterSubscriptionResult> {
     try {
+      const normalizedEmail = email.toLowerCase().trim();
+
       return await (dbInstance ?? db).transaction(async (tx) => {
         const context = createPublicQueryContext({ dbInstance: tx });
-        const normalizedEmail = email.toLowerCase().trim();
 
         // Check if email already exists
         const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
@@ -133,7 +134,7 @@ export class NewsletterFacade {
         }
 
         // New subscription
-        const newSignup = await NewsletterQuery.createSignupAsync(normalizedEmail, userId ?? null, context);
+        const newSignup = await NewsletterQuery.createSignupAsync(normalizedEmail, userId, context);
 
         if (!newSignup) {
           // Race condition - email was created between check and insert
@@ -176,6 +177,7 @@ export class NewsletterFacade {
                 email: normalizedEmail.substring(0, 3) + '***',
                 signupId: newSignup.id,
               },
+              level: 'warning',
               tags: {
                 component: facadeName,
                 operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,

@@ -444,6 +444,11 @@ export class FeaturedContentQuery extends BaseQuery {
    *
    * only joins with the collection's table and selects minimal fields
    * filters for active content within the date range
+   *
+   * Permission Filtering: This query returns public featured content only. No user-specific
+   * permission filtering is required as featured content is curated by admins and intended
+   * for public display. The query filters by isActive status and date range to ensure only
+   * currently active featured content is returned.
    */
   static async getFooterFeaturedContentAsync(
     context: QueryContext,

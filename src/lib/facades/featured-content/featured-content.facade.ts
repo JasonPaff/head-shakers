@@ -16,7 +16,13 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
-import { CACHE_ENTITY_TYPE, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import {
+  CACHE_ENTITY_TYPE,
+  CACHE_KEYS,
+  OPERATIONS,
+  SENTRY_BREADCRUMB_CATEGORIES,
+  SENTRY_LEVELS,
+} from '@/lib/constants';
 import { db } from '@/lib/db';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
@@ -102,8 +108,7 @@ export class FeaturedContentFacade {
 
           return FeaturedContentTransformer.transformFeaturedContent(rawData);
         },
-        // TODO: move to constants
-        'active',
+        CACHE_KEYS.FEATURED.CONTENT_TYPES.ACTIVE,
         {
           context: {
             entityType: CACHE_ENTITY_TYPE.FEATURED,
@@ -312,7 +317,7 @@ export class FeaturedContentFacade {
 
           return data;
         },
-        'footer',
+        CACHE_KEYS.FEATURED.CONTENT_TYPES.FOOTER,
         {
           context: {
             entityType: CACHE_ENTITY_TYPE.FEATURED,
