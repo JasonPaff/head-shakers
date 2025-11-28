@@ -393,55 +393,44 @@ export class FeaturedContentQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
-    // create aliases for likes table - one for user like status, one for like counts
-    const userLikes = alias(likes, 'userLikes');
-    const collectionLikes = alias(likes, 'collectionLikes');
-
-    const results = await dbInstance
+    return dbInstance
       .select({
         comments: collections.commentCount,
         contentId: featuredContent.contentId,
         contentSlug: collections.slug,
         description: featuredContent.description,
         id: featuredContent.id,
-        imageUrl: sql<null | string>`COALESCE(${featuredContent.imageUrl}, ${collections.coverImageUrl})`,
-        isLiked: sql<boolean>`${userLikes.id} IS NOT NULL`,
+        imageUrl: sql<null | string>`COALESCE
+          (${featuredContent.imageUrl}, ${collections.coverImageUrl})`,
+        isLiked: sql<boolean>`${likes.id} IS NOT NULL`,
         isTrending: sql<boolean>`${featuredContent.featureType} = 'trending'`,
-        likeId: userLikes.id,
-        likes: sql<number>`COUNT(${collectionLikes.id})::integer`,
+        likeId: likes.id,
+        likes: collections.likeCount,
         ownerAvatarUrl: users.avatarUrl,
         ownerDisplayName: users.username,
         title: featuredContent.title,
-        totalItems: sql<number>`(
-          SELECT COUNT(*)::integer
-          FROM ${bobbleheads}
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
-          AND ${bobbleheads.deletedAt} IS NULL
-        )`.as('total_items'),
-        totalValue: sql<null | string>`(
-          SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
-          FROM ${bobbleheads}
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
-            AND ${bobbleheads.deletedAt} IS NULL
-        )`,
+        totalItems: sql<number>`(SELECT COUNT(*)::integer
+                                 FROM ${bobbleheads}
+                                 WHERE ${bobbleheads.collectionId} = ${collections.id}
+                                   AND ${bobbleheads.deletedAt} IS NULL)`.as('total_items'),
+        totalValue: sql<null | string>`(SELECT COALESCE(SUM(${bobbleheads.purchasePrice}), 0)
+                                        FROM ${bobbleheads}
+                                        WHERE ${bobbleheads.collectionId} = ${collections.id}
+                                          AND ${bobbleheads.deletedAt} IS NULL)`,
         viewCount: featuredContent.viewCount,
       })
       .from(featuredContent)
       .innerJoin(collections, eq(featuredContent.contentId, collections.id))
       .innerJoin(users, eq(collections.userId, users.id))
       .leftJoin(
-        userLikes,
+        likes,
         userId ?
           and(
-            eq(userLikes.targetId, collections.id),
-            eq(userLikes.targetType, 'collection'),
-            eq(userLikes.userId, userId),
+            eq(likes.targetId, collections.id),
+            eq(likes.targetType, 'collection'),
+            eq(likes.userId, userId),
           )
         : sql`false`,
-      )
-      .leftJoin(
-        collectionLikes,
-        and(eq(collectionLikes.targetId, collections.id), eq(collectionLikes.targetType, 'collection')),
       )
       .where(
         and(
@@ -451,29 +440,8 @@ export class FeaturedContentQuery extends BaseQuery {
           or(isNull(featuredContent.endDate), gte(featuredContent.endDate, now)),
         ),
       )
-      .groupBy(
-        featuredContent.id,
-        featuredContent.contentId,
-        featuredContent.description,
-        featuredContent.imageUrl,
-        featuredContent.title,
-        featuredContent.viewCount,
-        featuredContent.featureType,
-        featuredContent.priority,
-        featuredContent.createdAt,
-        collections.id,
-        collections.slug,
-        collections.commentCount,
-        collections.coverImageUrl,
-        users.id,
-        users.avatarUrl,
-        users.username,
-        userLikes.id,
-      )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
       .limit(6);
-
-    return results;
   }
 
   /**

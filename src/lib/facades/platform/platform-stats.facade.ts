@@ -82,9 +82,7 @@ export class PlatformStatsFacade extends BaseFacade {
       },
       {
         includeResultSummary: (stats) => ({
-          totalBobbleheads: stats.totalBobbleheads,
-          totalCollections: stats.totalCollections,
-          totalCollectors: stats.totalCollectors,
+          ...stats,
         }),
       },
     );

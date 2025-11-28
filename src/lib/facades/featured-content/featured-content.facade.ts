@@ -16,13 +16,18 @@ import type {
 
 import { CACHE_ENTITY_TYPE, CACHE_KEYS, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
+import { createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
 import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featured-content-transformer';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
-import { trackFacadeEntry, trackFacadeSuccess } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import {
+  trackFacadeEntry,
+  trackFacadeSuccess,
+  withFacadeBreadcrumbs,
+} from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'FeaturedContentFacade';
 
@@ -31,7 +36,7 @@ const facadeName = 'FeaturedContentFacade';
  * combines query operations with a sophisticated caching strategy
  * provides a clean API for all featured content operations
  */
-export class FeaturedContentFacade {
+export class FeaturedContentFacade extends BaseFacade {
   /**
    * create a new featured content entry
    */
@@ -60,7 +65,7 @@ export class FeaturedContentFacade {
    */
   static async deleteAsync(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
     try {
-      const context = createPublicQueryContext({ dbInstance });
+      const context = this.publicContext(dbInstance);
       return FeaturedContentQuery.deleteAsync(id, context);
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -84,7 +89,7 @@ export class FeaturedContentFacade {
     try {
       return await CacheService.featured.content(
         async () => {
-          const context = createPublicQueryContext({ dbInstance });
+          const context = this.publicContext(dbInstance);
           const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
 
           trackFacadeSuccess(facadeName, 'getActiveFeaturedContentAsync');
@@ -117,7 +122,7 @@ export class FeaturedContentFacade {
   static async getAllFeaturedContentForAdmin(
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<FeaturedContentRecord>> {
-    const context = createPublicQueryContext({ dbInstance });
+    const context = this.publicContext(dbInstance);
     return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
   }
 
@@ -149,35 +154,43 @@ export class FeaturedContentFacade {
   static async getFeaturedBobbleheadAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<HeroFeaturedBobbleheadData | null> {
-    trackFacadeEntry(facadeName, 'getFeaturedBobbleheadAsync');
+    const methodName = 'getFeaturedBobbleheadAsync';
 
-    try {
-      return await CacheService.featured.featuredBobblehead(
-        async () => {
-          const context = createPublicQueryContext({ dbInstance });
-          const data = await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
-
-          trackFacadeSuccess(facadeName, 'getFeaturedBobbleheadAsync', { found: data !== null });
-
-          return data;
-        },
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.FEATURED,
-            facade: facadeName,
-            operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
-          },
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: {},
-        facade: facadeName,
-        method: 'getHeroFeaturedBobbleheadAsync',
-        operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+    return withFacadeBreadcrumbs(
+      { facade: facadeName, method: methodName },
+      async () => {
+        try {
+          return await CacheService.featured.featuredBobblehead(
+            async () => {
+              const context = this.publicContext(dbInstance);
+              return await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
+            },
+            {
+              context: {
+                entityType: CACHE_ENTITY_TYPE.FEATURED,
+                facade: facadeName,
+                operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+              },
+            },
+          );
+        } catch (error) {
+          throw createFacadeError(
+            {
+              data: {},
+              facade: facadeName,
+              method: methodName,
+              operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+            },
+            error,
+          );
+        }
+      },
+      {
+        includeResultSummary: (featuredBobblehead) => ({
+          ...featuredBobblehead,
+        }),
+      },
+    );
   }
 
   /**
@@ -199,40 +212,39 @@ export class FeaturedContentFacade {
     userId?: null | string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FeaturedCollectionData>> {
-    trackFacadeEntry(facadeName, 'getFeaturedCollectionsAsync');
+    const methodName = 'getFeaturedCollectionsAsync';
 
-    try {
-      return await CacheService.featured.collections(
-        async () => {
-          const context = createPublicQueryContext({ dbInstance });
-          const data = await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
-
-          trackFacadeSuccess(facadeName, 'getFeaturedCollectionsAsync', {
-            count: data.length,
-            userId: userId || 'public',
-          });
-
-          return data;
-        },
-        userId,
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.FEATURED,
+    return withFacadeBreadcrumbs(
+      { facade: facadeName, method: methodName },
+      async () => {
+        try {
+          return await CacheService.featured.collections(
+            async () => {
+              const context = this.publicContext(dbInstance);
+              return await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
+            },
+            userId,
+            {
+              context: {
+                entityType: CACHE_ENTITY_TYPE.FEATURED,
+                facade: facadeName,
+                operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
+              },
+            },
+          );
+        } catch (error) {
+          const errorContext: FacadeErrorContext = {
+            data: { userId },
             facade: facadeName,
+            method: methodName,
             operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
-          },
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: { userId },
-        facade: facadeName,
-        method: 'getFeaturedCollectionsAsync',
-        operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
-        userId: userId || undefined,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+            userId: userId || undefined,
+          };
+          throw createFacadeError(errorContext, error);
+        }
+      },
+      { includeResultSummary: (data) => ({ ...data }) },
+    );
   }
 
   /**
@@ -242,7 +254,7 @@ export class FeaturedContentFacade {
     id: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
-    const context = createPublicQueryContext({ dbInstance });
+    const context = this.publicContext(dbInstance);
     return FeaturedContentQuery.findByIdAsync(id, context);
   }
 
@@ -253,7 +265,7 @@ export class FeaturedContentFacade {
     id: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<FeaturedContentRecord | null> {
-    const context = createPublicQueryContext({ dbInstance });
+    const context = this.publicContext(dbInstance);
     return FeaturedContentQuery.findFeaturedContentByIdForAdminAsync(id, context);
   }
 
@@ -268,7 +280,7 @@ export class FeaturedContentFacade {
     try {
       return await CacheService.featured.content(
         async () => {
-          const context = createPublicQueryContext({ dbInstance });
+          const context = this.publicContext(dbInstance);
           const data = await FeaturedContentQuery.getFooterFeaturedContentAsync(context);
 
           trackFacadeSuccess(facadeName, 'getFooterFeaturedContentAsync', { count: data.length });
@@ -319,31 +331,41 @@ export class FeaturedContentFacade {
   static async getTrendingBobbleheadsAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<TrendingBobbleheadData>> {
-    trackFacadeEntry(facadeName, 'getTrendingBobbleheadsAsync');
+    const methodName = 'getTrendingBobbleheadsAsync';
 
-    try {
-      return await CacheService.featured.trendingBobbleheads(
-        async () => {
-          const context = createPublicQueryContext({ dbInstance });
-          return await FeaturedContentQuery.getTrendingBobbleheadsAsync(context);
-        },
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.FEATURED,
+    return withFacadeBreadcrumbs(
+      { facade: facadeName, method: methodName },
+      async () => {
+        try {
+          return await CacheService.featured.trendingBobbleheads(
+            async () => {
+              const context = this.publicContext(dbInstance);
+              return await FeaturedContentQuery.getTrendingBobbleheadsAsync(context);
+            },
+            {
+              context: {
+                entityType: CACHE_ENTITY_TYPE.FEATURED,
+                facade: facadeName,
+                operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
+              },
+            },
+          );
+        } catch (error) {
+          const errorContext: FacadeErrorContext = {
+            data: {},
             facade: facadeName,
+            method: methodName,
             operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
-          },
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: {},
-        facade: facadeName,
-        method: 'getTrendingBobbleheadsAsync',
-        operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+          };
+          throw createFacadeError(errorContext, error);
+        }
+      },
+      {
+        includeResultSummary: (trendingBobbleheads) => ({
+          ...trendingBobbleheads,
+        }),
+      },
+    );
   }
 
   /**
@@ -358,7 +380,7 @@ export class FeaturedContentFacade {
    * increment view count for featured content
    */
   static async incrementViewCount(contentId: string, dbInstance?: DatabaseExecutor): Promise<void> {
-    const context = createPublicQueryContext({ dbInstance });
+    const context = this.publicContext(dbInstance);
 
     try {
       await FeaturedContentQuery.incrementViewCountAsync(contentId, context);
@@ -378,7 +400,7 @@ export class FeaturedContentFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
     try {
-      const context = createPublicQueryContext({ dbInstance });
+      const context = this.publicContext(dbInstance);
       return FeaturedContentQuery.toggleActiveAsync(id, isActive, context);
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -400,7 +422,7 @@ export class FeaturedContentFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
     try {
-      const context = createPublicQueryContext({ dbInstance });
+      const context = this.publicContext(dbInstance);
       return FeaturedContentQuery.updateAsync(id, data, context);
     } catch (error) {
       const context: FacadeErrorContext = {
