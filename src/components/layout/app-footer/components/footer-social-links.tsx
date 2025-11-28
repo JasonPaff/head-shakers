@@ -59,15 +59,8 @@ type FooterSocialLinksProps = ComponentProps<'div'> & ComponentTestIdProps;
 export const FooterSocialLinks = ({ className, testId, ...props }: FooterSocialLinksProps) => {
   const containerTestId = testId || generateTestId('layout', 'app-footer', 'social-links');
 
-  // Get active platforms with non-empty URLs
   const _activePlatforms = getActiveSocialPlatforms();
-
-  // Early return if no social profiles are configured
-  const _hasNoActivePlatforms = _activePlatforms.length === 0;
-
-  if (_hasNoActivePlatforms) {
-    return null;
-  }
+  if (_activePlatforms.length === 0) return null;
 
   return (
     <div
