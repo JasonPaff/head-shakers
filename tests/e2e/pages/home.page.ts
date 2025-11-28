@@ -3,21 +3,54 @@ import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './base.page';
 
 export class HomePage extends BasePage {
+  readonly url = '/';
+
+  get browseCollectionsLink(): Locator {
+    return this.page.getByRole('link', { name: /browse collections/i });
+  }
+
+  get exploreBobblesLink(): Locator {
+    return this.page.getByRole('link', { name: /explore bobbleheads/i });
+  }
+
+  get featuredCollectionsSection(): Locator {
+    return this.byTestId('layout-featured-collections-section');
+  }
+
+  // Legacy locators (kept for backwards compatibility)
   get getStartedButton(): Locator {
     return this.page.getByRole('link', { name: /get started/i });
   }
 
-  // Home page specific locators using role-based and semantic selectors
+  // Section locators
   get heroSection(): Locator {
-    return this.page.getByRole('region', { name: /hero/i }).or(this.byTestId('hero'));
+    return this.byTestId('layout-hero-section');
+  }
+
+  get joinCommunitySection(): Locator {
+    return this.byTestId('layout-join-community-section');
+  }
+
+  get myCollectionLink(): Locator {
+    return this.page.getByRole('link', { name: /my collection/i });
+  }
+
+  // Stats
+  get platformStats(): Locator {
+    return this.byTestId('feature-platform-stats-display');
   }
 
   get searchInput(): Locator {
     return this.finder.ui('input').or(this.page.getByRole('searchbox'));
   }
 
-  get url(): string {
-    return '/';
+  // CTAs
+  get startCollectionButton(): Locator {
+    return this.page.getByRole('button', { name: /start your collection/i });
+  }
+
+  get trendingBobbleheadsSection(): Locator {
+    return this.byTestId('layout-trending-bobbleheads-section');
   }
 
   constructor(page: Page) {
