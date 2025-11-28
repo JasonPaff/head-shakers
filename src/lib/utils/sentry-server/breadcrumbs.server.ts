@@ -1,13 +1,43 @@
 import * as Sentry from '@sentry/nextjs';
 
-import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import type { RevalidationResult } from '@/lib/services/cache-revalidation.service';
+
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS } from '@/lib/constants';
+import { handleActionError } from '@/lib/utils/action-error-handler';
 
 import type {
+  ActionBreadcrumbData,
+  ActionErrorContext,
+  ActionOperationContext,
+  CacheInvalidationConfig,
   FacadeBreadcrumbData,
   FacadeOperationContext,
   ServerBreadcrumbLevel,
+  WithActionBreadcrumbsOptions,
   WithFacadeBreadcrumbsOptions,
 } from './types';
+
+/**
+ * Add an action breadcrumb with BUSINESS_LOGIC category.
+ * Use for entry, success, and warning breadcrumbs in server actions.
+ *
+ * @example
+ * actionBreadcrumb('Processing payment');
+ * actionBreadcrumb('Payment completed', { orderId, amount });
+ * actionBreadcrumb('Partial failure in batch', { failedCount: 3 }, 'warning');
+ */
+export function actionBreadcrumb(
+  message: string,
+  data?: ActionBreadcrumbData,
+  level: ServerBreadcrumbLevel = 'info',
+): void {
+  Sentry.addBreadcrumb({
+    category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+    data,
+    level: SENTRY_LEVELS[level.toUpperCase() as keyof typeof SENTRY_LEVELS],
+    message,
+  });
+}
 
 /**
  * Add a facade breadcrumb with BUSINESS_LOGIC category.
@@ -29,6 +59,127 @@ export function facadeBreadcrumb(
     level: SENTRY_LEVELS[level.toUpperCase() as keyof typeof SENTRY_LEVELS],
     message,
   });
+}
+
+/**
+ * Set Sentry context with type-safe context key.
+ * Reduces boilerplate for Sentry.setContext(SENTRY_CONTEXTS.XXX, data).
+ *
+ * @example
+ * setActionContext('BOBBLEHEAD_DATA', bobbleheadData);
+ * setActionContext('COLLECTION_DATA', { name, slug, userId });
+ * setActionContext('INPUT_INFO', { filters, pagination, sort });
+ */
+export function setActionContext(
+  contextType: keyof typeof SENTRY_CONTEXTS,
+  data: Record<string, unknown>,
+): void {
+  Sentry.setContext(SENTRY_CONTEXTS[contextType], data);
+}
+
+/**
+ * Track server action operation start.
+ * Creates an entry breadcrumb with action and operation context.
+ *
+ * @example
+ * trackActionEntry('CREATE_BOBBLEHEAD', 'bobbleheads.create');
+ * trackActionEntry('UPDATE_COLLECTION', 'collections.update', { collectionId });
+ */
+export function trackActionEntry(actionName: string, operation: string, data?: ActionBreadcrumbData): void {
+  actionBreadcrumb(`${actionName}: ${operation} started`, {
+    actionName,
+    operation,
+    ...data,
+  });
+}
+
+/**
+ * Track server action operation success with optional result data.
+ * Creates a success breadcrumb with action and operation context.
+ *
+ * @example
+ * trackActionSuccess('CREATE_BOBBLEHEAD', 'bobbleheads.create', { bobbleheadId });
+ * trackActionSuccess('BATCH_DELETE', 'bobbleheads.batchDelete', { deletedCount: 5 });
+ */
+export function trackActionSuccess(actionName: string, operation: string, data?: ActionBreadcrumbData): void {
+  actionBreadcrumb(`${actionName}: ${operation} completed`, {
+    actionName,
+    operation,
+    ...data,
+  });
+}
+
+/**
+ * Track server action warning for partial failures or non-critical issues.
+ * Creates a warning-level breadcrumb with action and operation context.
+ *
+ * @example
+ * trackActionWarning('CREATE_BOBBLEHEAD', 'photo.move', 'Some photos failed to move', {
+ *   failedCount: 2,
+ *   totalCount: 10,
+ * });
+ */
+export function trackActionWarning(
+  actionName: string,
+  operation: string,
+  message: string,
+  data?: ActionBreadcrumbData,
+): void {
+  actionBreadcrumb(
+    message,
+    {
+      actionName,
+      operation,
+      ...data,
+    },
+    'warning',
+  );
+}
+
+// =============================================================================
+// Action Breadcrumb Helpers (Layer 1)
+// =============================================================================
+
+/**
+ * Track cache invalidation result and log failures to Sentry.
+ * Returns the original result for chaining.
+ *
+ * @example
+ * // Track and continue (failures are logged but don't throw)
+ * trackCacheInvalidation(
+ *   CacheRevalidationService.social.onLikeChange(targetType, targetId, userId, 'like'),
+ *   { entityType: 'like', entityId: targetId, operation: 'onLikeChange', userId }
+ * );
+ *
+ * @example
+ * // With result checking
+ * const result = trackCacheInvalidation(
+ *   CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId),
+ *   { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'onDelete', userId }
+ * );
+ * if (!result.isSuccess) {
+ *   // Handle manually if needed
+ * }
+ */
+export function trackCacheInvalidation(
+  result: RevalidationResult,
+  config: CacheInvalidationConfig,
+): RevalidationResult {
+  if (!result.isSuccess) {
+    Sentry.captureException(new Error(`Cache invalidation failed for ${config.operation}`), {
+      extra: {
+        entityId: config.entityId,
+        entityType: config.entityType,
+        error: result.error,
+        operation: config.operation,
+        tagsAttempted: result.tagsInvalidated,
+        userId: config.userId,
+      },
+      level: 'warning',
+    });
+  }
+
+  return result;
 }
 
 /**
@@ -115,6 +266,191 @@ export function trackFacadeWarning(
     'warning',
   );
 }
+
+// =============================================================================
+// Action Wrapper Functions (Layer 2)
+// =============================================================================
+
+/**
+ * Wrap a server action operation with automatic entry/success/error breadcrumbs.
+ * Use for straightforward operations where you want all tracking handled automatically.
+ * Does NOT handle errors - use withActionErrorHandling for that.
+ *
+ * @example
+ * // Basic usage
+ * return withActionBreadcrumbs(
+ *   { actionName: 'GET_CATEGORIES', operation: 'collections.getCategories' },
+ *   async () => {
+ *     return await CollectionsFacade.getCategories(dbInstance);
+ *   },
+ * );
+ *
+ * @example
+ * // With context and result summary
+ * return withActionBreadcrumbs(
+ *   {
+ *     actionName: 'CREATE_BOBBLEHEAD',
+ *     operation: 'bobbleheads.create',
+ *     userId: ctx.userId,
+ *     contextType: 'BOBBLEHEAD_DATA',
+ *     contextData: bobbleheadData,
+ *   },
+ *   async () => {
+ *     const result = await BobbleheadsFacade.createAsync(data, userId);
+ *     return { data: result, success: true };
+ *   },
+ *   {
+ *     includeResultSummary: (result) => ({
+ *       bobbleheadId: result.data.id,
+ *       name: result.data.name,
+ *     }),
+ *   },
+ * );
+ */
+export async function withActionBreadcrumbs<T>(
+  context: ActionOperationContext,
+  operation: () => Promise<T>,
+  options?: WithActionBreadcrumbsOptions<T>,
+): Promise<T> {
+  const { actionName, contextData, contextType, operation: op, userId } = context;
+
+  // Set Sentry context if provided
+  if (contextType && contextData) {
+    setActionContext(contextType, contextData);
+  }
+
+  const entryMessage = options?.entryMessage ?? `${actionName}: ${op} started`;
+  const successMessage = options?.successMessage ?? `${actionName}: ${op} completed`;
+
+  // Entry breadcrumb
+  actionBreadcrumb(entryMessage, {
+    actionName,
+    operation: op,
+    ...(userId && { userId }),
+  });
+
+  try {
+    const result = await operation();
+
+    // Success breadcrumb with optional result summary
+    const resultData = options?.includeResultSummary?.(result);
+    actionBreadcrumb(successMessage, {
+      actionName,
+      operation: op,
+      ...(userId && { userId }),
+      ...resultData,
+    });
+
+    return result;
+  } catch (error) {
+    // Error breadcrumb (but don't handle the error - let it propagate)
+    actionBreadcrumb(
+      `${actionName}: ${op} failed`,
+      {
+        actionName,
+        errorType: error instanceof Error ? error.constructor.name : 'unknown',
+        operation: op,
+        ...(userId && { userId }),
+      },
+      'error',
+    );
+
+    throw error;
+  }
+}
+
+/**
+ * Wrap a server action operation with automatic breadcrumbs AND error handling.
+ * Combines withActionBreadcrumbs with handleActionError for complete action wrapping.
+ *
+ * This is the most comprehensive wrapper - it handles:
+ * 1. Setting Sentry context (if contextType/contextData provided)
+ * 2. Entry breadcrumb on start
+ * 3. Success breadcrumb on completion
+ * 4. Error breadcrumb + handleActionError on failure
+ *
+ * @example
+ * // Simple action with full error handling
+ * return withActionErrorHandling(
+ *   {
+ *     actionName: ACTION_NAMES.COLLECTIONS.CREATE,
+ *     operation: OPERATIONS.COLLECTIONS.CREATE,
+ *     userId: ctx.userId,
+ *     input: parsedInput,
+ *     contextType: 'COLLECTION_DATA',
+ *     contextData: collectionData,
+ *   },
+ *   async () => {
+ *     const newCollection = await CollectionsFacade.createAsync(collectionData, ctx.userId, db);
+ *     if (!newCollection) {
+ *       throw new ActionError(ErrorType.INTERNAL, 'CREATE_FAILED', 'Failed to create');
+ *     }
+ *     return { data: newCollection, success: true };
+ *   },
+ *   { includeResultSummary: (r) => ({ collectionId: r.data.id }) },
+ * );
+ */
+export async function withActionErrorHandling<T>(
+  context: ActionErrorContext,
+  operation: () => Promise<T>,
+  breadcrumbOptions?: WithActionBreadcrumbsOptions<T>,
+): Promise<T> {
+  const { actionName, contextData, contextType, input, metadata, operation: op, userId } = context;
+
+  // Set Sentry context if provided
+  if (contextType && contextData) {
+    setActionContext(contextType, contextData);
+  }
+
+  const entryMessage = breadcrumbOptions?.entryMessage ?? `${actionName}: ${op} started`;
+  const successMessage = breadcrumbOptions?.successMessage ?? `${actionName}: ${op} completed`;
+
+  // Entry breadcrumb
+  actionBreadcrumb(entryMessage, {
+    actionName,
+    operation: op,
+    ...(userId && { userId }),
+  });
+
+  try {
+    const result = await operation();
+
+    // Success breadcrumb with optional result summary
+    const resultData = breadcrumbOptions?.includeResultSummary?.(result);
+    actionBreadcrumb(successMessage, {
+      actionName,
+      operation: op,
+      ...(userId && { userId }),
+      ...resultData,
+    });
+
+    return result;
+  } catch (error) {
+    // Error breadcrumb
+    actionBreadcrumb(
+      `${actionName}: ${op} failed`,
+      {
+        actionName,
+        errorType: error instanceof Error ? error.constructor.name : 'unknown',
+        operation: op,
+        ...(userId && { userId }),
+      },
+      'error',
+    );
+
+    // Delegate to handleActionError which will throw the appropriate ActionError
+    handleActionError(error, {
+      input: input as Record<string, unknown> | undefined,
+      metadata: metadata ?? { actionName },
+      operation: op,
+      userId,
+    });
+  }
+}
+
+// =============================================================================
+// Cache Invalidation Helper (Layer 3)
+// =============================================================================
 
 /**
  * Wrap a facade operation with automatic entry/success/error breadcrumbs.
