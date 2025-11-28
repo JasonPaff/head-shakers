@@ -31,9 +31,11 @@ Redesign the trending bobbleheads section on the home page using the styling, la
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/display/trending-bobbleheads-display.tsx` - Client component for grid rendering with hover effects, badges, and stats
 
 **Changes:**
+
 - Create TrendingBobblehead interface matching FeaturedContentData structure with required fields
 - Create TrendingBobbleheadsDisplayProps interface accepting array of trending bobbleheads
 - Implement TrendingBobbleheadsDisplay component with 6-column responsive grid (grid-cols-2 sm:grid-cols-3 lg:grid-cols-6)
@@ -53,11 +55,13 @@ Redesign the trending bobbleheads section on the home page using the styling, la
 - Link cards to bobblehead detail pages using $path with route '/bobbleheads/[bobbleheadSlug]'
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component exports TrendingBobbleheadsDisplay and TrendingBobblehead interface
 - [ ] Grid layout matches demo design with 6 columns on large screens
 - [ ] Cards display compact styling with p-3 padding
@@ -74,9 +78,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/async/trending-bobbleheads-async.tsx` - Server component for data fetching and transformation
 
 **Changes:**
+
 - Add 'server-only' import at top of file
 - Create TrendingBobbleheadsAsyncProps interface with currentUserId property (null | string)
 - Implement TrendingBobbleheadsAsync async server component
@@ -92,11 +98,13 @@ npm run lint:fix && npm run typecheck
 - Return TrendingBobbleheadsDisplay component with transformed data
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component marked with 'server-only' import
 - [ ] Properly integrates with FeaturedContentFacade.getTrendingContent()
 - [ ] Filters to only bobblehead content type
@@ -114,9 +122,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/skeletons/trending-bobbleheads-skeleton.tsx` - Loading skeleton component
 
 **Changes:**
+
 - Import Skeleton component from components/ui/skeleton
 - Import generateTestId utility
 - Create TrendingBobbleheadsSkeleton functional component
@@ -133,11 +143,13 @@ npm run lint:fix && npm run typecheck
 - Match border styling from display component
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton grid matches display component layout (grid-cols-2 sm:grid-cols-3 lg:grid-cols-6)
 - [ ] Displays 12 skeleton cards for 2-row layout
 - [ ] Accessibility attributes properly implemented
@@ -153,9 +165,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/app/(app)/(home)/components/error/trending-bobbleheads-error-boundary.tsx` - Error boundary component
 
 **Changes:**
+
 - Copy pattern from FeaturedCollectionsErrorBoundary as template
 - Mark file with 'use client' directive
 - Import necessary types (ErrorInfo, ReactNode)
@@ -171,11 +185,13 @@ npm run lint:fix && npm run typecheck
 - Return children when no error
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Error boundary follows existing pattern from FeaturedCollectionsErrorBoundary
 - [ ] Displays user-friendly error message
 - [ ] Provides refresh functionality
@@ -191,9 +207,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Add trending section between featured bobbleheads and join community sections
 
 **Changes:**
+
 - Import TrendingBobbleheadsAsync from async/trending-bobbleheads-async
 - Import TrendingBobbleheadsSkeleton from skeletons/trending-bobbleheads-skeleton
 - Import TrendingBobbleheadsErrorBoundary from error/trending-bobbleheads-error-boundary
@@ -216,11 +234,13 @@ npm run lint:fix && npm run typecheck
 - Link button to browse bobbleheads page using $path with route '/browse/search'
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Trending section positioned correctly in page layout
 - [ ] Section header matches demo design with Flame icon
 - [ ] Gradient background matches demo styling
@@ -242,6 +262,7 @@ npm run lint:fix && npm run typecheck
 None - manual verification step
 
 **Changes:**
+
 - Load home page in development server
 - Verify gradient backgrounds match across hero, featured collections, and trending sections
 - Test responsive grid behavior at breakpoints (mobile 2-col, tablet 3-col, desktop 6-col)
@@ -256,12 +277,14 @@ None - manual verification step
 - Verify accessibility attributes work with screen readers
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 npm run dev
 ```
 
 **Success Criteria:**
+
 - [ ] Visual consistency confirmed across all sections
 - [ ] Responsive grid works at all breakpoints
 - [ ] Hover effects smooth and performant
@@ -294,6 +317,7 @@ npm run dev
 **Data Flow**: Uses FeaturedContentFacade.getTrendingContent() which returns items with featureType='trending'. The implementation filters to only bobblehead content types since trending can include collections and users.
 
 **Performance Considerations**:
+
 - Limits results to 12 items (2 rows of 6) to prevent excessive DOM nodes
 - Uses CldImage with blur placeholders for progressive loading
 - Batches like data fetching to minimize database queries
@@ -307,24 +331,27 @@ npm run dev
 ## File Discovery Results
 
 ### Files to Create (4)
-| File | Purpose |
-|------|---------|
-| `src/app/(app)/(home)/components/display/trending-bobbleheads-display.tsx` | Client component for rendering |
-| `src/app/(app)/(home)/components/async/trending-bobbleheads-async.tsx` | Server component for data fetching |
-| `src/app/(app)/(home)/components/skeletons/trending-bobbleheads-skeleton.tsx` | Loading skeleton |
-| `src/app/(app)/(home)/components/error/trending-bobbleheads-error-boundary.tsx` | Error boundary |
+
+| File                                                                            | Purpose                            |
+| ------------------------------------------------------------------------------- | ---------------------------------- |
+| `src/app/(app)/(home)/components/display/trending-bobbleheads-display.tsx`      | Client component for rendering     |
+| `src/app/(app)/(home)/components/async/trending-bobbleheads-async.tsx`          | Server component for data fetching |
+| `src/app/(app)/(home)/components/skeletons/trending-bobbleheads-skeleton.tsx`   | Loading skeleton                   |
+| `src/app/(app)/(home)/components/error/trending-bobbleheads-error-boundary.tsx` | Error boundary                     |
 
 ### Files to Modify (1)
-| File | Purpose |
-|------|---------|
+
+| File                            | Purpose                           |
+| ------------------------------- | --------------------------------- |
 | `src/app/(app)/(home)/page.tsx` | Add trending section to home page |
 
 ### Reference Files (6)
-| File | Purpose |
-|------|---------|
-| `src/app/home-page-demo/page.tsx` | Source trending section design (lines 863-977) |
-| `src/app/(app)/(home)/components/hero-section.tsx` | Color scheme reference |
-| `src/app/(app)/(home)/components/display/featured-collections-display.tsx` | Card pattern reference |
-| `src/app/(app)/(home)/components/async/featured-collections-async.tsx` | Async pattern reference |
-| `src/components/ui/badge.tsx` | Badge variants |
-| `src/lib/facades/featured-content/featured-content.facade.ts` | Data fetching method |
+
+| File                                                                       | Purpose                                        |
+| -------------------------------------------------------------------------- | ---------------------------------------------- |
+| `src/app/home-page-demo/page.tsx`                                          | Source trending section design (lines 863-977) |
+| `src/app/(app)/(home)/components/hero-section.tsx`                         | Color scheme reference                         |
+| `src/app/(app)/(home)/components/display/featured-collections-display.tsx` | Card pattern reference                         |
+| `src/app/(app)/(home)/components/async/featured-collections-async.tsx`     | Async pattern reference                        |
+| `src/components/ui/badge.tsx`                                              | Badge variants                                 |
+| `src/lib/facades/featured-content/featured-content.facade.ts`              | Data fetching method                           |

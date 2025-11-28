@@ -35,17 +35,20 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Database Management
+
 - Database auto-starts via global setup (Testcontainers)
 - Use `getTestDb()` from `tests/setup/test-db.ts`
 - Use `resetTestDatabase()` or `cleanupTable()` in `beforeEach`
 - Mock `@/lib/db` to use test database
 
 ### Factory Usage
+
 - Use factories from `tests/fixtures/` for test data
 - Create realistic test scenarios with proper relationships
 - Clean up created data between tests
 
 ### External Service Mocking
+
 - Mock Sentry for breadcrumb verification
 - Mock CacheService for cache behavior control
 - Mock Redis client to avoid connection issues

@@ -13,29 +13,30 @@ Scope Filter: all (Unit, Component, Integration, E2E)
 
 ## Coverage Gap Summary
 
-| Priority | Test Count | Description |
-|----------|------------|-------------|
-| Critical | 34 | Facades, Queries, Page composition |
-| High | 56 | Display, Async, Section components |
-| Medium | 37 | Skeletons, Utilities, Transformers |
-| **Total** | **127** | **Missing tests** |
+| Priority  | Test Count | Description                        |
+| --------- | ---------- | ---------------------------------- |
+| Critical  | 34         | Facades, Queries, Page composition |
+| High      | 56         | Display, Async, Section components |
+| Medium    | 37         | Skeletons, Utilities, Transformers |
+| **Total** | **127**    | **Missing tests**                  |
 
 ---
 
 ## Overview
 
-| Metric | Value |
-|--------|-------|
-| Total Tests | 127 |
-| Complexity | High |
-| Risk Level | Medium (core user-facing feature) |
-| Estimated Steps | 15 |
+| Metric          | Value                             |
+| --------------- | --------------------------------- |
+| Total Tests     | 127                               |
+| Complexity      | High                              |
+| Risk Level      | Medium (core user-facing feature) |
+| Estimated Steps | 15                                |
 
 ## Prerequisites
 
 ### 1. Test Infrastructure Setup
 
 **Clerk Auth Mock** (Required for component tests)
+
 ```typescript
 // tests/mocks/clerk.mock.ts
 vi.mock('@clerk/nextjs', () => ({
@@ -45,15 +46,17 @@ vi.mock('@clerk/nextjs', () => ({
 ```
 
 **Cloudinary Utilities Mock** (Required for display component tests)
+
 ```typescript
 // tests/mocks/cloudinary.mock.ts
 vi.mock('@/lib/utils/cloudinary.utils', () => ({
-  extractPublicIdFromCloudinaryUrl: vi.fn((url: string) => url ? 'mock-public-id' : null),
+  extractPublicIdFromCloudinaryUrl: vi.fn((url: string) => (url ? 'mock-public-id' : null)),
   generateBlurDataUrl: vi.fn(() => 'data:image/jpeg;base64,mock'),
 }));
 ```
 
 **next-typesafe-url Mock** (Required for navigation tests)
+
 ```typescript
 // tests/mocks/path.mock.ts
 vi.mock('next-typesafe-url', () => ({
@@ -64,6 +67,7 @@ vi.mock('next-typesafe-url', () => ({
 ### 2. Database Fixtures (Required for integration tests)
 
 **Featured Content Factory**
+
 - File: `tests/fixtures/featured-content.factory.ts`
 - Create functions: `createTestFeaturedBobblehead()`, `createTestFeaturedCollection()`, `createTestTrendingBobblehead()`
 
@@ -81,14 +85,18 @@ vi.mock('next-typesafe-url', () => ({
 **Why**: AuthContent component and auth-aware CTAs require mocked auth state
 **Test Type**: Infrastructure
 **Files to Create**:
+
 - `tests/mocks/clerk.mock.ts`
 
 **Implementation**:
+
 ```typescript
 // tests/mocks/clerk.mock.ts
 import { vi } from 'vitest';
 
-export const mockClerkAuth = (overrides: Partial<{ isLoaded: boolean; isSignedIn: boolean; userId: string | null }> = {}) => {
+export const mockClerkAuth = (
+  overrides: Partial<{ isLoaded: boolean; isSignedIn: boolean; userId: string | null }> = {},
+) => {
   const defaultState = {
     isLoaded: true,
     isSignedIn: false,
@@ -105,11 +113,13 @@ export const mockLoadingAuth = () => mockClerkAuth({ isLoaded: false });
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run typecheck
 ```
 
 **Success Criteria**:
+
 - Mock exports `mockClerkAuth`, `mockSignedInUser`, `mockSignedOutUser`, `mockLoadingAuth`
 - TypeScript compiles without errors
 
@@ -121,27 +131,31 @@ npm run typecheck
 **Why**: Display components use `extractPublicIdFromCloudinaryUrl` and `generateBlurDataUrl`
 **Test Type**: Infrastructure
 **Files to Create**:
+
 - `tests/mocks/cloudinary.mock.ts`
 
 **Implementation**:
+
 ```typescript
 // tests/mocks/cloudinary.mock.ts
 import { vi } from 'vitest';
 
 export const mockCloudinaryUtils = () => {
   vi.mock('@/lib/utils/cloudinary.utils', () => ({
-    extractPublicIdFromCloudinaryUrl: vi.fn((url: string | null) => url ? 'mock-public-id' : null),
+    extractPublicIdFromCloudinaryUrl: vi.fn((url: string | null) => (url ? 'mock-public-id' : null)),
     generateBlurDataUrl: vi.fn(() => 'data:image/jpeg;base64,/9j/mock'),
   }));
 };
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run typecheck
 ```
 
 **Success Criteria**:
+
 - Mock properly mocks both Cloudinary utility functions
 - TypeScript compiles without errors
 
@@ -153,24 +167,29 @@ npm run typecheck
 **Why**: Integration tests need consistent test data for featured bobbleheads, collections, trending
 **Test Type**: Infrastructure
 **Files to Create**:
+
 - `tests/fixtures/featured-content.factory.ts`
 
 **Test Cases**:
+
 - Factory creates valid featured_content records
 - Factory supports overrides for all fields
 - Factory links to valid bobblehead/collection records
 
 **Patterns to Follow**:
+
 - Use pattern from existing `tests/fixtures/user.factory.ts`
 - Return typed objects matching `FeaturedContentRecord`
 
 **Validation Commands**:
+
 ```bash
 npm run typecheck
 npm run test:run -- tests/fixtures/featured-content.factory.test.ts
 ```
 
 **Success Criteria**:
+
 - Factory creates records in database
 - All foreign key constraints satisfied
 - Returns properly typed objects
@@ -183,9 +202,11 @@ npm run test:run -- tests/fixtures/featured-content.factory.test.ts
 **Why**: Critical for image display; used by all display components
 **Test Type**: Unit
 **Files to Create**:
+
 - `tests/unit/lib/utils/cloudinary.utils.test.ts`
 
 **Test Cases**:
+
 1. `extractPublicIdFromCloudinaryUrl` - extracts public ID from valid Cloudinary URL
 2. `extractPublicIdFromCloudinaryUrl` - returns null for null/undefined input
 3. `extractPublicIdFromCloudinaryUrl` - returns null for non-Cloudinary URL
@@ -193,6 +214,7 @@ npm run test:run -- tests/fixtures/featured-content.factory.test.ts
 5. `generateBlurDataUrl` - handles various public IDs
 
 **Patterns to Follow**:
+
 ```typescript
 describe('cloudinary utilities', () => {
   describe('extractPublicIdFromCloudinaryUrl', () => {
@@ -206,11 +228,13 @@ describe('cloudinary utilities', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:run -- tests/unit/lib/utils/cloudinary.utils.test.ts
 ```
 
 **Success Criteria**:
+
 - All 5 test cases pass
 - 100% coverage of utility functions
 
@@ -222,9 +246,11 @@ npm run test:run -- tests/unit/lib/utils/cloudinary.utils.test.ts
 **Why**: Transforms database records to typed DTOs
 **Test Type**: Unit
 **Files to Create**:
+
 - `tests/unit/lib/queries/featured-content/featured-content-transformer.test.ts`
 
 **Test Cases**:
+
 1. `transformFeaturedContent` - transforms complete record correctly
 2. `transformFeaturedContent` - handles null optional fields
 3. `filterByType` - filters by single feature type
@@ -232,11 +258,13 @@ npm run test:run -- tests/unit/lib/utils/cloudinary.utils.test.ts
 5. `filterByType` - returns empty array for no matches
 
 **Validation Commands**:
+
 ```bash
 npm run test:run -- tests/unit/lib/queries/featured-content/featured-content-transformer.test.ts
 ```
 
 **Success Criteria**:
+
 - All transformation edge cases covered
 - Type safety verified
 
@@ -248,9 +276,11 @@ npm run test:run -- tests/unit/lib/queries/featured-content/featured-content-tra
 **Why**: Critical facade that aggregates platform metrics; uses parallel queries
 **Test Type**: Integration
 **Files to Create**:
+
 - `tests/integration/facades/platform/platform-stats.facade.test.ts`
 
 **Test Cases**:
+
 1. Returns correct counts for bobbleheads, collections, users
 2. Returns zeros when database is empty
 3. Handles database errors gracefully
@@ -258,6 +288,7 @@ npm run test:run -- tests/unit/lib/queries/featured-content/featured-content-tra
 5. Parallel query execution timing
 
 **Patterns to Follow**:
+
 ```typescript
 import { getTestDb, resetTestDatabase } from '@/tests/setup/test-db';
 import { PlatformStatsFacade } from '@/lib/facades/platform/platform-stats.facade';
@@ -285,11 +316,13 @@ describe('PlatformStatsFacade', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:integration -- tests/integration/facades/platform/platform-stats.facade.test.ts
 ```
 
 **Success Criteria**:
+
 - All 5 test cases pass
 - Database queries execute correctly
 - Error handling verified
@@ -302,9 +335,11 @@ npm run test:integration -- tests/integration/facades/platform/platform-stats.fa
 **Why**: Core data pipeline for hero, featured collections, trending sections
 **Test Type**: Integration
 **Files to Create**:
+
 - `tests/integration/facades/featured-content/featured-content.facade.test.ts`
 
 **Test Cases**:
+
 1. `getFeaturedBobbleheadAsync` - returns featured bobblehead with all fields
 2. `getFeaturedBobbleheadAsync` - returns null when none featured
 3. `getFeaturedCollectionsAsync` - returns up to 6 collections
@@ -316,11 +351,13 @@ npm run test:integration -- tests/integration/facades/platform/platform-stats.fa
 9. Error context propagation with Sentry
 
 **Validation Commands**:
+
 ```bash
 npm run test:integration -- tests/integration/facades/featured-content/featured-content.facade.test.ts
 ```
 
 **Success Criteria**:
+
 - All 9 test cases pass
 - Cache behavior verified
 - User-specific data handling correct
@@ -333,9 +370,11 @@ npm run test:integration -- tests/integration/facades/featured-content/featured-
 **Why**: Foundation for facade layer; complex joins and filters
 **Test Type**: Integration
 **Files to Create**:
+
 - `tests/integration/queries/featured-content/featured-content-query.test.ts`
 
 **Test Cases**:
+
 1. `getFeaturedBobbleheadAsync` - joins with bobbleheads table correctly
 2. `getFeaturedBobbleheadAsync` - orders by priority descending
 3. `getFeaturedCollectionsAsync` - includes owner user data
@@ -344,11 +383,13 @@ npm run test:integration -- tests/integration/facades/featured-content/featured-
 6. Query handles null/empty results gracefully
 
 **Validation Commands**:
+
 ```bash
 npm run test:integration -- tests/integration/queries/featured-content/featured-content-query.test.ts
 ```
 
 **Success Criteria**:
+
 - All query methods tested
 - Join behavior verified
 - Filter logic correct
@@ -361,18 +402,21 @@ npm run test:integration -- tests/integration/queries/featured-content/featured-
 **Why**: Quick wins; simple structure, important for loading UX
 **Test Type**: Component
 **Files to Create**:
+
 - `tests/components/home/skeleton/platform-stats-skeleton.test.tsx`
 - `tests/components/home/skeleton/featured-bobblehead-skeleton.test.tsx`
 - `tests/components/home/skeleton/featured-collections-skeleton.test.tsx`
 - `tests/components/home/skeleton/trending-bobbleheads-skeleton.test.tsx`
 
 **Test Cases per File**:
+
 1. Renders correct number of skeleton items
 2. Has proper accessibility attributes (aria-busy, role="status")
 3. Includes correct test IDs
 4. (For featured-bobblehead) Renders floating card animations
 
 **Patterns to Follow**:
+
 ```typescript
 import { customRender, screen } from '@/tests/setup/test-utils';
 import { PlatformStatsSkeleton } from '@/app/(app)/(home)/components/skeleton/platform-stats-skeleton';
@@ -393,11 +437,13 @@ describe('PlatformStatsSkeleton', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:components -- tests/components/home/skeleton/
 ```
 
 **Success Criteria**:
+
 - All 4 skeleton components tested
 - Accessibility attributes verified
 - ~8 tests total
@@ -410,40 +456,47 @@ npm run test:components -- tests/components/home/skeleton/
 **Why**: User-facing rendering logic; handles empty states, images, formatting
 **Test Type**: Component
 **Files to Create**:
+
 - `tests/components/home/display/platform-stats-display.test.tsx`
 - `tests/components/home/display/featured-bobblehead-display.test.tsx`
 - `tests/components/home/display/featured-collections-display.test.tsx`
 - `tests/components/home/display/trending-bobbleheads-display.test.tsx`
 
 **Test Cases - PlatformStatsDisplay**:
+
 1. Renders all 3 stat values
 2. Formats numbers with toLocaleString
 3. Has proper accessibility (dl/dt/dd structure)
 
 **Test Cases - FeaturedBobbleheadDisplay**:
+
 1. Renders with complete data
 2. Shows trophy icon when no image
 3. Displays editor's pick badge
 4. Links to bobblehead detail page
 
 **Test Cases - FeaturedCollectionsDisplay**:
+
 1. Renders collection grid
 2. Shows empty state when no collections
 3. Displays owner avatar and info
 4. Shows like status and trending badge
 
 **Test Cases - TrendingBobbleheadsDisplay**:
+
 1. Renders trending grid
 2. Shows empty state
 3. Maps badge variants correctly
 4. Displays category and year
 
 **Validation Commands**:
+
 ```bash
 npm run test:components -- tests/components/home/display/
 ```
 
 **Success Criteria**:
+
 - All display states tested
 - Image fallbacks verified
 - ~18 tests total
@@ -456,15 +509,18 @@ npm run test:components -- tests/components/home/display/
 **Why**: Critical for all auth-aware CTAs on home page
 **Test Type**: Component
 **Files to Create**:
+
 - `tests/components/ui/auth.test.tsx`
 
 **Test Cases**:
+
 1. Shows loading skeleton when `isLoaded` is false
 2. Renders children when signed in
 3. Renders fallback when signed out
 4. Fragment wrapper doesn't add extra DOM
 
 **Patterns to Follow**:
+
 ```typescript
 import { mockLoadingAuth, mockSignedInUser, mockSignedOutUser } from '@/tests/mocks/clerk.mock';
 
@@ -483,11 +539,13 @@ describe('AuthContent', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:components -- tests/components/ui/auth.test.tsx
 ```
 
 **Success Criteria**:
+
 - All 3 auth states tested
 - Integration with Clerk useAuth verified
 
@@ -499,35 +557,42 @@ npm run test:components -- tests/components/ui/auth.test.tsx
 **Why**: User-facing structure; wraps Suspense boundaries
 **Test Type**: Component
 **Files to Create**:
+
 - `tests/components/home/sections/hero-section.test.tsx`
 - `tests/components/home/sections/featured-collections-section.test.tsx`
 - `tests/components/home/sections/trending-bobbleheads-section.test.tsx`
 - `tests/components/home/sections/join-community-section.test.tsx`
 
 **Test Cases - HeroSection**:
+
 1. Renders heading and CTAs
 2. Shows Suspense fallback skeletons
 3. Auth-aware button rendering
 
 **Test Cases - FeaturedCollectionsSection**:
+
 1. Renders section heading
 2. Shows "View All" link
 
 **Test Cases - TrendingBobbleheadsSection**:
+
 1. Renders section heading
 2. Shows "Explore All" link
 
 **Test Cases - JoinCommunitySection**:
+
 1. Renders 3 feature cards
 2. Auth-aware CTAs (signed in vs out)
 3. Loading state for auth
 
 **Validation Commands**:
+
 ```bash
 npm run test:components -- tests/components/home/sections/
 ```
 
 **Success Criteria**:
+
 - Section structure verified
 - Suspense boundaries tested with fallbacks
 - ~14 tests total
@@ -540,19 +605,23 @@ npm run test:components -- tests/components/home/sections/
 **Why**: Orchestrates all sections; generates metadata
 **Test Type**: Component
 **Files to Create**:
+
 - `tests/components/home/home-page.test.tsx`
 
 **Test Cases**:
+
 1. Renders all 4 sections
 2. `generateMetadata` returns correct SEO data
 3. JSON-LD schema is valid
 
 **Validation Commands**:
+
 ```bash
 npm run test:components -- tests/components/home/home-page.test.tsx
 ```
 
 **Success Criteria**:
+
 - Page composition verified
 - Metadata generation tested
 
@@ -564,10 +633,12 @@ npm run test:components -- tests/components/home/home-page.test.tsx
 **Why**: Validates complete user experience including data loading
 **Test Type**: E2E
 **Files to Create**:
+
 - `tests/e2e/specs/public/home-sections.spec.ts`
 - `tests/e2e/specs/user/home-authenticated.spec.ts`
 
 **Test Cases - Public (Unauthenticated)**:
+
 1. Hero section visible with "Start Your Collection" CTA
 2. Platform stats display with numbers
 3. Featured collections section loads
@@ -577,12 +648,14 @@ npm run test:components -- tests/components/home/home-page.test.tsx
 7. "Explore Bobbleheads" navigation works
 
 **Test Cases - Authenticated**:
+
 1. Hero section shows "My Collection" button
 2. Join community shows "My Collection" link
 3. Featured collections show like status
 4. Navigation to dashboard works
 
 **Patterns to Follow**:
+
 ```typescript
 import { expect } from '@playwright/test';
 import { test } from '@/tests/e2e/fixtures/base.fixture';
@@ -598,12 +671,14 @@ test.describe('Home Page - Public', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/public/home-sections.spec.ts
 npm run test:e2e -- tests/e2e/specs/user/home-authenticated.spec.ts
 ```
 
 **Success Criteria**:
+
 - All sections visible and functional
 - Navigation works correctly
 - Auth states render properly
@@ -617,9 +692,11 @@ npm run test:e2e -- tests/e2e/specs/user/home-authenticated.spec.ts
 **Why**: Support E2E tests with consistent locators
 **Test Type**: E2E Infrastructure
 **Files to Modify**:
+
 - `tests/e2e/pages/home.page.ts`
 
 **Additions**:
+
 ```typescript
 export class HomePage extends BasePage {
   readonly url = '/';
@@ -642,11 +719,13 @@ export class HomePage extends BasePage {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/smoke/health.spec.ts
 ```
 
 **Success Criteria**:
+
 - POM includes all section locators
 - Existing smoke test still passes
 
@@ -655,11 +734,13 @@ npm run test:e2e -- tests/e2e/specs/smoke/health.spec.ts
 ## Quality Gates
 
 ### After Each Step
+
 - [ ] Tests pass: `npm run test:run -- {test-file}`
 - [ ] TypeScript compiles: `npm run typecheck`
 - [ ] Linting passes: `npm run lint`
 
 ### After All Steps
+
 - [ ] Full test suite passes: `npm run test:run`
 - [ ] E2E tests pass: `npm run test:e2e`
 - [ ] Coverage meets threshold (60%+): `npm run test:coverage`
@@ -669,18 +750,21 @@ npm run test:e2e -- tests/e2e/specs/smoke/health.spec.ts
 ## Test Infrastructure Notes
 
 ### Existing Setup (Reuse)
+
 - `tests/setup/test-utils.tsx` - customRender with providers
 - `tests/setup/test-db.ts` - Testcontainers helpers
 - `tests/setup/vitest.setup.ts` - Global mocks (Clerk, Next.js)
 - `tests/e2e/fixtures/base.fixture.ts` - Playwright fixtures
 
 ### Pre-Mocked (No Additional Setup)
+
 - Clerk authentication (`@clerk/nextjs`, `@clerk/nextjs/server`)
 - Next.js navigation (`next/navigation`, `next/headers`)
 - Toast notifications (`sonner`)
 - Theme provider (`next-themes`)
 
 ### New Mocks Required
+
 - Cloudinary utilities (Step 2)
 - next-typesafe-url $path (one-time in vitest.setup.ts)
 

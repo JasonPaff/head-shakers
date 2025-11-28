@@ -34,6 +34,7 @@ For page routes (e.g., `/app/(app)/(home)/page.tsx`):
 3. **Note the exact signatures and parameters used**
 
 Example analysis of a page:
+
 ```
 Entry: src/app/(app)/(home)/page.tsx
 
@@ -63,6 +64,7 @@ CollectionsFacade.getFeaturedAsync()
 ```
 
 **For each method, identify**:
+
 - What other methods does it call?
 - What parameters does it accept?
 - What does it return?
@@ -85,6 +87,7 @@ FeaturedCollectionsSection
 ```
 
 For client components, also trace:
+
 - useState variables and their purposes
 - useEffect dependencies and side effects
 - Event handlers and what they trigger
@@ -95,11 +98,13 @@ For client components, also trace:
 **DO NOT just list files. List file + specific methods/functions.**
 
 Example - WRONG (too vague):
+
 ```
 Facades: src/lib/facades/collections.facade.ts
 ```
 
 Example - CORRECT (surgical precision):
+
 ```
 Facades:
 - src/lib/facades/collections.facade.ts
@@ -115,6 +120,7 @@ Return your analysis in this exact structure:
 # Code Review Scope Analysis
 
 ## Target Area
+
 - **Description**: {user's target description}
 - **Entry Point**: {main file path}
 - **Route**: {page route if applicable}
@@ -122,17 +128,18 @@ Return your analysis in this exact structure:
 ## Call Graph Overview
 
 Visual representation of the code flow:
-
 ```
+
 {Entry Point}
 ├── {Component/Method 1}
-│   ├── {Sub-call 1}
-│   │   └── {Database operation}
-│   └── {Sub-call 2}
+│ ├── {Sub-call 1}
+│ │ └── {Database operation}
+│ └── {Sub-call 2}
 ├── {Component/Method 2}
-│   └── {Facade call}
-│       └── {Query call}
+│ └── {Facade call}
+│ └── {Query call}
 └── {Component/Method 3}
+
 ```
 
 ## Feature Sections Identified
@@ -262,37 +269,39 @@ Visual representation of the code flow:
 ### Entry: `HomePage` (page.tsx)
 
 ```
+
 HomePage
 ├── CollectionsFacade.getFeaturedAsync(6)
-│   ├── CacheService.collections.featured(6)
-│   │   └── CollectionsQueries.getFeaturedAsync(6, context)
-│   │       └── SELECT from collections WHERE isFeatured = true
-│   └── Sentry.addBreadcrumb('collections.getFeatured')
+│ ├── CacheService.collections.featured(6)
+│ │ └── CollectionsQueries.getFeaturedAsync(6, context)
+│ │ └── SELECT from collections WHERE isFeatured = true
+│ └── Sentry.addBreadcrumb('collections.getFeatured')
 │
 ├── BobbleheadsFacade.getFeaturedAsync(8)
-│   ├── CacheService.bobbleheads.featured(8)
-│   │   └── BobbleheadsQueries.getFeaturedAsync(8, context)
-│   │       └── SELECT from bobbleheads WHERE isFeatured = true
-│   └── Sentry.addBreadcrumb('bobbleheads.getFeatured')
+│ ├── CacheService.bobbleheads.featured(8)
+│ │ └── BobbleheadsQueries.getFeaturedAsync(8, context)
+│ │ └── SELECT from bobbleheads WHERE isFeatured = true
+│ └── Sentry.addBreadcrumb('bobbleheads.getFeatured')
 │
 ├── StatsFacade.getPlatformStatsAsync()
-│   └── CacheService.stats.platform()
-│       └── Multiple COUNT queries
+│ └── CacheService.stats.platform()
+│ └── Multiple COUNT queries
 │
 ├── <FeaturedCollectionsSection collections={...} />
-│   └── <CollectionCard /> × N
-│       └── <Card>, <Avatar>, <Link>
+│ └── <CollectionCard /> × N
+│ └── <Card>, <Avatar>, <Link>
 │
 ├── <FeaturedBobbleheadsSection bobbleheads={...} />
-│   └── <BobbleheadCard /> × N
+│ └── <BobbleheadCard /> × N
 │
 ├── <PlatformStatsSection stats={...} />
-│   └── <StatCard /> × N
+│ └── <StatCard /> × N
 │
 └── <NewsletterSection />
-    └── <NewsletterForm /> (client component)
-        ├── useServerAction(subscribeNewsletterAction)
-        └── handleSubmit → executeAsync()
+└── <NewsletterForm /> (client component)
+├── useServerAction(subscribeNewsletterAction)
+└── handleSubmit → executeAsync()
+
 ```
 
 ## Summary Statistics

@@ -56,7 +56,9 @@ tests/integration/
 ```typescript
 // Mock the database to use test database
 vi.mock('@/lib/db', () => ({
-  get db() { return getTestDb(); },
+  get db() {
+    return getTestDb();
+  },
 }));
 
 // Mock Sentry
@@ -68,8 +70,12 @@ vi.mock('@sentry/nextjs', () => ({
 
 // Mock cache service
 vi.mock('@/lib/services/cache.service', () => ({
-  CacheService: { /* domain helpers */ },
-  CacheRevalidationService: { /* invalidation methods */ },
+  CacheService: {
+    /* domain helpers */
+  },
+  CacheRevalidationService: {
+    /* invalidation methods */
+  },
 }));
 
 // Mock Redis

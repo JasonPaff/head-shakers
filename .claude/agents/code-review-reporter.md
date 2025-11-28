@@ -43,6 +43,7 @@ You will receive:
    - `static-analysis-validator` - Lint, type, and format issues
 
 Each agent returns findings with:
+
 - Status (success/failure/incomplete)
 - **Specific methods/components reviewed** (not just files)
 - Issues found with severity, file, line, method, and description
@@ -53,6 +54,7 @@ Each agent returns findings with:
 ### Step 1: Parse and Normalize Findings
 
 For each agent's output:
+
 1. Extract all issues with their metadata
 2. **Map each issue to the specific method/function it affects**
 3. Normalize severity levels to: CRITICAL, HIGH, MEDIUM, LOW, INFO
@@ -62,10 +64,12 @@ For each agent's output:
 ### Step 2: Deduplicate Issues
 
 Many issues may appear in multiple reports:
+
 - Same file/line/method flagged by different agents
 - Related issues (e.g., lint error and type error from same problem)
 
 For duplicates:
+
 - Keep the most detailed description
 - Merge recommendations
 - Note which agents flagged it
@@ -74,24 +78,26 @@ For duplicates:
 
 Group issues into these categories:
 
-| Category | Description | Severity Weight |
-|----------|-------------|-----------------|
-| Security | XSS, injection, auth issues | CRITICAL |
-| Type Safety | TypeScript errors, any usage | HIGH |
-| Conventions | Project pattern violations | MEDIUM |
-| Performance | Inefficient code, missing optimization | MEDIUM |
-| Code Quality | Best practices, readability | LOW |
-| Style | Formatting, naming conventions | LOW |
-| Documentation | Missing/incorrect comments | INFO |
+| Category      | Description                            | Severity Weight |
+| ------------- | -------------------------------------- | --------------- |
+| Security      | XSS, injection, auth issues            | CRITICAL        |
+| Type Safety   | TypeScript errors, any usage           | HIGH            |
+| Conventions   | Project pattern violations             | MEDIUM          |
+| Performance   | Inefficient code, missing optimization | MEDIUM          |
+| Code Quality  | Best practices, readability            | LOW             |
+| Style         | Formatting, naming conventions         | LOW             |
+| Documentation | Missing/incorrect comments             | INFO            |
 
 ### Step 4: Calculate Health Scores
 
 **Per-Layer Scores** (0-100):
+
 ```
 Score = 100 - (CRITICAL * 25) - (HIGH * 15) - (MEDIUM * 5) - (LOW * 2)
 ```
 
 Scores for each layer:
+
 - UI/Components Score
 - Business Logic Score
 - Data Layer Score
@@ -99,6 +105,7 @@ Scores for each layer:
 - Overall Score (weighted average)
 
 **Grade Assignment**:
+
 - A: 90-100 (Excellent)
 - B: 80-89 (Good)
 - C: 70-79 (Needs Improvement)
@@ -108,6 +115,7 @@ Scores for each layer:
 ### Step 5: Generate Recommendations
 
 For each issue category, provide:
+
 1. **Immediate Actions**: Must fix before merge (CRITICAL/HIGH)
 2. **Short-term Improvements**: Should fix soon (MEDIUM)
 3. **Long-term Enhancements**: Nice to have (LOW/INFO)
@@ -129,24 +137,24 @@ Generate a report with this exact structure:
 
 ### Overall Health: {Grade} ({Score}/100)
 
-| Layer | Score | Grade | Status |
-|-------|-------|-------|--------|
-| UI/Components | {score} | {grade} | {emoji} |
-| Business Logic | {score} | {grade} | {emoji} |
-| Data Layer | {score} | {grade} | {emoji} |
-| Validation | {score} | {grade} | {emoji} |
-| **Overall** | **{score}** | **{grade}** | **{emoji}** |
+| Layer          | Score       | Grade       | Status      |
+| -------------- | ----------- | ----------- | ----------- |
+| UI/Components  | {score}     | {grade}     | {emoji}     |
+| Business Logic | {score}     | {grade}     | {emoji}     |
+| Data Layer     | {score}     | {grade}     | {emoji}     |
+| Validation     | {score}     | {grade}     | {emoji}     |
+| **Overall**    | **{score}** | **{grade}** | **{emoji}** |
 
 ### Issue Summary
 
-| Severity | Count | Status |
-|----------|-------|--------|
-| Critical | {n} | {Must fix immediately} |
-| High | {n} | {Fix before merge} |
-| Medium | {n} | {Should address} |
-| Low | {n} | {Consider fixing} |
-| Info | {n} | {For awareness} |
-| **Total** | **{n}** | |
+| Severity  | Count   | Status                 |
+| --------- | ------- | ---------------------- |
+| Critical  | {n}     | {Must fix immediately} |
+| High      | {n}     | {Fix before merge}     |
+| Medium    | {n}     | {Should address}       |
+| Low       | {n}     | {Consider fixing}      |
+| Info      | {n}     | {For awareness}        |
+| **Total** | **{n}** |                        |
 
 ### Key Findings
 
@@ -161,17 +169,18 @@ Generate a report with this exact structure:
 ### Call Graph
 
 {Include the call graph from the scope analysis - this shows how the code flows}
-
 ```
+
 {Entry Point}
 ├── {Component/Method 1}
-│   ├── {Sub-call 1}
-│   │   └── {Database operation}
-│   └── {Sub-call 2}
+│ ├── {Sub-call 1}
+│ │ └── {Database operation}
+│ └── {Sub-call 2}
 ├── {Component/Method 2}
-│   └── {Facade call}
-│       └── {Query call}
+│ └── {Facade call}
+│ └── {Query call}
 └── {Component/Method 3}
+
 ```
 
 ### Review Scope

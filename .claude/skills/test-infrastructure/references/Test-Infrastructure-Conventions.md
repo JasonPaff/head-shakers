@@ -121,11 +121,14 @@ export const bobbleheadHandlers = [
   // POST create bobblehead
   http.post('/api/bobbleheads', async ({ request }) => {
     const body = await request.json();
-    return HttpResponse.json({
-      id: 'new-bobblehead-id',
-      ...body,
-      createdAt: new Date().toISOString(),
-    }, { status: 201 });
+    return HttpResponse.json(
+      {
+        id: 'new-bobblehead-id',
+        ...body,
+        createdAt: new Date().toISOString(),
+      },
+      { status: 201 },
+    );
   }),
 
   // PUT update bobblehead
@@ -166,11 +169,7 @@ import { authHandlers } from './auth.handlers';
 import { bobbleheadHandlers } from './bobbleheads.handlers';
 import { collectionHandlers } from './collections.handlers';
 
-export const handlers = [
-  ...authHandlers,
-  ...bobbleheadHandlers,
-  ...collectionHandlers,
-];
+export const handlers = [...authHandlers, ...bobbleheadHandlers, ...collectionHandlers];
 
 // tests/setup/msw.setup.ts
 import { setupServer } from 'msw/node';
@@ -404,6 +403,7 @@ export class ComponentFinder {
 ## Checklist
 
 ### Factory Checklist
+
 - [ ] Use async functions returning database entities
 - [ ] Accept `overrides` parameter for customization
 - [ ] Generate unique IDs using timestamps
@@ -411,6 +411,7 @@ export class ComponentFinder {
 - [ ] Export named factory functions
 
 ### MSW Handler Checklist
+
 - [ ] Use `http` from MSW for route handlers
 - [ ] Return `HttpResponse.json()` for JSON responses
 - [ ] Handle request body with `await request.json()`
@@ -418,6 +419,7 @@ export class ComponentFinder {
 - [ ] Include error response handlers for testing error states
 
 ### Page Object Checklist
+
 - [ ] Extend `BasePage` class
 - [ ] Define abstract `url` property
 - [ ] Use `byTestId` helper for element location
@@ -425,6 +427,7 @@ export class ComponentFinder {
 - [ ] Keep methods focused and reusable
 
 ### Mock Data Checklist
+
 - [ ] Export typed mock objects
 - [ ] Use realistic data patterns
 - [ ] Include edge case variations (empty, null, etc.)

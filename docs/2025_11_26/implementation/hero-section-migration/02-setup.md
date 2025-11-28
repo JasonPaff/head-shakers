@@ -9,21 +9,21 @@
 
 ## Step Routing Table
 
-| Step | Title | Primary Files | Specialist | Skills |
-|------|-------|---------------|------------|--------|
-| 1 | Create Platform Statistics Facade | src/lib/facades/platform/platform-stats.facade.ts | facade-specialist | facade-layer, caching, sentry-monitoring, drizzle-orm |
-| 2 | Create Platform Statistics Query Methods | src/lib/queries/bobbleheads/, src/lib/queries/collections/ | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3 | Create Hero Stats Async Component | src/app/(app)/(home)/components/async/ | react-component-specialist | react-coding-conventions, ui-components |
-| 4 | Create Hero Stats Skeleton Component | src/app/(app)/(home)/components/skeletons/ | react-component-specialist | react-coding-conventions, ui-components |
-| 5 | Extract and Adapt Badge Component Variants | src/components/ui/badge.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 6 | Create Hero Featured Bobblehead Showcase | src/app/(app)/(home)/components/display/ | react-component-specialist | react-coding-conventions, ui-components |
-| 7 | Create Hero Featured Bobblehead Async | src/app/(app)/(home)/components/async/ | react-component-specialist | react-coding-conventions, ui-components |
-| 8 | Create Hero Featured Bobblehead Skeleton | src/app/(app)/(home)/components/skeletons/ | react-component-specialist | react-coding-conventions, ui-components |
-| 9 | Create New Hero Section Component | src/app/(app)/(home)/components/ | react-component-specialist | react-coding-conventions, ui-components |
-| 10 | Integrate New Hero Section into Home Page | src/app/(app)/(home)/page.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 11 | Update Badge Icon Support | src/components/ui/badge.tsx | react-component-specialist | react-coding-conventions, ui-components |
-| 12 | Create Cache Service Methods | src/lib/services/cache.service.ts | facade-specialist | facade-layer, caching |
-| 13 | Add Cache Revalidation | src/lib/services/cache-revalidation.service.ts | facade-specialist | facade-layer, caching |
+| Step | Title                                      | Primary Files                                              | Specialist                 | Skills                                                |
+| ---- | ------------------------------------------ | ---------------------------------------------------------- | -------------------------- | ----------------------------------------------------- |
+| 1    | Create Platform Statistics Facade          | src/lib/facades/platform/platform-stats.facade.ts          | facade-specialist          | facade-layer, caching, sentry-monitoring, drizzle-orm |
+| 2    | Create Platform Statistics Query Methods   | src/lib/queries/bobbleheads/, src/lib/queries/collections/ | database-specialist        | database-schema, drizzle-orm, validation-schemas      |
+| 3    | Create Hero Stats Async Component          | src/app/(app)/(home)/components/async/                     | react-component-specialist | react-coding-conventions, ui-components               |
+| 4    | Create Hero Stats Skeleton Component       | src/app/(app)/(home)/components/skeletons/                 | react-component-specialist | react-coding-conventions, ui-components               |
+| 5    | Extract and Adapt Badge Component Variants | src/components/ui/badge.tsx                                | react-component-specialist | react-coding-conventions, ui-components               |
+| 6    | Create Hero Featured Bobblehead Showcase   | src/app/(app)/(home)/components/display/                   | react-component-specialist | react-coding-conventions, ui-components               |
+| 7    | Create Hero Featured Bobblehead Async      | src/app/(app)/(home)/components/async/                     | react-component-specialist | react-coding-conventions, ui-components               |
+| 8    | Create Hero Featured Bobblehead Skeleton   | src/app/(app)/(home)/components/skeletons/                 | react-component-specialist | react-coding-conventions, ui-components               |
+| 9    | Create New Hero Section Component          | src/app/(app)/(home)/components/                           | react-component-specialist | react-coding-conventions, ui-components               |
+| 10   | Integrate New Hero Section into Home Page  | src/app/(app)/(home)/page.tsx                              | react-component-specialist | react-coding-conventions, ui-components               |
+| 11   | Update Badge Icon Support                  | src/components/ui/badge.tsx                                | react-component-specialist | react-coding-conventions, ui-components               |
+| 12   | Create Cache Service Methods               | src/lib/services/cache.service.ts                          | facade-specialist          | facade-layer, caching                                 |
+| 13   | Add Cache Revalidation                     | src/lib/services/cache-revalidation.service.ts             | facade-specialist          | facade-layer, caching                                 |
 
 ## Multi-Domain Steps
 

@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
+import { eq } from 'drizzle-orm';
 
 import type { bobbleheadPhotos } from '@/lib/db/schema';
 import type { FindOptions } from '@/lib/queries/base/query-context';
@@ -23,7 +24,7 @@ import type {
 import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
-import { bobbleheads } from '@/lib/db/schema';
+import { bobbleheadCollections, bobbleheads } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { TagsFacade } from '@/lib/facades/tags/tags.facade';
@@ -60,28 +61,75 @@ export class BobbleheadsFacade {
   }
 
   static async createAsync(
-    data: InsertBobblehead,
+    data: InsertBobblehead & { collectionIds: Array<string> },
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const dbInst = context.dbInstance ?? db;
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
 
-      // generate slug from name
-      const baseSlug = generateSlug(data.name);
+        // generate slug from name
+        const baseSlug = generateSlug(data.name);
 
-      // query all existing bobblehead slugs to check for collisions
-      const existingSlugs = await dbInst
-        .select({ slug: bobbleheads.slug })
-        .from(bobbleheads)
-        .then((results) => results.map((r) => r.slug));
+        // query all existing bobblehead slugs to check for collisions
+        const existingSlugs = await tx
+          .select({ slug: bobbleheads.slug })
+          .from(bobbleheads)
+          .then((results) => results.map((r) => r.slug));
 
-      // ensure slug is unique across all bobbleheads
-      const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+        // ensure slug is unique across all bobbleheads
+        const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
 
-      // create bobblehead with unique slug
-      return BobbleheadsQuery.createAsync({ ...data, slug: uniqueSlug }, userId, context);
+        // extract collectionIds and remove from data for bobblehead insert
+        const { collectionIds, ...bobbleheadData } = data;
+
+        // create bobblehead with unique slug
+        const createdBobblehead = await BobbleheadsQuery.createAsync(
+          { ...bobbleheadData, slug: uniqueSlug },
+          userId,
+          context,
+        );
+
+        if (!createdBobblehead) {
+          return null;
+        }
+
+        // insert junction table entries for each collection
+        if (collectionIds.length > 0) {
+          await tx.insert(bobbleheadCollections).values(
+            collectionIds.map((collectionId) => ({
+              bobbleheadId: createdBobblehead.id,
+              collectionId,
+            })),
+          );
+        }
+
+        // invalidate cache for all affected collections
+        for (const collectionId of collectionIds) {
+          CacheRevalidationService.bobbleheads.onCreate(
+            createdBobblehead.id,
+            userId,
+            collectionId,
+            createdBobblehead.slug,
+          );
+        }
+
+        // add breadcrumb on success
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            bobbleheadId: createdBobblehead.id,
+            collectionCount: collectionIds.length,
+            operation: 'create',
+            userId,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Created bobblehead ${createdBobblehead.id} with ${collectionIds.length} collection(s)`,
+        });
+
+        return createdBobblehead;
+      });
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { manufacturer: data.manufacturer, name: data.name },
@@ -100,16 +148,25 @@ export class BobbleheadsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
 
-      // get bobblehead and photos, then delete from the database
-      const deleteResult = await BobbleheadsQuery.deleteAsync(data, userId, context);
+        // get collection associations before deletion for cache invalidation
+        const associations = await tx
+          .select({ collectionId: bobbleheadCollections.collectionId })
+          .from(bobbleheadCollections)
+          .where(eq(bobbleheadCollections.bobbleheadId, data.bobbleheadId));
 
-      const { bobblehead, photos } = deleteResult;
+        const collectionIds = associations.map((a) => a.collectionId);
 
-      if (!bobblehead) {
-        return null;
-      }
+        // get bobblehead and photos, then delete from the database
+        const deleteResult = await BobbleheadsQuery.deleteAsync(data, userId, context);
+
+        const { bobblehead, photos } = deleteResult;
+
+        if (!bobblehead) {
+          return null;
+        }
 
       // attempt to clean up photos from Cloudinary (non-blocking)
       if (photos && photos.length > 0) {
@@ -146,19 +203,38 @@ export class BobbleheadsFacade {
         }
       }
 
-      // remove tag associations
-      const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobblehead(bobblehead.id, userId);
+        // remove tag associations
+        const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobblehead(bobblehead.id, userId);
 
-      if (!wasTagRemovalSuccessful) {
+        if (!wasTagRemovalSuccessful) {
+          Sentry.addBreadcrumb({
+            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+            data: { bobbleheadId: bobblehead.id },
+            level: SENTRY_LEVELS.WARNING,
+            message: 'Failed to remove tags during bobblehead deletion',
+          });
+        }
+
+        // invalidate cache for all affected collections
+        for (const collectionId of collectionIds) {
+          CacheRevalidationService.bobbleheads.onDelete(bobblehead.id, userId, collectionId, bobblehead.slug);
+        }
+
+        // add breadcrumb on success
         Sentry.addBreadcrumb({
           category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: { bobbleheadId: bobblehead.id },
-          level: SENTRY_LEVELS.WARNING,
-          message: 'Failed to remove tags during bobblehead deletion',
+          data: {
+            bobbleheadId: bobblehead.id,
+            collectionCount: collectionIds.length,
+            operation: 'delete',
+            userId,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Deleted bobblehead ${bobblehead.id} from ${collectionIds.length} collection(s)`,
         });
-      }
 
-      return bobblehead;
+        return bobblehead;
+      });
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { bobbleheadId: data.bobbleheadId },
@@ -875,40 +951,111 @@ export class BobbleheadsFacade {
   }
 
   static async updateAsync(
-    data: UpdateBobblehead,
+    data: UpdateBobblehead & { collectionIds?: Array<string> },
     userId: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
     try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const dbInst = context.dbInstance ?? db;
+      return await (dbInstance ?? db).transaction(async (tx) => {
+        const context = createProtectedQueryContext(userId, { dbInstance: tx });
 
-      const updateData: UpdateBobblehead & { slug?: string } = { ...data };
-
-      // if name is being updated, check if it actually changed before regenerating slug
-      if (data.name) {
-        // fetch existing bobblehead to compare name
-        const existing = await dbInst.query.bobbleheads.findFirst({
+        // verify ownership
+        const existing = await tx.query.bobbleheads.findFirst({
           where: (b, { eq }) => eq(b.id, data.id),
         });
 
-        // only regenerate slug if name has actually changed
-        if (existing && existing.name !== data.name) {
+        if (!existing || existing.userId !== userId) {
+          return null;
+        }
+
+        // extract collectionIds and remove from data for bobblehead update
+        const { collectionIds, ...bobbleheadUpdateData } = data;
+
+        let updateData: Omit<UpdateBobblehead, 'collectionIds'> & { slug?: string } = { ...bobbleheadUpdateData };
+
+        // if name is being updated, check if it actually changed before regenerating slug
+        if (data.name && existing.name !== data.name) {
           const baseSlug = generateSlug(data.name);
 
           // query existing slugs excluding current bobblehead
-          const existingSlugs = await dbInst
+          const existingSlugs = await tx
             .select({ slug: bobbleheads.slug })
             .from(bobbleheads)
             .then((results) => results.map((r) => r.slug).filter((slug) => slug !== existing.slug));
 
           // ensure new slug is unique
           const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-          updateData.slug = uniqueSlug;
+          updateData = { ...updateData, slug: uniqueSlug };
         }
-      }
 
-      return BobbleheadsQuery.updateAsync(updateData, userId, context);
+        // update bobblehead
+        const updatedBobblehead = await BobbleheadsQuery.updateAsync(updateData, userId, context);
+
+        if (!updatedBobblehead) {
+          return null;
+        }
+
+        // handle collection changes if collectionIds are provided
+        if (collectionIds !== undefined) {
+          // get existing collection associations before deletion for cache invalidation
+          const existingAssociations = await tx
+            .select({ collectionId: bobbleheadCollections.collectionId })
+            .from(bobbleheadCollections)
+            .where(eq(bobbleheadCollections.bobbleheadId, updatedBobblehead.id));
+
+          const oldCollectionIds = existingAssociations.map((a) => a.collectionId);
+
+          // delete existing junction table entries
+          await tx
+            .delete(bobbleheadCollections)
+            .where(eq(bobbleheadCollections.bobbleheadId, updatedBobblehead.id));
+
+          // insert new junction table entries
+          if (collectionIds.length > 0) {
+            await tx.insert(bobbleheadCollections).values(
+              collectionIds.map((collectionId) => ({
+                bobbleheadId: updatedBobblehead.id,
+                collectionId,
+              })),
+            );
+          }
+
+          // invalidate cache for all affected collections (old and new)
+          const allAffectedCollections = [...new Set([...collectionIds, ...oldCollectionIds])];
+          for (const collectionId of allAffectedCollections) {
+            CacheRevalidationService.bobbleheads.onUpdate(
+              updatedBobblehead.id,
+              userId,
+              collectionId,
+              updatedBobblehead.slug,
+            );
+          }
+        } else {
+          // no collection changes, just invalidate bobblehead cache without specific collection
+          CacheRevalidationService.bobbleheads.onUpdate(
+            updatedBobblehead.id,
+            userId,
+            undefined,
+            updatedBobblehead.slug,
+          );
+        }
+
+        // add breadcrumb on success
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            bobbleheadId: updatedBobblehead.id,
+            collectionCount: collectionIds?.length,
+            collectionsUpdated: collectionIds !== undefined,
+            operation: 'update',
+            userId,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Updated bobblehead ${updatedBobblehead.id}${collectionIds !== undefined ? ` with ${collectionIds.length} collection(s)` : ''}`,
+        });
+
+        return updatedBobblehead;
+      });
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { id: data.id, name: data.name },

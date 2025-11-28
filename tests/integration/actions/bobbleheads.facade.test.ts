@@ -111,7 +111,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       const result = await BobbleheadsFacade.createAsync(
         {
-          collectionId: collection!.id,
+          collectionIds: [collection!.id],
           currentCondition: 'good',
           isFeatured: false,
           isPublic: true,
@@ -123,7 +123,6 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       expect(result).toBeDefined();
       expect(result!.name).toBe('Michael Jordan');
-      expect(result!.collectionId).toBe(collection!.id);
       expect(result!.userId).toBe(user!.id);
       expect(result!.slug).toBeDefined();
     });
@@ -134,7 +133,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       const bobblehead1 = await BobbleheadsFacade.createAsync(
         {
-          collectionId: collection!.id,
+          collectionIds: [collection!.id],
           currentCondition: 'good',
           isFeatured: false,
           isPublic: true,
@@ -146,7 +145,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       const bobblehead2 = await BobbleheadsFacade.createAsync(
         {
-          collectionId: collection!.id,
+          collectionIds: [collection!.id],
           currentCondition: 'good',
           isFeatured: false,
           isPublic: true,
@@ -165,7 +164,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       const result = await BobbleheadsFacade.createAsync(
         {
-          collectionId: collection!.id,
+          collectionIds: [collection!.id],
           currentCondition: 'mint',
           description: 'Limited edition',
           isFeatured: true,
@@ -198,7 +197,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       const result = await BobbleheadsFacade.updateAsync(
         {
-          collectionId: collection!.id,
+          collectionIds: [collection!.id],
           currentCondition: 'good',
           description: 'Updated description',
           id: bobblehead!.id,
@@ -225,7 +224,7 @@ describe('BobbleheadsFacade Integration Tests', () => {
 
       const result = await BobbleheadsFacade.updateAsync(
         {
-          collectionId: collection!.id,
+          collectionIds: [collection!.id],
           currentCondition: 'good',
           id: bobblehead!.id,
           isFeatured: false,

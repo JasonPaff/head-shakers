@@ -15,6 +15,7 @@ You are a code review fix orchestrator for Head Shakers. You take the output fro
 ```
 
 **Arguments**:
+
 - `path/to/review-directory` (required): Path to the code review output directory
   - Example: `docs/2025_11_27/code-reviews/home-page-review`
 - `--dry-run`: Parse and plan fixes without making changes
@@ -23,6 +24,7 @@ You are a code review fix orchestrator for Head Shakers. You take the output fro
 - `--priority=all`: Fix all issues including LOW
 
 **Examples**:
+
 ```
 /fix-review docs/2025_11_27/code-reviews/home-page-review
 /fix-review docs/2025_11_27/code-reviews/home-page-review --dry-run
@@ -35,11 +37,13 @@ You are a code review fix orchestrator for Head Shakers. You take the output fro
 ### Phase 1: Input Validation & Setup
 
 **1. Parse Arguments from $ARGUMENTS**:
+
 - Extract review directory path
 - Parse optional flags (--dry-run, --priority)
 - Validate that a review directory was provided
 
 **2. If no directory provided**: Stop with error message:
+
 ```
 Error: Review directory path required.
 
@@ -51,12 +55,14 @@ Examples:
 ```
 
 **3. Validate Review Directory Exists**:
+
 - Check directory exists
 - Verify required files present:
   - `01-scope-analysis.md`
   - `agent-reports/` directory with at least one report
 
 **4. Initialize Todo List**:
+
 ```
 - Parse code review reports
 - Categorize issues by specialist
@@ -87,6 +93,7 @@ Review Directory Structure:
 ```
 
 For each agent report file that exists:
+
 1. Read the file content
 2. Parse issues using this pattern:
    - Look for `### HIGH Severity`, `### MEDIUM Severity`, `### LOW Severity` sections
@@ -99,18 +106,19 @@ For each agent report file that exists:
 
 ```typescript
 type Issue = {
-  id: string;                    // e.g., "client-1"
+  id: string; // e.g., "client-1"
   severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
-  specialist: string;            // Which agent found it
-  file: string;                  // File path
-  line: string;                  // Line number(s)
-  method?: string;               // Method/component name if identified
-  issue: string;                 // Problem description
-  recommendation: string;        // How to fix
+  specialist: string; // Which agent found it
+  file: string; // File path
+  line: string; // Line number(s)
+  method?: string; // Method/component name if identified
+  issue: string; // Problem description
+  recommendation: string; // How to fix
 };
 ```
 
 **Filter by Priority**:
+
 - `--priority=high` (default): Keep CRITICAL + HIGH
 - `--priority=medium`: Keep CRITICAL + HIGH + MEDIUM
 - `--priority=all`: Keep all issues
@@ -123,28 +131,28 @@ Mark "Categorize issues by specialist" as in_progress.
 
 Group issues by the specialist agent that should fix them:
 
-| Source Report | Fix Specialist |
-|---------------|----------------|
+| Source Report                           | Fix Specialist                |
+| --------------------------------------- | ----------------------------- |
 | `client-component-specialist-report.md` | `client-component-specialist` |
 | `server-component-specialist-report.md` | `server-component-specialist` |
-| `facade-specialist-report.md` | `facade-specialist` |
-| `server-action-specialist-report.md` | `server-action-specialist` |
-| `database-specialist-report.md` | `database-specialist` |
-| `validation-specialist-report.md` | `validation-specialist` |
-| `conventions-validator-report.md` | `conventions-validator` |
-| `static-analysis-validator-report.md` | `static-analysis-validator` |
+| `facade-specialist-report.md`           | `facade-specialist`           |
+| `server-action-specialist-report.md`    | `server-action-specialist`    |
+| `database-specialist-report.md`         | `database-specialist`         |
+| `validation-specialist-report.md`       | `validation-specialist`       |
+| `conventions-validator-report.md`       | `conventions-validator`       |
+| `static-analysis-validator-report.md`   | `static-analysis-validator`   |
 
 **Create Fix Plan Summary**:
 
 ```markdown
 ## Fix Plan
 
-| Specialist | Issues to Fix | Files Affected |
-|------------|---------------|----------------|
-| client-component-specialist | 6 | 2 |
-| server-component-specialist | 3 | 4 |
-| facade-specialist | 2 | 2 |
-| Total | 11 | 8 |
+| Specialist                  | Issues to Fix | Files Affected |
+| --------------------------- | ------------- | -------------- |
+| client-component-specialist | 6             | 2              |
+| server-component-specialist | 3             | 4              |
+| facade-specialist           | 2             | 2              |
+| Total                       | 11            | 8              |
 ```
 
 **If --dry-run**: Display the fix plan and stop here. Do not proceed to Phase 4.
@@ -163,33 +171,41 @@ Each agent MUST validate its own changes before reporting. Include the following
 
 ## Standard Validation Requirements (Include in ALL Agent Prompts)
 
-```markdown
+````markdown
 ## MANDATORY: Self-Validation After Fixes
 
 After making ALL fixes, you MUST validate your changes:
 
 ### Step 1: Track Modified Files
+
 Keep a list of every file you modified during this fix session.
 
 ### Step 2: Run ESLint on Modified Files
+
 For each modified file, run:
+
 ```bash
 npx eslint {file_path} --fix
 ```
+````
 
 If ESLint reports errors that --fix couldn't auto-resolve:
+
 1. Read the error message carefully
 2. Attempt to fix the issue manually
 3. Re-run ESLint to verify
 4. Maximum 2 retry attempts per file
 
 ### Step 3: Run TypeScript Check on Modified Files
+
 Run typecheck to verify no type errors:
+
 ```bash
 npx tsc --noEmit
 ```
 
 If type errors exist in your modified files:
+
 1. Identify which errors are in files YOU modified
 2. Attempt to fix the type error
 3. Re-run typecheck to verify
@@ -203,25 +219,29 @@ In your final report, include a VALIDATION section:
 ## Validation Results
 
 ### Files Modified
+
 - `src/path/to/file1.tsx`
 - `src/path/to/file2.ts`
 
 ### ESLint Results
-| File | Status | Errors Fixed | Errors Remaining |
-|------|--------|--------------|------------------|
-| `file1.tsx` | PASS | 2 | 0 |
-| `file2.ts` | PASS | 0 | 0 |
+
+| File        | Status | Errors Fixed | Errors Remaining |
+| ----------- | ------ | ------------ | ---------------- |
+| `file1.tsx` | PASS   | 2            | 0                |
+| `file2.ts`  | PASS   | 0            | 0                |
 
 ### TypeScript Results
-| File | Status | Errors |
-|------|--------|--------|
-| `file1.tsx` | PASS | 0 |
-| `file2.ts` | PASS | 0 |
+
+| File        | Status | Errors |
+| ----------- | ------ | ------ |
+| `file1.tsx` | PASS   | 0      |
+| `file2.ts`  | PASS   | 0      |
 
 ### Overall Validation: PASS / FAIL
 ```
 
 If validation FAILS after retries, still report the fix as applied but mark validation as FAILED with details about remaining errors.
+
 ```
 
 ---
@@ -230,23 +250,27 @@ For each specialist with issues to fix:
 
 #### Client Component Fixes
 ```
+
 subagent_type: "client-component-specialist"
 
 Fix the following issues in client components:
 
 ## Context
+
 Review ID: {review-id}
 Original Review: {review-directory-path}
 
 ## Issues to Fix
 
 ### Issue 1: {title}
+
 - **File**: `{file_path}`
 - **Line**: {line_number}
 - **Problem**: {issue description}
 - **Fix Required**: {recommendation}
 
 ### Issue 2: {title}
+
 ...
 
 ## Instructions
@@ -269,6 +293,7 @@ Original Review: {review-directory-path}
 ## Issues Fixed
 
 ### Issue 1: {title}
+
 - **File**: `{file_path}:{line}`
 - **Status**: FIXED / PARTIAL / FAILED
 - **Changes Made**: {description of fix}
@@ -277,6 +302,7 @@ Original Review: {review-directory-path}
 ## Issues Not Fixed
 
 ### Issue N: {title}
+
 - **File**: `{file_path}:{line}`
 - **Reason**: {why it couldn't be fixed}
 - **Manual Action Required**: {what needs to be done}
@@ -284,37 +310,46 @@ Original Review: {review-directory-path}
 ## Validation Results
 
 ### Files Modified
+
 {list all files}
 
 ### ESLint Results
+
 {table with results per file}
 
 ### TypeScript Results
+
 {table with results per file}
 
 ### Overall Validation: PASS / FAIL
 
 ## Summary
+
 - Fixed: {n}
 - Partial: {n}
 - Failed: {n}
 - Validation: PASS/FAIL
 ```
+
 ```
 
 #### Server Component Fixes
 ```
+
 subagent_type: "server-component-specialist"
 
 Fix the following issues in server components:
 
 ## Context
+
 Review ID: {review-id}
 
 ## Issues to Fix
+
 {List all server component issues with file, line, problem, fix required}
 
 ## Instructions
+
 1. Read each file before making changes
 2. Apply fixes following server component conventions
 3. Verify async patterns remain correct
@@ -327,22 +362,28 @@ Review ID: {review-id}
 {Include the Standard Validation Requirements section above}
 
 ## Report Format
+
 {Same structure as Client Component Fix Report}
+
 ```
 
 #### Facade Fixes
 ```
+
 subagent_type: "facade-specialist"
 
 Fix the following issues in facade methods:
 
 ## Context
+
 Review ID: {review-id}
 
 ## Issues to Fix
+
 {List all facade issues with file, line, problem, fix required}
 
 ## Instructions
+
 1. Read facade file before changes
 2. Apply fixes following facade conventions
 3. Verify cache patterns remain correct
@@ -355,19 +396,24 @@ Review ID: {review-id}
 {Include the Standard Validation Requirements section above}
 
 ## Report Format
+
 {Same structure as Client Component Fix Report}
+
 ```
 
 #### Server Action Fixes
 ```
+
 subagent_type: "server-action-specialist"
 
 Fix the following issues in server actions:
 
 ## Issues to Fix
+
 {List all action issues}
 
 ## Instructions
+
 Follow server action conventions. Verify auth clients, input validation, and error handling remain correct.
 Track every file you modify.
 
@@ -376,19 +422,24 @@ Track every file you modify.
 {Include the Standard Validation Requirements section above}
 
 ## Report Format
+
 {Same structure as Client Component Fix Report}
+
 ```
 
 #### Database/Query Fixes
 ```
+
 subagent_type: "database-specialist"
 
 Fix the following issues in queries:
 
 ## Issues to Fix
+
 {List all database issues}
 
 ## Instructions
+
 Follow Drizzle ORM conventions. Verify query patterns, permission filters, and type safety.
 Track every file you modify.
 
@@ -397,19 +448,24 @@ Track every file you modify.
 {Include the Standard Validation Requirements section above}
 
 ## Report Format
+
 {Same structure as Client Component Fix Report}
+
 ```
 
 #### Validation Schema Fixes
 ```
+
 subagent_type: "validation-specialist"
 
 Fix the following issues in validation schemas:
 
 ## Issues to Fix
+
 {List all validation issues}
 
 ## Instructions
+
 Follow zod/drizzle-zod conventions. Verify schema composition and type exports.
 Track every file you modify.
 
@@ -418,19 +474,24 @@ Track every file you modify.
 {Include the Standard Validation Requirements section above}
 
 ## Report Format
+
 {Same structure as Client Component Fix Report}
+
 ```
 
 #### Convention Fixes
 ```
+
 subagent_type: "conventions-validator"
 
 Fix the following convention violations:
 
 ## Issues to Fix
+
 {List all convention issues}
 
 ## Instructions
+
 Apply project React conventions. Fix naming, exports, type patterns.
 Track every file you modify.
 
@@ -439,8 +500,10 @@ Track every file you modify.
 {Include the Standard Validation Requirements section above}
 
 ## Report Format
+
 {Same structure as Client Component Fix Report}
-```
+
+````
 
 **Save each agent's fix report** to `{review-directory}/fix-reports/{agent-name}-fixes.md`
 
@@ -473,7 +536,7 @@ For each agent response:
 
 ### Validation Failures
 1. **src/path/file.tsx** - ESLint: `no-unused-vars` on line 42
-```
+````
 
 **If any validation failures exist**: Note them for the final report. These need manual attention.
 
@@ -490,6 +553,7 @@ npm run typecheck
 ```
 
 This catches:
+
 - Type errors caused by changes affecting other files
 - Import/export mismatches between files
 - Interface changes that affect consumers
@@ -515,15 +579,16 @@ Mark "Generate fix summary" as in_progress.
 
 ## Summary
 
-| Metric | Count |
-|--------|-------|
-| Issues Targeted | {n} |
-| Issues Fixed | {n} |
-| Issues Validated | {n} |
-| Validation Failures | {n} |
-| Files Modified | {n} |
+| Metric              | Count |
+| ------------------- | ----- |
+| Issues Targeted     | {n}   |
+| Issues Fixed        | {n}   |
+| Issues Validated    | {n}   |
+| Validation Failures | {n}   |
+| Files Modified      | {n}   |
 
 ### Success Rate: {percentage}%
+
 ### Validation Rate: {percentage}%
 
 ---
@@ -532,12 +597,12 @@ Mark "Generate fix summary" as in_progress.
 
 ### Client Components
 
-| Metric | Value |
-|--------|-------|
-| Issues Fixed | {n} |
-| Validation | PASS/FAIL |
-| Lint Errors | {n} |
-| Type Errors | {n} |
+| Metric       | Value     |
+| ------------ | --------- |
+| Issues Fixed | {n}       |
+| Validation   | PASS/FAIL |
+| Lint Errors  | {n}       |
+| Type Errors  | {n}       |
 
 **Fixes Applied**:
 | File | Line | Issue | Fix Status | Validation |
@@ -545,9 +610,11 @@ Mark "Generate fix summary" as in_progress.
 | `{path}` | {line} | {description} | Fixed | PASS |
 
 ### Server Components
+
 {Same structure}
 
 ### Facades
+
 {Same structure}
 
 ---
@@ -556,13 +623,14 @@ Mark "Generate fix summary" as in_progress.
 
 ### Per-Agent Validation
 
-| Agent | ESLint | TypeScript | Overall |
-|-------|--------|------------|---------|
-| client-component-specialist | PASS | PASS | PASS |
-| server-component-specialist | FAIL (1) | PASS | FAIL |
-| facade-specialist | PASS | PASS | PASS |
+| Agent                       | ESLint   | TypeScript | Overall |
+| --------------------------- | -------- | ---------- | ------- |
+| client-component-specialist | PASS     | PASS       | PASS    |
+| server-component-specialist | FAIL (1) | PASS       | FAIL    |
+| facade-specialist           | PASS     | PASS       | PASS    |
 
 ### Final Project Verification
+
 - TypeScript: {PASS/FAIL with error count}
 
 ---
@@ -572,6 +640,7 @@ Mark "Generate fix summary" as in_progress.
 {If any failed}
 
 ### 1. {Issue Title}
+
 - **File**: `{path}:{line}`
 - **Reason**: {why it couldn't be fixed}
 - **Manual Action Required**: {what the developer needs to do}
@@ -583,6 +652,7 @@ Mark "Generate fix summary" as in_progress.
 {If any validation failures}
 
 ### 1. {File}:{Line}
+
 - **Error Type**: ESLint / TypeScript
 - **Error**: {error message}
 - **In Fix**: {which issue fix caused this}
@@ -605,8 +675,8 @@ Mark "Generate fix summary" as in_progress.
 
 ---
 
-*Fix report generated by Claude Code - Fix Review Orchestrator*
-*Validation: Per-agent self-validation with final project verification*
+_Fix report generated by Claude Code - Fix Review Orchestrator_
+_Validation: Per-agent self-validation with final project verification_
 ```
 
 **Update Review Index**: Add link to fix report in `00-review-index.md` if it exists.
@@ -649,20 +719,21 @@ Priority: {priority level}
 Mark all todos as completed.
 
 **If validation failures exist**: Use AskUserQuestion to offer:
+
 - "View validation failures in detail"
 - "Attempt to fix validation errors"
 - "Done for now"
 
 ### Error Handling
 
-| Failure | Action |
-|---------|--------|
-| Review directory not found | Show error with path |
-| No agent reports found | Show error, list expected files |
-| Agent fix failed | Continue with others, note in summary |
-| Agent validation failed | Mark as "needs attention", continue |
-| Final verification failed | List errors, don't block report |
-| All fixes failed | Generate report noting failures |
+| Failure                    | Action                                |
+| -------------------------- | ------------------------------------- |
+| Review directory not found | Show error with path                  |
+| No agent reports found     | Show error, list expected files       |
+| Agent fix failed           | Continue with others, note in summary |
+| Agent validation failed    | Mark as "needs attention", continue   |
+| Final verification failed  | List errors, don't block report       |
+| All fixes failed           | Generate report noting failures       |
 
 ### Performance Notes
 
@@ -675,6 +746,7 @@ Mark all todos as completed.
 ## Fix Quality Standards
 
 Good fixes must:
+
 1. **Resolve the identified issue** - Not just change code randomly
 2. **Pass ESLint** - No new lint errors in modified files
 3. **Pass TypeScript** - No new type errors in modified files

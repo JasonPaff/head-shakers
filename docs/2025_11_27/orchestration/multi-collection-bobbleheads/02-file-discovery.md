@@ -50,64 +50,64 @@ Return a comprehensive list with file paths, priority, and brief description of 
 
 #### Database Schema Files
 
-| File Path | Relevance |
-|-----------|-----------|
-| `src/lib/db/schema/bobbleheads.schema.ts` | Currently has direct foreign key `collectionId` (line 33-35) that must be removed. Junction table will replace this one-to-many relationship. |
-| `src/lib/db/schema/collections.schema.ts` | Reference for schema patterns. No structural changes needed, but relations will change. |
-| `src/lib/db/schema/relations.schema.ts` | CRITICAL: Must update `bobbleheadsRelations` (line 43-59) and `collectionsRelations` (line 35-41) to define many-to-many relationships through new junction table instead of one-to-many. |
-| `src/lib/db/schema/index.ts` | Must export new junction table schema after creation. |
-| **NEW FILE**: `src/lib/db/schema/bobblehead-collections.schema.ts` | Create new junction table with composite primary key, foreign keys to both tables, cascade delete behavior, and performance indexes. |
+| File Path                                                          | Relevance                                                                                                                                                                                 |
+| ------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/db/schema/bobbleheads.schema.ts`                          | Currently has direct foreign key `collectionId` (line 33-35) that must be removed. Junction table will replace this one-to-many relationship.                                             |
+| `src/lib/db/schema/collections.schema.ts`                          | Reference for schema patterns. No structural changes needed, but relations will change.                                                                                                   |
+| `src/lib/db/schema/relations.schema.ts`                            | CRITICAL: Must update `bobbleheadsRelations` (line 43-59) and `collectionsRelations` (line 35-41) to define many-to-many relationships through new junction table instead of one-to-many. |
+| `src/lib/db/schema/index.ts`                                       | Must export new junction table schema after creation.                                                                                                                                     |
+| **NEW FILE**: `src/lib/db/schema/bobblehead-collections.schema.ts` | Create new junction table with composite primary key, foreign keys to both tables, cascade delete behavior, and performance indexes.                                                      |
 
 ### HIGH PRIORITY (Core Implementation Files)
 
 #### Query Layer
 
-| File Path | Methods to Update |
-|-----------|-------------------|
-| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | `findByCollectionAsync` (lines 212-240), `findByIdWithRelationsAsync` (lines 265-318), `findBySlugWithRelationsAsync` (lines 343-398), `getAdjacentBobbleheadsInCollectionAsync` (lines 446-534), `getBobbleheadPositionInCollectionAsync` (lines 628-680), `searchAsync` (lines 729-788) |
+| File Path                                          | Methods to Update                                                                                                                                                                                                                                                                                             |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/queries/bobbleheads/bobbleheads-query.ts` | `findByCollectionAsync` (lines 212-240), `findByIdWithRelationsAsync` (lines 265-318), `findBySlugWithRelationsAsync` (lines 343-398), `getAdjacentBobbleheadsInCollectionAsync` (lines 446-534), `getBobbleheadPositionInCollectionAsync` (lines 628-680), `searchAsync` (lines 729-788)                     |
 | `src/lib/queries/collections/collections.query.ts` | `getAllCollectionBobbleheadsWithPhotosAsync` (lines 260-309), `getBobbleheadsInCollectionAsync` (lines 311-340), `getBrowseCategoriesAsync` (lines 342-589), `getCollectionBobbleheadsWithPhotosAsync` (lines 737-787), `getDashboardDataAsync` (lines 862-883), `getDistinctCategoriesAsync` (lines 885-912) |
 
 #### Facade Layer
 
-| File Path | Methods to Update |
-|-----------|-------------------|
+| File Path                                           | Methods to Update                                                                        |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `src/lib/facades/bobbleheads/bobbleheads.facade.ts` | `createAsync` (lines 62-94), `deleteAsync` (lines 97-172), `updateAsync` (lines 877-922) |
-| `src/lib/facades/collections/collections.facade.ts` | `deleteAsync` (lines 557-586) |
+| `src/lib/facades/collections/collections.facade.ts` | `deleteAsync` (lines 557-586)                                                            |
 
 #### Server Actions
 
-| File Path | Actions to Update |
-|-----------|-------------------|
+| File Path                                            | Actions to Update                                                                                                                               |
+| ---------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/lib/actions/bobbleheads/bobbleheads.actions.ts` | `createBobbleheadWithPhotosAction` (lines 39-230), `updateBobbleheadWithPhotosAction` (lines 294-491), `deleteBobbleheadAction` (lines 232-292) |
-| `src/lib/actions/collections/collections.actions.ts` | `deleteCollectionAction` (lines 158-212) - validate cascade delete |
+| `src/lib/actions/collections/collections.actions.ts` | `deleteCollectionAction` (lines 158-212) - validate cascade delete                                                                              |
 
 ### MEDIUM PRIORITY (May Need Updates)
 
 #### Validation Schemas
 
-| File Path | Relevance |
-|-----------|-----------|
+| File Path                                       | Relevance                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | `src/lib/validations/bobbleheads.validation.ts` | Review `collectionId` validation at line 72. Consider adding new schema for junction table operations. |
-| `src/lib/validations/collections.validation.ts` | May need new schemas for adding/removing bobbleheads from collections. |
+| `src/lib/validations/collections.validation.ts` | May need new schemas for adding/removing bobbleheads from collections.                                 |
 
 ### LOW PRIORITY (UI/Frontend - Reference Only)
 
 #### Components
 
-| File Path | Notes |
-|-----------|-------|
-| `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx` | Form still needs collectionId, backend handles junction table |
-| `src/components/feature/collections/collection-delete.tsx` | No changes needed, cascade delete works |
-| `src/app/(app)/bobbleheads/add/components/collection-assignment.tsx` | Form component, backend handles junction table |
-| `src/app/(app)/bobbleheads/add/components/add-item-form-client.tsx` | Form submission unchanged |
+| File Path                                                            | Notes                                                         |
+| -------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `src/components/feature/bobblehead/bobblehead-edit-dialog.tsx`       | Form still needs collectionId, backend handles junction table |
+| `src/components/feature/collections/collection-delete.tsx`           | No changes needed, cascade delete works                       |
+| `src/app/(app)/bobbleheads/add/components/collection-assignment.tsx` | Form component, backend handles junction table                |
+| `src/app/(app)/bobbleheads/add/components/add-item-form-client.tsx`  | Form submission unchanged                                     |
 
 #### Pages
 
-| File Path | Notes |
-|-----------|-------|
+| File Path                                                          | Notes                                            |
+| ------------------------------------------------------------------ | ------------------------------------------------ |
 | `src/app/(app)/collections/[collectionSlug]/(collection)/page.tsx` | Server component fetches data, no changes needed |
-| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Server component, no changes needed |
-| `src/app/(app)/bobbleheads/add/page.tsx` | Form page, no changes needed |
+| `src/app/(app)/bobbleheads/[bobbleheadSlug]/(bobblehead)/page.tsx` | Server component, no changes needed              |
+| `src/app/(app)/bobbleheads/add/page.tsx`                           | Form page, no changes needed                     |
 
 ## Architecture Insights
 
@@ -127,6 +127,7 @@ Return a comprehensive list with file paths, priority, and brief description of 
 ## File Validation Results
 
 All discovered files verified to exist:
+
 - ✅ `src/lib/db/schema/bobbleheads.schema.ts`
 - ✅ `src/lib/db/schema/collections.schema.ts`
 - ✅ `src/lib/db/schema/relations.schema.ts`

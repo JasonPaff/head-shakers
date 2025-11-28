@@ -33,18 +33,21 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Test Structure
+
 - Use `describe`/`it` blocks (no imports - globals enabled)
 - Follow Arrange-Act-Assert pattern
 - Test pure functions in isolation
 - Mock ALL external dependencies with `vi.mock()`
 
 ### Validation Schema Testing
+
 - Test valid input scenarios
 - Test invalid input scenarios with specific error expectations
 - Test edge cases (empty strings, null, undefined, boundary values)
 - Use `safeParse` for validation testing
 
 ### Isolation Requirements
+
 - NO database access in unit tests
 - NO MSW handlers needed (no API calls)
 - Mock external imports with `vi.mock()`

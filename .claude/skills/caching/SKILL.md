@@ -80,15 +80,15 @@ This skill activates when:
 
 ## Caching Layer Selection Guide
 
-| Use Case | Recommended Layer | Rationale |
-|----------|------------------|-----------|
-| Same-request deduplication | React `cache()` | Prevents redundant calls within single render (implemented for auth) |
-| Entity data (bobbleheads, collections) | `unstable_cache` | Tag-based invalidation, automatic revalidation |
-| High-traffic public search | Redis | Distributed, fast, handles scale |
-| View tracking deduplication | Redis | Distributed, TTL-based expiry |
-| Rate limiting | Redis | Distributed counters, automatic TTL expiry |
-| Distributed locks | Redis | Prevents concurrent updates |
-| Image transformations | Cloudinary | CDN-level caching, on-the-fly transforms |
+| Use Case                               | Recommended Layer | Rationale                                                            |
+| -------------------------------------- | ----------------- | -------------------------------------------------------------------- |
+| Same-request deduplication             | React `cache()`   | Prevents redundant calls within single render (implemented for auth) |
+| Entity data (bobbleheads, collections) | `unstable_cache`  | Tag-based invalidation, automatic revalidation                       |
+| High-traffic public search             | Redis             | Distributed, fast, handles scale                                     |
+| View tracking deduplication            | Redis             | Distributed, TTL-based expiry                                        |
+| Rate limiting                          | Redis             | Distributed counters, automatic TTL expiry                           |
+| Distributed locks                      | Redis             | Prevents concurrent updates                                          |
+| Image transformations                  | Cloudinary        | CDN-level caching, on-the-fly transforms                             |
 
 ## References
 

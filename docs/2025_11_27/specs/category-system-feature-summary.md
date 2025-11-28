@@ -25,6 +25,7 @@ Power users like sports collectors with large, specialized collections have no w
 Replace free-form text with a curated, hierarchical category system that users can browse and select from.
 
 **Example hierarchy:**
+
 - Sports
   - Baseball
     - MLB
@@ -52,6 +53,7 @@ Replace free-form text with a curated, hierarchical category system that users c
 - Other (Custom)
 
 **Key characteristics:**
+
 - Up to 5 levels of depth to accommodate detailed categorization
 - Users select the most specific category that applies (e.g., "Baltimore Orioles" rather than just "Baseball")
 - Up to 5 categories can be applied to a collection or bobblehead
@@ -64,6 +66,7 @@ Allow bobbleheads to belong to multiple collections simultaneously.
 **Example use case:**
 
 A Baltimore Orioles collector could have:
+
 1. "All My Orioles" - contains every Orioles-related bobblehead
 2. "Baltimore Orioles MLB" - just the major league items
 3. "Bowie Baysox" - just one minor league affiliate
@@ -73,6 +76,7 @@ The same bobblehead can appear in multiple collections without duplicating data.
 ### Community-Driven Growth
 
 When users can't find the right category:
+
 - They select "Other" and type what they were looking for
 - These suggestions are collected for admin review
 - Popular or valid suggestions can be added as official categories
@@ -82,12 +86,12 @@ When users can't find the right category:
 
 ## User Benefits
 
-| User Type | Benefit |
-|-----------|---------|
-| **New collectors** | Easy onboarding - browse and pick from a list instead of guessing what to type |
-| **Serious collectors** | Organize large collections across multiple views without duplicating work |
-| **Browsers** | Find collections by category with confidence that results are accurate |
-| **Niche collectors** | Request new categories through "Other" option; system grows with the community |
+| User Type              | Benefit                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| **New collectors**     | Easy onboarding - browse and pick from a list instead of guessing what to type |
+| **Serious collectors** | Organize large collections across multiple views without duplicating work      |
+| **Browsers**           | Find collections by category with confidence that results are accurate         |
+| **Niche collectors**   | Request new categories through "Other" option; system grows with the community |
 
 ---
 
@@ -167,4 +171,4 @@ This feature is planned for implementation before the initial production release
 
 ---
 
-*Document prepared: November 27, 2025*
+_Document prepared: November 27, 2025_

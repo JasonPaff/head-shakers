@@ -66,7 +66,7 @@ interface BobbleheadForEdit {
   acquisitionMethod: null | string;
   category: null | string;
   characterName: null | string;
-  collectionId: string;
+  collectionIds?: Array<string>;
   currentCondition: null | string;
   customFields: Array<Record<string, string>> | null;
   description: null | string;
@@ -269,7 +269,7 @@ export const BobbleheadEditDialog = withFocusManagement(
         acquisitionMethod: bobblehead.acquisitionMethod || '',
         category: bobblehead.category || '',
         characterName: bobblehead.characterName || '',
-        collectionId: bobblehead.collectionId,
+        collectionIds: bobblehead.collectionIds || [],
         currentCondition: bobblehead.currentCondition || DEFAULTS.BOBBLEHEAD.CONDITION,
         customFields: bobblehead.customFields || [],
         description: bobblehead.description || '',

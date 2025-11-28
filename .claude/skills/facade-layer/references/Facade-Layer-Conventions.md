@@ -141,30 +141,32 @@ The `QueryContext` drives automatic filtering in query methods. Query classes ex
 
 ```typescript
 interface QueryContext {
-  dbInstance?: DatabaseExecutor;    // Transaction or main db
-  isPublic?: boolean;               // Public access mode - only public content
-  requiredUserId?: string;          // For protected operations - must be owner
-  shouldIncludeDeleted?: boolean;   // Include soft-deleted records
-  userId?: string;                  // Current user ID
+  dbInstance?: DatabaseExecutor; // Transaction or main db
+  isPublic?: boolean; // Public access mode - only public content
+  requiredUserId?: string; // For protected operations - must be owner
+  shouldIncludeDeleted?: boolean; // Include soft-deleted records
+  userId?: string; // Current user ID
 }
 ```
 
 ### How Context Flags Affect Filtering
 
 Query methods internally use `buildBaseFilters()` which applies:
+
 1. **Permission filter** - Based on `isPublic`, `userId`, `requiredUserId`
 2. **Soft-delete filter** - Based on `shouldIncludeDeleted`
 
-| Context Factory | Flags Set | Permission Behavior | Soft-Delete Behavior |
-|-----------------|-----------|---------------------|----------------------|
-| `createPublicQueryContext()` | `isPublic: true` | Only `isPublic = true` records | Excludes deleted |
-| `createUserQueryContext(id)` | `userId: id` | Public OR owned by user | Excludes deleted |
-| `createProtectedQueryContext(id)` | `requiredUserId: id` | Only owned by user | Excludes deleted |
-| `createAdminQueryContext(id)` | `userId: id` | All content (no filter) | Excludes deleted |
+| Context Factory                   | Flags Set            | Permission Behavior            | Soft-Delete Behavior |
+| --------------------------------- | -------------------- | ------------------------------ | -------------------- |
+| `createPublicQueryContext()`      | `isPublic: true`     | Only `isPublic = true` records | Excludes deleted     |
+| `createUserQueryContext(id)`      | `userId: id`         | Public OR owned by user        | Excludes deleted     |
+| `createProtectedQueryContext(id)` | `requiredUserId: id` | Only owned by user             | Excludes deleted     |
+| `createAdminQueryContext(id)`     | `userId: id`         | All content (no filter)        | Excludes deleted     |
 
 ### Why This Matters for Facades
 
 **Facades should trust query methods to handle filtering.** When you:
+
 1. Create the correct context type
 2. Pass it to query methods
 3. The query layer automatically applies appropriate filters
@@ -180,10 +182,12 @@ const context = createPublicQueryContext({ dbInstance });
 const count = await dbInstance
   .select({ count: count() })
   .from(bobbleheads)
-  .where(and(
-    eq(bobbleheads.isPublic, true),      // Redundant - context handles this
-    isNull(bobbleheads.deletedAt)         // Redundant - context handles this
-  ));
+  .where(
+    and(
+      eq(bobbleheads.isPublic, true), // Redundant - context handles this
+      isNull(bobbleheads.deletedAt), // Redundant - context handles this
+    ),
+  );
 ```
 
 ### Override Flags When Needed
@@ -194,12 +198,12 @@ You can override default flags for special cases:
 // Include soft-deleted records (e.g., for admin restore feature)
 const context = createAdminQueryContext(adminUserId, {
   dbInstance,
-  shouldIncludeDeleted: true,  // Override to see deleted records
+  shouldIncludeDeleted: true, // Override to see deleted records
 });
 
 // Public context with transaction support
 const context = createPublicQueryContext({
-  dbInstance: tx,  // Use transaction executor
+  dbInstance: tx, // Use transaction executor
 });
 ```
 
@@ -419,7 +423,7 @@ Always use semantically correct operation constants from `OPERATIONS` in `@/lib/
 const errorContext: FacadeErrorContext = {
   facade: facadeName,
   method: 'getPlatformStats',
-  operation: OPERATIONS.PLATFORM.GET_STATS,  // Matches the actual operation
+  operation: OPERATIONS.PLATFORM.GET_STATS, // Matches the actual operation
 };
 
 // If OPERATIONS.PLATFORM.GET_STATS doesn't exist, ADD it to operations.ts:
@@ -435,7 +439,7 @@ const errorContext: FacadeErrorContext = {
 const errorContext: FacadeErrorContext = {
   facade: facadeName,
   method: 'getPlatformStats',
-  operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS,  // Wrong! This is for view analytics
+  operation: OPERATIONS.ANALYTICS.GET_VIEW_STATS, // Wrong! This is for view analytics
 };
 ```
 
@@ -445,11 +449,11 @@ Use query methods whose names match the access context. Don't use admin-named me
 
 ### Method Naming Guidelines
 
-| Access Context | Method Naming Pattern | Example |
-|---------------|----------------------|---------|
-| Public (no auth) | `get{Entity}CountAsync`, `find{Entity}sAsync` | `getUsersCountAsync()` |
-| User (authenticated) | `get{Entity}ByUserAsync`, `findUserOwnedAsync` | `getBobbleheadsByUserAsync()` |
-| Admin (elevated) | `{action}ForAdminAsync`, `get{Entity}sForAdminAsync` | `countUsersForAdminAsync()` |
+| Access Context       | Method Naming Pattern                                | Example                       |
+| -------------------- | ---------------------------------------------------- | ----------------------------- |
+| Public (no auth)     | `get{Entity}CountAsync`, `find{Entity}sAsync`        | `getUsersCountAsync()`        |
+| User (authenticated) | `get{Entity}ByUserAsync`, `findUserOwnedAsync`       | `getBobbleheadsByUserAsync()` |
+| Admin (elevated)     | `{action}ForAdminAsync`, `get{Entity}sForAdminAsync` | `countUsersForAdminAsync()`   |
 
 ### Correct Usage
 
@@ -468,7 +472,7 @@ const users = await UsersQuery.findUsersForAdminAsync(filters, context);
 ```typescript
 // INCORRECT: Public query using admin-named method
 const context = createPublicQueryContext({ dbInstance });
-const count = await UsersQuery.countUsersForAdminAsync({}, context);  // Semantically wrong!
+const count = await UsersQuery.countUsersForAdminAsync({}, context); // Semantically wrong!
 ```
 
 ## Consistent Context Usage
@@ -799,15 +803,15 @@ if (currentDepth >= MAX_NESTING_DEPTH) {
 
 Use this matrix to determine the appropriate return type for facade methods:
 
-| Operation Type | Return Type | When to Use |
-|---------------|-------------|-------------|
-| Find single entity | `Promise<Entity \| null>` | Simple lookups where not found is expected |
-| Find many entities | `Promise<Array<Entity>>` | List queries (empty array if none) |
-| Paginated queries | `Promise<{ items, hasMore, total }>` | When pagination is needed |
-| Create/Update mutations | `Promise<MutationResult>` | Complex mutations with potential failures |
-| Simple mutations | `Promise<Entity \| null>` | Simple single-step mutations |
-| Delete operations | `Promise<boolean>` | When only success/failure matters |
-| Validation checks | `Promise<ValidationResult>` | Pre-flight validation |
+| Operation Type          | Return Type                          | When to Use                                |
+| ----------------------- | ------------------------------------ | ------------------------------------------ |
+| Find single entity      | `Promise<Entity \| null>`            | Simple lookups where not found is expected |
+| Find many entities      | `Promise<Array<Entity>>`             | List queries (empty array if none)         |
+| Paginated queries       | `Promise<{ items, hasMore, total }>` | When pagination is needed                  |
+| Create/Update mutations | `Promise<MutationResult>`            | Complex mutations with potential failures  |
+| Simple mutations        | `Promise<Entity \| null>`            | Simple single-step mutations               |
+| Delete operations       | `Promise<boolean>`                   | When only success/failure matters          |
+| Validation checks       | `Promise<ValidationResult>`          | Pre-flight validation                      |
 
 ### MutationResult Pattern (for complex operations)
 

@@ -28,21 +28,25 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Test Structure
+
 - Follow the project's test directory organization
 - Use correct file naming patterns for each test type
 - Keep test files close to their corresponding source files in the test hierarchy
 
 ### Description Conventions
+
 - Use `describe`/`it` blocks with clear, behavior-focused descriptions
 - Organize tests: positive cases first, edge cases, then error cases
 - Use globals (no imports needed for `describe`/`it`/`expect`/`vi`)
 
 ### Assertion Patterns
+
 - Use semantic assertions (`toBeInTheDocument`, `toHaveLength`, etc.)
 - Prefer specific matchers over generic `toBe(true)`
 - Use `async/await` properly with async assertions
 
 ### Anti-Patterns to Avoid
+
 - Never test implementation details
 - Never use `test.only` in committed code
 - Never skip test cleanup

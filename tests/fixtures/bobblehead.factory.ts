@@ -6,7 +6,7 @@
  * For unit tests, use the mock data from tests/mocks/data/bobbleheads.mock.ts instead.
  */
 
-import { bobbleheads } from '@/lib/db/schema/index';
+import { bobbleheadCollections, bobbleheads } from '@/lib/db/schema/index';
 
 import { getTestDb } from '../setup/test-db';
 
@@ -54,7 +54,6 @@ export async function createTestBobblehead(options: CreateTestBobbleheadOptions)
     acquisitionMethod: options.acquisitionMethod ?? null,
     category: options.category ?? null,
     characterName: options.characterName ?? null,
-    collectionId: options.collectionId,
     currentCondition: options.currentCondition ?? 'good',
     description: options.description ?? null,
     isPublic: options.isPublic ?? true,
@@ -69,6 +68,13 @@ export async function createTestBobblehead(options: CreateTestBobbleheadOptions)
   };
 
   const [bobblehead] = await db.insert(bobbleheads).values(bobbleheadData).returning();
+
+  // Create junction table entry for the collection
+  await db.insert(bobbleheadCollections).values({
+    bobbleheadId: bobblehead!.id,
+    collectionId: options.collectionId,
+  });
+
   return bobblehead;
 }
 
@@ -109,7 +115,6 @@ export async function createTestFeaturedBobblehead(options: CreateTestBobblehead
     acquisitionMethod: options.acquisitionMethod ?? null,
     category: options.category ?? null,
     characterName: options.characterName ?? null,
-    collectionId: options.collectionId,
     currentCondition: options.currentCondition ?? 'mint',
     description: options.description ?? null,
     isFeatured: true,
@@ -125,6 +130,13 @@ export async function createTestFeaturedBobblehead(options: CreateTestBobblehead
   };
 
   const [bobblehead] = await db.insert(bobbleheads).values(bobbleheadData).returning();
+
+  // Create junction table entry for the collection
+  await db.insert(bobbleheadCollections).values({
+    bobbleheadId: bobblehead!.id,
+    collectionId: options.collectionId,
+  });
+
   return bobblehead;
 }
 

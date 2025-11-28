@@ -62,20 +62,20 @@ Generate an implementation plan in MARKDOWN format (NOT XML) following your defi
 
 ### Step Breakdown
 
-| Step | Description | Confidence |
-|------|-------------|------------|
-| 1 | Update Featured Collections Section Header | High |
-| 2 | Add View All Button | High |
-| 3 | Rebuild Card Structure | High |
-| 4 | Integrate Static Stats Display | Medium |
-| 5 | Add Owner Avatar and Metadata | High |
-| 6 | Update Data Mapping | Medium |
-| 7 | Update Skeleton Loading State | High |
-| 8 | Remove Unused CVA Imports | High |
-| 9 | Add Trending Badge Support | Medium |
-| 10 | Verify Badge Variant Support | Low |
-| 11 | Update Grid Layout and Spacing | High |
-| 12 | Test Full Integration | High |
+| Step | Description                                | Confidence |
+| ---- | ------------------------------------------ | ---------- |
+| 1    | Update Featured Collections Section Header | High       |
+| 2    | Add View All Button                        | High       |
+| 3    | Rebuild Card Structure                     | High       |
+| 4    | Integrate Static Stats Display             | Medium     |
+| 5    | Add Owner Avatar and Metadata              | High       |
+| 6    | Update Data Mapping                        | Medium     |
+| 7    | Update Skeleton Loading State              | High       |
+| 8    | Remove Unused CVA Imports                  | High       |
+| 9    | Add Trending Badge Support                 | Medium     |
+| 10   | Verify Badge Variant Support               | Low        |
+| 11   | Update Grid Layout and Spacing             | High       |
+| 12   | Test Full Integration                      | High       |
 
 ## Quality Gates Defined
 

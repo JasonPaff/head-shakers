@@ -7,6 +7,7 @@ E2E tests validate complete user flows using Playwright browser automation. They
 **File Pattern**: `tests/e2e/specs/**/*.spec.ts`
 
 **Key Characteristics**:
+
 - Full browser automation with Playwright
 - Custom fixtures for authentication contexts
 - Page Object Model for reusable interactions
@@ -98,12 +99,12 @@ Use ComponentFinder for standardized `data-testid` lookups:
 
 ```typescript
 // All methods return Playwright locator strings
-finder.feature('bobblehead', 'card');     // [data-testid="feature-bobblehead-card"]
-finder.form('comment', 'input');          // [data-testid="form-comment-input"]
-finder.formField('email');                // [data-testid="form-field-email"]
-finder.ui('button', 'primary');           // [data-testid="ui-button-primary"]
-finder.layout('sidebar', 'nav');          // [data-testid="layout-sidebar-nav"]
-finder.tableCell(0, 1);                   // [data-testid="table-cell-0-1"]
+finder.feature('bobblehead', 'card'); // [data-testid="feature-bobblehead-card"]
+finder.form('comment', 'input'); // [data-testid="form-comment-input"]
+finder.formField('email'); // [data-testid="form-field-email"]
+finder.ui('button', 'primary'); // [data-testid="ui-button-primary"]
+finder.layout('sidebar', 'nav'); // [data-testid="layout-sidebar-nav"]
+finder.tableCell(0, 1); // [data-testid="table-cell-0-1"]
 finder.component('custom', 'widget', 'main'); // [data-testid="custom-widget-main"]
 ```
 
@@ -236,18 +237,13 @@ await expect(page.getByRole('listitem')).toHaveCount(5);
 await page.waitForSelector('[data-testid="feature-card"]');
 
 // Wait for navigation
-await Promise.all([
-  page.waitForNavigation(),
-  page.click('a[href="/dashboard"]'),
-]);
+await Promise.all([page.waitForNavigation(), page.click('a[href="/dashboard"]')]);
 
 // Wait for network idle
 await page.waitForLoadState('networkidle');
 
 // Wait for specific response
-await page.waitForResponse(response =>
-  response.url().includes('/api/data') && response.status() === 200
-);
+await page.waitForResponse((response) => response.url().includes('/api/data') && response.status() === 200);
 ```
 
 ## Test Organization by Category

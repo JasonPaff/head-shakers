@@ -15,6 +15,7 @@ You are a code review orchestrator for Head Shakers. You coordinate comprehensiv
 ```
 
 **Arguments**:
+
 - `target area description` (required): Description of the code area to review
   - Page route: `"the home page at /app/(app)/(home)/page.tsx"`
   - Feature: `"the bobblehead detail page and all its components"`
@@ -25,6 +26,7 @@ You are a code review orchestrator for Head Shakers. You coordinate comprehensiv
 - `--quick`: Review only HIGH priority methods/components (faster but less comprehensive)
 
 **Examples**:
+
 ```
 /code-review "the home page route located at /app/(app)/(home)/page.tsx"
 /code-review "bobblehead collection management feature"
@@ -37,11 +39,13 @@ You are a code review orchestrator for Head Shakers. You coordinate comprehensiv
 ### Phase 1: Input Validation & Setup
 
 **1. Parse Arguments from $ARGUMENTS**:
+
 - Extract target description
 - Parse optional flags (--skip-static, --verbose, --quick)
 - Validate that a target description was provided
 
 **2. If no target provided**: Stop with error message:
+
 ```
 Error: Target area description required.
 
@@ -54,11 +58,13 @@ Examples:
 ```
 
 **3. Setup Environment**:
+
 - Generate review ID: `review-{timestamp}`
 - Create review directory: `docs/{YYYY_MM_DD}/code-reviews/{review-slug}/`
 - Create subdirectories: `agent-reports/`, `screenshots/` (if UI components)
 
 **4. Initialize Todo List**:
+
 ```
 - Scope analysis for code review
 - Dispatch specialist reviewers (in parallel)
@@ -68,6 +74,7 @@ Examples:
 ```
 
 **5. Save Setup Log**: `00-review-setup.md` with:
+
 - Review ID
 - Target description
 - Timestamp
@@ -112,6 +119,7 @@ Return the structured analysis following your output format specification with:
 ```
 
 **Response Handling**:
+
 - If empty/failed: Log failure, attempt fallback using Glob patterns to discover files
 - Extract file + method assignments by specialist domain
 - **CRITICAL**: Parse the specific methods for each file, not just file lists
@@ -129,6 +137,7 @@ Based on the scope analysis, launch ALL relevant specialist agents IN PARALLEL (
 For each specialist domain with methods to review:
 
 #### Server Component Review (if server component methods found)
+
 ```
 subagent_type: "server-component-specialist"
 
@@ -176,6 +185,7 @@ Return findings with:
 ```
 
 #### Client Component Review (if client component methods found)
+
 ```
 subagent_type: "client-component-specialist"
 
@@ -212,6 +222,7 @@ Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Facade Review (if facade methods found)
+
 ```
 subagent_type: "facade-specialist"
 
@@ -255,6 +266,7 @@ Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Server Action Review (if action methods found)
+
 ```
 subagent_type: "server-action-specialist"
 
@@ -292,6 +304,7 @@ Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Database/Query Review (if query methods found)
+
 ```
 subagent_type: "database-specialist"
 
@@ -333,6 +346,7 @@ Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Validation Review (if validation schemas found)
+
 ```
 subagent_type: "validation-specialist"
 
@@ -361,6 +375,7 @@ Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Conventions Review (specific components only)
+
 ```
 subagent_type: "conventions-validator"
 
@@ -392,6 +407,7 @@ Return findings with file:line, severity, description, and recommendation.
 ```
 
 #### Static Analysis (unless --skip-static)
+
 ```
 subagent_type: "static-analysis-validator"
 
@@ -417,6 +433,7 @@ Mark "Wait for all reviews" as in_progress.
 All agents were launched in parallel. Collect their responses:
 
 For each agent response:
+
 1. **If success**: Parse the structured output, extract issues
 2. **If incomplete**: Extract available data, note incomplete sections
 3. **If failed/timeout**: Log failure, mark as "AGENT_FAILED"
@@ -426,16 +443,16 @@ Create summary tracking which agents completed:
 ```markdown
 ## Agent Completion Status
 
-| Agent | Status | Methods Reviewed | Issues Found |
-|-------|--------|------------------|--------------|
-| server-component-specialist | SUCCESS | 6 components | 3 |
-| client-component-specialist | SUCCESS | 3 components | 7 |
-| facade-specialist | SUCCESS | 4 methods | 2 |
-| server-action-specialist | SUCCESS | 1 action | 1 |
-| database-specialist | INCOMPLETE | 2 methods | 1 |
-| validation-specialist | SUCCESS | 1 schema | 0 |
-| conventions-validator | SUCCESS | 8 components | 4 |
-| static-analysis-validator | SUCCESS | 21 files | 5 |
+| Agent                       | Status     | Methods Reviewed | Issues Found |
+| --------------------------- | ---------- | ---------------- | ------------ |
+| server-component-specialist | SUCCESS    | 6 components     | 3            |
+| client-component-specialist | SUCCESS    | 3 components     | 7            |
+| facade-specialist           | SUCCESS    | 4 methods        | 2            |
+| server-action-specialist    | SUCCESS    | 1 action         | 1            |
+| database-specialist         | INCOMPLETE | 2 methods        | 1            |
+| validation-specialist       | SUCCESS    | 1 schema         | 0            |
+| conventions-validator       | SUCCESS    | 8 components     | 4            |
+| static-analysis-validator   | SUCCESS    | 21 files         | 5            |
 ```
 
 Save to `02-agent-status.md`
@@ -495,6 +512,7 @@ Include the call graph in the report to show code relationships.
 ```
 
 **Response Handling**:
+
 - Parse the compiled report
 - Validate all required sections present
 - Save to `03-code-review-report.md`
@@ -585,20 +603,21 @@ Files:
 Mark all todos as completed.
 
 **If critical/high issues found**: Use AskUserQuestion to offer:
+
 - "View detailed report"
 - "Create fix plan with /plan-feature"
 - "Done for now"
 
 ### Error Handling
 
-| Failure | Action |
-|---------|--------|
-| No target provided | Show usage and examples |
-| Scope analysis failed | Use fallback Glob patterns, note reduced precision |
-| All agents failed | Generate minimal report noting failures |
-| Some agents failed | Continue with available results, note gaps |
-| Reporter failed | Output raw agent results as fallback |
-| Directory creation failed | Use alternative path, warn user |
+| Failure                   | Action                                             |
+| ------------------------- | -------------------------------------------------- |
+| No target provided        | Show usage and examples                            |
+| Scope analysis failed     | Use fallback Glob patterns, note reduced precision |
+| All agents failed         | Generate minimal report noting failures            |
+| Some agents failed        | Continue with available results, note gaps         |
+| Reporter failed           | Output raw agent results as fallback               |
+| Directory creation failed | Use alternative path, warn user                    |
 
 ### Performance Notes
 
@@ -611,6 +630,7 @@ Mark all todos as completed.
 ## Review Quality Standards
 
 A good code review identifies:
+
 1. **Security issues** - XSS, injection, auth problems
 2. **Type safety issues** - TypeScript errors, any usage
 3. **Convention violations** - Project-specific patterns

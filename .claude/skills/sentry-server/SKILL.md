@@ -56,13 +56,13 @@ This skill activates when working on **server-side code**:
 
 ## Constants (Always Use)
 
-| Constant                       | Import Path                 | Purpose                        |
-| ------------------------------ | --------------------------- | ------------------------------ |
-| `SENTRY_CONTEXTS`              | `@/lib/constants/sentry`    | Context names for `setContext` |
-| `SENTRY_BREADCRUMB_CATEGORIES` | `@/lib/constants/sentry`    | Breadcrumb category values     |
-| `SENTRY_LEVELS`                | `@/lib/constants/sentry`    | Breadcrumb level values        |
-| `SENTRY_TAGS`                  | `@/lib/constants/sentry`    | Tag names for `setTag`         |
-| `SENTRY_OPERATIONS`            | `@/lib/constants/sentry`    | Operation names for spans      |
+| Constant                       | Import Path              | Purpose                        |
+| ------------------------------ | ------------------------ | ------------------------------ |
+| `SENTRY_CONTEXTS`              | `@/lib/constants/sentry` | Context names for `setContext` |
+| `SENTRY_BREADCRUMB_CATEGORIES` | `@/lib/constants/sentry` | Breadcrumb category values     |
+| `SENTRY_LEVELS`                | `@/lib/constants/sentry` | Breadcrumb level values        |
+| `SENTRY_TAGS`                  | `@/lib/constants/sentry` | Tag names for `setTag`         |
+| `SENTRY_OPERATIONS`            | `@/lib/constants/sentry` | Operation names for spans      |
 
 ## Usage Pattern Reference
 

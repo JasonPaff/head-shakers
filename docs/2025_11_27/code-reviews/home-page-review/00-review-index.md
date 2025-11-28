@@ -36,12 +36,12 @@
 
 ## Layer Health
 
-| Layer | Score | Grade |
-|-------|-------|-------|
-| UI/Components | 71 | C |
-| Business Logic | 93 | A |
-| Data Layer | 94 | A |
-| Static Analysis | 100 | A |
+| Layer           | Score | Grade |
+| --------------- | ----- | ----- |
+| UI/Components   | 71    | C     |
+| Business Logic  | 93    | A     |
+| Data Layer      | 94    | A     |
+| Static Analysis | 100   | A     |
 
 ## Top Priority Fixes
 

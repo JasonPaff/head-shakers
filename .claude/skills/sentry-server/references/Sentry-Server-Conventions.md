@@ -517,7 +517,7 @@ try {
 } catch (error) {
   Sentry.captureException(error, {
     extra: { entityId, publicId, operation: 'cloudinary-cleanup' },
-    level: 'warning',  // WARNING, not error
+    level: 'warning', // WARNING, not error
   });
   // Continue execution - don't throw
 }
