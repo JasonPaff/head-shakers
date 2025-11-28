@@ -609,6 +609,64 @@ export type EntityWithUser = PublicEntity & {
 };
 ```
 
+## Email Normalization
+
+When working with email addresses in queries, always use the `normalizeEmail` helper to ensure consistent storage and case-insensitive lookups.
+
+### Using normalizeEmail
+
+```typescript
+// In a query class extending BaseQuery
+static async findByEmailAsync(
+  email: string,
+  context: QueryContext,
+): Promise<SubscriberRecord | null> {
+  const dbInstance = this.getDbInstance(context);
+  const normalizedEmail = this.normalizeEmail(email);
+
+  const result = await dbInstance
+    .select()
+    .from(subscribers)
+    .where(eq(subscribers.email, normalizedEmail))
+    .limit(1);
+
+  return result[0] || null;
+}
+
+// For create operations - always normalize before storing
+static async createAsync(
+  email: string,
+  context: QueryContext,
+): Promise<SubscriberRecord | null> {
+  const dbInstance = this.getDbInstance(context);
+
+  const result = await dbInstance
+    .insert(subscribers)
+    .values({ email: this.normalizeEmail(email) })
+    .returning();
+
+  return result?.[0] || null;
+}
+```
+
+### What normalizeEmail Does
+
+```typescript
+protected static normalizeEmail(email: string): string {
+  return email.toLowerCase().trim();
+}
+```
+
+- Converts email to lowercase for case-insensitive matching
+- Trims leading/trailing whitespace
+
+### When to Use
+
+- **Lookups**: Always normalize the input email before querying
+- **Inserts**: Always normalize before storing to ensure consistent data
+- **Updates**: Normalize email fields being updated
+- **Comparisons**: Normalize both sides when comparing emails outside of queries
+
 ## Anti-Patterns to Avoid
 
 1. **Never access `db` directly** - Always use `this.getDbInstance(context)`
@@ -620,3 +678,4 @@ export type EntityWithUser = PublicEntity & {
 7. **Never allow negative counts** - Use `GREATEST(0, count - 1)` for decrements
 8. **Never skip ownership checks** - Verify `userId` on update/delete operations
 9. **Never ignore circuit breaker** - Use `executeWithRetry` for operations prone to transient failures
+10. **Never use raw emails in queries** - Always use `this.normalizeEmail(email)` for consistent case-insensitive matching
