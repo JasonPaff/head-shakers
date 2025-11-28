@@ -12,7 +12,7 @@ import { generateTestId } from '@/lib/test-ids';
  * Caching: Uses CacheService.featured.content() via FeaturedContentFacade.getFooterFeaturedContentAsync()
  * with CACHE_KEYS.FEATURED.CONTENT_TYPES.FOOTER key
  */
-export const FooterFeaturedSection = async () => {
+export const FooterFeaturedSectionAsync = async () => {
   const featuredContent = await FeaturedContentFacade.getFooterFeaturedContentAsync();
   if (featuredContent.length === 0) return null;
 

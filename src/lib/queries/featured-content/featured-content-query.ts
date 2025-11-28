@@ -483,7 +483,7 @@ export class FeaturedContentQuery extends BaseQuery {
     const dbInstance = this.getDbInstance(context);
     const now = new Date();
 
-    const results = await dbInstance
+    return dbInstance
       .select({
         collectionName: collections.name,
         collectionSlug: collections.slug,
@@ -506,8 +506,6 @@ export class FeaturedContentQuery extends BaseQuery {
       )
       .orderBy(desc(featuredContent.priority), desc(featuredContent.createdAt))
       .limit(CONFIG.CONTENT.MAX_FEATURED_FOOTER_ITEMS + 1);
-
-    return results;
   }
 
   /**

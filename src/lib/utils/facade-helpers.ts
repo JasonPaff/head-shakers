@@ -23,7 +23,8 @@ export interface FacadeOperationConfig {
  * Simplified version when operation name matches method name.
  *
  * Common case that reduces config verbosity. Use when the operation
- * identifier is the same as the method name.
+ * identifier is the same as the method name. Does NOT include Sentry
+ * breadcrumbs - use for simple operations that don't need tracking.
  *
  * @example
  * return executeFacadeMethod(
@@ -44,7 +45,7 @@ export async function executeFacadeMethod<T>(
   operation: () => Promise<T>,
   options?: { data?: Record<string, unknown>; userId?: string },
 ): Promise<T> {
-  return executeFacadeOperation(
+  return executeFacadeOperationWithoutBreadcrumbs(
     {
       data: options?.data,
       facade,
@@ -57,56 +58,14 @@ export async function executeFacadeMethod<T>(
 }
 
 /**
- * Execute a facade operation with automatic error handling.
- *
- * Wraps the operation in a try-catch and converts errors to ActionError
- * with proper facade context. Use for simple operations that don't need
- * Sentry breadcrumbs.
- *
- * @example
- * return executeFacadeOperation(
- *   {
- *     facade: facadeName,
- *     method: 'getBobbleheadBySlug',
- *     operation: 'getBySlug',
- *     userId: viewerUserId,
- *     data: { slug },
- *   },
- *   async () => {
- *     const context = viewerUserId
- *       ? createUserQueryContext(viewerUserId, { dbInstance })
- *       : createPublicQueryContext({ dbInstance });
- *     return BobbleheadsQuery.findBySlugAsync(slug, context);
- *   },
- * );
- */
-export async function executeFacadeOperation<T>(
-  config: FacadeOperationConfig,
-  operation: () => Promise<T>,
-): Promise<T> {
-  try {
-    return await operation();
-  } catch (error) {
-    const errorContext: FacadeErrorContext = {
-      data: config.data,
-      facade: config.facade,
-      method: config.method,
-      operation: config.operation,
-      userId: config.userId,
-    };
-    throw createFacadeError(errorContext, error);
-  }
-}
-
-/**
  * Execute a facade operation with breadcrumbs AND error handling.
  *
  * Combines withFacadeBreadcrumbs with error handling for complete
- * facade operation wrapping. Use for operations that need Sentry
- * breadcrumb tracking.
+ * facade operation wrapping. This is the default helper for most
+ * facade operations as they typically need Sentry breadcrumb tracking.
  *
  * @example
- * return executeFacadeOperationWithBreadcrumbs(
+ * return executeFacadeOperation(
  *   {
  *     facade: facadeName,
  *     method: 'getPlatformStatsAsync',
@@ -125,7 +84,7 @@ export async function executeFacadeOperation<T>(
  *   },
  * );
  */
-export async function executeFacadeOperationWithBreadcrumbs<T>(
+export async function executeFacadeOperation<T>(
   config: FacadeOperationConfig,
   operation: () => Promise<T>,
   breadcrumbOptions?: WithFacadeBreadcrumbsOptions<T>,
@@ -150,4 +109,46 @@ export async function executeFacadeOperationWithBreadcrumbs<T>(
     },
     breadcrumbOptions,
   );
+}
+
+/**
+ * Execute a facade operation with error handling but WITHOUT breadcrumbs.
+ *
+ * Wraps the operation in a try-catch and converts errors to ActionError
+ * with proper facade context. Use for simple operations that don't need
+ * Sentry breadcrumb tracking.
+ *
+ * @example
+ * return executeFacadeOperationWithoutBreadcrumbs(
+ *   {
+ *     facade: facadeName,
+ *     method: 'getBobbleheadBySlug',
+ *     operation: 'getBySlug',
+ *     userId: viewerUserId,
+ *     data: { slug },
+ *   },
+ *   async () => {
+ *     const context = viewerUserId
+ *       ? createUserQueryContext(viewerUserId, { dbInstance })
+ *       : createPublicQueryContext({ dbInstance });
+ *     return BobbleheadsQuery.findBySlugAsync(slug, context);
+ *   },
+ * );
+ */
+export async function executeFacadeOperationWithoutBreadcrumbs<T>(
+  config: FacadeOperationConfig,
+  operation: () => Promise<T>,
+): Promise<T> {
+  try {
+    return await operation();
+  } catch (error) {
+    const errorContext: FacadeErrorContext = {
+      data: config.data,
+      facade: config.facade,
+      method: config.method,
+      operation: config.operation,
+      userId: config.userId,
+    };
+    throw createFacadeError(errorContext, error);
+  }
 }

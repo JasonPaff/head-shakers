@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { FooterContainer } from '@/components/layout/app-footer/components/footer-container';
-import { FooterFeaturedSection } from '@/components/layout/app-footer/components/footer-featured-section';
+import { FooterFeaturedSectionAsync } from '@/components/layout/app-footer/components/footer-featured-section-async';
 import { FooterFeaturedSectionSkeleton } from '@/components/layout/app-footer/components/footer-featured-section-skeleton';
 import { FooterLegal } from '@/components/layout/app-footer/components/footer-legal';
 import { FooterNavLink } from '@/components/layout/app-footer/components/footer-nav-link';
@@ -89,7 +89,7 @@ export const AppFooter = () => {
             {/* Featured Collections Section */}
             <ErrorBoundary name={'footer-featured-section'}>
               <Suspense fallback={<FooterFeaturedSectionSkeleton />}>
-                <FooterFeaturedSection />
+                <FooterFeaturedSectionAsync />
               </Suspense>
             </ErrorBoundary>
           </FooterContainer>

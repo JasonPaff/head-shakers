@@ -23,11 +23,8 @@ import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featu
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
-import {
-  trackFacadeEntry,
-  trackFacadeSuccess,
-  withFacadeBreadcrumbs,
-} from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
+import { trackFacadeEntry, trackFacadeSuccess } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'FeaturedContentFacade';
 
@@ -154,41 +151,29 @@ export class FeaturedContentFacade extends BaseFacade {
   static async getFeaturedBobbleheadAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<HeroFeaturedBobbleheadData | null> {
-    const methodName = 'getFeaturedBobbleheadAsync';
-
-    return withFacadeBreadcrumbs(
-      { facade: facadeName, method: methodName },
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getFeaturedBobbleheadAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
+      },
       async () => {
-        try {
-          return await CacheService.featured.featuredBobblehead(
-            async () => {
-              const context = this.publicContext(dbInstance);
-              return await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
-            },
-            {
-              context: {
-                entityType: CACHE_ENTITY_TYPE.FEATURED,
-                facade: facadeName,
-                operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
-              },
-            },
-          );
-        } catch (error) {
-          throw createFacadeError(
-            {
-              data: {},
+        return await CacheService.featured.featuredBobblehead(
+          async () => {
+            const context = this.publicContext(dbInstance);
+            return await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
+          },
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.FEATURED,
               facade: facadeName,
-              method: methodName,
               operation: OPERATIONS.FEATURED_CONTENT.GET_HERO_BOBBLEHEAD,
             },
-            error,
-          );
-        }
+          },
+        );
       },
       {
-        includeResultSummary: (featuredBobblehead) => ({
-          ...featuredBobblehead,
-        }),
+        includeResultSummary: (data) => ({ ...data }),
       },
     );
   }
@@ -212,36 +197,28 @@ export class FeaturedContentFacade extends BaseFacade {
     userId?: null | string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FeaturedCollectionData>> {
-    const methodName = 'getFeaturedCollectionsAsync';
-
-    return withFacadeBreadcrumbs(
-      { facade: facadeName, method: methodName },
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getFeaturedCollectionsAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
+        userId: userId ?? undefined,
+      },
       async () => {
-        try {
-          return await CacheService.featured.collections(
-            async () => {
-              const context = this.publicContext(dbInstance);
-              return await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
+        return await CacheService.featured.collections(
+          async () => {
+            const context = this.publicContext(dbInstance);
+            return await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
+          },
+          userId,
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.FEATURED,
+              facade: facadeName,
+              operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
             },
-            userId,
-            {
-              context: {
-                entityType: CACHE_ENTITY_TYPE.FEATURED,
-                facade: facadeName,
-                operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
-              },
-            },
-          );
-        } catch (error) {
-          const errorContext: FacadeErrorContext = {
-            data: { userId },
-            facade: facadeName,
-            method: methodName,
-            operation: OPERATIONS.FEATURED_CONTENT.GET_FEATURED_COLLECTIONS,
-            userId: userId || undefined,
-          };
-          throw createFacadeError(errorContext, error);
-        }
+          },
+        );
       },
       { includeResultSummary: (data) => ({ ...data }) },
     );
@@ -275,36 +252,30 @@ export class FeaturedContentFacade extends BaseFacade {
   static async getFooterFeaturedContentAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FooterFeaturedContentData>> {
-    trackFacadeEntry(facadeName, 'getFooterFeaturedContentAsync');
-
-    try {
-      return await CacheService.featured.content(
-        async () => {
-          const context = this.publicContext(dbInstance);
-          const data = await FeaturedContentQuery.getFooterFeaturedContentAsync(context);
-
-          trackFacadeSuccess(facadeName, 'getFooterFeaturedContentAsync', { count: data.length });
-
-          return data;
-        },
-        CACHE_KEYS.FEATURED.CONTENT_TYPES.FOOTER,
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.FEATURED,
-            facade: facadeName,
-            operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
-          },
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: {},
+    return executeFacadeOperation(
+      {
         facade: facadeName,
         method: 'getFooterFeaturedContentAsync',
         operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+      },
+      async () => {
+        return await CacheService.featured.content(
+          async () => {
+            const context = this.publicContext(dbInstance);
+            return await FeaturedContentQuery.getFooterFeaturedContentAsync(context);
+          },
+          CACHE_KEYS.FEATURED.CONTENT_TYPES.FOOTER,
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.FEATURED,
+              facade: facadeName,
+              operation: OPERATIONS.FEATURED_CONTENT.GET_ACTIVE,
+            },
+          },
+        );
+      },
+      { includeResultSummary: (data) => ({ ...data }) },
+    );
   }
 
   /**
@@ -331,39 +302,29 @@ export class FeaturedContentFacade extends BaseFacade {
   static async getTrendingBobbleheadsAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<TrendingBobbleheadData>> {
-    const methodName = 'getTrendingBobbleheadsAsync';
-
-    return withFacadeBreadcrumbs(
-      { facade: facadeName, method: methodName },
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getTrendingBobbleheadsAsync',
+        operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
+      },
       async () => {
-        try {
-          return await CacheService.featured.trendingBobbleheads(
-            async () => {
-              const context = this.publicContext(dbInstance);
-              return await FeaturedContentQuery.getTrendingBobbleheadsAsync(context);
+        return await CacheService.featured.trendingBobbleheads(
+          async () => {
+            const context = this.publicContext(dbInstance);
+            return await FeaturedContentQuery.getTrendingBobbleheadsAsync(context);
+          },
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.FEATURED,
+              facade: facadeName,
+              operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
             },
-            {
-              context: {
-                entityType: CACHE_ENTITY_TYPE.FEATURED,
-                facade: facadeName,
-                operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
-              },
-            },
-          );
-        } catch (error) {
-          const errorContext: FacadeErrorContext = {
-            data: {},
-            facade: facadeName,
-            method: methodName,
-            operation: OPERATIONS.FEATURED_CONTENT.GET_TRENDING_BOBBLEHEADS,
-          };
-          throw createFacadeError(errorContext, error);
-        }
+          },
+        );
       },
       {
-        includeResultSummary: (trendingBobbleheads) => ({
-          ...trendingBobbleheads,
-        }),
+        includeResultSummary: (data) => ({ ...data }),
       },
     );
   }

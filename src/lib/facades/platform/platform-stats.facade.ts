@@ -8,7 +8,7 @@ import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
-import { executeFacadeOperationWithBreadcrumbs } from '@/lib/utils/facade-helpers';
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 
 const facadeName = 'PlatformStatsFacade';
 
@@ -35,7 +35,7 @@ export class PlatformStatsFacade extends BaseFacade {
    * @returns Platform statistics with total counts
    */
   static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
-    return executeFacadeOperationWithBreadcrumbs(
+    return executeFacadeOperation(
       {
         facade: facadeName,
         method: 'getPlatformStatsAsync',
@@ -69,8 +69,8 @@ export class PlatformStatsFacade extends BaseFacade {
         );
       },
       {
-        includeResultSummary: (stats) => ({
-          ...stats,
+        includeResultSummary: (data) => ({
+          ...data,
         }),
       },
     );

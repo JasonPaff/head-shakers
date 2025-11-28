@@ -540,13 +540,11 @@ export class BobbleheadsQuery extends BaseQuery {
   static async getBobbleheadCountAsync(context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
-    const result = await dbInstance
+    return await dbInstance
       .select({ count: count() })
       .from(bobbleheads)
       .where(buildSoftDeleteFilter(bobbleheads.deletedAt, context))
       .then((result) => result[0]?.count || 0);
-
-    return result;
   }
 
   /**
