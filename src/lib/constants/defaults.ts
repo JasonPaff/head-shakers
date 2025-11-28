@@ -22,7 +22,6 @@ export const DEFAULTS = {
   COLLECTION: {
     COMMENT_COUNT: 0,
     IS_PUBLIC: true,
-    LIKE_COUNT: 0,
   },
   COMMENT: {
     LIKE_COUNT: 0,

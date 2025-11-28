@@ -139,7 +139,7 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(result!.contentSlug).toBe(bobblehead!.slug);
       expect(result!.description).toBe('This is an amazing featured bobblehead');
       expect(result!.owner).toBe(user!.id);
-      expect(result!.likes).toBe(0);
+      expect(result!.likes).toBe(0); // No likes created, dynamic count should be 0
       expect(result!.viewCount).toBe(0);
 
       // Verify cache was called
@@ -316,6 +316,7 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(result).toHaveLength(1);
       expect(result[0]!.isLiked).toBe(true);
       expect(result[0]!.likeId).toBeDefined();
+      expect(result[0]!.likes).toBe(1); // Dynamic count: 1 like created
 
       // Verify cache key includes userId
       expect(cacheCallsByMethod[`collections-${viewer!.id}`]).toBe(1);
@@ -341,6 +342,7 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(result).toHaveLength(1);
       expect(result[0]!.isLiked).toBe(false);
       expect(result[0]!.likeId).toBeNull();
+      expect(result[0]!.likes).toBe(0); // No likes created, dynamic count should be 0
 
       // Verify cache key for public access
       expect(cacheCallsByMethod['collections-public']).toBe(1);
@@ -411,7 +413,7 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(featured.isTrending).toBe(true);
       expect(featured.ownerDisplayName).toBe('collector');
       expect(featured.totalItems).toBe(0);
-      expect(featured.likes).toBe(0);
+      expect(featured.likes).toBe(0); // No likes created, dynamic count should be 0
       expect(featured.comments).toBe(0);
       expect(featured.viewCount).toBe(0);
     });
@@ -554,7 +556,7 @@ describe('FeaturedContentFacade Integration Tests', () => {
       expect(trending.category).toBe('Sports');
       expect(trending.year).toBe(2023);
       expect(trending.featureType).toBe('trending');
-      expect(trending.likeCount).toBe(0);
+      expect(trending.likeCount).toBe(0); // No likes created, dynamic count should be 0
       expect(trending.viewCount).toBe(0);
     });
 
