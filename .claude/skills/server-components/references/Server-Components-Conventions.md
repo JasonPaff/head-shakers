@@ -71,6 +71,7 @@ import 'server-only';
 ```
 
 **When to use**:
+
 - Async components that fetch data
 - Files with direct database/facade calls
 - Files with server-only utilities (auth, etc.)
@@ -82,10 +83,7 @@ import 'server-only';
 ### Single Fetch
 
 ```tsx
-const data = await BobbleheadsFacade.getBobbleheadByIdAsync(
-  bobbleheadId,
-  viewerUserId,
-);
+const data = await BobbleheadsFacade.getBobbleheadByIdAsync(bobbleheadId, viewerUserId);
 ```
 
 ### Parallel Fetching with Promise.all
@@ -161,7 +159,7 @@ import { Suspense } from 'react';
 // In page.tsx
 <Suspense fallback={<CollectionBobbleheadsSkeleton />}>
   <CollectionBobbleheadsAsync collectionId={collectionId} />
-</Suspense>
+</Suspense>;
 ```
 
 ### Create Async Wrapper Components
@@ -201,7 +199,7 @@ import { MyErrorBoundary } from './my-error-boundary';
   <Suspense fallback={<HeaderSkeleton />}>
     <HeaderAsync />
   </Suspense>
-</MyErrorBoundary>
+</MyErrorBoundary>;
 ```
 
 ---
@@ -242,11 +240,7 @@ if (!userId) {
 ```tsx
 import type { Metadata } from 'next';
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
 
   const data = await MyFacade.getSeoDataAsync(slug);
@@ -334,12 +328,12 @@ export const revalidate = 600; // Revalidate every 10 minutes
 
 ### Common Revalidation Values
 
-| Value | Duration  | Use Case                      |
-| ----- | --------- | ----------------------------- |
-| 60    | 1 minute  | Trending content              |
-| 300   | 5 minutes | Search results                |
-| 600   | 10 minutes| Browse pages                  |
-| 3600  | 1 hour    | Static content                |
+| Value | Duration   | Use Case         |
+| ----- | ---------- | ---------------- |
+| 60    | 1 minute   | Trending content |
+| 300   | 5 minutes  | Search results   |
+| 600   | 10 minutes | Browse pages     |
+| 3600  | 1 hour     | Static content   |
 
 ---
 
@@ -380,11 +374,11 @@ async function MyPage({ routeParams, searchParams }: PageProps) {
 
 ## Component Naming Conventions
 
-| Suffix      | Purpose                               | Example                     |
-| ----------- | ------------------------------------- | --------------------------- |
-| `*Async`    | Async data-fetching component         | `CollectionHeaderAsync`     |
-| `*Server`   | Server-only orchestration             | `FeaturedContentServer`     |
-| `*Skeleton` | Loading state placeholder             | `CollectionHeaderSkeleton`  |
+| Suffix      | Purpose                       | Example                    |
+| ----------- | ----------------------------- | -------------------------- |
+| `*Async`    | Async data-fetching component | `CollectionHeaderAsync`    |
+| `*Server`   | Server-only orchestration     | `FeaturedContentServer`    |
+| `*Skeleton` | Loading state placeholder     | `CollectionHeaderSkeleton` |
 
 ---
 
@@ -479,11 +473,7 @@ export const revalidate = 600;
 
 export default withParamValidation(MyPage, Route);
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const data = await MyFacade.getSeoDataAsync(slug);
 
@@ -560,11 +550,7 @@ async function MyPage({ routeParams, searchParams }: PageProps) {
       <ContentLayout>
         <MyErrorBoundary section={'content'}>
           <Suspense fallback={<MyContentSkeleton />}>
-            <MyContentAsync
-              dataId={data.id}
-              isOwner={isOwner}
-              searchParams={resolvedSearchParams}
-            />
+            <MyContentAsync dataId={data.id} isOwner={isOwner} searchParams={resolvedSearchParams} />
           </Suspense>
         </MyErrorBoundary>
       </ContentLayout>

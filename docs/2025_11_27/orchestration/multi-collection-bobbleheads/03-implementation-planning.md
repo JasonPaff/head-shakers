@@ -65,28 +65,28 @@ The implementation planner agent returned a comprehensive 17-step markdown imple
 
 ## Plan Summary
 
-| Metric | Value |
-|--------|-------|
-| Total Steps | 17 |
-| Estimated Duration | 2-3 days |
-| Complexity | High |
-| Risk Level | High |
-| Files to Create | 2 (junction table schema, migration) |
-| Files to Modify | 12+ |
-| Quality Gates | 8 |
+| Metric             | Value                                |
+| ------------------ | ------------------------------------ |
+| Total Steps        | 17                                   |
+| Estimated Duration | 2-3 days                             |
+| Complexity         | High                                 |
+| Risk Level         | High                                 |
+| Files to Create    | 2 (junction table schema, migration) |
+| Files to Modify    | 12+                                  |
+| Quality Gates      | 8                                    |
 
 ### Step Breakdown by Category
 
-| Category | Steps | Files |
-|----------|-------|-------|
-| Database Schema | 1-4 | 4 files |
-| Database Migration | 5-6 | 1 file |
-| Query Layer | 7-8 | 2 files |
-| Facade Layer | 9-10 | 2 files |
-| Validation Schemas | 11-12 | 2 files |
-| Server Actions | 13-14 | 2 files |
-| Frontend | 15 | Multiple |
-| Types & Testing | 16-17 | Multiple |
+| Category           | Steps | Files    |
+| ------------------ | ----- | -------- |
+| Database Schema    | 1-4   | 4 files  |
+| Database Migration | 5-6   | 1 file   |
+| Query Layer        | 7-8   | 2 files  |
+| Facade Layer       | 9-10  | 2 files  |
+| Validation Schemas | 11-12 | 2 files  |
+| Server Actions     | 13-14 | 2 files  |
+| Frontend           | 15    | Multiple |
+| Types & Testing    | 16-17 | Multiple |
 
 ## Complexity Assessment
 

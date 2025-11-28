@@ -46,7 +46,7 @@ tests/components/
 - [ ] Prefer accessibility-first queries (`getByRole`, `getByLabelText`)
 - [ ] Test user interactions with `await user.click()`, `await user.type()`
 - [ ] Mock server actions with `vi.mock()`
-- [ ] Use `data-testid` with namespace pattern (ui-*, feature-*, form-*)
+- [ ] Use `data-testid` with namespace pattern (ui-_, feature-_, form-\*)
 - [ ] Use `waitFor` for async assertions
 - [ ] Test both success and error states
 - [ ] No imports for `describe`/`it`/`expect`/`vi` (globals enabled)
@@ -54,6 +54,7 @@ tests/components/
 ### Pre-Mocked Dependencies
 
 These are automatically mocked in `tests/setup/vitest.setup.ts`:
+
 - `@clerk/nextjs` - ClerkProvider, useAuth, useUser, etc.
 - `@clerk/nextjs/server` - auth(), clerkClient()
 - `next/navigation` - useRouter, useParams, redirect

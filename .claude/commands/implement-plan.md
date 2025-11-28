@@ -41,19 +41,19 @@ You are a lightweight implementation orchestrator that coordinates the execution
 
 ## Available Specialist Agents
 
-| Agent                          | Domain              | Skills Auto-Loaded                                                        | File Patterns                                                           |
-| ------------------------------ | ------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| `server-action-specialist`     | Server actions      | server-actions, sentry-monitoring, validation-schemas                     | `src/lib/actions/**/*.actions.ts`                                       |
-| `database-specialist`          | Schemas & queries   | database-schema, drizzle-orm, validation-schemas                          | `src/lib/db/schema/**`, `src/lib/queries/**`                            |
-| `facade-specialist`            | Business logic      | facade-layer, caching, sentry-monitoring, drizzle-orm                     | `src/lib/facades/**/*.facade.ts`                                        |
-| `server-component-specialist`  | Server components   | react-coding-conventions, ui-components, server-components, caching       | `src/app/**/page.tsx`, `layout.tsx`, `*-async.tsx`, `*-skeleton.tsx`    |
-| `client-component-specialist`  | Client components   | react-coding-conventions, ui-components, client-components                | `src/components/**/*.tsx` (with hooks/events), `*-client.tsx`           |
-| `form-specialist`              | Forms               | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx`                         |
-| `media-specialist`             | Cloudinary          | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components                                  |
-| `test-specialist`              | Testing             | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`                                |
-| `validation-specialist`        | Zod schemas         | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`                                |
-| `resend-specialist`            | Email sending       | resend-email, sentry-monitoring                                           | `src/lib/services/resend*.ts`, `src/lib/email-templates/**/*.tsx`       |
-| `general-purpose`              | Fallback            | None (manual skill invocation)                                            | Any other files                                                         |
+| Agent                         | Domain            | Skills Auto-Loaded                                                        | File Patterns                                                        |
+| ----------------------------- | ----------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| `server-action-specialist`    | Server actions    | server-actions, sentry-monitoring, validation-schemas                     | `src/lib/actions/**/*.actions.ts`                                    |
+| `database-specialist`         | Schemas & queries | database-schema, drizzle-orm, validation-schemas                          | `src/lib/db/schema/**`, `src/lib/queries/**`                         |
+| `facade-specialist`           | Business logic    | facade-layer, caching, sentry-monitoring, drizzle-orm                     | `src/lib/facades/**/*.facade.ts`                                     |
+| `server-component-specialist` | Server components | react-coding-conventions, ui-components, server-components, caching       | `src/app/**/page.tsx`, `layout.tsx`, `*-async.tsx`, `*-skeleton.tsx` |
+| `client-component-specialist` | Client components | react-coding-conventions, ui-components, client-components                | `src/components/**/*.tsx` (with hooks/events), `*-client.tsx`        |
+| `form-specialist`             | Forms             | form-system, react-coding-conventions, validation-schemas, server-actions | Form components, `*-form*.tsx`, `*-dialog*.tsx`                      |
+| `media-specialist`            | Cloudinary        | cloudinary-media, react-coding-conventions                                | Cloudinary utilities, image components                               |
+| `test-specialist`             | Testing           | testing-patterns                                                          | `tests/**/*.test.ts`, `e2e/**/*.spec.ts`                             |
+| `validation-specialist`       | Zod schemas       | validation-schemas                                                        | `src/lib/validations/**/*.validation.ts`                             |
+| `resend-specialist`           | Email sending     | resend-email, sentry-monitoring                                           | `src/lib/services/resend*.ts`, `src/lib/email-templates/**/*.tsx`    |
+| `general-purpose`             | Fallback          | None (manual skill invocation)                                            | Any other files                                                      |
 
 ## Step-Type Detection Algorithm
 

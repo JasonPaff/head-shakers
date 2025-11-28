@@ -59,24 +59,24 @@ This skill activates when working on **client-side/front-end code**:
 
 ## Constants (Always Use)
 
-| Constant                       | Import Path                 | Purpose                        |
-| ------------------------------ | --------------------------- | ------------------------------ |
-| `SENTRY_CONTEXTS`              | `@/lib/constants/sentry`    | Context names for `setContext` |
-| `SENTRY_BREADCRUMB_CATEGORIES` | `@/lib/constants/sentry`    | Breadcrumb category values     |
-| `SENTRY_LEVELS`                | `@/lib/constants/sentry`    | Breadcrumb level values        |
-| `SENTRY_TAGS`                  | `@/lib/constants/sentry`    | Tag names for tags             |
+| Constant                       | Import Path              | Purpose                        |
+| ------------------------------ | ------------------------ | ------------------------------ |
+| `SENTRY_CONTEXTS`              | `@/lib/constants/sentry` | Context names for `setContext` |
+| `SENTRY_BREADCRUMB_CATEGORIES` | `@/lib/constants/sentry` | Breadcrumb category values     |
+| `SENTRY_LEVELS`                | `@/lib/constants/sentry` | Breadcrumb level values        |
+| `SENTRY_TAGS`                  | `@/lib/constants/sentry` | Tag names for tags             |
 
 ## Usage Pattern Reference
 
-| Use Case                | Primary Method            | Level     |
-| ----------------------- | ------------------------- | --------- |
-| Route error page        | `Sentry.captureException` | `error`   |
-| Global error            | `Sentry.captureException` | `fatal`   |
-| Error boundary catch    | `Sentry.captureException` | `error`   |
-| Error boundary reset    | `Sentry.captureMessage`   | `info`    |
-| User interaction        | `Sentry.addBreadcrumb`    | `info`    |
-| Form submission start   | `Sentry.addBreadcrumb`    | `info`    |
-| Client action failure   | `Sentry.captureException` | `error`   |
+| Use Case              | Primary Method            | Level   |
+| --------------------- | ------------------------- | ------- |
+| Route error page      | `Sentry.captureException` | `error` |
+| Global error          | `Sentry.captureException` | `fatal` |
+| Error boundary catch  | `Sentry.captureException` | `error` |
+| Error boundary reset  | `Sentry.captureMessage`   | `info`  |
+| User interaction      | `Sentry.addBreadcrumb`    | `info`  |
+| Form submission start | `Sentry.addBreadcrumb`    | `info`  |
+| Client action failure | `Sentry.captureException` | `error` |
 
 ## File Patterns
 

@@ -1,20 +1,20 @@
 'use client';
 
+import type { LucideIcon } from 'lucide-react';
+
 import {
-  ChartSplineIcon,
+  BarChartIcon,
+  BellRingIcon,
+  FileTextIcon,
   LayoutDashboardIcon,
-  MailIcon,
   PackageIcon,
   PackagePlusIcon,
-  ShieldHalfIcon,
-  SparklesIcon,
-  TriangleAlertIcon,
+  SettingsIcon,
+  StarIcon,
   UsersIcon,
 } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
-
-import type { NavigationLink } from '@/components/layout/app-header/components/app-header-nav-menu';
+import { $path } from 'next-typesafe-url';
 
 import { AuthContent } from '@/components/ui/auth';
 import { Button } from '@/components/ui/button';
@@ -22,68 +22,77 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAdminRole } from '@/hooks/use-admin-role';
 import { generateTestId } from '@/lib/test-ids';
-import { cn } from '@/utils/tailwind-utils';
 
-const navigationLinks: Array<NavigationLink> = [
+interface NavItem {
+  href: string;
+  icon: LucideIcon;
+  title: string;
+}
+
+interface NavMenu {
+  icon: LucideIcon;
+  isAdminRequired?: boolean;
+  items: Array<NavItem>;
+  label: string;
+  menuLabel: string;
+}
+
+const navigationLinks: Array<NavMenu> = [
   {
-    icon: ShieldHalfIcon,
+    icon: SettingsIcon,
     isAdminRequired: true,
     items: [
       {
-        description: 'Manage featured content',
         href: $path({ route: '/admin/featured-content' }),
-        icon: SparklesIcon,
+        icon: StarIcon,
         title: 'Featured Content',
       },
       {
-        description: 'View site analytics and reports',
         href: $path({ route: '/admin/analytics' }),
-        icon: ChartSplineIcon,
+        icon: BarChartIcon,
         title: 'Analytics',
       },
       {
-        description: 'Manage launch notification signups',
         href: $path({ route: '/admin/launch-notifications' }),
-        icon: MailIcon,
-        title: 'Launch Notifications',
+        icon: BellRingIcon,
+        title: 'Notifications',
       },
       {
-        description: 'Reports of inappropriate content or behavior',
         href: $path({ route: '/admin/reports' }),
-        icon: TriangleAlertIcon,
+        icon: FileTextIcon,
         title: 'Reports',
       },
       {
-        description: 'Manage users and their roles',
         href: $path({ route: '/admin/users' }),
         icon: UsersIcon,
         title: 'Users',
       },
     ],
     label: 'Admin',
+    menuLabel: 'Administration',
   },
   {
     icon: PackageIcon,
-    isAuthRequired: true,
     items: [
       {
-        description: 'Overview of your collection and recent activity',
         href: $path({ route: '/dashboard/collection' }),
         icon: LayoutDashboardIcon,
         title: 'Dashboard',
       },
       {
-        description: 'Add a new bobblehead to your collection',
         href: $path({ route: '/bobbleheads/add' }),
         icon: PackagePlusIcon,
         title: 'Add Bobblehead',
       },
     ],
     label: 'My Collection',
+    menuLabel: 'My Collection',
   },
 ];
 
@@ -105,45 +114,30 @@ export const AppHeaderAuthNavMenu = () => {
       className={'flex items-center gap-2 max-md:hidden'}
       data-testid={generateTestId('layout', 'app-header', 'auth-section')}
     >
-      {filteredNavigationLinks.map((link, index) => {
-        return (
-          <AuthContent key={index}>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size={'sm'} variant={'ghost'}>
-                  <link.icon aria-hidden className={'mr-2 size-4'} />
-                  {link.label}
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align={'end'}
-                className={'w-[400px] p-4 md:w-[500px] lg:w-[600px]'}
-                collisionPadding={8}
-              >
-                <div className={'grid gap-3 md:grid-cols-2'}>
-                  {link.items.map((item, itemIndex) => (
-                    <DropdownMenuItem asChild key={itemIndex}>
-                      <Link
-                        className={cn(
-                          'flex cursor-pointer flex-col items-start gap-1 rounded-md p-3',
-                          'hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
-                        )}
-                        href={item.href}
-                      >
-                        <div className={'flex items-center gap-2 text-sm leading-none font-medium'}>
-                          <item.icon aria-hidden className={'size-4'} />
-                          {item.title}
-                        </div>
-                        <p className={'text-sm leading-snug text-muted-foreground'}>{item.description}</p>
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </div>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </AuthContent>
-        );
-      })}
+      {filteredNavigationLinks.map((link, index) => (
+        <AuthContent key={index}>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button className={'gap-2'} variant={'ghost'}>
+                <link.icon className={'h-4 w-4'} />
+                {link.label}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align={'start'} className={'w-48'}>
+              <DropdownMenuLabel>{link.menuLabel}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {link.items.map((item, itemIndex) => (
+                <DropdownMenuItem asChild key={itemIndex}>
+                  <Link className={'cursor-pointer'} href={item.href}>
+                    <item.icon className={'mr-2 h-4 w-4'} />
+                    {item.title}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </AuthContent>
+      ))}
     </div>
   );
 };

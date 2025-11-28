@@ -11,35 +11,35 @@
 
 ## Coverage Matrix
 
-| Source File | Unit | Component | Integration | E2E | Gap Status |
-| --- | --- | --- | --- | --- | --- |
-| `src/app/(app)/(home)/page.tsx` | ❌ | ❌ | ❌ | ✅ | Partial |
-| `hero-section.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-collections-section.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `trending-bobbleheads-section.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `join-community-section.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `platform-stats-async.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-bobblehead-async.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-collections-async.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `trending-bobbleheads-async.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `platform-stats-display.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-bobblehead-display.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-collections-display.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `trending-bobbleheads-display.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `platform-stats-skeleton.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-bobblehead-skeleton.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `featured-collections-skeleton.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `trending-bobbleheads-skeleton.tsx` | ❌ | ❌ | ❌ | ❌ | Missing |
-| `platform-stats.facade.ts` | ❌ | N/A | ❌ | ❌ | Missing |
-| `featured-content.facade.ts` | ❌ | N/A | ❌ | ❌ | Missing |
-| `featured-content-query.ts` | ❌ | N/A | ❌ | ❌ | Missing |
-| `featured-content-transformer.ts` | ❌ | N/A | ❌ | ❌ | Missing |
-| `auth.tsx` (AuthContent) | ❌ | ❌ | ❌ | ❌ | Missing |
-| `cloudinary.utils.ts` | ❌ | N/A | ❌ | ❌ | Missing |
-| `cache.service.ts` | ❌ | N/A | ❌ | ❌ | Missing |
-| `bobbleheads-query.ts` (getBobbleheadCountAsync) | ❌ | N/A | ❌ | ❌ | Missing |
-| `collections.query.ts` (getCollectionCountAsync) | ❌ | N/A | ❌ | ❌ | Missing |
-| `users-query.ts` (getUserCountAsync) | ❌ | N/A | ❌ | ❌ | Missing |
+| Source File                                      | Unit | Component | Integration | E2E | Gap Status |
+| ------------------------------------------------ | ---- | --------- | ----------- | --- | ---------- |
+| `src/app/(app)/(home)/page.tsx`                  | ❌   | ❌        | ❌          | ✅  | Partial    |
+| `hero-section.tsx`                               | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-collections-section.tsx`               | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `trending-bobbleheads-section.tsx`               | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `join-community-section.tsx`                     | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `platform-stats-async.tsx`                       | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-bobblehead-async.tsx`                  | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-collections-async.tsx`                 | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `trending-bobbleheads-async.tsx`                 | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `platform-stats-display.tsx`                     | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-bobblehead-display.tsx`                | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-collections-display.tsx`               | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `trending-bobbleheads-display.tsx`               | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `platform-stats-skeleton.tsx`                    | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-bobblehead-skeleton.tsx`               | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `featured-collections-skeleton.tsx`              | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `trending-bobbleheads-skeleton.tsx`              | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `platform-stats.facade.ts`                       | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `featured-content.facade.ts`                     | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `featured-content-query.ts`                      | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `featured-content-transformer.ts`                | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `auth.tsx` (AuthContent)                         | ❌   | ❌        | ❌          | ❌  | Missing    |
+| `cloudinary.utils.ts`                            | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `cache.service.ts`                               | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `bobbleheads-query.ts` (getBobbleheadCountAsync) | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `collections.query.ts` (getCollectionCountAsync) | ❌   | N/A       | ❌          | ❌  | Missing    |
+| `users-query.ts` (getUserCountAsync)             | ❌   | N/A       | ❌          | ❌  | Missing    |
 
 ---
 
@@ -50,11 +50,13 @@
 These are core business logic components that directly affect user experience and data integrity.
 
 #### File: `src/app/(app)/(home)/page.tsx`
+
 **Current Coverage**: E2E smoke test only (basic page load)
 
 **Missing Test Types**: Unit, Component, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `generateMetadata()` - SEO metadata generation
 - `HomePage()` component - Page composition and layout
 - JSON-LD schema injection (ORGANIZATION_SCHEMA, WEBSITE_SCHEMA)
@@ -63,6 +65,7 @@ These are core business logic components that directly affect user experience an
 **Risk Assessment**: High - Affects SEO, structured data, page rendering
 
 **Estimated Tests**:
+
 - 2 unit tests (metadata generation, schema validation)
 - 2 component tests (page render, section composition)
 - 1 integration test (full page data flow)
@@ -71,11 +74,13 @@ These are core business logic components that directly affect user experience an
 ---
 
 #### File: `src/lib/facades/platform/platform-stats.facade.ts`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `PlatformStatsFacade.getPlatformStatsAsync()` - Main entry point
   - Cache integration (CacheService.platform.stats)
   - Parallel query execution (Promise.all for 3 counts)
@@ -86,6 +91,7 @@ These are core business logic components that directly affect user experience an
 **Risk Assessment**: Critical - Aggregates platform metrics; cache layer failure affects all pages
 
 **Estimated Tests**:
+
 - 2 unit tests (successful fetch, cache hit)
 - 2 unit tests (error scenarios, database failure)
 - 1 unit test (parallel execution timing)
@@ -95,11 +101,13 @@ These are core business logic components that directly affect user experience an
 ---
 
 #### File: `src/lib/facades/featured-content/featured-content.facade.ts`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `getFeaturedBobbleheadAsync()` - Hero section data (cached, single record)
 - `getFeaturedCollectionsAsync()` - Featured collections grid (cached, up to 6 records, user-specific)
 - `getTrendingBobbleheadsAsync()` - Trending grid (cached, up to 12 records)
@@ -109,6 +117,7 @@ These are core business logic components that directly affect user experience an
 **Risk Assessment**: Critical - Core featured content pipeline; affects 3 major sections
 
 **Estimated Tests**:
+
 - 3 unit tests (getFeaturedBobblehead, getFeaturedCollections, getTrendingBobbleheads)
 - 2 unit tests (cache key differences for user-specific data)
 - 2 unit tests (filter operations - filterByType)
@@ -118,11 +127,13 @@ These are core business logic components that directly affect user experience an
 ---
 
 #### File: `src/lib/queries/featured-content/featured-content-query.ts`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `getFeaturedBobbleheadAsync(context)` - Single featured bobblehead query
 - `getFeaturedCollectionsAsync(context, userId)` - Collections with like status
 - `getTrendingBobbleheadsAsync(context)` - Trending bobbleheads with category/year
@@ -132,6 +143,7 @@ These are core business logic components that directly affect user experience an
 **Risk Assessment**: Critical - Raw database queries; direct impact on facade
 
 **Estimated Tests**:
+
 - 2 unit/integration tests (getFeaturedBobblehead with/without data)
 - 2 unit/integration tests (getFeaturedCollections with/without userId)
 - 1 unit/integration test (getTrendingBobbleheads)
@@ -145,11 +157,13 @@ These are core business logic components that directly affect user experience an
 User-facing components, display logic, and direct facades for featured content.
 
 #### File: `src/app/(app)/(home)/components/sections/hero-section.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, E2E
 
 **Exports/Functionality Requiring Tests**:
+
 - `HeroSection` component rendering
 - Gradient and animated background elements
 - Main heading with orange gradient text
@@ -162,6 +176,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Primary user-facing component; brand presentation
 
 **Estimated Tests**:
+
 - 3 component tests (render, auth states, error boundaries)
 - 2 component tests (Suspense fallback states)
 - 2 E2E tests (hero visibility, CTA button interaction)
@@ -170,11 +185,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/sections/featured-collections-section.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, E2E
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedCollectionsSection` component
 - Section heading and icon
 - Suspense boundary with FeaturedCollectionsAsync
@@ -185,6 +202,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Featured content discovery path
 
 **Estimated Tests**:
+
 - 2 component tests (render, error state)
 - 1 component test (Suspense fallback)
 - 2 E2E tests (section visibility, "View All" button navigation)
@@ -192,11 +210,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/sections/trending-bobbleheads-section.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, E2E
 
 **Exports/Functionality Requiring Tests**:
+
 - `TrendingBobbleheadsSection` component
 - Section heading and icon
 - Suspense and ErrorBoundary boundaries
@@ -206,6 +226,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Trending content discovery
 
 **Estimated Tests**:
+
 - 2 component tests (render, error handling)
 - 1 component test (Suspense fallback)
 - 2 E2E tests (section visibility, button navigation)
@@ -213,11 +234,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/sections/join-community-section.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, E2E
 
 **Exports/Functionality Requiring Tests**:
+
 - `JoinCommunitySection` component
 - Feature cards (Connect, Discover, Share)
 - Auth-aware CTA buttons with different states:
@@ -230,6 +253,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Conversion funnel; critical for user onboarding
 
 **Estimated Tests**:
+
 - 3 component tests (authenticated, unauthenticated, loading states)
 - 1 component test (feature cards rendering)
 - 2 E2E tests (button navigation, auth state switching)
@@ -237,11 +261,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/async/platform-stats-async.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `PlatformStatsAsync()` server component
 - Facade integration (PlatformStatsFacade.getPlatformStatsAsync)
 - Props passing to PlatformStatsDisplay
@@ -249,17 +275,20 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Direct integration with facade
 
 **Estimated Tests**:
+
 - 1 integration test (successful data fetch and render)
 - 1 integration test (facade error handling)
 
 ---
 
 #### File: `src/app/(app)/(home)/components/async/featured-bobblehead-async.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedBobbleheadAsync()` server component
 - Facade integration (FeaturedContentFacade.getFeaturedBobbleheadAsync)
 - Data transformation and field mapping
@@ -269,6 +298,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Hero section data dependency
 
 **Estimated Tests**:
+
 - 1 integration test (successful fetch with all fields)
 - 1 integration test (partial data handling)
 - 1 integration test (null result)
@@ -276,11 +306,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/async/featured-collections-async.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedCollectionsAsync()` server component
 - Facade integration with userId
 - Array mapping transformation
@@ -291,6 +323,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Featured collections data dependency
 
 **Estimated Tests**:
+
 - 1 integration test (successful fetch with user data)
 - 1 integration test (public access without userId)
 - 1 integration test (null fields handling)
@@ -298,11 +331,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/async/trending-bobbleheads-async.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `TrendingBobbleheadsAsync()` server component
 - Facade integration
 - Array mapping with badge assignment
@@ -312,17 +347,20 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Trending section data dependency
 
 **Estimated Tests**:
+
 - 1 integration test (successful fetch with all fields)
 - 1 integration test (missing field handling)
 
 ---
 
 #### File: `src/app/(app)/(home)/components/display/platform-stats-display.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `PlatformStatsDisplay` component
 - Props: platformStats with totalBobbleheads, totalCollectors, totalCollections
 - Number formatting with toLocaleString()
@@ -333,6 +371,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Stats display logic
 
 **Estimated Tests**:
+
 - 1 component test (render with data)
 - 1 component test (number formatting)
 - 1 component test (accessibility attributes)
@@ -340,11 +379,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/display/featured-bobblehead-display.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedBobbleheadDisplay` component with testId prop
 - Cloudinary image handling:
   - Image extraction from publicId
@@ -359,6 +400,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Complex display component
 
 **Estimated Tests**:
+
 - 1 component test (render with complete data)
 - 1 component test (missing image handling)
 - 1 component test (Cloudinary utilities integration)
@@ -368,11 +410,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/display/featured-collections-display.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedCollectionsDisplay` component with collections array
 - Empty state handling (0 collections)
 - `FeaturedCollectionCard` sub-component rendering
@@ -386,6 +430,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Collections grid display
 
 **Estimated Tests**:
+
 - 1 component test (render with data)
 - 1 component test (empty state)
 - 1 component test (image fallbacks)
@@ -395,11 +440,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/app/(app)/(home)/components/display/trending-bobbleheads-display.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `TrendingBobbleheadsDisplay` component
 - Empty state handling
 - `TrendingBobbleheadCard` sub-component
@@ -412,6 +459,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Trending grid display
 
 **Estimated Tests**:
+
 - 1 component test (render with data)
 - 1 component test (empty state)
 - 1 component test (badge variant mapping)
@@ -421,11 +469,13 @@ User-facing components, display logic, and direct facades for featured content.
 ---
 
 #### File: `src/components/ui/auth.tsx` (AuthContent)
+
 **Current Coverage**: None (Not a skeleton component)
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `AuthContent` component with auth state management
 - Three conditional renders:
   1. Loading state (loadingSkeleton)
@@ -437,6 +487,7 @@ User-facing components, display logic, and direct facades for featured content.
 **Risk Assessment**: High - Affects all auth-aware components (hero, community section)
 
 **Estimated Tests**:
+
 - 1 component test (loading state)
 - 1 component test (authenticated render)
 - 1 component test (unauthenticated render)
@@ -448,11 +499,13 @@ User-facing components, display logic, and direct facades for featured content.
 Skeleton components, utility functions, and supporting queries.
 
 #### File: `src/app/(app)/(home)/components/skeleton/platform-stats-skeleton.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `PlatformStatsSkeleton` component
 - Skeleton structure (3 stat items)
 - Accessibility: aria-busy, aria-label, role="status", sr-only
@@ -462,17 +515,20 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Loading state UX
 
 **Estimated Tests**:
+
 - 1 component test (render structure)
 - 1 component test (accessibility attributes)
 
 ---
 
 #### File: `src/app/(app)/(home)/components/skeleton/featured-bobblehead-skeleton.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedBobbleheadSkeleton` component
 - Main card structure
 - Floating cards with animation delays
@@ -482,6 +538,7 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Loading state UX
 
 **Estimated Tests**:
+
 - 1 component test (structure)
 - 1 component test (floating card animations)
 - 1 component test (accessibility)
@@ -489,11 +546,13 @@ Skeleton components, utility functions, and supporting queries.
 ---
 
 #### File: `src/app/(app)/(home)/components/skeleton/featured-collections-skeleton.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `FeaturedCollectionsSkeleton` component
 - Array rendering (6 skeleton cards)
 - Test ID generation
@@ -502,17 +561,20 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Loading state UX
 
 **Estimated Tests**:
+
 - 1 component test (renders 6 skeletons)
 - 1 component test (grid structure)
 
 ---
 
 #### File: `src/app/(app)/(home)/components/skeleton/trending-bobbleheads-skeleton.tsx`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Component
 
 **Exports/Functionality Requiring Tests**:
+
 - `TrendingBobbleheadsSkeleton` component
 - Array rendering (12 skeleton cards)
 - Test ID generation
@@ -521,17 +583,20 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Loading state UX
 
 **Estimated Tests**:
+
 - 1 component test (renders 12 skeletons)
 - 1 component test (responsive grid)
 
 ---
 
 #### File: `src/lib/queries/featured-content/featured-content-transformer.ts`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit
 
 **Exports/Functionality Requiring Tests**:
+
 - `transformFeaturedContent()` - Transform raw data to FeaturedContentData
 - `filterByType()` - Filter by feature_type
 - Field mapping and null handling
@@ -540,6 +605,7 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Data transformation layer
 
 **Estimated Tests**:
+
 - 1 unit test (successful transformation)
 - 1 unit test (null field handling)
 - 1 unit test (filterByType with multiple types)
@@ -548,11 +614,13 @@ Skeleton components, utility functions, and supporting queries.
 ---
 
 #### File: `src/lib/utils/cloudinary.utils.ts`
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit
 
 **Exports/Functionality Requiring Tests**:
+
 - `extractPublicIdFromCloudinaryUrl()` - Extract public ID from URL
 - `generateBlurDataUrl()` - Generate blur placeholder
 - Edge cases: null, undefined, invalid URLs
@@ -561,6 +629,7 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Image optimization utility
 
 **Estimated Tests**:
+
 - 1 unit test (valid Cloudinary URL)
 - 1 unit test (null/undefined handling)
 - 1 unit test (invalid URL format)
@@ -568,12 +637,14 @@ Skeleton components, utility functions, and supporting queries.
 
 ---
 
-#### File: `src/lib/services/cache.service.ts` (featured.* methods)
+#### File: `src/lib/services/cache.service.ts` (featured.\* methods)
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `CacheService.featured.featuredBobblehead()` - Redis cache for featured bobblehead
 - `CacheService.featured.collections()` - User-specific cache for collections
 - `CacheService.featured.trendingBobbleheads()` - Cache for trending bobbleheads
@@ -584,6 +655,7 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Performance optimization layer
 
 **Estimated Tests**:
+
 - 1 unit test (cache key generation)
 - 1 unit test (TTL configuration)
 - 2 integration tests (cache hit, cache miss)
@@ -592,11 +664,13 @@ Skeleton components, utility functions, and supporting queries.
 ---
 
 #### File: `src/lib/queries/bobbleheads/bobbleheads-query.ts` (getBobbleheadCountAsync)
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `getBobbleheadCountAsync()` - Count active bobbleheads
 - Database query execution
 - Result counting/aggregation
@@ -604,40 +678,47 @@ Skeleton components, utility functions, and supporting queries.
 **Risk Assessment**: Medium - Platform stats dependency
 
 **Estimated Tests**:
+
 - 1 unit/integration test (successful count)
 - 1 integration test (error handling)
 
 ---
 
 #### File: `src/lib/queries/collections/collections.query.ts` (getCollectionCountAsync)
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `getCollectionCountAsync()` - Count active collections
 - Database query execution
 
 **Risk Assessment**: Medium - Platform stats dependency
 
 **Estimated Tests**:
+
 - 1 unit/integration test (successful count)
 - 1 integration test (error handling)
 
 ---
 
 #### File: `src/lib/queries/users/users-query.ts` (getUserCountAsync)
+
 **Current Coverage**: None
 
 **Missing Test Types**: Unit, Integration
 
 **Exports/Functionality Requiring Tests**:
+
 - `getUserCountAsync()` - Count active users
 - Database query execution
 
 **Risk Assessment**: Medium - Platform stats dependency
 
 **Estimated Tests**:
+
 - 1 unit/integration test (successful count)
 - 1 integration test (error handling)
 
@@ -771,35 +852,39 @@ No low-priority gaps identified. All remaining components have dependencies on h
 
 ## Test Count Summary by Type
 
-| Test Type | Count | Status |
-| --- | --- | --- |
-| **Unit Tests** | 42 | Missing |
-| **Component Tests** | 42 | Missing |
-| **Integration Tests** | 28 | Missing |
-| **E2E Tests** | 15 | Partial (1 smoke test exists) |
-| **Total** | **127** | Missing |
+| Test Type             | Count   | Status                        |
+| --------------------- | ------- | ----------------------------- |
+| **Unit Tests**        | 42      | Missing                       |
+| **Component Tests**   | 42      | Missing                       |
+| **Integration Tests** | 28      | Missing                       |
+| **E2E Tests**         | 15      | Partial (1 smoke test exists) |
+| **Total**             | **127** | Missing                       |
 
 ---
 
 ## Implementation Phases
 
 ### Phase 1: Infrastructure Setup (2 days)
+
 - Clerk mock for auth-aware components
 - Cloudinary utilities mock
 - Featured content database factory
 - Cache service test utilities
 
 ### Phase 2: Core Facades & Queries (5 days)
+
 - Platform stats facade (6 unit + 3 integration tests)
 - Featured content facade (9 unit + 5 integration tests)
 - Query and transformer unit tests (8 unit tests)
 
 ### Phase 3: Async Components & Transformations (3 days)
+
 - Async component integration tests (6 tests)
 - Display component tests (18 tests)
 - Auth component tests (3 tests)
 
 ### Phase 4: Section Components & E2E (4 days)
+
 - Section component tests (8 tests)
 - Skeleton component tests (8 tests)
 - E2E section tests (14 tests)
@@ -847,7 +932,9 @@ const collections: Array<FeaturedCollection> = collectionsData.map((data) => ({
 ```typescript
 // Platform Stats Facade - Cache with custom key
 return await CacheService.platform.stats(
-  async () => { /* fetch logic */ },
+  async () => {
+    /* fetch logic */
+  },
   {
     context: {
       entityType: CACHE_ENTITY_TYPE.PLATFORM,
@@ -855,7 +942,7 @@ return await CacheService.platform.stats(
       operation: OPERATIONS.PLATFORM.GET_STATS,
     },
     ttl: CACHE_CONFIG.TTL.EXTENDED,
-  }
+  },
 );
 ```
 

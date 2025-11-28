@@ -7,6 +7,7 @@ Integration tests validate facades, server actions, and database operations with
 **File Pattern**: `tests/integration/**/*.test.ts` or `*.integration.test.ts`
 
 **Key Characteristics**:
+
 - Real database operations (Testcontainers PostgreSQL)
 - Test realistic business logic scenarios
 - Use factories for test data creation
@@ -118,12 +119,7 @@ describe('SocialFacade', () => {
 
   describe('toggleLike', () => {
     it('should create a like when not liked', async () => {
-      const result = await SocialFacade.toggleLike(
-        'target-123',
-        'bobblehead',
-        testUserId,
-        getTestDb(),
-      );
+      const result = await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, getTestDb());
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(true);
@@ -135,12 +131,7 @@ describe('SocialFacade', () => {
       await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, getTestDb());
 
       // Toggle (unlike)
-      const result = await SocialFacade.toggleLike(
-        'target-123',
-        'bobblehead',
-        testUserId,
-        getTestDb(),
-      );
+      const result = await SocialFacade.toggleLike('target-123', 'bobblehead', testUserId, getTestDb());
 
       expect(result.isSuccessful).toBe(true);
       expect(result.isLiked).toBe(false);
@@ -156,10 +147,10 @@ The database is automatically managed via global setup. Use the helpers from `te
 
 ```typescript
 import {
-  getTestDb,          // Get Drizzle ORM database instance
-  resetTestDatabase,  // Truncate all tables (23 tables with CASCADE)
-  cleanupTable,       // Cleanup specific table
-  closeTestDb,        // Close worker connection
+  getTestDb, // Get Drizzle ORM database instance
+  resetTestDatabase, // Truncate all tables (23 tables with CASCADE)
+  cleanupTable, // Cleanup specific table
+  closeTestDb, // Close worker connection
   isTestDbInitialized, // Check initialization status
 } from '@/tests/setup/test-db';
 ```

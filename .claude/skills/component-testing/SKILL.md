@@ -33,22 +33,26 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Custom Render
+
 - ALWAYS use `customRender` from `tests/setup/test-utils.tsx`
 - Returns `{ user, ...renderResult }` with pre-configured userEvent
 - Includes all providers (theme, clerk, etc.)
 
 ### Testing Library Queries
+
 - Prefer `getByRole` for accessibility
-- Use `getByTestId` with namespace pattern (ui-*, feature-*, form-*)
+- Use `getByTestId` with namespace pattern (ui-_, feature-_, form-\*)
 - Use `getByText`, `getByLabelText` for content
 - Use `queryBy*` for assertions on missing elements
 
 ### User Interactions
+
 - Use `user` from customRender return (pre-configured userEvent)
 - Always `await` user interactions
 - Test real user behaviors, not implementation details
 
 ### Pre-Mocked Dependencies
+
 - Clerk, Next.js navigation, sonner, next-themes are pre-mocked
 - Mock server actions with `vi.mock()`
 

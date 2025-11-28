@@ -7,6 +7,7 @@ Unit tests validate isolated pieces of code - pure functions, validation schemas
 **File Pattern**: `tests/unit/**/*.test.ts`
 
 **Key Characteristics**:
+
 - Pure isolation - no database, no network
 - Fast execution (no external dependencies)
 - Mock all external imports
@@ -141,9 +142,7 @@ describe('processData', () => {
   it('should log processing start', () => {
     processData({ id: '123' });
 
-    expect(logger.info).toHaveBeenCalledWith(
-      expect.stringContaining('Processing'),
-    );
+    expect(logger.info).toHaveBeenCalledWith(expect.stringContaining('Processing'));
   });
 });
 ```

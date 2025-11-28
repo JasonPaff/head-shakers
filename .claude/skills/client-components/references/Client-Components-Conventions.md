@@ -195,8 +195,8 @@ import { useToggle } from '@/hooks/use-toggle';
 const [isOpen, setIsOpen] = useToggle(false);
 
 // Usage
-setIsOpen.on();     // Open
-setIsOpen.off();    // Close
+setIsOpen.on(); // Open
+setIsOpen.off(); // Close
 setIsOpen.toggle(); // Toggle
 ```
 
@@ -204,9 +204,12 @@ setIsOpen.toggle(); // Toggle
 
 ```tsx
 // Always use useCallback for handlers passed to children or in dependency arrays
-const handleSubmit = useCallback((data: FormData) => {
-  onSubmit?.(data);
-}, [onSubmit]);
+const handleSubmit = useCallback(
+  (data: FormData) => {
+    onSubmit?.(data);
+  },
+  [onSubmit],
+);
 
 const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
   setValue(e.target.value);
@@ -286,16 +289,19 @@ const handleTouchStart = useCallback((e: TouchEvent<HTMLElement>) => {
   }
 }, []);
 
-const handleTouchEnd = useCallback((e: TouchEvent<HTMLElement>) => {
-  const touch = e.changedTouches[0];
-  if (!touch) return;
+const handleTouchEnd = useCallback(
+  (e: TouchEvent<HTMLElement>) => {
+    const touch = e.changedTouches[0];
+    if (!touch) return;
 
-  const diff = touchStartXRef.current - touch.clientX;
-  if (Math.abs(diff) > 50) {
-    // Swipe detected
-    diff > 0 ? handleNext() : handlePrev();
-  }
-}, [handleNext, handlePrev]);
+    const diff = touchStartXRef.current - touch.clientX;
+    if (Math.abs(diff) > 50) {
+      // Swipe detected
+      diff > 0 ? handleNext() : handlePrev();
+    }
+  },
+  [handleNext, handlePrev],
+);
 ```
 
 ---
@@ -310,10 +316,10 @@ Always use the project's `useServerAction` hook, **never `useAction` directly**:
 import { useServerAction } from '@/hooks/use-server-action';
 
 const {
-  execute,        // For silent operations
-  executeAsync,   // For awaited operations with toast
-  isExecuting,    // Loading state
-  result,         // Action result
+  execute, // For silent operations
+  executeAsync, // For awaited operations with toast
+  isExecuting, // Loading state
+  result, // Action result
 } = useServerAction(myServerAction, {
   toastMessages: {
     error: 'Action failed',
@@ -413,20 +419,14 @@ export const CreateForm = withFocusManagement(({ onClose, onSuccess }: CreateFor
 
   return (
     <form onSubmit={handleSubmit}>
-      <form.AppField name={'name'}>
-        {(field) => <field.TextField isRequired label={'Name'} />}
-      </form.AppField>
+      <form.AppField name={'name'}>{(field) => <field.TextField isRequired label={'Name'} />}</form.AppField>
 
       <form.AppField name={'description'}>
         {(field) => <field.TextareaField label={'Description'} />}
       </form.AppField>
 
       <form.AppForm>
-        {(formApi) => (
-          <formApi.SubmitButton isDisabled={isExecuting}>
-            Create
-          </formApi.SubmitButton>
-        )}
+        {(formApi) => <formApi.SubmitButton isDisabled={isExecuting}>Create</formApi.SubmitButton>}
       </form.AppForm>
     </form>
   );
@@ -767,9 +767,7 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
 
             {/* Empty State */}
             <Conditional isCondition={_shouldShowEmptyState}>
-              <div className={'py-8 text-center text-sm text-muted-foreground'}>
-                No results found
-              </div>
+              <div className={'py-8 text-center text-sm text-muted-foreground'}>No results found</div>
             </Conditional>
           </PopoverContent>
         </Conditional>

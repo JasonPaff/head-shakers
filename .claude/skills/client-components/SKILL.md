@@ -44,20 +44,24 @@ Before creating or modifying client components:
 ### 2. Apply Client Component Patterns
 
 **'use client' Directive**:
+
 - Must be the first line of the file
 - Required when using hooks, event handlers, or browser APIs
 
 **Hook Organization**:
+
 - Follow the 7-step internal organization order
 - Use useCallback for memoized event handlers
 - Use useMemo for expensive calculations
 
 **Event Handling**:
+
 - Prefix handlers with `handle`: handleClick, handleSubmit
 - Include e.preventDefault() and e.stopPropagation() where needed
 - Support keyboard accessibility
 
 **Server Action Consumption**:
+
 - Use `useServerAction` hook from `@/hooks/use-server-action`
 - Use `executeAsync` with `toastMessages` for mutations
 - Access results via `data.data` in callbacks

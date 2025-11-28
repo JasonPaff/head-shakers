@@ -38,15 +38,15 @@ You are a lightweight test implementation orchestrator that coordinates the exec
 
 ## Available Specialist Agents
 
-| Agent                           | Domain               | Skills Auto-Loaded                  | File Patterns                           |
-| ------------------------------- | -------------------- | ----------------------------------- | --------------------------------------- |
-| `unit-test-specialist`          | Unit tests           | testing-base, unit-testing          | `tests/unit/**/*.test.ts`               |
-| `component-test-specialist`     | Component tests      | testing-base, component-testing     | `tests/components/**/*.test.tsx`        |
-| `integration-test-specialist`   | Integration tests    | testing-base, integration-testing   | `tests/integration/**/*.test.ts`        |
-| `e2e-test-specialist`           | E2E tests            | testing-base, e2e-testing           | `tests/e2e/specs/**/*.spec.ts`          |
-| `test-infrastructure-specialist`| Infrastructure       | testing-base, test-infrastructure   | `tests/fixtures/**`, `tests/mocks/**`   |
-| `test-executor`                 | Running tests        | (none)                              | Test execution and validation           |
-| `general-purpose`               | Fallback             | None (manual)                       | Any other files                         |
+| Agent                            | Domain            | Skills Auto-Loaded                | File Patterns                         |
+| -------------------------------- | ----------------- | --------------------------------- | ------------------------------------- |
+| `unit-test-specialist`           | Unit tests        | testing-base, unit-testing        | `tests/unit/**/*.test.ts`             |
+| `component-test-specialist`      | Component tests   | testing-base, component-testing   | `tests/components/**/*.test.tsx`      |
+| `integration-test-specialist`    | Integration tests | testing-base, integration-testing | `tests/integration/**/*.test.ts`      |
+| `e2e-test-specialist`            | E2E tests         | testing-base, e2e-testing         | `tests/e2e/specs/**/*.spec.ts`        |
+| `test-infrastructure-specialist` | Infrastructure    | testing-base, test-infrastructure | `tests/fixtures/**`, `tests/mocks/**` |
+| `test-executor`                  | Running tests     | (none)                            | Test execution and validation         |
+| `general-purpose`                | Fallback          | None (manual)                     | Any other files                       |
 
 ## Step-Type Detection Algorithm
 
@@ -78,16 +78,16 @@ You are a lightweight test implementation orchestrator that coordinates the exec
 
 For logging and progress tracking, identify the test type:
 
-| File Pattern                     | Test Type      | Specialist Agent                  |
-| -------------------------------- | -------------- | --------------------------------- |
-| `tests/unit/**/*.test.ts`        | Unit           | unit-test-specialist              |
-| `tests/components/**/*.test.tsx` | Component      | component-test-specialist         |
-| `tests/integration/**/*.test.ts` | Integration    | integration-test-specialist       |
-| `tests/e2e/specs/**/*.spec.ts`   | E2E            | e2e-test-specialist               |
-| `tests/fixtures/**/*`            | Infrastructure | test-infrastructure-specialist    |
-| `tests/mocks/**/*`               | Infrastructure | test-infrastructure-specialist    |
-| `tests/e2e/pages/**/*`           | Infrastructure | test-infrastructure-specialist    |
-| `tests/e2e/helpers/**/*`         | Infrastructure | test-infrastructure-specialist    |
+| File Pattern                     | Test Type      | Specialist Agent               |
+| -------------------------------- | -------------- | ------------------------------ |
+| `tests/unit/**/*.test.ts`        | Unit           | unit-test-specialist           |
+| `tests/components/**/*.test.tsx` | Component      | component-test-specialist      |
+| `tests/integration/**/*.test.ts` | Integration    | integration-test-specialist    |
+| `tests/e2e/specs/**/*.spec.ts`   | E2E            | e2e-test-specialist            |
+| `tests/fixtures/**/*`            | Infrastructure | test-infrastructure-specialist |
+| `tests/mocks/**/*`               | Infrastructure | test-infrastructure-specialist |
+| `tests/e2e/pages/**/*`           | Infrastructure | test-infrastructure-specialist |
+| `tests/e2e/helpers/**/*`         | Infrastructure | test-infrastructure-specialist |
 
 ## Workflow Overview
 
@@ -377,7 +377,7 @@ When the user runs this command, execute this comprehensive workflow:
 
    **CRITICAL**: The orchestrator MUST NOT proceed to the next step while tests from the current step are failing. This loop continues until ALL tests pass.
 
-   ```
+   ````
    WHILE tests are failing:
      1. Log fix attempt number (starting at 1)
      2. Collect failing test details:
@@ -460,7 +460,7 @@ When the user runs this command, execute this comprehensive workflow:
             - "I'll fix manually, then continue"
         - Handle user response accordingly
    END WHILE
-   ```
+   ````
 
    **Fix Loop Logging**:
    - Each fix attempt is logged in the step results file
@@ -760,14 +760,14 @@ YY-implementation-summary.md        # Final summary with test breakdown
 
 ## Test Type Routing
 
-| Step       | Test Type      | Specialist                       |
-| ---------- | -------------- | -------------------------------- |
-| 1. {title} | infrastructure | test-infrastructure-specialist   |
-| 2. {title} | unit           | unit-test-specialist             |
-| 3. {title} | component      | component-test-specialist        |
-| 4. {title} | integration    | integration-test-specialist      |
-| 5. {title} | e2e            | e2e-test-specialist              |
-| ...        | ...            | ...                              |
+| Step       | Test Type      | Specialist                     |
+| ---------- | -------------- | ------------------------------ |
+| 1. {title} | infrastructure | test-infrastructure-specialist |
+| 2. {title} | unit           | unit-test-specialist           |
+| 3. {title} | component      | component-test-specialist      |
+| 4. {title} | integration    | integration-test-specialist    |
+| 5. {title} | e2e            | e2e-test-specialist            |
+| ...        | ...            | ...                            |
 
 ## Navigation
 
@@ -775,16 +775,16 @@ YY-implementation-summary.md        # Final summary with test breakdown
 - [Setup and Routing](./02-setup.md)
 - [Step 1: {title}](./03-step-1-results.md) [infrastructure]
 - [Step 2: {title}](./04-step-2-results.md) [unit]
-...
+  ...
 - [Test Validation](./XX-test-validation.md)
 - [Implementation Summary](./YY-implementation-summary.md)
 
 ## Quick Status
 
-| Step       | Test Type      | Specialist                     | Status | Tests   | Fix Attempts | Duration |
-| ---------- | -------------- | ------------------------------ | ------ | ------- | ------------ | -------- |
-| 1. {title} | infrastructure | test-infrastructure-specialist | ✓      | N/A     | 0            | 2.3s     |
-| 2. {title} | unit           | unit-test-specialist           | ✓      | 5/5     | 1            | 8.2s     |
+| Step       | Test Type      | Specialist                     | Status | Tests | Fix Attempts | Duration |
+| ---------- | -------------- | ------------------------------ | ------ | ----- | ------------ | -------- |
+| 1. {title} | infrastructure | test-infrastructure-specialist | ✓      | N/A   | 0            | 2.3s     |
+| 2. {title} | unit           | unit-test-specialist           | ✓      | 5/5   | 1            | 8.2s     |
 
 ...
 

@@ -11,12 +11,7 @@ Head Shakers uses Sentry for client-side error tracking, session replay, and use
 ```typescript
 import * as Sentry from '@sentry/nextjs';
 
-import {
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_CONTEXTS,
-  SENTRY_LEVELS,
-  SENTRY_TAGS,
-} from '@/lib/constants';
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS, SENTRY_TAGS } from '@/lib/constants';
 ```
 
 ## Client Configuration
@@ -43,10 +38,7 @@ Sentry.init({
 
   // Integrations
   enableLogs: true,
-  integrations: [
-    Sentry.replayIntegration(),
-    Sentry.consoleLoggingIntegration({ levels: ['warn', 'error'] }),
-  ],
+  integrations: [Sentry.replayIntegration(), Sentry.consoleLoggingIntegration({ levels: ['warn', 'error'] })],
 
   // PII Scrubbing (REQUIRED)
   beforeSend(event) {
@@ -58,10 +50,7 @@ Sentry.init({
   },
 
   // Filter known benign errors (optional)
-  ignoreErrors: [
-    'ResizeObserver loop limit exceeded',
-    'Non-Error promise rejection captured',
-  ],
+  ignoreErrors: ['ResizeObserver loop limit exceeded', 'Non-Error promise rejection captured'],
 });
 
 // REQUIRED: Track route transitions
@@ -448,30 +437,30 @@ const handleUploadError = (error: Error, photoCount: number) => {
 
 ## Breadcrumb Categories for Client
 
-| Category           | Use Case                           |
-| ------------------ | ---------------------------------- |
-| `USER_INTERACTION` | Button clicks, form inputs, etc.   |
-| `NAVIGATION`       | Route changes, page loads          |
-| `BUSINESS_LOGIC`   | Action results, state changes      |
-| `VALIDATION`       | Form validation events             |
+| Category           | Use Case                         |
+| ------------------ | -------------------------------- |
+| `USER_INTERACTION` | Button clicks, form inputs, etc. |
+| `NAVIGATION`       | Route changes, page loads        |
+| `BUSINESS_LOGIC`   | Action results, state changes    |
+| `VALIDATION`       | Form validation events           |
 
 ## Breadcrumb Levels
 
-| Level     | Use Case                  |
-| --------- | ------------------------- |
-| `INFO`    | Successful user actions   |
-| `DEBUG`   | Detailed UI interactions  |
-| `WARNING` | Recoverable issues        |
-| `ERROR`   | Failed operations         |
+| Level     | Use Case                 |
+| --------- | ------------------------ |
+| `INFO`    | Successful user actions  |
+| `DEBUG`   | Detailed UI interactions |
+| `WARNING` | Recoverable issues       |
+| `ERROR`   | Failed operations        |
 
 ## Error Levels for Client
 
-| Level     | Use Case                          | Example                      |
-| --------- | --------------------------------- | ---------------------------- |
-| `info`    | User action logging               | Form reset, retry clicked    |
-| `warning` | Non-critical client issues        | Upload warning, slow action  |
-| `error`   | Client-side failures              | Route error, boundary catch  |
-| `fatal`   | Critical application failures     | Global error handler         |
+| Level     | Use Case                      | Example                     |
+| --------- | ----------------------------- | --------------------------- |
+| `info`    | User action logging           | Form reset, retry clicked   |
+| `warning` | Non-critical client issues    | Upload warning, slow action |
+| `error`   | Client-side failures          | Route error, boundary catch |
+| `fatal`   | Critical application failures | Global error handler        |
 
 ## Anti-Patterns to Avoid
 

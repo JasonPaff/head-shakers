@@ -40,22 +40,26 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Factories
+
 - Async functions returning database entities
 - Accept `overrides` parameter for customization
 - Generate unique IDs using timestamps
 - Export named factory functions
 
 ### MSW Handlers
+
 - Use `http` from MSW for route handlers
 - Return `HttpResponse.json()` for JSON responses
 - Export handlers array for server setup
 
 ### Page Objects
+
 - Extend `BasePage` class
 - Define abstract `url` property
 - Use `byTestId` helper for element location
 
 ### Mock Data
+
 - Export typed mock objects
 - Use realistic data patterns
 - Include edge case variations

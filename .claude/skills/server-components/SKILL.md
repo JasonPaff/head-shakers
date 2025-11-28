@@ -45,27 +45,32 @@ Before creating or modifying server components:
 ### 2. Apply Server Component Patterns
 
 **Async Component Structure**:
+
 - Use async arrow functions or async function declarations
 - Add `import 'server-only'` guard for server-only code
 - Fetch data through facades with caching
 - Use Promise.all for parallel data fetching
 
 **Authentication**:
+
 - Use `getUserIdAsync()` for optional user auth
 - Use `getRequiredUserIdAsync()` for required user auth (redirect if unauthenticated or user not found)
 - Use `checkIsOwnerAsync()` for ownership checks
 
 **Streaming with Suspense**:
+
 - Wrap async children in `<Suspense fallback={<Skeleton />}>`
 - Create corresponding skeleton components
 - Use error boundaries for resilience
 
 **Metadata Generation**:
+
 - Export `generateMetadata` for pages
 - Use `generatePageMetadata()` utility
 - Include JSON-LD structured data
 
 **ISR Configuration**:
+
 - Export `revalidate` constant when appropriate
 
 ### 3. Automatic Convention Enforcement

@@ -60,13 +60,13 @@ Use React's `cache()` for deduplicating expensive operations within a single req
 
 The following auth-related functions use React `cache()` for request-level deduplication:
 
-| Function | Location | Description |
-|----------|----------|-------------|
-| `getCurrentClerkUserId` | `@/utils/optional-auth-utils` | Returns Clerk user ID (cached) |
-| `getOptionalUserId` | `@/utils/optional-auth-utils` | Returns DB user ID or null (cached) |
-| `getUserId` | `@/utils/user-utils` | Returns DB user ID, redirects if unauthenticated (cached) |
-| `checkIsModerator` | `@/lib/utils/admin.utils` | Checks moderator/admin role (cached) |
-| `getCurrentUserWithRole` | `@/lib/utils/admin.utils` | Returns user with role info (cached) |
+| Function                 | Location                      | Description                                               |
+| ------------------------ | ----------------------------- | --------------------------------------------------------- |
+| `getCurrentClerkUserId`  | `@/utils/optional-auth-utils` | Returns Clerk user ID (cached)                            |
+| `getOptionalUserId`      | `@/utils/optional-auth-utils` | Returns DB user ID or null (cached)                       |
+| `getUserId`              | `@/utils/user-utils`          | Returns DB user ID, redirects if unauthenticated (cached) |
+| `checkIsModerator`       | `@/lib/utils/admin.utils`     | Checks moderator/admin role (cached)                      |
+| `getCurrentUserWithRole` | `@/lib/utils/admin.utils`     | Returns user with role info (cached)                      |
 
 ### Pattern
 
@@ -310,8 +310,8 @@ REDIS_KEYS.CACHE.FEATURED_CONTENT(type);
 import { RedisOperations } from '@/lib/utils/redis-client';
 
 // Basic operations
-await RedisOperations.get<T>(key);           // Auto-deserializes JSON
-await RedisOperations.set<T>(key, value, ttlSeconds);  // Auto-serializes
+await RedisOperations.get<T>(key); // Auto-deserializes JSON
+await RedisOperations.set<T>(key, value, ttlSeconds); // Auto-serializes
 await RedisOperations.del(key);
 await RedisOperations.exists(key);
 await RedisOperations.expire(key, ttlSeconds);
@@ -410,48 +410,48 @@ CacheTagGenerators.featured.content(type);
 ```typescript
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 
-CACHE_CONFIG.TTL.REALTIME;      // 30 seconds - Ultra-fast changing data (trending)
-CACHE_CONFIG.TTL.SHORT;         // 300 seconds (5 min) - User-specific, frequent updates
-CACHE_CONFIG.TTL.MEDIUM;        // 1800 seconds (30 min) - Semi-static list data
-CACHE_CONFIG.TTL.LONG;          // 3600 seconds (1 hour) - Stable entity data
-CACHE_CONFIG.TTL.EXTENDED;      // 14400 seconds (4 hours) - Rarely changing
+CACHE_CONFIG.TTL.REALTIME; // 30 seconds - Ultra-fast changing data (trending)
+CACHE_CONFIG.TTL.SHORT; // 300 seconds (5 min) - User-specific, frequent updates
+CACHE_CONFIG.TTL.MEDIUM; // 1800 seconds (30 min) - Semi-static list data
+CACHE_CONFIG.TTL.LONG; // 3600 seconds (1 hour) - Stable entity data
+CACHE_CONFIG.TTL.EXTENDED; // 14400 seconds (4 hours) - Rarely changing
 CACHE_CONFIG.TTL.PUBLIC_SEARCH; // 600 seconds (10 min) - Public search results
-CACHE_CONFIG.TTL.DAILY;         // 86400 seconds (24 hours) - Aggregated data
-CACHE_CONFIG.TTL.WEEKLY;        // 604800 seconds (7 days) - Statistical data
+CACHE_CONFIG.TTL.DAILY; // 86400 seconds (24 hours) - Aggregated data
+CACHE_CONFIG.TTL.WEEKLY; // 604800 seconds (7 days) - Statistical data
 ```
 
-| TTL Type      | Duration | Use Case                                        |
-| ------------- | -------- | ----------------------------------------------- |
-| REALTIME      | 30s      | Trending content, live metrics                  |
-| SHORT         | 5 min    | User dashboards, recent activity                |
-| MEDIUM        | 30 min   | Collection lists, search results                |
-| LONG          | 1 hour   | Entity details, user profiles                   |
-| EXTENDED      | 4 hours  | Photos, rarely changing data                    |
-| PUBLIC_SEARCH | 10 min   | Public search dropdown and page results         |
-| DAILY         | 24 hours | Aggregated statistics, historical data          |
-| WEEKLY        | 7 days   | Long-term statistics, global metrics            |
+| TTL Type      | Duration | Use Case                                |
+| ------------- | -------- | --------------------------------------- |
+| REALTIME      | 30s      | Trending content, live metrics          |
+| SHORT         | 5 min    | User dashboards, recent activity        |
+| MEDIUM        | 30 min   | Collection lists, search results        |
+| LONG          | 1 hour   | Entity details, user profiles           |
+| EXTENDED      | 4 hours  | Photos, rarely changing data            |
+| PUBLIC_SEARCH | 10 min   | Public search dropdown and page results |
+| DAILY         | 24 hours | Aggregated statistics, historical data  |
+| WEEKLY        | 7 days   | Long-term statistics, global metrics    |
 
 ### REDIS_TTL (for Redis operations)
 
 ```typescript
 import { REDIS_TTL } from '@/lib/constants/redis-keys';
 
-REDIS_TTL.ANALYTICS;           // 604800 (1 week)
-REDIS_TTL.CACHE.SHORT;         // 300 (5 min)
-REDIS_TTL.CACHE.MEDIUM;        // 1800 (30 min)
-REDIS_TTL.CACHE.LONG;          // 3600 (1 hour)
-REDIS_TTL.CACHE.DAILY;         // 86400 (24 hours)
-REDIS_TTL.LOCK;                // 30 seconds
-REDIS_TTL.RATE_LIMIT;          // 60 seconds
-REDIS_TTL.SESSION;             // 86400 (24 hours)
-REDIS_TTL.TEMP;                // 3600 (1 hour)
+REDIS_TTL.ANALYTICS; // 604800 (1 week)
+REDIS_TTL.CACHE.SHORT; // 300 (5 min)
+REDIS_TTL.CACHE.MEDIUM; // 1800 (30 min)
+REDIS_TTL.CACHE.LONG; // 3600 (1 hour)
+REDIS_TTL.CACHE.DAILY; // 86400 (24 hours)
+REDIS_TTL.LOCK; // 30 seconds
+REDIS_TTL.RATE_LIMIT; // 60 seconds
+REDIS_TTL.SESSION; // 86400 (24 hours)
+REDIS_TTL.TEMP; // 3600 (1 hour)
 
 // View tracking specific
-REDIS_TTL.VIEW_TRACKING.DEDUPLICATION;  // 300 (5 min)
-REDIS_TTL.VIEW_TRACKING.COUNTS;         // 3600 (1 hour)
-REDIS_TTL.VIEW_TRACKING.AGGREGATES;     // 86400 (24 hours)
-REDIS_TTL.VIEW_TRACKING.TRENDING;       // 900 (15 min)
-REDIS_TTL.VIEW_TRACKING.STATS;          // 1800 (30 min)
+REDIS_TTL.VIEW_TRACKING.DEDUPLICATION; // 300 (5 min)
+REDIS_TTL.VIEW_TRACKING.COUNTS; // 3600 (1 hour)
+REDIS_TTL.VIEW_TRACKING.AGGREGATES; // 86400 (24 hours)
+REDIS_TTL.VIEW_TRACKING.TRENDING; // 900 (15 min)
+REDIS_TTL.VIEW_TRACKING.STATS; // 1800 (30 min)
 ```
 
 ---
@@ -753,16 +753,16 @@ export const updateBobbleheadAction = authActionClient
 
 ## When to Use Each Caching Layer
 
-| Use Case | Recommended Layer | Rationale |
-|----------|------------------|-----------|
-| Same-request deduplication | React `cache()` | Prevents redundant calls within single render |
-| Entity data (bobbleheads, collections) | `unstable_cache` | Tag-based invalidation, automatic revalidation |
-| User-specific dashboard | `unstable_cache` | Privacy separation, tag invalidation |
-| Public search results (high traffic) | Redis | Distributed, fast, handles scale |
-| View tracking deduplication | Redis | Distributed, TTL-based expiry, prevents duplicate counts |
-| Rate limiting | Redis | Distributed counters, automatic TTL expiry |
-| Distributed locks | Redis | Prevents concurrent updates across instances |
-| Image transformations | Cloudinary | CDN-level caching, on-the-fly transforms |
+| Use Case                               | Recommended Layer | Rationale                                                |
+| -------------------------------------- | ----------------- | -------------------------------------------------------- |
+| Same-request deduplication             | React `cache()`   | Prevents redundant calls within single render            |
+| Entity data (bobbleheads, collections) | `unstable_cache`  | Tag-based invalidation, automatic revalidation           |
+| User-specific dashboard                | `unstable_cache`  | Privacy separation, tag invalidation                     |
+| Public search results (high traffic)   | Redis             | Distributed, fast, handles scale                         |
+| View tracking deduplication            | Redis             | Distributed, TTL-based expiry, prevents duplicate counts |
+| Rate limiting                          | Redis             | Distributed counters, automatic TTL expiry               |
+| Distributed locks                      | Redis             | Prevents concurrent updates across instances             |
+| Image transformations                  | Cloudinary        | CDN-level caching, on-the-fly transforms                 |
 
 ---
 
@@ -788,10 +788,12 @@ export const updateBobbleheadAction = authActionClient
 When implementing facades, caching is NOT optional:
 
 ### Read Operations
+
 - **ALL facade read methods MUST use domain-specific CacheService helpers**
 - Example: `CacheService.bobbleheads.byId()`, NOT raw query calls
 
 ### Write Operations
+
 - **ALL facade write methods MUST invalidate cache after mutation**
 - Use `CacheRevalidationService.{domain}.on{Action}()` methods
 - Cache invalidation must happen AFTER successful database operation

@@ -7,6 +7,7 @@ Component tests validate React components using Testing Library. They verify ren
 **File Pattern**: `tests/components/**/*.test.tsx`
 
 **Key Characteristics**:
+
 - Use custom render with providers
 - Test user behavior, not implementation
 - Accessibility-first query selection
@@ -213,6 +214,7 @@ These are automatically mocked in `tests/setup/vitest.setup.ts`:
 ```
 
 Default test user in mocks:
+
 - `userId: 'test-user-id'`
 - `email: 'test@example.com'`
 

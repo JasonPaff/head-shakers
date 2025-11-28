@@ -1,0 +1,104 @@
+/* Cyberpunk Tech Styles for Header Demo 4 */
+
+/* Cyber Button - Angular with glow effects */
+.cyber-button {
+  position: relative;
+  overflow: visible;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+}
+
+.cyber-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: theme('colors.primary.DEFAULT / 0.05');
+  transform: skewX(-6deg);
+  transition: all 0.2s ease;
+  z-index: -1;
+}
+
+.cyber-button:hover::before {
+  background: theme('colors.primary.DEFAULT / 0.15');
+  box-shadow: 0 0 8px theme('colors.primary.DEFAULT / 0.3');
+}
+
+.cyber-button:active::before {
+  background: theme('colors.primary.DEFAULT / 0.2');
+}
+
+/* Primary Cyber Button */
+.cyber-button-primary {
+  position: relative;
+  overflow: visible;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: theme('colors.primary.DEFAULT');
+  color: theme('colors.primary.foreground');
+  transition: all 0.2s ease;
+}
+
+.cyber-button-primary::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(45deg, theme('colors.primary.DEFAULT'), theme('colors.orange.300'));
+  transform: skewX(-6deg);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.cyber-button-primary:hover::before {
+  opacity: 1;
+  box-shadow: 0 0 12px theme('colors.primary.DEFAULT / 0.5');
+}
+
+.cyber-button-primary:hover {
+  box-shadow: 0 0 10px theme('colors.primary.DEFAULT / 0.4');
+}
+
+/* Cyber Dropdown Menu */
+.cyber-dropdown {
+  border: 1px solid theme('colors.primary.DEFAULT / 0.2');
+  background: theme('colors.background');
+  box-shadow: 0 0 20px theme('colors.primary.DEFAULT / 0.2');
+}
+
+.cyber-dropdown::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, theme('colors.primary.DEFAULT / 0.05'), transparent);
+  pointer-events: none;
+}
+
+/* Cyber Menu Item */
+.cyber-menu-item {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  letter-spacing: 0.025em;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+}
+
+.cyber-menu-item::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: theme('colors.primary.DEFAULT / 0.05');
+  transform: translateX(-100%) skewX(-12deg);
+  transition: transform 0.2s ease;
+}
+
+.cyber-menu-item:hover::before {
+  transform: translateX(0) skewX(-12deg);
+}
+
+.cyber-menu-item:hover {
+  color: theme('colors.primary.DEFAULT');
+  text-shadow: 0 0 8px theme('colors.primary.DEFAULT / 0.3');
+}

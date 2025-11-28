@@ -29,9 +29,11 @@ Allow bobbleheads to belong to multiple collections simultaneously. This plan wi
 ## Summary
 
 ### Feature Overview
+
 Transform bobbleheads-collections relationship from one-to-many to many-to-many using a junction table pattern.
 
 ### Key Statistics
+
 - **Implementation Steps**: 17
 - **Estimated Duration**: 2-3 days
 - **Complexity**: High
@@ -40,6 +42,7 @@ Transform bobbleheads-collections relationship from one-to-many to many-to-many 
 - **Files to Modify**: 12+
 
 ### Critical Files Identified
+
 - Database Schema: 5 files (1 new)
 - Query Layer: 2 files (12 methods total)
 - Facade Layer: 2 files
@@ -47,5 +50,6 @@ Transform bobbleheads-collections relationship from one-to-many to many-to-many 
 - Validation Schemas: 2 files
 
 ### Reference Patterns Found
+
 - `bobbleheadTags` junction table (existing pattern to follow)
 - `bobbleheadTagsRelations` many-to-many relations (existing pattern to follow)

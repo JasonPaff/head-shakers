@@ -32,9 +32,11 @@ Replace the current featured collections section styling with the new design fro
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Update featured collections section header (lines 174-189)
 
 **Changes:**
+
 - Replace section background from `bg-card` to `bg-white dark:bg-slate-950`
 - Update section padding from `py-8` to `py-20`
 - Modify icon container background from `bg-orange-200/50` to `bg-gradient-to-br from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30`
@@ -46,11 +48,13 @@ Replace the current featured collections section styling with the new design fro
 - Modify container padding from `px-4` to `px-6`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Section header matches demo styling with orange/amber gradient icon background
 - [ ] Typography sizes and colors match demo specifications
 - [ ] Dark mode variants apply correctly
@@ -65,9 +69,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/page.tsx` - Add button after FeaturedCollectionsAsync (after line 195)
 
 **Changes:**
+
 - Add div container with classes `mt-12 text-center` after FeaturedCollectionsErrorBoundary closing tag
 - Add Button component with `size="lg"` and `variant="outline"`
 - Apply orange/amber themed classes: `border-orange-500/30 text-orange-600 hover:bg-orange-50 hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-950/50`
@@ -77,11 +83,13 @@ npm run lint:fix && npm run typecheck
 - Import ArrowRight from lucide-react if not already imported
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Button appears centered below featured collections grid
 - [ ] Orange/amber styling matches demo and hero section theme
 - [ ] Hover states work correctly in light and dark modes
@@ -98,9 +106,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Complete card component rebuild (lines 75-227)
 
 **Changes:**
+
 - Remove all CVA variant imports and usage (featuredCardVariants, featuredCardContentVariants, etc.)
 - Replace article className with: `group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl dark:border-slate-800 dark:bg-slate-900`
 - Restructure card to have two main sections: image container and footer section
@@ -121,11 +131,13 @@ npm run lint:fix && npm run typecheck
 - Use Link wrapper on entire card for navigation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Card displays image at top with gradient overlay
 - [ ] Title and description appear as white text overlaid on image
 - [ ] Footer section displays owner avatar, username, items count, and value
@@ -144,9 +156,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Add stats to interface and display
 
 **Changes:**
+
 - Import Eye and MessageCircle icons from lucide-react
 - Add stats display div with classes `mt-4 flex items-center gap-4 border-t border-slate-100 pt-4 text-sm text-slate-500 dark:border-slate-800`
 - Create span for likes with Heart icon: `flex items-center gap-1` and icon classes `size-4 text-red-400`
@@ -158,11 +172,13 @@ npm run lint:fix && npm run typecheck
 - Remove any existing like button interaction components
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Stats row displays likes, views, and comments with proper icons
 - [ ] Numbers format correctly with thousand separators
 - [ ] Icons have correct sizes and colors
@@ -179,9 +195,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Add owner section to footer
 
 **Changes:**
+
 - Add owner section container with classes `flex items-center justify-between`
 - Create left section with classes `flex items-center gap-3`
 - Add img element for owner avatar with classes `size-9 rounded-full object-cover ring-2 ring-orange-500/20`
@@ -196,11 +214,13 @@ npm run lint:fix && npm run typecheck
 - Display "Est. Value" label with classes `text-xs text-slate-500`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Owner avatar displays with orange ring effect
 - [ ] Username shows with @ prefix
 - [ ] Items count appears below username
@@ -217,10 +237,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/async/featured-collections-async.tsx` - Add fields to data mapping
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Update interface
 
 **Changes:**
+
 - Update FeaturedCollection interface to add `totalItems: number` and `totalValue: number` properties
 - Modify collections mapping in FeaturedCollectionsAsync to include these fields from content data
 - Map totalItems from `content.totalItems ?? 0`
@@ -229,11 +251,13 @@ npm run lint:fix && npm run typecheck
 - Update async component return type to match new interface
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Interface includes new properties with correct types
 - [ ] Data mapping provides values for totalItems and totalValue
 - [ ] TypeScript compilation succeeds without errors
@@ -248,9 +272,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/skeletons/featured-collections-skeleton.tsx` - Complete skeleton rebuild
 
 **Changes:**
+
 - Update grid classes from `gap-6` to `gap-8`
 - Change Card className to match new design: `overflow-hidden rounded-2xl border border-slate-200 shadow-lg dark:border-slate-800`
 - Remove CardContent wrapper
@@ -263,11 +289,13 @@ npm run lint:fix && npm run typecheck
 - Ensure all Skeleton components use appropriate widths and heights
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Skeleton structure matches new card layout
 - [ ] Loading state appears visually similar to loaded cards
 - [ ] Skeleton displays correct aspect ratio for image
@@ -283,9 +311,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Remove variant imports
 
 **Changes:**
+
 - Remove import of featuredCardBadgeVariants
 - Remove import of featuredCardContentVariants
 - Remove import of featuredCardDescriptionVariants
@@ -299,11 +329,13 @@ npm run lint:fix && npm run typecheck
 - Verify no other components depend on removed imports
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All unused imports removed
 - [ ] No TypeScript errors from missing imports
 - [ ] Component still renders correctly
@@ -318,10 +350,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Add trending badge
 - `src/app/(app)/(home)/components/async/featured-collections-async.tsx` - Add isTrending field
 
 **Changes:**
+
 - Import Badge component from `@/components/ui/badge`
 - Add isTrending boolean property to FeaturedCollection interface
 - Map isTrending from content data in async component
@@ -332,11 +366,13 @@ npm run lint:fix && npm run typecheck
 - Ensure badge appears above image with proper z-index
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Trending badge appears on applicable collections
 - [ ] Badge positioned correctly in top-right corner
 - [ ] Badge styling matches demo design
@@ -352,9 +388,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Low
 
 **Files to Modify:**
+
 - `src/components/ui/badge.tsx` - Potentially add trending variant
 
 **Changes:**
+
 - Review Badge component variants to check for "trending" support
 - If trending variant exists, use it directly
 - If not, apply custom className to Badge for trending styling: `bg-gradient-to-r from-orange-500 to-red-500 text-white border-transparent`
@@ -362,11 +400,13 @@ npm run lint:fix && npm run typecheck
 - Verify badge works in both light and dark modes
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Badge displays with orange-to-red gradient
 - [ ] Text is white and readable
 - [ ] Badge works in light and dark modes
@@ -381,20 +421,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx` - Update grid classes
 
 **Changes:**
+
 - Change grid gap from `gap-8` to `gap-8` (verify if demo uses different spacing)
 - Ensure grid maintains `md:grid-cols-2 lg:grid-cols-3` for responsive layout
 - Verify empty state styling still works with new design
 - Update empty state icon and text colors to match new theme
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid spacing matches demo visually
 - [ ] Responsive breakpoints work correctly
 - [ ] Empty state displays appropriately
@@ -409,9 +453,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - testing only
 
 **Changes:**
+
 - Start development server and navigate to home page
 - Verify featured collections section matches demo styling
 - Test hover interactions on cards (translate-y, shadow, image scale)
@@ -424,11 +470,13 @@ npm run lint:fix && npm run typecheck
 - Check accessibility (keyboard navigation, screen readers)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Visual design matches demo and hero section color scheme
 - [ ] All interactions work smoothly
 - [ ] Light and dark modes both display correctly
@@ -454,6 +502,7 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 **Color Palette Reference:**
+
 - Primary background: `bg-white dark:bg-slate-950`
 - Card background: `bg-white dark:bg-slate-900`
 - Card border: `border-slate-200 dark:border-slate-800`
@@ -466,12 +515,14 @@ npm run lint:fix && npm run typecheck
 - Button hover: `hover:bg-orange-50 dark:hover:bg-orange-950/50`
 
 **Key Assumptions:**
+
 - FeaturedContentFacade may not return totalItems and totalValue - may need facade updates
 - Owner avatar URL may not be in current data structure - may need to add or use placeholder
 - Trending flag may need to be added to backend data
 - Current Badge component may not have "trending" variant
 
 **Risk Mitigation:**
+
 - If backend data missing required fields, use placeholder values initially
 - If Badge lacks trending variant, use custom className approach
 - Test with real data early to identify data mapping issues

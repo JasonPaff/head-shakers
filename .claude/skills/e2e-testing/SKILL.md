@@ -35,20 +35,24 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Custom Fixtures
+
 - Use fixtures from `tests/e2e/fixtures/base.fixture.ts`
 - Available: `adminPage`, `userPage`, `newUserPage` (authenticated contexts)
 - Available: `adminFinder`, `userFinder`, `newUserFinder` (ComponentFinder instances)
 
 ### Page Object Model
+
 - Extend `BasePage` class for page objects
 - Define `url` property for navigation
 - Use `byTestId` helper for data-testid lookups
 
 ### ComponentFinder
+
 - Use for standardized `data-testid` lookups
 - Methods: `feature()`, `form()`, `ui()`, `layout()`, `tableCell()`
 
 ### Test Organization
+
 - Place in appropriate `tests/e2e/specs/{category}/` folder
 - Categories: smoke, public, user, admin, onboarding
 

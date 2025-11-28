@@ -96,7 +96,7 @@ This agent handles files matching:
 - `tests/e2e/pages/**/*.page.ts`
 - `tests/e2e/helpers/**/*.ts`
 - `tests/helpers/**/*.ts`
-- `tests/setup/**/*.ts` (except vitest.*.ts)
+- `tests/setup/**/*.ts` (except vitest.\*.ts)
 
 ## Quality Standards
 

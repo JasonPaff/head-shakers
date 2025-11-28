@@ -31,41 +31,49 @@ This skill activates when:
 ## Key Patterns (REQUIRED)
 
 ### Naming Conventions (Strict)
+
 - **ALL async methods MUST use `Async` suffix** (e.g., `createAsync`, `updateAsync`, `deleteAsync`, `getByIdAsync`)
 - No exceptions - this ensures consistent API across all facades
 
 ### Structure Requirements
+
 - Use static class methods (no instantiation needed)
 - Define `const facadeName = '{Domain}Facade'` at file top for error context
 - Accept optional `DatabaseExecutor` (`dbInstance?: DatabaseExecutor`) as last parameter
 - Create appropriate query context (`createProtectedQueryContext`, `createUserQueryContext`, `createPublicQueryContext`, `createAdminQueryContext`)
 
 ### QueryContext and Automatic Filtering (IMPORTANT)
+
 - **Context drives filtering**: Query methods automatically apply permission and soft-delete filters based on context flags
 - **Trust query methods**: Don't manually add filters that queries handle via `buildBaseFilters()`
 - **Context factories set flags**: `createPublicQueryContext()` sets `isPublic: true`, etc.
 - **Override when needed**: Pass `shouldIncludeDeleted: true` for admin restore features
 
 ### Transaction Requirements (MANDATORY for mutations)
+
 - **ALL multi-step mutations MUST use transactions**: `(dbInstance ?? db).transaction(async (tx) => { ... })`
 - Pass transaction executor (`tx`) to all nested query calls
 - Single-step reads do NOT need transactions
 
 ### Caching Requirements (MANDATORY)
+
 - **ALL read operations MUST use domain-specific CacheService** (`CacheService.bobbleheads.byId()`, etc.)
 - **ALL write operations MUST invalidate cache** via `CacheRevalidationService`
 - Never use generic `CacheService.cached()` when domain helper exists
 
 ### Error Handling (MANDATORY)
+
 - **ALL methods MUST wrap in try-catch** with `createFacadeError(errorContext, error)`
 - Use consistent return patterns (see Return Type Decision Matrix in conventions)
 
 ### Sentry Monitoring (MANDATORY)
+
 - **ALL facade methods MUST add Sentry breadcrumbs** for successful operations
 - Use `Sentry.captureException` with `level: 'warning'` for non-blocking failures
 - Never fail main operations due to monitoring failures
 
 ### Documentation Requirements (MANDATORY)
+
 - **ALL public methods MUST have JSDoc** with:
   - Description of what the method does
   - `@param` for each parameter
@@ -73,6 +81,7 @@ This skill activates when:
   - Cache behavior notes (TTL, invalidation triggers)
 
 ### Method Complexity Limits
+
 - Methods should not exceed 50-60 lines
 - Extract helpers for complex transformations
 - Use `Promise.all` for parallel independent data fetching

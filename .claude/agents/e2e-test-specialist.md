@@ -70,10 +70,10 @@ import { test, expect } from '@/tests/e2e/fixtures/base.fixture';
 ### ComponentFinder Methods
 
 ```typescript
-finder.feature('bobblehead', 'card');  // [data-testid="feature-bobblehead-card"]
-finder.form('comment', 'input');       // [data-testid="form-comment-input"]
-finder.formField('email');             // [data-testid="form-field-email"]
-finder.ui('button', 'primary');        // [data-testid="ui-button-primary"]
+finder.feature('bobblehead', 'card'); // [data-testid="feature-bobblehead-card"]
+finder.form('comment', 'input'); // [data-testid="form-comment-input"]
+finder.formField('email'); // [data-testid="form-field-email"]
+finder.ui('button', 'primary'); // [data-testid="ui-button-primary"]
 ```
 
 ## File Patterns
