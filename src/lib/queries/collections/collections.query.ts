@@ -9,7 +9,7 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
+import { bobbleheadCollections, bobbleheadPhotos, bobbleheads, collections, users } from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
@@ -150,22 +150,44 @@ export class CollectionsQuery extends BaseQuery {
       context,
     );
 
-    // first get the collection
+    // first get the collection with bobbleheads through junction table
     const collection = await dbInstance.query.collections.findFirst({
       where: this.combineFilters(eq(collections.id, id), permissionFilter),
       with: {
-        bobbleheads: {
-          columns: {
-            id: true,
-            isFeatured: true,
-            updatedAt: true,
+        bobbleheadCollections: {
+          columns: {},
+          with: {
+            bobblehead: {
+              columns: {
+                deletedAt: true,
+                id: true,
+                isFeatured: true,
+                updatedAt: true,
+              },
+            },
           },
-          where: isNull(bobbleheads.deletedAt),
         },
       },
     });
 
-    return collection || null;
+    if (!collection) return null;
+
+    // transform junction table results to match the expected structure and filter out deleted bobbleheads
+    const bobbleheadCollections = collection.bobbleheadCollections;
+    const bobbleheads = bobbleheadCollections
+      .map(
+        (bc: {
+          bobblehead: null | { deletedAt: Date | null; id: string; isFeatured: boolean; updatedAt: Date };
+        }) => bc.bobblehead,
+      )
+      .filter((b): b is NonNullable<typeof b> => b !== null && b.deletedAt === null);
+
+    const transformedCollection: CollectionWithRelations = {
+      ...collection,
+      bobbleheads,
+    };
+
+    return transformedCollection;
   }
 
   static async findBySlugAsync(
@@ -205,7 +227,7 @@ export class CollectionsQuery extends BaseQuery {
       context,
     );
 
-    // get the collection by slug and userId
+    // get the collection by slug and userId with bobbleheads through junction table
     const collection = await dbInstance.query.collections.findFirst({
       where: this.combineFilters(
         eq(collections.slug, slug),
@@ -213,18 +235,40 @@ export class CollectionsQuery extends BaseQuery {
         permissionFilter,
       ),
       with: {
-        bobbleheads: {
-          columns: {
-            id: true,
-            isFeatured: true,
-            updatedAt: true,
+        bobbleheadCollections: {
+          columns: {},
+          with: {
+            bobblehead: {
+              columns: {
+                deletedAt: true,
+                id: true,
+                isFeatured: true,
+                updatedAt: true,
+              },
+            },
           },
-          where: isNull(bobbleheads.deletedAt),
         },
       },
     });
 
-    return collection || null;
+    if (!collection) return null;
+
+    // transform junction table results to match the expected structure and filter out deleted bobbleheads
+    const bobbleheadCollections = collection.bobbleheadCollections;
+    const bobbleheads = bobbleheadCollections
+      .map(
+        (bc: {
+          bobblehead: null | { deletedAt: Date | null; id: string; isFeatured: boolean; updatedAt: Date };
+        }) => bc.bobblehead,
+      )
+      .filter((b): b is NonNullable<typeof b> => b !== null && b.deletedAt === null);
+
+    const transformedCollection: CollectionWithRelations = {
+      ...collection,
+      bobbleheads,
+    };
+
+    return transformedCollection;
   }
 
   static async findByUserAsync(
@@ -292,14 +336,15 @@ export class CollectionsQuery extends BaseQuery {
     return dbInstance
       .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
-      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
+      .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
         this.combineFilters(
-          eq(bobbleheads.collectionId, collectionId),
+          eq(bobbleheadCollections.collectionId, collectionId),
           collectionFilter,
           bobbleheadFilter,
           searchCondition,
@@ -332,9 +377,14 @@ export class CollectionsQuery extends BaseQuery {
     return dbInstance
       .select(this._selectBobbleheadBase())
       .from(bobbleheads)
-      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
+      .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
       .where(
-        this.combineFilters(eq(bobbleheads.collectionId, collectionId), collectionFilter, bobbleheadFilter),
+        this.combineFilters(
+          eq(bobbleheadCollections.collectionId, collectionId),
+          collectionFilter,
+          bobbleheadFilter,
+        ),
       )
       .orderBy(bobbleheads.createdAt);
   }
@@ -402,12 +452,13 @@ export class CollectionsQuery extends BaseQuery {
 
     // if category filter is present, we need to filter collections that have bobbleheads in that category
     if (categoryFilter) {
-      // get distinct collection IDs that have bobbleheads in the specified category
+      // get distinct collection IDs that have bobbleheads in the specified category through junction table
       const collectionsWithCategory = dbInstance
         .selectDistinct({
-          collectionId: bobbleheads.collectionId,
+          collectionId: bobbleheadCollections.collectionId,
         })
         .from(bobbleheads)
+        .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
         .where(this.combineFilters(categoryFilter, isNull(bobbleheads.deletedAt)))
         .as('collections_with_category');
 
@@ -433,12 +484,13 @@ export class CollectionsQuery extends BaseQuery {
           description: collections.description,
           firstBobbleheadPhoto: sql<null | string>`(
             SELECT ${bobbleheadPhotos.url}
-            FROM ${bobbleheads}
+            FROM ${bobbleheadCollections}
+            INNER JOIN ${bobbleheads} ON ${bobbleheadCollections.bobbleheadId} = ${bobbleheads.id}
             LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
               AND ${bobbleheadPhotos.isPrimary} = true
-            WHERE ${bobbleheads.collectionId} = ${collections.id}
+            WHERE ${bobbleheadCollections.collectionId} = ${collections.id}
               AND ${bobbleheads.deletedAt} IS NULL
-            ORDER BY ${bobbleheads.createdAt} ASC
+            ORDER BY ${bobbleheadCollections.createdAt} ASC
             LIMIT 1
           )`,
           id: collections.id,
@@ -521,12 +573,13 @@ export class CollectionsQuery extends BaseQuery {
         description: collections.description,
         firstBobbleheadPhoto: sql<null | string>`(
           SELECT ${bobbleheadPhotos.url}
-          FROM ${bobbleheads}
+          FROM ${bobbleheadCollections}
+          INNER JOIN ${bobbleheads} ON ${bobbleheadCollections.bobbleheadId} = ${bobbleheads.id}
           LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
             AND ${bobbleheadPhotos.isPrimary} = true
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          WHERE ${bobbleheadCollections.collectionId} = ${collections.id}
             AND ${bobbleheads.deletedAt} IS NULL
-          ORDER BY ${bobbleheads.createdAt} ASC
+          ORDER BY ${bobbleheadCollections.createdAt} ASC
           LIMIT 1
         )`,
         id: collections.id,
@@ -667,12 +720,13 @@ export class CollectionsQuery extends BaseQuery {
         description: collections.description,
         firstBobbleheadPhoto: sql<null | string>`(
           SELECT ${bobbleheadPhotos.url}
-          FROM ${bobbleheads}
+          FROM ${bobbleheadCollections}
+          INNER JOIN ${bobbleheads} ON ${bobbleheadCollections.bobbleheadId} = ${bobbleheads.id}
           LEFT JOIN ${bobbleheadPhotos} ON ${bobbleheads.id} = ${bobbleheadPhotos.bobbleheadId}
             AND ${bobbleheadPhotos.isPrimary} = true
-          WHERE ${bobbleheads.collectionId} = ${collections.id}
+          WHERE ${bobbleheadCollections.collectionId} = ${collections.id}
             AND ${bobbleheads.deletedAt} IS NULL
-          ORDER BY ${bobbleheads.createdAt} ASC
+          ORDER BY ${bobbleheadCollections.createdAt} ASC
           LIMIT 1
         )`,
         id: collections.id,
@@ -770,14 +824,15 @@ export class CollectionsQuery extends BaseQuery {
     return dbInstance
       .select(this._selectBobbleheadWithPhoto())
       .from(bobbleheads)
-      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
+      .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
       .leftJoin(
         bobbleheadPhotos,
         and(eq(bobbleheads.id, bobbleheadPhotos.bobbleheadId), eq(bobbleheadPhotos.isPrimary, true)),
       )
       .where(
         this.combineFilters(
-          eq(bobbleheads.collectionId, collectionId),
+          eq(bobbleheadCollections.collectionId, collectionId),
           collectionFilter,
           bobbleheadFilter,
           searchCondition,
@@ -865,35 +920,59 @@ export class CollectionsQuery extends BaseQuery {
   ): Promise<Array<CollectionWithRelations>> {
     const dbInstance = this.getDbInstance(context);
 
-    // get user's collections with all relations for dashboard
-    return await dbInstance.query.collections.findMany({
+    // get user's collections with all relations for dashboard through junction table
+    const collectionsResult = await dbInstance.query.collections.findMany({
       orderBy: [sql`lower(${collections.name}) asc`],
       where: eq(collections.userId, userId),
       with: {
-        bobbleheads: {
-          columns: {
-            id: true,
-            isFeatured: true,
-            updatedAt: true,
+        bobbleheadCollections: {
+          columns: {},
+          with: {
+            bobblehead: {
+              columns: {
+                deletedAt: true,
+                id: true,
+                isFeatured: true,
+                updatedAt: true,
+              },
+            },
           },
-          where: isNull(bobbleheads.deletedAt),
         },
       },
+    });
+
+    // transform junction table results to match the expected structure and filter out deleted bobbleheads
+    return collectionsResult.map((collection) => {
+      const bobbleheadCollections = collection.bobbleheadCollections;
+      const bobbleheads = bobbleheadCollections
+        .map(
+          (bc: {
+            bobblehead: null | { deletedAt: Date | null; id: string; isFeatured: boolean; updatedAt: Date };
+          }) => bc.bobblehead,
+        )
+        .filter((b): b is NonNullable<typeof b> => b !== null && b.deletedAt === null);
+
+      const transformedCollection: CollectionWithRelations = {
+        ...collection,
+        bobbleheads,
+      };
+      return transformedCollection;
     });
   }
 
   static async getDistinctCategoriesAsync(context: QueryContext): Promise<Array<CategoryRecord>> {
     const dbInstance = this.getDbInstance(context);
 
-    // get distinct categories with counts from bobbleheads that belong to public collections
+    // get distinct categories with counts from bobbleheads that belong to public collections through junction table
     const results = await dbInstance
       .selectDistinct({
         bobbleheadCount: sql<number>`COUNT(DISTINCT ${bobbleheads.id})::int`,
         category: bobbleheads.category,
-        collectionCount: sql<number>`COUNT(DISTINCT ${bobbleheads.collectionId})::int`,
+        collectionCount: sql<number>`COUNT(DISTINCT ${bobbleheadCollections.collectionId})::int`,
       })
       .from(bobbleheads)
-      .innerJoin(collections, eq(bobbleheads.collectionId, collections.id))
+      .innerJoin(bobbleheadCollections, eq(bobbleheads.id, bobbleheadCollections.bobbleheadId))
+      .innerJoin(collections, eq(bobbleheadCollections.collectionId, collections.id))
       .where(
         this.combineFilters(
           sql`${bobbleheads.category} IS NOT NULL`,
@@ -991,7 +1070,7 @@ export class CollectionsQuery extends BaseQuery {
   private static _selectBobbleheadWithPhoto() {
     return {
       ...this._selectBobbleheadBase(),
-      collectionId: bobbleheads.collectionId,
+      collectionId: bobbleheadCollections.collectionId,
       collectionSlug: collections.slug,
       featurePhoto: bobbleheadPhotos.url,
     };

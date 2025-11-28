@@ -5,12 +5,13 @@ import { deleteCollectionSchema, getCollectionBySlugSchema } from '@/lib/validat
 describe('collections validation schemas', () => {
   describe('deleteCollectionSchema', () => {
     it('should validate a valid collection ID', () => {
-      const input = { collectionId: 'collection-123' };
+      const validUuid = '123e4567-e89b-12d3-a456-426614174000';
+      const input = { collectionId: validUuid };
       const result = deleteCollectionSchema.safeParse(input);
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.collectionId).toBe('collection-123');
+        expect(result.data.collectionId).toBe(validUuid);
       }
     });
 

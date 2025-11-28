@@ -1,0 +1,2 @@
+ALTER TABLE "bobblehead_collections" ADD COLUMN "updated_at" timestamp DEFAULT now() NOT NULL;--> statement-breakpoint
+ALTER TABLE "bobblehead_collections" ADD CONSTRAINT "bobblehead_collections_dates_logic" CHECK ("bobblehead_collections"."created_at" <= "bobblehead_collections"."updated_at");
