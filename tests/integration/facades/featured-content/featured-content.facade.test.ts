@@ -148,7 +148,14 @@ describe('FeaturedContentFacade Integration Tests', () => {
       // Verify Sentry breadcrumbs
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'Fetching featured bobblehead',
+          category: 'business_logic',
+          message: 'FeaturedContentFacade.getFeaturedBobbleheadAsync started',
+        }),
+      );
+      expect(mockAddBreadcrumb).toHaveBeenCalledWith(
+        expect.objectContaining({
+          category: 'business_logic',
+          message: 'FeaturedContentFacade.getFeaturedBobbleheadAsync completed',
         }),
       );
     });
@@ -660,13 +667,15 @@ describe('FeaturedContentFacade Integration Tests', () => {
       // Assert - Verify breadcrumbs were added
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'Fetching featured collections',
+          category: 'business_logic',
+          message: 'FeaturedContentFacade.getFeaturedCollectionsAsync started',
         }),
       );
 
       expect(mockAddBreadcrumb).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'Featured collections fetched successfully',
+          category: 'business_logic',
+          message: 'FeaturedContentFacade.getFeaturedCollectionsAsync completed',
         }),
       );
     });
