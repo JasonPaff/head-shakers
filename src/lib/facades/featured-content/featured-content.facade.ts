@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
-
 import type {
   FeaturedCollectionData,
   FeaturedContentRecord,
@@ -16,13 +14,7 @@ import type {
   UpdateFeaturedContent,
 } from '@/lib/validations/system.validation';
 
-import {
-  CACHE_ENTITY_TYPE,
-  CACHE_KEYS,
-  OPERATIONS,
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_LEVELS,
-} from '@/lib/constants';
+import { CACHE_ENTITY_TYPE, CACHE_KEYS, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { createPublicQueryContext, createUserQueryContext } from '@/lib/queries/base/query-context';
 import { FeaturedContentQuery } from '@/lib/queries/featured-content/featured-content-query';
@@ -30,6 +22,7 @@ import { FeaturedContentTransformer } from '@/lib/queries/featured-content/featu
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { trackFacadeEntry, trackFacadeSuccess } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'FeaturedContentFacade';
 
@@ -86,11 +79,7 @@ export class FeaturedContentFacade {
   static async getActiveFeaturedContentAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FeaturedContentData>> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching active featured content',
-    });
+    trackFacadeEntry(facadeName, 'getActiveFeaturedContentAsync');
 
     try {
       return await CacheService.featured.content(
@@ -98,13 +87,7 @@ export class FeaturedContentFacade {
           const context = createPublicQueryContext({ dbInstance });
           const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
 
-          // Add breadcrumb for successful fetch
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {},
-            level: SENTRY_LEVELS.INFO,
-            message: 'Active featured content fetched successfully',
-          });
+          trackFacadeSuccess(facadeName, 'getActiveFeaturedContentAsync');
 
           return FeaturedContentTransformer.transformFeaturedContent(rawData);
         },
@@ -166,11 +149,7 @@ export class FeaturedContentFacade {
   static async getFeaturedBobbleheadAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<HeroFeaturedBobbleheadData | null> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching featured bobblehead',
-    });
+    trackFacadeEntry(facadeName, 'getFeaturedBobbleheadAsync');
 
     try {
       return await CacheService.featured.featuredBobblehead(
@@ -178,12 +157,7 @@ export class FeaturedContentFacade {
           const context = createPublicQueryContext({ dbInstance });
           const data = await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
 
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: { found: data !== null },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Featured bobblehead fetched successfully',
-          });
+          trackFacadeSuccess(facadeName, 'getFeaturedBobbleheadAsync', { found: data !== null });
 
           return data;
         },
@@ -225,11 +199,7 @@ export class FeaturedContentFacade {
     userId?: null | string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FeaturedCollectionData>> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching featured collections',
-    });
+    trackFacadeEntry(facadeName, 'getFeaturedCollectionsAsync');
 
     try {
       return await CacheService.featured.collections(
@@ -237,11 +207,9 @@ export class FeaturedContentFacade {
           const context = createPublicQueryContext({ dbInstance });
           const data = await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
 
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: { count: data.length, userId: userId || 'public' },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Featured collections fetched successfully',
+          trackFacadeSuccess(facadeName, 'getFeaturedCollectionsAsync', {
+            count: data.length,
+            userId: userId || 'public',
           });
 
           return data;
@@ -295,11 +263,7 @@ export class FeaturedContentFacade {
   static async getFooterFeaturedContentAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<FooterFeaturedContentData>> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching footer featured content',
-    });
+    trackFacadeEntry(facadeName, 'getFooterFeaturedContentAsync');
 
     try {
       return await CacheService.featured.content(
@@ -307,13 +271,7 @@ export class FeaturedContentFacade {
           const context = createPublicQueryContext({ dbInstance });
           const data = await FeaturedContentQuery.getFooterFeaturedContentAsync(context);
 
-          // Add breadcrumb for successful fetch
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: { count: data.length },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Footer featured content fetched successfully',
-          });
+          trackFacadeSuccess(facadeName, 'getFooterFeaturedContentAsync', { count: data.length });
 
           return data;
         },
@@ -361,11 +319,7 @@ export class FeaturedContentFacade {
   static async getTrendingBobbleheadsAsync(
     dbInstance: DatabaseExecutor = db,
   ): Promise<Array<TrendingBobbleheadData>> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching trending bobbleheads',
-    });
+    trackFacadeEntry(facadeName, 'getTrendingBobbleheadsAsync');
 
     try {
       return await CacheService.featured.trendingBobbleheads(

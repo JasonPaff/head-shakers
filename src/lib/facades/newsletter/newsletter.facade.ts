@@ -4,12 +4,13 @@ import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
 import { ResendService } from '@/lib/services/resend.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'NewsletterFacade';
 
@@ -92,14 +93,9 @@ export class NewsletterFacade {
               await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
             }
 
-            Sentry.addBreadcrumb({
-              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-              data: {
-                hasUserId: Boolean(userId),
-                signupId: resubscribed?.id,
-              },
-              level: SENTRY_LEVELS.INFO,
-              message: 'Newsletter email resubscribed',
+            facadeBreadcrumb('Newsletter email resubscribed', {
+              hasUserId: Boolean(userId),
+              signupId: resubscribed?.id,
             });
 
             return {
@@ -111,14 +107,9 @@ export class NewsletterFacade {
 
           // Already actively subscribed - return success for privacy
           // Don't expose whether email exists to prevent enumeration
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {
-              hasUserId: Boolean(userId),
-              signupId: existingSignup.id,
-            },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Newsletter signup attempted for existing subscriber',
+          facadeBreadcrumb('Newsletter signup attempted for existing subscriber', {
+            hasUserId: Boolean(userId),
+            signupId: existingSignup.id,
           });
 
           // Update userId if provided and not already set
@@ -147,26 +138,16 @@ export class NewsletterFacade {
           };
         }
 
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            hasUserId: Boolean(userId),
-            signupId: newSignup.id,
-          },
-          level: SENTRY_LEVELS.INFO,
-          message: 'New newsletter subscription created',
+        facadeBreadcrumb('New newsletter subscription created', {
+          hasUserId: Boolean(userId),
+          signupId: newSignup.id,
         });
 
         // Send welcome email asynchronously for new subscribers
         // Fire-and-forget pattern with error handling in .catch()
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            email: normalizedEmail.substring(0, 3) + '***',
-            operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
-          },
-          level: SENTRY_LEVELS.INFO,
-          message: 'Sending newsletter welcome email',
+        facadeBreadcrumb('Sending newsletter welcome email', {
+          email: normalizedEmail.substring(0, 3) + '***',
+          operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
         });
 
         // Fire and forget - don't await to avoid blocking subscription
@@ -233,13 +214,8 @@ export class NewsletterFacade {
 
       const unsubscribed = await NewsletterQuery.unsubscribeAsync(normalizedEmail, context);
 
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          signupId: unsubscribed?.id,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: 'Newsletter email unsubscribed',
+      facadeBreadcrumb('Newsletter email unsubscribed', {
+        signupId: unsubscribed?.id,
       });
 
       return unsubscribed;

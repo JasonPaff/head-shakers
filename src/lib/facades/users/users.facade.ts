@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
 
 import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
@@ -6,13 +5,7 @@ import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { AdminUsersFilter, AssignableRole } from '@/lib/validations/admin-users.validation';
 
-import {
-  CACHE_ENTITY_TYPE,
-  OPERATIONS,
-  SCHEMA_LIMITS,
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_LEVELS,
-} from '@/lib/constants';
+import { CACHE_ENTITY_TYPE, OPERATIONS, SCHEMA_LIMITS } from '@/lib/constants';
 import { isReservedUsername } from '@/lib/constants/reserved-usernames';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
@@ -21,6 +14,7 @@ import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { facadeBreadcrumb, trackFacadeEntry } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'UsersFacade';
 
@@ -75,11 +69,7 @@ export class UsersFacade {
     clerkId: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<null | UserRecord> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching user by Clerk ID',
-    });
+    trackFacadeEntry(facadeName, 'getUserByClerkIdAsync');
 
     try {
       return CacheService.users.profile(
@@ -132,12 +122,7 @@ export class UsersFacade {
     );
 
     if (user) {
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: { ...user },
-        level: SENTRY_LEVELS.INFO,
-        message: 'User fetched by ID successfully',
-      });
+      facadeBreadcrumb('User fetched by ID successfully', { ...user });
     }
 
     return user;

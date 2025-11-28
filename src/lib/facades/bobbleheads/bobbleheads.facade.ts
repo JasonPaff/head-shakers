@@ -20,7 +20,7 @@ import type {
   UpdateBobbleheadPhotoMetadata,
 } from '@/lib/validations/bobbleheads.validation';
 
-import { OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { OPERATIONS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { bobbleheads } from '@/lib/db/schema';
@@ -39,6 +39,7 @@ import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createFacadeCacheKey, createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { facadeBreadcrumb, trackFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 const facadeName = 'BobbleheadsFacade';
@@ -121,21 +122,19 @@ export class BobbleheadsFacade {
           const failedDeletions = deletionResults.filter((result) => !result.success);
 
           if (successfulDeletions > 0) {
-            Sentry.addBreadcrumb({
-              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-              data: { bobbleheadId: bobblehead.id, count: successfulDeletions },
-              level: SENTRY_LEVELS.INFO,
-              message: `Successfully deleted ${successfulDeletions} photos from Cloudinary`,
+            facadeBreadcrumb(`Successfully deleted ${successfulDeletions} photos from Cloudinary`, {
+              bobbleheadId: bobblehead.id,
+              count: successfulDeletions,
             });
           }
 
           if (failedDeletions.length > 0) {
-            Sentry.addBreadcrumb({
-              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-              data: { bobbleheadId: bobblehead.id, count: failedDeletions.length, failures: failedDeletions },
-              level: SENTRY_LEVELS.WARNING,
-              message: `Failed to delete ${failedDeletions.length} photos from Cloudinary`,
-            });
+            trackFacadeWarning(
+              facadeName,
+              'deleteAsync',
+              `Failed to delete ${failedDeletions.length} photos from Cloudinary`,
+              { bobbleheadId: bobblehead.id, count: failedDeletions.length, failures: failedDeletions },
+            );
           }
         } catch (error) {
           // don't fail the entire operation if Cloudinary cleanup fails
@@ -150,11 +149,8 @@ export class BobbleheadsFacade {
       const wasTagRemovalSuccessful = await TagsFacade.removeAllFromBobblehead(bobblehead.id, userId);
 
       if (!wasTagRemovalSuccessful) {
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: { bobbleheadId: bobblehead.id },
-          level: SENTRY_LEVELS.WARNING,
-          message: 'Failed to remove tags during bobblehead deletion',
+        trackFacadeWarning(facadeName, 'deleteAsync', 'Failed to remove tags during bobblehead deletion', {
+          bobbleheadId: bobblehead.id,
         });
       }
 
@@ -195,11 +191,9 @@ export class BobbleheadsFacade {
         const failedDeletions = deletionResults.filter((result) => !result.success);
 
         if (failedDeletions.length > 0) {
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: { failures: failedDeletions, photoId: deletedPhoto.id },
-            level: SENTRY_LEVELS.WARNING,
-            message: 'Failed to delete photo from Cloudinary',
+          trackFacadeWarning(facadeName, 'deletePhotoAsync', 'Failed to delete photo from Cloudinary', {
+            failures: failedDeletions,
+            photoId: deletedPhoto.id,
           });
         }
       } catch (error) {
@@ -429,21 +423,15 @@ export class BobbleheadsFacade {
             };
           };
 
-          // Add breadcrumb for successful cache miss (data fetched)
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {
-              bobbleheadId,
-              collectionId,
-              contextName: contextData?.contextName || null,
-              contextType: contextData?.contextType || null,
-              currentPosition,
-              hasNext: !!adjacentResult.nextBobblehead,
-              hasPrevious: !!adjacentResult.previousBobblehead,
-              totalCount,
-            },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Fetched bobblehead navigation data',
+          facadeBreadcrumb('Fetched bobblehead navigation data', {
+            bobbleheadId,
+            collectionId,
+            contextName: contextData?.contextName || null,
+            contextType: contextData?.contextType || null,
+            currentPosition,
+            hasNext: !!adjacentResult.nextBobblehead,
+            hasPrevious: !!adjacentResult.previousBobblehead,
+            totalCount,
           });
 
           return {

@@ -1,9 +1,7 @@
-import * as Sentry from '@sentry/nextjs';
-
 import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
-import { CACHE_ENTITY_TYPE, OPERATIONS, SENTRY_BREADCRUMB_CATEGORIES, SENTRY_LEVELS } from '@/lib/constants';
+import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
@@ -12,12 +10,10 @@ import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { trackFacadeEntry, trackFacadeSuccess } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'PlatformStatsFacade';
 
-/**
- * Platform-wide statistics result
- */
 export interface PlatformStats {
   totalBobbleheads: number;
   totalCollections: number;
@@ -41,11 +37,8 @@ export class PlatformStatsFacade {
    * @returns Platform statistics with total counts
    */
   static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      level: SENTRY_LEVELS.INFO,
-      message: 'Fetching platform statistics',
-    });
+    const methodName = 'getPlatformStatsAsync';
+    trackFacadeEntry(facadeName, methodName);
 
     try {
       return await CacheService.platform.stats(
@@ -59,23 +52,15 @@ export class PlatformStatsFacade {
             UsersQuery.getUserCountAsync(context),
           ]);
 
-          // Add breadcrumb for successful stats fetch
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {
-              bobbleheadsCount,
-              collectionsCount,
-              collectorsCount,
-            },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Platform statistics fetched successfully',
-          });
-
-          return {
+          const stats: PlatformStats = {
             totalBobbleheads: bobbleheadsCount,
             totalCollections: collectionsCount,
             totalCollectors: collectorsCount,
           };
+
+          trackFacadeSuccess(facadeName, methodName, { ...stats });
+
+          return stats;
         },
         {
           context: {
@@ -90,7 +75,7 @@ export class PlatformStatsFacade {
       const errorContext: FacadeErrorContext = {
         data: {},
         facade: facadeName,
-        method: 'getPlatformStatsAsync',
+        method: methodName,
         operation: OPERATIONS.PLATFORM.GET_STATS,
       };
       throw createFacadeError(errorContext, error);

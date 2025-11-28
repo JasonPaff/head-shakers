@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
-
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
 import type {
   CommentTargetType,
@@ -11,13 +9,7 @@ import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { InsertComment, InsertLike } from '@/lib/validations/social.validation';
 
-import {
-  type LikeTargetType,
-  MAX_COMMENT_NESTING_DEPTH,
-  OPERATIONS,
-  SENTRY_BREADCRUMB_CATEGORIES,
-  SENTRY_LEVELS,
-} from '@/lib/constants';
+import { type LikeTargetType, MAX_COMMENT_NESTING_DEPTH, OPERATIONS } from '@/lib/constants';
 import { CACHE_CONFIG, CACHE_KEYS } from '@/lib/constants/cache';
 import { db } from '@/lib/db';
 import {
@@ -32,6 +24,7 @@ import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { isCommentEditable } from '@/lib/utils/comment.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 export interface CommentData {
   comment: CommentWithUser;
@@ -358,15 +351,9 @@ export class SocialFacade {
             };
           });
 
-          // add breadcrumb for monitoring
-          Sentry.addBreadcrumb({
-            category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-            data: {
-              hasViewerUser: !!viewerUserId,
-              targetCount: targets.length,
-            },
-            level: SENTRY_LEVELS.INFO,
-            message: 'Batch content like data fetched',
+          facadeBreadcrumb('Batch content like data fetched', {
+            hasViewerUser: !!viewerUserId,
+            targetCount: targets.length,
           });
 
           return results;
