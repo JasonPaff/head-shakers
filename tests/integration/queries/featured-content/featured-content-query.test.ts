@@ -223,8 +223,11 @@ describe('FeaturedContentQuery Integration Tests', () => {
       const db = getTestDb();
       const { featuredContent } = await import('@/lib/db/schema');
 
+      // Use a valid UUID format for non-existent bobblehead
+      const nonExistentBobbleheadId = '00000000-0000-0000-0000-000000000000';
+
       await db.insert(featuredContent).values({
-        contentId: 'non-existent-bobblehead-id',
+        contentId: nonExistentBobbleheadId,
         contentType: 'bobblehead',
         description: 'This points to nothing',
         featureType: 'editor_pick',
@@ -397,7 +400,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.imageUrl).toBe('https://example.com/featured.jpg'); // Uses featuredContent.imageUrl
       expect(featured.ownerDisplayName).toBe('owner');
       expect(featured.totalItems).toBe(0); // Default total items
-      expect(featured.totalValue).toBe(0); // Default total value
+      expect(featured.totalValue).toBe('0.00'); // Default total value (decimal returned as string)
       expect(featured.likes).toBe(0); // Default like count
       expect(featured.comments).toBe(0); // Default comment count
       expect(featured.viewCount).toBe(0);
@@ -754,7 +757,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.likes).toBe(0); // Default like count
       expect(featured.comments).toBe(0); // Default comment count
       expect(featured.totalItems).toBe(0); // Default total items
-      expect(featured.totalValue).toBe(0); // Default total value
+      expect(featured.totalValue).toBe('0.00'); // Default total value (decimal returned as string)
     });
   });
 });

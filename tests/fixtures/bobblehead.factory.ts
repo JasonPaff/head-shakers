@@ -46,8 +46,9 @@ export interface CreateTestBobbleheadOptions {
 export async function createTestBobblehead(options: CreateTestBobbleheadOptions) {
   const db = getTestDb();
   const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000000);
   const name = options.name ?? `Test Bobblehead ${timestamp}`;
-  const slug = options.slug ?? `test-bobblehead-${timestamp}`;
+  const slug = options.slug ?? `test-bobblehead-${timestamp}-${random}`;
 
   const bobbleheadData = {
     acquisitionDate: options.acquisitionDate ?? null,
@@ -107,8 +108,9 @@ export async function createTestBobbleheads(
 export async function createTestFeaturedBobblehead(options: CreateTestBobbleheadOptions) {
   const db = getTestDb();
   const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 1000000);
   const name = options.name ?? `Featured Bobblehead ${timestamp}`;
-  const slug = options.slug ?? `featured-bobblehead-${timestamp}`;
+  const slug = options.slug ?? `featured-bobblehead-${timestamp}-${random}`;
 
   const bobbleheadData = {
     acquisitionDate: options.acquisitionDate ?? null,
