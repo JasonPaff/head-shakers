@@ -918,9 +918,13 @@ export class SocialFacade {
 
       if (deletedReply) {
         // decrement comment count for each deleted reply (only for bobblehead targets)
-        // collections use dynamic counts calculated from comment table
+        // collections use dynamic counts calculated from the comment table
         if (deletedReply.targetType === ENUMS.COMMENT.TARGET_TYPE[0]) {
-          await SocialQuery.decrementCommentCountAsync(deletedReply.targetId, deletedReply.targetType, context);
+          await SocialQuery.decrementCommentCountAsync(
+            deletedReply.targetId,
+            deletedReply.targetType,
+            context,
+          );
         }
       }
     }
