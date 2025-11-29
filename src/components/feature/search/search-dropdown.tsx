@@ -107,8 +107,8 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
   const _isQueryValid = query.trim().length >= CONFIG.SEARCH.MIN_QUERY_LENGTH;
   const _isLoading = isExecuting;
   const _hasResults =
-    searchResultsData &&
-    (searchResultsData.collections.length > 0 || searchResultsData.bobbleheads.length > 0);
+    searchResultsData?.wasSuccess &&
+    (searchResultsData.data.collections.length > 0 || searchResultsData.data.bobbleheads.length > 0);
   const _shouldShowEmptyState = !_isLoading && _isQueryValid && !_hasResults;
   const _shouldShowResults = !_isLoading && _hasResults;
 
@@ -173,8 +173,12 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
             <Conditional isCondition={_shouldShowResults}>
               <div className={'flex flex-col'}>
                 {/* Collections Section */}
-                <Conditional isCondition={!!searchResultsData && searchResultsData.collections.length > 0}>
-                  {searchResultsData?.collections.map((collection) => (
+                <Conditional
+                  isCondition={
+                    !!searchResultsData?.wasSuccess && searchResultsData.data.collections.length > 0
+                  }
+                >
+                  {searchResultsData?.data?.collections.map((collection) => (
                     <SearchResultItem
                       entityType={'collection'}
                       key={collection.id}
@@ -185,8 +189,12 @@ export const SearchDropdown = ({ className, testId, ...props }: SearchDropdownPr
                 </Conditional>
 
                 {/* Bobbleheads Section */}
-                <Conditional isCondition={!!searchResultsData && searchResultsData.bobbleheads.length > 0}>
-                  {searchResultsData?.bobbleheads.map((bobblehead) => (
+                <Conditional
+                  isCondition={
+                    !!searchResultsData?.wasSuccess && searchResultsData.data.bobbleheads.length > 0
+                  }
+                >
+                  {searchResultsData?.data?.bobbleheads?.map((bobblehead) => (
                     <SearchResultItem
                       entityType={'bobblehead'}
                       key={bobblehead.id}

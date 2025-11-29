@@ -42,23 +42,13 @@ export const FeaturedContentForm = withFocusManagement(
     const { executeAsync: createFeaturedContentAsync, isExecuting: isCreating } = useServerAction(
       createFeaturedContentAction,
       {
-        toastMessages: {
-          error: 'Failed to create featured content. Please try again.',
-          loading: 'Creating featured content...',
-          success: 'Featured content created successfully!',
-        },
+        loadingMessage: 'Creating featured content...',
       },
     );
 
     const { executeAsync: updateFeaturedContentAsync, isExecuting: isUpdating } = useServerAction(
       updateFeaturedContentAction,
-      {
-        toastMessages: {
-          error: 'Failed to update featured content. Please try again.',
-          loading: 'Update featured content...',
-          success: 'Featured content updated successfully!',
-        },
-      },
+      { loadingMessage: 'Update featured content...' },
     );
 
     const form = useAppForm({
@@ -82,6 +72,7 @@ export const FeaturedContentForm = withFocusManagement(
           if (result?.data) {
             const data = result.data.data;
             setExistingData(data);
+            if (!data) return;
             form.setFieldValue('contentType', data.contentType);
             form.setFieldValue('featureType', data.featureType);
             form.setFieldValue('contentId', data.contentId);

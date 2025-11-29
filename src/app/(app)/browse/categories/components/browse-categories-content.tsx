@@ -54,8 +54,8 @@ export function BrowseCategoriesContent({ defaultCategory }: BrowseCategoriesCon
     const fetchCategories = async () => {
       try {
         const result = await getCategoriesAction();
-        if (result?.data) {
-          setCategories(result.data);
+        if (result?.data?.wasSuccess) {
+          setCategories(result.data.data);
         }
       } catch (err) {
         console.error('Failed to fetch categories:', err);
@@ -110,8 +110,8 @@ export function BrowseCategoriesContent({ defaultCategory }: BrowseCategoriesCon
 
           const actionDuration = performance.now() - actionStartTime;
 
-          if (result?.data) {
-            setBrowseResults(result.data);
+          if (result?.data?.wasSuccess) {
+            setBrowseResults(result.data.data);
             setError(null);
 
             Sentry.addBreadcrumb({
@@ -120,11 +120,11 @@ export function BrowseCategoriesContent({ defaultCategory }: BrowseCategoriesCon
                 activeFilters,
                 durationMs: actionDuration,
                 page: queryParams.page,
-                resultCount: result.data.collections.length,
-                totalCount: result.data.pagination.totalCount,
+                resultCount: result.data.data.collections.length,
+                totalCount: result.data.data.pagination.totalCount,
               },
               level: 'info',
-              message: `Browse categories successful: ${result.data.collections.length} results loaded in ${actionDuration.toFixed(2)}ms`,
+              message: `Browse categories successful: ${result.data.data.collections.length} results loaded in ${actionDuration.toFixed(2)}ms`,
             });
 
             // Track slow action responses
@@ -133,7 +133,7 @@ export function BrowseCategoriesContent({ defaultCategory }: BrowseCategoriesCon
                 level: 'info',
                 tags: {
                   activeFilters: activeFilters.join(','),
-                  resultCount: result.data.collections.length.toString(),
+                  resultCount: result.data.data.collections.length.toString(),
                 },
               });
             }

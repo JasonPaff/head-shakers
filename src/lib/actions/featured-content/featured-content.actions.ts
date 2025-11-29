@@ -30,7 +30,7 @@ import {
 } from '@/lib/validations/admin.validation';
 
 const toggleActiveSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
   isActive: z.boolean(),
 });
 
@@ -227,7 +227,7 @@ export const toggleFeaturedContentActiveAction = authActionClient
   });
 
 const deleteFeaturedContentSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 /**
@@ -239,7 +239,7 @@ export const deleteFeaturedContentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteFeaturedContentSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<null>> => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse> => {
     const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 

@@ -87,8 +87,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         try {
           if (contentType === 'collection') {
             const response = await getCollection({ id: selectedContentId });
-            if (response?.data?.collection) {
-              const collection = response.data.collection;
+            if (response?.data?.data?.collection) {
+              const collection = response.data.data.collection;
               setSelectedItem({
                 additionalInfo: `${collection.totalItems} items`,
                 description: collection.description,
@@ -102,8 +102,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             }
           } else if (contentType === 'bobblehead') {
             const response = await getBobblehead({ id: selectedContentId });
-            if (response?.data?.bobblehead) {
-              const bobblehead = response.data.bobblehead;
+            if (response?.data?.data?.bobblehead) {
+              const bobblehead = response.data.data.bobblehead;
               setSelectedItem({
                 additionalInfo: `${bobblehead.manufacturer}${bobblehead.series ? ` - ${bobblehead.series}` : ''}${bobblehead.year ? ` (${bobblehead.year})` : ''}`,
                 description: bobblehead.description,
@@ -118,8 +118,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             }
           } else if (contentType === 'user') {
             const response = await getUser({ id: selectedContentId });
-            if (response?.data?.user) {
-              const user = response.data.user;
+            if (response?.data?.data?.user) {
+              const user = response.data.data.user;
               setSelectedItem({
                 additionalInfo: user.location ?? undefined,
                 description: user.bio,
@@ -178,8 +178,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
         if (contentType === 'collection') {
           const response = await searchCollections(searchParams);
 
-          if (response?.data?.collections) {
-            searchResults = response.data.collections.map((collection) => ({
+          if (response?.data?.data?.collections) {
+            searchResults = response.data.data.collections.map((collection) => ({
               additionalInfo: `${collection.totalItems} items`,
               description: collection.description,
               id: collection.id,
@@ -192,8 +192,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
           }
         } else if (contentType === 'bobblehead') {
           const response = await searchBobbleheads(searchParams);
-          if (response?.data?.bobbleheads) {
-            searchResults = response.data.bobbleheads.map((bobblehead) => ({
+          if (response?.data?.data?.bobbleheads) {
+            searchResults = response.data.data.bobbleheads.map((bobblehead) => ({
               additionalInfo: `${bobblehead.manufacturer}${bobblehead.series ? ` - ${bobblehead.series}` : ''}${bobblehead.year ? ` (${bobblehead.year})` : ''}`,
               description: bobblehead.description,
               id: bobblehead.id,
@@ -207,8 +207,8 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
           }
         } else if (contentType === 'user') {
           const response = await searchUsers({ query: searchQuery || '' });
-          if (response?.data?.users) {
-            searchResults = response.data.users.map((user) => ({
+          if (response?.data?.data?.users) {
+            searchResults = response.data.data.users.map((user) => ({
               additionalInfo: user.location ?? undefined,
               description: user.bio,
               id: user.id,

@@ -88,24 +88,16 @@ export const UserManagementClient = ({ className, initialData, ...props }: UserM
   });
 
   const { executeAsync: lockUser, isPending: isLocking } = useServerAction(lockUserAction, {
+    loadingMessage: 'Locking user account...',
     onSuccess: () => {
       void handleRefresh();
-    },
-    toastMessages: {
-      error: 'Failed to lock user account',
-      loading: 'Locking user account...',
-      success: 'User account locked successfully',
     },
   });
 
   const { executeAsync: unlockUser, isPending: isUnlocking } = useServerAction(unlockUserAction, {
+    loadingMessage: 'Unlocking user account...',
     onSuccess: () => {
       void handleRefresh();
-    },
-    toastMessages: {
-      error: 'Failed to unlock user account',
-      loading: 'Unlocking user account...',
-      success: 'User account unlocked successfully',
     },
   });
 

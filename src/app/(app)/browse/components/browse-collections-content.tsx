@@ -89,8 +89,8 @@ export function BrowseCollectionsContent() {
 
           const actionDuration = performance.now() - actionStartTime;
 
-          if (result?.data) {
-            setBrowseResults(result.data);
+          if (result?.data?.wasSuccess) {
+            setBrowseResults(result.data.data);
             setError(null);
 
             Sentry.addBreadcrumb({
@@ -99,11 +99,11 @@ export function BrowseCollectionsContent() {
                 activeFilters,
                 durationMs: actionDuration,
                 page: queryParams.page,
-                resultCount: result.data.collections.length,
-                totalCount: result.data.pagination.totalCount,
+                resultCount: result.data.data.collections.length,
+                totalCount: result.data.data.pagination.totalCount,
               },
               level: 'info',
-              message: `Browse successful: ${result.data.collections.length} results loaded in ${actionDuration.toFixed(2)}ms`,
+              message: `Browse successful: ${result.data.data.collections.length} results loaded in ${actionDuration.toFixed(2)}ms`,
             });
 
             // Track slow action responses
@@ -112,7 +112,7 @@ export function BrowseCollectionsContent() {
                 level: 'info',
                 tags: {
                   activeFilters: activeFilters.join(','),
-                  resultCount: result.data.collections.length.toString(),
+                  resultCount: result.data.data.collections.length.toString(),
                 },
               });
             }

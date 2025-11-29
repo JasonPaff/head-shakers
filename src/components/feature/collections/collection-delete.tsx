@@ -31,11 +31,7 @@ export const CollectionDelete = ({
   const router = useRouter();
 
   const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction, {
-    toastMessages: {
-      error: 'Failed to delete collection. Please try again.',
-      loading: 'Deleting collection...',
-      success: 'Collection deleted successfully!',
-    },
+    loadingMessage: 'Deleting collection...',
   });
 
   const handleDeleteAsync = async () => {

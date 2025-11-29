@@ -45,7 +45,7 @@ export const recordViewAction = publicActionClient
       ActionResponse<{
         isDuplicate: boolean;
         totalViews: number;
-        viewId: null | string;
+        viewId: string;
       }>
     > => {
       const viewData = recordViewSchema.parse(ctx.sanitizedInput || parsedInput);

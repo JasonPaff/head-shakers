@@ -75,8 +75,8 @@ export const SearchPageContent = () => {
             query: queryParams.q,
           });
 
-          if (result?.data) {
-            setSearchResults(result.data);
+          if (result?.data?.wasSuccess) {
+            setSearchResults(result.data.data);
             setError(null);
           } else if (result?.serverError) {
             setError(result.serverError);

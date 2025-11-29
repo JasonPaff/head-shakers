@@ -57,17 +57,10 @@ export const UserRoleDialog = ({ isOpen, onClose, onSuccess, user }: UserRoleDia
 
   // Server action for updating user role
   const { executeAsync: updateUserRole, isPending: isExecuting } = useServerAction(updateUserRoleAction, {
+    loadingMessage: 'Updating user role...',
     onSuccess: () => {
       onSuccess?.();
       handleClose();
-    },
-    toastMessages: {
-      error: 'Failed to update user role',
-      loading: 'Updating user role...',
-      success: (data) => {
-        const result = data as { data?: { message?: string } };
-        return result?.data?.message ?? 'User role updated successfully';
-      },
     },
   });
 

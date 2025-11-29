@@ -155,7 +155,6 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
         }
       }
 
-      // Use toast.promise for smooth loading→success/error transitions
       const toastResult = toast.promise(actionPromise, {
         error: (err: unknown) => {
           options?.onBeforeError?.();

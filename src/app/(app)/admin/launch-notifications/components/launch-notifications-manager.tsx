@@ -44,17 +44,13 @@ export function LaunchNotificationsManager({
   const { executeAsync: sendNotificationsAsync, isExecuting: isSendingNotifications } = useServerAction(
     sendLaunchNotificationsAction,
     {
+      loadingMessage: 'Sending launch notifications...',
       onSuccess: async () => {
         // Refresh stats after sending
         const result = await getLaunchNotificationStatsAction();
         if (result?.data?.data) {
           setStats(result.data.data);
         }
-      },
-      toastMessages: {
-        error: 'Failed to send launch notifications',
-        loading: 'Sending launch notifications...',
-        success: 'Launch notifications sent successfully!',
       },
     },
   );

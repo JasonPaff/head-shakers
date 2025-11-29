@@ -47,14 +47,10 @@ const UpdateReportStatusDialogContent = withFocusManagement<UpdateReportStatusDi
 
     // Server action for updating report status
     const { executeAsync: updateReportStatus, isExecuting } = useServerAction(updateReportStatusAction, {
+      loadingMessage: 'Updating report status...',
       onSuccess: () => {
         onSuccess?.();
         onClose();
-      },
-      toastMessages: {
-        error: 'Failed to update report status',
-        loading: 'Updating report status...',
-        success: 'Report status updated successfully',
       },
     });
 

@@ -23,16 +23,12 @@ export const BobbleheadDeleteDialog = ({
   const router = useRouter();
 
   const { executeAsync } = useServerAction(deleteBobbleheadAction, {
-    toastMessages: {
-      error: 'Failed to delete bobblehead. Please try again.',
-      loading: 'Deleting bobblehead...',
-      success: '',
-    },
+    loadingMessage: 'Deleting bobblehead...',
   });
 
   const handleDeleteAsync = async () => {
     await executeAsync({ bobbleheadId }).then(() => {
-      // redirect to parent collection
+      // redirect to the parent collection
       router.push(
         $path({
           route: '/collections/[collectionSlug]',

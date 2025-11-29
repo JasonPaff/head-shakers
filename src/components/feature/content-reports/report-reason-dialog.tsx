@@ -53,13 +53,9 @@ export const ReportReasonDialog = withFocusManagement(
     const { focusFirstError } = useFocusContext();
 
     const { executeAsync, isExecuting } = useServerAction(createContentReportAction, {
+      loadingMessage: 'Submitting report...',
       onSuccess: () => {
         handleClose();
-      },
-      toastMessages: {
-        error: 'Failed to submit report. Please try again.',
-        loading: 'Submitting report...',
-        success: 'Report submitted successfully. Thank you for helping keep our community safe.',
       },
     });
 

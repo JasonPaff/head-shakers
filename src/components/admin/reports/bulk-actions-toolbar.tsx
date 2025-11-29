@@ -87,16 +87,12 @@ export const BulkActionsToolbar = ({
 
   // Other hooks
   const { executeAsync: executeBulkUpdate, isExecuting } = useServerAction(bulkUpdateReportsAction, {
+    loadingMessage: 'Updating reports...',
     onSuccess: () => {
       onBulkComplete?.();
       onClearSelection();
       setIsConfirmDialogOpen(false);
       setPendingAction(null);
-    },
-    toastMessages: {
-      error: 'Failed to update reports. Some reports may have been updated successfully.',
-      loading: 'Updating reports...',
-      success: 'Reports updated successfully',
     },
   });
 

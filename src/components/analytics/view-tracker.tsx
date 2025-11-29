@@ -63,6 +63,7 @@ export const ViewTracker = ({
       }
     },
     onSuccess: ({ data }) => {
+      if (!data?.wasSuccess) return;
       onViewRecorded?.(data.data);
     },
   });

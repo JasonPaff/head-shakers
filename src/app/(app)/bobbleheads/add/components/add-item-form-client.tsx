@@ -38,6 +38,7 @@ export const AddItemFormClient = withFocusManagement(
     const { focusFirstError } = useFocusContext();
 
     const { executeAsync, isExecuting } = useServerAction(createBobbleheadWithPhotosAction, {
+      loadingMessage: 'Adding your bobblehead to the collection...',
       onSuccess: ({ data }) => {
         if (data?.data?.collectionSlug) {
           router.push(
@@ -47,11 +48,6 @@ export const AddItemFormClient = withFocusManagement(
             }),
           );
         }
-      },
-      toastMessages: {
-        error: 'Failed to add bobblehead. Please try again.',
-        loading: 'Adding your bobblehead to the collection...',
-        success: 'Bobblehead added successfully! 🎉',
       },
     });
 

@@ -80,23 +80,11 @@ export const AdminReportsClient = ({ className, initialData, testId, ...props }:
   });
 
   const { executeAsync: executeUpdateStatus } = useServerAction(updateReportStatusAction, {
-    toastMessages: {
-      error: 'Failed to update report status',
-      loading: 'Updating report status...',
-      success: 'Report status updated successfully',
-    },
+    loadingMessage: 'Updating report status...',
   });
 
   const { executeAsync: executeBulkUpdate } = useServerAction(bulkUpdateReportsAction, {
-    toastMessages: {
-      error: 'Failed to update reports',
-      loading: 'Updating reports...',
-      success: (data) => {
-        const result = data as { data?: { data?: Array<unknown> } };
-        const count = result?.data?.data?.length ?? 0;
-        return `Successfully updated ${count} report${count === 1 ? '' : 's'}`;
-      },
-    },
+    loadingMessage: 'Updating reports...',
   });
 
   // Event handlers

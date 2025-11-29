@@ -31,11 +31,7 @@ export const BobbleheadDelete = ({
   const router = useRouter();
 
   const { executeAsync, isExecuting } = useServerAction(deleteBobbleheadAction, {
-    toastMessages: {
-      error: 'Failed to delete bobblehead. Please try again.',
-      loading: 'Deleting bobblehead...',
-      success: '',
-    },
+    loadingMessage: 'Deleting bobblehead...',
   });
 
   const handleDeleteAsync = async () => {

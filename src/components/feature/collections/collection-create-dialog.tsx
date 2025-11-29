@@ -49,17 +49,13 @@ export const CollectionCreateDialog = withFocusManagement(
     const { userId } = useAuth();
 
     const { executeAsync, isExecuting } = useServerAction(createCollectionAction, {
-      onSuccess: ({ data }) => {
+      loadingMessage: 'Creating collection...',
+      onAfterSuccess: (data) => {
         onCollectionCreated?.({
-          id: data.data.id,
-          name: data.data.name,
+          id: data.id,
+          name: data.name,
         });
         handleClose();
-      },
-      toastMessages: {
-        error: 'Failed to create collection. Please try again.',
-        loading: 'Creating collection...',
-        success: 'Collection created successfully!',
       },
     });
 

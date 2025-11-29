@@ -27,13 +27,9 @@ export const UsernameSetupDialog = ({ currentUsername, isOpen, onClose }: Userna
 
   // Server action to skip username setup (keeps current username, sets timestamp)
   const { executeAsync: skipSetup, isExecuting: isSkipping } = useServerAction(updateUsernameAction, {
+    loadingMessage: 'Saving username...',
     onSuccess: () => {
       handleClose();
-    },
-    toastMessages: {
-      error: 'Failed to save username',
-      loading: 'Saving username...',
-      success: 'Username saved successfully!',
     },
   });
 

@@ -40,15 +40,11 @@ export const UsernameEditForm = withFocusManagement<UsernameEditFormProps>(
 
     // Server action for updating username
     const { executeAsync: updateUsername, isExecuting } = useServerAction(updateUsernameAction, {
+      loadingMessage: 'Updating username...',
       onSuccess: () => {
         if (onSuccess) {
           onSuccess();
         }
-      },
-      toastMessages: {
-        error: 'Failed to update username',
-        loading: 'Updating username...',
-        success: 'Username updated successfully!',
       },
     });
 
@@ -115,11 +111,8 @@ export const UsernameEditForm = withFocusManagement<UsernameEditFormProps>(
         return;
       }
 
-      if (availabilityResult.data?.available) {
-        setAvailabilityState('available');
-      } else {
-        setAvailabilityState('taken');
-      }
+      if (availabilityResult.data?.data?.available) setAvailabilityState('available');
+      else setAvailabilityState('taken');
     }, [availabilityResult, isCheckingAvailability]);
 
     // Render availability indicator

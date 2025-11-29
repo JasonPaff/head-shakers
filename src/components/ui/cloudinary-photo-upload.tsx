@@ -113,6 +113,7 @@ export const CloudinaryPhotoUpload = ({
   const { executeAsync: deletePhoto, isExecuting: isDeletingPhoto } = useServerAction(
     deleteBobbleheadPhotoAction,
     {
+      loadingMessage: 'Deleting photo...',
       onAfterSuccess: () => {
         // photo already removed optimistically, just close dialog and clean up deleting state
         setIsDeleteDialogOpen(false);
@@ -143,11 +144,6 @@ export const CloudinaryPhotoUpload = ({
           setPreviousPhotosState([]);
         }
         setDeletingPhotoId(null);
-      },
-      toastMessages: {
-        error: 'Failed to delete photo. Please try again.',
-        loading: 'Deleting photo...',
-        success: undefined, // we'll show our own success toast with undo
       },
     },
   );
@@ -552,13 +548,12 @@ export const CloudinaryPhotoUpload = ({
         const wasPrimaryPhoto = photoToDelete.isPrimary;
 
         // reorder remaining photos and promote new primary if needed
-        const reorderedPhotos = updatedPhotos.map((photo, index) => ({
+
+        return updatedPhotos.map((photo, index) => ({
           ...photo,
           isPrimary: wasPrimaryPhoto && index === 0, // first photo becomes primary if we deleted the primary
           sortOrder: index,
         }));
-
-        return reorderedPhotos;
       });
 
       // persisted photo - call server action
@@ -576,13 +571,12 @@ export const CloudinaryPhotoUpload = ({
         const wasPrimaryPhoto = photoToDelete.isPrimary;
 
         // reorder remaining photos and promote new primary if needed
-        const reorderedPhotos = updatedPhotos.map((photo, index) => ({
+
+        return updatedPhotos.map((photo, index) => ({
           ...photo,
           isPrimary: wasPrimaryPhoto && index === 0, // first photo becomes primary if we deleted the primary
           sortOrder: index,
         }));
-
-        return reorderedPhotos;
       });
 
       // close dialog
@@ -595,10 +589,7 @@ export const CloudinaryPhotoUpload = ({
     (photoId: string, updates: Partial<CloudinaryPhoto>) => {
       // update local state immediately
       onPhotosChange((currentPhotos) => {
-        const updatedPhotos = currentPhotos.map((photo) =>
-          photo.id === photoId ? { ...photo, ...updates } : photo,
-        );
-        return updatedPhotos;
+        return currentPhotos.map((photo) => (photo.id === photoId ? { ...photo, ...updates } : photo));
       });
 
       // debounce server action for persisted photos only (not temp photos)
@@ -678,11 +669,10 @@ export const CloudinaryPhotoUpload = ({
 
     // update primary photo
     onPhotosChange((currentPhotos) => {
-      const updatedPhotos = currentPhotos.map((photo) => ({
+      return currentPhotos.map((photo) => ({
         ...photo,
         isPrimary: photo.id === pendingPrimaryPhotoId,
       }));
-      return updatedPhotos;
     });
 
     // close dialog and clear pending state
@@ -937,13 +927,12 @@ export const CloudinaryPhotoUpload = ({
       const wasPrimaryPhotoDeleted = currentPhotos.some((p) => p.isPrimary && selectedPhotoIds.has(p.id));
 
       // reorder remaining photos and promote new primary if needed
-      const reorderedPhotos = remainingPhotos.map((photo, index) => ({
+
+      return remainingPhotos.map((photo, index) => ({
         ...photo,
         isPrimary: wasPrimaryPhotoDeleted && index === 0, // first photo becomes primary if we deleted the primary
         sortOrder: index,
       }));
-
-      return reorderedPhotos;
     });
 
     // execute bulk delete

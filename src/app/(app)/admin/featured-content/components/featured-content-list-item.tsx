@@ -74,11 +74,7 @@ export const FeaturedContentListItem = ({ onEdit, ...content }: FeaturedContentL
     input: deleteInput,
     isPending: isDeleting,
   } = useServerAction(deleteFeaturedContentAction, {
-    toastMessages: {
-      error: 'Failed to delete featured content. Please try again.',
-      loading: 'Deleting featured content...',
-      success: 'Featured content deleted successfully.',
-    },
+    loadingMessage: 'Deleting featured content...',
   });
 
   const {
@@ -86,14 +82,7 @@ export const FeaturedContentListItem = ({ onEdit, ...content }: FeaturedContentL
     input: toggleInput,
     isPending: isToggling,
   } = useServerAction(toggleFeaturedContentActiveAction, {
-    toastMessages: {
-      error: 'Failed to update featured content status. Please try again.',
-      loading: content.isActive ? 'Deactivating featured content...' : 'Activating featured content...',
-      success:
-        content.isActive ?
-          'Featured content deactivated successfully.'
-        : 'Featured content activated successfully.',
-    },
+    loadingMessage: content.isActive ? 'Deactivating featured content...' : 'Activating featured content...',
   });
 
   const handleEdit = () => {

@@ -10,11 +10,7 @@ import { addToWaitlistSchema } from '@/lib/validations/launch-notification.valid
 
 export const LaunchWaitlistForm = withFocusManagement(() => {
   const { executeAsync } = useServerAction(addToLaunchWaitlistAction, {
-    toastMessages: {
-      error: 'Failed to add email to waitlist',
-      loading: 'Adding to waitlist...',
-      success: "You're on the list! Check your email for confirmation.",
-    },
+    loadingMessage: 'Adding to waitlist...',
   });
 
   const form = useAppForm({

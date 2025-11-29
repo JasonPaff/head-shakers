@@ -55,13 +55,9 @@ export const CollectionEditDialog = withFocusManagement(
     const { userId } = useAuth();
 
     const { executeAsync, isExecuting } = useServerAction(updateCollectionAction, {
+      loadingMessage: 'Updating collection...',
       onAfterSuccess: () => {
         handleClose();
-      },
-      toastMessages: {
-        error: 'Failed to update collection. Please try again.',
-        loading: 'Updating collection...',
-        success: 'Collection updated successfully!',
       },
     });
 

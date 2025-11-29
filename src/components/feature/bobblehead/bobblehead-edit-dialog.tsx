@@ -248,16 +248,12 @@ export const BobbleheadEditDialog = withFocusManagement(
     const photoUploadRef = useRef<CloudinaryPhotoUploadRef>(null);
 
     const { executeAsync, isExecuting } = useServerAction(updateBobbleheadWithPhotosAction, {
+      loadingMessage: 'Updating bobblehead...',
       onAfterSuccess: () => {
         if (serverActionAbortRef.current) return; // skip if dialog closed
         router.refresh();
         handleClose();
         onSuccess?.();
-      },
-      toastMessages: {
-        error: 'Failed to update bobblehead. Please try again.',
-        loading: 'Updating bobblehead...',
-        success: 'Bobblehead updated successfully!',
       },
     });
 
