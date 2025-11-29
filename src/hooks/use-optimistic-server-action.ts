@@ -18,7 +18,7 @@ type BreadcrumbContext = {
   component: string;
 };
 
-type UseOptimisticServerActionOptions<State, T> = {
+type UseOptimisticServerActionOptions<State, T, Input> = {
   /** When provided, automatically tracks action execution with Sentry breadcrumbs */
   breadcrumbContext?: BreadcrumbContext;
   /** The current state used for optimistic updates */
@@ -31,8 +31,8 @@ type UseOptimisticServerActionOptions<State, T> = {
   onBeforeError?: () => void;
   /** Called before success handling */
   onBeforeSuccess?: (data: T) => void;
-  /** Function to calculate the optimistic state before server response */
-  onUpdate: (currentState: State) => State;
+  /** Function to calculate the optimistic state before server response. Receives both current state and the action input. */
+  onUpdate: (state: State, input: Input) => State;
 };
 
 /**
@@ -50,18 +50,24 @@ type UseOptimisticServerActionOptions<State, T> = {
  * - ActionResponse unwrapping
  *
  * @example
- * const { execute, isPending, optimisticState } = useOptimisticServerAction(myAction, {
- *   breadcrumbContext: { action: 'toggle-subscription', component: 'newsletter' },
- *   currentState: { isSubscribed: false },
- *   onUpdate: (state) => ({ isSubscribed: !state.isSubscribed }),
+ * const { execute, isPending, optimisticState } = useOptimisticServerAction(subscribeAction, {
+ *   breadcrumbContext: { action: 'newsletter-subscribe', component: 'newsletter' },
+ *   currentState: { isSubscribed: false, email: '' },
+ *   onUpdate: (_state, input) => ({ isSubscribed: true, email: input.email }),
  *   onAfterSuccess: (data) => {
- *     router.refresh();
+ *     setPersistedState({ isSubscribed: true, email: data.email });
  *   },
  * });
  */
-export const useOptimisticServerAction = <S extends StandardSchemaV1 | undefined, CVE, T, State>(
+export const useOptimisticServerAction = <
+  S extends StandardSchemaV1 | undefined,
+  CVE,
+  T,
+  State,
+  Input = S extends StandardSchemaV1<infer I, unknown> ? I : void,
+>(
   action: HookSafeActionFn<string, S, CVE, ActionResponse<T>>,
-  options: UseOptimisticServerActionOptions<State, T>,
+  options: UseOptimisticServerActionOptions<State, T, Input>,
 ) => {
   const {
     breadcrumbContext,
@@ -120,7 +126,9 @@ export const useOptimisticServerAction = <S extends StandardSchemaV1 | undefined
         onAfterSuccess?.(args.data.data);
       }
     },
-    updateFn: onUpdate,
+    // Type assertion needed because our Input generic is inferred the same way as
+    // next-safe-action's InferInputOrDefault but TypeScript can't verify they're identical
+    updateFn: onUpdate as (state: State, input: unknown) => State,
   });
 
   const execute = useCallback(
