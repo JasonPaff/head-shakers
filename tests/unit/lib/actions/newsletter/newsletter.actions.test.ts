@@ -4,6 +4,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { NewsletterSubscriptionResult } from '@/lib/facades/newsletter/newsletter.facade';
 import type { ActionResponse } from '@/lib/utils/action-response';
 
+// Import action handler functions directly - we'll test the business logic
+import { OPERATIONS } from '@/lib/constants';
+import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
+import { maskEmail } from '@/lib/utils/email-utils';
+import { actionBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import {
+  insertNewsletterSignupSchema,
+  unsubscribeFromNewsletterSchema,
+} from '@/lib/validations/newsletter.validation';
+import { getUserIdAsync } from '@/utils/auth-utils';
+
 // Mock server-only module
 vi.mock('server-only', () => ({}));
 
@@ -47,14 +58,13 @@ vi.mock('@/lib/utils/action-response', async () => {
 });
 
 vi.mock('@/lib/validations/newsletter.validation', async () => {
-  const actual = await vi.importActual('@/lib/validations/newsletter.validation');
-  return actual;
+  return await vi.importActual('@/lib/validations/newsletter.validation');
 });
 
 // Mock the action client and middleware
 vi.mock('@/lib/utils/next-safe-action', () => {
   const createMockActionClient = () => {
-    const mockClient = {
+    return {
       action: vi.fn(
         (handler: (args: { ctx: { db: never; sanitizedInput: object }; parsedInput: object }) => unknown) => {
           // Simulate the action client calling the handler with mock context
@@ -75,7 +85,6 @@ vi.mock('@/lib/utils/next-safe-action', () => {
         return this;
       }),
     };
-    return mockClient;
   };
 
   return {
@@ -86,15 +95,6 @@ vi.mock('@/lib/utils/next-safe-action', () => {
 vi.mock('@/lib/middleware/rate-limit.middleware', () => ({
   createPublicRateLimitMiddleware: vi.fn(() => vi.fn((x: unknown) => x)),
 }));
-
-// Import action handler functions directly - we'll test the business logic
-import { OPERATIONS } from '@/lib/constants';
-import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
-import { maskEmail } from '@/lib/utils/email-utils';
-import { actionBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
-import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
-import { unsubscribeFromNewsletterSchema } from '@/lib/validations/newsletter.validation';
-import { getUserIdAsync } from '@/utils/auth-utils';
 
 describe('newsletter server actions', () => {
   beforeEach(() => {
