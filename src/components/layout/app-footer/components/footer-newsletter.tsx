@@ -21,6 +21,17 @@ import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.valid
 export const FooterNewsletter = withFocusManagement(() => {
   const { focusFirstError } = useFocusContext();
 
+  const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
+    breadcrumbContext: {
+      action: 'newsletter-subscribe',
+      component: 'footer-newsletter',
+    },
+    loadingMessage: 'Subscribing...',
+    onAfterSuccess: () => {
+      form.reset();
+    },
+  });
+
   const form = useAppForm({
     canSubmitWhenInvalid: true,
     defaultValues: {
@@ -38,17 +49,6 @@ export const FooterNewsletter = withFocusManagement(() => {
     }),
     validators: {
       onSubmit: insertNewsletterSignupSchema,
-    },
-  });
-
-  const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
-    breadcrumbContext: {
-      action: 'newsletter-subscribe',
-      component: 'footer-newsletter',
-    },
-    loadingMessage: 'Subscribing...',
-    onAfterSuccess: () => {
-      form.reset();
     },
   });
 

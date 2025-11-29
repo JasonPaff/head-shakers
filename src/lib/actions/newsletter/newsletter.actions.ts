@@ -43,7 +43,7 @@ export const subscribeToNewsletterAction = publicActionClient
       async () => {
         const result = await NewsletterFacade.subscribeAsync(input.email, userId ?? undefined, ctx.db);
 
-        if (result.isSuccessful) {
+        if (!result.isSuccessful) {
           actionBreadcrumb(
             'Newsletter signup failed',
             {
