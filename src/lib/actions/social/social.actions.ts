@@ -73,98 +73,93 @@ export const toggleLikeAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(toggleLikeSchema)
-  .action(
-    async ({
-      ctx,
-      parsedInput,
-    }): Promise<ActionResponse<{ isLiked: boolean; likeCount: number; likeId: null | string }>> => {
-      const likeData = toggleLikeSchema.parse(ctx.sanitizedInput);
-      const dbInstance = ctx.db;
+  .action(async ({ ctx, parsedInput }) => {
+    const likeData = toggleLikeSchema.parse(ctx.sanitizedInput);
+    const dbInstance = ctx.db;
 
-      Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
-        targetId: likeData.targetId,
-        targetType: likeData.targetType,
-        userId: ctx.userId,
+    Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
+      targetId: likeData.targetId,
+      targetType: likeData.targetType,
+      userId: ctx.userId,
+    });
+
+    try {
+      const result = await SocialFacade.toggleLike(
+        likeData.targetId,
+        likeData.targetType,
+        ctx.userId,
+        dbInstance,
+      );
+
+      if (!result.isSuccessful) {
+        throw new ActionError(
+          ErrorType.BUSINESS_RULE,
+          ERROR_CODES.SOCIAL.LIKE_FAILED,
+          ERROR_MESSAGES.SOCIAL.LIKE_FAILED,
+          { ctx, operation: OPERATIONS.SOCIAL.TOGGLE_LIKE },
+          true, // recoverable
+          400,
+        );
+      }
+
+      const actionType = result.isLiked ? 'liked' : 'unliked';
+
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
+          actionType,
+          likeCount: result.likeCount,
+          targetId: likeData.targetId,
+          targetType: likeData.targetType,
+        },
+        level: SENTRY_LEVELS.INFO,
+        message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
       });
 
-      try {
-        const result = await SocialFacade.toggleLike(
-          likeData.targetId,
-          likeData.targetType,
-          ctx.userId,
-          dbInstance,
-        );
+      // Perform cache invalidation synchronously and check result
+      const revalidationResult = CacheRevalidationService.social.onLikeChange(
+        likeData.targetType,
+        likeData.targetId,
+        ctx.userId,
+        result.isLiked ? 'like' : 'unlike',
+      );
 
-        if (!result.isSuccessful) {
-          throw new ActionError(
-            ErrorType.BUSINESS_RULE,
-            ERROR_CODES.SOCIAL.LIKE_FAILED,
-            ERROR_MESSAGES.SOCIAL.LIKE_FAILED,
-            { ctx, operation: OPERATIONS.SOCIAL.TOGGLE_LIKE },
-            true, // recoverable
-            400,
-          );
-        }
-
-        const actionType = result.isLiked ? 'liked' : 'unliked';
-
-        Sentry.addBreadcrumb({
-          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-          data: {
-            actionType,
-            likeCount: result.likeCount,
-            targetId: likeData.targetId,
-            targetType: likeData.targetType,
+      // Log cache invalidation failures to Sentry but don't fail the request
+      if (!revalidationResult.isSuccess) {
+        Sentry.captureException(new Error('Cache invalidation failed for like action'), {
+          extra: {
+            entityId: likeData.targetId,
+            entityType: likeData.targetType,
+            error: revalidationResult.error,
+            operation: actionType,
+            tagsAttempted: revalidationResult.tagsInvalidated,
+            userId: ctx.userId,
           },
-          level: SENTRY_LEVELS.INFO,
-          message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
-        });
-
-        // Perform cache invalidation synchronously and check result
-        const revalidationResult = CacheRevalidationService.social.onLikeChange(
-          likeData.targetType,
-          likeData.targetId,
-          ctx.userId,
-          result.isLiked ? 'like' : 'unlike',
-        );
-
-        // Log cache invalidation failures to Sentry but don't fail the request
-        if (!revalidationResult.isSuccess) {
-          Sentry.captureException(new Error('Cache invalidation failed for like action'), {
-            extra: {
-              entityId: likeData.targetId,
-              entityType: likeData.targetType,
-              error: revalidationResult.error,
-              operation: actionType,
-              tagsAttempted: revalidationResult.tagsInvalidated,
-              userId: ctx.userId,
-            },
-            level: 'warning',
-          });
-        }
-
-        return actionSuccess(
-          {
-            isLiked: result.isLiked,
-            likeCount: result.likeCount,
-            likeId: result.likeId,
-          },
-          result.isLiked ?
-            `Added to liked ${likeData.targetType}s`
-          : `Removed from liked ${likeData.targetType}s`,
-        );
-      } catch (error) {
-        return handleActionError(error, {
-          input: parsedInput,
-          metadata: {
-            actionName: ACTION_NAMES.SOCIAL.LIKE,
-          },
-          operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
-          userId: ctx.userId,
+          level: 'warning',
         });
       }
-    },
-  );
+
+      return actionSuccess(
+        {
+          isLiked: result.isLiked,
+          likeCount: result.likeCount,
+          likeId: result.likeId,
+        },
+        result.isLiked ?
+          `Added to liked ${likeData.targetType}s`
+        : `Removed from liked ${likeData.targetType}s`,
+      );
+    } catch (error) {
+      return handleActionError(error, {
+        input: parsedInput,
+        metadata: {
+          actionName: ACTION_NAMES.SOCIAL.LIKE,
+        },
+        operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
+        userId: ctx.userId,
+      });
+    }
+  });
 
 // ==================== Comment Actions ====================
 

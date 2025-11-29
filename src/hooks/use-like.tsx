@@ -1,11 +1,12 @@
 'use client';
 
 import { useAuth } from '@clerk/nextjs';
+import { useOptimisticAction } from 'next-safe-action/hooks';
 import { useCallback, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
 import type { LikeTargetType } from '@/lib/constants';
 
-import { useOptimisticServerAction } from '@/hooks/use-optimistic-server-action';
 import { toggleLikeAction } from '@/lib/actions/social/social.actions';
 
 interface UseLikeOptions {
@@ -35,21 +36,29 @@ export const useLike = ({
     execute: executeToggle,
     isPending,
     optimisticState,
-  } = useOptimisticServerAction(toggleLikeAction, {
+  } = useOptimisticAction(toggleLikeAction, {
     currentState: persistedState,
-    onAfterError: () => {
+    onError: (args: { error: { serverError?: string; validationErrors?: unknown } }) => {
+      // Show error toast and rollback happens automatically
+      const errorMessage = args.error.serverError || 'Failed to update like status';
+      toast.error(errorMessage);
+
       // Restore initial state via callback for parent components
       onLikeChange?.(isInitiallyLiked, initialLikeCount);
     },
-    onAfterSuccess: (data) => {
+    onSuccess: (args: {
+      data?: { data?: { isLiked: boolean; likeCount: number; likeId: null | string } };
+    }) => {
       // On success, update persisted state so optimistic updates persist
-      setPersistedState({
-        isLiked: data.isLiked,
-        likeCount: data.likeCount,
-        likeId: data.likeId,
-      });
+      if (args.data?.data) {
+        setPersistedState({
+          isLiked: args.data.data.isLiked,
+          likeCount: args.data.data.likeCount,
+          likeId: args.data.data.likeId,
+        });
+      }
     },
-    onUpdate: (currentState) => {
+    updateFn: (currentState: { isLiked: boolean; likeCount: number; likeId: null | string }) => {
       const isNewLiked = !currentState.isLiked;
       const newLikeCount = isNewLiked ? currentState.likeCount + 1 : Math.max(0, currentState.likeCount - 1);
 
