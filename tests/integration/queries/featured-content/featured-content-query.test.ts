@@ -756,7 +756,7 @@ describe('FeaturedContentQuery Integration Tests', () => {
       expect(featured.ownerAvatarUrl).toBe('https://example.com/owner-avatar.jpg');
       expect(featured.isLiked).toBe(true);
       expect(featured.likeId).toBe(like!.id);
-      expect(featured.likes).toBe(0);
+      expect(featured.likes).toBe(1);
       expect(featured.comments).toBe(0);
       expect(featured.totalItems).toBe(0);
       expect(featured.totalValue).toBe('0');
