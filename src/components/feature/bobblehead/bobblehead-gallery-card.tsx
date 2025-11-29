@@ -133,7 +133,7 @@ export const BobbleheadGalleryCard = ({
 
   const photos = useMemo(() => {
     const allPhotos =
-      photosResult.data?.data?.map((photo: SelectBobbleheadPhoto) => ({
+      (photosResult.data?.data as Array<SelectBobbleheadPhoto> | undefined)?.map((photo) => ({
         altText: photo.altText,
         url: photo.url,
       })) ?? [];

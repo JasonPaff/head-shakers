@@ -459,7 +459,9 @@ export const BobbleheadEditDialog = withFocusManagement(
 
           if (photosData && Array.isArray(photosData)) {
             // transform database photos to CloudinaryPhoto format
-            const transformedPhotos = photosData.map(transformDatabasePhotoToCloudinary);
+            const transformedPhotos = (
+              photosData as Array<Parameters<typeof transformDatabasePhotoToCloudinary>[0]>
+            ).map(transformDatabasePhotoToCloudinary);
 
             setPhotoCount(transformedPhotos.length);
 
