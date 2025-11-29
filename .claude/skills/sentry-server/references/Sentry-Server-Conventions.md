@@ -548,6 +548,7 @@ import {
   withActionBreadcrumbs,
   withActionErrorHandling,
   // Facade helpers
+  captureFacadeWarning,
   facadeBreadcrumb,
   trackFacadeEntry,
   trackFacadeError,
@@ -613,15 +614,17 @@ trackActionWarning('CREATE_BOBBLEHEAD', 'photo.move', 'Some photos failed to mov
 Track cache invalidation and automatically log failures as warnings (non-throwing):
 
 ```typescript
-trackCacheInvalidation(
-  CacheRevalidationService.social.onLikeChange(targetType, targetId, userId, 'like'),
-  { entityType: 'like', entityId: targetId, operation: 'onLikeChange', userId }
-);
+trackCacheInvalidation(CacheRevalidationService.social.onLikeChange(targetType, targetId, userId, 'like'), {
+  entityType: 'like',
+  entityId: targetId,
+  operation: 'onLikeChange',
+  userId,
+});
 
 // Can chain for conditional handling
 const result = trackCacheInvalidation(
   CacheRevalidationService.bobbleheads.onDelete(bobbleheadId, userId, collectionId),
-  { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'onDelete', userId }
+  { entityType: 'bobblehead', entityId: bobbleheadId, operation: 'onDelete', userId },
 );
 if (!result.isSuccess) {
   // Handle manually if needed
@@ -649,6 +652,32 @@ trackFacadeWarning('BobbleheadsFacade', 'deleteAsync', 'Failed to delete 2 photo
 trackFacadeError('BobbleheadsFacade', 'createAsync', 'Database transaction failed', {
   errorType: 'TransactionError',
 });
+```
+
+#### `captureFacadeWarning()`
+
+Capture a non-critical exception in a facade with proper tags and warning level. Use for errors that should be logged to Sentry but shouldn't fail the main operation:
+
+```typescript
+// Email sending failure (non-critical)
+try {
+  await EmailService.sendWelcomeEmail(userId);
+} catch (emailError) {
+  captureFacadeWarning(emailError, facadeName, OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL, {
+    signupId,
+  });
+  // Continue execution - don't throw
+}
+
+// Cloudinary cleanup failure
+try {
+  await CloudinaryService.deletePhotos(urls);
+} catch (error) {
+  captureFacadeWarning(error, 'BobbleheadsFacade', 'cloudinary-cleanup', {
+    bobbleheadId,
+    photoCount: urls.length,
+  });
+}
 ```
 
 ### Layer 2: Wrapper Functions (Recommended)
@@ -739,48 +768,48 @@ static async getStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats
 
 ```typescript
 interface ActionOperationContext {
-  actionName: string;              // From ACTION_NAMES constant
-  operation: string;               // From OPERATIONS constant
-  userId?: string;                 // Optional: user ID if authenticated
-  contextType?: keyof typeof SENTRY_CONTEXTS;  // Optional: Sentry context type
-  contextData?: Record<string, unknown>;       // Optional: data for context
+  actionName: string; // From ACTION_NAMES constant
+  operation: string; // From OPERATIONS constant
+  userId?: string; // Optional: user ID if authenticated
+  contextType?: keyof typeof SENTRY_CONTEXTS; // Optional: Sentry context type
+  contextData?: Record<string, unknown>; // Optional: data for context
 }
 
 interface ActionErrorContext extends ActionOperationContext {
-  input?: unknown;                 // Original input data for error context
-  metadata?: Record<string, unknown>;  // Additional metadata
+  input?: unknown; // Original input data for error context
+  metadata?: Record<string, unknown>; // Additional metadata
 }
 
 interface FacadeOperationContext {
-  facade: string;                  // Facade class name
-  method: string;                  // Method name
-  userId?: string;                 // Optional: user ID
+  facade: string; // Facade class name
+  method: string; // Method name
+  userId?: string; // Optional: user ID
 }
 
 interface CacheInvalidationConfig {
-  entityType: string;              // e.g., 'bobblehead', 'collection', 'like'
-  entityId: string;                // ID of the entity being invalidated
-  operation: string;               // Operation that triggered invalidation
-  userId?: string;                 // Optional: user ID if available
+  entityType: string; // e.g., 'bobblehead', 'collection', 'like'
+  entityId: string; // ID of the entity being invalidated
+  operation: string; // Operation that triggered invalidation
+  userId?: string; // Optional: user ID if available
 }
 
 interface WithActionBreadcrumbsOptions<T> {
-  entryMessage?: string;           // Custom entry message
-  successMessage?: string;         // Custom success message
+  entryMessage?: string; // Custom entry message
+  successMessage?: string; // Custom success message
   includeResultSummary?: (result: T) => Record<string, unknown>;
 }
 ```
 
 ### When to Use Each Pattern
 
-| Scenario | Recommended Helper |
-|----------|-------------------|
-| Server action with mutations | `withActionErrorHandling()` |
-| Server action read-only | `withActionBreadcrumbs()` |
-| Facade method (any) | `withFacadeBreadcrumbs()` |
-| Cache invalidation | `trackCacheInvalidation()` |
-| Manual control needed | `trackActionEntry()` + `trackActionSuccess()` |
-| Simple breadcrumb | `actionBreadcrumb()` / `facadeBreadcrumb()` |
+| Scenario                     | Recommended Helper                            |
+| ---------------------------- | --------------------------------------------- |
+| Server action with mutations | `withActionErrorHandling()`                   |
+| Server action read-only      | `withActionBreadcrumbs()`                     |
+| Facade method (any)          | `withFacadeBreadcrumbs()`                     |
+| Cache invalidation           | `trackCacheInvalidation()`                    |
+| Manual control needed        | `trackActionEntry()` + `trackActionSuccess()` |
+| Simple breadcrumb            | `actionBreadcrumb()` / `facadeBreadcrumb()`   |
 
 ### Benefits Over Manual Patterns
 
@@ -795,12 +824,12 @@ interface WithActionBreadcrumbsOptions<T> {
 
 For facade operations that need **both** breadcrumbs AND error handling combined, see the facade helpers in `@/lib/utils/facade-helpers.ts`:
 
-| Helper | Breadcrumbs | Error Handling | Use Case |
-|--------|-------------|----------------|----------|
-| `executeFacadeOperation()` | ✓ | ✓ | Full wrapper for complex facade operations |
-| `executeFacadeMethod()` | ✗ | ✓ | Simplified wrapper when operation name = method name |
-| `executeFacadeOperationWithoutBreadcrumbs()` | ✗ | ✓ | Error handling only |
-| `includeFullResult` | - | - | Helper to spread entire result into breadcrumbs |
+| Helper                                       | Breadcrumbs | Error Handling | Use Case                                             |
+| -------------------------------------------- | ----------- | -------------- | ---------------------------------------------------- |
+| `executeFacadeOperation()`                   | ✓           | ✓              | Full wrapper for complex facade operations           |
+| `executeFacadeMethod()`                      | ✗           | ✓              | Simplified wrapper when operation name = method name |
+| `executeFacadeOperationWithoutBreadcrumbs()` | ✗           | ✓              | Error handling only                                  |
+| `includeFullResult`                          | -           | -              | Helper to spread entire result into breadcrumbs      |
 
 ```typescript
 import { executeFacadeOperation, includeFullResult } from '@/lib/utils/facade-helpers';

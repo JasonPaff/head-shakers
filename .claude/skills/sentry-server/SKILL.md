@@ -82,14 +82,15 @@ Import from `@/lib/utils/sentry-server/breadcrumbs.server`:
 
 ### For Facades
 
-| Function                   | Purpose                                           |
-| -------------------------- | ------------------------------------------------- |
-| `withFacadeBreadcrumbs()`  | Wrap facade method with automatic breadcrumbs     |
-| `trackFacadeEntry()`       | Track facade operation start                      |
-| `trackFacadeSuccess()`     | Track facade success with optional result data    |
-| `trackFacadeWarning()`     | Track facade warning for partial failures         |
-| `trackFacadeError()`       | Track facade error                                |
-| `facadeBreadcrumb()`       | Add a simple breadcrumb for facade operations     |
+| Function                  | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `withFacadeBreadcrumbs()` | Wrap facade method with automatic breadcrumbs              |
+| `trackFacadeEntry()`      | Track facade operation start                               |
+| `trackFacadeSuccess()`    | Track facade success with optional result data             |
+| `trackFacadeWarning()`    | Track facade warning for partial failures                  |
+| `trackFacadeError()`      | Track facade error                                         |
+| `facadeBreadcrumb()`      | Add a simple breadcrumb for facade operations              |
+| `captureFacadeWarning()`  | Capture non-critical exception with warning level and tags |
 
 See `references/Sentry-Server-Conventions.md` for complete documentation with examples.
 

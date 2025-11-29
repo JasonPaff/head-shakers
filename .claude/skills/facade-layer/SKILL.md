@@ -71,7 +71,7 @@ This skill activates when:
 - **Use `withFacadeBreadcrumbs()` wrapper** to add automatic entry/success/error breadcrumbs (recommended)
 - Alternatively, use `trackFacadeEntry()` and `trackFacadeSuccess()` for manual control
 - Use `trackFacadeWarning()` for non-critical failures that shouldn't fail the operation
-- Use `Sentry.captureException` with `level: 'warning'` for non-blocking failures
+- Use `captureFacadeWarning()` to capture non-critical exceptions with proper tags and warning level
 - Never fail main operations due to monitoring failures
 
 ### Documentation Requirements (MANDATORY)

@@ -624,18 +624,18 @@ import { executeFacadeOperation, includeFullResult } from '@/lib/utils/facade-he
 return executeFacadeOperation(
   { facade: facadeName, method: 'getDataAsync', operation: 'getData' },
   async () => fetchData(),
-  { includeResultSummary: includeFullResult },  // Spreads entire result
+  { includeResultSummary: includeFullResult }, // Spreads entire result
 );
 ```
 
 ### When to Use Each Helper
 
-| Scenario | Helper | Breadcrumbs | Error Handling |
-|----------|--------|-------------|----------------|
-| Complex operations needing full observability | `executeFacadeOperation` | ✓ | ✓ |
-| Simple queries (operation name = method name) | `executeFacadeMethod` | ✗ | ✓ |
-| Operations without breadcrumb needs | `executeFacadeOperationWithoutBreadcrumbs` | ✗ | ✓ |
-| Manual control needed | `withFacadeBreadcrumbs` (from sentry-server) | ✓ | ✗ |
+| Scenario                                      | Helper                                       | Breadcrumbs | Error Handling |
+| --------------------------------------------- | -------------------------------------------- | ----------- | -------------- |
+| Complex operations needing full observability | `executeFacadeOperation`                     | ✓           | ✓              |
+| Simple queries (operation name = method name) | `executeFacadeMethod`                        | ✗           | ✓              |
+| Operations without breadcrumb needs           | `executeFacadeOperationWithoutBreadcrumbs`   | ✗           | ✓              |
+| Manual control needed                         | `withFacadeBreadcrumbs` (from sentry-server) | ✓           | ✗              |
 
 ### FacadeOperationConfig Interface
 
@@ -659,6 +659,16 @@ interface FacadeOperationConfig {
 ### Using Helper Utilities (Recommended)
 
 The recommended approach is to use helper utilities from `@/lib/utils/sentry-server/breadcrumbs.server`:
+
+| Function                  | Purpose                                                    |
+| ------------------------- | ---------------------------------------------------------- |
+| `withFacadeBreadcrumbs()` | Wrap facade method with automatic breadcrumbs              |
+| `trackFacadeEntry()`      | Track facade operation start                               |
+| `trackFacadeSuccess()`    | Track facade success with optional result data             |
+| `trackFacadeWarning()`    | Track facade warning for partial failures (breadcrumb)     |
+| `trackFacadeError()`      | Track facade error (breadcrumb)                            |
+| `facadeBreadcrumb()`      | Add a simple breadcrumb for facade operations              |
+| `captureFacadeWarning()`  | Capture non-critical exception with warning level and tags |
 
 #### `withFacadeBreadcrumbs()` - Full Wrapper (Recommended)
 
@@ -704,6 +714,7 @@ Use tracking functions when you need fine-grained control:
 
 ```typescript
 import {
+  captureFacadeWarning,
   trackFacadeEntry,
   trackFacadeSuccess,
   trackFacadeWarning,
@@ -723,9 +734,10 @@ static async deleteAsync(entityId: string, userId: string, dbInstance?: Database
     try {
       await CloudinaryService.deletePhotos(photoUrls);
     } catch (error) {
-      trackFacadeWarning('BobbleheadsFacade', 'deleteAsync', 'Failed to delete photos from Cloudinary', {
+      // Use captureFacadeWarning to capture the exception with proper tags
+      captureFacadeWarning(error, 'BobbleheadsFacade', 'cloudinary-cleanup', {
         entityId,
-        failedCount: photoUrls.length,
+        photoCount: photoUrls.length,
       });
     }
 
@@ -735,6 +747,37 @@ static async deleteAsync(entityId: string, userId: string, dbInstance?: Database
   }
 }
 ```
+
+#### `captureFacadeWarning()` - For Non-Critical Exceptions
+
+Capture a non-critical exception with proper facade tags and warning level. Use when you need to log an exception to Sentry but shouldn't fail the main operation:
+
+```typescript
+// Email sending failure (non-critical)
+try {
+  await EmailService.sendWelcomeEmail(userId);
+} catch (emailError) {
+  captureFacadeWarning(emailError, facadeName, OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL, {
+    signupId,
+  });
+  // Continue execution - don't throw
+}
+
+// Cloudinary cleanup failure
+try {
+  await CloudinaryService.deletePhotos(urls);
+} catch (error) {
+  captureFacadeWarning(error, 'BobbleheadsFacade', 'cloudinary-cleanup', {
+    bobbleheadId,
+    photoCount: urls.length,
+  });
+}
+```
+
+**Key difference from `trackFacadeWarning()`:**
+
+- `trackFacadeWarning()` adds a breadcrumb (trail of events leading up to an error)
+- `captureFacadeWarning()` captures an exception to Sentry (shows up as an issue with stack trace)
 
 ### Manual Pattern (Fallback)
 

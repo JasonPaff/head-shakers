@@ -87,9 +87,9 @@ Facades extend `BaseFacade` which provides context creation helpers:
 
 - [ ] **Use `executeFacadeOperation()` or `withFacadeBreadcrumbs()` wrapper** for automatic entry/success/error breadcrumbs
 - [ ] Alternatively, use `trackFacadeEntry()` + `trackFacadeSuccess()` for manual control
-- [ ] Use `trackFacadeWarning()` for non-critical failures that shouldn't fail the operation
+- [ ] Use `trackFacadeWarning()` for non-critical failures that shouldn't fail the operation (adds breadcrumb)
+- [ ] Use `captureFacadeWarning()` to capture non-critical exceptions with proper tags and warning level (captures to Sentry)
 - [ ] Use `SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC` for facade operations (automatic with helpers)
-- [ ] Capture non-critical exceptions with `level: 'warning'` without failing operation
 - [ ] Use Sentry constants from `@/lib/constants` (never hardcode strings)
 - [ ] Include relevant IDs in breadcrumb data (entityId, userId, operation)
 
