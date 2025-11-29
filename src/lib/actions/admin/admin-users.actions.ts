@@ -101,7 +101,7 @@ export const getUserDetailsAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(adminUserDetailsSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ stats: UserStats; user: UserRecord; }>> => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ stats: UserStats; user: UserRecord }>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { userId: targetUserId } = adminUserDetailsSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;

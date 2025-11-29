@@ -47,66 +47,70 @@ Return at minimum 3 relevant files. Validate that each file exists before includ
 
 ### Critical Priority Files (Require Modification)
 
-| File Path | Reason | Modification Type |
-|-----------|--------|-------------------|
-| `src/lib/db/schema/newsletter-signups.schema.ts` | Contains `updatedAt` column definition (line 24) and check constraint (line 33) | Remove column and constraint |
-| `src/lib/queries/newsletter/newsletter.queries.ts` | Sets `updatedAt: new Date()` in 3 update operations (lines 153, 177, 204) | Remove updatedAt references |
-| `src/lib/validations/newsletter.validation.ts` | Uses drizzle-zod auto-generation; verify omit list | Update omit configuration |
+| File Path                                          | Reason                                                                          | Modification Type            |
+| -------------------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------- |
+| `src/lib/db/schema/newsletter-signups.schema.ts`   | Contains `updatedAt` column definition (line 24) and check constraint (line 33) | Remove column and constraint |
+| `src/lib/queries/newsletter/newsletter.queries.ts` | Sets `updatedAt: new Date()` in 3 update operations (lines 153, 177, 204)       | Remove updatedAt references  |
+| `src/lib/validations/newsletter.validation.ts`     | Uses drizzle-zod auto-generation; verify omit list                              | Update omit configuration    |
 
 ### High Priority Files (Migration)
 
-| File Path | Reason | Modification Type |
-|-----------|--------|-------------------|
+| File Path                                                        | Reason                                 | Modification Type                             |
+| ---------------------------------------------------------------- | -------------------------------------- | --------------------------------------------- |
 | `src/lib/db/migrations/20251125005244_awesome_justin_hammer.sql` | Original migration creating the column | Review only (new migration will be generated) |
-| New migration file (to be created) | Will drop column and constraint | Create via `npm run db:generate` |
+| New migration file (to be created)                               | Will drop column and constraint        | Create via `npm run db:generate`              |
 
 ### Medium Priority Files (Review Only)
 
-| File Path | Reason | Modification Type |
-|-----------|--------|-------------------|
-| `src/lib/facades/newsletter/newsletter.facade.ts` | Calls query methods; types auto-update | Review only |
-| `src/lib/actions/newsletter/newsletter.actions.ts` | Uses validation schemas; no direct updatedAt reference | Review only |
+| File Path                                          | Reason                                                 | Modification Type |
+| -------------------------------------------------- | ------------------------------------------------------ | ----------------- |
+| `src/lib/facades/newsletter/newsletter.facade.ts`  | Calls query methods; types auto-update                 | Review only       |
+| `src/lib/actions/newsletter/newsletter.actions.ts` | Uses validation schemas; no direct updatedAt reference | Review only       |
 
 ### Low Priority Files (Review Only)
 
-| File Path | Reason | Modification Type |
-|-----------|--------|-------------------|
-| `src/lib/services/cache-revalidation.service.ts` | Newsletter cache invalidation; no updatedAt refs | Review only |
-| `src/lib/services/cache.service.ts` | Newsletter caching utilities; no updatedAt refs | Review only |
-| `src/components/layout/app-footer/components/footer-newsletter.tsx` | UI component; no direct field references | Review only |
-| `src/lib/constants/schema-limits.ts` | Schema limits; no timestamp limits | Review only |
-| `src/lib/db/schema/index.ts` | Barrel export; auto-reflects changes | Review only |
+| File Path                                                           | Reason                                           | Modification Type |
+| ------------------------------------------------------------------- | ------------------------------------------------ | ----------------- |
+| `src/lib/services/cache-revalidation.service.ts`                    | Newsletter cache invalidation; no updatedAt refs | Review only       |
+| `src/lib/services/cache.service.ts`                                 | Newsletter caching utilities; no updatedAt refs  | Review only       |
+| `src/components/layout/app-footer/components/footer-newsletter.tsx` | UI component; no direct field references         | Review only       |
+| `src/lib/constants/schema-limits.ts`                                | Schema limits; no timestamp limits               | Review only       |
+| `src/lib/db/schema/index.ts`                                        | Barrel export; auto-reflects changes             | Review only       |
 
 ## Key Architecture Insights
 
 ### Drizzle-Zod Integration Pattern
+
 - Codebase uses `createSelectSchema` and `createInsertSchema` from `drizzle-zod`
 - Validation schemas auto-generate from Drizzle table definitions
 - Type chain: Drizzle schema → Drizzle-Zod → TypeScript types
 
 ### Update Pattern in Queries
+
 All update operations explicitly set `updatedAt: new Date()`:
+
 - `resubscribeAsync` (line 153)
 - `unsubscribeAsync` (line 177)
 - `updateUserIdAsync` (line 204)
 
 ### Database Constraint
+
 - CHECK constraint: `newsletter_signups_dates_logic`
 - Ensures: `created_at <= updated_at`
 - Must be dropped before dropping the column
 
 ## File Validation Results
 
-| File | Exists | Accessible |
-|------|--------|------------|
-| `src/lib/db/schema/newsletter-signups.schema.ts` | ✅ | ✅ |
-| `src/lib/queries/newsletter/newsletter.queries.ts` | ✅ | ✅ |
-| `src/lib/validations/newsletter.validation.ts` | ✅ | ✅ |
-| `src/lib/facades/newsletter/newsletter.facade.ts` | ✅ | ✅ |
-| `src/lib/actions/newsletter/newsletter.actions.ts` | ✅ | ✅ |
-| `src/lib/services/cache-revalidation.service.ts` | ✅ | ✅ |
-| `src/lib/services/cache.service.ts` | ✅ | ✅ |
-| `src/components/layout/app-footer/components/footer-newsletter.tsx` | ✅ | ✅ |
+| File                                                                | Exists | Accessible |
+| ------------------------------------------------------------------- | ------ | ---------- |
+| `src/lib/db/schema/newsletter-signups.schema.ts`                    | ✅     | ✅         |
+| `src/lib/queries/newsletter/newsletter.queries.ts`                  | ✅     | ✅         |
+| `src/lib/validations/newsletter.validation.ts`                      | ✅     | ✅         |
+| `src/lib/facades/newsletter/newsletter.facade.ts`                   | ✅     | ✅         |
+| `src/lib/actions/newsletter/newsletter.actions.ts`                  | ✅     | ✅         |
+| `src/lib/services/cache-revalidation.service.ts`                    | ✅     | ✅         |
+| `src/lib/services/cache.service.ts`                                 | ✅     | ✅         |
+| `src/components/layout/app-footer/components/footer-newsletter.tsx` | ✅     | ✅         |
 
 ## Test Coverage Note
 

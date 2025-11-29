@@ -159,7 +159,6 @@ export class NewsletterQuery extends BaseQuery {
       .set({
         subscribedAt: new Date(),
         unsubscribedAt: null,
-        updatedAt: new Date(),
       })
       .where(eq(newsletterSignups.email, normalizedEmail))
       .returning();
@@ -183,7 +182,6 @@ export class NewsletterQuery extends BaseQuery {
       .update(newsletterSignups)
       .set({
         unsubscribedAt: new Date(),
-        updatedAt: new Date(),
       })
       .where(eq(newsletterSignups.email, normalizedEmail))
       .returning();
@@ -210,7 +208,6 @@ export class NewsletterQuery extends BaseQuery {
     const result = await dbInstance
       .update(newsletterSignups)
       .set({
-        updatedAt: new Date(),
         userId,
       })
       .where(eq(newsletterSignups.email, normalizedEmail))

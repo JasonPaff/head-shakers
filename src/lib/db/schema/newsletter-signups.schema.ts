@@ -11,7 +11,7 @@ import { SCHEMA_LIMITS } from '@/lib/constants';
  * - Email is unique and required
  * - userId is optional for linking to Clerk users (varchar to match Clerk ID format)
  * - Uses soft delete pattern with unsubscribedAt timestamp
- * - Standard audit timestamps (createdAt, updatedAt)
+ * - Standard audit timestamp (createdAt)
  */
 export const newsletterSignups = pgTable(
   'newsletter_signups',
@@ -21,7 +21,6 @@ export const newsletterSignups = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     subscribedAt: timestamp('subscribed_at').defaultNow().notNull(),
     unsubscribedAt: timestamp('unsubscribed_at'),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
     userId: varchar('user_id', { length: SCHEMA_LIMITS.NEWSLETTER_SIGNUP.USER_ID.MAX }),
   },
   (table) => [
@@ -30,7 +29,6 @@ export const newsletterSignups = pgTable(
       'newsletter_signups_email_not_empty',
       sql`length(trim(${table.email})) >= ${sql.raw(String(SCHEMA_LIMITS.NEWSLETTER_SIGNUP.EMAIL.MIN))}`,
     ),
-    check('newsletter_signups_dates_logic', sql`${table.createdAt} <= ${table.updatedAt}`),
     check(
       'newsletter_signups_unsubscribed_after_subscribed',
       sql`${table.unsubscribedAt} IS NULL OR ${table.unsubscribedAt} >= ${table.subscribedAt}`,
