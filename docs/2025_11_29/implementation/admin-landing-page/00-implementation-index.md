@@ -16,11 +16,11 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Loaded |
-|------|------------|---------------|
-| 1. Update Admin Page Component Structure | server-component-specialist | react-coding-conventions, ui-components, server-components |
-| 2. Add Responsive Grid Layout and Styling | server-component-specialist | react-coding-conventions, ui-components, server-components |
-| 3. Test Navigation and Accessibility | orchestrator (verification only) | N/A |
+| Step                                      | Specialist                       | Skills Loaded                                              |
+| ----------------------------------------- | -------------------------------- | ---------------------------------------------------------- |
+| 1. Update Admin Page Component Structure  | server-component-specialist      | react-coding-conventions, ui-components, server-components |
+| 2. Add Responsive Grid Layout and Styling | server-component-specialist      | react-coding-conventions, ui-components, server-components |
+| 3. Test Navigation and Accessibility      | orchestrator (verification only) | N/A                                                        |
 
 ## Navigation
 
@@ -34,11 +34,11 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Duration | Issues |
-|------|------------|--------|----------|--------|
-| 1. Update Admin Page Component Structure | server-component-specialist | ✓ | ~2 min | None |
-| 2. Add Responsive Grid Layout and Styling | server-component-specialist | ✓ | ~30 sec | None |
-| 3. Test Navigation and Accessibility | orchestrator | ✓ | ~1 min | None |
+| Step                                      | Specialist                  | Status | Duration | Issues |
+| ----------------------------------------- | --------------------------- | ------ | -------- | ------ |
+| 1. Update Admin Page Component Structure  | server-component-specialist | ✓      | ~2 min   | None   |
+| 2. Add Responsive Grid Layout and Styling | server-component-specialist | ✓      | ~30 sec  | None   |
+| 3. Test Navigation and Accessibility      | orchestrator                | ✓      | ~1 min   | None   |
 
 ## Summary
 

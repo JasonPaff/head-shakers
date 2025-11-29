@@ -26,24 +26,27 @@ Enhance the existing admin landing page to include all 5 admin sections with pro
 ## File Discovery Results
 
 ### File to Modify
+
 - `src/app/(app)/admin/page.tsx` - Current admin landing page (needs enhancement)
 
 ### Reference Files
-| File | Purpose |
-|------|---------|
+
+| File                                                                     | Purpose                                                    |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------- |
 | `src/components/layout/app-header/components/app-header-mobile-menu.tsx` | Contains adminNavItems array with all 5 sections and icons |
-| `src/components/ui/card.tsx` | Card components to use |
-| `src/components/layout/admin/admin-layout.tsx` | Layout wrapper (already used) |
-| `src/components/ui/admin/admin-route-guard.tsx` | Auth/authorization component |
+| `src/components/ui/card.tsx`                                             | Card components to use                                     |
+| `src/components/layout/admin/admin-layout.tsx`                           | Layout wrapper (already used)                              |
+| `src/components/ui/admin/admin-route-guard.tsx`                          | Auth/authorization component                               |
 
 ### Admin Sections to Include
-| Section | Route | Icon | Description |
-|---------|-------|------|-------------|
-| Featured Content | `/admin/featured-content` | SparklesIcon | Manage homepage featured collections and bobbleheads |
-| Analytics | `/admin/analytics` | ChartSplineIcon | View platform usage and engagement metrics |
-| Launch Notifications | `/admin/launch-notifications` | MailIcon | Manage pre-launch email signups |
-| Reports | `/admin/reports` | TriangleAlertIcon | Review content reports and moderation queue |
-| Users | `/admin/users` | UsersIcon | Manage users, roles, and permissions |
+
+| Section              | Route                         | Icon              | Description                                          |
+| -------------------- | ----------------------------- | ----------------- | ---------------------------------------------------- |
+| Featured Content     | `/admin/featured-content`     | SparklesIcon      | Manage homepage featured collections and bobbleheads |
+| Analytics            | `/admin/analytics`            | ChartSplineIcon   | View platform usage and engagement metrics           |
+| Launch Notifications | `/admin/launch-notifications` | MailIcon          | Manage pre-launch email signups                      |
+| Reports              | `/admin/reports`              | TriangleAlertIcon | Review content reports and moderation queue          |
+| Users                | `/admin/users`                | UsersIcon         | Manage users, roles, and permissions                 |
 
 ---
 
@@ -66,9 +69,11 @@ Enhance the existing admin landing page to include all 5 admin sections with pro
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/page.tsx` - Replace current implementation with enhanced version
 
 **Changes:**
+
 - Add imports for Link from Next.js and $path from next-typesafe-url
 - Add imports for all 5 Lucide React icons (SparklesIcon, ChartSplineIcon, MailIcon, TriangleAlertIcon, UsersIcon)
 - Replace existing 3 cards with 5 new cards matching adminNavItems structure from mobile menu
@@ -81,11 +86,13 @@ Enhance the existing admin landing page to include all 5 admin sections with pro
 - Maintain existing generateMetadata function
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All 5 admin sections are displayed as cards
 - [ ] Each card shows the correct icon from Lucide React
 - [ ] Each card is clickable and uses $path for routing
@@ -107,9 +114,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/admin/page.tsx` - Update grid classes and add hover effects
 
 **Changes:**
+
 - Maintain the existing responsive grid: `grid gap-6 md:grid-cols-2 lg:grid-cols-3`
 - Add transition classes to Card components for smooth hover effects
 - Add hover state classes: `hover:border-primary/50 hover:shadow-md`
@@ -118,11 +127,13 @@ npm run lint:fix && npm run typecheck
 - Structure each card consistently: CardHeader with icon and title, CardContent with description
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Grid displays 1 column on mobile, 2 on tablet, 3 on desktop
 - [ ] Cards have smooth hover transitions
 - [ ] Hover effects include border color and shadow changes
@@ -141,17 +152,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None (testing step only)
 
 **Changes:**
+
 - Manual verification only - no code changes in this step
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Clicking each card navigates to the correct admin section route
 - [ ] All routes use type-safe $path utility (verified in code review)
 - [ ] Icons have `aria-hidden` attribute for proper screen reader behavior
@@ -179,6 +194,7 @@ npm run lint:fix && npm run typecheck
 ## Notes
 
 ### Important Considerations
+
 - The admin landing page uses `isAdminRequired={false}` which means it's accessible to both moderators and admins. This should remain unchanged.
 - Icon imports must exactly match the mobile menu pattern: SparklesIcon, ChartSplineIcon, MailIcon, TriangleAlertIcon, UsersIcon
 - The Link component should wrap the entire Card component to make the full card clickable
@@ -187,18 +203,20 @@ npm run lint:fix && npm run typecheck
 - The responsive grid already exists and should be maintained
 
 ### Architectural Decisions
-| Decision | Confidence | Rationale |
-|----------|------------|-----------|
-| Link Wrapper Pattern | High | Wrapping entire Card in Link provides best UX |
-| Icon Placement | High | Icons in CardHeader next to title matches common patterns |
-| Static Implementation | High | No dynamic data needed - purely navigation page |
-| Hover Effects | Medium | Border and shadow changes provide clear feedback |
+
+| Decision              | Confidence | Rationale                                                 |
+| --------------------- | ---------- | --------------------------------------------------------- |
+| Link Wrapper Pattern  | High       | Wrapping entire Card in Link provides best UX             |
+| Icon Placement        | High       | Icons in CardHeader next to title matches common patterns |
+| Static Implementation | High       | No dynamic data needed - purely navigation page           |
+| Hover Effects         | Medium     | Border and shadow changes provide clear feedback          |
 
 ### Edge Cases and Risks
-| Risk/Edge Case | Level | Mitigation |
-|----------------|-------|------------|
-| Route Mismatch | Low | All routes verified to exist |
-| Icon Import Errors | Low | All icons already used in mobile menu |
-| TypeScript Errors | Low | Using established patterns |
-| Long Descriptions | Low | Keep descriptions concise |
-| Accessibility | Low | Use aria-hidden on icons |
+
+| Risk/Edge Case     | Level | Mitigation                            |
+| ------------------ | ----- | ------------------------------------- |
+| Route Mismatch     | Low   | All routes verified to exist          |
+| Icon Import Errors | Low   | All icons already used in mobile menu |
+| TypeScript Errors  | Low   | Using established patterns            |
+| Long Descriptions  | Low   | Keep descriptions concise             |
+| Accessibility      | Low   | Use aria-hidden on icons              |

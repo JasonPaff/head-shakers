@@ -30,48 +30,54 @@ A static admin landing page that serves as the primary entry point for administr
 ### Files by Priority
 
 #### Critical Priority (3 files)
-| File | Modification | Reason |
-|------|-------------|--------|
-| `src/app/(app)/admin/page.tsx` | YES - Modify | Main admin landing page - needs enhancement |
-| `src/components/layout/admin/admin-layout.tsx` | NO - Reference | Layout wrapper with authentication |
-| `src/components/ui/admin/admin-route-guard.tsx` | NO - Reference | Auth/authorization component |
+
+| File                                            | Modification   | Reason                                      |
+| ----------------------------------------------- | -------------- | ------------------------------------------- |
+| `src/app/(app)/admin/page.tsx`                  | YES - Modify   | Main admin landing page - needs enhancement |
+| `src/components/layout/admin/admin-layout.tsx`  | NO - Reference | Layout wrapper with authentication          |
+| `src/components/ui/admin/admin-route-guard.tsx` | NO - Reference | Auth/authorization component                |
 
 #### High Priority (4 files)
-| File | Modification | Reason |
-|------|-------------|--------|
+
+| File                           | Modification   | Reason                         |
+| ------------------------------ | -------------- | ------------------------------ |
 | `src/lib/utils/admin.utils.ts` | NO - Reference | Admin authentication utilities |
-| `src/components/ui/card.tsx` | NO - Use as-is | Card UI component |
-| `src/components/ui/button.tsx` | NO - Use as-is | Button component with asChild |
-| `src/components/ui/badge.tsx` | NO - Optional | Badge for status indicators |
+| `src/components/ui/card.tsx`   | NO - Use as-is | Card UI component              |
+| `src/components/ui/button.tsx` | NO - Use as-is | Button component with asChild  |
+| `src/components/ui/badge.tsx`  | NO - Optional  | Badge for status indicators    |
 
 #### Medium Priority - Reference Pages (5 files)
-| File | Purpose |
-|------|---------|
-| `src/app/(app)/admin/featured-content/page.tsx` | Pattern example |
-| `src/app/(app)/admin/analytics/page.tsx` | Suspense patterns |
-| `src/app/(app)/admin/users/page.tsx` | Complex admin page |
-| `src/app/(app)/admin/reports/page.tsx` | Stats cards pattern |
-| `src/app/(app)/admin/launch-notifications/page.tsx` | Simple admin page |
+
+| File                                                | Purpose             |
+| --------------------------------------------------- | ------------------- |
+| `src/app/(app)/admin/featured-content/page.tsx`     | Pattern example     |
+| `src/app/(app)/admin/analytics/page.tsx`            | Suspense patterns   |
+| `src/app/(app)/admin/users/page.tsx`                | Complex admin page  |
+| `src/app/(app)/admin/reports/page.tsx`              | Stats cards pattern |
+| `src/app/(app)/admin/launch-notifications/page.tsx` | Simple admin page   |
 
 #### Medium Priority - Navigation (2 files)
-| File | Purpose |
-|------|---------|
-| `src/components/layout/app-header/components/app-header-user.tsx` | Admin link pattern |
+
+| File                                                                     | Purpose                   |
+| ------------------------------------------------------------------------ | ------------------------- |
+| `src/components/layout/app-header/components/app-header-user.tsx`        | Admin link pattern        |
 | `src/components/layout/app-header/components/app-header-mobile-menu.tsx` | **Admin nav items array** |
 
 #### Low Priority (6 files)
-| File | Purpose |
-|------|---------|
-| `src/middleware.ts` | Route protection config |
-| `src/app/(app)/layout.tsx` | App layout structure |
-| `src/lib/test-ids/generator.ts` | Test ID generation |
-| `src/utils/auth-utils.ts` | $path patterns |
-| `src/app/(app)/(home)/components/sections/hero-section.tsx` | Icon/Link patterns |
-| `src/lib/constants/enums.ts` | User role definitions |
+
+| File                                                        | Purpose                 |
+| ----------------------------------------------------------- | ----------------------- |
+| `src/middleware.ts`                                         | Route protection config |
+| `src/app/(app)/layout.tsx`                                  | App layout structure    |
+| `src/lib/test-ids/generator.ts`                             | Test ID generation      |
+| `src/utils/auth-utils.ts`                                   | $path patterns          |
+| `src/app/(app)/(home)/components/sections/hero-section.tsx` | Icon/Link patterns      |
+| `src/lib/constants/enums.ts`                                | User role definitions   |
 
 ## Key Architecture Insights
 
 ### Existing Admin Sections (5 total)
+
 1. **Featured Content** (`/admin/featured-content`) - SparklesIcon
 2. **Analytics** (`/admin/analytics`) - ChartSplineIcon
 3. **Launch Notifications** (`/admin/launch-notifications`) - MailIcon
@@ -79,6 +85,7 @@ A static admin landing page that serves as the primary entry point for administr
 5. **Users** (`/admin/users`) - UsersIcon
 
 ### Current State of Admin Landing Page
+
 - Exists at `src/app/(app)/admin/page.tsx`
 - Only shows 3 cards (missing Analytics and Launch Notifications)
 - Hardcoded statistics (12, 3, 1,234)
@@ -89,18 +96,21 @@ A static admin landing page that serves as the primary entry point for administr
 ### Key Patterns Discovered
 
 **$path Usage:**
+
 ```typescript
 import { $path } from 'next-typesafe-url';
 <Link href={$path({ route: '/admin/section' })}>
 ```
 
 **Icon Usage:**
+
 ```typescript
 import { IconName } from 'lucide-react';
 <IconName aria-hidden className={'size-6 text-muted-foreground'} />
 ```
 
 **Admin Nav Items Array (from mobile menu):**
+
 ```typescript
 const adminNavItems = [
   { href: $path({ route: '/admin/featured-content' }), icon: SparklesIcon, label: 'Featured Content' },
