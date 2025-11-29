@@ -1,11 +1,9 @@
 import type { Metadata } from 'next';
 
 import { withParamValidation } from 'next-typesafe-url/app/hoc';
-import { Suspense } from 'react';
 
-import { DashboardHeader } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-header';
-import { DashboardTabs } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-tabs';
-import { DashboardHeaderSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/dashboard-header-skeleton';
+import { BobbleheadManagementDashboard } from '@/app/(app)/dashboard/collection/(collection)/mockups/bobblehead-mgmt-1';
+import { Mockup1 } from '@/app/(app)/dashboard/collection/(collection)/mockups/mockup-1';
 import { Route } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 import { ContentLayout } from '@/components/layout/content-layout';
 
@@ -23,10 +21,8 @@ export const dynamic = 'force-dynamic';
 function DashboardCollectionPage() {
   return (
     <ContentLayout>
-      <Suspense fallback={<DashboardHeaderSkeleton />}>
-        <DashboardHeader />
-      </Suspense>
-      <DashboardTabs />
+      <Mockup1 />
+      <BobbleheadManagementDashboard />
     </ContentLayout>
   );
 }
