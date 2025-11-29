@@ -120,7 +120,7 @@ export const toggleLikeAction = authActionClient
   .inputSchema(toggleLikeSchema)
   .action(async ({ ctx, parsedInput }) => {
     const data = toggleLikeSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     // 1. Set context at start
     Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
@@ -663,7 +663,7 @@ export const createBobbleheadAction = authActionClient
   .inputSchema(insertBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
     const data = insertBobbleheadSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     return withActionErrorHandling(
       {

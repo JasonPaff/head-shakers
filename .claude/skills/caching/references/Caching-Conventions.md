@@ -722,7 +722,7 @@ export const updateBobbleheadAction = authActionClient
   .inputSchema(updateBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
     const data = updateBobbleheadSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     try {
       // 1. Delegate to facade

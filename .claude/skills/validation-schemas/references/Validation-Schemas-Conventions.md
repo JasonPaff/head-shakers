@@ -470,7 +470,7 @@ export const createBobbleheadAction = authActionClient
     // WRONG: Never use parsedInput directly
     // const data = parsedInput; // Don't do this!
 
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
     // ... rest of action
   });
 ```

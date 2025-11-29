@@ -62,7 +62,7 @@ export const {verb}{Entity}Action = authActionClient
   .action(async ({ ctx, parsedInput }) => {
     // CRITICAL: Always parse sanitizedInput through schema, never use parsedInput directly
     const data = {validationSchema}.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     // 1. Set Sentry context first
     Sentry.setContext(SENTRY_CONTEXTS.{CONTEXT_NAME}, {
@@ -145,8 +145,8 @@ The `ctx.sanitizedInput` is sanitized but typed as `unknown`. You must run it th
 ### 2. Database Instance
 
 ```typescript
-// Always prefer transaction if available
-const dbInstance = ctx.tx ?? ctx.db;
+// ctx.db is the transaction when isTransactionRequired: true, otherwise the regular db
+const dbInstance = ctx.db;
 ```
 
 ### 3. Metadata Configuration
@@ -200,7 +200,7 @@ export const createCollectionAction = authActionClient
   .inputSchema(insertCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const data = insertCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     return withActionErrorHandling(
       {

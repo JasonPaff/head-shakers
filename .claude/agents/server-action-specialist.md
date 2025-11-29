@@ -36,15 +36,97 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 - [ ] Include metadata with `actionName` and `isTransactionRequired`
 - [ ] Return consistent shape: `{ success, message, data }`
 
-### Sentry & Error Handling Helpers (from `@/lib/utils/sentry-server/breadcrumbs.server`)
+### Sentry & Error Handling - MANDATORY HELPERS
 
-- [ ] **Use `withActionErrorHandling()`** for mutations - combines context, breadcrumbs, AND error handling (recommended)
-- [ ] **Use `withActionBreadcrumbs()`** for read-only actions - breadcrumbs only, errors propagate
-- [ ] **Use `trackCacheInvalidation()`** after mutations - automatically logs failures as warnings
-- [ ] **Use `trackActionEntry()` + `trackActionSuccess()`** for manual control when needed
-- [ ] **Use `setActionContext()`** for type-safe Sentry context setting
+> **CRITICAL**: You MUST use the helper utilities from `@/lib/utils/sentry-server/breadcrumbs.server`.
+> **DO NOT** use manual `Sentry.setContext()`, `Sentry.addBreadcrumb()`, or try-catch with `handleActionError()` directly.
+> The manual pattern is DEPRECATED. Always use the wrapper helpers described below.
+
+**REQUIRED for mutation actions (create, update, delete, toggle):**
+
+```typescript
+import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+return withActionErrorHandling(
+  {
+    actionName: ACTION_NAMES.DOMAIN.ACTION,
+    operation: OPERATIONS.DOMAIN.OPERATION,
+    userId: ctx.userId,
+    input: parsedInput,
+    contextType: 'CONTEXT_TYPE',  // e.g., 'BOBBLEHEAD_DATA', 'COLLECTION_DATA'
+    contextData: { /* relevant non-PII data */ },
+  },
+  async () => {
+    // Business logic - delegate to facade
+    const result = await DomainFacade.methodAsync(...);
+    return { data: result, success: true, message: 'Success message' };
+  },
+  { includeResultSummary: (r) => ({ entityId: r.data.id }) },
+);
+```
+
+**REQUIRED for read-only actions:**
+
+```typescript
+import { withActionBreadcrumbs } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+return withActionBreadcrumbs(
+  { actionName: 'ACTION_NAME', operation: 'domain.operation' },
+  async () => {
+    return await DomainFacade.queryAsync(...);
+  },
+);
+```
+
+**REQUIRED after cache-invalidating mutations:**
+
+```typescript
+import { trackCacheInvalidation } from '@/lib/utils/sentry-server/breadcrumbs.server';
+
+trackCacheInvalidation(
+  CacheRevalidationService.domain.onEntityChange(entityId, userId),
+  { entityType: 'entity', entityId, operation: 'onEntityChange', userId }
+);
+```
+
+### Sentry Helper Reference
+
+| Action Type | MUST Use | Purpose |
+|-------------|----------|---------|
+| Mutations (create/update/delete) | `withActionErrorHandling()` | Context + breadcrumbs + error handling |
+| Read-only queries | `withActionBreadcrumbs()` | Breadcrumbs only, errors propagate |
+| Cache invalidation | `trackCacheInvalidation()` | Logs failures as warnings (non-throwing) |
+| Type-safe context (rare) | `setActionContext()` | When manual context needed outside wrappers |
+
+### What NOT to Do (DEPRECATED PATTERNS)
+
+```typescript
+// ❌ WRONG - Do NOT use manual Sentry calls
+Sentry.setContext(SENTRY_CONTEXTS.DATA, { ... });
+try {
+  const result = await Facade.method(...);
+  Sentry.addBreadcrumb({ ... });
+  return { success: true, data: result };
+} catch (error) {
+  return handleActionError(error, { ... });
+}
+
+// ✅ CORRECT - Use withActionErrorHandling wrapper
+return withActionErrorHandling(
+  { actionName, operation, userId, input: parsedInput, contextType, contextData },
+  async () => {
+    const result = await Facade.method(...);
+    return { success: true, data: result, message: 'Success' };
+  },
+  { includeResultSummary: (r) => ({ id: r.data.id }) },
+);
+```
+
+### Additional Requirements
+
 - [ ] Use facades for business logic (actions are thin orchestrators)
-- [ ] Handle errors with `handleActionError` utility (automatic with `withActionErrorHandling`)
+- [ ] Verify you used `withActionErrorHandling()` for ALL mutation actions
+- [ ] Verify you used `trackCacheInvalidation()` after mutations that affect cached data
 
 ### Client-Side Consumption Requirements
 
@@ -96,6 +178,12 @@ When completing a step, provide:
 
 **Files Created**:
 - path/to/newfile.ts - Description of purpose
+
+**Sentry Helper Verification** (REQUIRED):
+- [ ] Used `withActionErrorHandling()` for mutation actions: YES / NO / N/A
+- [ ] Used `withActionBreadcrumbs()` for read-only actions: YES / NO / N/A
+- [ ] Used `trackCacheInvalidation()` after mutations: YES / NO / N/A
+- [ ] NO manual Sentry.setContext/addBreadcrumb calls: VERIFIED / VIOLATION
 
 **Conventions Applied**:
 - [List key conventions that were followed]
