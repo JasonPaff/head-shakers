@@ -37,19 +37,23 @@ Refined Request: Remove the `totalValue` column from the `collections` table in 
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/collections.schema.ts`
 
 **Changes:**
+
 - Remove the `totalValue` column definition (lines 33-36)
 - Remove the `totalValue` non-negative check constraint (line 68)
 - Remove the `collections_total_value_desc_idx` index (line 60)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `totalValue` column definition removed from schema
 - [ ] `collections_total_value_non_negative` constraint removed
 - [ ] `collections_total_value_desc_idx` index removed
@@ -65,19 +69,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/defaults.ts`
 - `src/lib/constants/schema-limits.ts`
 
 **Changes:**
+
 - In defaults.ts: Remove `TOTAL_VALUE: '0.00'` from COLLECTION object (line 27)
 - In schema-limits.ts: Remove `TOTAL_VALUE: { PRECISION: 15, SCALE: 2 }` from COLLECTION object (line 34)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] TOTAL_VALUE removed from DEFAULTS.COLLECTION
 - [ ] TOTAL_VALUE removed from SCHEMA_LIMITS.COLLECTION
 - [ ] All validation commands pass
@@ -92,9 +100,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts`
 
 **Changes:**
+
 - In the SELECT clause at line 466 (category filter path), replace `totalValue: collections.totalValue` with computed SQL expression using LEFT JOIN and SUM
 - In the SELECT clause at line 549 (no category filter path), replace `totalValue: collections.totalValue` with same computed SQL expression
 - Add LEFT JOIN to bobbleheads table with soft delete filter for both query paths
@@ -102,11 +112,13 @@ npm run lint:fix && npm run typecheck
 - Update type definition BrowseCollectionRecord if needed to reflect computed value type
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both SELECT statements use computed totalValue via SQL aggregation
 - [ ] LEFT JOIN includes `AND bobbleheads.deletedAt IS NULL` filter
 - [ ] COALESCE ensures non-null result (0 for empty collections)
@@ -122,9 +134,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts`
 
 **Changes:**
+
 - In the SELECT clause at line 690, replace `totalValue: collections.totalValue` with computed SQL expression
 - In the SELECT clause at line 716, replace same pattern in transformed results
 - Add LEFT JOIN to bobbleheads table with soft delete filter
@@ -132,11 +146,13 @@ npm run lint:fix && npm run typecheck
 - Ensure aggregation doesn't affect pagination or other query logic
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] SELECT statement uses computed totalValue via SQL aggregation
 - [ ] LEFT JOIN and GROUP BY correctly structured
 - [ ] Pagination logic unaffected
@@ -152,9 +168,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/featured-content/featured-content-query.ts`
 
 **Changes:**
+
 - In FeaturedCollectionData type definition (line 34), update `totalValue` type if necessary (currently `null | string`)
 - In getFeaturedCollectionsAsync method (line 412), replace `totalValue: collections.totalValue` in SELECT with computed SQL expression
 - Add LEFT JOIN to bobbleheads table with collectionId match and deletedAt filter
@@ -162,11 +180,13 @@ npm run lint:fix && npm run typecheck
 - Ensure aggregation doesn't break the existing join to users and likes tables
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Type definition reflects computed value approach
 - [ ] SELECT statement uses aggregated totalValue
 - [ ] JOIN logic properly handles multiple table relationships
@@ -182,19 +202,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/collections.validation.ts`
 
 **Changes:**
+
 - Verify that `totalValue` is included in the `.omit()` call (around line 34) or is automatically excluded after schema change
 - If not already in omit list, add `totalValue: true` to ensure it's not accepted in insert/update operations
 - Review exported types to ensure totalValue is not exposed in insert/update schemas
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] totalValue excluded from insertCollectionSchema
 - [ ] totalValue excluded from updateCollectionSchema
 - [ ] Type exports reflect exclusion
@@ -210,19 +234,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/display/featured-collections-display.tsx`
 
 **Changes:**
+
 - Update FeaturedCollection interface (line 34) - verify `totalValue?: number` type is appropriate for computed decimal values
 - Review component logic at line 206 where totalValue is displayed - ensure number formatting handles decimal correctly
 - No changes needed to display logic if type is already optional number
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Interface type matches query return type
 - [ ] Display logic handles decimal values correctly
 - [ ] toLocaleString() formatting works with computed values
@@ -238,20 +266,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/app/(app)/(home)/components/async/featured-collections-async.tsx`
 
 **Changes:**
+
 - At line 28, review transformation: `totalValue: data.totalValue ? Number(data.totalValue) : 0`
 - Update to handle computed numeric value from query (may already be number after query changes)
 - Ensure conversion logic handles decimal precision appropriately
 - Remove string-to-number conversion if query now returns number directly
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Transformation logic matches query return type
 - [ ] Decimal precision preserved during transformation
 - [ ] Fallback to 0 for null values maintained
@@ -267,19 +299,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/scripts/seed.ts`
 
 **Changes:**
+
 - Search for all collection insert operations containing `totalValue: '0.00'`
 - Remove totalValue field from collection seed data objects
 - Computed value will be calculated dynamically when queried
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All collection inserts exclude totalValue
 - [ ] Seed script runs without errors
 - [ ] All validation commands pass
@@ -294,20 +330,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `tests/components/home/display/featured-collections-display.test.tsx`
 
 **Changes:**
+
 - Remove or update `totalValue` from mock FeaturedCollection objects
 - Change assertions that verify totalValue display to use computed values
 - Update test expectations for Est. Value display to match component behavior
 - Ensure mocked data structure matches updated interface
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test -- featured-collections-display.test
 ```
 
 **Success Criteria:**
+
 - [ ] Mock data excludes or correctly includes computed totalValue
 - [ ] Test assertions updated for new data structure
 - [ ] All tests pass
@@ -323,20 +363,24 @@ npm run lint:fix && npm run typecheck && npm run test -- featured-collections-di
 **Confidence**: High
 
 **Files to Modify:**
+
 - `tests/integration/queries/featured-content/featured-content-query.test.ts`
 
 **Changes:**
+
 - Find assertions that check for `totalValue` in query results
 - Remove these assertions or update to verify computed totalValue in result
 - Update test fixtures to exclude totalValue from database inserts
 - Ensure test collections have bobbleheads with purchasePrice for meaningful computed values
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck && npm run test -- featured-content-query.test
 ```
 
 **Success Criteria:**
+
 - [ ] Assertions updated or removed for totalValue
 - [ ] Test fixtures reflect schema changes
 - [ ] Integration tests verify computed values correctly
@@ -353,9 +397,11 @@ npm run lint:fix && npm run typecheck && npm run test -- featured-content-query.
 **Confidence**: High
 
 **Files to Create:**
+
 - Auto-generated migration file in `src/lib/db/migrations/`
 
 **Changes:**
+
 - Run `npm run db:generate` to create migration based on schema changes
 - Review generated SQL to verify it includes:
   - DROP INDEX for `collections_total_value_desc_idx`
@@ -364,11 +410,13 @@ npm run lint:fix && npm run typecheck && npm run test -- featured-content-query.
 - Verify migration doesn't include unintended schema changes
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file created with timestamp name
 - [ ] Migration includes DROP INDEX statement
 - [ ] Migration includes DROP CONSTRAINT statement
@@ -385,20 +433,24 @@ npm run db:generate
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - Database tables (via migration)
 
 **Changes:**
+
 - Run `npm run db:migrate` to apply migration to development database
 - Verify migration completes successfully without errors
 - Check database to confirm column, constraint, and index removed
 - Test that queries using computed values work correctly
 
 **Validation Commands:**
+
 ```bash
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration runs without errors
 - [ ] `total_value` column removed from `collections` table
 - [ ] `collections_total_value_non_negative` constraint removed
@@ -415,20 +467,24 @@ npm run db:migrate
 **Confidence**: High
 
 **Files to Modify:**
+
 - Various (based on search results)
 
 **Changes:**
+
 - Use grep/search to find all remaining `totalValue` references
 - Review each reference to determine if it needs updating
 - Update any missed queries, components, types, or tests
 - Verify facades, actions, or other layers don't reference totalValue
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All remaining totalValue references identified
 - [ ] Each reference either updated or confirmed as intentional
 - [ ] No orphaned references that would cause errors
@@ -444,20 +500,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - None (verification step)
 
 **Changes:**
+
 - Run full test suite: unit, component, and integration tests
 - Fix any failing tests discovered during full suite run
 - Verify no test timeouts or unexpected failures
 - Check test coverage hasn't decreased significantly
 
 **Validation Commands:**
+
 ```bash
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All unit tests pass
 - [ ] All component tests pass
 - [ ] All integration tests pass
@@ -482,18 +542,21 @@ npm run test
 
 **Architecture Decision:**
 The computed value approach (using `COALESCE(SUM(bobbleheads.purchasePrice), 0)`) is preferred over denormalization because:
+
 - Eliminates data consistency issues when bobblehead prices change
 - Removes need for update triggers or application-level synchronization
 - Simplifies code by removing totalValue update logic
 - PostgreSQL efficiently handles aggregation with proper indexes on `bobbleheads.collectionId`
 
 **Performance Considerations:**
+
 - Existing index `bobbleheads_collection_id_idx` supports efficient aggregation
 - Consider adding composite index `(collectionId, purchasePrice)` if query performance degrades
 - Monitor query performance after deployment using existing database monitoring
 
 **Rollback Strategy:**
 If issues arise:
+
 1. Revert schema changes by restoring `totalValue` column definition
 2. Generate reverse migration to ADD column back
 3. Write data migration to repopulate totalValue from computed values
@@ -501,6 +564,7 @@ If issues arise:
 5. Update totalValue: `UPDATE collections SET total_value = (SELECT COALESCE(SUM(purchase_price), 0) FROM bobbleheads WHERE collection_id = collections.id AND deleted_at IS NULL)`
 
 **Testing Recommendations:**
+
 - Test with collections containing 0 bobbleheads (should return 0)
 - Test with collections where all bobbleheads have null purchasePrice (should return 0)
 - Test with collections having mixed null/valued purchasePrice fields
@@ -508,6 +572,7 @@ If issues arise:
 - Verify decimal precision maintained (2 decimal places)
 
 **Migration Deployment:**
+
 - Coordinate with team before running migration in staging/production
 - Consider running during low-traffic period to minimize impact
 - Monitor error logs after deployment for any query failures

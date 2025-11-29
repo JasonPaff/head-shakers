@@ -30,20 +30,24 @@ Remove the denormalized `commentCount` column from the `collections` table schem
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/collections.schema.ts` - Remove commentCount column definition, two indexes, and check constraint
 
 **Changes:**
+
 - Remove line 21: `commentCount: integer('comment_count').default(DEFAULTS.COLLECTION.COMMENT_COUNT).notNull()`
 - Remove line 54: `index('collections_comment_count_desc_idx').on(sql`${table.commentCount} DESC`)`
 - Remove line 55: `index('collections_public_comment_count_idx').on(table.isPublic, sql`${table.commentCount} DESC`)`
 - Remove line 61: `check('collections_comment_count_non_negative', sql`${table.commentCount} >= 0`)`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] commentCount column removed from schema definition
 - [ ] Both commentCount indexes removed
 - [ ] Check constraint removed
@@ -59,20 +63,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - Migration file will be auto-generated in `src/lib/db/migrations/` with timestamp prefix
 
 **Changes:**
+
 - Run `npm run db:generate` to create migration file
 - Verify generated migration contains DROP INDEX statements for both indexes
 - Verify generated migration contains ALTER TABLE DROP CONSTRAINT statement
 - Verify generated migration contains ALTER TABLE DROP COLUMN statement
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file created with proper timestamp
 - [ ] Migration drops `collections_comment_count_desc_idx` index
 - [ ] Migration drops `collections_public_comment_count_idx` index
@@ -89,20 +97,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Update lines 445, 494, 539, 586
 
 **Changes:**
+
 - Remove `commentCount: collections.commentCount` from both SELECT statements (lines 445, 539)
 - Add new computed field using pattern from existing `totalItems` calculation (lines 467-472, 560-565)
 - Replace `commentCount: row.commentCount` in transformation (lines 494, 586)
 - Use SQL subquery: `SELECT COUNT(*)::integer FROM comments WHERE target_id = collections.id AND target_type = 'collection' AND deleted_at IS NULL`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] commentCount replaced with dynamic SQL COUNT in both query branches (with category filter and without)
 - [ ] SQL subquery properly filters by target_id, target_type, and deleted_at
 - [ ] Result transformation updated to use computed commentCount
@@ -118,19 +130,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Update lines 690, 737
 
 **Changes:**
+
 - Remove `commentCount: collections.commentCount` from SELECT statement (line 690)
 - Add computed commentCount field using same SQL subquery pattern as Step 3
 - Replace `commentCount: row.commentCount` in transformation (line 737)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] commentCount replaced with dynamic SQL COUNT in query
 - [ ] SQL subquery matches pattern from Step 3
 - [ ] Result transformation updated correctly
@@ -146,19 +162,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/featured-content/featured-content-query.ts` - Update line 398
 
 **Changes:**
+
 - Replace `comments: collections.commentCount` with computed SQL COUNT subquery
 - Use existing pattern from totalItems calculation (lines 411-416) as reference
 - Ensure SQL subquery joins comments table with proper filters
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] commentCount replaced with dynamic SQL COUNT
 - [ ] SQL subquery properly structured
 - [ ] All validation commands pass
@@ -173,19 +193,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/social/social.query.ts` - Remove lines 96-119 (decrementCommentCountAsync) and lines 746-769 (incrementCommentCountAsync)
 
 **Changes:**
+
 - Delete entire `decrementCommentCountAsync` method (lines 96-119)
 - Delete entire `incrementCommentCountAsync` method (lines 746-769)
 - Keep only the bobblehead-related cases, remove collection-related switch cases
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both methods completely removed
 - [ ] Collection-related switch cases deleted
 - [ ] Bobblehead operations remain intact
@@ -201,9 +225,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/social/social.facade.ts` - Update lines 88-128 (createComment), 135-219 (createCommentReply), 226-278 (deleteComment)
 
 **Changes:**
+
 - In `createComment` method: Keep increment call (still needed for bobbleheads), verify it handles both target types
 - In `createCommentReply` method: Keep increment call (still needed for bobbleheads)
 - In `deleteComment` method: Keep decrement call (still needed for bobbleheads)
@@ -211,11 +237,13 @@ npm run lint:fix && npm run typecheck
 - No changes needed - methods still work for bobbleheads which retain commentCount
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Increment/decrement calls verified to work for both bobblehead and collection targets
 - [ ] No code changes needed (methods handle polymorphic targets)
 - [ ] All validation commands pass
@@ -230,18 +258,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/defaults.ts` - Remove line 23
 
 **Changes:**
+
 - Remove `COMMENT_COUNT: 0` from COLLECTION object (line 23)
 - Keep other COLLECTION defaults (IS_PUBLIC, LIKE_COUNT)
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] COMMENT_COUNT constant removed from COLLECTION defaults
 - [ ] Other defaults remain intact
 - [ ] All validation commands pass
@@ -256,20 +288,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `tests/fixtures/collection.factory.ts` - Remove commentCount field
 - `tests/mocks/data/collections.mock.ts` - Remove commentCount from mock objects
 
 **Changes:**
+
 - Remove commentCount property from factory function
 - Remove commentCount from all mock collection objects
 - Ensure factory generates valid collections without commentCount
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] commentCount removed from factory
 - [ ] commentCount removed from all mock objects
 - [ ] All validation commands pass
@@ -284,21 +320,25 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `tests/integration/queries/featured-content/featured-content-query.test.ts` - Remove commentCount assertions
 - `tests/integration/facades/featured-content/featured-content.facade.test.ts` - Remove commentCount assertions
 
 **Changes:**
+
 - Search for `commentCount` or `comment_count` in test assertions
 - Replace assertions with dynamic comment count queries where needed
 - Remove assertions if comment count is not critical to test case
 - Update test expectations to match new dynamic query results
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No test assertions reference commentCount field
 - [ ] Tests updated to verify comment counts through dynamic queries if needed
 - [ ] All validation commands pass
@@ -313,16 +353,19 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Changes:**
+
 - Run `npm run db:migrate` to apply migration to database
 - Verify migration completes without errors
 - Check database schema to confirm column, indexes, and constraint removed
 
 **Validation Commands:**
+
 ```bash
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration executes successfully without errors
 - [ ] Database no longer has comment_count column in collections table
 - [ ] Both indexes removed from database
@@ -338,16 +381,19 @@ npm run db:migrate
 **Confidence**: Medium
 
 **Changes:**
+
 - Run `npm run test` to execute all unit, integration, and e2e tests
 - Fix any failing tests related to collections or comments
 - Verify all query results include computed commentCount values
 
 **Validation Commands:**
+
 ```bash
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All unit tests pass
 - [ ] All integration tests pass
 - [ ] All e2e tests pass

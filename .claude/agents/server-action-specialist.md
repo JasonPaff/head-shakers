@@ -83,20 +83,22 @@ return withActionBreadcrumbs(
 ```typescript
 import { trackCacheInvalidation } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
-trackCacheInvalidation(
-  CacheRevalidationService.domain.onEntityChange(entityId, userId),
-  { entityType: 'entity', entityId, operation: 'onEntityChange', userId }
-);
+trackCacheInvalidation(CacheRevalidationService.domain.onEntityChange(entityId, userId), {
+  entityType: 'entity',
+  entityId,
+  operation: 'onEntityChange',
+  userId,
+});
 ```
 
 ### Sentry Helper Reference
 
-| Action Type | MUST Use | Purpose |
-|-------------|----------|---------|
-| Mutations (create/update/delete) | `withActionErrorHandling()` | Context + breadcrumbs + error handling |
-| Read-only queries | `withActionBreadcrumbs()` | Breadcrumbs only, errors propagate |
-| Cache invalidation | `trackCacheInvalidation()` | Logs failures as warnings (non-throwing) |
-| Type-safe context (rare) | `setActionContext()` | When manual context needed outside wrappers |
+| Action Type                      | MUST Use                    | Purpose                                     |
+| -------------------------------- | --------------------------- | ------------------------------------------- |
+| Mutations (create/update/delete) | `withActionErrorHandling()` | Context + breadcrumbs + error handling      |
+| Read-only queries                | `withActionBreadcrumbs()`   | Breadcrumbs only, errors propagate          |
+| Cache invalidation               | `trackCacheInvalidation()`  | Logs failures as warnings (non-throwing)    |
+| Type-safe context (rare)         | `setActionContext()`        | When manual context needed outside wrappers |
 
 ### What NOT to Do (DEPRECATED PATTERNS)
 

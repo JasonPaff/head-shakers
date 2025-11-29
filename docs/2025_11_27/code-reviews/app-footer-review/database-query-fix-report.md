@@ -3,12 +3,14 @@
 ## Issues Fixed
 
 ### Issue 1: Missing soft delete filter for collections (HIGH)
+
 - **File**: `src/lib/queries/featured-content/featured-content-query.ts:448-476`
 - **Status**: ALREADY FIXED
 - **Changes Made**: No changes required - the soft delete filter `isNull(collections.deletedAt)` was already present in the JOIN condition on line 466
 - **Notes**: The review incorrectly identified this as missing. The filter is correctly applied in the leftJoin condition.
 
 ### Issue 2: Inefficient double query in isActiveSubscriberAsync (HIGH)
+
 - **File**: `src/lib/queries/newsletter/newsletter.queries.ts:105-125`
 - **Status**: FIXED
 - **Changes Made**:
@@ -18,6 +20,7 @@
 - **Notes**: Now `isActiveSubscriberAsync` simply calls `getActiveSubscriberAsync` and returns whether the result is not null, eliminating the redundant query pattern.
 
 ### Issue 3: No permission filters documented (MEDIUM)
+
 - **File**: `src/lib/queries/featured-content/featured-content-query.ts:448-476`
 - **Status**: FIXED
 - **Changes Made**: Added comprehensive JSDoc comment explaining permission filtering approach
@@ -31,6 +34,7 @@
 - **Notes**: This clarifies that the absence of user-specific permission filters is intentional for public featured content.
 
 ### Issue 4: NULL vs undefined inconsistency (MEDIUM)
+
 - **File**: `src/lib/queries/newsletter/newsletter.queries.ts:36-38`
 - **Status**: FIXED
 - **Changes Made**:
@@ -40,6 +44,7 @@
 - **Notes**: Type signature now matches database schema expectations. Updated calling code in `newsletter.facade.ts` from `userId ?? null` to just `userId`.
 
 ### Issue 5: Missing existence check in resubscribeAsync (MEDIUM)
+
 - **File**: `src/lib/queries/newsletter/newsletter.queries.ts:130-147`
 - **Status**: FIXED
 - **Changes Made**:
@@ -49,6 +54,7 @@
 - **Notes**: Prevents silent failures and makes the method's behavior more explicit.
 
 ### Issue 6: No idempotency check in updateUserIdAsync (MEDIUM)
+
 - **File**: `src/lib/queries/newsletter/newsletter.queries.ts:174-191`
 - **Status**: FIXED
 - **Changes Made**:
@@ -65,21 +71,24 @@ None - all issues were successfully resolved.
 ## Validation Results
 
 ### Files Modified
+
 1. `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\newsletter\newsletter.queries.ts`
 2. `C:\Users\JasonPaff\dev\head-shakers\src\lib\queries\featured-content\featured-content-query.ts`
 3. `C:\Users\JasonPaff\dev\head-shakers\src\lib\facades\newsletter\newsletter.facade.ts`
 
 ### ESLint Results
-| File | Status | Errors Fixed | Errors Remaining |
-|------|--------|--------------|------------------|
-| newsletter.queries.ts | PASS | 0 | 0 |
-| featured-content-query.ts | PASS | 0 | 0 |
-| newsletter.facade.ts | PASS | 0 | 0 |
+
+| File                      | Status | Errors Fixed | Errors Remaining |
+| ------------------------- | ------ | ------------ | ---------------- |
+| newsletter.queries.ts     | PASS   | 0            | 0                |
+| featured-content-query.ts | PASS   | 0            | 0                |
+| newsletter.facade.ts      | PASS   | 0            | 0                |
 
 ### TypeScript Results
-| File | Status | Errors |
-|------|--------|--------|
-| All modified files | PASS | 0 |
+
+| File               | Status | Errors |
+| ------------------ | ------ | ------ |
+| All modified files | PASS   | 0      |
 
 **TypeScript Typecheck**: PASS - No type errors in entire codebase
 

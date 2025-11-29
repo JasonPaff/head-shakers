@@ -175,10 +175,17 @@ export abstract class BaseContextHelpers {
   protected static userContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext;
 
   /** Create a QueryContext for viewer-based access (user if logged in, else public) */
-  protected static viewerContext(viewerUserId: string | undefined, dbInstance?: DatabaseExecutor): QueryContext;
+  protected static viewerContext(
+    viewerUserId: string | undefined,
+    dbInstance?: DatabaseExecutor,
+  ): QueryContext;
 
   /** Create owner-or-viewer context (protected if viewer is owner, else viewer context) */
-  protected static ownerOrViewerContext(ownerId: string, viewerUserId: string | undefined, dbInstance?: DatabaseExecutor): QueryContext;
+  protected static ownerOrViewerContext(
+    ownerId: string,
+    viewerUserId: string | undefined,
+    dbInstance?: DatabaseExecutor,
+  ): QueryContext;
 }
 ```
 

@@ -28,18 +28,22 @@ Remove the denormalized `totalItems` column from the collections table and repla
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/collections.schema.ts` - Remove totalItems column definition and check constraint
 
 **Changes:**
+
 - Remove totalItems column definition
 - Remove check constraint `collections_total_items_non_negative`
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] totalItems column definition removed from collections schema
 - [ ] Check constraint removed from schema
 - [ ] All validation commands pass
@@ -53,17 +57,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/constants/defaults.ts` - Remove TOTAL_ITEMS from COLLECTION defaults
 
 **Changes:**
+
 - Remove `TOTAL_ITEMS: 0` from DEFAULTS.COLLECTION
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] TOTAL_ITEMS constant removed from DEFAULTS.COLLECTION
 - [ ] All validation commands pass
 
@@ -76,17 +84,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/collections.validation.ts` - Remove totalItems from omit list
 
 **Changes:**
+
 - Remove `totalItems: true` from the omit object
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] totalItems removed from insertCollectionSchema omit list
 - [ ] All validation commands pass
 
@@ -99,19 +111,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Update getBrowseCategoriesAsync method
 
 **Changes:**
+
 - Replace `totalItems: collections.totalItems` with dynamic COUNT subquery
 - Add SQL subquery counting non-deleted bobbleheads for each collection
 - Update transformation functions to use the computed count
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Both occurrences in getBrowseCategoriesAsync replaced with COUNT subquery
 - [ ] Subquery filters for deletedAt IS NULL
 - [ ] All validation commands pass
@@ -125,19 +141,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Update getBrowseCollectionsAsync method
 
 **Changes:**
+
 - Replace `totalItems: collections.totalItems` with dynamic COUNT subquery
 - Add SQL subquery counting non-deleted bobbleheads
 - Update transformation to use the computed count
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] totalItems replaced with COUNT subquery in getBrowseCollectionsAsync
 - [ ] Subquery filters for deletedAt IS NULL
 - [ ] All validation commands pass
@@ -151,20 +171,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/collections/collections.query.ts` - Update getCollectionMetadata method
 
 **Changes:**
+
 - Replace `itemCount: collections.totalItems` with dynamic COUNT using LEFT JOIN
 - Add LEFT JOIN to bobbleheads table with deletedAt filter
 - Use COUNT aggregation as itemCount
 - Add GROUP BY clause for proper aggregation
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] itemCount computed via COUNT aggregation with LEFT JOIN
 - [ ] Proper GROUP BY clause added for aggregation
 - [ ] Filters for deletedAt IS NULL in JOIN condition
@@ -179,18 +203,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/featured-content/featured-content-query.ts` - Update getFeaturedCollectionsAsync method
 
 **Changes:**
+
 - Replace `totalItems: collections.totalItems` with dynamic COUNT subquery
 - Add SQL subquery counting non-deleted bobbleheads
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] totalItems replaced with COUNT subquery in getFeaturedCollectionsAsync
 - [ ] Subquery filters for deletedAt IS NULL
 - [ ] All validation commands pass
@@ -204,17 +232,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/featured-content/featured-content-query.ts` - Add JSDoc comment to totalItems field
 
 **Changes:**
+
 - Add JSDoc comment to document that totalItems is computed from non-deleted bobbleheads count
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] JSDoc comment added to document computed nature
 - [ ] Type signature unchanged to maintain compatibility
 - [ ] All validation commands pass
@@ -228,18 +260,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-search/content-search.query.ts` - Update findCollectionByIdAsync, searchCollectionsAsync, and searchPublicCollections methods
 
 **Changes:**
+
 - Replace `totalItems: collections.totalItems` with dynamic COUNT subquery in all three methods
 - Add SQL subquery counting non-deleted bobbleheads
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All three occurrences replaced with COUNT subquery
 - [ ] Subqueries filter for deletedAt IS NULL
 - [ ] All validation commands pass
@@ -253,17 +289,21 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/content-search/content-search.query.ts` - Add JSDoc comment to totalItems field
 
 **Changes:**
+
 - Add JSDoc comment to document that totalItems is computed from non-deleted bobbleheads count
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] JSDoc comment added to document computed nature
 - [ ] Type signature unchanged to maintain compatibility
 - [ ] All validation commands pass
@@ -277,19 +317,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/scripts/seed.ts` - Remove totalItems from sample data and updateAggregates function
 
 **Changes:**
+
 - Remove all `totalItems: X` entries from collection sample data
 - Remove the entire updateAggregates function if it exists
 - Remove any calls to updateAggregates function
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All totalItems references removed from seed data
 - [ ] updateAggregates function removed if present
 - [ ] All validation commands pass
@@ -303,18 +347,22 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `tests/mocks/data/collections.mock.ts` - Remove totalItems from mock objects
 
 **Changes:**
+
 - Remove totalItems field from all mock collection objects
 - Update factory functions to not include totalItems
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All totalItems references removed from mock data
 - [ ] Mock objects match updated schema
 - [ ] All validation commands pass
@@ -328,20 +376,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - New migration file in `src/lib/db/migrations/` - Generated by Drizzle
 
 **Changes:**
+
 - Run `npm run db:generate` to create migration
 - Review generated migration SQL to ensure it drops the column and constraint correctly
 - Verify migration includes DROP COLUMN and DROP CONSTRAINT statements
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file generated successfully
 - [ ] Migration includes DROP COLUMN statement for total_items
 - [ ] Migration includes DROP CONSTRAINT statement for check constraint
@@ -356,20 +408,24 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Modify:**
+
 - `tests/integration/queries/featured-content/featured-content-query.test.ts` - Update assertions
 - `tests/integration/facades/featured-content/featured-content.facade.test.ts` - Update assertions
 
 **Changes:**
+
 - Update test assertions to verify totalItems is computed correctly
 - Change expectations from static totalItems to dynamically computed counts
 - Ensure tests verify counts match actual non-deleted bobblehead counts
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All test assertions updated to expect computed totalItems
 - [ ] Tests verify counts match non-deleted bobbleheads
 - [ ] All validation commands pass
@@ -383,19 +439,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - verification step only
 
 **Changes:**
+
 - Run `npm run test` to execute all tests
 - Verify all tests pass
 - Address any failing tests by updating assertions or fixing queries
 
 **Validation Commands:**
+
 ```bash
 npm run test
 ```
 
 **Success Criteria:**
+
 - [ ] All unit tests pass
 - [ ] All integration tests pass
 - [ ] All component tests pass
@@ -410,19 +470,23 @@ npm run test
 **Confidence**: High
 
 **Files to Modify:**
+
 - None - database operation only
 
 **Changes:**
+
 - Run `npm run db:migrate` to apply migration
 - Verify migration completes successfully
 - Check database schema to confirm column is removed
 
 **Validation Commands:**
+
 ```bash
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration executes without errors
 - [ ] total_items column removed from collections table
 - [ ] collections_total_items_non_negative constraint removed

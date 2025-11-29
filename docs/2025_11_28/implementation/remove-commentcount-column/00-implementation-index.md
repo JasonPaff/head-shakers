@@ -16,20 +16,20 @@
 
 ## Specialist Routing
 
-| Step | Specialist | Skills Loaded |
-|------|------------|---------------|
-| 1. Update Collections Schema | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 2. Generate Database Migration | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 3. Update getBrowseCategoriesAsync | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 4. Update getBrowseCollectionsAsync | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 5. Update getFeaturedCollectionsAsync | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 6. Remove Increment/Decrement Operations | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 7. Update SocialFacade | facade-specialist | facade-layer, caching, sentry-monitoring, drizzle-orm |
-| 8. Remove Default Constant | general-purpose | None |
-| 9. Update Test Fixtures | test-infrastructure-specialist | test-infrastructure, testing-base |
-| 10. Update Integration Tests | integration-test-specialist | integration-testing, testing-base |
-| 11. Run Database Migration | database-specialist | database-schema, drizzle-orm |
-| 12. Run Full Test Suite | test-executor | All testing tools |
+| Step                                     | Specialist                     | Skills Loaded                                         |
+| ---------------------------------------- | ------------------------------ | ----------------------------------------------------- |
+| 1. Update Collections Schema             | database-specialist            | database-schema, drizzle-orm, validation-schemas      |
+| 2. Generate Database Migration           | database-specialist            | database-schema, drizzle-orm, validation-schemas      |
+| 3. Update getBrowseCategoriesAsync       | database-specialist            | database-schema, drizzle-orm, validation-schemas      |
+| 4. Update getBrowseCollectionsAsync      | database-specialist            | database-schema, drizzle-orm, validation-schemas      |
+| 5. Update getFeaturedCollectionsAsync    | database-specialist            | database-schema, drizzle-orm, validation-schemas      |
+| 6. Remove Increment/Decrement Operations | database-specialist            | database-schema, drizzle-orm, validation-schemas      |
+| 7. Update SocialFacade                   | facade-specialist              | facade-layer, caching, sentry-monitoring, drizzle-orm |
+| 8. Remove Default Constant               | general-purpose                | None                                                  |
+| 9. Update Test Fixtures                  | test-infrastructure-specialist | test-infrastructure, testing-base                     |
+| 10. Update Integration Tests             | integration-test-specialist    | integration-testing, testing-base                     |
+| 11. Run Database Migration               | database-specialist            | database-schema, drizzle-orm                          |
+| 12. Run Full Test Suite                  | test-executor                  | All testing tools                                     |
 
 ## Navigation
 
@@ -39,20 +39,20 @@
 
 ## Quick Status
 
-| Step | Specialist | Status | Issues |
-|------|------------|--------|--------|
-| 1. Update Collections Schema | database-specialist | ✓ Completed | None |
-| 2. Generate Database Migration | database-specialist | ✓ Completed | None |
-| 3. Update getBrowseCategoriesAsync | database-specialist | ✓ Completed | None |
-| 4. Update getBrowseCollectionsAsync | database-specialist | ✓ Completed | None |
-| 5. Update getFeaturedCollectionsAsync | database-specialist | ✓ Completed | None |
-| 6. Remove Increment/Decrement Operations | database-specialist | ✓ Completed | None |
-| 7. Update SocialFacade | facade-specialist | ✓ Completed | None |
-| 8. Remove Default Constant | general-purpose | ✓ Completed | None |
-| 9. Update Test Fixtures | test-infrastructure-specialist | ✓ Completed | No changes needed |
-| 10. Update Integration Tests | integration-test-specialist | ✓ Completed | None |
-| 11. Run Database Migration | database-specialist | ✓ Ready | Requires DB credentials |
-| 12. Run Full Test Suite | test-executor | ✓ Completed | 685 tests passed |
+| Step                                     | Specialist                     | Status      | Issues                  |
+| ---------------------------------------- | ------------------------------ | ----------- | ----------------------- |
+| 1. Update Collections Schema             | database-specialist            | ✓ Completed | None                    |
+| 2. Generate Database Migration           | database-specialist            | ✓ Completed | None                    |
+| 3. Update getBrowseCategoriesAsync       | database-specialist            | ✓ Completed | None                    |
+| 4. Update getBrowseCollectionsAsync      | database-specialist            | ✓ Completed | None                    |
+| 5. Update getFeaturedCollectionsAsync    | database-specialist            | ✓ Completed | None                    |
+| 6. Remove Increment/Decrement Operations | database-specialist            | ✓ Completed | None                    |
+| 7. Update SocialFacade                   | facade-specialist              | ✓ Completed | None                    |
+| 8. Remove Default Constant               | general-purpose                | ✓ Completed | None                    |
+| 9. Update Test Fixtures                  | test-infrastructure-specialist | ✓ Completed | No changes needed       |
+| 10. Update Integration Tests             | integration-test-specialist    | ✓ Completed | None                    |
+| 11. Run Database Migration               | database-specialist            | ✓ Ready     | Requires DB credentials |
+| 12. Run Full Test Suite                  | test-executor                  | ✓ Completed | 685 tests passed        |
 
 ## Test Results
 

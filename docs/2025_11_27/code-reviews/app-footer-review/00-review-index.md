@@ -38,35 +38,40 @@
 ## Critical Issues Summary
 
 ### 1. Data Leakage Risk
+
 **Location**: `featured-content.facade.ts:308`
 Sentry breadcrumb spreads entire result object, potentially exposing PII.
 
 ### 2. Missing Soft Delete Filter
+
 **Location**: `featured-content-query.ts:448-476`
 Query doesn't filter soft-deleted collections.
 
 ## Health Scores by Layer
 
-| Layer | Score | Grade |
-|-------|-------|-------|
-| UI/Components | 85 | B |
-| Business Logic | 70 | C |
-| Data Layer | 75 | C |
-| Validation | 65 | D |
+| Layer          | Score | Grade |
+| -------------- | ----- | ----- |
+| UI/Components  | 85    | B     |
+| Business Logic | 70    | C     |
+| Data Layer     | 75    | C     |
+| Validation     | 65    | D     |
 
 ## Key Files Reviewed
 
 ### Server Components
+
 - `src/components/layout/app-footer/app-footer.tsx`
 - `src/components/layout/app-footer/components/footer-featured-section.tsx`
 - `src/components/layout/app-footer/components/footer-newsletter.tsx`
 
 ### Business Logic
+
 - `src/lib/facades/featured-content/featured-content.facade.ts`
 - `src/lib/facades/newsletter/newsletter.facade.ts`
 - `src/lib/actions/newsletter/newsletter.actions.ts` (Exemplary - A+)
 
 ### Data Layer
+
 - `src/lib/queries/featured-content/featured-content-query.ts`
 - `src/lib/queries/newsletter/newsletter.queries.ts`
 - `src/lib/validations/newsletter.validation.ts`

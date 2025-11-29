@@ -33,6 +33,7 @@ The codebase already has robust error handling infrastructure:
 Examining `BobbleheadsFacade` (945 lines), we observe:
 
 **Pattern 1: Simple read methods (no breadcrumbs)**
+
 ```typescript
 static async getBobbleheadBySlug(
   slug: string,
@@ -58,6 +59,7 @@ static async getBobbleheadBySlug(
 ```
 
 **Pattern 2: Operations with breadcrumbs (newer pattern)**
+
 ```typescript
 static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
   const methodName = 'getPlatformStatsAsync';
@@ -85,6 +87,7 @@ static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<P
 ```
 
 **Pattern 3: Cached read methods**
+
 ```typescript
 static async getBobbleheadById(
   id: string,
@@ -285,11 +288,7 @@ interface FacadeDecoratorOptions {
  * Usage: @FacadeMethod({ operation: 'getBySlug', getUserId: (args) => args[1] })
  */
 export function FacadeMethod(options: FacadeDecoratorOptions = {}) {
-  return function (
-    target: unknown,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value;
     const facadeName = target.constructor.name;
 
@@ -664,8 +663,9 @@ export class BobbleheadsFacade extends BaseFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
     try {
-      const context = viewerUserId
-        ? createUserQueryContext(viewerUserId, { dbInstance })
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
       return BobbleheadsQuery.findBySlugAsync(slug, context);
     } catch (error) {
@@ -689,8 +689,9 @@ export class BobbleheadsFacade extends BaseFacade {
     return this.execute(
       'getBySlug',
       async () => {
-        const context = viewerUserId
-          ? createUserQueryContext(viewerUserId, { dbInstance })
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
           : createPublicQueryContext({ dbInstance });
         return BobbleheadsQuery.findBySlugAsync(slug, context);
       },
@@ -703,19 +704,24 @@ export class BobbleheadsFacade extends BaseFacade {
     return this.executeWithBreadcrumbs(
       OPERATIONS.PLATFORM.GET_STATS,
       async () => {
-        return await CacheService.platform.stats(async () => {
-          const context = this.publicContext(dbInstance);
-          const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
-            BobbleheadsQuery.getBobbleheadCountAsync(context),
-            CollectionsQuery.getCollectionCountAsync(context),
-            UsersQuery.getUserCountAsync(context),
-          ]);
-          return {
-            totalBobbleheads: bobbleheadsCount,
-            totalCollections: collectionsCount,
-            totalCollectors: collectorsCount,
-          };
-        }, { /* cache options */ });
+        return await CacheService.platform.stats(
+          async () => {
+            const context = this.publicContext(dbInstance);
+            const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
+              BobbleheadsQuery.getBobbleheadCountAsync(context),
+              CollectionsQuery.getCollectionCountAsync(context),
+              UsersQuery.getUserCountAsync(context),
+            ]);
+            return {
+              totalBobbleheads: bobbleheadsCount,
+              totalCollections: collectionsCount,
+              totalCollectors: collectorsCount,
+            };
+          },
+          {
+            /* cache options */
+          },
+        );
       },
       {
         includeResultSummary: (stats) => ({
@@ -943,7 +949,7 @@ function transformFacadeMethods(sourceFile: SourceFile): SourceFile {
   function visitor(node: Node): Node {
     if (ts.isMethodDeclaration(node)) {
       const jsdoc = getJSDocTags(node);
-      const facadeMethodTag = jsdoc.find(tag => tag.tagName.text === 'FacadeMethod');
+      const facadeMethodTag = jsdoc.find((tag) => tag.tagName.text === 'FacadeMethod');
 
       if (facadeMethodTag) {
         // Extract metadata from tag
@@ -974,8 +980,9 @@ export class BobbleheadsFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    const context = viewerUserId
-      ? createUserQueryContext(viewerUserId, { dbInstance })
+    const context =
+      viewerUserId ?
+        createUserQueryContext(viewerUserId, { dbInstance })
       : createPublicQueryContext({ dbInstance });
     return BobbleheadsQuery.findBySlugAsync(slug, context);
   }
@@ -989,8 +996,9 @@ export class BobbleheadsFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
     try {
-      const context = viewerUserId
-        ? createUserQueryContext(viewerUserId, { dbInstance })
+      const context =
+        viewerUserId ?
+          createUserQueryContext(viewerUserId, { dbInstance })
         : createPublicQueryContext({ dbInstance });
       return BobbleheadsQuery.findBySlugAsync(slug, context);
     } catch (error) {
@@ -1038,14 +1046,14 @@ export class BobbleheadsFacade {
 
 ## Comparison Matrix
 
-| Strategy | LOC Reduction | Complexity | Breaking Changes | Stack Inference | Experimental | Recommended |
-|----------|---------------|------------|------------------|-----------------|--------------|-------------|
-| 1. HOF with Inference | 44% | Medium | No | Yes (fragile) | No | No |
-| 2. Decorators | 33% | High | No | Yes | Yes | No |
-| 3. Result Types | N/A | Very High | Yes | No | No | No |
-| 4. Base Class | 50% | Medium | No | Yes (fragile) | No | Maybe |
-| 5. Explicit Wrappers | 42% | Low | No | No | No | **Yes** |
-| 6. Build-time Generation | 100% | Very High | No | No | Yes | No |
+| Strategy                 | LOC Reduction | Complexity | Breaking Changes | Stack Inference | Experimental | Recommended |
+| ------------------------ | ------------- | ---------- | ---------------- | --------------- | ------------ | ----------- |
+| 1. HOF with Inference    | 44%           | Medium     | No               | Yes (fragile)   | No           | No          |
+| 2. Decorators            | 33%           | High       | No               | Yes             | Yes          | No          |
+| 3. Result Types          | N/A           | Very High  | Yes              | No              | No           | No          |
+| 4. Base Class            | 50%           | Medium     | No               | Yes (fragile)   | No           | Maybe       |
+| 5. Explicit Wrappers     | 42%           | Low        | No               | No              | No           | **Yes**     |
+| 6. Build-time Generation | 100%          | Very High  | No               | No              | Yes          | No          |
 
 ---
 
@@ -1205,6 +1213,7 @@ export async function executeFacadeMethod<T>(
 ### Before/After Examples
 
 **Simple read method:**
+
 ```typescript
 // Before (12 lines)
 static async getBobbleheadBySlug(
@@ -1248,6 +1257,7 @@ static async getBobbleheadBySlug(
 ```
 
 **Method with breadcrumbs:**
+
 ```typescript
 // Before (25 lines with nested try-catch)
 static async getPlatformStatsAsync(dbInstance: DatabaseExecutor = db): Promise<PlatformStats> {
@@ -1360,12 +1370,18 @@ export class BobbleheadsFacade extends BaseFacade {
     viewerUserId?: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<BobbleheadRecord | null> {
-    return this.execute('getBobbleheadBySlug', 'getBySlug', async () => {
-      const context = viewerUserId
-        ? createUserQueryContext(viewerUserId, { dbInstance })
-        : createPublicQueryContext({ dbInstance });
-      return BobbleheadsQuery.findBySlugAsync(slug, context);
-    }, { userId: viewerUserId, data: { slug } });
+    return this.execute(
+      'getBobbleheadBySlug',
+      'getBySlug',
+      async () => {
+        const context =
+          viewerUserId ?
+            createUserQueryContext(viewerUserId, { dbInstance })
+          : createPublicQueryContext({ dbInstance });
+        return BobbleheadsQuery.findBySlugAsync(slug, context);
+      },
+      { userId: viewerUserId, data: { slug } },
+    );
   }
 }
 ```
@@ -1402,11 +1418,13 @@ Based on `BobbleheadsFacade.ts` (945 lines, 30 methods with try-catch):
 ### Primary Recommendation: Strategy 5 (Explicit Wrapper Functions)
 
 **Implement immediately:**
+
 - `executeFacadeOperation` - for simple operations
 - `executeFacadeOperationWithBreadcrumbs` - for operations needing breadcrumbs
 - `executeFacadeMethod` - shorthand for when operation === method
 
 **Why:**
+
 - Lowest risk
 - No experimental features
 - Compatible with existing code
@@ -1416,11 +1434,13 @@ Based on `BobbleheadsFacade.ts` (945 lines, 30 methods with try-catch):
 ### Secondary Recommendation: Enhance BaseFacade (Strategy 4 + 5 Hybrid)
 
 **Implement later** (optional enhancement):
+
 - Add `execute` and `executeWithBreadcrumbs` to `BaseFacade`
 - Delegates to standalone helpers internally
 - Provides convenience for facades extending BaseFacade
 
 **Why:**
+
 - Even less boilerplate for child facades
 - Builds on existing infrastructure
 - Backward compatible
@@ -1557,7 +1577,13 @@ describe('facade-helpers', () => {
     it('should wrap errors in FacadeError', async () => {
       await expect(
         executeFacadeOperation(
-          { facade: 'TestFacade', method: 'testMethod', operation: 'test', userId: 'user123', data: { key: 'value' } },
+          {
+            facade: 'TestFacade',
+            method: 'testMethod',
+            operation: 'test',
+            userId: 'user123',
+            data: { key: 'value' },
+          },
           async () => {
             throw new Error('Test error');
           },
@@ -1584,12 +1610,10 @@ describe('facade-helpers', () => {
 
   describe('executeFacadeMethod', () => {
     it('should use method name as operation', async () => {
-      const result = await executeFacadeMethod(
-        'TestFacade',
-        'getBySl',
-        async () => ({ id: '123' }),
-        { userId: 'user1', data: { slug: 'test' } },
-      );
+      const result = await executeFacadeMethod('TestFacade', 'getBySl', async () => ({ id: '123' }), {
+        userId: 'user1',
+        data: { slug: 'test' },
+      });
       expect(result).toEqual({ id: '123' });
     });
   });

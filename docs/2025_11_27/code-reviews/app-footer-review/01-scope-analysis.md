@@ -75,24 +75,25 @@ AppFooter (server component)
 
 ## Summary Statistics
 
-| Category | Files | Methods/Components | Priority Breakdown |
-|----------|-------|-------------------|-------------------|
-| Server Components | 8 | 10 | 2 HIGH, 3 MEDIUM, 5 LOW |
-| Client Components | 2 | 2 | 1 HIGH, 1 LOW |
-| Server Actions | 1 | 2 | 1 HIGH, 1 MEDIUM |
-| Facades | 2 | 2 | 2 HIGH |
-| Cache Service | 1 | 1 | 1 MEDIUM |
-| Queries | 2 | 5 | 3 HIGH, 2 MEDIUM |
-| Validation | 1 | 1 | 1 MEDIUM |
-| Utilities | 3 | 3 | 1 MEDIUM, 2 LOW |
-| Hooks | 4 | 5 | 2 HIGH, 3 MEDIUM |
-| UI Components | 1 | 1 | 1 LOW |
-| Config | 1 | 1 (partial) | 1 MEDIUM |
-| **Total** | **26** | **33** | **9 HIGH, 11 MEDIUM, 13 LOW** |
+| Category          | Files  | Methods/Components | Priority Breakdown            |
+| ----------------- | ------ | ------------------ | ----------------------------- |
+| Server Components | 8      | 10                 | 2 HIGH, 3 MEDIUM, 5 LOW       |
+| Client Components | 2      | 2                  | 1 HIGH, 1 LOW                 |
+| Server Actions    | 1      | 2                  | 1 HIGH, 1 MEDIUM              |
+| Facades           | 2      | 2                  | 2 HIGH                        |
+| Cache Service     | 1      | 1                  | 1 MEDIUM                      |
+| Queries           | 2      | 5                  | 3 HIGH, 2 MEDIUM              |
+| Validation        | 1      | 1                  | 1 MEDIUM                      |
+| Utilities         | 3      | 3                  | 1 MEDIUM, 2 LOW               |
+| Hooks             | 4      | 5                  | 2 HIGH, 3 MEDIUM              |
+| UI Components     | 1      | 1                  | 1 LOW                         |
+| Config            | 1      | 1 (partial)        | 1 MEDIUM                      |
+| **Total**         | **26** | **33**             | **9 HIGH, 11 MEDIUM, 13 LOW** |
 
 ## Files to Review
 
 ### Server Components
+
 - `src/components/layout/app-footer/app-footer.tsx`
 - `src/components/layout/app-footer/components/footer-container.tsx`
 - `src/components/layout/app-footer/components/footer-social-links.tsx`
@@ -102,24 +103,30 @@ AppFooter (server component)
 - `src/components/layout/app-footer/components/footer-featured-section.tsx`
 
 ### Client Components
+
 - `src/components/layout/app-footer/components/footer-newsletter.tsx`
 - `src/components/ui/separator.tsx`
 
 ### Server Actions
+
 - `src/lib/actions/newsletter/newsletter.actions.ts`
 
 ### Facades
+
 - `src/lib/facades/featured-content/featured-content.facade.ts` (only `getFooterFeaturedContentAsync`)
 - `src/lib/facades/newsletter/newsletter.facade.ts` (only `subscribeAsync`)
 
 ### Queries
+
 - `src/lib/queries/featured-content/featured-content-query.ts` (only `getFooterFeaturedContentAsync`)
 - `src/lib/queries/newsletter/newsletter.queries.ts` (4 methods: `findByEmailAsync`, `createSignupAsync`, `resubscribeAsync`, `updateUserIdAsync`)
 
 ### Validation
+
 - `src/lib/validations/newsletter.validation.ts`
 
 ### Hooks
+
 - `src/hooks/use-server-action.ts`
 - `src/components/ui/form/index.tsx` (only `useAppForm`)
 - `src/components/ui/form/focus-management/with-focus-management.tsx`

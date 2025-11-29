@@ -54,6 +54,7 @@ See full implementation plan saved to `docs/2025_11_28/plans/remove-commentCount
 - **Total Steps**: 12 implementation steps
 
 ### Step Breakdown
+
 1. Update Collections Schema - Remove column, indexes, constraint
 2. Generate Database Migration - Create migration file
 3. Update CollectionsQuery - getBrowseCategoriesAsync

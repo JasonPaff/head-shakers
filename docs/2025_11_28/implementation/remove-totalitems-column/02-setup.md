@@ -26,24 +26,24 @@
 
 ## Step-Type Detection and Specialist Routing
 
-| Step | Files | Detected Specialist | Skills Auto-Loaded |
-|------|-------|---------------------|-------------------|
-| 1 | `src/lib/db/schema/collections.schema.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 2 | `src/lib/constants/defaults.ts` | general-purpose | None |
-| 3 | `src/lib/validations/collections.validation.ts` | validation-specialist | validation-schemas |
-| 4 | `src/lib/queries/collections/collections.query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 5 | `src/lib/queries/collections/collections.query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 6 | `src/lib/queries/collections/collections.query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 7 | `src/lib/queries/featured-content/featured-content-query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 8 | `src/lib/queries/featured-content/featured-content-query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 9 | `src/lib/queries/content-search/content-search.query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 10 | `src/lib/queries/content-search/content-search.query.ts` | database-specialist | database-schema, drizzle-orm, validation-schemas |
-| 11 | `src/lib/db/scripts/seed.ts` | database-specialist | database-schema, drizzle-orm |
-| 12 | `tests/mocks/data/collections.mock.ts` | test-infrastructure-specialist | test-infrastructure, testing-base |
-| 13 | `src/lib/db/migrations/` | database-specialist | database-schema, drizzle-orm |
-| 14 | `tests/integration/**/*.test.ts` | integration-test-specialist | integration-testing, testing-base |
-| 15 | None (verification only) | test-executor | None |
-| 16 | None (database operation) | database-specialist | database-schema, drizzle-orm |
+| Step | Files                                                        | Detected Specialist            | Skills Auto-Loaded                               |
+| ---- | ------------------------------------------------------------ | ------------------------------ | ------------------------------------------------ |
+| 1    | `src/lib/db/schema/collections.schema.ts`                    | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 2    | `src/lib/constants/defaults.ts`                              | general-purpose                | None                                             |
+| 3    | `src/lib/validations/collections.validation.ts`              | validation-specialist          | validation-schemas                               |
+| 4    | `src/lib/queries/collections/collections.query.ts`           | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 5    | `src/lib/queries/collections/collections.query.ts`           | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 6    | `src/lib/queries/collections/collections.query.ts`           | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 7    | `src/lib/queries/featured-content/featured-content-query.ts` | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 8    | `src/lib/queries/featured-content/featured-content-query.ts` | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 9    | `src/lib/queries/content-search/content-search.query.ts`     | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 10   | `src/lib/queries/content-search/content-search.query.ts`     | database-specialist            | database-schema, drizzle-orm, validation-schemas |
+| 11   | `src/lib/db/scripts/seed.ts`                                 | database-specialist            | database-schema, drizzle-orm                     |
+| 12   | `tests/mocks/data/collections.mock.ts`                       | test-infrastructure-specialist | test-infrastructure, testing-base                |
+| 13   | `src/lib/db/migrations/`                                     | database-specialist            | database-schema, drizzle-orm                     |
+| 14   | `tests/integration/**/*.test.ts`                             | integration-test-specialist    | integration-testing, testing-base                |
+| 15   | None (verification only)                                     | test-executor                  | None                                             |
+| 16   | None (database operation)                                    | database-specialist            | database-schema, drizzle-orm                     |
 
 ## Step Dependencies
 
@@ -59,20 +59,24 @@
 ## Files Summary by Step
 
 ### Core Schema Changes (Steps 1-3)
+
 - `src/lib/db/schema/collections.schema.ts`
 - `src/lib/constants/defaults.ts`
 - `src/lib/validations/collections.validation.ts`
 
 ### Query Updates (Steps 4-10)
+
 - `src/lib/queries/collections/collections.query.ts`
 - `src/lib/queries/featured-content/featured-content-query.ts`
 - `src/lib/queries/content-search/content-search.query.ts`
 
 ### Supporting Files (Steps 11-12)
+
 - `src/lib/db/scripts/seed.ts`
 - `tests/mocks/data/collections.mock.ts`
 
 ### Migration & Testing (Steps 13-16)
+
 - New migration file in `src/lib/db/migrations/`
 - `tests/integration/queries/featured-content/featured-content-query.test.ts`
 - `tests/integration/facades/featured-content/featured-content.facade.test.ts`

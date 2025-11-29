@@ -28,11 +28,11 @@
 
 ## Prerequisites Validation
 
-| Prerequisite | Status |
-|-------------|--------|
-| Database backup recommendation | Noted |
+| Prerequisite                                    | Status   |
+| ----------------------------------------------- | -------- |
+| Database backup recommendation                  | Noted    |
 | Understanding of Drizzle ORM COUNT aggregations | Required |
-| Familiarity with permission filtering patterns | Required |
+| Familiarity with permission filtering patterns  | Required |
 
 ## Files to Modify (Verified)
 

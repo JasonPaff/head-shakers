@@ -21,17 +21,22 @@ This orchestration removes the denormalized `commentCount` column from the colle
 ## Summary
 
 ### Step 1: Feature Refinement
+
 Enhanced the original request with project-specific technical context including Drizzle ORM, Neon serverless, next-safe-action, and the facade/query layer architecture.
 
 ### Step 2: File Discovery
+
 Discovered 25+ relevant files across:
+
 - **Critical**: Schema file with column definition, indexes, and constraints
 - **High**: 3 query files selecting/updating commentCount
 - **Medium**: Facades and validation schemas
 - **Supporting**: Constants and test files
 
 ### Step 3: Implementation Planning
+
 Generated 12-step implementation plan:
+
 1. Update Collections Schema
 2. Generate Database Migration
 3. Update CollectionsQuery - getBrowseCategoriesAsync
