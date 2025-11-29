@@ -29,7 +29,6 @@ import * as schema from '@/lib/db/schema/index';
 const KNOWN_TABLES = [
   'users',
   'user_settings',
-  'notification_settings',
   'user_blocks',
   'collections',
   'bobbleheads',
@@ -38,7 +37,6 @@ const KNOWN_TABLES = [
   'tags',
   'comments',
   'likes',
-  'notifications',
   'featured_content',
   'content_metrics',
   'launch_notifications',

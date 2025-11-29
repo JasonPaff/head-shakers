@@ -4,7 +4,6 @@ import { boolean, index, pgEnum, pgTable, timestamp, uniqueIndex, uuid, varchar 
 import { DEFAULTS, ENUMS, SCHEMA_LIMITS } from '@/lib/constants';
 
 export const commentPermissionEnum = pgEnum('comment_permission', ENUMS.USER_SETTINGS.COMMENT_PERMISSION);
-export const digestFrequencyEnum = pgEnum('digest_frequency', ENUMS.USER_SETTINGS.DIGEST_FREQUENCY);
 export const privacyLevelEnum = pgEnum('privacy_level', ENUMS.USER_SETTINGS.PRIVACY_LEVEL);
 export const userRoleEnum = pgEnum('user_role', ENUMS.USER.ROLE);
 
@@ -72,62 +71,6 @@ export const userSettings = pgTable(
   (table) => [
     // single column indexes
     index('user_settings_user_id_idx').on(table.userId),
-  ],
-);
-
-export const notificationSettings = pgTable(
-  'notification_settings',
-  {
-    createdAt: timestamp('created_at').defaultNow().notNull(),
-    digestFrequency: digestFrequencyEnum('digest_frequency')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.DIGEST_FREQUENCY)
-      .notNull(),
-    emailNewComments: boolean('email_new_comments')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_EMAIL_NEW_COMMENTS)
-      .notNull(),
-    emailNewFollowers: boolean('email_new_followers')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_EMAIL_NEW_FOLLOWERS)
-      .notNull(),
-    emailNewLikes: boolean('email_new_likes')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_EMAIL_NEW_LIKES)
-      .notNull(),
-    emailPlatformUpdates: boolean('email_platform_updates')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_EMAIL_PLATFORM_UPDATES)
-      .notNull(),
-    emailWeeklyDigest: boolean('email_weekly_digest')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_EMAIL_WEEKLY_DIGEST)
-      .notNull(),
-    id: uuid('id').primaryKey().defaultRandom(),
-    inAppFollowingUpdates: boolean('in_app_following_updates')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_IN_APP_FOLLOWING_UPDATES)
-      .notNull(),
-    inAppNewComments: boolean('in_app_new_comments')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_IN_APP_NEW_COMMENTS)
-      .notNull(),
-    inAppNewFollowers: boolean('in_app_new_followers')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_IN_APP_NEW_FOLLOWERS)
-      .notNull(),
-    inAppNewLikes: boolean('in_app_new_likes')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_IN_APP_NEW_LIKES)
-      .notNull(),
-    pushNewComments: boolean('push_new_comments')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_PUSH_NEW_COMMENTS)
-      .notNull(),
-    pushNewFollowers: boolean('push_new_followers')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_PUSH_NEW_FOLLOWERS)
-      .notNull(),
-    pushNewLikes: boolean('push_new_likes')
-      .default(DEFAULTS.NOTIFICATION_SETTINGS.IS_PUSH_NEW_LIKES)
-      .notNull(),
-    updatedAt: timestamp('updated_at').defaultNow().notNull(),
-    userId: uuid('user_id')
-      .references(() => users.id, { onDelete: 'cascade' })
-      .notNull()
-      .unique(),
-  },
-  (table) => [
-    // single column indexes
-    index('notification_settings_user_id_idx').on(table.userId),
   ],
 );
 

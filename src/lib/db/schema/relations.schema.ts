@@ -5,9 +5,9 @@ import { bobbleheadPhotos, bobbleheads, bobbleheadTags } from '@/lib/db/schema/b
 import { collections } from '@/lib/db/schema/collections.schema';
 import { contentReports } from '@/lib/db/schema/moderation.schema';
 import { comments, likes } from '@/lib/db/schema/social.schema';
-import { featuredContent, notifications } from '@/lib/db/schema/system.schema';
+import { featuredContent } from '@/lib/db/schema/system.schema';
 import { tags } from '@/lib/db/schema/tags.schema';
-import { notificationSettings, userBlocks, users, userSettings } from '@/lib/db/schema/users.schema';
+import { userBlocks, users, userSettings } from '@/lib/db/schema/users.schema';
 
 export const bobbleheadPhotosRelations = relations(bobbleheadPhotos, ({ one }) => ({
   bobblehead: one(bobbleheads, {
@@ -105,24 +105,6 @@ export const likesRelations = relations(likes, ({ one }) => ({
   }),
 }));
 
-export const notificationSettingsRelations = relations(notificationSettings, ({ one }) => ({
-  user: one(users, {
-    fields: [notificationSettings.userId],
-    references: [users.id],
-  }),
-}));
-
-export const notificationsRelations = relations(notifications, ({ one }) => ({
-  relatedUser: one(users, {
-    fields: [notifications.relatedUserId],
-    references: [users.id],
-  }),
-  user: one(users, {
-    fields: [notifications.userId],
-    references: [users.id],
-  }),
-}));
-
 export const searchQueriesRelations = relations(searchQueries, ({ one }) => ({
   user: one(users, {
     fields: [searchQueries.userId],
@@ -170,11 +152,6 @@ export const usersRelations = relations(users, ({ many, one }) => ({
   contentViews: many(contentViews),
   likes: many(likes),
   moderatedReports: many(contentReports, { relationName: 'moderator' }),
-  notifications: many(notifications),
-  notificationSettings: one(notificationSettings, {
-    fields: [users.id],
-    references: [notificationSettings.userId],
-  }),
   reports: many(contentReports, { relationName: 'reporter' }),
   searchQueries: many(searchQueries),
   settings: one(userSettings, {

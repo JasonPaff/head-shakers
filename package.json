@@ -109,6 +109,7 @@
     "@vitejs/plugin-react": "^5.1.1",
     "@vitest/coverage-v8": "^4.0.13",
     "@vitest/eslint-plugin": "^1.4.3",
+    "baseline-browser-mapping": "^2.8.32",
     "drizzle-kit": "^0.31.5",
     "eslint": "^9",
     "eslint-config-prettier": "^10.1.8",

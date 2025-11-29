@@ -47,10 +47,6 @@ export const ENUMS = {
   LOGIN: {
     METHOD: ['email', 'facebook', 'github', 'gmail', 'google'] as const,
   },
-  NOTIFICATION: {
-    RELATED_TYPE: ['bobblehead', 'collection', 'comment', 'user'] as const,
-    TYPE: ['comment', 'like', 'follow', 'mention', 'system'] as const,
-  },
   SEARCH: {
     RESULT_TYPE: ['bobblehead', 'collection', 'user'] as const,
     SORT_BY: ['relevance', 'date', 'price', 'popularity'] as const,
@@ -62,7 +58,6 @@ export const ENUMS = {
   },
   USER_SETTINGS: {
     COMMENT_PERMISSION: ['anyone', 'followers', 'none'] as const,
-    DIGEST_FREQUENCY: ['daily', 'weekly', 'monthly', 'never'] as const,
     PRIVACY_LEVEL: ['public', 'followers', 'private'] as const,
     THEME: ['light', 'dark', 'auto'] as const,
   },
@@ -76,7 +71,6 @@ export type ContentMetricType = (typeof ENUMS.CONTENT_METRIC.TYPE)[number];
 export type ContentReportReason = (typeof ENUMS.CONTENT_REPORT.REASON)[number];
 export type ContentReportStatus = (typeof ENUMS.CONTENT_REPORT.STATUS)[number];
 export type LikeTargetType = (typeof ENUMS.LIKE.TARGET_TYPE)[number];
-export type NotificationType = (typeof ENUMS.NOTIFICATION.TYPE)[number];
 export type PrivacyLevel = (typeof ENUMS.USER_SETTINGS.PRIVACY_LEVEL)[number];
 export type SearchViewMode = (typeof ENUMS.SEARCH.VIEW_MODE)[number];
 export type UserRole = (typeof ENUMS.USER.ROLE)[number];

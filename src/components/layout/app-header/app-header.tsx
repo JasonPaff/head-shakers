@@ -7,7 +7,6 @@ import { AppHeaderColorMode } from '@/components/layout/app-header/components/ap
 import { AppHeaderContainer } from '@/components/layout/app-header/components/app-header-container';
 import { AppHeaderMobileMenu } from '@/components/layout/app-header/components/app-header-mobile-menu';
 import { AppHeaderNavMenu } from '@/components/layout/app-header/components/app-header-nav-menu';
-import { AppHeaderNotifications } from '@/components/layout/app-header/components/app-header-notifications';
 import { AppHeaderSearch } from '@/components/layout/app-header/components/app-header-search';
 import { AppHeaderUser } from '@/components/layout/app-header/components/app-header-user';
 import { AuthContent } from '@/components/ui/auth';
@@ -83,14 +82,6 @@ export const AppHeader = () => {
               <AppHeaderAuthNavMenu />
             </div>
           </AuthContent>
-
-          {/* Notifications - Always visible */}
-          <div
-            className={'flex items-center'}
-            data-testid={generateTestId('layout', 'app-header', 'notifications-section')}
-          >
-            <AppHeaderNotifications />
-          </div>
 
           {/* User Menu - Always visible */}
           <div

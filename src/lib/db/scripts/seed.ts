@@ -8,7 +8,6 @@ import {
   collections,
   comments,
   likes,
-  notificationSettings,
   tags,
   users,
   userSettings,
@@ -414,7 +413,6 @@ async function resetDatabase() {
   await db.delete(bobbleheads);
   await db.delete(collections);
   await db.delete(tags);
-  await db.delete(notificationSettings);
   await db.delete(userSettings);
   await db.delete(users);
 
@@ -665,14 +663,6 @@ async function seedUsers() {
 
     await db.insert(userSettings).values(userSettingsData);
     console.log(`✅ Created user settings for ${userSettingsData.length} new users`);
-
-    // Create notification settings for new users only
-    const notificationSettingsData = insertedUsers.map((user) => ({
-      userId: user.id,
-    }));
-
-    await db.insert(notificationSettings).values(notificationSettingsData);
-    console.log(`✅ Created notification settings for ${notificationSettingsData.length} new users`);
   }
 
   return allUsers;

@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { db } from '@/lib/db';
-import { notificationSettings, users, userSettings } from '@/lib/db/schema';
+import { users, userSettings } from '@/lib/db/schema';
 
 type ClerkUser = User | UserJSON;
 
@@ -69,7 +69,7 @@ export class UserSyncService {
 
   /**
    * sync user from Clerk to database
-   * creates user + userSettings + notificationSettings in a single transaction
+   * creates user + userSettings in a single transaction
    * handles duplicate clerkId errors gracefully (race conditions)
    *
    * @param clerkUser - Clerk user object from webhook or API
@@ -117,11 +117,6 @@ export class UserSyncService {
 
         // insert user settings with defaults
         await tx.insert(userSettings).values({
-          userId: newUser.id,
-        });
-
-        // insert notification settings with defaults
-        await tx.insert(notificationSettings).values({
           userId: newUser.id,
         });
 

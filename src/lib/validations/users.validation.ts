@@ -3,7 +3,7 @@ import z from 'zod';
 
 import { SCHEMA_LIMITS } from '@/lib/constants';
 import { isReservedUsername } from '@/lib/constants/reserved-usernames';
-import { notificationSettings, userBlocks, users, userSettings } from '@/lib/db/schema';
+import { userBlocks, users, userSettings } from '@/lib/db/schema';
 
 export const selectUserSchema = createSelectSchema(users);
 export const insertUserSchema = createInsertSchema(users, {
@@ -41,16 +41,6 @@ export const insertUserSettingsSchema = createInsertSchema(userSettings, {
 });
 
 export const updateUserSettingsSchema = insertUserSettingsSchema.partial();
-
-export const selectNotificationSettingsSchema = createSelectSchema(notificationSettings);
-export const insertNotificationSettingsSchema = createInsertSchema(notificationSettings).omit({
-  createdAt: true,
-  id: true,
-  updatedAt: true,
-  userId: true,
-});
-
-export const updateNotificationSettingsSchema = insertNotificationSettingsSchema.partial();
 
 export const selectUserBlockSchema = createSelectSchema(userBlocks);
 export const insertUserBlockSchema = createInsertSchema(userBlocks, {
@@ -102,16 +92,12 @@ export const updateUsernameSchema = z.object({
 });
 
 export type CheckUsernameAvailability = z.infer<typeof checkUsernameAvailabilitySchema>;
-export type InsertNotificationSettings = z.infer<typeof insertNotificationSettingsSchema>;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type InsertUserBlock = z.infer<typeof insertUserBlockSchema>;
 export type InsertUserSettings = z.infer<typeof insertUserSettingsSchema>;
-export type SelectNotificationSettings = z.infer<typeof selectNotificationSettingsSchema>;
 export type SelectUser = z.infer<typeof selectUserSchema>;
 export type SelectUserBlock = z.infer<typeof selectUserBlockSchema>;
 export type SelectUserSettings = z.infer<typeof selectUserSettingsSchema>;
-export type UpdateNotificationSettings = z.infer<typeof updateNotificationSettingsSchema>;
-
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type UpdateUsername = z.infer<typeof updateUsernameSchema>;
 export type UpdateUserSettings = z.infer<typeof updateUserSettingsSchema>;

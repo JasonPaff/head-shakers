@@ -70,9 +70,6 @@ export const SCHEMA_LIMITS = {
     EMAIL: { MAX: 255, MIN: 5 },
     USER_ID: { MAX: 255 },
   },
-  NOTIFICATION: {
-    TITLE: { MAX: 255, MIN: 1 },
-  },
   SEARCH_QUERY: {
     IP_ADDRESS: { MAX: 50 },
     QUERY: { MAX: 500, MIN: 1 },
