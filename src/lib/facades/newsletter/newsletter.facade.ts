@@ -8,9 +8,9 @@ import { db } from '@/lib/db';
 import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
 import { ResendService } from '@/lib/services/resend.service';
-import { normalizeEmail } from '@/lib/utils/email-utils';
+import { maskEmail, normalizeEmail } from '@/lib/utils/email-utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
-import { trackFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'NewsletterFacade';
 
@@ -138,15 +138,11 @@ export class NewsletterFacade extends BaseFacade {
   private static async sendWelcomeEmailAsync(email: string, signupId: string): Promise<void> {
     try {
       await ResendService.sendNewsletterWelcomeAsync(email);
+      facadeBreadcrumb('Newsletter welcome email sent successfully', { email, signupId });
     } catch (emailError) {
-      trackFacadeWarning(facadeName, 'sendWelcomeEmailAsync', 'Failed to send newsletter welcome email', {
-        email: email.substring(0, 3) + '***',
-        signupId,
-      });
-
       Sentry.captureException(emailError, {
         extra: {
-          email: email.substring(0, 3) + '***',
+          email: maskEmail(email),
           signupId,
         },
         level: 'warning',
