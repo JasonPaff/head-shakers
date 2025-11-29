@@ -71,7 +71,7 @@ export const toggleLikeAction = authActionClient
   .inputSchema(toggleLikeSchema)
   .action(async ({ ctx, parsedInput }) => {
     const likeData = toggleLikeSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
       targetId: likeData.targetId,
@@ -169,7 +169,7 @@ export const createCommentAction = authActionClient
   .inputSchema(createCommentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const commentData = createCommentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COMMENT_DATA, {
       parentCommentId: commentData.parentCommentId,
@@ -283,7 +283,7 @@ export const updateCommentAction = authActionClient
   .inputSchema(updateCommentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const updateData = updateCommentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COMMENT_DATA, {
       commentId: updateData.commentId,
@@ -371,7 +371,7 @@ export const deleteCommentAction = authActionClient
   .inputSchema(deleteCommentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const deleteData = deleteCommentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COMMENT_DATA, {
       commentId: deleteData.commentId,

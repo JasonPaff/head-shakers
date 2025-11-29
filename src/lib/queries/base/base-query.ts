@@ -97,12 +97,4 @@ export abstract class BaseQuery extends BaseContextHelpers {
   protected static getDbInstance(context: QueryContext): DatabaseExecutor {
     return context.dbInstance ?? db;
   }
-
-  /**
-   * Normalize email address for consistent storage and lookup
-   * Converts to lowercase and trims whitespace
-   */
-  protected static normalizeEmail(email: string): string {
-    return email.toLowerCase().trim();
-  }
 }

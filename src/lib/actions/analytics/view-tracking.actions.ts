@@ -133,7 +133,7 @@ export const batchRecordViewsAction = authActionClient
   .inputSchema(batchRecordViewsSchema)
   .action(async ({ ctx, parsedInput }) => {
     const batchData = batchRecordViewsSchema.parse(ctx.sanitizedInput || parsedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.BATCH_VIEW_DATA, {
       batchId: batchData.batchId,

@@ -28,7 +28,7 @@ export const checkUsernameAvailabilityAction = publicActionClient
   .inputSchema(checkUsernameAvailabilitySchema)
   .action(async ({ ctx }) => {
     const { username } = checkUsernameAvailabilitySchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.addBreadcrumb({
       category: SENTRY_BREADCRUMB_CATEGORIES.ACTION,
@@ -69,7 +69,7 @@ export const updateUsernameAction = authActionClient
   .inputSchema(updateUsernameSchema)
   .action(async ({ ctx }) => {
     const { username } = updateUsernameSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {
       newUsername: username,

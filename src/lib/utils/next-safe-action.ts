@@ -41,7 +41,6 @@ export interface AdminSanitizedContext extends AdminContext {
 // context after transaction middleware (admin chain)
 export interface AdminTransactionContext extends AdminSanitizedContext {
   db: DatabaseExecutor;
-  tx?: DatabaseExecutor;
 }
 
 // base context from auth middleware
@@ -66,7 +65,6 @@ export interface PublicSanitizedContext extends PublicContext {
 // context after transaction middleware (public chain)
 export interface PublicTransactionContext extends PublicSanitizedContext {
   db: DatabaseExecutor;
-  tx?: DatabaseExecutor;
 }
 
 // context after sanitization middleware (auth chain)
@@ -77,7 +75,6 @@ export interface SanitizedContext extends AuthContext {
 // context after transaction middleware (auth chain)
 export interface TransactionContext extends SanitizedContext {
   db: DatabaseExecutor;
-  tx?: DatabaseExecutor;
 }
 
 // base client with enhanced error handling

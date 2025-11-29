@@ -1,16 +1,16 @@
 import * as Sentry from '@sentry/nextjs';
 
 import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.queries';
-import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
 import { OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { createPublicQueryContext } from '@/lib/queries/base/query-context';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
 import { ResendService } from '@/lib/services/resend.service';
-import { createFacadeError } from '@/lib/utils/error-builders';
-import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { normalizeEmail } from '@/lib/utils/email-utils';
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
+import { trackFacadeWarning } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'NewsletterFacade';
 
@@ -32,201 +32,132 @@ export interface NewsletterSubscriptionResult {
  * NewsletterFacade handles business logic for newsletter operations
  * Provides methods for subscribing, unsubscribing, and checking subscription status
  */
-export class NewsletterFacade {
-  /**
-   * Check if an email is currently subscribed to the newsletter
-   * Returns true only if email exists AND is not unsubscribed
-   *
-   * @param email - Email address to check
-   * @param dbInstance - Optional database instance for transactions
-   * @returns Boolean indicating if email is actively subscribed
-   */
-  static async isEmailSubscribedAsync(email: string, dbInstance?: DatabaseExecutor): Promise<boolean> {
-    try {
-      const context = createPublicQueryContext({ dbInstance });
-      return NewsletterQuery.isActiveSubscriberAsync(email, context);
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: { email: email.substring(0, 3) + '***' },
-        facade: facadeName,
-        method: 'isEmailSubscribedAsync',
-        operation: OPERATIONS.NEWSLETTER.CHECK_SUBSCRIPTION,
-      };
-      throw createFacadeError(errorContext, error);
-    }
-  }
-
+export class NewsletterFacade extends BaseFacade {
   /**
    * Subscribe an email to the newsletter
+   *
    * Handles the following cases:
    * - New subscription: Creates a new signup record
-   * - Existing active subscription: Returns success with isAlreadySubscribed=true
+   * - Existing active subscription: Returns success with isAlreadySubscribed=true (privacy-preserving)
    * - Previously unsubscribed: Resubscribes the email
+   *
+   * Sends welcome email asynchronously (non-blocking) for new subscribers.
    *
    * @param email - Email address to subscribe
    * @param userId - Optional Clerk user ID to associate with subscription
-   * @param dbInstance - Optional database instance for transactions
+   * @param dbInstance - Database instance for transactions (defaults to db)
    * @returns Result object with subscription status and signup record
    */
   static async subscribeAsync(
     email: string,
     userId?: string,
-    dbInstance?: DatabaseExecutor,
+    dbInstance: DatabaseExecutor = db,
   ): Promise<NewsletterSubscriptionResult> {
-    try {
-      const normalizedEmail = email.toLowerCase().trim();
-
-      return await (dbInstance ?? db).transaction(async (tx) => {
-        const context = createPublicQueryContext({ dbInstance: tx });
-
-        // Check if email already exists
-        const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
-
-        if (existingSignup) {
-          // Check if previously unsubscribed
-          if (existingSignup.unsubscribedAt !== null) {
-            // Resubscribe
-            const resubscribed = await NewsletterQuery.resubscribeAsync(normalizedEmail, context);
-
-            // Update userId if provided and different
-            if (userId && resubscribed && resubscribed.userId !== userId) {
-              await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
-            }
-
-            facadeBreadcrumb('Newsletter email resubscribed', {
-              hasUserId: Boolean(userId),
-              signupId: resubscribed?.id,
-            });
-
-            return {
-              isAlreadySubscribed: false,
-              isSuccessful: true,
-              signup: resubscribed,
-            };
-          }
-
-          // Already actively subscribed - return success for privacy
-          // Don't expose whether email exists to prevent enumeration
-          facadeBreadcrumb('Newsletter signup attempted for existing subscriber', {
-            hasUserId: Boolean(userId),
-            signupId: existingSignup.id,
-          });
-
-          // Update userId if provided and not already set
-          if (userId && !existingSignup.userId) {
-            await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
-          }
-
-          return {
-            isAlreadySubscribed: true,
-            isSuccessful: true,
-            signup: existingSignup,
-          };
-        }
-
-        // New subscription
-        const newSignup = await NewsletterQuery.createSignupAsync(normalizedEmail, userId, context);
-
-        if (!newSignup) {
-          // Race condition - email was created between check and insert
-          // This shouldn't happen with transaction, but handle gracefully
-          const existingAfterRace = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
-          return {
-            isAlreadySubscribed: true,
-            isSuccessful: true,
-            signup: existingAfterRace,
-          };
-        }
-
-        facadeBreadcrumb('New newsletter subscription created', {
-          hasUserId: Boolean(userId),
-          signupId: newSignup.id,
-        });
-
-        // Send welcome email asynchronously for new subscribers
-        // Fire-and-forget pattern with error handling in .catch()
-        facadeBreadcrumb('Sending newsletter welcome email', {
-          email: normalizedEmail.substring(0, 3) + '***',
-          operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
-        });
-
-        // Fire and forget - don't await to avoid blocking subscription
-        void ResendService.sendNewsletterWelcomeAsync(normalizedEmail).catch((emailError) => {
-          Sentry.captureException(emailError, {
-            extra: {
-              email: normalizedEmail.substring(0, 3) + '***',
-              signupId: newSignup.id,
-            },
-            level: 'warning',
-            tags: {
-              component: facadeName,
-              operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
-            },
-          });
-        });
-
-        return {
-          isAlreadySubscribed: false,
-          isSuccessful: true,
-          signup: newSignup,
-        };
-      });
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
+    return executeFacadeOperation(
+      {
         data: { hasUserId: Boolean(userId) },
         facade: facadeName,
         method: 'subscribeAsync',
         operation: OPERATIONS.NEWSLETTER.SUBSCRIBE,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+        userId,
+      },
+      async () => {
+        const normalizedEmail = normalizeEmail(email);
+
+        return await dbInstance.transaction(async (tx) => {
+          const context = this.publicContext(tx);
+
+          const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
+
+          if (existingSignup) {
+            if (existingSignup.unsubscribedAt !== null) {
+              const resubscribed = await NewsletterQuery.resubscribeAsync(normalizedEmail, context);
+
+              // Update userId if provided and different
+              if (userId && resubscribed && resubscribed.userId !== userId) {
+                await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
+              }
+
+              return {
+                isAlreadySubscribed: false,
+                isSuccessful: true,
+                signup: resubscribed,
+              };
+            }
+
+            // Already actively subscribed - return success for privacy
+            // Don't expose it whether email exists to prevent enumeration
+            // Update userId if provided and not already set
+            if (userId && !existingSignup.userId) {
+              await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
+            }
+
+            return {
+              isAlreadySubscribed: true,
+              isSuccessful: true,
+              signup: existingSignup,
+            };
+          }
+
+          // New subscription
+          const newSignup = await NewsletterQuery.createSignupAsync(normalizedEmail, userId, context);
+
+          if (!newSignup) {
+            const existingAfterRace = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
+            return {
+              isAlreadySubscribed: true,
+              isSuccessful: true,
+              signup: existingAfterRace,
+            };
+          }
+
+          // Send welcome email asynchronously - non-blocking
+          void this.sendWelcomeEmailAsync(normalizedEmail, newSignup.id);
+
+          return {
+            isAlreadySubscribed: false,
+            isSuccessful: true,
+            signup: newSignup,
+          };
+        });
+      },
+      {
+        includeResultSummary: (result) => ({
+          isAlreadySubscribed: result.isAlreadySubscribed,
+          isSuccessful: result.isSuccessful,
+          signupId: result.signup?.id,
+        }),
+      },
+    );
   }
 
   /**
-   * Unsubscribe an email from the newsletter
-   * Uses soft delete pattern - sets unsubscribedAt timestamp
+   * Send welcome email asynchronously (non-blocking)
+   * Failures are logged as warnings and don't fail the subscription
    *
-   * @param email - Email address to unsubscribe
-   * @param dbInstance - Optional database instance for transactions
-   * @returns The unsubscribed signup record, or null if email not found
+   * @param email - Email address to send to (already normalized)
+   * @param signupId - Newsletter signup ID for error tracking
    */
-  static async unsubscribeAsync(
-    email: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<NewsletterSignupRecord | null> {
+  private static async sendWelcomeEmailAsync(email: string, signupId: string): Promise<void> {
     try {
-      const context = createPublicQueryContext({ dbInstance });
-      const normalizedEmail = email.toLowerCase().trim();
-
-      // Check if email exists first
-      const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
-
-      if (!existingSignup) {
-        // Email not found - return null but don't error
-        // This prevents email enumeration attacks
-        return null;
-      }
-
-      if (existingSignup.unsubscribedAt !== null) {
-        // Already unsubscribed - return existing record
-        return existingSignup;
-      }
-
-      const unsubscribed = await NewsletterQuery.unsubscribeAsync(normalizedEmail, context);
-
-      facadeBreadcrumb('Newsletter email unsubscribed', {
-        signupId: unsubscribed?.id,
+      await ResendService.sendNewsletterWelcomeAsync(email);
+    } catch (emailError) {
+      trackFacadeWarning(facadeName, 'sendWelcomeEmailAsync', 'Failed to send newsletter welcome email', {
+        email: email.substring(0, 3) + '***',
+        signupId,
       });
 
-      return unsubscribed;
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: { email: email.substring(0, 3) + '***' },
-        facade: facadeName,
-        method: 'unsubscribeAsync',
-        operation: OPERATIONS.NEWSLETTER.UNSUBSCRIBE,
-      };
-      throw createFacadeError(errorContext, error);
+      Sentry.captureException(emailError, {
+        extra: {
+          email: email.substring(0, 3) + '***',
+          signupId,
+        },
+        level: 'warning',
+        tags: {
+          component: facadeName,
+          operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
+        },
+      });
     }
   }
 }

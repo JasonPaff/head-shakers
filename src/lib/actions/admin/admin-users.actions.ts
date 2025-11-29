@@ -160,7 +160,7 @@ export const updateUserRoleAction = adminActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { isAdmin, isModerator, userId } = ctx;
     const { newRole, userId: targetUserId } = adminUpdateUserRoleSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     // Only admins can change user roles
     if (!isAdmin) {
@@ -254,7 +254,7 @@ export const lockUserAction = adminActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { isAdmin, isModerator, userId } = ctx;
     const { lockDuration, reason, userId: targetUserId } = adminLockUserSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {
       isAdmin,
@@ -348,7 +348,7 @@ export const unlockUserAction = adminActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { isAdmin, isModerator, userId } = ctx;
     const { userId: targetUserId } = adminUnlockUserSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {
       isAdmin,

@@ -34,7 +34,7 @@ export const createCollectionAction = authActionClient
   .inputSchema(insertCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const collectionData = insertCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, collectionData);
 
@@ -90,7 +90,7 @@ export const updateCollectionAction = authActionClient
   .inputSchema(updateCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const collectionData = updateCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, collectionData);
 
@@ -163,7 +163,7 @@ export const deleteCollectionAction = authActionClient
   .inputSchema(deleteCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const collectionData = deleteCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, collectionData);
 
@@ -222,7 +222,7 @@ export const browseCollectionsAction = publicActionClient
   .inputSchema(browseCollectionsInputSchema)
   .action(async ({ ctx, parsedInput }) => {
     const browseInput = browseCollectionsInputSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       filters: browseInput.filters,
@@ -265,7 +265,7 @@ export const getCategoriesAction = publicActionClient
     isTransactionRequired: false,
   })
   .action(async ({ ctx }) => {
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     try {
       const categories = await CollectionsFacade.getCategories(dbInstance);
@@ -301,7 +301,7 @@ export const browseCategoriesAction = publicActionClient
   .inputSchema(browseCategoriesInputSchema)
   .action(async ({ ctx, parsedInput }) => {
     const browseInput = browseCategoriesInputSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       filters: browseInput.filters,

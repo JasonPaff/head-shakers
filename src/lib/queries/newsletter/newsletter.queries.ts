@@ -4,6 +4,7 @@ import type { QueryContext } from '@/lib/queries/base/query-context';
 
 import { newsletterSignups } from '@/lib/db/schema/newsletter-signups.schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
+import { normalizeEmail } from '@/lib/utils/email-utils';
 
 /**
  * Type for inserting a new newsletter signup
@@ -11,7 +12,7 @@ import { BaseQuery } from '@/lib/queries/base/base-query';
 export type InsertNewsletterSignup = typeof newsletterSignups.$inferInsert;
 
 /**
- * Type for newsletter signup record from database
+ * Type for newsletter signup record from the database
  */
 export type NewsletterSignupRecord = typeof newsletterSignups.$inferSelect;
 
@@ -35,7 +36,7 @@ export class NewsletterQuery extends BaseQuery {
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .insert(newsletterSignups)
@@ -54,7 +55,7 @@ export class NewsletterQuery extends BaseQuery {
   static async emailExistsAsync(email: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .select({ id: newsletterSignups.id })
@@ -75,7 +76,7 @@ export class NewsletterQuery extends BaseQuery {
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .select()
@@ -87,7 +88,7 @@ export class NewsletterQuery extends BaseQuery {
   }
 
   /**
-   * Get active subscriber by email (not unsubscribed)
+   * Get the active subscriber by email (not unsubscribed)
    */
   static async getActiveSubscriberAsync(
     email: string,
@@ -95,7 +96,7 @@ export class NewsletterQuery extends BaseQuery {
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .select()
@@ -113,7 +114,7 @@ export class NewsletterQuery extends BaseQuery {
 
   /**
    * Check if an email is actively subscribed (not unsubscribed)
-   * Uses single query via getActiveSubscriberAsync to efficiently check both existence and subscription status
+   * Uses a single query via getActiveSubscriberAsync to efficiently check both existence and subscription status
    */
   static async isActiveSubscriberAsync(email: string, context: QueryContext): Promise<boolean> {
     const signup = await this.getActiveSubscriberAsync(email, context);
@@ -139,7 +140,7 @@ export class NewsletterQuery extends BaseQuery {
     const existing = await this.findByEmailAsync(email, context);
     if (!existing) return null;
 
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .update(newsletterSignups)
@@ -164,7 +165,7 @@ export class NewsletterQuery extends BaseQuery {
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .update(newsletterSignups)
@@ -196,7 +197,7 @@ export class NewsletterQuery extends BaseQuery {
       return null;
     }
 
-    const normalizedEmail = this.normalizeEmail(email);
+    const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
       .update(newsletterSignups)

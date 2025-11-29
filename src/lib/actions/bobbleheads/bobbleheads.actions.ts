@@ -55,7 +55,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
     try {
-      const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.tx);
+      const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.db);
 
       if (!newBobblehead) {
         throw new ActionError(
@@ -112,7 +112,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
           // insert photos into the database with permanent URLs
           uploadedPhotos = await Promise.all(
-            photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
+            photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
           );
 
           // clean up any temp photos that failed to move
@@ -147,7 +147,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
             }));
 
             uploadedPhotos = await Promise.all(
-              photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
+              photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
             );
           } catch (fallbackError) {
             console.error('Fallback photo save also failed:', fallbackError);
@@ -162,7 +162,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
         try {
           // create or get existing tags for the user
           const tagPromises = tags.map(async (tagName) => {
-            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.tx);
+            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
             return existingTag;
           });
 
@@ -171,7 +171,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
 
           // attach tags to the bobblehead
           if (tagIds.length > 0) {
-            await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.tx);
+            await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.db);
             createdTags = tagRecords.filter(Boolean);
           }
         } catch (tagError) {
@@ -206,7 +206,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
       const collection = await CollectionsFacade.getCollectionById(
         newBobblehead.collectionId,
         userId,
-        ctx.tx,
+        ctx.db,
       );
       const collectionSlug = collection?.slug ?? null;
 
@@ -237,7 +237,7 @@ export const deleteBobbleheadAction = authActionClient
   .inputSchema(deleteBobbleheadSchema)
   .action(async ({ ctx, parsedInput }) => {
     const bobbleheadData = deleteBobbleheadSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db ?? ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
@@ -315,7 +315,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
       const updatedBobblehead = await BobbleheadsFacade.updateAsync(
         { id, ...bobbleheadData },
         userId,
-        ctx.tx,
+        ctx.db,
       );
 
       if (!updatedBobblehead) {
@@ -378,7 +378,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
 
             // insert photos into the database with permanent URLs
             uploadedPhotos = await Promise.all(
-              photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
+              photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
             );
 
             // clean up any temp photos that failed to move
@@ -413,7 +413,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
               }));
 
               uploadedPhotos = await Promise.all(
-                photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.tx)),
+                photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
               );
             } catch (fallbackError) {
               console.error('Fallback photo save also failed:', fallbackError);
@@ -432,7 +432,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
 
           // create or get existing tags for the user
           const tagPromises = tags.map(async (tagName) => {
-            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.tx);
+            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
             return existingTag;
           });
 
@@ -441,7 +441,7 @@ export const updateBobbleheadWithPhotosAction = authActionClient
 
           // attach tags to the bobblehead
           if (tagIds.length > 0) {
-            await TagsFacade.attachToBobblehead(updatedBobblehead.id, tagIds, userId, ctx.tx);
+            await TagsFacade.attachToBobblehead(updatedBobblehead.id, tagIds, userId, ctx.db);
             updatedTags = tagRecords.filter(Boolean);
           }
         } catch (tagError) {
@@ -534,7 +534,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
 
     try {
       // get all photos for the bobblehead before deletion to determine if we need to promote a new primary
-      const allPhotos = await BobbleheadsFacade.getBobbleheadPhotos(photoData.bobbleheadId, userId, ctx.tx);
+      const allPhotos = await BobbleheadsFacade.getBobbleheadPhotos(photoData.bobbleheadId, userId, ctx.db);
 
       const photoToDelete = allPhotos.find((p) => p.id === photoData.photoId);
 
@@ -552,7 +552,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
       const wasPrimaryPhoto = photoToDelete.isPrimary;
 
       // delete the photo
-      const deletedPhoto = await BobbleheadsFacade.deletePhotoAsync(photoData, userId, ctx.tx);
+      const deletedPhoto = await BobbleheadsFacade.deletePhotoAsync(photoData, userId, ctx.db);
 
       if (!deletedPhoto) {
         throw new ActionError(
@@ -585,7 +585,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
             photoOrder,
           },
           userId,
-          ctx.tx,
+          ctx.db,
         );
 
         Sentry.addBreadcrumb({
@@ -612,7 +612,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
             photoOrder,
           },
           userId,
-          ctx.tx,
+          ctx.db,
         );
       }
 
@@ -668,7 +668,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
     });
 
     try {
-      const updatedPhotos = await BobbleheadsFacade.reorderPhotosAsync(reorderData, userId, ctx.tx);
+      const updatedPhotos = await BobbleheadsFacade.reorderPhotosAsync(reorderData, userId, ctx.db);
 
       if (updatedPhotos.length === 0) {
         throw new ActionError(
@@ -732,7 +732,7 @@ export const updateBobbleheadPhotoMetadataAction = authActionClient
     });
 
     try {
-      const updatedPhoto = await BobbleheadsFacade.updatePhotoMetadataAsync(metadataData, userId, ctx.tx);
+      const updatedPhoto = await BobbleheadsFacade.updatePhotoMetadataAsync(metadataData, userId, ctx.db);
 
       if (!updatedPhoto) {
         throw new ActionError(

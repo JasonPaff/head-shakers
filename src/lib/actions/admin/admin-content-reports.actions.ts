@@ -95,7 +95,7 @@ export const updateReportStatusAction = adminActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { isAdmin, isModerator, userId } = ctx;
     const { moderatorNotes, reportId, status } = adminUpdateReportSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     // ensure the user has proper permissions for status changes
     // some status changes may require full admin privileges
@@ -177,7 +177,7 @@ export const bulkUpdateReportsAction = adminActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { isAdmin, isModerator, userId } = ctx;
     const { moderatorNotes, reportIds, status } = adminBulkUpdateReportsSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     // ensure user has admin privileges for bulk operations
     if (!isAdmin) {

@@ -45,7 +45,7 @@ export const searchCollectionsForFeaturingAction = adminActionClient
   .inputSchema(searchContentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       excludeTags,
@@ -100,7 +100,7 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
   .inputSchema(searchContentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       excludeTags,
@@ -155,7 +155,7 @@ export const searchUsersForFeaturingAction = adminActionClient
   .inputSchema(searchContentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, { excludeTags, includeTags, limit, query, type: 'users' });
 
@@ -200,7 +200,7 @@ export const getCollectionForFeaturingAction = adminActionClient
   .inputSchema(getCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const input = getCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, { id: input.id });
 
@@ -238,7 +238,7 @@ export const getBobbleheadForFeaturingAction = adminActionClient
   .inputSchema(getCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const input = getCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { id: input.id });
 
@@ -277,7 +277,7 @@ export const getUserForFeaturingAction = adminActionClient
   .inputSchema(getCollectionSchema)
   .action(async ({ ctx, parsedInput }) => {
     const input = getCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { id: input.id });
 
@@ -337,7 +337,7 @@ export const searchPublicContentAction = publicActionClient
   .inputSchema(publicSearchInputSchema)
   .action(async ({ ctx, parsedInput }) => {
     const input = publicSearchInputSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       category: input.filters?.category,
@@ -410,7 +410,7 @@ export const getPublicSearchDropdownAction = publicActionClient
   .inputSchema(searchDropdownInputSchema)
   .action(async ({ ctx, parsedInput }) => {
     const input = searchDropdownInputSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
       query: input.query,

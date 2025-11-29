@@ -52,7 +52,7 @@ export const createFeaturedContentAction = adminActionClient
     }
 
     const featuredContentData = adminCreateFeaturedContentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
@@ -124,7 +124,7 @@ export const updateFeaturedContentAction = adminActionClient
     }
 
     const featuredContentData = adminUpdateFeaturedContentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 
@@ -184,7 +184,7 @@ export const toggleFeaturedContentActiveAction = authActionClient
   .inputSchema(toggleActiveSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { id, isActive } = toggleActiveSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, { id, isActive });
 
@@ -243,7 +243,7 @@ export const deleteFeaturedContentAction = authActionClient
   .inputSchema(deleteFeaturedContentSchema)
   .action(async ({ ctx, parsedInput }) => {
     const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, { id });
 
@@ -297,7 +297,7 @@ export const getFeaturedContentByIdAction = adminActionClient
   .inputSchema(adminGetFeaturedContentByIdSchema)
   .action(async ({ ctx, parsedInput }) => {
     const featuredContentData = adminGetFeaturedContentByIdSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.FEATURED_CONTENT_DATA, featuredContentData);
 

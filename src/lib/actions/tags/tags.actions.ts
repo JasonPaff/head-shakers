@@ -212,7 +212,7 @@ export const attachTagsAction = authActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { bobbleheadId, tagIds } = attachTagsSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { bobbleheadId });
@@ -288,7 +288,7 @@ export const detachTagsAction = authActionClient
   .action(async ({ ctx, parsedInput }) => {
     const { bobbleheadId, tagIds } = detachTagsSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
-    const dbInstance = ctx.tx ?? ctx.db;
+    const dbInstance = ctx.db;
 
     Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, { userId });
     Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { bobbleheadId });

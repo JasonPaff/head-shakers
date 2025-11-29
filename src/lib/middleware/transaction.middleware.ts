@@ -14,7 +14,6 @@ export const transactionMiddleware = createMiddleware<{
       return await next({
         ctx: {
           db: tx,
-          tx,
         },
       });
     });
@@ -38,7 +37,6 @@ export const publicTransactionMiddleware = createMiddleware<{
       return await next({
         ctx: {
           db: tx,
-          tx,
         },
       });
     });
