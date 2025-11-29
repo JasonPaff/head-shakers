@@ -26,19 +26,23 @@ Add unsubscribe functionality to the footer newsletter component by checking use
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/newsletter.validation.ts` - Add unsubscribe schema and type exports
 
 **Changes:**
+
 - Add `unsubscribeFromNewsletterSchema` using Zod with email validation
 - Add type exports `UnsubscribeFromNewsletter` and `UnsubscribeFromNewsletterInput`
 - Schema should validate email format and length matching existing subscription schema patterns
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Unsubscribe schema validates email format
 - [ ] Type exports available for use in actions
 - [ ] All validation commands pass
@@ -52,9 +56,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Add unsubscribeAsync static method
 
 **Changes:**
+
 - Add `unsubscribeAsync` method accepting email and optional dbInstance
 - Use `executeFacadeOperation` wrapper for consistent error handling
 - Call `NewsletterQuery.unsubscribeAsync` to perform database update
@@ -63,11 +69,13 @@ npm run lint:fix && npm run typecheck
 - Return result indicating success/failure
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Method signature matches facade patterns
 - [ ] Uses executeFacadeOperation wrapper
 - [ ] Includes proper Sentry breadcrumbs
@@ -83,9 +91,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/actions/newsletter/newsletter.actions.ts` - Add unsubscribe action
 
 **Changes:**
+
 - Add `unsubscribeFromNewsletterAction` using `publicActionClient`
 - Use `ACTION_NAMES.NEWSLETTER.UNSUBSCRIBE` metadata
 - Set `isTransactionRequired: true`
@@ -97,11 +107,13 @@ npm run lint:fix && npm run typecheck
 - Add actionBreadcrumb calls for tracking
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Action follows existing subscribeToNewsletterAction pattern
 - [ ] Includes proper Sentry context and breadcrumbs
 - [ ] Authorization checks user authentication
@@ -117,15 +129,18 @@ npm run lint:fix && npm run typecheck
 **Confidence**: Medium
 
 **Files to Create:**
+
 - `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx` - Client component for subscription form
 - `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` - Client component for unsubscribe interface
 
 **Files to Modify:**
+
 - `src/components/layout/app-footer/components/footer-newsletter.tsx` - Convert to async server component wrapper
 
 **Changes:**
 
 **FooterNewsletter (parent server component):**
+
 - Remove 'use client' directive to make it a server component
 - Import getUserIdAsync from auth-utils
 - Import UsersFacade to get user email
@@ -137,12 +152,14 @@ npm run lint:fix && npm run typecheck
 - Maintain existing container structure with aria-labelledby and role
 
 **FooterNewsletterSubscribe (new client component):**
+
 - Move existing subscription form logic from FooterNewsletter
 - Keep all existing functionality: form handling, useServerAction, field components
 - Export as named export following project conventions
 - Apply withFocusManagement wrapper
 
 **FooterNewsletterUnsubscribe (new client component):**
+
 - Create 'use client' component with similar structure to subscribe component
 - Accept userEmail as prop for display purposes
 - Use useServerAction hook with unsubscribeFromNewsletterAction
@@ -153,11 +170,13 @@ npm run lint:fix && npm run typecheck
 - Apply withFocusManagement wrapper for consistency
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Server component properly checks auth and subscription status
 - [ ] Subscribe client component maintains existing functionality
 - [ ] Unsubscribe client component follows UI patterns with Radix and Tailwind
@@ -174,10 +193,12 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Review unsubscribeAsync privacy handling
 - `src/lib/actions/newsletter/newsletter.actions.ts` - Review action error messages
 
 **Changes:**
+
 - Ensure unsubscribe facade returns success even for non-existent emails (privacy)
 - Verify error messages don't reveal subscription status to unauthenticated users
 - Confirm masked email logging in Sentry breadcrumbs
@@ -186,11 +207,13 @@ npm run lint:fix && npm run typecheck
 - Verify resubscribe flow still works after unsubscribing
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] No email enumeration vulnerabilities
 - [ ] Consistent success messages regardless of email existence
 - [ ] Masked emails in all logging

@@ -1,15 +1,18 @@
 # Step 2: AI-Powered File Discovery
 
 ## Step Metadata
+
 - **Start Time**: 2025-11-28T00:00:30Z
 - **End Time**: 2025-11-28T00:01:30Z
 - **Duration**: ~60 seconds
 - **Status**: Completed
 
 ## Input
+
 Refined feature request from Step 1 regarding newsletter unsubscribe functionality for signed-in subscribers.
 
 ## Agent Prompt Sent
+
 ```
 Discover all files relevant to implementing this feature:
 
@@ -31,52 +34,52 @@ When a signed-in user who has already subscribed to the newsletter visits the ap
 
 ### Critical Priority Files
 
-| File Path | Action | Relevance |
-|-----------|--------|-----------|
-| `src/components/layout/app-footer/components/footer-newsletter.tsx` | Modify | Current newsletter subscription component - needs conditional render logic |
-| `src/lib/actions/newsletter/newsletter.actions.ts` | Modify | Add unsubscribeFromNewsletterAction |
-| `src/lib/facades/newsletter/newsletter.facade.ts` | Modify | Add unsubscribeAsync method |
-| `src/lib/queries/newsletter/newsletter.queries.ts` | Reference | Already contains unsubscribeAsync, isActiveSubscriberAsync methods |
-| `src/lib/validations/newsletter.validation.ts` | Modify | Add unsubscribeNewsletterSchema |
+| File Path                                                           | Action    | Relevance                                                                  |
+| ------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------- |
+| `src/components/layout/app-footer/components/footer-newsletter.tsx` | Modify    | Current newsletter subscription component - needs conditional render logic |
+| `src/lib/actions/newsletter/newsletter.actions.ts`                  | Modify    | Add unsubscribeFromNewsletterAction                                        |
+| `src/lib/facades/newsletter/newsletter.facade.ts`                   | Modify    | Add unsubscribeAsync method                                                |
+| `src/lib/queries/newsletter/newsletter.queries.ts`                  | Reference | Already contains unsubscribeAsync, isActiveSubscriberAsync methods         |
+| `src/lib/validations/newsletter.validation.ts`                      | Modify    | Add unsubscribeNewsletterSchema                                            |
 
 ### High Priority Files
 
-| File Path | Action | Relevance |
-|-----------|--------|-----------|
-| `src/lib/constants/action-names.ts` | Reference | Already contains ACTION_NAMES.NEWSLETTER.UNSUBSCRIBE |
-| `src/lib/constants/operations.ts` | Reference | Already contains OPERATIONS.NEWSLETTER.UNSUBSCRIBE |
-| `src/lib/db/schema/newsletter-signups.schema.ts` | Reference | Schema with unsubscribedAt field already exists |
-| `src/utils/auth-utils.ts` | Reference | getUserIdAsync for current user |
-| `src/hooks/use-server-action.ts` | Reference | Custom hook for server action integration |
-| `src/lib/utils/email-utils.ts` | Reference | Email normalization utilities |
-| `src/lib/utils/action-response.ts` | Reference | ActionResponse types |
-| `src/lib/utils/next-safe-action.ts` | Reference | publicActionClient configuration |
+| File Path                                        | Action    | Relevance                                            |
+| ------------------------------------------------ | --------- | ---------------------------------------------------- |
+| `src/lib/constants/action-names.ts`              | Reference | Already contains ACTION_NAMES.NEWSLETTER.UNSUBSCRIBE |
+| `src/lib/constants/operations.ts`                | Reference | Already contains OPERATIONS.NEWSLETTER.UNSUBSCRIBE   |
+| `src/lib/db/schema/newsletter-signups.schema.ts` | Reference | Schema with unsubscribedAt field already exists      |
+| `src/utils/auth-utils.ts`                        | Reference | getUserIdAsync for current user                      |
+| `src/hooks/use-server-action.ts`                 | Reference | Custom hook for server action integration            |
+| `src/lib/utils/email-utils.ts`                   | Reference | Email normalization utilities                        |
+| `src/lib/utils/action-response.ts`               | Reference | ActionResponse types                                 |
+| `src/lib/utils/next-safe-action.ts`              | Reference | publicActionClient configuration                     |
 
 ### Medium Priority Files
 
-| File Path | Action | Relevance |
-|-----------|--------|-----------|
-| `src/components/ui/auth.tsx` | Reference | AuthContent component pattern |
-| `src/components/ui/conditional.tsx` | Reference | Conditional rendering helper |
-| `src/components/ui/button.tsx` | Reference | Button component for UI |
-| `src/components/ui/form/form-components/submit-button.tsx` | Reference | Submit button patterns |
-| `src/components/layout/app-footer/app-footer.tsx` | Reference | Parent footer component |
+| File Path                                                  | Action    | Relevance                     |
+| ---------------------------------------------------------- | --------- | ----------------------------- |
+| `src/components/ui/auth.tsx`                               | Reference | AuthContent component pattern |
+| `src/components/ui/conditional.tsx`                        | Reference | Conditional rendering helper  |
+| `src/components/ui/button.tsx`                             | Reference | Button component for UI       |
+| `src/components/ui/form/form-components/submit-button.tsx` | Reference | Submit button patterns        |
+| `src/components/layout/app-footer/app-footer.tsx`          | Reference | Parent footer component       |
 
 ### Low Priority Files
 
-| File Path | Action | Relevance |
-|-----------|--------|-----------|
+| File Path                            | Action    | Relevance               |
+| ------------------------------------ | --------- | ----------------------- |
 | `src/lib/constants/schema-limits.ts` | Reference | Newsletter email limits |
-| `src/lib/db/schema/users.schema.ts` | Reference | User table structure |
+| `src/lib/db/schema/users.schema.ts`  | Reference | User table structure    |
 
 ## Files to Create
 
-| File Path | Purpose |
-|-----------|---------|
+| File Path                                                                       | Purpose                                                     |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Unsubscribe UI component (optional - could modify existing) |
-| `tests/lib/actions/newsletter/newsletter.actions.test.ts` | Action integration tests |
-| `tests/lib/facades/newsletter/newsletter.facade.test.ts` | Facade unit tests |
-| `tests/lib/validations/newsletter.validation.test.ts` | Validation schema tests |
+| `tests/lib/actions/newsletter/newsletter.actions.test.ts`                       | Action integration tests                                    |
+| `tests/lib/facades/newsletter/newsletter.facade.test.ts`                        | Facade unit tests                                           |
+| `tests/lib/validations/newsletter.validation.test.ts`                           | Validation schema tests                                     |
 
 ## Key Architecture Insights
 
@@ -86,6 +89,7 @@ When a signed-in user who has already subscribed to the newsletter visits the ap
 4. **Strong Patterns**: Consistent patterns for actions, facades, and form handling
 
 ## Discovery Statistics
+
 - **Directories Explored**: 15+
 - **Files Examined**: 45+
 - **Relevant Files Found**: 23
@@ -93,6 +97,7 @@ When a signed-in user who has already subscribed to the newsletter visits the ap
 - **Files to Create**: 4-8
 
 ## Validation Results
+
 - [x] Minimum 3 relevant files discovered (found 23)
 - [x] All critical file paths validated
 - [x] Files properly categorized by priority

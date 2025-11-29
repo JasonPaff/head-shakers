@@ -11,6 +11,7 @@ When a user who is signed in has signed up to the newsletter then instead of sho
 ## Workflow Overview
 
 This orchestration follows a 3-step process:
+
 1. **Feature Request Refinement** - Enhance request with project context
 2. **File Discovery** - Find all relevant files for implementation
 3. **Implementation Planning** - Generate detailed implementation plan
