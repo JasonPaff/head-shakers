@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 
 import type { RevalidationResult } from '@/lib/services/cache-revalidation.service';
 
-import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS } from '@/lib/constants';
+import { SENTRY_BREADCRUMB_CATEGORIES, SENTRY_CONTEXTS, SENTRY_LEVELS, SENTRY_TAGS } from '@/lib/constants';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { includeFullResult } from '@/lib/utils/facade-helpers';
 
@@ -37,6 +37,43 @@ export function actionBreadcrumb(
     data,
     level: SENTRY_LEVELS[level.toUpperCase() as keyof typeof SENTRY_LEVELS],
     message,
+  });
+}
+
+/**
+ * Capture a non-critical exception in a facade with proper tags and warning level.
+ * Use for errors that should be logged but shouldn't fail the main operation.
+ *
+ * @example
+ * // Email sending failure (non-critical)
+ * catch (emailError) {
+ *   captureFacadeWarning(emailError, facadeName, OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL, {
+ *     signupId,
+ *   });
+ * }
+ *
+ * @example
+ * // Cloudinary cleanup failure
+ * catch (error) {
+ *   captureFacadeWarning(error, 'BobbleheadsFacade', 'cloudinary-cleanup', {
+ *     bobbleheadId,
+ *     photoCount: urls.length,
+ *   });
+ * }
+ */
+export function captureFacadeWarning(
+  error: unknown,
+  facade: string,
+  operation: string,
+  extra?: Record<string, unknown>,
+): void {
+  Sentry.captureException(error, {
+    extra,
+    level: 'warning',
+    tags: {
+      [SENTRY_TAGS.COMPONENT]: facade,
+      [SENTRY_TAGS.OPERATION]: operation,
+    },
   });
 }
 
@@ -110,6 +147,10 @@ export function trackActionSuccess(actionName: string, operation: string, data?:
   });
 }
 
+// =============================================================================
+// Action Breadcrumb Helpers (Layer 1)
+// =============================================================================
+
 /**
  * Track server action warning for partial failures or non-critical issues.
  * Creates a warning-level breadcrumb with action and operation context.
@@ -136,10 +177,6 @@ export function trackActionWarning(
     'warning',
   );
 }
-
-// =============================================================================
-// Action Breadcrumb Helpers (Layer 1)
-// =============================================================================
 
 /**
  * Track cache invalidation result and log failures to Sentry.

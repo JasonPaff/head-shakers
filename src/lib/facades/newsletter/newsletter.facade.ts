@@ -1,5 +1,3 @@
-import * as Sentry from '@sentry/nextjs';
-
 import type { NewsletterSignupRecord } from '@/lib/queries/newsletter/newsletter.queries';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 
@@ -10,7 +8,7 @@ import { NewsletterQuery } from '@/lib/queries/newsletter/newsletter.queries';
 import { ResendService } from '@/lib/services/resend.service';
 import { maskEmail, normalizeEmail } from '@/lib/utils/email-utils';
 import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
-import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { captureFacadeWarning, facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'NewsletterFacade';
 
@@ -140,16 +138,9 @@ export class NewsletterFacade extends BaseFacade {
       await ResendService.sendNewsletterWelcomeAsync(email);
       facadeBreadcrumb('Newsletter welcome email sent successfully', { email, signupId });
     } catch (emailError) {
-      Sentry.captureException(emailError, {
-        extra: {
-          email: maskEmail(email),
-          signupId,
-        },
-        level: 'warning',
-        tags: {
-          component: facadeName,
-          operation: OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL,
-        },
+      captureFacadeWarning(emailError, facadeName, OPERATIONS.NEWSLETTER.SEND_WELCOME_EMAIL, {
+        email: maskEmail(email),
+        signupId,
       });
     }
   }
