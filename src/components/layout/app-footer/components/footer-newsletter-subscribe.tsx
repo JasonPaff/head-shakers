@@ -3,17 +3,22 @@
 import type { FormEvent } from 'react';
 
 import { revalidateLogic } from '@tanstack/form-core';
-import { MailIcon } from 'lucide-react';
+import { MailCheckIcon, MailIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
-import { useServerAction } from '@/hooks/use-server-action';
+import { useOptimisticServerAction } from '@/hooks/use-optimistic-server-action';
 import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
 import { generateTestId } from '@/lib/test-ids';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
+
+type OptimisticState = {
+  email: string;
+  isSubscribed: boolean;
+};
 
 /**
  * Newsletter subscription form component for the footer
@@ -23,17 +28,19 @@ import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.valid
 export const FooterNewsletterSubscribe = withFocusManagement(() => {
   const { focusFirstError } = useFocusContext();
   const router = useRouter();
+  const emailRef = useRef('');
 
-  const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
+  const { execute, isPending, optimisticState } = useOptimisticServerAction(subscribeToNewsletterAction, {
     breadcrumbContext: {
       action: 'newsletter-subscribe',
       component: 'footer-newsletter-subscribe',
     },
-    loadingMessage: 'Subscribing...',
+    currentState: { email: '', isSubscribed: false } as OptimisticState,
     onAfterSuccess: () => {
       form.reset();
       router.refresh();
     },
+    onUpdate: () => ({ email: emailRef.current, isSubscribed: true }),
   });
 
   const form = useAppForm({
@@ -41,8 +48,9 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
     defaultValues: {
       email: '',
     },
-    onSubmit: async ({ value }) => {
-      await executeAsync(value);
+    onSubmit: ({ value }) => {
+      emailRef.current = value.email;
+      execute(value);
     },
     onSubmitInvalid: ({ formApi }) => {
       focusFirstError(formApi);
@@ -64,6 +72,37 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
     },
     [form],
   );
+
+  // Show optimistic subscribed state
+  if (optimisticState.isSubscribed) {
+    return (
+      <div
+        aria-labelledby={'footer-newsletter-heading'}
+        className={
+          'rounded-lg border border-slate-200 bg-slate-100 p-4 dark:border-slate-700 dark:bg-slate-800'
+        }
+        data-slot={'footer-newsletter-subscribe'}
+        data-testid={generateTestId('layout', 'app-footer', 'newsletter-subscribe')}
+        role={'region'}
+      >
+        <div className={'mb-2'}>
+          <div className={'mb-1 flex items-center gap-2'}>
+            <MailCheckIcon aria-hidden className={'size-4 text-green-600 dark:text-green-400'} />
+            <h3
+              className={'text-sm font-semibold text-slate-700 dark:text-slate-200'}
+              id={'footer-newsletter-heading'}
+            >
+              Newsletter Subscriber
+            </h3>
+          </div>
+          <p className={'text-xs text-slate-600 dark:text-slate-400'}>
+            You&apos;re receiving bobblehead news and updates at{' '}
+            <span className={'font-medium'}>{optimisticState.email}</span>
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -96,7 +135,7 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
                 <field.TextField
                   className={`border-slate-300 bg-white pr-3 pl-9 text-slate-900 placeholder:text-slate-500
                     dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-400`}
-                  disabled={isExecuting}
+                  disabled={isPending}
                   fieldErrorProps={{
                     className: 'mt-1 text-xs text-red-600 dark:text-red-400',
                   }}
@@ -117,10 +156,10 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
           <form.SubmitButton
             className={`bg-slate-700 font-semibold text-white hover:bg-slate-800
               dark:bg-slate-600 dark:hover:bg-slate-500`}
-            isDisabled={isExecuting}
+            isDisabled={isPending}
             testId={'footer-newsletter-submit'}
           >
-            {isExecuting ? 'Subscribing...' : 'Subscribe'}
+            {isPending ? 'Subscribing...' : 'Subscribe'}
           </form.SubmitButton>
         </form.AppForm>
       </form>
