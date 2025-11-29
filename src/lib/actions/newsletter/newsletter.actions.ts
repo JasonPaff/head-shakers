@@ -4,8 +4,8 @@ import 'server-only';
 
 import { ACTION_NAMES, OPERATIONS } from '@/lib/constants';
 import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
+import { maskEmail } from '@/lib/utils/email-utils';
 import { publicActionClient } from '@/lib/utils/next-safe-action';
-import { maskEmail } from '@/lib/utils/privacy-utils';
 import { actionBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
