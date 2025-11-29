@@ -16,6 +16,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 type FooterNewsletterUnsubscribeProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
+    isActiveSubscriber: boolean;
     userEmail: string;
   };
 
@@ -29,7 +30,7 @@ type OptimisticState = {
  * Shows user email for confirmation before unsubscribing
  */
 export const FooterNewsletterUnsubscribe = withFocusManagement(
-  ({ className, testId, userEmail, ...props }: FooterNewsletterUnsubscribeProps) => {
+  ({ className, isActiveSubscriber, testId, userEmail, ...props }: FooterNewsletterUnsubscribeProps) => {
     const router = useRouter();
 
     const { execute, isPending, optimisticState } = useOptimisticServerAction(
@@ -39,7 +40,7 @@ export const FooterNewsletterUnsubscribe = withFocusManagement(
           action: 'newsletter-unsubscribe',
           component: 'footer-newsletter-unsubscribe',
         },
-        currentState: { isSubscribed: true } as OptimisticState,
+        currentState: { isSubscribed: isActiveSubscriber } satisfies OptimisticState,
         onAfterSuccess: () => {
           router.refresh();
         },

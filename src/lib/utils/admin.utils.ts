@@ -3,7 +3,7 @@ import { cache } from 'react';
 
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
-import { getCurrentClerkUserId } from '@/utils/auth-utils';
+import { getClerkIdAsync } from '@/utils/auth-utils';
 
 /**
  * Check if the current user has moderator or admin privileges.
@@ -11,7 +11,7 @@ import { getCurrentClerkUserId } from '@/utils/auth-utils';
  */
 export const checkIsModerator = cache(async (): Promise<boolean> => {
   try {
-    const clerkUserId = await getCurrentClerkUserId();
+    const clerkUserId = await getClerkIdAsync();
     if (!clerkUserId) return false;
 
     const [dbUser] = await db
@@ -32,7 +32,7 @@ export const checkIsModerator = cache(async (): Promise<boolean> => {
  */
 export const getCurrentUserWithRole = cache(async () => {
   try {
-    const clerkUserId = await getCurrentClerkUserId();
+    const clerkUserId = await getClerkIdAsync();
     if (!clerkUserId) return null;
 
     const [dbUser] = await db

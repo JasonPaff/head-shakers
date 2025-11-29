@@ -35,7 +35,7 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
       action: 'newsletter-subscribe',
       component: 'footer-newsletter-subscribe',
     },
-    currentState: { email: '', isSubscribed: false } as OptimisticState,
+    currentState: { email: '', isSubscribed: false } satisfies OptimisticState,
     onAfterSuccess: () => {
       form.reset();
       router.refresh();

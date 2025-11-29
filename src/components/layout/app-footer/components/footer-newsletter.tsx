@@ -22,7 +22,8 @@ export const FooterNewsletter = async () => {
 
   // Check if the user is actively subscribed
   const isActiveSubscriber = await NewsletterFacade.getIsActiveSubscriberAsync(email);
-  if (isActiveSubscriber) return <FooterNewsletterUnsubscribe userEmail={email} />;
+  if (isActiveSubscriber)
+    return <FooterNewsletterUnsubscribe isActiveSubscriber={isActiveSubscriber} userEmail={email} />;
 
   return <FooterNewsletterSubscribe />;
 };

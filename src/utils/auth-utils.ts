@@ -10,7 +10,7 @@ import { UsersFacade } from '@/lib/facades/users/users.facade';
  * React cache() ensures this is only called once per request even if
  * invoked multiple times in the component tree.
  */
-export const getCurrentClerkUserId = cache(async (): Promise<null | string> => {
+export const getClerkIdAsync = cache(async (): Promise<null | string> => {
   try {
     const { userId } = await auth();
     return userId;
@@ -25,7 +25,7 @@ export const getCurrentClerkUserId = cache(async (): Promise<null | string> => {
  */
 export const getUserIdAsync = cache(async (): Promise<null | string> => {
   try {
-    const clerkUserId = await getCurrentClerkUserId();
+    const clerkUserId = await getClerkIdAsync();
     if (!clerkUserId) return null;
 
     // get the database user record using Clerk ID
@@ -43,7 +43,7 @@ export const getUserIdAsync = cache(async (): Promise<null | string> => {
  * Redirects to home if not authenticated or user not found in the database.
  */
 export const getRequiredUserIdAsync = cache(async (): Promise<string> => {
-  const clerkUserId = await getCurrentClerkUserId();
+  const clerkUserId = await getClerkIdAsync();
   if (!clerkUserId) redirect($path({ route: '/' }));
 
   // get the database user record using Clerk ID
