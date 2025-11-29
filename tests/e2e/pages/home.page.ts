@@ -35,6 +35,49 @@ export class HomePage extends BasePage {
     return this.page.getByRole('link', { name: /my collection/i });
   }
 
+  // Newsletter locators
+  get newsletterEmailInput(): Locator {
+    return this.byTestId('footer-newsletter-email');
+  }
+
+  get newsletterSection(): Locator {
+    return this.byTestId('layout-app-footer-newsletter-subscribe').or(
+      this.byTestId('layout-app-footer-newsletter-unsubscribe'),
+    );
+  }
+
+  get newsletterStayUpdatedText(): Locator {
+    return this.page.getByText(/stay updated/i);
+  }
+
+  get newsletterSubmitButton(): Locator {
+    return this.byTestId('footer-newsletter-submit');
+  }
+
+  get newsletterSubscribeSection(): Locator {
+    return this.byTestId('layout-app-footer-newsletter-subscribe');
+  }
+
+  get newsletterSubscribingButton(): Locator {
+    return this.page.getByRole('button', { name: /subscribing/i });
+  }
+
+  get newsletterSuccessHeading(): Locator {
+    return this.page.getByRole('heading', { name: /newsletter subscriber/i });
+  }
+
+  get newsletterUnsubscribeButton(): Locator {
+    return this.byTestId('layout-app-footer-newsletter-unsubscribe-button');
+  }
+
+  get newsletterUnsubscribeSection(): Locator {
+    return this.byTestId('layout-app-footer-newsletter-unsubscribe');
+  }
+
+  get newsletterUnsubscribingButton(): Locator {
+    return this.page.getByRole('button', { name: /unsubscribing/i });
+  }
+
   // Stats
   get platformStats(): Locator {
     return this.byTestId('feature-platform-stats-display');
@@ -61,9 +104,20 @@ export class HomePage extends BasePage {
     await this.getStartedButton.click();
   }
 
+  // Newsletter actions
+  async scrollToFooter(): Promise<void> {
+    await this.page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await this.newsletterSection.waitFor({ state: 'visible' });
+  }
+
   // Home page specific actions
   async search(query: string): Promise<void> {
     await this.searchInput.fill(query);
     await this.searchInput.press('Enter');
+  }
+
+  async subscribeToNewsletter(email: string): Promise<void> {
+    await this.newsletterEmailInput.fill(email);
+    await this.newsletterSubmitButton.click();
   }
 }
