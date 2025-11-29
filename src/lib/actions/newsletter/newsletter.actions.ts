@@ -19,8 +19,8 @@ export const subscribeToNewsletterAction = publicActionClient
   .inputSchema(insertNewsletterSignupSchema)
   .action(async ({ ctx, parsedInput }) => {
     const input = insertNewsletterSignupSchema.parse(ctx.sanitizedInput);
-    const maskedEmail = maskEmail(input.email);
     const userId = await getUserIdAsync();
+    const maskedEmail = maskEmail(input.email);
 
     return withActionErrorHandling(
       {

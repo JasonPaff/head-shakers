@@ -63,63 +63,60 @@ export class NewsletterFacade extends BaseFacade {
       },
       async () => {
         const normalizedEmail = normalizeEmail(email);
+        const context = this.publicContext(dbInstance);
 
-        return await dbInstance.transaction(async (tx) => {
-          const context = this.publicContext(tx);
+        const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
 
-          const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
+        if (existingSignup) {
+          if (existingSignup.unsubscribedAt !== null) {
+            const resubscribed = await NewsletterQuery.resubscribeAsync(normalizedEmail, context);
 
-          if (existingSignup) {
-            if (existingSignup.unsubscribedAt !== null) {
-              const resubscribed = await NewsletterQuery.resubscribeAsync(normalizedEmail, context);
-
-              // Update userId if provided and different
-              if (userId && resubscribed && resubscribed.userId !== userId) {
-                await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
-              }
-
-              return {
-                isAlreadySubscribed: false,
-                isSuccessful: true,
-                signup: resubscribed,
-              };
-            }
-
-            // Already actively subscribed - return success for privacy
-            // Don't expose it whether email exists to prevent enumeration
-            // Update userId if provided and not already set
-            if (userId && !existingSignup.userId) {
+            // Update userId if provided and different
+            if (userId && resubscribed && resubscribed.userId !== userId) {
               await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
             }
 
             return {
-              isAlreadySubscribed: true,
+              isAlreadySubscribed: false,
               isSuccessful: true,
-              signup: existingSignup,
+              signup: resubscribed,
             };
           }
 
-          // New subscription
-          const newSignup = await NewsletterQuery.createSignupAsync(normalizedEmail, userId, context);
-
-          if (!newSignup) {
-            const existingAfterRace = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
-            return {
-              isAlreadySubscribed: true,
-              isSuccessful: true,
-              signup: existingAfterRace,
-            };
+          // Already actively subscribed - return success for privacy
+          // Do not expose the email exists to prevent enumeration
+          // Update userId if provided and not already set
+          if (userId && !existingSignup.userId) {
+            await NewsletterQuery.updateUserIdAsync(normalizedEmail, userId, context);
           }
-
-          // Send welcome email asynchronously - non-blocking
-          void this.sendWelcomeEmailAsync(normalizedEmail, newSignup.id);
 
           return {
-            isAlreadySubscribed: false,
+            isAlreadySubscribed: true,
             isSuccessful: true,
-            signup: newSignup,
+            signup: existingSignup,
           };
-        });
+        }
+
+        // New subscription
+        const newSignup = await NewsletterQuery.createSignupAsync(normalizedEmail, userId, context);
+
+        if (!newSignup) {
+          const existingAfterRace = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
+          return {
+            isAlreadySubscribed: true,
+            isSuccessful: true,
+            signup: existingAfterRace,
+          };
+        }
+
+        // Send welcome email asynchronously - non-blocking
+        void this.sendWelcomeEmailAsync(normalizedEmail, newSignup.id);
+
+        return {
+          isAlreadySubscribed: false,
+          isSuccessful: true,
+          signup: newSignup,
+        };
       },
       {
         includeResultSummary: (result) => ({

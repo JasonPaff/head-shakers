@@ -75,7 +75,6 @@ export class NewsletterQuery extends BaseQuery {
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
     const dbInstance = this.getDbInstance(context);
-
     const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
@@ -134,12 +133,10 @@ export class NewsletterQuery extends BaseQuery {
     email: string,
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
-    const dbInstance = this.getDbInstance(context);
-
-    // Verify record exists before updating
     const existing = await this.findByEmailAsync(email, context);
     if (!existing) return null;
 
+    const dbInstance = this.getDbInstance(context);
     const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
@@ -189,14 +186,10 @@ export class NewsletterQuery extends BaseQuery {
     userId: string,
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
-    const dbInstance = this.getDbInstance(context);
-
-    // Verify record exists and userId is not already set
     const existing = await this.findByEmailAsync(email, context);
-    if (!existing || existing.userId !== null) {
-      return null;
-    }
+    if (!existing || existing.userId !== null) return null;
 
+    const dbInstance = this.getDbInstance(context);
     const normalizedEmail = normalizeEmail(email);
 
     const result = await dbInstance
