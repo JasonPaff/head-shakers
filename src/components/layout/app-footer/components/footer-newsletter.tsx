@@ -65,8 +65,6 @@ export const FooterNewsletter = withFocusManagement(() => {
     [form],
   );
 
-  const _submitButtonText = isExecuting ? 'Subscribing...' : 'Subscribe';
-
   return (
     <div
       aria-labelledby={'footer-newsletter-heading'}
@@ -122,7 +120,7 @@ export const FooterNewsletter = withFocusManagement(() => {
             isDisabled={isExecuting}
             testId={'footer-newsletter-submit'}
           >
-            {_submitButtonText}
+            {isExecuting ? 'Subscribing...' : 'Subscribe'}
           </form.SubmitButton>
         </form.AppForm>
       </form>
