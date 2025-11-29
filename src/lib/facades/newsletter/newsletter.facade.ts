@@ -32,6 +32,28 @@ export interface NewsletterSubscriptionResult {
  */
 export class NewsletterFacade extends BaseFacade {
   /**
+   * Check if an email is actively subscribed to the newsletter
+   *
+   * @param email - Email address to check
+   * @param dbInstance - Database instance for transactions (defaults to db)
+   * @returns True if the email is actively subscribed, false otherwise
+   */
+  static async isActiveSubscriberAsync(email: string, dbInstance: DatabaseExecutor = db): Promise<boolean> {
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'isActiveSubscriberAsync',
+        operation: OPERATIONS.NEWSLETTER.CHECK_SUBSCRIPTION,
+      },
+      async () => {
+        const normalizedEmail = normalizeEmail(email);
+        const context = this.publicContext(dbInstance);
+        return NewsletterQuery.isActiveSubscriberAsync(normalizedEmail, context);
+      },
+    );
+  }
+
+  /**
    * Subscribe an email to the newsletter
    *
    * Handles the following cases:
@@ -121,6 +143,51 @@ export class NewsletterFacade extends BaseFacade {
           isAlreadySubscribed: result.isAlreadySubscribed,
           isSuccessful: result.isSuccessful,
           signupId: result.signup?.id,
+        }),
+      },
+    );
+  }
+
+  /**
+   * Unsubscribe an email from the newsletter
+   *
+   * Privacy-preserving behavior: Always returns success, even if the email doesn't exist.
+   * This prevents email enumeration attacks where attackers could determine which emails
+   * are in the system by checking unsubscribe responses.
+   *
+   * @param email - Email address to unsubscribe
+   * @param dbInstance - Database instance for transactions (defaults to db)
+   * @returns Result object indicating success (always successful for privacy)
+   */
+  static async unsubscribeAsync(
+    email: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<NewsletterSubscriptionResult> {
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'unsubscribeAsync',
+        operation: OPERATIONS.NEWSLETTER.UNSUBSCRIBE,
+      },
+      async () => {
+        const normalizedEmail = normalizeEmail(email);
+        const context = this.publicContext(dbInstance);
+
+        // Attempt to unsubscribe the email
+        const result = await NewsletterQuery.unsubscribeAsync(normalizedEmail, context);
+
+        // Privacy-preserving: Return success even if email doesn't exist
+        // This prevents attackers from using the unsubscribe endpoint to enumerate emails
+        return {
+          isAlreadySubscribed: false,
+          isSuccessful: true,
+          signup: result,
+        };
+      },
+      {
+        includeResultSummary: (result) => ({
+          isSuccessful: result.isSuccessful,
+          wasFound: result.signup !== null,
         }),
       },
     );

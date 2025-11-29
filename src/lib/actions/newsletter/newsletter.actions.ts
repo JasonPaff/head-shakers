@@ -13,6 +13,7 @@ import { publicActionClient } from '@/lib/utils/next-safe-action';
 import { actionBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
+import { unsubscribeFromNewsletterSchema } from '@/lib/validations/newsletter.validation';
 import { getUserIdAsync } from '@/utils/auth-utils';
 
 type SubscribeToNewsLetterResponse = { isAlreadySubscribed: boolean; signupId: string | undefined };
@@ -70,6 +71,60 @@ export const subscribeToNewsletterAction = publicActionClient
               email: maskedEmail,
               isAlreadySubscribed: result.data?.isAlreadySubscribed,
               signupId: result.data?.signupId,
+            }
+          : {},
+      },
+    );
+  });
+
+export const unsubscribeFromNewsletterAction = publicActionClient
+  .metadata({
+    actionName: ACTION_NAMES.NEWSLETTER.UNSUBSCRIBE,
+    isTransactionRequired: true,
+  })
+  .inputSchema(unsubscribeFromNewsletterSchema)
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<void>> => {
+    const input = unsubscribeFromNewsletterSchema.parse(ctx.sanitizedInput);
+    const userId = await getUserIdAsync();
+    const maskedEmail = maskEmail(input.email);
+
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.NEWSLETTER.UNSUBSCRIBE,
+        contextData: {
+          email: maskedEmail,
+          hasUserId: Boolean(userId),
+        },
+        contextType: 'NEWSLETTER_DATA',
+        input: parsedInput,
+        operation: OPERATIONS.NEWSLETTER.UNSUBSCRIBE,
+        userId: userId ?? undefined,
+      },
+      async () => {
+        const result = await NewsletterFacade.unsubscribeAsync(input.email, ctx.db);
+
+        if (!result.isSuccessful) {
+          actionBreadcrumb(
+            'Newsletter unsubscribe failed',
+            {
+              email: maskedEmail,
+              error: result.error,
+              operation: OPERATIONS.NEWSLETTER.UNSUBSCRIBE,
+            },
+            'warning',
+          );
+
+          return actionFailure('Unable to process your unsubscribe request. Please try again.');
+        }
+
+        // Same message regardless of subscription status (privacy - prevents email enumeration)
+        return actionSuccess(undefined, 'You have been unsubscribed from the newsletter.');
+      },
+      {
+        includeResultSummary: (result) =>
+          result.wasSuccess ?
+            {
+              email: maskedEmail,
             }
           : {},
       },
