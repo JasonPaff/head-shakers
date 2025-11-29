@@ -3,6 +3,7 @@
 import type { ComponentProps } from 'react';
 
 import { MailCheckIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -26,12 +27,17 @@ type FooterNewsletterUnsubscribeProps = ComponentProps<'div'> &
  */
 export const FooterNewsletterUnsubscribe = withFocusManagement(
   ({ className, testId, userEmail, ...props }: FooterNewsletterUnsubscribeProps) => {
+    const router = useRouter();
+
     const { executeAsync, isExecuting } = useServerAction(unsubscribeFromNewsletterAction, {
       breadcrumbContext: {
         action: 'newsletter-unsubscribe',
         component: 'footer-newsletter-unsubscribe',
       },
       loadingMessage: 'Unsubscribing...',
+      onAfterSuccess: () => {
+        router.refresh();
+      },
     });
 
     const handleUnsubscribe = useCallback(async () => {

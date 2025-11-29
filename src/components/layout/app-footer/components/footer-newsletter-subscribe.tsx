@@ -4,6 +4,7 @@ import type { FormEvent } from 'react';
 
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import { useAppForm } from '@/components/ui/form';
@@ -21,6 +22,7 @@ import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.valid
  */
 export const FooterNewsletterSubscribe = withFocusManagement(() => {
   const { focusFirstError } = useFocusContext();
+  const router = useRouter();
 
   const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
     breadcrumbContext: {
@@ -30,6 +32,7 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
     loadingMessage: 'Subscribing...',
     onAfterSuccess: () => {
       form.reset();
+      router.refresh();
     },
   });
 
