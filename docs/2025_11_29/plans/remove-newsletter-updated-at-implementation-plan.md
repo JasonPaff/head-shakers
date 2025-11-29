@@ -28,19 +28,23 @@ Remove the redundant `updated_at` column from the `newsletter_signups` table sin
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/db/schema/newsletter-signups.schema.ts` - Remove `updatedAt` column definition (line 24), remove check constraint `newsletter_signups_dates_logic` (line 33), and update comment on line 14
 
 **Changes:**
+
 - Remove the `updatedAt: timestamp("updated_at").notNull()` column definition
 - Remove the `check("newsletter_signups_dates_logic", ...)` constraint that validates `updatedAt >= createdAt`
 - Update the comment from "Standard audit timestamps (createdAt, updatedAt)" to "Standard audit timestamp (createdAt)" or similar
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] `updatedAt` column definition removed from schema
 - [ ] Check constraint removed from schema
 - [ ] Comment updated to reflect single timestamp
@@ -56,19 +60,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/queries/newsletter/newsletter.queries.ts` - Remove `updatedAt` from update operations on lines 153, 177, and 204
 
 **Changes:**
+
 - In `resubscribeAsync` method (line 153): Remove `updatedAt: new Date()` from the set clause
 - In `unsubscribeAsync` method (line 177): Remove `updatedAt: new Date()` from the set clause
 - In `updateUserIdAsync` method (line 204): Remove `updatedAt: new Date()` from the set clause
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All three `updatedAt` assignments removed from query methods
 - [ ] Query methods still compile without TypeScript errors
 - [ ] All validation commands pass
@@ -83,19 +91,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/lib/validations/newsletter.validation.ts` - Review and potentially update omit lists if needed
 
 **Changes:**
+
 - Review the file to ensure drizzle-zod auto-generation correctly excludes `updatedAt`
 - Verify that any manual schema definitions or omit lists are still appropriate
 - Remove `updatedAt` from any explicit type definitions or omit lists if present
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Validation schemas compile without errors
 - [ ] No explicit references to `updatedAt` in validation schemas
 - [ ] All validation commands pass
@@ -110,19 +122,23 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - A new migration file will be auto-generated in the migrations directory (exact path determined by Drizzle config)
 
 **Changes:**
+
 - Run migration generation command to create SQL migration
 - Review generated migration to ensure it drops constraint before dropping column
 - Verify migration SQL is correct and safe
 
 **Validation Commands:**
+
 ```bash
 npm run db:generate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration file successfully generated
 - [ ] Migration SQL includes DROP CONSTRAINT for `newsletter_signups_dates_logic`
 - [ ] Migration SQL includes DROP COLUMN for `updated_at`
@@ -138,19 +154,23 @@ npm run db:generate
 **Confidence**: High
 
 **Files to Modify:**
+
 - Database schema (via migration execution)
 
 **Changes:**
+
 - Execute migration against development database
 - Verify migration completes successfully
 - Confirm column and constraint are removed from database
 
 **Validation Commands:**
+
 ```bash
 npm run db:migrate
 ```
 
 **Success Criteria:**
+
 - [ ] Migration executes without errors
 - [ ] Database no longer contains `updated_at` column in `newsletter_signups` table
 - [ ] Check constraint `newsletter_signups_dates_logic` no longer exists
@@ -165,19 +185,23 @@ npm run db:migrate
 **Confidence**: High
 
 **Files to Modify:**
+
 - All previously modified TypeScript files
 
 **Changes:**
+
 - Run Prettier to format all modified files
 - Run final lint and typecheck across entire codebase
 - Verify no regressions introduced
 
 **Validation Commands:**
+
 ```bash
 npm run format && npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] All code properly formatted
 - [ ] No linting errors
 - [ ] No TypeScript errors
@@ -210,19 +234,22 @@ npm run format && npm run lint:fix && npm run typecheck
 ## File Discovery Summary
 
 ### Critical Priority (Require Modification)
-| File | Reason |
-|------|--------|
-| `src/lib/db/schema/newsletter-signups.schema.ts` | Contains `updatedAt` column definition and check constraint |
-| `src/lib/queries/newsletter/newsletter.queries.ts` | Sets `updatedAt: new Date()` in 3 update operations |
-| `src/lib/validations/newsletter.validation.ts` | Uses drizzle-zod; verify omit list |
+
+| File                                               | Reason                                                      |
+| -------------------------------------------------- | ----------------------------------------------------------- |
+| `src/lib/db/schema/newsletter-signups.schema.ts`   | Contains `updatedAt` column definition and check constraint |
+| `src/lib/queries/newsletter/newsletter.queries.ts` | Sets `updatedAt: new Date()` in 3 update operations         |
+| `src/lib/validations/newsletter.validation.ts`     | Uses drizzle-zod; verify omit list                          |
 
 ### High Priority (Migration)
-| File | Reason |
-|------|--------|
+
+| File               | Reason                                      |
+| ------------------ | ------------------------------------------- |
 | New migration file | Will be generated via `npm run db:generate` |
 
 ### Medium Priority (Review Only)
-| File | Reason |
-|------|--------|
-| `src/lib/facades/newsletter/newsletter.facade.ts` | Types auto-update |
+
+| File                                               | Reason                        |
+| -------------------------------------------------- | ----------------------------- |
+| `src/lib/facades/newsletter/newsletter.facade.ts`  | Types auto-update             |
 | `src/lib/actions/newsletter/newsletter.actions.ts` | No direct updatedAt reference |

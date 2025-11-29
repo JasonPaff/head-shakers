@@ -40,7 +40,6 @@ export const insertNewsletterSignupSchema = createInsertSchema(newsletterSignups
   createdAt: true,
   id: true,
   subscribedAt: true,
-  updatedAt: true,
   userId: true,
 });
 
