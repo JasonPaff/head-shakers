@@ -8,7 +8,6 @@ import { useCallback } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
-import { Button } from '@/components/ui/button';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { useServerAction } from '@/hooks/use-server-action';
 import { unsubscribeFromNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
@@ -59,31 +58,34 @@ export const FooterNewsletterUnsubscribe = withFocusManagement(
         {...props}
       >
         {/* Newsletter Header */}
-        <div className={'mb-3'}>
+        <div className={'mb-2'}>
           <div className={'mb-1 flex items-center gap-2'}>
             <MailCheckIcon aria-hidden className={'size-4 text-green-600 dark:text-green-400'} />
             <h3
               className={'text-sm font-semibold text-slate-700 dark:text-slate-200'}
               id={'footer-newsletter-heading'}
             >
-              You&apos;re Subscribed
+              Newsletter Subscriber
             </h3>
           </div>
           <p className={'text-xs text-slate-600 dark:text-slate-400'}>
-            Subscribed as <span className={'font-medium'}>{userEmail}</span>
+            You&apos;re receiving bobblehead news and updates at{' '}
+            <span className={'font-medium'}>{userEmail}</span>
           </p>
         </div>
 
-        {/* Unsubscribe Button */}
-        <Button
-          className={'w-full'}
+        {/* Unsubscribe Link */}
+        <button
+          className={
+            'text-xs text-slate-500 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-50 dark:text-slate-400'
+          }
+          data-testid={`${unsubscribeTestId}-button`}
           disabled={isExecuting}
           onClick={handleUnsubscribe}
-          testId={`${unsubscribeTestId}-button`}
-          variant={'destructive'}
+          type={'button'}
         >
           {isExecuting ? 'Unsubscribing...' : 'Unsubscribe'}
-        </Button>
+        </button>
       </div>
     );
   },
