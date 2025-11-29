@@ -5,7 +5,13 @@
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-import { CACHE_CONFIG, CACHE_KEYS, isCacheEnabled, isCacheLoggingEnabled } from '@/lib/constants/cache';
+import {
+  CACHE_CONFIG,
+  CACHE_ENTITY_TYPE,
+  CACHE_KEYS,
+  isCacheEnabled,
+  isCacheLoggingEnabled,
+} from '@/lib/constants/cache';
 import { type CacheEntityType, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
 import { RedisOperations } from '@/lib/utils/redis-client';
 
@@ -494,6 +500,28 @@ export class CacheRevalidationService {
   };
 
   /**
+   * newsletter-specific revalidation utilities
+   */
+  static readonly newsletter = {
+    /**
+     * revalidate after newsletter subscription status change
+     * Invalidates cache for the specific email's subscription status
+     *
+     * @param email - The normalized email address
+     * @param operation - The operation performed ('subscribe' | 'unsubscribe')
+     */
+    onSubscriptionChange: (email: string, operation: 'subscribe' | 'unsubscribe'): RevalidationResult => {
+      const tags = [CACHE_CONFIG.TAGS.NEWSLETTER, CACHE_CONFIG.TAGS.NEWSLETTER_SUBSCRIPTION(email)];
+
+      return CacheRevalidationService.revalidateTags(tags, {
+        entityType: CACHE_ENTITY_TYPE.NEWSLETTER,
+        operation: `${CACHE_ENTITY_TYPE.NEWSLETTER}:${operation}`,
+        reason: `Newsletter subscription ${operation}d`,
+      });
+    },
+  };
+
+  /**
    * platform-level revalidation utilities
    */
   static readonly platform = {
@@ -503,8 +531,8 @@ export class CacheRevalidationService {
     onStatsChange: (): RevalidationResult => {
       const tags = [CACHE_CONFIG.TAGS.PLATFORM_STATS];
       return CacheRevalidationService.revalidateTags(tags, {
-        entityType: 'platform',
-        operation: 'platform:stats:change',
+        entityType: CACHE_ENTITY_TYPE.PLATFORM,
+        operation: `${CACHE_ENTITY_TYPE.PLATFORM}:stats:change`,
         reason: 'Platform statistics changed',
       });
     },

@@ -29,10 +29,10 @@ export const getUserIdAsync = cache(async (): Promise<null | string> => {
     if (!clerkUserId) return null;
 
     // get the database user record using Clerk ID
-    const dbUser = await UsersFacade.getUserByClerkIdAsync(clerkUserId);
-    if (!dbUser) return null;
+    const userId = await UsersFacade.getUserIdByClerkIdAsync(clerkUserId);
+    if (!userId) return null;
 
-    return dbUser.id;
+    return userId;
   } catch {
     return null;
   }
@@ -40,17 +40,17 @@ export const getUserIdAsync = cache(async (): Promise<null | string> => {
 
 /**
  * Get the current database user ID with request-level deduplication.
- * Redirects to home if not authenticated or user not found in database.
+ * Redirects to home if not authenticated or user not found in the database.
  */
 export const getRequiredUserIdAsync = cache(async (): Promise<string> => {
   const clerkUserId = await getCurrentClerkUserId();
   if (!clerkUserId) redirect($path({ route: '/' }));
 
   // get the database user record using Clerk ID
-  const dbUser = await UsersFacade.getUserByClerkIdAsync(clerkUserId);
-  if (!dbUser) redirect($path({ route: '/' }));
+  const userId = await UsersFacade.getUserIdByClerkIdAsync(clerkUserId);
+  if (!userId) redirect($path({ route: '/' }));
 
-  return dbUser.id;
+  return userId;
 });
 
 /**

@@ -124,6 +124,9 @@ export const OPERATIONS = {
   },
   USERS: {
     DELETE_ACCOUNT: 'delete_user_account',
+    GET_EMAIL_BY_USER_ID: 'get_email_by_user_id',
+    GET_USER_BY_CLERK_ID: 'get_user_by_clerk_id',
+    GET_USER_ID_BY_CLERK_ID: 'get_user_id_by_clerk_id',
     UPDATE_PROFILE: 'update_user_profile',
     UPDATE_SETTINGS: 'update_user_settings',
   },

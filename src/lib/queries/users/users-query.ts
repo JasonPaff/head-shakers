@@ -29,9 +29,6 @@ export type UserStats = {
 };
 
 export class UsersQuery extends BaseQuery {
-  /**
-   * check if username exists, optionally excluding a specific user
-   */
   static async checkUsernameExistsAsync(
     username: string,
     context: QueryContext,
@@ -57,17 +54,9 @@ export class UsersQuery extends BaseQuery {
 
     // If we found a user with this username and we're excluding a specific user,
     // check if the found user is the one we're excluding
-    if (excludeUserId && foundUser.id === excludeUserId) {
-      return false;
-    }
-
-    return true;
+    return !(excludeUserId && foundUser.id === excludeUserId);
   }
 
-  /**
-   * Count users for admin listing with filters
-   * Used for pagination metadata
-   */
   static async countUsersForAdminAsync(filters: AdminUsersFilter, context: QueryContext): Promise<number> {
     const dbInstance = this.getDbInstance(context);
 
@@ -79,9 +68,24 @@ export class UsersQuery extends BaseQuery {
   }
 
   /**
-   * find user by clerk id
+   * Get user email by user ID
+   * Returns null if user does not exist or does not have an email address
+   * @param userId
+   * @param context
    */
-  static async findByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | UserRecord> {
+  static async getEmailByUserIdAsync(userId: string, context: QueryContext): Promise<null | string> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    return result[0]?.email || null;
+  }
+
+  static async getUserByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
@@ -89,10 +93,7 @@ export class UsersQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  /**
-   * find user by user id
-   */
-  static async findByIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {
+  static async getUserByUserIdAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
@@ -100,10 +101,18 @@ export class UsersQuery extends BaseQuery {
     return result[0] || null;
   }
 
-  /**
-   * find user by username
-   */
-  static async findByUsernameAsync(username: string, context: QueryContext): Promise<null | UserRecord> {
+  static async getUserByUserIdForAdminAsync(
+    userId: string,
+    context: QueryContext,
+  ): Promise<null | UserRecord> {
+    const dbInstance = this.getDbInstance(context);
+
+    const user = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
+
+    return user[0] || null;
+  }
+
+  static async getUserByUsernameAsync(username: string, context: QueryContext): Promise<null | UserRecord> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance.select().from(users).where(eq(users.username, username)).limit(1);
@@ -114,76 +123,6 @@ export class UsersQuery extends BaseQuery {
   // ============================================================================
   // Admin Query Methods
   // ============================================================================
-
-  /**
-   * Find users for admin listing with pagination, sorting, and filtering
-   * Includes computed fields for collections and bobbleheads counts
-   *
-   * @param filters - Filtering, sorting, and pagination options
-   * @param context - Query context with database instance
-   * @returns Array of users with counts
-   */
-  static async findUsersForAdminAsync(
-    filters: AdminUsersFilter,
-    context: QueryContext,
-  ): Promise<Array<AdminUserListRecord>> {
-    const dbInstance = this.getDbInstance(context);
-
-    const whereConditions = this._buildAdminFilterConditions(filters);
-    const orderByClause = this._getAdminSortOrder(filters.sortBy, filters.sortOrder);
-    const pagination = this.applyPagination({
-      limit: filters.limit,
-      offset: filters.offset,
-    });
-
-    // Use subqueries for counts to leverage existing indexes
-    const result = await dbInstance
-      .select({
-        avatarUrl: users.avatarUrl,
-        bio: users.bio,
-        bobbleheadsCount: sql<number>`(
-          SELECT COUNT(*)::int
-          FROM ${bobbleheads}
-          WHERE ${bobbleheads.userId} = ${users.id}
-            AND ${bobbleheads.deletedAt} IS NULL
-        )`,
-        clerkId: users.clerkId,
-        collectionsCount: sql<number>`(
-          SELECT COUNT(*)::int
-          FROM ${collections}
-          WHERE ${collections.userId} = ${users.id}
-        )`,
-        createdAt: users.createdAt,
-        deletedAt: users.deletedAt,
-        email: users.email,
-        id: users.id,
-        lastActiveAt: users.lastActiveAt,
-        location: users.location,
-        lockedUntil: users.lockedUntil,
-        role: users.role,
-        updatedAt: users.updatedAt,
-        username: users.username,
-        usernameChangedAt: users.usernameChangedAt,
-      })
-      .from(users)
-      .where(whereConditions)
-      .orderBy(orderByClause)
-      .limit(pagination.limit ?? 25)
-      .offset(pagination.offset ?? 0);
-
-    return result;
-  }
-
-  /**
-   * Get user by ID for admin detail view
-   */
-  static async getUserByIdForAdminAsync(userId: string, context: QueryContext): Promise<null | UserRecord> {
-    const dbInstance = this.getDbInstance(context);
-
-    const user = await dbInstance.select().from(users).where(eq(users.id, userId)).limit(1);
-
-    return user[0] || null;
-  }
 
   /**
    * Get total users count (excluding deleted)
@@ -197,6 +136,21 @@ export class UsersQuery extends BaseQuery {
       .from(users)
       .where(buildSoftDeleteFilter(users.deletedAt, context))
       .then((result) => result[0]?.count || 0);
+  }
+
+  /**
+   * find user ID by clerk ID
+   */
+  static async getUserIdByClerkIdAsync(clerkId: string, context: QueryContext): Promise<null | string> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({ userId: users.id })
+      .from(users)
+      .where(eq(users.clerkId, clerkId))
+      .limit(1);
+
+    return result[0]?.userId || null;
   }
 
   /**
@@ -226,6 +180,59 @@ export class UsersQuery extends BaseQuery {
       .limit(1);
 
     return result[0] || null;
+  }
+
+  /**
+   * Find users for admin listing with pagination, sorting, and filtering
+   * Includes computed fields for collections and bobbleheads counts
+   *
+   * @param filters - Filtering, sorting, and pagination options
+   * @param context - Query context with database instance
+   * @returns Array of users with counts
+   */
+  static async getUsersForAdminAsync(
+    filters: AdminUsersFilter,
+    context: QueryContext,
+  ): Promise<Array<AdminUserListRecord>> {
+    const dbInstance = this.getDbInstance(context);
+
+    const whereConditions = this._buildAdminFilterConditions(filters);
+    const orderByClause = this._getAdminSortOrder(filters.sortBy, filters.sortOrder);
+    const pagination = this.applyPagination({
+      limit: filters.limit,
+      offset: filters.offset,
+    });
+
+    // Use subqueries for counts to leverage existing indexes
+    return dbInstance
+      .select({
+        avatarUrl: users.avatarUrl,
+        bio: users.bio,
+        bobbleheadsCount: sql<number>`(SELECT COUNT(*)::int
+                                       FROM ${bobbleheads}
+                                       WHERE ${bobbleheads.userId} = ${users.id}
+                                         AND ${bobbleheads.deletedAt} IS NULL)`,
+        clerkId: users.clerkId,
+        collectionsCount: sql<number>`(SELECT COUNT(*)::int
+                                       FROM ${collections}
+                                       WHERE ${collections.userId} = ${users.id})`,
+        createdAt: users.createdAt,
+        deletedAt: users.deletedAt,
+        email: users.email,
+        id: users.id,
+        lastActiveAt: users.lastActiveAt,
+        location: users.location,
+        lockedUntil: users.lockedUntil,
+        role: users.role,
+        updatedAt: users.updatedAt,
+        username: users.username,
+        usernameChangedAt: users.usernameChangedAt,
+      })
+      .from(users)
+      .where(whereConditions)
+      .orderBy(orderByClause)
+      .limit(pagination.limit ?? 25)
+      .offset(pagination.offset ?? 0);
   }
 
   /**

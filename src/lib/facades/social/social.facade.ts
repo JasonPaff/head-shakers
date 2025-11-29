@@ -837,7 +837,7 @@ export class SocialFacade {
         }
 
         // Check if comment is within edit window (admins bypass this restriction)
-        const user = await UsersQuery.getUserByIdForAdminAsync(userId, context);
+        const user = await UsersQuery.getUserByUserIdForAdminAsync(userId, context);
         const isAdmin = user?.role === 'admin';
 
         if (!isAdmin && !isCommentEditable(existingComment.createdAt)) {

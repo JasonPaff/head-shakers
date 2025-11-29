@@ -33,6 +33,7 @@ export const CACHE_CONFIG = {
     BOBBLEHEADS: 'bobbleheads',
     COLLECTIONS: 'collections',
     FEATURED: 'featured',
+    NEWSLETTER: 'newsletter',
     PLATFORM: 'platform',
     SEARCH: 'search',
     SOCIAL: 'social',
@@ -56,6 +57,8 @@ export const CACHE_CONFIG = {
     // feature-based tags
     FEATURED_CONTENT: 'featured-content',
     GLOBAL_STATS: 'global-stats',
+    NEWSLETTER: 'newsletter',
+    NEWSLETTER_SUBSCRIPTION: (email: string) => `newsletter:subscription:${email}`,
     PLATFORM_STATS: 'platform-stats',
     POPULAR_CONTENT: 'popular-content',
     PUBLIC_CONTENT: 'public-content',
@@ -177,6 +180,13 @@ export const CACHE_KEYS = {
   },
 
   /**
+   * newsletter-related cache keys
+   */
+  NEWSLETTER: {
+    IS_ACTIVE_SUBSCRIBER: (email: string) => `${CACHE_CONFIG.NAMESPACES.NEWSLETTER}:active:${email}`,
+  },
+
+  /**
    * platform-level cache keys
    */
   PLATFORM: {
@@ -234,9 +244,10 @@ export const CACHE_ENTITY_TYPE = {
   BOBBLEHEAD: 'bobblehead',
   COLLECTION: 'collection',
   FEATURED: 'featured',
+  NEWSLETTER: 'newsletter',
   PLATFORM: 'platform',
   USER: 'user',
-};
+} as const;
 
 export type CacheEnvironment = keyof typeof CACHE_CONFIG.ENVIRONMENT;
 /**

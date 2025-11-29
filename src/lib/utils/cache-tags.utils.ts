@@ -347,6 +347,18 @@ export const CacheTagGenerators = {
   },
 
   /**
+   * generate tags for newsletter operations
+   */
+  newsletter: {
+    /**
+     * generate tags for newsletter subscription check
+     * Uses email-specific tag for targeted invalidation
+     */
+    subscription: (email: string) =>
+      new CacheTagBuilder().addCustom(`newsletter:subscription:${email}`).build(),
+  },
+
+  /**
    * generate tags for search operations
    */
   search: {

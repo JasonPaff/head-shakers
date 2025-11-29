@@ -6,7 +6,8 @@ import type { ActionContext, ActionMetadata, PublicContext } from '@/lib/utils/n
 
 import { REDIS_KEYS } from '@/lib/constants';
 import { circuitBreakers } from '@/lib/utils/circuit-breaker-registry';
-import { ActionError, ErrorType } from '@/lib/utils/errors';
+import { createRateLimitError } from '@/lib/utils/error-builders';
+import { ActionError } from '@/lib/utils/errors';
 import { withServiceRetry } from '@/lib/utils/retry';
 
 const redis = new Redis({
@@ -53,9 +54,7 @@ export const createRateLimitMiddleware = (
       });
 
       if (current.result > requests) {
-        throw new ActionError(
-          ErrorType.RATE_LIMIT,
-          'RATE_LIMIT_EXCEEDED',
+        throw createRateLimitError(
           `Rate limit exceeded. Max ${requests} requests per ${windowInSeconds} seconds.`,
           {
             currentCount: current.result,
@@ -64,20 +63,22 @@ export const createRateLimitMiddleware = (
             userId: ctx.userId,
             window: windowInSeconds,
           },
-          false,
-          429,
         );
       }
 
       return next();
     } catch (error) {
+      // If it's already an ActionError (rate limit exceeded), re-throw it
+      if (error instanceof ActionError) {
+        throw error;
+      }
+
       // If Redis is down, we should fail open for rate limiting to maintain availability
       // Log the error but allow the request to proceed
       console.warn(
         `Rate limiting unavailable due to Redis failure: ${error instanceof Error ? error.message : String(error)}`,
       );
 
-      // In production, you might want to use in-memory fallback or fail closed
       return next();
     }
   });
@@ -128,9 +129,7 @@ export const createPublicRateLimitMiddleware = (
       });
 
       if (current.result > requests) {
-        throw new ActionError(
-          ErrorType.RATE_LIMIT,
-          'RATE_LIMIT_EXCEEDED',
+        throw createRateLimitError(
           `Rate limit exceeded. Max ${requests} requests per ${windowInSeconds} seconds.`,
           {
             currentCount: current.result,
@@ -138,8 +137,6 @@ export const createPublicRateLimitMiddleware = (
             operation: metadata.actionName,
             window: windowInSeconds,
           },
-          false,
-          429,
         );
       }
 

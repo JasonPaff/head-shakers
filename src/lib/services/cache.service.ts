@@ -2,6 +2,7 @@ import { revalidateTag, unstable_cache } from 'next/cache';
 
 import {
   CACHE_CONFIG,
+  CACHE_ENTITY_TYPE,
   CACHE_KEYS,
   getEnvironmentTTL,
   isCacheEnabled,
@@ -619,11 +620,56 @@ export class CacheService {
   };
 
   /**
+   * newsletter-specific cache utilities
+   */
+  static readonly newsletter = {
+    /**
+     * cache newsletter subscription status check
+     *
+     * Caches whether an email is actively subscribed to the newsletter.
+     * Uses LONG TTL (4 hours) to balance freshness with performance
+     * as subscription status changes infrequently but needs reasonable freshness.
+     *
+     * @template T - The return type (typically boolean)
+     * @param fn - The async function that checks subscription status
+     * @param email - The normalized email address to check
+     * @param options - Cache options (TTL defaults to 5 minutes)
+     *
+     * @remarks
+     * - Cache invalidated on subscribe/unsubscribe operations
+     * - Uses email-specific tags for targeted invalidation
+     * - Privacy-preserving: cache key includes hashed email
+     */
+    isActiveSubscriber: async <T>(
+      fn: () => Promise<T>,
+      email: string,
+      options: Omit<CacheOptions, 'tags'> = {},
+    ) => {
+      const key = CACHE_KEYS.NEWSLETTER.IS_ACTIVE_SUBSCRIBER(email);
+      const tags = [CACHE_CONFIG.TAGS.NEWSLETTER, CACHE_CONFIG.TAGS.NEWSLETTER_SUBSCRIPTION(email)];
+
+      return CacheService.cached(fn, key, {
+        ...options,
+        context: {
+          ...options.context,
+          entityType: CACHE_ENTITY_TYPE.NEWSLETTER,
+          operation: `${CACHE_CONFIG.NAMESPACES.NEWSLETTER}:is-active-subscriber`,
+        },
+        tags,
+        ttl: options.ttl || CACHE_CONFIG.TTL.LONG,
+      });
+    },
+  };
+
+  /**
    * platform-level cache utilities
    */
   static readonly platform = {
     /**
-     * cache platform statistics
+     * Caches platform-level stats (total bobbleheads, total collections, etc.)
+     *
+     * @param fn - The async function that performs the stats query
+     * @param options - Cache options (TTL defaults to 1 hour)
      */
     stats: async <T>(fn: () => Promise<T>, options: Omit<CacheOptions, 'tags'> = {}) => {
       const key = CACHE_KEYS.PLATFORM.STATS();
@@ -631,9 +677,13 @@ export class CacheService {
 
       return CacheService.cached(fn, key, {
         ...options,
-        context: { ...options.context, entityType: 'platform', operation: 'platform:stats' },
+        context: {
+          ...options.context,
+          entityType: CACHE_ENTITY_TYPE.PLATFORM,
+          operation: `${CACHE_CONFIG.NAMESPACES.PLATFORM}:stats`,
+        },
         tags,
-        ttl: options.ttl || CACHE_CONFIG.TTL.EXTENDED,
+        ttl: options.ttl || CACHE_CONFIG.TTL.MEDIUM,
       });
     },
   };

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 
 import type { QueryContext } from '@/lib/queries/base/query-context';
 
@@ -113,11 +113,26 @@ export class NewsletterQuery extends BaseQuery {
 
   /**
    * Check if an email is actively subscribed (not unsubscribed)
-   * Uses a single query via getActiveSubscriberAsync to efficiently check both existence and subscription status
+   *
+   * @returns true if the email is subscribed and not unsubscribed, false otherwise.
+   * @example 'const isSubscribed = await NewsletterQuery.getIsActiveSubscriberAsync(email);'
    */
-  static async isActiveSubscriberAsync(email: string, context: QueryContext): Promise<boolean> {
-    const signup = await this.getActiveSubscriberAsync(email, context);
-    return signup !== null;
+  static async getIsActiveSubscriberAsync(email: string, context: QueryContext): Promise<boolean> {
+    const dbInstance = this.getDbInstance(context);
+
+    const [newsletterSignup] = await dbInstance
+      .select({ exists: sql<boolean>`1` })
+      .from(newsletterSignups)
+      .where(
+        and(
+          eq(newsletterSignups.email, email),
+          isNotNull(newsletterSignups.subscribedAt),
+          isNull(newsletterSignups.unsubscribedAt),
+        ),
+      )
+      .limit(1);
+
+    return !!newsletterSignup?.exists;
   }
 
   /**

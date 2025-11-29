@@ -1,7 +1,6 @@
 import { eq } from 'drizzle-orm';
 
 import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
-import type { FacadeErrorContext } from '@/lib/utils/error-types';
 import type { DatabaseExecutor } from '@/lib/utils/next-safe-action';
 import type { AdminUsersFilter, AssignableRole } from '@/lib/validations/admin-users.validation';
 
@@ -9,12 +8,13 @@ import { CACHE_ENTITY_TYPE, OPERATIONS, SCHEMA_LIMITS } from '@/lib/constants';
 import { isReservedUsername } from '@/lib/constants/reserved-usernames';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { createPublicQueryContext } from '@/lib/queries/base/query-context';
 import { UsersQuery } from '@/lib/queries/users/users-query';
 import { CacheService } from '@/lib/services/cache.service';
 import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
-import { createFacadeError } from '@/lib/utils/error-builders';
-import { facadeBreadcrumb, trackFacadeEntry } from '@/lib/utils/sentry-server/breadcrumbs.server';
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
+import { facadeBreadcrumb } from '@/lib/utils/sentry-server/breadcrumbs.server';
 
 const facadeName = 'UsersFacade';
 
@@ -23,7 +23,7 @@ const facadeName = 'UsersFacade';
  * combines query operations with business logic validation
  * provides a clean API for all user operations
  */
-export class UsersFacade {
+export class UsersFacade extends BaseFacade {
   /**
    * check if user can change their username (cooldown period has passed)
    */
@@ -61,6 +61,41 @@ export class UsersFacade {
   }
 
   /**
+   * get email by user ID
+   * @param userId
+   * @param dbInstance
+   */
+  static async getEmailByUserIdAsync(
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<null | string> {
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getEmailByUserIdAsync',
+        operation: OPERATIONS.USERS.GET_EMAIL_BY_USER_ID,
+      },
+      async () => {
+        return await CacheService.users.profile(
+          () => {
+            const context = this.publicContext(dbInstance);
+            return UsersQuery.getEmailByUserIdAsync(userId, context);
+          },
+          userId,
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.USER,
+              facade: facadeName,
+              operation: OPERATIONS.USERS.GET_EMAIL_BY_USER_ID,
+              userId,
+            },
+          },
+        );
+      },
+    );
+  }
+
+  /**
    * get user by Clerk ID
    * @param clerkId
    * @param dbInstance
@@ -69,33 +104,30 @@ export class UsersFacade {
     clerkId: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<null | UserRecord> {
-    trackFacadeEntry(facadeName, 'getUserByClerkIdAsync');
-
-    try {
-      return CacheService.users.profile(
-        () => {
-          const context = createPublicQueryContext({ dbInstance });
-          return UsersQuery.findByClerkIdAsync(clerkId, context);
-        },
-        clerkId,
-        {
-          context: {
-            entityType: CACHE_ENTITY_TYPE.USER,
-            facade: facadeName,
-            operation: 'getUserByClerkIdAsync',
-            userId: clerkId,
-          },
-        },
-      );
-    } catch (error) {
-      const errorContext: FacadeErrorContext = {
-        data: { clerkId },
+    return executeFacadeOperation(
+      {
         facade: facadeName,
         method: 'getUserByClerkIdAsync',
-        operation: OPERATIONS.PLATFORM.GET_STATS,
-      };
-      throw createFacadeError(errorContext, error);
-    }
+        operation: OPERATIONS.USERS.GET_USER_BY_CLERK_ID,
+      },
+      async () => {
+        return await CacheService.users.profile(
+          () => {
+            const context = this.publicContext(dbInstance);
+            return UsersQuery.getUserByClerkIdAsync(clerkId, context);
+          },
+          clerkId,
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.USER,
+              facade: facadeName,
+              operation: OPERATIONS.USERS.GET_USER_BY_CLERK_ID,
+              userId: clerkId,
+            },
+          },
+        );
+      },
+    );
   }
 
   /**
@@ -115,7 +147,7 @@ export class UsersFacade {
     const user = await CacheService.users.profile(
       () => {
         const context = createPublicQueryContext({ dbInstance });
-        return UsersQuery.findByIdAsync(userId, context);
+        return UsersQuery.getUserByUserIdAsync(userId, context);
       },
       userId,
       { context: { entityType: 'user', facade: 'UsersFacade', operation: 'getByUserId', userId } },
@@ -136,7 +168,7 @@ export class UsersFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<null | UserRecord> {
     const context = createPublicQueryContext({ dbInstance });
-    return UsersQuery.findByUsernameAsync(username, context);
+    return UsersQuery.getUserByUsernameAsync(username, context);
   }
 
   /**
@@ -158,7 +190,7 @@ export class UsersFacade {
 
     // Fetch user and stats in parallel
     const [user, stats] = await Promise.all([
-      UsersQuery.getUserByIdForAdminAsync(userId, context),
+      UsersQuery.getUserByUserIdForAdminAsync(userId, context),
       UsersQuery.getUserStatsAsync(userId, context),
     ]);
 
@@ -167,6 +199,41 @@ export class UsersFacade {
     }
 
     return { stats, user };
+  }
+
+  /**
+   * get user ID by Clerk ID
+   * @param clerkId
+   * @param dbInstance
+   */
+  static async getUserIdByClerkIdAsync(
+    clerkId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<null | string> {
+    return executeFacadeOperation(
+      {
+        facade: facadeName,
+        method: 'getUserIdByClerkIdAsync',
+        operation: OPERATIONS.USERS.GET_USER_ID_BY_CLERK_ID,
+      },
+      async () => {
+        return await CacheService.users.profile(
+          () => {
+            const context = this.publicContext(dbInstance);
+            return UsersQuery.getUserIdByClerkIdAsync(clerkId, context);
+          },
+          clerkId,
+          {
+            context: {
+              entityType: CACHE_ENTITY_TYPE.USER,
+              facade: facadeName,
+              operation: OPERATIONS.USERS.GET_USER_ID_BY_CLERK_ID,
+              userId: clerkId,
+            },
+          },
+        );
+      },
+    );
   }
 
   /**
@@ -221,7 +288,7 @@ export class UsersFacade {
 
     // Execute count and data queries in parallel
     const [users, total] = await Promise.all([
-      UsersQuery.findUsersForAdminAsync(filters, context),
+      UsersQuery.getUsersForAdminAsync(filters, context),
       UsersQuery.countUsersForAdminAsync(filters, context),
     ]);
 
@@ -281,7 +348,7 @@ export class UsersFacade {
 
     // Fetch target user to check if they're an admin
     const context = createPublicQueryContext({ dbInstance: executor });
-    const targetUser = await UsersQuery.findByIdAsync(targetUserId, context);
+    const targetUser = await UsersQuery.getUserByUserIdAsync(targetUserId, context);
 
     if (!targetUser) {
       throw new Error('User not found');

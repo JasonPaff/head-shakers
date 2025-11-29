@@ -14,27 +14,15 @@ import { getUserIdAsync } from '@/utils/auth-utils';
 export const FooterNewsletter = async () => {
   // Check if the user is authenticated
   const userId = await getUserIdAsync();
-
-  // If not authenticated, show the subscribed form
-  if (!userId) {
-    return <FooterNewsletterSubscribe />;
-  }
+  if (!userId) return <FooterNewsletterSubscribe />;
 
   // Get user record to check email
-  const user = await UsersFacade.getUserByIdAsync(userId);
-
-  // If user not found or no email, show the subscribed form
-  if (!user?.email) {
-    return <FooterNewsletterSubscribe />;
-  }
+  const email = await UsersFacade.getEmailByUserIdAsync(userId);
+  if (!email) return <FooterNewsletterSubscribe />;
 
   // Check if the user is actively subscribed
-  const isActiveSubscriber = await NewsletterFacade.isActiveSubscriberAsync(user.email);
-
-  // Show unsubscribe UI if actively subscribed, otherwise show subscribe form
-  if (isActiveSubscriber) {
-    return <FooterNewsletterUnsubscribe userEmail={user.email} />;
-  }
+  const isActiveSubscriber = await NewsletterFacade.getIsActiveSubscriberAsync(email);
+  if (isActiveSubscriber) return <FooterNewsletterUnsubscribe userEmail={email} />;
 
   return <FooterNewsletterSubscribe />;
 };
