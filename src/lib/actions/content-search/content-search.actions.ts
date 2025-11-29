@@ -4,6 +4,20 @@ import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
+import type {
+  BobbleheadSearchResponse,
+  BobbleheadSearchResultWithPhotos,
+  CollectionSearchResponse,
+  PublicSearchDropdownResponse,
+  PublicSearchPageResponse,
+  UserSearchResponse,
+} from '@/lib/facades/content-search/content-search.facade';
+import type {
+  CollectionSearchResult,
+  UserSearchResult,
+} from '@/lib/queries/content-search/content-search.query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   CONFIG,
@@ -14,6 +28,7 @@ import {
 } from '@/lib/constants';
 import { ContentSearchFacade } from '@/lib/facades/content-search/content-search.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { adminActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
   publicSearchInputSchema,
@@ -43,7 +58,7 @@ export const searchCollectionsForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(searchContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CollectionSearchResponse>> => {
     const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -78,7 +93,7 @@ export const searchCollectionsForFeaturingAction = adminActionClient
         message: `Searched collections for featuring: "${query}"`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -98,7 +113,7 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(searchContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<BobbleheadSearchResponse>> => {
     const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -133,7 +148,7 @@ export const searchBobbleheadsForFeaturingAction = adminActionClient
         message: `Searched bobbleheads for featuring: "${query}"`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -153,7 +168,7 @@ export const searchUsersForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(searchContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<UserSearchResponse>> => {
     const { excludeTags, includeTags, limit, query } = searchContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -178,7 +193,7 @@ export const searchUsersForFeaturingAction = adminActionClient
         message: `Searched users for featuring: "${query}"`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -198,7 +213,7 @@ export const getCollectionForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(getCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ collection: CollectionSearchResult }>> => {
     const input = getCollectionSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -216,7 +231,7 @@ export const getCollectionForFeaturingAction = adminActionClient
         message: `Retrieved collection for featuring: ${result.collection.name}`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -236,35 +251,40 @@ export const getBobbleheadForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(getCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const input = getCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<ActionResponse<{ bobblehead: BobbleheadSearchResultWithPhotos }>> => {
+      const input = getCollectionSchema.parse(ctx.sanitizedInput);
+      const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { id: input.id });
+      Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { id: input.id });
 
-    try {
-      const result = await ContentSearchFacade.getBobbleheadForFeaturing(input.id, ctx.userId, dbInstance);
+      try {
+        const result = await ContentSearchFacade.getBobbleheadForFeaturing(input.id, ctx.userId, dbInstance);
 
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          bobblehead: result.bobblehead,
-          photoCount: result.bobblehead.photos.length,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Retrieved bobblehead for featuring: ${result.bobblehead.name}`,
-      });
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            bobblehead: result.bobblehead,
+            photoCount: result.bobblehead.photos.length,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Retrieved bobblehead for featuring: ${result.bobblehead.name}`,
+        });
 
-      return result;
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: { actionName: ACTION_NAMES.ADMIN.GET_BOBBLEHEAD_FOR_FEATURING },
-        operation: OPERATIONS.SEARCH.BOBBLEHEADS,
-        userId: ctx.userId,
-      });
-    }
-  });
+        return actionSuccess(result);
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: { actionName: ACTION_NAMES.ADMIN.GET_BOBBLEHEAD_FOR_FEATURING },
+          operation: OPERATIONS.SEARCH.BOBBLEHEADS,
+          userId: ctx.userId,
+        });
+      }
+    },
+  );
 
 /**
  * Get a specific user by ID for featuring (admin/moderator only)
@@ -275,7 +295,7 @@ export const getUserForFeaturingAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(getCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ user: UserSearchResult }>> => {
     const input = getCollectionSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -293,7 +313,7 @@ export const getUserForFeaturingAction = adminActionClient
         message: `Retrieved user for featuring: ${result.user.username}`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -335,7 +355,7 @@ export const searchPublicContentAction = publicActionClient
     isTransactionRequired: false,
   })
   .inputSchema(publicSearchInputSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<PublicSearchPageResponse>> => {
     const input = publicSearchInputSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -375,7 +395,7 @@ export const searchPublicContentAction = publicActionClient
         message: `Public search executed: "${input.query}" - ${result.counts.total} results`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -408,7 +428,7 @@ export const getPublicSearchDropdownAction = publicActionClient
     isTransactionRequired: false,
   })
   .inputSchema(searchDropdownInputSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<PublicSearchDropdownResponse>> => {
     const input = searchDropdownInputSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -434,7 +454,7 @@ export const getPublicSearchDropdownAction = publicActionClient
         message: `Dropdown search executed: "${input.query}" - ${result.totalResults} results`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,

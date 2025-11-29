@@ -3,6 +3,9 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
+import type { CommentWithDepth, CommentWithUser } from '@/lib/queries/social/social.query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -18,6 +21,7 @@ import { BobbleheadsQuery } from '@/lib/queries/bobbleheads/bobbleheads-query';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, type DatabaseExecutor, publicActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -69,95 +73,98 @@ export const toggleLikeAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(toggleLikeSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const likeData = toggleLikeSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<ActionResponse<{ isLiked: boolean; likeCount: number; likeId: null | string }>> => {
+      const likeData = toggleLikeSchema.parse(ctx.sanitizedInput);
+      const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
-      targetId: likeData.targetId,
-      targetType: likeData.targetType,
-      userId: ctx.userId,
-    });
-
-    try {
-      const result = await SocialFacade.toggleLike(
-        likeData.targetId,
-        likeData.targetType,
-        ctx.userId,
-        dbInstance,
-      );
-
-      if (!result.isSuccessful) {
-        throw new ActionError(
-          ErrorType.BUSINESS_RULE,
-          ERROR_CODES.SOCIAL.LIKE_FAILED,
-          ERROR_MESSAGES.SOCIAL.LIKE_FAILED,
-          { ctx, operation: OPERATIONS.SOCIAL.TOGGLE_LIKE },
-          true, // recoverable
-          400,
-        );
-      }
-
-      const actionType = result.isLiked ? 'liked' : 'unliked';
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          actionType,
-          likeCount: result.likeCount,
-          targetId: likeData.targetId,
-          targetType: likeData.targetType,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
+      Sentry.setContext(SENTRY_CONTEXTS.LIKE_DATA, {
+        targetId: likeData.targetId,
+        targetType: likeData.targetType,
+        userId: ctx.userId,
       });
 
-      // Perform cache invalidation synchronously and check result
-      const revalidationResult = CacheRevalidationService.social.onLikeChange(
-        likeData.targetType,
-        likeData.targetId,
-        ctx.userId,
-        result.isLiked ? 'like' : 'unlike',
-      );
+      try {
+        const result = await SocialFacade.toggleLike(
+          likeData.targetId,
+          likeData.targetType,
+          ctx.userId,
+          dbInstance,
+        );
 
-      // Log cache invalidation failures to Sentry but don't fail the request
-      if (!revalidationResult.isSuccess) {
-        Sentry.captureException(new Error('Cache invalidation failed for like action'), {
-          extra: {
-            entityId: likeData.targetId,
-            entityType: likeData.targetType,
-            error: revalidationResult.error,
-            operation: actionType,
-            tagsAttempted: revalidationResult.tagsInvalidated,
-            userId: ctx.userId,
+        if (!result.isSuccessful) {
+          throw new ActionError(
+            ErrorType.BUSINESS_RULE,
+            ERROR_CODES.SOCIAL.LIKE_FAILED,
+            ERROR_MESSAGES.SOCIAL.LIKE_FAILED,
+            { ctx, operation: OPERATIONS.SOCIAL.TOGGLE_LIKE },
+            true, // recoverable
+            400,
+          );
+        }
+
+        const actionType = result.isLiked ? 'liked' : 'unliked';
+
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            actionType,
+            likeCount: result.likeCount,
+            targetId: likeData.targetId,
+            targetType: likeData.targetType,
           },
-          level: 'warning',
+          level: SENTRY_LEVELS.INFO,
+          message: `User ${actionType} ${likeData.targetType} ${likeData.targetId}`,
         });
-      }
 
-      return {
-        data: {
-          isLiked: result.isLiked,
-          likeCount: result.likeCount,
-          likeId: result.likeId,
-        },
-        message:
+        // Perform cache invalidation synchronously and check result
+        const revalidationResult = CacheRevalidationService.social.onLikeChange(
+          likeData.targetType,
+          likeData.targetId,
+          ctx.userId,
+          result.isLiked ? 'like' : 'unlike',
+        );
+
+        // Log cache invalidation failures to Sentry but don't fail the request
+        if (!revalidationResult.isSuccess) {
+          Sentry.captureException(new Error('Cache invalidation failed for like action'), {
+            extra: {
+              entityId: likeData.targetId,
+              entityType: likeData.targetType,
+              error: revalidationResult.error,
+              operation: actionType,
+              tagsAttempted: revalidationResult.tagsInvalidated,
+              userId: ctx.userId,
+            },
+            level: 'warning',
+          });
+        }
+
+        return actionSuccess(
+          {
+            isLiked: result.isLiked,
+            likeCount: result.likeCount,
+            likeId: result.likeId,
+          },
           result.isLiked ?
             `Added to liked ${likeData.targetType}s`
           : `Removed from liked ${likeData.targetType}s`,
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.SOCIAL.LIKE,
-        },
-        operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
-        userId: ctx.userId,
-      });
-    }
-  });
+        );
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: {
+            actionName: ACTION_NAMES.SOCIAL.LIKE,
+          },
+          operation: OPERATIONS.SOCIAL.TOGGLE_LIKE,
+          userId: ctx.userId,
+        });
+      }
+    },
+  );
 
 // ==================== Comment Actions ====================
 
@@ -167,7 +174,7 @@ export const createCommentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(createCommentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CommentWithUser | null>> => {
     const commentData = createCommentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -258,13 +265,12 @@ export const createCommentAction = authActionClient
         commentData.parentCommentId,
       );
 
-      return {
-        data: result.comment,
-        message: isReply ? 'Reply added successfully' : 'Comment added successfully',
-        success: true,
-      };
+      return actionSuccess(
+        result.comment,
+        isReply ? 'Reply added successfully' : 'Comment added successfully',
+      );
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.COMMENTS.CREATE,
@@ -281,7 +287,7 @@ export const updateCommentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(updateCommentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CommentWithUser | null>> => {
     const updateData = updateCommentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -346,13 +352,9 @@ export const updateCommentAction = authActionClient
         );
       }
 
-      return {
-        data: result.comment,
-        message: 'Comment updated successfully',
-        success: true,
-      };
+      return actionSuccess(result.comment, 'Comment updated successfully');
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.COMMENTS.UPDATE,
@@ -369,7 +371,7 @@ export const deleteCommentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteCommentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ success: boolean }>> => {
     const deleteData = deleteCommentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -423,13 +425,9 @@ export const deleteCommentAction = authActionClient
         );
       }
 
-      return {
-        data: { success: true },
-        message: 'Comment deleted successfully',
-        success: true,
-      };
+      return actionSuccess({ success: true }, 'Comment deleted successfully');
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.COMMENTS.DELETE,
@@ -452,49 +450,51 @@ export const getCommentsAction = publicActionClient
     isTransactionRequired: false,
   })
   .inputSchema(getCommentsSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const input = getCommentsSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<ActionResponse<{ comments: Array<CommentWithDepth>; hasMore: boolean; total: number }>> => {
+      const input = getCommentsSchema.parse(ctx.sanitizedInput);
+      const dbInstance = ctx.db;
 
-    Sentry.addBreadcrumb({
-      category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-      data: {
-        limit: input.pagination?.limit,
-        offset: input.pagination?.offset,
-        targetId: input.targetId,
-        targetType: input.targetType,
-      },
-      level: SENTRY_LEVELS.INFO,
-      message: `Loading comments for ${input.targetType} ${input.targetId}`,
-    });
-
-    try {
-      const result = await SocialFacade.getCommentsWithReplies(
-        input.targetId,
-        input.targetType,
-        {
+      Sentry.addBreadcrumb({
+        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+        data: {
           limit: input.pagination?.limit,
           offset: input.pagination?.offset,
+          targetId: input.targetId,
+          targetType: input.targetType,
         },
-        undefined, // viewerUserId - public access
-        dbInstance,
-      );
+        level: SENTRY_LEVELS.INFO,
+        message: `Loading comments for ${input.targetType} ${input.targetId}`,
+      });
 
-      return {
-        data: {
+      try {
+        const result = await SocialFacade.getCommentsWithReplies(
+          input.targetId,
+          input.targetType,
+          {
+            limit: input.pagination?.limit,
+            offset: input.pagination?.offset,
+          },
+          undefined, // viewerUserId - public access
+          dbInstance,
+        );
+
+        return actionSuccess({
           comments: result.comments,
           hasMore: result.hasMore,
           total: result.total,
-        },
-        success: true,
-      };
-    } catch (error) {
-      handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COMMENTS.GET_LIST,
-        },
-        operation: OPERATIONS.COMMENTS.GET_COMMENTS,
-      });
-    }
-  });
+        });
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: {
+            actionName: ACTION_NAMES.COMMENTS.GET_LIST,
+          },
+          operation: OPERATIONS.COMMENTS.GET_COMMENTS,
+        });
+      }
+    },
+  );

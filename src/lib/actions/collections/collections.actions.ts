@@ -3,6 +3,14 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
+import type {
+  BrowseCategoriesResult,
+  BrowseCollectionsResult,
+  CategoryRecord,
+  CollectionRecord,
+} from '@/lib/queries/collections/collections.query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -16,6 +24,7 @@ import { CollectionsFacade } from '@/lib/facades/collections/collections.facade'
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import { browseCategoriesInputSchema } from '@/lib/validations/browse-categories.validation';
@@ -32,7 +41,7 @@ export const createCollectionAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(insertCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CollectionRecord>> => {
     const collectionData = insertCollectionSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -66,12 +75,9 @@ export const createCollectionAction = authActionClient
 
       CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
 
-      return {
-        data: newCollection,
-        success: true,
-      };
+      return actionSuccess(newCollection);
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.CREATE,
@@ -88,7 +94,7 @@ export const updateCollectionAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(updateCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CollectionRecord>> => {
     const collectionData = updateCollectionSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -139,12 +145,9 @@ export const updateCollectionAction = authActionClient
 
       CacheRevalidationService.collections.onUpdate(collectionData.collectionId, ctx.userId);
 
-      return {
-        data: updatedCollection,
-        success: true,
-      };
+      return actionSuccess(updatedCollection);
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.UPDATE,
@@ -161,7 +164,7 @@ export const deleteCollectionAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteCollectionSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<null>> => {
     const collectionData = deleteCollectionSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -195,12 +198,9 @@ export const deleteCollectionAction = authActionClient
 
       CacheRevalidationService.collections.onDelete(collectionData.collectionId, ctx.userId);
 
-      return {
-        data: null,
-        success: true,
-      };
+      return actionSuccess(null);
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.COLLECTIONS.DELETE,
@@ -220,7 +220,7 @@ export const browseCollectionsAction = publicActionClient
     isTransactionRequired: false,
   })
   .inputSchema(browseCollectionsInputSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<BrowseCollectionsResult>> => {
     const browseInput = browseCollectionsInputSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -244,7 +244,7 @@ export const browseCollectionsAction = publicActionClient
         message: `Browsed collections with filters`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -264,7 +264,7 @@ export const getCategoriesAction = publicActionClient
     actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,
     isTransactionRequired: false,
   })
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<Array<CategoryRecord>>> => {
     const dbInstance = ctx.db;
 
     try {
@@ -279,7 +279,7 @@ export const getCategoriesAction = publicActionClient
         message: `Retrieved ${categories.length} categories`,
       });
 
-      return categories;
+      return actionSuccess(categories);
     } catch (error) {
       return handleActionError(error, {
         metadata: {
@@ -299,7 +299,7 @@ export const browseCategoriesAction = publicActionClient
     isTransactionRequired: false,
   })
   .inputSchema(browseCategoriesInputSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<BrowseCategoriesResult>> => {
     const browseInput = browseCategoriesInputSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -324,7 +324,7 @@ export const browseCategoriesAction = publicActionClient
         message: `Browsed categories with filters`,
       });
 
-      return result;
+      return actionSuccess(result);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,

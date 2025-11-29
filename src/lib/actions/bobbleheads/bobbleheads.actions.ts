@@ -4,6 +4,8 @@ import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   CloudinaryPathBuilder,
@@ -23,6 +25,7 @@ import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import { isTempPhoto } from '@/lib/utils/photo-transform.utils';
@@ -48,186 +51,195 @@ export const createBobbleheadWithPhotosAction = authActionClient
     ),
   )
   .inputSchema(createBobbleheadWithPhotosSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
-    const userId = ctx.userId;
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<
+      ActionResponse<{
+        bobblehead: unknown;
+        collectionSlug: null | string;
+        photos: Array<unknown>;
+        tags: Array<unknown>;
+      }>
+    > => {
+      const { photos, tags, ...bobbleheadData } = createBobbleheadWithPhotosSchema.parse(ctx.sanitizedInput);
+      const userId = ctx.userId;
 
-    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
+      Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, bobbleheadData);
 
-    try {
-      const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.db);
+      try {
+        const newBobblehead = await BobbleheadsFacade.createAsync(bobbleheadData, userId, ctx.db);
 
-      if (!newBobblehead) {
-        throw new ActionError(
-          ErrorType.INTERNAL,
-          ERROR_CODES.BOBBLEHEADS.CREATE_FAILED,
-          ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED,
-          { ctx, operation: OPERATIONS.BOBBLEHEADS.CREATE },
-          false,
-          500,
-        );
-      }
-
-      // if photos are provided, create database records for them
-      let uploadedPhotos: Array<unknown> = [];
-      if (photos && photos.length > 0) {
-        try {
-          // move photos from temp folder to permanent location in Cloudinary
-          const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
-            userId,
-            newBobblehead.collectionId,
-            newBobblehead.id,
+        if (!newBobblehead) {
+          throw new ActionError(
+            ErrorType.INTERNAL,
+            ERROR_CODES.BOBBLEHEADS.CREATE_FAILED,
+            ERROR_MESSAGES.BOBBLEHEAD.CREATE_FAILED,
+            { ctx, operation: OPERATIONS.BOBBLEHEADS.CREATE },
+            false,
+            500,
           );
-          const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
-            photos.map((photo) => ({
-              publicId: photo.publicId,
-              url: photo.url,
-            })),
-            permanentFolder,
-          );
+        }
 
-          // create a map of old publicId to new values for a quick lookup
-          const movedPhotosMap = new Map(
-            movedPhotos.map((moved) => [
-              moved.oldPublicId,
-              { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
-            ]),
-          );
-
-          // update photo records with new URLs and public IDs
-          const photoRecords = photos.map((photo) => {
-            const movedPhoto = movedPhotosMap.get(photo.publicId);
-            return {
-              altText: photo.altText,
-              bobbleheadId: newBobblehead.id,
-              caption: photo.caption,
-              fileSize: photo.bytes,
-              height: photo.height,
-              isPrimary: photo.isPrimary,
-              sortOrder: photo.sortOrder,
-              url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
-              width: photo.width,
-            };
-          });
-
-          // insert photos into the database with permanent URLs
-          uploadedPhotos = await Promise.all(
-            photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
-          );
-
-          // clean up any temp photos that failed to move
-          const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
-          if (failedMoves.length > 0) {
-            console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
-            Sentry.addBreadcrumb({
-              category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-              data: { failedMoves },
-              level: SENTRY_LEVELS.WARNING,
-              message: 'Some photos failed to move to permanent location',
-            });
-          }
-        } catch (photoError) {
-          // if photo processing fails, we still want to keep the bobblehead,
-          // but we should log this for debugging
-          console.error('Photo processing failed:', photoError);
-          Sentry.captureException(photoError);
-
-          // still try to save photos with temp URLs as fallback
+        // if photos are provided, create database records for them
+        let uploadedPhotos: Array<unknown> = [];
+        if (photos && photos.length > 0) {
           try {
-            const photoRecords = photos.map((photo) => ({
-              altText: photo.altText,
-              bobbleheadId: newBobblehead.id,
-              caption: photo.caption,
-              fileSize: photo.bytes,
-              height: photo.height,
-              isPrimary: photo.isPrimary,
-              sortOrder: photo.sortOrder,
-              url: photo.url,
-              width: photo.width,
-            }));
+            // move photos from temp folder to permanent location in Cloudinary
+            const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
+              userId,
+              newBobblehead.collectionId,
+              newBobblehead.id,
+            );
+            const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
+              photos.map((photo) => ({
+                publicId: photo.publicId,
+                url: photo.url,
+              })),
+              permanentFolder,
+            );
 
+            // create a map of old publicId to new values for a quick lookup
+            const movedPhotosMap = new Map(
+              movedPhotos.map((moved) => [
+                moved.oldPublicId,
+                { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
+              ]),
+            );
+
+            // update photo records with new URLs and public IDs
+            const photoRecords = photos.map((photo) => {
+              const movedPhoto = movedPhotosMap.get(photo.publicId);
+              return {
+                altText: photo.altText,
+                bobbleheadId: newBobblehead.id,
+                caption: photo.caption,
+                fileSize: photo.bytes,
+                height: photo.height,
+                isPrimary: photo.isPrimary,
+                sortOrder: photo.sortOrder,
+                url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
+                width: photo.width,
+              };
+            });
+
+            // insert photos into the database with permanent URLs
             uploadedPhotos = await Promise.all(
               photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
             );
-          } catch (fallbackError) {
-            console.error('Fallback photo save also failed:', fallbackError);
-            Sentry.captureException(fallbackError);
+
+            // clean up any temp photos that failed to move
+            const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
+            if (failedMoves.length > 0) {
+              console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
+              Sentry.addBreadcrumb({
+                category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+                data: { failedMoves },
+                level: SENTRY_LEVELS.WARNING,
+                message: 'Some photos failed to move to permanent location',
+              });
+            }
+          } catch (photoError) {
+            // if photo processing fails, we still want to keep the bobblehead,
+            // but we should log this for debugging
+            console.error('Photo processing failed:', photoError);
+            Sentry.captureException(photoError);
+
+            // still try to save photos with temp URLs as fallback
+            try {
+              const photoRecords = photos.map((photo) => ({
+                altText: photo.altText,
+                bobbleheadId: newBobblehead.id,
+                caption: photo.caption,
+                fileSize: photo.bytes,
+                height: photo.height,
+                isPrimary: photo.isPrimary,
+                sortOrder: photo.sortOrder,
+                url: photo.url,
+                width: photo.width,
+              }));
+
+              uploadedPhotos = await Promise.all(
+                photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
+              );
+            } catch (fallbackError) {
+              console.error('Fallback photo save also failed:', fallbackError);
+              Sentry.captureException(fallbackError);
+            }
           }
         }
-      }
 
-      // process tags if provided
-      let createdTags: Array<unknown> = [];
-      if (tags && tags.length > 0) {
-        try {
-          // create or get existing tags for the user
-          const tagPromises = tags.map(async (tagName) => {
-            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
-            return existingTag;
-          });
+        // process tags if provided
+        let createdTags: Array<unknown> = [];
+        if (tags && tags.length > 0) {
+          try {
+            // create or get existing tags for the user
+            const tagPromises = tags.map(async (tagName) => {
+              const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
+              return existingTag;
+            });
 
-          const tagRecords = await Promise.all(tagPromises);
-          const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
+            const tagRecords = await Promise.all(tagPromises);
+            const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
 
-          // attach tags to the bobblehead
-          if (tagIds.length > 0) {
-            await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.db);
-            createdTags = tagRecords.filter(Boolean);
+            // attach tags to the bobblehead
+            if (tagIds.length > 0) {
+              await TagsFacade.attachToBobblehead(newBobblehead.id, tagIds, userId, ctx.db);
+              createdTags = tagRecords.filter(Boolean);
+            }
+          } catch (tagError) {
+            // iff tag processing fails, we still want to keep the bobblehead
+            console.error('Tag processing failed:', tagError);
+            Sentry.captureException(tagError);
           }
-        } catch (tagError) {
-          // iff tag processing fails, we still want to keep the bobblehead
-          console.error('Tag processing failed:', tagError);
-          Sentry.captureException(tagError);
         }
-      }
 
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          bobblehead: newBobblehead,
-          photosCount: uploadedPhotos.length,
-          tagsCount: createdTags.length,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
-      });
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            bobblehead: newBobblehead,
+            photosCount: uploadedPhotos.length,
+            tagsCount: createdTags.length,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Created bobblehead: ${newBobblehead.name} with ${uploadedPhotos.length} photos and ${createdTags.length} tags`,
+        });
 
-      // invalidate metadata cache for the new bobblehead
-      invalidateMetadataCache('bobblehead', newBobblehead.id);
+        // invalidate metadata cache for the new bobblehead
+        invalidateMetadataCache('bobblehead', newBobblehead.id);
 
-      CacheRevalidationService.bobbleheads.onCreate(
-        newBobblehead.id,
-        userId,
-        newBobblehead.collectionId,
-        newBobblehead.slug,
-      );
+        CacheRevalidationService.bobbleheads.onCreate(
+          newBobblehead.id,
+          userId,
+          newBobblehead.collectionId,
+          newBobblehead.slug,
+        );
 
-      // fetch collection slug for navigation
-      const collection = await CollectionsFacade.getCollectionById(
-        newBobblehead.collectionId,
-        userId,
-        ctx.db,
-      );
-      const collectionSlug = collection?.slug ?? null;
+        // fetch collection slug for navigation
+        const collection = await CollectionsFacade.getCollectionById(
+          newBobblehead.collectionId,
+          userId,
+          ctx.db,
+        );
+        const collectionSlug = collection?.slug ?? null;
 
-      return {
-        data: {
+        return actionSuccess({
           bobblehead: newBobblehead,
           collectionSlug,
           photos: uploadedPhotos,
           tags: createdTags,
-        },
-        success: true,
-      };
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.CREATE },
-        operation: OPERATIONS.BOBBLEHEADS.CREATE_WITH_PHOTOS,
-        userId,
-      });
-    }
-  });
+        });
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.CREATE },
+          operation: OPERATIONS.BOBBLEHEADS.CREATE_WITH_PHOTOS,
+          userId,
+        });
+      }
+    },
+  );
 
 export const deleteBobbleheadAction = authActionClient
   .metadata({
@@ -235,7 +247,7 @@ export const deleteBobbleheadAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteBobbleheadSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<null>> => {
     const bobbleheadData = deleteBobbleheadSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db ?? ctx.db;
 
@@ -275,10 +287,7 @@ export const deleteBobbleheadAction = authActionClient
         deletedBobblehead?.slug,
       );
 
-      return {
-        data: null,
-        success: true,
-      };
+      return actionSuccess(null);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -303,192 +312,200 @@ export const updateBobbleheadWithPhotosAction = authActionClient
     ),
   )
   .inputSchema(updateBobbleheadWithPhotosSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { id, photos, tags, ...bobbleheadData } = updateBobbleheadWithPhotosSchema.parse(
-      ctx.sanitizedInput,
-    );
-    const userId = ctx.userId;
-
-    Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { ...bobbleheadData, id });
-
-    try {
-      const updatedBobblehead = await BobbleheadsFacade.updateAsync(
-        { id, ...bobbleheadData },
-        userId,
-        ctx.db,
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<
+      ActionResponse<{
+        bobblehead: unknown;
+        photos: Array<unknown>;
+        tags: Array<unknown>;
+      }>
+    > => {
+      const { id, photos, tags, ...bobbleheadData } = updateBobbleheadWithPhotosSchema.parse(
+        ctx.sanitizedInput,
       );
+      const userId = ctx.userId;
 
-      if (!updatedBobblehead) {
-        throw new ActionError(
-          ErrorType.INTERNAL,
-          ERROR_CODES.BOBBLEHEADS.UPDATE_FAILED,
-          ERROR_MESSAGES.BOBBLEHEAD.UPDATE_FAILED,
-          { ctx, operation: OPERATIONS.BOBBLEHEADS.UPDATE },
-          false,
-          500,
+      Sentry.setContext(SENTRY_CONTEXTS.BOBBLEHEAD_DATA, { ...bobbleheadData, id });
+
+      try {
+        const updatedBobblehead = await BobbleheadsFacade.updateAsync(
+          { id, ...bobbleheadData },
+          userId,
+          ctx.db,
         );
-      }
 
-      // if photos are provided, only process NEW photos (filter out existing ones)
-      let uploadedPhotos: Array<unknown> = [];
-      if (photos && photos.length > 0) {
-        // separate new photos (temp- IDs) from existing photos (UUID IDs)
-        // existing photos are already in the database and should not be re-inserted
-        const newPhotos = photos.filter(isTempPhoto);
+        if (!updatedBobblehead) {
+          throw new ActionError(
+            ErrorType.INTERNAL,
+            ERROR_CODES.BOBBLEHEADS.UPDATE_FAILED,
+            ERROR_MESSAGES.BOBBLEHEAD.UPDATE_FAILED,
+            { ctx, operation: OPERATIONS.BOBBLEHEADS.UPDATE },
+            false,
+            500,
+          );
+        }
 
-        if (newPhotos.length > 0) {
-          try {
-            // move photos from temp folder to permanent location in Cloudinary
-            const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
-              userId,
-              updatedBobblehead.collectionId,
-              updatedBobblehead.id,
-            );
-            const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
-              newPhotos.map((photo) => ({
-                publicId: photo.publicId,
-                url: photo.url,
-              })),
-              permanentFolder,
-            );
+        // if photos are provided, only process NEW photos (filter out existing ones)
+        let uploadedPhotos: Array<unknown> = [];
+        if (photos && photos.length > 0) {
+          // separate new photos (temp- IDs) from existing photos (UUID IDs)
+          // existing photos are already in the database and should not be re-inserted
+          const newPhotos = photos.filter(isTempPhoto);
 
-            // create a map of old publicId to new values for a quick lookup
-            const movedPhotosMap = new Map(
-              movedPhotos.map((moved) => [
-                moved.oldPublicId,
-                { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
-              ]),
-            );
-
-            // update photo records with new URLs and public IDs
-            const photoRecords = newPhotos.map((photo) => {
-              const movedPhoto = movedPhotosMap.get(photo.publicId);
-              return {
-                altText: photo.altText,
-                bobbleheadId: updatedBobblehead.id,
-                caption: photo.caption,
-                fileSize: photo.bytes,
-                height: photo.height,
-                isPrimary: photo.isPrimary,
-                sortOrder: photo.sortOrder,
-                url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
-                width: photo.width,
-              };
-            });
-
-            // insert photos into the database with permanent URLs
-            uploadedPhotos = await Promise.all(
-              photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
-            );
-
-            // clean up any temp photos that failed to move
-            const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
-            if (failedMoves.length > 0) {
-              console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
-              Sentry.addBreadcrumb({
-                category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-                data: { failedMoves },
-                level: SENTRY_LEVELS.WARNING,
-                message: 'Some photos failed to move to permanent location',
-              });
-            }
-          } catch (photoError) {
-            // if photo processing fails, we still want to keep the update,
-            // but we should log this for debugging
-            console.error('Photo processing failed:', photoError);
-            Sentry.captureException(photoError);
-
-            // still try to save photos with temp URLs as fallback
+          if (newPhotos.length > 0) {
             try {
-              const photoRecords = newPhotos.map((photo) => ({
-                altText: photo.altText,
-                bobbleheadId: updatedBobblehead.id,
-                caption: photo.caption,
-                fileSize: photo.bytes,
-                height: photo.height,
-                isPrimary: photo.isPrimary,
-                sortOrder: photo.sortOrder,
-                url: photo.url,
-                width: photo.width,
-              }));
+              // move photos from temp folder to permanent location in Cloudinary
+              const permanentFolder = CloudinaryPathBuilder.bobbleheadPath(
+                userId,
+                updatedBobblehead.collectionId,
+                updatedBobblehead.id,
+              );
+              const movedPhotos = await CloudinaryService.movePhotosToPermFolder(
+                newPhotos.map((photo) => ({
+                  publicId: photo.publicId,
+                  url: photo.url,
+                })),
+                permanentFolder,
+              );
 
+              // create a map of old publicId to new values for a quick lookup
+              const movedPhotosMap = new Map(
+                movedPhotos.map((moved) => [
+                  moved.oldPublicId,
+                  { newPublicId: moved.newPublicId, newUrl: moved.newUrl },
+                ]),
+              );
+
+              // update photo records with new URLs and public IDs
+              const photoRecords = newPhotos.map((photo) => {
+                const movedPhoto = movedPhotosMap.get(photo.publicId);
+                return {
+                  altText: photo.altText,
+                  bobbleheadId: updatedBobblehead.id,
+                  caption: photo.caption,
+                  fileSize: photo.bytes,
+                  height: photo.height,
+                  isPrimary: photo.isPrimary,
+                  sortOrder: photo.sortOrder,
+                  url: movedPhoto?.newUrl || photo.url, // use new URL if the move succeeded
+                  width: photo.width,
+                };
+              });
+
+              // insert photos into the database with permanent URLs
               uploadedPhotos = await Promise.all(
                 photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
               );
-            } catch (fallbackError) {
-              console.error('Fallback photo save also failed:', fallbackError);
-              Sentry.captureException(fallbackError);
+
+              // clean up any temp photos that failed to move
+              const failedMoves = movedPhotos.filter((m) => m.oldPublicId === m.newPublicId);
+              if (failedMoves.length > 0) {
+                console.warn(`Failed to move ${failedMoves.length} photos to permanent location`);
+                Sentry.addBreadcrumb({
+                  category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+                  data: { failedMoves },
+                  level: SENTRY_LEVELS.WARNING,
+                  message: 'Some photos failed to move to permanent location',
+                });
+              }
+            } catch (photoError) {
+              // if photo processing fails, we still want to keep the update,
+              // but we should log this for debugging
+              console.error('Photo processing failed:', photoError);
+              Sentry.captureException(photoError);
+
+              // still try to save photos with temp URLs as fallback
+              try {
+                const photoRecords = newPhotos.map((photo) => ({
+                  altText: photo.altText,
+                  bobbleheadId: updatedBobblehead.id,
+                  caption: photo.caption,
+                  fileSize: photo.bytes,
+                  height: photo.height,
+                  isPrimary: photo.isPrimary,
+                  sortOrder: photo.sortOrder,
+                  url: photo.url,
+                  width: photo.width,
+                }));
+
+                uploadedPhotos = await Promise.all(
+                  photoRecords.map((record) => BobbleheadsFacade.addPhotoAsync(record, ctx.db)),
+                );
+              } catch (fallbackError) {
+                console.error('Fallback photo save also failed:', fallbackError);
+                Sentry.captureException(fallbackError);
+              }
             }
           }
         }
-      }
 
-      // process tags if provided
-      let updatedTags: Array<unknown> = [];
-      if (tags && tags.length > 0) {
-        try {
-          // remove existing tags and add new ones
-          await TagsFacade.removeAllFromBobblehead(updatedBobblehead.id, userId);
+        // process tags if provided
+        let updatedTags: Array<unknown> = [];
+        if (tags && tags.length > 0) {
+          try {
+            // remove existing tags and add new ones
+            await TagsFacade.removeAllFromBobblehead(updatedBobblehead.id, userId);
 
-          // create or get existing tags for the user
-          const tagPromises = tags.map(async (tagName) => {
-            const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
-            return existingTag;
-          });
+            // create or get existing tags for the user
+            const tagPromises = tags.map(async (tagName) => {
+              const existingTag = await TagsFacade.getOrCreateByName(tagName, userId, ctx.db);
+              return existingTag;
+            });
 
-          const tagRecords = await Promise.all(tagPromises);
-          const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
+            const tagRecords = await Promise.all(tagPromises);
+            const tagIds = tagRecords.filter(Boolean).map((tag) => tag!.id);
 
-          // attach tags to the bobblehead
-          if (tagIds.length > 0) {
-            await TagsFacade.attachToBobblehead(updatedBobblehead.id, tagIds, userId, ctx.db);
-            updatedTags = tagRecords.filter(Boolean);
+            // attach tags to the bobblehead
+            if (tagIds.length > 0) {
+              await TagsFacade.attachToBobblehead(updatedBobblehead.id, tagIds, userId, ctx.db);
+              updatedTags = tagRecords.filter(Boolean);
+            }
+          } catch (tagError) {
+            // if tag processing fails, we still want to keep the update
+            console.error('Tag processing failed:', tagError);
+            Sentry.captureException(tagError);
           }
-        } catch (tagError) {
-          // if tag processing fails, we still want to keep the update
-          console.error('Tag processing failed:', tagError);
-          Sentry.captureException(tagError);
         }
-      }
 
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          bobblehead: updatedBobblehead,
-          photosCount: uploadedPhotos.length,
-          tagsCount: updatedTags.length,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos and ${updatedTags.length} tags`,
-      });
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            bobblehead: updatedBobblehead,
+            photosCount: uploadedPhotos.length,
+            tagsCount: updatedTags.length,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Updated bobblehead: ${updatedBobblehead.name} with ${uploadedPhotos.length} photos and ${updatedTags.length} tags`,
+        });
 
-      // invalidate metadata cache for the updated bobblehead
-      invalidateMetadataCache('bobblehead', updatedBobblehead.id);
+        // invalidate metadata cache for the updated bobblehead
+        invalidateMetadataCache('bobblehead', updatedBobblehead.id);
 
-      CacheRevalidationService.bobbleheads.onUpdate(
-        updatedBobblehead.id,
-        userId,
-        updatedBobblehead.collectionId,
-        updatedBobblehead.slug,
-      );
+        CacheRevalidationService.bobbleheads.onUpdate(
+          updatedBobblehead.id,
+          userId,
+          updatedBobblehead.collectionId,
+          updatedBobblehead.slug,
+        );
 
-      return {
-        data: {
+        return actionSuccess({
           bobblehead: updatedBobblehead,
           photos: uploadedPhotos,
           tags: updatedTags,
-        },
-        success: true,
-      };
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE },
-        operation: OPERATIONS.BOBBLEHEADS.UPDATE,
-        userId,
-      });
-    }
-  });
+        });
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: { actionName: ACTION_NAMES.BOBBLEHEADS.UPDATE },
+          operation: OPERATIONS.BOBBLEHEADS.UPDATE,
+          userId,
+        });
+      }
+    },
+  );
 
 const getBobbleheadPhotosSchema = z.object({
   bobbleheadId: z.string(),
@@ -499,17 +516,14 @@ export const getBobbleheadPhotosAction = publicActionClient
     actionName: ACTION_NAMES.BOBBLEHEADS.GET_PHOTOS_BY_BOBBLEHEAD,
   })
   .inputSchema(getBobbleheadPhotosSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<Array<unknown>>> => {
     const { bobbleheadId } = getBobbleheadPhotosSchema.parse(ctx.sanitizedInput);
     const userId = (await getUserIdAsync()) ?? undefined;
 
     try {
       const photos = await BobbleheadsFacade.getBobbleheadPhotos(bobbleheadId, userId ?? undefined, ctx.db);
 
-      return {
-        data: photos,
-        success: true,
-      };
+      return actionSuccess(photos);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -526,7 +540,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteBobbleheadPhotoSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<unknown>> => {
     const photoData = deleteBobbleheadPhotoSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
@@ -632,10 +646,7 @@ export const deleteBobbleheadPhotoAction = authActionClient
 
       CacheRevalidationService.bobbleheads.onPhotoChange(photoData.bobbleheadId, userId, 'delete');
 
-      return {
-        data: deletedPhoto,
-        success: true,
-      };
+      return actionSuccess(deletedPhoto);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -658,7 +669,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
     ),
   )
   .inputSchema(reorderBobbleheadPhotosSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<Array<unknown>>> => {
     const reorderData = reorderBobbleheadPhotosSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
@@ -696,10 +707,7 @@ export const reorderBobbleheadPhotosAction = authActionClient
 
       CacheRevalidationService.bobbleheads.onPhotoChange(reorderData.bobbleheadId, userId, 'reorder');
 
-      return {
-        data: updatedPhotos,
-        success: true,
-      };
+      return actionSuccess(updatedPhotos);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -722,7 +730,7 @@ export const updateBobbleheadPhotoMetadataAction = authActionClient
     ),
   )
   .inputSchema(updateBobbleheadPhotoMetadataSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<unknown>> => {
     const metadataData = updateBobbleheadPhotoMetadataSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
@@ -760,10 +768,7 @@ export const updateBobbleheadPhotoMetadataAction = authActionClient
 
       CacheRevalidationService.bobbleheads.onPhotoChange(metadataData.bobbleheadId, userId, 'update');
 
-      return {
-        data: updatedPhoto,
-        success: true,
-      };
+      return actionSuccess(updatedPhoto);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,

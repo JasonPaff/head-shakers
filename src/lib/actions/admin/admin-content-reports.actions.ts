@@ -3,6 +3,9 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
+import type { ReportsStatsResult } from '@/lib/queries/content-reports/content-reports.query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -14,12 +17,15 @@ import {
 } from '@/lib/constants';
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
   adminBulkUpdateReportsSchema,
   adminReportsFilterSchema,
   adminUpdateReportSchema,
+  type SelectContentReport,
+  type SelectContentReportWithSlugs,
 } from '@/lib/validations/moderation.validation';
 
 const BULK_OPERATION_LIMITS = {
@@ -35,53 +41,57 @@ export const getAdminReportsAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(adminReportsFilterSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { isAdmin, isModerator, userId } = ctx;
-    const input = adminReportsFilterSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<
+      ActionResponse<{ reports: Array<SelectContentReportWithSlugs>; stats: ReportsStatsResult }>
+    > => {
+      const { isAdmin, isModerator, userId } = ctx;
+      const input = adminReportsFilterSchema.parse(ctx.sanitizedInput);
+      const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.CONTENT_REPORT, {
-      isAdmin,
-      isModerator,
-      operation: 'get_admin_reports',
-      userId,
-    });
-
-    try {
-      const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
-        input,
+      Sentry.setContext(SENTRY_CONTEXTS.CONTENT_REPORT, {
+        isAdmin,
+        isModerator,
+        operation: 'get_admin_reports',
         userId,
-        dbInstance,
-      );
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          reportCount: reports.length,
-          statsTotal: stats.total,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Admin retrieved ${reports.length} reports`,
       });
 
-      return {
-        data: {
+      try {
+        const { reports, stats } = await ContentReportsFacade.getAllReportsWithSlugsForAdminAsync(
+          input,
+          userId,
+          dbInstance,
+        );
+
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            reportCount: reports.length,
+            statsTotal: stats.total,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Admin retrieved ${reports.length} reports`,
+        });
+
+        return actionSuccess({
           reports,
           stats,
-        },
-        success: true,
-      };
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.ADMIN.GET_ADMIN_REPORTS,
-          userId,
-        },
-        operation: OPERATIONS.ADMIN.GET_ADMIN_REPORTS,
-      });
-    }
-  });
+        });
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: {
+            actionName: ACTION_NAMES.ADMIN.GET_ADMIN_REPORTS,
+            userId,
+          },
+          operation: OPERATIONS.ADMIN.GET_ADMIN_REPORTS,
+        });
+      }
+    },
+  );
 
 /**
  * Update individual report status (admin only)
@@ -92,7 +102,7 @@ export const updateReportStatusAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminUpdateReportSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<SelectContentReport>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { moderatorNotes, reportId, status } = adminUpdateReportSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
@@ -137,10 +147,7 @@ export const updateReportStatusAction = adminActionClient
         message: `Report status updated to ${status}`,
       });
 
-      return {
-        data: updatedReport,
-        success: true,
-      };
+      return actionSuccess(updatedReport);
     } catch (error) {
       // handle specific errors
       if (error instanceof Error && error.message.includes('Failed to update')) {
@@ -174,7 +181,7 @@ export const bulkUpdateReportsAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminBulkUpdateReportsSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<Array<SelectContentReport>>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { moderatorNotes, reportIds, status } = adminBulkUpdateReportsSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
@@ -242,10 +249,7 @@ export const bulkUpdateReportsAction = adminActionClient
         message: `Bulk updated ${updatedReports.length} reports to ${status}`,
       });
 
-      return {
-        data: updatedReports,
-        success: true,
-      };
+      return actionSuccess(updatedReports);
     } catch (error) {
       // handle specific bulk operation errors
       if (error instanceof Error && error.message.includes('more than 100')) {
@@ -278,7 +282,7 @@ export const getReportsStatsAction = adminActionClient
     actionName: ACTION_NAMES.ADMIN.GET_REPORTS_STATS,
     isTransactionRequired: false,
   })
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<ReportsStatsResult>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const dbInstance = ctx.db;
 
@@ -302,10 +306,7 @@ export const getReportsStatsAction = adminActionClient
         message: `Admin retrieved report statistics`,
       });
 
-      return {
-        data: stats,
-        success: true,
-      };
+      return actionSuccess(stats);
     } catch (error) {
       return handleActionError(error, {
         input: {},

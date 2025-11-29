@@ -4,6 +4,10 @@ import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
+import type { FeaturedContentRecord } from '@/lib/queries/featured-content/featured-content-query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+import type { SelectFeaturedContent } from '@/lib/validations/system.validation';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -16,6 +20,7 @@ import {
 import { FeaturedContentFacade } from '@/lib/facades/featured-content/featured-content.facade';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { adminActionClient, authActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -38,7 +43,7 @@ export const createFeaturedContentAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminCreateFeaturedContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<SelectFeaturedContent>> => {
     // ensure the user has admin privileges (moderators cannot create featured content)
     if (!ctx.isAdmin) {
       throw new ActionError(
@@ -85,12 +90,9 @@ export const createFeaturedContentAction = adminActionClient
 
       CacheRevalidationService.featured.onContentChange();
 
-      return {
-        data: newFeaturedContent,
-        success: true,
-      };
+      return actionSuccess(newFeaturedContent);
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.ADMIN.CREATE_FEATURED_CONTENT,
@@ -110,7 +112,7 @@ export const updateFeaturedContentAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminUpdateFeaturedContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<SelectFeaturedContent>> => {
     // ensure user has admin privileges
     if (!ctx.isAdmin) {
       throw new ActionError(
@@ -157,12 +159,9 @@ export const updateFeaturedContentAction = adminActionClient
 
       CacheRevalidationService.featured.onContentChange();
 
-      return {
-        data: updatedFeaturedContent,
-        success: true,
-      };
+      return actionSuccess(updatedFeaturedContent);
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.ADMIN.UPDATE_FEATURED_CONTENT,
@@ -182,7 +181,7 @@ export const toggleFeaturedContentActiveAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(toggleActiveSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<SelectFeaturedContent>> => {
     const { id, isActive } = toggleActiveSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -213,11 +212,10 @@ export const toggleFeaturedContentActiveAction = authActionClient
 
       CacheRevalidationService.featured.onContentChange();
 
-      return {
-        data: updatedFeaturedContent,
-        message: `Featured content ${isActive ? 'activated' : 'deactivated'} successfully`,
-        success: true,
-      };
+      return actionSuccess(
+        updatedFeaturedContent,
+        `Featured content ${isActive ? 'activated' : 'deactivated'} successfully`,
+      );
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -241,7 +239,7 @@ export const deleteFeaturedContentAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(deleteFeaturedContentSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<null>> => {
     const { id } = deleteFeaturedContentSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -272,11 +270,7 @@ export const deleteFeaturedContentAction = authActionClient
 
       CacheRevalidationService.featured.onContentChange();
 
-      return {
-        data: null,
-        message: 'Featured content deleted successfully',
-        success: true,
-      };
+      return actionSuccess(null, 'Featured content deleted successfully');
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -295,7 +289,7 @@ export const getFeaturedContentByIdAction = adminActionClient
     actionName: ACTION_NAMES.ADMIN.GET_FEATURED_CONTENT_BY_ID,
   })
   .inputSchema(adminGetFeaturedContentByIdSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<FeaturedContentRecord>> => {
     const featuredContentData = adminGetFeaturedContentByIdSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -318,12 +312,9 @@ export const getFeaturedContentByIdAction = adminActionClient
         );
       }
 
-      return {
-        data: featuredContent,
-        success: true,
-      };
+      return actionSuccess(featuredContent);
     } catch (error) {
-      handleActionError(error, {
+      return handleActionError(error, {
         input: parsedInput,
         metadata: {
           actionName: ACTION_NAMES.ADMIN.GET_FEATURED_CONTENT_BY_ID,

@@ -3,6 +3,8 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -16,9 +18,14 @@ import {
 import { ContentReportsFacade } from '@/lib/facades/content-reports/content-reports.facade';
 import { createRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient } from '@/lib/utils/next-safe-action';
-import { checkReportStatusSchema, createContentReportSchema } from '@/lib/validations/moderation.validation';
+import {
+  checkReportStatusSchema,
+  createContentReportSchema,
+  type SelectContentReport,
+} from '@/lib/validations/moderation.validation';
 
 // Apply hourly rate limiting (3 reports per hour)
 const rateLimitedAuthClient = authActionClient.use(
@@ -33,7 +40,7 @@ export const createContentReportAction = rateLimitedAuthClient
     isTransactionRequired: true,
   })
   .inputSchema(createContentReportSchema)
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ reportId: string; status: string }>> => {
     const reportData = createContentReportSchema.parse(ctx.sanitizedInput);
     const userId = ctx.userId;
 
@@ -61,14 +68,13 @@ export const createContentReportAction = rateLimitedAuthClient
         message: `Content report created for ${reportData.targetType} ${reportData.targetId}`,
       });
 
-      return {
-        data: {
+      return actionSuccess(
+        {
           reportId: newReport.id,
           status: newReport.status,
         },
-        message: 'Thank you for your report. We will review it shortly.',
-        success: true,
-      };
+        'Thank you for your report. We will review it shortly.',
+      );
     } catch (error) {
       // Handle specific facade errors
       if (error instanceof Error) {
@@ -126,30 +132,31 @@ export const checkReportStatusAction = authActionClient
     isTransactionRequired: false,
   })
   .inputSchema(checkReportStatusSchema)
-  .action(async ({ ctx }) => {
-    const statusInput = checkReportStatusSchema.parse(ctx.sanitizedInput);
-    const { targetId, targetType } = statusInput;
-    const userId = ctx.userId;
+  .action(
+    async ({
+      ctx,
+    }): Promise<ActionResponse<{ hasReported: boolean; report: null | SelectContentReport }>> => {
+      const statusInput = checkReportStatusSchema.parse(ctx.sanitizedInput);
+      const { targetId, targetType } = statusInput;
+      const userId = ctx.userId;
 
-    try {
-      const reportStatus = await ContentReportsFacade.getReportStatusAsync(
-        userId,
-        targetId,
-        targetType,
-        ctx.db,
-      );
+      try {
+        const reportStatus = await ContentReportsFacade.getReportStatusAsync(
+          userId,
+          targetId,
+          targetType,
+          ctx.db,
+        );
 
-      return {
-        data: reportStatus,
-        success: true,
-      };
-    } catch (error) {
-      return handleActionError(error, {
-        input: statusInput,
-        metadata: {
-          actionName: ACTION_NAMES.MODERATION.CHECK_REPORT_STATUS,
-        },
-        operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
-      });
-    }
-  });
+        return actionSuccess(reportStatus);
+      } catch (error) {
+        return handleActionError(error, {
+          input: statusInput,
+          metadata: {
+            actionName: ACTION_NAMES.MODERATION.CHECK_REPORT_STATUS,
+          },
+          operation: OPERATIONS.MODERATION.GET_REPORT_STATUS,
+        });
+      }
+    },
+  );

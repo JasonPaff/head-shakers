@@ -3,6 +3,9 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
+import type { UserRecord } from '@/lib/queries/users/users-query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -14,6 +17,7 @@ import {
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
 import { checkUsernameAvailabilitySchema, updateUsernameSchema } from '@/lib/validations/users.validation';
@@ -26,7 +30,7 @@ export const checkUsernameAvailabilityAction = publicActionClient
     actionName: ACTION_NAMES.USERS.CHECK_USERNAME_AVAILABILITY,
   })
   .inputSchema(checkUsernameAvailabilitySchema)
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ available: boolean }>> => {
     const { username } = checkUsernameAvailabilitySchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -47,9 +51,7 @@ export const checkUsernameAvailabilityAction = publicActionClient
         message: 'Username availability check completed',
       });
 
-      return {
-        available: isAvailable,
-      };
+      return actionSuccess({ available: isAvailable });
     } catch (error) {
       return handleActionError(error, {
         metadata: { username },
@@ -67,7 +69,7 @@ export const updateUsernameAction = authActionClient
     isTransactionRequired: true,
   })
   .inputSchema(updateUsernameSchema)
-  .action(async ({ ctx }) => {
+  .action(async ({ ctx }): Promise<ActionResponse<{ user: UserRecord }>> => {
     const { username } = updateUsernameSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
 
@@ -132,10 +134,7 @@ export const updateUsernameAction = authActionClient
       // invalidate metadata cache for the user (username affects metadata)
       invalidateMetadataCache('user', ctx.userId);
 
-      return {
-        success: true,
-        user: updatedUser,
-      };
+      return actionSuccess({ user: updatedUser });
     } catch (error) {
       return handleActionError(error, {
         metadata: { newUsername: username, userId: ctx.userId },

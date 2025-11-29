@@ -3,6 +3,9 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
+import type { AdminUserListRecord, UserRecord, UserStats } from '@/lib/queries/users/users-query';
+import type { ActionResponse } from '@/lib/utils/action-response';
+
 import {
   ACTION_NAMES,
   ERROR_CODES,
@@ -14,6 +17,7 @@ import {
 } from '@/lib/constants';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { handleActionError } from '@/lib/utils/action-error-handler';
+import { actionSuccess } from '@/lib/utils/action-response';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
 import { adminActionClient } from '@/lib/utils/next-safe-action';
 import {
@@ -33,58 +37,60 @@ export const getAdminUsersAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(adminUsersFilterSchema)
-  .action(async ({ ctx, parsedInput }) => {
-    const { isAdmin, isModerator, userId } = ctx;
-    const input = adminUsersFilterSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
+  .action(
+    async ({
+      ctx,
+      parsedInput,
+    }): Promise<ActionResponse<{ total: number; users: Array<AdminUserListRecord> }>> => {
+      const { isAdmin, isModerator, userId } = ctx;
+      const input = adminUsersFilterSchema.parse(ctx.sanitizedInput);
+      const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {
-      filters: {
-        limit: input.limit,
-        offset: input.offset,
-        role: input.role,
-        search: input.search ? '[REDACTED]' : undefined,
-        sortBy: input.sortBy,
-        sortOrder: input.sortOrder,
-        status: input.status,
-      },
-      isAdmin,
-      isModerator,
-      operation: 'get_admin_users',
-      userId,
-    });
-
-    try {
-      const { total, users } = await UsersFacade.getUsersForAdminAsync(input, dbInstance);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          totalUsers: total,
-          usersReturned: users.length,
+      Sentry.setContext(SENTRY_CONTEXTS.USER_DATA, {
+        filters: {
+          limit: input.limit,
+          offset: input.offset,
+          role: input.role,
+          search: input.search ? '[REDACTED]' : undefined,
+          sortBy: input.sortBy,
+          sortOrder: input.sortOrder,
+          status: input.status,
         },
-        level: SENTRY_LEVELS.INFO,
-        message: `Admin retrieved ${users.length} users`,
+        isAdmin,
+        isModerator,
+        operation: 'get_admin_users',
+        userId,
       });
 
-      return {
-        data: {
+      try {
+        const { total, users } = await UsersFacade.getUsersForAdminAsync(input, dbInstance);
+
+        Sentry.addBreadcrumb({
+          category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
+          data: {
+            totalUsers: total,
+            usersReturned: users.length,
+          },
+          level: SENTRY_LEVELS.INFO,
+          message: `Admin retrieved ${users.length} users`,
+        });
+
+        return actionSuccess({
           total,
           users,
-        },
-        success: true,
-      };
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.ADMIN_USERS.GET_USERS,
-          userId,
-        },
-        operation: OPERATIONS.ADMIN_USERS.GET_USERS,
-      });
-    }
-  });
+        });
+      } catch (error) {
+        return handleActionError(error, {
+          input: parsedInput,
+          metadata: {
+            actionName: ACTION_NAMES.ADMIN_USERS.GET_USERS,
+            userId,
+          },
+          operation: OPERATIONS.ADMIN_USERS.GET_USERS,
+        });
+      }
+    },
+  );
 
 /**
  * Get detailed user information for admin view
@@ -95,7 +101,7 @@ export const getUserDetailsAction = adminActionClient
     isTransactionRequired: false,
   })
   .inputSchema(adminUserDetailsSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<{ stats: UserStats; user: UserRecord; }>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { userId: targetUserId } = adminUserDetailsSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
@@ -131,10 +137,7 @@ export const getUserDetailsAction = adminActionClient
         message: `Admin retrieved user details`,
       });
 
-      return {
-        data: userDetails,
-        success: true,
-      };
+      return actionSuccess(userDetails);
     } catch (error) {
       return handleActionError(error, {
         input: parsedInput,
@@ -157,7 +160,7 @@ export const updateUserRoleAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminUpdateUserRoleSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<UserRecord>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { newRole, userId: targetUserId } = adminUpdateUserRoleSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
@@ -199,11 +202,7 @@ export const updateUserRoleAction = adminActionClient
         message: `User role updated to ${newRole}`,
       });
 
-      return {
-        data: updatedUser,
-        message: `User role updated to ${newRole}`,
-        success: true,
-      };
+      return actionSuccess(updatedUser, `User role updated to ${newRole}`);
     } catch (error) {
       // Handle specific business rule errors from facade
       if (error instanceof Error) {
@@ -251,7 +250,7 @@ export const lockUserAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminLockUserSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<UserRecord>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { lockDuration, reason, userId: targetUserId } = adminLockUserSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
@@ -282,12 +281,10 @@ export const lockUserAction = adminActionClient
         message: `User account locked`,
       });
 
-      return {
-        data: updatedUser,
-        message:
-          lockDuration ? `User account locked for ${lockDuration} hours` : 'User account locked indefinitely',
-        success: true,
-      };
+      return actionSuccess(
+        updatedUser,
+        lockDuration ? `User account locked for ${lockDuration} hours` : 'User account locked indefinitely',
+      );
     } catch (error) {
       // Handle specific business rule errors from facade
       if (error instanceof Error) {
@@ -345,7 +342,7 @@ export const unlockUserAction = adminActionClient
     isTransactionRequired: true,
   })
   .inputSchema(adminUnlockUserSchema)
-  .action(async ({ ctx, parsedInput }) => {
+  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<UserRecord>> => {
     const { isAdmin, isModerator, userId } = ctx;
     const { userId: targetUserId } = adminUnlockUserSchema.parse(ctx.sanitizedInput);
     const dbInstance = ctx.db;
@@ -372,11 +369,7 @@ export const unlockUserAction = adminActionClient
         message: `User account unlocked`,
       });
 
-      return {
-        data: updatedUser,
-        message: 'User account unlocked',
-        success: true,
-      };
+      return actionSuccess(updatedUser, 'User account unlocked');
     } catch (error) {
       // Handle specific errors from facade
       if (error instanceof Error && error.message.includes('User not found')) {
