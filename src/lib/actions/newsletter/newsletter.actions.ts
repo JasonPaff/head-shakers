@@ -4,8 +4,9 @@ import 'server-only';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
 
-import { ACTION_NAMES, OPERATIONS } from '@/lib/constants';
+import { ACTION_NAMES, CONFIG, OPERATIONS } from '@/lib/constants';
 import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
+import { createPublicRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { actionSuccess } from '@/lib/utils/action-response';
 import { actionFailure } from '@/lib/utils/action-response';
 import { maskEmail } from '@/lib/utils/email-utils';
@@ -18,7 +19,15 @@ import { getUserIdAsync } from '@/utils/auth-utils';
 
 type SubscribeToNewsLetterResponse = { isAlreadySubscribed: boolean; signupId: string | undefined };
 
-export const subscribeToNewsletterAction = publicActionClient
+const rateLimitedPublicClient = publicActionClient.use(
+  createPublicRateLimitMiddleware(
+    CONFIG.RATE_LIMITING.ACTION_SPECIFIC.NEWSLETTER_SUBSCRIBE.REQUESTS,
+    CONFIG.RATE_LIMITING.ACTION_SPECIFIC.NEWSLETTER_SUBSCRIBE.WINDOW,
+    ACTION_NAMES.NEWSLETTER.SUBSCRIBE,
+  ),
+);
+
+export const subscribeToNewsletterAction = rateLimitedPublicClient
   .metadata({
     actionName: ACTION_NAMES.NEWSLETTER.SUBSCRIBE,
     isTransactionRequired: true,

@@ -106,6 +106,7 @@ export const CONFIG = {
       COLLECTION_UPDATE: { REQUESTS: 60, WINDOW: 60 }, // 60 updates per minute
       COMMENT: { REQUESTS: 20, WINDOW: 300 }, // 20 comments per 5 minutes
       LIKE: { REQUESTS: 50, WINDOW: 300 }, // 50 likes per 5 minutes
+      NEWSLETTER_SUBSCRIBE: { REQUESTS: 3, WINDOW: 3600 }, // 3 subscribes per hour
       PHOTO_DELETE: { REQUESTS: 10, WINDOW: 60 }, // 10 photo deletes per minute
       PHOTO_REORDER: { REQUESTS: 20, WINDOW: 60 }, // 20 photo reorders per minute
       PHOTO_SET_PRIMARY: { REQUESTS: 10, WINDOW: 60 }, // 10 photo primary sets per minute

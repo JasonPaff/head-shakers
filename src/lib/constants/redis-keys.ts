@@ -24,6 +24,7 @@ export const REDIS_KEYS = {
   },
   RATE_LIMIT: (userId: string) => `rate_limit:${userId}`,
   RATE_LIMIT_ACTION: (userId: string, action: string) => `rate_limit:${userId}:${action}`,
+  RATE_LIMIT_IP: (ip: string, action: string) => `rate_limit:ip:${ip}:${action}`,
   REALTIME: {
     COLLECTION_VIEWERS: (collectionId: string) => `viewers:collection:${collectionId}`,
     NOTIFICATIONS: (userId: string) => `notifications:${userId}`,
