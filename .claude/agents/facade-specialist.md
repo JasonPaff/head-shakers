@@ -62,9 +62,30 @@ To load a skill, read its reference file from the `.claude/skills/{skill-name}/r
 - [ ] Use `CACHE_CONFIG.TTL` for TTL values (never hardcode)
 - [ ] Never use generic `CacheService.cached()` when domain helper exists
 
+### Facade Operation Helpers (RECOMMENDED)
+
+Use the facade operation helpers from `@/lib/utils/facade-helpers.ts`:
+
+- [ ] **Use `executeFacadeOperation()`** for operations needing breadcrumbs + error handling (recommended)
+- [ ] **Use `executeFacadeMethod()`** for simple queries where operation name = method name (no breadcrumbs)
+- [ ] **Use `executeFacadeOperationWithoutBreadcrumbs()`** for operations that only need error handling
+- [ ] **Use `includeFullResult`** helper when all result data should be in breadcrumbs
+- [ ] Alternatively, use `withFacadeBreadcrumbs()` for breadcrumb-only wrapping
+- [ ] Use `createFacadeError(errorContext, error)` for manual error handling (automatic with helpers)
+
+### Context Helper Methods (BaseContextHelpers)
+
+Facades extend `BaseFacade` which provides context creation helpers:
+
+- [ ] Use `this.viewerContext(viewerUserId, dbInstance)` for viewer-based access
+- [ ] Use `this.protectedContext(userId, dbInstance)` for owner-only operations
+- [ ] Use `this.publicContext(dbInstance)` for public access
+- [ ] Use `this.userContext(userId, dbInstance)` for authenticated user access
+- [ ] Use `this.ownerOrViewerContext(ownerId, viewerUserId, dbInstance)` for owner-or-viewer access
+
 ### Sentry Requirements (MANDATORY)
 
-- [ ] **Use `withFacadeBreadcrumbs()` wrapper** for automatic entry/success/error breadcrumbs (recommended)
+- [ ] **Use `executeFacadeOperation()` or `withFacadeBreadcrumbs()` wrapper** for automatic entry/success/error breadcrumbs
 - [ ] Alternatively, use `trackFacadeEntry()` + `trackFacadeSuccess()` for manual control
 - [ ] Use `trackFacadeWarning()` for non-critical failures that shouldn't fail the operation
 - [ ] Use `SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC` for facade operations (automatic with helpers)
@@ -101,12 +122,14 @@ Before completing, verify NONE of these exist:
 - [ ] ❌ Stub methods returning hardcoded values (e.g., `return Promise.resolve({})`)
 - [ ] ❌ Missing transactions on multi-step mutations
 - [ ] ❌ Missing cache invalidation after write operations
-- [ ] ❌ Missing Sentry breadcrumbs in facade methods (use `withFacadeBreadcrumbs` or tracking helpers)
+- [ ] ❌ Missing Sentry breadcrumbs in facade methods (use `executeFacadeOperation`, `withFacadeBreadcrumbs`, or tracking helpers)
 - [ ] ❌ Missing JSDoc on public methods
 - [ ] ❌ Silent failures (errors logged but not handled)
 - [ ] ❌ Generic `CacheService.cached()` when domain helper exists
 - [ ] ❌ Hardcoded Sentry strings instead of constants
 - [ ] ❌ Methods exceeding 60 lines without extracted helpers
+- [ ] ❌ Manual error handling when facade helpers could be used
+- [ ] ❌ Using `createPublicQueryContext()` directly instead of `this.publicContext()` helper
 
 ## File Patterns
 

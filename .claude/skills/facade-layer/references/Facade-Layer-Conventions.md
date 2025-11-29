@@ -515,6 +515,145 @@ static async getAggregateDataAsync(userId: string, dbInstance?: DatabaseExecutor
 }
 ```
 
+## Facade Operation Helpers
+
+The project provides facade operation helper utilities in `@/lib/utils/facade-helpers.ts` that combine breadcrumb tracking with error handling for consistent facade patterns.
+
+### Import
+
+```typescript
+import {
+  executeFacadeMethod,
+  executeFacadeOperation,
+  executeFacadeOperationWithoutBreadcrumbs,
+  includeFullResult,
+} from '@/lib/utils/facade-helpers';
+```
+
+### `executeFacadeOperation()` - Full Wrapper (Recommended)
+
+Executes a facade operation with **both** Sentry breadcrumbs AND error handling. This is the default helper for most facade operations:
+
+```typescript
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
+
+static async getPlatformStatsAsync(dbInstance?: DatabaseExecutor): Promise<PlatformStats> {
+  return executeFacadeOperation(
+    {
+      facade: facadeName,
+      method: 'getPlatformStatsAsync',
+      operation: OPERATIONS.PLATFORM.GET_STATS,
+    },
+    async () => {
+      return await CacheService.platform.stats(async () => {
+        const context = createPublicQueryContext({ dbInstance });
+        // ... fetch stats
+        return { totalBobbleheads, totalCollections, totalCollectors };
+      });
+    },
+    {
+      includeResultSummary: (stats) => ({
+        totalBobbleheads: stats.totalBobbleheads,
+        totalCollections: stats.totalCollections,
+      }),
+    },
+  );
+}
+```
+
+### `executeFacadeMethod()` - Simplified Wrapper
+
+Simplified version when the operation name matches the method name. Does NOT include Sentry breadcrumbs - use for simple operations:
+
+```typescript
+import { executeFacadeMethod } from '@/lib/utils/facade-helpers';
+
+static async getBobbleheadBySlugAsync(
+  slug: string,
+  viewerUserId?: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<BobbleheadRecord | null> {
+  return executeFacadeMethod(
+    facadeName,
+    'getBobbleheadBySlugAsync',
+    async () => {
+      const context = viewerUserId
+        ? createUserQueryContext(viewerUserId, { dbInstance })
+        : createPublicQueryContext({ dbInstance });
+      return BobbleheadsQuery.findBySlugAsync(slug, context);
+    },
+    { userId: viewerUserId, data: { slug } },
+  );
+}
+```
+
+### `executeFacadeOperationWithoutBreadcrumbs()` - Error Handling Only
+
+Wraps operation with error handling but skips breadcrumbs. Use for simple operations that don't need Sentry tracking:
+
+```typescript
+import { executeFacadeOperationWithoutBreadcrumbs } from '@/lib/utils/facade-helpers';
+
+static async simpleQueryAsync(
+  id: string,
+  dbInstance?: DatabaseExecutor,
+): Promise<EntityRecord | null> {
+  return executeFacadeOperationWithoutBreadcrumbs(
+    {
+      facade: facadeName,
+      method: 'simpleQueryAsync',
+      operation: 'simpleQuery',
+      data: { id },
+    },
+    async () => {
+      const context = createPublicQueryContext({ dbInstance });
+      return EntityQuery.findByIdAsync(id, context);
+    },
+  );
+}
+```
+
+### `includeFullResult()` - Result Summarizer Helper
+
+Helper for `includeResultSummary` that spreads the entire result into breadcrumb data:
+
+```typescript
+import { executeFacadeOperation, includeFullResult } from '@/lib/utils/facade-helpers';
+
+// Include all result fields in breadcrumb
+return executeFacadeOperation(
+  { facade: facadeName, method: 'getDataAsync', operation: 'getData' },
+  async () => fetchData(),
+  { includeResultSummary: includeFullResult },  // Spreads entire result
+);
+```
+
+### When to Use Each Helper
+
+| Scenario | Helper | Breadcrumbs | Error Handling |
+|----------|--------|-------------|----------------|
+| Complex operations needing full observability | `executeFacadeOperation` | ✓ | ✓ |
+| Simple queries (operation name = method name) | `executeFacadeMethod` | ✗ | ✓ |
+| Operations without breadcrumb needs | `executeFacadeOperationWithoutBreadcrumbs` | ✗ | ✓ |
+| Manual control needed | `withFacadeBreadcrumbs` (from sentry-server) | ✓ | ✗ |
+
+### FacadeOperationConfig Interface
+
+```typescript
+interface FacadeOperationConfig {
+  /** Name of the facade class */
+  facade: string;
+  /** Method name being executed */
+  method: string;
+  /** Operation identifier (from OPERATIONS constants) */
+  operation: string;
+  /** User ID if available */
+  userId?: string;
+  /** Additional data for error context (sanitized for logging) */
+  data?: Record<string, unknown>;
+}
+```
+
 ## Sentry Integration
 
 ### Using Helper Utilities (Recommended)

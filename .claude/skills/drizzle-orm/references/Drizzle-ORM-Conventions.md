@@ -155,7 +155,69 @@ interface QueryContext {
 }
 ```
 
+### BaseContextHelpers Abstract Base Class
+
+Both `BaseQuery` and `BaseFacade` extend `BaseContextHelpers`, which provides convenient context creation methods. These are **protected static methods** available within queries and facades:
+
+```typescript
+// src/lib/queries/base/base-context-helpers.ts
+export abstract class BaseContextHelpers {
+  /** Create a QueryContext for admin access */
+  protected static adminContext(adminUserId: string, dbInstance?: DatabaseExecutor): QueryContext;
+
+  /** Create a QueryContext for protected/owner-only operations */
+  protected static protectedContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext;
+
+  /** Create a QueryContext for public access only */
+  protected static publicContext(dbInstance?: DatabaseExecutor): QueryContext;
+
+  /** Create a QueryContext for authenticated user access */
+  protected static userContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext;
+
+  /** Create a QueryContext for viewer-based access (user if logged in, else public) */
+  protected static viewerContext(viewerUserId: string | undefined, dbInstance?: DatabaseExecutor): QueryContext;
+
+  /** Create owner-or-viewer context (protected if viewer is owner, else viewer context) */
+  protected static ownerOrViewerContext(ownerId: string, viewerUserId: string | undefined, dbInstance?: DatabaseExecutor): QueryContext;
+}
+```
+
+#### Using Context Helpers in Queries/Facades
+
+```typescript
+// Inside a Query or Facade class
+static async findByIdAsync(id: string, viewerUserId?: string, dbInstance?: DatabaseExecutor) {
+  // Use the helper instead of calling factory functions directly
+  const context = this.viewerContext(viewerUserId, dbInstance);
+  return await this.executeQuery(context);
+}
+
+static async updateAsync(id: string, userId: string, dbInstance?: DatabaseExecutor) {
+  // Owner-only operations use protectedContext
+  const context = this.protectedContext(userId, dbInstance);
+  return await this.executeUpdate(context);
+}
+
+static async getPublicDataAsync(dbInstance?: DatabaseExecutor) {
+  // Public operations
+  const context = this.publicContext(dbInstance);
+  return await this.executeQuery(context);
+}
+
+static async getDataForOwnerOrViewerAsync(
+  ownerId: string,
+  viewerUserId?: string,
+  dbInstance?: DatabaseExecutor
+) {
+  // Returns protected context if viewer is owner, otherwise viewer context
+  const context = this.ownerOrViewerContext(ownerId, viewerUserId, dbInstance);
+  return await this.executeQuery(context);
+}
+```
+
 ### Context Factory Functions
+
+For direct use outside of Query/Facade classes:
 
 ```typescript
 import {

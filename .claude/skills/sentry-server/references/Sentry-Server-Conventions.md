@@ -790,3 +790,27 @@ interface WithActionBreadcrumbsOptions<T> {
 4. **Result Summarization** - Extract relevant data from operation results
 5. **Non-Throwing Cache Tracking** - `trackCacheInvalidation` handles failures gracefully
 6. **Integrated Error Handling** - `withActionErrorHandling` combines breadcrumbs with error handling
+
+## Facade Operation Helpers (Related)
+
+For facade operations that need **both** breadcrumbs AND error handling combined, see the facade helpers in `@/lib/utils/facade-helpers.ts`:
+
+| Helper | Breadcrumbs | Error Handling | Use Case |
+|--------|-------------|----------------|----------|
+| `executeFacadeOperation()` | ✓ | ✓ | Full wrapper for complex facade operations |
+| `executeFacadeMethod()` | ✗ | ✓ | Simplified wrapper when operation name = method name |
+| `executeFacadeOperationWithoutBreadcrumbs()` | ✗ | ✓ | Error handling only |
+| `includeFullResult` | - | - | Helper to spread entire result into breadcrumbs |
+
+```typescript
+import { executeFacadeOperation, includeFullResult } from '@/lib/utils/facade-helpers';
+
+// Full breadcrumbs + error handling
+return executeFacadeOperation(
+  { facade: facadeName, method: 'getStatsAsync', operation: OPERATIONS.PLATFORM.GET_STATS },
+  async () => fetchStats(),
+  { includeResultSummary: includeFullResult },
+);
+```
+
+See the **facade-layer** skill for complete documentation on these helpers.
