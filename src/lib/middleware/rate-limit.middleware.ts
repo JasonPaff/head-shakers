@@ -24,6 +24,9 @@ export const createRateLimitMiddleware = (
     ctx: ActionContext;
     metadata: ActionMetadata;
   }>().define(async ({ ctx, metadata, next }) => {
+    // Skip rate limiting if disabled (e.g., for E2E tests)
+    if (process.env.DISABLE_RATE_LIMITING === 'true') return next();
+
     const key =
       keyGenerator ? keyGenerator(ctx) : REDIS_KEYS.RATE_LIMIT_ACTION(ctx.userId, metadata.actionName);
 
@@ -97,6 +100,9 @@ export const createPublicRateLimitMiddleware = (
     ctx: PublicContext;
     metadata: ActionMetadata;
   }>().define(async ({ metadata, next }) => {
+    // Skip rate limiting if disabled (e.g., for E2E tests)
+    if (process.env.DISABLE_RATE_LIMITING === 'true') return next();
+
     // Get IP from headers (x-forwarded-for for proxied requests, x-real-ip as fallback)
     const headersList = await headers();
     const forwardedFor = headersList.get('x-forwarded-for');
