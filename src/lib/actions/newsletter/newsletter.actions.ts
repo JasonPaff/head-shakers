@@ -43,7 +43,7 @@ export const subscribeToNewsletterAction = publicActionClient
       async () => {
         const result = await NewsletterFacade.subscribeAsync(input.email, userId ?? undefined, ctx.db);
 
-        if (!result.isSuccessful) {
+        if (result.isSuccessful) {
           actionBreadcrumb(
             'Newsletter signup failed',
             {
@@ -54,7 +54,7 @@ export const subscribeToNewsletterAction = publicActionClient
             'warning',
           );
 
-          return actionFailure(result.error || 'Unable to process your subscription. Please try again.');
+          return actionFailure('Unable to process your subscription. Please try again.');
         }
 
         // Same message for both new and existing subscribers (privacy - prevents email enumeration)

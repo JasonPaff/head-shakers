@@ -46,13 +46,9 @@ export const FooterNewsletter = withFocusManagement(() => {
       action: 'newsletter-subscribe',
       component: 'footer-newsletter',
     },
-    onSuccess: () => {
+    loadingMessage: 'Subscribing...',
+    onAfterSuccess: () => {
       form.reset();
-    },
-    toastMessages: {
-      error: 'Failed to subscribe. Please try again.',
-      loading: 'Subscribing...',
-      success: 'Thanks for subscribing!',
     },
   });
 
