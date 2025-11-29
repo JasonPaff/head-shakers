@@ -4,8 +4,7 @@ import type { FormEvent } from 'react';
 
 import { revalidateLogic } from '@tanstack/form-core';
 import { MailCheckIcon, MailIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useCallback, useRef } from 'react';
+import { useCallback } from 'react';
 
 import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
@@ -15,11 +14,6 @@ import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter
 import { generateTestId } from '@/lib/test-ids';
 import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.validation';
 
-type OptimisticState = {
-  email: string;
-  isSubscribed: boolean;
-};
-
 /**
  * Newsletter subscription form component for the footer
  * Compact design with inline email input and submit button
@@ -27,20 +21,17 @@ type OptimisticState = {
  */
 export const FooterNewsletterSubscribe = withFocusManagement(() => {
   const { focusFirstError } = useFocusContext();
-  const router = useRouter();
-  const emailRef = useRef('');
 
   const { execute, isPending, optimisticState } = useOptimisticServerAction(subscribeToNewsletterAction, {
     breadcrumbContext: {
       action: 'newsletter-subscribe',
       component: 'footer-newsletter-subscribe',
     },
-    currentState: { email: '', isSubscribed: false } satisfies OptimisticState,
+    currentState: { email: '', isSubscribed: false },
     onAfterSuccess: () => {
       form.reset();
-      router.refresh();
     },
-    onUpdate: () => ({ email: emailRef.current, isSubscribed: true }),
+    onUpdate: ({ email }) => ({ email, isSubscribed: true }),
   });
 
   const form = useAppForm({
@@ -49,7 +40,6 @@ export const FooterNewsletterSubscribe = withFocusManagement(() => {
       email: '',
     },
     onSubmit: ({ value }) => {
-      emailRef.current = value.email;
       execute(value);
     },
     onSubmitInvalid: ({ formApi }) => {

@@ -3,7 +3,6 @@
 import type { ComponentProps } from 'react';
 
 import { MailCheckIcon, MailIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -31,8 +30,6 @@ type OptimisticState = {
  */
 export const FooterNewsletterUnsubscribe = withFocusManagement(
   ({ className, isActiveSubscriber, testId, userEmail, ...props }: FooterNewsletterUnsubscribeProps) => {
-    const router = useRouter();
-
     const { execute, isPending, optimisticState } = useOptimisticServerAction(
       unsubscribeFromNewsletterAction,
       {
@@ -41,9 +38,6 @@ export const FooterNewsletterUnsubscribe = withFocusManagement(
           component: 'footer-newsletter-unsubscribe',
         },
         currentState: { isSubscribed: isActiveSubscriber } satisfies OptimisticState,
-        onAfterSuccess: () => {
-          router.refresh();
-        },
         onUpdate: () => ({ isSubscribed: false }),
       },
     );
