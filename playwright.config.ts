@@ -97,6 +97,16 @@ export default defineConfig({
         storageState: { cookies: [], origins: [] },
       },
     },
+    {
+      name: 'feature-tests',
+      testDir: './tests/e2e/specs/feature',
+      // Feature tests may use custom fixtures for different auth states
+      dependencies: ['auth-setup'],
+      use: {
+        // No default storage state - tests use custom fixtures (page, userPage, adminPage, newUserPage)
+        storageState: { cookies: [], origins: [] },
+      },
+    },
   ],
 
   webServer: {
