@@ -1,54 +1,71 @@
 import type { Metadata } from 'next';
 
+import { ChartSplineIcon, MailIcon, SparklesIcon, TriangleAlertIcon, UsersIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
+
 import { AdminLayout } from '@/components/layout/admin/admin-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+const adminSections = [
+  {
+    description: 'Manage homepage featured collections and bobbleheads',
+    href: $path({ route: '/admin/featured-content' }),
+    icon: SparklesIcon,
+    title: 'Featured Content',
+  },
+  {
+    description: 'View platform usage and engagement metrics',
+    href: $path({ route: '/admin/analytics' }),
+    icon: ChartSplineIcon,
+    title: 'Analytics',
+  },
+  {
+    description: 'Manage pre-launch email signups',
+    href: $path({ route: '/admin/launch-notifications' }),
+    icon: MailIcon,
+    title: 'Launch Notifications',
+  },
+  {
+    description: 'Review content reports and moderation queue',
+    href: $path({ route: '/admin/reports' }),
+    icon: TriangleAlertIcon,
+    title: 'Reports',
+  },
+  {
+    description: 'Manage users, roles, and permissions',
+    href: $path({ route: '/admin/users' }),
+    icon: UsersIcon,
+    title: 'Users',
+  },
+];
 
 export default function AdminPage() {
   return (
     <AdminLayout isAdminRequired={false}>
       <div className={'grid gap-6 md:grid-cols-2 lg:grid-cols-3'}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Featured Content</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className={'text-sm text-muted-foreground'}>
-              Manage featured collections and bobbleheads displayed on the homepage
-            </p>
-            <div className={'mt-4'}>
-              <p className={'text-2xl font-bold'}>12</p>
-              <p className={'text-xs text-muted-foreground'}>Active Features</p>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Admin Navigation Cards */}
+        {adminSections.map((section) => {
+          const Icon = section.icon;
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Content Reports</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className={'text-sm text-muted-foreground'}>
-              Review and moderate reported content from the community
-            </p>
-            <div className={'mt-4'}>
-              <p className={'text-2xl font-bold'}>3</p>
-              <p className={'text-xs text-muted-foreground'}>Pending Reports</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>User Management</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className={'text-sm text-muted-foreground'}>Manage user accounts and community moderation</p>
-            <div className={'mt-4'}>
-              <p className={'text-2xl font-bold'}>1,234</p>
-              <p className={'text-xs text-muted-foreground'}>Total Users</p>
-            </div>
-          </CardContent>
-        </Card>
+          return (
+            <Link href={section.href} key={section.href}>
+              <Card
+                className={'h-full cursor-pointer transition-all hover:border-primary hover:shadow-md'}
+                data-slot={'admin-nav-card'}
+              >
+                <CardHeader>
+                  <div className={'flex items-center gap-3'}>
+                    <Icon aria-hidden className={'size-5 text-primary'} />
+                    <CardTitle>{section.title}</CardTitle>
+                  </div>
+                  <CardDescription>{section.description}</CardDescription>
+                </CardHeader>
+                <CardContent />
+              </Card>
+            </Link>
+          );
+        })}
       </div>
     </AdminLayout>
   );
