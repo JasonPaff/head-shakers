@@ -72,10 +72,12 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
         {
           error: (error) => {
             options?.onBeforeError?.();
+
             // Track action error
             if (breadcrumbContext) {
               trackServerAction(breadcrumbContext.action, 'error', breadcrumbContext.component);
             }
+
             const message =
               typeof options?.toastMessages?.error === 'function' ?
                 options.toastMessages.error(error)
@@ -83,6 +85,7 @@ export const useServerAction = <ServerError, S extends StandardSchemaV1 | undefi
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 (error?.serverError as string) ||
                 'Unexpected error, please try again.';
+
             options?.onAfterError?.();
             return message;
           },
