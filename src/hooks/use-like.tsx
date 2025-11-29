@@ -62,13 +62,11 @@ export const useLike = ({
       const isNewLiked = !currentState.isLiked;
       const newLikeCount = isNewLiked ? currentState.likeCount + 1 : Math.max(0, currentState.likeCount - 1);
 
-      const newState = {
+      return {
         isLiked: isNewLiked,
         likeCount: newLikeCount,
         likeId: currentState.likeId,
       };
-
-      return newState;
     },
   });
 
