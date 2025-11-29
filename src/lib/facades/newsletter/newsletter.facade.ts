@@ -205,14 +205,12 @@ export class NewsletterFacade extends BaseFacade {
         const normalizedEmail = normalizeEmail(email);
         const context = this.publicContext(dbInstance);
 
-        // Attempt to unsubscribe the email
         const result = await NewsletterQuery.unsubscribeAsync(normalizedEmail, context);
 
-        // Invalidate cache after unsubscription (even if email doesn't exist for privacy)
         CacheRevalidationService.newsletter.onSubscriptionChange(normalizedEmail, 'unsubscribe');
 
         // Privacy-preserving: Return success even if email doesn't exist
-        // This prevents attackers from using the unsubscribe endpoint to enumerate emails
+        // This prevents attackers from using the unsubscribed endpoint to list emails
         return {
           isAlreadySubscribed: false,
           isSuccessful: true,
