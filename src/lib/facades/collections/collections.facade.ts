@@ -1,5 +1,7 @@
 import * as Sentry from '@sentry/nextjs';
 import { eq } from 'drizzle-orm';
+import { $path } from 'next-typesafe-url';
+import { revalidatePath } from 'next/cache';
 
 import type { FindOptions } from '@/lib/queries/base/query-context';
 import type {
@@ -33,6 +35,8 @@ import {
   createUserQueryContext,
 } from '@/lib/queries/base/query-context';
 import { CollectionsQuery } from '@/lib/queries/collections/collections.query';
+import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
+import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
@@ -549,15 +553,27 @@ export class CollectionsFacade extends BaseFacade {
         const baseSlug = generateSlug(collection.name);
         const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
 
-        return await CollectionsQuery.createAsync({ ...collection, slug: uniqueSlug }, userId, context);
+        const newCollection = await CollectionsQuery.createAsync(
+          { ...collection, slug: uniqueSlug },
+          userId,
+          context,
+        );
+
+        if (newCollection) {
+          invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, newCollection.id);
+          revalidatePath($path({ route: '/dashboard/collection' }));
+          CacheRevalidationService.collections.onCreate(newCollection.id, userId, newCollection.slug);
+        }
+
+        return newCollection;
       },
     );
   }
 
-  static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {
+  static async deleteAsync(collection: DeleteCollection, userId: string, dbInstance: DatabaseExecutor = db) {
     try {
       const context = createUserQueryContext(userId, { dbInstance });
-      const deletedCollection = await CollectionsQuery.deleteAsync(data, userId, context);
+      const deletedCollection = await CollectionsQuery.deleteAsync(collection, userId, context);
 
       // cleanup cover photo from Cloudinary if it exists
       if (deletedCollection?.coverImageUrl) {
@@ -572,11 +588,17 @@ export class CollectionsFacade extends BaseFacade {
         }
       }
 
+      if (deletedCollection) {
+        invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, deletedCollection.id);
+        revalidatePath($path({ route: '/dashboard/collection' }));
+        CacheRevalidationService.collections.onDelete(deletedCollection.id, userId);
+      }
+
       return deletedCollection;
     } catch (error) {
       const context: FacadeErrorContext = {
-        data: { collectionId: data.collectionId },
-        facade: 'CollectionsFacade',
+        data: { collectionId: collection.collectionId },
+        facade: facadeName,
         method: 'deleteAsync',
         operation: 'delete',
         userId,
@@ -656,12 +678,12 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async getById(
+  static async getByIdAsync(
     collectionId: string,
     viewerUserId?: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<CollectionRecord | null> {
-    return executeFacadeOperation(
+    return await executeFacadeOperation(
       {
         data: { collectionId, viewerUserId },
         facade: facadeName,
@@ -1197,12 +1219,18 @@ export class CollectionsFacade extends BaseFacade {
           .where(eq(collections.userId, userId))
           .then((results) => results.map((r) => r.slug).filter((slug) => slug !== data.collectionId));
 
-        // ensure new slug is unique within user's collections
-        const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-        updateData.slug = uniqueSlug;
+        updateData.slug = ensureUniqueSlug(baseSlug, existingSlugs);
       }
 
-      return await CollectionsQuery.updateAsync(updateData, userId, context);
+      const updatedCollection = await CollectionsQuery.updateAsync(updateData, userId, context);
+
+      if (updatedCollection) {
+        invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, updatedCollection.id);
+        revalidatePath($path({ route: '/dashboard/collection' }));
+        CacheRevalidationService.collections.onUpdate(updatedCollection.id, userId);
+      }
+
+      return updatedCollection;
     } catch (error) {
       const context: FacadeErrorContext = {
         data: { collectionId: data.collectionId },

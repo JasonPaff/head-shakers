@@ -3,7 +3,7 @@
 import { useAuth } from '@clerk/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
 import { useStore } from '@tanstack/react-form';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
@@ -40,8 +40,6 @@ interface CollectionCreateDialogProps extends ComponentTestIdProps {
 export const CollectionCreateDialog = withFocusManagement(
   ({ isOpen, onClose, onCollectionCreated, testId }: CollectionCreateDialogProps) => {
     const [coverImageUrl, setCoverImageUrl] = useState<string>();
-
-    const nameRef = useRef<HTMLInputElement>(null);
 
     const { focusFirstError } = useFocusContext();
     const { userId } = useAuth();
@@ -148,7 +146,6 @@ export const CollectionCreateDialog = withFocusManagement(
                 <form.AppField name={'name'}>
                   {(field) => (
                     <field.TextField
-                      focusRef={nameRef}
                       isRequired
                       label={'Name'}
                       placeholder={'Enter collection name'}

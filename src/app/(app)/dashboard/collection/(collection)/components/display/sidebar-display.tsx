@@ -1,6 +1,5 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
@@ -51,7 +50,6 @@ export const SidebarDisplay = ({
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
   const { setPreference } = useUserPreferences();
-  const router = useRouter();
 
   const setCardStyle = useCallback(
     (newStyle: CollectionCardStyle) => {
@@ -78,7 +76,6 @@ export const SidebarDisplay = ({
 
   const handleCollectionCreated = (newCollection: ComboboxItem) => {
     setSelectedCollectionId(newCollection.id);
-    router.refresh();
   };
 
   const handleCollectionSelect = (id: string) => {

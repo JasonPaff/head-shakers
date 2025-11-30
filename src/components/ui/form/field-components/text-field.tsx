@@ -2,9 +2,9 @@
 
 import type { ComponentProps } from 'react';
 
+import { useRef } from 'react';
 import { useId } from 'react';
 
-import type { FocusRef } from '@/components/ui/form/types';
 import type { InputProps } from '@/components/ui/input';
 
 import { useFieldContext } from '@/components/ui/form';
@@ -19,7 +19,6 @@ import { generateFormFieldTestId } from '@/lib/test-ids';
 type TextFieldProps = InputProps & {
   description?: string;
   fieldErrorProps?: ComponentProps<typeof FieldError>;
-  focusRef?: FocusRef;
   isRequired?: boolean;
   label: string;
   labelClassName?: string;
@@ -28,7 +27,6 @@ type TextFieldProps = InputProps & {
 export const TextField = ({
   description,
   fieldErrorProps,
-  focusRef,
   isRequired,
   label,
   labelClassName,
@@ -37,6 +35,8 @@ export const TextField = ({
 }: TextFieldProps) => {
   const field = useFieldContext<string>();
   const id = useId();
+
+  const focusRef = useRef<HTMLInputElement>(null);
 
   const fieldName = field.name || 'text-field';
   const inputTestId = testId || generateFormFieldTestId(fieldName);

@@ -3,7 +3,7 @@
 import { useAuth } from '@clerk/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
 import { useStore } from '@tanstack/react-form';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
@@ -23,7 +23,6 @@ import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { Label } from '@/components/ui/label';
-import { useDialogTracking } from '@/hooks/use-dialog-tracking';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { CloudinaryPathBuilder } from '@/lib/constants/cloudinary-paths';
@@ -50,14 +49,8 @@ export const CollectionEditDialog = withFocusManagement(
       collection.coverImageUrl ?? undefined,
     );
 
-    const nameRef = useRef<HTMLInputElement>(null);
-
     const { focusFirstError } = useFocusContext();
     const { userId } = useAuth();
-
-    const { trackCancel, trackConfirm, trackedOnOpenChange } = useDialogTracking({
-      dialogName: 'collection-edit-dialog',
-    });
 
     const { executeAsync } = useServerAction(updateCollectionAction, {
       breadcrumbContext: {
@@ -107,7 +100,6 @@ export const CollectionEditDialog = withFocusManagement(
     };
 
     const handleCancelClick = () => {
-      trackCancel();
       handleClose();
     };
 
@@ -126,14 +118,13 @@ export const CollectionEditDialog = withFocusManagement(
     const deleteButtonTestId = generateTestId('feature', 'collection-edit-delete');
 
     return (
-      <Dialog onOpenChange={trackedOnOpenChange(handleOpenChange)} open={isOpen}>
+      <Dialog onOpenChange={handleOpenChange} open={isOpen}>
         <DialogContent className={'sm:max-w-md'} testId={dialogTestId}>
           <form
             data-testid={formTestId}
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              trackConfirm();
               void form.handleSubmit();
             }}
           >
@@ -153,7 +144,6 @@ export const CollectionEditDialog = withFocusManagement(
                 <form.AppField name={'name'}>
                   {(field) => (
                     <field.TextField
-                      focusRef={nameRef}
                       isRequired
                       label={'Name'}
                       placeholder={'Enter collection name'}
