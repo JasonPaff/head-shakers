@@ -341,18 +341,18 @@ import { useServerAction } from '@/hooks/use-server-action';
 
 ### Hook Options
 
-| Option             | Type                                                                                                  | Description                                        |
-| ------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `breadcrumbContext` | `{ action: string, component: string }`                                                              | Enables automatic Sentry breadcrumb tracking       |
-| `toastMessages`    | `{ loading?: string, success?: string \| ((data) => string), error?: string \| ((error) => string) }` | Custom toast messages                              |
-| `isDisableToast`   | `boolean`                                                                                             | Disable all toasts for silent operations           |
-| `loadingMessage`   | `string`                                                                                              | Loading message shown during execution             |
-| `onSuccess`        | `({ data }) => void`                                                                                  | Called with action result on success               |
-| `onAfterSuccess`   | `(data: T) => void`                                                                                   | Called after success handling is complete          |
-| `onBeforeSuccess`  | `(data: T) => void`                                                                                   | Called before success toast is shown               |
-| `onAfterError`     | `() => void`                                                                                          | Called after error handling completes              |
-| `onBeforeError`    | `() => void`                                                                                          | Called before error toast is shown                 |
-| `onValidationError` | `(errors) => string \| void`                                                                         | Custom handler for validation errors               |
+| Option              | Type                                                                                                  | Description                                  |
+| ------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `breadcrumbContext` | `{ action: string, component: string }`                                                               | Enables automatic Sentry breadcrumb tracking |
+| `toastMessages`     | `{ loading?: string, success?: string \| ((data) => string), error?: string \| ((error) => string) }` | Custom toast messages                        |
+| `isDisableToast`    | `boolean`                                                                                             | Disable all toasts for silent operations     |
+| `loadingMessage`    | `string`                                                                                              | Loading message shown during execution       |
+| `onSuccess`         | `({ data }) => void`                                                                                  | Called with action result on success         |
+| `onAfterSuccess`    | `(data: T) => void`                                                                                   | Called after success handling is complete    |
+| `onBeforeSuccess`   | `(data: T) => void`                                                                                   | Called before success toast is shown         |
+| `onAfterError`      | `() => void`                                                                                          | Called after error handling completes        |
+| `onBeforeError`     | `() => void`                                                                                          | Called before error toast is shown           |
+| `onValidationError` | `(errors) => string \| void`                                                                          | Custom handler for validation errors         |
 
 ### Hook Return Values
 
@@ -377,9 +377,9 @@ This creates a trail in Sentry that shows what the user was doing before an erro
 
 #### breadcrumbContext Properties
 
-| Property    | Type     | Description                                                              |
-| ----------- | -------- | ------------------------------------------------------------------------ |
-| `action`    | `string` | Name of the action (e.g., `'newsletter-subscribe'`, `'update-bobblehead'`) |
+| Property    | Type     | Description                                                                  |
+| ----------- | -------- | ---------------------------------------------------------------------------- |
+| `action`    | `string` | Name of the action (e.g., `'newsletter-subscribe'`, `'update-bobblehead'`)   |
 | `component` | `string` | Component initiating the action (e.g., `'footer-newsletter'`, `'edit-form'`) |
 
 #### Example: Form with Sentry Tracking
@@ -413,13 +413,13 @@ export const NewsletterForm = () => {
 
 #### When to Use breadcrumbContext
 
-| Scenario                        | Use breadcrumbContext? | Reason                                      |
-| ------------------------------- | ---------------------- | ------------------------------------------- |
-| User-initiated mutations        | Yes                    | Track user actions for debugging            |
-| Form submissions                | Yes                    | Understand user flow before errors          |
-| Silent background operations    | Optional               | May add noise but useful for complex flows  |
-| Search/autocomplete             | No                     | Too frequent, adds noise                    |
-| Analytics/view tracking         | No                     | Not user-initiated actions                  |
+| Scenario                     | Use breadcrumbContext? | Reason                                     |
+| ---------------------------- | ---------------------- | ------------------------------------------ |
+| User-initiated mutations     | Yes                    | Track user actions for debugging           |
+| Form submissions             | Yes                    | Understand user flow before errors         |
+| Silent background operations | Optional               | May add noise but useful for complex flows |
+| Search/autocomplete          | No                     | Too frequent, adds noise                   |
+| Analytics/view tracking      | No                     | Not user-initiated actions                 |
 
 #### Sentry Breadcrumb Output
 
