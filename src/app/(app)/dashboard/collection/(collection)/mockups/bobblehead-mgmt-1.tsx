@@ -1046,7 +1046,7 @@ export const BobbleheadManagementDashboard = ({
           <div className={'w-full max-w-sm'}>
             <Input
               isClearable
-              isSearch
+              leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
               onChange={handleSearchChange}
               onClear={handleSearchClear}
               placeholder={'Search bobbleheads...'}

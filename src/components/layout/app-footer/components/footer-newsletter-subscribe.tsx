@@ -79,7 +79,7 @@ export const FooterNewsletterSubscribe = withFocusManagement(
                       )}
                       disabled={isPending}
                       label={''}
-                      leftIcon={<MailIcon className={'size-4'} />}
+                      leftIcon={<MailIcon aria-hidden className={'size-4'} />}
                       placeholder={'Enter your email'}
                       testId={generateTestId('layout', 'app-footer', 'newsletter-email-input')}
                       type={'email'}

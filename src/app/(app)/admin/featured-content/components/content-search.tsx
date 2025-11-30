@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDownIcon, ChevronRightIcon, Image as ImageIcon } from 'lucide-react';
+import { ChevronDownIcon, ChevronRightIcon, Image as ImageIcon, SearchIcon } from 'lucide-react';
 import { useAction } from 'next-safe-action/hooks';
 import { useEffect, useMemo, useState, useTransition } from 'react';
 import { useDebouncedCallback } from 'use-debounce';
@@ -302,7 +302,7 @@ export const ContentSearch = ({ contentType, onSelect, selectedContentId }: Cont
             <Input
               className={'pl-10'}
               isClearable
-              isSearch
+              leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
               onChange={(e) => {
                 handleSearch(e.target.value);
               }}

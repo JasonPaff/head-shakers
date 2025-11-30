@@ -1,5 +1,6 @@
 'use client';
 
+import { SearchIcon } from 'lucide-react';
 import { parseAsString, parseAsStringEnum, useQueryStates } from 'nuqs';
 import { useEffect, useState } from 'react';
 import { useDebounce } from 'use-debounce';
@@ -39,7 +40,7 @@ export const CollectionBobbleheadControls = () => {
           aria-label={'search bobbleheads'}
           className={'w-full'}
           isClearable
-          isSearch
+          leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
           name={'search'}
           onChange={(e) => {
             setSearchQuery(e.target.value);

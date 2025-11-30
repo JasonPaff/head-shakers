@@ -1,6 +1,6 @@
 'use client';
 
-import { FilterIcon, MoreVerticalIcon, PencilIcon, Trash2Icon } from 'lucide-react';
+import { FilterIcon, MoreVerticalIcon, PencilIcon, SearchIcon, Trash2Icon } from 'lucide-react';
 import { $path } from 'next-typesafe-url';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
@@ -100,7 +100,7 @@ export const BobbleheadsManagementGrid = ({ bobbleheads }: BobbleheadsManagement
         <div className={'flex-1'}>
           <Input
             isClearable
-            isSearch
+            leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
             onChange={(e) => {
               setSearchTerm(e.target.value);
             }}
