@@ -1,6 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { Fragment, useState } from 'react';
+
+import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+
+import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
+import { CollectionEditDialog } from '@/components/feature/collections/collection-edit-dialog';
+import { Conditional } from '@/components/ui/conditional';
+import { useToggle } from '@/hooks/use-toggle';
 
 import type { CollectionCardStyle } from '../sidebar/sidebar-search';
 
@@ -20,10 +28,19 @@ export type CollectionDisplayData = {
   description: string;
   featuredCount: number;
   id: string;
+  isPublic: boolean;
   likeCount: number;
   name: string;
   totalValue: number;
   viewCount: number;
+};
+
+type CollectionForEdit = {
+  coverImageUrl?: null | string;
+  description: null | string;
+  id: string;
+  isPublic: boolean;
+  name: string;
 };
 
 type SidebarDisplayProps = {
@@ -32,9 +49,15 @@ type SidebarDisplayProps = {
 };
 
 export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDisplayProps) => {
+  const router = useRouter();
+
   const [searchValue, setSearchValue] = useState('');
   const [cardStyle, setCardStyle] = useState<CollectionCardStyle>('compact');
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(initialSelectedId);
+  const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
+
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
   // Filter collections based on search
   const filteredCollections =
@@ -49,8 +72,12 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
   const hasCollections = filteredCollections.length > 0;
 
   const handleCreateCollection = () => {
-    // TODO: Navigate to create collection or open dialog
-    console.log('Create collection clicked');
+    setIsCreateDialogOpen.on();
+  };
+
+  const handleCollectionCreated = (newCollection: ComboboxItem) => {
+    setSelectedCollectionId(newCollection.id);
+    router.refresh();
   };
 
   const handleCollectionSelect = (id: string) => {
@@ -60,8 +87,22 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
   };
 
   const handleEditCollection = (id: string) => {
-    // TODO: Navigate to edit collection
-    console.log('Edit collection:', id);
+    const collection = collections.find((c) => c.id === id);
+    if (collection) {
+      setEditingCollection({
+        coverImageUrl: collection.coverImageUrl || null,
+        description: collection.description || null,
+        id: collection.id,
+        isPublic: collection.isPublic,
+        name: collection.name,
+      });
+      setIsEditDialogOpen.on();
+    }
+  };
+
+  const handleEditDialogClose = () => {
+    setIsEditDialogOpen.off();
+    setEditingCollection(null);
   };
 
   const renderCollectionCard = (collection: CollectionDisplayData) => {
@@ -122,8 +163,10 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
 
   return (
     <Fragment>
+      {/* Header */}
       <SidebarHeader onCreateClick={handleCreateCollection} />
 
+      {/* Search Bar */}
       <SidebarSearch
         cardStyle={cardStyle}
         onCardStyleChange={setCardStyle}
@@ -134,13 +177,31 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
         searchValue={searchValue}
       />
 
+      {/* Collection List */}
       <SidebarCollectionList cardStyle={cardStyle}>
         {hasCollections ?
           filteredCollections.map(renderCollectionCard)
         : <NoCollections onCreateClick={handleCreateCollection} />}
       </SidebarCollectionList>
 
+      {/* Footer */}
       <SidebarFooter totalCount={collections.length} />
+
+      {/* Create Collection Dialog */}
+      <CollectionCreateDialog
+        isOpen={isCreateDialogOpen}
+        onClose={setIsCreateDialogOpen.off}
+        onCollectionCreated={handleCollectionCreated}
+      />
+
+      {/* Edit Collection Details Dialog */}
+      <Conditional isCondition={!!editingCollection}>
+        <CollectionEditDialog
+          collection={editingCollection!}
+          isOpen={isEditDialogOpen}
+          onClose={handleEditDialogClose}
+        />
+      </Conditional>
     </Fragment>
   );
 };

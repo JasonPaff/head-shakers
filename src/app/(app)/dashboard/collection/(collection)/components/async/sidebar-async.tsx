@@ -22,6 +22,7 @@ export async function SidebarAsync() {
     description: string;
     featuredCount: number;
     id: string;
+    isPublic: boolean;
     likeCount: number;
     name: string;
     totalValue: number;
