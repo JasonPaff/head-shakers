@@ -7,9 +7,20 @@ import { cookieConstants } from '@/constants/cookies';
 
 export type CollectionCardStyle = 'compact' | 'cover' | 'detailed';
 
+export type CollectionSortOption =
+  | 'comments-desc'
+  | 'count-asc'
+  | 'count-desc'
+  | 'likes-desc'
+  | 'name-asc'
+  | 'name-desc'
+  | 'value-asc'
+  | 'value-desc'
+  | 'views-desc';
+
 export type UserPreferences = {
+  collectionSidebarSort?: CollectionSortOption;
   collectionSidebarView?: CollectionCardStyle;
-  // Future preferences can be added here
 };
 
 const COOKIE_CONFIG = cookieConstants.userPreferences;

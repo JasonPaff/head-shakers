@@ -3,6 +3,7 @@
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+import type { CollectionSortOption } from '@/hooks/use-user-preferences';
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
 import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
@@ -34,17 +35,20 @@ type SidebarDisplayProps = {
   collections: Array<CollectionDashboardListData>;
   initialCardStyle?: CollectionCardStyle;
   initialSelectedId?: string;
+  initialSortOption?: CollectionSortOption;
 };
 
 export const SidebarDisplay = ({
   collections,
   initialCardStyle = 'compact',
   initialSelectedId,
+  initialSortOption = 'name-asc',
 }: SidebarDisplayProps) => {
   const [cardStyle, setCardStyleState] = useState<CollectionCardStyle>(initialCardStyle);
   const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
   const [searchValue, setSearchValue] = useState('');
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(initialSelectedId);
+  const [sortOption, setSortOptionState] = useState<CollectionSortOption>(initialSortOption);
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
@@ -59,16 +63,50 @@ export const SidebarDisplay = ({
     [setPreference],
   );
 
-  // Filter collections based on search
+  const setSortOption = useCallback(
+    (newSortOption: CollectionSortOption) => {
+      setSortOptionState(newSortOption);
+      setPreference('collectionSidebarSort', newSortOption);
+    },
+    [setPreference],
+  );
+
+  // Filter and sort collections
   const filteredCollections = useMemo(() => {
-    return searchValue.trim() ?
+    const filtered =
+      searchValue.trim() ?
         collections.filter(
           (c) =>
             c.name.toLowerCase().includes(searchValue.toLowerCase()) ||
             c.description?.toLowerCase().includes(searchValue.toLowerCase()),
         )
       : collections;
-  }, [collections, searchValue]);
+
+    return [...filtered].sort((a, b) => {
+      switch (sortOption) {
+        case 'comments-desc':
+          return b.commentCount - a.commentCount;
+        case 'count-asc':
+          return a.bobbleheadCount - b.bobbleheadCount;
+        case 'count-desc':
+          return b.bobbleheadCount - a.bobbleheadCount;
+        case 'likes-desc':
+          return b.likeCount - a.likeCount;
+        case 'name-asc':
+          return a.name.localeCompare(b.name);
+        case 'name-desc':
+          return b.name.localeCompare(a.name);
+        case 'value-asc':
+          return (a.totalValue ?? 0) - (b.totalValue ?? 0);
+        case 'value-desc':
+          return (b.totalValue ?? 0) - (a.totalValue ?? 0);
+        case 'views-desc':
+          return b.viewCount - a.viewCount;
+        default:
+          return 0;
+      }
+    });
+  }, [collections, searchValue, sortOption]);
 
   const handleCreateCollection = () => {
     setIsCreateDialogOpen.on();
@@ -120,7 +158,9 @@ export const SidebarDisplay = ({
         onSearchClear={() => {
           setSearchValue('');
         }}
+        onSortChange={setSortOption}
         searchValue={searchValue}
+        sortOption={sortOption}
       />
 
       {/* Collection List */}

@@ -21,6 +21,7 @@ export async function SidebarAsync() {
     <SidebarDisplay
       collections={collections}
       initialCardStyle={preferences.collectionSidebarView ?? 'compact'}
+      initialSortOption={preferences.collectionSidebarSort ?? 'name-asc'}
     />
   );
 }
