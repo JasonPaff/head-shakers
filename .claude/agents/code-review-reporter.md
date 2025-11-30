@@ -39,7 +39,6 @@ You will receive:
    - `server-action-specialist` - Server action review findings
    - `database-specialist` - Database/query review findings
    - `validation-specialist` - Validation schema findings
-   - `conventions-validator` - React conventions violations
    - `static-analysis-validator` - Lint, type, and format issues
 
 Each agent returns findings with:
@@ -308,7 +307,6 @@ These methods exist in the reviewed files but were not in the call path for this
 | server-action-specialist | {status} | {n} | {n} |
 | database-specialist | {status} | {n} | {n} |
 | validation-specialist | {status} | {n} | {n} |
-| conventions-validator | {status} | {n} | {n} |
 | static-analysis-validator | {status} | {n} | {n} |
 
 ---
@@ -372,13 +370,6 @@ These methods exist in the reviewed files but were not in the call path for this
 <summary>Validation Review ({n} schemas, {n} issues)</summary>
 
 {Full output from validation-specialist}
-
-</details>
-
-<details>
-<summary>Conventions Review ({n} components, {n} issues)</summary>
-
-{Full output from conventions-validator}
 
 </details>
 

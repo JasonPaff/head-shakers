@@ -1,5 +1,5 @@
 ---
-allowed-tools: Task(subagent_type:ui-audit-specialist), Task(subagent_type:file-discovery-agent), Task(subagent_type:static-analysis-validator), Task(subagent_type:conventions-validator), Read(*), Write(*), Bash(npm:*,mkdir:*,curl:*,netstat:*), TodoWrite(*), Glob(*), Grep(*), AskUserQuestion(*)
+allowed-tools: Task(subagent_type:*), Read(*), Write(*), Bash(npm:*,mkdir:*,curl:*,netstat:*), TodoWrite(*), Glob(*), Grep(*), AskUserQuestion(*)
 argument-hint: 'page-path [feature-scope] [--skip-ui|--skip-code|--verbose]'
 description: Comprehensive page audit combining interactive UI testing with code standards review
 ---
@@ -128,15 +128,6 @@ Execute: lint, typecheck, format checks.
 Return structured results per your agent definition.
 ```
 
-**Call conventions-validator**:
-
-```
-Validate React conventions on .tsx/.jsx files for {page-path}.
-
-Check: Boolean naming, export style, component order, derived variables.
-Return structured results per your agent definition.
-```
-
 **Also Run (orchestrator directly)**:
 
 - Grep for `eslint-disable`, `ts-ignore`, `ts-nocheck` → CRITICAL issues
@@ -154,7 +145,6 @@ Save results:
 
 - `03-ui-audit.md` (from ui-audit-specialist)
 - `04-code-audit.md` (from static-analysis-validator)
-- `05-code-debt.md` (from conventions-validator + grep results)
 
 Mark completed todos.
 

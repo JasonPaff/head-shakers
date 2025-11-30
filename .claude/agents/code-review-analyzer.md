@@ -254,16 +254,6 @@ Visual representation of the code flow:
 
 ---
 
-### UI Components (conventions-validator)
-
-#### `{file_path}`
-| Component | Used By | Purpose | Priority |
-|-----------|---------|---------|----------|
-| `SectionHeader` | `FeaturedCollectionsSection` | Section title/description | LOW |
-| `Card` | `CollectionCard` | Card container | LOW |
-
----
-
 ## Complete Method Call Graph
 
 ### Entry: `HomePage` (page.tsx)

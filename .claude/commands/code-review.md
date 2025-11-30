@@ -374,38 +374,6 @@ DO NOT IMPLEMENT CHANGES. Only identify issues.
 Return findings with file:line, severity, description, and recommendation.
 ```
 
-#### Conventions Review (specific components only)
-
-```
-subagent_type: "conventions-validator"
-
-Validate React conventions on these specific components:
-
-## Components to Review
-
-{From scope analysis - include all tsx/jsx files with their specific exports}
-
-Example format:
-### `src/app/(app)/(home)/page.tsx`
-- Review: `HomePage` component
-
-### `src/components/feature/newsletter/newsletter-form.tsx`
-- Review: `NewsletterForm` component only
-- Skip: Other exports in this file
-
-## Convention Checklist
-- Boolean naming (must start with 'is')
-- Derived variable naming (must use '_' prefix)
-- Export style (named exports only, no default)
-- Handler naming (`handle` prefix for internal, `on` prefix for props)
-- Component internal order (useState → hooks → useMemo → useEffect → handlers → derived)
-- Type import patterns (`import type`)
-
-Focus ONLY on the listed components.
-
-Return findings with file:line, severity, description, and recommendation.
-```
-
 #### Static Analysis (unless --skip-static)
 
 ```
@@ -451,7 +419,6 @@ Create summary tracking which agents completed:
 | server-action-specialist    | SUCCESS    | 1 action         | 1            |
 | database-specialist         | INCOMPLETE | 2 methods        | 1            |
 | validation-specialist       | SUCCESS    | 1 schema         | 0            |
-| conventions-validator       | SUCCESS    | 8 components     | 4            |
 | static-analysis-validator   | SUCCESS    | 21 files         | 5            |
 ```
 
@@ -497,9 +464,6 @@ Flags: {--skip-static, --verbose, --quick as applicable}
 
 ### Validation Review
 {Full output from validation-specialist or "AGENT_FAILED: No results"}
-
-### Conventions Review
-{Full output from conventions-validator or "AGENT_FAILED: No results"}
 
 ### Static Analysis
 {Full output from static-analysis-validator or "SKIPPED" or "AGENT_FAILED"}
@@ -560,7 +524,6 @@ Mark "Save and display results" as in_progress.
 - [Server Actions](./agent-reports/server-action-specialist-report.md)
 - [Database](./agent-reports/database-specialist-report.md)
 - [Validation](./agent-reports/validation-specialist-report.md)
-- [Conventions](./agent-reports/conventions-validator-report.md)
 - [Static Analysis](./agent-reports/static-analysis-validator-report.md)
 ```
 
