@@ -37,16 +37,12 @@ interface CollectionCreateDialogProps extends ComponentTestIdProps {
 
 export const CollectionCreateDialog = withFocusManagement(
   ({ isOpen, onClose, onCollectionCreated, testId }: CollectionCreateDialogProps) => {
-    const dialogTestId = testId || generateTestId('feature', 'collection-create-dialog');
-    const formTestId = generateTestId('feature', 'collection-create-form');
-    const cancelButtonTestId = generateTestId('feature', 'collection-create-cancel');
-    const submitButtonTestId = generateTestId('feature', 'collection-create-submit');
-
-    // useState hooks
-    const [coverImageUrl, setCoverImageUrl] = useState<string | undefined>(undefined);
+    const [coverImageUrl, setCoverImageUrl] = useState<string>();
 
     const { focusFirstError } = useFocusContext();
     const { userId } = useAuth();
+
+    const nameRef = useRef<HTMLInputElement>(null);
 
     const { executeAsync, isExecuting } = useServerAction(createCollectionAction, {
       loadingMessage: 'Creating collection...',
@@ -82,7 +78,6 @@ export const CollectionCreateDialog = withFocusManagement(
       },
     });
 
-    // Event handlers
     const handleOpenChange = (isOpen: boolean) => {
       if (isOpen) return;
       handleClose();
@@ -104,7 +99,10 @@ export const CollectionCreateDialog = withFocusManagement(
       setCoverImageUrl(undefined);
     };
 
-    const nameRef = useRef<HTMLInputElement>(null);
+    const dialogTestId = testId || generateTestId('feature', 'collection-create-dialog');
+    const formTestId = generateTestId('feature', 'collection-create-form');
+    const cancelButtonTestId = generateTestId('feature', 'collection-create-cancel');
+    const submitButtonTestId = generateTestId('feature', 'collection-create-submit');
 
     return (
       <Dialog onOpenChange={handleOpenChange} open={isOpen}>
