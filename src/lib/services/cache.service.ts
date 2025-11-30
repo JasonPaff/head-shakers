@@ -419,8 +419,8 @@ export class CacheService {
         context: {
           ...options.context,
           entityId: collectionId,
-          entityType: 'collection',
-          operation: 'collection:by-id',
+          entityType: CACHE_ENTITY_TYPE.COLLECTION,
+          operation: `${CACHE_ENTITY_TYPE.COLLECTION}:by-id`,
         },
         tags,
         ttl: options.ttl || CACHE_CONFIG.TTL.LONG,

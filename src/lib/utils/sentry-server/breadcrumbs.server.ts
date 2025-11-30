@@ -109,10 +109,10 @@ export function facadeBreadcrumb(
  * setActionContext('INPUT_INFO', { filters, pagination, sort });
  */
 export function setActionContext(
-  contextType: keyof typeof SENTRY_CONTEXTS,
+  contextType: (typeof SENTRY_CONTEXTS)[keyof typeof SENTRY_CONTEXTS],
   data: Record<string, unknown>,
 ): void {
-  Sentry.setContext(SENTRY_CONTEXTS[contextType], data);
+  Sentry.setContext(Object.values(SENTRY_CONTEXTS).find((v) => v === contextType) ?? 'unknown', data);
 }
 
 /**

@@ -78,7 +78,7 @@ export class UsersFacade extends BaseFacade {
       async () => {
         return await CacheService.users.profile(
           () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return UsersQuery.getEmailByUserIdAsync(userId, context);
           },
           userId,
@@ -113,7 +113,7 @@ export class UsersFacade extends BaseFacade {
       async () => {
         return await CacheService.users.profile(
           () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return UsersQuery.getUserByClerkIdAsync(clerkId, context);
           },
           clerkId,
@@ -219,7 +219,7 @@ export class UsersFacade extends BaseFacade {
       async () => {
         return await CacheService.users.profile(
           () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return UsersQuery.getUserIdByClerkIdAsync(clerkId, context);
           },
           clerkId,

@@ -398,7 +398,7 @@ export class BobbleheadsFacade {
 
           // Fetch collection information
           let contextData: BobbleheadNavigationDataSchema['context'] = null;
-          const collection = await CollectionsFacade.getCollectionById(collectionId, viewerUserId);
+          const collection = await CollectionsFacade.getById(collectionId, viewerUserId);
           if (collection) {
             contextData = {
               contextId: collection.id,

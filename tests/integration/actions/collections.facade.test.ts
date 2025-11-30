@@ -211,7 +211,7 @@ describe('CollectionsFacade Integration Tests', () => {
       expect(result!.id).toBe(collection!.id);
 
       // Verify it's actually deleted
-      const fetched = await CollectionsFacade.getCollectionById(collection!.id, user!.id);
+      const fetched = CollectionsFacade.getById(collection!.id, user!.id);
       expect(fetched).toBeNull();
     });
 
@@ -225,7 +225,7 @@ describe('CollectionsFacade Integration Tests', () => {
       expect(result).toBeNull();
 
       // Verify it still exists
-      const fetched = await CollectionsFacade.getCollectionById(collection!.id, user1!.id);
+      const fetched = CollectionsFacade.getById(collection!.id, user1!.id);
       expect(fetched).toBeDefined();
     });
   });
@@ -238,11 +238,11 @@ describe('CollectionsFacade Integration Tests', () => {
         userId: user!.id,
       });
 
-      const result = await CollectionsFacade.getCollectionById(collection!.id, user!.id);
+      const result = CollectionsFacade.getById(collection!.id, user!.id);
 
       expect(result).toBeDefined();
-      expect(result!.id).toBe(collection!.id);
-      expect(result!.name).toBe('Test Collection');
+      expect(result.id).toBe(collection!.id);
+      expect(result.name).toBe('Test Collection');
     });
 
     it('should return public collection for non-owner', async () => {
@@ -253,10 +253,10 @@ describe('CollectionsFacade Integration Tests', () => {
         userId: owner!.id,
       });
 
-      const result = await CollectionsFacade.getCollectionById(collection!.id, viewer!.id);
+      const result = CollectionsFacade.getById(collection!.id, viewer!.id);
 
       expect(result).toBeDefined();
-      expect(result!.id).toBe(collection!.id);
+      expect(result.id).toBe(collection!.id);
     });
 
     it('should not return private collection for non-owner', async () => {
@@ -267,7 +267,7 @@ describe('CollectionsFacade Integration Tests', () => {
         userId: owner!.id,
       });
 
-      const result = await CollectionsFacade.getCollectionById(collection!.id, viewer!.id);
+      const result = CollectionsFacade.getById(collection!.id, viewer!.id);
 
       expect(result).toBeNull();
     });
@@ -275,10 +275,7 @@ describe('CollectionsFacade Integration Tests', () => {
     it('should return null for non-existent collection', async () => {
       const user = await createTestUser();
 
-      const result = await CollectionsFacade.getCollectionById(
-        'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
-        user!.id,
-      );
+      const result = CollectionsFacade.getById('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', user!.id);
 
       expect(result).toBeNull();
     });

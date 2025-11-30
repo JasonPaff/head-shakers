@@ -20,9 +20,11 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
+import { CACHE_ENTITY_TYPE, OPERATIONS } from '@/lib/constants';
 import { db } from '@/lib/db';
 import { collections } from '@/lib/db/schema';
 import { ViewTrackingFacade } from '@/lib/facades/analytics/view-tracking.facade';
+import { BaseFacade } from '@/lib/facades/base/base-facade';
 import { SocialFacade } from '@/lib/facades/social/social.facade';
 import {
   createProtectedQueryContext,
@@ -34,6 +36,7 @@ import { CacheService } from '@/lib/services/cache.service';
 import { CloudinaryService } from '@/lib/services/cloudinary.service';
 import { createHashFromObject } from '@/lib/utils/cache.utils';
 import { createFacadeError } from '@/lib/utils/error-builders';
+import { executeFacadeOperation } from '@/lib/utils/facade-helpers';
 import { ensureUniqueSlug, generateSlug } from '@/lib/utils/slug';
 
 export interface CollectionDashboardData {
@@ -62,7 +65,9 @@ export interface CollectionMetrics {
 
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
-export class CollectionsFacade {
+const facadeName = 'CollectionsFacade';
+
+export class CollectionsFacade extends BaseFacade {
   /**
    * Browse collections by category with filtering, sorting, and pagination
    */
@@ -522,36 +527,30 @@ export class CollectionsFacade {
     }
   }
 
-  static async createAsync(data: InsertCollection, userId: string, dbInstance?: DatabaseExecutor) {
-    try {
-      const context = createUserQueryContext(userId, { dbInstance });
-      const dbInst = context.dbInstance ?? db;
-
-      // generate slug from name
-      const baseSlug = generateSlug(data.name);
-
-      // query existing collection slugs for this user only (user-scoped)
-      const existingSlugs = await dbInst
-        .select({ slug: collections.slug })
-        .from(collections)
-        .where(eq(collections.userId, userId))
-        .then((results) => results.map((r) => r.slug));
-
-      // ensure slug is unique within user's collections
-      const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
-
-      // create collection with unique slug
-      return await CollectionsQuery.createAsync({ ...data, slug: uniqueSlug }, userId, context);
-    } catch (error) {
-      const context: FacadeErrorContext = {
-        data: { isPublic: data.isPublic, name: data.name },
-        facade: 'CollectionsFacade',
+  static async createAsync(
+    collection: InsertCollection,
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionRecord | null> {
+    return executeFacadeOperation(
+      {
+        data: { collection, userId },
+        facade: facadeName,
         method: 'createAsync',
-        operation: 'create',
+        operation: OPERATIONS.COLLECTIONS.CREATE,
         userId,
-      };
-      throw createFacadeError(context, error);
-    }
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+
+        const existingSlugs = await CollectionsQuery.getSlugsByUserId(userId, context);
+
+        const baseSlug = generateSlug(collection.name);
+        const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
+
+        return await CollectionsQuery.createAsync({ ...collection, slug: uniqueSlug }, userId, context);
+      },
+    );
   }
 
   static async deleteAsync(data: DeleteCollection, userId: string, dbInstance?: DatabaseExecutor) {
@@ -654,6 +653,39 @@ export class CollectionsFacade {
       };
       throw createFacadeError(context, error);
     }
+  }
+
+  static async getById(
+    collectionId: string,
+    viewerUserId?: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<CollectionRecord | null> {
+    return executeFacadeOperation(
+      {
+        data: { collectionId, viewerUserId },
+        facade: facadeName,
+        method: 'getById',
+        operation: OPERATIONS.COLLECTIONS.GET_BY_ID,
+      },
+      async () => {
+        return CacheService.collections.byId(
+          async () => {
+            const context = this.getViewerContext(viewerUserId, dbInstance);
+            return await CollectionsQuery.getByIdAsync(collectionId, context);
+          },
+          collectionId,
+          {
+            context: {
+              entityId: collectionId,
+              entityType: CACHE_ENTITY_TYPE.COLLECTION,
+              facade: facadeName,
+              operation: 'getById',
+              userId: viewerUserId,
+            },
+          },
+        );
+      },
+    );
   }
 
   /**
@@ -794,32 +826,6 @@ export class CollectionsFacade {
       };
       throw createFacadeError(context, error);
     }
-  }
-
-  static async getCollectionById(
-    id: string,
-    viewerUserId?: string,
-    dbInstance?: DatabaseExecutor,
-  ): Promise<CollectionRecord | null> {
-    return CacheService.collections.byId(
-      () => {
-        const context =
-          viewerUserId ?
-            createUserQueryContext(viewerUserId, { dbInstance })
-          : createPublicQueryContext({ dbInstance });
-        return CollectionsQuery.findByIdAsync(id, context);
-      },
-      id,
-      {
-        context: {
-          entityId: id,
-          entityType: 'collection',
-          facade: 'CollectionsFacade',
-          operation: 'getById',
-          userId: viewerUserId,
-        },
-      },
-    );
   }
 
   static async getCollectionBySlug(

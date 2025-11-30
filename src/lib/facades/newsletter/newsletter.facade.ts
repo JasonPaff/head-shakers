@@ -43,7 +43,7 @@ export class NewsletterFacade extends BaseFacade {
    * @param dbInstance - Database instance for transactions (defaults to db)
    * @returns True if the email is actively subscribed, false otherwise
    */
-  static async getIsActiveSubscriberAsync(
+  static async getIsActiveSubscriberByEmailAsync(
     email: string,
     dbInstance: DatabaseExecutor = db,
   ): Promise<boolean> {
@@ -58,8 +58,8 @@ export class NewsletterFacade extends BaseFacade {
 
         return CacheService.newsletter.isActiveSubscriber(
           async () => {
-            const context = this.publicContext(dbInstance);
-            return NewsletterQuery.getIsActiveSubscriberAsync(normalizedEmail, context);
+            const context = this.getPublicContext(dbInstance);
+            return NewsletterQuery.getIsActiveSubscriberByEmailAsync(normalizedEmail, context);
           },
           normalizedEmail,
           {
@@ -106,7 +106,7 @@ export class NewsletterFacade extends BaseFacade {
       },
       async () => {
         const normalizedEmail = normalizeEmail(email);
-        const context = this.publicContext(dbInstance);
+        const context = this.getPublicContext(dbInstance);
 
         const existingSignup = await NewsletterQuery.findByEmailAsync(normalizedEmail, context);
 
@@ -203,7 +203,7 @@ export class NewsletterFacade extends BaseFacade {
       },
       async () => {
         const normalizedEmail = normalizeEmail(email);
-        const context = this.publicContext(dbInstance);
+        const context = this.getPublicContext(dbInstance);
 
         const result = await NewsletterQuery.unsubscribeAsync(normalizedEmail, context);
 

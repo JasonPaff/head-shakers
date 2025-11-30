@@ -24,7 +24,7 @@ export abstract class BaseContextHelpers {
    * Create a QueryContext for owner-or-viewer access
    * Returns protected context if viewer is the owner, otherwise viewer context
    */
-  protected static ownerOrViewerContext(
+  protected static getOwnerOrViewerContext(
     ownerId: string,
     viewerUserId: string | undefined,
     dbInstance?: DatabaseExecutor,
@@ -32,27 +32,27 @@ export abstract class BaseContextHelpers {
     if (viewerUserId && viewerUserId === ownerId) {
       return createProtectedQueryContext(ownerId, { dbInstance });
     }
-    return this.viewerContext(viewerUserId, dbInstance);
+    return this.getViewerContext(viewerUserId, dbInstance);
   }
 
   /**
    * Create a QueryContext for protected/owner-only operations
    */
-  protected static protectedContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
+  protected static getProtectedContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
     return createProtectedQueryContext(userId, { dbInstance });
   }
 
   /**
    * Create a QueryContext for public access only
    */
-  protected static publicContext(dbInstance?: DatabaseExecutor): QueryContext {
+  protected static getPublicContext(dbInstance?: DatabaseExecutor): QueryContext {
     return createPublicQueryContext({ dbInstance });
   }
 
   /**
    * Create a QueryContext for authenticated user access
    */
-  protected static userContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
+  protected static getUserContext(userId: string, dbInstance?: DatabaseExecutor): QueryContext {
     return createUserQueryContext(userId, { dbInstance });
   }
 
@@ -60,7 +60,7 @@ export abstract class BaseContextHelpers {
    * Create a QueryContext for viewer-based access
    * Returns user context if viewerUserId is provided, otherwise public context
    */
-  protected static viewerContext(
+  protected static getViewerContext(
     viewerUserId: string | undefined,
     dbInstance?: DatabaseExecutor,
   ): QueryContext {

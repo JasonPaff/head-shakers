@@ -192,7 +192,7 @@ describe('NewsletterQuery', () => {
       const context: QueryContext = { dbInstance: mockDb };
 
       // Act
-      const result = await NewsletterQuery.getActiveSubscriberAsync(mockEmail, context);
+      const result = await NewsletterQuery.getActiveSubscriberByEmailAsync(mockEmail, context);
 
       // Assert
       expect(normalizeEmail).toHaveBeenCalledWith(mockEmail);
@@ -212,7 +212,7 @@ describe('NewsletterQuery', () => {
       const context: QueryContext = { dbInstance: mockDb };
 
       // Act
-      const result = await NewsletterQuery.getActiveSubscriberAsync(mockEmail, context);
+      const result = await NewsletterQuery.getActiveSubscriberByEmailAsync(mockEmail, context);
 
       // Assert
       expect(result).toBeNull();
@@ -229,7 +229,7 @@ describe('NewsletterQuery', () => {
       const context: QueryContext = { dbInstance: mockDb };
 
       // Act
-      const result = await NewsletterQuery.getActiveSubscriberAsync(mockEmail, context);
+      const result = await NewsletterQuery.getActiveSubscriberByEmailAsync(mockEmail, context);
 
       // Assert
       expect(result).toBeNull();
@@ -248,7 +248,7 @@ describe('NewsletterQuery', () => {
       const context: QueryContext = { dbInstance: mockDb };
 
       // Act
-      const result = await NewsletterQuery.getIsActiveSubscriberAsync(mockEmail, context);
+      const result = await NewsletterQuery.getIsActiveSubscriberByEmailAsync(mockEmail, context);
 
       // Assert
       expect(mockSelect).toHaveBeenCalledWith({ exists: sql`1` });
@@ -275,7 +275,7 @@ describe('NewsletterQuery', () => {
       const context: QueryContext = { dbInstance: mockDb };
 
       // Act
-      const result = await NewsletterQuery.getIsActiveSubscriberAsync(mockEmail, context);
+      const result = await NewsletterQuery.getIsActiveSubscriberByEmailAsync(mockEmail, context);
 
       // Assert
       expect(result).toBe(false);

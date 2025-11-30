@@ -440,7 +440,7 @@ describe('NewsletterFacade', () => {
       vi.mocked(CacheService.newsletter.isActiveSubscriber).mockResolvedValue(isCachedValue);
 
       // Act
-      const result = await NewsletterFacade.getIsActiveSubscriberAsync(email, mockDb);
+      const result = await NewsletterFacade.getIsActiveSubscriberByEmailAsync(email, mockDb);
 
       // Assert
       expect(result).toBe(isCachedValue);
@@ -448,7 +448,7 @@ describe('NewsletterFacade', () => {
       expect(vi.mocked(CacheService.newsletter.isActiveSubscriber)).toHaveBeenCalled();
 
       // Verify query not called (cache hit)
-      expect(vi.mocked(NewsletterQuery.getIsActiveSubscriberAsync)).not.toHaveBeenCalled();
+      expect(vi.mocked(NewsletterQuery.getIsActiveSubscriberByEmailAsync)).not.toHaveBeenCalled();
     });
 
     it('should query and cache result when cache miss', async () => {
@@ -461,14 +461,14 @@ describe('NewsletterFacade', () => {
       vi.mocked(CacheService.newsletter.isActiveSubscriber).mockImplementation(async (fn) => {
         return fn();
       });
-      vi.mocked(NewsletterQuery.getIsActiveSubscriberAsync).mockResolvedValue(isQueryResult);
+      vi.mocked(NewsletterQuery.getIsActiveSubscriberByEmailAsync).mockResolvedValue(isQueryResult);
 
       // Act
-      const result = await NewsletterFacade.getIsActiveSubscriberAsync(email, mockDb);
+      const result = await NewsletterFacade.getIsActiveSubscriberByEmailAsync(email, mockDb);
 
       // Assert
       expect(result).toBe(isQueryResult);
-      expect(vi.mocked(NewsletterQuery.getIsActiveSubscriberAsync)).toHaveBeenCalledWith(
+      expect(vi.mocked(NewsletterQuery.getIsActiveSubscriberByEmailAsync)).toHaveBeenCalledWith(
         normalizedEmail,
         expect.any(Object),
       );

@@ -62,7 +62,7 @@ export class FeaturedContentFacade extends BaseFacade {
    */
   static async deleteAsync(id: string, dbInstance?: DatabaseExecutor): Promise<null | SelectFeaturedContent> {
     try {
-      const context = this.publicContext(dbInstance);
+      const context = this.getPublicContext(dbInstance);
       return FeaturedContentQuery.deleteAsync(id, context);
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -86,7 +86,7 @@ export class FeaturedContentFacade extends BaseFacade {
     try {
       return await CacheService.featured.content(
         async () => {
-          const context = this.publicContext(dbInstance);
+          const context = this.getPublicContext(dbInstance);
           const rawData = await FeaturedContentQuery.getActiveFeaturedContentAsync(context);
 
           trackFacadeSuccess(facadeName, 'getActiveFeaturedContentAsync');
@@ -119,7 +119,7 @@ export class FeaturedContentFacade extends BaseFacade {
   static async getAllFeaturedContentForAdmin(
     dbInstance?: DatabaseExecutor,
   ): Promise<Array<FeaturedContentRecord>> {
-    const context = this.publicContext(dbInstance);
+    const context = this.getPublicContext(dbInstance);
     return FeaturedContentQuery.findAllFeaturedContentForAdminAsync(context);
   }
 
@@ -160,7 +160,7 @@ export class FeaturedContentFacade extends BaseFacade {
       async () => {
         return await CacheService.featured.featuredBobblehead(
           async () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return await FeaturedContentQuery.getFeaturedBobbleheadAsync(context);
           },
           {
@@ -204,7 +204,7 @@ export class FeaturedContentFacade extends BaseFacade {
       async () => {
         return await CacheService.featured.collections(
           async () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return await FeaturedContentQuery.getFeaturedCollectionsAsync(context, userId);
           },
           userId,
@@ -227,7 +227,7 @@ export class FeaturedContentFacade extends BaseFacade {
     id: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
-    const context = this.publicContext(dbInstance);
+    const context = this.getPublicContext(dbInstance);
     return FeaturedContentQuery.findByIdAsync(id, context);
   }
 
@@ -238,7 +238,7 @@ export class FeaturedContentFacade extends BaseFacade {
     id: string,
     dbInstance?: DatabaseExecutor,
   ): Promise<FeaturedContentRecord | null> {
-    const context = this.publicContext(dbInstance);
+    const context = this.getPublicContext(dbInstance);
     return FeaturedContentQuery.findFeaturedContentByIdForAdminAsync(id, context);
   }
 
@@ -257,7 +257,7 @@ export class FeaturedContentFacade extends BaseFacade {
       async () => {
         return await CacheService.featured.content(
           async () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return await FeaturedContentQuery.getFooterFeaturedContentAsync(context);
           },
           CACHE_KEYS.FEATURED.CONTENT_TYPES.FOOTER,
@@ -306,7 +306,7 @@ export class FeaturedContentFacade extends BaseFacade {
       async () => {
         return await CacheService.featured.trendingBobbleheads(
           async () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
             return await FeaturedContentQuery.getTrendingBobbleheadsAsync(context);
           },
           {
@@ -333,7 +333,7 @@ export class FeaturedContentFacade extends BaseFacade {
    * increment view count for featured content
    */
   static async incrementViewCount(contentId: string, dbInstance?: DatabaseExecutor): Promise<void> {
-    const context = this.publicContext(dbInstance);
+    const context = this.getPublicContext(dbInstance);
 
     try {
       await FeaturedContentQuery.incrementViewCountAsync(contentId, context);
@@ -353,7 +353,7 @@ export class FeaturedContentFacade extends BaseFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
     try {
-      const context = this.publicContext(dbInstance);
+      const context = this.getPublicContext(dbInstance);
       return FeaturedContentQuery.toggleActiveAsync(id, isActive, context);
     } catch (error) {
       const context: FacadeErrorContext = {
@@ -375,7 +375,7 @@ export class FeaturedContentFacade extends BaseFacade {
     dbInstance?: DatabaseExecutor,
   ): Promise<null | SelectFeaturedContent> {
     try {
-      const context = this.publicContext(dbInstance);
+      const context = this.getPublicContext(dbInstance);
       return FeaturedContentQuery.updateAsync(id, data, context);
     } catch (error) {
       const context: FacadeErrorContext = {

@@ -89,7 +89,7 @@ export class NewsletterQuery extends BaseQuery {
   /**
    * Get the active subscriber by email (not unsubscribed)
    */
-  static async getActiveSubscriberAsync(
+  static async getActiveSubscriberByEmailAsync(
     email: string,
     context: QueryContext,
   ): Promise<NewsletterSignupRecord | null> {
@@ -117,7 +117,7 @@ export class NewsletterQuery extends BaseQuery {
    * @returns true if the email is subscribed and not unsubscribed, false otherwise.
    * @example 'const isSubscribed = await NewsletterQuery.getIsActiveSubscriberAsync(email);'
    */
-  static async getIsActiveSubscriberAsync(email: string, context: QueryContext): Promise<boolean> {
+  static async getIsActiveSubscriberByEmailAsync(email: string, context: QueryContext): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
     const [newsletterSignup] = await dbInstance

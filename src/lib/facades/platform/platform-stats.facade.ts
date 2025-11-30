@@ -44,7 +44,7 @@ export class PlatformStatsFacade extends BaseFacade {
       async () => {
         return await CacheService.platform.stats(
           async () => {
-            const context = this.publicContext(dbInstance);
+            const context = this.getPublicContext(dbInstance);
 
             const [bobbleheadsCount, collectionsCount, collectorsCount] = await Promise.all([
               BobbleheadsQuery.getBobbleheadCountAsync(context),

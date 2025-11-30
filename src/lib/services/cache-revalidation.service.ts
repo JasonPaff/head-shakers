@@ -3,6 +3,7 @@
  * provides enterprise-grade cache invalidation patterns using revalidateTag
  */
 
+import { $path } from 'next-typesafe-url';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import {
@@ -12,7 +13,7 @@ import {
   isCacheEnabled,
   isCacheLoggingEnabled,
 } from '@/lib/constants/cache';
-import { type CacheEntityType, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
+import { type CacheEntityType, CacheTagGenerators, CacheTagInvalidation } from '@/lib/utils/cache-tags.utils';
 import { RedisOperations } from '@/lib/utils/redis-client';
 
 /**
@@ -367,12 +368,20 @@ export class CacheRevalidationService {
      * revalidate after collection creation
      */
     onCreate: (collectionId: string, userId: string, collectionSlug?: string): RevalidationResult => {
-      const tags = CacheTagInvalidation.onCollectionChange(collectionId, userId);
+      const tags = CacheTagGenerators.collection.create(collectionId, userId);
 
       // Path-based revalidation using slug if provided
       if (isCacheEnabled() && collectionSlug) {
         try {
-          revalidatePath(`/collections/${collectionSlug}`, 'page');
+          revalidatePath(
+            $path({
+              route: '/collections/[collectionSlug]',
+              routeParams: {
+                slug: collectionSlug,
+              },
+            }),
+            'page',
+          );
         } catch (error) {
           console.error('[CacheRevalidation] Path revalidation error on create:', error);
         }
@@ -380,8 +389,8 @@ export class CacheRevalidationService {
 
       return CacheRevalidationService.revalidateTags(tags, {
         entityId: collectionId,
-        entityType: 'collection',
-        operation: 'collection:create',
+        entityType: CACHE_ENTITY_TYPE.COLLECTION,
+        operation: `${CACHE_ENTITY_TYPE.COLLECTION}:create`,
         reason: 'New collection created',
         userId,
       });

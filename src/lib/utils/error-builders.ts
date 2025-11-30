@@ -237,10 +237,6 @@ export function createNotFoundError(
   );
 }
 
-// ============================================================================
-// layer-specific error builders
-// ============================================================================
-
 /**
  * creates an error from a query operation
  */
@@ -290,6 +286,10 @@ export function createQueryError(context: QueryErrorContext, originalError?: unk
 
   return createInternalError(`Unexpected error in ${query}.${method}`, context, originalError as Error);
 }
+
+// ============================================================================
+// layer-specific error builders
+// ============================================================================
 
 /**
  * creates a rate limit error
@@ -345,10 +345,6 @@ export function createValidationError(
   return new ActionError(ErrorType.VALIDATION, code, message, context, false, 400, originalError);
 }
 
-// ============================================================================
-// helper utilities
-// ============================================================================
-
 /**
  * ensures an error is an ActionError, converting if necessary
  */
@@ -363,6 +359,10 @@ export function ensureActionError(error: unknown, defaultContext?: Record<string
 
   return createInternalError('An unknown error occurred', defaultContext);
 }
+
+// ============================================================================
+// helper utilities
+// ============================================================================
 
 /**
  * type guard to check if an error is an ActionError

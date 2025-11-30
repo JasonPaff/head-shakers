@@ -38,7 +38,7 @@ export interface ActionOperationContext {
   /** Additional data to include in Sentry context */
   contextData?: Record<string, unknown>;
   /** Key from SENTRY_CONTEXTS to set context data under */
-  contextType?: keyof typeof SENTRY_CONTEXTS;
+  contextType?: (typeof SENTRY_CONTEXTS)[keyof typeof SENTRY_CONTEXTS];
   /** Operation name from OPERATIONS constant */
   operation: string;
   /** User ID if authenticated */

@@ -115,7 +115,11 @@ export class CollectionsQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
-  static async createAsync(data: InsertCollection & { slug: string }, userId: string, context: QueryContext) {
+  static async createAsync(
+    data: InsertCollection & { slug: string },
+    userId: string,
+    context: QueryContext,
+  ): Promise<CollectionRecord | null> {
     const dbInstance = this.getDbInstance(context);
 
     const result = await dbInstance
@@ -135,23 +139,6 @@ export class CollectionsQuery extends BaseQuery {
       .returning();
 
     return result?.[0] || null;
-  }
-
-  static async findByIdAsync(id: string, context: QueryContext): Promise<CollectionRecord | null> {
-    const dbInstance = this.getDbInstance(context);
-
-    const result = await dbInstance
-      .select()
-      .from(collections)
-      .where(
-        this.combineFilters(
-          eq(collections.id, id),
-          this.buildBaseFilters(collections.isPublic, collections.userId, undefined, context),
-        ),
-      )
-      .limit(1);
-
-    return result[0] || null;
   }
 
   static async findByIdWithRelationsAsync(
@@ -794,6 +781,23 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
+  static async getByIdAsync(collectionId: string, context: QueryContext): Promise<CollectionRecord | null> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select()
+      .from(collections)
+      .where(
+        this.combineFilters(
+          eq(collections.id, collectionId),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
+        ),
+      )
+      .limit(1);
+
+    return result[0] || null;
+  }
+
   static async getCollectionBobbleheadsWithPhotosAsync(
     collectionId: string,
     context: QueryContext,
@@ -972,6 +976,16 @@ export class CollectionsQuery extends BaseQuery {
       collectionCount: row.collectionCount,
       name: row.category || '',
     }));
+  }
+
+  static async getSlugsByUserId(userId: string, context: QueryContext): Promise<Array<string>> {
+    const dbInstance = this.getDbInstance(context);
+
+    return await dbInstance
+      .select({ slug: collections.slug })
+      .from(collections)
+      .where(eq(collections.userId, userId))
+      .then((results) => results.map((r) => r.slug));
   }
 
   static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {

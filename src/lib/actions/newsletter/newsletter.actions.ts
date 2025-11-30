@@ -4,7 +4,7 @@ import 'server-only';
 
 import type { ActionResponse } from '@/lib/utils/action-response';
 
-import { ACTION_NAMES, CONFIG, OPERATIONS } from '@/lib/constants';
+import { ACTION_NAMES, CONFIG, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { NewsletterFacade } from '@/lib/facades/newsletter/newsletter.facade';
 import { createPublicRateLimitMiddleware } from '@/lib/middleware/rate-limit.middleware';
 import { actionSuccess } from '@/lib/utils/action-response';
@@ -45,7 +45,7 @@ export const subscribeToNewsletterAction = rateLimitedPublicClient
           email: maskedEmail,
           hasUserId: Boolean(userId),
         },
-        contextType: 'NEWSLETTER_DATA',
+        contextType: SENTRY_CONTEXTS.NEWSLETTER_DATA,
         input: parsedInput,
         operation: OPERATIONS.NEWSLETTER.SUBSCRIBE,
         userId: userId ?? undefined,
@@ -104,7 +104,7 @@ export const unsubscribeFromNewsletterAction = publicActionClient
           email: maskedEmail,
           hasUserId: Boolean(userId),
         },
-        contextType: 'NEWSLETTER_DATA',
+        contextType: SENTRY_CONTEXTS.NEWSLETTER_DATA,
         input: parsedInput,
         operation: OPERATIONS.NEWSLETTER.UNSUBSCRIBE,
         userId: userId ?? undefined,

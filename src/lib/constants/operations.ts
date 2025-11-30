@@ -51,6 +51,7 @@ export const OPERATIONS = {
     BROWSE_CATEGORIES: 'browse_categories',
     CREATE: 'create_collection',
     DELETE: 'delete_collection',
+    GET_BY_ID: 'get_collection_by_id',
     GET_BY_USER: 'get_collections_by_user',
     GET_CATEGORIES: 'get_categories',
     UPDATE: 'update_collection',

@@ -3,7 +3,7 @@
  * provides intelligent tag generation and invalidation patterns
  */
 
-import { CACHE_CONFIG } from '@/lib/constants/cache';
+import { CACHE_CONFIG, CACHE_ENTITY_TYPE } from '@/lib/constants/cache';
 
 /**
  * valid aggregate types for cache operations
@@ -297,8 +297,8 @@ export const CacheTagGenerators = {
   collection: {
     create: (collectionId: string, userId: string) =>
       new CacheTagBuilder()
-        .addEntity('collection', collectionId)
-        .addEntity('user', userId)
+        .addEntity(CACHE_ENTITY_TYPE.COLLECTION, collectionId)
+        .addEntity(CACHE_ENTITY_TYPE.USER, userId)
         .addRelationship('user-collections', userId)
         .addFeature('public')
         .addAggregate('user-stats', userId)
@@ -317,10 +317,10 @@ export const CacheTagGenerators = {
         .build(),
 
     read: (collectionId: string, userId?: string) => {
-      const builder = new CacheTagBuilder().addEntity('collection', collectionId);
+      const builder = new CacheTagBuilder().addEntity(CACHE_ENTITY_TYPE.COLLECTION, collectionId);
 
       if (userId) {
-        builder.addEntity('user', userId);
+        builder.addEntity(CACHE_ENTITY_TYPE.USER, userId);
       }
 
       return builder.build();
@@ -328,8 +328,8 @@ export const CacheTagGenerators = {
 
     update: (collectionId: string, userId: string) =>
       new CacheTagBuilder()
-        .addEntity('collection', collectionId)
-        .addEntity('user', userId)
+        .addEntity(CACHE_ENTITY_TYPE.COLLECTION, collectionId)
+        .addEntity(CACHE_ENTITY_TYPE.USER, userId)
         .addRelationship('user-collections', userId)
         .addFeature('public')
         .addFeature('popular')
@@ -355,7 +355,7 @@ export const CacheTagGenerators = {
      * Uses email-specific tag for targeted invalidation
      */
     subscription: (email: string) =>
-      new CacheTagBuilder().addCustom(`newsletter:subscription:${email}`).build(),
+      new CacheTagBuilder().addCustom(`${CACHE_ENTITY_TYPE.NEWSLETTER}:subscription:${email}`).build(),
   },
 
   /**

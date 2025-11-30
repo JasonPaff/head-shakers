@@ -19,7 +19,7 @@ export const FooterNewsletter = async () => {
   if (userId) {
     userEmail = await UsersFacade.getEmailByUserIdAsync(userId);
     if (userEmail) {
-      isSubscribed = await NewsletterFacade.getIsActiveSubscriberAsync(userEmail);
+      isSubscribed = await NewsletterFacade.getIsActiveSubscriberByEmailAsync(userEmail);
     }
   }
 

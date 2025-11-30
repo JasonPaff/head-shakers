@@ -217,11 +217,7 @@ export const createBobbleheadWithPhotosAction = authActionClient
         );
 
         // fetch collection slug for navigation
-        const collection = await CollectionsFacade.getCollectionById(
-          newBobblehead.collectionId,
-          userId,
-          ctx.db,
-        );
+        const collection = await CollectionsFacade.getById(newBobblehead.collectionId, userId, ctx.db);
         const collectionSlug = collection?.slug ?? null;
 
         return actionSuccess({

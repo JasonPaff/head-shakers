@@ -3,16 +3,12 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
 
-import type {
-  BrowseCategoriesResult,
-  BrowseCollectionsResult,
-  CategoryRecord,
-  CollectionRecord,
-} from '@/lib/queries/collections/collections.query';
+import type { CollectionRecord } from '@/lib/queries/collections/collections.query';
 import type { ActionResponse } from '@/lib/utils/action-response';
 
 import {
   ACTION_NAMES,
+  CACHE_ENTITY_TYPE,
   ERROR_CODES,
   ERROR_MESSAGES,
   OPERATIONS,
@@ -25,10 +21,10 @@ import { invalidateMetadataCache } from '@/lib/seo/cache.utils';
 import { CacheRevalidationService } from '@/lib/services/cache-revalidation.service';
 import { handleActionError } from '@/lib/utils/action-error-handler';
 import { actionSuccess } from '@/lib/utils/action-response';
+import { createInternalError, createNotFoundError } from '@/lib/utils/error-builders';
 import { ActionError, ErrorType } from '@/lib/utils/errors';
-import { authActionClient, publicActionClient } from '@/lib/utils/next-safe-action';
-import { browseCategoriesInputSchema } from '@/lib/validations/browse-categories.validation';
-import { browseCollectionsInputSchema } from '@/lib/validations/browse-collections.validation';
+import { authActionClient } from '@/lib/utils/next-safe-action';
+import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
 import {
   deleteCollectionSchema,
   insertCollectionSchema,
@@ -43,49 +39,34 @@ export const createCollectionAction = authActionClient
   .inputSchema(insertCollectionSchema)
   .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CollectionRecord>> => {
     const collectionData = insertCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, collectionData);
-
-    try {
-      const newCollection = await CollectionsFacade.createAsync(collectionData, ctx.userId, dbInstance);
-
-      if (!newCollection) {
-        throw new ActionError(
-          ErrorType.INTERNAL,
-          ERROR_CODES.COLLECTIONS.CREATE_FAILED,
-          ERROR_MESSAGES.COLLECTION.CREATE_FAILED,
-          { ctx, operation: OPERATIONS.COLLECTIONS.CREATE },
-          false,
-          500,
-        );
-      }
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          collection: newCollection,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Created collection: ${newCollection.name}`,
-      });
-
-      // invalidate metadata cache for the new collection
-      invalidateMetadataCache('collection', newCollection.id);
-
-      CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
-
-      return actionSuccess(newCollection);
-    } catch (error) {
-      return handleActionError(error, {
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.COLLECTIONS.CREATE,
+        contextData: { parsedInput },
+        contextType: SENTRY_CONTEXTS.COLLECTION_DATA,
         input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COLLECTIONS.CREATE,
-        },
         operation: OPERATIONS.COLLECTIONS.CREATE,
         userId: ctx.userId,
-      });
-    }
+      },
+      async () => {
+        const newCollection = await CollectionsFacade.createAsync(collectionData, ctx.userId, ctx.db);
+
+        if (!newCollection) {
+          throw createInternalError(ERROR_MESSAGES.COLLECTION.CREATE_FAILED, {
+            ctx,
+            errorCode: ERROR_CODES.COLLECTIONS.CREATE_FAILED,
+            operation: OPERATIONS.COLLECTIONS.CREATE,
+          });
+        }
+
+        // TODO: investigate caching
+        invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, newCollection.id);
+        CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
+
+        return actionSuccess(newCollection);
+      },
+    );
   });
 
 export const updateCollectionAction = authActionClient
@@ -96,66 +77,48 @@ export const updateCollectionAction = authActionClient
   .inputSchema(updateCollectionSchema)
   .action(async ({ ctx, parsedInput }): Promise<ActionResponse<CollectionRecord>> => {
     const collectionData = updateCollectionSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
 
-    Sentry.setContext(SENTRY_CONTEXTS.COLLECTION_DATA, collectionData);
-
-    try {
-      const currentCollection = await CollectionsFacade.getCollectionById(
-        collectionData.collectionId,
-        ctx.userId,
-        dbInstance,
-      );
-
-      if (!currentCollection) {
-        throw new ActionError(
-          ErrorType.INTERNAL,
-          ERROR_CODES.COLLECTIONS.EXISTING_NOT_FOUND,
-          ERROR_MESSAGES.COLLECTION.NOT_FOUND,
-          { ctx, operation: OPERATIONS.COLLECTIONS.UPDATE },
-          false,
-          500,
-        );
-      }
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          collection: currentCollection,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Updated collection: ${currentCollection.name}`,
-      });
-
-      const updatedCollection = await CollectionsFacade.updateAsync(collectionData, ctx.userId, dbInstance);
-
-      if (!updatedCollection) {
-        throw new ActionError(
-          ErrorType.INTERNAL,
-          ERROR_CODES.COLLECTIONS.EXISTING_UPDATE_FAILED,
-          ERROR_MESSAGES.COLLECTION.UPDATE_FAILED,
-          { ctx, operation: OPERATIONS.COLLECTIONS.UPDATE },
-          false,
-          500,
-        );
-      }
-
-      // invalidate metadata cache for the updated collection
-      invalidateMetadataCache('collection', collectionData.collectionId);
-
-      CacheRevalidationService.collections.onUpdate(collectionData.collectionId, ctx.userId);
-
-      return actionSuccess(updatedCollection);
-    } catch (error) {
-      return handleActionError(error, {
+    return withActionErrorHandling(
+      {
+        actionName: ACTION_NAMES.COLLECTIONS.UPDATE,
+        contextData: { parsedInput },
+        contextType: SENTRY_CONTEXTS.COLLECTION_DATA,
         input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COLLECTIONS.UPDATE,
-        },
         operation: OPERATIONS.COLLECTIONS.UPDATE,
         userId: ctx.userId,
-      });
-    }
+      },
+      async () => {
+        const currentCollection = await CollectionsFacade.getById(
+          collectionData.collectionId,
+          ctx.userId,
+          ctx.db,
+        );
+
+        if (!currentCollection) {
+          throw createNotFoundError(ERROR_MESSAGES.COLLECTION.NOT_FOUND, collectionData.collectionId, {
+            ctx,
+            errorCode: ERROR_CODES.COLLECTIONS.EXISTING_NOT_FOUND,
+            operation: OPERATIONS.COLLECTIONS.UPDATE,
+          });
+        }
+
+        const updatedCollection = await CollectionsFacade.updateAsync(collectionData, ctx.userId, ctx.db);
+
+        if (!updatedCollection) {
+          throw createInternalError(ERROR_MESSAGES.COLLECTION.UPDATE_FAILED, {
+            ctx,
+            errorCode: ERROR_CODES.COLLECTIONS.EXISTING_UPDATE_FAILED,
+            operation: OPERATIONS.COLLECTIONS.UPDATE,
+          });
+        }
+
+        // TODO: investigate caching
+        invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, collectionData.collectionId);
+        CacheRevalidationService.collections.onUpdate(collectionData.collectionId, ctx.userId);
+
+        return actionSuccess(updatedCollection);
+      },
+    );
   });
 
 export const deleteCollectionAction = authActionClient
@@ -207,131 +170,6 @@ export const deleteCollectionAction = authActionClient
         },
         operation: OPERATIONS.COLLECTIONS.DELETE,
         userId: ctx.userId,
-      });
-    }
-  });
-
-/**
- * Browse collections with filtering, sorting, and pagination (public action)
- */
-export const browseCollectionsAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.COLLECTIONS.BROWSE,
-    isTransactionRequired: false,
-  })
-  .inputSchema(browseCollectionsInputSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<BrowseCollectionsResult>> => {
-    const browseInput = browseCollectionsInputSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
-
-    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
-      filters: browseInput.filters,
-      pagination: browseInput.pagination,
-      sort: browseInput.sort,
-    });
-
-    try {
-      const result = await CollectionsFacade.browseCollections(browseInput, undefined, dbInstance);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          filters: browseInput.filters,
-          resultCount: result.collections.length,
-          totalCount: result.pagination.totalCount,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Browsed collections with filters`,
-      });
-
-      return actionSuccess(result);
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COLLECTIONS.BROWSE,
-        },
-        operation: OPERATIONS.COLLECTIONS.BROWSE,
-      });
-    }
-  });
-
-/**
- * Get all distinct categories (public action)
- */
-export const getCategoriesAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,
-    isTransactionRequired: false,
-  })
-  .action(async ({ ctx }): Promise<ActionResponse<Array<CategoryRecord>>> => {
-    const dbInstance = ctx.db;
-
-    try {
-      const categories = await CollectionsFacade.getCategories(dbInstance);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          categoryCount: categories.length,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Retrieved ${categories.length} categories`,
-      });
-
-      return actionSuccess(categories);
-    } catch (error) {
-      return handleActionError(error, {
-        metadata: {
-          actionName: ACTION_NAMES.COLLECTIONS.GET_CATEGORIES,
-        },
-        operation: OPERATIONS.COLLECTIONS.GET_CATEGORIES,
-      });
-    }
-  });
-
-/**
- * Browse collections by category with filtering, sorting, and pagination (public action)
- */
-export const browseCategoriesAction = publicActionClient
-  .metadata({
-    actionName: ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES,
-    isTransactionRequired: false,
-  })
-  .inputSchema(browseCategoriesInputSchema)
-  .action(async ({ ctx, parsedInput }): Promise<ActionResponse<BrowseCategoriesResult>> => {
-    const browseInput = browseCategoriesInputSchema.parse(ctx.sanitizedInput);
-    const dbInstance = ctx.db;
-
-    Sentry.setContext(SENTRY_CONTEXTS.INPUT_INFO, {
-      filters: browseInput.filters,
-      pagination: browseInput.pagination,
-      sort: browseInput.sort,
-    });
-
-    try {
-      const result = await CollectionsFacade.browseCategories(browseInput, undefined, dbInstance);
-
-      Sentry.addBreadcrumb({
-        category: SENTRY_BREADCRUMB_CATEGORIES.BUSINESS_LOGIC,
-        data: {
-          category: browseInput.filters?.category,
-          filters: browseInput.filters,
-          resultCount: result.collections.length,
-          totalCount: result.pagination.totalCount,
-        },
-        level: SENTRY_LEVELS.INFO,
-        message: `Browsed categories with filters`,
-      });
-
-      return actionSuccess(result);
-    } catch (error) {
-      return handleActionError(error, {
-        input: parsedInput,
-        metadata: {
-          actionName: ACTION_NAMES.COLLECTIONS.BROWSE_CATEGORIES,
-        },
-        operation: OPERATIONS.COLLECTIONS.BROWSE_CATEGORIES,
       });
     }
   });
