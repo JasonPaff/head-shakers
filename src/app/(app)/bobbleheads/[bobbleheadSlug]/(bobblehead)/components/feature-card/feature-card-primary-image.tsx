@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps, KeyboardEvent } from 'react';
+import type { ComponentProps, KeyboardEvent, MouseEvent } from 'react';
 
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
@@ -84,12 +84,12 @@ export const FeatureCardPrimaryImage = ({
     }
   };
 
-  const handlePreviousClick = (event: React.MouseEvent) => {
+  const handlePreviousClick = (event: MouseEvent) => {
     event.stopPropagation();
     onPrevious();
   };
 
-  const handleNextClick = (event: React.MouseEvent) => {
+  const handleNextClick = (event: MouseEvent) => {
     event.stopPropagation();
     onNext();
   };

@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import type { CommentWithDepth } from '@/lib/queries/social/social.query';
 
 import { CommentSection } from '@/components/feature/comments/comment-section';
@@ -18,7 +20,7 @@ interface BobbleheadCommentsDialogProps {
   /**
    * Trigger element that opens the dialog
    */
-  children: React.ReactNode;
+  children: ReactNode;
   /**
    * Comments to display in the dialog
    */

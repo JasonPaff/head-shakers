@@ -5,7 +5,7 @@ import type { ComponentPropsWithRef } from 'react';
 import { revalidateLogic } from '@tanstack/form-core';
 import { useStore } from '@tanstack/react-form';
 import { Loader2Icon } from 'lucide-react';
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import type { SelectContentReport } from '@/lib/validations/moderation.validation';
 
@@ -43,7 +43,7 @@ const UpdateReportStatusDialogContent = withFocusManagement<UpdateReportStatusDi
     const { focusFirstError } = useFocusContext();
 
     // useState hooks
-    const [isFormDirty, setIsFormDirty] = React.useState(false);
+    const [isFormDirty, setIsFormDirty] = useState(false);
 
     // Server action for updating report status
     const { executeAsync: updateReportStatus, isExecuting } = useServerAction(updateReportStatusAction, {
@@ -84,7 +84,7 @@ const UpdateReportStatusDialogContent = withFocusManagement<UpdateReportStatusDi
     const currentNotes = useStore(form.store, (state) => state.values.moderatorNotes);
 
     // useEffect hooks
-    React.useEffect(() => {
+    useEffect(() => {
       if (isOpen && report) {
         form.reset();
         form.setFieldValue('reportId', report.id);
@@ -94,7 +94,7 @@ const UpdateReportStatusDialogContent = withFocusManagement<UpdateReportStatusDi
       }
     }, [isOpen, report, form]);
 
-    React.useEffect(() => {
+    useEffect(() => {
       const hasChanges =
         currentStatus !== report?.status ||
         (currentNotes?.trim() || undefined) !== (report?.moderatorNotes ?? undefined);

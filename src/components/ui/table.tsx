@@ -1,9 +1,9 @@
-import * as React from 'react';
+import type { HTMLAttributes, Ref, TdHTMLAttributes, ThHTMLAttributes } from 'react';
 
 import { cn } from '@/utils/tailwind-utils';
 
-interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
-  ref?: React.Ref<HTMLTableElement>;
+interface TableProps extends HTMLAttributes<HTMLTableElement> {
+  ref?: Ref<HTMLTableElement>;
 }
 
 export const Table = ({ className, ...props }: TableProps) => (
@@ -12,32 +12,32 @@ export const Table = ({ className, ...props }: TableProps) => (
   </div>
 );
 
-interface TableHeaderProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  ref?: React.Ref<HTMLTableSectionElement>;
+interface TableHeaderProps extends HTMLAttributes<HTMLTableSectionElement> {
+  ref?: Ref<HTMLTableSectionElement>;
 }
 
 export const TableHeader = ({ className, ...props }: TableHeaderProps) => (
   <thead className={cn('[&_tr]:border-b', className)} {...props} />
 );
 
-interface TableBodyProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  ref?: React.Ref<HTMLTableSectionElement>;
+interface TableBodyProps extends HTMLAttributes<HTMLTableSectionElement> {
+  ref?: Ref<HTMLTableSectionElement>;
 }
 
 export const TableBody = ({ className, ...props }: TableBodyProps) => (
   <tbody className={cn('[&_tr:last-child]:border-0', className)} {...props} />
 );
 
-interface TableFooterProps extends React.HTMLAttributes<HTMLTableSectionElement> {
-  ref?: React.Ref<HTMLTableSectionElement>;
+interface TableFooterProps extends HTMLAttributes<HTMLTableSectionElement> {
+  ref?: Ref<HTMLTableSectionElement>;
 }
 
 export const TableFooter = ({ className, ...props }: TableFooterProps) => (
   <tfoot className={cn('border-t bg-muted/50 font-medium [&>tr]:last:border-b-0', className)} {...props} />
 );
 
-interface TableRowProps extends React.HTMLAttributes<HTMLTableRowElement> {
-  ref?: React.Ref<HTMLTableRowElement>;
+interface TableRowProps extends HTMLAttributes<HTMLTableRowElement> {
+  ref?: Ref<HTMLTableRowElement>;
 }
 
 export const TableRow = ({ className, ...props }: TableRowProps) => (
@@ -51,8 +51,8 @@ export const TableRow = ({ className, ...props }: TableRowProps) => (
   />
 );
 
-interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {
-  ref?: React.Ref<HTMLTableCellElement>;
+interface TableHeadProps extends ThHTMLAttributes<HTMLTableCellElement> {
+  ref?: Ref<HTMLTableCellElement>;
 }
 
 export const TableHead = ({ className, ...props }: TableHeadProps) => (
@@ -66,16 +66,16 @@ export const TableHead = ({ className, ...props }: TableHeadProps) => (
   />
 );
 
-interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {
-  ref?: React.Ref<HTMLTableCellElement>;
+interface TableCellProps extends TdHTMLAttributes<HTMLTableCellElement> {
+  ref?: Ref<HTMLTableCellElement>;
 }
 
 export const TableCell = ({ className, ...props }: TableCellProps) => (
   <td className={cn('p-4 align-middle [&:has([role=checkbox])]:pr-0', className)} {...props} />
 );
 
-interface TableCaptionProps extends React.HTMLAttributes<HTMLTableCaptionElement> {
-  ref?: React.Ref<HTMLTableCaptionElement>;
+interface TableCaptionProps extends HTMLAttributes<HTMLTableCaptionElement> {
+  ref?: Ref<HTMLTableCaptionElement>;
 }
 
 export const TableCaption = ({ className, ...props }: TableCaptionProps) => (

@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentProps } from 'react';
+import type { ChangeEvent, ComponentProps, FormEvent } from 'react';
 
 import { LoaderIcon, ReplyIcon, XIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -73,11 +73,11 @@ export const CommentForm = ({
     _isReplyMode ? `Reply to ${parentCommentAuthor ?? 'comment'}...` : placeholder;
   const _effectiveSubmitText = _isReplyMode ? 'Post Reply' : submitButtonText;
 
-  const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (_isContentValid && !isSubmitting && !isAtMaxDepth) {

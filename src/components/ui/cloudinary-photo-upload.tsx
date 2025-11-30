@@ -2,6 +2,7 @@
 'use client';
 
 import type { CloudinaryUploadWidgetError, CloudinaryUploadWidgetResults } from 'next-cloudinary';
+import type { Ref } from 'react';
 
 import { useAuth } from '@clerk/nextjs';
 import * as Sentry from '@sentry/nextjs';
@@ -69,7 +70,7 @@ interface CloudinaryPhotoUploadProps {
   ) => void;
   onUploadStateChange?: (isUploading: boolean) => void;
   photos: Array<CloudinaryPhoto>;
-  ref?: React.Ref<CloudinaryPhotoUploadRef>;
+  ref?: Ref<CloudinaryPhotoUploadRef>;
 }
 
 export const CloudinaryPhotoUpload = ({

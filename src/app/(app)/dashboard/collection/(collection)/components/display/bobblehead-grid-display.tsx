@@ -189,7 +189,7 @@ export const BobbleheadGridDisplay = ({
       </Conditional>
 
       {/* Bobblehead Grid */}
-      <BobbleheadGrid gridDensity={gridDensity}>
+      <BobbleheadGrid gridDensity={gridDensity} isEmpty={!_hasBobbleheads}>
         <Conditional isCondition={_hasBobbleheads}>
           {filteredBobbleheads.map((bobblehead) => (
             <BobbleheadCard

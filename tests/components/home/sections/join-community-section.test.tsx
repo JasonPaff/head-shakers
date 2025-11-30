@@ -12,7 +12,7 @@ vi.mock('@clerk/nextjs', async () => {
   const actual = await vi.importActual<typeof ClerkNextjs>('@clerk/nextjs');
   return {
     ...actual,
-    SignUpButton: ({ children }: { children: React.ReactNode }): JSX.Element => <button>{children}</button>,
+    SignUpButton: ({ children }: Children): JSX.Element => <button>{children}</button>,
   };
 });
 

@@ -10,7 +10,7 @@ export const NoBobbleheads = ({ onAddClick }: NoBobbleheadsProps) => {
   return (
     <div
       className={
-        'flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed bg-card p-8 text-center'
+        'flex h-full min-h-[400px] w-full flex-col items-center justify-center rounded-lg border border-dashed bg-card p-8 text-center'
       }
       data-slot={'no-bobbleheads'}
     >

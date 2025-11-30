@@ -20,7 +20,7 @@ import {
   TrashIcon,
   XIcon,
 } from 'lucide-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { type MouseEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -391,7 +391,7 @@ const CollectionSidebarItem = ({
   }, [collection.id, onClick]);
 
   const handleEdit = useCallback(
-    (e: React.MouseEvent) => {
+    (e: MouseEvent) => {
       e.stopPropagation();
       onEdit(collection.id);
     },
@@ -489,7 +489,7 @@ const CollectionDetailedCard = ({
   }, [collection.id, onClick]);
 
   const handleEdit = useCallback(
-    (e: React.MouseEvent) => {
+    (e: MouseEvent) => {
       e.stopPropagation();
       onEdit(collection.id);
     },
@@ -644,7 +644,7 @@ const CollectionCoverCard = ({ collection, isActive, onClick, onEdit, testId }: 
   }, [collection.id, onClick]);
 
   const handleEdit = useCallback(
-    (e: React.MouseEvent) => {
+    (e: MouseEvent) => {
       e.stopPropagation();
       onEdit(collection.id);
     },

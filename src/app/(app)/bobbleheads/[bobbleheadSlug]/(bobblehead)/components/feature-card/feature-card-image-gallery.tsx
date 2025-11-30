@@ -3,7 +3,7 @@
 import type { ComponentProps } from 'react';
 
 import { CldImage } from 'next-cloudinary';
-import { useCallback, useEffect, useRef } from 'react';
+import { type KeyboardEvent, useCallback, useEffect, useRef } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -57,7 +57,7 @@ export const FeatureCardImageGallery = ({
   );
 
   const handleKeyDown = useCallback(
-    (index: number, event: React.KeyboardEvent) => {
+    (index: number, event: KeyboardEvent) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         onImageSelect(index);

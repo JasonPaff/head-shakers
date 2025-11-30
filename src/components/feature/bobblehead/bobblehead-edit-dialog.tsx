@@ -1,5 +1,6 @@
 'use client';
 
+import type { RefObject } from 'react';
 import type { z } from 'zod';
 
 import * as Sentry from '@sentry/nextjs';
@@ -94,7 +95,7 @@ interface ItemPhotosEditProps {
   isLoading: boolean;
   onRetry: () => void;
   photoCount: number;
-  photoUploadRef?: React.RefObject<CloudinaryPhotoUploadRef | null>;
+  photoUploadRef?: RefObject<CloudinaryPhotoUploadRef | null>;
 }
 
 function ItemPhotosEditComponent({
