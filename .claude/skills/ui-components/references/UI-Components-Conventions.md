@@ -97,7 +97,7 @@ type DialogContentProps = ComponentProps<typeof DialogPrimitive.Content> &
 type InputProps = ComponentProps<'input'> &
   ComponentTestIdProps & {
     isClearable?: boolean;
-    isSearch?: boolean;
+    leftIcon?: ReactNode | 'search';
     onClear?: () => void;
   };
 ```
@@ -174,7 +174,7 @@ type ButtonProps = {
 
 type InputProps = {
   isClearable?: boolean;
-  isSearch?: boolean;
+  leftIcon?: ReactNode | 'search';
 };
 
 // Incorrect - DO NOT USE

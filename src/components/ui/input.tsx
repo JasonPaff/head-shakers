@@ -1,8 +1,8 @@
 'use client';
 
-import type { ChangeEvent, ComponentProps } from 'react';
+import type { ChangeEvent, ComponentProps, ReactElement } from 'react';
 
-import { SearchIcon, XIcon } from 'lucide-react';
+import { XIcon } from 'lucide-react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
@@ -12,30 +12,33 @@ import { cn } from '@/utils/tailwind-utils';
 
 import { Conditional } from './conditional';
 
-type InputProps = ComponentProps<'input'> &
+export type InputProps = ComponentProps<'input'> &
   ComponentTestIdProps & {
     isClearable?: boolean;
-    isSearch?: boolean;
+    leftIcon?: ReactElement;
     onClear?: () => void;
   };
 
 export const Input = ({
   className,
   isClearable,
-  isSearch,
+  leftIcon,
   onClear,
   ref,
   testId,
   type,
   ...props
 }: InputProps) => {
-  const inputTestId = testId || generateTestId('ui', 'input');
-  const clearButtonTestId = generateTestId('ui', 'button', 'clear');
-
   const handleInputClear = () => {
     props.onChange?.({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
     onClear?.();
   };
+
+  const inputTestId = testId || generateTestId('ui', 'input');
+  const clearButtonTestId = generateTestId('ui', 'button', 'clear');
+
+  const _hasLeftIcon = !!leftIcon;
+  const _hasClearButton = isClearable && !!props.value;
 
   return (
     <div className={'relative'}>
@@ -51,7 +54,7 @@ export const Input = ({
           'focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
           'aria-invalid:border-destructive aria-invalid:ring-destructive/20',
           'dark:aria-invalid:ring-destructive/40',
-          isSearch ? 'pl-8' : '',
+          _hasLeftIcon ? 'pl-8' : '',
           className,
         )}
         data-slot={'input'}
@@ -61,16 +64,15 @@ export const Input = ({
         {...props}
       />
 
-      {/* Search Icon */}
-      <Conditional isCondition={isSearch}>
-        <SearchIcon
-          aria-hidden
-          className={'absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground'}
-        />
+      {/* Left Icon */}
+      <Conditional isCondition={_hasLeftIcon}>
+        <div className={'pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-muted-foreground'}>
+          {leftIcon}
+        </div>
       </Conditional>
 
       {/* Clear Button */}
-      <Conditional isCondition={isClearable && !!props.value}>
+      <Conditional isCondition={_hasClearButton}>
         <Button
           className={'absolute top-1/2 right-2 size-6 -translate-y-1/2'}
           onClick={handleInputClear}
