@@ -41,6 +41,7 @@ export type ComponentTestId =
   | 'collection-create-form'
   | 'collection-create-submit'
   | 'collection-edit-cancel'
+  | 'collection-edit-delete'
   | 'collection-edit-dialog'
   | 'collection-edit-form'
   | 'collection-edit-submit'

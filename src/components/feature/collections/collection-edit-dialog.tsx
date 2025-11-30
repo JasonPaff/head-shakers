@@ -8,6 +8,7 @@ import { useRef, useState } from 'react';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
 
+import { CollectionDelete } from '@/components/feature/collections/collection-delete';
 import { Button } from '@/components/ui/button';
 import { CloudinaryCoverUpload } from '@/components/ui/cloudinary-cover-upload';
 import {
@@ -122,6 +123,7 @@ export const CollectionEditDialog = withFocusManagement(
     const formTestId = generateTestId('feature', 'collection-edit-form');
     const cancelButtonTestId = generateTestId('feature', 'collection-edit-cancel');
     const submitButtonTestId = generateTestId('feature', 'collection-edit-submit');
+    const deleteButtonTestId = generateTestId('feature', 'collection-edit-delete');
 
     return (
       <Dialog onOpenChange={trackedOnOpenChange(handleOpenChange)} open={isOpen}>
@@ -197,18 +199,32 @@ export const CollectionEditDialog = withFocusManagement(
               </div>
 
               {/* Action Buttons */}
-              <DialogFooter>
-                <Button
+              <DialogFooter className={'sm:justify-between'}>
+                {/* Delete */}
+                <CollectionDelete
+                  collectionId={collection.id}
+                  collectionName={collection.name}
                   disabled={isSubmitting}
-                  onClick={handleCancelClick}
-                  testId={cancelButtonTestId}
-                  variant={'outline'}
+                  testId={deleteButtonTestId}
+                  variant={'ghost'}
                 >
-                  Cancel
-                </Button>
-                <form.SubmitButton testId={submitButtonTestId}>
-                  {isSubmitting ? 'Updating...' : 'Update Collection'}
-                </form.SubmitButton>
+                  Delete
+                </CollectionDelete>
+
+                {/* Cancel / Submit */}
+                <div className={'flex gap-2'}>
+                  <Button
+                    disabled={isSubmitting}
+                    onClick={handleCancelClick}
+                    testId={cancelButtonTestId}
+                    variant={'outline'}
+                  >
+                    Cancel
+                  </Button>
+                  <form.SubmitButton testId={submitButtonTestId}>
+                    {isSubmitting ? 'Updating...' : 'Update Collection'}
+                  </form.SubmitButton>
+                </div>
               </DialogFooter>
             </form.AppForm>
           </form>

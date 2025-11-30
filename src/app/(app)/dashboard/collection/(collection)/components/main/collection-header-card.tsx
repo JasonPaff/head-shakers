@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { formatCurrency } from '@/lib/utils/currency.utils';
 
 export type CollectionHeaderCardProps = {
   bobbleheadCount: number;
@@ -41,10 +42,7 @@ export const CollectionHeaderCard = ({
   totalValue,
   viewCount,
 }: CollectionHeaderCardProps) => {
-  const formattedValue = new Intl.NumberFormat('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  }).format(totalValue);
+  const formattedValue = formatCurrency(totalValue);
 
   return (
     <Card className={'m-4 mb-0 hidden lg:block'} data-slot={'collection-header-card'}>

@@ -2,6 +2,7 @@ import 'server-only';
 
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
+import { getUserPreferences } from '@/utils/server-cookies';
 
 import { SidebarDisplay } from '../display/sidebar-display';
 
@@ -11,7 +12,15 @@ import { SidebarDisplay } from '../display/sidebar-display';
  */
 export async function SidebarAsync() {
   const userId = await getRequiredUserIdAsync();
-  const collections = await CollectionsFacade.getDashboardListByUserId(userId);
+  const [collections, preferences] = await Promise.all([
+    CollectionsFacade.getDashboardListByUserId(userId),
+    getUserPreferences(),
+  ]);
 
-  return <SidebarDisplay collections={collections} />;
+  return (
+    <SidebarDisplay
+      collections={collections}
+      initialCardStyle={preferences.collectionSidebarView ?? 'compact'}
+    />
+  );
 }

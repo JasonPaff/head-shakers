@@ -46,6 +46,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useToggle } from '@/hooks/use-toggle';
 import { generateTestId } from '@/lib/test-ids';
+import { formatCurrency } from '@/lib/utils/currency.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 // ========================================
@@ -398,10 +399,7 @@ const CollectionSidebarItem = ({
     [collection.id, onEdit],
   );
 
-  const formattedValue = new Intl.NumberFormat('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  }).format(collection.totalValue);
+  const formattedValue = formatCurrency(collection.totalValue);
 
   return (
     <div
@@ -496,10 +494,7 @@ const CollectionDetailedCard = ({
     [collection.id, onEdit],
   );
 
-  const formattedValue = new Intl.NumberFormat('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  }).format(collection.totalValue);
+  const formattedValue = formatCurrency(collection.totalValue);
 
   return (
     <HoverCard openDelay={300}>
@@ -651,10 +646,7 @@ const CollectionCoverCard = ({ collection, isActive, onClick, onEdit, testId }: 
     [collection.id, onEdit],
   );
 
-  const formattedValue = new Intl.NumberFormat('en-US', {
-    currency: 'USD',
-    style: 'currency',
-  }).format(collection.totalValue);
+  const formattedValue = formatCurrency(collection.totalValue);
 
   return (
     <div
@@ -1103,12 +1095,7 @@ export function OffCanvasDrawerDashboard({ className, testId, ...props }: OffCan
   // 4. useEffect hooks
   // (none needed)
 
-  // 5. Utility functions
-  const formatCurrency = (value: number): string => {
-    return new Intl.NumberFormat('en-US', { currency: 'USD', style: 'currency' }).format(value);
-  };
-
-  // 6. Event handlers
+  // 5. Event handlers
   const handleCollectionSelect = useCallback(
     (collectionId: string) => {
       setSelectedCollectionId(collectionId);

@@ -13,6 +13,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Conditional } from '@/components/ui/conditional';
+import { formatCurrency } from '@/lib/utils/currency.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 interface EngagementMetricsCardProps {
@@ -44,10 +45,7 @@ export const EngagementMetricsCard = ({
   const formatValue = (val: number, fmt: typeof format) => {
     switch (fmt) {
       case 'currency':
-        return new Intl.NumberFormat('en-US', {
-          currency: 'USD',
-          style: 'currency',
-        }).format(val);
+        return formatCurrency(val);
       case 'duration': {
         const minutes = Math.floor(val / 60);
         const seconds = val % 60;

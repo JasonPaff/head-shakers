@@ -14,6 +14,11 @@ export const cookieConstants = {
     maxAge: 60 * 60 * 24 * 365, // 1 year
     name: 'head-shakers-theme',
   },
+  userPreferences: {
+    defaultValue: '{}',
+    maxAge: 60 * 60 * 24 * 365, // 1 year
+    name: 'head-shakers-user-preferences',
+  },
 } as const;
 
 export type CookieKey = keyof typeof cookieConstants;

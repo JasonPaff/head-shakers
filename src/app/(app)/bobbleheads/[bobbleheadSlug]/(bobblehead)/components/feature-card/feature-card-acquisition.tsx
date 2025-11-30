@@ -8,6 +8,7 @@ import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 import { Conditional } from '@/components/ui/conditional';
 import { generateTestId } from '@/lib/test-ids';
+import { formatCurrency } from '@/lib/utils/currency.utils';
 import { cn } from '@/utils/tailwind-utils';
 
 import { FeatureCardDetailItem } from './feature-card-detail-item';
@@ -17,19 +18,6 @@ type FeatureCardAcquisitionProps = ComponentProps<'div'> &
   ComponentTestIdProps & {
     bobblehead: BobbleheadWithRelations;
   };
-
-/**
- * Formats a numeric value as USD currency
- */
-const formatCurrency = (value: null | number | string | undefined): null | string => {
-  if (value === null || value === undefined) return null;
-
-  const numericValue = typeof value === 'string' ? parseFloat(value) : value;
-
-  if (isNaN(numericValue)) return null;
-
-  return new Intl.NumberFormat('en-US', { currency: 'USD', style: 'currency' }).format(numericValue);
-};
 
 /**
  * Formats a date value as "MMM d, yyyy" (e.g., "Dec 15, 2024")

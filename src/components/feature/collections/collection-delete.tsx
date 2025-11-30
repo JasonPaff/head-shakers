@@ -3,7 +3,6 @@
 import type { ComponentProps } from 'react';
 
 import { TrashIcon } from 'lucide-react';
-import { $path } from 'next-typesafe-url';
 import { useRouter } from 'next/navigation';
 import { Fragment } from 'react';
 
@@ -32,12 +31,13 @@ export const CollectionDelete = ({
 
   const { executeAsync, isExecuting } = useServerAction(deleteCollectionAction, {
     loadingMessage: 'Deleting collection...',
+    onAfterSuccess: () => {
+      router.refresh();
+    },
   });
 
   const handleDeleteAsync = async () => {
-    await executeAsync({ collectionId }).then(() => {
-      router.push($path({ route: '/dashboard/collection' }));
-    });
+    await executeAsync({ collectionId });
   };
 
   return (
