@@ -10,7 +10,7 @@ import { BrowseCollectionsFilters } from '@/app/(app)/browse/components/browse-c
 import { BrowseCollectionsPagination } from '@/app/(app)/browse/components/browse-collections-pagination';
 import { BrowseCollectionsTable } from '@/app/(app)/browse/components/browse-collections-table';
 import { Spinner } from '@/components/ui/spinner';
-import { browseCollectionsAction } from '@/lib/actions/collections/collections.actions';
+import { browseCollectionsAction } from '@/lib/actions/collections/collections-browse.actions';
 import { CONFIG } from '@/lib/constants';
 import {
   BROWSE_COLLECTIONS_SORT_BY,
