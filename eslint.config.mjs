@@ -81,10 +81,10 @@ export default eslintTypescript.config([
   {
     ...eslintReactSnob.configs.strict,
   },
-  // testing library config for component tests (exclude E2E tests which use Playwright)
+  // testing library config for component tests (exclude E2E and integration tests)
   {
     files: ['tests/**/*.{ts,tsx}'],
-    ignores: ['tests/e2e/**/*.{ts,tsx}'],
+    ignores: ['tests/e2e/**/*.{ts,tsx}', 'tests/integration/**/*.{ts,tsx}'],
     ...eslintTestingLibrary.configs['flat/react'],
   },
   // vitest config for unit/integration/component tests (exclude E2E which uses Playwright)
