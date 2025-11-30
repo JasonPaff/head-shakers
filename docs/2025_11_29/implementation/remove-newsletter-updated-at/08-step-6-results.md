@@ -26,17 +26,18 @@
 
 ## Validation Results
 
-| Command             | Result                    | Notes                                                       |
-| ------------------- | ------------------------- | ----------------------------------------------------------- |
-| `npm run format`    | PASS                      | All files formatted successfully                            |
-| `npm run lint:fix`  | PASS                      | No linting errors                                           |
-| `npm run typecheck` | FAIL (pre-existing)       | Pre-existing errors in unrelated files (bobblehead, likes)  |
+| Command             | Result              | Notes                                                      |
+| ------------------- | ------------------- | ---------------------------------------------------------- |
+| `npm run format`    | PASS                | All files formatted successfully                           |
+| `npm run lint:fix`  | PASS                | No linting errors                                          |
+| `npm run typecheck` | FAIL (pre-existing) | Pre-existing errors in unrelated files (bobblehead, likes) |
 
 **Note**: TypeScript errors are pre-existing issues in unrelated files (bobblehead-edit-dialog.tsx, bobblehead-gallery-card.tsx, use-like.tsx) and are NOT introduced by this change.
 
 ## updatedAt Reference Check
 
 Verified no remaining `updatedAt` references in newsletter-related code:
+
 - `src/lib/db/schema/newsletter-signups.schema.ts` - ✓ No references
 - `src/lib/queries/newsletter/newsletter.queries.ts` - ✓ No references
 - `src/lib/validations/newsletter.validation.ts` - ✓ No references

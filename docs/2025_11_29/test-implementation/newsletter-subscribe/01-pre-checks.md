@@ -28,11 +28,13 @@
 ## Prerequisites Validation
 
 ### Test Framework
+
 - [x] Vitest available (version 4.0.3)
 - [x] @testing-library/react available (version 16.3.0)
 - [x] MSW available for mocking (version 2.12.2)
 
 ### Source Files Under Test
+
 1. `src/lib/utils/email-utils.ts` - Email normalization and masking utilities
 2. `src/lib/utils/action-response.ts` - Action response helpers
 3. `src/lib/validations/newsletter.validation.ts` - Zod validation schemas
@@ -41,6 +43,7 @@
 6. `src/lib/actions/newsletter/newsletter.actions.ts` - Server actions
 
 ### Test Directory Structure to Create
+
 ```
 tests/unit/lib/
 ├── utils/

@@ -7,6 +7,7 @@
 ## Input: Coverage Gaps
 
 9 coverage gaps identified requiring 12 E2E tests:
+
 - Critical: 7 tests (Anonymous subscription, Auth non-subscriber, Auth unsubscribe)
 - High: 5 tests (Validation, Loading states, Privacy)
 - Medium: 3 tests (State persistence, Footer visibility)

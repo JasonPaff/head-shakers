@@ -5,6 +5,7 @@
 ## Extracted Implementation Steps
 
 ### Step 1: Email Utilities Tests
+
 - **Test Type**: unit
 - **Specialist**: unit-test-specialist
 - **Priority**: Critical
@@ -13,6 +14,7 @@
 - **Test Cases**: 7 total (normalizeEmail: 4, maskEmail: 3)
 
 ### Step 2: Action Response Helpers Tests
+
 - **Test Type**: unit
 - **Specialist**: unit-test-specialist
 - **Priority**: High
@@ -21,6 +23,7 @@
 - **Test Cases**: 6 total (actionSuccess: 2, actionFailure: 1, Type Guards: 3)
 
 ### Step 3: Newsletter Validation Schema Tests
+
 - **Test Type**: unit
 - **Specialist**: unit-test-specialist
 - **Priority**: Critical
@@ -29,6 +32,7 @@
 - **Test Cases**: 12 total (insertNewsletterSignupSchema: 6, unsubscribeFromNewsletterSchema: 6)
 
 ### Step 4: Newsletter Query Layer Tests
+
 - **Test Type**: unit
 - **Specialist**: unit-test-specialist
 - **Priority**: High
@@ -37,6 +41,7 @@
 - **Test Cases**: 16 total
 
 ### Step 5: Newsletter Facade Layer Tests
+
 - **Test Type**: unit
 - **Specialist**: unit-test-specialist
 - **Priority**: Critical
@@ -45,6 +50,7 @@
 - **Test Cases**: 14 total
 
 ### Step 6: Newsletter Server Actions Tests
+
 - **Test Type**: unit
 - **Specialist**: unit-test-specialist
 - **Priority**: High
@@ -54,14 +60,14 @@
 
 ## Step Routing Table
 
-| Step | Test Type | Specialist | Files | Test Count |
-|------|-----------|------------|-------|------------|
-| 1 | unit | unit-test-specialist | email-utils.test.ts | 7 |
-| 2 | unit | unit-test-specialist | action-response.test.ts | 6 |
-| 3 | unit | unit-test-specialist | newsletter.validation.test.ts | 12 |
-| 4 | unit | unit-test-specialist | newsletter.queries.test.ts | 16 |
-| 5 | unit | unit-test-specialist | newsletter.facade.test.ts | 14 |
-| 6 | unit | unit-test-specialist | newsletter.actions.test.ts | 6 |
+| Step | Test Type | Specialist           | Files                         | Test Count |
+| ---- | --------- | -------------------- | ----------------------------- | ---------- |
+| 1    | unit      | unit-test-specialist | email-utils.test.ts           | 7          |
+| 2    | unit      | unit-test-specialist | action-response.test.ts       | 6          |
+| 3    | unit      | unit-test-specialist | newsletter.validation.test.ts | 12         |
+| 4    | unit      | unit-test-specialist | newsletter.queries.test.ts    | 16         |
+| 5    | unit      | unit-test-specialist | newsletter.facade.test.ts     | 14         |
+| 6    | unit      | unit-test-specialist | newsletter.actions.test.ts    | 6          |
 
 ## Step Dependencies
 
@@ -73,6 +79,7 @@
 ## Todo List Created
 
 7 items created:
+
 1. Step 1: Email Utilities Tests [unit] - pending
 2. Step 2: Action Response Helpers Tests [unit] - pending
 3. Step 3: Newsletter Validation Schema Tests [unit] - pending

@@ -6,13 +6,13 @@
 
 ## Summary
 
-| Metric | Value |
-|--------|-------|
-| **Source Files Analyzed** | 4 user-facing components + 1 server action file |
-| **Existing E2E Tests Found** | 0 tests covering newsletter functionality |
-| **Total Coverage Gaps** | 9 user flows |
-| **Estimated E2E Test Cases** | 12 test cases |
-| **New Test Files Needed** | 1 file |
+| Metric                       | Value                                                     |
+| ---------------------------- | --------------------------------------------------------- |
+| **Source Files Analyzed**    | 4 user-facing components + 1 server action file           |
+| **Existing E2E Tests Found** | 0 tests covering newsletter functionality                 |
+| **Total Coverage Gaps**      | 9 user flows                                              |
+| **Estimated E2E Test Cases** | 12 test cases                                             |
+| **New Test Files Needed**    | 1 file                                                    |
 | **Test Data Setup Required** | Yes - requires test user subscriber/non-subscriber states |
 
 ---
@@ -21,17 +21,17 @@
 
 ### Components
 
-| File | Type | Purpose | Exports |
-|------|------|---------|---------|
-| `src/components/layout/app-footer/app-footer.tsx` | Server | Footer layout wrapper | `AppFooter` |
-| `src/components/layout/app-footer/components/footer-newsletter.tsx` | Server | Orchestrates subscribe/unsubscribe display | `FooterNewsletter` |
-| `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx` | Client | Email subscription form with optimistic UI | `FooterNewsletterSubscribe` |
-| `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Client | Unsubscribe interface with user email | `FooterNewsletterUnsubscribe` |
+| File                                                                            | Type   | Purpose                                    | Exports                       |
+| ------------------------------------------------------------------------------- | ------ | ------------------------------------------ | ----------------------------- |
+| `src/components/layout/app-footer/app-footer.tsx`                               | Server | Footer layout wrapper                      | `AppFooter`                   |
+| `src/components/layout/app-footer/components/footer-newsletter.tsx`             | Server | Orchestrates subscribe/unsubscribe display | `FooterNewsletter`            |
+| `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx`   | Client | Email subscription form with optimistic UI | `FooterNewsletterSubscribe`   |
+| `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Client | Unsubscribe interface with user email      | `FooterNewsletterUnsubscribe` |
 
 ### Server Actions
 
-| File | Exports | Purpose |
-|------|---------|---------|
+| File                                               | Exports                                                          | Purpose                                        |
+| -------------------------------------------------- | ---------------------------------------------------------------- | ---------------------------------------------- |
 | `src/lib/actions/newsletter/newsletter.actions.ts` | `subscribeToNewsletterAction`, `unsubscribeFromNewsletterAction` | Handle newsletter mutations with rate limiting |
 
 ---
@@ -39,13 +39,16 @@
 ## Existing E2E Test Coverage
 
 ### Tests Found
+
 - `tests/e2e/specs/smoke/health.spec.ts` - Application health checks only
 - `tests/e2e/specs/smoke/auth-flow.spec.ts` - Authentication flows only
 - `tests/e2e/specs/public/home-sections.spec.ts` - General home page sections (not footer-specific)
 - `tests/e2e/specs/user/home-authenticated.spec.ts` - Authenticated home page (not footer-specific)
 
 ### Gap Summary
+
 **Zero direct coverage** of newsletter footer functionality. No E2E tests validate:
+
 - Newsletter subscription form rendering
 - Form submission flows
 - Optimistic UI state transitions
@@ -60,22 +63,26 @@
 ### Critical Priority
 
 #### Gap 1: Anonymous User Newsletter Subscription Flow
+
 **User Flow**: Unauthenticated user subscribes from footer
 **Current Coverage**: None
 **Risk**: Core feature path, public-facing signup mechanism
 
 **What's Missing**:
+
 - Anonymous user sees subscribe form in footer
 - Valid email submission triggers success state
 - Form shows optimistic "Newsletter Subscriber" confirmation
 - Page refresh maintains correct state (unsubscribed)
 
 **Estimated Test Cases**: 3
+
 1. Anonymous user can see "Stay Updated" subscribe form in footer
 2. Anonymous user submits valid email → shows "Newsletter Subscriber" message with email
 3. Anonymous user subscribes → footer shows confirmation state after page refresh
 
 **Setup Requirements**:
+
 - Test runs on unauthenticated session (`page` fixture, not `userPage`)
 - Navigate to home page where footer is visible
 - Scroll to footer section
@@ -85,22 +92,26 @@
 ---
 
 #### Gap 2: Authenticated Unsubscribed User Subscription Flow
+
 **User Flow**: Logged-in non-subscriber clicks subscribe
 **Current Coverage**: None
 **Risk**: Core authenticated feature path, subscription mechanism
 
 **What's Missing**:
+
 - Authenticated user (not subscribed) sees subscribe form
 - Form submission transitions to unsubscribe view
 - Displays correct email confirmation
 - State persists after page refresh
 
 **Estimated Test Cases**: 3
+
 1. Authenticated non-subscriber sees "Stay Updated" subscribe form in footer
 2. Authenticated user submits subscription → footer transitions to "Newsletter Subscriber" + unsubscribe button
 3. Authenticated subscriber → page refresh maintains "Newsletter Subscriber" state with unsubscribe option
 
 **Setup Requirements**:
+
 - Uses `userPage` fixture (pre-authenticated test user)
 - User must NOT be in newsletter_signups table initially
 - Database seeding ensures clean state (no prior subscription)
@@ -110,22 +121,26 @@
 ---
 
 #### Gap 3: Authenticated Subscribed User Unsubscribe Flow
+
 **User Flow**: Logged-in subscriber clicks unsubscribe
 **Current Coverage**: None
 **Risk**: User control feature, critical for compliance and user experience
 
 **What's Missing**:
+
 - Authenticated subscriber sees unsubscribe interface
 - Unsubscribe button with email confirmation
 - Clicking unsubscribe transitions back to subscribe form
 - State persists across page reloads
 
 **Estimated Test Cases**: 2
+
 1. Authenticated subscriber sees "Newsletter Subscriber" + unsubscribe button with email in footer
 2. User clicks unsubscribe → footer transitions to "Stay Updated" subscribe form
 3. After unsubscribe → page refresh shows subscribe form, not unsubscribe button
 
 **Setup Requirements**:
+
 - Test user must have active newsletter subscription
 - Database seeding required (newsletter_signups with unsubscribedAt = NULL)
 
@@ -136,21 +151,25 @@
 ### High Priority
 
 #### Gap 4: Email Validation Error Handling
+
 **User Flow**: Invalid email submission shows validation error
 **Current Coverage**: None
 **Risk**: Form validation UX, prevents invalid data submission
 
 **What's Missing**:
+
 - Submitting blank email shows validation error
 - Submitting invalid format (no @) shows validation error
 - Submitting too-long email shows validation error
 - Error messages display clearly in form
 
 **Estimated Test Cases**: 2
+
 1. Anonymous user submits empty email → sees validation error message
 2. Anonymous user submits invalid email format (e.g., "notanemail") → sees validation error
 
 **Setup Requirements**:
+
 - Navigate to home page footer
 - Focus on email input field
 - Clear field or type invalid value
@@ -161,21 +180,25 @@
 ---
 
 #### Gap 5: Optimistic UI State Management
+
 **User Flow**: Form shows "Subscribing..." and disables on submit
 **Current Coverage**: None
 **Risk**: User feedback, prevents double-submission
 
 **What's Missing**:
+
 - Submit button shows "Subscribing..." loading state
 - Email input is disabled during submission
 - Form prevents multiple submissions while pending
 - State clears after success
 
 **Estimated Test Cases**: 2
+
 1. User submits form → button shows "Subscribing..." text and is disabled
 2. User submits form → email input disabled during submission, re-enabled after success
 
 **Setup Requirements**:
+
 - Intercept network requests to slow down response
 - Or mock slow server action delay
 - Verify button/input state during pending period
@@ -185,20 +208,24 @@
 ---
 
 #### Gap 6: Duplicate Subscription Privacy Behavior
+
 **User Flow**: User resubscribes after unsubscribing
 **Current Coverage**: None
 **Risk**: Privacy-preserving design, prevents email enumeration
 
 **What's Missing**:
+
 - Resubscription shows same success message as new subscription
 - No indication whether email was previously subscribed
 - API response doesn't leak subscription history
 
 **Estimated Test Cases**: 2
+
 1. Previously unsubscribed user resubscribes → sees success message (same as new subscriber)
 2. User subscribes twice → both attempts show same success message (no enumeration leak)
 
 **Setup Requirements**:
+
 - Create test scenario with previously unsubscribed email
 - Or use same email for multiple subscribe attempts
 - Verify consistent messaging
@@ -208,19 +235,23 @@
 ---
 
 #### Gap 7: Unsubscribe Button Loading State
+
 **User Flow**: Unsubscribe button shows "Unsubscribing..." during request
 **Current Coverage**: None
 **Risk**: User feedback during state transition
 
 **What's Missing**:
+
 - Unsubscribe button shows "Unsubscribing..." text
 - Button is disabled during unsubscribe request
 - Button re-enables after completion
 
 **Estimated Test Cases**: 1
+
 1. User clicks unsubscribe → button shows "Unsubscribing..." and is disabled
 
 **Setup Requirements**:
+
 - Intercept network requests or add delay
 - Verify button state during pending period
 
@@ -231,21 +262,25 @@
 ### Medium Priority
 
 #### Gap 8: Page Refresh State Consistency
+
 **User Flow**: Subscription state persists across page navigations
 **Current Coverage**: None (partially covered by Gap 2 & 3)
 **Risk**: Server-side state synchronization
 
 **What's Missing**:
+
 - After successful subscription, page refresh shows correct state
 - After unsubscribe, page refresh shows unsubscribed state
 - FooterNewsletter server component fetches fresh data from database
 - User's Clerk session remains valid
 
 **Estimated Test Cases**: 2
+
 1. Anonymous user subscribes → navigates to different page → returns to home → still shows "Newsletter Subscriber" state
 2. Subscriber unsubscribes → navigates away → returns to home → shows subscribe form
 
 **Setup Requirements**:
+
 - Page navigation required (e.g., click link, use browser back/forward)
 - Database queries must return fresh subscription state
 - Clerk session remains authenticated
@@ -255,20 +290,24 @@
 ---
 
 #### Gap 9: Footer Visibility on All Pages
+
 **User Flow**: Newsletter component visible throughout site
 **Current Coverage**: Partially (home-sections tests check footer exists but not newsletter)
 **Risk**: Feature discoverability
 
 **What's Missing**:
+
 - Newsletter section renders on home page (public)
 - Newsletter section renders on dashboard pages (authenticated)
 - Newsletter section handles server component errors gracefully
 - Newsletter form is accessible from multiple page types
 
 **Estimated Test Cases**: 1 (extends existing tests)
+
 1. (Informational) Verify newsletter component renders on home, dashboard, and browse pages
 
 **Setup Requirements**:
+
 - Navigate to multiple page types
 - Verify footer newsletter component visible
 
@@ -283,12 +322,14 @@
 To properly test all flows, the following test users must be configured:
 
 #### 1. Non-Subscriber User (`userPage` fixture)
+
 - **Clerk User ID**: Configured in `playwright/.auth/user.json`
 - **Email**: Comes from Clerk user profile
 - **Newsletter State**: NOT in `newsletter_signups` table
 - **Setup Method**: Pre-authenticate in auth-setup, ensure no newsletter signup record
 
 #### 2. Subscriber User (NEW - needs creation)
+
 - **Clerk User ID**: To be created
 - **Email**: To be configured in Clerk
 - **Newsletter State**: Active subscription (subscribedAt IS NOT NULL, unsubscribedAt IS NULL)
@@ -302,6 +343,7 @@ To properly test all flows, the following test users must be configured:
     ```
 
 #### 3. Anonymous Session
+
 - **Status**: No authentication
 - **Email**: Any test email for subscription
 - **Newsletter State**: Can vary (testing both new and duplicate scenarios)
@@ -348,13 +390,12 @@ export class HomePage extends BasePage {
   // Newsletter unsubscribe component
   get newsletterUnsubscribeButton(): Locator {
     return this.page.getByTestId(
-      generateTestId('layout', 'app-footer', 'newsletter-unsubscribe') + '-button'
+      generateTestId('layout', 'app-footer', 'newsletter-unsubscribe') + '-button',
     );
   }
 
   get newsletterSubscriberEmail(): Locator {
-    return this.finder.layout('app-footer', 'newsletter-unsubscribe')
-      .getByText(/you're receiving/i);
+    return this.finder.layout('app-footer', 'newsletter-unsubscribe').getByText(/you're receiving/i);
   }
 
   // Actions
@@ -381,17 +422,8 @@ export class HomePage extends BasePage {
 
 ```typescript
 export const NEWSLETTER_TEST_EMAILS = {
-  valid: [
-    'test-subscriber@example.com',
-    'valid.email+tag@domain.co.uk',
-    'user123@company.org',
-  ],
-  invalid: [
-    'notanemail',
-    '@nodomain.com',
-    'missingat.com',
-    'spaces in@email.com',
-  ],
+  valid: ['test-subscriber@example.com', 'valid.email+tag@domain.co.uk', 'user123@company.org'],
+  invalid: ['notanemail', '@nodomain.com', 'missingat.com', 'spaces in@email.com'],
 };
 
 export const NEWSLETTER_TEST_STATES = {
@@ -461,30 +493,30 @@ test.describe('Newsletter Footer - Privacy Behavior', () => {
 
 ## Priority Ranking Rationale
 
-| Gap | Priority | Tests | Justification |
-|-----|----------|-------|---------------|
-| Gap 1 | Critical | 3 | Primary user flow (anonymous signup); zero coverage |
-| Gap 2 | Critical | 3 | Secondary user flow (authenticated signup); zero coverage |
-| Gap 3 | Critical | 2 | User control; compliance requirement (GDPR opt-out) |
-| Gap 4 | High | 2 | Form validation UX; prevents invalid data |
-| Gap 5 | High | 2 | UX feedback; prevents accidental double-submission |
-| Gap 6 | High | 2 | Security feature; prevents email enumeration |
-| Gap 7 | High | 1 | UX feedback; consistent with Gap 5 pattern |
-| Gap 8 | Medium | 2 | Data persistence; server-side integrity |
-| Gap 9 | Medium | 1 | Feature visibility; discoverability |
-| **Total** | - | **12** | - |
+| Gap       | Priority | Tests  | Justification                                             |
+| --------- | -------- | ------ | --------------------------------------------------------- |
+| Gap 1     | Critical | 3      | Primary user flow (anonymous signup); zero coverage       |
+| Gap 2     | Critical | 3      | Secondary user flow (authenticated signup); zero coverage |
+| Gap 3     | Critical | 2      | User control; compliance requirement (GDPR opt-out)       |
+| Gap 4     | High     | 2      | Form validation UX; prevents invalid data                 |
+| Gap 5     | High     | 2      | UX feedback; prevents accidental double-submission        |
+| Gap 6     | High     | 2      | Security feature; prevents email enumeration              |
+| Gap 7     | High     | 1      | UX feedback; consistent with Gap 5 pattern                |
+| Gap 8     | Medium   | 2      | Data persistence; server-side integrity                   |
+| Gap 9     | Medium   | 1      | Feature visibility; discoverability                       |
+| **Total** | -        | **12** | -                                                         |
 
 ---
 
 ## Coverage Matrix
 
-| Source File | Public | Auth | E2E Coverage |
-|-------------|--------|------|--------------|
-| `app-footer.tsx` | - | - | Indirect (part of page structure) |
-| `footer-newsletter.tsx` | Partial | Partial | Gap 1, 2, 3, 8, 9 |
-| `footer-newsletter-subscribe.tsx` | Missing | Partial | Gap 1, 2, 4, 5, 6 |
-| `footer-newsletter-unsubscribe.tsx` | N/A | Missing | Gap 3, 7, 8 |
-| `newsletter.actions.ts` | Partial | Partial | Gap 1, 2, 3, 4, 5, 6, 7 (via component tests) |
+| Source File                         | Public  | Auth    | E2E Coverage                                  |
+| ----------------------------------- | ------- | ------- | --------------------------------------------- |
+| `app-footer.tsx`                    | -       | -       | Indirect (part of page structure)             |
+| `footer-newsletter.tsx`             | Partial | Partial | Gap 1, 2, 3, 8, 9                             |
+| `footer-newsletter-subscribe.tsx`   | Missing | Partial | Gap 1, 2, 4, 5, 6                             |
+| `footer-newsletter-unsubscribe.tsx` | N/A     | Missing | Gap 3, 7, 8                                   |
+| `newsletter.actions.ts`             | Partial | Partial | Gap 1, 2, 3, 4, 5, 6, 7 (via component tests) |
 
 ---
 
@@ -527,20 +559,20 @@ test('component loads successfully', async ({ page }) => {
 
 ## Estimated Effort
 
-| Task | Effort | Dependencies |
-|------|--------|--------------|
-| Create Page Object extensions | 1-2 hours | None |
-| Create newsletter.fixtures.ts | 30 minutes | None |
-| Implement Gap 1 tests (3 tests) | 2-3 hours | Page Object, fixtures |
-| Implement Gap 2 tests (3 tests) | 2-3 hours | Database setup script |
-| Implement Gap 3 tests (2 tests) | 1.5-2 hours | Database setup script |
-| Implement Gap 4 tests (2 tests) | 1-1.5 hours | Page Object |
-| Implement Gap 5 tests (2 tests) | 1-1.5 hours | Network mocking (optional) |
-| Implement Gap 6 tests (2 tests) | 1-1.5 hours | Fixtures |
-| Implement Gap 7 tests (1 test) | 30-45 minutes | Page Object |
-| Implement Gap 8 tests (2 tests) | 1.5-2 hours | Database setup, page navigation |
-| Implement Gap 9 tests (1 test) | 30-45 minutes | Navigation helpers |
-| **Total** | **15-18 hours** | **Parallel work possible** |
+| Task                            | Effort          | Dependencies                    |
+| ------------------------------- | --------------- | ------------------------------- |
+| Create Page Object extensions   | 1-2 hours       | None                            |
+| Create newsletter.fixtures.ts   | 30 minutes      | None                            |
+| Implement Gap 1 tests (3 tests) | 2-3 hours       | Page Object, fixtures           |
+| Implement Gap 2 tests (3 tests) | 2-3 hours       | Database setup script           |
+| Implement Gap 3 tests (2 tests) | 1.5-2 hours     | Database setup script           |
+| Implement Gap 4 tests (2 tests) | 1-1.5 hours     | Page Object                     |
+| Implement Gap 5 tests (2 tests) | 1-1.5 hours     | Network mocking (optional)      |
+| Implement Gap 6 tests (2 tests) | 1-1.5 hours     | Fixtures                        |
+| Implement Gap 7 tests (1 test)  | 30-45 minutes   | Page Object                     |
+| Implement Gap 8 tests (2 tests) | 1.5-2 hours     | Database setup, page navigation |
+| Implement Gap 9 tests (1 test)  | 30-45 minutes   | Navigation helpers              |
+| **Total**                       | **15-18 hours** | **Parallel work possible**      |
 
 ---
 
@@ -564,6 +596,7 @@ Before considering E2E test coverage complete:
 ## Related Test Plans
 
 This E2E coverage analysis complements:
+
 - **Unit Tests**: `docs/2025_11_29/plans/newsletter-subscribe-test-plan.md` (59 unit/integration tests)
 - **Component Tests**: Would cover `FooterNewsletterSubscribe` and `FooterNewsletterUnsubscribe` in isolation
 

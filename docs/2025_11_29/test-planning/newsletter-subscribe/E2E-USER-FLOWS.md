@@ -1,9 +1,11 @@
 # E2E Test User Flow Diagrams
 
 ## Flow 1: Anonymous User Subscription (Gap 1)
+
 **Priority**: CRITICAL | **Tests**: 3
 
 ### Scenario 1.1: Valid Email Submission
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Home Page (Unauthenticated)                                 │
@@ -66,9 +68,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 2: Authenticated User Subscription (Gap 2)
+
 **Priority**: CRITICAL | **Tests**: 3
 
 ### Scenario 2.1: Non-Subscriber Becomes Subscriber
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Home Page (Authenticated, Not Subscribed)                   │
@@ -139,9 +143,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 3: Authenticated Subscriber Unsubscribe (Gap 3)
+
 **Priority**: CRITICAL | **Tests**: 2
 
 ### Scenario 3.1: Subscriber Unsubscribes
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Home Page (Authenticated, Subscribed)                       │
@@ -212,9 +218,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 4: Email Validation Errors (Gap 4)
+
 **Priority**: HIGH | **Tests**: 2
 
 ### Scenario 4.1: Invalid Email Format
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Footer Newsletter Component                                  │
@@ -257,9 +265,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 5: Optimistic UI Loading States (Gap 5)
+
 **Priority**: HIGH | **Tests**: 2
 
 ### Scenario 5.1: Submit Button State Transition
+
 ```
 BEFORE SUBMIT:
 ┌──────────────────────┐
@@ -295,9 +305,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 6: Privacy - Duplicate Subscription (Gap 6)
+
 **Priority**: HIGH | **Tests**: 2
 
 ### Scenario 6.1: Resubscription Looks Identical to New
+
 ```
 SCENARIO A: First-time subscriber
 ┌────────────────────────────────────────┐
@@ -333,9 +345,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 7: Unsubscribe Button Loading (Gap 7)
+
 **Priority**: HIGH | **Tests**: 1
 
 ### Scenario 7.1: Unsubscribe Loading State
+
 ```
 BEFORE UNSUBSCRIBE:
 ┌─────────────────────────────────────┐
@@ -375,9 +389,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 8: Page Refresh State Consistency (Gap 8)
+
 **Priority**: MEDIUM | **Tests**: 2
 
 ### Scenario 8.1: Subscription State Persists
+
 ```
 ┌─────────────────┐
 │ Home Page       │
@@ -433,9 +449,11 @@ TEST ASSERTIONS:
 ---
 
 ## Flow 9: Footer Visibility (Gap 9)
+
 **Priority**: MEDIUM | **Tests**: 1
 
 ### Scenario 9.1: Newsletter Available on Multiple Pages
+
 ```
 ┌──────────────────────────────────┐
 │ Home Page                         │
@@ -550,15 +568,14 @@ Low Isolation    = Informational, no side effects
 
 ## Quick Reference: Gap to Test Mapping
 
-| Gap | User Type | Action | Expected Result | Test Count |
-|-----|-----------|--------|-----------------|------------|
-| 1 | Anonymous | Submit valid email | Optimistic success + persists | 3 |
-| 2 | Auth non-sub | Submit subscription | Transitions to unsubscribe UI | 3 |
-| 3 | Auth subscriber | Click unsubscribe | Transitions to subscribe UI | 2 |
-| 4 | Either | Submit invalid email | Validation error shown | 2 |
-| 5 | Either | During submit | Button shows loading state | 2 |
-| 6 | Either | Resubscribe | Same message as new subscribe | 2 |
-| 7 | Auth subscriber | Click unsubscribe | Button shows loading state | 1 |
-| 8 | Either | Page refresh | State persists from database | 2 |
-| 9 | Either | Multiple pages | Newsletter available everywhere | 1 |
-
+| Gap | User Type       | Action               | Expected Result                 | Test Count |
+| --- | --------------- | -------------------- | ------------------------------- | ---------- |
+| 1   | Anonymous       | Submit valid email   | Optimistic success + persists   | 3          |
+| 2   | Auth non-sub    | Submit subscription  | Transitions to unsubscribe UI   | 3          |
+| 3   | Auth subscriber | Click unsubscribe    | Transitions to subscribe UI     | 2          |
+| 4   | Either          | Submit invalid email | Validation error shown          | 2          |
+| 5   | Either          | During submit        | Button shows loading state      | 2          |
+| 6   | Either          | Resubscribe          | Same message as new subscribe   | 2          |
+| 7   | Auth subscriber | Click unsubscribe    | Button shows loading state      | 1          |
+| 8   | Either          | Page refresh         | State persists from database    | 2          |
+| 9   | Either          | Multiple pages       | Newsletter available everywhere | 1          |

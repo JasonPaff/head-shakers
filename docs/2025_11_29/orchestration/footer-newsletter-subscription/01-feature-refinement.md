@@ -7,6 +7,7 @@
 ## Original Request
 
 There is a placeholder location under the social media bar on the app footer where I want the newsletter subscribe/unsubscribe feature will go. I want you to implement it based on the requirements:
+
 - Authenticated and public (unauthenticated) users will be able to sign up for the newsletter but their experience will be slightly different
 - Both types of users will, when unsubscribed, see the same sign up component
 - Authenticated users will, when subscribed and active, see an unsubscribe component with a subtle unsubscribe button

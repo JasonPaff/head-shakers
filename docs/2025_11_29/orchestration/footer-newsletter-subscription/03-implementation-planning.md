@@ -15,17 +15,20 @@ Generate implementation plan in MARKDOWN format with Overview, Quick Summary, Pr
 ## Implementation Plan Generated
 
 ### Overview
+
 - **Estimated Duration**: 4-6 hours
 - **Complexity**: Medium
 - **Risk Level**: Medium
 
 ### Steps Summary
+
 1. Create Footer Newsletter Subscribe Client Component
 2. Create Footer Newsletter Unsubscribe Client Component
 3. Implement Footer Newsletter Server Component Orchestrator
 4. Verify Integration and Component Behavior
 
 ### Key Architectural Decisions
+
 1. **Optimistic State Management**: Wrapper client component manages optimistic subscription state using useState
 2. **Conditional Toast Behavior**: useServerAction with isDisableToast: true for authenticated users only
 3. **Component Separation**: Three components - server orchestrator, subscribe component, unsubscribe component

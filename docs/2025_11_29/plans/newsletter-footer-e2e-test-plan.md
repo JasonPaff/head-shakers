@@ -6,13 +6,13 @@
 
 ## Overview
 
-| Metric | Value |
-|--------|-------|
-| Total Tests | 12 |
-| New Test Files | 1 spec file + Page Object extensions |
-| Complexity | Medium |
-| Risk Level | High (user acquisition + compliance) |
-| Estimated Effort | 4-6 hours |
+| Metric           | Value                                |
+| ---------------- | ------------------------------------ |
+| Total Tests      | 12                                   |
+| New Test Files   | 1 spec file + Page Object extensions |
+| Complexity       | Medium                               |
+| Risk Level       | High (user acquisition + compliance) |
+| Estimated Effort | 4-6 hours                            |
 
 ## Analysis Summary
 
@@ -48,6 +48,7 @@
 **Test Type**: Infrastructure
 
 **Files to Modify**:
+
 - `tests/e2e/pages/home.page.ts`
 
 **Changes to Make**:
@@ -97,11 +98,13 @@ async scrollToFooter(): Promise<void> {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run typecheck
 ```
 
 **Success Criteria**:
+
 - TypeScript compiles without errors
 - Locators match actual component test IDs
 
@@ -116,6 +119,7 @@ npm run typecheck
 **Test Type**: E2E Infrastructure
 
 **Files to Create**:
+
 - `tests/e2e/specs/feature/newsletter-footer.spec.ts`
 
 **Test Cases**:
@@ -138,16 +142,19 @@ test.describe('Newsletter Footer - Authenticated Subscriber', () => {
 ```
 
 **Patterns to Follow**:
+
 - Use `test.describe` blocks to group by user state
 - Import from `../../fixtures/base.fixture`
 - Instantiate `HomePage` in `beforeEach`
 
 **Validation Commands**:
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --list
 ```
 
 **Success Criteria**:
+
 - Test file recognized by Playwright
 - All test cases listed
 
@@ -162,18 +169,19 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --list
 **Test Type**: E2E
 
 **Files to Modify**:
+
 - `tests/e2e/specs/feature/newsletter-footer.spec.ts`
 
 **Test Cases**:
 
-| Test | Gap | Priority |
-|------|-----|----------|
-| should display subscribe form for anonymous users | 1 | Critical |
-| should successfully subscribe with valid email | 1 | Critical |
-| should show validation error for invalid email | 4 | High |
-| should show validation error for empty email | 4 | High |
-| should show loading state during submission | 5 | High |
-| should show same message for duplicate subscription | 6 | High |
+| Test                                                | Gap | Priority |
+| --------------------------------------------------- | --- | -------- |
+| should display subscribe form for anonymous users   | 1   | Critical |
+| should successfully subscribe with valid email      | 1   | Critical |
+| should show validation error for invalid email      | 4   | High     |
+| should show validation error for empty email        | 4   | High     |
+| should show loading state during submission         | 5   | High     |
+| should show same message for duplicate subscription | 6   | High     |
 
 **Implementation Details**:
 
@@ -229,11 +237,13 @@ test.describe('Newsletter Footer - Public (Unauthenticated)', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --grep "Public"
 ```
 
 **Success Criteria**:
+
 - All 6 tests pass
 - No flaky tests (run 3x)
 
@@ -248,15 +258,16 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --grep "Pu
 **Test Type**: E2E
 
 **Files to Modify**:
+
 - `tests/e2e/specs/feature/newsletter-footer.spec.ts`
 
 **Test Cases**:
 
-| Test | Gap | Priority |
-|------|-----|----------|
-| should display subscribe form for authenticated non-subscriber | 2 | Critical |
-| should transition to unsubscribe view after subscribing | 2 | Critical |
-| should persist subscription state after page refresh | 2 | Critical |
+| Test                                                           | Gap | Priority |
+| -------------------------------------------------------------- | --- | -------- |
+| should display subscribe form for authenticated non-subscriber | 2   | Critical |
+| should transition to unsubscribe view after subscribing        | 2   | Critical |
+| should persist subscription state after page refresh           | 2   | Critical |
 
 **Implementation Details**:
 
@@ -305,11 +316,13 @@ test.describe('Newsletter Footer - Authenticated Non-Subscriber', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --grep "Non-Subscriber"
 ```
 
 **Success Criteria**:
+
 - All 3 tests pass
 - UI transitions correctly observed
 
@@ -324,15 +337,16 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --grep "No
 **Test Type**: E2E
 
 **Files to Modify**:
+
 - `tests/e2e/specs/feature/newsletter-footer.spec.ts`
 
 **Test Cases**:
 
-| Test | Gap | Priority |
-|------|-----|----------|
-| should display unsubscribe button with user email | 3 | Critical |
-| should transition to subscribe form after unsubscribing | 3 | Critical |
-| should show loading state during unsubscribe | 7 | High |
+| Test                                                    | Gap | Priority |
+| ------------------------------------------------------- | --- | -------- |
+| should display unsubscribe button with user email       | 3   | Critical |
+| should transition to subscribe form after unsubscribing | 3   | Critical |
+| should show loading state during unsubscribe            | 7   | High     |
 
 **Implementation Details**:
 
@@ -376,11 +390,13 @@ test.describe('Newsletter Footer - Authenticated Subscriber', () => {
 ```
 
 **Validation Commands**:
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --grep "Subscriber"
 ```
 
 **Success Criteria**:
+
 - All 3 tests pass
 - Unsubscribe flow completes successfully
 
@@ -395,6 +411,7 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --grep "Su
 **Test Type**: E2E Validation
 
 **Validation Commands**:
+
 ```bash
 # Run all newsletter tests
 npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts
@@ -407,6 +424,7 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --repeat-e
 ```
 
 **Success Criteria**:
+
 - All 12 tests pass
 - No flaky tests across 3 runs
 - Coverage gaps addressed:
@@ -425,21 +443,25 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --repeat-e
 ## Quality Gates
 
 ### Gate 1: Infrastructure Ready
+
 - [ ] HomePage Page Object extended with newsletter locators
 - [ ] TypeScript compiles without errors
 - [ ] Test file created and recognized by Playwright
 
 ### Gate 2: Public Tests Pass
+
 - [ ] All 6 public user tests pass
 - [ ] Validation errors display correctly
 - [ ] Loading states visible during submission
 
 ### Gate 3: Authenticated Tests Pass
+
 - [ ] Non-subscriber can subscribe (3 tests)
 - [ ] Subscriber can unsubscribe (3 tests)
 - [ ] UI transitions correctly between states
 
 ### Gate 4: Full Suite Validation
+
 - [ ] All 12 tests pass
 - [ ] No flaky tests (3x repeat)
 - [ ] All 9 coverage gaps addressed
@@ -452,13 +474,13 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts --repeat-e
 
 Ensure these data-testid attributes exist on newsletter components:
 
-| Component | Test ID |
-|-----------|---------|
-| Newsletter section | `layout-footer-newsletter` |
-| Subscribe form | `form-newsletter-subscribe` |
-| Email input | Standard `textbox` role |
-| Submit button | Standard `button` role |
-| Unsubscribe button | Standard `button` role |
+| Component          | Test ID                     |
+| ------------------ | --------------------------- |
+| Newsletter section | `layout-footer-newsletter`  |
+| Subscribe form     | `form-newsletter-subscribe` |
+| Email input        | Standard `textbox` role     |
+| Submit button      | Standard `button` role      |
+| Unsubscribe button | Standard `button` role      |
 
 ### Database Considerations
 
@@ -469,11 +491,11 @@ Ensure these data-testid attributes exist on newsletter components:
 
 ### Authentication Contexts
 
-| Context | User State | Newsletter State |
-|---------|------------|------------------|
-| `page` (anonymous) | Not logged in | N/A |
-| `newUserPage` | Logged in | Not subscribed |
-| `userPage` | Logged in | Subscribed |
+| Context            | User State    | Newsletter State |
+| ------------------ | ------------- | ---------------- |
+| `page` (anonymous) | Not logged in | N/A              |
+| `newUserPage`      | Logged in     | Not subscribed   |
+| `userPage`         | Logged in     | Subscribed       |
 
 ---
 

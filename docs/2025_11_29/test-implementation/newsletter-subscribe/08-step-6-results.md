@@ -14,6 +14,7 @@
 ## Subagent Input
 
 Implement unit tests for newsletter server actions:
+
 - `subscribeToNewsletterAction`: 3 tests for subscription logic
 - `unsubscribeFromNewsletterAction`: 3 tests for unsubscription logic
 
@@ -22,16 +23,19 @@ Implement unit tests for newsletter server actions:
 **Status**: success
 
 **Files Created**:
+
 - `tests/unit/lib/actions/newsletter/newsletter.actions.test.ts` - Unit tests for newsletter server actions
 
 **Test Cases Implemented** (6 total):
 
 **subscribeToNewsletterAction logic (3 tests)**
+
 - should return success response for new subscription
 - should return success response for existing subscriber (same message for privacy)
 - should return failure response when facade fails
 
 **unsubscribeFromNewsletterAction logic (3 tests)**
+
 - should return success response for valid unsubscribe
 - should return same success message even if email does not exist (privacy)
 - should return failure response when facade fails
@@ -43,6 +47,7 @@ Implement unit tests for newsletter server actions:
 **Result**: PASS
 
 **Output**:
+
 ```
 ✓ tests/unit/lib/actions/newsletter/newsletter.actions.test.ts (6 tests) 18ms
 

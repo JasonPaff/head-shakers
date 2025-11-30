@@ -50,6 +50,7 @@ Unit tests for the newsletter subscribe/unsubscribe feature should focus on vali
 ## Refined Test Scope Summary
 
 **Key Testable Units Identified**:
+
 - Validation schemas (insertNewsletterSignupSchema, unsubscribeFromNewsletterSchema)
 - Email utility functions (maskEmail, normalizeEmail)
 - NewsletterFacade business logic (with mocked dependencies)

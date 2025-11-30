@@ -18,25 +18,25 @@
 
 ## Locators Added
 
-| Locator | Type | Target |
-|---------|------|--------|
-| `newsletterEmailInput` | test ID | `footer-newsletter-email` |
-| `newsletterSection` | test ID (or) | subscribe OR unsubscribe section |
-| `newsletterStayUpdatedText` | text | "Stay Updated" text |
-| `newsletterSubmitButton` | test ID | `footer-newsletter-submit` |
-| `newsletterSubscribeSection` | test ID | subscribe section |
-| `newsletterSubscribingButton` | role | "Subscribing..." button |
-| `newsletterSuccessHeading` | role | "Newsletter Subscriber" heading |
-| `newsletterUnsubscribeButton` | test ID | unsubscribe button |
-| `newsletterUnsubscribeSection` | test ID | unsubscribe section |
-| `newsletterUnsubscribingButton` | role | "Unsubscribing..." button |
+| Locator                         | Type         | Target                           |
+| ------------------------------- | ------------ | -------------------------------- |
+| `newsletterEmailInput`          | test ID      | `footer-newsletter-email`        |
+| `newsletterSection`             | test ID (or) | subscribe OR unsubscribe section |
+| `newsletterStayUpdatedText`     | text         | "Stay Updated" text              |
+| `newsletterSubmitButton`        | test ID      | `footer-newsletter-submit`       |
+| `newsletterSubscribeSection`    | test ID      | subscribe section                |
+| `newsletterSubscribingButton`   | role         | "Subscribing..." button          |
+| `newsletterSuccessHeading`      | role         | "Newsletter Subscriber" heading  |
+| `newsletterUnsubscribeButton`   | test ID      | unsubscribe button               |
+| `newsletterUnsubscribeSection`  | test ID      | unsubscribe section              |
+| `newsletterUnsubscribingButton` | role         | "Unsubscribing..." button        |
 
 ## Helper Methods Added
 
-| Method | Description |
-|--------|-------------|
-| `scrollToFooter()` | Scrolls to footer and waits for newsletter section |
-| `subscribeToNewsletter(email)` | Fills email and clicks subscribe |
+| Method                         | Description                                        |
+| ------------------------------ | -------------------------------------------------- |
+| `scrollToFooter()`             | Scrolls to footer and waits for newsletter section |
+| `subscribeToNewsletter(email)` | Fills email and clicks subscribe                   |
 
 ## Orchestrator Verification
 

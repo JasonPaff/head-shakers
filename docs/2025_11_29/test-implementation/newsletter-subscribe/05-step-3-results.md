@@ -14,6 +14,7 @@
 ## Subagent Input
 
 Implement unit tests for newsletter validation schemas:
+
 - `insertNewsletterSignupSchema`: 6 tests for email validation on signup
 - `unsubscribeFromNewsletterSchema`: 6 tests for email validation on unsubscribe
 
@@ -22,11 +23,13 @@ Implement unit tests for newsletter validation schemas:
 **Status**: success
 
 **Files Created**:
+
 - `tests/unit/lib/validations/newsletter.validation.test.ts` - Unit tests for newsletter validation schemas
 
 **Test Cases Implemented**:
 
 **insertNewsletterSignupSchema (6 tests)**:
+
 - should accept valid email address
 - should reject invalid email format (missing @)
 - should reject email exceeding maximum length
@@ -35,6 +38,7 @@ Implement unit tests for newsletter validation schemas:
 - should reject email with only whitespace
 
 **unsubscribeFromNewsletterSchema (6 tests)**:
+
 - should accept valid email address
 - should reject invalid email format
 - should reject email exceeding maximum length (255 chars)
@@ -51,6 +55,7 @@ Implement unit tests for newsletter validation schemas:
 **Result**: PASS
 
 **Output**:
+
 ```
 ✓ tests/unit/lib/validations/newsletter.validation.test.ts (12 tests) 9ms
 

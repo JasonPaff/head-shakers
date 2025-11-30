@@ -17,14 +17,14 @@
 
 ## Test Cases Implemented
 
-| Test | Description | Result |
-|------|-------------|--------|
-| should display subscribe form for anonymous users | Verifies section, input, button, text visible | PASS |
-| should successfully subscribe with valid email | Tests successful subscription flow | PASS |
-| should show validation error for invalid email | Tests error for "invalid-email" format | PASS |
-| should show validation error for empty email | Tests form prevents empty submission | PASS |
-| should show loading state during submission | Tests submission completes successfully | PASS |
-| should show same message for duplicate subscription | Privacy-preserving duplicate handling | PASS |
+| Test                                                | Description                                   | Result |
+| --------------------------------------------------- | --------------------------------------------- | ------ |
+| should display subscribe form for anonymous users   | Verifies section, input, button, text visible | PASS   |
+| should successfully subscribe with valid email      | Tests successful subscription flow            | PASS   |
+| should show validation error for invalid email      | Tests error for "invalid-email" format        | PASS   |
+| should show validation error for empty email        | Tests form prevents empty submission          | PASS   |
+| should show loading state during submission         | Tests submission completes successfully       | PASS   |
+| should show same message for duplicate subscription | Privacy-preserving duplicate handling         | PASS   |
 
 ## Orchestrator Verification
 

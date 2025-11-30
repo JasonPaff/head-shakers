@@ -6,6 +6,7 @@
 ## Full Test Suite Results
 
 **Command**:
+
 ```bash
 npm run test -- --run tests/unit/lib/utils/email-utils.test.ts \
   tests/unit/lib/utils/action-response.test.ts \
@@ -19,23 +20,23 @@ npm run test -- --run tests/unit/lib/utils/email-utils.test.ts \
 
 ## Test Results by File
 
-| Test File | Tests | Status | Duration |
-|-----------|-------|--------|----------|
-| email-utils.test.ts | 7 | PASS | 5ms |
-| action-response.test.ts | 17 | PASS | 10ms |
-| newsletter.validation.test.ts | 12 | PASS | 10ms |
-| newsletter.queries.test.ts | 18 | PASS | 15ms |
-| newsletter.facade.test.ts | 14 | PASS | 28ms |
-| newsletter.actions.test.ts | 6 | PASS | 17ms |
-| **Total** | **74** | **PASS** | **85ms** |
+| Test File                     | Tests  | Status   | Duration |
+| ----------------------------- | ------ | -------- | -------- |
+| email-utils.test.ts           | 7      | PASS     | 5ms      |
+| action-response.test.ts       | 17     | PASS     | 10ms     |
+| newsletter.validation.test.ts | 12     | PASS     | 10ms     |
+| newsletter.queries.test.ts    | 18     | PASS     | 15ms     |
+| newsletter.facade.test.ts     | 14     | PASS     | 28ms     |
+| newsletter.actions.test.ts    | 6      | PASS     | 17ms     |
+| **Total**                     | **74** | **PASS** | **85ms** |
 
 ## Validation Commands
 
-| Command | Result |
-|---------|--------|
-| `npm run lint:fix` | PASS |
-| `npm run typecheck` | PASS |
-| `npm run test` | PASS (74 tests) |
+| Command             | Result          |
+| ------------------- | --------------- |
+| `npm run lint:fix`  | PASS            |
+| `npm run typecheck` | PASS            |
+| `npm run test`      | PASS (74 tests) |
 
 ## Test Distribution
 

@@ -12,48 +12,48 @@ Refined feature request for newsletter subscription component in footer with dif
 
 ### Critical Priority (Core Implementation)
 
-| File | Description | Status |
-|------|-------------|--------|
-| `src/components/layout/app-footer/components/footer-newsletter.tsx` | Current placeholder (4 lines) - needs full implementation | EXISTS |
-| `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx` | Subscribe client component | NEW FILE |
-| `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Unsubscribe client component | NEW FILE |
-| `src/lib/actions/newsletter/newsletter.actions.ts` | Server actions (subscribeToNewsletterAction, unsubscribeFromNewsletterAction) | EXISTS (142 lines) |
-| `src/lib/validations/newsletter.validation.ts` | Zod schemas (insertNewsletterSignupSchema) | EXISTS (58 lines) |
-| `src/lib/facades/newsletter/newsletter.facade.ts` | NewsletterFacade with getIsActiveSubscriberAsync | EXISTS (248 lines) |
-| `src/lib/queries/newsletter/newsletter.queries.ts` | Database query methods | EXISTS (219 lines) |
-| `src/lib/db/schema/newsletter-signups.schema.ts` | Newsletter signups table schema | EXISTS (46 lines) |
+| File                                                                            | Description                                                                   | Status             |
+| ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ------------------ |
+| `src/components/layout/app-footer/components/footer-newsletter.tsx`             | Current placeholder (4 lines) - needs full implementation                     | EXISTS             |
+| `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx`   | Subscribe client component                                                    | NEW FILE           |
+| `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Unsubscribe client component                                                  | NEW FILE           |
+| `src/lib/actions/newsletter/newsletter.actions.ts`                              | Server actions (subscribeToNewsletterAction, unsubscribeFromNewsletterAction) | EXISTS (142 lines) |
+| `src/lib/validations/newsletter.validation.ts`                                  | Zod schemas (insertNewsletterSignupSchema)                                    | EXISTS (58 lines)  |
+| `src/lib/facades/newsletter/newsletter.facade.ts`                               | NewsletterFacade with getIsActiveSubscriberAsync                              | EXISTS (248 lines) |
+| `src/lib/queries/newsletter/newsletter.queries.ts`                              | Database query methods                                                        | EXISTS (219 lines) |
+| `src/lib/db/schema/newsletter-signups.schema.ts`                                | Newsletter signups table schema                                               | EXISTS (46 lines)  |
 
 ### High Priority (Supporting Infrastructure)
 
-| File | Description | Status |
-|------|-------------|--------|
-| `src/utils/auth-utils.ts` | getUserIdAsync() for authentication | EXISTS (69 lines) |
-| `src/lib/facades/users/users.facade.ts` | UsersFacade.getEmailByUserIdAsync() | EXISTS |
-| `src/hooks/use-server-action.ts` | Hook with isDisableToast for optimistic updates | EXISTS (190 lines) |
-| `src/hooks/use-like.tsx` | Example of optimistic updates pattern | EXISTS (103 lines) |
-| `src/components/ui/form/index.tsx` | useAppForm hook export | EXISTS |
-| `src/components/ui/form/field-components/text-field.tsx` | TextField for email input | EXISTS (90 lines) |
-| `src/components/ui/button.tsx` | Button with destructive variant | EXISTS (96 lines) |
-| `src/lib/test-ids/generator.ts` | generateTestId() function | EXISTS (312 lines) |
+| File                                                     | Description                                     | Status             |
+| -------------------------------------------------------- | ----------------------------------------------- | ------------------ |
+| `src/utils/auth-utils.ts`                                | getUserIdAsync() for authentication             | EXISTS (69 lines)  |
+| `src/lib/facades/users/users.facade.ts`                  | UsersFacade.getEmailByUserIdAsync()             | EXISTS             |
+| `src/hooks/use-server-action.ts`                         | Hook with isDisableToast for optimistic updates | EXISTS (190 lines) |
+| `src/hooks/use-like.tsx`                                 | Example of optimistic updates pattern           | EXISTS (103 lines) |
+| `src/components/ui/form/index.tsx`                       | useAppForm hook export                          | EXISTS             |
+| `src/components/ui/form/field-components/text-field.tsx` | TextField for email input                       | EXISTS (90 lines)  |
+| `src/components/ui/button.tsx`                           | Button with destructive variant                 | EXISTS (96 lines)  |
+| `src/lib/test-ids/generator.ts`                          | generateTestId() function                       | EXISTS (312 lines) |
 
 ### Medium Priority (Reference Examples)
 
-| File | Description |
-|------|-------------|
-| `src/components/layout/app-footer/app-footer.tsx` | Main footer showing where FooterNewsletter renders (line 62) |
-| `src/components/layout/app-footer/components/footer-social-links.tsx` | Example footer component with styling patterns |
-| `src/components/layout/app-footer/components/footer-legal.tsx` | Example with Tailwind styling |
-| `src/app/(public)/coming-soon/launch-waitlist-form.tsx` | Simple email form with useAppForm |
-| `src/components/feature/users/username-edit-form.tsx` | Complex form with useServerAction |
-| `src/lib/constants/action-names.ts` | ACTION_NAMES.NEWSLETTER for breadcrumbs |
+| File                                                                  | Description                                                  |
+| --------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `src/components/layout/app-footer/app-footer.tsx`                     | Main footer showing where FooterNewsletter renders (line 62) |
+| `src/components/layout/app-footer/components/footer-social-links.tsx` | Example footer component with styling patterns               |
+| `src/components/layout/app-footer/components/footer-legal.tsx`        | Example with Tailwind styling                                |
+| `src/app/(public)/coming-soon/launch-waitlist-form.tsx`               | Simple email form with useAppForm                            |
+| `src/components/feature/users/username-edit-form.tsx`                 | Complex form with useServerAction                            |
+| `src/lib/constants/action-names.ts`                                   | ACTION_NAMES.NEWSLETTER for breadcrumbs                      |
 
 ### Low Priority (Testing)
 
-| File | Description |
-|------|-------------|
-| `tests/unit/lib/actions/newsletter/newsletter.actions.test.ts` | Action unit tests |
-| `tests/e2e/specs/feature/newsletter-footer.spec.ts` | E2E tests for newsletter |
-| `tests/components/layout/app-footer/footer-social-links.test.tsx` | Component test example |
+| File                                                              | Description              |
+| ----------------------------------------------------------------- | ------------------------ |
+| `tests/unit/lib/actions/newsletter/newsletter.actions.test.ts`    | Action unit tests        |
+| `tests/e2e/specs/feature/newsletter-footer.spec.ts`               | E2E tests for newsletter |
+| `tests/components/layout/app-footer/footer-social-links.test.tsx` | Component test example   |
 
 ## Architecture Insights
 

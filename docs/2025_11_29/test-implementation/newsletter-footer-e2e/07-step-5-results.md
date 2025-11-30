@@ -18,11 +18,11 @@
 
 ## Test Cases Implemented
 
-| Test | Fixture | Status |
-|------|---------|--------|
-| should display unsubscribe button with user email | userPage | SKIPPED (rate limit) |
+| Test                                                    | Fixture  | Status               |
+| ------------------------------------------------------- | -------- | -------------------- |
+| should display unsubscribe button with user email       | userPage | SKIPPED (rate limit) |
 | should transition to subscribe form after unsubscribing | userPage | SKIPPED (rate limit) |
-| should show loading state during unsubscribe | userPage | SKIPPED (rate limit) |
+| should show loading state during unsubscribe            | userPage | SKIPPED (rate limit) |
 
 ## Orchestrator Verification
 
@@ -42,6 +42,7 @@ The tests gracefully skip when rate-limited rather than failing. This is the cor
 3. Tests require a subscribed user to test unsubscribe functionality
 
 **Resolution Options**:
+
 1. Wait 1 hour for rate limit to reset
 2. Manually subscribe the test user via UI
 3. Insert subscription record directly in E2E database

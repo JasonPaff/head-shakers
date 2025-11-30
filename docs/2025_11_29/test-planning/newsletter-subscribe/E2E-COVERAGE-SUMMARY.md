@@ -2,14 +2,14 @@
 
 ## Quick Overview
 
-| Metric | Value |
-|--------|-------|
-| **Current E2E Coverage** | 0 tests for newsletter footer |
-| **Total Coverage Gaps** | 9 distinct user flows |
-| **Test Cases to Implement** | 12 E2E tests |
-| **New Test File** | 1 (`tests/e2e/specs/feature/newsletter-footer.spec.ts`) |
-| **Estimated Implementation Time** | 15-18 hours |
-| **Test Types** | Playwright E2E (Page Object Model) |
+| Metric                            | Value                                                   |
+| --------------------------------- | ------------------------------------------------------- |
+| **Current E2E Coverage**          | 0 tests for newsletter footer                           |
+| **Total Coverage Gaps**           | 9 distinct user flows                                   |
+| **Test Cases to Implement**       | 12 E2E tests                                            |
+| **New Test File**                 | 1 (`tests/e2e/specs/feature/newsletter-footer.spec.ts`) |
+| **Estimated Implementation Time** | 15-18 hours                                             |
+| **Test Types**                    | Playwright E2E (Page Object Model)                      |
 
 ---
 
@@ -66,26 +66,31 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ## Source Components Under Test
 
 ### 1. `footer-newsletter.tsx` (Server Component)
+
 - **Role**: Orchestrates subscription state logic
 - **Tests**: Gap 1, 2, 3, 8, 9
 - **Coverage**: Server-side state fetching, conditional rendering
 
 ### 2. `footer-newsletter-subscribe.tsx` (Client Component)
+
 - **Role**: Email input form with optimistic UI
 - **Tests**: Gap 1, 2, 4, 5, 6
 - **Coverage**: Form submission, validation, optimistic state transitions
 
 ### 3. `footer-newsletter-unsubscribe.tsx` (Client Component)
+
 - **Role**: Unsubscribe interface with user email display
 - **Tests**: Gap 3, 7, 8
 - **Coverage**: Unsubscribe action, loading state, state transitions
 
 ### 4. `app-footer.tsx` (Server Component)
+
 - **Role**: Footer layout wrapper
 - **Tests**: Gap 9 (implicitly)
 - **Coverage**: Component integration, accessibility
 
 ### 5. `newsletter.actions.ts` (Server Actions)
+
 - **Role**: Handle mutations with rate limiting
 - **Tests**: Gap 1, 2, 3, 4, 5, 6, 7 (via component tests)
 - **Coverage**: Form submission backend (tested through UI flows)
@@ -95,6 +100,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ## Test Implementation Roadmap
 
 ### Phase 1: Infrastructure Setup (Day 1)
+
 ```
 1. Extend HomePage.page.ts with newsletter locators
 2. Create newsletter.fixtures.ts with test data
@@ -102,6 +108,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### Phase 2: Public User Flows (Day 2)
+
 ```
 4. Gap 1: Anonymous subscription (3 tests)
 5. Gap 4: Email validation (2 tests)
@@ -110,6 +117,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### Phase 3: Authenticated Flows (Day 3)
+
 ```
 8. Gap 2: Non-subscriber authentication (3 tests)
 9. Gap 3: Subscriber unsubscribe (2 tests)
@@ -117,6 +125,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### Phase 4: State Persistence (Day 4)
+
 ```
 11. Gap 8: Page refresh consistency (2 tests)
 12. Gap 9: Footer visibility (1 test)
@@ -127,18 +136,21 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ## Test Isolation & Data
 
 ### Anonymous User Tests (Gap 1, 4, 5, 6)
+
 - **Isolation**: No Clerk authentication
 - **Database Setup**: None (testing new subscriptions)
 - **Fixture**: `page` (default browser context)
 - **Teardown**: Optional (can reuse emails across tests)
 
 ### Authenticated Non-Subscriber Tests (Gap 2)
+
 - **Isolation**: Uses `userPage` fixture (pre-authenticated)
 - **Database Setup**: Ensure user NOT in newsletter_signups
 - **Fixture**: `userPage` (authenticated session)
 - **Teardown**: Clear newsletter signup after tests
 
 ### Authenticated Subscriber Tests (Gap 3, 7, 8)
+
 - **Isolation**: Requires fresh subscriber user
 - **Database Setup**: Insert active subscription (unsubscribedAt = NULL)
 - **Fixture**: `userPage` (authenticated session)
@@ -149,6 +161,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ## Key Features Tested
 
 ### Form Submission
+
 ```
 ✓ Valid email accepted
 ✓ Invalid email rejected with error message
@@ -158,6 +171,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### State Transitions
+
 ```
 ✓ Subscribe form → "Newsletter Subscriber" confirmation
 ✓ "Newsletter Subscriber" → Subscribe form (after unsubscribe)
@@ -166,6 +180,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### Privacy & Security
+
 ```
 ✓ Duplicate subscription shows same message
 ✓ Unsubscribe always succeeds (no email enumeration)
@@ -173,6 +188,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### Accessibility
+
 ```
 ✓ Form labeled correctly ("Stay Updated")
 ✓ Email input has placeholder
@@ -181,6 +197,7 @@ Footer Visibility       | Gap 9     | Gap 9         | Gap 9
 ```
 
 ### Error Handling
+
 ```
 ✓ Network errors shown to user
 ✓ Rate limiting handled gracefully (implicit via server action)
@@ -210,17 +227,20 @@ await expect(homePage.newsletterSubmitButton).toHaveText('Subscribe');
 ## Database Test Data States
 
 ### Clean Non-Subscriber State
+
 ```sql
 DELETE FROM newsletter_signups WHERE user_id = '<test-user-id>';
 ```
 
 ### Active Subscription State
+
 ```sql
 INSERT INTO newsletter_signups (id, email, user_id, subscribed_at, unsubscribed_at, created_at)
 VALUES (gen_random_uuid(), 'test@example.com', '<user-id>', NOW(), NULL, NOW());
 ```
 
 ### Previously Unsubscribed State
+
 ```sql
 INSERT INTO newsletter_signups (id, email, user_id, subscribed_at, unsubscribed_at, created_at)
 VALUES (gen_random_uuid(), 'test@example.com', '<user-id>', NOW() - INTERVAL '1 day', NOW(), NOW());
@@ -231,6 +251,7 @@ VALUES (gen_random_uuid(), 'test@example.com', '<user-id>', NOW() - INTERVAL '1 
 ## Expected Test Results
 
 ### All Tests Pass Locally
+
 ```bash
 npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts
 
@@ -254,13 +275,13 @@ npm run test:e2e -- tests/e2e/specs/feature/newsletter-footer.spec.ts
 
 ## Risk Assessment
 
-| Risk | Impact | Mitigation |
-|------|--------|-----------|
-| Database state leaking between tests | Medium | Use fresh test users per test |
-| Flaky network timeouts | Medium | Increase timeout for subscription action |
-| Email enumeration vulnerability | High | Verify identical messages in both cases |
-| Optimistic UI not reverting on error | Medium | Test error state explicitly |
-| Page refresh losing state | Medium | Verify server-side data persistence |
+| Risk                                 | Impact | Mitigation                               |
+| ------------------------------------ | ------ | ---------------------------------------- |
+| Database state leaking between tests | Medium | Use fresh test users per test            |
+| Flaky network timeouts               | Medium | Increase timeout for subscription action |
+| Email enumeration vulnerability      | High   | Verify identical messages in both cases  |
+| Optimistic UI not reverting on error | Medium | Test error state explicitly              |
+| Page refresh losing state            | Medium | Verify server-side data persistence      |
 
 ---
 

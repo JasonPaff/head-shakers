@@ -21,29 +21,30 @@
 
 ## Prerequisites Validation
 
-| Prerequisite | Status | Notes |
-|-------------|--------|-------|
-| Playwright configured | PASS | playwright.config.ts exists |
-| Base fixture available | PASS | tests/e2e/fixtures/base.fixture.ts exists |
-| Auth setup complete | PASS | admin, user, new-user contexts available |
-| HomePage Page Object | PASS | tests/e2e/pages/home.page.ts exists |
-| Newsletter components | PASS | 3 newsletter components found |
+| Prerequisite           | Status | Notes                                     |
+| ---------------------- | ------ | ----------------------------------------- |
+| Playwright configured  | PASS   | playwright.config.ts exists               |
+| Base fixture available | PASS   | tests/e2e/fixtures/base.fixture.ts exists |
+| Auth setup complete    | PASS   | admin, user, new-user contexts available  |
+| HomePage Page Object   | PASS   | tests/e2e/pages/home.page.ts exists       |
+| Newsletter components  | PASS   | 3 newsletter components found             |
 
 ## Test IDs Identified
 
 From analyzing newsletter components:
 
-| Component | Test ID Pattern |
-|-----------|----------------|
-| Subscribe section | `layout-app-footer-newsletter-subscribe` |
-| Unsubscribe section | `layout-app-footer-newsletter-unsubscribe` |
-| Email input | `footer-newsletter-email` (via testId prop) |
-| Submit button | `footer-newsletter-submit` (via testId prop) |
-| Unsubscribe button | `${unsubscribeTestId}-button` |
+| Component           | Test ID Pattern                              |
+| ------------------- | -------------------------------------------- |
+| Subscribe section   | `layout-app-footer-newsletter-subscribe`     |
+| Unsubscribe section | `layout-app-footer-newsletter-unsubscribe`   |
+| Email input         | `footer-newsletter-email` (via testId prop)  |
+| Submit button       | `footer-newsletter-submit` (via testId prop) |
+| Unsubscribe button  | `${unsubscribeTestId}-button`                |
 
 ## Newsletter Component Analysis
 
 ### Subscribe Form (`footer-newsletter-subscribe.tsx`)
+
 - Uses `useAppForm` with TanStack Form
 - Email validation via `insertNewsletterSignupSchema`
 - Optimistic UI with "Subscribing..." loading state
@@ -51,6 +52,7 @@ From analyzing newsletter components:
 - Test ID: `layout-app-footer-newsletter-subscribe`
 
 ### Unsubscribe Form (`footer-newsletter-unsubscribe.tsx`)
+
 - Button-based unsubscribe action
 - Optimistic UI with "Unsubscribing..." loading state
 - Shows user email for confirmation

@@ -18,14 +18,14 @@
 
 ## Test Type Routing
 
-| Step | Test Type | Specialist |
-|------|-----------|------------|
-| 1. Email Utilities Tests | unit | unit-test-specialist |
-| 2. Action Response Helpers Tests | unit | unit-test-specialist |
-| 3. Newsletter Validation Schema Tests | unit | unit-test-specialist |
-| 4. Newsletter Query Layer Tests | unit | unit-test-specialist |
-| 5. Newsletter Facade Layer Tests | unit | unit-test-specialist |
-| 6. Newsletter Server Actions Tests | unit | unit-test-specialist |
+| Step                                  | Test Type | Specialist           |
+| ------------------------------------- | --------- | -------------------- |
+| 1. Email Utilities Tests              | unit      | unit-test-specialist |
+| 2. Action Response Helpers Tests      | unit      | unit-test-specialist |
+| 3. Newsletter Validation Schema Tests | unit      | unit-test-specialist |
+| 4. Newsletter Query Layer Tests       | unit      | unit-test-specialist |
+| 5. Newsletter Facade Layer Tests      | unit      | unit-test-specialist |
+| 6. Newsletter Server Actions Tests    | unit      | unit-test-specialist |
 
 ## Navigation
 
@@ -42,14 +42,14 @@
 
 ## Quick Status
 
-| Step | Test Type | Specialist | Status | Tests | Fix Attempts | Duration |
-|------|-----------|------------|--------|-------|--------------|----------|
-| 1. Email Utilities Tests | unit | unit-test-specialist | pending | - | - | - |
-| 2. Action Response Helpers Tests | unit | unit-test-specialist | pending | - | - | - |
-| 3. Newsletter Validation Schema Tests | unit | unit-test-specialist | pending | - | - | - |
-| 4. Newsletter Query Layer Tests | unit | unit-test-specialist | pending | - | - | - |
-| 5. Newsletter Facade Layer Tests | unit | unit-test-specialist | pending | - | - | - |
-| 6. Newsletter Server Actions Tests | unit | unit-test-specialist | pending | - | - | - |
+| Step                                  | Test Type | Specialist           | Status  | Tests | Fix Attempts | Duration |
+| ------------------------------------- | --------- | -------------------- | ------- | ----- | ------------ | -------- |
+| 1. Email Utilities Tests              | unit      | unit-test-specialist | pending | -     | -            | -        |
+| 2. Action Response Helpers Tests      | unit      | unit-test-specialist | pending | -     | -            | -        |
+| 3. Newsletter Validation Schema Tests | unit      | unit-test-specialist | pending | -     | -            | -        |
+| 4. Newsletter Query Layer Tests       | unit      | unit-test-specialist | pending | -     | -            | -        |
+| 5. Newsletter Facade Layer Tests      | unit      | unit-test-specialist | pending | -     | -            | -        |
+| 6. Newsletter Server Actions Tests    | unit      | unit-test-specialist | pending | -     | -            | -        |
 
 ## Summary
 

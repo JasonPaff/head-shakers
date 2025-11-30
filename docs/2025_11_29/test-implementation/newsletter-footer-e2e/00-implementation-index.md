@@ -18,14 +18,14 @@
 
 ## Test Type Routing
 
-| Step | Title | Test Type | Specialist | Status |
-|------|-------|-----------|------------|--------|
-| 1 | Extend HomePage Page Object | infrastructure | test-infrastructure-specialist | COMPLETE |
-| 2 | Create Newsletter E2E Test File | e2e infrastructure | e2e-test-specialist | COMPLETE |
-| 3 | Public User Tests (6 tests) | e2e | e2e-test-specialist | COMPLETE |
-| 4 | Authenticated Non-Subscriber Tests (3 tests) | e2e | e2e-test-specialist | COMPLETE |
-| 5 | Authenticated Subscriber Tests (3 tests) | e2e | e2e-test-specialist | COMPLETE |
-| 6 | Full Test Suite Validation | e2e validation | orchestrator | COMPLETE |
+| Step | Title                                        | Test Type          | Specialist                     | Status   |
+| ---- | -------------------------------------------- | ------------------ | ------------------------------ | -------- |
+| 1    | Extend HomePage Page Object                  | infrastructure     | test-infrastructure-specialist | COMPLETE |
+| 2    | Create Newsletter E2E Test File              | e2e infrastructure | e2e-test-specialist            | COMPLETE |
+| 3    | Public User Tests (6 tests)                  | e2e                | e2e-test-specialist            | COMPLETE |
+| 4    | Authenticated Non-Subscriber Tests (3 tests) | e2e                | e2e-test-specialist            | COMPLETE |
+| 5    | Authenticated Subscriber Tests (3 tests)     | e2e                | e2e-test-specialist            | COMPLETE |
+| 6    | Full Test Suite Validation                   | e2e validation     | orchestrator                   | COMPLETE |
 
 ## Navigation
 
@@ -41,16 +41,16 @@
 
 ## Quick Status
 
-| Step | Title | Test Type | Status | Tests | Fix Attempts | Duration |
-|------|-------|-----------|--------|-------|--------------|----------|
-| 1 | Extend HomePage Page Object | infrastructure | PASS | N/A | 0 | ~30s |
-| 2 | Create Newsletter E2E Test File | e2e infrastructure | PASS | N/A | 0 | ~30s |
-| 3 | Public User Tests | e2e | PASS | 6/6 | 0 | ~50s |
-| 4 | Auth Non-Subscriber Tests | e2e | PASS | 3/3 | 0 | ~40s |
-| 5 | Auth Subscriber Tests | e2e | SKIP* | 0/3 | 1 | ~45s |
-| 6 | Full Validation | validation | PASS | 9/12 | 0 | ~60s |
+| Step | Title                           | Test Type          | Status | Tests | Fix Attempts | Duration |
+| ---- | ------------------------------- | ------------------ | ------ | ----- | ------------ | -------- |
+| 1    | Extend HomePage Page Object     | infrastructure     | PASS   | N/A   | 0            | ~30s     |
+| 2    | Create Newsletter E2E Test File | e2e infrastructure | PASS   | N/A   | 0            | ~30s     |
+| 3    | Public User Tests               | e2e                | PASS   | 6/6   | 0            | ~50s     |
+| 4    | Auth Non-Subscriber Tests       | e2e                | PASS   | 3/3   | 0            | ~40s     |
+| 5    | Auth Subscriber Tests           | e2e                | SKIP\* | 0/3   | 1            | ~45s     |
+| 6    | Full Validation                 | validation         | PASS   | 9/12  | 0            | ~60s     |
 
-*Step 5 tests skip gracefully due to rate limiting - will pass when limit resets.
+\*Step 5 tests skip gracefully due to rate limiting - will pass when limit resets.
 
 ## Summary
 
@@ -61,6 +61,7 @@ Test implementation is **COMPLETE**. All 12 newsletter footer E2E tests are impl
 - **0 tests failing**
 
 The 3 skipped tests will pass when:
+
 1. Rate limit resets (~1 hour), OR
 2. Test user is manually subscribed via UI, OR
 3. Subscription is seeded in E2E database

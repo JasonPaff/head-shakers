@@ -29,17 +29,20 @@ Implement a newsletter subscription component in the footer that provides differ
 ## File Discovery Summary
 
 ### Files to Create
-| File | Purpose |
-|------|---------|
-| `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx` | Client component for subscription form |
-| `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Client component for unsubscribe UI |
+
+| File                                                                            | Purpose                                |
+| ------------------------------------------------------------------------------- | -------------------------------------- |
+| `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx`   | Client component for subscription form |
+| `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx` | Client component for unsubscribe UI    |
 
 ### Files to Modify
-| File | Purpose |
-|------|---------|
+
+| File                                                                | Purpose                                                |
+| ------------------------------------------------------------------- | ------------------------------------------------------ |
 | `src/components/layout/app-footer/components/footer-newsletter.tsx` | Transform placeholder to server component orchestrator |
 
 ### Existing Infrastructure (No Changes Needed)
+
 - `src/lib/actions/newsletter/newsletter.actions.ts` - Server actions
 - `src/lib/facades/newsletter/newsletter.facade.ts` - Business logic
 - `src/hooks/use-server-action.ts` - Hook with optimistic support
@@ -57,9 +60,11 @@ Implement a newsletter subscription component in the footer that provides differ
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/layout/app-footer/components/footer-newsletter-subscribe.tsx`
 
 **Changes:**
+
 - Create `FooterNewsletterSubscribe` client component accepting `userEmail?: string` and `onOptimisticSubscribe?: () => void` props
 - Implement `useAppForm` with `insertNewsletterSignupSchema` for email validation
 - Add conditional `useServerAction` call with `isDisableToast: true` when `userEmail` is provided (authenticated)
@@ -73,11 +78,13 @@ Implement a newsletter subscription component in the footer that provides differ
 - Implement focus management for form fields
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component accepts optional `userEmail` and `onOptimisticSubscribe` props
 - [ ] Form validates email input using Zod schema
 - [ ] Authenticated users trigger optimistic callback before server action
@@ -94,9 +101,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Create:**
+
 - `src/components/layout/app-footer/components/footer-newsletter-unsubscribe.tsx`
 
 **Changes:**
+
 - Create `FooterNewsletterUnsubscribe` client component accepting `userEmail: string` and `onOptimisticUnsubscribe: () => void` props
 - Implement `useServerAction` with `isDisableToast: true` for `unsubscribeFromNewsletterAction`
 - Add unsubscribe button click handler that calls `onOptimisticUnsubscribe` before server action
@@ -109,11 +118,13 @@ npm run lint:fix && npm run typecheck
 - Handle loading states during server action execution
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Component displays current subscription status with user email
 - [ ] Unsubscribe button triggers optimistic callback immediately
 - [ ] Destructive variant styling is applied correctly
@@ -130,9 +141,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - `src/components/layout/app-footer/components/footer-newsletter.tsx`
 
 **Changes:**
+
 - Remove existing placeholder content
 - Import `getUserIdAsync` from auth-utils
 - Import `UsersFacade.getEmailByUserIdAsync` and `NewsletterFacade.getIsActiveSubscriberAsync`
@@ -150,11 +163,13 @@ npm run lint:fix && npm run typecheck
 - Add test ID for newsletter section container
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Server component correctly identifies authentication status
 - [ ] User email is fetched for authenticated users
 - [ ] Subscription status is checked for authenticated users
@@ -172,9 +187,11 @@ npm run lint:fix && npm run typecheck
 **Confidence**: High
 
 **Files to Modify:**
+
 - None (verification step only)
 
 **Changes:**
+
 - Verify footer-newsletter component renders in app footer without errors
 - Test public user flow: submit email, verify toast appears, check database entry
 - Test authenticated non-subscriber flow: verify form shows with pre-filled email, submit, verify optimistic update
@@ -186,11 +203,13 @@ npm run lint:fix && npm run typecheck
 - Test loading states during async operations
 
 **Validation Commands:**
+
 ```bash
 npm run lint:fix && npm run typecheck
 ```
 
 **Success Criteria:**
+
 - [ ] Newsletter component renders correctly in footer
 - [ ] All three user states (public, authenticated non-subscriber, authenticated subscriber) work as expected
 - [ ] Optimistic UI updates occur immediately for authenticated users

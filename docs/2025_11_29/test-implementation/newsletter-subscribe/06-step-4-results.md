@@ -14,6 +14,7 @@
 ## Subagent Input
 
 Implement unit tests for NewsletterQuery class with Drizzle ORM mocking:
+
 - `createSignupAsync`: 3 tests
 - `emailExistsAsync`: 2 tests
 - `findByEmailAsync`: 2 tests
@@ -28,40 +29,49 @@ Implement unit tests for NewsletterQuery class with Drizzle ORM mocking:
 **Status**: success
 
 **Files Created**:
+
 - `tests/unit/lib/queries/newsletter/newsletter.queries.test.ts` - Comprehensive unit tests with Drizzle ORM mocking
 
 **Test Cases Implemented** (18 total):
 
 **createSignupAsync** (3 tests):
+
 - should create new signup with normalized email and userId
 - should handle conflict gracefully - returns null when onConflictDoNothing triggers
 - should handle anonymous signup with userId undefined
 
 **emailExistsAsync** (2 tests):
+
 - should return true when email exists
 - should return false when email does not exist
 
 **findByEmailAsync** (2 tests):
+
 - should find signup by normalized email
 - should return null when email not found
 
 **getActiveSubscriberAsync** (3 tests):
+
 - should return subscriber when active (not unsubscribed)
 - should return null when subscriber is unsubscribed
 - should return null when email does not exist
 
 **getIsActiveSubscriberAsync** (2 tests):
+
 - should return true for active subscriber
 - should return false for inactive or non-existent subscriber
 
 **resubscribeAsync** (2 tests):
+
 - should resubscribe existing email - clear unsubscribedAt and update subscribedAt
 - should return null when email does not exist
 
 **unsubscribeAsync** (1 test):
+
 - should set unsubscribedAt timestamp for normalized email
 
 **updateUserIdAsync** (3 tests):
+
 - should update userId only if currently null
 - should return null when userId already set (idempotent check)
 - should return null when email does not exist
@@ -73,6 +83,7 @@ Implement unit tests for NewsletterQuery class with Drizzle ORM mocking:
 **Result**: PASS
 
 **Output**:
+
 ```
 ✓ tests/unit/lib/queries/newsletter/newsletter.queries.test.ts (18 tests) 15ms
 

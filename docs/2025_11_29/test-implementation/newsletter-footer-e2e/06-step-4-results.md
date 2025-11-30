@@ -17,11 +17,11 @@
 
 ## Test Cases Implemented
 
-| Test | Fixture | Result |
-|------|---------|--------|
-| should display subscribe form for authenticated non-subscriber | newUserPage | PASS |
-| should transition to unsubscribe view after subscribing | newUserPage | PASS |
-| should persist subscription state after page refresh | newUserPage | PASS |
+| Test                                                           | Fixture     | Result |
+| -------------------------------------------------------------- | ----------- | ------ |
+| should display subscribe form for authenticated non-subscriber | newUserPage | PASS   |
+| should transition to unsubscribe view after subscribing        | newUserPage | PASS   |
+| should persist subscription state after page refresh           | newUserPage | PASS   |
 
 ## Orchestrator Verification
 

@@ -5,14 +5,14 @@
 
 ## Extracted Implementation Steps
 
-| Step | Title | Test Type | Files | Tests |
-|------|-------|-----------|-------|-------|
-| 1 | Extend HomePage Page Object | infrastructure | 1 modify | 0 |
-| 2 | Create Newsletter E2E Test File | e2e infrastructure | 1 create | 0 |
-| 3 | Public User Tests | e2e | 1 modify | 6 |
-| 4 | Auth Non-Subscriber Tests | e2e | 1 modify | 3 |
-| 5 | Auth Subscriber Tests | e2e | 1 modify | 3 |
-| 6 | Full Test Suite Validation | validation | 0 | 12 total |
+| Step | Title                           | Test Type          | Files    | Tests    |
+| ---- | ------------------------------- | ------------------ | -------- | -------- |
+| 1    | Extend HomePage Page Object     | infrastructure     | 1 modify | 0        |
+| 2    | Create Newsletter E2E Test File | e2e infrastructure | 1 create | 0        |
+| 3    | Public User Tests               | e2e                | 1 modify | 6        |
+| 4    | Auth Non-Subscriber Tests       | e2e                | 1 modify | 3        |
+| 5    | Auth Subscriber Tests           | e2e                | 1 modify | 3        |
+| 6    | Full Test Suite Validation      | validation         | 0        | 12 total |
 
 ## Step Routing Table
 
@@ -28,6 +28,7 @@ Step 6: test-executor (validation - execution)
 ## Todo List Created
 
 7 items total:
+
 1. Pre-checks (in_progress)
 2. Step 1: Extend HomePage Page Object [infrastructure]
 3. Step 2: Create Newsletter E2E Test File [e2e infrastructure]

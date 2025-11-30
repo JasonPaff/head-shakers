@@ -5,14 +5,14 @@
 
 ## Quality Gate Results
 
-| Gate                                                      | Result              | Notes                                             |
-| --------------------------------------------------------- | ------------------- | ------------------------------------------------- |
-| All TypeScript files pass `npm run typecheck`             | WARN (pre-existing) | Pre-existing errors in unrelated files            |
-| All files pass `npm run lint:fix`                         | PASS                | No linting errors                                 |
-| All files properly formatted with `npm run format`        | PASS                | All files formatted correctly                     |
-| Database migration executes successfully                  | PASS                | Migration applied successfully                    |
-| No references to `updatedAt` remain in newsletter code    | PASS                | Verified via grep search                          |
-| Schema, queries, and validations align with removed column| PASS                | All aligned correctly                             |
+| Gate                                                       | Result              | Notes                                  |
+| ---------------------------------------------------------- | ------------------- | -------------------------------------- |
+| All TypeScript files pass `npm run typecheck`              | WARN (pre-existing) | Pre-existing errors in unrelated files |
+| All files pass `npm run lint:fix`                          | PASS                | No linting errors                      |
+| All files properly formatted with `npm run format`         | PASS                | All files formatted correctly          |
+| Database migration executes successfully                   | PASS                | Migration applied successfully         |
+| No references to `updatedAt` remain in newsletter code     | PASS                | Verified via grep search               |
+| Schema, queries, and validations align with removed column | PASS                | All aligned correctly                  |
 
 ## Detailed Results
 
@@ -32,6 +32,7 @@
 **Result**: WARN - Pre-existing errors in unrelated files
 
 Pre-existing errors (not introduced by this change):
+
 - `bobblehead-edit-dialog.tsx` - Type incompatibility in photo mapping
 - `bobblehead-gallery-card.tsx` - Type incompatibility in photo mapping
 - `use-like.tsx` - ActionResponse type incompatibility
@@ -51,6 +52,7 @@ Pre-existing errors (not introduced by this change):
 ```
 
 Schema check:
+
 ```
 Everything's fine 🐶🔥
 ```
@@ -61,6 +63,7 @@ Everything's fine 🐶🔥
 **Result**: No matches found ✓
 
 Files verified:
+
 - `src/lib/db/schema/newsletter-signups.schema.ts` - No `updatedAt` references
 - `src/lib/queries/newsletter/newsletter.queries.ts` - No `updatedAt` references
 - `src/lib/validations/newsletter.validation.ts` - No `updatedAt` references
