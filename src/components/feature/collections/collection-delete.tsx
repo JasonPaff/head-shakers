@@ -16,6 +16,7 @@ import { cn } from '@/utils/tailwind-utils';
 type CollectionDeleteProps = Children<{
   collectionId: string;
   collectionName: string;
+  onSuccess?: () => void;
 }> &
   Omit<ComponentProps<typeof Button>, 'children' | 'onClick'>;
 
@@ -23,6 +24,7 @@ export const CollectionDelete = ({
   children,
   collectionId,
   collectionName,
+  onSuccess,
   ...props
 }: CollectionDeleteProps) => {
   const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
@@ -38,6 +40,7 @@ export const CollectionDelete = ({
 
   const handleDeleteAsync = async () => {
     await executeAsync({ collectionId });
+    onSuccess?.();
   };
 
   return (

@@ -205,6 +205,7 @@ export const CollectionEditDialog = withFocusManagement(
                   collectionId={collection.id}
                   collectionName={collection.name}
                   disabled={isSubmitting}
+                  onSuccess={onClose}
                   testId={deleteButtonTestId}
                   variant={'ghost'}
                 >
