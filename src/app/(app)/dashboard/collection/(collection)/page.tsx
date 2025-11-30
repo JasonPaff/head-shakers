@@ -11,11 +11,34 @@ import { CollectionLayout } from './components/layout/collection-layout';
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
 import { SidebarSkeleton } from './components/skeleton/sidebar-skeleton';
+import { collectionDashboardSearchParamsCache } from './search-params';
 
-export default function CollectionPage() {
+type CollectionPageProps = {
+  searchParams: Promise<Record<string, Array<string> | string | undefined>>;
+};
+
+export default async function CollectionPage({ searchParams }: CollectionPageProps) {
+  await collectionDashboardSearchParamsCache.parse(searchParams);
+
   return (
     <CollectionLayout
-      main={<MainContentWrapper />}
+      main={
+        <Fragment>
+          {/* Collection Header */}
+          <ErrorBoundary name={'collection-header'}>
+            <Suspense fallback={<CollectionHeaderSkeleton />}>
+              <CollectionHeaderAsync />
+            </Suspense>
+          </ErrorBoundary>
+
+          {/* Bobblehead Grid */}
+          <ErrorBoundary name={'collection-bobbleheads'}>
+            <Suspense fallback={<BobbleheadContentSkeleton />}>
+              <BobbleheadGridAsync />
+            </Suspense>
+          </ErrorBoundary>
+        </Fragment>
+      }
       sidebar={
         <ErrorBoundary name={'collection-sidebar'}>
           <Suspense fallback={<SidebarSkeleton />}>
@@ -32,29 +55,4 @@ export function generateMetadata(): Metadata {
     description: 'Manage your bobblehead collections',
     title: 'My Collection',
   };
-}
-
-/**
- * Wrapper component for the main content area with two separate suspense boundaries:
- * 1. Collection header - loads collection metadata
- * 2. Bobblehead grid - loads bobblehead items with toolbar
- */
-function MainContentWrapper() {
-  return (
-    <Fragment>
-      {/* Collection Header */}
-      <ErrorBoundary name={'collection-header'}>
-        <Suspense fallback={<CollectionHeaderSkeleton />}>
-          <CollectionHeaderAsync />
-        </Suspense>
-      </ErrorBoundary>
-
-      {/* Bobblehead Grid */}
-      <ErrorBoundary name={'collection-bobbleheads'}>
-        <Suspense fallback={<BobbleheadContentSkeleton />}>
-          <BobbleheadGridAsync />
-        </Suspense>
-      </ErrorBoundary>
-    </Fragment>
-  );
 }

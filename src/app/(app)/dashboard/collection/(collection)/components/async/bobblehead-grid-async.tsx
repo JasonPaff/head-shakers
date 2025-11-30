@@ -1,5 +1,10 @@
 import 'server-only';
 
+import { ENUMS } from '@/lib/constants';
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
+
+import { collectionDashboardSearchParamsCache } from '../../search-params';
 import { BobbleheadGridDisplay } from '../display/bobblehead-grid-display';
 
 // Type for bobblehead data from the server
@@ -21,27 +26,47 @@ export type BobbleheadData = {
   year?: number;
 };
 
-// TODO: Add collectionId prop when implementing real data fetching
-// type BobbleheadGridAsyncProps = {
-//   collectionId?: string;
-// };
-
 /**
  * Server component that fetches bobbleheads for a collection
  * and passes them to the client display component.
  */
 export async function BobbleheadGridAsync() {
-  // TODO: Replace with real facade calls:
-  // const userId = await getUserIdAsync();
-  // const bobbleheads = await BobbleheadsFacade.getBobbleheadsByCollectionAsync(collectionId, userId);
+  const collectionId = collectionDashboardSearchParamsCache.get('collectionId');
 
-  // Placeholder await - remove when adding real data fetching
-  await Promise.resolve();
+  if (!collectionId) {
+    return (
+      <BobbleheadGridDisplay bobbleheads={[]} categories={[]} conditions={[...ENUMS.BOBBLEHEAD.CONDITION]} />
+    );
+  }
 
-  // For now, pass empty data - replace with real facade calls
-  const bobbleheads: Array<BobbleheadData> = [];
-  const categories: Array<string> = [];
-  const conditions: Array<string> = [];
+  const userId = await getRequiredUserIdAsync();
+  const bobbleheadRecords = await CollectionsFacade.getCollectionBobbleheadsWithPhotos(collectionId, userId);
 
-  return <BobbleheadGridDisplay bobbleheads={bobbleheads} categories={categories} conditions={conditions} />;
+  const bobbleheads: Array<BobbleheadData> = bobbleheadRecords.map((b) => ({
+    characterName: b.characterName ?? undefined,
+    commentCount: 0, // TODO: Add when available from facade
+    condition: b.condition ?? 'good',
+    height: b.height ?? undefined,
+    id: b.id,
+    imageUrl: b.featurePhoto ?? undefined,
+    isFeatured: b.isFeatured,
+    likeCount: b.likeData?.likeCount ?? 0,
+    manufacturer: b.manufacturer ?? undefined,
+    material: b.material ?? undefined,
+    name: b.name ?? '',
+    purchasePrice: b.purchasePrice ?? undefined,
+    series: b.series ?? undefined,
+    viewCount: 0, // TODO: Add when available from facade
+    year: b.year ?? undefined,
+  }));
+
+  const categories = [...new Set(bobbleheads.map((b) => b.manufacturer).filter(Boolean))] as Array<string>;
+
+  return (
+    <BobbleheadGridDisplay
+      bobbleheads={bobbleheads}
+      categories={categories}
+      conditions={[...ENUMS.BOBBLEHEAD.CONDITION]}
+    />
+  );
 }

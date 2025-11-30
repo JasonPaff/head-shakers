@@ -1,38 +1,53 @@
 import 'server-only';
 
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
+
+import { collectionDashboardSearchParamsCache } from '../../search-params';
 import { CollectionHeaderDisplay } from '../display/collection-header-display';
 
 export type CollectionHeaderData = {
   bobbleheadCount: number;
-  coverImageUrl: string;
-  description: string;
+  coverImageUrl: null | string;
+  description: null | string;
   featuredCount: number;
   id: string;
   likeCount: number;
   name: string;
-  totalValue: number;
+  totalValue: null | number;
   viewCount: number;
 };
-
-// TODO: Add collectionId prop when implementing real data fetching
-// type CollectionHeaderAsyncProps = {
-//   collectionId?: string;
-// };
 
 /**
  * Server component that fetches collection header data
  * and passes it to the client display component.
  */
 export async function CollectionHeaderAsync() {
-  // TODO: Replace with real facade calls:
-  // const userId = await getUserIdAsync();
-  // const collection = await CollectionsFacade.getCollectionByIdAsync(collectionId, userId);
+  const collectionId = collectionDashboardSearchParamsCache.get('collectionId');
 
-  // Placeholder await - remove when adding real data fetching
-  await Promise.resolve();
+  if (!collectionId) {
+    return <CollectionHeaderDisplay collection={null} />;
+  }
 
-  // For now, pass null - replace with real facade calls
-  const collection: CollectionHeaderData | null = null;
+  const userId = await getRequiredUserIdAsync();
 
-  return <CollectionHeaderDisplay collection={collection} />;
+  const collections = await CollectionsFacade.getDashboardListByUserId(userId);
+  const collection = collections.find((collection) => collection.id === collectionId);
+
+  const headerData: CollectionHeaderData | null =
+    collection ?
+      {
+        bobbleheadCount: collection.bobbleheadCount,
+        coverImageUrl: collection.coverImageUrl,
+        description: collection.description,
+        featuredCount: collection.featuredCount,
+        id: collection.id,
+        likeCount: collection.likeCount,
+        name: collection.name,
+        totalValue: collection.totalValue,
+        viewCount: collection.viewCount,
+      }
+    : null;
+
+  return <CollectionHeaderDisplay collection={headerData} />;
 }
