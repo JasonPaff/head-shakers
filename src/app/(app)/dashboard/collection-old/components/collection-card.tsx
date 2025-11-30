@@ -8,7 +8,7 @@ import Link from 'next/link';
 
 import type { CollectionDashboardData } from '@/lib/facades/collections/collections.facade';
 
-import { CollectionActions } from '@/app/(app)/dashboard/collection/(collection)/components/collection-actions';
+import { CollectionActions } from '@/app/(app)/dashboard/collection-old/components/collection-actions';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

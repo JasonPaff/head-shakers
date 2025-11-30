@@ -1,4 +1,4 @@
-import { CollectionCardSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/collection-card-skeleton';
+import { CollectionCardSkeleton } from '@/app/(app)/dashboard/collection-old/components/skeletons/collection-card-skeleton';
 
 export const CollectionsTabSkeleton = () => {
   return (

@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { CollectionCard } from '@/app/(app)/dashboard/collection/(collection)/components/collection-card';
-import { CollectionsEmptyState } from '@/app/(app)/dashboard/collection/(collection)/components/collections-empty-state';
+import { CollectionCard } from '@/app/(app)/dashboard/collection-old/components/collection-card';
+import { CollectionsEmptyState } from '@/app/(app)/dashboard/collection-old/components/collections-empty-state';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { UsersFacade } from '@/lib/facades/users/users.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';

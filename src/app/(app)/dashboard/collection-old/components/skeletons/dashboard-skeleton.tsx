@@ -1,6 +1,6 @@
-import { BobbleheadsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/bobbleheads-tab-skeleton';
-import { CollectionsTabSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/collections-tab-skeleton';
-import { DashboardHeaderSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/dashboard-header-skeleton';
+import { BobbleheadsTabSkeleton } from '@/app/(app)/dashboard/collection-old/components/skeletons/bobbleheads-tab-skeleton';
+import { CollectionsTabSkeleton } from '@/app/(app)/dashboard/collection-old/components/skeletons/collections-tab-skeleton';
+import { DashboardHeaderSkeleton } from '@/app/(app)/dashboard/collection-old/components/skeletons/dashboard-header-skeleton';
 import { ContentLayout } from '@/components/layout/content-layout';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

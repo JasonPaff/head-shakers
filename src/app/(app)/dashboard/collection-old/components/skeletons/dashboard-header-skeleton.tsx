@@ -1,4 +1,4 @@
-import { DashboardStatsSkeleton } from '@/app/(app)/dashboard/collection/(collection)/components/skeletons/dashboard-stats-skeleton';
+import { DashboardStatsSkeleton } from '@/app/(app)/dashboard/collection-old/components/skeletons/dashboard-stats-skeleton';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export const DashboardHeaderSkeleton = () => {

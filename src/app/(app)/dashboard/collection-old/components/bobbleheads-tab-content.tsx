@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { BobbleheadsEmptyState } from '@/app/(app)/dashboard/collection/(collection)/components/bobbleheads-empty-state';
-import { BobbleheadsManagementGrid } from '@/app/(app)/dashboard/collection/(collection)/components/bobbleheads-management-grid';
+import { BobbleheadsEmptyState } from '@/app/(app)/dashboard/collection-old/components/bobbleheads-empty-state';
+import { BobbleheadsManagementGrid } from '@/app/(app)/dashboard/collection-old/components/bobbleheads-management-grid';
 import { BobbleheadsFacade } from '@/lib/facades/bobbleheads/bobbleheads.facade';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
 

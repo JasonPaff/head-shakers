@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { CollectionCreateButton } from '@/app/(app)/dashboard/collection/(collection)/components/collection-create-button';
-import { DashboardStats } from '@/app/(app)/dashboard/collection/(collection)/components/dashboard-stats';
+import { CollectionCreateButton } from '@/app/(app)/dashboard/collection-old/components/collection-create-button';
+import { DashboardStats } from '@/app/(app)/dashboard/collection-old/components/dashboard-stats';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
 import { generateTestId } from '@/lib/test-ids';
 import { getRequiredUserIdAsync } from '@/utils/auth-utils';
