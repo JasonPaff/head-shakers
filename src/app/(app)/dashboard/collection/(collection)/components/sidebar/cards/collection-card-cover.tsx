@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon, HeartIcon } from 'lucide-react';
+import { EditIcon, GlobeIcon, HeartIcon, LockIcon } from 'lucide-react';
 
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
@@ -77,6 +77,13 @@ export const CollectionCardCover = ({ collection, isActive, onClick, onEdit }: C
                   <HeartIcon aria-hidden className={'size-3'} /> {collection.likeCount}
                 </span>
               </div>
+            </div>
+
+            {/* Visibility Indicator */}
+            <div className={'absolute top-2 left-2 rounded-full bg-black/50 p-1.5 text-white'}>
+              {collection.isPublic ?
+                <GlobeIcon aria-label={'Public'} className={'size-3.5'} />
+              : <LockIcon aria-label={'Private'} className={'size-3.5'} />}
             </div>
 
             {/* Edit Button */}

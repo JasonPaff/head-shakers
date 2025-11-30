@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon, GripVerticalIcon, HeartIcon, StarIcon } from 'lucide-react';
+import { EditIcon, GlobeIcon, GripVerticalIcon, HeartIcon, LockIcon, StarIcon } from 'lucide-react';
 
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
@@ -75,6 +75,9 @@ export const CollectionCardDetailed = ({
               <div className={'mt-2 flex items-center gap-3 text-xs text-muted-foreground'}>
                 <span className={'font-medium'}>{collection.bobbleheadCount} items</span>
                 <span className={'font-medium text-primary'}>{formattedValue}</span>
+                {collection.isPublic ?
+                  <GlobeIcon aria-label={'Public'} className={'size-3'} />
+                : <LockIcon aria-label={'Private'} className={'size-3'} />}
               </div>
 
               {/* Engagement Stats */}

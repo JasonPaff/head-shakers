@@ -1,6 +1,6 @@
 import type { MouseEvent } from 'react';
 
-import { EditIcon } from 'lucide-react';
+import { EditIcon, GlobeIcon, LockIcon } from 'lucide-react';
 
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
@@ -71,6 +71,10 @@ export const CollectionCardCompact = ({
               <h3 className={'truncate text-sm font-semibold sm:text-base md:text-sm'}>{collection.name}</h3>
               <div className={'mt-1 flex items-center gap-2 text-xs text-muted-foreground'}>
                 <span>{collection.bobbleheadCount} items</span>
+                <span>•</span>
+                {collection.isPublic ?
+                  <GlobeIcon aria-label={'Public'} className={'size-3'} />
+                : <LockIcon aria-label={'Private'} className={'size-3'} />}
                 <span>•</span>
                 <span className={'font-medium text-primary'}>{formattedValue}</span>
               </div>

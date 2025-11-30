@@ -9,7 +9,7 @@ import type { ComboboxItem } from '@/components/ui/form/field-components/combobo
 import { addItemFormOptions } from '@/app/(app)/bobbleheads/add/components/add-item-form-options';
 import { AnimatedMotivationalMessage } from '@/app/(app)/bobbleheads/add/components/animated-motivational-message';
 import { useMotivationalMessage } from '@/app/(app)/bobbleheads/add/hooks/use-motivational-message';
-import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
+import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { withForm } from '@/components/ui/form';
 import { useToggle } from '@/hooks/use-toggle';
@@ -93,10 +93,10 @@ export const CollectionAssignment = withForm({
           </AnimatedMotivationalMessage>
         </CardContent>
 
-        <CollectionCreateDialog
+        <CollectionUpsertDialog
           isOpen={isCreateCollectionDialogOpen}
           onClose={setIsCreateCollectionDialogOpen.off}
-          onCollectionCreated={handleCollectionCreated}
+          onSuccess={handleCollectionCreated}
         />
       </Card>
     );

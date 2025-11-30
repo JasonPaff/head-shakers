@@ -48,6 +48,10 @@ export const CollectionHoverCardContent = ({ collection }: CollectionHoverCardCo
             <span className={'text-muted-foreground'}>Likes:</span>
             <p className={'font-medium'}>{collection.likeCount}</p>
           </div>
+          <div>
+            <span className={'text-muted-foreground'}>Visibility:</span>
+            <p className={'font-medium'}>{collection.isPublic ? 'Public' : 'Private'}</p>
+          </div>
         </div>
 
         <Separator />

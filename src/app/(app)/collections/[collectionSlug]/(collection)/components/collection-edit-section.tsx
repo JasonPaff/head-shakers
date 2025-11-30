@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
-import { CollectionEditDialog } from '@/components/feature/collections/collection-edit-dialog';
+import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
@@ -28,7 +28,7 @@ export const CollectionEditSection = ({ collection, isOwner }: CollectionEditSec
       </Conditional>
 
       <Conditional isCondition={isEditDialogOpen}>
-        <CollectionEditDialog
+        <CollectionUpsertDialog
           collection={collection}
           isOpen={isEditDialogOpen}
           onClose={setIsEditDialogOpen.off}

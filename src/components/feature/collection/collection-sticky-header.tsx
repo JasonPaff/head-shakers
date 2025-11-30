@@ -6,8 +6,8 @@ import { Fragment } from 'react';
 import type { PublicCollection } from '@/lib/facades/collections/collections.facade';
 
 import { CollectionDelete } from '@/components/feature/collections/collection-delete';
-import { CollectionEditDialog } from '@/components/feature/collections/collection-edit-dialog';
 import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
+import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { ReportButton } from '@/components/feature/content-reports/report-button';
 import { Button } from '@/components/ui/button';
 import { Conditional } from '@/components/ui/conditional';
@@ -112,7 +112,7 @@ export const CollectionStickyHeader = ({
 
       {/* Edit Dialog */}
       {isEditDialogOpen && collection && (
-        <CollectionEditDialog
+        <CollectionUpsertDialog
           collection={collection}
           isOpen={isEditDialogOpen}
           onClose={setIsEditDialogOpen.off}

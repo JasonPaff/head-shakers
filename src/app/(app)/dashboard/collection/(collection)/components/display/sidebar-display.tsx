@@ -5,8 +5,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react';
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
-import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
-import { CollectionEditDialog } from '@/components/feature/collections/collection-edit-dialog';
+import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
 import { Conditional } from '@/components/ui/conditional';
 import { useToggle } from '@/hooks/use-toggle';
 import { useUserPreferences } from '@/hooks/use-user-preferences';
@@ -141,15 +140,15 @@ export const SidebarDisplay = ({
       <SidebarFooter totalCount={collections.length} />
 
       {/* Create Collection Dialog */}
-      <CollectionCreateDialog
+      <CollectionUpsertDialog
         isOpen={isCreateDialogOpen}
         onClose={setIsCreateDialogOpen.off}
-        onCollectionCreated={handleCollectionCreated}
+        onSuccess={handleCollectionCreated}
       />
 
       {/* Edit Collection Details Dialog */}
       <Conditional isCondition={!!editingCollection}>
-        <CollectionEditDialog
+        <CollectionUpsertDialog
           collection={editingCollection!}
           isOpen={isEditDialogOpen}
           onClose={handleEditDialogClose}
