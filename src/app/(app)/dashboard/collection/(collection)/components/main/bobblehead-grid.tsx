@@ -12,7 +12,7 @@ export const BobbleheadGrid = ({ children, gridDensity, isEmpty }: BobbleheadGri
     : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4';
 
   return (
-    <div className={'flex-1 overflow-y-auto px-4 pb-4'} data-slot={'bobblehead-grid-container'}>
+    <div className={'flex-1 overflow-y-auto p-4'} data-slot={'bobblehead-grid-container'}>
       {isEmpty ?
         <div className={'flex h-full items-center justify-center'}>{children}</div>
       : <div className={cn('grid gap-4', gridCols)} data-slot={'bobblehead-grid'}>

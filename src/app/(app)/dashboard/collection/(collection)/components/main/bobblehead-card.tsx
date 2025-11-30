@@ -90,14 +90,35 @@ export const BobbleheadCard = ({
   const handleDelete = () => onDelete(id);
   const handleFeatureToggle = () => onFeatureToggle(id);
 
+  const handleCardClick = () => {
+    if (isSelectionMode) {
+      onSelectionChange(id, !isSelected);
+    }
+  };
+
   return (
     <div
-      className={'group relative overflow-hidden rounded-lg border bg-card transition-all hover:shadow-lg'}
+      className={cn(
+        'group relative overflow-hidden rounded-lg border bg-card transition-all hover:shadow-lg',
+        isSelected && 'ring-2 ring-primary',
+      )}
       data-slot={'bobblehead-card'}
     >
       <HoverCard open={isSelectionMode ? false : undefined} openDelay={200}>
         <HoverCardTrigger asChild>
-          <div className={'cursor-pointer'}>
+          <div
+            aria-checked={isSelectionMode ? isSelected : undefined}
+            className={'cursor-pointer'}
+            onClick={handleCardClick}
+            onKeyDown={(e) => {
+              if (isSelectionMode && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                handleCardClick();
+              }
+            }}
+            role={isSelectionMode ? 'checkbox' : undefined}
+            tabIndex={isSelectionMode ? 0 : undefined}
+          >
             {/* Image Container */}
             <div className={'relative aspect-square overflow-hidden bg-muted'}>
               {imageUrl && (
