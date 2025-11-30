@@ -959,7 +959,7 @@ export class CollectionsQuery extends BaseQuery {
       .select({
         bobbleheadCount: count(bobbleheads.id).as('bobblehead_count'),
         collectionId: bobbleheads.collectionId,
-        featuredCount: count(bobbleheads.isFeatured).as('featured_count'),
+        featuredCount: count(sql`CASE WHEN ${bobbleheads.isFeatured} THEN 1 END`).as('featured_count'),
         totalValue: sum(bobbleheads.purchasePrice).as('total_value'),
       })
       .from(bobbleheads)
