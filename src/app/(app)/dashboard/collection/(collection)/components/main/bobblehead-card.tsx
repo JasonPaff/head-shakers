@@ -95,7 +95,7 @@ export const BobbleheadCard = ({
       className={'group relative overflow-hidden rounded-lg border bg-card transition-all hover:shadow-lg'}
       data-slot={'bobblehead-card'}
     >
-      <HoverCard openDelay={200}>
+      <HoverCard open={isSelectionMode ? false : undefined} openDelay={200}>
         <HoverCardTrigger asChild>
           <div className={'cursor-pointer'}>
             {/* Image Container */}

@@ -45,5 +45,6 @@ export const collections = pgTable(
 
     // unique constraints
     uniqueIndex('collections_user_slug_unique').on(table.userId, table.slug),
+    uniqueIndex('collections_user_name_lower_unique').on(table.userId, sql`lower(${table.name})`),
   ],
 );

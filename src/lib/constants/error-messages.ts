@@ -35,6 +35,7 @@ export const ERROR_MESSAGES = {
     CREATE_FAILED: 'Failed to create collection',
     DELETE_FAILED: 'Failed to delete collection',
     NAME_REQUIRED: 'Collection name is required',
+    NAME_TAKEN: 'You already have a collection with this name',
     NOT_FOUND: 'Collection not found',
     NOT_FOUND_OR_NOT_PUBLIC: 'Collection not found or not public',
     UPDATE_FAILED: 'Failed to update collection',

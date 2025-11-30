@@ -532,7 +532,7 @@ export class CollectionsFacade extends BaseFacade {
     }
   }
 
-  static async createAsync(
+  static async createCollectionAsync(
     collection: InsertCollection,
     userId: string,
     dbInstance: DatabaseExecutor = db,
@@ -548,12 +548,12 @@ export class CollectionsFacade extends BaseFacade {
       async () => {
         const context = this.getUserContext(userId, dbInstance);
 
-        const existingSlugs = await CollectionsQuery.getSlugsByUserId(userId, context);
+        const existingSlugs = await CollectionsQuery.getCollectionSlugsByUserId(userId, context);
 
         const baseSlug = generateSlug(collection.name);
         const uniqueSlug = ensureUniqueSlug(baseSlug, existingSlugs);
 
-        const newCollection = await CollectionsQuery.createAsync(
+        const newCollection = await CollectionsQuery.createCollectionAsync(
           { ...collection, slug: uniqueSlug },
           userId,
           context,
@@ -1113,6 +1113,31 @@ export class CollectionsFacade extends BaseFacade {
   }
 
   /**
+   * Check if collection name is available for user (case-insensitive)
+   * @param name - Collection name to check
+   * @param userId - User ID to check against
+   * @param excludeCollectionId - Optional collection ID to exclude (for updates)
+   * @param dbInstance - Optional database instance for transactions
+   * @returns true if name is available, false if already taken
+   */
+  static async getIsCollectionNameAvailableAsync(
+    name: string,
+    userId: string,
+    excludeCollectionId?: string,
+    dbInstance?: DatabaseExecutor,
+  ): Promise<boolean> {
+    // TODO: add caching service
+    const context = this.getUserContext(userId, dbInstance);
+    const exists = await CollectionsQuery.getIsCollectionNameAvailableAsync(
+      name,
+      userId,
+      context,
+      excludeCollectionId,
+    );
+    return !exists;
+  }
+
+  /**
    * Get trending collections based on view data
    */
   static async getTrendingCollectionsAsync(
@@ -1210,6 +1235,17 @@ export class CollectionsFacade extends BaseFacade {
 
       // if name is being updated, regenerate slug
       if (data.name) {
+        // Check name uniqueness (excluding current collection)
+        const isNameAvailable = await this.getIsCollectionNameAvailableAsync(
+          data.name,
+          userId,
+          data.collectionId,
+          dbInst,
+        );
+        if (!isNameAvailable) {
+          return null;
+        }
+
         const baseSlug = generateSlug(data.name);
 
         // query existing slugs for this user, excluding current collection

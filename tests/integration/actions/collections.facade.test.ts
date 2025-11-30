@@ -93,7 +93,7 @@ describe('CollectionsFacade Integration Tests', () => {
         name: 'My Collection',
       };
 
-      const result = await CollectionsFacade.createAsync(collectionData, user!.id);
+      const result = await CollectionsFacade.createCollectionAsync(collectionData, user!.id);
 
       expect(result).toBeDefined();
       expect(result!.name).toBe('My Collection');
@@ -106,12 +106,12 @@ describe('CollectionsFacade Integration Tests', () => {
     it('should generate a unique slug for the collection', async () => {
       const user = await createTestUser();
 
-      const collection1 = await CollectionsFacade.createAsync(
+      const collection1 = await CollectionsFacade.createCollectionAsync(
         { description: null, isPublic: true, name: 'Test Collection' },
         user!.id,
       );
 
-      const collection2 = await CollectionsFacade.createAsync(
+      const collection2 = await CollectionsFacade.createCollectionAsync(
         { description: null, isPublic: true, name: 'Test Collection' },
         user!.id,
       );
@@ -122,7 +122,7 @@ describe('CollectionsFacade Integration Tests', () => {
     it('should create a private collection when isPublic is false', async () => {
       const user = await createTestUser();
 
-      const result = await CollectionsFacade.createAsync(
+      const result = await CollectionsFacade.createCollectionAsync(
         { description: null, isPublic: false, name: 'Private Collection' },
         user!.id,
       );
@@ -133,7 +133,7 @@ describe('CollectionsFacade Integration Tests', () => {
     it('should set default values for optional fields', async () => {
       const user = await createTestUser();
 
-      const result = await CollectionsFacade.createAsync(
+      const result = await CollectionsFacade.createCollectionAsync(
         { description: null, isPublic: true, name: 'Minimal Collection' },
         user!.id,
       );

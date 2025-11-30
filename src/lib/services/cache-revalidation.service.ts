@@ -377,7 +377,7 @@ export class CacheRevalidationService {
             $path({
               route: '/collections/[collectionSlug]',
               routeParams: {
-                slug: collectionSlug,
+                collectionSlug,
               },
             }),
             'page',

@@ -12,8 +12,10 @@ export type CollectionHeaderData = {
   description: null | string;
   featuredCount: number;
   id: string;
+  isPublic: boolean;
   likeCount: number;
   name: string;
+  slug: string;
   totalValue: null | number;
   viewCount: number;
 };
@@ -42,8 +44,10 @@ export async function CollectionHeaderAsync() {
         description: collection.description,
         featuredCount: collection.featuredCount,
         id: collection.id,
+        isPublic: collection.isPublic,
         likeCount: collection.likeCount,
         name: collection.name,
+        slug: collection.slug,
         totalValue: collection.totalValue,
         viewCount: collection.viewCount,
       }

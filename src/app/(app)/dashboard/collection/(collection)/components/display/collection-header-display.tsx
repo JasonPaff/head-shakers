@@ -1,7 +1,20 @@
 'use client';
 
+import { useQueryStates } from 'nuqs';
+import { Fragment, useState } from 'react';
+
+import type { CollectionForUpsert } from '@/components/feature/collections/collection-upsert-dialog.types';
+
+import { CollectionUpsertDialog } from '@/components/feature/collections/collection-upsert-dialog';
+import { ConfirmDeleteAlertDialog } from '@/components/ui/alert-dialogs/confirm-delete-alert-dialog';
+import { Conditional } from '@/components/ui/conditional';
+import { useServerAction } from '@/hooks/use-server-action';
+import { useToggle } from '@/hooks/use-toggle';
+import { deleteCollectionAction } from '@/lib/actions/collections/collections.actions';
+
 import type { CollectionHeaderData } from '../async/collection-header-async';
 
+import { collectionDashboardParsers } from '../../search-params';
 import { CollectionHeaderCard } from '../main/collection-header-card';
 
 type CollectionHeaderDisplayProps = {
@@ -9,22 +22,48 @@ type CollectionHeaderDisplayProps = {
 };
 
 export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayProps) => {
-  // Early return if no collection data - header won't be shown
+  const [editingCollection, setEditingCollection] = useState<CollectionForUpsert | null>(null);
+  const [isConfirmDeleteDialogOpen, setIsConfirmDeleteDialogOpen] = useToggle();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
+
+  const [, setParams] = useQueryStates(
+    { collectionId: collectionDashboardParsers.collectionId },
+    { shallow: false },
+  );
+
+  const { executeAsync } = useServerAction(deleteCollectionAction, {
+    loadingMessage: 'Deleting collection...',
+    onAfterSuccess: () => {
+      void setParams({ collectionId: null });
+    },
+  });
+
   if (!collection) {
     return null;
   }
 
-  // Action handlers - TODO: Implement real actions
   const handleEdit = () => {
-    console.log('Edit collection:', collection.id);
+    setEditingCollection({
+      coverImageUrl: collection.coverImageUrl || null,
+      description: collection.description || null,
+      id: collection.id,
+      isPublic: collection.isPublic,
+      name: collection.name,
+    });
+    setIsEditDialogOpen.on();
   };
 
-  const handleShare = () => {
-    console.log('Share collection:', collection.id);
+  const handleEditDialogClose = () => {
+    setIsEditDialogOpen.off();
+    setEditingCollection(null);
   };
 
   const handleDelete = () => {
-    console.log('Delete collection:', collection.id);
+    setIsConfirmDeleteDialogOpen.on();
+  };
+
+  const handleDeleteAsync = async () => {
+    await executeAsync({ collectionId: collection.id });
   };
 
   const handleSettings = () => {
@@ -32,19 +71,38 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
   };
 
   return (
-    <CollectionHeaderCard
-      bobbleheadCount={collection.bobbleheadCount}
-      coverImageUrl={collection.coverImageUrl}
-      description={collection.description}
-      featuredCount={collection.featuredCount}
-      likeCount={collection.likeCount}
-      name={collection.name}
-      onDelete={handleDelete}
-      onEdit={handleEdit}
-      onSettings={handleSettings}
-      onShare={handleShare}
-      totalValue={collection.totalValue}
-      viewCount={collection.viewCount}
-    />
+    <Fragment>
+      <CollectionHeaderCard
+        bobbleheadCount={collection.bobbleheadCount}
+        collectionSlug={collection.slug}
+        coverImageUrl={collection.coverImageUrl}
+        description={collection.description}
+        featuredCount={collection.featuredCount}
+        likeCount={collection.likeCount}
+        name={collection.name}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+        onSettings={handleSettings}
+        totalValue={collection.totalValue}
+        viewCount={collection.viewCount}
+      />
+
+      <ConfirmDeleteAlertDialog
+        confirmationText={collection.name}
+        isOpen={isConfirmDeleteDialogOpen}
+        onClose={setIsConfirmDeleteDialogOpen.off}
+        onDeleteAsync={handleDeleteAsync}
+      >
+        This will permanently delete this collection and all bobbleheads within.
+      </ConfirmDeleteAlertDialog>
+
+      <Conditional isCondition={!!editingCollection}>
+        <CollectionUpsertDialog
+          collection={editingCollection!}
+          isOpen={isEditDialogOpen}
+          onClose={handleEditDialogClose}
+        />
+      </Conditional>
+    </Fragment>
   );
 };

@@ -112,6 +112,7 @@ export type CollectionDashboardListData = {
   isPublic: boolean;
   likeCount: number;
   name: string;
+  slug: string;
   totalValue: null | number;
   viewCount: number;
 };
@@ -138,7 +139,7 @@ export class CollectionsQuery extends BaseQuery {
     return result[0]?.count || 0;
   }
 
-  static async createAsync(
+  static async createCollectionAsync(
     data: InsertCollection & { slug: string },
     userId: string,
     context: QueryContext,
@@ -949,6 +950,16 @@ export class CollectionsQuery extends BaseQuery {
     };
   }
 
+  static async getCollectionSlugsByUserId(userId: string, context: QueryContext): Promise<Array<string>> {
+    const dbInstance = this.getDbInstance(context);
+
+    return await dbInstance
+      .select({ slug: collections.slug })
+      .from(collections)
+      .where(eq(collections.userId, userId))
+      .then((results) => results.map((r) => r.slug));
+  }
+
   static async getDashboardListByUserId(
     userId: string,
     context: QueryContext,
@@ -1007,6 +1018,7 @@ export class CollectionsQuery extends BaseQuery {
         isPublic: collections.isPublic,
         likeCount: sql<number>`COALESCE(${likeStats.likeCount}, 0)`,
         name: collections.name,
+        slug: collections.slug,
         totalValue: sql<number>`COALESCE(${bobbleheadStats.totalValue}, 0)`,
         viewCount: sql<number>`COALESCE(${viewStats.viewCount}, 0)`,
       })
@@ -1054,14 +1066,34 @@ export class CollectionsQuery extends BaseQuery {
     }));
   }
 
-  static async getSlugsByUserId(userId: string, context: QueryContext): Promise<Array<string>> {
+  /**
+   * Check if collection name exists for user (case-insensitive)
+   */
+  static async getIsCollectionNameAvailableAsync(
+    name: string,
+    userId: string,
+    context: QueryContext,
+    excludeCollectionId?: string,
+  ): Promise<boolean> {
     const dbInstance = this.getDbInstance(context);
 
-    return await dbInstance
-      .select({ slug: collections.slug })
+    const conditions = [
+      sql`lower(${collections.name}) = lower(${name})`,
+      eq(collections.userId, userId),
+      isNull(collections.deletedAt),
+    ];
+
+    if (excludeCollectionId) {
+      conditions.push(sql`${collections.id} != ${excludeCollectionId}`);
+    }
+
+    const result = await dbInstance
+      .select({ id: collections.id })
       .from(collections)
-      .where(eq(collections.userId, userId))
-      .then((results) => results.map((r) => r.slug));
+      .where(and(...conditions))
+      .limit(1);
+
+    return result.length > 0;
   }
 
   static async updateAsync(data: UpdateCollection, userId: string, context: QueryContext) {

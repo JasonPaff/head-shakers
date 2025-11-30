@@ -7,7 +7,7 @@ import type { ActionResponse } from '@/lib/utils/action-response';
 
 import { ACTION_NAMES, ERROR_CODES, ERROR_MESSAGES, OPERATIONS, SENTRY_CONTEXTS } from '@/lib/constants';
 import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
-import { actionSuccess } from '@/lib/utils/action-response';
+import { actionFailure, actionSuccess } from '@/lib/utils/action-response';
 import { createInternalError, createNotFoundError } from '@/lib/utils/error-builders';
 import { authActionClient } from '@/lib/utils/next-safe-action';
 import { withActionErrorHandling } from '@/lib/utils/sentry-server/breadcrumbs.server';
@@ -36,7 +36,23 @@ export const createCollectionAction = authActionClient
         userId: ctx.userId,
       },
       async () => {
-        const createdCollection = await CollectionsFacade.createAsync(collectionData, ctx.userId, ctx.db);
+        // Duplicate name check
+        const isNameAvailable = await CollectionsFacade.getIsCollectionNameAvailableAsync(
+          collectionData.name,
+          ctx.userId,
+          undefined,
+          ctx.db,
+        );
+
+        if (!isNameAvailable) {
+          return actionFailure(ERROR_MESSAGES.COLLECTION.NAME_TAKEN);
+        }
+
+        const createdCollection = await CollectionsFacade.createCollectionAsync(
+          collectionData,
+          ctx.userId,
+          ctx.db,
+        );
 
         if (!createdCollection) {
           throw createInternalError(ERROR_MESSAGES.COLLECTION.CREATE_FAILED, {
@@ -70,6 +86,20 @@ export const updateCollectionAction = authActionClient
         userId: ctx.userId,
       },
       async () => {
+        // Duplicate name check (only if name is being updated)
+        if (collectionData.name) {
+          const isNameAvailable = await CollectionsFacade.getIsCollectionNameAvailableAsync(
+            collectionData.name,
+            ctx.userId,
+            collectionData.collectionId,
+            ctx.db,
+          );
+
+          if (!isNameAvailable) {
+            return actionFailure(ERROR_MESSAGES.COLLECTION.NAME_TAKEN);
+          }
+        }
+
         const updatedCollection = await CollectionsFacade.updateAsync(collectionData, ctx.userId, ctx.db);
 
         if (!updatedCollection) {

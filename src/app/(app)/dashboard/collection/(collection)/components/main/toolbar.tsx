@@ -53,6 +53,8 @@ export const Toolbar = ({
   searchValue,
   sortBy,
 }: ToolbarProps) => {
+  const hasActiveFilters = filterCategory !== 'all' || filterCondition !== 'all' || filterFeatured !== 'all';
+
   return (
     <div
       className={'m-4 mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}
@@ -77,9 +79,15 @@ export const Toolbar = ({
         {/* Filters Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size={'sm'} variant={'outline'}>
+            <Button className={'relative'} size={'sm'} variant={'outline'}>
               <FilterIcon aria-hidden className={'size-4'} />
               <span className={'hidden sm:inline'}>Filters</span>
+              {hasActiveFilters && (
+                <span
+                  aria-label={'Filters active'}
+                  className={'absolute -top-1 -right-1 size-2 rounded-full bg-primary'}
+                />
+              )}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align={'start'} className={'w-56'}>

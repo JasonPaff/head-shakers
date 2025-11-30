@@ -29,7 +29,7 @@ export function createBusinessRuleError(
   message: string,
   context?: Record<string, unknown>,
 ): ActionError {
-  return new ActionError(ErrorType.BUSINESS_RULE, code, message, context, false, 422);
+  return new ActionError(ErrorType.BUSINESS_RULE, code, message, context, false, 400);
 }
 
 /**

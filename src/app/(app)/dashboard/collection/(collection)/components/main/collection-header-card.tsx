@@ -1,5 +1,6 @@
 import { EditIcon, HeartIcon, MoreVerticalIcon, SettingsIcon, ShareIcon, TrashIcon } from 'lucide-react';
 
+import { CollectionShareMenu } from '@/components/feature/collections/collection-share-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,6 +16,7 @@ import { formatCurrency } from '@/lib/utils/currency.utils';
 
 export type CollectionHeaderCardProps = {
   bobbleheadCount: number;
+  collectionSlug: string;
   coverImageUrl: null | string;
   description: null | string;
   featuredCount: number;
@@ -23,13 +25,13 @@ export type CollectionHeaderCardProps = {
   onDelete?: () => void;
   onEdit?: () => void;
   onSettings?: () => void;
-  onShare?: () => void;
   totalValue: null | number;
   viewCount: number;
 };
 
 export const CollectionHeaderCard = ({
   bobbleheadCount,
+  collectionSlug,
   coverImageUrl,
   description,
   featuredCount,
@@ -38,7 +40,6 @@ export const CollectionHeaderCard = ({
   onDelete,
   onEdit,
   onSettings,
-  onShare,
   totalValue,
   viewCount,
 }: CollectionHeaderCardProps) => {
@@ -80,10 +81,12 @@ export const CollectionHeaderCard = ({
               <EditIcon aria-hidden className={'size-4'} />
               Edit
             </Button>
-            <Button onClick={onShare} size={'sm'} variant={'outline'}>
-              <ShareIcon aria-hidden className={'size-4'} />
-              Share
-            </Button>
+            <CollectionShareMenu collectionSlug={collectionSlug}>
+              <Button size={'sm'} variant={'outline'}>
+                <ShareIcon aria-hidden className={'size-4'} />
+                Share
+              </Button>
+            </CollectionShareMenu>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button size={'icon'} variant={'ghost'}>

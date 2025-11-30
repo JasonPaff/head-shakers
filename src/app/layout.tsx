@@ -77,7 +77,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   enableSystem
                 >
                   {children}
-                  <Toaster closeButton duration={2500} position={'top-right'} richColors />
+                  <Toaster closeButton duration={2500} position={'top-center'} richColors />
                 </ThemeProvider>
               </NuqsAdapter>
             </TooltipProvider>
