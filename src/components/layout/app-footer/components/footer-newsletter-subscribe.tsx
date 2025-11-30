@@ -13,8 +13,9 @@ import { insertNewsletterSignupSchema } from '@/lib/validations/newsletter.valid
 import { cn } from '@/utils/tailwind-utils';
 
 interface FooterNewsletterSubscribeProps {
+  currentEmail: null | string;
   isAuthenticated: boolean;
-  onError: (errorMessage: string) => void;
+  onError: (errorMessage: string, previousEmail: null | string) => void;
   onOptimisticSubscribe: (email: string) => void;
 }
 
@@ -32,7 +33,7 @@ interface FooterNewsletterSubscribeProps {
  * - Error toast via onError callback on failure
  */
 export const FooterNewsletterSubscribe = withFocusManagement(
-  ({ isAuthenticated, onError, onOptimisticSubscribe }: FooterNewsletterSubscribeProps) => {
+  ({ currentEmail, isAuthenticated, onError, onOptimisticSubscribe }: FooterNewsletterSubscribeProps) => {
     const { focusFirstError } = useFocusManagement();
     const containerTestId = generateTestId('layout', 'app-footer', 'newsletter-subscribe');
 
@@ -55,6 +56,9 @@ export const FooterNewsletterSubscribe = withFocusManagement(
         const email = value.email;
 
         if (isAuthenticated) {
+          // Capture previous email state before optimistic update for rollback
+          const previousEmail = currentEmail;
+
           // Optimistically update UI for authenticated users
           onOptimisticSubscribe(email);
 
@@ -63,9 +67,9 @@ export const FooterNewsletterSubscribe = withFocusManagement(
             // Success - UI already shows unsubscribe view
             form.reset();
           } catch (error) {
-            // Error - roll back the optimistic update
+            // Error - roll back the optimistic update using captured previous state
             const errorMessage = error instanceof Error ? error.message : 'Failed to subscribe';
-            onError(errorMessage);
+            onError(errorMessage, previousEmail);
           }
         } else {
           // Public users - let the toast handle success/error

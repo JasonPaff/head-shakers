@@ -12,6 +12,7 @@ import { FooterNewsletterClient } from './footer-newsletter-client';
  */
 export const FooterNewsletter = async () => {
   const userId = await getUserIdAsync();
+
   let isSubscribed = false;
   let userEmail: null | string = null;
 

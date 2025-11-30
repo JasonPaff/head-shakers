@@ -48,9 +48,9 @@ export const FooterNewsletterClient = ({
    * Called when subscribe action fails for authenticated users.
    * Rolls back the optimistic update and shows error toast.
    */
-  const handleSubscribeError = (errorMessage: string) => {
+  const handleSubscribeError = (errorMessage: string, previousEmail: null | string) => {
     setIsSubscribed(false);
-    setSubscribedEmail(null);
+    setSubscribedEmail(previousEmail);
     toast.error(errorMessage);
   };
 
@@ -90,6 +90,7 @@ export const FooterNewsletterClient = ({
   return (
     <div data-slot={'footer-newsletter'} data-testid={containerTestId}>
       <FooterNewsletterSubscribe
+        currentEmail={subscribedEmail}
         isAuthenticated={isAuthenticated}
         onError={handleSubscribeError}
         onOptimisticSubscribe={handleOptimisticSubscribe}
