@@ -1,4 +1,6 @@
 import { CheckIcon, FilterIcon, GripVerticalIcon, LayoutListIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +22,6 @@ export type ToolbarProps = {
   filterFeatured: string;
   gridDensity: 'comfortable' | 'compact';
   isSelectionMode: boolean;
-  onAddBobblehead?: () => void;
   onFilterCategoryChange: (value: string) => void;
   onFilterConditionChange: (value: string) => void;
   onFilterFeaturedChange: (value: string) => void;
@@ -41,7 +42,6 @@ export const Toolbar = ({
   filterFeatured,
   gridDensity,
   isSelectionMode,
-  onAddBobblehead,
   onFilterCategoryChange,
   onFilterConditionChange,
   onFilterFeaturedChange,
@@ -153,9 +153,11 @@ export const Toolbar = ({
         </Button>
 
         {/* Add New Button */}
-        <Button onClick={onAddBobblehead} size={'sm'}>
-          <PlusIcon aria-hidden className={'size-4'} />
-          Add Bobblehead
+        <Button asChild size={'sm'}>
+          <Link href={$path({ route: '/bobbleheads/add' })}>
+            <PlusIcon aria-hidden className={'size-4'} />
+            Add Bobblehead
+          </Link>
         </Button>
       </div>
 

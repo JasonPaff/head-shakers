@@ -1,12 +1,12 @@
+'use client';
+
 import { BoxIcon, PlusIcon } from 'lucide-react';
+import { $path } from 'next-typesafe-url';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
 
-type NoBobbleheadsProps = {
-  onAddClick?: () => void;
-};
-
-export const NoBobbleheads = ({ onAddClick }: NoBobbleheadsProps) => {
+export const NoBobbleheads = () => {
   return (
     <div
       className={
@@ -19,9 +19,11 @@ export const NoBobbleheads = ({ onAddClick }: NoBobbleheadsProps) => {
       <p className={'mb-4 max-w-sm text-sm text-muted-foreground'}>
         Start building this collection by adding your first bobblehead
       </p>
-      <Button onClick={onAddClick}>
-        <PlusIcon aria-hidden className={'size-4'} />
-        Add Your First Bobblehead
+      <Button asChild>
+        <Link href={$path({ route: '/bobbleheads/add' })}>
+          <PlusIcon aria-hidden className={'size-4'} />
+          Add Your First Bobblehead
+        </Link>
       </Button>
     </div>
   );

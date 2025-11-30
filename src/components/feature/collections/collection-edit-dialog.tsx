@@ -2,7 +2,8 @@
 
 import { useAuth } from '@clerk/nextjs';
 import { revalidateLogic } from '@tanstack/form-core';
-import { useState } from 'react';
+import { useStore } from '@tanstack/react-form';
+import { useRef, useState } from 'react';
 
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 import type { UpdateCollectionInput } from '@/lib/validations/collections.validation';
@@ -21,6 +22,7 @@ import { useAppForm } from '@/components/ui/form';
 import { useFocusContext } from '@/components/ui/form/focus-management/focus-context';
 import { withFocusManagement } from '@/components/ui/form/focus-management/with-focus-management';
 import { Label } from '@/components/ui/label';
+import { useDialogTracking } from '@/hooks/use-dialog-tracking';
 import { useServerAction } from '@/hooks/use-server-action';
 import { updateCollectionAction } from '@/lib/actions/collections/collections.actions';
 import { CloudinaryPathBuilder } from '@/lib/constants/cloudinary-paths';
@@ -43,18 +45,24 @@ interface CollectionForEdit {
 
 export const CollectionEditDialog = withFocusManagement(
   ({ collection, isOpen, onClose, testId }: CollectionEditDialogProps) => {
-    const dialogTestId = testId || generateTestId('feature', 'collection-edit-dialog');
-    const formTestId = generateTestId('feature', 'collection-edit-form');
-    const cancelButtonTestId = generateTestId('feature', 'collection-edit-cancel');
-    const submitButtonTestId = generateTestId('feature', 'collection-edit-submit');
+    const [coverImageUrl, setCoverImageUrl] = useState<string | undefined>(
+      collection.coverImageUrl ?? undefined,
+    );
 
-    // useState hooks
-    const [coverImageUrl, setCoverImageUrl] = useState<null | string | undefined>(collection.coverImageUrl);
+    const nameRef = useRef<HTMLInputElement>(null);
 
     const { focusFirstError } = useFocusContext();
     const { userId } = useAuth();
 
-    const { executeAsync, isExecuting } = useServerAction(updateCollectionAction, {
+    const { trackCancel, trackConfirm, trackedOnOpenChange } = useDialogTracking({
+      dialogName: 'collection-edit-dialog',
+    });
+
+    const { executeAsync } = useServerAction(updateCollectionAction, {
+      breadcrumbContext: {
+        action: 'update-collection',
+        component: 'CollectionEditDialog',
+      },
       loadingMessage: 'Updating collection...',
       onAfterSuccess: () => {
         handleClose();
@@ -62,6 +70,7 @@ export const CollectionEditDialog = withFocusManagement(
     });
 
     const form = useAppForm({
+      canSubmitWhenInvalid: true,
       defaultValues: {
         collectionId: collection.id,
         coverImageUrl: collection.coverImageUrl || undefined,
@@ -84,10 +93,21 @@ export const CollectionEditDialog = withFocusManagement(
       },
     });
 
-    // Event handlers
+    const [isSubmitting] = useStore(form.store, (state) => [state.isSubmitting]);
+
     const handleClose = () => {
       setTimeout(() => form.reset(), 300);
       onClose();
+    };
+
+    const handleOpenChange = (open: boolean) => {
+      if (open) return;
+      handleClose();
+    };
+
+    const handleCancelClick = () => {
+      trackCancel();
+      handleClose();
     };
 
     const handleUploadComplete = (_publicId: string, secureUrl: string) => {
@@ -95,85 +115,102 @@ export const CollectionEditDialog = withFocusManagement(
     };
 
     const handleRemoveCover = () => {
-      setCoverImageUrl(null);
+      setCoverImageUrl(undefined);
     };
 
+    const dialogTestId = testId || generateTestId('feature', 'collection-edit-dialog');
+    const formTestId = generateTestId('feature', 'collection-edit-form');
+    const cancelButtonTestId = generateTestId('feature', 'collection-edit-cancel');
+    const submitButtonTestId = generateTestId('feature', 'collection-edit-submit');
+
     return (
-      <Dialog
-        onOpenChange={(open) => {
-          if (open) return;
-          handleClose();
-        }}
-        open={isOpen}
-      >
-        <DialogContent className={'sm:max-w-[425px]'} testId={dialogTestId}>
+      <Dialog onOpenChange={trackedOnOpenChange(handleOpenChange)} open={isOpen}>
+        <DialogContent className={'sm:max-w-md'} testId={dialogTestId}>
           <form
             data-testid={formTestId}
             onSubmit={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              trackConfirm();
               void form.handleSubmit();
             }}
           >
-            {/* Header */}
-            <DialogHeader>
-              <DialogTitle>Update Existing Collection</DialogTitle>
-              <DialogDescription>
-                Update the details of your collection below. You can change the name, description, and
-                visibility.
-              </DialogDescription>
-            </DialogHeader>
+            <form.AppForm>
+              {/* Header */}
+              <DialogHeader>
+                <DialogTitle>Update Existing Collection</DialogTitle>
+                <DialogDescription>
+                  Update the details of your collection below. You can change the name, description, and
+                  visibility.
+                </DialogDescription>
+              </DialogHeader>
 
-            {/* Form Fields */}
-            <div className={'grid gap-4 py-4'}>
-              {/* Name */}
-              <form.AppField name={'name'}>
-                {(field) => (
-                  <field.TextField isRequired label={'Name'} placeholder={'Enter collection name'} />
+              {/* Form Fields */}
+              <div className={'grid gap-4 py-4'}>
+                {/* Name */}
+                <form.AppField name={'name'}>
+                  {(field) => (
+                    <field.TextField
+                      focusRef={nameRef}
+                      isRequired
+                      label={'Name'}
+                      placeholder={'Enter collection name'}
+                      testId={`${dialogTestId}-name-field`}
+                    />
+                  )}
+                </form.AppField>
+
+                {/* Description */}
+                <form.AppField name={'description'}>
+                  {(field) => (
+                    <field.TextareaField
+                      label={'Description'}
+                      placeholder={'Enter collection description'}
+                      testId={`${dialogTestId}-description-field`}
+                    />
+                  )}
+                </form.AppField>
+
+                {/* Cover Photo */}
+                {userId && (
+                  <div className={'space-y-2'}>
+                    <Label>Cover Photo (Optional)</Label>
+                    <CloudinaryCoverUpload
+                      currentImageUrl={coverImageUrl}
+                      isDisabled={isSubmitting}
+                      onRemove={handleRemoveCover}
+                      onUploadComplete={handleUploadComplete}
+                      uploadFolder={CloudinaryPathBuilder.tempPath(userId)}
+                    />
+                  </div>
                 )}
-              </form.AppField>
 
-              {/* Description */}
-              <form.AppField name={'description'}>
-                {(field) => (
-                  <field.TextareaField label={'Description'} placeholder={'Enter collection description'} />
-                )}
-              </form.AppField>
+                {/* Visibility */}
+                <form.AppField name={'isPublic'}>
+                  {(field) => (
+                    <field.SwitchField
+                      label={'Public Collection'}
+                      testId={`${dialogTestId}-is-public-field`}
+                    />
+                  )}
+                </form.AppField>
+              </div>
 
-              {/* Cover Photo */}
-              {userId && (
-                <div className={'space-y-2'}>
-                  <Label>Cover Photo (Optional)</Label>
-                  <CloudinaryCoverUpload
-                    currentImageUrl={coverImageUrl || undefined}
-                    isDisabled={isExecuting}
-                    onRemove={handleRemoveCover}
-                    onUploadComplete={handleUploadComplete}
-                    uploadFolder={CloudinaryPathBuilder.tempPath(userId)}
-                  />
-                </div>
-              )}
-
-              {/* Visibility */}
-              <form.AppField name={'isPublic'}>
-                {(field) => <field.SwitchField label={'Public Collection'} />}
-              </form.AppField>
-            </div>
-
-            {/* Action Buttons */}
-            <DialogFooter>
-              <Button
-                disabled={isExecuting}
-                onClick={handleClose}
-                testId={cancelButtonTestId}
-                variant={'outline'}
-              >
-                Cancel
-              </Button>
-              <Button disabled={isExecuting} testId={submitButtonTestId} type={'submit'}>
-                {isExecuting ? 'Updating...' : 'Update Collection'}
-              </Button>
-            </DialogFooter>
+              {/* Action Buttons */}
+              <DialogFooter>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={handleCancelClick}
+                  testId={cancelButtonTestId}
+                  variant={'outline'}
+                >
+                  Cancel
+                </Button>
+                <form.SubmitButton testId={submitButtonTestId}>
+                  {isSubmitting ? 'Updating...' : 'Update Collection'}
+                </form.SubmitButton>
+              </DialogFooter>
+            </form.AppForm>
           </form>
         </DialogContent>
       </Dialog>

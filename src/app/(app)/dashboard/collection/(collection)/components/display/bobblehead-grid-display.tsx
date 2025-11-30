@@ -88,10 +88,6 @@ export const BobbleheadGridDisplay = ({
     return result;
   }, [bobbleheads, searchValue, filterCondition, filterFeatured, sortBy]);
 
-  const handleAddBobblehead = () => {
-    console.log('Add bobblehead clicked');
-  };
-
   const handleSelectionModeToggle = () => {
     setIsSelectionMode.toggle();
     if (isSelectionMode) {
@@ -160,7 +156,6 @@ export const BobbleheadGridDisplay = ({
         filterFeatured={filterFeatured}
         gridDensity={gridDensity}
         isSelectionMode={isSelectionMode}
-        onAddBobblehead={handleAddBobblehead}
         onFilterCategoryChange={setFilterCategory}
         onFilterConditionChange={setFilterCondition}
         onFilterFeaturedChange={setFilterFeatured}
@@ -224,7 +219,7 @@ export const BobbleheadGridDisplay = ({
         </Conditional>
 
         <Conditional isCondition={!_hasBobbleheads && !_hasNoResults}>
-          <NoBobbleheads onAddClick={handleAddBobblehead} />
+          <NoBobbleheads />
         </Conditional>
       </BobbleheadGrid>
     </Fragment>
