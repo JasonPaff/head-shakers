@@ -16,7 +16,7 @@ export type CollectionCardStyle = 'compact' | 'cover' | 'detailed';
 
 type SidebarSearchProps = {
   cardStyle: CollectionCardStyle;
-  disabled?: boolean;
+  isDisabled?: boolean;
   onCardStyleChange: (style: CollectionCardStyle) => void;
   onSearchChange?: (value: string) => void;
   onSearchClear?: () => void;
@@ -25,7 +25,7 @@ type SidebarSearchProps = {
 
 export const SidebarSearch = ({
   cardStyle,
-  disabled = false,
+  isDisabled = false,
   onCardStyleChange,
   onSearchChange,
   onSearchClear,
@@ -42,7 +42,7 @@ export const SidebarSearch = ({
   return (
     <div className={'space-y-2 border-b bg-background/30 p-3 backdrop-blur-sm'} data-slot={'sidebar-search'}>
       <Input
-        disabled={disabled}
+        disabled={isDisabled}
         isClearable
         leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
         onChange={(e) => {

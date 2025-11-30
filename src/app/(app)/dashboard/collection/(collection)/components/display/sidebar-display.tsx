@@ -114,7 +114,7 @@ export const SidebarDisplay = ({
       {/* Search Bar */}
       <SidebarSearch
         cardStyle={cardStyle}
-        disabled={!hasAnyCollections}
+        isDisabled={!hasAnyCollections}
         onCardStyleChange={setCardStyle}
         onSearchChange={setSearchValue}
         onSearchClear={() => {
