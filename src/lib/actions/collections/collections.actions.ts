@@ -60,7 +60,6 @@ export const createCollectionAction = authActionClient
           });
         }
 
-        // TODO: investigate caching
         invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, newCollection.id);
         CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
 
@@ -98,7 +97,6 @@ export const updateCollectionAction = authActionClient
           });
         }
 
-        // TODO: investigate caching
         invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, collectionData.collectionId);
         CacheRevalidationService.collections.onUpdate(collectionData.collectionId, ctx.userId);
 
@@ -142,9 +140,7 @@ export const deleteCollectionAction = authActionClient
         message: `Deleted collection: ${deletedCollection.name}`,
       });
 
-      // invalidate metadata cache for the deleted collection
-      invalidateMetadataCache('collection', collectionData.collectionId);
-
+      invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, collectionData.collectionId);
       CacheRevalidationService.collections.onDelete(collectionData.collectionId, ctx.userId);
 
       return actionSuccess(null);
