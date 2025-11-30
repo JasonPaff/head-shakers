@@ -341,15 +341,18 @@ import { useServerAction } from '@/hooks/use-server-action';
 
 ### Hook Options
 
-| Option            | Type                                                                                                  | Description                              |
-| ----------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| `toastMessages`   | `{ loading?: string, success?: string \| ((data) => string), error?: string \| ((error) => string) }` | Custom toast messages                    |
-| `isDisableToast`  | `boolean`                                                                                             | Disable all toasts for silent operations |
-| `onSuccess`       | `({ data }) => void`                                                                                  | Called with action result on success     |
-| `onAfterSuccess`  | `() => void`                                                                                          | Called after success toast is shown      |
-| `onBeforeSuccess` | `() => void`                                                                                          | Called before success toast is shown     |
-| `onAfterError`    | `() => void`                                                                                          | Called after error toast is shown        |
-| `onBeforeError`   | `() => void`                                                                                          | Called before error toast is shown       |
+| Option             | Type                                                                                                  | Description                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `breadcrumbContext` | `{ action: string, component: string }`                                                              | Enables automatic Sentry breadcrumb tracking       |
+| `toastMessages`    | `{ loading?: string, success?: string \| ((data) => string), error?: string \| ((error) => string) }` | Custom toast messages                              |
+| `isDisableToast`   | `boolean`                                                                                             | Disable all toasts for silent operations           |
+| `loadingMessage`   | `string`                                                                                              | Loading message shown during execution             |
+| `onSuccess`        | `({ data }) => void`                                                                                  | Called with action result on success               |
+| `onAfterSuccess`   | `(data: T) => void`                                                                                   | Called after success handling is complete          |
+| `onBeforeSuccess`  | `(data: T) => void`                                                                                   | Called before success toast is shown               |
+| `onAfterError`     | `() => void`                                                                                          | Called after error handling completes              |
+| `onBeforeError`    | `() => void`                                                                                          | Called before error toast is shown                 |
+| `onValidationError` | `(errors) => string \| void`                                                                         | Custom handler for validation errors               |
 
 ### Hook Return Values
 
@@ -359,6 +362,77 @@ import { useServerAction } from '@/hooks/use-server-action';
 | `execute`      | `(input) => void`            | Sync execution for callbacks           |
 | `isExecuting`  | `boolean`                    | Loading state indicator                |
 | `result`       | `Result \| undefined`        | Last execution result                  |
+
+---
+
+### Client-Side Sentry Integration (breadcrumbContext)
+
+The `breadcrumbContext` option enables automatic Sentry breadcrumb tracking for client-side action execution. When provided, the hook tracks:
+
+- **started** - When action execution begins
+- **success** - When action completes successfully
+- **error** - When action fails (validation, business logic, or unexpected errors)
+
+This creates a trail in Sentry that shows what the user was doing before an error occurred.
+
+#### breadcrumbContext Properties
+
+| Property    | Type     | Description                                                              |
+| ----------- | -------- | ------------------------------------------------------------------------ |
+| `action`    | `string` | Name of the action (e.g., `'newsletter-subscribe'`, `'update-bobblehead'`) |
+| `component` | `string` | Component initiating the action (e.g., `'footer-newsletter'`, `'edit-form'`) |
+
+#### Example: Form with Sentry Tracking
+
+```typescript
+'use client';
+
+import { useServerAction } from '@/hooks/use-server-action';
+import { subscribeToNewsletterAction } from '@/lib/actions/newsletter/newsletter.actions';
+
+export const NewsletterForm = () => {
+  const { executeAsync, isExecuting } = useServerAction(subscribeToNewsletterAction, {
+    // Enable Sentry breadcrumb tracking
+    breadcrumbContext: {
+      action: 'newsletter-subscribe',
+      component: 'footer-newsletter',
+    },
+    loadingMessage: 'Subscribing...',
+    onAfterSuccess: () => {
+      // Handle success
+    },
+  });
+
+  const handleSubmit = async (email: string) => {
+    await executeAsync({ email });
+  };
+
+  // ... form implementation
+};
+```
+
+#### When to Use breadcrumbContext
+
+| Scenario                        | Use breadcrumbContext? | Reason                                      |
+| ------------------------------- | ---------------------- | ------------------------------------------- |
+| User-initiated mutations        | Yes                    | Track user actions for debugging            |
+| Form submissions                | Yes                    | Understand user flow before errors          |
+| Silent background operations    | Optional               | May add noise but useful for complex flows  |
+| Search/autocomplete             | No                     | Too frequent, adds noise                    |
+| Analytics/view tracking         | No                     | Not user-initiated actions                  |
+
+#### Sentry Breadcrumb Output
+
+When an error occurs, Sentry will show breadcrumbs like:
+
+```
+[INFO] Server action newsletter-subscribe started (component: footer-newsletter)
+[INFO] Server action newsletter-subscribe success (component: footer-newsletter)
+...
+[ERROR] Server action update-profile error (component: settings-form)
+```
+
+This integrates with the server-side Sentry tracking from `withActionErrorHandling()` to provide end-to-end visibility.
 
 ---
 

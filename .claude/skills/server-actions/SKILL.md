@@ -47,6 +47,7 @@ This skill activates when:
 - Always use `useServerAction` hook from `@/hooks/use-server-action` (never `useAction` directly)
 - Use `executeAsync` with `toastMessages` for user-initiated mutations
 - Use `execute` with `isDisableToast: true` for silent background operations
+- Use `breadcrumbContext` for Sentry tracking on user-initiated actions (provides `action` and `component` names)
 - Access results via `data.data` in callbacks or `result?.data?.data` from result object
 - Use `isExecuting` for loading states and button disabled states
 - Integrate with `useAppForm` for form submissions with focus management

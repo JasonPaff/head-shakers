@@ -136,6 +136,7 @@ return withActionErrorHandling(
 - [ ] Never use `useAction` directly from next-safe-action
 - [ ] Use `executeAsync` with `toastMessages` for user-initiated mutations
 - [ ] Use `execute` with `isDisableToast: true` for background operations
+- [ ] Use `breadcrumbContext` for Sentry tracking on user-initiated actions
 - [ ] Access results via `data.data` in callbacks
 - [ ] Use `isExecuting` for loading states
 
