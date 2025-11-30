@@ -7,6 +7,7 @@ import type {
   BrowseCategoriesResult,
   BrowseCollectionsResult,
   CategoryRecord,
+  CollectionDashboardListData,
   CollectionRecord,
   CollectionWithRelations,
 } from '@/lib/queries/collections/collections.query';
@@ -65,7 +66,7 @@ export interface CollectionMetrics {
 
 export type PublicCollection = Awaited<ReturnType<typeof CollectionsFacade.getCollectionForPublicView>>;
 
-const facadeName = 'CollectionsFacade';
+const facadeName = 'COLLECTIONS_FACADE';
 
 export class CollectionsFacade extends BaseFacade {
   /**
@@ -1064,6 +1065,25 @@ export class CollectionsFacade extends BaseFacade {
           operation: 'getWithRelations',
           userId: viewerUserId,
         },
+      },
+    );
+  }
+
+  static async getDashboardListByUserId(
+    userId: string,
+    dbInstance: DatabaseExecutor = db,
+  ): Promise<Array<CollectionDashboardListData>> {
+    return executeFacadeOperation(
+      {
+        data: { userId },
+        facade: facadeName,
+        method: 'getDashboardListByUserId',
+        operation: OPERATIONS.COLLECTIONS.GET_DASHBOARD_LIST_BY_USER_ID,
+        userId,
+      },
+      async () => {
+        const context = this.getUserContext(userId, dbInstance);
+        return await CollectionsQuery.getDashboardListByUserId(userId, context);
       },
     );
   }

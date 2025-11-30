@@ -1,33 +1,17 @@
 import 'server-only';
 
+import { CollectionsFacade } from '@/lib/facades/collections/collections.facade';
+import { getRequiredUserIdAsync } from '@/utils/auth-utils';
+
 import { SidebarDisplay } from '../display/sidebar-display';
 
 /**
- * Server component that fetches collections data
+ * Server component that fetches the collection data
  * and passes it to the client display component.
  */
 export async function SidebarAsync() {
-  // TODO: Replace with real facade call:
-  // const userId = await getUserIdAsync();
-  // const collections = await CollectionsFacade.getCollectionsAsync(userId);
-
-  // Placeholder await - remove when adding real data fetching
-  await Promise.resolve();
-
-  // For now, pass empty data - replace with real facade call
-  const collections: Array<{
-    bobbleheadCount: number;
-    commentCount: number;
-    coverImageUrl: string;
-    description: string;
-    featuredCount: number;
-    id: string;
-    isPublic: boolean;
-    likeCount: number;
-    name: string;
-    totalValue: number;
-    viewCount: number;
-  }> = [];
+  const userId = await getRequiredUserIdAsync();
+  const collections = await CollectionsFacade.getDashboardListByUserId(userId);
 
   return <SidebarDisplay collections={collections} />;
 }

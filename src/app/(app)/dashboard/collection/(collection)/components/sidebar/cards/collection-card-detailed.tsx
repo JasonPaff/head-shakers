@@ -12,8 +12,8 @@ import { cn } from '@/utils/tailwind-utils';
 export type CollectionCardDetailedProps = {
   bobbleheadCount: number;
   commentCount: number;
-  coverImageUrl: string;
-  description: string;
+  coverImageUrl: null | string;
+  description: null | string;
   featuredCount: number;
   id: string;
   isActive: boolean;
@@ -76,7 +76,7 @@ export const CollectionCardDetailed = ({
           <div className={'flex items-start gap-3'} data-slot={'card-content'}>
             {/* Collection Thumbnail */}
             <Avatar className={'size-16 rounded-md'}>
-              <AvatarImage alt={name} src={coverImageUrl} />
+              <AvatarImage alt={name} src={coverImageUrl ?? '/collection-cover-placeholder.png'} />
               <AvatarFallback>{name.charAt(0)}</AvatarFallback>
             </Avatar>
 
@@ -113,7 +113,7 @@ export const CollectionCardDetailed = ({
               <Button onClick={handleEdit} size={'icon'} variant={'ghost'}>
                 <EditIcon aria-hidden className={'size-3.5'} />
               </Button>
-              <GripVerticalIcon className={'size-4 cursor-grab text-muted-foreground'} />
+              <GripVerticalIcon aria-hidden className={'size-4 cursor-grab text-muted-foreground'} />
             </div>
           </div>
 
@@ -134,7 +134,7 @@ export const CollectionCardDetailed = ({
         <div className={'space-y-3'}>
           <div className={'flex items-start gap-3'}>
             <Avatar className={'size-12 rounded-md'}>
-              <AvatarImage alt={name} src={coverImageUrl} />
+              <AvatarImage alt={name} src={coverImageUrl ?? '/collection-cover-placeholder.png'} />
               <AvatarFallback>{name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>

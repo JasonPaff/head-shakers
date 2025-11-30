@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Fragment, useState } from 'react';
 
 import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
 import { CollectionCreateDialog } from '@/components/feature/collections/collection-create-dialog';
 import { CollectionEditDialog } from '@/components/feature/collections/collection-edit-dialog';
@@ -21,20 +22,6 @@ import { SidebarFooter } from '../sidebar/sidebar-footer';
 import { SidebarHeader } from '../sidebar/sidebar-header';
 import { SidebarSearch } from '../sidebar/sidebar-search';
 
-export type CollectionDisplayData = {
-  bobbleheadCount: number;
-  commentCount: number;
-  coverImageUrl: string;
-  description: string;
-  featuredCount: number;
-  id: string;
-  isPublic: boolean;
-  likeCount: number;
-  name: string;
-  totalValue: number;
-  viewCount: number;
-};
-
 type CollectionForEdit = {
   coverImageUrl?: null | string;
   description: null | string;
@@ -44,20 +31,20 @@ type CollectionForEdit = {
 };
 
 type SidebarDisplayProps = {
-  collections: Array<CollectionDisplayData>;
+  collections: Array<CollectionDashboardListData>;
   initialSelectedId?: string;
 };
 
 export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDisplayProps) => {
-  const router = useRouter();
-
-  const [searchValue, setSearchValue] = useState('');
   const [cardStyle, setCardStyle] = useState<CollectionCardStyle>('compact');
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(initialSelectedId);
   const [editingCollection, setEditingCollection] = useState<CollectionForEdit | null>(null);
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>(initialSelectedId);
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
+
+  const router = useRouter();
 
   // Filter collections based on search
   const filteredCollections =
@@ -65,7 +52,7 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
       collections.filter(
         (c) =>
           c.name.toLowerCase().includes(searchValue.toLowerCase()) ||
-          c.description.toLowerCase().includes(searchValue.toLowerCase()),
+          c.description?.toLowerCase().includes(searchValue.toLowerCase()),
       )
     : collections;
 
@@ -105,62 +92,6 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
     setEditingCollection(null);
   };
 
-  const renderCollectionCard = (collection: CollectionDisplayData) => {
-    const isActive = collection.id === selectedCollectionId;
-
-    switch (cardStyle) {
-      case 'cover':
-        return (
-          <CollectionCardCover
-            bobbleheadCount={collection.bobbleheadCount}
-            coverImageUrl={collection.coverImageUrl}
-            description={collection.description}
-            id={collection.id}
-            isActive={isActive}
-            key={collection.id}
-            likeCount={collection.likeCount}
-            name={collection.name}
-            onClick={handleCollectionSelect}
-            onEdit={handleEditCollection}
-            totalValue={collection.totalValue}
-          />
-        );
-      case 'detailed':
-        return (
-          <CollectionCardDetailed
-            bobbleheadCount={collection.bobbleheadCount}
-            commentCount={collection.commentCount}
-            coverImageUrl={collection.coverImageUrl}
-            description={collection.description}
-            featuredCount={collection.featuredCount}
-            id={collection.id}
-            isActive={isActive}
-            key={collection.id}
-            likeCount={collection.likeCount}
-            name={collection.name}
-            onClick={handleCollectionSelect}
-            onEdit={handleEditCollection}
-            totalValue={collection.totalValue}
-            viewCount={collection.viewCount}
-          />
-        );
-      default:
-        return (
-          <CollectionCardCompact
-            bobbleheadCount={collection.bobbleheadCount}
-            coverImageUrl={collection.coverImageUrl}
-            id={collection.id}
-            isActive={isActive}
-            key={collection.id}
-            name={collection.name}
-            onClick={handleCollectionSelect}
-            onEdit={handleEditCollection}
-            totalValue={collection.totalValue}
-          />
-        );
-    }
-  };
-
   return (
     <Fragment>
       {/* Header */}
@@ -180,7 +111,16 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
       {/* Collection List */}
       <SidebarCollectionList cardStyle={cardStyle}>
         {hasCollections ?
-          filteredCollections.map(renderCollectionCard)
+          filteredCollections.map((collection) => (
+            <CollectionCardMapper
+              cardStyle={cardStyle}
+              collection={collection}
+              key={collection.id}
+              onCollectionSelect={handleCollectionSelect}
+              onEditCollection={handleEditCollection}
+              selectedCollectionId={selectedCollectionId}
+            />
+          ))
         : <NoCollections onCreateClick={handleCreateCollection} />}
       </SidebarCollectionList>
 
@@ -203,5 +143,75 @@ export const SidebarDisplay = ({ collections, initialSelectedId }: SidebarDispla
         />
       </Conditional>
     </Fragment>
+  );
+};
+
+interface CollectionCardMapperProps {
+  cardStyle: CollectionCardStyle;
+  collection: CollectionDashboardListData;
+  onCollectionSelect: (id: string) => void;
+  onEditCollection: (id: string) => void;
+  selectedCollectionId?: string;
+}
+
+const CollectionCardMapper = ({
+  cardStyle,
+  collection,
+  onCollectionSelect,
+  onEditCollection,
+  selectedCollectionId,
+}: CollectionCardMapperProps) => {
+  const isActive = collection.id === selectedCollectionId;
+
+  if (cardStyle === 'cover') {
+    return (
+      <CollectionCardCover
+        bobbleheadCount={collection.bobbleheadCount}
+        coverImageUrl={collection.coverImageUrl}
+        description={collection.description}
+        id={collection.id}
+        isActive={isActive}
+        key={collection.id}
+        likeCount={collection.likeCount}
+        name={collection.name}
+        onClick={onCollectionSelect}
+        onEdit={onEditCollection}
+        totalValue={collection.totalValue ?? 0}
+      />
+    );
+  }
+
+  if (cardStyle === 'detailed') {
+    return (
+      <CollectionCardDetailed
+        bobbleheadCount={collection.bobbleheadCount}
+        commentCount={collection.commentCount}
+        coverImageUrl={collection.coverImageUrl}
+        description={collection.description}
+        featuredCount={collection.featuredCount}
+        id={collection.id}
+        isActive={isActive}
+        key={collection.id}
+        likeCount={collection.likeCount}
+        name={collection.name}
+        onClick={onCollectionSelect}
+        onEdit={onEditCollection}
+        totalValue={collection.totalValue ?? 0}
+        viewCount={collection.viewCount}
+      />
+    );
+  }
+  return (
+    <CollectionCardCompact
+      bobbleheadCount={collection.bobbleheadCount}
+      coverImageUrl={collection.coverImageUrl}
+      id={collection.id}
+      isActive={isActive}
+      key={collection.id}
+      name={collection.name}
+      onClick={onCollectionSelect}
+      onEdit={onEditCollection}
+      totalValue={collection.totalValue ?? 0}
+    />
   );
 };

@@ -12,6 +12,7 @@ import {
   lte,
   or,
   sql,
+  sum,
 } from 'drizzle-orm';
 
 import type { FindOptions, QueryContext } from '@/lib/queries/base/query-context';
@@ -23,7 +24,15 @@ import type {
   UpdateCollection,
 } from '@/lib/validations/collections.validation';
 
-import { bobbleheadPhotos, bobbleheads, collections, comments, likes, users } from '@/lib/db/schema';
+import {
+  bobbleheadPhotos,
+  bobbleheads,
+  collections,
+  comments,
+  contentViews,
+  likes,
+  users,
+} from '@/lib/db/schema';
 import { BaseQuery } from '@/lib/queries/base/base-query';
 import { buildSoftDeleteFilter } from '@/lib/queries/base/permission-filters';
 
@@ -91,6 +100,20 @@ export type CategoryRecord = {
   bobbleheadCount: number;
   collectionCount: number;
   name: string;
+};
+
+export type CollectionDashboardListData = {
+  bobbleheadCount: number;
+  commentCount: number;
+  coverImageUrl: null | string;
+  description: null | string;
+  featuredCount: number;
+  id: string;
+  isPublic: boolean;
+  likeCount: number;
+  name: string;
+  totalValue: null | number;
+  viewCount: number;
 };
 
 export type CollectionRecord = typeof collections.$inferSelect;
@@ -947,6 +970,44 @@ export class CollectionsQuery extends BaseQuery {
         },
       },
     });
+  }
+
+  static async getDashboardListByUserId(
+    userId: string,
+    context: QueryContext,
+  ): Promise<Array<CollectionDashboardListData>> {
+    const dbInstance = this.getDbInstance(context);
+
+    const result = await dbInstance
+      .select({
+        bobbleheadCount: count(bobbleheads.id),
+        commentCount: count(comments.id),
+        coverImageUrl: collections.coverImageUrl,
+        description: collections.description,
+        featuredCount: count(bobbleheads.isFeatured),
+        id: collections.id,
+        isPublic: collections.isPublic,
+        likeCount: count(likes.id),
+        name: collections.name,
+        totalValue: sum(bobbleheads.purchasePrice).mapWith(Number),
+        viewCount: count(contentViews.id),
+      })
+      .from(collections)
+      .leftJoin(bobbleheads, eq(bobbleheads.collectionId, collections.id))
+      .leftJoin(comments, and(eq(comments.targetId, collections.id), eq(comments.targetType, 'collection')))
+      .leftJoin(likes, and(eq(likes.targetId, collections.id), eq(likes.targetType, 'collection')))
+      .leftJoin(
+        contentViews,
+        and(eq(contentViews.targetId, collections.id), eq(contentViews.targetType, 'collection')),
+      )
+      .where(
+        this.combineFilters(
+          eq(collections.userId, userId),
+          this.buildBaseFilters(collections.isPublic, collections.userId, collections.deletedAt, context),
+        ),
+      );
+
+    return result || [];
   }
 
   static async getDistinctCategoriesAsync(context: QueryContext): Promise<Array<CategoryRecord>> {

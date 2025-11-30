@@ -9,7 +9,7 @@ import { cn } from '@/utils/tailwind-utils';
 
 export type CollectionCardCompactProps = {
   bobbleheadCount: number;
-  coverImageUrl: string;
+  coverImageUrl: null | string;
   id: string;
   isActive: boolean;
   name: string;
@@ -62,7 +62,7 @@ export const CollectionCardCompact = ({
       <div className={'flex items-start gap-3 sm:gap-4'} data-slot={'item-content'}>
         {/* Collection Thumbnail */}
         <Avatar className={'size-14 rounded-md sm:size-16 md:size-12'}>
-          <AvatarImage alt={name} src={coverImageUrl} />
+          <AvatarImage alt={name} src={coverImageUrl ?? '/collection-cover-placeholder.png'} />
           <AvatarFallback>{name.charAt(0)}</AvatarFallback>
         </Avatar>
 

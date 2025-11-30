@@ -8,8 +8,8 @@ import { cn } from '@/utils/tailwind-utils';
 
 export type CollectionCardCoverProps = {
   bobbleheadCount: number;
-  coverImageUrl: string;
-  description: string;
+  coverImageUrl: null | string;
+  description: null | string;
   id: string;
   isActive: boolean;
   likeCount: number;
@@ -68,7 +68,7 @@ export const CollectionCardCover = ({
           alt={name}
           className={'size-full object-cover transition-transform group-hover:scale-105'}
           data-slot={'collection-cover'}
-          src={coverImageUrl}
+          src={coverImageUrl ?? '/collection-cover-placeholder.png'}
         />
 
         {/* Gradient Overlay */}
