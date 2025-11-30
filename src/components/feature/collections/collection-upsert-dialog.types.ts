@@ -1,4 +1,4 @@
-import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
 import type { ComponentTestIdProps } from '@/lib/test-ids';
 
 /**
@@ -24,5 +24,5 @@ export interface CollectionUpsertDialogProps extends ComponentTestIdProps {
   /**
    * Called on successful create (with new collection) or edit (with updated collection).
    */
-  onSuccess?: (collection: ComboboxItem) => void;
+  onSuccess?: (collection: CollectionCreatedResult) => void;
 }

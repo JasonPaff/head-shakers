@@ -31,16 +31,27 @@ export type BobbleheadData = {
  * and passes them to the client display component.
  */
 export async function BobbleheadGridAsync() {
-  const collectionId = collectionDashboardSearchParamsCache.get('collectionId');
+  const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
 
-  if (!collectionId) {
+  if (!collectionSlug) {
     return (
       <BobbleheadGridDisplay bobbleheads={[]} categories={[]} conditions={[...ENUMS.BOBBLEHEAD.CONDITION]} />
     );
   }
 
   const userId = await getRequiredUserIdAsync();
-  const bobbleheadRecords = await CollectionsFacade.getCollectionBobbleheadsWithPhotos(collectionId, userId);
+
+  // Look up collection by slug to get the ID for querying bobbleheads
+  const collections = await CollectionsFacade.getDashboardListByUserId(userId);
+  const collection = collections.find((c) => c.slug === collectionSlug);
+
+  if (!collection) {
+    return (
+      <BobbleheadGridDisplay bobbleheads={[]} categories={[]} conditions={[...ENUMS.BOBBLEHEAD.CONDITION]} />
+    );
+  }
+
+  const bobbleheadRecords = await CollectionsFacade.getCollectionBobbleheadsWithPhotos(collection.id, userId);
 
   const bobbleheads: Array<BobbleheadData> = bobbleheadRecords.map((b) => ({
     characterName: b.characterName ?? undefined,

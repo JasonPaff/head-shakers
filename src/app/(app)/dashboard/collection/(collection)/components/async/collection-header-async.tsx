@@ -25,16 +25,16 @@ export type CollectionHeaderData = {
  * and passes it to the client display component.
  */
 export async function CollectionHeaderAsync() {
-  const collectionId = collectionDashboardSearchParamsCache.get('collectionId');
+  const collectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
 
-  if (!collectionId) {
+  if (!collectionSlug) {
     return <CollectionHeaderDisplay collection={null} />;
   }
 
   const userId = await getRequiredUserIdAsync();
 
   const collections = await CollectionsFacade.getDashboardListByUserId(userId);
-  const collection = collections.find((collection) => collection.id === collectionId);
+  const collection = collections.find((collection) => collection.slug === collectionSlug);
 
   const headerData: CollectionHeaderData | null =
     collection ?

@@ -18,6 +18,8 @@ import { insertCollectionSchema, updateCollectionSchema } from '@/lib/validation
 
 import type { CollectionForUpsert } from '../collection-upsert-dialog.types';
 
+export type CollectionCreatedResult = { id: string; name: string; slug: string };
+
 export interface UseCollectionUpsertFormLabels {
   description: string;
   submitButton: string;
@@ -27,7 +29,7 @@ export interface UseCollectionUpsertFormLabels {
 
 export interface UseCollectionUpsertFormOptions {
   collection?: CollectionForUpsert;
-  onSuccess?: (result: { id: string; name: string }) => void;
+  onSuccess?: (result: CollectionCreatedResult) => void;
 }
 
 export function useCollectionUpsertForm({ collection, onSuccess }: UseCollectionUpsertFormOptions) {
@@ -50,7 +52,7 @@ export function useCollectionUpsertForm({ collection, onSuccess }: UseCollection
     },
     loadingMessage: isEditMode ? 'Updating collection...' : 'Creating collection...',
     onAfterSuccess: (data) => {
-      onSuccess?.({ id: data.id, name: data.name });
+      onSuccess?.({ id: data.id, name: data.name, slug: data.slug });
     },
   });
 

@@ -27,14 +27,14 @@ export const CollectionHeaderDisplay = ({ collection }: CollectionHeaderDisplayP
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
   const [, setParams] = useQueryStates(
-    { collectionId: collectionDashboardParsers.collectionId },
+    { collectionSlug: collectionDashboardParsers.collectionSlug },
     { shallow: false },
   );
 
   const { executeAsync } = useServerAction(deleteCollectionAction, {
     loadingMessage: 'Deleting collection...',
     onAfterSuccess: () => {
-      void setParams({ collectionId: null });
+      void setParams({ collectionSlug: null });
     },
   });
 

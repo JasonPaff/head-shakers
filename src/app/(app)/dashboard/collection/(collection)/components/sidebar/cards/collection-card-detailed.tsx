@@ -16,7 +16,7 @@ import { CollectionHoverCardContent } from './collection-card-hovercard';
 export type CollectionCardDetailedProps = {
   collection: CollectionDashboardListData;
   isActive: boolean;
-  onClick: (id: string) => void;
+  onClick: (slug: string) => void;
   onEdit: (id: string) => void;
 };
 
@@ -28,7 +28,7 @@ export const CollectionCardDetailed = ({
 }: CollectionCardDetailedProps) => {
   const formattedValue = formatCurrency(collection.totalValue);
 
-  const handleClick = () => onClick(collection.id);
+  const handleClick = () => onClick(collection.slug);
 
   const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();

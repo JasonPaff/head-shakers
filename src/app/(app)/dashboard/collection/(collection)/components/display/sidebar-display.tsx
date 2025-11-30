@@ -3,7 +3,7 @@
 import { useQueryStates } from 'nuqs';
 import { Fragment, useCallback, useMemo, useState } from 'react';
 
-import type { ComboboxItem } from '@/components/ui/form/field-components/combobox-field';
+import type { CollectionCreatedResult } from '@/components/feature/collections/hooks/use-collection-upsert-form';
 import type { CollectionSortOption } from '@/hooks/use-user-preferences';
 import type { CollectionDashboardListData } from '@/lib/queries/collections/collections.query';
 
@@ -36,18 +36,18 @@ type CollectionForEdit = {
 type SidebarDisplayProps = {
   collections: Array<CollectionDashboardListData>;
   initialCardStyle?: CollectionCardStyle;
-  initialSelectedId?: string;
+  initialSelectedSlug?: string;
   initialSortOption?: CollectionSortOption;
 };
 
 export const SidebarDisplay = ({
   collections,
   initialCardStyle = 'compact',
-  initialSelectedId,
+  initialSelectedSlug,
   initialSortOption = 'name-asc',
 }: SidebarDisplayProps) => {
-  const [{ collectionId }, setParams] = useQueryStates(
-    { collectionId: collectionDashboardParsers.collectionId },
+  const [{ collectionSlug }, setParams] = useQueryStates(
+    { collectionSlug: collectionDashboardParsers.collectionSlug },
     { shallow: false },
   );
 
@@ -56,28 +56,12 @@ export const SidebarDisplay = ({
   const [searchValue, setSearchValue] = useState('');
   const [sortOption, setSortOptionState] = useState<CollectionSortOption>(initialSortOption);
 
-  const selectedCollectionId = collectionId ?? initialSelectedId;
+  const selectedCollectionSlug = collectionSlug ?? initialSelectedSlug;
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useToggle();
   const [isEditDialogOpen, setIsEditDialogOpen] = useToggle();
 
   const { setPreference } = useUserPreferences();
-
-  const setCardStyle = useCallback(
-    (newStyle: CollectionCardStyle) => {
-      setCardStyleState(newStyle);
-      setPreference('collectionSidebarView', newStyle);
-    },
-    [setPreference],
-  );
-
-  const setSortOption = useCallback(
-    (newSortOption: CollectionSortOption) => {
-      setSortOptionState(newSortOption);
-      setPreference('collectionSidebarSort', newSortOption);
-    },
-    [setPreference],
-  );
 
   // Filter and sort collections
   const filteredCollections = useMemo(() => {
@@ -116,16 +100,32 @@ export const SidebarDisplay = ({
     });
   }, [collections, searchValue, sortOption]);
 
+  const setCardStyle = useCallback(
+    (newStyle: CollectionCardStyle) => {
+      setCardStyleState(newStyle);
+      setPreference('collectionSidebarView', newStyle);
+    },
+    [setPreference],
+  );
+
+  const setSortOption = useCallback(
+    (newSortOption: CollectionSortOption) => {
+      setSortOptionState(newSortOption);
+      setPreference('collectionSidebarSort', newSortOption);
+    },
+    [setPreference],
+  );
+
   const handleCreateCollection = () => {
     setIsCreateDialogOpen.on();
   };
 
-  const handleCollectionCreated = (newCollection: ComboboxItem) => {
-    void setParams({ collectionId: newCollection.id });
+  const handleCollectionCreated = (newCollection: CollectionCreatedResult) => {
+    void setParams({ collectionSlug: newCollection.slug });
   };
 
-  const handleCollectionSelect = (id: string) => {
-    void setParams({ collectionId: id });
+  const handleCollectionSelect = (slug: string) => {
+    void setParams({ collectionSlug: slug });
   };
 
   const handleEditCollection = (id: string) => {
@@ -179,7 +179,7 @@ export const SidebarDisplay = ({
               key={collection.id}
               onCollectionSelect={handleCollectionSelect}
               onEditCollection={handleEditCollection}
-              selectedCollectionId={selectedCollectionId}
+              selectedCollectionSlug={selectedCollectionSlug}
             />
           ))
         : hasAnyCollections ?
@@ -212,9 +212,9 @@ export const SidebarDisplay = ({
 interface CollectionCardMapperProps {
   cardStyle: CollectionCardStyle;
   collection: CollectionDashboardListData;
-  onCollectionSelect: (id: string) => void;
+  onCollectionSelect: (slug: string) => void;
   onEditCollection: (id: string) => void;
-  selectedCollectionId?: string;
+  selectedCollectionSlug?: string;
 }
 
 const CollectionCardMapper = ({
@@ -222,9 +222,9 @@ const CollectionCardMapper = ({
   collection,
   onCollectionSelect,
   onEditCollection,
-  selectedCollectionId,
+  selectedCollectionSlug,
 }: CollectionCardMapperProps) => {
-  const isActive = collection.id === selectedCollectionId;
+  const isActive = collection.slug === selectedCollectionSlug;
 
   if (cardStyle === 'cover') {
     return (

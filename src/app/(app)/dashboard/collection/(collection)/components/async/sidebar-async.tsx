@@ -19,16 +19,16 @@ export async function SidebarAsync() {
     getUserPreferences(),
   ]);
 
-  const urlCollectionId = collectionDashboardSearchParamsCache.get('collectionId');
+  const urlCollectionSlug = collectionDashboardSearchParamsCache.get('collectionSlug');
 
-  const validCollectionId = collections.find((collection) => collection.id === urlCollectionId)?.id;
-  const effectiveCollectionId = validCollectionId ?? collections[0]?.id;
+  const validCollectionSlug = collections.find((collection) => collection.slug === urlCollectionSlug)?.slug;
+  const effectiveCollectionSlug = validCollectionSlug ?? collections[0]?.slug;
 
   return (
     <SidebarDisplay
       collections={collections}
       initialCardStyle={preferences.collectionSidebarView ?? 'compact'}
-      initialSelectedId={effectiveCollectionId}
+      initialSelectedSlug={effectiveCollectionSlug}
       initialSortOption={preferences.collectionSidebarSort ?? 'name-asc'}
     />
   );

@@ -29,7 +29,7 @@ export const CONDITION_FILTER_OPTIONS = ['all', ...ENUMS.BOBBLEHEAD.CONDITION] a
  * Shared between server cache and client useQueryStates.
  */
 export const collectionDashboardParsers = {
-  collectionId: parseAsString,
+  collectionSlug: parseAsString,
   condition: parseAsStringEnum([...CONDITION_FILTER_OPTIONS]).withDefault('all'),
   featured: parseAsStringEnum([...FEATURED_FILTER_OPTIONS]).withDefault('all'),
   search: parseAsString.withDefault(''),
@@ -46,7 +46,7 @@ export const collectionDashboardSearchParamsCache = createSearchParamsCache(coll
  * Type for collection dashboard search params
  */
 export type CollectionDashboardSearchParams = {
-  collectionId: null | string;
+  collectionSlug: null | string;
   condition: (typeof CONDITION_FILTER_OPTIONS)[number];
   featured: (typeof FEATURED_FILTER_OPTIONS)[number];
   search: string;

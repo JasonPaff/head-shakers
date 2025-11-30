@@ -6,7 +6,7 @@ import { BOBBLEHEAD_SORT_OPTIONS, CONDITION_FILTER_OPTIONS, FEATURED_FILTER_OPTI
 
 export const Route = {
   searchParams: z.object({
-    collectionId: z.string().optional(),
+    collectionSlug: z.string().optional(),
     condition: z
       .enum([...CONDITION_FILTER_OPTIONS] as [string, ...Array<string>])
       .optional()
