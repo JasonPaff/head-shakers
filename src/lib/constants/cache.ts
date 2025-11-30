@@ -57,6 +57,12 @@ export const CACHE_CONFIG = {
     // feature-based tags
     FEATURED_CONTENT: 'featured-content',
     GLOBAL_STATS: 'global-stats',
+
+    // metadata-specific tags (for SEO metadata caching only)
+    METADATA_BOBBLEHEAD: (id: string) => `metadata:bobblehead:${id}`,
+    METADATA_COLLECTION: (id: string) => `metadata:collection:${id}`,
+    METADATA_USER: (id: string) => `metadata:user:${id}`,
+
     NEWSLETTER: 'newsletter',
     NEWSLETTER_SUBSCRIPTION: (email: string) => `newsletter:subscription:${email}`,
     PLATFORM_STATS: 'platform-stats',

@@ -17,7 +17,6 @@
 
 import { CACHE_CONFIG } from '@/lib/constants/cache';
 import { CacheService } from '@/lib/services/cache.service';
-import { CacheTagGenerators } from '@/lib/utils/cache-tags.utils';
 
 /**
  * Cache statistics for metadata operations
@@ -127,15 +126,15 @@ export async function batchCacheMetadata<T, TItem extends { id: string }>(
       switch (contentType) {
         case 'bobblehead':
           key = getBobbleheadMetadataKey(item.id);
-          tags = CacheTagGenerators.bobblehead.read(item.id);
+          tags = [CACHE_CONFIG.TAGS.METADATA_BOBBLEHEAD(item.id)];
           break;
         case 'collection':
           key = getCollectionMetadataKey(item.id);
-          tags = CacheTagGenerators.collection.read(item.id);
+          tags = [CACHE_CONFIG.TAGS.METADATA_COLLECTION(item.id)];
           break;
         case 'user':
           key = getUserMetadataKey(item.id);
-          tags = CacheTagGenerators.user.profile(item.id);
+          tags = [CACHE_CONFIG.TAGS.METADATA_USER(item.id)];
           break;
       }
 
@@ -311,13 +310,13 @@ export function invalidateMetadataCache(contentType: MetadataContentType, conten
   try {
     switch (contentType) {
       case 'bobblehead':
-        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.BOBBLEHEAD(contentId));
+        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.METADATA_BOBBLEHEAD(contentId));
         break;
       case 'collection':
-        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.COLLECTION(contentId));
+        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.METADATA_COLLECTION(contentId));
         break;
       case 'user':
-        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.USER(contentId));
+        CacheService.invalidateByTag(CACHE_CONFIG.TAGS.METADATA_USER(contentId));
         break;
     }
   } catch (error) {
@@ -393,15 +392,15 @@ export async function warmMetadataCache<T>(
       switch (contentType) {
         case 'bobblehead':
           key = getBobbleheadMetadataKey(id);
-          tags = CacheTagGenerators.bobblehead.read(id);
+          tags = [CACHE_CONFIG.TAGS.METADATA_BOBBLEHEAD(id)];
           break;
         case 'collection':
           key = getCollectionMetadataKey(id);
-          tags = CacheTagGenerators.collection.read(id);
+          tags = [CACHE_CONFIG.TAGS.METADATA_COLLECTION(id)];
           break;
         case 'user':
           key = getUserMetadataKey(id);
-          tags = CacheTagGenerators.user.profile(id);
+          tags = [CACHE_CONFIG.TAGS.METADATA_USER(id)];
           break;
       }
 
