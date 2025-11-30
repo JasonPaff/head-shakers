@@ -1,5 +1,3 @@
-'use client';
-
 import { LayoutListIcon, SearchIcon, SquareIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -43,8 +41,10 @@ export const SidebarSearch = ({
     <div className={'space-y-2 border-b bg-background/30 p-3 backdrop-blur-sm'} data-slot={'sidebar-search'}>
       <Input
         isClearable
-        leftIcon={<SearchIcon className={'size-4'} />}
-        onChange={(e) => onSearchChange?.(e.target.value)}
+        leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
+        onChange={(e) => {
+          onSearchChange?.(e.target.value);
+        }}
         onClear={onSearchClear}
         placeholder={'Search collections...'}
         value={searchValue}
@@ -64,7 +64,9 @@ export const SidebarSearch = ({
           <DropdownMenuLabel>Card Style</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuRadioGroup
-            onValueChange={(value) => onCardStyleChange(value as CollectionCardStyle)}
+            onValueChange={(value) => {
+              onCardStyleChange(value as CollectionCardStyle);
+            }}
             value={cardStyle}
           >
             <DropdownMenuRadioItem value={'compact'}>

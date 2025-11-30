@@ -9,9 +9,8 @@ type NoResultsProps = {
 export const NoResults = ({ onClearFilters }: NoResultsProps) => {
   return (
     <div
-      className={
-        'flex min-h-[400px] flex-col items-center justify-center rounded-lg border border-dashed bg-card p-8 text-center'
-      }
+      className={`flex min-h-[400px] flex-col items-center justify-center
+        rounded-lg border border-dashed bg-card p-8 text-center`}
       data-slot={'no-results'}
     >
       <SearchIcon aria-hidden className={'mb-4 size-12 text-muted-foreground/50'} />

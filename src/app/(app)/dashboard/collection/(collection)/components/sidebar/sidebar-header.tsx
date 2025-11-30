@@ -20,7 +20,7 @@ export const SidebarHeader = ({ onCreateClick }: SidebarHeaderProps) => {
         Collections
       </h2>
       <Button onClick={onCreateClick} size={'sm'}>
-        <PlusIcon className={'size-4'} />
+        <PlusIcon aria-hidden className={'size-4'} />
         New
       </Button>
     </div>

@@ -1,4 +1,4 @@
-'use client';
+import type { MouseEvent } from 'react';
 
 import { EditIcon } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export const CollectionCardCompact = ({
 
   const handleClick = () => onClick(id);
 
-  const handleEdit = (e: React.MouseEvent) => {
+  const handleEdit = (e: MouseEvent) => {
     e.stopPropagation();
     onEdit(id);
   };
@@ -83,7 +83,7 @@ export const CollectionCardCompact = ({
           size={'icon'}
           variant={'ghost'}
         >
-          <EditIcon className={'size-3.5'} />
+          <EditIcon aria-hidden className={'size-3.5'} />
         </Button>
       </div>
 

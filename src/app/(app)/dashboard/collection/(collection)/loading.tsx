@@ -1,7 +1,20 @@
+import { Fragment } from 'react';
+
 import { CollectionLayout } from './components/layout/collection-layout';
-import { MainContentSkeleton } from './components/skeleton/main-content-skeleton';
+import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
+import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
 import { SidebarSkeleton } from './components/skeleton/sidebar-skeleton';
 
 export default function CollectionLoading() {
-  return <CollectionLayout main={<MainContentSkeleton />} sidebar={<SidebarSkeleton />} />;
+  return (
+    <CollectionLayout
+      main={
+        <Fragment>
+          <CollectionHeaderSkeleton />
+          <BobbleheadContentSkeleton />
+        </Fragment>
+      }
+      sidebar={<SidebarSkeleton />}
+    />
+  );
 }

@@ -1,5 +1,3 @@
-'use client';
-
 import { EditIcon, MoreVerticalIcon, StarIcon, TrashIcon } from 'lucide-react';
 import { useMemo } from 'react';
 
@@ -65,14 +63,6 @@ export const BobbleheadCard = ({
   viewCount,
   year,
 }: BobbleheadCardProps) => {
-  const handleCheckboxChange = (checked: boolean) => {
-    onSelectionChange(id, checked);
-  };
-
-  const handleEdit = () => onEdit(id);
-  const handleDelete = () => onDelete(id);
-  const handleFeatureToggle = () => onFeatureToggle(id);
-
   const conditionColor = useMemo(() => {
     switch (condition) {
       case 'excellent':
@@ -91,6 +81,14 @@ export const BobbleheadCard = ({
         return 'bg-secondary text-secondary-foreground';
     }
   }, [condition]);
+
+  const handleCheckboxChange = (checked: boolean) => {
+    onSelectionChange(id, checked);
+  };
+
+  const handleEdit = () => onEdit(id);
+  const handleDelete = () => onDelete(id);
+  const handleFeatureToggle = () => onFeatureToggle(id);
 
   return (
     <div
@@ -126,7 +124,9 @@ export const BobbleheadCard = ({
                 <div className={'absolute top-2 right-2'}>
                   <div
                     className={'rounded-md bg-background/90 p-1.5 backdrop-blur-sm'}
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.stopPropagation();
@@ -162,7 +162,7 @@ export const BobbleheadCard = ({
                     <DropdownMenuContent align={'end'}>
                       <DropdownMenuItem onClick={handleFeatureToggle}>
                         <StarIcon aria-hidden className={'size-4'} />
-                        {isFeatured ? 'Unfeature' : 'Feature'}
+                        {isFeatured ? 'Un-feature' : 'Feature'}
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={handleDelete} variant={'destructive'}>

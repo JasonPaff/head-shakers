@@ -1,11 +1,8 @@
-import type { ReactNode } from 'react';
-
 import { cn } from '@/utils/tailwind-utils';
 
-type BobbleheadGridProps = {
-  children: ReactNode;
+type BobbleheadGridProps = Children<{
   gridDensity: 'comfortable' | 'compact';
-};
+}>;
 
 export const BobbleheadGrid = ({ children, gridDensity }: BobbleheadGridProps) => {
   const gridCols =

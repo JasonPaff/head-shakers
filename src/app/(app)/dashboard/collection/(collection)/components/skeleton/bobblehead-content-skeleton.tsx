@@ -1,13 +1,15 @@
 import { Fragment } from 'react';
 
 import { BobbleheadGridSkeleton } from './bobblehead-grid-skeleton';
-import { CollectionHeaderSkeleton } from './collection-header-skeleton';
 import { ToolbarSkeleton } from './toolbar-skeleton';
 
-export const MainContentSkeleton = () => {
+/**
+ * Combined skeleton for the bobblehead content area.
+ * Includes toolbar and grid skeletons (but not the collection header).
+ */
+export const BobbleheadContentSkeleton = () => {
   return (
     <Fragment>
-      <CollectionHeaderSkeleton />
       <ToolbarSkeleton />
       <BobbleheadGridSkeleton />
     </Fragment>

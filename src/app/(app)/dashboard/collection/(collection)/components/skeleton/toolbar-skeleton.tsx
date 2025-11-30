@@ -5,7 +5,7 @@ export const ToolbarSkeleton = () => {
     <div
       aria-busy={'true'}
       aria-label={'Loading toolbar'}
-      className={'m-4 mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}
+      className={'m-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'}
       data-slot={'toolbar-skeleton'}
       role={'status'}
     >

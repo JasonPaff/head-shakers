@@ -1,13 +1,10 @@
-import type { ReactNode } from 'react';
-
 import { cn } from '@/utils/tailwind-utils';
 
 import type { CollectionCardStyle } from './sidebar-search';
 
-type SidebarCollectionListProps = {
+type SidebarCollectionListProps = Children<{
   cardStyle: CollectionCardStyle;
-  children: ReactNode;
-};
+}>;
 
 export const SidebarCollectionList = ({ cardStyle, children }: SidebarCollectionListProps) => {
   return (

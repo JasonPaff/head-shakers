@@ -1,5 +1,3 @@
-'use client';
-
 import { MenuIcon, PlusIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -25,7 +23,7 @@ export const CollectionMobileHeader = ({
       data-slot={'mobile-header'}
     >
       <Button onClick={onMenuClick} size={'icon'} variant={'ghost'}>
-        <MenuIcon className={'size-5'} />
+        <MenuIcon aria-hidden className={'size-5'} />
         <span className={'sr-only'}>Open menu</span>
       </Button>
 

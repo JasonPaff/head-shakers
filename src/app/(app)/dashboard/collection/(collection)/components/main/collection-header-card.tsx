@@ -1,5 +1,3 @@
-'use client';
-
 import { EditIcon, HeartIcon, MoreVerticalIcon, SettingsIcon, ShareIcon, TrashIcon } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -71,7 +69,7 @@ export const CollectionHeaderCard = ({
                 <span className={'font-semibold text-primary'}>{formattedValue} total value</span>
                 <Separator className={'h-4'} orientation={'vertical'} />
                 <span>
-                  <HeartIcon className={'inline size-3.5'} /> {likeCount}
+                  <HeartIcon aria-hidden className={'inline size-3.5'} /> {likeCount}
                 </span>
                 <span>{viewCount} views</span>
               </div>

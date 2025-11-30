@@ -1,5 +1,3 @@
-'use client';
-
 import { CheckIcon, FilterIcon, GripVerticalIcon, LayoutListIcon, PlusIcon, SearchIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -67,7 +65,9 @@ export const Toolbar = ({
           <Input
             isClearable
             leftIcon={<SearchIcon aria-hidden className={'size-4'} />}
-            onChange={(e) => onSearchChange(e.target.value)}
+            onChange={(e) => {
+              onSearchChange(e.target.value);
+            }}
             onClear={onSearchClear}
             placeholder={'Search bobbleheads...'}
             value={searchValue}

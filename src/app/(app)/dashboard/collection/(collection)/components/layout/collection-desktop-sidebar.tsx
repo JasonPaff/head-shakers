@@ -1,10 +1,6 @@
-import type { ReactNode } from 'react';
-
 import { cn } from '@/utils/tailwind-utils';
 
-type CollectionDesktopSidebarProps = {
-  children: ReactNode;
-};
+type CollectionDesktopSidebarProps = Children;
 
 export const CollectionDesktopSidebar = ({ children }: CollectionDesktopSidebarProps) => {
   return (
