@@ -412,7 +412,7 @@ export class ContentReportsFacade {
           break;
         }
         case 'collection': {
-          const collection = await CollectionsQuery.findByIdAsync(targetId, context);
+          const collection = await CollectionsQuery.getByIdAsync(targetId, context);
           isTargetExists = !!collection;
 
           // prevent self-reporting

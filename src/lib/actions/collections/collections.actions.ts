@@ -2,6 +2,8 @@
 
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
+import { $path } from 'next-typesafe-url';
+import { revalidatePath } from 'next/cache';
 
 import type { CollectionRecord } from '@/lib/queries/collections/collections.query';
 import type { ActionResponse } from '@/lib/utils/action-response';
@@ -61,6 +63,7 @@ export const createCollectionAction = authActionClient
         }
 
         invalidateMetadataCache(CACHE_ENTITY_TYPE.COLLECTION, newCollection.id);
+        revalidatePath($path({ route: '/dashboard/collection' }));
         CacheRevalidationService.collections.onCreate(newCollection.id, ctx.userId, newCollection.slug);
 
         return actionSuccess(newCollection);

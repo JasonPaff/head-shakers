@@ -55,7 +55,7 @@ async function getEntitySlugByTypeAndId(
         return bobblehead?.slug;
       }
       case 'collection': {
-        const collection = await CollectionsQuery.findByIdAsync(targetId, publicContext);
+        const collection = await CollectionsQuery.getByIdAsync(targetId, publicContext);
         return collection?.slug;
       }
       default:
