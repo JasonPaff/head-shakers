@@ -34,8 +34,7 @@ declare module "@@@next-typesafe-url" {
     "/collections/[collectionSlug]/edit": StaticRoute;
     "/collections/[collectionSlug]/settings": StaticRoute;
     "/collections/[collectionSlug]/share": StaticRoute;
-    "/dashboard/feed": StaticRoute;
-    "/dashboard/notifications": StaticRoute;
+    "/dashboard/collection-demo": StaticRoute;
     "/settings/collections": StaticRoute;
     "/settings/data/export": StaticRoute;
     "/settings/data/import": StaticRoute;

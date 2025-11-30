@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 
+import { withParamValidation } from 'next-typesafe-url/app/hoc';
 import { Fragment, Suspense } from 'react';
+
+import type { PageProps } from '@/app/(app)/dashboard/collection/(collection)/route-type';
 
 import { ErrorBoundary } from '@/components/ui/error-boundary/error-boundary';
 
@@ -11,13 +14,19 @@ import { CollectionLayout } from './components/layout/collection-layout';
 import { BobbleheadContentSkeleton } from './components/skeleton/bobblehead-content-skeleton';
 import { CollectionHeaderSkeleton } from './components/skeleton/collection-header-skeleton';
 import { SidebarSkeleton } from './components/skeleton/sidebar-skeleton';
+import { Route } from './route-type';
 import { collectionDashboardSearchParamsCache } from './search-params';
 
-type CollectionPageProps = {
-  searchParams: Promise<Record<string, Array<string> | string | undefined>>;
-};
+type CollectionPageProps = PageProps;
 
-export default async function CollectionPage({ searchParams }: CollectionPageProps) {
+export function generateMetadata(): Metadata {
+  return {
+    description: 'Manage your bobblehead collections',
+    title: 'My Collection',
+  };
+}
+
+async function CollectionPage({ searchParams }: CollectionPageProps) {
   await collectionDashboardSearchParamsCache.parse(searchParams);
 
   return (
@@ -50,9 +59,4 @@ export default async function CollectionPage({ searchParams }: CollectionPagePro
   );
 }
 
-export function generateMetadata(): Metadata {
-  return {
-    description: 'Manage your bobblehead collections',
-    title: 'My Collection',
-  };
-}
+export default withParamValidation(CollectionPage, Route);
